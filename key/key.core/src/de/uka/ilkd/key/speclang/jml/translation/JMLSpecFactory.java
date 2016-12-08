@@ -451,15 +451,11 @@ public class JMLSpecFactory {
         clauses.infFlowSpecs = translateInfFlowSpecClauses(pm, progVars.selfVar,
                 progVars.paramVars, progVars.resultVar, progVars.excVar,
                 textualSpecCase.getInfFlowSpecs());
-        try {
-            clauses.joinProcedure = translateJoinProcedure(
-                    textualSpecCase.getJoinProcs(),
-                    textualSpecCase.getJoinParams());
-        }
-        catch (ParserException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+
+        clauses.joinProcedure = translateJoinProcedure(
+                textualSpecCase.getJoinProcs(),
+                textualSpecCase.getJoinParams());
+
         /*
          * if (clauses.joinProcedure instanceof JoinWithPredicateAbstraction)
          * ((JoinWithPredicateAbstraction)clauses.joinProcedure).setPredicates(
@@ -522,28 +518,21 @@ public class JMLSpecFactory {
         }
     }
 
-    private List<AbstractionPredicate> translateJoinParameters(String params)
-            throws SLTranslationException, ParserException {
-        // String predicatesString = joinPredicate.head().text.substring(15);
-
-        return AbstractionPredicate.fromString(params, services);
-
-    }
+   
 
     private JoinProcedure translateJoinProcedure(
             ImmutableList<PositionedString> originalClauses,
-            ImmutableList<PositionedString> joinPredicates)
-            throws SLTranslationException, ParserException {
+            ImmutableList<PositionedString> joinParams)
+            throws SLTranslationException {
         if (originalClauses == null || originalClauses.size() == 0) {
             return null;
         }
 
         // Extract the name of the join procedure: Remove beginning
         // <code>"join_proc<code> and trailing <code>;"</code>.
-
         String joinProcName = originalClauses.head().text.substring(11,
                 originalClauses.head().text.length() - 2);
-        
+
         JoinProcedure chosenProc = JoinProcedure
                 .getProcedureByName(joinProcName);
 
@@ -554,36 +543,63 @@ public class JMLSpecFactory {
                     originalClauses.head().pos);
 
         }
-
+        // maybe in the future it will be useful to create a field in
+        // JoinProcedure to know if it needs parameters
         if (chosenProc instanceof JoinWithPredicateAbstraction) {
-            if (joinPredicates == null) {
-                throw new SLTranslationException(
-                        "Abstraction Predicates are missing");
-            }
-            else {
-                String[] parameters = joinPredicates.head().text
-                        .substring(13, joinPredicates.head().text.length() - 1)
-                        .split("\" : ");
-
-               if (parameters.length != 2) {
             
-                throw new SLTranslationException("Unknown lattice type:",
-                        originalClauses.head().fileName,
+            if (joinParams == null) {
+                throw new SLTranslationException(
+                        "Parameters are missing", originalClauses.head().fileName,
                         originalClauses.head().pos);
             }
-
             else {
-
-                final JoinWithPredicateAbstractionFactory absPredicateFactory = (JoinWithPredicateAbstractionFactory) chosenProc;
-                chosenProc = absPredicateFactory.instantiate(
-                        translateJoinParameters(parameters[1]),
-                        translateLatticeType(parameters[0]),
-                        new LinkedHashMap<ProgramVariable, AbstractDomainElement>());
+               
+            try {
+                chosenProc = translateJoinByPredicateAbstraction(chosenProc, joinParams);
+            }
+            catch (ParserException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
             }
         }
 
         return chosenProc;
+    }
+
+    private JoinProcedure translateJoinByPredicateAbstraction(JoinProcedure joinProc,
+            ImmutableList<PositionedString> params) throws SLTranslationException, ParserException {
+      
+            // split the user input according to the structure defined for the
+            // join procedure.
+            // This only works for JoinByPredicateAbstraction: "latticeType" : abstract domains;
+            // abstract domains should have the form (sort placeholder, predicate)
+            // this also removes the " at the end of latticeType
+        // Extract the user input. Remove join_params and the ; at the end
+         String str = params.head().text.substring(13,
+                params.head().text.length() - 1);
+        
+            String[] parameters = str.split("\" : ");
+
+        if (parameters.length != 2) {
+
+            throw new SLTranslationException(
+                    "Parameters have the wrong format:", params.head().fileName,
+                    params.head().pos);
+        }
+
+        else {
+
+            Class<? extends AbstractPredicateAbstractionLattice> latticeType = translateLatticeType(
+                    parameters[0]);
+            List<AbstractionPredicate> predicates = AbstractionPredicate
+                    .fromString(parameters[1], services);
+            final JoinWithPredicateAbstractionFactory absPredicateFactory = (JoinWithPredicateAbstractionFactory) joinProc;
+            joinProc = absPredicateFactory.instantiate(predicates, latticeType,
+                    new LinkedHashMap<ProgramVariable, AbstractDomainElement>());
+        }
+
+        return joinProc;
     }
 
     private Class<? extends AbstractPredicateAbstractionLattice> translateLatticeType(

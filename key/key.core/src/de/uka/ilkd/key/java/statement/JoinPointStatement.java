@@ -3,18 +3,17 @@ package de.uka.ilkd.key.java.statement;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
-import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
+import de.uka.ilkd.key.rule.join.JoinProcedure;
 
 public class JoinPointStatement extends JavaStatement{
-    private BlockContractBuiltInRuleApp application;
+    private JoinProcedure joinProc;
     private String statement;
     private int num;
-    public JoinPointStatement() {
-        setStatement("JOIN_POINT");
-    }
-    public JoinPointStatement(final BlockContractBuiltInRuleApp application, int num) {
-        this.setApplication(application);
+  
+    public JoinPointStatement(JoinProcedure joinProc, int num) {
+        this.setJoinProc(joinProc);
         this.setNum(num);
+        setStatement("JOIN POINT " + num);
     }
     @Override
     public void visit(Visitor v) {
@@ -38,20 +37,25 @@ public class JoinPointStatement extends JavaStatement{
         this.statement = statement;
     }
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printJoinPoint();
+        p.printJoinPoint(num);
     }
-    public BlockContractBuiltInRuleApp getApplication() {
-        return application;
-    }
-    public void setApplication(BlockContractBuiltInRuleApp application) {
-        this.application = application;
-    }
+
     public int getNum() {
         return num;
     }
     public void setNum(int num) {
         this.num = num;
     }
+    public JoinProcedure getJoinProc() {
+        return joinProc;
+    }
+    public void setJoinProc(JoinProcedure joinProc) {
+        this.joinProc = joinProc;
+    }
     
+    public String toString(){
+        return statement;
+        
+    }
 
 }
