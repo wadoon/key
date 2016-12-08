@@ -23,7 +23,6 @@ import java.util.Map;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-
 /**
  * A Namespace keeps track of already used {@link Name}s and the objects
  * carrying these names. These objects have to implement the interface
@@ -96,6 +95,10 @@ public class Namespace<E extends Named> implements java.io.Serializable {
         if(sealed) {
             System.err.println("SEALED");
             throw new IllegalStateException("This namespace has been sealed; addition is not possible.");
+        }
+        
+        if(lookup(sym.name()) != null) {
+            System.err.println("Name already in namespace: " + sym.name().toString());
         }
 
         if (symbols == null) {
@@ -196,7 +199,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
 
     public Namespace<E> extended(Iterable<? extends E> ext) {
 	Namespace<E> result = new Namespace<E>(this);
-	result.addSafely(ext);
+	result.add(ext);
         return result;
     }
 
@@ -260,7 +263,7 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     public Namespace<E> copy() {
 	Namespace<E> copy = new Namespace<E>();
 	if(symbols != null)
-	    copy.addSafely(symbols.values());
+	    copy.add(symbols.values());
 	if(protocol != null) {
 	    copy.protocol = new LinkedHashMap<Name, E>(copy.protocol);
 	}
