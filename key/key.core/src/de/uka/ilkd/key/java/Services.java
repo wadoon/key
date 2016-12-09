@@ -21,12 +21,14 @@ import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.InnerVariableNamer;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.NameRecorder;
@@ -139,6 +141,13 @@ public class Services implements TermServices {
     			(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
     	nameRecorder = new NameRecorder();
     }
+
+//    public Services getOverlay(Namespace<IProgramVariable> programVars) {
+//        Services result = new Services(profile);
+//        result.counters = this.counters;
+//        // etc.
+//        result.namespaces = new NamespaceSet();
+//    }
 
 
     /**
