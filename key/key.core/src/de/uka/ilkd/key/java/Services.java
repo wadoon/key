@@ -21,14 +21,12 @@ import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.InnerVariableNamer;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.NameRecorder;
@@ -142,12 +140,27 @@ public class Services implements TermServices {
     	nameRecorder = new NameRecorder();
     }
 
-//    public Services getOverlay(Namespace<IProgramVariable> programVars) {
-//        Services result = new Services(profile);
-//        result.counters = this.counters;
-//        // etc.
-//        result.namespaces = new NamespaceSet();
-//    }
+    private Services(Services s) {
+        this.profile = s.profile;
+        this.proof = s.proof;
+        this.namespaces = s.namespaces;
+        this.cee = s.cee;
+        this.typeconverter = s.typeconverter;
+        this.javainfo = s.javainfo;
+        this.counters = s.counters;
+        this.specRepos = s.specRepos;
+        this.javaModel = s.javaModel;
+        this.nameRecorder = s.nameRecorder;
+        this.factory = s.factory;
+        this.caches = s.caches;
+        this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
+    }
+
+    public Services getOverlay(NamespaceSet namespaces) {
+        Services result = new Services(this);
+        result.setNamespaces(namespaces);
+        return result;
+    }
 
 
     /**
@@ -242,6 +255,10 @@ public class Services implements TermServices {
     	return s;
     }
     
+    public Services shallowCopy() {
+        return new Services(this);
+    }
+
     /**
      * Creates a deep copy of {@link #counters} which means that a new
      * list is created with a copy of each contained {@link Counter}.
