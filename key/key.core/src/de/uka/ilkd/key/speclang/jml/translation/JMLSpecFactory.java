@@ -13,7 +13,13 @@
 
 package de.uka.ilkd.key.speclang.jml.translation;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -22,7 +28,11 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.*;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.DisjunctivePredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -49,7 +59,6 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
@@ -88,7 +97,6 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
  * A factory for creating class invariants and operation contracts from textual
@@ -567,36 +575,33 @@ public class JMLSpecFactory {
         return chosenProc;
     }
 
-    private JoinProcedure translateJoinByPredicateAbstraction(JoinProcedure joinProc,
-            ImmutableList<PositionedString> params) throws SLTranslationException, ParserException {
-      
-            // split the user input according to the structure defined for the
-            // join procedure.
-            // This only works for JoinByPredicateAbstraction: "latticeType" : abstract domains;
-            // abstract domains should have the form (sort placeholder, predicate)
-            // this also removes the " at the end of latticeType
+    private JoinProcedure translateJoinByPredicateAbstraction(
+            JoinProcedure joinProc, ImmutableList<PositionedString> params)
+            throws SLTranslationException, ParserException {
+
+        // split the user input according to the structure defined for the
+        // join procedure.
+        // This only works for JoinByPredicateAbstraction:
+        // "latticeType : abstract domains";
+        // abstract domains should have the form (sort placeholder, predicate)
+        // this also removes the " at the end of latticeType
         // Extract the user input. Remove join_params and the ; at the end
-         String str = params.head().text.substring(13,
-                params.head().text.length() - 1);
-        
-            String[] parameters = str.split("\" : ");
 
-        if (parameters.length != 2) {
+        Pattern p = Pattern.compile("\"([^\"]+) : ([^\"]+)\"");
+        Matcher m = p.matcher(params.head().text);
 
-            throw new SLTranslationException(
-                    "Parameters have the wrong format:", params.head().fileName,
-                    params.head().pos);
-        }
-
-        else {
-
+        if (m.find()) {
             Class<? extends AbstractPredicateAbstractionLattice> latticeType = translateLatticeType(
-                    parameters[0]);
+                    m.group(1));
             List<AbstractionPredicate> predicates = AbstractionPredicate
-                    .fromString(parameters[1], services);
+                    .fromString(m.group(2), services);
             final JoinWithPredicateAbstractionFactory absPredicateFactory = (JoinWithPredicateAbstractionFactory) joinProc;
             joinProc = absPredicateFactory.instantiate(predicates, latticeType,
                     new LinkedHashMap<ProgramVariable, AbstractDomainElement>());
+        } else {
+            throw new SLTranslationException(
+                    "Parameters have the wrong format:", params.head().fileName,
+                    params.head().pos);
         }
 
         return joinProc;
