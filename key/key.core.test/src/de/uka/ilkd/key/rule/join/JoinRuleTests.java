@@ -89,6 +89,20 @@ public class JoinRuleTests extends TestCase {
     }
     
 
+
+    /**
+     * This test case tries to prove a simple method that computes the double of
+     * the absolute of a given Integer parameter. The absolute is computed twice
+     * in if blocks which contain a merge procedure JML specification.
+     */
+    @Test
+    public void testDoJMLSpecifiedPredAbstrProof() throws Exception {
+        final Proof proof = loadProof("doubleAbs.key");
+        startAutomaticStrategy(proof);
+        assertTrue(proof.closed());
+    }
+    
+
     /**
      * Runs the FullAutoPilotWithJMLSpecJoinsProofMacro on the problem with join
      * blocks specified in JML, following by an automatic strategy finish. At
