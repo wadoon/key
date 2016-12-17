@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -34,6 +35,8 @@ import de.uka.ilkd.key.proof.Proof;
 public class ScriptView extends JPanel implements ActionListener {
 
     private static final Map<String, ProofScriptCommand> COMMANDS = loadCommands();
+
+    private static final Map<String, String> SKIP = Collections.singletonMap("#1", "skip");
     
     private JTextArea textArea;
     private KeYMediator mediator;
@@ -114,6 +117,10 @@ public class ScriptView extends JPanel implements ActionListener {
 
         try {
             mediator.stopInterface(true);
+            if(oldroot != null) {
+                oldroot.dump(0);
+                newroot.dump(0);
+            }
             compareAndAct(newroot, oldroot);
             oldroot = newroot;
         } finally {
@@ -127,15 +134,27 @@ public class ScriptView extends JPanel implements ActionListener {
             Iterator<ScriptNode> nIt = newnode.getChildren().iterator();
             Iterator<ScriptNode> oIt = oldnode.getChildren().iterator();
             while(oIt.hasNext() && nIt.hasNext()) {
-                compareAndAct(nIt.next(), oIt.next());
+                ScriptNode n = nIt.next();
+                ScriptNode o = oIt.next();
+                n.setProofNode(o.getProofNode());
+                compareAndAct(n, o);
             }
-            if(oIt.hasNext() || nIt.hasNext()) {
-                throw new ScriptException("mismatched arity");
+            while(oIt.hasNext()) {
+                // old node has more than new node: prune these
+                mediator.setBack(oIt.next().getProofNode());
+            }
+            while(nIt.hasNext()) {
+                // XXX This is not good and will definitely fail.
+                // new node has more than old node: go into these too.
+                compareAndAct(nIt.next(), null);
             }
             
         } else {
 
             Node node = newnode.getProofNode();
+            if(node == null) {
+                node = oldnode.getProofNode();
+            }
             mediator.setBack(node);
             
             Goal g = null;
@@ -161,12 +180,24 @@ public class ScriptView extends JPanel implements ActionListener {
             
             List<Node> leaves = new ArrayList<Node>();
             findLeaves(node, leaves);
+            leaves.remove(node);
             List<ScriptNode> children = newnode.getChildren();
             
-            if(children.size() != 0 && children.size() != leaves.size()) {
-                throw new ScriptException("Command " + argMap.get("#literal") + 
-                        " requires " + leaves.size() + 
-                        " children, but received " + children.size());
+//            if(children.size() != 0 && children.size() != leaves.size()) {
+//                throw new ScriptException("Command " + argMap.get("#literal") + 
+//                        " requires " + leaves.size() + 
+//                        " children, but received " + children.size());
+//            }
+            
+            if(children.size() > leaves.size()) {
+              throw new ScriptException("Command " + argMap.get("#literal") + 
+                      " requires " + leaves.size() + 
+                      " children, but received " + children.size());
+          }
+            
+            while(children.size() < leaves.size()) {
+                // Adding phantom skip nodes ...
+                children.add(new ScriptNode(SKIP, -1, -1));
             }
             
             for(int i=0; i < children.size(); i++) {
@@ -186,7 +217,7 @@ public class ScriptView extends JPanel implements ActionListener {
             node = node.child(0);
         }
         
-        if(node.leaf())
+        if(node.leaf() && !node.isClosed())
             leaves.add(node);
         
         for (Node child : node.children()) {
