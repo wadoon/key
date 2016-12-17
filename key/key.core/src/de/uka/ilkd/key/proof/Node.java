@@ -375,6 +375,10 @@ public class Node  {
 	return new NodeIterator(getLeaves().iterator());
     }
 
+    public List<Node> children() {
+        return Collections.unmodifiableList(children);
+    }
+
     /** returns an iterator for the direct children of this node.
      */
     public Iterator<Node> childrenIterator() {
