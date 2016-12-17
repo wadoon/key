@@ -85,6 +85,10 @@ public class MainWindowTabbedPane extends JTabbedPane {
         setSelectedIndex(0);
         setPreferredSize(new java.awt.Dimension(250, 440));
 
+        // proof script view
+        ScriptView scriptView = new ScriptView(mediator, mainWindow);
+        addTab("Script", null, scriptView, "Proof script");
+
         // change some key mappings which collide with font settings.
         getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .getParent().remove(
