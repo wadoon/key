@@ -8,6 +8,7 @@ import java.util.Map;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
@@ -83,6 +84,10 @@ public abstract class AbstractCommand implements ProofScriptCommand {
     }
 
     final protected static Term toTerm(Proof proof, Map<String, Object> state, String string, Sort sort) throws ParserException, ScriptException {
+        return toTerm(proof, null, state, string, sort);
+    }
+
+    final protected static Term toTerm(Proof proof, Goal goal, Map<String, Object> state, String string, Sort sort) throws ParserException, ScriptException {
 
         AbbrevMap abbrMap = (AbbrevMap)state.get(ABBREV_KEY);
         if(abbrMap == null) {
@@ -91,7 +96,15 @@ public abstract class AbstractCommand implements ProofScriptCommand {
 
         StringReader reader = new StringReader(string);
         Services services = proof.getServices();
-        Term formula = PARSER.parse(reader, sort, services, services.getNamespaces(), abbrMap);
+
+        NamespaceSet nss;
+        if(goal == null) {
+            nss = services.getNamespaces();
+        } else {
+            nss = goal.getLocalNamespaces();
+        }
+
+        Term formula = PARSER.parse(reader, sort, services, nss, abbrMap);
         return formula;
     }
 
