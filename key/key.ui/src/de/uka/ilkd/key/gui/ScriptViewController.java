@@ -1,115 +1,60 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Font;
-import java.awt.Point;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.macros.scripts.*;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.List;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
+import java.util.*;
 
-import javax.swing.JButton;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
+/**
+ * Created by sarah on 12/20/16.
+ */
+public class ScriptViewController implements ActionListener{
+    private static final Map<String, ProofScriptCommand> COMMANDS = loadCommands();
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.macros.scripts.AbstractCommand;
-import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
-import de.uka.ilkd.key.macros.scripts.ScriptException;
-import de.uka.ilkd.key.macros.scripts.ScriptNode;
-import de.uka.ilkd.key.macros.scripts.ScriptTreeParser;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
+    private static final Map<String, String> SKIP = Collections.singletonMap("#1", "skip");
 
-@SuppressWarnings("serial")
-public class ScriptView extends JPanel{
-
-//    private static final Map<String, ProofScriptCommand> COMMANDS = loadCommands();
-
-//    private static final Map<String, String> SKIP = Collections.singletonMap("#1", "skip");
-
-    private JTextArea textArea;
-    //private KeYMediator mediator;
+  //  private JTextArea textArea;
+    private KeYMediator mediator;
     private MainWindow mainWindow;
-    private JButton b;
 
-    public JTextArea getTextArea() {
-        return textArea;
-    }
+    private ScriptNode oldroot;
+    private Proof associatedProof;
 
-    public JButton getB() {
-        return b;
-    }
-
-    public JButton getP() {
-        return p;
-    }
-
-    public JButton getG() {
-        return g;
-    }
-
-    private JButton p;
-    private JButton g;
-
-    //  private ScriptNode oldroot;
-    //private Proof associatedProof;
-
-    public ScriptView(KeYMediator mediator, MainWindow mainWindow) {
-      //  this.mediator = mediator;
+    private ScriptView view;
+    public ScriptViewController(ScriptView scriptView, KeYMediator mediator, MainWindow mainWindow) {
+        this.mediator = mediator;
         this.mainWindow = mainWindow;
+        this.view = scriptView;
         init();
     }
 
     private void init() {
-        setLayout(new BorderLayout());
-        {
-            JToolBar bar = new JToolBar();
-            bar.setFloatable(false);
-            {
-                b = new JButton("R");
-                b.setActionCommand("reset");
-                //  b.addActionListener(this);
-                bar.add(b);
-            }
-            {
-                p = new JButton("P");
-                p.setActionCommand("parse");
-                //b.addActionListener(this);
-                bar.add(p);
-            }
-            {
-                g = new JButton("G");
-                g.setActionCommand("goto");
-                //b.addActionListener(this);
-                bar.add(g);
-            }
-            add(bar, BorderLayout.NORTH);
+        view.getP().addActionListener(this);
+        view.getG().addActionListener(this);
+        view.getB().addActionListener(this);
+        view.getTextArea().addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    if(SwingUtilities.isRightMouseButton(e)) {
+                        int pos = view.getTextArea().viewToModel(e.getPoint());
+                        textPopup(e.getPoint(), pos);
+                    }
+                }
+            });
         }
-        {
-            textArea = new JTextArea();
-            textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-            add(new JScrollPane(textArea), BorderLayout.CENTER);
-
-        }
-    }
 
 
-/*
     protected void textPopup(Point p, final int pos) {
         final ScriptNode node;
         if(oldroot != null) {
@@ -146,6 +91,7 @@ public class ScriptView extends JPanel{
                 m.setEnabled(false);
             }
             m.addActionListener(new ActionListener() {
+                JTextArea textArea = view.getTextArea();
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     textArea.setCaretPosition(pos);
@@ -182,24 +128,23 @@ public class ScriptView extends JPanel{
             });
             pm.add(m);
         }
-        pm.show(textArea, p.x, p.y);
+        pm.show(view.getTextArea(), p.x, p.y);
     }
-*/
 
-/*    @Override
+    @Override
     public void actionPerformed(ActionEvent e) {
         try {
             switch(e.getActionCommand()) {
-            case "reset":
-                reset();
-                break;
-            case "parse":
-                parse();
-                break;
-            case "goto":
-                goTo();
-                break;
-            default: throw new Error();
+                case "reset":
+                    reset();
+                    break;
+                case "parse":
+                    parse();
+                    break;
+                case "goto":
+                    goTo();
+                    break;
+                default: throw new Error();
             }
         } catch (Exception ex) {
             ExceptionDialog.showDialog(mainWindow, ex);
@@ -215,7 +160,7 @@ public class ScriptView extends JPanel{
         if(associatedProof != mediator.getSelectedProof())
             throw new ScriptException("wrong proof selcted");
 
-        ScriptNode newroot = ScriptTreeParser.parse(new StringReader(textArea.getText()));
+        ScriptNode newroot = ScriptTreeParser.parse(new StringReader(view.getTextArea().getText()));
         newroot.setProofNode(associatedProof.root());
 
         try {
@@ -281,10 +226,10 @@ public class ScriptView extends JPanel{
                 newnode.clearChildren();
             }
 
-            List<Node> leaves = new ArrayList<Node>();
+            java.util.List<Node> leaves = new ArrayList<Node>();
             findLeaves(node, leaves);
             leaves.remove(node);
-            List<ScriptNode> children = newnode.getChildren();
+            java.util.List<ScriptNode> children = newnode.getChildren();
 
 //            if(children.size() != 0 && children.size() != leaves.size()) {
 //                throw new ScriptException("Command " + argMap.get("#literal") +
@@ -293,10 +238,10 @@ public class ScriptView extends JPanel{
 //            }
 
             if(children.size() > leaves.size()) {
-              throw new ScriptException("Command " + argMap.get("#literal") +
-                      " requires " + leaves.size() +
-                      " children, but received " + children.size());
-          }
+                throw new ScriptException("Command " + argMap.get("#literal") +
+                        " requires " + leaves.size() +
+                        " children, but received " + children.size());
+            }
 
             while(children.size() < leaves.size()) {
                 // Adding phantom skip nodes ...
@@ -314,7 +259,7 @@ public class ScriptView extends JPanel{
 
     }
 
-    private void findLeaves(Node node, List<Node> leaves) {
+    private void findLeaves(Node node, java.util.List<Node> leaves) {
 
         while(node.childrenCount() == 1) {
             node = node.child(0);
@@ -329,7 +274,7 @@ public class ScriptView extends JPanel{
     }
 
     private void goTo() {
-        int pos = textArea.getCaretPosition();
+        int pos = view.getTextArea().getCaretPosition();
         if(oldroot == null)
             ExceptionDialog.showDialog(mainWindow, new Exception("There is currently no parsed script tree to browse."));
         ScriptNode snode = getNodeAtPos(oldroot, pos);
@@ -365,7 +310,7 @@ public class ScriptView extends JPanel{
         }
 
         return result;
-    }*/
+    }
 
 
 }
