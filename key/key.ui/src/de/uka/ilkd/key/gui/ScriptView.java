@@ -5,6 +5,8 @@ import java.awt.Font;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -25,6 +27,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.macros.scripts.AbstractCommand;
@@ -81,7 +84,31 @@ public class ScriptView extends JPanel implements ActionListener {
             add(bar, BorderLayout.NORTH);
         }
         {
-            textArea = new JTextArea();
+            textArea = new JTextArea() {
+                @Override
+                public String getToolTipText(MouseEvent e) {
+                    int pos = viewToModel(e.getPoint());
+                    if (oldroot != null) {
+                        ScriptNode node = getNodeAtPos(oldroot, pos);
+                        if (node != null) {
+                            StringBuilder sb = new StringBuilder();
+                            if (node.getProofNode() != null)
+                                sb.append("\u2192" + node.getProofNode().serialNr());
+                            else
+                                sb.append("X");
+                            if (node.getEncounteredException() != null) {
+                                sb.append(" ").append(node.getEncounteredException().getMessage());
+                            }
+                            return sb.toString();
+                        } else {
+                            return "no node";
+                        }
+                    } else {
+                        return "not parsed yet";
+                    }
+                }
+            };
+            ToolTipManager.sharedInstance().registerComponent(textArea);
             textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
             add(new JScrollPane(textArea), BorderLayout.CENTER);
             textArea.addMouseListener(new MouseAdapter() {
@@ -90,6 +117,22 @@ public class ScriptView extends JPanel implements ActionListener {
                     if(SwingUtilities.isRightMouseButton(e)) {
                         int pos = textArea.viewToModel(e.getPoint());
                         textPopup(e.getPoint(), pos);
+                    }
+                }
+            });
+            textArea.addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyTyped(KeyEvent e) {
+                    if(e.getKeyCode() == KeyEvent.VK_ENTER && e.isControlDown()) {
+                        if(e.isShiftDown()) {
+                            goTo();
+                        } else {
+                            try {
+                                parse();
+                            } catch (Exception ex) {
+                                ExceptionDialog.showDialog(mainWindow, ex);
+                            }
+                        }
                     }
                 }
             });
@@ -111,6 +154,7 @@ public class ScriptView extends JPanel implements ActionListener {
                 m.setEnabled(false);
             }
             m.addActionListener(new ActionListener() {
+                @Override
                 public void actionPerformed(ActionEvent e) {
                     ExceptionDialog.showDialog(mainWindow, node.getEncounteredException());
                 }
