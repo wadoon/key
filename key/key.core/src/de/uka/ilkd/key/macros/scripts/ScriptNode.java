@@ -13,6 +13,7 @@ public class ScriptNode {
     private int toPos;
     private List<ScriptNode> children = new LinkedList<>();
     private Node proofNode;
+    private Throwable encounteredException;
 
     public ScriptNode(Map<String, String> command, int fromPos, int toPos) {
         this.command = command;
@@ -61,6 +62,14 @@ public class ScriptNode {
     
     public void clearChildren() {
         children.clear();
+    }
+
+    public Throwable getEncounteredException() {
+        return encounteredException;
+    }
+
+    public void setEncounteredException(Throwable encounteredException) {
+        this.encounteredException = encounteredException;
     }
 
 }
