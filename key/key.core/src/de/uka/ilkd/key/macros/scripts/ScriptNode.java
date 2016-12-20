@@ -59,5 +59,9 @@ public class ScriptNode {
         return toPos;
     }
     
+    public void clearChildren() {
+        children.clear();
+    }
+
 }
 
