@@ -8,13 +8,10 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Deque;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.ServiceLoader;
 
 import javax.swing.JButton;
@@ -176,7 +173,13 @@ public class ScriptView extends JPanel implements ActionListener {
 
             HashMap<String, Object> state = new HashMap<String, Object>();
             state.put(AbstractCommand.GOAL_KEY, node);
+            try {
             command.execute(mediator.getUI(), associatedProof, argMap, state);
+            } catch (ScriptException e) {
+                ExceptionDialog.showDialog(mainWindow, new Exception("intermed. local error:" + e.getMessage(), e));
+                associatedProof.pruneProof(node);
+                newnode.clearChildren();
+            }
             
             List<Node> leaves = new ArrayList<Node>();
             findLeaves(node, leaves);
@@ -227,6 +230,8 @@ public class ScriptView extends JPanel implements ActionListener {
 
     private void goTo() {
         int pos = textArea.getCaretPosition();
+        if(oldroot == null)
+            ExceptionDialog.showDialog(mainWindow, new Exception("There is currently no parsed script tree to browse."));
         goTo(oldroot, pos);
     }
 
