@@ -88,7 +88,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
         // proof script view
         ScriptView scriptView = new ScriptView(mediator, mainWindow);
         addTab("Script", null, scriptView, "Proof script");
-
+        ScriptViewController svc = new ScriptViewController(scriptView, mediator, mainWindow);
         // change some key mappings which collide with font settings.
         getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .getParent().remove(
