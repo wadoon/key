@@ -1,20 +1,39 @@
 package de.uka.ilkd.key.gui;
 
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.macros.scripts.*;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.List;
+import java.awt.BorderLayout;
+import java.awt.Font;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.ServiceLoader;
+
+import javax.swing.JButton;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
+
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.macros.scripts.AbstractCommand;
+import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
+import de.uka.ilkd.key.macros.scripts.ScriptException;
+import de.uka.ilkd.key.macros.scripts.ScriptNode;
+import de.uka.ilkd.key.macros.scripts.ScriptTreeParser;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 
 /**
  * Created by sarah on 12/20/16.
@@ -31,28 +50,85 @@ public class ScriptViewController implements ActionListener{
     private ScriptNode oldroot;
     private Proof associatedProof;
 
-    private ScriptView view;
-    public ScriptViewController(ScriptView scriptView, KeYMediator mediator, MainWindow mainWindow) {
+    private JPanel view;
+    private JTextArea textArea;
+
+    public ScriptViewController(KeYMediator mediator, MainWindow mainWindow) {
         this.mediator = mediator;
         this.mainWindow = mainWindow;
-        this.view = scriptView;
-        init();
+        initPanel();
     }
 
-    private void init() {
-        view.getP().addActionListener(this);
-        view.getG().addActionListener(this);
-        view.getB().addActionListener(this);
-        view.getTextArea().addMouseListener(new MouseAdapter() {
+    @SuppressWarnings("serial")
+    private void initPanel() {
+        view = new JPanel(new BorderLayout());
+        {
+            JToolBar bar = new JToolBar();
+            bar.setFloatable(false);
+            {
+                JButton b = new JButton("R");
+                b.setActionCommand("reset");
+                b.addActionListener(this);
+                bar.add(b);
+            }
+            {
+                JButton p = new JButton("P");
+                p.setActionCommand("parse");
+                p.addActionListener(this);
+                bar.add(p);
+            }
+            {
+                JButton g = new JButton("G");
+                g.setActionCommand("goto");
+                g.addActionListener(this);
+                bar.add(g);
+            }
+            view.add(bar, BorderLayout.NORTH);
+        }
+        {
+            textArea = new JTextArea() {
+                @Override
+                public String getToolTipText(MouseEvent e) {
+                    int pos = viewToModel(e.getPoint());
+                    if (oldroot != null) {
+                        ScriptNode node = getNodeAtPos(oldroot, pos);
+                        if (node != null) {
+                            StringBuilder sb = new StringBuilder();
+                            if (node.getProofNode() != null)
+                                sb.append("\u2192" + node.getProofNode().serialNr());
+                            else
+                                sb.append("X");
+                            if (node.getEncounteredException() != null) {
+                                sb.append(" ").append(node.getEncounteredException().getMessage());
+                            }
+                            return sb.toString();
+                        } else {
+                            return "no node";
+                        }
+                    } else {
+                        return "not parsed yet";
+                    }
+                }
+            };
+            ToolTipManager.sharedInstance().registerComponent(textArea);
+
+            textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+            view.add(new JScrollPane(textArea), BorderLayout.CENTER);
+            textArea.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     if(SwingUtilities.isRightMouseButton(e)) {
-                        int pos = view.getTextArea().viewToModel(e.getPoint());
+                        int pos = textArea.viewToModel(e.getPoint());
                         textPopup(e.getPoint(), pos);
                     }
                 }
             });
         }
+    }
+
+    public JPanel getPanel() {
+        return view;
+    }
 
 
     protected void textPopup(Point p, final int pos) {
@@ -91,7 +167,6 @@ public class ScriptViewController implements ActionListener{
                 m.setEnabled(false);
             }
             m.addActionListener(new ActionListener() {
-                JTextArea textArea = view.getTextArea();
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     textArea.setCaretPosition(pos);
@@ -128,7 +203,7 @@ public class ScriptViewController implements ActionListener{
             });
             pm.add(m);
         }
-        pm.show(view.getTextArea(), p.x, p.y);
+        pm.show(textArea, p.x, p.y);
     }
 
     @Override
@@ -160,7 +235,7 @@ public class ScriptViewController implements ActionListener{
         if(associatedProof != mediator.getSelectedProof())
             throw new ScriptException("wrong proof selcted");
 
-        ScriptNode newroot = ScriptTreeParser.parse(new StringReader(view.getTextArea().getText()));
+        ScriptNode newroot = ScriptTreeParser.parse(new StringReader(textArea.getText()));
         newroot.setProofNode(associatedProof.root());
 
         try {
@@ -231,11 +306,11 @@ public class ScriptViewController implements ActionListener{
             leaves.remove(node);
             java.util.List<ScriptNode> children = newnode.getChildren();
 
-//            if(children.size() != 0 && children.size() != leaves.size()) {
-//                throw new ScriptException("Command " + argMap.get("#literal") +
-//                        " requires " + leaves.size() +
-//                        " children, but received " + children.size());
-//            }
+            //            if(children.size() != 0 && children.size() != leaves.size()) {
+            //                throw new ScriptException("Command " + argMap.get("#literal") +
+            //                        " requires " + leaves.size() +
+            //                        " children, but received " + children.size());
+            //            }
 
             if(children.size() > leaves.size()) {
                 throw new ScriptException("Command " + argMap.get("#literal") +
@@ -274,7 +349,7 @@ public class ScriptViewController implements ActionListener{
     }
 
     private void goTo() {
-        int pos = view.getTextArea().getCaretPosition();
+        int pos = textArea.getCaretPosition();
         if(oldroot == null)
             ExceptionDialog.showDialog(mainWindow, new Exception("There is currently no parsed script tree to browse."));
         ScriptNode snode = getNodeAtPos(oldroot, pos);
@@ -311,6 +386,5 @@ public class ScriptViewController implements ActionListener{
 
         return result;
     }
-
 
 }
