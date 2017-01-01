@@ -3,21 +3,16 @@ package de.uka.ilkd.key.rule.join;
 import java.io.File;
 
 import org.junit.Test;
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.JoinPointStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 import junit.framework.TestCase;
@@ -32,7 +27,21 @@ public class JoinPointRuleTests extends TestCase {
 
     @Test
     public void testJoinPointStatement() {
-        final Proof proof = loadProof("absBlockContract.key");
+        final Proof proof = loadProof("AbsBlockContract.ITE.proof");
+        startAutomaticStrategy(proof);
+        assertTrue(proof.closed());
+    }
+
+    @Test
+    public void testNestedJoinBlockContract1() {
+        final Proof proof = loadProof("AbsBlockContract.nested.1.proof");
+        startAutomaticStrategy(proof);
+        assertTrue(proof.closed());
+    }
+
+    @Test
+    public void testNestedJoinBlockContract2() {
+        final Proof proof = loadProof("AbsBlockContract.nested.2.proof");
         startAutomaticStrategy(proof);
         assertTrue(proof.closed());
     }
@@ -45,7 +54,7 @@ public class JoinPointRuleTests extends TestCase {
         Node nodeBefore = proof.openGoals().head().node();
 
         startAutomaticStrategy(proof);
-     
+
         assertTrue(proof.openGoals().head().appliedRuleApps()
                 .head() instanceof BlockContractBuiltInRuleApp);
 
@@ -56,31 +65,33 @@ public class JoinPointRuleTests extends TestCase {
                 .equals(nodeBefore.sequent().antecedent()));
         assertTrue(nodeAfter.sequent().succedent().size() == nodeBefore
                 .sequent().succedent().size());
-        
-        checkJavaBlocks(nodeAfter, nodeBefore);
+
+        checkJavaBlocks(nodeBefore, nodeAfter);
 
     }
-    
+
     @Test
     public void testJoinPointRuleApp() {
-        final Proof proof = loadProof("absBlockContract.beforeJoinPointRule.key");
-        
+        final Proof proof = loadProof(
+                "absBlockContract.beforeJoinPointRule.key");
+
         startAutomaticStrategy(proof);
-        System.out.println(proof.openGoals());
-        assertTrue(proof.openGoals().head().appliedRuleApps()
-                .tail().head() instanceof JoinPointBuiltInRuleApp);
-        
+        assertTrue(proof.openGoals().head().appliedRuleApps().tail()
+                .head() instanceof JoinPointBuiltInRuleApp);
+
         assertTrue(proof.openGoals().head().appliedRuleApps()
                 .head() instanceof JoinRuleBuiltInRuleApp);
-       
+
     }
+
     @Test
     public void testRemoveJPS() {
-        final Proof proof = loadProof("absBlockContract.beforeDelete.key");
+        final Proof proof = loadProof("AbsBlockContract.beforeDelete.proof");
         Node nodeBefore = proof.openGoals().head().node();
 
         startAutomaticStrategy(proof);
-        System.out.println(proof.openGoals());
+        startAutomaticStrategy(proof); 
+        startAutomaticStrategy(proof);
         assertTrue(proof.openGoals().head().appliedRuleApps()
                 .head() instanceof DeleteJoinPointBuiltInRuleApp);
 
@@ -91,47 +102,40 @@ public class JoinPointRuleTests extends TestCase {
                 .equals(nodeBefore.sequent().antecedent()));
         assertTrue(nodeAfter.sequent().succedent().size() == nodeBefore
                 .sequent().succedent().size());
-        
-        checkJavaBlocks(nodeBefore, nodeAfter);
-    }
-    
-    private void checkJavaBlocks(Node a, Node b){
-        for (int i = 0; i < b.sequent().succedent().size(); i++) {
-            Term termA = a.sequent().succedent().get(i).formula();
-            Term termB = b.sequent().succedent().get(i).formula();
-            
-            if (termB.isContainsJavaBlockRecursive()) {
 
-                if (!JoinRuleUtils.getJavaBlockRecursive(termB).equals(
-                        JoinRuleUtils.getJavaBlockRecursive(termA))) {
-                    
-                    JavaProgramElement jPA = JoinRuleUtils
-                            .getJavaBlockRecursive(termA).program();
-                    JavaProgramElement jPB = JoinRuleUtils
-                            .getJavaBlockRecursive(termB).program();
-                    
-                    ImmutableArray<? extends Statement> bodyA = ((StatementBlock) jPA)
-                            .getBody();
-                    ImmutableArray<? extends Statement> bodyB = ((StatementBlock) jPB)
-                            .getBody();
-                    
-                    StatementBlock innerBlockA = ((MethodFrame) bodyA
-                            .get(0).getFirstElement()).getBody();
-                    StatementBlock innerBlockB= ((MethodFrame) bodyB
-                            .get(0).getFirstElement()).getBody();
-                    
-                    assertTrue(innerBlockA
-                            .getChildCount() == innerBlockB.getChildCount()
+        checkJavaBlocks(nodeAfter, nodeBefore);
+    }
+
+    private void checkJavaBlocks(Node withoutJP, Node withJP) {
+        for (int i = 0; i < withJP.sequent().succedent().size(); i++) {
+            Term termWithoutJP = withoutJP.sequent().succedent().get(i).formula();
+            Term termWithJP = withJP.sequent().succedent().get(i).formula();
+
+            if (termWithJP.isContainsJavaBlockRecursive()) {
+
+                if (!JoinRuleUtils.getJavaBlockRecursive(termWithJP).equals(
+                        JoinRuleUtils.getJavaBlockRecursive(termWithoutJP))) {
+
+                    JavaProgramElement jPWithoutJP = JoinRuleUtils
+                            .getJavaBlockRecursive(termWithoutJP).program();
+                    JavaProgramElement jPWithJP = JoinRuleUtils
+                            .getJavaBlockRecursive(termWithJP).program();
+
+                    StatementBlock blockWithoutJP = ((StatementBlock) jPWithoutJP)
+                            .getInnerMostMethodFrame().getBody();
+                    StatementBlock blockWithJP = ((StatementBlock) jPWithJP)
+                            .getInnerMostMethodFrame().getBody();
+
+                    assertTrue(blockWithJP
+                            .getChildCount() == blockWithoutJP.getChildCount()
                                     + 1);
 
-                    for (int j = 0; j < innerBlockA.getChildCount(); j++) {
-                        if (!innerBlockB.getChildAt(i)
-                                .equals(innerBlockB.getChildAt(i))) {
-                            assertTrue(innerBlockA
-                                    .getChildAt(i) instanceof JoinPointStatement
-                                    || innerBlockB.getChildAt(
-                                            i) instanceof JoinPointStatement);
-                            checkTheRest(innerBlockA, innerBlockB, i);
+                    for (int j = 0; j < blockWithoutJP.getChildCount(); j++) {
+                        if (!blockWithoutJP.getChildAt(j)
+                                .equals(blockWithJP.getChildAt(j))) {
+                            assertTrue(blockWithJP.getChildAt(
+                                    j) instanceof JoinPointStatement);
+                            restIsEqual(blockWithoutJP, blockWithJP, j);
                             break;
                         }
                     }
@@ -141,11 +145,11 @@ public class JoinPointRuleTests extends TestCase {
         }
     }
 
-    private void checkTheRest(StatementBlock innerBlockAfter,
-            StatementBlock innerBlockBefore, int i) {
-        for (int j = i; j < innerBlockBefore.getChildCount(); j++) {
-            assertTrue(innerBlockAfter.getChildAt(j + 1)
-                    .equals(innerBlockBefore.getChildAt(j)));
+    private void restIsEqual(StatementBlock blockA,
+            StatementBlock blockB, int i) {
+        for (int j = i; j < blockA.getChildCount(); j++) {
+            assertTrue(blockA.getChildAt(j)
+                    .equals(blockB.getChildAt(j + 1)));
         }
     }
 
@@ -154,7 +158,6 @@ public class JoinPointRuleTests extends TestCase {
         starter.init(proof);
         starter.start();
     }
-
 
     static Proof loadProof(String proofFileName) {
         File proofFile = new File(TEST_RESOURCES_DIR_PREFIX + proofFileName);

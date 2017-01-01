@@ -39,10 +39,13 @@ import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowBlockContractTacletBuilder;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.NotEquals;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.IExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
@@ -50,12 +53,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.Transformer;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -85,7 +83,7 @@ public class BlockContractRule implements BuiltInRule {
 
     private static Term lastFocusTerm;
     private static Instantiation lastInstantiation;
-    
+
     private int joinblockCount = 0;
 
     public static Instantiation instantiate(final Term formula, final Goal goal,
@@ -441,8 +439,7 @@ public class BlockContractRule implements BuiltInRule {
         assert application instanceof BlockContractBuiltInRuleApp;
 
         if (((BlockContractBuiltInRuleApp) application).getContract()
-                .getJoinProcedure() != null){
-            joinblockCount =+ 1;
+                .getJoinProcedure() != null) {
             return applyJoinBlockContract(goal, services,
                     (BlockContractBuiltInRuleApp) application);
         }
@@ -467,40 +464,29 @@ public class BlockContractRule implements BuiltInRule {
             StatementBlock oldProgram = (StatementBlock) oldTerm.javaBlock()
                     .program();
 
-            Statement oldTryStatement = oldProgram.getBody().get(0);
-            MethodFrame oldMethodFrame = oldProgram.getInnerMostMethodFrame();
-            StatementBlock innerBlock = oldMethodFrame.getBody();
-            int size = innerBlock.getChildCount();
+            //Statement oldTryStatement = oldProgram.getBody().get(0);
+           // MethodFrame oldMethodFrame = oldProgram.getInnerMostMethodFrame();
+            StatementBlock body = oldProgram.getInnerMostMethodFrame().getBody();
 
-            Statement[] newInnerBlock = new Statement[size + 1];
-            newInnerBlock[0] = (Statement) innerBlock.getChildAt(0);
-            newInnerBlock[1] = (Statement) new JoinPointStatement(application.getContract().getJoinProcedure(),
-                    joinblockCount);
-            //ImmutableArray<Statement> lst1 =  new ImmutableArray<Statement>(newInnerBlock);
-            //ImmutableList<Statement> lst = (ImmutableList<Statement>) innerBlock.getBody().toImmutableList().take(1);
-          //  ImmutableList<Statement> lst3 = lst1.toImmutableList();
-           // lst3 = lst3.append(lst);
-            for (int i = 1; i < size; i++) {
+            StatementBlock newBody = getBlockWithJPS(body,
+                    instantiation.block, services, application);
 
-                newInnerBlock[i + 1] = ((Statement) innerBlock.getChildAt(i));
-            }
-
-            MethodFrame newMethodFrame = KeYJavaASTFactory.methodFrame(
+          /*  MethodFrame newMethodFrame = KeYJavaASTFactory.methodFrame(
                     oldMethodFrame.getProgramVariable(),
-                    oldMethodFrame.getExecutionContext(),
-                    new StatementBlock(newInnerBlock));
+                    oldMethodFrame.getExecutionContext(), newBlock);
 
-            Try newTryStatement = KeYJavaASTFactory.tryBlock(newMethodFrame,
+           Try newTryStatement = KeYJavaASTFactory.tryBlock(newMethodFrame,
                     (Catch) ((Try) oldTryStatement).getChildAt(1));
 
-            Statement newProgram = (Statement) new ProgramElementReplacer(
+            Statement newProgram2 = (Statement) new ProgramElementReplacer(
                     oldProgram, services).replace(oldTryStatement,
-                            newTryStatement);
-
+                            newTryStatement);*/
+            
+           Statement newProgram = (Statement) new ProgramElementReplacer(
+                  oldProgram, services).replace(body,
+                         newBody);
             JavaBlock newJavaBlock = JavaBlock
-                    .createJavaBlock(newProgram instanceof StatementBlock
-                            ? (StatementBlock) newProgram
-                            : new StatementBlock(newProgram));
+                    .createJavaBlock(KeYJavaASTFactory.block(newProgram));
 
             TermBuilder tb = services.getTermBuilder();
             Term newTerm = tb.tf().createTerm(oldTerm.op(), oldTerm.subs(),
@@ -510,8 +496,63 @@ public class BlockContractRule implements BuiltInRule {
                     new SequentFormula(tb.apply(instantiation.update, newTerm)),
                     application.posInOccurrence());
         }
+    
+    return goals;
 
-        return goals;
+    }
+
+    private StatementBlock getBlockWithJPS(StatementBlock block1,
+            StatementBlock block2, Services services,
+            final BlockContractBuiltInRuleApp app) {
+        if (block1.getChildAt(0) != null
+                && block1.getChildAt(0) instanceof StatementBlock) {
+            if (block1.getChildAt(0).equals(block2)) {
+
+                return insertJoinPoint(services, app,
+                       block1);
+           
+            }
+            else {
+                StatementBlock sB = getBlockWithJPS(
+                        (StatementBlock) block1.getChildAt(0), block2, services,
+                        app);
+                int size = block1.getChildCount();
+                Statement[] newContent = new Statement[size];
+                newContent[0] = (Statement) sB;
+
+                for (int i = 1; i < size; i++) {
+
+                    newContent[i] = ((Statement) block1.getChildAt(i));
+                }
+
+                return KeYJavaASTFactory.block(newContent);
+            }
+
+        }
+        else
+            return null;
+
+    }
+
+    private StatementBlock insertJoinPoint(final Services services,
+            final BlockContractBuiltInRuleApp application,
+            StatementBlock block) {
+        int size = block.getChildCount();
+        final ProgramVariable progVar = KeYJavaASTFactory.localVariable(
+                services.getVariableNamer()
+                        .getTemporaryNameProposal("join_point"),
+                new KeYJavaType(PrimitiveType.JAVA_BOOLEAN, Sort.ANY));
+
+        Statement[] newInnerMostContent = new Statement[size + 1];
+        newInnerMostContent[0] = (Statement) block.getChildAt(0);
+        newInnerMostContent[1] = (Statement) new JoinPointStatement(
+                application.getContract().getJoinProcedure(), progVar);
+
+        for (int i = 1; i < size; i++) {
+
+            newInnerMostContent[i + 1] = ((Statement) block.getChildAt(i));
+        }
+        return KeYJavaASTFactory.block(newInnerMostContent);
     }
 
     private ImmutableList<Goal> apply(final Goal goal, final Services services,

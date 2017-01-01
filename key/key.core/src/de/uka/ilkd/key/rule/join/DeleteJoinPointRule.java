@@ -59,12 +59,12 @@ public class DeleteJoinPointRule implements BuiltInRule {
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 
-        if (pio != null && pio.subTerm().isContainsJavaBlockRecursive()
-                && JoinPointRule.isJoinPointStatement(JoinRuleUtils
-                        .getJavaBlockRecursive(pio.subTerm()).program())) {
+        if (pio != null && JoinPointRule.isJoinPointStatement(
+                JoinRuleUtils.getJavaBlockRecursive(pio.subTerm()).program())) {
+            
             ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                     .findPotentialJoinPartners(goal, pio);
-
+            
             if (joinPartners.equals(ImmutableSLList.nil()) && (goal
                     .appliedRuleApps().head() instanceof JoinRuleBuiltInRuleApp
                     || goal.appliedRuleApps().tail()

@@ -16,19 +16,17 @@ public class DeleteJoinPointBuiltInRuleApp extends AbstractBuiltInRuleApp{
 
     @Override
     public AbstractBuiltInRuleApp replacePos(PosInOccurrence newPos) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public IBuiltInRuleApp setIfInsts(ImmutableList<PosInOccurrence> ifInsts) {
-        // TODO Auto-generated method stub
-        return null;
+        setMutable(ifInsts);
+        return this;
     }
 
     @Override
     public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
-        // TODO Auto-generated method stub
         return this;
     }
 

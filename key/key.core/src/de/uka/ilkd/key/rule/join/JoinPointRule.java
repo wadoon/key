@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.statement.JoinPointStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
@@ -31,8 +32,7 @@ public class JoinPointRule implements BuiltInRule {
         PosInOccurrence pio = ruleApp.posInOccurrence();
         JoinRuleBuiltInRuleApp app = new JoinRuleBuiltInRuleApp(new JoinRule(),
                 pio);
-        
-      //At this point the JoinPointStatement should be the first inside the try Statement
+      
         StatementBlock block = (StatementBlock) JoinRuleUtils
                 .getJavaBlockRecursive(pio.subTerm()).program();
         JoinProcedure concreteRule = ((JoinPointStatement) block
@@ -47,8 +47,8 @@ public class JoinPointRule implements BuiltInRule {
         app.setJoinPartners(joinPartners);
       
         ImmutableList<Goal> newGoals = goal.split(1);
-        Goal goalB = newGoals.head();
-        newGoals = goalB.apply(app);
+        Goal g = newGoals.head();
+        newGoals = g.apply(app);
 
         return newGoals;
     }
@@ -75,7 +75,7 @@ public class JoinPointRule implements BuiltInRule {
         if (pio != null && pio.subTerm().isContainsJavaBlockRecursive()
                 && isJoinPointStatement(JoinRuleUtils
                         .getJavaBlockRecursive(pio.subTerm()).program())) {
-          
+           
             ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                     .findPotentialJoinPartners(goal, pio);
             

@@ -1,24 +1,36 @@
 package de.uka.ilkd.key.java.statement;
 
+import org.key_project.util.ExtList;
+
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 
 public class JoinPointStatement extends JavaStatement{
     private JoinProcedure joinProc;
-    private String statement;
-    private int num;
+    private ProgramVariable prgVar;
   
-    public JoinPointStatement(JoinProcedure joinProc, int num) {
-        this.setJoinProc(joinProc);
-        this.setNum(num);
-        setStatement("JOIN POINT " + num);
+    public JoinPointStatement(ExtList children) {
+        super(children);
+        this.prgVar = children.get(ProgramVariable.class);
+        this.joinProc = children.get(JoinProcedure.class);
     }
+    
+    public JoinPointStatement(JoinProcedure joinProc) {
+       this.joinProc = joinProc;
+    }  
+    
+    public JoinPointStatement(JoinProcedure joinProcedure,
+            ProgramVariable progVar) {
+        this.joinProc = joinProcedure;
+        this.prgVar = progVar;
+        }
+
     @Override
     public void visit(Visitor v) {
-        // TODO Auto-generated method stub
-        
+     //v.performActionOnJoinPointStatement(this);
     }
     @Override
     public int getChildCount() {
@@ -30,22 +42,12 @@ public class JoinPointStatement extends JavaStatement{
         // TODO Auto-generated method stub
         return null;
     }
-    public String getStatement() {
-        return statement;
-    }
-    public void setStatement(String statement) {
-        this.statement = statement;
-    }
+  
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-        p.printJoinPoint(num);
+      
+        p.printJoinPoint(prgVar);
     }
 
-    public int getNum() {
-        return num;
-    }
-    public void setNum(int num) {
-        this.num = num;
-    }
     public JoinProcedure getJoinProc() {
         return joinProc;
     }
@@ -54,7 +56,7 @@ public class JoinPointStatement extends JavaStatement{
     }
     
     public String toString(){
-        return statement;
+        return (prgVar.toString());
         
     }
 
