@@ -26,8 +26,23 @@ public class JoinPointRuleTests extends TestCase {
     }
 
     @Test
-    public void testJoinPointStatement() {
+    public void testITEabs() {
         final Proof proof = loadProof("AbsBlockContract.ITE.proof");
+        startAutomaticStrategy(proof);
+        assertTrue(proof.closed());
+    }
+
+    @Test
+    public void testPredicateAbstractionAbs() {
+        final Proof proof = loadProof(
+                "AbsBlockContract.predicateAbstraction.proof");
+        startAutomaticStrategy(proof);
+        assertTrue(proof.closed());
+    }
+
+    @Test
+    public void testITEgcd() {
+        final Proof proof = loadProof("Gcd.ITE.proof");
         startAutomaticStrategy(proof);
         assertTrue(proof.closed());
     }
@@ -86,11 +101,8 @@ public class JoinPointRuleTests extends TestCase {
 
     @Test
     public void testRemoveJPS() {
-        final Proof proof = loadProof("AbsBlockContract.beforeDelete.proof");
+        final Proof proof = loadProof("AbsBlockContract.beforeDelete.key");
         Node nodeBefore = proof.openGoals().head().node();
-
-        startAutomaticStrategy(proof);
-        startAutomaticStrategy(proof); 
         startAutomaticStrategy(proof);
         assertTrue(proof.openGoals().head().appliedRuleApps()
                 .head() instanceof DeleteJoinPointBuiltInRuleApp);
@@ -106,9 +118,11 @@ public class JoinPointRuleTests extends TestCase {
         checkJavaBlocks(nodeAfter, nodeBefore);
     }
 
+    
     private void checkJavaBlocks(Node withoutJP, Node withJP) {
         for (int i = 0; i < withJP.sequent().succedent().size(); i++) {
-            Term termWithoutJP = withoutJP.sequent().succedent().get(i).formula();
+            Term termWithoutJP = withoutJP.sequent().succedent().get(i)
+                    .formula();
             Term termWithJP = withJP.sequent().succedent().get(i).formula();
 
             if (termWithJP.isContainsJavaBlockRecursive()) {
@@ -145,11 +159,10 @@ public class JoinPointRuleTests extends TestCase {
         }
     }
 
-    private void restIsEqual(StatementBlock blockA,
-            StatementBlock blockB, int i) {
+    private void restIsEqual(StatementBlock blockA, StatementBlock blockB,
+            int i) {
         for (int j = i; j < blockA.getChildCount(); j++) {
-            assertTrue(blockA.getChildAt(j)
-                    .equals(blockB.getChildAt(j + 1)));
+            assertTrue(blockA.getChildAt(j).equals(blockB.getChildAt(j + 1)));
         }
     }
 

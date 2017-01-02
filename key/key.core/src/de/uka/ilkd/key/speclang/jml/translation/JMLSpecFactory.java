@@ -555,9 +555,9 @@ public class JMLSpecFactory {
         // JoinProcedure to know if it needs parameters
         if (chosenProc instanceof JoinWithPredicateAbstraction) {
             
-            if (joinParams == null) {
+            if (joinParams == null || joinParams.size() == 0) {
                 throw new SLTranslationException(
-                        "Parameters are missing", originalClauses.head().fileName,
+                        "Parameters for the join procedure are missing", originalClauses.head().fileName,
                         originalClauses.head().pos);
             }
             else {
@@ -578,7 +578,7 @@ public class JMLSpecFactory {
     private JoinProcedure translateJoinByPredicateAbstraction(
             JoinProcedure joinProc, ImmutableList<PositionedString> params)
             throws SLTranslationException, ParserException {
-
+        
         // split the user input according to the structure defined for the
         // join procedure.
         // This only works for JoinByPredicateAbstraction:
