@@ -65,6 +65,7 @@ import de.uka.ilkd.key.java.declaration.modifier.Static;
 import de.uka.ilkd.key.java.declaration.modifier.StrictFp;
 import de.uka.ilkd.key.java.declaration.modifier.TwoState;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.expression.ElementValueArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
@@ -1358,23 +1359,47 @@ public class Recoder2KeYConverter {
         
         if (md.getASTParent() instanceof recoder.java.declaration.InterfaceDeclaration) {
             recoder.java.declaration.InterfaceDeclaration p = (recoder.java.declaration.InterfaceDeclaration) md.getASTParent();
-            isRemote = checkContainsRemoteType(p.getAllSupertypes()); 
+            isRemote = checkContainsRemoteType(p.getAllSupertypes(), md); 
+if (isRemote) {
+System.out.println("Recoder2KeYConverter1: Remote method: " + p.getName() + "." + md.getName());
+}            
         } else if (md.getASTParent() instanceof recoder.java.declaration.ClassDeclaration) {
             recoder.java.declaration.ClassDeclaration p = (recoder.java.declaration.ClassDeclaration) md.getASTParent();
-            isRemote = checkContainsRemoteType(p.getAllSupertypes()); 
-        }
+            isRemote = checkContainsRemoteType(p.getAllSupertypes(), md);
+if (isRemote) {
+System.out.println("Recoder2KeYConverter2: Remote method: " + p.getName() + "." + md.getName());
+}            
+        }     
         
         return isRemote;
     }
     
-    private boolean checkContainsRemoteType(List<recoder.abstraction.ClassType> cts) {
+    private boolean checkContainsRemoteType(List<recoder.abstraction.ClassType> cts, recoder.java.declaration.MethodDeclaration md) {
         boolean result=false;
         
         for (recoder.abstraction.ClassType ct : cts) {
             List<? extends recoder.abstraction.AnnotationUse> anns = ct.getAnnotations();
             for (recoder.abstraction.AnnotationUse ann : anns) {
-                if (ann.toString().equals("@Remote")) {                    
-                    result = true;
+
+                if (ann instanceof recoder.java.declaration.AnnotationUseSpecification &&
+                    ((recoder.java.declaration.AnnotationUseSpecification)ann).getTypeReference().getName().equals("Remote")) { 
+
+                    //the class type is annotated with Remote
+                    for (recoder.abstraction.Method meth : ct.getMethods()) {
+                      
+                        if (meth.getName().equals(md.getName())) {
+                           
+                            List<recoder.abstraction.Type> ts = meth.getSignature();
+                            List<recoder.abstraction.Type> ts2 = md.getSignature();
+                          
+                            boolean isequal = ts.size() == ts2.size();                          
+                            for (int i = 0; isequal && i < ts.size(); i++) {
+                                isequal = isequal && ts.get(i).equals(ts2.get(i));    
+                            }
+                           
+                            result = isequal;
+                        }
+                    }
                 }
             }
             
@@ -2074,6 +2099,11 @@ public class Recoder2KeYConverter {
 
     public ArrayInitializer convert(recoder.java.expression.ArrayInitializer arg) {
         return new ArrayInitializer(collectChildrenAndComments(arg), 
+                getKeYJavaType(getServiceConfiguration().getSourceInfo().getType(arg.getASTParent())));
+    }
+    
+    public ElementValueArrayInitializer convert(recoder.java.expression.ElementValueArrayInitializer arg) {
+        return new ElementValueArrayInitializer(collectChildrenAndComments(arg), 
                 getKeYJavaType(getServiceConfiguration().getSourceInfo().getType(arg.getASTParent())));
     }
 

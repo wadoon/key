@@ -4640,29 +4640,36 @@ Expression ElementValue() :
 {
 	Expression res = null;
 	Expression tmp;
-	ASTList<Expression> elist;
+	ASTList<Expression> elist = null;
 }
 {
 	(   res = Expression()
 	  | res = AnnotationUse()
-	  | "{" tmp = ElementValue()
+	  			
+	  | "{"  { res = new ElementValueArrayInitializer(); setPrefixInfo(res); }
+	   [
+	    tmp = ElementValue()
 	  		{
-	  			res = new ElementValueArrayInitializer();
-	  			setPrefixInfo(res);
+	  			
 	  			elist = new ASTArrayList<Expression>();
 	  			elist.add(tmp);
 	  		}
 	  		(LOOKAHEAD(2) "," tmp = ElementValue()
 	  			{ elist.add(tmp); }
-	  		)* [","] "}"
+	  		)* [","] 
+	  	]
+	  "}"
 
 		{
+			if (elist != null) elist.trimToSize();
+			setPostfixInfo(res);
 			((ElementValueArrayInitializer)res).setElementValues(elist);
 		}
+		
 
 	)
 	{
-		setPostfixInfo(res);
+
 		return res;
 	}
 }
