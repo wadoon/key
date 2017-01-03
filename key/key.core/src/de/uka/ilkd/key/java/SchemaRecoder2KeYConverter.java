@@ -47,6 +47,7 @@ import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -66,6 +67,7 @@ import de.uka.ilkd.key.rule.metaconstruct.ExpandMethodBody;
 import de.uka.ilkd.key.rule.metaconstruct.ForToWhile;
 import de.uka.ilkd.key.rule.metaconstruct.InitArrayCreation;
 import de.uka.ilkd.key.rule.metaconstruct.IsStatic;
+import de.uka.ilkd.key.rule.metaconstruct.LoopComplexToSimple;
 import de.uka.ilkd.key.rule.metaconstruct.MethodCall;
 import de.uka.ilkd.key.rule.metaconstruct.MultipleVarDecl;
 import de.uka.ilkd.key.rule.metaconstruct.PostWork;
@@ -137,7 +139,9 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         } else if ("#for-to-while".equals(mcName)) {
             final ProgramSV[] labels = mc.getSV();
             return new ForToWhile(labels[0], labels[1], 
-                    list.get(Statement.class));      
+                    list.get(Statement.class));
+        } else if ("#loop-complex-to-simple".equals(mcName)) {
+            return new LoopComplexToSimple(list.get(While.class));
         }  else if ("#enhancedfor-elim".equals(mcName)){ 
             EnhancedFor efor = list.get(EnhancedFor.class);
             if(efor == null)
