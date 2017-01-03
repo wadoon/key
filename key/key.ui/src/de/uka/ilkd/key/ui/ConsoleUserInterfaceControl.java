@@ -17,11 +17,13 @@ import java.io.File;
 import java.io.IOException;
 
 import de.uka.ilkd.key.proof.init.*;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.AbstractProofControl;
+import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -111,6 +113,11 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
                System.out.println("Time per step: " + stat.timePerStepInMillis + "ms");
            }
            System.out.println("Number of goals remaining open: " + openGoals);
+           if(openGoals == 0){
+        	   System.out.println("Proved");
+           }else{
+        	   System.out.println("Not proved");
+           }
            System.out.flush();
        }
        // this seems to be a good place to free some memory
@@ -433,4 +440,8 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
       }
    }
 
+   @Override
+   public TermLabelVisibilityManager getTermLabelVisibilityManager() {
+      return null;
+   }
 }

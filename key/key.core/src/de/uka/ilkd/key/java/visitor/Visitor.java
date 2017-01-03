@@ -142,6 +142,7 @@ import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopInit;
+import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Return;
@@ -162,7 +163,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 /**
  * This class is implemented by visitors/walkers.
@@ -305,6 +306,8 @@ public interface Visitor {
     void performActionOnCatchAllStatement(CatchAllStatement x); 
 
     void performActionOnSynchronizedBlock(SynchronizedBlock x); 
+
+    void performActionOnLoopScopeBlock(LoopScopeBlock x); 
 
     void performActionOnImport(Import x);
 
@@ -471,7 +474,7 @@ public interface Visitor {
 
     void performActionOnLocationVariable(LocationVariable variable); 
 
-    void performActionOnLoopInvariant(LoopInvariant x);
+    void performActionOnLoopInvariant(LoopSpecification x);
     
     void performActionOnBlockContract(BlockContract x);
 

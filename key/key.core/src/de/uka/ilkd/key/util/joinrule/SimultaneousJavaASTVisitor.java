@@ -150,6 +150,7 @@ import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopInit;
+import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -172,7 +173,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 /**
  * Extends the JavaASTWalker to use the visitor mechanism. The methods inherited
@@ -204,8 +205,8 @@ public abstract class SimultaneousJavaASTVisitor extends
         super.walk(node1, node2);
 
         if (node1 instanceof LoopStatement && services != null) {
-            LoopInvariant li = services.getSpecificationRepository()
-                    .getLoopInvariant((LoopStatement) node1);
+            LoopSpecification li = services.getSpecificationRepository()
+                    .getLoopSpec((LoopStatement) node1);
             if (li != null) {
                 visit(li);
             }
@@ -689,6 +690,11 @@ public abstract class SimultaneousJavaASTVisitor extends
     }
 
     @Override
+    public void visit(LoopScopeBlock x1, LoopScopeBlock x2) {
+        doDefaultAction(x1, x2);
+    }
+
+    @Override
     public void visit(MetaClassReference x1, MetaClassReference x2) {
         doDefaultAction(x1, x2);
     }
@@ -1005,7 +1011,7 @@ public abstract class SimultaneousJavaASTVisitor extends
     }
 
     @Override
-    public void visit(LoopInvariant x) {
+    public void visit(LoopSpecification x) {
         // do nothing
     }
 

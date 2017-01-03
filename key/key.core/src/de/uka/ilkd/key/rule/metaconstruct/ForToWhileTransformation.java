@@ -44,9 +44,9 @@ import de.uka.ilkd.key.speclang.LoopInvariant;
  */
 
 public class ForToWhileTransformation extends WhileLoopTransformation {
-
+    
     public ForToWhileTransformation(ProgramElement root,
-            ProgramElementName outerLabel, ProgramElementName innerLabel,
+            ProgramElementName outerLabel, ProgramElementName innerLabel, 
             Services services) {
         super(root, outerLabel, innerLabel, services);
     }
@@ -71,14 +71,14 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
                 inits = (ILoopInit) changeList.removeFirst();
             }
 
-            Guard guard;
-            if (x.getGuard() != null) {
+            Guard guard;            
+            if (x.getGuard() != null) {            
                 guard = (Guard) changeList.removeFirst();
                 if (guard.getExpression() == null) {
-                    guard = KeYJavaASTFactory.trueGuard();
+		    guard = KeYJavaASTFactory.trueGuard();
                 }
             } else {
-                guard = KeYJavaASTFactory.trueGuard();
+		guard = KeYJavaASTFactory.trueGuard();
             }
 
             if (changeList.get(0) instanceof IForUpdates) {
@@ -88,20 +88,18 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
             body = (Statement) changeList.removeFirst();
 
             if (innerLabelNeeded() && breakInnerLabel != null) {
-                body = KeYJavaASTFactory.labeledStatement(
-                        breakInnerLabel.getLabel(), body,
-                        PositionInfo.UNDEFINED);
+		body = KeYJavaASTFactory.labeledStatement(
+			breakInnerLabel.getLabel(), body, PositionInfo.UNDEFINED);
             }
 
             final int updateSize = (updates == null ? 0 : updates.size());
-
+            
             Statement innerBlockStatements[] = new Statement[updateSize + 1];
             innerBlockStatements[0] = body;
             if (updates != null) {
                 for (int copyStatements = 0; copyStatements < updateSize; copyStatements++) {
-                    innerBlockStatements[copyStatements
-                            + 1] = (ExpressionStatement) updates
-                                    .getExpressionAt(copyStatements);
+                    innerBlockStatements[copyStatements + 1] = (ExpressionStatement) updates
+                            .getExpressionAt(copyStatements);
                 }
             }
 
@@ -114,25 +112,24 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
                             .get(copyStatements);
                 }
             }
+            
+	    outerBlockStatements[initSize] = KeYJavaASTFactory.whileLoop(
+		    guard.getExpression(),
+		    KeYJavaASTFactory.block(innerBlockStatements), null);
 
-            outerBlockStatements[initSize] = KeYJavaASTFactory.whileLoop(
-                    guard.getExpression(),
-                    KeYJavaASTFactory.block(innerBlockStatements), null);
-
-            Statement outerBlock = KeYJavaASTFactory
-                    .block(outerBlockStatements);
+	    Statement outerBlock = KeYJavaASTFactory
+		    .block(outerBlockStatements);
 
             if (outerLabelNeeded() && breakOuterLabel != null) {
-                outerBlock = KeYJavaASTFactory.labeledStatement(
-                        breakOuterLabel.getLabel(), outerBlock,
-                        PositionInfo.UNDEFINED);
+		outerBlock = KeYJavaASTFactory.labeledStatement(
+			breakOuterLabel.getLabel(), outerBlock, PositionInfo.UNDEFINED);
             }
-
+            
             // copy loop invariant to the created while loop
-            LoopInvariant li = services.getSpecificationRepository()
-                    .getLoopInvariant(x);
+            LoopSpecification li 
+                = services.getSpecificationRepository().getLoopSpec(x);
             if (li != null) {
-                li = li.setLoop((While) outerBlockStatements[initSize]);
+                li = li.setLoop((While)outerBlockStatements[initSize]);
                 services.getSpecificationRepository().addLoopInvariant(li);
             }
 
