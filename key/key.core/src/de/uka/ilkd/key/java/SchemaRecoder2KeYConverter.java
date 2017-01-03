@@ -43,6 +43,7 @@ import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.IGuard;
 import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;

@@ -29,7 +29,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 /**
  * Converts a loop with a non-simple guard expression into one with a simple
@@ -118,8 +118,8 @@ public class LoopComplexToSimple extends ProgramTransformer {
         Statement newLoop = KeYJavaASTFactory.whileLoop(newBoolVar, newBlock);
 
         // Re-attach loop invariant, if present
-        LoopInvariant li = services.getSpecificationRepository()
-                .getLoopInvariant((While) pe);
+        LoopSpecification li = services.getSpecificationRepository()
+                .getLoopSpec((While) pe);
 
         if (li != null) {
             li = li.setLoop((While) newLoop);
