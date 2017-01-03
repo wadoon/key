@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -397,10 +398,16 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final ProgramElement newProg = newProgram(services, loop, origJavaBlock,
                 loopScopeIdxVar);
 
+        final Term labeledIdxVar = tb.label(tb.var(loopScopeIdxVar),
+                ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL);
+        
         final Term newPost = tb.and(
-                tb.imp(tb.equals(tb.var(loopScopeIdxVar), tb.TRUE()), post),
-                tb.imp(tb.equals(tb.var(loopScopeIdxVar), tb.FALSE()),
-                        fullInvariant));
+                tb.imp(tb.equals(
+                        labeledIdxVar,
+                        tb.TRUE()), post),
+                tb.imp(tb.equals(
+                        labeledIdxVar,
+                        tb.FALSE()), fullInvariant));
 
         final Term newFormula = tb.applySequential(uBeforeLoopDefAnonVariant,
                 tb.prog(modality,

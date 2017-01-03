@@ -105,6 +105,14 @@ public final class ParameterlessTermLabel implements TermLabel {
    public static final TermLabel POST_CONDITION_LABEL =
            new ParameterlessTermLabel(POST_CONDITION_LABEL_NAME);
 
+   /**
+    * Label attached to the loop scope index variable.
+    */
+   public static final Name LOOP_SCOPE_INDEX_LABEL_NAME = new Name("loopScopeIndex");
+
+   public static final TermLabel LOOP_SCOPE_INDEX_LABEL =
+           new ParameterlessTermLabel(LOOP_SCOPE_INDEX_LABEL_NAME);
+
     /**
      * The unique name of this label.
      * This is the basename and does not include the parameters
