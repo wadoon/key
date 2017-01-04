@@ -7,6 +7,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     // Parser Tests
     de.tud.cs.se.ds.psec.parser.ParserTest.class,
+    de.tud.cs.se.ds.psec.parser.SimpleParserTest.class,
     // Compiler Tests
     de.tud.cs.se.ds.psec.compiler.SimpleCompilerFunctionalTests.class,
     de.tud.cs.se.ds.psec.compiler.MethodCallFunctionalTests.class,

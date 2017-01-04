@@ -19,36 +19,37 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Child_callContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.ConditionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.DefinitionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Field_instrContext;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.GetUppermostLoopEntryLabelContext;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.GetUppermostLoopExitLabelContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.GlobalLabelInitExplicitContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.GlobalLabelInitNewNameContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Global_label_refContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.InstructionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IntUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Invoke_instr_literalContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Invoke_instr_svContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsBeforeLoopScopeExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsConstructorExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsFieldReferenceContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsGlobalLabelExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsResultVarExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsStaticExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsSuperMethodContext;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsValidInStateExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsVoidExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LabelUnaryBytecodeInstrContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Label_name_or_name_declContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Label_or_global_label_refContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Labeled_bytecode_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LocVarUnaryBytecodeInstrContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Name_declContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Negated_load_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Nullary_bytecode_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Params_load_instrContext;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.PopLoopEntryLabelContext;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.PopLoopExitLabelContext;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.PushLoopEntryLabelContext;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.PushLoopExitLabelContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SimpleTypeExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_arithmetic_expressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_load_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SpecialExpressionAtomContext;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SpecialLabelUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SpecialUnaryInstrsContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Store_instrContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.StrEqualsExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.StringLitUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Super_callContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.TranslationContext;
@@ -56,20 +57,21 @@ import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCheckInput;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCondition;
 import de.tud.cs.se.ds.psec.parser.ast.ChildCall;
 import de.tud.cs.se.ds.psec.parser.ast.FieldInstr;
+import de.tud.cs.se.ds.psec.parser.ast.GlobalLabelInitialization;
 import de.tud.cs.se.ds.psec.parser.ast.Instruction;
 import de.tud.cs.se.ds.psec.parser.ast.Instructions;
 import de.tud.cs.se.ds.psec.parser.ast.IntegerUnaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.InvokeInstr;
+import de.tud.cs.se.ds.psec.parser.ast.LabelNameOrNameDecl;
 import de.tud.cs.se.ds.psec.parser.ast.LabelUnaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.LabeledBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.LdcInstr;
 import de.tud.cs.se.ds.psec.parser.ast.LoadInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.LocVarUnaryBytecodeInstr;
-import de.tud.cs.se.ds.psec.parser.ast.LoopLabelInstruction;
+import de.tud.cs.se.ds.psec.parser.ast.NameDecl;
 import de.tud.cs.se.ds.psec.parser.ast.NullaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.ParamsLoadInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.StoreInstruction;
-import de.tud.cs.se.ds.psec.parser.ast.StringTranslationTacletASTElement;
 import de.tud.cs.se.ds.psec.parser.ast.SuperCallInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
@@ -78,14 +80,17 @@ import de.tud.cs.se.ds.psec.parser.ast.TypeInstr;
 import de.tud.cs.se.ds.psec.parser.exceptions.TranslationTacletInputException;
 import de.tud.cs.se.ds.psec.util.LogicUtils;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ConstructorDeclaration;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.MethodName;
+import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 
 /**
  * Front-end for {@link TranslationTacletParser}, a parser for taclets defining
@@ -96,9 +101,6 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
  */
 public class TranslationTacletParserFE extends
         TranslationTacletParserBaseVisitor<TranslationTacletASTElement> {
-
-    public static final String UPPERMOST_LOOP_EXIT_SPECIAL_LBL = "<<UPPERMOST_LOOP_EXIT>>";
-    public static final String UPPERMOST_LOOP_ENTRY_SPECIAL_LBL = "<<UPPERMOST_LOOP_ENTRY>>";
 
     /**
      * The file that's being parsed. May be null if a String is being parsed.
@@ -291,7 +293,7 @@ public class TranslationTacletParserFE extends
             return LogicUtils.isSimpleExpression(expr, info.getServices());
         });
     }
-    
+
     @Override
     public ApplicabilityCondition visitIsSuperMethod(IsSuperMethodContext ctx) {
         return new ApplicabilityCondition(info -> {
@@ -305,6 +307,23 @@ public class TranslationTacletParserFE extends
                     .equals(pm.getContainerType().getSort())
                     && methodBeingCompiled.getContainerType().getSort()
                             .extendsTrans(pm.getContainerType().getSort());
+        });
+    }
+
+    @Override
+    public ApplicabilityCondition visitIsBeforeLoopScopeExpression(
+            IsBeforeLoopScopeExpressionContext ctx) {
+        return new ApplicabilityCondition(info -> {
+
+            StatementBlock block = (StatementBlock) ((ContextStatementBlockInstantiation) info
+                    .getInstantiations().getInstantiationFor("Context").get())
+                            .programElement();
+            block = block.getInnerMostMethodFrame().getBody();
+            while (!block.isEmpty() && block.getBody().get(0) instanceof StatementBlock) {
+                block = (StatementBlock) block.getBody().get(0);
+            }
+            
+            return block.getBody().size() > 1 && block.getBody().get(1) instanceof LoopScopeBlock;
         });
     }
 
@@ -341,13 +360,25 @@ public class TranslationTacletParserFE extends
         return new ApplicabilityCondition(info -> {
             // This check may also be called for void methods, during the
             // selection of suitable translation. Therefore, locVarOrFieldRef
-            // may occasionally be no present.
+            // may occasionally be not present.
             Optional<Object> locVarOrFieldRef = info.getInstantiations()
                     .getInstantiationFor(ctx.LOC_REF().getText());
 
             return locVarOrFieldRef.isPresent()
                     ? (locVarOrFieldRef.get() instanceof FieldReference)
                     : false;
+        });
+    }
+
+    @Override
+    public ApplicabilityCondition visitIsGlobalLabelExpression(
+            IsGlobalLabelExpressionContext ctx) {
+        LabelNameOrNameDecl lblOrNameDecl = visitLabel_or_global_label_ref(
+                ctx.label_or_global_label_ref());
+
+        return new ApplicabilityCondition(info -> {
+            return info.getGlobalLabelHelper().hasGlobalLabel(
+                    lblOrNameDecl.getName(info.getInstantiations()));
         });
     }
 
@@ -392,25 +423,6 @@ public class TranslationTacletParserFE extends
                     || locVar.name().toString().startsWith("self");
         });
     }
-    
-    @Override
-    public StringTranslationTacletASTElement visitGetUppermostLoopEntryLabel(
-            GetUppermostLoopEntryLabelContext ctx) {
-        return new StringTranslationTacletASTElement(UPPERMOST_LOOP_ENTRY_SPECIAL_LBL);
-    }
-    
-    @Override
-    public StringTranslationTacletASTElement visitGetUppermostLoopExitLabel(
-            GetUppermostLoopExitLabelContext ctx) {
-        return new StringTranslationTacletASTElement(UPPERMOST_LOOP_EXIT_SPECIAL_LBL);
-    }
-    
-    @Override
-    public TranslationTacletASTElement visitIsValidInStateExpression(
-            IsValidInStateExpressionContext ctx) {
-        // TODO Enter actual method body
-        return super.visitIsValidInStateExpression(ctx);
-    }
 
     @Override
     public ApplicabilityCondition visitSimple_arithmetic_expression(
@@ -453,6 +465,18 @@ public class TranslationTacletParserFE extends
     }
 
     @Override
+    public ApplicabilityCondition visitStrEqualsExpression(
+            StrEqualsExpressionContext ctx) {
+        final String locRef = ctx.LOC_REF().getText();
+        final String cmp = ctx.STRING_LITERAL().getText().replace("\"", "");
+
+        return new ApplicabilityCondition(info -> {
+            return info.getInstantiations().getInstantiationFor(locRef)
+                    .orElse("").toString().equals(cmp);
+        });
+    }
+
+    @Override
     public Instructions visitTranslation(TranslationContext ctx) {
         // Reset the label map
         labelMap = new HashMap<>();
@@ -472,7 +496,7 @@ public class TranslationTacletParserFE extends
     public LabeledBytecodeInstr visitLabeled_bytecode_instr(
             Labeled_bytecode_instrContext ctx) {
         return new LabeledBytecodeInstr(
-                getUniquePerTranslationLabelName(ctx.LABEL().getText()),
+                visitLabel_or_global_label_ref(ctx.label_or_global_label_ref()),
                 (Instruction) visit(ctx.bytecode_instr()));
     }
 
@@ -500,15 +524,8 @@ public class TranslationTacletParserFE extends
     public LabelUnaryBytecodeInstr visitLabelUnaryBytecodeInstr(
             LabelUnaryBytecodeInstrContext ctx) {
         return new LabelUnaryBytecodeInstr(ctx.label_unary_instrs().getText(),
-                getUniquePerTranslationLabelName(ctx.LABEL().getText()));
-    }
-
-    @Override
-    public TranslationTacletASTElement visitSpecialLabelUnaryBytecodeInstr(
-            SpecialLabelUnaryBytecodeInstrContext ctx) {
-        return new LabelUnaryBytecodeInstr(ctx.label_unary_instrs().getText(),
-                ((StringTranslationTacletASTElement) visit(
-                        ctx.special_lbl_term())).getString());
+                visitLabel_or_global_label_ref(
+                        ctx.label_or_global_label_ref()));
     }
 
     @Override
@@ -593,29 +610,48 @@ public class TranslationTacletParserFE extends
     }
 
     @Override
-    public LoopLabelInstruction visitPushLoopEntryLabel(
-            PushLoopEntryLabelContext ctx) {
-        return new LoopLabelInstruction(LoopLabelInstruction.LOOP_ENTRY,
-                ctx.LABEL().getText());
+    public GlobalLabelInitialization visitGlobalLabelInitExplicit(
+            GlobalLabelInitExplicitContext ctx) {
+        return new GlobalLabelInitialization(ctx.LABEL().getText());
     }
 
     @Override
-    public LoopLabelInstruction visitPushLoopExitLabel(
-            PushLoopExitLabelContext ctx) {
-        return new LoopLabelInstruction(LoopLabelInstruction.LOOP_EXIT,
-                ctx.LABEL().getText());
+    public GlobalLabelInitialization visitGlobalLabelInitNewName(
+            GlobalLabelInitNewNameContext ctx) {
+        return new GlobalLabelInitialization(visitName_decl(ctx.name_decl()));
     }
 
     @Override
-    public LoopLabelInstruction visitPopLoopEntryLabel(
-            PopLoopEntryLabelContext ctx) {
-        return new LoopLabelInstruction(LoopLabelInstruction.LOOP_ENTRY);
+    public LabelNameOrNameDecl visitGlobal_label_ref(
+            Global_label_refContext ctx) {
+        return visitLabel_name_or_name_decl(ctx.label_name_or_name_decl());
     }
 
     @Override
-    public TranslationTacletASTElement visitPopLoopExitLabel(
-            PopLoopExitLabelContext ctx) {
-        return new LoopLabelInstruction(LoopLabelInstruction.LOOP_EXIT);
+    public LabelNameOrNameDecl visitLabel_or_global_label_ref(
+            Label_or_global_label_refContext ctx) {
+        if (ctx.LABEL() != null) {
+            return new LabelNameOrNameDecl(
+                    getUniquePerTranslationLabelName(ctx.LABEL().getText()));
+        } else {
+            return visitGlobal_label_ref(ctx.global_label_ref());
+        }
+    }
+
+    @Override
+    public LabelNameOrNameDecl visitLabel_name_or_name_decl(
+            Label_name_or_name_declContext ctx) {
+        if (ctx.LABEL() == null) {
+            return new LabelNameOrNameDecl(visitName_decl(ctx.name_decl()));
+        } else {
+            return new LabelNameOrNameDecl(ctx.LABEL().getText());
+        }
+    }
+
+    @Override
+    public NameDecl visitName_decl(Name_declContext ctx) {
+        return new NameDecl(ctx.base.getText(),
+                ctx.extension.getText().replaceAll("\"", ""));
     }
 
     // //////////////////////// //

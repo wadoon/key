@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.objectweb.asm.MethodVisitor;
 
+import de.tud.cs.se.ds.psec.compiler.GlobalLabelHelper;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
@@ -39,8 +40,8 @@ public class ChildCall extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, RuleInstantiations instantiations,
-            Services services, List<TacletASTNode> children) {
+            GlobalLabelHelper globalLabelHelper, UniqueLabelManager labelManager,
+            RuleInstantiations instantiations, Services services, List<TacletASTNode> children) {
         // XXX Remove this hack!!! Test cases: testSimpleWhile, testSimpleFor
         // Applies in loop transformation: The body has a last statement that
         // expects a child, but has none. The real child is part of the loop

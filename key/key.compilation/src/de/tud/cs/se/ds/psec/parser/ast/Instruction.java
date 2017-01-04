@@ -1,21 +1,15 @@
 package de.tud.cs.se.ds.psec.parser.ast;
 
-import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
-import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.exceptions.UnexpectedTranslationSituationException;
 import de.tud.cs.se.ds.psec.parser.exceptions.UnknownInstructionException;
 import de.tud.cs.se.ds.psec.util.InformationExtraction;
-import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.java.Expression;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
@@ -39,80 +33,6 @@ public abstract class Instruction extends TranslationTacletASTElement {
     private static final String UNEXPECTED_TYPE_FOR_LOAD_INSTRUCTION = //
             "Unexpected type for \\load instruction: %s";
     private static final Logger logger = LogManager.getFormatterLogger();
-
-    /**
-     * The {@link Instructions} object; this is used for accessing information
-     * about loop entry / exit labels.
-     */
-    private Instructions instructions = null;
-
-    /**
-     * Any {@link Instructions} object calling the
-     * {@link #translate(MethodVisitor, ProgVarHelper, UniqueLabelManager, RuleInstantiations, Services, List)}
-     * method of this {@link Instruction} should call this method before!
-     * Otherwise, the compilation of loops will not work.
-     * 
-     * @param instructions
-     *            The {@link Instructions} object containing this
-     *            {@link Instruction}.
-     */
-    void setInstructions(Instructions instructions) {
-        this.instructions = instructions;
-    }
-
-    /**
-     * Pushes a loop entry {@link Label} on top of the stack of loop entry
-     * {@link Label}s.
-     * 
-     * @param label
-     *            The {@link Label} to push.
-     */
-    protected void pushLoopEntryLabel(Label label) {
-        instructions.pushLoopEntryLabel(label);
-    }
-
-    /**
-     * Pushes a loop entry {@link Label} on top of the stack of loop entry
-     * {@link Label}s.
-     * 
-     * @param label
-     *            The {@link Label} to push.
-     */
-    protected void pushLoopExitLabel(Label label) {
-        instructions.pushLoopExitLabel(label);
-    }
-
-    /**
-     * Pops the first loop entry {@link Label} from the stack.
-     */
-    protected void popLoopEntryLabel() {
-        instructions.popLoopEntryLabel();
-    }
-
-    /**
-     * Pops the first loop entry {@link Label} from the stack.
-     */
-    protected void popLoopExitLabel() {
-        instructions.popLoopExitLabel();
-    }
-
-    /**
-     * Returns, but not removes, the most current loop entry {@link Label}.
-     * 
-     * @return The most current loop entry {@link Label}.
-     */
-    protected Label getUppermostLoopEntryLabel() {
-        return instructions.getUppermostLoopEntryLabel();
-    }
-
-    /**
-     * Returns, but not removes, the most current loop exit {@link Label}.
-     * 
-     * @return The most current loop exit {@link Label}.
-     */
-    protected Label getUppermostLoopExitLabel() {
-        return instructions.getUppermostLoopExitLabel();
-    }
 
     /**
      * Loads the given {@link Expression} to the stack. Supports

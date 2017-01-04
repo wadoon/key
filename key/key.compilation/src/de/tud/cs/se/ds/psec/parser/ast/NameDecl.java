@@ -10,34 +10,34 @@ import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Named;
 
 /**
- * A bytecode LDC instruction.
+ * A special construct for creating names from location variables, with an
+ * explicit suffix.
  *
  * @author Dominic Scheurer
  */
-public class LdcInstr extends Instruction {
-    private String locVarSV;
+public class NameDecl extends TranslationTacletASTElement {
 
-    /**
-     * @param insn
-     *            The bytecode instruction.
-     * @param locVarSV
-     *            The location variable that is the argument of this
-     *            {@link LdcInstr}.
-     */
-    public LdcInstr(String locVarSV) {
+    private String locVarSV, extension;
+
+    public NameDecl(String locVarSV, String extension) {
         this.locVarSV = locVarSV;
+        this.extension = extension;
+    }
+
+    public String getName(RuleInstantiations instantiations) {
+        return ((Named) instantiations.getInstantiationFor(locVarSV).get())
+                .name().toString() + extension;
     }
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
             GlobalLabelHelper globalLabelHelper, UniqueLabelManager labelManager,
             RuleInstantiations instantiations, Services services, List<TacletASTNode> children) {
-
-        String strWithQuotes = instantiations.getInstantiationFor(locVarSV).get().toString();
-        mv.visitLdcInsn(strWithQuotes.substring(1, strWithQuotes.length() - 1));
-
+        // This element should not be translated.
+        // That's maybe a design flaw...
     }
 
 }

@@ -6,6 +6,7 @@ import java.util.function.Function;
 
 import org.objectweb.asm.MethodVisitor;
 
+import de.tud.cs.se.ds.psec.compiler.GlobalLabelHelper;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
@@ -91,10 +92,10 @@ public class TranslationDefinition extends TranslationTacletASTElement {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, RuleInstantiations instantiations,
-            Services services, List<TacletASTNode> children) {
-        instructions.translate(mv, pvHelper, labelManager, instantiations,
-                services, children);
+            GlobalLabelHelper globalLabelHelper, UniqueLabelManager labelManager,
+            RuleInstantiations instantiations, Services services, List<TacletASTNode> children) {
+        instructions.translate(mv, pvHelper, globalLabelHelper, labelManager,
+                instantiations, services, children);
     }
 
     /**
@@ -107,6 +108,11 @@ public class TranslationDefinition extends TranslationTacletASTElement {
      */
     public int maxIndexOfCalledChildren() {
         return instructions.maxIndexOfCalledChildren();
+    }
+    
+    @Override
+    public String toString() {
+        return translationName;
     }
 
 }

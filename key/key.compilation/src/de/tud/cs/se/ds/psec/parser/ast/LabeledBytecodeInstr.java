@@ -2,8 +2,10 @@ package de.tud.cs.se.ds.psec.parser.ast;
 
 import java.util.List;
 
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
+import de.tud.cs.se.ds.psec.compiler.GlobalLabelHelper;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
@@ -16,7 +18,7 @@ import de.uka.ilkd.key.java.Services;
  * @author Dominic Scheurer
  */
 public class LabeledBytecodeInstr extends Instruction {
-    private String labelName;
+    private LabelNameOrNameDecl labelName;
     private Instruction labeledInstruction;
 
     /**
@@ -26,7 +28,7 @@ public class LabeledBytecodeInstr extends Instruction {
      * @param labeledInstruction
      *            The {@link TranslationTacletASTElement} that is labeled.
      */
-    public LabeledBytecodeInstr(String labelName,
+    public LabeledBytecodeInstr(LabelNameOrNameDecl labelName,
             Instruction labeledInstruction) {
         this.labelName = labelName;
         this.labeledInstruction = labeledInstruction;
@@ -34,13 +36,17 @@ public class LabeledBytecodeInstr extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, RuleInstantiations instantiations, Services services,
-            List<TacletASTNode> children) {
+            GlobalLabelHelper globalLabelHelper, UniqueLabelManager labelManager,
+            RuleInstantiations instantiations, Services services, List<TacletASTNode> children) {
 
-        //TODO Visit label iff not visited already
-        mv.visitLabel(labelManager.getLabelForName(labelName));
-        labeledInstruction.translate(mv, pvHelper, labelManager, instantiations, services,
-                children);
+        String name = labelName.getName(instantiations);
+        Label lbl = labelName.isExplicitName()
+                ? labelManager.getLabelForName(name) : globalLabelHelper.getGlobalLabel(name);
+
+        // TODO Visit label iff not visited already
+        mv.visitLabel(lbl);
+        labeledInstruction.translate(mv, pvHelper, globalLabelHelper, labelManager,
+                instantiations, services, children);
 
     }
 
@@ -50,6 +56,12 @@ public class LabeledBytecodeInstr extends Instruction {
      */
     Instruction getLabeledInstruction() {
         return labeledInstruction;
+    }
+
+    // For testing reasons...
+    public String toString(RuleInstantiations instantiations) {
+        return labelName.getName(instantiations) + ": "
+                + labeledInstruction.getClass().getSimpleName();
     }
 
 }

@@ -8,6 +8,7 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import de.tud.cs.se.ds.psec.compiler.GlobalLabelHelper;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
@@ -38,6 +39,7 @@ public abstract class TranslationTacletASTElement implements Opcodes {
      * @param pvHelper
      *            A {@link ProgVarHelper} for resolving references to program
      *            variables.
+     * @param globalLabelHelper TODO
      * @param labelManager
      *            The {@link UniqueLabelManager} for keeping track of the
      *            connection between {@link Label} names and objects.
@@ -49,8 +51,8 @@ public abstract class TranslationTacletASTElement implements Opcodes {
      *            translation.
      */
     public abstract void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, RuleInstantiations instantiations,
-            Services services, List<TacletASTNode> children);
+            GlobalLabelHelper globalLabelHelper, UniqueLabelManager labelManager,
+            RuleInstantiations instantiations, Services services, List<TacletASTNode> children);
 
     /**
      * Returns the value instantiated for the {@link SchemaVariable}

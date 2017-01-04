@@ -8,10 +8,10 @@ import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
+import de.tud.cs.se.ds.psec.compiler.GlobalLabelHelper;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParserFE;
 import de.tud.cs.se.ds.psec.parser.exceptions.UnknownInstructionException;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.tud.cs.se.ds.psec.util.Utilities;
@@ -25,7 +25,7 @@ import de.uka.ilkd.key.java.Services;
 public class LabelUnaryBytecodeInstr extends Instruction {
     private static final Logger logger = LogManager.getFormatterLogger();
 
-    private String labelName;
+    private LabelNameOrNameDecl labelName;
     private int opcode;
 
     private static final HashMap<String, Integer> OPCODES_MAP = new HashMap<>();
@@ -44,12 +44,12 @@ public class LabelUnaryBytecodeInstr extends Instruction {
      * 
      * @param insn
      *            The bytecode instruction.
-     * @param labelName
+     * @param nameOrDecl
      *            The name of the label. This name has to be unique per
      *            translation definition.
      */
-    public LabelUnaryBytecodeInstr(String insn, String labelName) {
-        this.labelName = labelName;
+    public LabelUnaryBytecodeInstr(String insn, LabelNameOrNameDecl nameOrDecl) {
+        this.labelName = nameOrDecl;
 
         if (!OPCODES_MAP.containsKey(insn)) {
             String message = Utilities.format("Unknown instruction %s", insn);
@@ -63,20 +63,12 @@ public class LabelUnaryBytecodeInstr extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, RuleInstantiations instantiations,
-            Services services, List<TacletASTNode> children) {
+            GlobalLabelHelper globalLabelHelper, UniqueLabelManager labelManager,
+            RuleInstantiations instantiations, Services services, List<TacletASTNode> children) {
 
-        Label lbl;
-        switch (labelName) {
-        case TranslationTacletParserFE.UPPERMOST_LOOP_ENTRY_SPECIAL_LBL:
-            lbl = getUppermostLoopEntryLabel();
-            break;
-        case TranslationTacletParserFE.UPPERMOST_LOOP_EXIT_SPECIAL_LBL:
-            lbl = getUppermostLoopExitLabel();
-            break;
-        default:
-            lbl = labelManager.getLabelForName(labelName);
-        }
+        String name = labelName.getName(instantiations);
+        Label lbl = labelName.isExplicitName()
+                ? labelManager.getLabelForName(name) : globalLabelHelper.getGlobalLabel(name);
 
         //TODO Visit label iff it has not been visited already
 //        mv.visitLabel(lbl);

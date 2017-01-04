@@ -2,6 +2,7 @@ package de.tud.cs.se.ds.psec.parser.ast;
 
 import java.util.List;
 
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.GlobalLabelHelper;
@@ -10,38 +11,40 @@ import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
- * An instruction to an Integer {@link ProgramVariable} or {@link Literal} onto
- * the stack.
+ * Directive to store a global {@link Label}; either with a simple label name
+ * like "l0" or with a complex {@link NameDecl} based on the name of a
+ * {@link ProgramVariable}.
  *
  * @author Dominic Scheurer
  */
-public class LoadInstruction extends Instruction {
-    private String schemaVar;
-    private boolean negative;
+public class GlobalLabelInitialization extends Instruction {
+    private LabelNameOrNameDecl labelName;
 
     /**
-     * Constructs a {@link LoadInstruction} for loading the element specified in
-     * the symbolic execution taclet by the schema variable schemaVar onto the
-     * stack. If negative is set, then the element will be negated.
-     * 
-     * @param schemaVar
-     * @param negative
+     * @param labelName
      */
-    public LoadInstruction(String schemaVar, boolean negative) {
-        this.schemaVar = schemaVar;
-        this.negative = negative;
+    public GlobalLabelInitialization(String labelName) {
+        this.labelName = new LabelNameOrNameDecl(labelName);
+    }
+
+    /**
+     * 
+     * @param nameDecl
+     */
+    public GlobalLabelInitialization(NameDecl nameDecl) {
+        this.labelName = new LabelNameOrNameDecl(nameDecl);
     }
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
             GlobalLabelHelper globalLabelHelper, UniqueLabelManager labelManager,
             RuleInstantiations instantiations, Services services, List<TacletASTNode> children) {
-        loadExpressionToStack(mv, pvHelper,
-                instantiations.getInstantiationFor(schemaVar).get(), negative);
+        
+        globalLabelHelper.registerGlobalLabel(labelName.getName(instantiations));
+
     }
 
 }

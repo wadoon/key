@@ -5,9 +5,9 @@
 // execution, remember to call the next node by "#child-1".
 
 
-// ###########################
-// ### Splitting and loops ###
-// ###########################
+// #################
+// ### Splitting ###
+// #################
 
 if_split_1_child {
 	\taclets ("ifElseSplit", "ifSplit")
@@ -28,35 +28,42 @@ if_split_2_children {
 	)
 }
 
+// #############
+// ### Loops ###
+// #############
+
 while_loop_by_invariant {
-	\taclets ("Loop Invariant")
-	\condition (#num-children == 3)
+	\taclets ("Loop (Scope) Invariant")
+	\condition (#num-children == 2)
 	\translation (
-		\pushLoopEntryLabel (l1)
-		\pushLoopExitLabel (l3)
-		GOTO l1
-		l2: #child-2
-		l1: \load (#guard)
-		IFNE l2
-		\popLoopEntryLabel
-		\popLoopExitLabel
-		l3: #child-3
+		#child-2
 	)
 }
 
-break {
-	\taclets ("blockBreakLabel")
-	\condition (isValidInState("brk = TRUE"))
+loop_scope_idx_initialization {
+	\taclets ("assignment")
+	\condition (isBeforeLoopScope)
 	\translation (
-		GOTO \uppermostLoopExitLabel
+		\newGlobalLabel (\name (#loc, "_entry"))
+		\newGlobalLabel (\name (#loc, "_exit"))
+		
+		\globalLabel (\name (#loc, "_entry")): #child-1
 	)
 }
 
-continue {
-	\taclets ("blockBreakLabel")
-	\condition (!isValidInState("brk = TRUE"))
+loop_scope_idx_true {
+	\taclets ("assignment")
+	\condition (strEquals (#se, "true"))
+	\condition (isGlobalLabel (\globalLabel (\name (#loc, "_exit"))))
 	\translation (
-		GOTO \uppermostLoopEntryLabel
+		\globalLabel (\name (#loc, "_exit")): #child-1
+	)
+}
+
+unlabeledContinueIndexedLoopScope {
+	\taclets ("unlabeledContinueIndexedLoopScope")
+	\translation (
+		GOTO \globalLabel (\name (#lhs, "_entry"))
 	)
 }
 
@@ -359,6 +366,8 @@ xor {
 assignment_no_result_var {
 	\taclets ("assignment")
 	\condition (!isResultVar(#se))
+	\condition (!isGlobalLabel (\globalLabel (\name (#loc, "_exit"))))
+	\condition (!isBeforeLoopScope)
 	\translation (
 		\load (#se)
 		\store (#loc)

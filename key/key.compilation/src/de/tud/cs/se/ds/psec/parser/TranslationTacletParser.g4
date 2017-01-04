@@ -50,11 +50,13 @@ instruction
         bytecode_instr
     |
         labeled_bytecode_instr
+    |
+    	global_label_initialization
     ;
 
 labeled_bytecode_instr
     :
-        LABEL COLON bytecode_instr
+        label_or_global_label_ref COLON bytecode_instr
     ;
 
 bytecode_instr
@@ -74,10 +76,6 @@ bytecode_instr
     	store_instr
     |
         child_call
-    |
-    	push_label_instr
-    |
-    	pop_label_instr
     ;
 
 nullary_bytecode_instr
@@ -103,17 +101,15 @@ nullary_bytecode_instr
 
 unary_bytecode_instr
 	:
-        loc_var_unary_instrs (LOC_REF | integer)   # locVarUnaryBytecodeInstr
+        loc_var_unary_instrs (LOC_REF | integer)     # locVarUnaryBytecodeInstr
     |
-    	label_unary_instrs LABEL                   # labelUnaryBytecodeInstr
+    	label_unary_instrs label_or_global_label_ref # labelUnaryBytecodeInstr
     |
-    	label_unary_instrs special_lbl_term        # specialLabelUnaryBytecodeInstr
+    	int_const_unary_instrs integer               # intUnaryBytecodeInstr
     |
-    	int_const_unary_instrs integer             # intUnaryBytecodeInstr
+    	string_lit_unary_instrs LOC_REF              # stringLitUnaryBytecodeInstr
     |
-    	string_lit_unary_instrs LOC_REF            # stringLitUnaryBytecodeInstr
-    |
-    	special_unary_instrs (LOC_REF | type_spec) # specialUnaryInstrs
+    	special_unary_instrs (LOC_REF | type_spec)   # specialUnaryInstrs
     ;
 
 field_instr
@@ -252,37 +248,54 @@ child_call
         CHILD NUMBER
     ;
 
-push_label_instr
-	:
-		PUSH_LOOP_ENTRY_LABEL
-		LPAREN
-			LABEL
-		RPAREN               # pushLoopEntryLabel
-	|
-		PUSH_LOOP_EXIT_LABEL
-		LPAREN
-			LABEL
-		RPAREN               # pushLoopExitLabel
-	;
-
-pop_label_instr
-	:
-		POP_LOOP_ENTRY_LABEL # popLoopEntryLabel
-	|
-		POP_LOOP_EXIT_LABEL  # popLoopExitLabel
-	;
-
-
-special_lbl_term
-	:
-		UPPERMOST_LOOP_ENTRY_LABEL # getUppermostLoopEntryLabel
-	|
-		UPPERMOST_LOOP_EXIT_LABEL  # getUppermostLoopExitLabel
-	;
-
 integer
 	:
 		MINUS ? NUMBER
+	;
+
+global_label_initialization
+	:
+		NEW_GLOB_LBL
+		LPAREN
+			LABEL
+		RPAREN        # globalLabelInitExplicit
+	|
+		NEW_GLOB_LBL
+		LPAREN
+			name_decl
+		RPAREN        # globalLabelInitNewName
+	;
+
+label_or_global_label_ref
+	:
+		LABEL
+	|
+		global_label_ref
+	;
+
+global_label_ref
+	:
+		GLOB_LBL
+		LPAREN
+			label_name_or_name_decl
+		RPAREN
+	;
+
+label_name_or_name_decl
+	:
+		LABEL
+	|
+		name_decl
+	;
+
+name_decl
+	:
+		NAME_FUNC
+		LPAREN
+			(base = LOC_REF)
+			COMMA
+			(extension = STRING_LITERAL)
+		RPAREN
 	;
 
 // Typ and Method signatures
@@ -360,6 +373,9 @@ expression_atom
 
 special_expression
 	:
+		IS_BEFORE_LOOP_SCOPE
+		                # isBeforeLoopScopeExpression
+	|
 		IS_CONSTRUCTOR
 		LPAREN
 			LOC_REF
@@ -369,6 +385,12 @@ special_expression
 		LPAREN
 			LOC_REF
 		RPAREN          # isFieldReference
+	|
+		IS_GLOBAL_LABEL
+		LPAREN
+			label_or_global_label_ref
+		RPAREN
+			            # isGlobalLabelExpression
 	|
 		IS_RESULT_VAR
 		LPAREN
@@ -385,11 +407,6 @@ special_expression
 			LOC_REF
 		RPAREN          # isStaticExpression
 	|
-		IS_VALID_IN_STATE
-		LPAREN
-			(formula = STRING_LITERAL)
-		RPAREN          # isValidInStateExpression
-	|
 		IS_SUPER_METHOD
 		LPAREN
 			(called_method = LOC_REF)
@@ -401,6 +418,13 @@ special_expression
 		LPAREN
 			LOC_REF
 		RPAREN          # isVoidExpression
+	|
+		STR_EQUALS
+		LPAREN
+			LOC_REF
+			COMMA
+			STRING_LITERAL
+		RPAREN          # strEqualsExpression
 	;
 
 simple_arithmetic_expression
