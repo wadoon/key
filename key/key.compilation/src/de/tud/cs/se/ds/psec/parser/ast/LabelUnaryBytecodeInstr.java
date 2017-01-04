@@ -11,7 +11,6 @@ import org.objectweb.asm.MethodVisitor;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParserFE;
 import de.tud.cs.se.ds.psec.parser.exceptions.UnknownInstructionException;
 import de.tud.cs.se.ds.psec.util.UniqueLabelManager;
 import de.tud.cs.se.ds.psec.util.Utilities;
@@ -66,17 +65,7 @@ public class LabelUnaryBytecodeInstr extends Instruction {
             UniqueLabelManager labelManager, RuleInstantiations instantiations,
             Services services, List<TacletASTNode> children) {
 
-        Label lbl;
-        switch (labelName) {
-        case TranslationTacletParserFE.UPPERMOST_LOOP_ENTRY_SPECIAL_LBL:
-            lbl = getUppermostLoopEntryLabel();
-            break;
-        case TranslationTacletParserFE.UPPERMOST_LOOP_EXIT_SPECIAL_LBL:
-            lbl = getUppermostLoopExitLabel();
-            break;
-        default:
-            lbl = labelManager.getLabelForName(labelName);
-        }
+        Label lbl = labelManager.getLabelForName(labelName);
 
         //TODO Visit label iff it has not been visited already
 //        mv.visitLabel(lbl);

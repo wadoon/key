@@ -23,24 +23,6 @@ SUPER_CALL
 NEGATE
     : '\\negate' ;
 
-POP_LOOP_ENTRY_LABEL
-	: '\\popLoopEntryLabel' ;
-
-POP_LOOP_EXIT_LABEL
-	: '\\popLoopExitLabel' ;
-
-PUSH_LOOP_ENTRY_LABEL
-	: '\\pushLoopEntryLabel' ;
-
-PUSH_LOOP_EXIT_LABEL
-	: '\\pushLoopExitLabel' ;
-
-UPPERMOST_LOOP_ENTRY_LABEL
-	: '\\uppermostLoopEntryLabel';
-
-UPPERMOST_LOOP_EXIT_LABEL
-	: '\\uppermostLoopExitLabel';
-
 STORE
     : '\\store' ;
 

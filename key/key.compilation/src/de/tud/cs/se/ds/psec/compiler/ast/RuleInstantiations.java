@@ -50,6 +50,9 @@ public class RuleInstantiations {
                         app.instantiations().lookupValue(svName)))
                 .filter(pair -> pair.second != null)
                 .forEach(pair -> instantiations.put(pair.first, pair.second));
+        
+        //Memo
+        //((de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation) instantiations.get("Context")).programElement()
     }
 
     /**

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
@@ -58,60 +57,6 @@ public abstract class Instruction extends TranslationTacletASTElement {
      */
     void setInstructions(Instructions instructions) {
         this.instructions = instructions;
-    }
-
-    /**
-     * Pushes a loop entry {@link Label} on top of the stack of loop entry
-     * {@link Label}s.
-     * 
-     * @param label
-     *            The {@link Label} to push.
-     */
-    protected void pushLoopEntryLabel(Label label) {
-        instructions.pushLoopEntryLabel(label);
-    }
-
-    /**
-     * Pushes a loop entry {@link Label} on top of the stack of loop entry
-     * {@link Label}s.
-     * 
-     * @param label
-     *            The {@link Label} to push.
-     */
-    protected void pushLoopExitLabel(Label label) {
-        instructions.pushLoopExitLabel(label);
-    }
-
-    /**
-     * Pops the first loop entry {@link Label} from the stack.
-     */
-    protected void popLoopEntryLabel() {
-        instructions.popLoopEntryLabel();
-    }
-
-    /**
-     * Pops the first loop entry {@link Label} from the stack.
-     */
-    protected void popLoopExitLabel() {
-        instructions.popLoopExitLabel();
-    }
-
-    /**
-     * Returns, but not removes, the most current loop entry {@link Label}.
-     * 
-     * @return The most current loop entry {@link Label}.
-     */
-    protected Label getUppermostLoopEntryLabel() {
-        return instructions.getUppermostLoopEntryLabel();
-    }
-
-    /**
-     * Returns, but not removes, the most current loop exit {@link Label}.
-     * 
-     * @return The most current loop exit {@link Label}.
-     */
-    protected Label getUppermostLoopExitLabel() {
-        return instructions.getUppermostLoopExitLabel();
     }
 
     /**

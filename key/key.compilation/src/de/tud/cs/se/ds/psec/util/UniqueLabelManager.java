@@ -6,7 +6,7 @@ import org.objectweb.asm.Label;
 
 /**
  * This class keeps track of names for {@link Label}s (that have to be unique
- * per translation definition) and makes sure that a givne label name is always
+ * per translation definition) and makes sure that a given label name is always
  * assigned the same {@link Label}.
  *
  * @author Dominic Scheurer
@@ -27,12 +27,12 @@ public class UniqueLabelManager {
 
         if (labelMap.containsKey(labelName)) {
             result = labelMap.get(labelName);
-        }
-        else {
+        } else {
             result = new Label();
             labelMap.put(labelName, result);
         }
 
         return result;
     }
+    
 }

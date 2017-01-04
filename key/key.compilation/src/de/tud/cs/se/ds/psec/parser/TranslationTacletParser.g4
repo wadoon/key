@@ -74,10 +74,6 @@ bytecode_instr
     	store_instr
     |
         child_call
-    |
-    	push_label_instr
-    |
-    	pop_label_instr
     ;
 
 nullary_bytecode_instr
@@ -106,8 +102,6 @@ unary_bytecode_instr
         loc_var_unary_instrs (LOC_REF | integer)   # locVarUnaryBytecodeInstr
     |
     	label_unary_instrs LABEL                   # labelUnaryBytecodeInstr
-    |
-    	label_unary_instrs special_lbl_term        # specialLabelUnaryBytecodeInstr
     |
     	int_const_unary_instrs integer             # intUnaryBytecodeInstr
     |
@@ -251,34 +245,6 @@ child_call
     :
         CHILD NUMBER
     ;
-
-push_label_instr
-	:
-		PUSH_LOOP_ENTRY_LABEL
-		LPAREN
-			LABEL
-		RPAREN               # pushLoopEntryLabel
-	|
-		PUSH_LOOP_EXIT_LABEL
-		LPAREN
-			LABEL
-		RPAREN               # pushLoopExitLabel
-	;
-
-pop_label_instr
-	:
-		POP_LOOP_ENTRY_LABEL # popLoopEntryLabel
-	|
-		POP_LOOP_EXIT_LABEL  # popLoopExitLabel
-	;
-
-
-special_lbl_term
-	:
-		UPPERMOST_LOOP_ENTRY_LABEL # getUppermostLoopEntryLabel
-	|
-		UPPERMOST_LOOP_EXIT_LABEL  # getUppermostLoopExitLabel
-	;
 
 integer
 	:

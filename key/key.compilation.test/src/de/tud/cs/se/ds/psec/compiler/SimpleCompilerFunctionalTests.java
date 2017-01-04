@@ -24,7 +24,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
  * @author Dominic Scheurer
  */
 public class SimpleCompilerFunctionalTests extends AbstractCompilerFunctionalTest {
-    private static final boolean DELETE_TMP_FILES = true;
+    private static final boolean DELETE_TMP_FILES = false;
 
     public SimpleCompilerFunctionalTests() {
         super(DELETE_TMP_FILES);

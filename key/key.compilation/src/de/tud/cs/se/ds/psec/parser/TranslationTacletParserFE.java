@@ -38,10 +38,6 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LocVarUnaryBytecodeIn
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Negated_load_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Nullary_bytecode_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Params_load_instrContext;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.PopLoopEntryLabelContext;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.PopLoopExitLabelContext;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.PushLoopEntryLabelContext;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.PushLoopExitLabelContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SimpleTypeExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_arithmetic_expressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_load_instrContext;
@@ -65,7 +61,6 @@ import de.tud.cs.se.ds.psec.parser.ast.LabeledBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.LdcInstr;
 import de.tud.cs.se.ds.psec.parser.ast.LoadInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.LocVarUnaryBytecodeInstr;
-import de.tud.cs.se.ds.psec.parser.ast.LoopLabelInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.NullaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.ParamsLoadInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.StoreInstruction;
@@ -590,32 +585,6 @@ public class TranslationTacletParserFE extends
     @Override
     public ChildCall visitChild_call(Child_callContext ctx) {
         return new ChildCall(Integer.parseInt(ctx.NUMBER().getText()));
-    }
-
-    @Override
-    public LoopLabelInstruction visitPushLoopEntryLabel(
-            PushLoopEntryLabelContext ctx) {
-        return new LoopLabelInstruction(LoopLabelInstruction.LOOP_ENTRY,
-                ctx.LABEL().getText());
-    }
-
-    @Override
-    public LoopLabelInstruction visitPushLoopExitLabel(
-            PushLoopExitLabelContext ctx) {
-        return new LoopLabelInstruction(LoopLabelInstruction.LOOP_EXIT,
-                ctx.LABEL().getText());
-    }
-
-    @Override
-    public LoopLabelInstruction visitPopLoopEntryLabel(
-            PopLoopEntryLabelContext ctx) {
-        return new LoopLabelInstruction(LoopLabelInstruction.LOOP_ENTRY);
-    }
-
-    @Override
-    public TranslationTacletASTElement visitPopLoopExitLabel(
-            PopLoopExitLabelContext ctx) {
-        return new LoopLabelInstruction(LoopLabelInstruction.LOOP_EXIT);
     }
 
     // //////////////////////// //
