@@ -51,18 +51,18 @@ loop_scope_idx_initialization {
 	)
 }
 
+loop_scope_idx_true {
+	\taclets ("assignment")
+	\condition (strEquals (#se, "true"))
+	\translation (
+		\globalLabel (\name (#loc, "_exit")): #child-1
+	)
+}
+
 unlabeledContinueIndexedLoopScope {
 	\taclets ("unlabeledContinueIndexedLoopScope")
 	\translation (
 		GOTO \globalLabel (\name (#lhs, "_entry"))
-	)
-}
-
-loop_scope_idx_true {
-	\taclets ("assignment")
-	\condition (equals (#se, TRUE))
-	\translation (
-		\globalLabel (\name (#loc, "_exit")): #child-1
 	)
 }
 

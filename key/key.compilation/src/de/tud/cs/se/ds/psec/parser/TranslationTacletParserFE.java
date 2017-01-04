@@ -21,6 +21,7 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.DefinitionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Field_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.GlobalLabelInitExplicitContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.GlobalLabelInitNewNameContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Global_label_refContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.InstructionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IntUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Invoke_instr_literalContext;
@@ -34,6 +35,7 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsValidInStateExpress
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsVoidExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LabelUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Label_name_or_name_declContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Label_or_global_label_refContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Labeled_bytecode_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LocVarUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Name_declContext;
@@ -458,7 +460,7 @@ public class TranslationTacletParserFE extends
     public LabeledBytecodeInstr visitLabeled_bytecode_instr(
             Labeled_bytecode_instrContext ctx) {
         return new LabeledBytecodeInstr(
-                labelNameOrNameDecl(ctx.label_name_or_name_decl()),
+                visitLabel_or_global_label_ref(ctx.label_or_global_label_ref()),
                 (Instruction) visit(ctx.bytecode_instr()));
     }
 
@@ -486,7 +488,8 @@ public class TranslationTacletParserFE extends
     public LabelUnaryBytecodeInstr visitLabelUnaryBytecodeInstr(
             LabelUnaryBytecodeInstrContext ctx) {
         return new LabelUnaryBytecodeInstr(ctx.label_unary_instrs().getText(),
-                labelNameOrNameDecl(ctx.label_name_or_name_decl()));
+                visitLabel_or_global_label_ref(
+                        ctx.label_or_global_label_ref()));
     }
 
     @Override
@@ -583,6 +586,23 @@ public class TranslationTacletParserFE extends
     }
 
     @Override
+    public LabelNameOrNameDecl visitGlobal_label_ref(
+            Global_label_refContext ctx) {
+        return visitLabel_name_or_name_decl(ctx.label_name_or_name_decl());
+    }
+
+    @Override
+    public LabelNameOrNameDecl visitLabel_or_global_label_ref(
+            Label_or_global_label_refContext ctx) {
+        if (ctx.LABEL() != null) {
+            return new LabelNameOrNameDecl(
+                    getUniquePerTranslationLabelName(ctx.LABEL().getText()));
+        } else {
+            return visitGlobal_label_ref(ctx.global_label_ref());
+        }
+    }
+
+    @Override
     public LabelNameOrNameDecl visitLabel_name_or_name_decl(
             Label_name_or_name_declContext ctx) {
         if (ctx.LABEL() == null) {
@@ -640,28 +660,5 @@ public class TranslationTacletParserFE extends
         } else {
             return fileName;
         }
-    }
-
-    /**
-     * Returns a {@link LabelNameOrNameDecl} from the respective context; makes
-     * sure that, if a literal name is given, it is unique per translation.
-     * 
-     * @param nameOrDeclCtx
-     *            The {@link Label_name_or_name_declContext} to create the
-     *            {@link LabelNameOrNameDecl} from.
-     * @return A {@link LabelNameOrNameDecl} object created from the given
-     *         context object.
-     */
-    private LabelNameOrNameDecl labelNameOrNameDecl(
-            Label_name_or_name_declContext nameOrDeclCtx) {
-        LabelNameOrNameDecl nameOrDecl = null;
-        if (nameOrDeclCtx.LABEL() != null) {
-            nameOrDecl = new LabelNameOrNameDecl(
-                    getUniquePerTranslationLabelName(
-                            nameOrDeclCtx.LABEL().getText()));
-        } else {
-            nameOrDecl = visitLabel_name_or_name_decl(nameOrDeclCtx);
-        }
-        return nameOrDecl;
     }
 }

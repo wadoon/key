@@ -35,17 +35,17 @@ public class LabeledBytecodeInstr extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, RuleInstantiations instantiations, Services services,
-            List<TacletASTNode> children) {
+            UniqueLabelManager labelManager, RuleInstantiations instantiations,
+            Services services, List<TacletASTNode> children) {
 
         String name = labelName.getName(instantiations);
         Label lbl = labelName.isExplicitName()
                 ? labelManager.getLabelForName(name) : getGlobalLabel(name);
 
-        //TODO Visit label iff not visited already
+        // TODO Visit label iff not visited already
         mv.visitLabel(lbl);
-        labeledInstruction.translate(mv, pvHelper, labelManager, instantiations, services,
-                children);
+        labeledInstruction.translate(mv, pvHelper, labelManager, instantiations,
+                services, children);
 
     }
 
@@ -55,6 +55,12 @@ public class LabeledBytecodeInstr extends Instruction {
      */
     Instruction getLabeledInstruction() {
         return labeledInstruction;
+    }
+
+    // For testing reasons...
+    public String toString(RuleInstantiations instantiations) {
+        return labelName.getName(instantiations) + ": "
+                + labeledInstruction.getClass().getSimpleName();
     }
 
 }

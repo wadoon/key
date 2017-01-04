@@ -13,8 +13,9 @@ import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCheckInput;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCondition;
 import de.tud.cs.se.ds.psec.parser.ast.GlobalLabelInitialization;
-import de.tud.cs.se.ds.psec.parser.ast.Instruction;
 import de.tud.cs.se.ds.psec.parser.ast.LabelNameOrNameDecl;
+import de.tud.cs.se.ds.psec.parser.ast.LabelUnaryBytecodeInstr;
+import de.tud.cs.se.ds.psec.parser.ast.LabeledBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.NameDecl;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.uka.ilkd.key.java.Services;
@@ -106,11 +107,43 @@ public class SimpleParserTest {
     }
 
     @Test
+    public void testStrEqualsExpr() {
+        String testStr1 = "\\condition ( strEquals (#se,  \"TRUE\" ))";
+        String testStr2 = "\\condition (!strEquals (#se,  \"TRUE\" ))";
+        String testStr3 = "\\condition ( strEquals (#se1, \"FALSE\"))";
+
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("#se", services.getTermBuilder().TRUE());
+        map.put("#se1", services.getTermBuilder().FALSE());
+
+        TranslationTacletParser parser = ParserTest.setupParser(testStr1);
+        ApplicabilityCondition parsedCondition = new TranslationTacletParserFE(
+                true).visitCondition(parser.condition());
+
+        assertTrue(parsedCondition.isApplicable(new ApplicabilityCheckInput(0,
+                new RuleInstantiations(map), services)));
+
+        parser = ParserTest.setupParser(testStr2);
+        parsedCondition = new TranslationTacletParserFE(true)
+                .visitCondition(parser.condition());
+        assertFalse(parsedCondition.isApplicable(new ApplicabilityCheckInput(0,
+                new RuleInstantiations(map), services)));
+        
+        parser = ParserTest.setupParser(testStr3);
+        parsedCondition = new TranslationTacletParserFE(true)
+                .visitCondition(parser.condition());
+        assertTrue(parsedCondition.isApplicable(new ApplicabilityCheckInput(0,
+                new RuleInstantiations(map), services)));
+    }
+
+    @Test
     public void testNameFunctionAndGlobalLabels() {
         String test1a = "\\name (#loc, \"_exit\")";
         String test1b = "l0";
         String test2 = "\\newGlobalLabel (" + test1a + ")";
-        String test3 = "\\globalLabel (" + test1a + "): #child-1";
+        String test3 = "\\globalLabel (" + test1a + ")";
+        String test4 = test3 + ": #child-1";
+        String test5 = "GOTO " + test3;
 
         final TranslationTacletParserFE parserFE = //
                 new TranslationTacletParserFE(true);
@@ -139,7 +172,19 @@ public class SimpleParserTest {
         assertTrue(parserFE.visitInstruction(
                 parser.instruction()) instanceof GlobalLabelInitialization);
 
-        // TODO
+        parser = ParserTest.setupParser(test3);
+        labelNameOrNameDecl = parserFE
+                .visitGlobal_label_ref(parser.global_label_ref());
+        assertEquals("x_exit", labelNameOrNameDecl.getName(instantiations));
+
+        parser = ParserTest.setupParser(test4);
+        LabeledBytecodeInstr instr = parserFE
+                .visitLabeled_bytecode_instr(parser.labeled_bytecode_instr());
+        assertEquals("x_exit: ChildCall", instr.toString(instantiations));
+
+        parser = ParserTest.setupParser(test5);
+        assertTrue(parserFE.visitInstruction(
+                parser.instruction()) instanceof LabelUnaryBytecodeInstr);
     }
 
 }

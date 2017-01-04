@@ -56,7 +56,7 @@ instruction
 
 labeled_bytecode_instr
     :
-        label_name_or_name_decl COLON bytecode_instr
+        label_or_global_label_ref COLON bytecode_instr
     ;
 
 bytecode_instr
@@ -101,15 +101,15 @@ nullary_bytecode_instr
 
 unary_bytecode_instr
 	:
-        loc_var_unary_instrs (LOC_REF | integer)   # locVarUnaryBytecodeInstr
+        loc_var_unary_instrs (LOC_REF | integer)     # locVarUnaryBytecodeInstr
     |
-    	label_unary_instrs label_name_or_name_decl # labelUnaryBytecodeInstr
+    	label_unary_instrs label_or_global_label_ref # labelUnaryBytecodeInstr
     |
-    	int_const_unary_instrs integer             # intUnaryBytecodeInstr
+    	int_const_unary_instrs integer               # intUnaryBytecodeInstr
     |
-    	string_lit_unary_instrs LOC_REF            # stringLitUnaryBytecodeInstr
+    	string_lit_unary_instrs LOC_REF              # stringLitUnaryBytecodeInstr
     |
-    	special_unary_instrs (LOC_REF | type_spec) # specialUnaryInstrs
+    	special_unary_instrs (LOC_REF | type_spec)   # specialUnaryInstrs
     ;
 
 field_instr
@@ -264,6 +264,21 @@ global_label_initialization
 		LPAREN
 			name_decl
 		RPAREN        # globalLabelInitNewName
+	;
+
+label_or_global_label_ref
+	:
+		LABEL
+	|
+		global_label_ref
+	;
+
+global_label_ref
+	:
+		GLOB_LBL
+		LPAREN
+			label_name_or_name_decl
+		RPAREN
 	;
 
 label_name_or_name_decl
