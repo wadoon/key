@@ -398,11 +398,6 @@ special_expression
 			LOC_REF
 		RPAREN          # isStaticExpression
 	|
-		IS_VALID_IN_STATE
-		LPAREN
-			(formula = STRING_LITERAL)
-		RPAREN          # isValidInStateExpression
-	|
 		IS_SUPER_METHOD
 		LPAREN
 			(called_method = LOC_REF)
@@ -414,6 +409,13 @@ special_expression
 		LPAREN
 			LOC_REF
 		RPAREN          # isVoidExpression
+	|
+		STR_EQUALS
+		LPAREN
+			LOC_REF
+			COMMA
+			STRING_LITERAL
+		RPAREN          # strEqualsExpression
 	;
 
 simple_arithmetic_expression

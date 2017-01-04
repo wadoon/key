@@ -31,7 +31,6 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsFieldReferenceConte
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsResultVarExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsStaticExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsSuperMethodContext;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsValidInStateExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsVoidExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LabelUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Label_name_or_name_declContext;
@@ -48,6 +47,7 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Simple_load_instrCont
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SpecialExpressionAtomContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SpecialUnaryInstrsContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Store_instrContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.StrEqualsExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.StringLitUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Super_callContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.TranslationContext;
@@ -394,13 +394,6 @@ public class TranslationTacletParserFE extends
     }
 
     @Override
-    public TranslationTacletASTElement visitIsValidInStateExpression(
-            IsValidInStateExpressionContext ctx) {
-        // TODO Enter actual method body
-        return super.visitIsValidInStateExpression(ctx);
-    }
-
-    @Override
     public ApplicabilityCondition visitSimple_arithmetic_expression(
             Simple_arithmetic_expressionContext ctx) {
         final String cmp = ctx.comparator().getText();
@@ -437,6 +430,18 @@ public class TranslationTacletParserFE extends
             default:
                 return false;
             }
+        });
+    }
+
+    @Override
+    public ApplicabilityCondition visitStrEqualsExpression(
+            StrEqualsExpressionContext ctx) {
+        final String locRef = ctx.LOC_REF().getText();
+        final String cmp = ctx.STRING_LITERAL().getText().replace("\"", "");
+
+        return new ApplicabilityCondition(info -> {
+            return info.getInstantiations().getInstantiationFor(locRef)
+                    .orElse("").toString().equals(cmp);
         });
     }
 

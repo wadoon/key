@@ -119,7 +119,6 @@ public class SimpleParserTest {
         TranslationTacletParser parser = ParserTest.setupParser(testStr1);
         ApplicabilityCondition parsedCondition = new TranslationTacletParserFE(
                 true).visitCondition(parser.condition());
-
         assertTrue(parsedCondition.isApplicable(new ApplicabilityCheckInput(0,
                 new RuleInstantiations(map), services)));
 
