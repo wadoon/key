@@ -1,5 +1,6 @@
 package de.tud.cs.se.ds.psec.parser;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -11,6 +12,9 @@ import org.junit.Test;
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCheckInput;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCondition;
+import de.tud.cs.se.ds.psec.parser.ast.GlobalLabelInitialization;
+import de.tud.cs.se.ds.psec.parser.ast.Instruction;
+import de.tud.cs.se.ds.psec.parser.ast.NameDecl;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -109,13 +113,20 @@ public class SimpleParserTest {
         final TranslationTacletParserFE parserFE = //
                 new TranslationTacletParserFE(true);
 
-        TranslationTacletParser parser = ParserTest.setupParser(test1);
-        parserFE.visitName_decl(parser.name_decl());
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("#loc", new LocationVariable(new ProgramElementName("x"),
+                services.getJavaInfo().getKeYJavaType("boolean")));
 
-        // TODO
+        RuleInstantiations instantiations = new RuleInstantiations(map);
+
+        TranslationTacletParser parser = ParserTest.setupParser(test1);
+
+        NameDecl nameDecl = parserFE.visitName_decl(parser.name_decl());
+        assertEquals("x_exit", nameDecl.getName(instantiations));
 
         parser = ParserTest.setupParser(test2);
-        parserFE.visitInstruction(parser.instruction());
+        assertTrue(parserFE.visitInstruction(
+                parser.instruction()) instanceof GlobalLabelInitialization);
 
         // TODO
     }

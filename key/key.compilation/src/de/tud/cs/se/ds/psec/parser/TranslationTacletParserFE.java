@@ -19,6 +19,8 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Child_callContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.ConditionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.DefinitionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Field_instrContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.GlobalLabelInitExplicitContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.GlobalLabelInitNewNameContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.InstructionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IntUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Invoke_instr_literalContext;
@@ -33,6 +35,7 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsVoidExpressionConte
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LabelUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Labeled_bytecode_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LocVarUnaryBytecodeInstrContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Name_declContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Negated_load_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Nullary_bytecode_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Params_load_instrContext;
@@ -49,6 +52,7 @@ import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCheckInput;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCondition;
 import de.tud.cs.se.ds.psec.parser.ast.ChildCall;
 import de.tud.cs.se.ds.psec.parser.ast.FieldInstr;
+import de.tud.cs.se.ds.psec.parser.ast.GlobalLabelInitialization;
 import de.tud.cs.se.ds.psec.parser.ast.Instruction;
 import de.tud.cs.se.ds.psec.parser.ast.Instructions;
 import de.tud.cs.se.ds.psec.parser.ast.IntegerUnaryBytecodeInstr;
@@ -58,6 +62,7 @@ import de.tud.cs.se.ds.psec.parser.ast.LabeledBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.LdcInstr;
 import de.tud.cs.se.ds.psec.parser.ast.LoadInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.LocVarUnaryBytecodeInstr;
+import de.tud.cs.se.ds.psec.parser.ast.NameDecl;
 import de.tud.cs.se.ds.psec.parser.ast.NullaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.ParamsLoadInstruction;
 import de.tud.cs.se.ds.psec.parser.ast.StoreInstruction;
@@ -282,7 +287,7 @@ public class TranslationTacletParserFE extends
             return LogicUtils.isSimpleExpression(expr, info.getServices());
         });
     }
-    
+
     @Override
     public ApplicabilityCondition visitIsSuperMethod(IsSuperMethodContext ctx) {
         return new ApplicabilityCondition(info -> {
@@ -383,7 +388,7 @@ public class TranslationTacletParserFE extends
                     || locVar.name().toString().startsWith("self");
         });
     }
-    
+
     @Override
     public TranslationTacletASTElement visitIsValidInStateExpression(
             IsValidInStateExpressionContext ctx) {
@@ -561,6 +566,24 @@ public class TranslationTacletParserFE extends
     @Override
     public ChildCall visitChild_call(Child_callContext ctx) {
         return new ChildCall(Integer.parseInt(ctx.NUMBER().getText()));
+    }
+
+    @Override
+    public GlobalLabelInitialization visitGlobalLabelInitExplicit(
+            GlobalLabelInitExplicitContext ctx) {
+        return new GlobalLabelInitialization(ctx.LABEL().getText());
+    }
+
+    @Override
+    public GlobalLabelInitialization visitGlobalLabelInitNewName(
+            GlobalLabelInitNewNameContext ctx) {
+        return new GlobalLabelInitialization(visitName_decl(ctx.name_decl()));
+    }
+
+    @Override
+    public NameDecl visitName_decl(Name_declContext ctx) {
+        return new NameDecl(ctx.base.getText(),
+                ctx.extension.getText().replaceAll("\"", ""));
     }
 
     // //////////////////////// //

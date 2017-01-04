@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
@@ -57,6 +58,20 @@ public abstract class Instruction extends TranslationTacletASTElement {
      */
     void setInstructions(Instructions instructions) {
         this.instructions = instructions;
+    }
+
+    /**
+     * @see Instructions#registerGlobalLabel(String)
+     */
+    protected void registerGlobalLabel(String label) {
+        instructions.registerGlobalLabel(label);
+    }
+
+    /**
+     * @see Instructions#getGlobalLabel(String)
+     */
+    protected Label getGlobalLabel(String label) {
+        return instructions.getGlobalLabel(label);
     }
 
     /**
