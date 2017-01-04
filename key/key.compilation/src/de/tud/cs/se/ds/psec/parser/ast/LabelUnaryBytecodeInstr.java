@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
+import de.tud.cs.se.ds.psec.compiler.GlobalLabelHelper;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
@@ -62,12 +63,12 @@ public class LabelUnaryBytecodeInstr extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, RuleInstantiations instantiations,
-            Services services, List<TacletASTNode> children) {
+            GlobalLabelHelper globalLabelHelper, UniqueLabelManager labelManager,
+            RuleInstantiations instantiations, Services services, List<TacletASTNode> children) {
 
         String name = labelName.getName(instantiations);
         Label lbl = labelName.isExplicitName()
-                ? labelManager.getLabelForName(name) : getGlobalLabel(name);
+                ? labelManager.getLabelForName(name) : globalLabelHelper.getGlobalLabel(name);
 
         //TODO Visit label iff it has not been visited already
 //        mv.visitLabel(lbl);

@@ -411,7 +411,7 @@ public class MethodBodyCompiler implements Opcodes {
      * @param ruleApp
      *            The {@link RuleApp} to translate; usually a {@link TacletApp}.
      * @param statement
-     *            TODO
+     *            The currently translated statement; for informative reasons.
      */
     private Optional<TacletASTNode> toASTNode(RuleApp ruleApp,
             String statement) {

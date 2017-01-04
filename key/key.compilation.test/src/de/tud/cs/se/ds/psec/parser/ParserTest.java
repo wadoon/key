@@ -62,26 +62,26 @@ public class ParserTest {
     public void testRuleFiltering() {
         assertNotNull("No single rule for ifSplit with two children",
                 definitions.getDefinitionFor("ifSplit",
-                        new ApplicabilityCheckInput(2, null, null)));
+                        new ApplicabilityCheckInput(2, null, null, null)));
     }
 
     @Test
     public void testApplicability() {
         TranslationDefinition ifSplitDefn = definitions.getDefinitionFor(
-                "ifSplit", new ApplicabilityCheckInput(2, null, null));
+                "ifSplit", new ApplicabilityCheckInput(2, null, null, null));
 
         assertNotNull(ifSplitDefn);
 
         assertTrue("Rule is not applicable as expected", ifSplitDefn
-                .isApplicable(new ApplicabilityCheckInput(2, null, null)));
+                .isApplicable(new ApplicabilityCheckInput(2, null, null, null)));
     }
 
     @Test
     public void testSameTranslationForIfSplitAndIfElseSplit() {
         TranslationDefinition ifSplitDefn = definitions.getDefinitionFor(
-                "ifSplit", new ApplicabilityCheckInput(2, null, null));
+                "ifSplit", new ApplicabilityCheckInput(2, null, null, null));
         TranslationDefinition ifElseSplitDefn = definitions.getDefinitionFor(
-                "ifElseSplit", new ApplicabilityCheckInput(2, null, null));
+                "ifElseSplit", new ApplicabilityCheckInput(2, null, null, null));
 
         assertNotNull(ifSplitDefn);
         assertNotNull(ifElseSplitDefn);

@@ -373,6 +373,9 @@ expression_atom
 
 special_expression
 	:
+		IS_BEFORE_LOOP_SCOPE
+		                # isBeforeLoopScopeExpression
+	|
 		IS_CONSTRUCTOR
 		LPAREN
 			LOC_REF
@@ -382,6 +385,12 @@ special_expression
 		LPAREN
 			LOC_REF
 		RPAREN          # isFieldReference
+	|
+		IS_GLOBAL_LABEL
+		LPAREN
+			label_or_global_label_ref
+		RPAREN
+			            # isGlobalLabelExpression
 	|
 		IS_RESULT_VAR
 		LPAREN

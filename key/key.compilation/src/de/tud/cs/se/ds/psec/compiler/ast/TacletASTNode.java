@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
+import de.tud.cs.se.ds.psec.compiler.GlobalLabelHelper;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.exceptions.UnexpectedTranslationSituationException;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCheckInput;
@@ -32,6 +33,7 @@ public class TacletASTNode implements Opcodes {
     private List<TacletASTNode> children = new ArrayList<>();
     private MethodVisitor mv;
     private ProgVarHelper pvHelper;
+    private GlobalLabelHelper globalLabelHelper;
     private RuleInstantiations instantiations;
     private List<TranslationDefinition> definitions;
     private String seTacletName;
@@ -54,6 +56,7 @@ public class TacletASTNode implements Opcodes {
      *            {@link TacletASTNode}.
      * @param pvHelper
      *            The {@link ProgVarHelper} of the corresponding method.
+     * @param globalLabelHelper TODO
      * @param instantiations
      *            Instantiations of schema variables, or, in the case of
      *            built-in rules, internal parameters.
@@ -61,11 +64,12 @@ public class TacletASTNode implements Opcodes {
      */
     public TacletASTNode(String seTacletName, String statement,
             List<TranslationDefinition> definitions, MethodVisitor mv,
-            ProgVarHelper pvHelper, RuleInstantiations instantiations,
-            Optional<Term> update, Services services) {
+            ProgVarHelper pvHelper, GlobalLabelHelper globalLabelHelper,
+            RuleInstantiations instantiations, Optional<Term> update, Services services) {
         this.instantiations = instantiations;
         this.mv = mv;
         this.pvHelper = pvHelper;
+        this.globalLabelHelper = globalLabelHelper;
         this.definitions = definitions;
         this.seTacletName = seTacletName;
         this.statement = statement;
@@ -89,7 +93,7 @@ public class TacletASTNode implements Opcodes {
         // If this is actually caused by an error, there will be a succeeding
         // NullPointerException during the applicability check.
         ApplicabilityCheckInput applCheckInput = new ApplicabilityCheckInput(
-                children.size(), instantiations, services);
+                children.size(), instantiations, globalLabelHelper, services);
 
         List<TranslationDefinition> candidates = definitions.stream()
                 .filter(d -> d.isApplicable(applCheckInput))
@@ -112,8 +116,8 @@ public class TacletASTNode implements Opcodes {
         logger.trace("Using translation %s",
                 candidates.get(0).getTranslationName());
 
-        candidates.get(0).translate(mv, pvHelper, labelManager, instantiations,
-                services, children);
+        candidates.get(0).translate(mv, pvHelper, globalLabelHelper, labelManager,
+                instantiations, services, children);
     }
 
     /**

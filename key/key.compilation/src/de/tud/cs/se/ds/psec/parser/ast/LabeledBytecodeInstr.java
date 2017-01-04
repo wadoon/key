@@ -5,6 +5,7 @@ import java.util.List;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
+import de.tud.cs.se.ds.psec.compiler.GlobalLabelHelper;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
@@ -35,17 +36,17 @@ public class LabeledBytecodeInstr extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, RuleInstantiations instantiations,
-            Services services, List<TacletASTNode> children) {
+            GlobalLabelHelper globalLabelHelper, UniqueLabelManager labelManager,
+            RuleInstantiations instantiations, Services services, List<TacletASTNode> children) {
 
         String name = labelName.getName(instantiations);
         Label lbl = labelName.isExplicitName()
-                ? labelManager.getLabelForName(name) : getGlobalLabel(name);
+                ? labelManager.getLabelForName(name) : globalLabelHelper.getGlobalLabel(name);
 
         // TODO Visit label iff not visited already
         mv.visitLabel(lbl);
-        labeledInstruction.translate(mv, pvHelper, labelManager, instantiations,
-                services, children);
+        labeledInstruction.translate(mv, pvHelper, globalLabelHelper, labelManager,
+                instantiations, services, children);
 
     }
 

@@ -112,14 +112,16 @@ AND : '&';
 OR  : '|';
 NOT : '!';
 
-IS_CONSTRUCTOR    : 'isConstructor' ;
-IS_FIELD_REF      : 'isFieldReference' ;
-IS_RESULT_VAR     : 'isResultVar' ;
-IS_SIMPLE_TYPE    : 'isSimpleType' ;
-IS_STATIC         : 'isStatic' ;
-IS_SUPER_METHOD   : 'isSuperMethod' ;
-IS_VOID           : 'isVoid' ;
-STR_EQUALS        : 'strEquals' ;
+IS_BEFORE_LOOP_SCOPE : 'isBeforeLoopScope' ;
+IS_CONSTRUCTOR       : 'isConstructor' ;
+IS_FIELD_REF         : 'isFieldReference' ;
+IS_GLOBAL_LABEL      : 'isGlobalLabel' ;
+IS_RESULT_VAR        : 'isResultVar' ;
+IS_SIMPLE_TYPE       : 'isSimpleType' ;
+IS_STATIC            : 'isStatic' ;
+IS_SUPER_METHOD      : 'isSuperMethod' ;
+IS_VOID              : 'isVoid' ;
+STR_EQUALS           : 'strEquals' ;
 
 // Arithmetics
 

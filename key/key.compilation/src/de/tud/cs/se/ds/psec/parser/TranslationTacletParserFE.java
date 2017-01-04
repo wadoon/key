@@ -26,8 +26,10 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.InstructionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IntUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Invoke_instr_literalContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Invoke_instr_svContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsBeforeLoopScopeExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsConstructorExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsFieldReferenceContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsGlobalLabelExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsResultVarExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsStaticExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsSuperMethodContext;
@@ -78,14 +80,20 @@ import de.tud.cs.se.ds.psec.parser.ast.TypeInstr;
 import de.tud.cs.se.ds.psec.parser.exceptions.TranslationTacletInputException;
 import de.tud.cs.se.ds.psec.util.LogicUtils;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ConstructorDeclaration;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.MethodName;
+import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 
 /**
  * Front-end for {@link TranslationTacletParser}, a parser for taclets defining
@@ -96,9 +104,6 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
  */
 public class TranslationTacletParserFE extends
         TranslationTacletParserBaseVisitor<TranslationTacletASTElement> {
-
-    public static final String UPPERMOST_LOOP_EXIT_SPECIAL_LBL = "<<UPPERMOST_LOOP_EXIT>>";
-    public static final String UPPERMOST_LOOP_ENTRY_SPECIAL_LBL = "<<UPPERMOST_LOOP_ENTRY>>";
 
     /**
      * The file that's being parsed. May be null if a String is being parsed.
@@ -309,6 +314,27 @@ public class TranslationTacletParserFE extends
     }
 
     @Override
+    public ApplicabilityCondition visitIsBeforeLoopScopeExpression(
+            IsBeforeLoopScopeExpressionContext ctx) {
+        return new ApplicabilityCondition(info -> {
+
+            StatementBlock block = (StatementBlock) ((ContextStatementBlockInstantiation) info
+                    .getInstantiations().getInstantiationFor("Context").get())
+                            .programElement();
+            Statement stmt = ((StatementBlock) JavaTools
+                    .removeActiveStatement(JavaBlock.createJavaBlock(block),
+                            info.getServices())
+                    .program()).getInnerMostMethodFrame().getBody().getBody()
+                            .get(0);
+            while (stmt instanceof StatementBlock && !((StatementBlock) stmt).isEmpty()) {
+                stmt = ((StatementBlock) stmt).getBody().get(0);
+            }
+
+            return stmt instanceof LoopScopeBlock;
+        });
+    }
+
+    @Override
     public ApplicabilityCondition visitIsConstructorExpression(
             IsConstructorExpressionContext ctx) {
         return new ApplicabilityCondition(info -> {
@@ -341,13 +367,25 @@ public class TranslationTacletParserFE extends
         return new ApplicabilityCondition(info -> {
             // This check may also be called for void methods, during the
             // selection of suitable translation. Therefore, locVarOrFieldRef
-            // may occasionally be no present.
+            // may occasionally be not present.
             Optional<Object> locVarOrFieldRef = info.getInstantiations()
                     .getInstantiationFor(ctx.LOC_REF().getText());
 
             return locVarOrFieldRef.isPresent()
                     ? (locVarOrFieldRef.get() instanceof FieldReference)
                     : false;
+        });
+    }
+
+    @Override
+    public ApplicabilityCondition visitIsGlobalLabelExpression(
+            IsGlobalLabelExpressionContext ctx) {
+        LabelNameOrNameDecl lblOrNameDecl = visitLabel_or_global_label_ref(
+                ctx.label_or_global_label_ref());
+
+        return new ApplicabilityCondition(info -> {
+            return info.getGlobalLabelHelper().hasGlobalLabel(
+                    lblOrNameDecl.getName(info.getInstantiations()));
         });
     }
 

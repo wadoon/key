@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.objectweb.asm.MethodVisitor;
 
+import de.tud.cs.se.ds.psec.compiler.GlobalLabelHelper;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.compiler.ast.TacletASTNode;
@@ -31,8 +32,8 @@ public class LdcInstr extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            UniqueLabelManager labelManager, RuleInstantiations instantiations,
-            Services services, List<TacletASTNode> children) {
+            GlobalLabelHelper globalLabelHelper, UniqueLabelManager labelManager,
+            RuleInstantiations instantiations, Services services, List<TacletASTNode> children) {
 
         String strWithQuotes = instantiations.getInstantiationFor(locVarSV).get().toString();
         mv.visitLdcInsn(strWithQuotes.substring(1, strWithQuotes.length() - 1));

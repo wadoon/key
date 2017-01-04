@@ -9,6 +9,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.MethodVisitor;
 
+import de.tud.cs.se.ds.psec.compiler.GlobalLabelHelper;
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
 import de.tud.cs.se.ds.psec.compiler.exceptions.NoTranslationException;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
@@ -50,6 +51,7 @@ public class TacletTranslationFactory {
     private MethodVisitor mv;
     private TranslationDefinitions definitions = null;
     private ProgVarHelper pvHelper;
+    private GlobalLabelHelper globalLabelHelper;
     private ProgramMethod methodBeingCompiled = null;
     private Services services;
 
@@ -76,6 +78,7 @@ public class TacletTranslationFactory {
         this.methodBeingCompiled = methonBeingCompiled;
         this.mv = mv;
         this.pvHelper = pvHelper;
+        this.globalLabelHelper = new GlobalLabelHelper();
         this.definitions = definitions;
         this.services = services;
     }
@@ -187,7 +190,7 @@ public class TacletTranslationFactory {
             }
 
             result = new TacletASTNode(ruleName, statement, candidates, mv,
-                    pvHelper, instantiations, maybeUpdate, services);
+                    pvHelper, globalLabelHelper, instantiations, maybeUpdate, services);
         } else {
             if (!isSimplificationSETaclet(app.taclet())) {
                 String message = Utilities.format(
@@ -312,8 +315,8 @@ public class TacletTranslationFactory {
         if (candidates != null) {
 
             result = new TacletASTNode(ruleName, statement, candidates, mv,
-                    pvHelper, new RuleInstantiations(instantiations), update,
-                    services);
+                    pvHelper, globalLabelHelper, new RuleInstantiations(instantiations),
+                    update, services);
 
         } else {
             String message = Utilities.format(
@@ -378,8 +381,8 @@ public class TacletTranslationFactory {
         logger.trace("Translating taclet %s", tacletName);
 
         TacletASTNode result = new TacletASTNode(tacletName, "",
-                definitions.getDefinitionsFor(tacletName), mv, pvHelper, null,
-                null, null);
+                definitions.getDefinitionsFor(tacletName), mv, pvHelper, globalLabelHelper,
+                null, null, null);
 
         return result == null ? Optional.empty() : Optional.of(result);
     }

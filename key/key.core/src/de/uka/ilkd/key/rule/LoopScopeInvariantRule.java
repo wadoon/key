@@ -239,9 +239,10 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             Term[] uBeforeLoopDefAnonVariant) {
         final While loop = inst.loop;
 
-        final Term newFormula = formulaWithLoopScope(services, inst, anonUpdate,
-                loop, frameCondition, variantPO, termLabelState,
-                presrvAndUCGoal, uBeforeLoopDefAnonVariant, invTerm);
+        final Term newFormula = formulaWithLoopScope(services,
+                (LoopInvariantBuiltInRuleApp) ruleApp, inst, anonUpdate, loop,
+                frameCondition, variantPO, termLabelState, presrvAndUCGoal,
+                uBeforeLoopDefAnonVariant, invTerm);
 
         presrvAndUCGoal.setBranchLabel("Invariant Preserved and Used");
         presrvAndUCGoal.addFormula(new SequentFormula(uAnonInv), true, false);
@@ -351,6 +352,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * 
      * @param services
      *            The {@link Services} object.
+     * @param ruleApp
+     *            TODO
      * @param inst
      *            The {@link Instantiation} of parameters for the
      *            {@link LoopScopeInvariantRule} app.
@@ -377,10 +380,10 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      *         replaced in the "preserves and use case" branch.
      */
     private Term formulaWithLoopScope(Services services,
-            final Instantiation inst, Term anonUpdate, final While loop,
-            Term frameCondition, Term variantPO, TermLabelState termLabelState,
-            Goal presrvAndUCGoal, final Term[] uBeforeLoopDefAnonVariant,
-            Term invTerm) {
+            LoopInvariantBuiltInRuleApp ruleApp, final Instantiation inst,
+            Term anonUpdate, final While loop, Term frameCondition,
+            Term variantPO, TermLabelState termLabelState, Goal presrvAndUCGoal,
+            final Term[] uBeforeLoopDefAnonVariant, Term invTerm) {
         final TermBuilder tb = services.getTermBuilder();
         final Term progPost = splitUpdates(inst.progPost, services).second;
 
@@ -400,19 +403,29 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         final Term labeledIdxVar = tb.label(tb.var(loopScopeIdxVar),
                 ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL);
-        
-        final Term newPost = tb.and(
-                tb.imp(tb.equals(
-                        labeledIdxVar,
-                        tb.TRUE()), post),
-                tb.imp(tb.equals(
-                        labeledIdxVar,
-                        tb.FALSE()), fullInvariant));
 
+        final Term newPost = tb.and(
+                tb.imp(tb.equals(labeledIdxVar, tb.TRUE()), post),
+                tb.imp(tb.equals(labeledIdxVar, tb.FALSE()), fullInvariant));
+
+        final JavaBlock newJavaBlock = JavaBlock
+                .createJavaBlock((StatementBlock) newProg);
+
+        // TODO: The following handling of the term labels might be insufficient
+        // in general; probably, something involging the TermLabelManager should
+        // be used.
         final Term newFormula = tb.applySequential(uBeforeLoopDefAnonVariant,
-                tb.prog(modality,
-                        JavaBlock.createJavaBlock((StatementBlock) newProg),
-                        newPost));
+                tb.prog(modality, newJavaBlock, newPost, progPost.getLabels()));
+
+        // The following exemplary method call refers to the
+        // WhileInvariantTransformer
+        //@formatter:off
+//                        computeLoopBodyModalityLabels(termLabelState, services,
+//                                ruleApp.pio, INSTANCE, ruleApp, presrvAndUCGoal,
+//                                post.op(), newPost, newJavaBlock,
+//                                presrvAndUCGoal.sequent(), post.getLabels())));
+        //@formatter:on
+
         return newFormula;
     }
 

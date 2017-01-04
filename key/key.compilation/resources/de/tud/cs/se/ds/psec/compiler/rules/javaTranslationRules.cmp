@@ -54,6 +54,7 @@ loop_scope_idx_initialization {
 loop_scope_idx_true {
 	\taclets ("assignment")
 	\condition (strEquals (#se, "true"))
+	\condition (isGlobalLabel (\globalLabel (\name (#loc, "_exit"))))
 	\translation (
 		\globalLabel (\name (#loc, "_exit")): #child-1
 	)
@@ -365,6 +366,8 @@ xor {
 assignment_no_result_var {
 	\taclets ("assignment")
 	\condition (!isResultVar(#se))
+	\condition (!isGlobalLabel (\globalLabel (\name (#loc, "_exit"))))
+	\condition (!isBeforeLoopScope)
 	\translation (
 		\load (#se)
 		\store (#loc)

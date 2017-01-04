@@ -46,13 +46,13 @@ public class SimpleParserTest {
                 true).visitCondition(parser.condition());
 
         assertTrue(parsedCondition
-                .isApplicable(new ApplicabilityCheckInput(0, null, null)));
+                .isApplicable(new ApplicabilityCheckInput(0, null, null, null)));
         assertTrue(parsedCondition
-                .isApplicable(new ApplicabilityCheckInput(1, null, null)));
+                .isApplicable(new ApplicabilityCheckInput(1, null, null, null)));
         assertFalse(parsedCondition
-                .isApplicable(new ApplicabilityCheckInput(2, null, null)));
+                .isApplicable(new ApplicabilityCheckInput(2, null, null, null)));
         assertFalse(parsedCondition
-                .isApplicable(new ApplicabilityCheckInput(3, null, null)));
+                .isApplicable(new ApplicabilityCheckInput(3, null, null, null)));
     }
 
     @Test
@@ -75,13 +75,13 @@ public class SimpleParserTest {
                 true).visitDefinition(parser.definition());
 
         assertFalse(parsedDefinition
-                .isApplicable(new ApplicabilityCheckInput(0, null, null)));
+                .isApplicable(new ApplicabilityCheckInput(0, null, null, null)));
         assertFalse(parsedDefinition
-                .isApplicable(new ApplicabilityCheckInput(1, null, null)));
+                .isApplicable(new ApplicabilityCheckInput(1, null, null, null)));
         assertFalse(parsedDefinition
-                .isApplicable(new ApplicabilityCheckInput(2, null, null)));
+                .isApplicable(new ApplicabilityCheckInput(2, null, null, null)));
         assertFalse(parsedDefinition
-                .isApplicable(new ApplicabilityCheckInput(3, null, null)));
+                .isApplicable(new ApplicabilityCheckInput(3, null, null, null)));
     }
 
     @Test
@@ -97,13 +97,13 @@ public class SimpleParserTest {
                 services.getJavaInfo().getKeYJavaType("int")));
 
         assertTrue(parsedCondition.isApplicable(new ApplicabilityCheckInput(0,
-                new RuleInstantiations(map), services)));
+                new RuleInstantiations(map), null, services)));
 
         map.put("#se", new LocationVariable(new ProgramElementName("v"),
                 services.getJavaInfo().getKeYJavaType("java.lang.Object")));
 
         assertFalse(parsedCondition.isApplicable(new ApplicabilityCheckInput(0,
-                new RuleInstantiations(map), services)));
+                new RuleInstantiations(map), null, services)));
     }
 
     @Test
@@ -120,19 +120,19 @@ public class SimpleParserTest {
         ApplicabilityCondition parsedCondition = new TranslationTacletParserFE(
                 true).visitCondition(parser.condition());
         assertTrue(parsedCondition.isApplicable(new ApplicabilityCheckInput(0,
-                new RuleInstantiations(map), services)));
+                new RuleInstantiations(map), null, services)));
 
         parser = ParserTest.setupParser(testStr2);
         parsedCondition = new TranslationTacletParserFE(true)
                 .visitCondition(parser.condition());
         assertFalse(parsedCondition.isApplicable(new ApplicabilityCheckInput(0,
-                new RuleInstantiations(map), services)));
+                new RuleInstantiations(map), null, services)));
         
         parser = ParserTest.setupParser(testStr3);
         parsedCondition = new TranslationTacletParserFE(true)
                 .visitCondition(parser.condition());
         assertTrue(parsedCondition.isApplicable(new ApplicabilityCheckInput(0,
-                new RuleInstantiations(map), services)));
+                new RuleInstantiations(map), null, services)));
     }
 
     @Test
