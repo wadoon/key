@@ -1,0 +1,10 @@
+//This is just a stub
+
+package java.lang.annotation;
+
+@Documented
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.ANNOTATION_TYPE)
+public @interface Target {
+    ElementType[] value();
+}

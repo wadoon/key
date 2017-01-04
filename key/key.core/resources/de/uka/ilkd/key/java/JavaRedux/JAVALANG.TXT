@@ -43,3 +43,8 @@ java.io.IOException
 java.io.Serializable
 
 java.lang.Override
+java.lang.annotation.Target
+java.lang.annotation.ElementType
+java.lang.annotation.Retention
+java.lang.annotation.RetentionPolicy
+java.lang.annotation.Documented
