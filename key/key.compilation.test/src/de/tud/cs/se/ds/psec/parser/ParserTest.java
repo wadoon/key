@@ -1,7 +1,6 @@
 package de.tud.cs.se.ds.psec.parser;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -9,7 +8,6 @@ import static org.junit.Assert.fail;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Optional;
 
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -18,22 +16,18 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.Before;
 import org.junit.Test;
 
-import de.tud.cs.se.ds.psec.compiler.ast.RuleInstantiations;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCheckInput;
-import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCondition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinitions;
 import de.tud.cs.se.ds.psec.util.ResourceManager;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
- * Tests for the translation taclet parser.
+ * Tests for the translation taclet parser. Parses the complete translation rule
+ * base.
  *
  * @author Dominic Scheurer
  */
@@ -41,7 +35,6 @@ public class ParserTest {
     private static final String TRANSLATION_RULES_PATH = "/de/tud/cs/se/ds/psec/compiler/rules/javaTranslationRules.cmp";
 
     private TranslationDefinitions definitions;
-    private Services services;
 
     @Before
     public void setUp() throws Exception {
@@ -54,7 +47,6 @@ public class ParserTest {
         }
 
         definitions = new TranslationTacletParserFE(true).parse(maybeUrl.get());
-        services = loadProof("resources/testcase/dummy.key").getServices();
     }
 
     @Test
@@ -99,75 +91,6 @@ public class ParserTest {
                 ifSplitDefn, ifElseSplitDefn);
     }
 
-    @Test
-    public void testNegatedArithmeticExpr() {
-        String testStr = "\\condition (!#num-children >= 2)";
-
-        TranslationTacletParser parser = setupParser(testStr);
-        ApplicabilityCondition parsedCondition = new TranslationTacletParserFE(
-                true).visitCondition(parser.condition());
-
-        assertTrue(parsedCondition
-                .isApplicable(new ApplicabilityCheckInput(0, null, null)));
-        assertTrue(parsedCondition
-                .isApplicable(new ApplicabilityCheckInput(1, null, null)));
-        assertFalse(parsedCondition
-                .isApplicable(new ApplicabilityCheckInput(2, null, null)));
-        assertFalse(parsedCondition
-                .isApplicable(new ApplicabilityCheckInput(3, null, null)));
-    }
-
-    @Test
-    public void testMultipleConditions() {
-        StringBuilder sb = new StringBuilder();
-
-        //@formatter:off
-        sb
-            .append("test {")
-            .append("  \\taclets (\"testTaclet\")")
-            // This should define an unsatisfiable condition
-            .append("  \\condition (!#num-children >= 2)")
-            .append("  \\condition ( #num-children >= 2)")
-            .append("  \\translation ( RETURN )")
-            .append("}");
-        //@formatter:on
-
-        TranslationTacletParser parser = setupParser(sb.toString());
-        TranslationDefinition parsedDefinition = new TranslationTacletParserFE(
-                true).visitDefinition(parser.definition());
-
-        assertFalse(parsedDefinition
-                .isApplicable(new ApplicabilityCheckInput(0, null, null)));
-        assertFalse(parsedDefinition
-                .isApplicable(new ApplicabilityCheckInput(1, null, null)));
-        assertFalse(parsedDefinition
-                .isApplicable(new ApplicabilityCheckInput(2, null, null)));
-        assertFalse(parsedDefinition
-                .isApplicable(new ApplicabilityCheckInput(3, null, null)));
-    }
-
-    @Test
-    public void testSimpleTypeExpr() {
-        String testStr = "\\condition (isSimpleType(#se))";
-
-        TranslationTacletParser parser = setupParser(testStr);
-        ApplicabilityCondition parsedCondition = new TranslationTacletParserFE(
-                true).visitCondition(parser.condition());
-
-        HashMap<String, Object> map = new HashMap<>();
-        map.put("#se", new LocationVariable(new ProgramElementName("v"),
-                services.getJavaInfo().getKeYJavaType("int")));
-
-        assertTrue(parsedCondition.isApplicable(new ApplicabilityCheckInput(0,
-                new RuleInstantiations(map), services)));
-
-        map.put("#se", new LocationVariable(new ProgramElementName("v"),
-                services.getJavaInfo().getKeYJavaType("java.lang.Object")));
-
-        assertFalse(parsedCondition.isApplicable(new ApplicabilityCheckInput(0,
-                new RuleInstantiations(map), services)));
-    }
-
     /**
      * Creates a {@link TranslationTacletParser} for the given input
      * {@link String}.
@@ -176,7 +99,7 @@ public class ParserTest {
      *            The {@link String} to parse.
      * @return The {@link TranslationTacletParser} for the input.
      */
-    private TranslationTacletParser setupParser(String input) {
+    static TranslationTacletParser setupParser(String input) {
         CharStream stream = new ANTLRInputStream(input);
 
         // Create the lexer
@@ -199,20 +122,19 @@ public class ParserTest {
      *            The file name of the proof file to load.
      * @return The loaded proof.
      */
-    private static Proof loadProof(String proofFileName) {
+    static Proof loadProof(String proofFileName) {
         File proofFile = new File(proofFileName);
         assertTrue(proofFile.exists());
-    
+
         try {
-            KeYEnvironment<?> environment =
-                    KeYEnvironment.load(JavaProfile.getDefaultInstance(),
-                            proofFile, null, null, null, true);
+            KeYEnvironment<?> environment = KeYEnvironment.load(
+                    JavaProfile.getDefaultInstance(), proofFile, null, null,
+                    null, true);
             Proof proof = environment.getLoadedProof();
             assertNotNull(proof);
-    
+
             return proof;
-        }
-        catch (ProblemLoaderException e) {
+        } catch (ProblemLoaderException e) {
             fail("Proof could not be loaded:\n" + e.getMessage());
             return null;
         }

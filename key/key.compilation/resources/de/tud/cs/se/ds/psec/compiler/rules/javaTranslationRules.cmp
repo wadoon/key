@@ -5,9 +5,9 @@
 // execution, remember to call the next node by "#child-1".
 
 
-// ###########################
-// ### Splitting and loops ###
-// ###########################
+// #################
+// ### Splitting ###
+// #################
 
 if_split_1_child {
 	\taclets ("ifElseSplit", "ifSplit")
@@ -27,6 +27,10 @@ if_split_2_children {
 		l0: #child-2
 	)
 }
+
+// #############
+// ### Loops ###
+// #############
 
 while_loop_by_invariant {
 	\taclets ("Loop (Scope) Invariant")
@@ -59,57 +63,6 @@ loop_scope_idx_true {
 	\condition (equals (#se, TRUE))
 	\translation (
 		\globalLabel (\name (#loc, "_exit")): #child-1
-	)
-}
-
-/*
-while_loop_by_invariant {
-	\taclets ("Loop Invariant")
-	\condition (#num-children == 3)
-	\translation (
-		\pushLoopEntryLabel (l1)
-		\pushLoopExitLabel (l3)
-		GOTO l1
-		l2: #child-2
-		l1: \load (#guard)
-		IFNE l2
-		\popLoopEntryLabel
-		\popLoopExitLabel
-		l3: #child-3
-	)
-}
-
-break {
-	\taclets ("blockBreakLabel")
-	\condition (isValidInState("brk = TRUE"))
-	\translation (
-		GOTO \uppermostLoopExitLabel
-	)
-}
-
-continue {
-	\taclets ("blockBreakLabel")
-	\condition (!isValidInState("brk = TRUE"))
-	\translation (
-		GOTO \uppermostLoopEntryLabel
-	)
-}
-*/
-
-//TODO
-while_loop_by_loop_scope_invariant {
-	\taclets ("Loop (Scope) Invariant")
-	\condition (#num-children == 2)
-	\translation (
-		\pushLoopEntryLabel (l1)
-		\pushLoopExitLabel (l3)
-		GOTO l1
-		l2: #child-2
-		l1: \load (#guard)
-		IFNE l2
-		\popLoopEntryLabel
-		\popLoopExitLabel
-		l3: #child-3
 	)
 }
 

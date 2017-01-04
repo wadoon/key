@@ -29,6 +29,17 @@ STORE
 CHILD
     : '#child-' ;
 
+// Special instructions
+
+NEW_GLOB_LBL
+	: '\\newGlobalLabel' ;
+
+GLOB_LBL
+	: '\\globalLabel' ;
+
+NAME_FUNC
+	: '\\name' ;
+
 // General punctuation
 
 SEMI

@@ -50,6 +50,8 @@ instruction
         bytecode_instr
     |
         labeled_bytecode_instr
+    |
+    	label_initialization
     ;
 
 labeled_bytecode_instr
@@ -249,6 +251,29 @@ child_call
 integer
 	:
 		MINUS ? NUMBER
+	;
+
+label_initialization
+	:
+		NEW_GLOB_LBL
+		LPAREN
+			LABEL
+		RPAREN        # globalLabelInitExplicit
+	|
+		NEW_GLOB_LBL
+		LPAREN
+			name_decl
+		RPAREN        # globalLabelInitNewName
+	;
+
+name_decl
+	:
+		NAME_FUNC
+		LPAREN
+			(base = LOC_REF)
+			COMMA
+			(extension = STRING_LITERAL)
+		RPAREN
 	;
 
 // Typ and Method signatures
