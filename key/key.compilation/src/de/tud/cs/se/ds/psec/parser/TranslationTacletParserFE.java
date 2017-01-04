@@ -321,16 +321,12 @@ public class TranslationTacletParserFE extends
             StatementBlock block = (StatementBlock) ((ContextStatementBlockInstantiation) info
                     .getInstantiations().getInstantiationFor("Context").get())
                             .programElement();
-            Statement stmt = ((StatementBlock) JavaTools
-                    .removeActiveStatement(JavaBlock.createJavaBlock(block),
-                            info.getServices())
-                    .program()).getInnerMostMethodFrame().getBody().getBody()
-                            .get(0);
-            while (stmt instanceof StatementBlock && !((StatementBlock) stmt).isEmpty()) {
-                stmt = ((StatementBlock) stmt).getBody().get(0);
+            block = block.getInnerMostMethodFrame().getBody();
+            while (!block.isEmpty() && block.getBody().get(0) instanceof StatementBlock) {
+                block = (StatementBlock) block.getBody().get(0);
             }
-
-            return stmt instanceof LoopScopeBlock;
+            
+            return block.getBody().size() > 1 && block.getBody().get(1) instanceof LoopScopeBlock;
         });
     }
 
