@@ -33,6 +33,7 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsSuperMethodContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsValidInStateExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IsVoidExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LabelUnaryBytecodeInstrContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Label_name_or_name_declContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Labeled_bytecode_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.LocVarUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Name_declContext;
@@ -57,6 +58,7 @@ import de.tud.cs.se.ds.psec.parser.ast.Instruction;
 import de.tud.cs.se.ds.psec.parser.ast.Instructions;
 import de.tud.cs.se.ds.psec.parser.ast.IntegerUnaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.InvokeInstr;
+import de.tud.cs.se.ds.psec.parser.ast.LabelNameOrNameDecl;
 import de.tud.cs.se.ds.psec.parser.ast.LabelUnaryBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.LabeledBytecodeInstr;
 import de.tud.cs.se.ds.psec.parser.ast.LdcInstr;
@@ -456,7 +458,7 @@ public class TranslationTacletParserFE extends
     public LabeledBytecodeInstr visitLabeled_bytecode_instr(
             Labeled_bytecode_instrContext ctx) {
         return new LabeledBytecodeInstr(
-                getUniquePerTranslationLabelName(ctx.LABEL().getText()),
+                labelNameOrNameDecl(ctx.label_name_or_name_decl()),
                 (Instruction) visit(ctx.bytecode_instr()));
     }
 
@@ -484,7 +486,7 @@ public class TranslationTacletParserFE extends
     public LabelUnaryBytecodeInstr visitLabelUnaryBytecodeInstr(
             LabelUnaryBytecodeInstrContext ctx) {
         return new LabelUnaryBytecodeInstr(ctx.label_unary_instrs().getText(),
-                getUniquePerTranslationLabelName(ctx.LABEL().getText()));
+                labelNameOrNameDecl(ctx.label_name_or_name_decl()));
     }
 
     @Override
@@ -581,6 +583,16 @@ public class TranslationTacletParserFE extends
     }
 
     @Override
+    public LabelNameOrNameDecl visitLabel_name_or_name_decl(
+            Label_name_or_name_declContext ctx) {
+        if (ctx.LABEL() == null) {
+            return new LabelNameOrNameDecl(visitName_decl(ctx.name_decl()));
+        } else {
+            return new LabelNameOrNameDecl(ctx.LABEL().getText());
+        }
+    }
+
+    @Override
     public NameDecl visitName_decl(Name_declContext ctx) {
         return new NameDecl(ctx.base.getText(),
                 ctx.extension.getText().replaceAll("\"", ""));
@@ -628,5 +640,28 @@ public class TranslationTacletParserFE extends
         } else {
             return fileName;
         }
+    }
+
+    /**
+     * Returns a {@link LabelNameOrNameDecl} from the respective context; makes
+     * sure that, if a literal name is given, it is unique per translation.
+     * 
+     * @param nameOrDeclCtx
+     *            The {@link Label_name_or_name_declContext} to create the
+     *            {@link LabelNameOrNameDecl} from.
+     * @return A {@link LabelNameOrNameDecl} object created from the given
+     *         context object.
+     */
+    private LabelNameOrNameDecl labelNameOrNameDecl(
+            Label_name_or_name_declContext nameOrDeclCtx) {
+        LabelNameOrNameDecl nameOrDecl = null;
+        if (nameOrDeclCtx.LABEL() != null) {
+            nameOrDecl = new LabelNameOrNameDecl(
+                    getUniquePerTranslationLabelName(
+                            nameOrDeclCtx.LABEL().getText()));
+        } else {
+            nameOrDecl = visitLabel_name_or_name_decl(nameOrDeclCtx);
+        }
+        return nameOrDecl;
     }
 }

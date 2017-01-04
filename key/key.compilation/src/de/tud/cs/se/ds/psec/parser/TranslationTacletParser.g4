@@ -51,12 +51,12 @@ instruction
     |
         labeled_bytecode_instr
     |
-    	label_initialization
+    	global_label_initialization
     ;
 
 labeled_bytecode_instr
     :
-        LABEL COLON bytecode_instr
+        label_name_or_name_decl COLON bytecode_instr
     ;
 
 bytecode_instr
@@ -103,7 +103,7 @@ unary_bytecode_instr
 	:
         loc_var_unary_instrs (LOC_REF | integer)   # locVarUnaryBytecodeInstr
     |
-    	label_unary_instrs LABEL                   # labelUnaryBytecodeInstr
+    	label_unary_instrs label_name_or_name_decl # labelUnaryBytecodeInstr
     |
     	int_const_unary_instrs integer             # intUnaryBytecodeInstr
     |
@@ -253,7 +253,7 @@ integer
 		MINUS ? NUMBER
 	;
 
-label_initialization
+global_label_initialization
 	:
 		NEW_GLOB_LBL
 		LPAREN
@@ -264,6 +264,13 @@ label_initialization
 		LPAREN
 			name_decl
 		RPAREN        # globalLabelInitNewName
+	;
+
+label_name_or_name_decl
+	:
+		LABEL
+	|
+		name_decl
 	;
 
 name_decl

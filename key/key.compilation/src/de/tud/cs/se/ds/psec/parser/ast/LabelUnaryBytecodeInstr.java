@@ -24,7 +24,7 @@ import de.uka.ilkd.key.java.Services;
 public class LabelUnaryBytecodeInstr extends Instruction {
     private static final Logger logger = LogManager.getFormatterLogger();
 
-    private String labelName;
+    private LabelNameOrNameDecl labelName;
     private int opcode;
 
     private static final HashMap<String, Integer> OPCODES_MAP = new HashMap<>();
@@ -43,12 +43,12 @@ public class LabelUnaryBytecodeInstr extends Instruction {
      * 
      * @param insn
      *            The bytecode instruction.
-     * @param labelName
+     * @param nameOrDecl
      *            The name of the label. This name has to be unique per
      *            translation definition.
      */
-    public LabelUnaryBytecodeInstr(String insn, String labelName) {
-        this.labelName = labelName;
+    public LabelUnaryBytecodeInstr(String insn, LabelNameOrNameDecl nameOrDecl) {
+        this.labelName = nameOrDecl;
 
         if (!OPCODES_MAP.containsKey(insn)) {
             String message = Utilities.format("Unknown instruction %s", insn);
@@ -65,7 +65,9 @@ public class LabelUnaryBytecodeInstr extends Instruction {
             UniqueLabelManager labelManager, RuleInstantiations instantiations,
             Services services, List<TacletASTNode> children) {
 
-        Label lbl = labelManager.getLabelForName(labelName);
+        String name = labelName.getName(instantiations);
+        Label lbl = labelName.isExplicitName()
+                ? labelManager.getLabelForName(name) : getGlobalLabel(name);
 
         //TODO Visit label iff it has not been visited already
 //        mv.visitLabel(lbl);

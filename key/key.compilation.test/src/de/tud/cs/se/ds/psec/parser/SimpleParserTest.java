@@ -14,6 +14,7 @@ import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCheckInput;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCondition;
 import de.tud.cs.se.ds.psec.parser.ast.GlobalLabelInitialization;
 import de.tud.cs.se.ds.psec.parser.ast.Instruction;
+import de.tud.cs.se.ds.psec.parser.ast.LabelNameOrNameDecl;
 import de.tud.cs.se.ds.psec.parser.ast.NameDecl;
 import de.tud.cs.se.ds.psec.parser.ast.TranslationDefinition;
 import de.uka.ilkd.key.java.Services;
@@ -106,9 +107,10 @@ public class SimpleParserTest {
 
     @Test
     public void testNameFunctionAndGlobalLabels() {
-        String test1 = "\\name (#loc, \"_exit\")";
-        String test2 = "\\newGlobalLabel (" + test1 + ")";
-        String test3 = "\\globalLabel (" + test1 + "): #child-1";
+        String test1a = "\\name (#loc, \"_exit\")";
+        String test1b = "l0";
+        String test2 = "\\newGlobalLabel (" + test1a + ")";
+        String test3 = "\\globalLabel (" + test1a + "): #child-1";
 
         final TranslationTacletParserFE parserFE = //
                 new TranslationTacletParserFE(true);
@@ -119,10 +121,19 @@ public class SimpleParserTest {
 
         RuleInstantiations instantiations = new RuleInstantiations(map);
 
-        TranslationTacletParser parser = ParserTest.setupParser(test1);
-
+        TranslationTacletParser parser = ParserTest.setupParser(test1a);
         NameDecl nameDecl = parserFE.visitName_decl(parser.name_decl());
         assertEquals("x_exit", nameDecl.getName(instantiations));
+
+        parser = ParserTest.setupParser(test1a);
+        LabelNameOrNameDecl labelNameOrNameDecl = parserFE
+                .visitLabel_name_or_name_decl(parser.label_name_or_name_decl());
+        assertEquals("x_exit", labelNameOrNameDecl.getName(instantiations));
+
+        parser = ParserTest.setupParser(test1b);
+        labelNameOrNameDecl = parserFE
+                .visitLabel_name_or_name_decl(parser.label_name_or_name_decl());
+        assertEquals("l0", labelNameOrNameDecl.getName(instantiations));
 
         parser = ParserTest.setupParser(test2);
         assertTrue(parserFE.visitInstruction(

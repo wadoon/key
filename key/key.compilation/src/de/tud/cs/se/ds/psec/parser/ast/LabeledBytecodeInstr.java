@@ -2,6 +2,7 @@ package de.tud.cs.se.ds.psec.parser.ast;
 
 import java.util.List;
 
+import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 
 import de.tud.cs.se.ds.psec.compiler.ProgVarHelper;
@@ -16,7 +17,7 @@ import de.uka.ilkd.key.java.Services;
  * @author Dominic Scheurer
  */
 public class LabeledBytecodeInstr extends Instruction {
-    private String labelName;
+    private LabelNameOrNameDecl labelName;
     private Instruction labeledInstruction;
 
     /**
@@ -26,7 +27,7 @@ public class LabeledBytecodeInstr extends Instruction {
      * @param labeledInstruction
      *            The {@link TranslationTacletASTElement} that is labeled.
      */
-    public LabeledBytecodeInstr(String labelName,
+    public LabeledBytecodeInstr(LabelNameOrNameDecl labelName,
             Instruction labeledInstruction) {
         this.labelName = labelName;
         this.labeledInstruction = labeledInstruction;
@@ -37,8 +38,12 @@ public class LabeledBytecodeInstr extends Instruction {
             UniqueLabelManager labelManager, RuleInstantiations instantiations, Services services,
             List<TacletASTNode> children) {
 
+        String name = labelName.getName(instantiations);
+        Label lbl = labelName.isExplicitName()
+                ? labelManager.getLabelForName(name) : getGlobalLabel(name);
+
         //TODO Visit label iff not visited already
-        mv.visitLabel(labelManager.getLabelForName(labelName));
+        mv.visitLabel(lbl);
         labeledInstruction.translate(mv, pvHelper, labelManager, instantiations, services,
                 children);
 

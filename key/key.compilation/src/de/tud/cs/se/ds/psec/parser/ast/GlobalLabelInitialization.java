@@ -20,14 +20,13 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  * @author Dominic Scheurer
  */
 public class GlobalLabelInitialization extends Instruction {
-    private String labelName = null;
-    private NameDecl nameDecl = null;
+    private LabelNameOrNameDecl labelName;
 
     /**
      * @param labelName
      */
     public GlobalLabelInitialization(String labelName) {
-        this.labelName = labelName;
+        this.labelName = new LabelNameOrNameDecl(labelName);
     }
 
     /**
@@ -35,17 +34,15 @@ public class GlobalLabelInitialization extends Instruction {
      * @param nameDecl
      */
     public GlobalLabelInitialization(NameDecl nameDecl) {
-        this.nameDecl = nameDecl;
+        this.labelName = new LabelNameOrNameDecl(nameDecl);
     }
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
             UniqueLabelManager labelManager, RuleInstantiations instantiations,
             Services services, List<TacletASTNode> children) {
-
-        String lblName = labelName == null ? nameDecl.getName(instantiations)
-                : labelName;
-        registerGlobalLabel(lblName);
+        
+        registerGlobalLabel(labelName.getName(instantiations));
 
     }
 
