@@ -18,6 +18,7 @@ public class SuperClass {
       @ ensures true;
       @*/
     protected SuperClass(NatWrapper nat) {
+        this();
         this.nat = nat;
     }
     

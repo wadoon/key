@@ -82,13 +82,16 @@ public class SuperCallInstruction extends Instruction {
 
             SpecialConstructorReference scr = (SpecialConstructorReference) instantiations
                     .getInstantiationFor(specialConstructorReferenceSV).get();
-            
+
+            KeYJavaType type = null;
             if (scr instanceof SuperConstructorReference) {
-                pm = getProgramMethod(services, "<init>", scr.getArguments(),
-                        executionContext, superType);
+                type = superType;
             } else if (scr instanceof ThisConstructorReference) {
-                // TODO
+                type = executionContext.getTypeReference().getKeYJavaType();
             }
+
+            pm = getProgramMethod(services, "<init>", scr.getArguments(),
+                    executionContext, type);
 
         }
 
@@ -102,14 +105,24 @@ public class SuperCallInstruction extends Instruction {
     }
 
     /**
-     * TODO
+     * Returns a {@link ProgramMethod} for the given specification.
      * 
      * @param services
+     *            The {@link Services} object.
      * @param methodName
+     *            The name for the {@link ProgramMethod} to find.
      * @param args
+     *            The list of argument {@link Expression}s for the
+     *            {@link ProgramMethod} call.
      * @param executionContext
+     *            The {@link ExecutionContext}, needed for determining the
+     *            argument types.
      * @param superType
-     * @return
+     *            The class type the method is contained in.
+     * @return A {@link ProgramMethod} for the given specification.
+     * @throws UnexpectedTranslationSituationException
+     *             if there is not exactly one method meeting the given
+     *             specification.
      */
     private ProgramMethod getProgramMethod(Services services, String methodName,
             ImmutableArray<Expression> args, ExecutionContext executionContext,

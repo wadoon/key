@@ -189,6 +189,17 @@ operation_contract_static_void {
 	)
 }
 
+// We ignore "methodCall" method calls, since they are
+// only used for cases where we already compiled a
+// special_constructor_call before. For normal method
+// calls, we use contracts in any case.
+method_call_ignore {
+	\taclets ("methodCall")
+	\translation (
+		#child-1
+	)
+}
+
 method_call_super_constructor_simple_args {
 	\taclets ("special_constructor_call")
 	\condition (hasSimpleExpressionArguments (#scr))

@@ -26,7 +26,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.reference.MethodReference;
-import de.uka.ilkd.key.java.reference.SuperConstructorReference;
+import de.uka.ilkd.key.java.reference.SpecialConstructorReference;
 import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -169,11 +169,11 @@ public class MethodBodyCompiler implements Opcodes {
                 .computeActiveStatement(startNode.getAppliedRuleApp());
 
         if (actStmt == null || !(actStmt instanceof MethodReference
-                || actStmt instanceof SuperConstructorReference)) {
+                || actStmt instanceof SpecialConstructorReference)) {
             return true;
         }
-        
-        if (actStmt instanceof SuperConstructorReference) {
+
+        if (actStmt instanceof SpecialConstructorReference) {
             return false;
         } else {
             return !((MethodReference) actStmt).getName().equals("<init>");
