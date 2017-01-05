@@ -26,6 +26,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.reference.MethodReference;
+import de.uka.ilkd.key.java.reference.SuperConstructorReference;
 import de.uka.ilkd.key.java.statement.EmptyStatement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -107,7 +108,7 @@ public class MethodBodyCompiler implements Opcodes {
         // Add a super() call to the beginning of a constructor if there
         // is no explicit one. In Java, you can omit this, while in bytecode,
         // it is required.
-        //TODO this can be wrong -- see "Inheritance" test case
+        // TODO this can be wrong -- see "Inheritance" test case
         if (shouldAddConstructorCall(startNode)) {
             // TODO Check what happens if there is no super constructor with
             // empty arguments. Does KeY complain in this case, like the Java
@@ -167,13 +168,16 @@ public class MethodBodyCompiler implements Opcodes {
         SourceElement actStmt = NodeInfo
                 .computeActiveStatement(startNode.getAppliedRuleApp());
 
-        if (actStmt == null || !(actStmt instanceof MethodReference)) {
+        if (actStmt == null || !(actStmt instanceof MethodReference
+                || actStmt instanceof SuperConstructorReference)) {
             return true;
         }
-
-        MethodReference mRef = (MethodReference) actStmt;
-
-        return !mRef.getName().equals("<init>");
+        
+        if (actStmt instanceof SuperConstructorReference) {
+            return false;
+        } else {
+            return !((MethodReference) actStmt).getName().equals("<init>");
+        }
     }
 
     /**
@@ -262,8 +266,7 @@ public class MethodBodyCompiler implements Opcodes {
         currentNode = currentNode.child(0);
 
         while (currentNode.childrenCount() == 1 && !currentNode.leaf()
-                && !translationFactory.assertHasDefinitionFor(
-                        currentNode.getAppliedRuleApp())) {
+                && !isSymbolicExecutionNode(currentNode)) {
             currentNode = currentNode.child(0);
         }
 

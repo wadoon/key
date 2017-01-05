@@ -189,7 +189,7 @@ operation_contract_static_void {
 	)
 }
 
-/*method_call_super_constructor {
+method_call_super_constructor {
 	\taclets ("superRemoveForCompilation")
 	\condition (isConstructor (#mn))
 	\translation (
@@ -198,7 +198,7 @@ operation_contract_static_void {
 		\superCall (#mn, #selist)
 		#child-1
 	)
-}*/
+}
 
 // TODO: Should translate methodBodyExpand instead --
 //       then the #elist is already an #selist.
