@@ -22,7 +22,6 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodName;
 import de.uka.ilkd.key.java.reference.SpecialConstructorReference;
 import de.uka.ilkd.key.java.reference.SuperConstructorReference;
-import de.uka.ilkd.key.java.reference.ThisConstructorReference;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
@@ -86,7 +85,8 @@ public class SuperCallInstruction extends Instruction {
             KeYJavaType type = null;
             if (scr instanceof SuperConstructorReference) {
                 type = superType;
-            } else if (scr instanceof ThisConstructorReference) {
+            } else {
+                // In this case, scr must be of type ThisConstructorReference.
                 type = executionContext.getTypeReference().getKeYJavaType();
             }
 
