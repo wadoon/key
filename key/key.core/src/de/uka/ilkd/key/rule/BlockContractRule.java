@@ -69,6 +69,7 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Terms;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
 import de.uka.ilkd.key.speclang.BlockWellDefinedness;
+import de.uka.ilkd.key.speclang.SimpleBlockContract;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -464,27 +465,27 @@ public class BlockContractRule implements BuiltInRule {
             StatementBlock oldProgram = (StatementBlock) oldTerm.javaBlock()
                     .program();
 
-            //Statement oldTryStatement = oldProgram.getBody().get(0);
-           // MethodFrame oldMethodFrame = oldProgram.getInnerMostMethodFrame();
-            StatementBlock body = oldProgram.getInnerMostMethodFrame().getBody();
+            MethodFrame oldMethodFrame = oldProgram.getInnerMostMethodFrame();
+            StatementBlock body = oldMethodFrame.getBody();
 
             StatementBlock newBody = getBlockWithJPS(body,
                     instantiation.block, services, application);
 
-          /*  MethodFrame newMethodFrame = KeYJavaASTFactory.methodFrame(
-                    oldMethodFrame.getProgramVariable(),
-                    oldMethodFrame.getExecutionContext(), newBlock);
-
-           Try newTryStatement = KeYJavaASTFactory.tryBlock(newMethodFrame,
-                    (Catch) ((Try) oldTryStatement).getChildAt(1));
-
-            Statement newProgram2 = (Statement) new ProgramElementReplacer(
-                    oldProgram, services).replace(oldTryStatement,
-                            newTryStatement);*/
+             MethodFrame newMethodFrame = KeYJavaASTFactory.methodFrame(
+                   oldMethodFrame.getProgramVariable(),
+                   oldMethodFrame.getExecutionContext(), newBody);
+//
+//           Try newTryStatement = KeYJavaASTFactory.tryBlock(newMethodFrame,
+//                    (Catch) ((Try) oldTryStatement).getChildAt(1));
+//
+//            Statement newProgram = (Statement) new ProgramElementReplacer(
+//                    oldProgram, services).replace(oldTryStatement,
+//                            newTryStatement);
             
            Statement newProgram = (Statement) new ProgramElementReplacer(
-                  oldProgram, services).replace(body,
-                         newBody);
+                  oldProgram, services).replace(oldMethodFrame,
+                         newMethodFrame);
+            
             JavaBlock newJavaBlock = JavaBlock
                     .createJavaBlock(KeYJavaASTFactory.block(newProgram));
 
@@ -546,7 +547,7 @@ public class BlockContractRule implements BuiltInRule {
         Statement[] newInnerMostContent = new Statement[size + 1];
         newInnerMostContent[0] = (Statement) block.getChildAt(0);
         newInnerMostContent[1] = (Statement) new JoinPointStatement(
-                application.getContract().getJoinProcedure(), progVar);
+                (SimpleBlockContract) application.getContract(), progVar);
 
         for (int i = 1; i < size; i++) {
 

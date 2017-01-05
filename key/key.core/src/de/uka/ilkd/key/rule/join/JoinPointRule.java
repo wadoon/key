@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.speclang.SimpleBlockContract;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
@@ -28,16 +29,16 @@ public class JoinPointRule implements BuiltInRule {
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services,
             RuleApp ruleApp) throws RuleAbortException {
-        
+
         PosInOccurrence pio = ruleApp.posInOccurrence();
         JoinRuleBuiltInRuleApp app = new JoinRuleBuiltInRuleApp(new JoinRule(),
                 pio);
-      
+
         StatementBlock block = (StatementBlock) JoinRuleUtils
                 .getJavaBlockRecursive(pio.subTerm()).program();
         JoinProcedure concreteRule = ((JoinPointStatement) block
-                        .getInnerMostMethodFrame().getBody().getFirstElement())
-                                .getJoinProc();
+                .getInnerMostMethodFrame().getBody().getFirstElement())
+                        .getJoinProc();
 
         ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                 .findPotentialJoinPartners(goal, pio, goal.proof().root());
@@ -45,7 +46,7 @@ public class JoinPointRule implements BuiltInRule {
         app.setJoinNode(goal.node());
         app.setConcreteRule(concreteRule);
         app.setJoinPartners(joinPartners);
-      
+
         ImmutableList<Goal> newGoals = goal.split(1);
         Goal g = newGoals.head();
         newGoals = g.apply(app);
@@ -62,43 +63,102 @@ public class JoinPointRule implements BuiltInRule {
     public String displayName() {
         return DISPLAY_NAME;
     }
-    
 
     @Override
     public String toString() {
         return displayName();
     }
-    
+
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        
-        if (pio != null && pio.subTerm().isContainsJavaBlockRecursive()
-                && isJoinPointStatement(JoinRuleUtils
-                        .getJavaBlockRecursive(pio.subTerm()).program())) {
-           
-            ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
-                    .findPotentialJoinPartners(goal, pio);
-            
-            if (!joinPartners.equals(ImmutableSLList.nil())) {
-                return true;
+
+        if (pio != null && pio.subTerm().isContainsJavaBlockRecursive()) {
+            SimpleBlockContract contract = isJoinPointStatement(JoinRuleUtils
+                    .getJavaBlockRecursive(pio.subTerm()).program());
+
+            if (contract != null) {
+                ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
+                        .findPotentialJoinPartners(goal, pio);
+                ImmutableList<Goal> joinPartnersGoal = ImmutableSLList.nil();
+
+                for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> p : joinPartners) {
+                    joinPartnersGoal = joinPartnersGoal.append(p.first);
+                }
+
+                if (!joinPartners.isEmpty()) {
+                    ImmutableList<Goal> openGoals = goal.node().proof()
+                            .openGoals();
+                    for (Goal g : openGoals) {
+                        //not linked
+                        if (!g.equals(goal) && !g.isLinked() && !joinPartnersGoal.contains(g)) {
+                            JavaBlock jB;
+                            for(int i = 0; i < g.node().sequent().succedent().size(); i++){
+                            jB = JoinRuleUtils
+                                    .getJavaBlockRecursive(g.node().sequent()
+                                            .succedent().get(i).formula());
+
+                            if (((StatementBlock) jB.program())
+                                    .getInnerMostMethodFrame() != null && hasSameBlock(((StatementBlock) jB.program())
+                                    .getInnerMostMethodFrame().getBody(),
+                                    contract.getBlock())) {
+
+                                return false;
+                            }
+                            }
+                            if (hasSameBlockContractRule(g, contract))
+                                return false;
+                        }
+                    }
+                    return true;
+                }
             }
         }
-        
-        return false;
 
+        return false;
     }
 
-    public static boolean isJoinPointStatement(ProgramElement pE) {
+    private boolean hasSameBlockContractRule(Goal g,
+            SimpleBlockContract contract) {
+        for (RuleApp rA : g.appliedRuleApps()) {
+            if (rA instanceof BlockContractBuiltInRuleApp
+                    && ((BlockContractBuiltInRuleApp) rA).getContract()
+                            .equals(contract))
+                return true;
+        }
+        return false;
+    }
+
+    private boolean hasSameBlock(StatementBlock block1, StatementBlock block2) {
+
+        for (int i = 0; i < block1.getChildCount(); i++) {
+            if (block1.getChildAt(i) != null
+                    && block1.getChildAt(i) instanceof StatementBlock) {
+                if (block1.getChildAt(i).equals(block2)) {
+                    return true;
+                }
+                else {
+                    return hasSameBlock((StatementBlock) block1.getChildAt(0),
+                            block2);
+                }
+            }
+        }
+        return false;
+    }
+
+    public static SimpleBlockContract isJoinPointStatement(ProgramElement pE) {
 
         if (pE != null && pE instanceof StatementBlock
                 && ((StatementBlock) pE).getInnerMostMethodFrame() != null
-                && ((StatementBlock) pE).getInnerMostMethodFrame().getBody() != null
+                && ((StatementBlock) pE).getInnerMostMethodFrame()
+                        .getBody() != null
                 && ((StatementBlock) pE).getInnerMostMethodFrame().getBody()
                         .getFirstElement() instanceof JoinPointStatement)
-            return true;
+            return ((JoinPointStatement) ((StatementBlock) pE)
+                    .getInnerMostMethodFrame().getBody().getFirstElement())
+                            .getContract();
 
         else
-            return false;
+            return null;
 
     }
 
@@ -113,5 +173,4 @@ public class JoinPointRule implements BuiltInRule {
         return new JoinPointBuiltInRuleApp(this, pos);
     }
 
-    
 }

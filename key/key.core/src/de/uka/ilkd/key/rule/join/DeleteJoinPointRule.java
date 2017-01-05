@@ -59,24 +59,23 @@ public class DeleteJoinPointRule implements BuiltInRule {
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 
-        if (pio != null && JoinPointRule.isJoinPointStatement(
-                JoinRuleUtils.getJavaBlockRecursive(pio.subTerm()).program())) {
-            
+        if (pio != null && JoinPointRule.isJoinPointStatement(JoinRuleUtils
+                .getJavaBlockRecursive(pio.subTerm()).program()) != null) {
+
             ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                     .findPotentialJoinPartners(goal, pio);
-            
-            if (joinPartners.equals(ImmutableSLList.nil()) && (goal
-                    .appliedRuleApps().head() instanceof JoinRuleBuiltInRuleApp
-                    || goal.appliedRuleApps().tail()
-                            .head() instanceof JoinRuleBuiltInRuleApp)) {
+
+            if (joinPartners.isEmpty() && goal.appliedRuleApps()
+                    .head() instanceof JoinRuleBuiltInRuleApp) {
                 return true;
+                /*
+                 * for (RuleApp rA : goal.appliedRuleApps()) { if (rA instanceof
+                 * JoinRuleBuiltInRuleApp) return true; }
+                 */
             }
-            else
-                return false;
 
         }
-        else
-            return false;
+        return false;
 
     }
 
@@ -106,14 +105,35 @@ public class DeleteJoinPointRule implements BuiltInRule {
                 Statement oldTryStatement = oldProgram.getBody().get(0);
                 MethodFrame oldMethodFrame = oldProgram
                         .getInnerMostMethodFrame();
-                StatementBlock innerBlock = oldMethodFrame.getBody();
+                StatementBlock body = oldMethodFrame.getBody();
 
-                int size = innerBlock.getBody().toImmutableList().tail().size();
-                Statement[] array = new Statement[size];
+                // StatementBlock newBody = getBlockWithJPS(body,
+                // instantiation.block, services, application);
+
+                int size = body.getBody().toImmutableList().tail().size();
+                StatementBlock newInnerBlock = new StatementBlock();
+                if (body.getChildAt(0) instanceof StatementBlock) {
+                    int size2 = ((StatementBlock) body.getChildAt(0))
+                            .getChildCount() - 1;
+                    Statement[] array2 = new Statement[size2];
+                    StatementBlock newBlock = new StatementBlock(
+                            ((StatementBlock) body.getChildAt(0)).getBody()
+                                    .toImmutableList().tail().toArray(array2));
+                    Statement[] newContent = new Statement[size];
+                    newContent[0] = ((Statement) newBlock);
+                    for (int k = 1; k < size; k++) {
+
+                        newContent[k] = ((Statement) body.getChildAt(k));
+                    }
+
+                    newInnerBlock =  KeYJavaASTFactory.block(newContent);
+                }
+                else { Statement[] array = new Statement[size];
                 // the same as the old inner block but without the
                 // JoinPointStatement.
-                StatementBlock newInnerBlock = new StatementBlock(innerBlock
-                        .getBody().toImmutableList().tail().toArray(array));
+                newInnerBlock = new StatementBlock(
+                        body.getBody().toImmutableList().tail().toArray(array));
+                }
 
                 MethodFrame newMethodFrame = KeYJavaASTFactory.methodFrame(
                         oldMethodFrame.getProgramVariable(),
@@ -121,17 +141,12 @@ public class DeleteJoinPointRule implements BuiltInRule {
                                 .getExecutionContext(),
                         newInnerBlock);
 
-                Try newTryStatement = KeYJavaASTFactory.tryBlock(newMethodFrame,
-                        (Catch) ((Try) oldTryStatement).getChildAt(1));
-
                 Statement newProgram = (Statement) new ProgramElementReplacer(
-                        oldProgram, services).replace(oldTryStatement,
-                                newTryStatement);
+                        oldProgram, services).replace(oldMethodFrame,
+                                newMethodFrame);
 
                 JavaBlock newJavaBlock = JavaBlock
-                        .createJavaBlock(newProgram instanceof StatementBlock
-                                ? (StatementBlock) newProgram
-                                : new StatementBlock(newProgram));
+                        .createJavaBlock(KeYJavaASTFactory.block(newProgram));
 
                 TermBuilder tb = services.getTermBuilder();
                 Term oldTerm = UpdateApplication.getTarget(formula);
