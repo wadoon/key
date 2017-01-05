@@ -189,29 +189,21 @@ operation_contract_static_void {
 	)
 }
 
-method_call_super_constructor {
-	\taclets ("superRemoveForCompilation")
-	\condition (isConstructor (#mn))
+method_call_super_constructor_simple_args {
+	\taclets ("special_constructor_call")
+	\condition (hasSimpleExpressionArguments (#scr))
 	\translation (
 		ALOAD 0
-		\load_params (#selist)
-		\superCall (#mn, #selist)
+		\load_params (#scr)
+		\superCall (#scr)
 		#child-1
 	)
 }
 
-// TODO: Should translate methodBodyExpand instead --
-//       then the #elist is already an #selist.
-//       Also: Add primitive to make sure that we're not
-//       in some nested method frame. There should be
-//       something more elegant then \condition (isSuperMethod(#pm, #methodBeingCompiled))
-method_call_super_constructor_2 {
-	\taclets ("methodCallSuper")
-	\condition (isConstructor (#mn))
+method_call_super_constructor_complex_args {
+	\taclets ("special_constructor_call")
+	\condition (!hasSimpleExpressionArguments (#scr))
 	\translation (
-		ALOAD 0
-		\load_params (#elist)
-		\superCall (#mn, #elist)
 		#child-1
 	)
 }

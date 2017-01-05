@@ -112,6 +112,7 @@ AND : '&';
 OR  : '|';
 NOT : '!';
 
+HAS_SIMPLE_EXPR_ARGS : 'hasSimpleExpressionArguments' ;
 IS_BEFORE_LOOP_SCOPE : 'isBeforeLoopScope' ;
 IS_CONSTRUCTOR       : 'isConstructor' ;
 IS_FIELD_REF         : 'isFieldReference' ;

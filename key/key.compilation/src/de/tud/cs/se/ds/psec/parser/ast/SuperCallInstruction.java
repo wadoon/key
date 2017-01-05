@@ -20,6 +20,9 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MethodName;
+import de.uka.ilkd.key.java.reference.SpecialConstructorReference;
+import de.uka.ilkd.key.java.reference.SuperConstructorReference;
+import de.uka.ilkd.key.java.reference.ThisConstructorReference;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
@@ -31,6 +34,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 public class SuperCallInstruction extends Instruction {
     String methodNameSV;
     String argListSV;
+    String specialConstructorReferenceSV;
 
     /**
      * @param methodNameSV
@@ -45,16 +49,15 @@ public class SuperCallInstruction extends Instruction {
         this.argListSV = argListSV;
     }
 
+    public SuperCallInstruction(String specialConstructorReferenceSV) {
+        this.specialConstructorReferenceSV = specialConstructorReferenceSV;
+    }
+
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            GlobalLabelHelper globalLabelHelper, UniqueLabelManager labelManager,
-            RuleInstantiations instantiations, Services services, List<TacletASTNode> children) {
-
-        MethodName methodName = (MethodName) instantiations
-                .getInstantiationFor(methodNameSV).get();
-        @SuppressWarnings("unchecked")
-        ImmutableArray<Expression> args = (ImmutableArray<Expression>) instantiations
-                .getInstantiationFor(argListSV).get();
+            GlobalLabelHelper globalLabelHelper,
+            UniqueLabelManager labelManager, RuleInstantiations instantiations,
+            Services services, List<TacletASTNode> children) {
 
         ExecutionContext executionContext = (ExecutionContext) instantiations
                 .getInstantiationFor("#ex").get();
@@ -62,12 +65,61 @@ public class SuperCallInstruction extends Instruction {
         KeYJavaType superType = services.getJavaInfo().getSuperclass(
                 executionContext.getTypeReference().getKeYJavaType());
 
+        ProgramMethod pm = null;
+
+        if (specialConstructorReferenceSV == null) {
+
+            MethodName methodName = (MethodName) instantiations
+                    .getInstantiationFor(methodNameSV).get();
+            @SuppressWarnings("unchecked")
+            ImmutableArray<Expression> args = (ImmutableArray<Expression>) instantiations
+                    .getInstantiationFor(argListSV).get();
+
+            pm = getProgramMethod(services, methodName.toString(), args,
+                    executionContext, superType);
+
+        } else {
+
+            SpecialConstructorReference scr = (SpecialConstructorReference) instantiations
+                    .getInstantiationFor(specialConstructorReferenceSV).get();
+            
+            if (scr instanceof SuperConstructorReference) {
+                pm = getProgramMethod(services, "<init>", scr.getArguments(),
+                        executionContext, superType);
+            } else if (scr instanceof ThisConstructorReference) {
+                // TODO
+            }
+
+        }
+
+        // TODO check if we got all the right opcodes...
+        mv.visitMethodInsn(
+                pm.isConstructor() || pm.getName().equals("<init>")
+                        ? INVOKESPECIAL : INVOKEVIRTUAL,
+                InformationExtraction.toInternalName(pm.getContainerType()),
+                pm.getName(), InformationExtraction.getMethodTypeDescriptor(pm),
+                false);
+    }
+
+    /**
+     * TODO
+     * 
+     * @param services
+     * @param methodName
+     * @param args
+     * @param executionContext
+     * @param superType
+     * @return
+     */
+    private ProgramMethod getProgramMethod(Services services, String methodName,
+            ImmutableArray<Expression> args, ExecutionContext executionContext,
+            KeYJavaType superType) {
         List<ProgramMethod> suitableMethods = Utilities
                 .toStream(((ClassDeclaration) superType.getJavaType())
                         .getMembers())
                 .filter(memberDecl -> (memberDecl instanceof ProgramMethod))
                 .map(m -> (ProgramMethod) m)
-                .filter(mDecl -> mDecl.getName().equals(methodName.toString()))
+                .filter(mDecl -> mDecl.getName().equals(methodName))
                 .filter(mDecl -> {
                     if (args.size() != mDecl.getParameters().size()) {
                         return false;
@@ -89,19 +141,11 @@ public class SuperCallInstruction extends Instruction {
         if (suitableMethods.size() != 1) {
             throw new UnexpectedTranslationSituationException(Utilities.format(
                     "Wrong number of matching methods for %s, expected: 1, actual: %s",
-                    methodName.toString(), suitableMethods.size()));
+                    methodName, suitableMethods.size()));
         }
 
         ProgramMethod pm = suitableMethods.get(0);
-
-        // TODO check if we got all the right opcodes...
-        mv.visitMethodInsn(
-                pm.isConstructor() || pm.getName().equals("<init>")
-                        ? INVOKESPECIAL : INVOKEVIRTUAL,
-                InformationExtraction.toInternalName(pm.getContainerType()),
-                pm.getName(), InformationExtraction.getMethodTypeDescriptor(pm),
-                false);
-
+        return pm;
     }
 
 }

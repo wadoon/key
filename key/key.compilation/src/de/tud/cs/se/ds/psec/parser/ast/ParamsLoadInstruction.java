@@ -14,6 +14,7 @@ import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.expression.Literal;
+import de.uka.ilkd.key.java.reference.SpecialConstructorReference;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
@@ -43,10 +44,18 @@ public class ParamsLoadInstruction extends Instruction {
 
     @Override
     public void translate(MethodVisitor mv, ProgVarHelper pvHelper,
-            GlobalLabelHelper globalLabelHelper, UniqueLabelManager labelManager,
-            RuleInstantiations instantiations, Services services, List<TacletASTNode> children) {
-        Iterable<?> params = (Iterable<?>) instantiations
-                .getInstantiationFor(schemaVar).get();
+            GlobalLabelHelper globalLabelHelper,
+            UniqueLabelManager labelManager, RuleInstantiations instantiations,
+            Services services, List<TacletASTNode> children) {
+        Iterable<?> params = null;
+
+        Object svInstObj = instantiations.getInstantiationFor(schemaVar).get();
+
+        if (svInstObj instanceof SpecialConstructorReference) {
+            params = ((SpecialConstructorReference) svInstObj).getArguments();
+        } else {
+            params = (Iterable<?>) svInstObj;
+        }
 
         params.forEach(param -> {
             Expression e = null;

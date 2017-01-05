@@ -240,7 +240,12 @@ super_call
 			(mname = LOC_REF)
 			COMMA
 			(elist = LOC_REF)
-		RPAREN
+		RPAREN                # SuperCallExplicit
+	|
+		SUPER_CALL
+		LPAREN
+			(scr = LOC_REF)
+		RPAREN                # SuperCallSpecialCtorRef
 	;
 
 child_call
@@ -373,6 +378,11 @@ expression_atom
 
 special_expression
 	:
+		HAS_SIMPLE_EXPR_ARGS
+		LPAREN
+			LOC_REF
+		RPAREN          # hasSimpleExpressionArgsExpression
+	|
 		IS_BEFORE_LOOP_SCOPE
 		                # isBeforeLoopScopeExpression
 	|

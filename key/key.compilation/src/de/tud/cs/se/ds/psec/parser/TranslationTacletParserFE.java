@@ -22,6 +22,7 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Field_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.GlobalLabelInitExplicitContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.GlobalLabelInitNewNameContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Global_label_refContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.HasSimpleExpressionArgsExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.InstructionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.IntUnaryBytecodeInstrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Invoke_instr_literalContext;
@@ -51,7 +52,8 @@ import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SpecialUnaryInstrsCon
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Store_instrContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.StrEqualsExpressionContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.StringLitUnaryBytecodeInstrContext;
-import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.Super_callContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SuperCallExplicitContext;
+import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.SuperCallSpecialCtorRefContext;
 import de.tud.cs.se.ds.psec.parser.TranslationTacletParser.TranslationContext;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCheckInput;
 import de.tud.cs.se.ds.psec.parser.ast.ApplicabilityCondition;
@@ -79,18 +81,22 @@ import de.tud.cs.se.ds.psec.parser.ast.TranslationTacletASTElement;
 import de.tud.cs.se.ds.psec.parser.ast.TypeInstr;
 import de.tud.cs.se.ds.psec.parser.exceptions.TranslationTacletInputException;
 import de.tud.cs.se.ds.psec.util.LogicUtils;
+import de.tud.cs.se.ds.psec.util.Utilities;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ConstructorDeclaration;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.MethodName;
+import de.uka.ilkd.key.java.reference.SpecialConstructorReference;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 
 /**
@@ -312,6 +318,20 @@ public class TranslationTacletParserFE extends
     }
 
     @Override
+    public ApplicabilityCondition visitHasSimpleExpressionArgsExpression(
+            HasSimpleExpressionArgsExpressionContext ctx) {
+        return new ApplicabilityCondition(info -> {
+            SpecialConstructorReference scr = (SpecialConstructorReference) info
+                    .getInstantiations().getInstantiationFor("#scr").get();
+            
+            return Utilities.toStream(scr.getArguments())
+                    .map(elem -> ProgramSVSort.SIMPLEEXPRESSION
+                            .canStandFor((ProgramElement) elem, info.getServices()))
+                    .reduce(true, (acc, elem) -> acc && elem);
+        });
+    }
+
+    @Override
     public ApplicabilityCondition visitIsBeforeLoopScopeExpression(
             IsBeforeLoopScopeExpressionContext ctx) {
         return new ApplicabilityCondition(info -> {
@@ -504,9 +524,16 @@ public class TranslationTacletParserFE extends
     }
 
     @Override
-    public SuperCallInstruction visitSuper_call(Super_callContext ctx) {
+    public TranslationTacletASTElement visitSuperCallExplicit(
+            SuperCallExplicitContext ctx) {
         return new SuperCallInstruction(ctx.mname.getText(),
                 ctx.elist.getText());
+    }
+
+    @Override
+    public TranslationTacletASTElement visitSuperCallSpecialCtorRef(
+            SuperCallSpecialCtorRefContext ctx) {
+        return new SuperCallInstruction(ctx.scr.getText());
     }
 
     @Override
