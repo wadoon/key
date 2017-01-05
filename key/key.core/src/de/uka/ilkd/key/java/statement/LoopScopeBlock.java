@@ -75,7 +75,7 @@ public class LoopScopeBlock extends JavaStatement
     }
 
     /**
-     * Synchronized block.
+     * TODO
      * 
      * @param children
      *            a list with all children

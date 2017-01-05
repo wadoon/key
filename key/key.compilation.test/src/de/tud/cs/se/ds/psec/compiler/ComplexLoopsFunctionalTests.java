@@ -18,8 +18,8 @@ public class ComplexLoopsFunctionalTests
     private static final boolean DELETE_TMP_FILES = false;
     
     // Let tests time out after 15 seconds.
-    @Rule
-    public Timeout globalTimeout = Timeout.millis(15000);
+//    @Rule
+//    public Timeout globalTimeout = Timeout.millis(15000);
 
     public ComplexLoopsFunctionalTests() {
         super(DELETE_TMP_FILES);

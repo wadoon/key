@@ -80,6 +80,7 @@ import de.tud.cs.se.ds.psec.parser.ast.TypeInstr;
 import de.tud.cs.se.ds.psec.parser.exceptions.TranslationTacletInputException;
 import de.tud.cs.se.ds.psec.util.LogicUtils;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.ConstructorDeclaration;
 import de.uka.ilkd.key.java.declaration.MethodDeclaration;
@@ -318,12 +319,14 @@ public class TranslationTacletParserFE extends
             StatementBlock block = (StatementBlock) ((ContextStatementBlockInstantiation) info
                     .getInstantiations().getInstantiationFor("Context").get())
                             .programElement();
-            block = block.getInnerMostMethodFrame().getBody();
-            while (!block.isEmpty() && block.getBody().get(0) instanceof StatementBlock) {
-                block = (StatementBlock) block.getBody().get(0);
-            }
-            
-            return block.getBody().size() > 1 && block.getBody().get(1) instanceof LoopScopeBlock;
+
+            Statement lastPrefixElem = (Statement) block.getPrefixElements()
+                    .last();
+
+            return lastPrefixElem instanceof StatementBlock
+                    && ((StatementBlock) lastPrefixElem).getBody().size() > 1
+                    && ((StatementBlock) lastPrefixElem).getBody()
+                            .get(1) instanceof LoopScopeBlock;
         });
     }
 
