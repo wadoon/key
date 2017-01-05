@@ -107,12 +107,13 @@ public class MethodBodyCompiler implements Opcodes {
         // Add a super() call to the beginning of a constructor if there
         // is no explicit one. In Java, you can omit this, while in bytecode,
         // it is required.
+        //TODO this can be wrong -- see "Inheritance" test case
         if (shouldAddConstructorCall(startNode)) {
             // TODO Check what happens if there is no super constructor with
             // empty arguments. Does KeY complain in this case, like the Java
             // compiler would?
             logger.info(
-                    "There is no super constructor call in %s%s, adding one",
+                    "There is no super constructor call with empty arguments in %s%s, adding one",
                     mDecl.name(),
                     InformationExtraction.getMethodTypeDescriptor(mDecl));
             addConstructorCall();

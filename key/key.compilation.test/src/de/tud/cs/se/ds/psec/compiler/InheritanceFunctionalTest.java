@@ -16,7 +16,7 @@ import org.junit.Test;
  * @author Dominic Scheurer
  */
 public class InheritanceFunctionalTest extends AbstractCompilerFunctionalTest {
-    private static final boolean DELETE_TMP_FILES = true;
+    private static final boolean DELETE_TMP_FILES = false;
 
     public InheritanceFunctionalTest() {
         super(DELETE_TMP_FILES);

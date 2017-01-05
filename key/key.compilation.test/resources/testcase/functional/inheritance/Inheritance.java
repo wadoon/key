@@ -16,6 +16,7 @@ public class Inheritance extends SuperClass {
     public Inheritance(int i) {
         //XXX We can not write "super(new NatWrapper(i));", because then
         // SE does not finish...
+//        super(new NatWrapper(i));
         super(null);
         nat = new NatWrapper(i);
     }

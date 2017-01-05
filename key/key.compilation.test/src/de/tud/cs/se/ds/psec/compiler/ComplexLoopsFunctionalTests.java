@@ -15,11 +15,12 @@ import org.junit.rules.Timeout;
  */
 public class ComplexLoopsFunctionalTests
         extends AbstractCompilerFunctionalTest {
-    private static final boolean DELETE_TMP_FILES = false;
+    private static final boolean DELETE_TMP_FILES = true;
+    private static final int TIMEOUT_MS = 15 * 1000;
     
     // Let tests time out after 15 seconds.
-//    @Rule
-//    public Timeout globalTimeout = Timeout.millis(15000);
+    @Rule
+    public Timeout globalTimeout = Timeout.millis(TIMEOUT_MS);
 
     public ComplexLoopsFunctionalTests() {
         super(DELETE_TMP_FILES);

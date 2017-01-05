@@ -54,7 +54,7 @@ public class SuperCallInstruction extends Instruction {
                 .getInstantiationFor(methodNameSV).get();
         @SuppressWarnings("unchecked")
         ImmutableArray<Expression> args = (ImmutableArray<Expression>) instantiations
-                .getInstantiationFor("#selist").get();
+                .getInstantiationFor(argListSV).get();
 
         ExecutionContext executionContext = (ExecutionContext) instantiations
                 .getInstantiationFor("#ex").get();

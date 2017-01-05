@@ -12,6 +12,7 @@ import org.junit.runners.Suite;
     de.tud.cs.se.ds.psec.compiler.SimpleCompilerFunctionalTests.class,
     de.tud.cs.se.ds.psec.compiler.MethodCallFunctionalTests.class,
     de.tud.cs.se.ds.psec.compiler.InheritanceFunctionalTest.class,
+    de.tud.cs.se.ds.psec.compiler.ComplexLoopsFunctionalTests.class,
 })
 
 /**
