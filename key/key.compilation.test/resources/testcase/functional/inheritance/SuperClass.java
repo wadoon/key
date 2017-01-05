@@ -3,7 +3,11 @@ package de.tud.test.inheritance;
 //XXX Making this class abstract leads to the phenomenon that 
 // for instance #equals(Object) is not executed, but the proof
 // tree closed because of an unsatisfiable assumption...
-public class SuperClass {
+// The unsatisfiable assumption is
+// de.tud.test.inheritance.SuperClass::exactInstance(self) = TRUE
+// But it might happen that equals is not overridden, and actually
+// used by subclasses!
+public /*abstract*/ class SuperClass {
     protected NatWrapper nat;
     
     /*@ public normal_behavior
@@ -18,7 +22,7 @@ public class SuperClass {
       @ ensures true;
       @*/
     protected SuperClass(NatWrapper nat) {
-        this();
+        this(); // Optional
         this.nat = nat;
     }
     
