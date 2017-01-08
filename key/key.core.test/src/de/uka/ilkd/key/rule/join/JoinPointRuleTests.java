@@ -27,7 +27,7 @@ public class JoinPointRuleTests extends TestCase {
 
     @Test
     public void testITEabs() {
-        final Proof proof = loadProof("AbsBlockContract.ITE.proof");
+        final Proof proof = loadProof("AbsBlockContract.ITE.key");
         startAutomaticStrategy(proof);
         assertTrue(proof.closed());
     }
@@ -35,14 +35,14 @@ public class JoinPointRuleTests extends TestCase {
     @Test
     public void testPredicateAbstractionAbs() {
         final Proof proof = loadProof(
-                "AbsBlockContract.predicateAbstraction.proof");
+                "AbsBlockContract.predicateAbstraction.key");
         startAutomaticStrategy(proof);
         assertTrue(proof.closed());
     }
 
     @Test
     public void testITEgcd() {
-        final Proof proof = loadProof("Gcd.ITE.proof");
+        final Proof proof = loadProof("Gcd.ITE.key");
         startAutomaticStrategy(proof);
         assertTrue(proof.closed());
     }

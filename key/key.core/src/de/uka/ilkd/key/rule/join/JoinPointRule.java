@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
 import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.SimpleBlockContract;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
@@ -73,7 +74,7 @@ public class JoinPointRule implements BuiltInRule {
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 
         if (pio != null && pio.subTerm().isContainsJavaBlockRecursive()) {
-            SimpleBlockContract contract = isJoinPointStatement(JoinRuleUtils
+            BlockContract contract = isJoinPointStatement(JoinRuleUtils
                     .getJavaBlockRecursive(pio.subTerm()).program());
 
             if (contract != null) {
@@ -96,6 +97,7 @@ public class JoinPointRule implements BuiltInRule {
                             jB = JoinRuleUtils
                                     .getJavaBlockRecursive(g.node().sequent()
                                             .succedent().get(i).formula());
+                            jB.isEmpty();
 
                             if (((StatementBlock) jB.program())
                                     .getInnerMostMethodFrame() != null && hasSameBlock(((StatementBlock) jB.program())
@@ -118,7 +120,7 @@ public class JoinPointRule implements BuiltInRule {
     }
 
     private boolean hasSameBlockContractRule(Goal g,
-            SimpleBlockContract contract) {
+            BlockContract contract) {
         for (RuleApp rA : g.appliedRuleApps()) {
             if (rA instanceof BlockContractBuiltInRuleApp
                     && ((BlockContractBuiltInRuleApp) rA).getContract()
@@ -145,20 +147,21 @@ public class JoinPointRule implements BuiltInRule {
         return false;
     }
 
-    public static SimpleBlockContract isJoinPointStatement(ProgramElement pE) {
+    public static BlockContract isJoinPointStatement(ProgramElement pE) {
 
         if (pE != null && pE instanceof StatementBlock
                 && ((StatementBlock) pE).getInnerMostMethodFrame() != null
                 && ((StatementBlock) pE).getInnerMostMethodFrame()
-                        .getBody() != null
-                && ((StatementBlock) pE).getInnerMostMethodFrame().getBody()
-                        .getFirstElement() instanceof JoinPointStatement)
-            return ((JoinPointStatement) ((StatementBlock) pE)
-                    .getInnerMostMethodFrame().getBody().getFirstElement())
-                            .getContract();
-
-        else
-            return null;
+                        .getBody() != null){
+            SourceElement st = ((StatementBlock) pE).getInnerMostMethodFrame().getBody()
+            .getFirstElement();
+            if(st instanceof JoinPointStatement){
+                return ((JoinPointStatement) st)
+                                .getContract();
+            }
+            
+        }
+        return null;
 
     }
 

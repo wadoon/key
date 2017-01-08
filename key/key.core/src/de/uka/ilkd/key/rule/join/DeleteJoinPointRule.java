@@ -7,6 +7,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.Catch;
+import de.uka.ilkd.key.java.statement.JoinPointStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
@@ -102,51 +103,23 @@ public class DeleteJoinPointRule implements BuiltInRule {
                 StatementBlock oldProgram = (StatementBlock) JoinRuleUtils
                         .getJavaBlockRecursive(formula).program();
 
-                Statement oldTryStatement = oldProgram.getBody().get(0);
                 MethodFrame oldMethodFrame = oldProgram
                         .getInnerMostMethodFrame();
                 StatementBlock body = oldMethodFrame.getBody();
 
-                // StatementBlock newBody = getBlockWithJPS(body,
-                // instantiation.block, services, application);
-
-                int size = body.getBody().toImmutableList().tail().size();
-                StatementBlock newInnerBlock = new StatementBlock();
-                if (body.getChildAt(0) instanceof StatementBlock) {
-                    int size2 = ((StatementBlock) body.getChildAt(0))
-                            .getChildCount() - 1;
-                    Statement[] array2 = new Statement[size2];
-                    StatementBlock newBlock = new StatementBlock(
-                            ((StatementBlock) body.getChildAt(0)).getBody()
-                                    .toImmutableList().tail().toArray(array2));
-                    Statement[] newContent = new Statement[size];
-                    newContent[0] = ((Statement) newBlock);
-                    for (int k = 1; k < size; k++) {
-
-                        newContent[k] = ((Statement) body.getChildAt(k));
-                    }
-
-                    newInnerBlock =  KeYJavaASTFactory.block(newContent);
-                }
-                else { Statement[] array = new Statement[size];
-                // the same as the old inner block but without the
-                // JoinPointStatement.
-                newInnerBlock = new StatementBlock(
-                        body.getBody().toImmutableList().tail().toArray(array));
-                }
+                StatementBlock newBody = getBlockWithoutJPS(body);
 
                 MethodFrame newMethodFrame = KeYJavaASTFactory.methodFrame(
                         oldMethodFrame.getProgramVariable(),
                         oldProgram.getInnerMostMethodFrame()
                                 .getExecutionContext(),
-                        newInnerBlock);
+                        newBody);
 
-                Statement newProgram = (Statement) new ProgramElementReplacer(
+                StatementBlock newProgram = (StatementBlock) new ProgramElementReplacer(
                         oldProgram, services).replace(oldMethodFrame,
                                 newMethodFrame);
 
-                JavaBlock newJavaBlock = JavaBlock
-                        .createJavaBlock(KeYJavaASTFactory.block(newProgram));
+                JavaBlock newJavaBlock = JavaBlock.createJavaBlock(newProgram);
 
                 TermBuilder tb = services.getTermBuilder();
                 Term oldTerm = UpdateApplication.getTarget(formula);
@@ -159,6 +132,28 @@ public class DeleteJoinPointRule implements BuiltInRule {
                         pio);
             }
         }
+    }
+
+    private StatementBlock getBlockWithoutJPS(StatementBlock block1) {
+        if (block1.getChildAt(0) != null) {
+            int size = block1.getChildCount();
+            if (block1.getChildAt(0) instanceof JoinPointStatement) {
+                Statement[] array = new Statement[size - 1];
+                block1.getBody().arraycopy(1, array, 0, size - 1);
+                return KeYJavaASTFactory.block(array);
+
+            }
+            else if (block1.getChildAt(0) instanceof StatementBlock) {
+
+                Statement[] newContent = new Statement[size];
+                newContent[0] = getBlockWithoutJPS(
+                        (StatementBlock) block1.getChildAt(0));
+                block1.getBody().arraycopy(1, newContent, 1, size - 1);
+
+                return KeYJavaASTFactory.block(newContent);
+            }
+        }
+        return null;
     }
 
 }
