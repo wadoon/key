@@ -465,23 +465,28 @@ public class BlockContractRule implements BuiltInRule {
             StatementBlock oldProgram = (StatementBlock) jB.program();
 
             MethodFrame oldMethodFrame = oldProgram.getInnerMostMethodFrame();
-            StatementBlock body = oldMethodFrame.getBody();
+            // StatementBlock body = oldMethodFrame.getBody();
 
-            StatementBlock newBody = getBlockWithJPS(body, instantiation.block,
-                    services, application);
+            StatementBlock newBody = insertJoinPoint(services, application,
+                    instantiation.block);
 
-            MethodFrame newMethodFrame = KeYJavaASTFactory.methodFrame(
-                    oldMethodFrame.getProgramVariable(),
-                    oldMethodFrame.getExecutionContext(), newBody);
-            StatementBlock newProgram = (StatementBlock) new ProgramElementReplacer(
-                    oldProgram, services).replace(oldMethodFrame,
-                            newMethodFrame);
+            // MethodFrame newMethodFrame = KeYJavaASTFactory.methodFrame(
+            // oldMethodFrame.getProgramVariable(),
+            // oldMethodFrame.getExecutionContext(), newBody);
+            //
+            // MethodFrame newmF = (MethodFrame) new ProgramElementReplacer(
+            // oldMethodFrame, services).replace(instantiation.block,
+            // newBody);
+            //
+            Statement newProgram = (Statement) new ProgramElementReplacer(
+                    oldProgram, services).replace(instantiation.block, newBody);
             //
             // Statement newP = (Statement) new ProgramElementReplacer(
             // oldProgram, services).replace(instantiation.block,
             // newBody);
 
-            JavaBlock newJavaBlock = JavaBlock.createJavaBlock(newProgram);
+            JavaBlock newJavaBlock = JavaBlock
+                    .createJavaBlock((StatementBlock) newProgram);
 
             TermBuilder tb = services.getTermBuilder();
             Term newTerm = tb.tf().createTerm(oldTerm.op(), oldTerm.subs(),
@@ -495,53 +500,26 @@ public class BlockContractRule implements BuiltInRule {
 
     }
 
-    private StatementBlock getBlockWithJPS(StatementBlock block1,
-            StatementBlock block2, Services services,
-            final BlockContractBuiltInRuleApp app) {
-        
-        SourceElement sE = block1.getFirstElementIncludingBlocks();
-        
-        if (!sE.equals(block1) && sE instanceof StatementBlock) {
-            if (sE.equals(block2)) {
-                return insertJoinPoint(services, app, block1);
-            }
-            else {
-                StatementBlock sB = getBlockWithJPS(
-                        (StatementBlock) sE, block2, services,
-                        app);
-                int size = block1.getChildCount();
-                Statement[] newContent = new Statement[size];
-                newContent[0] = (Statement) sB;
-                block1.getBody().arraycopy(1, newContent, 1, size - 1);
-
-                return KeYJavaASTFactory.block(newContent);
-            }
-        }
-        else
-            return null;
-    }
-
     private StatementBlock insertJoinPoint(final Services services,
             final BlockContractBuiltInRuleApp application,
             StatementBlock block) {
-        int size = block.getChildCount();
+        // int size = block.getChildCount();
 
         final ProgramVariable progVar = KeYJavaASTFactory.localVariable(
                 services.getVariableNamer()
                         .getTemporaryNameProposal("join_point"),
                 new KeYJavaType(PrimitiveType.JAVA_BOOLEAN, Sort.ANY));
 
-        ProgramElement[] newContent = new ProgramElement[size + 2];
+        // Statement[] newContent = new Statement[size + 1];
 
-        newContent[0] = KeYJavaASTFactory.declare(
-         progVar, KeYJavaASTFactory.falseLiteral());
-        newContent[1] = block.getChildAt(0);
-        newContent[2] = new JoinPointStatement(
-                (BlockContract) application.getContract(), progVar);
+        // newContent[0] = KeYJavaASTFactory.declare(
+        // progVar, KeYJavaASTFactory.falseLiteral());
+        // newContent[0] = (Statement) block.getChildAt(0);
+        // newContent[1] = new JoinPointStatement(
+        // (BlockContract) application.getContract(), progVar);
 
-        block.getBody().arraycopy(1, newContent, 3, size - 1);
-
-        return KeYJavaASTFactory.block(new ExtList(newContent));
+        return KeYJavaASTFactory.block(block,
+                new JoinPointStatement(application.getContract(), progVar));
     }
 
     private ImmutableList<Goal> apply(final Goal goal, final Services services,
