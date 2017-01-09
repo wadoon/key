@@ -62,6 +62,7 @@ import de.uka.ilkd.key.java.declaration.modifier.Static;
 import de.uka.ilkd.key.java.declaration.modifier.StrictFp;
 import de.uka.ilkd.key.java.declaration.modifier.TwoState;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.expression.ElementValueArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
@@ -679,6 +680,11 @@ public class Recoder2KeYConverter {
         }
     }
 
+    public ElementValueArrayInitializer convert(recoder.java.expression.ElementValueArrayInitializer arg) {
+        return new ElementValueArrayInitializer(collectChildrenAndComments(arg), 
+                getKeYJavaType(getServiceConfiguration().getSourceInfo().getType(arg.getASTParent())));
+    }
+    
     /**
      * gets the KeY-Class related to the recoder one
      *
