@@ -233,7 +233,7 @@ public interface Visitor {
 
     void performActionOnInterfaceDeclaration(InterfaceDeclaration x); 
     
-   // void performActionOnJoinPointStatement(JoinPointStatement x)
+    void performActionOnJoinPointStatement(JoinPointStatement x);
     
     void performActionOnFieldDeclaration(FieldDeclaration x); 
 

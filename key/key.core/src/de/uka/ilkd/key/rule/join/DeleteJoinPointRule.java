@@ -114,6 +114,13 @@ public class DeleteJoinPointRule implements BuiltInRule {
                         oldProgram.getInnerMostMethodFrame()
                                 .getExecutionContext(),
                         newBody);
+                
+                ProgramElement pV = oldMethodFrame.getChildAt(0);
+                
+//                MethodFrame newmF = (MethodFrame) new ProgramElementReplacer(
+//                         oldMethodFrame, services).replace(body,
+//                         newBody);
+//                        
 
                 StatementBlock newProgram = (StatementBlock) new ProgramElementReplacer(
                         oldProgram, services).replace(oldMethodFrame,

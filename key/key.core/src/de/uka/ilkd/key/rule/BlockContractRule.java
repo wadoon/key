@@ -474,12 +474,12 @@ public class BlockContractRule implements BuiltInRule {
             // oldMethodFrame.getProgramVariable(),
             // oldMethodFrame.getExecutionContext(), newBody);
             //
-            // MethodFrame newmF = (MethodFrame) new ProgramElementReplacer(
-            // oldMethodFrame, services).replace(instantiation.block,
-            // newBody);
+             MethodFrame newmF = (MethodFrame) new ProgramElementReplacer(
+             oldMethodFrame, services).replace(instantiation.block,
+             newBody);
             //
             Statement newProgram = (Statement) new ProgramElementReplacer(
-                    oldProgram, services).replace(instantiation.block, newBody);
+                    oldProgram, services).replace(oldMethodFrame, newmF);
             //
             // Statement newP = (Statement) new ProgramElementReplacer(
             // oldProgram, services).replace(instantiation.block,
