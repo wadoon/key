@@ -61,8 +61,7 @@ public class DeleteJoinPointRule implements BuiltInRule {
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 
         if (pio != null && pio.subTerm().isContainsJavaBlockRecursive()
-                && JavaTools.getActiveStatement(goal.proof().getServices()
-                        .getTermBuilder().goBelowUpdates(pio.subTerm())
+                && JavaTools.getActiveStatement(TermBuilder.goBelowUpdates(pio.subTerm())
                         .javaBlock()) instanceof JoinPointStatement
         /*
          * JoinPointRule.isJoinPointStatement(JoinRuleUtils
