@@ -231,9 +231,7 @@ public interface Visitor {
 
     void performActionOnClassDeclaration(ClassDeclaration x); 
 
-    void performActionOnInterfaceDeclaration(InterfaceDeclaration x); 
-    
-    void performActionOnJoinPointStatement(JoinPointStatement x);
+    void performActionOnInterfaceDeclaration(InterfaceDeclaration x);
     
     void performActionOnFieldDeclaration(FieldDeclaration x); 
 
