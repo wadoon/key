@@ -12,6 +12,7 @@ import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
@@ -36,19 +37,25 @@ public class DeleteJoinPointRule implements BuiltInRule {
 
         ImmutableList<Goal> goals = goal.split(1);
         goal = goals.head();
-        deleteJoinPointStatement(goal, ruleApp.posInOccurrence(), services);
+        Term target =  TermBuilder.goBelowUpdates(ruleApp.posInOccurrence().subTerm());
+        JavaBlock newJavaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
+        TermBuilder tb = services.getTermBuilder();
+        Term newFormula = tb.prog((Modality)target.op(), newJavaBlock,
+                target.sub(0));
+        goal.changeFormula(
+                new SequentFormula(tb.apply(
+                        UpdateApplication.getUpdate(ruleApp.posInOccurrence().subTerm()), newFormula)),
+                ruleApp.posInOccurrence());
         return goals;
     }
 
     @Override
     public Name name() {
-
         return RULE_NAME;
     }
 
     @Override
     public String displayName() {
-        // TODO Auto-generated method stub
         return DISPLAY_NAME;
     }
 
@@ -60,8 +67,7 @@ public class DeleteJoinPointRule implements BuiltInRule {
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 
-        if (pio != null && pio.subTerm().isContainsJavaBlockRecursive()
-                && JavaTools.getActiveStatement(TermBuilder.goBelowUpdates(pio.subTerm())
+        if (pio != null && JavaTools.getActiveStatement(TermBuilder.goBelowUpdates(pio.subTerm())
                         .javaBlock()) instanceof JoinPointStatement
         /*
          * JoinPointRule.isJoinPointStatement(JoinRuleUtils
@@ -96,75 +102,7 @@ public class DeleteJoinPointRule implements BuiltInRule {
         return new DeleteJoinPointBuiltInRuleApp(this, pos);
     }
 
-    private void deleteJoinPointStatement(Goal goal, PosInOccurrence pio,
-            Services services) {
-
-        Semisequent succedent = goal.sequent().succedent();
-        for (int i = 0; i < succedent.size(); i++) {
-
-            Term formula = succedent.get(i).formula();
-
-            if (!JoinRuleUtils.getJavaBlockRecursive(formula).isEmpty()) {
-                StatementBlock oldProgram = (StatementBlock) JoinRuleUtils
-                        .getJavaBlockRecursive(formula).program();
-
-                MethodFrame oldMethodFrame = oldProgram
-                        .getInnerMostMethodFrame();
-                StatementBlock body = oldMethodFrame.getBody();
-
-                StatementBlock newBody = getBlockWithoutJPS(body);
-
-                MethodFrame newMethodFrame = KeYJavaASTFactory.methodFrame(
-                        oldMethodFrame.getProgramVariable(),
-                        oldProgram.getInnerMostMethodFrame()
-                                .getExecutionContext(),
-                        newBody);
-                
-                ProgramElement pV = oldMethodFrame.getChildAt(0);
-                
-//                MethodFrame newmF = (MethodFrame) new ProgramElementReplacer(
-//                         oldMethodFrame, services).replace(body,
-//                         newBody);
-//                        
-
-                StatementBlock newProgram = (StatementBlock) new ProgramElementReplacer(
-                        oldProgram, services).replace(oldMethodFrame,
-                                newMethodFrame);
-
-                JavaBlock newJavaBlock = JavaBlock.createJavaBlock(newProgram);
-
-                TermBuilder tb = services.getTermBuilder();
-                Term oldTerm = UpdateApplication.getTarget(formula);
-                Term newTerm = tb.tf().createTerm(oldTerm.op(), oldTerm.subs(),
-                        oldTerm.boundVars(), newJavaBlock);
-
-                goal.changeFormula(
-                        new SequentFormula(tb.apply(
-                                UpdateApplication.getUpdate(formula), newTerm)),
-                        pio);
-            }
-        }
+    
     }
 
-    private StatementBlock getBlockWithoutJPS(StatementBlock block1) {
-        if (block1.getChildAt(0) != null) {
-            int size = block1.getChildCount();
-            if (block1.getChildAt(0) instanceof JoinPointStatement) {
-                Statement[] array = new Statement[size - 1];
-                block1.getBody().arraycopy(1, array, 0, size - 1);
-                return KeYJavaASTFactory.block(array);
-
-            } else if (block1.getChildAt(0) instanceof StatementBlock) {
-
-                Statement[] newContent = new Statement[size];
-                newContent[0] = getBlockWithoutJPS(
-                        (StatementBlock) block1.getChildAt(0));
-                block1.getBody().arraycopy(1, newContent, 1, size - 1);
-
-                return KeYJavaASTFactory.block(newContent);
-            }
-        }
-        return null;
-    }
-
-}
+ 

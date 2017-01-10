@@ -37,6 +37,8 @@ public class JoinPointRule implements BuiltInRule {
 
         StatementBlock block = (StatementBlock) JoinRuleUtils
                 .getJavaBlockRecursive(pio.subTerm()).program();
+        
+        
         JoinProcedure concreteRule = ((JoinPointStatement) block
                 .getInnerMostMethodFrame().getBody().getFirstElement())
                         .getJoinProc();
@@ -74,10 +76,14 @@ public class JoinPointRule implements BuiltInRule {
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 
         if (pio != null && pio.subTerm().isContainsJavaBlockRecursive()) {
-            BlockContract contract = isJoinPointStatement(JoinRuleUtils
-                    .getJavaBlockRecursive(pio.subTerm()).program());
+            
+            SourceElement st = JavaTools.getActiveStatement(TermBuilder.goBelowUpdates(pio.subTerm())
+                    .javaBlock());
 
-            if (contract != null) {
+            if (st instanceof JoinPointStatement) {
+                
+                BlockContract contract = ((JoinPointStatement) st).getContract();
+                
                 ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                         .findPotentialJoinPartners(goal, pio);
                 ImmutableList<Goal> joinPartnersGoal = ImmutableSLList.nil();
@@ -92,6 +98,8 @@ public class JoinPointRule implements BuiltInRule {
                     for (Goal g : openGoals) {
                         //not linked
                         if (!g.equals(goal) && !g.isLinked() && !joinPartnersGoal.contains(g)) {
+                            SourceElement sE = JavaTools.getActiveStatement(JoinRuleUtils.getJavaBlockRecursive(g.appliedRuleApps().head().posInOccurrence().subTerm()));
+                            
                             JavaBlock jB;
                             for(int i = 0; i < g.node().sequent().succedent().size(); i++){
                             jB = JoinRuleUtils
