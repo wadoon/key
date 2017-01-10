@@ -38,17 +38,15 @@ public class JoinPointStatement extends JavaStatement{
 
     @Override
     public void visit(Visitor v) {
-     //v.performActionOnJoinPointStatement(this);
+       v.performActionOnJoinPointStatement(this);
     }
     @Override
     public int getChildCount() {
-        // TODO Auto-generated method stub
-        return 0;
+        return 1;
     }
     @Override
     public ProgramElement getChildAt(int index) {
-        // TODO Auto-generated method stub
-        return null;
+        return index == 0 ? prgVar : null;
     }
   
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
@@ -69,7 +67,6 @@ public class JoinPointStatement extends JavaStatement{
     }
 
     public BlockContract getContract() {
-        // TODO Auto-generated method stub
         return joinContract;
     }
 

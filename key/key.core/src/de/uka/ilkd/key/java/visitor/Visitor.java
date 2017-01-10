@@ -231,9 +231,7 @@ public interface Visitor {
 
     void performActionOnClassDeclaration(ClassDeclaration x); 
 
-    void performActionOnInterfaceDeclaration(InterfaceDeclaration x); 
-    
-    void performActionOnJoinPointStatement(JoinPointStatement x);
+    void performActionOnInterfaceDeclaration(InterfaceDeclaration x);
     
     void performActionOnFieldDeclaration(FieldDeclaration x); 
 
@@ -457,5 +455,8 @@ public interface Visitor {
     void performActionOnTransactionStatement(TransactionStatement transSt);
 
     public void performActionOnEmptyMapLiteral(EmptyMapLiteral aThis);
+
+    public void performActionOnJoinPointStatement(
+            JoinPointStatement joinPointStatement);
 
 }
