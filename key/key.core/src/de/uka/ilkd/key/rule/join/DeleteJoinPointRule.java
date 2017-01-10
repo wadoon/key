@@ -60,8 +60,14 @@ public class DeleteJoinPointRule implements BuiltInRule {
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 
-        if (pio != null && JoinPointRule.isJoinPointStatement(JoinRuleUtils
-                .getJavaBlockRecursive(pio.subTerm()).program()) != null) {
+        if (pio != null && pio.subTerm().isContainsJavaBlockRecursive()
+                && JavaTools.getActiveStatement(goal.proof().getServices()
+                        .getTermBuilder().goBelowUpdates(pio.subTerm())
+                        .javaBlock()) instanceof JoinPointStatement
+        /*
+         * JoinPointRule.isJoinPointStatement(JoinRuleUtils
+         * .getJavaBlockRecursive(pio.subTerm()).program()) != null
+         */) {
 
             ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                     .findPotentialJoinPartners(goal, pio);
@@ -149,8 +155,7 @@ public class DeleteJoinPointRule implements BuiltInRule {
                 block1.getBody().arraycopy(1, array, 0, size - 1);
                 return KeYJavaASTFactory.block(array);
 
-            }
-            else if (block1.getChildAt(0) instanceof StatementBlock) {
+            } else if (block1.getChildAt(0) instanceof StatementBlock) {
 
                 Statement[] newContent = new Statement[size];
                 newContent[0] = getBlockWithoutJPS(

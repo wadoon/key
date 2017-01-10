@@ -67,7 +67,6 @@ public class JoinPointStatement extends JavaStatement{
     }
 
     public BlockContract getContract() {
-        // TODO Auto-generated method stub
         return joinContract;
     }
 
