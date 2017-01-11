@@ -10,6 +10,7 @@ import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.join.DeleteJoinPointRule;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import static de.uka.ilkd.key.strategy.AbstractFeatureStrategy.let;
 import de.uka.ilkd.key.strategy.feature.ApplyTFFeature;
@@ -67,6 +68,12 @@ public class StaticFeatureCollection {
     protected static Feature blockContractFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(BlockContractRule.INSTANCE);
+        return ConditionalFeature.createConditional(filter, cost);
+    }
+    
+    protected static Feature deleteJoinPointFeature(Feature cost) {
+        SetRuleFilter filter = new SetRuleFilter();
+        filter.addRuleToSet(DeleteJoinPointRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
 

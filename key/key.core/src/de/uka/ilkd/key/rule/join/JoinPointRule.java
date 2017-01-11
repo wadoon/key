@@ -6,7 +6,10 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.JoinPointStatement;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -37,8 +40,7 @@ public class JoinPointRule implements BuiltInRule {
 
         StatementBlock block = (StatementBlock) JoinRuleUtils
                 .getJavaBlockRecursive(pio.subTerm()).program();
-        
-        
+
         JoinProcedure concreteRule = ((JoinPointStatement) block
                 .getInnerMostMethodFrame().getBody().getFirstElement())
                         .getJoinProc();
@@ -75,48 +77,55 @@ public class JoinPointRule implements BuiltInRule {
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 
-        if (pio != null && pio.subTerm().isContainsJavaBlockRecursive()) {
-            
-            SourceElement st = JavaTools.getActiveStatement(TermBuilder.goBelowUpdates(pio.subTerm())
-                    .javaBlock());
+        if (pio != null && pio.subTerm().isContainsJavaBlockRecursive()
+                && !goal.isLinked()) {
+
+            SourceElement st = JavaTools.getActiveStatement(
+                    TermBuilder.goBelowUpdates(pio.subTerm()).javaBlock());
 
             if (st instanceof JoinPointStatement) {
-                
-                BlockContract contract = ((JoinPointStatement) st).getContract();
-                
+
+                BlockContract contract = ((JoinPointStatement) st)
+                        .getContract();
+
                 ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                         .findPotentialJoinPartners(goal, pio);
-                ImmutableList<Goal> joinPartnersGoal = ImmutableSLList.nil();
-
-                for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> p : joinPartners) {
-                    joinPartnersGoal = joinPartnersGoal.append(p.first);
-                }
 
                 if (!joinPartners.isEmpty()) {
+
+                    ImmutableList<Goal> joinPartnersGoal = ImmutableSLList
+                            .nil();
+
+                    for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> p : joinPartners) {
+                        joinPartnersGoal = joinPartnersGoal.append(p.first);
+                    }
+
                     ImmutableList<Goal> openGoals = goal.node().proof()
                             .openGoals();
                     for (Goal g : openGoals) {
-                        //not linked
-                        if (!g.equals(goal) && !g.isLinked() && !joinPartnersGoal.contains(g)) {
-                            SourceElement sE = JavaTools.getActiveStatement(JoinRuleUtils.getJavaBlockRecursive(g.appliedRuleApps().head().posInOccurrence().subTerm()));
-                            
-                            JavaBlock jB;
-                            for(int i = 0; i < g.node().sequent().succedent().size(); i++){
-                            jB = JoinRuleUtils
-                                    .getJavaBlockRecursive(g.node().sequent()
-                                            .succedent().get(i).formula());
-                            jB.isEmpty();
+                        // not linked
+                        if (!g.equals(goal) && !g.isLinked()
+                                && !joinPartnersGoal.contains(g)) {
 
-                            if (((StatementBlock) jB.program())
-                                    .getInnerMostMethodFrame() != null && hasSameBlock(((StatementBlock) jB.program())
-                                    .getInnerMostMethodFrame().getBody(),
-                                    contract.getBlock())) {
-
-                                return false;
-                            }
-                            }
                             if (hasSameBlockContractRule(g, contract))
                                 return false;
+
+                            JavaBlock jB;
+                            for (int i = 0; i < g.node().sequent().succedent()
+                                    .size(); i++) {
+                                jB = JoinRuleUtils.getJavaBlockRecursive(
+                                        g.node().sequent().succedent().get(i)
+                                                .formula());
+                                MethodFrame mF = JavaTools
+                                        .getInnermostMethodFrame(jB,
+                                                goal.proof().getServices());
+                                if (mF != null && hasSameBlock(mF.getBody(),
+                                        contract.getBlock())) {
+
+                                    return false;
+                                }
+                            }
+
                         }
                     }
                     return true;
@@ -127,8 +136,7 @@ public class JoinPointRule implements BuiltInRule {
         return false;
     }
 
-    private boolean hasSameBlockContractRule(Goal g,
-            BlockContract contract) {
+    private boolean hasSameBlockContractRule(Goal g, BlockContract contract) {
         for (RuleApp rA : g.appliedRuleApps()) {
             if (rA instanceof BlockContractBuiltInRuleApp
                     && ((BlockContractBuiltInRuleApp) rA).getContract()
@@ -138,40 +146,17 @@ public class JoinPointRule implements BuiltInRule {
         return false;
     }
 
+    // TODO: test more complex cases
     private boolean hasSameBlock(StatementBlock block1, StatementBlock block2) {
-
-        for (int i = 0; i < block1.getChildCount(); i++) {
-            if (block1.getChildAt(i) != null
-                    && block1.getChildAt(i) instanceof StatementBlock) {
-                if (block1.getChildAt(i).equals(block2)) {
-                    return true;
+        boolean result = false;
+        ProgramElement pE;
+        for (int i = 0; i < block1.getChildCount() && !result; i++) {
+            pE = block1.getChildAt(i);
+           result = (pE instanceof StatementBlock) ? (pE.equals(block2)) ? true :  hasSameBlock((StatementBlock) pE,
+                            block2): false;
                 }
-                else {
-                    return hasSameBlock((StatementBlock) block1.getChildAt(0),
-                            block2);
-                }
-            }
+        return result;
         }
-        return false;
-    }
-
-    public static BlockContract isJoinPointStatement(ProgramElement pE) {
-
-        if (pE != null && pE instanceof StatementBlock
-                && ((StatementBlock) pE).getInnerMostMethodFrame() != null
-                && ((StatementBlock) pE).getInnerMostMethodFrame()
-                        .getBody() != null){
-            SourceElement st = ((StatementBlock) pE).getInnerMostMethodFrame().getBody()
-            .getFirstElement();
-            if(st instanceof JoinPointStatement){
-                return ((JoinPointStatement) st)
-                                .getContract();
-            }
-            
-        }
-        return null;
-
-    }
 
     @Override
     public boolean isApplicableOnSubTerms() {

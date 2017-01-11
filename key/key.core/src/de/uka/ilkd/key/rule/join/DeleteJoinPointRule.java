@@ -1,24 +1,13 @@
 package de.uka.ilkd.key.rule.join;
 
-import java.util.HashMap;
-
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.JoinPointStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.java.statement.Try;
-import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.util.Triple;
-import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 public class DeleteJoinPointRule implements BuiltInRule {
 
@@ -35,16 +24,33 @@ public class DeleteJoinPointRule implements BuiltInRule {
     public ImmutableList<Goal> apply(Goal goal, Services services,
             RuleApp ruleApp) throws RuleAbortException {
 
+        // Term formula = ruleApp.posInOccurrence().sequentFormula().formula();
+        // Term target = TermBuilder.goBelowUpdates(formula);
+        // JavaBlock newJavaBlock =
+        // JavaTools.removeActiveStatement(target.javaBlock(), services);
+        // TermBuilder tb = services.getTermBuilder();
+        // Term newTarget = tb.prog((Modality)target.op(), newJavaBlock,
+        // target.sub(0));
+        //
+        // goal.changeFormula(
+        // new SequentFormula(tb.apply(UpdateApplication.getUpdate(formula),
+        // newTarget)),
+        // ruleApp.posInOccurrence());
+
         ImmutableList<Goal> goals = goal.split(1);
         goal = goals.head();
-        Term target =  TermBuilder.goBelowUpdates(ruleApp.posInOccurrence().subTerm());
-        JavaBlock newJavaBlock = JavaTools.removeActiveStatement(target.javaBlock(), services);
+        Term target = TermBuilder
+                .goBelowUpdates(ruleApp.posInOccurrence().subTerm());
+        JavaBlock newJavaBlock = JavaTools
+                .removeActiveStatement(target.javaBlock(), services);
         TermBuilder tb = services.getTermBuilder();
-        Term newFormula = tb.prog((Modality)target.op(), newJavaBlock,
+        Term newFormula = tb.prog((Modality) target.op(), newJavaBlock,
                 target.sub(0));
         goal.changeFormula(
                 new SequentFormula(tb.apply(
-                        UpdateApplication.getUpdate(ruleApp.posInOccurrence().subTerm()), newFormula)),
+                        UpdateApplication
+                                .getUpdate(ruleApp.posInOccurrence().subTerm()),
+                        newFormula)),
                 ruleApp.posInOccurrence());
         return goals;
     }
@@ -67,28 +73,25 @@ public class DeleteJoinPointRule implements BuiltInRule {
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 
-        if (pio != null && JavaTools.getActiveStatement(TermBuilder.goBelowUpdates(pio.subTerm())
-                        .javaBlock()) instanceof JoinPointStatement
-        /*
-         * JoinPointRule.isJoinPointStatement(JoinRuleUtils
-         * .getJavaBlockRecursive(pio.subTerm()).program()) != null
-         */) {
+        if (pio != null
+                && JavaTools.getActiveStatement(
+                        TermBuilder.goBelowUpdates(pio.subTerm())
+                                .javaBlock()) instanceof JoinPointStatement
+                && JoinRule.findPotentialJoinPartners(goal, pio).isEmpty()) {
+            int i = 0;
+            ImmutableList<RuleApp> ruleApps = goal.appliedRuleApps();
 
-            ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
-                    .findPotentialJoinPartners(goal, pio);
-
-            if (joinPartners.isEmpty() && goal.appliedRuleApps()
-                    .head() instanceof JoinRuleBuiltInRuleApp) {
-                return true;
-                /*
-                 * for (RuleApp rA : goal.appliedRuleApps()) { if (rA instanceof
-                 * JoinRuleBuiltInRuleApp) return true; }
-                 */
+            while (!ruleApps.isEmpty() && i < 15) {
+                if (ruleApps.head() instanceof JoinRuleBuiltInRuleApp) {
+                    return true;
+                }
+                else {
+                    ruleApps = ruleApps.tail();
+                    i++;
+                }
             }
-
         }
         return false;
-
     }
 
     @Override
@@ -102,7 +105,4 @@ public class DeleteJoinPointRule implements BuiltInRule {
         return new DeleteJoinPointBuiltInRuleApp(this, pos);
     }
 
-    
-    }
-
- 
+}
