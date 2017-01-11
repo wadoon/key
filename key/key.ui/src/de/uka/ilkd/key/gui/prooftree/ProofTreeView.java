@@ -35,19 +35,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import javax.swing.Icon;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JSeparator;
-import javax.swing.JTree;
-import javax.swing.KeyStroke;
-import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
+import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.TreeUI;
@@ -98,6 +86,10 @@ public class ProofTreeView extends JPanel {
     public static final Color DARK_RED_COLOR = new Color(191,0,0);
     public static final Color PINK_COLOR = new Color(255,0,240);
     public static final Color ORANGE_COLOR = new Color(255,140,0);
+
+    //TODO: SaG Hack for Dynamic ProofTreeViewFilter + Button
+    private ProofTreeViewFilter proofTreeViewFilter;
+    private JButton closeFilter;
 
     /** the mediator is stored here */
     private KeYMediator mediator;
@@ -363,6 +355,39 @@ public class ProofTreeView extends JPanel {
         }
     }
 
+
+//TODO hack at the moment SaG: add pathfilter to proof tree
+    public void setFilter(ProofTreeViewFilter filter) {
+
+        this.proofTreeViewFilter = filter;
+        delegateModel.setFilter(filter, true);
+        ExpansionState.expandAll(delegateView);
+        closeFilter = new JButton("Close Filtered View");
+        closeFilter.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                closeFilter();
+            }
+        });
+        add(closeFilter, BorderLayout.SOUTH);
+        super.updateUI();
+
+
+
+    }
+    // remove button and pathfilter
+    public void closeFilter(){
+        //GUIProofTreeNode selectedNode = (GUIProofTreeNode) delegateView.getSelectionPath().getLastPathComponent();
+
+        TreePath path = delegateModel.getSelection();
+        delegateModel.setFilter(this.proofTreeViewFilter, false);
+        remove(closeFilter);
+        ExpansionState.expandAll(delegateView);
+        delegateModel.storeSelection(path);
+        super.revalidate();
+        super.repaint();
+
+    }
     /**
      *  moves the scope of the tree view to the given node so that it
      *	is visible
