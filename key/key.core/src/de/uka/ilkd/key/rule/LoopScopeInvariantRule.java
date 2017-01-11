@@ -24,6 +24,7 @@ import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -449,9 +450,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         // in general; probably, something involging the TermLabelManager should
         // be used.
         final Term newFormula = tb.applySequential(uBeforeLoopDefAnonVariant,
-                tb.prog(modality,
-                        JavaBlock.createJavaBlock((StatementBlock) newProg),
-                        newPost, progPost.getLabels()));
+                tb.prog(modality, newJavaBlock, newPost, progPost.getLabels()));
         return newFormula;
     }
 
