@@ -880,7 +880,8 @@ public final class MainWindow extends JFrame  {
     public ProofTreeView getProofTreeView() {
         return mainWindowTabbedPane.getProofTreeView();
     }
-    
+
+
     /**
      * Returns the current goal view.
      */

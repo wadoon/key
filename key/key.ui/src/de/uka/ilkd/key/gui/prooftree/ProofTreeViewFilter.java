@@ -15,7 +15,10 @@ package de.uka.ilkd.key.gui.prooftree;
 
 import javax.swing.tree.TreeNode;
 
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+
+import java.util.LinkedList;
 
 /**
  * Filters for the proof tree view.
@@ -27,6 +30,8 @@ public abstract class ProofTreeViewFilter {
 	public final static ProofTreeViewFilter HIDE_INTERMEDIATE = new HideIntermediateFilter();
 	public final static ProofTreeViewFilter HIDE_CLOSED_SUBTREES = new HideClosedSubtreesFilter();
 	public final static ProofTreeViewFilter ONLY_INTERACTIVE = new OnlyInteractiveFilter();
+
+
 
 	public final static ProofTreeViewFilter[] ALL =
 		new ProofTreeViewFilter[] {HIDE_INTERMEDIATE, ONLY_INTERACTIVE, HIDE_CLOSED_SUBTREES};
@@ -215,4 +220,6 @@ public abstract class ProofTreeViewFilter {
 			return true;
 		}
 	}
+
+
 }

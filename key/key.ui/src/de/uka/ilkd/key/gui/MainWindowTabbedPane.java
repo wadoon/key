@@ -31,9 +31,11 @@ public class MainWindowTabbedPane extends JTabbedPane {
      */
     private final ProofTreeView proofTreeView;
 
+    //TODO Hack: SaG
     public ProofTreeView getProofTreeView() {
         return proofTreeView;
     }
+
 
     /**
      * the list of current open goals
@@ -98,6 +100,9 @@ public class MainWindowTabbedPane extends JTabbedPane {
                 KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, Toolkit
                         .getDefaultToolkit().getMenuShortcutKeyMask()));
         setName("leftTabbed");
+
+        //TODO: SaG PathView
+
     }
 
     protected void setEnabledForAllTabs(boolean b) {
@@ -106,5 +111,7 @@ public class MainWindowTabbedPane extends JTabbedPane {
         strategySelectionView.setEnabled(b);
         infoView.setEnabled(b);
     }
+
+
 
 }
