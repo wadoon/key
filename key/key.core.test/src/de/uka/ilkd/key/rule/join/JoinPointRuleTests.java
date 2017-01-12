@@ -5,8 +5,11 @@ import java.io.File;
 import org.junit.Test;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.JoinPointStatement;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -22,7 +25,7 @@ public class JoinPointRuleTests extends TestCase {
     private static final String TEST_RESOURCES_DIR_PREFIX = "resources/testcase/joinPoint/";
 
     public JoinPointRuleTests() {
-        // TODO Auto-generated constructor stub
+        
     }
 
     @Test
@@ -80,29 +83,32 @@ public class JoinPointRuleTests extends TestCase {
                 .equals(nodeBefore.sequent().antecedent()));
         assertTrue(nodeAfter.sequent().succedent().size() == nodeBefore
                 .sequent().succedent().size());
+ 
+        StatementBlock blockWithoutJP = ((StatementBlock)JoinRuleUtils
+                .getJavaBlockRecursive(nodeBefore.sequent().succedent().get(1)
+                        .formula()).program())
+                .getInnerMostMethodFrame().getBody();
+        
+        StatementBlock blockWithJP = ((StatementBlock) JoinRuleUtils
+                .getJavaBlockRecursive(nodeAfter.sequent().succedent().get(1)
+                        .formula()).program())
+                .getInnerMostMethodFrame().getBody();
 
-        checkJavaBlocks(nodeBefore, nodeAfter);
+        assertTrue(((StatementBlock) blockWithJP.getChildAt(0)).getChildAt(1).equals(blockWithoutJP.getChildAt(0)));
+        assertTrue(((StatementBlock) blockWithJP.getChildAt(0)).getChildAt(2) instanceof JoinPointStatement);
+
+        for (int j = 1; j < blockWithoutJP.getChildCount(); j++) {
+            assertTrue(blockWithJP.getChildAt(j).equals(blockWithoutJP.getChildAt(j)));
+        }
 
     }
 
-    @Test
-    public void testJoinPointRuleApp() {
-        final Proof proof = loadProof(
-                "absBlockContract.beforeJoinPointRule.key");
-
-        startAutomaticStrategy(proof);
-        assertTrue(proof.openGoals().head().appliedRuleApps().tail()
-                .head() instanceof JoinPointBuiltInRuleApp);
-
-        assertTrue(proof.openGoals().head().appliedRuleApps()
-                .head() instanceof JoinRuleBuiltInRuleApp);
-
-    }
 
     @Test
     public void testRemoveJPS() {
         final Proof proof = loadProof("AbsBlockContract.beforeDelete.key");
         Node nodeBefore = proof.openGoals().head().node();
+        // for this proof the max steps is set to 1
         startAutomaticStrategy(proof);
         assertTrue(proof.openGoals().head().appliedRuleApps()
                 .head() instanceof DeleteJoinPointBuiltInRuleApp);
@@ -114,56 +120,24 @@ public class JoinPointRuleTests extends TestCase {
                 .equals(nodeBefore.sequent().antecedent()));
         assertTrue(nodeAfter.sequent().succedent().size() == nodeBefore
                 .sequent().succedent().size());
+        
+        JavaBlock javaBlockAfter = JoinRuleUtils
+                .getJavaBlockRecursive(nodeAfter.sequent().succedent().get(0)
+                        .formula());
+        
+        StatementBlock blockWithoutJP = ((StatementBlock) javaBlockAfter.program())
+                .getInnerMostMethodFrame().getBody();
+        StatementBlock blockWithJP = ((StatementBlock) JoinRuleUtils
+                .getJavaBlockRecursive(nodeBefore.sequent().succedent().get(0)
+                        .formula()).program())
+                .getInnerMostMethodFrame().getBody();
 
-        checkJavaBlocks(nodeAfter, nodeBefore);
-    }
+        assertTrue(JavaTools.getActiveStatement(javaBlockAfter).equals(new StatementBlock()));
 
-    
-    private void checkJavaBlocks(Node withoutJP, Node withJP) {
-        for (int i = 0; i < withJP.sequent().succedent().size(); i++) {
-            Term termWithoutJP = withoutJP.sequent().succedent().get(i)
-                    .formula();
-            Term termWithJP = withJP.sequent().succedent().get(i).formula();
-
-            if (termWithJP.isContainsJavaBlockRecursive()) {
-
-                if (!JoinRuleUtils.getJavaBlockRecursive(termWithJP).equals(
-                        JoinRuleUtils.getJavaBlockRecursive(termWithoutJP))) {
-
-                    JavaProgramElement jPWithoutJP = JoinRuleUtils
-                            .getJavaBlockRecursive(termWithoutJP).program();
-                    JavaProgramElement jPWithJP = JoinRuleUtils
-                            .getJavaBlockRecursive(termWithJP).program();
-
-                    StatementBlock blockWithoutJP = ((StatementBlock) jPWithoutJP)
-                            .getInnerMostMethodFrame().getBody();
-                    StatementBlock blockWithJP = ((StatementBlock) jPWithJP)
-                            .getInnerMostMethodFrame().getBody();
-
-                    assertTrue(blockWithJP
-                            .getChildCount() == blockWithoutJP.getChildCount()
-                                    + 1);
-
-                    for (int j = 0; j < blockWithoutJP.getChildCount(); j++) {
-                        if (!blockWithoutJP.getChildAt(j)
-                                .equals(blockWithJP.getChildAt(j))) {
-                            assertTrue(blockWithJP.getChildAt(
-                                    j) instanceof JoinPointStatement);
-                            restIsEqual(blockWithoutJP, blockWithJP, j);
-                            break;
-                        }
-                    }
-
-                }
-            }
+        for (int j = 1; j < blockWithoutJP.getChildCount(); j++) {
+            assertTrue(blockWithJP.getChildAt(j).equals(blockWithoutJP.getChildAt(j)));
         }
-    }
 
-    private void restIsEqual(StatementBlock blockA, StatementBlock blockB,
-            int i) {
-        for (int j = i; j < blockA.getChildCount(); j++) {
-            assertTrue(blockA.getChildAt(j).equals(blockB.getChildAt(j + 1)));
-        }
     }
 
     private void startAutomaticStrategy(final Proof proof) {
