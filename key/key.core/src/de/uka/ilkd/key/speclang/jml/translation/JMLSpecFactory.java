@@ -205,6 +205,7 @@ public class JMLSpecFactory {
         public Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
         public JoinProcedure joinProcedure;
+        public String joinParams;
     }
 
     // -------------------------------------------------------------------------
@@ -461,7 +462,9 @@ public class JMLSpecFactory {
                 textualSpecCase.getInfFlowSpecs());
 
         clauses.joinProcedure = translateJoinProcedure(
-                textualSpecCase.getJoinProcs(),
+                textualSpecCase.getJoinProcs());
+
+        clauses.joinParams = translateJoinParams(
                 textualSpecCase.getJoinParams());
 
         /*
@@ -526,11 +529,8 @@ public class JMLSpecFactory {
         }
     }
 
-   
-
     private JoinProcedure translateJoinProcedure(
-            ImmutableList<PositionedString> originalClauses,
-            ImmutableList<PositionedString> joinParams)
+            ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
         if (originalClauses == null || originalClauses.size() == 0) {
             return null;
@@ -551,60 +551,39 @@ public class JMLSpecFactory {
                     originalClauses.head().pos);
 
         }
-        // maybe in the future it will be useful to create a field in
-        // JoinProcedure to know if it needs parameters
-        if (chosenProc instanceof JoinWithPredicateAbstraction) {
-            
-            if (joinParams == null || joinParams.size() == 0) {
-                throw new SLTranslationException(
-                        "Parameters for the join procedure are missing", originalClauses.head().fileName,
-                        originalClauses.head().pos);
-            }
-            else {
-               
-            try {
-                chosenProc = translateJoinByPredicateAbstraction(chosenProc, joinParams);
-            }
-            catch (ParserException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            }
-        }
 
         return chosenProc;
     }
 
-    private JoinProcedure translateJoinByPredicateAbstraction(
-            JoinProcedure joinProc, ImmutableList<PositionedString> params)
-            throws SLTranslationException, ParserException {
-        
-        // split the user input according to the structure defined for the
-        // join procedure.
-        // This only works for JoinByPredicateAbstraction:
-        // "latticeType : abstract domains";
-        // abstract domains should have the form (sort placeholder, predicate)
-        // this also removes the " at the end of latticeType
-        // Extract the user input. Remove join_params and the ; at the end
+    private String translateJoinParams(ImmutableList<PositionedString> params) {
 
-        Pattern p = Pattern.compile("\"([^\"]+) : ([^\"]+)\"");
-        Matcher m = p.matcher(params.head().text);
+        String joinParams = params.head().text.substring(13,
+                params.head().text.length() - 2);
 
-        if (m.find()) {
-            Class<? extends AbstractPredicateAbstractionLattice> latticeType = translateLatticeType(
-                    m.group(1));
-            List<AbstractionPredicate> predicates = AbstractionPredicate
-                    .fromString(m.group(2), services);
-            final JoinWithPredicateAbstractionFactory absPredicateFactory = (JoinWithPredicateAbstractionFactory) joinProc;
-            joinProc = absPredicateFactory.instantiate(predicates, latticeType,
-                    new LinkedHashMap<ProgramVariable, AbstractDomainElement>());
-        } else {
-            throw new SLTranslationException(
-                    "Parameters have the wrong format:", params.head().fileName,
-                    params.head().pos);
-        }
-
-        return joinProc;
+        /*
+         * // split the user input according to the structure defined for the //
+         * join procedure. // This only works for JoinByPredicateAbstraction: //
+         * "latticeType : abstract domains"; // abstract domains should have the
+         * form (sort placeholder, predicate) // this also removes the " at the
+         * end of latticeType // Extract the user input. Remove join_params and
+         * the ; at the end
+         * 
+         * Pattern p = Pattern.compile("\"([^\"]+) : ([^\"]+)\""); Matcher m =
+         * p.matcher(params.head().text);
+         * 
+         * if (m.find()) { Class<? extends AbstractPredicateAbstractionLattice>
+         * latticeType = translateLatticeType( m.group(1));
+         * List<AbstractionPredicate> predicates = AbstractionPredicate
+         * .fromString(m.group(2), services); final
+         * JoinWithPredicateAbstractionFactory absPredicateFactory =
+         * (JoinWithPredicateAbstractionFactory) joinProc; joinProc =
+         * absPredicateFactory.instantiate(predicates, latticeType, new
+         * LinkedHashMap<ProgramVariable, AbstractDomainElement>()); } else {
+         * throw new SLTranslationException(
+         * "Parameters have the wrong format:", params.head().fileName,
+         * params.head().pos); }
+         */
+        return joinParams;
     }
 
     private Class<? extends AbstractPredicateAbstractionLattice> translateLatticeType(
@@ -1319,10 +1298,10 @@ public class JMLSpecFactory {
                 specificationCase, programVariables, behavior);
         return new SimpleBlockContract.Creator(block, labels, method, behavior,
                 variables, clauses.requires, clauses.ensures,
-                clauses.infFlowSpecs, clauses.joinProcedure, clauses.breaks,
-                clauses.continues, clauses.returns, clauses.signals,
-                clauses.signalsOnly, clauses.diverges, clauses.assignables,
-                clauses.hasMod, services).create();
+                clauses.infFlowSpecs, clauses.joinProcedure, clauses.joinParams,
+                clauses.breaks, clauses.continues, clauses.returns,
+                clauses.signals, clauses.signalsOnly, clauses.diverges,
+                clauses.assignables, clauses.hasMod, services).create();
     }
 
     private ProgramVariableCollection createProgramVariables(
