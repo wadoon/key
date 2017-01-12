@@ -965,8 +965,9 @@ public final class SpecificationRepository {
         // in any case, create axiom with non-static target
         addClassAxiom(new PartialInvAxiom(inv, false, services));
         // for a static invariant, create also an axiom with a static target
-        if (inv.isStatic())
+        if (inv.isStatic()) {
             addClassAxiom(new PartialInvAxiom(inv, true, services));
+        }
         // inherit non-private, non-static invariants
         if (!inv.isStatic()
                 && VisibilityModifier.allowsInheritance(inv.getVisibility())) {
@@ -1095,6 +1096,32 @@ public final class SpecificationRepository {
                                       null);
                 result = result.add(invRepresentsAxiom);
             }
+
+            // add static invariant axioms
+            for (KeYJavaType kjt : services.getJavaInfo().getAllKeYJavaTypes()) {
+                final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(kjt);
+                Term invDef = tb.tt();
+                for (ClassInvariant inv : myInvs) {
+                    if(inv.isStatic()) {
+                        invDef = tb.and(invDef, inv.getOriginalInv());
+                    }
+                }
+                invDef = tb.tf().createTerm(Equality.EQV, tb.staticInv(kjt), invDef);
+                final IObserverFunction invSymbol = services.getJavaInfo().getStaticInv(kjt);
+
+                final ClassAxiom invRepresentsAxiom
+                = new RepresentsAxiom("Class static invariant axiom for " + kjt.getFullName(),
+                                      invSymbol,
+                                      kjt,
+                                      new Private(),
+                                      null,
+                                      invDef,
+                                      null,
+                                      ImmutableSLList.<ProgramVariable> nil(),
+                                      null);
+                result = result.add(invRepresentsAxiom);
+            }
+
             // add query axioms for own class
             for (IProgramMethod pm : services.getJavaInfo()
                     .getAllProgramMethods(selfKjt)) {
