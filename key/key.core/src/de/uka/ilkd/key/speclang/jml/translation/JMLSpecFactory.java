@@ -18,6 +18,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -194,7 +196,7 @@ public class JMLSpecFactory {
         public Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
         public JoinProcedure joinProcedure;
-        public String joinParams;
+        public String[] joinParams;
     }
 
     // -------------------------------------------------------------------------
@@ -454,7 +456,7 @@ public class JMLSpecFactory {
                 textualSpecCase.getJoinProcs());
 
         clauses.joinParams = translateJoinParams(
-                textualSpecCase.getJoinParams());
+                textualSpecCase.getJoinParams(), clauses.joinProcedure);
 
         /*
          * if (clauses.joinProcedure instanceof JoinWithPredicateAbstraction)
@@ -544,16 +546,52 @@ public class JMLSpecFactory {
         return chosenProc;
     }
 
-    private String translateJoinParams(ImmutableList<PositionedString> params) {
-        if (params == null || params.size() == 0) {
+    private String[] translateJoinParams(ImmutableList<PositionedString> params,
+            JoinProcedure chosenProc) throws SLTranslationException {
+        if (chosenProc == null || !chosenProc.toString()
+                .equals("JoinByPredicateAbstraction")) {
             return null;
         }
-        String joinParams = params.head().text.substring(13,
-                params.head().text.length() - 2);
-        
-        return joinParams;
-    }
+        else if (params == null || params.size() == 0) {
 
+            throw new SLTranslationException("Parameters are missing");
+        }
+        else {
+            String joinParamsStr = params.head().text.substring(13,
+                    params.head().text.length() - 2);
+            String[] joinParams = new String[2];
+
+            Pattern p = Pattern.compile("([^\"]+) : ([^\"]+)");
+
+            Matcher m = p.matcher(joinParamsStr);
+
+            if (m.find() && m.groupCount() == 2) {
+                joinParams[0] = m.group(1);
+                if (!joinParams[0].equals("rep") && !joinParams[0].equals("con")
+                        && !joinParams[0].equals("dis")
+                        && !joinParams[0].equals("simple")) {
+                    throw new SLTranslationException("Unknown lattice type");
+                }
+                else if (joinParams[0].equals("rep")) {
+                    String preds = m.group(2);
+                    Pattern pRep = Pattern.compile("'(.+?)'");
+                    Matcher mRep = pRep.matcher(preds); // read rep?
+
+                    while (mRep.find()) {
+                        return null;
+                    }
+                }
+
+            }
+            else
+                throw new SLTranslationException(
+                        "Wrong format of parameters for the given procedure");
+
+            joinParams[1] = m.group(2);
+            return joinParams;
+
+        }
+    }
 
     /**
      * Clauses are expected to be conjoined in a right-associative way, i.e. A &

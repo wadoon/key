@@ -2143,7 +2143,7 @@ public class JoinRuleUtils {
     * This exception is thrown by methods to indicate that a given KeY sort is
     * not known in the current situation.
     */
-   static class SortNotKnownException extends RuntimeException {
+   public static class SortNotKnownException extends RuntimeException {
       private static final long serialVersionUID = -5728194402773352846L;
 
       public SortNotKnownException(String message) {

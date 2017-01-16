@@ -55,13 +55,18 @@ public class JoinPointRule implements BuiltInRule {
 
         JoinPointStatement jPS = ((JoinPointStatement) block
                 .getInnerMostMethodFrame().getBody().getFirstElement());
+        
+        String[] params = jPS.getContract().getJoinParams();
 
         JoinProcedure concreteRule = jPS.getJoinProc();
-        // TODO: set joinParams;
 
         if (concreteRule.toString().equals("JoinByPredicateAbstraction")) {
-            concreteRule = predAbstrWithParameters(concreteRule,
-                    jPS.getContract().getJoinParams(), services);
+            Class<? extends AbstractPredicateAbstractionLattice> latticeType = translateLatticeType(
+                   params[0]);
+            List<AbstractionPredicate> predicates = hasCorrectParams(params[1], goal);
+            final JoinWithPredicateAbstractionFactory absPredicateFactory = (JoinWithPredicateAbstractionFactory) concreteRule;
+            concreteRule = absPredicateFactory.instantiate(predicates, latticeType,
+                    new LinkedHashMap<ProgramVariable, AbstractDomainElement>());
         }
 
         ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
@@ -78,32 +83,6 @@ public class JoinPointRule implements BuiltInRule {
         return newGoals;
     }
 
-    private JoinProcedure predAbstrWithParameters(JoinProcedure joinProc,
-            String joinParams, Services services) {
-        if (joinParams.isEmpty()) {
-            return null;
-        }
-
-        Pattern p = Pattern.compile("([^\"]+) : ([^\"]+)");
-        Matcher m = p.matcher(joinParams);
-
-        if (m.find()) {
-            Class<? extends AbstractPredicateAbstractionLattice> latticeType = translateLatticeType(
-                    m.group(1));
-
-            List<AbstractionPredicate> predicates = null;
-            predicates = getPredicates(m.group(2), services);
-           
-            final JoinWithPredicateAbstractionFactory absPredicateFactory = (JoinWithPredicateAbstractionFactory) joinProc;
-            joinProc = absPredicateFactory.instantiate(predicates, latticeType,
-                    new LinkedHashMap<ProgramVariable, AbstractDomainElement>());
-        }
-        else {
-           return null;
-        }
-        return joinProc;
-    }
-
     private Class<? extends AbstractPredicateAbstractionLattice> translateLatticeType(
             String type) {
         if (type.equals("simple"))
@@ -115,49 +94,7 @@ public class JoinPointRule implements BuiltInRule {
         else
             return null;
     }
-    
-    private List<AbstractionPredicate> getPredicates(String input, Services services){
-        final ArrayList<AbstractionPredicate> result =
-                new ArrayList<AbstractionPredicate>();
-        Pattern p = Pattern.compile("\\('(.+?)', '(.+?)'\\)");
-        Matcher m = p.matcher(input);
-        //Report Error?
-        boolean matched = false;
-        while (m.find()) {
-            matched = true;
 
-            for (int i = 1; i < m.groupCount(); i += 2) {
-                
-                final String phStr = m.group(i);
-                final String predStr = m.group(i + 1);
-                String[] preds = predStr.split("', '");
-
-                // Parse the placeholder
-                Pair<Sort, Name> ph = null;
-                ph = JoinRuleUtils.parsePlaceholder(phStr, false, services);
-
-                // Add placeholder to namespaces, if necessary
-                if (services.getNamespaces().variables().lookup(ph.second) == null) {
-                    services.getNamespaces()
-                            .variables()
-                            .add(new LocationVariable(new ProgramElementName(
-                                    ph.second.toString()), ph.first));
-                }
-                for(int j = 0; j < preds.length; j++){
-                    try {
-                        result.add(JoinRuleUtils.parsePredicate(preds[j],
-                                JoinRuleUtils.singletonArrayList(ph), services));
-                    }
-                    catch (ParserException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }
-        return result;
-        
-    }
 
     @Override
     public Name name() {
@@ -178,78 +115,55 @@ public class JoinPointRule implements BuiltInRule {
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 
         if (pio != null && pio.subTerm().isContainsJavaBlockRecursive()
-                && !goal.isLinked()) {
+                && !goal.isLinked()
+                && JavaTools.getActiveStatement(
+                        TermBuilder.goBelowUpdates(pio.subTerm())
+                                .javaBlock()) instanceof JoinPointStatement) {
 
-            SourceElement st = JavaTools.getActiveStatement(
-                    TermBuilder.goBelowUpdates(pio.subTerm()).javaBlock());
+            BlockContract contract = ((JoinPointStatement) JavaTools
+                    .getActiveStatement(TermBuilder
+                            .goBelowUpdates(pio.subTerm()).javaBlock()))
+                                    .getContract();
 
-            if (st instanceof JoinPointStatement) {
+            ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
+                    .findPotentialJoinPartners(goal, pio);
 
-                BlockContract contract = ((JoinPointStatement) st)
-                        .getContract();
+            if (!joinPartners.isEmpty() && (!contract.getJoinProcedure()
+                    .toString().equals("JoinByPredicateAbstraction")
+                    || !hasCorrectParams(contract.getJoinParams()[1], goal).isEmpty())) {
 
-                ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
-                        .findPotentialJoinPartners(goal, pio);
+                ImmutableList<Goal> joinPartnersGoal = ImmutableSLList.nil();
 
-                if (!joinPartners.isEmpty()) {
-
-                    ImmutableList<Goal> joinPartnersGoal = ImmutableSLList
-                            .nil();
-
-                    for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> p : joinPartners) {
-                        joinPartnersGoal = joinPartnersGoal.append(p.first);
-                    }
-
-                    ImmutableList<Goal> openGoals = goal.node().proof()
-                            .openGoals();
-                    
-                    for (Goal g : openGoals) {
-                        // not linked
-                        if (!g.equals(goal) && !g.isLinked()
-                                && !joinPartnersGoal.contains(g)) {
-
-                            if (hasSameBlockContractRule(g, contract))
-                                return false;
-
-                            JavaBlock jB;
-                            for (int i = 0; i < g.node().sequent().succedent()
-                                    .size(); i++) {
-                                jB = JoinRuleUtils.getJavaBlockRecursive(
-                                        g.node().sequent().succedent().get(i)
-                                                .formula());
-                                MethodFrame mF = JavaTools
-                                        .getInnermostMethodFrame(jB,
-                                                goal.proof().getServices());
-                                if (mF != null && hasSameBlock(mF.getBody(),
-                                        contract.getBlock())) {
-
-                                    return false;
-                                }
-                            }
-
-                        }
-                    }
-                    
-                    return checkParameters(goal, pio,(JoinPointStatement) st) != null;
+                for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> p : joinPartners) {
+                    joinPartnersGoal = joinPartnersGoal.append(p.first);
                 }
+
+                ImmutableList<Goal> openGoals = goal.node().proof().openGoals();
+                for (Goal g : openGoals) {
+                    if (!g.equals(goal) && !g.isLinked()
+                            && !joinPartnersGoal.contains(g)
+                            && (hasSameBlockContractRule(g, contract)
+                                    || hasSameBlock(g, contract.getBlock()))) {
+                        return false;
+                    }
+                }
+                return true;
             }
         }
-
         return false;
     }
 
-    private JoinProcedure checkParameters(Goal goal, PosInOccurrence pio, JoinPointStatement st) {
-      
-        JoinProcedure concreteRule = st.getJoinProc();
-      
-        if (concreteRule.toString().equals("JoinByPredicateAbstraction") ) {
-            concreteRule = predAbstrWithParameters(concreteRule,
-                    st.getContract().getJoinParams(), goal.node().proof().getServices());
+    private List<AbstractionPredicate> hasCorrectParams(String parms, Goal g) {
+        List<AbstractionPredicate> result =
+                new ArrayList<AbstractionPredicate>();
+        try {
+             result = AbstractionPredicate.fromString(parms,
+                    g.proof().getServices());
         }
-        
-        return concreteRule;
-
-        
+        catch (ParserException| JoinRuleUtils.SortNotKnownException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
     private boolean hasSameBlockContractRule(Goal g, BlockContract contract) {
@@ -262,14 +176,27 @@ public class JoinPointRule implements BuiltInRule {
         return false;
     }
 
+    private boolean hasSameBlock(Goal g, StatementBlock block) {
+        for (int i = 0; i < g.node().sequent().succedent().size(); i++) {
+            JavaBlock jB = JoinRuleUtils.getJavaBlockRecursive(
+                    g.node().sequent().succedent().get(i).formula());
+            MethodFrame mF = JavaTools.getInnermostMethodFrame(jB,
+                    g.proof().getServices());
+            if (mF != null && hasSameBlockHelp(mF.getBody(), block))
+                return true;
+
+        }
+        return false;
+    }
+
     // TODO: test more complex cases
-    private boolean hasSameBlock(StatementBlock block1, StatementBlock block2) {
+    private boolean hasSameBlockHelp(StatementBlock block1,
+            StatementBlock block2) {
         boolean result = false;
         ProgramElement pE;
         for (int i = 0; i < block1.getChildCount() && !result; i++) {
             pE = block1.getChildAt(i);
-            result = (pE instanceof StatementBlock) ? (pE.equals(block2)) ? true
-                    : hasSameBlock((StatementBlock) pE, block2) : false;
+            result = (pE instanceof StatementBlock) && ((pE.equals(block2)) || hasSameBlockHelp((StatementBlock) pE, block2));
         }
         return result;
     }
