@@ -16,12 +16,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.ServiceLoader;
+import java.util.*;
 
 import javax.swing.JButton;
 import javax.swing.JMenuItem;
@@ -194,7 +189,7 @@ public class ScriptViewController implements ActionListener{
                 m.setEnabled(true);
             }
             m.addActionListener(new ActionListener() {
-                JTextArea textArea = view.getTextArea();
+
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     textArea.setCaretPosition(pos);
@@ -236,7 +231,7 @@ public class ScriptViewController implements ActionListener{
     }
 
     private void reparseFromCurrentPos() {
-        int pos = view.getTextArea().getCaretPosition();
+        int pos = textArea.getCaretPosition();
         ScriptNode snode = getNodeAtPos(oldroot, pos);
         if(snode != null) {
             Node proofNode = snode.getProofNode();
@@ -270,7 +265,7 @@ public class ScriptViewController implements ActionListener{
     }
 
     private void showPath(){
-        int pos = view.getTextArea().getCaretPosition();
+        int pos = textArea.getCaretPosition();
 
         if(oldroot == null)
             ExceptionDialog.showDialog(mainWindow, new Exception("There is currently no parsed script tree to browse."));
@@ -457,7 +452,8 @@ public class ScriptViewController implements ActionListener{
             //            }
 
             if(children.size() > leaves.size()) {
-                throw new ScriptException("Command " + argMap.get("#literal") +
+                throw new ScriptException("Command " +
+                        //argMap.get("#literal") +
                         " requires " + leaves.size() +
                         " children, but received " + children.size());
             }
