@@ -55,17 +55,19 @@ public class JoinPointRule implements BuiltInRule {
 
         JoinPointStatement jPS = ((JoinPointStatement) block
                 .getInnerMostMethodFrame().getBody().getFirstElement());
-        
+
         String[] params = jPS.getContract().getJoinParams();
 
         JoinProcedure concreteRule = jPS.getJoinProc();
 
         if (concreteRule.toString().equals("JoinByPredicateAbstraction")) {
             Class<? extends AbstractPredicateAbstractionLattice> latticeType = translateLatticeType(
-                   params[0]);
-            List<AbstractionPredicate> predicates = hasCorrectParams(params[1], goal);
+                    params[0]);
+            List<AbstractionPredicate> predicates = hasCorrectParams(params[1],
+                    goal);
             final JoinWithPredicateAbstractionFactory absPredicateFactory = (JoinWithPredicateAbstractionFactory) concreteRule;
-            concreteRule = absPredicateFactory.instantiate(predicates, latticeType,
+            concreteRule = absPredicateFactory.instantiate(predicates,
+                    latticeType,
                     new LinkedHashMap<ProgramVariable, AbstractDomainElement>());
         }
 
@@ -87,14 +89,13 @@ public class JoinPointRule implements BuiltInRule {
             String type) {
         if (type.equals("simple"))
             return SimplePredicateAbstractionLattice.class;
-        else if (type.equals("con"))
+        else if (type.equals("conjunctive"))
             return ConjunctivePredicateAbstractionLattice.class;
-        else if (type.equals("dis"))
+        else if (type.equals("disjunctive"))
             return DisjunctivePredicateAbstractionLattice.class;
         else
             return null;
     }
-
 
     @Override
     public Name name() {
@@ -130,7 +131,8 @@ public class JoinPointRule implements BuiltInRule {
 
             if (!joinPartners.isEmpty() && (!contract.getJoinProcedure()
                     .toString().equals("JoinByPredicateAbstraction")
-                    || !hasCorrectParams(contract.getJoinParams()[1], goal).isEmpty())) {
+                    || !hasCorrectParams(contract.getJoinParams()[1], goal)
+                            .isEmpty())) {
 
                 ImmutableList<Goal> joinPartnersGoal = ImmutableSLList.nil();
 
@@ -153,14 +155,61 @@ public class JoinPointRule implements BuiltInRule {
         return false;
     }
 
-    private List<AbstractionPredicate> hasCorrectParams(String parms, Goal g) {
-        List<AbstractionPredicate> result =
-                new ArrayList<AbstractionPredicate>();
+    private List<AbstractionPredicate> hasCorrectParams(String params, Goal g) {
+        
+        List<AbstractionPredicate> result = new ArrayList<AbstractionPredicate>();
+        Services services = g.proof().getServices();
         try {
-             result = AbstractionPredicate.fromString(parms,
+            Pattern p = Pattern.compile("\\\\(.+?) -> \\{(.+?)\\}");
+            Matcher m = p.matcher(params);
+            boolean matched = false;
+            while (m.find()) {
+                matched = true;
+                for (int i = 1; i < m.groupCount(); i += 2) {
+
+                    final String phStr = m.group(i);
+                    final String[] predStr = m.group(i + 1).split(", ");
+
+                    // Parse the placeholder
+                    Pair<Sort, Name> ph = null;
+                    ph = JoinRuleUtils.parsePlaceholder(phStr, false,
+                            g.proof().getServices());
+                    if (services.getNamespaces().variables()
+                            .lookup(ph.second) == null) {
+                        services.getNamespaces().variables()
+                                .add(new LocationVariable(
+                                        new ProgramElementName(
+                                                ph.second.toString()),
+                                        ph.first));
+                    }
+
+                    ArrayList<Pair<Sort, Name>> phList = JoinRuleUtils.singletonArrayList(ph);
+                   
+                    for (int j = 0; j < predStr.length; j++) {
+                        result.add(JoinRuleUtils.parsePredicate(predStr[j],
+                                phList,
+                                services));
+                    }
+
+                }
+
+            }
+
+        }
+        catch (ParserException | JoinRuleUtils.SortNotKnownException e) {
+            result = new ArrayList<AbstractionPredicate>();
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    private List<AbstractionPredicate> hasCorrectParams2(String parms, Goal g) {
+        List<AbstractionPredicate> result = new ArrayList<AbstractionPredicate>();
+        try {
+            result = AbstractionPredicate.fromString(parms,
                     g.proof().getServices());
         }
-        catch (ParserException| JoinRuleUtils.SortNotKnownException e) {
+        catch (ParserException | JoinRuleUtils.SortNotKnownException e) {
             e.printStackTrace();
         }
         return result;
@@ -196,7 +245,8 @@ public class JoinPointRule implements BuiltInRule {
         ProgramElement pE;
         for (int i = 0; i < block1.getChildCount() && !result; i++) {
             pE = block1.getChildAt(i);
-            result = (pE instanceof StatementBlock) && ((pE.equals(block2)) || hasSameBlockHelp((StatementBlock) pE, block2));
+            result = (pE instanceof StatementBlock) && ((pE.equals(block2))
+                    || hasSameBlockHelp((StatementBlock) pE, block2));
         }
         return result;
     }

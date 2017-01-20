@@ -561,14 +561,14 @@ public class JMLSpecFactory {
                     params.head().text.length() - 2);
             String[] joinParams = new String[2];
 
-            Pattern p = Pattern.compile("([^\"]+) : ([^\"]+)");
+            Pattern p = Pattern.compile("([^(]+)\\( ([^(]+)");
 
             Matcher m = p.matcher(joinParamsStr);
 
             if (m.find() && m.groupCount() == 2) {
                 joinParams[0] = m.group(1);
-                if (!joinParams[0].equals("rep") && !joinParams[0].equals("con")
-                        && !joinParams[0].equals("dis")
+                if (!joinParams[0].equals("domain") && !joinParams[0].equals("conjunctive")
+                        && !joinParams[0].equals("disjunctive")
                         && !joinParams[0].equals("simple")) {
                     throw new SLTranslationException("Unknown lattice type");
                 }
