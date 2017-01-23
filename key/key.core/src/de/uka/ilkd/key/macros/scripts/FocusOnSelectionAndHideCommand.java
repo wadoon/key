@@ -3,7 +3,6 @@ package de.uka.ilkd.key.macros.scripts;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -27,7 +26,7 @@ public class FocusOnSelectionAndHideCommand extends AbstractCommand {
     private Map<String, String> args;
     private Map<String, Object> stateMap;
     private String[] termsToKeep;
-
+    private Sequent toKeep;
 
 
     @Override
@@ -38,13 +37,12 @@ public class FocusOnSelectionAndHideCommand extends AbstractCommand {
         this.stateMap = stateMap;
         this.args = args;
 
-        String formulaString = args.get("formula");
-        if(formulaString == null) {
-            throw new ScriptException("Missing 'formula' argument for focus");
+        String sequentString = args.get("#2");
+        if(sequentString == null) {
+            throw new ScriptException("Missing 'sequent' argument for focus");
         }
 
-        termsToKeep = parseFormulaList(formulaString);
-
+        toKeep = parseSequent(sequentString, getGoalFromCurrentState());
         try {
             hideAll();
         } catch (ParserException e) {
@@ -58,28 +56,49 @@ public class FocusOnSelectionAndHideCommand extends AbstractCommand {
         return "focus";
     }
 
+    private Sequent parseSequent(String sequentString, Goal g)  throws ScriptException {
+    try {
+         return toSequent(proof, g, stateMap, sequentString);
+
+        } catch (Exception e) {
+            throw new ScriptException(e);
+        }
+
+    }
+
+    private Goal getGoalFromCurrentState(){
+        Object fixedGoal = stateMap.get(GOAL_KEY);
+        if (fixedGoal instanceof Node) {
+            Node fixed = (Node) fixedGoal;
+            //case node is already modified by focus, the child has to be returend
+            if (!fixed.leaf()) {
+                assert fixed.childrenCount() == 1;
+                fixed = fixed.child(0);
+            }
+            Goal g = getGoal(proof.openGoals(), fixed);
+            return g;
+        }
+        return null;
+    }
+
+
+
     /**
-     * Hide all formulas of teh seuqent that are not in the list tokeep
+     * Hide all formulas of the sequent that are not focus sequent
      * @throws ParserException
      * @throws ScriptException
      */
     private void hideAll() throws ParserException, ScriptException{
         while(true){
-        Object fixedGoal = stateMap.get(GOAL_KEY);
-        if(fixedGoal instanceof Node) {
-            Node fixed = (Node) fixedGoal;
-            //case node is already modified by focus, the child has to be returend
-            if(!fixed.leaf()){
-                assert fixed.childrenCount() == 1;
-                fixed = fixed.child(0);
-            }
+            //get current goal
+            Goal g = getGoalFromCurrentState();
+            //find formulas that should be hidden in sequent of current goal
 
-            Goal g = getGoal(proof.openGoals(), fixed);
+            //hide
 
-            SequentFormula toHide = null;
             if (g != null) {
 
-                toHide = iterateThroughSequentAndFindNonMatch(g);
+                SequentFormula toHide = iterateThroughSequentAndFindNonMatch(g);
                 //as long as there is a match
                 if (toHide != null) {
                     boolean antec = false;
@@ -101,39 +120,13 @@ public class FocusOnSelectionAndHideCommand extends AbstractCommand {
                 }
 
             }else{
-                //no goal found
+                //goal is null
                 break;
             }
         }
 
-
-        }
     }
 
-    /**
-     * Replace \n, whitepaces and seperating characters and return list with string representation of formula to hide
-     * This has to be adapted when syntax is clear; Syntax will be sequent
-     */
-    private String[] parseFormulaList(String formList){
-
-
-        String[] forms = formList.split("],");
-        String temp = "";
-        for(int i = 0; i < forms.length; i++){
-            temp = forms[i];
-            temp = temp.replaceAll("\n", "");
-            temp = temp.replaceAll(" ", "");
-            temp = temp.trim();
-            temp = temp.substring(1);
-            if(temp.endsWith("]")){
-                temp= temp.substring(0, temp.length()-1);
-            }
-            System.out.println(temp);
-            forms[i] = temp;
-        }
-
-        return forms;
-    }
 
     //determine where formula in sequent and apply either hide_left or hide_right
     private Taclet getTaclet(Term t, String pos) throws ScriptException{
@@ -164,31 +157,61 @@ public class FocusOnSelectionAndHideCommand extends AbstractCommand {
      * @return formula to hide, if all formulas in the sequent should be kept, returns null
      * @throws ScriptException
      * @throws ParserException
-     * TODO does not wrk for formulas with updates
+     *
      */
 
     private SequentFormula iterateThroughSequentAndFindNonMatch(Goal g) throws ScriptException, ParserException {
-        Sequent seq = g.sequent();
-        Iterator<SequentFormula> iterator = seq.iterator();
-        while(iterator.hasNext()){
-            SequentFormula form = iterator.next();
+        Semisequent focusedAntec = toKeep.antecedent();
+        Semisequent focusedSucc = toKeep.succedent();
 
+        Sequent currentGoalSeq = g.sequent();
+        Semisequent currentAntec = currentGoalSeq.antecedent();
+        Semisequent currentSucc = currentGoalSeq.succedent();
+
+
+        //first iterate through antecedent
+        Iterator<SequentFormula> iterator = currentAntec.iterator();
+        while(iterator.hasNext()) {
+            SequentFormula form = iterator.next();
+            Iterator<SequentFormula> focusAntecIter = focusedAntec.iterator();
 
             Boolean isIn = false;
-            for(int i = 0; i< termsToKeep.length; i++){
-                Term t = toTerm(proof, g, stateMap, termsToKeep[i], Sort.FORMULA);
-                System.out.println(t.equalsModRenaming(form.formula()));
-                System.out.println(form.formula().toString());
-                System.out.println("vs. \n"+t.toString());
-
-                if(form.formula().equalsModRenaming(t) ){
+            while (focusAntecIter.hasNext()) {
+                SequentFormula toKeepForm = focusAntecIter.next();
+                if (toKeepForm.equals(form)) {
                     isIn = true;
+                    break;
                 }
+            }
+
+/*                if(form.formula().equalsModRenaming(t) ){
+                    isIn = true;
+                }*/
+
+            if (!isIn) {
+                return form;
+            }
+        }
+        //if in antecedent no formula to hide iterate through succedent
+        Iterator<SequentFormula> iteratorSucc = currentSucc.iterator();
+
+        while(iteratorSucc.hasNext()) {
+            Boolean isIn = false;
+            SequentFormula form = iteratorSucc.next();
+            Iterator<SequentFormula> focusSuccIter = focusedSucc.iterator();
+
+            while (focusSuccIter.hasNext()) {
+               SequentFormula toKeepForm = focusSuccIter.next();
+               if (toKeepForm.equals(form)) {
+                    isIn = true;
+                    break;
+               }
             }
             if(!isIn){
                 return form;
             }
         }
+        //if no formulas to hide, return null
         return null;
     }
 
