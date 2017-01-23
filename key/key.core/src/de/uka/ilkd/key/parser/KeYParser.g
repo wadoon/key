@@ -2506,8 +2506,14 @@ term returns [Term _term = null]
               raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
-        
-        
+
+
+termEOF returns [Term _term = null]
+@after { _term = result; }
+    :
+        result = term EOF
+    ;
+
 elementary_update_term returns[Term _elementary_update_term=null]
 @after { _elementary_update_term = result; }
 :
@@ -3722,14 +3728,19 @@ modifiers[TacletBuilder b]
         ) *
     ;
 
-seq returns [Sequent s] : 
-        ant=semisequent SEQARROW suc=semisequent
+seq returns [Sequent s] :
+        ant=semisequent  SEQARROW suc=semisequent
         { s = Sequent.createSequent(ant, suc); }
     ;
      catch [RuntimeException ex] {
          raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
      }
+
+seqEOF returns [Sequent s] :
+         ss=seq EOF
+         {s = ss;}
+     ;
      
 termorseq returns [Object o]
     :
@@ -3768,7 +3779,7 @@ semisequent returns [Semisequent _semi_sequent]
 @after{ _semi_sequent = ss; }
     :
         /* empty */ | 
-        head=term ( COMMA ss=semisequent) ? 
+        head=term ( COMMA ss=semisequent) ?
         { 
           ss = ss.insertFirst(new SequentFormula(head)).semisequent(); 
         }
