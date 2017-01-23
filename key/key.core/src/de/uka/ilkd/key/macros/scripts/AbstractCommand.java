@@ -5,6 +5,8 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Map;
 
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
@@ -24,6 +26,7 @@ public abstract class AbstractCommand implements ProofScriptCommand {
     public static final String GOAL_KEY = "goal";
     public static final String ABBREV_KEY = "abbrMap";
     private static DefaultTermParser PARSER = new DefaultTermParser();
+
     private static AbbrevMap EMPTY_MAP = new AbbrevMap();
 
     protected static Goal getFirstOpenGoal(Proof proof, Map<String, Object> state) throws ScriptException {
@@ -137,6 +140,32 @@ public abstract class AbstractCommand implements ProofScriptCommand {
             proof.getSettings().getStrategySettings().setMaxSteps(steps);
         }
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(steps);
+     }
+
+     final protected Sequent toSequent(Proof proof, Goal goal, Map<String, Object> state, String string) throws ParserException, ScriptException {
+
+
+
+        AbbrevMap abbrMap = (AbbrevMap)state.get(ABBREV_KEY);
+        if(abbrMap == null) {
+            abbrMap = EMPTY_MAP;
+        }
+
+        StringReader reader = new StringReader(string);
+        Services services = proof.getServices();
+
+        NamespaceSet nss;
+        if(goal == null) {
+            nss = services.getNamespaces();
+        } else {
+            nss = goal.getLocalNamespaces();
+        }
+         Sequent seq = PARSER.parseSeq(reader, services, nss, abbrMap);
+         //Sequent seq = null;
+         return seq;
+        //Term formula = PARSER.parse(reader, sort, services, nss, abbrMap);
+        //return formula;
+
      }
 
 }
