@@ -86,13 +86,14 @@ public class StatementBlock extends JavaStatement
 	this(new ImmutableArray<Statement>(body));
     }
 
-    @Override
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-       return super.equalsModRenaming(se, nat)
-                && (this.getStartPosition().equals(Position.UNDEFINED) ||  // why do we care here about position info and nowhere else?
-                        se.getStartPosition().equals(Position.UNDEFINED) ||
-                        this.getStartPosition().getLine() == se.getStartPosition().getLine());
-    }
+
+//   @Override
+//   public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
+//       return super.equalsModRenaming(se, nat)
+//              /*  && (this.getStartPosition().equals(Position.UNDEFINED) ||  // why do we care here about position info and nowhere else?
+//                        se.getStartPosition().equals(Position.UNDEFINED) ||
+//                        this.getStartPosition().getLine() == se.getStartPosition().getLine());*/
+//    }
 
     @Override
     public int hashCode() {

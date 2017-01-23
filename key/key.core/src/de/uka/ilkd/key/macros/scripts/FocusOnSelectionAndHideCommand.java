@@ -1,34 +1,28 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.RegularExpression;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.recoderext.RegisteredEscapeExpression;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-
 import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.proof.*;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.inst.InstantiationEntry;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Hide all formulas that are not selected
  *  Created by sarah on 1/12/17.
  */
-public class focusOnSelectionAndHideCommand extends AbstractCommand {
+public class FocusOnSelectionAndHideCommand extends AbstractCommand {
     private Proof proof;
     private Map<String, String> args;
     private Map<String, Object> stateMap;
@@ -74,7 +68,7 @@ public class focusOnSelectionAndHideCommand extends AbstractCommand {
         Object fixedGoal = stateMap.get(GOAL_KEY);
         if(fixedGoal instanceof Node) {
             Node fixed = (Node) fixedGoal;
-            //case node is already modfied by foucs, the child has to be returend
+            //case node is already modified by focus, the child has to be returend
             if(!fixed.leaf()){
                 assert fixed.childrenCount() == 1;
                 fixed = fixed.child(0);
@@ -118,7 +112,7 @@ public class focusOnSelectionAndHideCommand extends AbstractCommand {
 
     /**
      * Replace \n, whitepaces and seperating characters and return list with string representation of formula to hide
-     * This has to be adapted when syntax is clear
+     * This has to be adapted when syntax is clear; Syntax will be sequent
      */
     private String[] parseFormulaList(String formList){
 
@@ -170,6 +164,7 @@ public class focusOnSelectionAndHideCommand extends AbstractCommand {
      * @return formula to hide, if all formulas in the sequent should be kept, returns null
      * @throws ScriptException
      * @throws ParserException
+     * TODO does not wrk for formulas with updates
      */
 
     private SequentFormula iterateThroughSequentAndFindNonMatch(Goal g) throws ScriptException, ParserException {
@@ -182,8 +177,11 @@ public class focusOnSelectionAndHideCommand extends AbstractCommand {
             Boolean isIn = false;
             for(int i = 0; i< termsToKeep.length; i++){
                 Term t = toTerm(proof, g, stateMap, termsToKeep[i], Sort.FORMULA);
-                //String comparison for updates in formulas, as terms appear to not be equal
-                if(form.formula().equals(t) || (form.formula().toString().equals(t.toString()))){
+                System.out.println(t.equalsModRenaming(form.formula()));
+                System.out.println(form.formula().toString());
+                System.out.println("vs. \n"+t.toString());
+
+                if(form.formula().equalsModRenaming(t) ){
                     isIn = true;
                 }
             }
@@ -227,38 +225,4 @@ public class focusOnSelectionAndHideCommand extends AbstractCommand {
 
 
 }
-/*
-rule allRight;
-rule impRight;
-rule methodCall;
-branches;
-	simp-upd;
-        rule methodBodyExpand;
-	simp-upd;
-	focus formula="[ {heap:=store(heap, p, Person::$age, x_0)}
-  \<{method-frame(source=birthday()@Person,this=p): {
-        if (this.age>=0) {
-          this.age++;
-        }
-      }
-    }\> gt(int::select(heap, p, Person::$age), x_0)]";
-next;
-        simp-upd;
-	focus formula="[p = null]";
-end;
 
-rule allRight;
-rule impRight;
-rule methodCall;
-branches;
-        skip;
-next;
-        simp-upd;
-	focus formula="[p = null]";
-end;
-
-, [geq(x_0, Z(0(#)))]
-
-
-
-*/
