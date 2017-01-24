@@ -579,6 +579,16 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         };
         def.doAction(x);
     }
+    
+    @Override
+    public void performActionOnLoopScopeBlock(LoopScopeBlock x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new LoopScopeBlock(changeList);
+            }
+        };
+        def.doAction(x);
+    }
 
     public void performActionOnCopyAssignment(CopyAssignment x) {
         DefaultAction def = new DefaultAction(x) {
