@@ -1,28 +1,17 @@
 package de.uka.ilkd.key.java.statement;
 
-import org.key_project.util.ExtList;
-
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.SimpleBlockContract;
 
 public class JoinPointStatement extends JavaStatement{
     
     private BlockContract joinContract;
     private JoinProcedure joinProc;
     private ProgramVariable prgVar;
-  
-    public JoinPointStatement(ExtList children) {
-        super(children);
-        this.joinContract = children.get(BlockContract.class);
-        this.joinProc = children.get(JoinProcedure.class);
-        this.prgVar = children.get(ProgramVariable.class);
-        
-    }
     
     public JoinPointStatement(BlockContract joinContract) {
        this.joinContract = joinContract;
