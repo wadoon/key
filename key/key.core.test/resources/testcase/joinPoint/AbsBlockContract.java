@@ -27,7 +27,7 @@ public class AbsBlockContract {
         int y;
         
         /*@  join_proc "JoinByPredicateAbstraction";
-          @  join_params "simple : ('int h', 'h >= 0')";
+          @  join_params \simple(\int h -> {h >= 0});
          @*/
         
         {if (num < 0) {

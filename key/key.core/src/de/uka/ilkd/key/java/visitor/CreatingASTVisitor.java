@@ -382,6 +382,16 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         };
         def.doAction(x);
     }
+    
+    @Override
+    public void performActionOnJoinPointStatement(JoinPointStatement x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new JoinPointStatement(changeList);
+            }
+        };
+        def.doAction(x);
+    }
 
     // eee
     public void performActionOnCase(Case x) {
