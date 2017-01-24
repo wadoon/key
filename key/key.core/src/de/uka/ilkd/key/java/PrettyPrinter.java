@@ -3191,5 +3191,10 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
+    public void printJoinPoint(ProgramVariable prgVar) throws IOException {
+       write(prgVar.toString());
+        
+    }
+
     
 }

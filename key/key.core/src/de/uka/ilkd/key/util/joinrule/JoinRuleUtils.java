@@ -1442,9 +1442,17 @@ public class JoinRuleUtils {
          ArrayList<Pair<Sort, Name>> registeredPlaceholders, Services services)
          throws ParserException {
       DefaultTermParser parser = new DefaultTermParser();
-      Term formula =
+      Term formula;
+      if(services.getProof() == null){
+          formula =
+                  parser.parse(new StringReader(input), Sort.FORMULA, services,
+                        services.getNamespaces(), null);
+      }
+      else{
+      formula =
             parser.parse(new StringReader(input), Sort.FORMULA, services,
                   services.getNamespaces(), services.getProof().abbreviations());
+      }
 
       ImmutableSet<LocationVariable> containedLocVars =
             JoinRuleUtils.getLocationVariables(formula, services);
@@ -2135,7 +2143,7 @@ public class JoinRuleUtils {
     * This exception is thrown by methods to indicate that a given KeY sort is
     * not known in the current situation.
     */
-   static class SortNotKnownException extends RuntimeException {
+   public static class SortNotKnownException extends RuntimeException {
       private static final long serialVersionUID = -5728194402773352846L;
 
       public SortNotKnownException(String message) {

@@ -504,6 +504,29 @@ public abstract class VariableNamer implements InstantiationProposer {
                                                app.posInOccurrence(),
                                                posOfDeclaration,
                                                previousProposals);
+        
+        
+        // Change by DS, 2016-12-15
+        // NOTE: That's possibly an evil, in terms of inefficient, hack!
+        // However, there is most likely something wrong in this routine
+        // which made me add some code; consider the test case
+        // JoinRuleTests#testDoJMLSpecifiedPredAbstrProof(); after the first
+        // merge, a new boolean variable was introduced for the complex condition
+        // in the if, and VariableNamer produced the same name as at the last
+        // if although \varcond \new is specified in the Taclet definition.
+        // It actually does not seem so bad in this case since we are inside
+        // a block, that is in a different scope; however, this gave rise to
+        // an Exception in CreatingASTVisitor#performActionOnMethodFrame(MethodFrame)
+        // that was hard to understand. The problem disappears with the below
+        // hack: We just increase a counter until the variable is really fresh.
+        // I don't know whether this is meant by "unique name for the instantiation"
+        // in the description of the method, but I'd suppose so...
+        int counter = 2;
+        while (services.getNamespaces().programVariables().lookup(name) != null) {
+            name = new ProgramElementName(basename + "_" + counter++);
+        }
+        
+        
         return (name == null ? null : name.toString());
     }
 

@@ -50,7 +50,7 @@ options {
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 }
 
-@annotateclass{ @SuppressWarnings("all") } 
+@annotateclass{ @SuppressWarnings("all") }
 
 @members {
     private KeYJMLPreLexer lexer;
@@ -134,7 +134,7 @@ options {
     /*
      * This method prepends a String to a given PositionedString and removes whitespaces from
      * heap brackets at the beginning of it. (Why is this necessary?)
-     * 
+     *
      * Note: Static manipulation of Strings that are passed to KeYJMLParser is fragile when it
      * comes to error reporting. Original JML input should be left unmodified as much as possible
      * so that correct error location can be reported to the user. Functionality of this method
@@ -177,7 +177,7 @@ options {
       }
       return result;
     }
-    
+
   @Override
   protected Object recoverFromMismatchedToken(IntStream input, int ttype, BitSet follow) throws RecognitionException {
     throw new MismatchedTokenException(ttype, input);
@@ -644,7 +644,7 @@ requires_clause
 requires_keyword
 :
     REQUIRES | REQUIRES_RED | PRE | PRE_RED
-    
+
 ;
 
 
@@ -733,7 +733,8 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=ensures_clause        { sc.addEnsures(ps); }
 	|   ps=ensures_free_clause   { sc.addEnsuresFree(ps); }
 	|   ps=signals_clause        { sc.addSignals(ps); }
-   |   ps=joinproc_clause        { sc.addJoinProcs(ps); }
+  |   ps=joinproc_clause        { sc.addJoinProcs(ps); }
+  |   ps=joinparams_clause  { sc.addJoinParams(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
 	|   ps=measured_by_clause    { sc.addMeasuredBy(ps); }
@@ -1051,11 +1052,11 @@ type returns [PositionedString text = null;]
 field_or_method_declaration[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
 :
-    typeps=type 	name=IDENT 
+    typeps=type 	name=IDENT
     ( (LPAREN) => methodDecl = method_declaration[mods, typeps, name] {result = methodDecl;}
       |
       fieldDecl = field_declaration[mods, typeps, name] {result = fieldDecl;}
-    ) 
+    )
 ;
 
 
@@ -1622,6 +1623,21 @@ joinproc_clause
 joinproc_keyword
 :
    JOIN_PROC
+;
+
+joinparams_clause
+   returns [PositionedString r = null]
+   throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+   joinparams_keyword result=expression { result = result.prepend("join_params "); }
+;
+
+
+joinparams_keyword
+:
+   JOIN_PARAMS
 ;
 
 

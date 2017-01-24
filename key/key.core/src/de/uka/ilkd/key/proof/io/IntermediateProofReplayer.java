@@ -891,7 +891,6 @@ public class IntermediateProofReplayer {
 
         ImmutableSet<IBuiltInRuleApp> result =
                 DefaultImmutableSet.<IBuiltInRuleApp> nil();
-
         for (final IBuiltInRuleApp app : g.ruleAppIndex().getBuiltInRules(g,
                 pos)) {
             if (app.rule().name().toString().equals(ruleName)) {

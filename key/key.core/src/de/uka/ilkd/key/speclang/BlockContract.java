@@ -92,6 +92,8 @@ public interface BlockContract extends SpecificationElement {
     public Term getAssignable(LocationVariable heap);
     
     public JoinProcedure getJoinProcedure();
+    
+    public String[] getJoinParams();
 
     public void visit(Visitor visitor);
 
@@ -108,6 +110,7 @@ public interface BlockContract extends SpecificationElement {
                                 Map<LocationVariable,Term> newModifiesClauses,
                                 final ImmutableList<InfFlowSpec> newInfFlowSpecs,
                                 final JoinProcedure newJoinProcedure,
+                                final String[] newJoinParams,
                                 Variables newVariables);
 
     public BlockContract setBlock(StatementBlock newBlock);

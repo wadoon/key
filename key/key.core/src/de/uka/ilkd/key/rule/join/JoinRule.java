@@ -293,7 +293,7 @@ public class JoinRule implements BuiltInRule {
                         });
 
         newGoal.indexOfTaclets().removeTaclets(partInstNoPosTacletsToRemove);
-
+      
         // Add new antecedent (path condition)
         for (Term antecedentFormula : getConjunctiveElementsFor(resultPathCondition)) {
             final SequentFormula newAntecedent =

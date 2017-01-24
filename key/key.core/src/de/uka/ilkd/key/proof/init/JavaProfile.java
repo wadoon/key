@@ -38,7 +38,10 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.join.DeleteJoinPointRule;
+import de.uka.ilkd.key.rule.join.JoinPointRule;
 import de.uka.ilkd.key.rule.join.JoinRule;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
@@ -173,7 +176,6 @@ public class JavaProfile extends AbstractProfile {
                ? new ComplexRuleJustificationBySpec()
                : super.getJustification(r);
     }
-
 
     /**
      * the name of the profile

@@ -104,7 +104,7 @@ import de.uka.ilkd.key.util.ProofUserManager;
 /**
  * This class represents the Editor for viewing KeY-Proofs
  * 
- * @author Christoph Schneider, Niklas Bunzel, Stefan Käsdorf, Marco Drebing
+ * @author Christoph Schneider, Niklas Bunzel, Stefan KÃ¤sdorf, Marco Drebing
  */
 public class KeYEditor extends SequentEditor implements IProofProvider, IProofNodeSearchSupport {
    /**

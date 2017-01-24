@@ -20,7 +20,7 @@ lexer grammar KeYJMLPreLexer;
     import de.uka.ilkd.key.util.Debug;
 }
 
-@annotateclass{ @SuppressWarnings("all") } 
+@annotateclass{ @SuppressWarnings("all") }
 
     ABSTRACT 			: 'abstract';
     ACCESSIBLE                  : 'accessible';
@@ -79,6 +79,7 @@ lexer grammar KeYJMLPreLexer;
     INSTANCE 			: 'instance';
     INVARIANT 			: 'invariant';
     INVARIANT_RED 		: 'invariant_redundantly';
+    JOIN_PARAMS    : 'join_params';
     JOIN_PROC           : 'join_proc';
     LOOP_INVARIANT  		: 'loop_invariant';
     LOOP_INVARIANT_RED  	: 'loop_invariant_redundantly';
@@ -258,8 +259,8 @@ fragment BODY
   | c = (' '|'\t'|'\r'|'\u000c') { sb.append((char)c); }
   | c = ~(' '|'\t'|'\r'|'\u000c' | '{' | '}' | '\n' | '@')
                                  { ignoreAt = false; sb.append((char)c); }
-  )* 
-  {braceCounter == 0}? => '}' 
+  )*
+  {braceCounter == 0}? => '}'
      { sb.append("}"); setText(sb.toString()); }
 ;
 
@@ -304,18 +305,18 @@ ESC
         :
         ']'
         ;
-        
-    
-// http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_4.html#SEC31, 2013-06-22
-    
-    
 
-        
+
+// http://www.eecs.ucf.edu/~leavens/JML/jmlrefman/jmlrefman_4.html#SEC31, 2013-06-22
+
+
+
+
 LPAREN : '(';
 RPAREN : ')';
 EQUALITY : '=';
 EMPTYBRACKETS : '[]';
-        
+
 
 COMMA : ',' ;
 DOT : '.' ;
@@ -332,7 +333,7 @@ JAVAOPERATOR
 
 JMLSPECIALSYMBOL
     :
-          '==>' | '<==' | '<==>' | '<=!=>' | '->' | '<-' | '..' 
+          '==>' | '<==' | '<==>' | '<=!=>' | '->' | '<-' | '..'
     ;
 
 INTEGERLITERAL
