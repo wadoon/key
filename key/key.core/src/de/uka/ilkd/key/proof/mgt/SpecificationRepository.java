@@ -948,7 +948,10 @@ public final class SpecificationRepository {
         final IObserverFunction target = inv.isStatic() ? services
                 .getJavaInfo().getStaticInv(kjt) : services.getJavaInfo()
                 .getInv();
-        invs.put(kjt, getClassInvariants(kjt).add(inv));
+        // do not add static invariants to the class invariant
+        if(!inv.isStatic()) {
+            invs.put(kjt, getClassInvariants(kjt).add(inv));
+        }
         final ImmutableSet<ClassWellDefinedness> cwds = getWdClassChecks(kjt);
         if (cwds.isEmpty()) {
             registerContract(new ClassWellDefinedness(inv, target, null, null, services));
@@ -962,12 +965,9 @@ public final class SpecificationRepository {
             registerContract(cwd);
         }
 
-        // in any case, create axiom with non-static target
-        addClassAxiom(new PartialInvAxiom(inv, false, services));
-        // for a static invariant, create also an axiom with a static target
-        if (inv.isStatic()) {
-            addClassAxiom(new PartialInvAxiom(inv, true, services));
-        }
+        // create axiom depending with static or non-static target depending on whether invariant is static
+        addClassAxiom(new PartialInvAxiom(inv, inv.isStatic(), services));
+
         // inherit non-private, non-static invariants
         if (!inv.isStatic()
                 && VisibilityModifier.allowsInheritance(inv.getVisibility())) {
