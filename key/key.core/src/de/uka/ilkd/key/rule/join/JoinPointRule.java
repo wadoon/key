@@ -135,6 +135,7 @@ public class JoinPointRule implements BuiltInRule {
             ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                     .findPotentialJoinPartners(goal, pio);
 
+            //XXX (DS): Why this concrete index access to the join params?
             if (!joinPartners.isEmpty() && (!jps.getJoinProc().toString()
                     .equals("JoinByPredicateAbstraction")
                     || !hasCorrectParams(jps.getJoinParams()[1], goal)

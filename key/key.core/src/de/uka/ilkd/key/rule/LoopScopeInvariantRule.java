@@ -33,7 +33,10 @@ import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -320,7 +323,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     private ProgramElement newProgram(Services services, final While loop,
             ArrayList<Label> labels, Statement stmtToReplace,
             final JavaBlock origProg, final ProgramVariable loopScopeIdxVar) {
-        
+
         final ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
 
         if (loop.getBody() instanceof StatementBlock) {
@@ -335,6 +338,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                 stmnt.toArray(new Statement[stmnt.size()]));
 
         // Add a JoinPointStatement before each return.
+
         final ProgramVariable joinPointVar = //
                 KeYJavaASTFactory
                         .localVariable( //
@@ -342,13 +346,29 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                                         .getTemporaryNameProposal("return_x"),
                                 loopScopeIdxVar.getKeYJavaType());
 
+        // HACK -->
+        // \simple(\int h -> {h >= 0})
+        String postCond = LogicPrinter
+                .quickPrintTerm(((FunctionalOperationContract) services
+                        .getSpecificationRepository()
+                        .getPOForProof(services.getProof()).getContract())
+                                .getPost(),
+                        services);
+        String predSpec = "(\\int _ph -> {"
+                + postCond.replaceAll("result", "_ph") + "}";
+        JoinPointStatement jps = new JoinPointStatement(joinPointVar,
+                JoinWithPredicateAbstractionFactory.instance(),
+                new String[] { "\\simple", predSpec });
+        // <-- HACK
+
+        // JoinPointStatement jps = new JoinPointStatement(joinPointVar);
+
         ifBody = (Statement) new ProgramElementPrepender(
-                (JavaProgramElement) ifBody, services).append(
-                        elem -> elem instanceof Return,
-                        new JoinPointStatement(joinPointVar));
-        
-        //TODO: Also add JPSs before breaks and continues.
-        //TODO: What about labeled breaks / continues?
+                (JavaProgramElement) ifBody, services)
+                        .append(elem -> elem instanceof Return, jps);
+
+        // TODO: Also add JPSs before breaks and continues.
+        // TODO: What about labeled breaks / continues?
 
         for (int i = labels.size() - 1; i >= 0; i--) {
             Label label = labels.get(i);
