@@ -61,11 +61,9 @@ public class JoinPointRule implements BuiltInRule {
         JoinRuleBuiltInRuleApp app = new JoinRuleBuiltInRuleApp(new JoinRule(),
                 pio);
 
-        StatementBlock block = (StatementBlock) JoinRuleUtils
-                .getJavaBlockRecursive(pio.subTerm()).program();
-
-        JoinPointStatement jPS = ((JoinPointStatement) block
-                .getInnerMostMethodFrame().getBody().getFirstElement());
+        JoinPointStatement jPS = (JoinPointStatement) JavaTools
+                .getActiveStatement(
+                        JoinRuleUtils.getJavaBlockRecursive(pio.subTerm()));
 
         String[] params = jPS.getJoinParams();
 

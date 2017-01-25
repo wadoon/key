@@ -6,6 +6,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
+import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -13,9 +14,12 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.statement.JoinPointStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
+import de.uka.ilkd.key.java.statement.Return;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.java.visitor.ProgramElementPrepender;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -316,6 +320,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     private ProgramElement newProgram(Services services, final While loop,
             ArrayList<Label> labels, Statement stmtToReplace,
             final JavaBlock origProg, final ProgramVariable loopScopeIdxVar) {
+
         final ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
 
         if (loop.getBody() instanceof StatementBlock) {
@@ -328,6 +333,12 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         Statement ifBody = new StatementBlock(
                 stmnt.toArray(new Statement[stmnt.size()]));
+
+        // Add a JoinPointStatement before each return.
+        ifBody = (Statement) new ProgramElementPrepender(
+                (JavaProgramElement) ifBody, services).append(
+                        elem -> elem instanceof Return,
+                        new JoinPointStatement(loopScopeIdxVar));
 
         for (int i = labels.size() - 1; i >= 0; i--) {
             Label label = labels.get(i);
