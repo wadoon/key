@@ -1,8 +1,8 @@
 package de.uka.ilkd.key.rule.join;
 
-import java.util.LinkedHashMap;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -11,23 +11,34 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.*;
-import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.statement.CatchAllStatement;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.DisjunctivePredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
+import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.JoinPointStatement;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.java.visitor.ContainsStatementVisitor;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.RuleAbortException;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.SimpleBlockContract;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
@@ -56,7 +67,7 @@ public class JoinPointRule implements BuiltInRule {
         JoinPointStatement jPS = ((JoinPointStatement) block
                 .getInnerMostMethodFrame().getBody().getFirstElement());
 
-        String[] params = jPS.getContract().getJoinParams();
+        String[] params = jPS.getJoinParams();
 
         JoinProcedure concreteRule = jPS.getJoinProc();
 
@@ -93,8 +104,7 @@ public class JoinPointRule implements BuiltInRule {
             return ConjunctivePredicateAbstractionLattice.class;
         else if (type.equals("disjunctive"))
             return DisjunctivePredicateAbstractionLattice.class;
-        else
-            return null;
+        else return null;
     }
 
     @Override
@@ -121,17 +131,16 @@ public class JoinPointRule implements BuiltInRule {
                         TermBuilder.goBelowUpdates(pio.subTerm())
                                 .javaBlock()) instanceof JoinPointStatement) {
 
-            BlockContract contract = ((JoinPointStatement) JavaTools
+            JoinPointStatement jps = ((JoinPointStatement) JavaTools
                     .getActiveStatement(TermBuilder
-                            .goBelowUpdates(pio.subTerm()).javaBlock()))
-                                    .getContract();
+                            .goBelowUpdates(pio.subTerm()).javaBlock()));
 
             ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                     .findPotentialJoinPartners(goal, pio);
 
-            if (!joinPartners.isEmpty() && (!contract.getJoinProcedure()
-                    .toString().equals("JoinByPredicateAbstraction")
-                    || !hasCorrectParams(contract.getJoinParams()[1], goal)
+            if (!joinPartners.isEmpty() && (!jps.getJoinProc().toString()
+                    .equals("JoinByPredicateAbstraction")
+                    || !hasCorrectParams(jps.getJoinParams()[1], goal)
                             .isEmpty())) {
 
                 ImmutableList<Goal> joinPartnersGoal = ImmutableSLList.nil();
@@ -144,8 +153,7 @@ public class JoinPointRule implements BuiltInRule {
                 for (Goal g : openGoals) {
                     if (!g.equals(goal) && !g.isLinked()
                             && !joinPartnersGoal.contains(g)
-                            && (hasSameBlockContractRule(g, contract)
-                                    || hasSameBlock(g, contract.getBlock()))) {
+                            && containsNonActiveJPS(g, jps)) {
                         return false;
                     }
                 }
@@ -156,15 +164,13 @@ public class JoinPointRule implements BuiltInRule {
     }
 
     private List<AbstractionPredicate> hasCorrectParams(String params, Goal g) {
-        
+
         List<AbstractionPredicate> result = new ArrayList<AbstractionPredicate>();
         Services services = g.proof().getServices();
         try {
             Pattern p = Pattern.compile("\\\\(.+?) -> \\{(.+?)\\}");
             Matcher m = p.matcher(params);
-            boolean matched = false;
             while (m.find()) {
-                matched = true;
                 for (int i = 1; i < m.groupCount(); i += 2) {
 
                     final String phStr = m.group(i);
@@ -183,72 +189,82 @@ public class JoinPointRule implements BuiltInRule {
                                         ph.first));
                     }
 
-                    ArrayList<Pair<Sort, Name>> phList = JoinRuleUtils.singletonArrayList(ph);
-                   
+                    ArrayList<Pair<Sort, Name>> phList = JoinRuleUtils
+                            .singletonArrayList(ph);
+
                     for (int j = 0; j < predStr.length; j++) {
                         result.add(JoinRuleUtils.parsePredicate(predStr[j],
-                                phList,
-                                services));
+                                phList, services));
                     }
 
                 }
 
             }
 
-        }
-        catch (ParserException | JoinRuleUtils.SortNotKnownException e) {
+        } catch (ParserException | JoinRuleUtils.SortNotKnownException e) {
             result = new ArrayList<AbstractionPredicate>();
             e.printStackTrace();
         }
         return result;
     }
 
-    private List<AbstractionPredicate> hasCorrectParams2(String parms, Goal g) {
-        List<AbstractionPredicate> result = new ArrayList<AbstractionPredicate>();
-        try {
-            result = AbstractionPredicate.fromString(parms,
-                    g.proof().getServices());
-        }
-        catch (ParserException | JoinRuleUtils.SortNotKnownException e) {
-            e.printStackTrace();
-        }
-        return result;
+    /**
+     * TODO
+     * 
+     * @param g
+     * @param jps
+     * @return
+     */
+    static boolean containsNonActiveJPS(Goal g, JoinPointStatement jps) {
+        return containsJPS(g, jps, true);
     }
 
-    private boolean hasSameBlockContractRule(Goal g, BlockContract contract) {
-        for (RuleApp rA : g.appliedRuleApps()) {
-            if (rA instanceof BlockContractBuiltInRuleApp
-                    && ((BlockContractBuiltInRuleApp) rA).getContract()
-                            .equals(contract))
-                return true;
+    /**
+     * TODO
+     * 
+     * @param g
+     * @param jps
+     * @return
+     */
+    static boolean containsJPS(Goal g, JoinPointStatement jps) {
+        return containsJPS(g, jps, false);
+    }
+
+    /**
+     * TODO
+     * 
+     * @param g
+     * @param jps
+     * @param onlyNonActive
+     * @return
+     */
+    private static boolean containsJPS(Goal g, JoinPointStatement jps,
+            boolean onlyNonActive) {
+        for (SequentFormula sf : g.node().sequent().succedent()) {
+            JavaBlock jb = JoinRuleUtils.getJavaBlockRecursive(sf.formula());
+
+            if (jb.isEmpty()) {
+                continue;
+            }
+
+            if (onlyNonActive && JavaTools.getActiveStatement(jb).equals(jps)) {
+                return false;
+            }
+
+            Services services = g.proof().getServices();
+            MethodFrame mf = JavaTools.getInnermostMethodFrame(jb, services);
+
+            if (mf != null) {
+                ContainsStatementVisitor visitor = new ContainsStatementVisitor(
+                        mf, jps, services);
+                visitor.start();
+                return visitor.isContained();
+            } else {
+                return false;
+            }
         }
+
         return false;
-    }
-
-    private boolean hasSameBlock(Goal g, StatementBlock block) {
-        for (int i = 0; i < g.node().sequent().succedent().size(); i++) {
-            JavaBlock jB = JoinRuleUtils.getJavaBlockRecursive(
-                    g.node().sequent().succedent().get(i).formula());
-            MethodFrame mF = JavaTools.getInnermostMethodFrame(jB,
-                    g.proof().getServices());
-            if (mF != null && hasSameBlockHelp(mF.getBody(), block))
-                return true;
-
-        }
-        return false;
-    }
-
-    // TODO: test more complex cases
-    private boolean hasSameBlockHelp(StatementBlock block1,
-            StatementBlock block2) {
-        boolean result = false;
-        ProgramElement pE;
-        for (int i = 0; i < block1.getChildCount() && !result; i++) {
-            pE = block1.getChildAt(i);
-            result = (pE instanceof StatementBlock) && ((pE.equals(block2))
-                    || hasSameBlockHelp((StatementBlock) pE, block2));
-        }
-        return result;
     }
 
     @Override

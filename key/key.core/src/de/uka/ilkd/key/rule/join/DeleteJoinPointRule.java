@@ -1,13 +1,28 @@
 package de.uka.ilkd.key.rule.join;
 
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 import org.key_project.util.collection.ImmutableList;
-import de.uka.ilkd.key.java.*;
+
+import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.JoinPointStatement;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.RuleAbortException;
+import de.uka.ilkd.key.rule.RuleApp;
 
 public class DeleteJoinPointRule implements BuiltInRule {
 
@@ -73,25 +88,25 @@ public class DeleteJoinPointRule implements BuiltInRule {
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 
-        if (pio != null
-                && JavaTools.getActiveStatement(
-                        TermBuilder.goBelowUpdates(pio.subTerm())
-                                .javaBlock()) instanceof JoinPointStatement
-                && JoinRule.findPotentialJoinPartners(goal, pio).isEmpty()) {
-            int i = 0;
-            ImmutableList<RuleApp> ruleApps = goal.appliedRuleApps();
-
-            while (!ruleApps.isEmpty() && i < 15) {
-                if (ruleApps.head() instanceof JoinRuleBuiltInRuleApp) {
-                    return true;
-                }
-                else {
-                    ruleApps = ruleApps.tail();
-                    i++;
-                }
-            }
+        if (pio == null || !pio.subTerm().isContainsJavaBlockRecursive()) {
+            return false;
         }
-        return false;
+
+        SourceElement activeStatement = JavaTools.getActiveStatement(
+                TermBuilder.goBelowUpdates(pio.subTerm()).javaBlock());
+
+        if (!(activeStatement instanceof JoinPointStatement)) {
+            return false;
+        }
+
+        JoinPointStatement jps = ((JoinPointStatement) activeStatement);
+
+        boolean result = StreamSupport
+                .stream(goal.proof().openGoals().spliterator(), true)
+                .filter(g -> g != goal && !g.isLinked())
+                .filter(g -> JoinPointRule.containsJPS(g, jps))
+                .collect(Collectors.counting()).intValue() == 0;
+        return result;
     }
 
     @Override
