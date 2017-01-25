@@ -553,6 +553,7 @@ TOKEN :
 		    | < INT: "int" >
 		    | < INTERFACE: "interface" >
 		    | < ISSTATIC: "#isstatic" >
+		    | < JOINPOINT: "join_point" >
 		    | < EVALARGS: "#evaluate-arguments" >
 		    | < REPLACEARGS: "#replace" >
 		    | < LONG: "long" >
@@ -3593,6 +3594,7 @@ Statement Statement() :
      | result = IfStatement()
      | result = WhileStatement()
      | result = LoopScopeStatement()
+     | result = JoinPointStatement()
      | result = KeYMetaConstructStatement()
      | result = DoStatement()
      | result = ForStatement()
@@ -4439,6 +4441,30 @@ Statement stat;
 	checkConstruction(result);
 	return result;
     }
+}
+
+JoinPointStatement JoinPointStatement() :
+{
+    JoinPointStatement result;
+    Expression indexPV = null;
+}
+{
+    "join_point"
+	{
+	    result = factory.createJoinPointStatement();
+	    setPrefixInfo(result);
+	}
+    "(" indexPV = Expression()
+	{
+	    result.setIndexPV(indexPV);
+	}
+	")"
+	";"
+	{
+	    checkConstruction(result);
+	    return result;
+	}
+
 }
 
 LoopScopeBlock LoopScopeStatement() :

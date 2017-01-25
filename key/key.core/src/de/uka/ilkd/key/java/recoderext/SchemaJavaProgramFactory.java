@@ -100,6 +100,10 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     public LoopScopeBlock createLoopScopeBlock() {
         return new LoopScopeBlock();
     }
+    
+    public JoinPointStatement createJoinPointStatement() {
+        return new JoinPointStatement();
+    }
 
     public RMethodBodyStatement createRMethodBodyStatement(
             TypeReference typeRef, ProgramVariableSVWrapper resVar,

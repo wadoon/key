@@ -406,6 +406,10 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public LoopScopeBlock createLoopScopeBlock() {
         return new LoopScopeBlock();
     }
+    
+    public JoinPointStatement createJoinPointStatement() {
+        return new JoinPointStatement();
+    }
 
     /**
      * Create a {@link MethodBodyStatement}.

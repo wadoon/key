@@ -15,6 +15,7 @@ package de.uka.ilkd.key.java;
 
 import java.util.List;
 
+import org.antlr.analysis.MachineProbe;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -42,6 +43,7 @@ import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.IGuard;
 import de.uka.ilkd.key.java.statement.ILoopInit;
+import de.uka.ilkd.key.java.statement.JoinPointStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -53,8 +55,10 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
 import de.uka.ilkd.key.rule.metaconstruct.ArrayLength;
 import de.uka.ilkd.key.rule.metaconstruct.ArrayPostDecl;
 import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
@@ -76,6 +80,8 @@ import de.uka.ilkd.key.rule.metaconstruct.SwitchToIf;
 import de.uka.ilkd.key.rule.metaconstruct.TypeOf;
 import de.uka.ilkd.key.rule.metaconstruct.Unpack;
 import de.uka.ilkd.key.rule.metaconstruct.UnwindLoop;
+import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.SimpleBlockContract;
 
 /**
  * This is an extension of the usual {@link Recoder2KeYConverter} that supports
@@ -239,8 +245,16 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     public LoopScopeBlock convert(
             de.uka.ilkd.key.java.recoderext.LoopScopeBlock l) {
         return new LoopScopeBlock(
-                (de.uka.ilkd.key.logic.op.IProgramVariable) callConvert(l.getIndexPV()),
+                (de.uka.ilkd.key.logic.op.IProgramVariable) callConvert(
+                        l.getIndexPV()),
                 (StatementBlock) callConvert(l.getBody()));
+    }
+
+    public JoinPointStatement convert(
+            de.uka.ilkd.key.java.recoderext.JoinPointStatement l) {
+        //TODO (DS): At some point, we have to get a contract into this... Or at least a JoinProcedure
+        return new JoinPointStatement(
+                (IProgramVariable) callConvert(l.getIndexPV()));
     }
 
     /**

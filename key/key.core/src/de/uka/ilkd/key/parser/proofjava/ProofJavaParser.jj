@@ -3676,6 +3676,7 @@ Statement Statement() :
 | result = ThrowStatement()
 | result = SynchronizedStatement()
 | result = LoopScope()
+| result = JoinPointStatement()
 | result = TryStatement()
 | result = AssertStatement()
 | result = KeYCatchAllStatement()
@@ -4513,6 +4514,31 @@ LoopScopeBlock LoopScope() :
       setPostfixInfo(result);
       return result;
   }
+}
+
+JoinPointStatement JoinPointStatement() :
+{
+    Expression expr = null;
+    JoinPointStatement result;
+}
+{
+  "join_point"
+  {
+      result = factory.createJoinPointStatement();
+      setPrefixInfo(result);
+  }
+  "(" expr = Expression()
+    {
+        result.setIndexPV(expr);
+    }
+  ")"
+  ";"
+  {
+    checkConstruction(result);
+    setPostfixInfo(result);
+    return result;
+  }
+
 }
 
 Try TryStatement() :
