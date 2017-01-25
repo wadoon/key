@@ -46,6 +46,10 @@ public class JoinPointStatement extends JavaStatement {
     public int getChildCount() {
         return 1;
     }
+    
+    public IProgramVariable getProgVar() {
+        return prgVar;
+    }
 
     @Override
     public ProgramElement getChildAt(int index) {
@@ -53,8 +57,7 @@ public class JoinPointStatement extends JavaStatement {
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-
-        p.printJoinPoint(prgVar);
+        p.printJoinPoint(this);
     }
 
     public JoinProcedure getJoinProc() {
@@ -71,7 +74,7 @@ public class JoinPointStatement extends JavaStatement {
     }
 
     public String toString() {
-        return "join_point(" + prgVar.toString() + ")";
+        return "join_point(" + prgVar.toString() + ");";
 
     }
 

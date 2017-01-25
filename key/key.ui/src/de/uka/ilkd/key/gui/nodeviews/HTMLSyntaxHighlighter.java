@@ -104,7 +104,8 @@ public class HTMLSyntaxHighlighter {
     private final static String[] JAVA_KEYWORDS = { "if", "else", "for", "do",
             "while", "return", "break", "switch", "case", "continue", "try",
             "catch", "finally", "assert", "null", "throw", "this", "true",
-            "false", "int", "char", "long", "short", "method-frame", "boolean" };
+            "false", "int", "char", "long", "short", "method-frame", "boolean",
+            "join_point"};
     
     public final static String JAVA_KEYWORDS_REGEX = concat("|",
             Arrays.asList(JAVA_KEYWORDS));

@@ -402,7 +402,7 @@ public class JoinRule implements BuiltInRule {
         // not always perform better than within the unoptimized version.
         //@formatter:off
 //        final Term newPathCondition =
-//                createSimplifiedDisjunctivePathCondition(state1.second,
+//                JoinRuleUtils.createSimplifiedDisjunctivePathCondition(state1.second,
 //                        state2.second, services, SIMPLIFICATION_TIMEOUT_MS);
         //@formatter:on
         

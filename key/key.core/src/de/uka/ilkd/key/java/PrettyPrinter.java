@@ -109,6 +109,7 @@ import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRight;
 import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRightAssignment;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
+import de.uka.ilkd.key.java.statement.JoinPointStatement;
 import de.uka.ilkd.key.java.reference.ArrayLengthReference;
 import de.uka.ilkd.key.java.reference.ArrayReference;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -3190,10 +3191,29 @@ public class PrettyPrinter {
         write("\\map_empty");
         printFooter(x);
     }
+    
+    public void printJoinPoint(JoinPointStatement x) throws IOException {
+        printHeader(x);
+        write("\n");
+        writeInternalIndentation(x);
 
-    public void printJoinPoint(IProgramVariable prgVar) throws IOException {
-       write("join_point(" + prgVar.toString() + ");");
+        // Mark statement start ...
+        markStart(0, x);
         
+        markKeywordStart();
+        write("join_point");
+        markKeywordEnd();
+        write("(");
+        noLinefeed = true;
+        writeElement(1, x.getProgVar());
+        write(")");
+        write(";");
+        noLinefeed = false;
+
+        // Mark statement end ...
+        markEnd(0, x);
+
+        printFooter(x);
     }
 
     

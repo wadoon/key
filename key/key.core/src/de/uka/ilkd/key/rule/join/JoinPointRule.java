@@ -18,7 +18,6 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.DisjunctivePredica
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.JoinPointStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.ContainsStatementVisitor;

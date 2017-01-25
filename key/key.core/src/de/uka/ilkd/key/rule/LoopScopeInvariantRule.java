@@ -320,7 +320,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     private ProgramElement newProgram(Services services, final While loop,
             ArrayList<Label> labels, Statement stmtToReplace,
             final JavaBlock origProg, final ProgramVariable loopScopeIdxVar) {
-
+        
         final ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
 
         if (loop.getBody() instanceof StatementBlock) {
@@ -335,10 +335,20 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                 stmnt.toArray(new Statement[stmnt.size()]));
 
         // Add a JoinPointStatement before each return.
+        final ProgramVariable joinPointVar = //
+                KeYJavaASTFactory
+                        .localVariable( //
+                                services.getVariableNamer()
+                                        .getTemporaryNameProposal("return_x"),
+                                loopScopeIdxVar.getKeYJavaType());
+
         ifBody = (Statement) new ProgramElementPrepender(
                 (JavaProgramElement) ifBody, services).append(
                         elem -> elem instanceof Return,
-                        new JoinPointStatement(loopScopeIdxVar));
+                        new JoinPointStatement(joinPointVar));
+        
+        //TODO: Also add JPSs before breaks and continues.
+        //TODO: What about labeled breaks / continues?
 
         for (int i = labels.size() - 1; i >= 0; i--) {
             Label label = labels.get(i);
@@ -352,9 +362,11 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final LoopScopeBlock loopScope = new LoopScopeBlock(loopScopeIdxVar,
                 KeYJavaASTFactory.block(newIf));
 
-        final StatementBlock newBlock = KeYJavaASTFactory
-                .block(KeYJavaASTFactory.declare(loopScopeIdxVar,
-                        KeYJavaASTFactory.falseLiteral()), loopScope);
+        final StatementBlock newBlock = KeYJavaASTFactory.block(
+                KeYJavaASTFactory.declare(joinPointVar),
+                KeYJavaASTFactory.declare(loopScopeIdxVar,
+                        KeYJavaASTFactory.falseLiteral()),
+                loopScope);
 
         final ProgramElement result = new ProgramElementReplacer(
                 origProg.program(), services).replace(stmtToReplace, newBlock);
