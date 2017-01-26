@@ -8,7 +8,6 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.SimpleBlockContract;
 
 public class JoinPointStatement extends JavaStatement{
     
@@ -23,11 +22,6 @@ public class JoinPointStatement extends JavaStatement{
         this.prgVar = children.get(ProgramVariable.class);
         
     }
-    
-    public JoinPointStatement(BlockContract joinContract) {
-       this.joinContract = joinContract;
-       this.joinProc = joinContract.getJoinProcedure();
-    }  
     
     public JoinPointStatement(
             ProgramVariable progVar, JoinProcedure joinProc, String params) {
