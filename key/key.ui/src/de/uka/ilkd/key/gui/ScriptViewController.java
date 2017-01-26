@@ -1,13 +1,11 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.prooftree.PathFilter;
-import java.awt.Font;
-import java.awt.Point;
 import de.uka.ilkd.key.macros.scripts.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -17,25 +15,6 @@ import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
-
-import javax.swing.JButton;
-import javax.swing.JMenuItem;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
-import javax.swing.ToolTipManager;
-
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.macros.scripts.AbstractCommand;
-import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
-import de.uka.ilkd.key.macros.scripts.ScriptException;
-import de.uka.ilkd.key.macros.scripts.ScriptNode;
-import de.uka.ilkd.key.macros.scripts.ScriptTreeParser;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
 
 /**
  * Created by sarah on 12/20/16.
@@ -112,9 +91,12 @@ public class ScriptViewController implements ActionListener{
                     }
                 }
             };
+
             ToolTipManager.sharedInstance().registerComponent(textArea);
 
             textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+            Gutter g = new Gutter(textArea);
+            view.add(g, BorderLayout.WEST);
             view.add(new JScrollPane(textArea), BorderLayout.CENTER);
             textArea.addMouseListener(new MouseAdapter() {
                 @Override
@@ -409,39 +391,7 @@ public class ScriptViewController implements ActionListener{
 
         } else {
 
-//            Node node = newnode.getProofNode();
-//            if(node == null) {
-//                node = oldnode.getProofNode();
-//            }
-//            mediator.setBack(node);
-//
-//            Map<String, String> argMap = newnode.getCommand();
-//            String name = argMap.get("#1");
-//            if(name == null) {
-//                throw new ScriptException("No command");
-//            }
-//
-//            ProofScriptCommand command = COMMANDS.get(name);
-//
-//            if(command == null && !name.equals("skip")) {
-//                throw new ScriptException("Unknown command " + name);
-//            }
-//            //heir Behandlung von skip, dass execute nicht auf skip angewandt wird
-//            HashMap<String, Object> state = new HashMap<String, Object>();
-//            state.put(AbstractCommand.GOAL_KEY, node);
-//            try {
-//                if(!name.equals("skip")) {
-//                    command.execute(mediator.getUI(), associatedProof, argMap, state);
-//                }
-//            } catch (ScriptException e) {
-//                associatedProof.pruneProof(node);
-//                newnode.setEncounteredException(e);
-//                newnode.clearChildren();
-//            }
-//
-//            java.util.List<Node> leaves = new ArrayList<Node>();
-//            findLeaves(node, leaves);
-//            leaves.remove(node);
+
             java.util.List<Node> leaves = act(newnode);
             java.util.List<ScriptNode> children = newnode.getChildren();
 
