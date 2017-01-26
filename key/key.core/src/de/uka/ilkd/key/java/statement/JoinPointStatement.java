@@ -7,25 +7,24 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.speclang.BlockContract;
 
 public class JoinPointStatement extends JavaStatement{
     
-    private BlockContract joinContract;
+    private String joinParams;
     private JoinProcedure joinProc;
     private ProgramVariable prgVar;
   
     public JoinPointStatement(ExtList children) {
         super(children);
-        this.joinContract = children.get(BlockContract.class);
+        this.joinParams = children.get(String.class);
         this.joinProc = children.get(JoinProcedure.class);
         this.prgVar = children.get(ProgramVariable.class);
         
     }
-    
     public JoinPointStatement(
-            ProgramVariable progVar, JoinProcedure joinProc, String params) {
-        this.joinProc = joinProc; 
+            ProgramVariable progVar, JoinProcedure joinProc, String joinParams) {
+        this.joinProc = joinProc;
+        this.joinParams = joinParams;
         this.prgVar = progVar;
         }
 
@@ -41,26 +40,36 @@ public class JoinPointStatement extends JavaStatement{
     public ProgramElement getChildAt(int index) {
         return index == 0 ? prgVar : null;
     }
-  
-    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
-      
-        p.printJoinPoint(prgVar);
+    
+    public void setJoinProc(JoinProcedure joinProc) {
+        this.joinProc = joinProc;
     }
 
     public JoinProcedure getJoinProc() {
         return joinProc;
     }
-    public void setJoinProc(JoinProcedure joinProc) {
-        this.joinProc = joinProc;
+    
+    public String getJoinParams() {
+        return joinParams;
     }
+
+    public ProgramVariable getProgVar() {
+        return prgVar;
+    }
+    
+    public boolean equals(Object o){
+       if( o == null || !(o instanceof JoinPointStatement)) return false;
+       JoinPointStatement jPS = (JoinPointStatement) o; 
+       return prgVar.equals(jPS.prgVar);
+       }
     
     public String toString(){
         return (prgVar.toString());
-        
+    }
+    
+    public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
+        p.printJoinPoint(this);
     }
 
-    public BlockContract getContract() {
-        return joinContract;
-    }
 
 }

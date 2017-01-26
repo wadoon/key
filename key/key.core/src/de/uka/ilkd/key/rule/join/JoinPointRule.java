@@ -63,7 +63,7 @@ public class JoinPointRule implements BuiltInRule {
         JoinPointStatement jPS = ((JoinPointStatement) block
                 .getInnerMostMethodFrame().getBody().getFirstElement());
 
-        String params = jPS.getContract().getJoinParams();
+        String params = jPS.getJoinParams();
 
         JoinProcedure concreteRule = jPS.getJoinProc();
 
@@ -159,17 +159,15 @@ public class JoinPointRule implements BuiltInRule {
                         TermBuilder.goBelowUpdates(pio.subTerm())
                                 .javaBlock()) instanceof JoinPointStatement) {
 
-            BlockContract contract = ((JoinPointStatement) JavaTools
-                    .getActiveStatement(TermBuilder
-                            .goBelowUpdates(pio.subTerm()).javaBlock()))
-                                    .getContract();
-
+            JoinPointStatement jPS = (JoinPointStatement) JavaTools.getActiveStatement(
+                  TermBuilder.goBelowUpdates(pio.subTerm())
+                  .javaBlock());
             ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                     .findPotentialJoinPartners(goal, pio);
 
-            if (!joinPartners.isEmpty() && (!contract.getJoinProcedure()
+            if (!joinPartners.isEmpty() && (!jPS.getJoinProc()
                     .toString().equals("JoinByPredicateAbstraction")
-                    || !hasCorrectParams(contract.getJoinParams(),
+                    || !hasCorrectParams(jPS.getJoinParams(),
                             goal.proof().getServices()))) {
 
                 ImmutableList<Goal> joinPartnersGoal = ImmutableSLList.nil();
@@ -182,13 +180,26 @@ public class JoinPointRule implements BuiltInRule {
                 for (Goal g : openGoals) {
                     if (!g.equals(goal) && !g.isLinked()
                             && !joinPartnersGoal.contains(g)
-                            && (hasSameBlockContractRule(g, contract)
-                                    || hasSameBlock(g, contract.getBlock()))) {
+                            && containsJPS(g)) {
                         return false;
                     }
                 }
                 return true;
             }
+        }
+        return false;
+    }
+
+    private boolean containsJPS(Goal g) {
+        Term t;
+        Semisequent sequent = g.node().sequent().succedent();
+        for(int i = 0; i < g.node().sequent().succedent().size(); i++){
+            t = sequent.get(i).formula();
+            if(t.javaBlock().program() instanceof StatementBlock){
+                MethodFrame mF = ((StatementBlock) t.javaBlock().program()).getInnerMostMethodFrame();
+                ContainsStatementVisitor visitor = new ContainsStatementVisitor();
+            }
+            
         }
         return false;
     }
@@ -259,42 +270,7 @@ public class JoinPointRule implements BuiltInRule {
         return result;
     }
 
-    private boolean hasSameBlockContractRule(Goal g, BlockContract contract) {
-        for (RuleApp rA : g.appliedRuleApps()) {
-            if (rA instanceof BlockContractBuiltInRuleApp
-                    && ((BlockContractBuiltInRuleApp) rA).getContract()
-                            .equals(contract))
-                return true;
-        }
-        return false;
-    }
-
-    private boolean hasSameBlock(Goal g, StatementBlock block) {
-        for (int i = 0; i < g.node().sequent().succedent().size(); i++) {
-            JavaBlock jB = JoinRuleUtils.getJavaBlockRecursive(
-                    g.node().sequent().succedent().get(i).formula());
-            MethodFrame mF = JavaTools.getInnermostMethodFrame(jB,
-                    g.proof().getServices());
-            if (mF != null && hasSameBlockHelp(mF.getBody(), block))
-                return true;
-
-        }
-        return false;
-    }
-
-    // TODO: test more complex cases
-    private boolean hasSameBlockHelp(StatementBlock block1,
-            StatementBlock block2) {
-        boolean result = false;
-        ProgramElement pE;
-        for (int i = 0; i < block1.getChildCount() && !result; i++) {
-            pE = block1.getChildAt(i);
-            result = (pE instanceof StatementBlock) && ((pE.equals(block2))
-                    || hasSameBlockHelp((StatementBlock) pE, block2));
-        }
-        return result;
-    }
-
+  
     @Override
     public boolean isApplicableOnSubTerms() {
         return false;

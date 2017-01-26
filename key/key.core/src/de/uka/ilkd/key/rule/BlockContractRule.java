@@ -454,7 +454,7 @@ public class BlockContractRule implements BuiltInRule {
         final Instantiation instantiation = instantiate(
                 application.posInOccurrence().subTerm(), goal, services);
         ImmutableList<Goal> goals = goal.split(1);
-        
+
         JavaBlock jB = instantiation.formula.javaBlock();
 
         if (!jB.isEmpty() && jB.program() instanceof StatementBlock) {
@@ -466,10 +466,13 @@ public class BlockContractRule implements BuiltInRule {
 
             StatementBlock newBlock = KeYJavaASTFactory.block(
                     instantiation.block,
-                    new JoinPointStatement(application.getContract(), progVar));
+                    new JoinPointStatement(progVar,
+                            application.getContract().getJoinProcedure(),
+                            application.getContract().getJoinParams()));
 
             Statement newProgram = (Statement) new ProgramElementReplacer(
-                    jB.program(), services).replace(instantiation.block, newBlock);
+                    jB.program(), services).replace(instantiation.block,
+                            newBlock);
 
             JavaBlock newJavaBlock = JavaBlock
                     .createJavaBlock((StatementBlock) newProgram);
@@ -486,7 +489,6 @@ public class BlockContractRule implements BuiltInRule {
         return goals;
 
     }
-
 
     private ImmutableList<Goal> apply(final Goal goal, final Services services,
             final BlockContractBuiltInRuleApp application)
