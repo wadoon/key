@@ -463,12 +463,16 @@ public class BlockContractRule implements BuiltInRule {
                     services.getVariableNamer()
                             .getTemporaryNameProposal("join_point"),
                     new KeYJavaType(PrimitiveType.JAVA_BOOLEAN, Sort.ANY));
+            
+            JoinPointStatement jPS = new JoinPointStatement(progVar,
+                    application.getContract().getJoinProcedure(),
+                    application.getContract().getJoinParams());
+            
+            services.getSpecificationRepository().addJoinPointStatements(jPS);
 
             StatementBlock newBlock = KeYJavaASTFactory.block(
-                    instantiation.block,
-                    new JoinPointStatement(progVar,
-                            application.getContract().getJoinProcedure(),
-                            application.getContract().getJoinParams()));
+                    instantiation.block, jPS
+                    );
 
             Statement newProgram = (Statement) new ProgramElementReplacer(
                     jB.program(), services).replace(instantiation.block,

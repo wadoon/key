@@ -197,7 +197,7 @@ public class JoinPointRule implements BuiltInRule {
             t = sequent.get(i).formula();
             if(t.javaBlock().program() instanceof StatementBlock){
                 MethodFrame mF = ((StatementBlock) t.javaBlock().program()).getInnerMostMethodFrame();
-                ContainsStatementVisitor visitor = new ContainsStatementVisitor();
+               // ContainsStatementVisitor visitor = new ContainsStatementVisitor();
             }
             
         }

@@ -32,6 +32,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.statement.JoinPointStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -57,6 +58,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -83,6 +85,7 @@ import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * Central storage for all specification elements, such as contracts, class
@@ -126,6 +129,8 @@ public final class SpecificationRepository {
             new LinkedHashMap<IObserverFunction, IObserverFunction>();
     private final Map<IObserverFunction, ImmutableSet<Taclet>> unlimitedToLimitTaclets =
             new LinkedHashMap<IObserverFunction, ImmutableSet<Taclet>>();
+    private final Map<Triple<ProgramVariable, JoinProcedure, String>, JoinPointStatement> joinPointStatements = 
+            new LinkedHashMap<Triple<ProgramVariable, JoinProcedure, String>, JoinPointStatement>();
 
     /**
      * <p>
@@ -1636,5 +1641,16 @@ public final class SpecificationRepository {
             result = result.union(s);
         }
         return result;
+    }
+    
+    public JoinPointStatement getJoinPointStatements(ProgramVariable progVar, JoinProcedure joinProc, String  joinParams){
+        final Triple<ProgramVariable, JoinProcedure, String> params = new Triple<ProgramVariable, JoinProcedure, String>(progVar, joinProc, joinParams);
+        JoinPointStatement jPS = joinPointStatements.get(params);
+        return jPS;
+    }
+    
+    public void addJoinPointStatements(JoinPointStatement jPS){
+        final Triple<ProgramVariable, JoinProcedure, String> params = new Triple<ProgramVariable, JoinProcedure, String>( jPS.getProgVar(), jPS.getJoinProc(), jPS.getJoinParams());
+        joinPointStatements.put(params, jPS);
     }
 }
