@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.speclang.jml.translation;
 
+import java.io.*;
+import java.net.URL;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -53,6 +55,7 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.rule.join.JoinPointRule;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ClassAxiom;
@@ -196,7 +199,7 @@ public class JMLSpecFactory {
         public Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
         public JoinProcedure joinProcedure;
-        public String[] joinParams;
+        public String joinParams;
     }
 
     // -------------------------------------------------------------------------
@@ -456,7 +459,7 @@ public class JMLSpecFactory {
                 textualSpecCase.getJoinProcs());
 
         clauses.joinParams = translateJoinParams(
-                textualSpecCase.getJoinParams(), clauses.joinProcedure);
+                textualSpecCase.getJoinParams());
 
         /*
          * if (clauses.joinProcedure instanceof JoinWithPredicateAbstraction)
@@ -546,51 +549,16 @@ public class JMLSpecFactory {
         return chosenProc;
     }
 
-    private String[] translateJoinParams(ImmutableList<PositionedString> params,
-            JoinProcedure chosenProc) throws SLTranslationException {
-        if (chosenProc == null || !chosenProc.toString()
-                .equals("JoinByPredicateAbstraction")) {
+    private String translateJoinParams(ImmutableList<PositionedString> params)
+            throws SLTranslationException {
+
+        if (params == null || params.size() == 0) {
             return null;
         }
-        else if (params == null || params.size() == 0) {
+        else
+            return params.head().text.substring(12,
+                    params.head().text.length() - 1);
 
-            throw new SLTranslationException("Parameters are missing");
-        }
-        else {
-            String joinParamsStr = params.head().text.substring(13,
-                    params.head().text.length() - 2);
-            String[] joinParams = new String[2];
-
-            Pattern p = Pattern.compile("([^(]+)\\( ([^(]+)");
-
-            Matcher m = p.matcher(joinParamsStr);
-
-            if (m.find() && m.groupCount() == 2) {
-                joinParams[0] = m.group(1);
-                if (!joinParams[0].equals("domain") && !joinParams[0].equals("conjunctive")
-                        && !joinParams[0].equals("disjunctive")
-                        && !joinParams[0].equals("simple")) {
-                    throw new SLTranslationException("Unknown lattice type");
-                }
-                else if (joinParams[0].equals("rep")) {
-                    String preds = m.group(2);
-                    Pattern pRep = Pattern.compile("'(.+?)'");
-                    Matcher mRep = pRep.matcher(preds); // read rep?
-
-                    while (mRep.find()) {
-                        return null;
-                    }
-                }
-
-            }
-            else
-                throw new SLTranslationException(
-                        "Wrong format of parameters for the given procedure");
-
-            joinParams[1] = m.group(2);
-            return joinParams;
-
-        }
     }
 
     /**

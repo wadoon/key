@@ -29,10 +29,9 @@ public class JoinPointStatement extends JavaStatement{
        this.joinProc = joinContract.getJoinProcedure();
     }  
     
-    public JoinPointStatement(BlockContract joinContract,
-            ProgramVariable progVar) {
-        this.joinContract = joinContract;
-        this.joinProc = joinContract.getJoinProcedure(); 
+    public JoinPointStatement(
+            ProgramVariable progVar, JoinProcedure joinProc, String params) {
+        this.joinProc = joinProc; 
         this.prgVar = progVar;
         }
 

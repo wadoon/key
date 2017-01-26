@@ -465,8 +465,6 @@ public class BlockContractRule implements BuiltInRule {
                     new KeYJavaType(PrimitiveType.JAVA_BOOLEAN, Sort.ANY));
 
             StatementBlock newBlock = KeYJavaASTFactory.block(
-                    KeYJavaASTFactory.declare(progVar,
-                            KeYJavaASTFactory.falseLiteral()),
                     instantiation.block,
                     new JoinPointStatement(application.getContract(), progVar));
 

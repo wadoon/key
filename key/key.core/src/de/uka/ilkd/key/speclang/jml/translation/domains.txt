@@ -1,0 +1,4 @@
+ID,lattice,placeholder,predicate1, predicate2, predicate3
+positive,simple,int _ph,_ph>=0,,,
+negative,,int _ph1,_ph1<0,,,
+interval,conjunctive,int _ph2,_ph2>=0,_ph2<=5 

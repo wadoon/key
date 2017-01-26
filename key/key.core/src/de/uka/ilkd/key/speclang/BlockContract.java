@@ -93,7 +93,7 @@ public interface BlockContract extends SpecificationElement {
     
     public JoinProcedure getJoinProcedure();
     
-    public String[] getJoinParams();
+    public String getJoinParams();
 
     public void visit(Visitor visitor);
 
@@ -110,7 +110,7 @@ public interface BlockContract extends SpecificationElement {
                                 Map<LocationVariable,Term> newModifiesClauses,
                                 final ImmutableList<InfFlowSpec> newInfFlowSpecs,
                                 final JoinProcedure newJoinProcedure,
-                                final String[] newJoinParams,
+                                final String newJoinParams,
                                 Variables newVariables);
 
     public BlockContract setBlock(StatementBlock newBlock);
