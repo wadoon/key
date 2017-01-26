@@ -17,6 +17,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.proofdiff.diff_match_patch.Diff;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
@@ -74,6 +75,8 @@ public class ProofDiffFrame extends JFrame {
      * The text area display the diff'ed text.
      */
     private JEditorPane textArea;
+
+    private SequentDiffView diffview;
 
     /**
      * The textfield holding the lower comparison number.
@@ -144,17 +147,17 @@ public class ProofDiffFrame extends JFrame {
                 bottom.add(go);
                 getRootPane().setDefaultButton(go);
             }
-            {
-                JButton go =  new JButton("Show diff2");
-                go.setToolTipText("Show difference between the two nodes specified here.");
-                go.addActionListener(new ActionListener() {
+           /* {
+                JButton go2 =  new JButton("Show diff2");
+                go2.setToolTipText("Show difference between the two nodes specified here.");
+                go2.addActionListener(new ActionListener() {
                     @Override public void actionPerformed(ActionEvent e) {
                         showTreeDiff();
                     }
                 });
-                bottom.add(go);
-                getRootPane().setDefaultButton(go);
-            }
+                bottom.add(go2);
+
+            }*/
             {
                 JButton last = new JButton("Show selected node");
                 last.setToolTipText("Show difference introduced by the rule application leading to the selected node");
@@ -181,7 +184,63 @@ public class ProofDiffFrame extends JFrame {
     }
 
     private void showTreeDiff() {
+        this.diffview  = new SequentDiffView();
+        getContentPane().add(this.diffview);
         System.out.println("Treediff");
+        String sFrom;
+        String sTo;
+
+        Sequent seqFrom;
+        Sequent seqTo;
+        Proof proof = mainWindow.getMediator().getSelectedProof();
+
+        if(proof == null) {
+            throw new IllegalArgumentException("There is no open proof!");
+        }
+
+        try {
+            int toNo;
+            String toText = to.getText();
+            if(toText.length() == 0) {
+                throw new IllegalArgumentException("At least the second proof node must be specified");
+            } else {
+                toNo = Integer.parseInt(to.getText());
+                Node node = findNode(proof.root(), toNo);
+
+                if(node == null) {
+                    throw new IllegalArgumentException(toNo + " does not denote a valid node");
+                }else{
+                    seqTo = node.sequent();
+                }
+
+            }
+
+            String fromText = from.getText();
+            int fromNo;
+            if(fromText.length() == 0) {
+                sFrom = getProofNodeText(getParent(toNo));
+                fromNo = Integer.parseInt(sFrom);
+            } else {
+                fromNo = Integer.parseInt(fromText);
+            }
+
+            Node node = findNode(proof.root(), fromNo);
+
+            if(node == null) {
+                throw new IllegalArgumentException(fromNo + " does not denote a valid node");
+            }else{
+                seqFrom = node.sequent();
+            }
+
+            SequentDiff sd = new SequentDiff(seqFrom, seqTo);
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(null, "This is not a number: " + e.getMessage(),
+                    "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        } catch (IllegalArgumentException e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
     }
 
     /**
