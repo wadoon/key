@@ -85,7 +85,6 @@ import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.Triple;
 
 /**
  * Central storage for all specification elements, such as contracts, class
@@ -129,8 +128,8 @@ public final class SpecificationRepository {
             new LinkedHashMap<IObserverFunction, IObserverFunction>();
     private final Map<IObserverFunction, ImmutableSet<Taclet>> unlimitedToLimitTaclets =
             new LinkedHashMap<IObserverFunction, ImmutableSet<Taclet>>();
-    private final Map<Triple<ProgramVariable, JoinProcedure, String>, JoinPointStatement> joinPointStatements = 
-            new LinkedHashMap<Triple<ProgramVariable, JoinProcedure, String>, JoinPointStatement>();
+    private final Map<Pair<JoinProcedure, String>, JoinPointStatement> joinPointStatements = 
+            new LinkedHashMap<Pair<JoinProcedure, String>, JoinPointStatement>();
 
     /**
      * <p>
@@ -1643,14 +1642,14 @@ public final class SpecificationRepository {
         return result;
     }
     
-    public JoinPointStatement getJoinPointStatements(ProgramVariable progVar, JoinProcedure joinProc, String  joinParams){
-        final Triple<ProgramVariable, JoinProcedure, String> params = new Triple<ProgramVariable, JoinProcedure, String>(progVar, joinProc, joinParams);
+    public JoinPointStatement getJoinPointStatements(JoinProcedure joinProc, String  joinParams){
+        final Pair<JoinProcedure, String> params = new Pair<JoinProcedure, String>(joinProc, joinParams);
         JoinPointStatement jPS = joinPointStatements.get(params);
         return jPS;
     }
     
     public void addJoinPointStatements(JoinPointStatement jPS){
-        final Triple<ProgramVariable, JoinProcedure, String> params = new Triple<ProgramVariable, JoinProcedure, String>( jPS.getProgVar(), jPS.getJoinProc(), jPS.getJoinParams());
+        final Pair<JoinProcedure, String> params = new Pair<JoinProcedure, String>(jPS.getJoinProc(), jPS.getJoinParams());
         joinPointStatements.put(params, jPS);
     }
 }

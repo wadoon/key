@@ -1,12 +1,7 @@
 package de.uka.ilkd.key.java.statement;
 
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.key_project.util.ExtList;
 
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
@@ -30,30 +25,9 @@ public class JoinPointStatement extends JavaStatement{
             ProgramVariable progVar, JoinProcedure joinProc, String joinParams) {
          this.joinParams = joinParams;
          this.prgVar = progVar;
-         this.joinProc = joinProc.toString().equals("JoinByPredicateAbstraction") ? getJoinProcWithParams(joinParams) : joinProc;
+         this.joinProc = joinProc;
         }
 
-    private JoinProcedure getJoinProcWithParams(String joinParams) {
-//        Pattern p = Pattern.compile("\\\\(.+?)\\( ([^\\\\]+)\\)");
-//        Matcher m = p.matcher(joinParams);
-//        boolean matched = false;
-//
-//        while (m.find()) {
-//            matched = true;
-//            if (m.groupCount() != 2)
-//                return false;
-//            else {
-//                List<AbstractionPredicate> predicates = getPredicates(
-//                        m.group(2), services);
-//                if (((m.group(1).equals("conjunctive")
-//                        || m.group(1).equals("disjunctive")
-//                        || m.group(1).equals("simple")) && predicates.isEmpty())
-//                        || !m.group(1).equals("rep"))
-//                    return false;
-//            }
-//        }
-        return null;
-    }
     @Override
     public void visit(Visitor v) {
        v.performActionOnJoinPointStatement(this);
