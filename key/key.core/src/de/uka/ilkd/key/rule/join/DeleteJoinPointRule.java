@@ -78,6 +78,12 @@ public class DeleteJoinPointRule implements BuiltInRule {
                         TermBuilder.goBelowUpdates(pio.subTerm())
                                 .javaBlock()) instanceof JoinPointStatement
                 && JoinRule.findPotentialJoinPartners(goal, pio).isEmpty()) {
+            
+            for(Goal g: goal.proof().openGoals()){
+                if(!g.equals(goal) && !g.isLinked() && JoinPointRule.containsJPS(g, (JoinPointStatement) JavaTools.getActiveStatement(
+                        TermBuilder.goBelowUpdates(pio.subTerm())
+                        .javaBlock()))) return false;
+            }
             int i = 0;
             ImmutableList<RuleApp> ruleApps = goal.appliedRuleApps();
 

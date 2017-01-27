@@ -4,13 +4,10 @@ import java.io.File;
 
 import org.junit.Test;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.JavaTools;
-import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.JoinPointStatement;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -30,7 +27,7 @@ public class JoinPointRuleTests extends TestCase {
 
     @Test
     public void testITEabs() {
-        final Proof proof = loadProof("AbsBlockContract.ITE.key");
+        final Proof proof = loadProof("Gcd.ITE.open.key");
         startAutomaticStrategy(proof);
         assertTrue(proof.closed());
     }
@@ -38,34 +35,29 @@ public class JoinPointRuleTests extends TestCase {
     @Test
     public void testPredicateAbstractionAbs() {
         final Proof proof = loadProof(
-                "AbsBlockContract.predicateAbstraction.key");
+                "Gcd.predAbstr.key");
+        startAutomaticStrategy(proof);
+        assertTrue(proof.closed());
+    }
+
+
+    @Test
+    public void testNestedMergeBlockContract1() {
+        final Proof proof = loadProof("Math_notNull.nested.key");
         startAutomaticStrategy(proof);
         assertTrue(proof.closed());
     }
 
     @Test
-    public void testITEgcd() {
-        final Proof proof = loadProof("Gcd.ITE.key");
-        startAutomaticStrategy(proof);
-        assertTrue(proof.closed());
-    }
-
-    @Test
-    public void testNestedJoinBlockContract1() {
-        final Proof proof = loadProof("AbsBlockContract.nested.1.proof");
-        startAutomaticStrategy(proof);
-        assertTrue(proof.closed());
-    }
-
-    @Test
-    public void testNestedJoinBlockContract2() {
-        final Proof proof = loadProof("AbsBlockContract.nested.2.proof");
+    public void testNestedMergeBlockContract2() {
+        final Proof proof = loadProof("Math_notNull.nested.2.key");
         startAutomaticStrategy(proof);
         assertTrue(proof.closed());
     }
 
     @Test
     public void testAddJPS() {
+        //For this example the max. number of steps is set to 1
         final Proof proof = loadProof(
                 "absBlockContract.addJoinPointStatement.key");
 
@@ -106,9 +98,9 @@ public class JoinPointRuleTests extends TestCase {
 
     @Test
     public void testRemoveJPS() {
-        final Proof proof = loadProof("AbsBlockContract.beforeDelete.key");
+        //For this example the max. number of steps ist set to 1
+        final Proof proof = loadProof("AbsBlockContract.beforeDelete.proof");
         Node nodeBefore = proof.openGoals().head().node();
-        // for this proof the max steps is set to 1
         startAutomaticStrategy(proof);
         assertTrue(proof.openGoals().head().appliedRuleApps()
                 .head() instanceof DeleteJoinPointBuiltInRuleApp);

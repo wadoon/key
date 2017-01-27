@@ -80,14 +80,15 @@ public class JoinPointRule implements BuiltInRule {
         return newGoals;
     }
 
-    private JoinWithPredicateAbstraction getProcedure(String params, JoinProcedure joinProc, Services services) {
+    private JoinWithPredicateAbstraction getProcedure(String params,
+            JoinProcedure joinProc, Services services) {
         Class<? extends AbstractPredicateAbstractionLattice> latticeType = null;
         List<AbstractionPredicate> predicates = null;
-        Pattern p = Pattern.compile("\\\\(.+?)\\( ([^\\\\]+)\\)");
+        Pattern p = Pattern.compile("([a-z]+)\\s*\\((.+?)\\)");
         Matcher m = p.matcher(params);
         while (m.find()) {
             if (m.group(1).equals("rep")) {
-                
+
                 URL path = JMLSpecFactory.class.getResource("domains.txt");
                 String line = "";
                 File f = new File(path.getFile());
@@ -98,7 +99,7 @@ public class JoinPointRule implements BuiltInRule {
                         String[] content = line.split(",", 3);
                         if (m.group(2).equals(content[0])) {
                             found = true;
-                            latticeType =  translateLatticeType(content[1]);
+                            latticeType = translateLatticeType(content[1]);
                             predicates = getPredicates(content[2], services);
                         }
                     }
@@ -114,7 +115,7 @@ public class JoinPointRule implements BuiltInRule {
             }
         }
         final JoinWithPredicateAbstractionFactory absPredicateFactory = (JoinWithPredicateAbstractionFactory) joinProc;
-         return absPredicateFactory.instantiate(predicates, latticeType,
+        return absPredicateFactory.instantiate(predicates, latticeType,
                 new LinkedHashMap<ProgramVariable, AbstractDomainElement>());
     }
 
@@ -154,14 +155,14 @@ public class JoinPointRule implements BuiltInRule {
                         TermBuilder.goBelowUpdates(pio.subTerm())
                                 .javaBlock()) instanceof JoinPointStatement) {
 
-            JoinPointStatement jPS = (JoinPointStatement) JavaTools.getActiveStatement(
-                  TermBuilder.goBelowUpdates(pio.subTerm())
-                  .javaBlock());
+            JoinPointStatement jPS = (JoinPointStatement) JavaTools
+                    .getActiveStatement(TermBuilder
+                            .goBelowUpdates(pio.subTerm()).javaBlock());
             ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                     .findPotentialJoinPartners(goal, pio);
 
-            if (!joinPartners.isEmpty() && (!jPS.getJoinProc()
-                    .toString().equals("JoinByPredicateAbstraction")
+            if (!joinPartners.isEmpty() && (!jPS.getJoinProc().toString()
+                    .equals("JoinByPredicateAbstraction")
                     || !hasCorrectParams(jPS.getJoinParams(),
                             goal.proof().getServices()))) {
 
@@ -175,7 +176,7 @@ public class JoinPointRule implements BuiltInRule {
                 for (Goal g : openGoals) {
                     if (!g.equals(goal) && !g.isLinked()
                             && !joinPartnersGoal.contains(g)
-                            && containsJPS(g)) {
+                            && containsJPS(g, jPS)) {
                         return false;
                     }
                 }
@@ -185,23 +186,38 @@ public class JoinPointRule implements BuiltInRule {
         return false;
     }
 
-    private boolean containsJPS(Goal g) {
+    public static boolean containsJPS(Goal g, JoinPointStatement jPS) {
         Term t;
         Semisequent sequent = g.node().sequent().succedent();
-        for(int i = 0; i < g.node().sequent().succedent().size(); i++){
+        boolean found = false;
+        for (int i = 0; i < g.node().sequent().succedent().size() && !found; i++) {
             t = sequent.get(i).formula();
-            if(t.javaBlock().program() instanceof StatementBlock){
-                MethodFrame mF = ((StatementBlock) t.javaBlock().program()).getInnerMostMethodFrame();
-                
-               // ContainsStatementVisitor visitor = new ContainsStatementVisitor();
+            if (JoinRuleUtils.getJavaBlockRecursive(t).program() instanceof StatementBlock) {
+                MethodFrame mF = ((StatementBlock) JoinRuleUtils.getJavaBlockRecursive(t).program())
+                        .getInnerMostMethodFrame();
+                if(mF!= null) found = checkProgramBody(mF.getBody(), jPS);
+                // ContainsStatementVisitor visitor = new
+                // ContainsStatementVisitor();
             }
-            
+
         }
-        return false;
+        return found;
+    }
+
+    private static boolean checkProgramBody(StatementBlock body,
+            JoinPointStatement jPS) {
+        boolean found = false;
+        for (int i = 0; i < body.getChildCount() && !found; i++) {
+            if (jPS.equals(body.getChildAt(i))) return true;
+            else if (body.getChildAt(i) instanceof StatementBlock)
+                found = checkProgramBody(((StatementBlock) body.getChildAt(i)), jPS);
+        }
+        return found;
     }
 
     private boolean hasCorrectParams(String params, Services services) {
-        Pattern p = Pattern.compile("\\\\(.+?)\\( ([^\\\\]+)\\)");
+        // Examples
+        Pattern p = Pattern.compile("([a-z]+)\\s*\\((.+?)\\)");
         Matcher m = p.matcher(params);
         boolean matched = false;
 
@@ -235,7 +251,6 @@ public class JoinPointRule implements BuiltInRule {
             else {
                 try {
                     final String phStr = m.group(1);
-                    final String[] predStr = m.group(2).split(", ");
                     Pair<Sort, Name> ph = null;
                     ph = JoinRuleUtils.parsePlaceholder(phStr, false, services);
                     if (services.getNamespaces().variables()
@@ -249,9 +264,14 @@ public class JoinPointRule implements BuiltInRule {
 
                     ArrayList<Pair<Sort, Name>> phList = JoinRuleUtils
                             .singletonArrayList(ph);
-
-                    for (int j = 0; j < predStr.length; j++) {
-                        result.add(JoinRuleUtils.parsePredicate(predStr[j],
+                    // it separates the predicates by comma.
+                    // Example: for input "x>=0, x<=10", m.groupCount=1
+                    // 1.m.find() -> m.group(1) = m.group(0) = "x>=0"
+                    // 2.m.find() -> m.group(1) = m.group(0) = "x<=10"
+                    Pattern p1 = Pattern.compile("([^,]+)");
+                    Matcher m1 = p1.matcher(m.group(2));
+                    while (m1.find()) {
+                        result.add(JoinRuleUtils.parsePredicate(m1.group(0),
                                 phList, services));
                     }
                 }
@@ -259,14 +279,11 @@ public class JoinPointRule implements BuiltInRule {
                         | JoinRuleUtils.SortNotKnownException e) {
                     result.clear();
                 }
-
             }
         }
-
         return result;
     }
 
-  
     @Override
     public boolean isApplicableOnSubTerms() {
         return false;
