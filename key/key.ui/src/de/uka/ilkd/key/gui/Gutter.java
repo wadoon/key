@@ -12,22 +12,40 @@ public class Gutter extends JPanel {
 
     int numberList;
     JTextArea lineNumbers;
+    LineNumberPanel num;
+
     public Gutter(JTextArea textarea){
-        this.setSize(new Dimension(5, textarea.getHeight()));
         this.numberList = 1;
+
+
+        this.setSize(new Dimension(5, textarea.getHeight()));
+        this.setLayout(new BorderLayout());
+
+        this.num = new LineNumberPanel();
+
         textarea.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
                 numberList = textarea.getLineCount();
-
-                updateNumbers();
+                if(num.currLineCount < numberList){
+                    while(num.currLineCount < numberList){
+                        num.currLineCount++;
+                        num.createNewLabel(num.currLineCount);
+                    }
+                }
+               // updateNumbers();
             }
 
             @Override
             public void removeUpdate(DocumentEvent documentEvent) {
                 numberList = textarea.getLineCount();
-
-                updateNumbers();
+                if(num.currLineCount > numberList){
+                    while(num.currLineCount > numberList){
+                        num.currLineCount--;
+                        num.removeLabel();
+                    }
+                }
+                //updateNumbers();
             }
 
             @Override
@@ -36,14 +54,18 @@ public class Gutter extends JPanel {
 
             }
         });
-        lineNumbers = new JTextArea();
+
+        this.add(num,BorderLayout.CENTER);
+
+      /*  lineNumbers = new JTextArea();
         lineNumbers.setEditable(false);
-        lineNumbers.setSize(this.getSize());
+        lineNumbers.setSize(this.getSize());*/
 
-        this.setLayout(new BorderLayout());
-        lineNumbers.setText("1");
 
-        this.add(lineNumbers, BorderLayout.CENTER);
+      //  lineNumbers.setText("1");
+
+       // this.add(lineNumbers, BorderLayout.WEST);
+
 
     }
 
@@ -53,6 +75,7 @@ public class Gutter extends JPanel {
                 sb.append(i+"\n");
                    }
         lineNumbers.setText(sb.toString());
+
     }
 
 }
