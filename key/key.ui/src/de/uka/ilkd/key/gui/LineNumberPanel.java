@@ -43,4 +43,15 @@ public class LineNumberPanel extends JPanel {
         labels.remove(currLineCount);
         update();
     }
+
+    public List<Integer> retrieveBreakpoints(){
+        LinkedList<Integer> l = new LinkedList();
+
+        for (LineLabel label : labels) {
+            if(label.isBreakPointSet()){
+                l.add(label.getLineNumber());
+            }
+        }
+        return l;
+    }
 }
