@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
 import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
+import de.uka.ilkd.key.rule.join.procedures.JoinParams;
 import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
@@ -56,12 +57,11 @@ public abstract class JoinProcedure {
             .<JoinProcedure> nil();
 
     static {
-        CONCRETE_RULES =
-                ImmutableSLList.<JoinProcedure> nil()
-                        .prepend(JoinWeaken.instance())
-                        .prepend(JoinWithPredicateAbstractionFactory.instance())
-                        .prepend(JoinIfThenElseAntecedent.instance())
-                        .prepend(JoinIfThenElse.instance());
+        CONCRETE_RULES = ImmutableSLList.<JoinProcedure> nil()
+                .prepend(JoinWeaken.instance())
+                .prepend(JoinWithPredicateAbstractionFactory.instance())
+                .prepend(JoinIfThenElseAntecedent.instance())
+                .prepend(JoinIfThenElse.instance());
     }
 
     /**
@@ -85,8 +85,8 @@ public abstract class JoinProcedure {
      *            The services object.
      * @return The join result.
      */
-    public abstract ValuesJoinResult joinValuesInStates(
-            Term v, SymbolicExecutionState state1, Term valueInState1,
+    public abstract ValuesJoinResult joinValuesInStates(Term v,
+            SymbolicExecutionState state1, Term valueInState1,
             SymbolicExecutionState state2, Term valueInState2,
             Term distinguishingFormula, Services services);
 
@@ -134,7 +134,7 @@ public abstract class JoinProcedure {
     public static ImmutableList<JoinProcedure> getJoinProcedures() {
         return CONCRETE_RULES;
     }
-    
+
     /**
      * Encapsulates the result of a join of values.
      *
@@ -145,9 +145,9 @@ public abstract class JoinProcedure {
         private Term joinVal;
         private LinkedHashSet<Name> newNames;
         private LinkedHashSet<Term> sideConditions;
-        
-        public ValuesJoinResult(ImmutableSet<Term> newConstraints,
-                Term joinVal, LinkedHashSet<Name> newNames,
+
+        public ValuesJoinResult(ImmutableSet<Term> newConstraints, Term joinVal,
+                LinkedHashSet<Name> newNames,
                 LinkedHashSet<Term> sideConditions) {
             this.newConstraints = newConstraints;
             this.joinVal = joinVal;

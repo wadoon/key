@@ -28,6 +28,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.PredicateAbstractionJoinParams;
 import de.uka.ilkd.key.informationflow.po.BlockExecutionPO;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.SymbolicExecutionPO;
@@ -64,6 +65,12 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.join.JoinProcedure;
+import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
+import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
+import de.uka.ilkd.key.rule.join.procedures.JoinParams;
+import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
+import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Terms;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
@@ -87,8 +94,7 @@ public class BlockContractRule implements BuiltInRule {
             final Services services) {
         if (formula == lastFocusTerm) {
             return lastInstantiation;
-        }
-        else {
+        } else {
             final Instantiation result = new Instantiator(formula, goal,
                     services).instantiate();
             lastFocusTerm = formula;
@@ -190,8 +196,7 @@ public class BlockContractRule implements BuiltInRule {
         if (modality == Modality.BOX) {
             collectedContracts = collectedContracts.union(
                     specifications.getBlockContracts(block, Modality.DIA));
-        }
-        else if (modality == Modality.BOX_TRANSACTION) {
+        } else if (modality == Modality.BOX_TRANSACTION) {
             collectedContracts = collectedContracts.union(specifications
                     .getBlockContracts(block, Modality.DIA_TRANSACTION));
         }
@@ -243,12 +248,10 @@ public class BlockContractRule implements BuiltInRule {
             Goal initiatingGoal = ((SymbolicExecutionPO) po)
                     .getInitiatingGoal();
             return contractApplied(contract, initiatingGoal);
-        }
-        else if (po instanceof BlockExecutionPO) {
+        } else if (po instanceof BlockExecutionPO) {
             Goal initiatingGoal = ((BlockExecutionPO) po).getInitiatingGoal();
             return contractApplied(contract, initiatingGoal);
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -441,9 +444,8 @@ public class BlockContractRule implements BuiltInRule {
                     (BlockContractBuiltInRuleApp) application);
         }
 
-        else
-            return apply(goal, services,
-                    (BlockContractBuiltInRuleApp) application);
+        else return apply(goal, services,
+                (BlockContractBuiltInRuleApp) application);
     }
 
     private ImmutableList<Goal> applyJoinBlockContract(final Goal goal,
@@ -454,7 +456,7 @@ public class BlockContractRule implements BuiltInRule {
         final Instantiation instantiation = instantiate(
                 application.posInOccurrence().subTerm(), goal, services);
         ImmutableList<Goal> goals = goal.split(1);
-        
+
         JavaBlock jB = instantiation.formula.javaBlock();
 
         if (!jB.isEmpty() && jB.program() instanceof StatementBlock) {
@@ -464,14 +466,34 @@ public class BlockContractRule implements BuiltInRule {
                             .getTemporaryNameProposal("join_point"),
                     new KeYJavaType(PrimitiveType.JAVA_BOOLEAN, Sort.ANY));
 
+            JoinPointStatement jps = new JoinPointStatement(progVar);
             StatementBlock newBlock = KeYJavaASTFactory.block(
                     KeYJavaASTFactory.declare(progVar,
                             KeYJavaASTFactory.falseLiteral()),
-                    instantiation.block,
-                    new JoinPointStatement(application.getContract(), progVar));
+                    instantiation.block, jps);
+
+            JoinProcedure joinProcedure = application.getContract()
+                    .getJoinProcedure();
+
+            // TODO (DS) Get correct join procedure params
+            JoinParams joinParams;
+            if (joinProcedure instanceof JoinIfThenElse) {
+
+            } else if (joinProcedure instanceof JoinIfThenElseAntecedent) {
+
+            } else if (joinProcedure instanceof JoinWithPredicateAbstraction) {
+
+            } else if (joinProcedure instanceof JoinWeaken) {
+
+            } else {
+                throw new RuntimeException();
+            }
+            services.getSpecificationRepository().addJoinPointMergeSpec(jps,
+                    joinParams);
 
             Statement newProgram = (Statement) new ProgramElementReplacer(
-                    jB.program(), services).replace(instantiation.block, newBlock);
+                    jB.program(), services).replace(instantiation.block,
+                            newBlock);
 
             JavaBlock newJavaBlock = JavaBlock
                     .createJavaBlock((StatementBlock) newProgram);
@@ -488,7 +510,6 @@ public class BlockContractRule implements BuiltInRule {
         return goals;
 
     }
-
 
     private ImmutableList<Goal> apply(final Goal goal, final Services services,
             final BlockContractBuiltInRuleApp application)
@@ -559,8 +580,7 @@ public class BlockContractRule implements BuiltInRule {
             configurator.setUpWdGoal(result.tail().tail().tail().head(),
                     contract, contextUpdate, heaps.get(0),
                     anonymisationHeaps.get(heaps.get(0)), localInVariables);
-        }
-        else {
+        } else {
             result = goal.split(3);
         }
 
@@ -580,8 +600,7 @@ public class BlockContractRule implements BuiltInRule {
                             reachableInCondition },
                     new Term[] { postcondition, frameCondition
                     /* , atMostOneFlagSetCondition */ }, exceptionParameter, conditionsAndClausesBuilder.terms);
-        }
-        else {
+        } else {
             Goal validityGoal = result.tail().tail().head();
             validityGoal.setBranchLabel("Information Flow Validity");
 
@@ -602,8 +621,7 @@ public class BlockContractRule implements BuiltInRule {
                 setUpInfFlowPartOfUsageGoal(result.head(), infFlowValidityData,
                         contextUpdate, remembranceUpdate, anonymisationUpdate,
                         tb);
-            }
-            else {
+            } else {
                 // nothing to prove -> set up trivial goal
                 validityGoal.addFormula(new SequentFormula(tb.tt()), false,
                         true);
@@ -758,8 +776,7 @@ public class BlockContractRule implements BuiltInRule {
         private Term extractUpdate() {
             if (formula.op() instanceof UpdateApplication) {
                 return UpdateApplication.getUpdate(formula);
-            }
-            else {
+            } else {
                 return services.getTermBuilder().skip();
             }
         }
@@ -767,8 +784,7 @@ public class BlockContractRule implements BuiltInRule {
         private Term extractUpdateTarget() {
             if (formula.op() instanceof UpdateApplication) {
                 return UpdateApplication.getTarget(formula);
-            }
-            else {
+            } else {
                 return formula;
             }
         }
@@ -799,11 +815,9 @@ public class BlockContractRule implements BuiltInRule {
                 if (element instanceof StatementBlock && hasApplicableContracts(
                         (StatementBlock) element, modality, goal)) {
                     return (StatementBlock) element;
-                }
-                else if (element instanceof StatementContainer) {
+                } else if (element instanceof StatementContainer) {
                     element = ((StatementContainer) element).getStatementAt(0);
-                }
-                else {
+                } else {
                     element = element.getFirstElement();
                 }
             }
@@ -880,8 +894,7 @@ public class BlockContractRule implements BuiltInRule {
                         placeholderVariable.getKeYJavaType());
                 goal.addProgramVariable(newVariable);
                 return newVariable;
-            }
-            else {
+            } else {
                 return null;
             }
         }
@@ -1055,8 +1068,7 @@ public class BlockContractRule implements BuiltInRule {
                 if (modifiesClause.equals(strictlyNothing())) {
                     frameCondition = frameStrictlyEmpty(var(heap),
                             remembranceVariables.get(heap));
-                }
-                else {
+                } else {
                     frameCondition = frame(var(heap),
                             remembranceVariables.get(heap), modifiesClause);
                 }
@@ -1262,12 +1274,10 @@ public class BlockContractRule implements BuiltInRule {
             if (instantiation.isTransactional()) {
                 return new StatementBlock(statement, new TransactionStatement(
                         de.uka.ilkd.key.java.recoderext.TransactionStatement.FINISH));
-            }
-            else {
+            } else {
                 if (statement instanceof StatementBlock) {
                     return (StatementBlock) statement;
-                }
-                else {
+                } else {
                     return new StatementBlock(statement);
                 }
             }

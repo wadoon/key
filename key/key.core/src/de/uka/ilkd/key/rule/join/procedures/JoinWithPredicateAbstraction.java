@@ -25,6 +25,7 @@ import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.PredicateAbstractionJoinParams;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -45,21 +46,18 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
      * Mapping from sorts (e.g., int) to predicates (functions parametric in one
      * argument of the given sort).
      */
-    private HashMap<Sort, ArrayList<AbstractionPredicate>> predicates =
-            new HashMap<Sort, ArrayList<AbstractionPredicate>>();
+    private HashMap<Sort, ArrayList<AbstractionPredicate>> predicates = new HashMap<Sort, ArrayList<AbstractionPredicate>>();
 
     /**
      * The concrete lattice type which determines how abstract elements are
      * generated from abstraction predicates.
      */
-    private Class<? extends AbstractPredicateAbstractionLattice> latticeType =
-            null;
+    private Class<? extends AbstractPredicateAbstractionLattice> latticeType = null;
 
     /**
      * Manually chosen lattice elements for program variables.
      */
-    private LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices =
-            null;
+    private LinkedHashMap<ProgramVariable, AbstractDomainElement> userChoices = null;
 
     /**
      * Default constructor for subclasses.
@@ -95,6 +93,16 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
         this.userChoices = userChoices;
     }
 
+    /**
+     * 
+     * @param joinParams
+     * @param services
+     */
+    public JoinWithPredicateAbstraction(
+            PredicateAbstractionJoinParams joinParams, Services services) {
+        this(joinParams.getPredicates(services), joinParams.getLatticeType(), null);
+    }
+
     /*
      * (non-Javadoc)
      * 
@@ -108,7 +116,8 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
     @Override
     public AbstractDomainLattice getAbstractDomainForSort(final Sort s,
             final Services services) {
-        return instantiateAbstractDomain(s, predicates.get(s), latticeType, services);
+        return instantiateAbstractDomain(s, predicates.get(s), latticeType,
+                services);
     }
 
     /**
@@ -139,12 +148,11 @@ public class JoinWithPredicateAbstraction extends JoinWithLatticeAbstraction {
         }
 
         try {
-            Constructor<? extends AbstractPredicateAbstractionLattice> latticeConstructor =
-                    latticeType.getConstructor(List.class);
+            Constructor<? extends AbstractPredicateAbstractionLattice> latticeConstructor = latticeType
+                    .getConstructor(List.class);
 
             return latticeConstructor.newInstance(applicablePredicates);
-        }
-        catch (NoSuchMethodException | SecurityException
+        } catch (NoSuchMethodException | SecurityException
                 | InstantiationException | IllegalAccessException
                 | IllegalArgumentException | InvocationTargetException e) {
             e.printStackTrace();

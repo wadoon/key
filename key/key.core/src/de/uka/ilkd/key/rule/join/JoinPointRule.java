@@ -15,6 +15,7 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateA
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionLattice;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.DisjunctivePredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.PredicateAbstractionJoinParams;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
@@ -37,6 +38,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.join.procedures.JoinParams;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
@@ -69,10 +71,14 @@ public class JoinPointRule implements BuiltInRule {
         JoinProcedure concreteRule = jPS.getJoinProc();
 
         if (concreteRule.toString().equals("JoinByPredicateAbstraction")) {
+            PredicateAbstractionJoinParams joinParams = new PredicateAbstractionJoinParams(
+                    new Pair<>(params[0], params[1]));
+            //TODO
+
             Class<? extends AbstractPredicateAbstractionLattice> latticeType = translateLatticeType(
                     params[0]);
-            List<AbstractionPredicate> predicates = hasCorrectParams(params[1],
-                    goal);
+            List<AbstractionPredicate> predicates = PredicateAbstractionJoinParams
+                    .parsePredicateSpec(params[1], services);
             final JoinWithPredicateAbstractionFactory absPredicateFactory = (JoinWithPredicateAbstractionFactory) concreteRule;
             concreteRule = absPredicateFactory.instantiate(predicates,
                     latticeType,
@@ -135,11 +141,14 @@ public class JoinPointRule implements BuiltInRule {
             ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                     .findPotentialJoinPartners(goal, pio);
 
-            //XXX (DS): Why this concrete index access to the join params?
-            if (!joinPartners.isEmpty() && (!jps.getJoinProc().toString()
-                    .equals("JoinByPredicateAbstraction")
-                    || !hasCorrectParams(jps.getJoinParams()[1], goal)
-                            .isEmpty())) {
+            // XXX (DS): Why this concrete index access to the join params?
+            if (!joinPartners.isEmpty()
+                    && (!jps.getJoinProc().toString()
+                            .equals("JoinByPredicateAbstraction")
+                            || !PredicateAbstractionJoinParams
+                                    .parsePredicateSpec(jps.getJoinParams()[1],
+                                            goal.proof().getServices())
+                                    .isEmpty())) {
 
                 ImmutableList<Goal> joinPartnersGoal = ImmutableSLList.nil();
 
@@ -159,51 +168,6 @@ public class JoinPointRule implements BuiltInRule {
             }
         }
         return false;
-    }
-
-    private List<AbstractionPredicate> hasCorrectParams(String params, Goal g) {
-
-        List<AbstractionPredicate> result = new ArrayList<AbstractionPredicate>();
-        Services services = g.proof().getServices();
-        try {
-            Pattern p = Pattern.compile("\\\\(.+?) -> \\{(.+?)\\}");
-            Matcher m = p.matcher(params);
-            while (m.find()) {
-                for (int i = 1; i < m.groupCount(); i += 2) {
-
-                    final String phStr = m.group(i);
-                    final String[] predStr = m.group(i + 1).split(", ");
-
-                    // Parse the placeholder
-                    Pair<Sort, Name> ph = null;
-                    ph = JoinRuleUtils.parsePlaceholder(phStr, false,
-                            g.proof().getServices());
-                    if (services.getNamespaces().variables()
-                            .lookup(ph.second) == null) {
-                        services.getNamespaces().variables()
-                                .add(new LocationVariable(
-                                        new ProgramElementName(
-                                                ph.second.toString()),
-                                        ph.first));
-                    }
-
-                    ArrayList<Pair<Sort, Name>> phList = JoinRuleUtils
-                            .singletonArrayList(ph);
-
-                    for (int j = 0; j < predStr.length; j++) {
-                        result.add(JoinRuleUtils.parsePredicate(predStr[j],
-                                phList, services));
-                    }
-
-                }
-
-            }
-
-        } catch (ParserException | JoinRuleUtils.SortNotKnownException e) {
-            result = new ArrayList<AbstractionPredicate>();
-            e.printStackTrace();
-        }
-        return result;
     }
 
     /**
