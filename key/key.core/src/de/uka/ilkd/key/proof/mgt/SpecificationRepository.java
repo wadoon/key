@@ -128,8 +128,8 @@ public final class SpecificationRepository {
             new LinkedHashMap<IObserverFunction, IObserverFunction>();
     private final Map<IObserverFunction, ImmutableSet<Taclet>> unlimitedToLimitTaclets =
             new LinkedHashMap<IObserverFunction, ImmutableSet<Taclet>>();
-    private final Map<Pair<JoinProcedure, String>, JoinPointStatement> joinPointStatements = 
-            new LinkedHashMap<Pair<JoinProcedure, String>, JoinPointStatement>();
+    private final Map<JoinPointStatement, Pair<JoinProcedure, String>> joinPointStatementSpecs = 
+            new LinkedHashMap<JoinPointStatement, Pair<JoinProcedure, String>>();
 
     /**
      * <p>
@@ -1642,14 +1642,13 @@ public final class SpecificationRepository {
         return result;
     }
     
-    public JoinPointStatement getJoinPointStatements(JoinProcedure joinProc, String  joinParams){
-        final Pair<JoinProcedure, String> params = new Pair<JoinProcedure, String>(joinProc, joinParams);
-        JoinPointStatement jPS = joinPointStatements.get(params);
-        return jPS;
+    public Pair<JoinProcedure, String> getJoinPointStatementSpec(JoinPointStatement jPS){
+        Pair<JoinProcedure, String> specs = joinPointStatementSpecs.get(jPS);
+        return specs;
     }
     
-    public void addJoinPointStatements(JoinPointStatement jPS){
-        final Pair<JoinProcedure, String> params = new Pair<JoinProcedure, String>(jPS.getJoinProc(), jPS.getJoinParams());
-        joinPointStatements.put(params, jPS);
+    public void addJoinPointStatementSpecs(JoinPointStatement jPS, JoinProcedure joinProc, String  joinParams){
+        final Pair<JoinProcedure, String> specs = new Pair<JoinProcedure, String>(joinProc, joinParams);
+        joinPointStatementSpecs.put(jPS, specs);
     }
 }

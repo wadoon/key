@@ -57,10 +57,10 @@ public class JoinPointRule implements BuiltInRule {
 
         JoinPointStatement jPS = ((JoinPointStatement) block
                 .getInnerMostMethodFrame().getBody().getFirstElement());
-
-        String params = jPS.getJoinParams();
-
-        JoinProcedure concreteRule = jPS.getJoinProc();
+        
+        Pair<JoinProcedure, String> specs = services.getSpecificationRepository().getJoinPointStatementSpec(jPS);
+        JoinProcedure concreteRule = specs.first;
+        String params = specs.second;
 
         if (concreteRule.toString().equals("JoinByPredicateAbstraction")) {
             concreteRule = getProcedure(params, concreteRule, services);
@@ -160,10 +160,13 @@ public class JoinPointRule implements BuiltInRule {
                             .goBelowUpdates(pio.subTerm()).javaBlock());
             ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                     .findPotentialJoinPartners(goal, pio);
+            Pair<JoinProcedure, String> specs = goal.node().proof().getServices().getSpecificationRepository().getJoinPointStatementSpec(jPS);
+            JoinProcedure joinProc = specs.first;
+            String params = specs.second;
 
-            if (!joinPartners.isEmpty() && (!jPS.getJoinProc().toString()
+            if (!joinPartners.isEmpty() && (!joinProc.toString()
                     .equals("JoinByPredicateAbstraction")
-                    || !hasCorrectParams(jPS.getJoinParams(),
+                    || !hasCorrectParams(params,
                             goal.proof().getServices()))) {
 
                 ImmutableList<Goal> joinPartnersGoal = ImmutableSLList.nil();

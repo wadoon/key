@@ -111,6 +111,8 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.rule.join.JoinProcedure;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Walks through a java AST in depth-left-fist-order.
@@ -186,7 +188,10 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnJoinPointStatement(JoinPointStatement x){
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
-                return new JoinPointStatement(changeList.get(ProgramVariable.class), x.getJoinProc(), x.getJoinParams());
+                Pair<JoinProcedure, String> specs = services.getSpecificationRepository().getJoinPointStatementSpec(x);
+                JoinPointStatement newJPS = new JoinPointStatement(changeList.get(ProgramVariable.class));
+                services.getSpecificationRepository().addJoinPointStatementSpecs(newJPS, specs.first, specs.second);
+                return newJPS;
             }
         };
         def.doAction(x);

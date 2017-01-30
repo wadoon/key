@@ -54,83 +54,90 @@ public class JoinPointRuleTests extends TestCase {
         startAutomaticStrategy(proof);
         assertTrue(proof.closed());
     }
-
+    
     @Test
-    public void testAddJPS() {
-        //For this example the max. number of steps is set to 1
-        final Proof proof = loadProof(
-                "absBlockContract.addJoinPointStatement.key");
-
-        Node nodeBefore = proof.openGoals().head().node();
-
+    public void testTryInsideContract(){
+        final Proof proof = loadProof("Math_divContract.key");
         startAutomaticStrategy(proof);
-
-        assertTrue(proof.openGoals().head().appliedRuleApps()
-                .head() instanceof BlockContractBuiltInRuleApp);
-
-        Node nodeAfter = proof.openGoals().head().node();
-
-        // check if antecedent didn't change
-        assertTrue(nodeAfter.sequent().antecedent()
-                .equals(nodeBefore.sequent().antecedent()));
-        assertTrue(nodeAfter.sequent().succedent().size() == nodeBefore
-                .sequent().succedent().size());
- 
-        StatementBlock blockWithoutJP = ((StatementBlock)JoinRuleUtils
-                .getJavaBlockRecursive(nodeBefore.sequent().succedent().get(1)
-                        .formula()).program())
-                .getInnerMostMethodFrame().getBody();
-        
-        StatementBlock blockWithJP = ((StatementBlock) JoinRuleUtils
-                .getJavaBlockRecursive(nodeAfter.sequent().succedent().get(1)
-                        .formula()).program())
-                .getInnerMostMethodFrame().getBody();
-
-        assertTrue(((StatementBlock) blockWithJP.getChildAt(0)).getChildAt(1).equals(blockWithoutJP.getChildAt(0)));
-        assertTrue(((StatementBlock) blockWithJP.getChildAt(0)).getChildAt(2) instanceof JoinPointStatement);
-
-        for (int j = 1; j < blockWithoutJP.getChildCount(); j++) {
-            assertTrue(blockWithJP.getChildAt(j).equals(blockWithoutJP.getChildAt(j)));
-        }
-
+        assertTrue(proof.closed());
     }
 
+//    @Test
+//    public void testAddJPS() {
+//        //For this example the max. number of steps is set to 1
+//        final Proof proof = loadProof(
+//                "absBlockContract.addJoinPointStatement.key");
+//
+//        Node nodeBefore = proof.openGoals().head().node();
+//
+//        startAutomaticStrategy(proof);
+//
+//        assertTrue(proof.openGoals().head().appliedRuleApps()
+//                .head() instanceof BlockContractBuiltInRuleApp);
+//
+//        Node nodeAfter = proof.openGoals().head().node();
+//
+//        // check if antecedent didn't change
+//        assertTrue(nodeAfter.sequent().antecedent()
+//                .equals(nodeBefore.sequent().antecedent()));
+//        assertTrue(nodeAfter.sequent().succedent().size() == nodeBefore
+//                .sequent().succedent().size());
+// 
+//        StatementBlock blockWithoutJP = ((StatementBlock)JoinRuleUtils
+//                .getJavaBlockRecursive(nodeBefore.sequent().succedent().get(1)
+//                        .formula()).program())
+//                .getInnerMostMethodFrame().getBody();
+//        
+//        StatementBlock blockWithJP = ((StatementBlock) JoinRuleUtils
+//                .getJavaBlockRecursive(nodeAfter.sequent().succedent().get(1)
+//                        .formula()).program())
+//                .getInnerMostMethodFrame().getBody();
+//
+//        assertTrue(((StatementBlock) blockWithJP.getChildAt(0)).getChildAt(1).equals(blockWithoutJP.getChildAt(0)));
+//        assertTrue(((StatementBlock) blockWithJP.getChildAt(0)).getChildAt(2) instanceof JoinPointStatement);
+//
+//        for (int j = 1; j < blockWithoutJP.getChildCount(); j++) {
+//            assertTrue(blockWithJP.getChildAt(j).equals(blockWithoutJP.getChildAt(j)));
+//        }
+//
+//    }
 
-    @Test
-    public void testRemoveJPS() {
-        //For this example the max. number of steps ist set to 1
-        final Proof proof = loadProof("AbsBlockContract.beforeDelete.proof");
-        Node nodeBefore = proof.openGoals().head().node();
-        startAutomaticStrategy(proof);
-        assertTrue(proof.openGoals().head().appliedRuleApps()
-                .head() instanceof DeleteJoinPointBuiltInRuleApp);
 
-        Node nodeAfter = proof.openGoals().head().node();
-
-        // check if antecedent didn't change
-        assertTrue(nodeAfter.sequent().antecedent()
-                .equals(nodeBefore.sequent().antecedent()));
-        assertTrue(nodeAfter.sequent().succedent().size() == nodeBefore
-                .sequent().succedent().size());
-        
-        JavaBlock javaBlockAfter = JoinRuleUtils
-                .getJavaBlockRecursive(nodeAfter.sequent().succedent().get(0)
-                        .formula());
-        
-        StatementBlock blockWithoutJP = ((StatementBlock) javaBlockAfter.program())
-                .getInnerMostMethodFrame().getBody();
-        StatementBlock blockWithJP = ((StatementBlock) JoinRuleUtils
-                .getJavaBlockRecursive(nodeBefore.sequent().succedent().get(0)
-                        .formula()).program())
-                .getInnerMostMethodFrame().getBody();
-
-        assertTrue(JavaTools.getActiveStatement(javaBlockAfter).equals(new StatementBlock()));
-
-        for (int j = 1; j < blockWithoutJP.getChildCount(); j++) {
-            assertTrue(blockWithJP.getChildAt(j).equals(blockWithoutJP.getChildAt(j)));
-        }
-
-    }
+//    @Test
+//    public void testRemoveJPS() {
+//        //For this example the max. number of steps ist set to 1
+//        final Proof proof = loadProof("AbsBlockContract.beforeDelete.proof");
+//        Node nodeBefore = proof.openGoals().head().node();
+//        startAutomaticStrategy(proof);
+//        assertTrue(proof.openGoals().head().appliedRuleApps()
+//                .head() instanceof DeleteJoinPointBuiltInRuleApp);
+//
+//        Node nodeAfter = proof.openGoals().head().node();
+//
+//        // check if antecedent didn't change
+//        assertTrue(nodeAfter.sequent().antecedent()
+//                .equals(nodeBefore.sequent().antecedent()));
+//        assertTrue(nodeAfter.sequent().succedent().size() == nodeBefore
+//                .sequent().succedent().size());
+//        
+//        JavaBlock javaBlockAfter = JoinRuleUtils
+//                .getJavaBlockRecursive(nodeAfter.sequent().succedent().get(0)
+//                        .formula());
+//        
+//        StatementBlock blockWithoutJP = ((StatementBlock) javaBlockAfter.program())
+//                .getInnerMostMethodFrame().getBody();
+//        StatementBlock blockWithJP = ((StatementBlock) JoinRuleUtils
+//                .getJavaBlockRecursive(nodeBefore.sequent().succedent().get(0)
+//                        .formula()).program())
+//                .getInnerMostMethodFrame().getBody();
+//
+//        assertTrue(JavaTools.getActiveStatement(javaBlockAfter).equals(new StatementBlock()));
+//
+//        for (int j = 1; j < blockWithoutJP.getChildCount(); j++) {
+//            assertTrue(blockWithJP.getChildAt(j).equals(blockWithoutJP.getChildAt(j)));
+//        }
+//
+//    }
 
     private void startAutomaticStrategy(final Proof proof) {
         ProofStarter starter = new ProofStarter(false);

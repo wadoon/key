@@ -40,7 +40,6 @@ import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowBlockContractTa
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.NotEquals;
@@ -464,11 +463,10 @@ public class BlockContractRule implements BuiltInRule {
                             .getTemporaryNameProposal("join_point"),
                     new KeYJavaType(PrimitiveType.JAVA_BOOLEAN, Sort.ANY));
             
-            JoinPointStatement jPS = new JoinPointStatement(progVar,
-                    application.getContract().getJoinProcedure(),
-                    application.getContract().getJoinParams());
+            JoinPointStatement jPS = new JoinPointStatement(progVar);
             
-            services.getSpecificationRepository().addJoinPointStatements(jPS);
+            services.getSpecificationRepository().addJoinPointStatementSpecs(jPS, application.getContract().getJoinProcedure(),
+                    application.getContract().getJoinParams());
 
             StatementBlock newBlock = KeYJavaASTFactory.block(
                     instantiation.block, jPS

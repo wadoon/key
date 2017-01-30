@@ -21,13 +21,17 @@ public class JoinPointStatement extends JavaStatement{
         this.prgVar = children.get(ProgramVariable.class);
         
     }
-    public JoinPointStatement(
-            ProgramVariable progVar, JoinProcedure joinProc, String joinParams) {
-         this.joinParams = joinParams;
-         this.prgVar = progVar;
-         this.joinProc = joinProc;
-        }
+//    public JoinPointStatement(
+//            ProgramVariable progVar, JoinProcedure joinProc, String joinParams) {
+//         this.joinParams = joinParams;
+//         this.prgVar = progVar;
+//         this.joinProc = joinProc;
+//        }
 
+    public JoinPointStatement(ProgramVariable progVar) {
+        this.prgVar = progVar;
+    }
+    
     @Override
     public void visit(Visitor v) {
        v.performActionOnJoinPointStatement(this);
@@ -41,17 +45,17 @@ public class JoinPointStatement extends JavaStatement{
         return index == 0 ? prgVar : null;
     }
     
-    public void setJoinProc(JoinProcedure joinProc) {
-        this.joinProc = joinProc;
-    }
-
-    public JoinProcedure getJoinProc() {
-        return joinProc;
-    }
-    
-    public String getJoinParams() {
-        return joinParams;
-    }
+//    public void setJoinProc(JoinProcedure joinProc) {
+//        this.joinProc = joinProc;
+//    }
+//
+//    public JoinProcedure getJoinProc() {
+//        return joinProc;
+//    }
+//    
+//    public String getJoinParams() {
+//        return joinParams;
+//    }
 
     public ProgramVariable getProgVar() {
         return prgVar;
