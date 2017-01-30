@@ -95,6 +95,7 @@ public class ScriptViewController implements ActionListener{
             ToolTipManager.sharedInstance().registerComponent(textArea);
 
             textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
+            //for linenumbers and breakpoints
             Gutter g = new Gutter(textArea);
             view.add(g, BorderLayout.WEST);
             view.add(new JScrollPane(textArea), BorderLayout.CENTER);
