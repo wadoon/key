@@ -51,6 +51,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NameCreationInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -59,6 +60,7 @@ import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.join.JoinIsApplicable;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
 import de.uka.ilkd.key.rule.BlockContractRule;
@@ -95,6 +97,7 @@ public class TacletMenu extends JMenu {
 	private static final String ENABLE_ABBREVIATION = "Enable abbreviation";
 	private static final String DISABLE_ABBREVIATION = "Disable abbreviation";
 	private static final String CHANGE_ABBREVIATION = "Change abbreviation";
+	private static final String JUMP_TO_INTRO = "Jump to introduction";
 	private static final String APPLY_CONTRACT = "Apply Contract";
 	private static final String CHOOSE_AND_APPLY_CONTRACT = "Choose and Apply Contract";
 	private static final String ENTER_LOOP_SPECIFICATION = "Enter Loop Specification";
@@ -131,8 +134,8 @@ public class TacletMenu extends JMenu {
         CLUTTER_RULES.add(new Name("less_is_total"));
         CLUTTER_RULES.add(new Name("less_zero_is_total"));
         CLUTTER_RULES.add(new Name("applyEqReverse"));
-        
-        
+
+
         // the following are used for drag'n'drop interactions
         CLUTTER_RULES.add(new Name("eqTermCut"));
         CLUTTER_RULES.add(new Name("instAll"));
@@ -233,16 +236,19 @@ public class TacletMenu extends JMenu {
 	if (pos != null) {
 	    PosInOccurrence occ = pos.getPosInOccurrence();
 	    if (occ != null && occ.posInTerm() != null) {
-		Term t = occ.subTerm ();
-		createAbbrevSection(t, control);
+	        Term t = occ.subTerm ();
+	        createAbbrevSection(t, control);
 
-		if(t.op() instanceof ProgramVariable) {
-		    ProgramVariable var = (ProgramVariable)t.op();
-		    if(var.getProgramElementName().getCreationInfo() != null) {
-		    	createNameCreationInfoSection(control);
-		    }
-		}
+	        if(t.op() instanceof ProgramVariable) {
+	            ProgramVariable var = (ProgramVariable)t.op();
+	            if(var.getProgramElementName().getCreationInfo() != null) {
+	                createNameCreationInfoSection(control);
+	            }
+	        }
 	    }
+	    JMenuItem item = new JMenuItem(JUMP_TO_INTRO);
+	    item.addActionListener(control);
+	    add(item);
 	}
 
     }
@@ -295,7 +301,7 @@ public class TacletMenu extends JMenu {
             }
         }
     }
-    
+
     /**
      * Creates the menu item for the "defocusing" join rule which links partner
      * nodes to join nodes.
@@ -311,7 +317,7 @@ public class TacletMenu extends JMenu {
             }
         }
     }
-    
+
 
     /**
      * adds an item for built in rules (e.g. Run Simplify or Update Simplifier)
@@ -673,7 +679,13 @@ public class TacletMenu extends JMenu {
 		    				  message,
 						  "Name creation info",
 		  				  JOptionPane.INFORMATION_MESSAGE);
-		}
+		} else if(((JMenuItem)e.getSource()).getText().
+             startsWith(JUMP_TO_INTRO)) {
+                 SequentFormula formula = pos.getPosInOccurrence().sequentFormula();
+                 boolean antec = pos.getPosInOccurrence().isInAntec();
+                 Node parent = XXXFindParent.findParent(formula, antec, mediator.getSelectedNode());
+                 mediator.getSelectionModel().setSelectedNode(parent);
+             }
 	    }
 	}
     }
