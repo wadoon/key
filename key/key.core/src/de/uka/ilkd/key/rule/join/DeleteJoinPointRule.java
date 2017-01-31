@@ -24,19 +24,6 @@ public class DeleteJoinPointRule implements BuiltInRule {
     public ImmutableList<Goal> apply(Goal goal, Services services,
             RuleApp ruleApp) throws RuleAbortException {
 
-        // Term formula = ruleApp.posInOccurrence().sequentFormula().formula();
-        // Term target = TermBuilder.goBelowUpdates(formula);
-        // JavaBlock newJavaBlock =
-        // JavaTools.removeActiveStatement(target.javaBlock(), services);
-        // TermBuilder tb = services.getTermBuilder();
-        // Term newTarget = tb.prog((Modality)target.op(), newJavaBlock,
-        // target.sub(0));
-        //
-        // goal.changeFormula(
-        // new SequentFormula(tb.apply(UpdateApplication.getUpdate(formula),
-        // newTarget)),
-        // ruleApp.posInOccurrence());
-
         ImmutableList<Goal> goals = goal.split(1);
         goal = goals.head();
         Term target = TermBuilder
@@ -76,19 +63,22 @@ public class DeleteJoinPointRule implements BuiltInRule {
         if (pio != null
                 && JavaTools.getActiveStatement(
                         TermBuilder.goBelowUpdates(pio.subTerm())
-                                .javaBlock()) instanceof JoinPointStatement
-                && JoinRule.findPotentialJoinPartners(goal, pio).isEmpty()) {
+                                .javaBlock()) instanceof JoinPointStatement) {
             
+            JoinPointStatement jPS = (JoinPointStatement) JavaTools.getActiveStatement(
+                    TermBuilder.goBelowUpdates(pio.subTerm())
+                    .javaBlock());
             for(Goal g: goal.proof().openGoals()){
-                if(!g.equals(goal) && !g.isLinked() && JoinPointRule.containsJPS(g, (JoinPointStatement) JavaTools.getActiveStatement(
-                        TermBuilder.goBelowUpdates(pio.subTerm())
-                        .javaBlock()))) return false;
+                if(!g.equals(goal) && !g.isLinked() && JoinPointRule.containsJPS(g, jPS )) return false;
             }
             int i = 0;
             ImmutableList<RuleApp> ruleApps = goal.appliedRuleApps();
 
             while (!ruleApps.isEmpty() && i < 15) {
-                if (ruleApps.head() instanceof JoinRuleBuiltInRuleApp) {
+                if (ruleApps.head() instanceof JoinRuleBuiltInRuleApp && JavaTools.getActiveStatement(
+                        TermBuilder.goBelowUpdates(ruleApps.head().posInOccurrence().subTerm())
+                        .javaBlock()).equals(jPS)) {
+                   
                     return true;
                 }
                 else {

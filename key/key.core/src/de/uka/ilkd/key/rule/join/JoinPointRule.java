@@ -200,9 +200,12 @@ public class JoinPointRule implements BuiltInRule {
             t = sequent.get(i).formula();
             MethodFrame mF = JavaTools.getInnermostMethodFrame(
                     JoinRuleUtils.getJavaBlockRecursive(t), services);
+            if(mF != null){
             ContainsStatementVisitor visitor = new ContainsStatementVisitor(mF,
                     jPS, services);
+           visitor.start();
            if(visitor.isContained()) return true;
+            }
         }
         return false;
     }
