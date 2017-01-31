@@ -16,46 +16,18 @@ public class Gutter extends JPanel {
 
     private LineNumberPanel num;
 
+    public JTextArea textarea;
+
     public Gutter(JTextArea textarea){
         this.numberList = 1;
-
+        this.textarea = textarea;
 
         this.setSize(new Dimension(5, textarea.getHeight()));
         this.setLayout(new BorderLayout());
 
         this.num = new LineNumberPanel();
 
-        textarea.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                numberList = textarea.getLineCount();
-
-                if(num.currLineCount < numberList){
-                    while(num.currLineCount < numberList){
-                        num.currLineCount++;
-                        num.createNewLabel(num.currLineCount);
-                    }
-                }
-
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-                numberList = textarea.getLineCount();
-                if(num.currLineCount > numberList){
-                    while(num.currLineCount > numberList){
-                        num.currLineCount--;
-                        num.removeLabel();
-                    }
-                }
-
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-
-            }
-        });
+        this.textarea.getDocument().addDocumentListener(new MyDocumentListener(textarea, numberList));
 
         this.add(num, BorderLayout.CENTER);
 
@@ -66,4 +38,43 @@ public class Gutter extends JPanel {
     }
 
 
+    private class MyDocumentListener implements DocumentListener {
+        JTextArea textarea;
+        int numberList;
+
+        public MyDocumentListener(JTextArea textarea, int numberList) {
+            this.textarea = textarea;
+            this.numberList = numberList;
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent documentEvent) {
+            numberList = textarea.getLineCount();
+
+            if(num.currLineCount < numberList){
+                while(num.currLineCount < numberList){
+                    num.currLineCount++;
+                    num.createNewLabel(num.currLineCount);
+                }
+            }
+
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent documentEvent) {
+            numberList = textarea.getLineCount();
+            if(num.currLineCount > numberList){
+                while(num.currLineCount > numberList){
+                    num.currLineCount--;
+                    num.removeLabel();
+                }
+            }
+
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent documentEvent) {
+
+        }
+    }
 }

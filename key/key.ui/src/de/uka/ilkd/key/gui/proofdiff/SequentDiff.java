@@ -21,8 +21,10 @@ public class SequentDiff {
     }
 
     public void init(){
+       // SequentChangeInfo
         Semisequent antecedentBefore = seqBefore.antecedent();
         Semisequent succedentBefore = seqBefore.succedent();
+
 
         Semisequent antecedentAfter = seqAfter.antecedent();
         Semisequent succedentAfter = seqAfter.succedent();
