@@ -20,6 +20,7 @@ import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.*;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.statement.JoinPointStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.visitor.ContainsStatementVisitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -57,8 +58,9 @@ public class JoinPointRule implements BuiltInRule {
 
         JoinPointStatement jPS = ((JoinPointStatement) block
                 .getInnerMostMethodFrame().getBody().getFirstElement());
-        
-        Pair<JoinProcedure, String> specs = services.getSpecificationRepository().getJoinPointStatementSpec(jPS);
+
+        Pair<JoinProcedure, String> specs = services
+                .getSpecificationRepository().getMergeSpecs(jPS);
         JoinProcedure concreteRule = specs.first;
         String params = specs.second;
 
@@ -160,14 +162,15 @@ public class JoinPointRule implements BuiltInRule {
                             .goBelowUpdates(pio.subTerm()).javaBlock());
             ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                     .findPotentialJoinPartners(goal, pio);
-            Pair<JoinProcedure, String> specs = goal.node().proof().getServices().getSpecificationRepository().getJoinPointStatementSpec(jPS);
+            Pair<JoinProcedure, String> specs = goal.node().proof()
+                    .getServices().getSpecificationRepository()
+                    .getMergeSpecs(jPS);
             JoinProcedure joinProc = specs.first;
             String params = specs.second;
 
             if (!joinPartners.isEmpty() && (!joinProc.toString()
                     .equals("JoinByPredicateAbstraction")
-                    || !hasCorrectParams(params,
-                            goal.proof().getServices()))) {
+                    || !hasCorrectParams(params, goal.proof().getServices()))) {
 
                 ImmutableList<Goal> joinPartnersGoal = ImmutableSLList.nil();
 
@@ -190,36 +193,27 @@ public class JoinPointRule implements BuiltInRule {
     }
 
     public static boolean containsJPS(Goal g, JoinPointStatement jPS) {
+        Services services = g.proof().getServices();
         Term t;
         Semisequent sequent = g.node().sequent().succedent();
-        boolean found = false;
-        for (int i = 0; i < g.node().sequent().succedent().size() && !found; i++) {
+        for (int i = 0; i < g.node().sequent().succedent().size(); i++) {
             t = sequent.get(i).formula();
-            if (JoinRuleUtils.getJavaBlockRecursive(t).program() instanceof StatementBlock) {
-                MethodFrame mF = ((StatementBlock) JoinRuleUtils.getJavaBlockRecursive(t).program())
-                        .getInnerMostMethodFrame();
-                if(mF!= null) found = checkProgramBody(mF.getBody(), jPS);
-                // ContainsStatementVisitor visitor = new
-                // ContainsStatementVisitor();
-            }
-
+            MethodFrame mF = JavaTools.getInnermostMethodFrame(
+                    JoinRuleUtils.getJavaBlockRecursive(t), services);
+            ContainsStatementVisitor visitor = new ContainsStatementVisitor(mF,
+                    jPS, services);
+           if(visitor.isContained()) return true;
         }
-        return found;
+        return false;
     }
 
-    private static boolean checkProgramBody(StatementBlock body,
-            JoinPointStatement jPS) {
-        boolean found = false;
-        for (int i = 0; i < body.getChildCount() && !found; i++) {
-            if (jPS.equals(body.getChildAt(i))) return true;
-            else if (body.getChildAt(i) instanceof StatementBlock)
-                found = checkProgramBody(((StatementBlock) body.getChildAt(i)), jPS);
-        }
-        return found;
-    }
 
     private boolean hasCorrectParams(String params, Services services) {
-        // Examples
+        /* params string  = latticeType(...)
+         * Matcher separates the string in m.group(1) = laticeType
+         * m.group(2) = string contained between the parenthesis
+         */
+        
         Pattern p = Pattern.compile("([a-z]+)\\s*\\((.+?)\\)");
         Matcher m = p.matcher(params);
         boolean matched = false;
@@ -244,7 +238,13 @@ public class JoinPointRule implements BuiltInRule {
     private List<AbstractionPredicate> getPredicates(String predicatesStr,
             Services services) {
         List<AbstractionPredicate> result = new ArrayList<AbstractionPredicate>();
-        Pattern p = Pattern.compile("(.+?) -> \\{(.+?)\\}");
+        /* parameters string should have the following structure
+        * placeholder -> {predicate, predicate1, ...} (whitespaces are optional)
+        * m.group(1) = placeholder and m.group(2) = all the predicates
+        * Placeholder structure: SORT var (NOTE: space between the sort and the variable is obligatory) 
+        * Example: int x 
+        */
+        Pattern p = Pattern.compile("(.+?)\\s*->\\s*\\{(.+?)\\}");
         Matcher m = p.matcher(predicatesStr);
         while (m.find()) {
             if (m.groupCount() != 2) {
@@ -267,7 +267,7 @@ public class JoinPointRule implements BuiltInRule {
 
                     ArrayList<Pair<Sort, Name>> phList = JoinRuleUtils
                             .singletonArrayList(ph);
-                    // it separates the predicates by comma.
+                    // it separates the predicates by a comma.
                     // Example: for input "x>=0, x<=10", m.groupCount=1
                     // 1.m.find() -> m.group(1) = m.group(0) = "x>=0"
                     // 2.m.find() -> m.group(1) = m.group(0) = "x<=10"

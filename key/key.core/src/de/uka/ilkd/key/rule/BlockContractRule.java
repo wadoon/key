@@ -465,7 +465,7 @@ public class BlockContractRule implements BuiltInRule {
             
             JoinPointStatement jPS = new JoinPointStatement(progVar);
             
-            services.getSpecificationRepository().addJoinPointStatementSpecs(jPS, application.getContract().getJoinProcedure(),
+            services.getSpecificationRepository().addMergeSpecs(jPS, application.getContract().getJoinProcedure(),
                     application.getContract().getJoinParams());
 
             StatementBlock newBlock = KeYJavaASTFactory.block(

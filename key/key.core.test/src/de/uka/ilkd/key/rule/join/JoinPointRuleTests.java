@@ -28,14 +28,14 @@ public class JoinPointRuleTests extends TestCase {
     }
 
     @Test
-    public void testITEabs() {
+    public void testITE() {
         final Proof proof = loadProof("Gcd.ITE.open.key");
         startAutomaticStrategy(proof);
         assertTrue(proof.closed());
     }
 
     @Test
-    public void testPredicateAbstractionAbs() {
+    public void testPredicateAbstraction() {
         final Proof proof = loadProof(
                 "Gcd.predAbstr.key");
         startAutomaticStrategy(proof);

@@ -188,9 +188,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     public void performActionOnJoinPointStatement(JoinPointStatement x){
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
-                Pair<JoinProcedure, String> specs = services.getSpecificationRepository().getJoinPointStatementSpec(x);
+                Pair<JoinProcedure, String> specs = services.getSpecificationRepository().getMergeSpecs(x);
                 JoinPointStatement newJPS = new JoinPointStatement(changeList.get(ProgramVariable.class));
-                services.getSpecificationRepository().addJoinPointStatementSpecs(newJPS, specs.first, specs.second);
+                services.getSpecificationRepository().addMergeSpecs(newJPS, specs.first, specs.second);
                 return newJPS;
             }
         };

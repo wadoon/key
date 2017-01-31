@@ -128,7 +128,7 @@ public final class SpecificationRepository {
             new LinkedHashMap<IObserverFunction, IObserverFunction>();
     private final Map<IObserverFunction, ImmutableSet<Taclet>> unlimitedToLimitTaclets =
             new LinkedHashMap<IObserverFunction, ImmutableSet<Taclet>>();
-    private final Map<JoinPointStatement, Pair<JoinProcedure, String>> joinPointStatementSpecs = 
+    private final Map<JoinPointStatement, Pair<JoinProcedure, String>> mergeSpecs = 
             new LinkedHashMap<JoinPointStatement, Pair<JoinProcedure, String>>();
 
     /**
@@ -1642,13 +1642,13 @@ public final class SpecificationRepository {
         return result;
     }
     
-    public Pair<JoinProcedure, String> getJoinPointStatementSpec(JoinPointStatement jPS){
-        Pair<JoinProcedure, String> specs = joinPointStatementSpecs.get(jPS);
+    public Pair<JoinProcedure, String> getMergeSpecs(JoinPointStatement jPS){
+        Pair<JoinProcedure, String> specs = mergeSpecs.get(jPS);
         return specs;
     }
     
-    public void addJoinPointStatementSpecs(JoinPointStatement jPS, JoinProcedure joinProc, String  joinParams){
+    public void addMergeSpecs(JoinPointStatement jPS, JoinProcedure joinProc, String  joinParams){
         final Pair<JoinProcedure, String> specs = new Pair<JoinProcedure, String>(joinProc, joinParams);
-        joinPointStatementSpecs.put(jPS, specs);
+        mergeSpecs.put(jPS, specs);
     }
 }
