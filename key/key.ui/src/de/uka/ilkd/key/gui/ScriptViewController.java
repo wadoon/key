@@ -5,13 +5,12 @@ import de.uka.ilkd.key.gui.prooftree.PathFilter;
 import de.uka.ilkd.key.macros.scripts.*;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rtextarea.RTextScrollPane;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.*;
@@ -32,7 +31,9 @@ public class ScriptViewController implements ActionListener{
     private Proof associatedProof;
 
     private JPanel view;
-    private JTextArea textArea;
+   // private JTextArea textArea;
+
+    private RSyntaxTextArea textArea;
 
     public ScriptViewController(KeYMediator mediator, MainWindow mainWindow) {
         this.mediator = mediator;
@@ -64,10 +65,18 @@ public class ScriptViewController implements ActionListener{
                 g.addActionListener(this);
                 bar.add(g);
             }
+            {
+                JButton g = new JButton("Step Mode");
+                g.setActionCommand("stepping");
+                g.addActionListener(this);
+                bar.add(g);
+            }
             view.add(bar, BorderLayout.NORTH);
         }
+
         {
-            textArea = new JTextArea() {
+
+              textArea = new RSyntaxTextArea() {
                 @Override
                 public String getToolTipText(MouseEvent e) {
                     int pos = viewToModel(e.getPoint());
@@ -95,10 +104,15 @@ public class ScriptViewController implements ActionListener{
             ToolTipManager.sharedInstance().registerComponent(textArea);
 
             textArea.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
-            //for linenumbers and breakpoints
-            Gutter g = new Gutter(textArea);
-            view.add(g, BorderLayout.WEST);
-            view.add(new JScrollPane(textArea), BorderLayout.CENTER);
+            textArea.setCodeFoldingEnabled(true);
+            textArea.setPaintTabLines(true);
+
+            RTextScrollPane scrollpane = new RTextScrollPane(textArea);
+            scrollpane.setIconRowHeaderEnabled(true);
+            scrollpane.setLineNumbersEnabled(true);
+
+            view.add(scrollpane, BorderLayout.CENTER);
+
             textArea.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
@@ -124,7 +138,8 @@ public class ScriptViewController implements ActionListener{
             node = null;
         }
 
-        JPopupMenu pm = new JPopupMenu();
+        JPopupMenu pm = textArea.getPopupMenu();
+                //new JPopupMenu();
         {
             JMenuItem m = new JMenuItem("Show node exception");
             if (node == null || node.getEncounteredException() == null) {
@@ -210,6 +225,7 @@ public class ScriptViewController implements ActionListener{
             });
             pm.add(m);
         }
+        textArea.setPopupMenu(pm);
         pm.show(textArea, p.x, p.y);
     }
 
@@ -240,11 +256,31 @@ public class ScriptViewController implements ActionListener{
                 case "showPath":
                     showPath();
                     break;
+                case "stepping":
+                    stepMode();
+                    break;
                 default: throw new Error();
             }
         } catch (Exception ex) {
             ExceptionDialog.showDialog(mainWindow, ex);
         }
+    }
+
+    private void stepMode() {
+
+        textArea.setCurrentLineHighlightColor(Color.lightGray);
+
+        goTo();
+        textArea.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent keyEvent) {
+                super.keyPressed(keyEvent);
+                if (keyEvent.equals(KeyEvent.VK_F3)){
+                    System.out.println("F3");
+                }
+            }
+        });
+
     }
 
     private void showPath(){
