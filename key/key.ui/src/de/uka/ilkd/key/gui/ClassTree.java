@@ -448,7 +448,23 @@ public class ClassTree extends JTree {
         DefaultMutableTreeNode node = getSelectedNode();
         return node != null ? (Entry) node.getUserObject() : null;
     }
-
+    
+    /**
+     * Recursively expands all rows of the ClassTree, such that all methods with a contract are visible.
+     * @param startIndex the index of the first row to expand (needed for recursion)
+     * @param rowCount the rowCount just before starting expansion of rows (needed for recursion)
+     */
+    public void expandAll(int startIndex, int rowCount) {
+    	// expand currently visible
+    	for (int i = startIndex; i < rowCount; ++i) {
+    		expandRow(i);
+    	}
+    	
+    	// expand rows which became newly visible
+    	if (getRowCount() != rowCount) {
+    		expandAll(rowCount, getRowCount());
+    	}
+    }
     
     
     //-------------------------------------------------------------------------
