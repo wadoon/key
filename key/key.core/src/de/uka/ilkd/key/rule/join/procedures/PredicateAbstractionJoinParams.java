@@ -1,25 +1,28 @@
-package de.uka.ilkd.key.axiom_abstraction.predicateabstraction;
+package de.uka.ilkd.key.rule.join.procedures;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractPredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.ConjunctivePredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.DisjunctivePredicateAbstractionLattice;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.rule.join.procedures.JoinParams;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
+import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
  * TODO
- * 
- * XXX: Should probably be moved into another package.
  *
  * @author Dominic Scheurer
  */
@@ -31,6 +34,11 @@ public class PredicateAbstractionJoinParams extends JoinParams {
     private final Pair<String, String> params;
 
     private final Class<? extends AbstractPredicateAbstractionLattice> latticeType;
+
+    /**
+     * The {@link AbstractionPredicate}s. This list will be null until the first
+     * call to {@link #getPredicates(Services)}.
+     */
     private List<AbstractionPredicate> predicates;
 
     /**
@@ -41,9 +49,15 @@ public class PredicateAbstractionJoinParams extends JoinParams {
      */
     public PredicateAbstractionJoinParams(Pair<String, String> params) {
         super(JoinWithPredicateAbstraction.class);
-        
+
         this.params = params;
         this.latticeType = latticeTypeFromString();
+    }
+
+    @Override
+    public JoinProcedure getInstantiatedJoinProcedure(Services services) {
+        return JoinWithPredicateAbstractionFactory.instance().instantiate(
+                getPredicates(services), latticeType, new LinkedHashMap<>());
     }
 
     /**
@@ -59,10 +73,11 @@ public class PredicateAbstractionJoinParams extends JoinParams {
 
         return predicates;
     }
-    
+
     /**
      * 
      * TODO
+     * 
      * @return
      */
     public Class<? extends AbstractPredicateAbstractionLattice> getLatticeType() {
@@ -71,14 +86,20 @@ public class PredicateAbstractionJoinParams extends JoinParams {
 
     /**
      * TODO
+     * 
      * @return
      */
     private Class<? extends AbstractPredicateAbstractionLattice> latticeTypeFromString() {
-        switch (params.first) {
-        case "simple": return SimplePredicateAbstractionLattice.class;
-        case "conjunctive": return ConjunctivePredicateAbstractionLattice.class;
-        case "disjunctive": return DisjunctivePredicateAbstractionLattice.class;
-        default: throw new RuntimeException("PredicateAbstractionJoinParams: Unexpected lattice type.");
+        switch (params.first.replace("\\", "")) {
+        case "simple":
+            return SimplePredicateAbstractionLattice.class;
+        case "conjunctive":
+            return ConjunctivePredicateAbstractionLattice.class;
+        case "disjunctive":
+            return DisjunctivePredicateAbstractionLattice.class;
+        default:
+            throw new RuntimeException(
+                    "PredicateAbstractionJoinParams: Unexpected lattice type: " + params.first);
         }
     }
 
@@ -95,7 +116,7 @@ public class PredicateAbstractionJoinParams extends JoinParams {
             Services services) {
         List<AbstractionPredicate> result = new ArrayList<AbstractionPredicate>();
         try {
-            Pattern p = Pattern.compile("(.+?) *-> *\\{([^\\}]+?)\\}");
+            Pattern p = Pattern.compile("\\\\(.+?) *-> *\\{([^\\}]+?)\\}");
             Matcher m = p.matcher(params);
             while (m.find()) {
                 for (int i = 1; i < m.groupCount(); i += 2) {

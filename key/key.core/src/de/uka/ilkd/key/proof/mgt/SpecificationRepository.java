@@ -107,7 +107,7 @@ public final class SpecificationRepository {
     private final Map<ProofOblInput, ImmutableSet<Proof>> proofs = new LinkedHashMap<ProofOblInput, ImmutableSet<Proof>>();
     private final Map<Pair<LoopStatement, Integer>, LoopSpecification> loopInvs = new LinkedHashMap<Pair<LoopStatement, Integer>, LoopSpecification>();
     private final Map<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>> blockContracts = new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>>();
-    private final Map<JoinPointStatement, ImmutableSet<JoinParams>> joinPointMergeContracts = new LinkedHashMap<JoinPointStatement, ImmutableSet<JoinParams>>();
+    private final Map<JoinPointStatement, JoinParams> joinPointMergeContracts = new LinkedHashMap<JoinPointStatement, JoinParams>();
     private final Map<IObserverFunction, IObserverFunction> unlimitedToLimited = new LinkedHashMap<IObserverFunction, IObserverFunction>();
     private final Map<IObserverFunction, IObserverFunction> limitedToUnlimited = new LinkedHashMap<IObserverFunction, IObserverFunction>();
     private final Map<IObserverFunction, ImmutableSet<Taclet>> unlimitedToLimitTaclets = new LinkedHashMap<IObserverFunction, ImmutableSet<Taclet>>();
@@ -1523,12 +1523,7 @@ public final class SpecificationRepository {
      */
     public void addJoinPointMergeSpec(final JoinPointStatement jps,
             final JoinParams joinParams) {
-        if (!joinPointMergeContracts.containsKey(jps)) {
-            joinPointMergeContracts.put(jps,
-                    DefaultImmutableSet.<JoinParams> nil());
-        }
-
-        joinPointMergeContracts.get(jps).add(joinParams);
+        joinPointMergeContracts.put(jps, joinParams);
     }
 
     /**
@@ -1537,8 +1532,7 @@ public final class SpecificationRepository {
      * @param jps
      * @return
      */
-    public ImmutableSet<JoinParams> getJoinPointMergeSpec(
-            final JoinPointStatement jps) {
+    public JoinParams getJoinPointMergeSpec(final JoinPointStatement jps) {
         return joinPointMergeContracts.get(jps);
     }
 

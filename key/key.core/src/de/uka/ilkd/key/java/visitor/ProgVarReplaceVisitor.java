@@ -30,6 +30,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.statement.JoinPointStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -453,5 +454,13 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                           newVariant, newSelfTerm, newLocalIns,
                                           newLocalOuts, atPres);
         services.getSpecificationRepository().addLoopInvariant(newInv);
+    }
+    
+    @Override
+    protected void performActionOnJoinPointSpecs(JoinPointStatement oldStmt,
+            JoinPointStatement newStmt) {
+        services.getSpecificationRepository().addJoinPointMergeSpec(newStmt,
+                services.getSpecificationRepository()
+                        .getJoinPointMergeSpec(oldStmt));
     }
 }

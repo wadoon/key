@@ -54,17 +54,6 @@ public class JoinWithPredicateAbstractionFactory extends
         return INSTANCE;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * de.uka.ilkd.key.rule.join.JoinProcedure#joinValuesInStates(de.uka.ilkd
-     * .key.logic.Term, de.uka.ilkd.key.util.joinrule.SymbolicExecutionState,
-     * de.uka.ilkd.key.logic.Term,
-     * de.uka.ilkd.key.util.joinrule.SymbolicExecutionState,
-     * de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.logic.Term,
-     * de.uka.ilkd.key.java.Services)
-     */
     @Override
     public ValuesJoinResult joinValuesInStates(
             Term v, SymbolicExecutionState state1, Term valueInState1,

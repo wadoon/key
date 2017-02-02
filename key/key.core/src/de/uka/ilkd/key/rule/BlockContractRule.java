@@ -28,7 +28,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.PredicateAbstractionJoinParams;
 import de.uka.ilkd.key.informationflow.po.BlockExecutionPO;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.SymbolicExecutionPO;
@@ -38,22 +37,53 @@ import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.init.StateVars;
 import de.uka.ilkd.key.informationflow.rule.tacletbuilder.InfFlowBlockContractTacletBuilder;
-import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.Label;
+import de.uka.ilkd.key.java.PositionInfo;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.StatementContainer;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.NotEquals;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.statement.Branch;
+import de.uka.ilkd.key.java.statement.Catch;
+import de.uka.ilkd.key.java.statement.CatchAllStatement;
+import de.uka.ilkd.key.java.statement.If;
+import de.uka.ilkd.key.java.statement.JoinPointStatement;
+import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.statement.TransactionStatement;
+import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnReplacer;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.JavaBlock;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.Transformer;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.macros.WellDefinednessMacro;
 import de.uka.ilkd.key.proof.Goal;
@@ -66,17 +96,16 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
-import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
-import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
 import de.uka.ilkd.key.rule.join.procedures.JoinParams;
-import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
+import de.uka.ilkd.key.rule.join.procedures.PredicateAbstractionJoinParams;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Terms;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
 import de.uka.ilkd.key.speclang.BlockWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 
 public class BlockContractRule implements BuiltInRule {
     public static final String FULL_PRECONDITION_TERM_HINT = "fullPrecondition";
@@ -475,19 +504,24 @@ public class BlockContractRule implements BuiltInRule {
             JoinProcedure joinProcedure = application.getContract()
                     .getJoinProcedure();
 
-            // TODO (DS) Get correct join procedure params
             JoinParams joinParams;
-            if (joinProcedure instanceof JoinIfThenElse) {
-
-            } else if (joinProcedure instanceof JoinIfThenElseAntecedent) {
-
-            } else if (joinProcedure instanceof JoinWithPredicateAbstraction) {
-
-            } else if (joinProcedure instanceof JoinWeaken) {
-
+            if (joinProcedure instanceof JoinWithPredicateAbstraction) {
+                joinParams = new PredicateAbstractionJoinParams(
+                        new Pair<>(application.getContract().getJoinParams()[0],
+                                application.getContract().getJoinParams()[1]));
             } else {
-                throw new RuntimeException();
+                // NOTE: Add more specialized JoinParams instantiations here
+                // when we have more non-parametric operations
+
+                joinParams = new JoinParams(joinProcedure.getClass()) {
+                    @Override
+                    public JoinProcedure getInstantiatedJoinProcedure(
+                            Services services) {
+                        return joinProcedure;
+                    }
+                };
             }
+
             services.getSpecificationRepository().addJoinPointMergeSpec(jps,
                     joinParams);
 

@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -31,13 +32,15 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.rule.join.procedures.PredicateAbstractionJoinParams;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
 /**
  * <p>
@@ -101,6 +104,17 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     public static final String FULL_INVARIANT_TERM_HINT = "fullInvariant";
 
     private static final Name NAME = new Name("Loop (Scope) Invariant");
+
+    /**
+     * TODO
+     */
+    private static final String MERGE_AFTER_LOOP_SCOPE_CFG = "mergeAfterLoopScope";
+
+    /**
+     * TODO
+     */
+    private static final String MERGE_AFTER_LOOP_SCOPE_CFG_ON = //
+            MERGE_AFTER_LOOP_SCOPE_CFG + ":on";
 
     @Override
     public Name name() {
@@ -337,38 +351,66 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         Statement ifBody = new StatementBlock(
                 stmnt.toArray(new Statement[stmnt.size()]));
 
-        // Add a JoinPointStatement before each return.
+        // Check if we should apply state merging after the loop scope
+        final HashMap<String, String> choices = services.getProof()
+                .getSettings().getChoiceSettings().getDefaultChoices();
 
-        final ProgramVariable joinPointVar = //
-                KeYJavaASTFactory
-                        .localVariable( //
-                                services.getVariableNamer()
-                                        .getTemporaryNameProposal("return_x"),
-                                loopScopeIdxVar.getKeYJavaType());
+        final boolean mergeAfterLoopScope = choices
+                .containsKey(MERGE_AFTER_LOOP_SCOPE_CFG)
+                && choices.get(MERGE_AFTER_LOOP_SCOPE_CFG)
+                        .equals(MERGE_AFTER_LOOP_SCOPE_CFG_ON);
 
-        // HACK -->
-        // \simple(\int h -> {h >= 0})
-        String postCond = LogicPrinter
-                .quickPrintTerm(((FunctionalOperationContract) services
-                        .getSpecificationRepository()
-                        .getPOForProof(services.getProof()).getContract())
-                                .getPost(),
-                        services);
-        String predSpec = "(\\int _ph -> {"
-                + postCond.replaceAll("result", "_ph") + "}";
-        JoinPointStatement jps = new JoinPointStatement(joinPointVar,
-                JoinWithPredicateAbstractionFactory.instance(),
-                new String[] { "\\simple", predSpec });
-        // <-- HACK
+        if (mergeAfterLoopScope) {
+            // Add a JoinPointStatement before each return.
 
-        // JoinPointStatement jps = new JoinPointStatement(joinPointVar);
+            // TODO: Check that there is no error if we are verifying a void
+            // method.
+            // TODO: Also add JPSs before breaks and continues.
+            // TODO: What about labeled breaks / continues?
 
-        ifBody = (Statement) new ProgramElementPrepender(
-                (JavaProgramElement) ifBody, services)
-                        .append(elem -> elem instanceof Return, jps);
+            final ProgramVariable joinPointVar = //
+                    KeYJavaASTFactory.localVariable( //
+                            services.getVariableNamer()
+                                    .getTemporaryNameProposal("return_x"),
+                            loopScopeIdxVar.getKeYJavaType());
 
-        // TODO: Also add JPSs before breaks and continues.
-        // TODO: What about labeled breaks / continues?
+            // Structure of first proof node is "==> Pre -> {U} \<{ P }\> Post
+            assert services.getProof().root().sequent().size() == 1;
+
+            Term PO = services.getProof().root().sequent().getFormulabyNr(1)
+                    .formula();
+            assert PO.op() == Junctor.IMP;
+
+            PO = TermBuilder.goBelowUpdates( //
+                    PO.sub(1) // Conclusion of the implication
+            ) // Modality with post condition
+                    .sub(0); // Post condition
+
+            final String postCond = LogicPrinter.quickPrintTerm(
+                    extractPOSubWithResultVar(services, PO), services);
+
+            // TODO: This is quite fragile, we should find away around these
+            // String manipulations.
+            final String predSpec = "(\\int _ph -> {"
+                    + postCond.replaceAll("result", "_ph") + "}";
+
+            final PredicateAbstractionJoinParams predAbstrJoinParams = //
+                    new PredicateAbstractionJoinParams(
+                            new Pair<String, String>("\\simple", predSpec));
+
+            final JoinPointStatement jps = new JoinPointStatement(joinPointVar);
+
+            services.getSpecificationRepository().addJoinPointMergeSpec(jps,
+                    predAbstrJoinParams);
+
+            // Add a JPS before every return statement.
+            // We only do this for non-void methods so far.
+            ifBody = (Statement) new ProgramElementPrepender(
+                    (JavaProgramElement) ifBody, services)
+                            .append(elem -> (elem instanceof Return
+                                    && ((Return) elem).getExpression() != null),
+                                    jps);
+        } // END if (mergeAfterLoopScope)
 
         for (int i = labels.size() - 1; i >= 0; i--) {
             Label label = labels.get(i);
@@ -384,14 +426,52 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         final StatementBlock newBlock = KeYJavaASTFactory.block(
                 KeYJavaASTFactory.declare(joinPointVar),
-                KeYJavaASTFactory.declare(loopScopeIdxVar,
-                        KeYJavaASTFactory.falseLiteral()),
-                loopScope);
+                KeYJavaASTFactory.declare(loopScopeIdxVar), loopScope);
 
         final ProgramElement result = new ProgramElementReplacer(
                 origProg.program(), services).replace(stmtToReplace, newBlock);
 
         return result;
+    }
+
+    /**
+     * Extracts the smallest subformula of postCondition containing the result
+     * variable such that the result variable is not contained in any other
+     * subformula.
+     * 
+     * @param services
+     *            The {@link Services} object.
+     * @param PO
+     *            The proof obligation that should be reduced to the parts about
+     *            the result variable.
+     * @return A subformula including the result variable.
+     */
+    private Term extractPOSubWithResultVar(Services services,
+            Term postCondition) {
+        Term newSubterm = null;
+        while (true) {
+            for (Term sub : postCondition.subs()) {
+                if (JoinRuleUtils.getLocationVariablesHashSet(sub, services)
+                        .contains((LocationVariable) services.getNamespaces()
+                                .programVariables().lookup("result"))) {
+                    if (newSubterm == null) {
+                        newSubterm = sub;
+                    } else {
+                        newSubterm = null;
+                        break;
+                    }
+                }
+            }
+
+            if (newSubterm != null) {
+                postCondition = newSubterm;
+                newSubterm = null;
+            } else {
+                break;
+            }
+        }
+
+        return postCondition;
     }
 
     /**

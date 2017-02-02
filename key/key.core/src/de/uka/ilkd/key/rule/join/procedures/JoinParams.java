@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.rule.join.procedures;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 
 /**
@@ -17,4 +18,21 @@ public abstract class JoinParams {
     public Class<? extends JoinProcedure> getJoinProc() {
         return joinProc;
     }
+
+    /**
+     * TODO
+     * 
+     * @return
+     */
+    public Class<? extends JoinProcedure> getJoinProcedure() {
+        return joinProc;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param services
+     * @return
+     */
+    public abstract JoinProcedure getInstantiatedJoinProcedure(Services services);
 }
