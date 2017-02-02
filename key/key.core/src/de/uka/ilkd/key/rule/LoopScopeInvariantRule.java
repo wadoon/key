@@ -38,7 +38,9 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.rule.join.procedures.PredicateAbstractionJoinParams;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
@@ -355,17 +357,21 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final boolean mergeAfterLoopScope = isMergeAfterLoopScopeOptionSet(
                 services) && !isVoidMethod(services);
 
-        final ProgramVariable joinPointReturnVar;
         if (mergeAfterLoopScope) {
-            joinPointReturnVar = //
+            final String loopScopeIdxVarName = loopScopeIdxVar.name()
+                    .toString();
+            // Base the name of the name of the loopScope index variable (remove
+            // the temporary suffix)
+            final ProgramVariable joinPointReturnVar = //
                     KeYJavaASTFactory.localVariable( //
-                            services.getVariableNamer()
-                                    .getTemporaryNameProposal("return_x"),
+                            services.getTermBuilder().newName("return_"
+                                    + loopScopeIdxVarName.substring( //
+                                            0, loopScopeIdxVarName
+                                                    .indexOf('#'))),
                             loopScopeIdxVar.getKeYJavaType());
+
             ifBody = insertJoinPointStatementsForReturn(services, ifBody,
                     joinPointReturnVar);
-        } else {
-            joinPointReturnVar = null;
         }
 
         for (int i = labels.size() - 1; i >= 0; i--) {
@@ -383,7 +389,6 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final StatementBlock newBlock;
         if (mergeAfterLoopScope) {
             newBlock = KeYJavaASTFactory.block(
-                    KeYJavaASTFactory.declare(joinPointReturnVar),
                     KeYJavaASTFactory.declare(loopScopeIdxVar), loopScope);
         } else {
             newBlock = KeYJavaASTFactory.block(
