@@ -360,6 +360,13 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                 && choices.get(MERGE_AFTER_LOOP_SCOPE_CFG)
                         .equals(MERGE_AFTER_LOOP_SCOPE_CFG_ON);
 
+        final ProgramVariable joinPointReturnVar = //
+                KeYJavaASTFactory
+                        .localVariable( //
+                                services.getVariableNamer()
+                                        .getTemporaryNameProposal("return_x"),
+                                loopScopeIdxVar.getKeYJavaType());
+
         if (mergeAfterLoopScope) {
             // Add a JoinPointStatement before each return.
 
@@ -367,12 +374,6 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             // method.
             // TODO: Also add JPSs before breaks and continues.
             // TODO: What about labeled breaks / continues?
-
-            final ProgramVariable joinPointVar = //
-                    KeYJavaASTFactory.localVariable( //
-                            services.getVariableNamer()
-                                    .getTemporaryNameProposal("return_x"),
-                            loopScopeIdxVar.getKeYJavaType());
 
             // Structure of first proof node is "==> Pre -> {U} \<{ P }\> Post
             assert services.getProof().root().sequent().size() == 1;
@@ -398,7 +399,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                     new PredicateAbstractionJoinParams(
                             new Pair<String, String>("\\simple", predSpec));
 
-            final JoinPointStatement jps = new JoinPointStatement(joinPointVar);
+            final JoinPointStatement jps = new JoinPointStatement(joinPointReturnVar);
 
             services.getSpecificationRepository().addJoinPointMergeSpec(jps,
                     predAbstrJoinParams);
@@ -424,9 +425,15 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final LoopScopeBlock loopScope = new LoopScopeBlock(loopScopeIdxVar,
                 KeYJavaASTFactory.block(newIf));
 
-        final StatementBlock newBlock = KeYJavaASTFactory.block(
-                KeYJavaASTFactory.declare(joinPointVar),
-                KeYJavaASTFactory.declare(loopScopeIdxVar), loopScope);
+        final StatementBlock newBlock;
+        if (mergeAfterLoopScope) {
+            newBlock = KeYJavaASTFactory.block(
+                    KeYJavaASTFactory.declare(joinPointReturnVar),
+                    KeYJavaASTFactory.declare(loopScopeIdxVar), loopScope);
+        } else {
+            newBlock = KeYJavaASTFactory.block(
+                    KeYJavaASTFactory.declare(loopScopeIdxVar), loopScope);
+        }
 
         final ProgramElement result = new ProgramElementReplacer(
                 origProg.program(), services).replace(stmtToReplace, newBlock);
