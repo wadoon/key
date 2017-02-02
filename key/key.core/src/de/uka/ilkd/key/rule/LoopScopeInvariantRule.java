@@ -453,7 +453,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final String postCond = LogicPrinter.quickPrintTerm(
                 extractPOSubWithResultVar(services, PO), services);
 
-        // TODO: This is quite fragile, we should find away around these
+        // TODO: This is quite fragile, we should find a way around these
         // String manipulations.
         final String predSpec = "(\\int _ph -> {"
                 + postCond.replaceAll("result", "_ph") + "}";
