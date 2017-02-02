@@ -352,66 +352,21 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                 stmnt.toArray(new Statement[stmnt.size()]));
 
         // Check if we should apply state merging after the loop scope
-        final HashMap<String, String> choices = services.getProof()
-                .getSettings().getChoiceSettings().getDefaultChoices();
+        final boolean mergeAfterLoopScope = isMergeAfterLoopScopeOptionSet(
+                services) && !isVoidMethod(services);
 
-        final boolean mergeAfterLoopScope = choices
-                .containsKey(MERGE_AFTER_LOOP_SCOPE_CFG)
-                && choices.get(MERGE_AFTER_LOOP_SCOPE_CFG)
-                        .equals(MERGE_AFTER_LOOP_SCOPE_CFG_ON);
-
-        final ProgramVariable joinPointReturnVar = //
-                KeYJavaASTFactory
-                        .localVariable( //
-                                services.getVariableNamer()
-                                        .getTemporaryNameProposal("return_x"),
-                                loopScopeIdxVar.getKeYJavaType());
-
+        final ProgramVariable joinPointReturnVar;
         if (mergeAfterLoopScope) {
-            // Add a JoinPointStatement before each return.
-
-            // TODO: Check that there is no error if we are verifying a void
-            // method.
-            // TODO: Also add JPSs before breaks and continues.
-            // TODO: What about labeled breaks / continues?
-
-            // Structure of first proof node is "==> Pre -> {U} \<{ P }\> Post
-            assert services.getProof().root().sequent().size() == 1;
-
-            Term PO = services.getProof().root().sequent().getFormulabyNr(1)
-                    .formula();
-            assert PO.op() == Junctor.IMP;
-
-            PO = TermBuilder.goBelowUpdates( //
-                    PO.sub(1) // Conclusion of the implication
-            ) // Modality with post condition
-                    .sub(0); // Post condition
-
-            final String postCond = LogicPrinter.quickPrintTerm(
-                    extractPOSubWithResultVar(services, PO), services);
-
-            // TODO: This is quite fragile, we should find away around these
-            // String manipulations.
-            final String predSpec = "(\\int _ph -> {"
-                    + postCond.replaceAll("result", "_ph") + "}";
-
-            final PredicateAbstractionJoinParams predAbstrJoinParams = //
-                    new PredicateAbstractionJoinParams(
-                            new Pair<String, String>("\\simple", predSpec));
-
-            final JoinPointStatement jps = new JoinPointStatement(joinPointReturnVar);
-
-            services.getSpecificationRepository().addJoinPointMergeSpec(jps,
-                    predAbstrJoinParams);
-
-            // Add a JPS before every return statement.
-            // We only do this for non-void methods so far.
-            ifBody = (Statement) new ProgramElementPrepender(
-                    (JavaProgramElement) ifBody, services)
-                            .append(elem -> (elem instanceof Return
-                                    && ((Return) elem).getExpression() != null),
-                                    jps);
-        } // END if (mergeAfterLoopScope)
+            joinPointReturnVar = //
+                    KeYJavaASTFactory.localVariable( //
+                            services.getVariableNamer()
+                                    .getTemporaryNameProposal("return_x"),
+                            loopScopeIdxVar.getKeYJavaType());
+            ifBody = insertJoinPointStatementsForReturn(services, ifBody,
+                    joinPointReturnVar);
+        } else {
+            joinPointReturnVar = null;
+        }
 
         for (int i = labels.size() - 1; i >= 0; i--) {
             Label label = labels.get(i);
@@ -439,6 +394,88 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                 origProg.program(), services).replace(stmtToReplace, newBlock);
 
         return result;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param services
+     * @return
+     */
+    private static boolean isMergeAfterLoopScopeOptionSet(Services services) {
+        final HashMap<String, String> choices = services.getProof()
+                .getSettings().getChoiceSettings().getDefaultChoices();
+
+        return choices.containsKey(MERGE_AFTER_LOOP_SCOPE_CFG)
+                && choices.get(MERGE_AFTER_LOOP_SCOPE_CFG)
+                        .equals(MERGE_AFTER_LOOP_SCOPE_CFG_ON);
+    }
+
+    /**
+     * TODO
+     * 
+     * @param services
+     * @return
+     */
+    private static boolean isVoidMethod(Services services) {
+        return services.getSpecificationRepository()
+                .getTargetOfProof(services.getProof())
+                .getType() == KeYJavaType.VOID_TYPE;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param services
+     * @param ifBody
+     * @param joinPointReturnVar
+     * @return
+     */
+    private Statement insertJoinPointStatementsForReturn(Services services,
+            Statement ifBody, final ProgramVariable joinPointReturnVar) {
+        // Add a JoinPointStatement before each return.
+
+        // TODO: Also add JPSs before breaks and continues.
+        // TODO: What about labeled breaks / continues?
+
+        // Structure of first proof node is "==> Pre -> {U} \<{ P }\> Post
+        assert services.getProof().root().sequent().size() == 1;
+
+        Term PO = services.getProof().root().sequent().getFormulabyNr(1)
+                .formula();
+        assert PO.op() == Junctor.IMP;
+
+        PO = TermBuilder.goBelowUpdates( //
+                PO.sub(1) // Conclusion of the implication
+        ) // Modality with post condition
+                .sub(0); // Post condition
+
+        final String postCond = LogicPrinter.quickPrintTerm(
+                extractPOSubWithResultVar(services, PO), services);
+
+        // TODO: This is quite fragile, we should find away around these
+        // String manipulations.
+        final String predSpec = "(\\int _ph -> {"
+                + postCond.replaceAll("result", "_ph") + "}";
+
+        final PredicateAbstractionJoinParams predAbstrJoinParams = //
+                new PredicateAbstractionJoinParams(
+                        new Pair<String, String>("\\simple", predSpec));
+
+        final JoinPointStatement jps = new JoinPointStatement(
+                joinPointReturnVar);
+
+        services.getSpecificationRepository().addJoinPointMergeSpec(jps,
+                predAbstrJoinParams);
+
+        // Add a JPS before every return statement.
+        // We only do this for non-void methods so far.
+        ifBody = (Statement) new ProgramElementPrepender(
+                (JavaProgramElement) ifBody, services)
+                        .append(elem -> (elem instanceof Return
+                                && ((Return) elem).getExpression() != null),
+                                jps);
+        return ifBody;
     }
 
     /**
