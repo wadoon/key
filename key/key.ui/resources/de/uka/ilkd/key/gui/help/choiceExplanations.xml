@@ -46,11 +46,12 @@ only be closable if the concrete join instance is correct.
 </entry>
 
 <entry key="mergeAfterLoopScope">
-Specifies whether the proof nodes after the execution of return statements
-in loops should be merged. This only applies to non-void methods. For the
-merging, the post condition of the method to prove is used to construct a
-specialized predicate abstraction domain (only the parts of the post condition
-talking about the method result are considered).
+Specifies whether the proof nodes after the execution of return
+statements in loops should be merged. This only applies to non-void
+methods. For the merging, the post condition of the method to prove
+is used to construct a specialized predicate abstraction domain
+(only the parts of the post condition talking about the method result
+are considered).
 
 When set to true, a Join Point Statement is inserted before every return
 inside the loop. In the future, this will be extended by Join Point Statements
