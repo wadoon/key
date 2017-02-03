@@ -379,6 +379,8 @@ public final class Goal  {
      */
     public void setSequent(SequentChangeInfo sci) {
         node().setSequent(sci.sequent());
+        //XXXSaG: Is this the right place
+        node().getNodeInfo().setSequentChangeInfo(sci);
         //VK reminder: now update the index
        	fireSequentChanged(sci);
     }

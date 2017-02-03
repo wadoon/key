@@ -1,25 +1,26 @@
 package de.uka.ilkd.key.gui.prooftree;
 
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
 import javax.swing.tree.TreeNode;
 import java.util.Enumeration;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
+ * Filter Proof Tree View acc. to nodes List
  * Created by sarah on 12/23/16.
  */
 public class PathFilter extends ProofTreeViewFilter.NodeFilter{
     boolean active;
 
-    public void setNodes(LinkedList<Node> nodes) {
+    public void setNodes(List<Node> nodes) {
         this.nodes = nodes;
         this.active = false;
     }
 
-    LinkedList<Node> nodes;
-        public PathFilter(LinkedList<Node> nodes){
+    List<Node> nodes;
+        public PathFilter(List<Node> nodes){
             if (nodes == null) {
                 this.nodes = new LinkedList<>();
 

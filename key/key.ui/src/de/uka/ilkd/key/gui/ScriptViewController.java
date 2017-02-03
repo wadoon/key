@@ -296,6 +296,7 @@ public class ScriptViewController implements ActionListener{
                 for (Node node : nodes) {
                     System.out.println("Node number: "+node.serialNr());
                 }
+                //Filter Nodes acc. to nodes List
                 PathFilter pf = new PathFilter(nodes);
                 mainWindow.getProofTreeView().setFilter(pf);
             }

@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import de.uka.ilkd.key.logic.*;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.java.ObjectUtil;
 
@@ -26,10 +27,6 @@ import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
@@ -71,6 +68,9 @@ public class NodeInfo {
     private String notes;
 
 
+    /**Info about the changes to the sequent of this node**/
+    private SequentChangeInfo sequentChangeInfo;
+
     public NodeInfo(Node node) {
         this.node = node;
     }
@@ -89,6 +89,13 @@ public class NodeInfo {
         symbolicExecNames.add(new Name("loop_expand"));
     }
 
+    public SequentChangeInfo getSequentChangeInfo() {
+        return sequentChangeInfo;
+    }
+
+    public void setSequentChangeInfo(SequentChangeInfo sequentChangeInfo) {
+        this.sequentChangeInfo = sequentChangeInfo;
+    }
 
     /**
      * determines the first and active statement if the applied

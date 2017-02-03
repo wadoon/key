@@ -13,46 +13,18 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.joinrule.JoinRuleMenuItem;
+import de.uka.ilkd.key.gui.prooftree.PathFilter;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NameCreationInfo;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -63,16 +35,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.join.JoinIsApplicable;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
-import de.uka.ilkd.key.rule.BlockContractRule;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
@@ -81,6 +44,13 @@ import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.*;
 
 
 /**
@@ -98,6 +68,7 @@ public class TacletMenu extends JMenu {
 	private static final String DISABLE_ABBREVIATION = "Disable abbreviation";
 	private static final String CHANGE_ABBREVIATION = "Change abbreviation";
 	private static final String JUMP_TO_INTRO = "Jump to introduction";
+    private static final String SHOW_HISTORY = "Show History";
 	private static final String APPLY_CONTRACT = "Apply Contract";
 	private static final String CHOOSE_AND_APPLY_CONTRACT = "Choose and Apply Contract";
 	private static final String ENTER_LOOP_SPECIFICATION = "Enter Loop Specification";
@@ -249,6 +220,10 @@ public class TacletMenu extends JMenu {
 	    JMenuItem item = new JMenuItem(JUMP_TO_INTRO);
 	    item.addActionListener(control);
 	    add(item);
+
+        JMenuItem item2 = new JMenuItem(SHOW_HISTORY);
+        item2.addActionListener(control);
+        add(item2);
 	}
 
     }
@@ -685,7 +660,23 @@ public class TacletMenu extends JMenu {
                  boolean antec = pos.getPosInOccurrence().isInAntec();
                  Node parent = XXXFindParent.findParent(formula, antec, mediator.getSelectedNode());
                  mediator.getSelectionModel().setSelectedNode(parent);
-             }
+             }else if(((JMenuItem)e.getSource()).getText().
+                startsWith(SHOW_HISTORY)) {
+            SequentFormula formula = pos.getPosInOccurrence().sequentFormula();
+            boolean antec = pos.getPosInOccurrence().isInAntec();
+
+			List<TrackNode> toHighlight = XXXFindParent.trackTransitive(formula, pos.getPosInOccurrence(), antec, mediator.getSelectedNode());
+			mediator.setToHighlight(toHighlight);
+			List<Node> nodes = new LinkedList<>();
+			for (TrackNode trackNode : toHighlight) {
+				nodes.add(trackNode.getNode());
+			}
+
+			PathFilter pf = new PathFilter(nodes);
+			MainWindow.getInstance().getProofTreeView().setFilter(pf);
+
+        }
+
 	    }
 	}
     }
