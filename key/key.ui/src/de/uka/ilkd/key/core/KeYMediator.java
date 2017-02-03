@@ -13,18 +13,11 @@
 
 package de.uka.ilkd.key.core;
 
-import java.util.EventObject;
-
-import javax.swing.Action;
-import javax.swing.SwingUtilities;
-import javax.swing.event.EventListenerList;
-
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.ProofControl;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
+import de.uka.ilkd.key.gui.nodeviews.TrackNode;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
@@ -36,16 +29,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.pp.NotationInfo;
-import de.uka.ilkd.key.proof.DefaultTaskFinishedInfo;
-import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofEvent;
-import de.uka.ilkd.key.proof.ProofTreeAdapter;
-import de.uka.ilkd.key.proof.ProofTreeEvent;
-import de.uka.ilkd.key.proof.RuleAppListener;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCut;
 import de.uka.ilkd.key.proof.delayedcut.DelayedCutListener;
@@ -60,6 +44,12 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
+import org.key_project.util.collection.ImmutableList;
+
+import javax.swing.*;
+import javax.swing.event.EventListenerList;
+import java.util.EventObject;
+import java.util.List;
 
 /**
  * The {@link KeYMediator} provides control logic for the user interface implemented in Swing.
@@ -89,6 +79,18 @@ public class KeYMediator {
     private KeYSelectionModel keySelectionModel;
 
     private TacletFilter filterForInteractiveProving;
+
+    //List with Objects contining nodes for History filter and the pios to highlight for the sequents
+    private List<TrackNode> toHighlight;
+
+
+    public List<TrackNode> getToHighlight() {
+        return toHighlight;
+    }
+
+    public void setToHighlight(List<TrackNode> toHighlight) {
+        this.toHighlight = toHighlight;
+    }
 
     /**
      * An optional used {@link AutoSaver}.

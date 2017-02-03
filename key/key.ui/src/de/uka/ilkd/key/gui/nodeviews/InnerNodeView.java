@@ -13,50 +13,26 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Color;
-import java.awt.Insets;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
-import javax.swing.JTextArea;
+import javax.swing.*;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
 import javax.swing.text.Highlighter.HighlightPainter;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.TermLabelSV;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.InitialPositionTable;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
-import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.IfFormulaInstSeq;
-import de.uka.ilkd.key.rule.IfFormulaInstantiation;
-import de.uka.ilkd.key.rule.NewDependingOn;
-import de.uka.ilkd.key.rule.NewVarcond;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.inst.GenericSortInstantiations;
+import java.awt.*;
 
 public class InnerNodeView extends SequentView {
 
@@ -67,6 +43,7 @@ public class InnerNodeView extends SequentView {
     private InitialPositionTable posTable;
     public final JTextArea tacletInfo;
     Node node;
+
 
     public InnerNodeView(Node node, MainWindow mainWindow) {
         super(mainWindow);
@@ -246,12 +223,16 @@ public class InnerNodeView extends SequentView {
             = new DefaultHighlighter.DefaultHighlightPainter(new Color(0.5f, 1.0f, 0.5f, 0.4f));
     static final HighlightPainter IF_FORMULA_HIGHLIGHTER
             = new DefaultHighlighter.DefaultHighlightPainter(new Color(0.8f, 1.0f, 0.8f, 0.5f));
-
+    //SaG:
+    static final HighlightPainter HISTORY_HIGHLIGHTER
+            = new DefaultHighlighter.DefaultHighlightPainter(new Color(1.0f, 0.5f, 0.5f, 1.0f));
     private void highlightRuleAppPosition(RuleApp app) {
         try {
             // Set the find highlight first and then the if highlights
             // This seems to make cause the find one to be painted
             // over the if one.
+
+
 
             if (app.posInOccurrence() != null) {
                 highlightPos(app.posInOccurrence(), RULEAPP_HIGHLIGHTER);
@@ -263,6 +244,20 @@ public class InnerNodeView extends SequentView {
                 highlightIfInsts((IBuiltInRuleApp) app);
             }
 
+            //SaG: to highlight position in innernodes for history view
+            java.util.List<TrackNode> toHighlightList = MainWindow.getInstance().getMediator().getToHighlight();
+            if(toHighlightList != null) {
+                for (TrackNode tn : toHighlightList) {
+                    if (tn.getNode().equals(this.node)) {
+                        java.util.List<PosInOccurrence> piosList = tn.getPositionsToHighlight();
+                        for (PosInOccurrence pio : piosList) {
+                            highlightTerm(pio);
+                            refreshHighlightning= true;
+                        }
+
+                    }
+                }
+            }
         } catch (BadLocationException badLocation) {
             System.err.println("NonGoalInfoView tried to "
                     + "highlight an area "
@@ -270,6 +265,26 @@ public class InnerNodeView extends SequentView {
             System.err.println("Exception:" + badLocation);
         }
     }
+
+    /**
+     * Highlight PIO for Tracking
+     * @param pos
+     */
+    public void highlightTerm(PosInOccurrence pos) {
+        if (pos != null) {
+            HighlightPainter painter = HISTORY_HIGHLIGHTER;
+
+
+            try {
+                highlightPos(pos, painter);
+            } catch (BadLocationException badLocation) {
+                System.err.println("History Highlighter: Tried to "
+                        + "highlight an area " + "that does not exist.");
+                System.err.println("Exception:" + badLocation);
+
+            }
+       }
+     }
 
     /**
      * @param tapp The taclet app for which the if formulae should be
