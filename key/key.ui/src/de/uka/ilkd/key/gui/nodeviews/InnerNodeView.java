@@ -257,6 +257,10 @@ public class InnerNodeView extends SequentView {
 
                     }
                 }
+            }else{
+                //no highlighter needed
+                refreshHighlightning = true;
+
             }
         } catch (BadLocationException badLocation) {
             System.err.println("NonGoalInfoView tried to "

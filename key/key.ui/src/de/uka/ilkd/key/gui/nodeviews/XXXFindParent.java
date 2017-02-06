@@ -48,21 +48,12 @@ public class XXXFindParent {
 
         //finde Elternknoten
         SequentChangeInfo sci = null;
+        //Knoten hat eine Aenderung an der Top-level SequentFormula
         Pair<Node, Integer> parent = findParentWithSCI(formula, antec, node);
 
         Node parentNode = parent.first;
         int siblingNumber = parent.second;
         TrackNode nodeToAdd = null;
-
-        //if the applied rule, that resulted in adding the formula was allLeft, we have to retrieve the quantified formula
-        if (parentNode.getAppliedRuleApp().rule().displayName().equals("allLeft")) {
-            nodeToAdd = new TrackNode(parentNode);
-            RuleApp rap = parentNode.getAppliedRuleApp();
-            nodeToAdd.addPositionToHighlight(rap.posInOccurrence());
-            nodeToAdd.addParentFormula(rap.posInOccurrence().sequentFormula());
-            return nodeToAdd;
-
-        }else {
 
             if (parentNode.childrenCount() == 1) {
 
@@ -81,14 +72,15 @@ public class XXXFindParent {
 
             if (sci != null) {
                 nodeToAdd = new TrackNode(parentNode);
-                List<Pair<SequentFormula, PosInOccurrence>> parentF= findParentFormula(sci, formula);
+                RuleApp rap = parentNode.getAppliedRuleApp();
+                List<Pair<SequentFormula, PosInOccurrence>> parentF = findParentFormula(sci, formula, rap);
                 for (Pair<SequentFormula, PosInOccurrence> sequentFormulaPosInOccurrencePair : parentF) {
                     nodeToAdd.addPositionToHighlight(sequentFormulaPosInOccurrencePair.second);
                     nodeToAdd.addParentFormula(sequentFormulaPosInOccurrencePair.first);
                 }
             }
             return nodeToAdd;
-        }
+//        }
 
 
     }
@@ -96,10 +88,10 @@ public class XXXFindParent {
     /**
      * Find list of parentformulas, that need to be tracked in the following for one specific node
      * @param sci
-     * @param formula
+     * @param child
      * @return
      */
-    private static List<Pair<SequentFormula, PosInOccurrence>> findParentFormula(SequentChangeInfo sci, SequentFormula formula) {
+    private static List<Pair<SequentFormula, PosInOccurrence>> findParentFormula(SequentChangeInfo sci, SequentFormula child, RuleApp rap) {
         List<SequentFormula> parents = new LinkedList<>();
         List<Pair<SequentFormula, PosInOccurrence>> pas = new LinkedList<>();
 
@@ -117,21 +109,21 @@ public class XXXFindParent {
         ImmutableList<FormulaChangeInfo> succModif = succ.modifiedFormulas();
 
         /*Cases:
-        1. Removed Formula either in succ or antec and added formula in succ or antec:
+        1. Removed Formula either in succ or antec and added child in succ or antec:
         a & b ==> ~~> a, b ==> added (a,b), removed (a&b)
         Parent(removed): (a&b), child(ren)(added): a, b
         2. Added Formula without a delete:
         Cut: a = b ==> added(a= b) Parent: none
-        3. Child is a result of a substitution in another formula
+        3. Child is a result of a substitution in another child
         a=b, a= c ~~> c=b, a=c Modification of a posInOcc
         */
 
 
 
-        //if formula is in added list
+        //if child is in added list
         if(addedAntec.size() > 0 || addedSucc.size() > 0) {
             //search in deleted list for parents
-            if (addedAntec.contains(formula) || addedSucc.contains(formula)) {
+            if (addedAntec.contains(child) || addedSucc.contains(child)) {
                 if (delAntec.size() > 0) {
                     Iterator<SequentFormula> iter = delAntec.iterator();
                     while (iter.hasNext()) {
@@ -141,7 +133,7 @@ public class XXXFindParent {
 
                         parents.add(curr);
                         //   System.out.println("ParentAntec: "+curr);
-                        //   System.out.println("Child: "+formula);
+                        //   System.out.println("Child: "+child);
 
                     }
                 } else {
@@ -154,20 +146,30 @@ public class XXXFindParent {
 
                             parents.add(curr);
                             //System.out.println("ParentSucc: "+curr);
-                            //System.out.println("Child: "+formula);
+                            //System.out.println("Child: "+child);
                         }
 
                     }
                 }
-                //formula was added and resulted from a parent formula (allLeft)
+
+                //if child was added and did not directly resulted from changing its parent, the parent has to be added from
+                // RuleApp
                 if(parents.size() == 0){
-                    if(addedAntec.contains(formula)){
-                        parents.add(formula);
-                        pas.add(new Pair<>(formula, new PosInOccurrence(formula, PosInTerm.getTopLevel(), true)));
+                    PosInOccurrence ruleApp = rap.posInOccurrence();
+                    SequentFormula parent = ruleApp.sequentFormula();
+
+                    if(addedAntec.contains(child)){
+//                        parents.add(child);
+//                        pas.add(new Pair<>(child, new PosInOccurrence(child, PosInTerm.getTopLevel(), true)));
+                        parents.add(parent);
+                        pas.add(new Pair(parent, ruleApp));
+
                     }else{
-                        if(addedSucc.contains(formula)) {
-                            parents.add(formula);
-                            pas.add(new Pair<>(formula, new PosInOccurrence(formula, PosInTerm.getTopLevel(), false)));
+                        if(addedSucc.contains(child)) {
+                            //parents.add(child);
+                            //pas.add(new Pair<>(child, new PosInOccurrence(child, PosInTerm.getTopLevel(), false)));
+                            parents.add(parent);
+                            pas.add(new Pair(parent, ruleApp));
                         }
                     }
 
@@ -176,33 +178,33 @@ public class XXXFindParent {
             }
 
         }else{
-            //formula was not added or deleted but modified e.g. applyEq
+            //child was not added or deleted but modified e.g. applyEq
             Iterator<FormulaChangeInfo> iter = antecModif.iterator();
             while(iter.hasNext()){
                 FormulaChangeInfo fci = iter.next();
-                if(fci.getNewFormula().equals(formula)){
+                if(fci.getNewFormula().equals(child)){
                     parents.add(fci.getOriginalFormula());
                     pas.add(new Pair<>(fci.getOriginalFormula(), fci.getPositionOfModification()));
 
                     //System.out.println("ParentAntec :"+fci.getOriginalFormula());
-                    //System.out.println("Child :"+formula);
+                    //System.out.println("Child :"+child);
                 }
             }
             Iterator<FormulaChangeInfo> iter2 = succModif.iterator();
             while(iter2.hasNext()){
                 FormulaChangeInfo fci = iter2.next();
-                if(fci.getNewFormula().equals(formula)){
+                if(fci.getNewFormula().equals(child)){
                     parents.add(fci.getOriginalFormula());
                     pas.add(new Pair<>(fci.getOriginalFormula(), fci.getPositionOfModification()));
 
                    // System.out.println("ParentSucc :"+fci.getOriginalFormula());
-                    //System.out.println("Child :"+formula);
+                    //System.out.println("Child :"+child);
                 }
             }
 
         }
 
-        if(parents.size() == 0 && (addedAntec.contains(formula) || addedSucc.contains(formula))){
+        if(parents.size() == 0 && (addedAntec.contains(child) || addedSucc.contains(child))){
 
 
 
