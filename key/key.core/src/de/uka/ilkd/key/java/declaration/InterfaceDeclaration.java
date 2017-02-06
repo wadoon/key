@@ -29,10 +29,12 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 public class InterfaceDeclaration extends TypeDeclaration {
 
     protected final Extends extending;
-
+    
+//    protected final ImmutableArray<AnnotationUseSpecification> annotations;
 
     public InterfaceDeclaration() {
-	extending = null;
+    	extending = null;
+//    	annotations = null;
     }
 
     /** Construct a new outer or member interface class. */
@@ -40,8 +42,15 @@ public class InterfaceDeclaration extends TypeDeclaration {
 				ProgramElementName fullName,
 				Extends extended, MemberDeclaration[] members,
 				boolean isLibrary){
+/*    	this(modifiers, name, fullName, extended, members, isLibrary, new LinkedList<AnnotationUseSpecification>());
+    }
+    public InterfaceDeclaration(Modifier[] modifiers, ProgramElementName name,
+				ProgramElementName fullName,
+				Extends extended, MemberDeclaration[] members,
+				boolean isLibrary, List<AnnotationUseSpecification> annotationList){*/
         super(modifiers, name, fullName, members, false, isLibrary);
-	extending = extended;
+        extending = extended;
+//        annotations = new ImmutableArray<>(annotationList);
     }
 
     /** Construct a new outer or member interface class. */
@@ -65,9 +74,14 @@ public class InterfaceDeclaration extends TypeDeclaration {
      * only available as bytecode) 
      */
     public InterfaceDeclaration(ExtList children, ProgramElementName fullName,
-				boolean isLibrary) { 
+				boolean isLibrary) {
+/*    	this(children, fullName, isLibrary, new LinkedList<AnnotationUseSpecification>());
+    }
+    public InterfaceDeclaration(ExtList children, ProgramElementName fullName,
+				boolean isLibrary, List<AnnotationUseSpecification> annotationList) {*/
 	super(children, fullName, isLibrary);
 	extending=children.get(Extends.class);
+//	annotations = new ImmutableArray<>(annotationList);
     } 
 
     public InterfaceDeclaration(ProgramElementName name) { 
@@ -76,7 +90,6 @@ public class InterfaceDeclaration extends TypeDeclaration {
 	      new de.uka.ilkd.key.java.declaration.MemberDeclaration[]{}, 
 	      true);
     }
-
 
     /**
      * Returns the number of children of this node.

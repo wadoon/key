@@ -52,5 +52,4 @@ public class AnnotationUseSpecification extends Modifier implements TypeReferenc
     public int getChildCount() {
         return 1;
     }
-
 }

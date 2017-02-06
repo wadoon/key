@@ -13,12 +13,16 @@
 
 package de.uka.ilkd.key.java.declaration;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Declaration;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.declaration.modifier.Abstract;
+import de.uka.ilkd.key.java.declaration.modifier.AnnotationUseSpecification;
 import de.uka.ilkd.key.java.declaration.modifier.Final;
 import de.uka.ilkd.key.java.declaration.modifier.Ghost;
 import de.uka.ilkd.key.java.declaration.modifier.Model;
@@ -47,6 +51,7 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
      * Modifiers.
      * caches the wrapper for the modifiers. The wrapper is needed to get access
      * to the array without hurting immutabilitiy */
+	// this array also contains annotations (like @Remote)
     protected final ImmutableArray<Modifier> modArray;
 
     
@@ -54,17 +59,17 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
      *      Java declaration.
      */
     public JavaDeclaration() {
-	modArray = null;
+    	modArray = null;
     }
 
 
     public JavaDeclaration(Modifier[] mods) {
-	modArray = new ImmutableArray<Modifier>(mods);
+    	modArray = new ImmutableArray<Modifier>(mods);
     }
 
     
     public JavaDeclaration(ImmutableArray<Modifier> mods) {
-	modArray = mods;
+    	modArray = mods;
     }
 
     
@@ -75,8 +80,8 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
      * a Comment
      */     
     public JavaDeclaration(ExtList children) {
-	super(children);
-	modArray = new ImmutableArray<Modifier>(children.collect(Modifier.class));
+    	super(children);
+    	modArray = new ImmutableArray<Modifier>(children.collect(Modifier.class));
     }
 
 
@@ -224,9 +229,23 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
 
     
     /**
-     * Test whether the declaration is synchronized.
+     * Test whether the declaration is synchronised.
      */
     protected boolean isSynchronized() {
         return containsModifier(Synchronized.class);
+    }
+
+    /**
+     * Returns all modifiers of type AnnotationUseSpecification.
+     * @return all annotations
+     */
+    protected ImmutableArray<AnnotationUseSpecification> getAnnotations() {
+    	List<AnnotationUseSpecification> annotations = new LinkedList<>();
+    	for (Modifier m : modArray) {
+    		if (m instanceof AnnotationUseSpecification) {
+    			annotations.add((AnnotationUseSpecification) m);
+    		}
+    	}
+    	return new ImmutableArray<>(annotations);
     }
 }

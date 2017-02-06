@@ -1103,6 +1103,7 @@ public class Recoder2KeYConverter {
 
         KeYJavaType kjt = getKeYJavaType(td);
         ExtList members = collectChildren(td);
+
         InterfaceDeclaration keYInterfaceDecl = new InterfaceDeclaration(
                 members, new ProgramElementName(td.getFullName()),
                 isParsingLibs());
