@@ -13,32 +13,23 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.Color;
-import java.awt.Insets;
-import java.awt.Point;
-import java.awt.Rectangle;
+import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.ApplyTacletDialog;
+import de.uka.ilkd.key.gui.GUIListener;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.pp.*;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.util.Debug;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.dnd.Autoscroll;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DropTarget;
 import java.util.EventObject;
 import java.util.LinkedList;
-
-import javax.swing.SwingUtilities;
-
-import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.ApplyTacletDialog;
-import de.uka.ilkd.key.gui.GUIListener;
-import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.pp.IdentitySequentPrintFilter;
-import de.uka.ilkd.key.pp.PosInSequent;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
-import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.Debug;
 
 /**
  * This sequent view displays the sequent of an open goal and allows selection
@@ -220,6 +211,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                     setText(getSyntaxHighlighter().process(
                             getLogicPrinter().toString(),
                             getMainWindow().getMediator().getSelectedNode()));
+
                     MainWindow.getInstance().sequentViewSearchBar.search();
                 } catch (Error e) {
                     System.err.println("Error occurred while printing Sequent!");
