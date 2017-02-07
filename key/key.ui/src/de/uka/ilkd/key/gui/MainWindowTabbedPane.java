@@ -1,17 +1,14 @@
 package de.uka.ilkd.key.gui;
 
-import java.awt.Toolkit;
-import java.awt.event.KeyEvent;
-
-import javax.swing.JComponent;
-import javax.swing.JScrollPane;
-import javax.swing.JTabbedPane;
-import javax.swing.KeyStroke;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.actions.AutoModeAction;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
+import de.uka.ilkd.key.gui.scripts.ScriptView;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.KeyEvent;
 
 /**
  * {@link JTabbedPane} displayed in {@link MainWindow}, to the left of
@@ -88,7 +85,8 @@ public class MainWindowTabbedPane extends JTabbedPane {
         setPreferredSize(new java.awt.Dimension(250, 440));
 
         // proof script view
-        ScriptViewController svc = new ScriptViewController(mediator, mainWindow);
+        //ScriptViewController svc = new ScriptViewController(mediator, mainWindow);
+        ScriptView svc = new ScriptView(mediator, mainWindow);
         addTab("Script", null, svc.getPanel(), "Proof script");
         // change some key mappings which collide with font settings.
         getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
