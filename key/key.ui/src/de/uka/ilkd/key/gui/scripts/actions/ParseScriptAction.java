@@ -2,14 +2,12 @@ package de.uka.ilkd.key.gui.scripts.actions;
 
 import de.uka.ilkd.key.gui.scripts.ActualScript;
 import de.uka.ilkd.key.gui.scripts.ScriptView;
-import de.uka.ilkd.key.macros.scripts.*;
-import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.macros.scripts.ScriptException;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.*;
 
 /**
  * Created by sarah on 2/6/17.

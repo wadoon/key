@@ -4,6 +4,7 @@ import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.scripts.actions.GoToNodeAction;
 import de.uka.ilkd.key.gui.scripts.actions.ParseScriptAction;
 import de.uka.ilkd.key.gui.scripts.actions.ResetScriptAction;
+import de.uka.ilkd.key.gui.scripts.actions.ShowPathAction;
 import de.uka.ilkd.key.macros.scripts.ScriptNode;
 
 import javax.swing.*;
@@ -56,21 +57,21 @@ public class TextPopupMouseListener extends MouseAdapter {
             });
             pm.add(m);
         }
-//        {
-//            // TODO Implement me!
-//            JMenuItem m = new JMenuItem("Reparse from here");
-//            m.addActionListener(new ActionListener() {
-//                @Override
-//                public void actionPerformed(ActionEvent actionEvent) {
-//                    reparseFromCurrentPos();
-//                }
-//            });
-//            // if (node == null)
-//            {
-//                m.setEnabled(false);
-//            }
-//            pm.add(m);
-//        }
+        /*{
+            // TODO Implement me!
+            JMenuItem m = new JMenuItem("Reparse from here");
+            m.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent actionEvent) {
+                    reparseFromCurrentPos();
+                }
+            });
+            // if (node == null)
+            {
+                m.setEnabled(false);
+            }
+            pm.add(m);
+        }*/
         {
             JMenuItem m = new JMenuItem("Show in proof tree");
             if (node == null) {
@@ -79,21 +80,14 @@ public class TextPopupMouseListener extends MouseAdapter {
             m.addActionListener(new GoToNodeAction(this.view, script));
             pm.add(m);
         }
-      /*  {
+        {
             JMenuItem m = new JMenuItem("Show Path");
             if (node == null) {
                 m.setEnabled(true);
             }
-            m.addActionListener(new ActionListener() {
-
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    textArea.setCaretPosition(pos);
-                    showPath();
-                }
-            });
+            m.addActionListener(new ShowPathAction(this.view, script));
             pm.add(m);
-        }*/
+        }
 
         pm.addSeparator();
         {

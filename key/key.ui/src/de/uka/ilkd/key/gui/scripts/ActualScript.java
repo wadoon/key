@@ -150,7 +150,7 @@ public class ActualScript {
      * @param node
      * @return
      */
-    private List<Node> getPaths(Node node){
+    public List<Node> getPaths(Node node){
         LinkedList<Node> nodes = new LinkedList<>();
         nodes.add(node);
         int i = node.serialNr();

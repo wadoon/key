@@ -11,6 +11,7 @@ import org.fife.ui.rtextarea.RTextScrollPane;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
 
 /**
  * Created by sarah on 2/7/17.
@@ -79,32 +80,32 @@ public class ScriptView {
         }
 
         {
-            textArea = new RSyntaxTextArea();
+           // textArea = new RSyntaxTextArea();
 
-//              textArea = new RSyntaxTextArea() {
-//                @Override
-//                public String getToolTipText(MouseEvent e) {
-//                    int pos = viewToModel(e.getPoint());
-//                    if (oldroot != null) {
-//                        ScriptNode node = getNodeAtPos(oldroot, pos);
-//                        if (node != null) {
-//                            StringBuilder sb = new StringBuilder();
-//                            if (node.getProofNode() != null)
-//                                sb.append("\u2192" + node.getProofNode().serialNr());
-//                            else
-//                                sb.append("X");
-//                            if (node.getEncounteredException() != null) {
-//                                sb.append(" ").append(node.getEncounteredException().getMessage());
-//                            }
-//                            return sb.toString();
-//                        } else {
-//                            return "no node";
-//                        }
-//                    } else {
-//                        return "not parsed yet";
-//                    }
-//                }
-//            };
+              textArea = new RSyntaxTextArea() {
+                @Override
+                public String getToolTipText(MouseEvent e) {
+                    int pos = viewToModel(e.getPoint());
+                    if (currentScript.getCurrentRoot() != null) {
+                        ScriptNode node = getNodeAtPos(currentScript.getCurrentRoot(), pos);
+                        if (node != null) {
+                            StringBuilder sb = new StringBuilder();
+                            if (node.getProofNode() != null)
+                                sb.append("\u2192" + node.getProofNode().serialNr());
+                            else
+                                sb.append("X");
+                            if (node.getEncounteredException() != null) {
+                                sb.append(" ").append(node.getEncounteredException().getMessage());
+                            }
+                            return sb.toString();
+                        } else {
+                            return "no node";
+                        }
+                    } else {
+                        return "not parsed yet";
+                    }
+                }
+            };
 
             ToolTipManager.sharedInstance().registerComponent(textArea);
             textArea.setPopupMenu(null);
