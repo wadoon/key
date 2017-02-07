@@ -5,6 +5,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.scripts.actions.GoToNodeAction;
 import de.uka.ilkd.key.gui.scripts.actions.ParseScriptAction;
 import de.uka.ilkd.key.gui.scripts.actions.ResetScriptAction;
+import de.uka.ilkd.key.gui.scripts.actions.StepModeAction;
 import de.uka.ilkd.key.macros.scripts.ScriptNode;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
@@ -70,17 +71,16 @@ public class ScriptView {
                 g.addActionListener(new GoToNodeAction(this, currentScript));
                 bar.add(g);
             }
- /*           {
-                JButton g = new JButton("Step Mode");
-                g.setActionCommand("stepping");
-                g.addActionListener(this);
+            {
+                JButton g = new JButton("Step Mode Start");
+                g.addActionListener(new StepModeAction(this, currentScript));
                 bar.add(g);
-            }*/
+            }
             view.add(bar, BorderLayout.NORTH);
         }
 
         {
-           // textArea = new RSyntaxTextArea();
+
 
               textArea = new RSyntaxTextArea() {
                 @Override

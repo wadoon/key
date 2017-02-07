@@ -16,6 +16,7 @@ public class ActualScript {
     private static final Map<String, ProofScriptCommand> COMMANDS = loadCommands();
 
     private static final Map<String, String> SKIP = Collections.singletonMap("#1", "skip");
+
     KeYMediator mediator;
 
     /**
@@ -28,6 +29,8 @@ public class ActualScript {
      * The data structure representing the script as tree
      */
     private ScriptNode currentRoot;
+
+    private Map<String, String> currentArgMap;
 
     public Proof getAssociatedProof() {
         return associatedProof;
@@ -48,6 +51,7 @@ public class ActualScript {
     public ActualScript(KeYMediator mediator){
         this.mediator = mediator;
         this.associatedProof = mediator.getSelectedProof();
+        this.currentArgMap = new HashMap<String, String>();
         this.currentRoot = null;
     }
 
@@ -113,8 +117,8 @@ public class ActualScript {
         } else {
 
 
-            java.util.List<Node> leaves = act(newnode);
-            java.util.List<ScriptNode> children = newnode.getChildren();
+            List<Node> leaves = act(newnode);
+            List<ScriptNode> children = newnode.getChildren();
 
             //            if(children.size() != 0 && children.size() != leaves.size()) {
             //                throw new ScriptException("Command " + argMap.get("#literal") +
@@ -124,7 +128,7 @@ public class ActualScript {
 
             if(children.size() > leaves.size()) {
                 throw new ScriptException("Command " +
-                        //argMap.get("#literal") +
+                        this.currentArgMap.get("#literal") +
                         " requires " + leaves.size() +
                         " children, but received " + children.size());
             }
@@ -171,7 +175,7 @@ public class ActualScript {
         else return 0;
     }
 
-    private java.util.List<Node> act(ScriptNode newnode) throws ScriptException, InterruptedException{
+    private List<Node> act(ScriptNode newnode) throws ScriptException, InterruptedException{
 
         Node node = newnode.getProofNode();
         if(node == null) {
@@ -198,6 +202,7 @@ public class ActualScript {
 
             String lit = argMap.get("#literal");
             argMap.put("#literal", "macro "+lit);
+            this.currentArgMap = argMap;
 
         }
 
