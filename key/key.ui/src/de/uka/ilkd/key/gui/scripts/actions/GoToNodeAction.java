@@ -16,8 +16,10 @@ public class GoToNodeAction extends AbstractAction {
 
     private static final String name = "Show in proof tree";
 
-    ScriptView view;
-    ActualScript currentScript;
+    private ScriptView view;
+    private ActualScript currentScript;
+
+
     public GoToNodeAction(ScriptView view, ActualScript currentScript){
         super(name);
         this.view = view;
@@ -30,7 +32,6 @@ public class GoToNodeAction extends AbstractAction {
         goTo();
 
     }
-
 
     private void goTo() {
         int pos = view.getTextArea().getCaretPosition();
