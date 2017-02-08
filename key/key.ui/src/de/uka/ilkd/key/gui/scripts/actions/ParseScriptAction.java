@@ -4,7 +4,6 @@ import de.uka.ilkd.key.gui.scripts.ActualScript;
 import de.uka.ilkd.key.gui.scripts.ScriptView;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.io.StringReader;
@@ -12,13 +11,15 @@ import java.io.StringReader;
 /**
  * Created by sarah on 2/6/17.
  */
-public class ParseScriptAction extends AbstractAction {
+public class ParseScriptAction extends AbstractScriptAction {
 
     private ScriptView view;
 
     private ActualScript script;
 
+    public static final String name = "Parse Script";
     public ParseScriptAction(ScriptView view, ActualScript script){
+        super(name, view, script);
         this.script = script;
         this.view = view;
     }

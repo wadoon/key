@@ -7,21 +7,20 @@ import de.uka.ilkd.key.gui.scripts.ScriptView;
 import de.uka.ilkd.key.macros.scripts.ScriptNode;
 import de.uka.ilkd.key.proof.Node;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.List;
 
 /**
  * Created by sarah on 2/6/17.
  */
-public class ShowPathAction extends AbstractAction {
+public class ShowPathAction extends AbstractScriptAction {
 
     private ScriptView view;
     private ActualScript script;
     public final static String name = "Show Path";
 
     public ShowPathAction(ScriptView view, ActualScript script){
-        super(name);
+        super(name, view, script);
         this.view = view;
         this.script = script;
 

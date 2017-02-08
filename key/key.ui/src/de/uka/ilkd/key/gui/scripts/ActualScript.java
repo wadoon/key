@@ -220,7 +220,7 @@ public class ActualScript {
             newnode.clearChildren();
         }
 
-        java.util.List<Node> leaves = new ArrayList<Node>();
+        List<Node> leaves = new ArrayList<Node>();
         findLeaves(node, leaves);
         leaves.remove(node);
         //  getPaths(node);
