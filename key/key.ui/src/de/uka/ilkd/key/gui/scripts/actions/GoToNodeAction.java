@@ -6,13 +6,12 @@ import de.uka.ilkd.key.gui.scripts.ScriptView;
 import de.uka.ilkd.key.macros.scripts.ScriptNode;
 import de.uka.ilkd.key.proof.Node;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 /**
  * Created by sarah on 1/31/17.
  */
-public class GoToNodeAction extends AbstractAction {
+public class GoToNodeAction extends AbstractScriptAction {
 
     private static final String name = "Show in proof tree";
 
@@ -21,20 +20,18 @@ public class GoToNodeAction extends AbstractAction {
 
 
     public GoToNodeAction(ScriptView view, ActualScript currentScript){
-        super(name);
+        super(name, view, currentScript);
         this.view = view;
         this.currentScript = currentScript;
-
     }
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        goTo();
-
+        int pos = view.getTextArea().getCaretPosition();
+        goTo(pos);
     }
 
-    private void goTo() {
-        int pos = view.getTextArea().getCaretPosition();
+    private void goTo(int pos) {
         if(currentScript.getCurrentRoot() == null)
             ExceptionDialog.showDialog(view.getMainWindow(), new Exception("There is currently no parsed script tree to browse."));
 
@@ -46,5 +43,4 @@ public class GoToNodeAction extends AbstractAction {
             }
         }
     }
-
 }

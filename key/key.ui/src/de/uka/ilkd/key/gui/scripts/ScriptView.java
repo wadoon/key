@@ -7,7 +7,6 @@ import de.uka.ilkd.key.gui.scripts.actions.ParseScriptAction;
 import de.uka.ilkd.key.gui.scripts.actions.ResetScriptAction;
 import de.uka.ilkd.key.gui.scripts.actions.StepModeAction;
 import de.uka.ilkd.key.macros.scripts.ScriptNode;
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import javax.swing.*;
@@ -20,7 +19,7 @@ import java.awt.event.MouseEvent;
 public class ScriptView {
 
 
-    public RSyntaxTextArea getTextArea() {
+    public ScriptTextArea getTextArea() {
         return textArea;
     }
 
@@ -32,7 +31,7 @@ public class ScriptView {
         return mediator;
     }
 
-    private RSyntaxTextArea textArea;
+    private ScriptTextArea textArea;
     private MainWindow mainWindow;
     private KeYMediator mediator;
     private JPanel view;
@@ -41,7 +40,7 @@ public class ScriptView {
 
     private ActualScript currentScript;
 
-
+    private JToolBar bar;
 
     public ScriptView(KeYMediator mediator, MainWindow mainWindow){
         this.mainWindow = mainWindow;
@@ -54,7 +53,7 @@ public class ScriptView {
     private void initPanel() {
         view = new JPanel(new BorderLayout());
         {
-            JToolBar bar = new JToolBar();
+            bar = new JToolBar();
             bar.setFloatable(false);
             {
                 JButton b = new JButton("R");
@@ -72,8 +71,8 @@ public class ScriptView {
                 bar.add(g);
             }
             {
-                JButton g = new JButton("Step Mode Start");
-                g.addActionListener(new StepModeAction(this, currentScript));
+                JButton g = new JButton("Start Step Mode");
+                g.addActionListener(new StepModeAction(g, this, currentScript));
                 bar.add(g);
             }
             view.add(bar, BorderLayout.NORTH);
@@ -82,7 +81,9 @@ public class ScriptView {
         {
 
 
-              textArea = new RSyntaxTextArea() {
+             // textArea = new RSyntaxTextArea() {
+            textArea = new ScriptTextArea() {
+
                 @Override
                 public String getToolTipText(MouseEvent e) {
                     int pos = viewToModel(e.getPoint());
@@ -141,6 +142,16 @@ public class ScriptView {
 
     public Component getPanel() {
         return view;
+    }
+
+    public void disableReset(){
+        bar.getComponent(0).setEnabled(false);
+
+    }
+
+    public void enableReset(){
+        bar.getComponent(0).setEnabled(true);
+
     }
 
 

@@ -3,17 +3,19 @@ package de.uka.ilkd.key.gui.scripts.actions;
 import de.uka.ilkd.key.gui.scripts.ActualScript;
 import de.uka.ilkd.key.gui.scripts.ScriptView;
 
-import javax.swing.*;
 import java.awt.event.ActionEvent;
 
 /**
  * Created by sarah on 2/6/17.
  */
-public class ResetScriptAction extends AbstractAction {
+public class ResetScriptAction extends AbstractScriptAction {
 
     private final ActualScript currentScript;
     private ScriptView view;
+
+    public static final String name ="Reset State";
     public ResetScriptAction(ScriptView view, ActualScript currentScript){
+        super(name, view, currentScript);
         this.currentScript = currentScript;
         this.view = view;
     }
