@@ -19,10 +19,10 @@ public class ShowPathAction extends AbstractScriptAction {
     private ActualScript script;
     public final static String name = "Show Path";
 
-    public ShowPathAction(ScriptView view, ActualScript script){
-        super(name, view, script);
+    public ShowPathAction(ScriptView view){
+        super(name, view);
         this.view = view;
-        this.script = script;
+        this.script = view.getCurrentScript();
 
 
     }

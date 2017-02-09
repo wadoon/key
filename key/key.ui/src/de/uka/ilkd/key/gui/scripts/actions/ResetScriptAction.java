@@ -14,9 +14,9 @@ public class ResetScriptAction extends AbstractScriptAction {
     private ScriptView view;
 
     public static final String name ="Reset State";
-    public ResetScriptAction(ScriptView view, ActualScript currentScript){
-        super(name, view, currentScript);
-        this.currentScript = currentScript;
+    public ResetScriptAction(ScriptView view){
+        super(name, view);
+        this.currentScript = view.getCurrentScript();
         this.view = view;
     }
 

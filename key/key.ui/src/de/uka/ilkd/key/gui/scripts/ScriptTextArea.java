@@ -13,8 +13,19 @@ public class ScriptTextArea extends RSyntaxTextArea {
 
     public ScriptTextArea(){
         super();
+        this.setHighlightCurrentLine(false);
     }
 
+    public void highlightLine(int line){
+        Color c = this.getCurrentLineHighlightColor();
+        try {
+            this.addLineHighlight(line, c);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //has a bug
     public void highlightLinesatPos(int from, int to){
 
 
@@ -35,12 +46,9 @@ public class ScriptTextArea extends RSyntaxTextArea {
 
         }
         for (int line : lines) {
-            try {
-                this.addLineHighlight(line, Color.LIGHT_GRAY);
-            } catch (BadLocationException e) {
-                e.printStackTrace();
-            }
+            highlightLine(line);
         }
 
     }
+
 }

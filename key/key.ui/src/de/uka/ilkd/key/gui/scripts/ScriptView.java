@@ -1,12 +1,14 @@
 package de.uka.ilkd.key.gui.scripts;
 
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.scripts.actions.GoToNodeAction;
 import de.uka.ilkd.key.gui.scripts.actions.ParseScriptAction;
 import de.uka.ilkd.key.gui.scripts.actions.ResetScriptAction;
 import de.uka.ilkd.key.gui.scripts.actions.StepModeAction;
 import de.uka.ilkd.key.macros.scripts.ScriptNode;
+import de.uka.ilkd.key.proof.Node;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import javax.swing.*;
@@ -17,6 +19,13 @@ import java.awt.event.MouseEvent;
  * Created by sarah on 2/7/17.
  */
 public class ScriptView {
+
+
+    public ActualScript getCurrentScript() {
+        return currentScript;
+    }
+
+    private ActualScript currentScript;
 
 
     public ScriptTextArea getTextArea() {
@@ -38,13 +47,14 @@ public class ScriptView {
 
 
 
-    private ActualScript currentScript;
+
 
     private JToolBar bar;
 
     public ScriptView(KeYMediator mediator, MainWindow mainWindow){
         this.mainWindow = mainWindow;
         this.mediator = mediator;
+
         this.currentScript = new ActualScript(mediator);
         initPanel();
     }
@@ -55,24 +65,24 @@ public class ScriptView {
         {
             bar = new JToolBar();
             bar.setFloatable(false);
+
             {
-                JButton b = new JButton("R");
-                b.addActionListener(new ResetScriptAction(this, currentScript));
+                JButton b = new JButton(new ResetScriptAction(this));
+                b.setText("R");
                 bar.add(b);
             }
             {
-                JButton p = new JButton("P");
-                p.addActionListener(new ParseScriptAction(this, currentScript));
+                JButton p = new JButton(new ParseScriptAction(this));
+                p.setText("P");
                 bar.add(p);
             }
             {
-                JButton g = new JButton("G");
-                g.addActionListener(new GoToNodeAction(this, currentScript));
+                JButton g = new JButton(new GoToNodeAction(this));
+                g.setText("G");
                 bar.add(g);
             }
             {
-                JButton g = new JButton("Start Step Mode");
-                g.addActionListener(new StepModeAction(g, this, currentScript));
+                JButton g = new JButton(new StepModeAction(this));
                 bar.add(g);
             }
             view.add(bar, BorderLayout.NORTH);
@@ -140,6 +150,18 @@ public class ScriptView {
         return null;
     }
 
+    public void goTo(int pos) {
+        if(currentScript.getCurrentRoot() == null)
+            ExceptionDialog.showDialog(getMainWindow(), new Exception("There is currently no parsed script tree to browse."));
+
+        ScriptNode snode = getNodeAtPos(currentScript.getCurrentRoot(), pos);
+        if(snode != null) {
+            Node proofNode = snode.getProofNode();
+            if(proofNode != null) {
+                getMediator().getSelectionModel().setSelectedNode(proofNode);
+            }
+        }
+    }
     public Component getPanel() {
         return view;
     }

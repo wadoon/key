@@ -1,10 +1,10 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import de.uka.ilkd.key.proof.Node;
+
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import de.uka.ilkd.key.proof.Node;
 
 public class ScriptNode {
     
@@ -71,6 +71,7 @@ public class ScriptNode {
     public void setEncounteredException(Throwable encounteredException) {
         this.encounteredException = encounteredException;
     }
+
 
 }
 

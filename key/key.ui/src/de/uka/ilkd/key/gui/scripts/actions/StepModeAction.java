@@ -19,66 +19,67 @@ import java.awt.event.ActionEvent;
 public class StepModeAction extends AbstractScriptAction {
     private JButton stepMode;
 
-    public static final String name = "Step Mode";
-    public static final String start = "Start Step Mode";
-    public static final String stop = "Stop Step Mode";
+
+    public static final String START = "Start Step Mode";
+    public static final String STOP = "Stop Step Mode";
 
     private StepOverListener stepOverListener;
 
-    public StepModeAction(JButton stepButton, ScriptView scriptView, ActualScript currentScript) {
-        super(name, scriptView, currentScript);
-        this.stepMode = stepButton;
-
+    public StepModeAction(ScriptView scriptView) {
+        super(START, scriptView);
     }
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
-        if(stepMode.getText().equals(start)) {
-            if (getActualScript().getCurrentRoot() != null) {
-                startStepMode(super.getActualScript(), super.getActualScript().getAssociatedProof());
-                stepMode.setText(stop);
+        if(getValue(NAME).equals(START)) {
+            if (getView().getCurrentScript().getCurrentRoot() != null) {
+                startStepMode(getView().getCurrentScript(), getView().getCurrentScript().getAssociatedProof());
+                putValue(NAME, STOP);
             }else{
                 ExceptionDialog.showDialog(getView().getMainWindow(), new ScriptException("There is no script to step through"));
 
             }
 
         }else{
-            stopStepMode(super.getActualScript(), super.getActualScript().getAssociatedProof());
-            stepMode.setText(start);
+            stopStepMode(getView().getCurrentScript(), getView().getCurrentScript().getAssociatedProof());
+            putValue(NAME, START);
+
         }
     }
 
     private void stopStepMode(ActualScript actualScript, Proof associatedProof) {
-        super.getView().getTextArea().removeKeyListener(stepOverListener);
-        super.getView().enableReset();
-        super.getView().getTextArea().removeAllLineHighlights();
-        super.getView().getTextArea().setCurrentLineHighlightColor(new Color(1f, 1f, 0.5f, 0.8f));
-        super.getView().getTextArea().setHighlightCurrentLine(true);
-        super.getView().getTextArea().repaint();
+        ScriptView view = super.getView();
+        view.getTextArea().removeKeyListener(stepOverListener);
+        view.enableReset();
+        view.getTextArea().removeAllLineHighlights();
+        view.getTextArea().setCurrentLineHighlightColor(new Color(1f, 1f, 0.5f, 0.8f));
+        view.getTextArea().setHighlightCurrentLine(true);
+        view.getTextArea().repaint();
     }
 
     private void startStepMode(ActualScript actualScript, Proof associatedProof){
 
-        super.getView().disableReset();
+        ScriptView view = super.getView();
+        view.disableReset();
 
         DebugModel model;
-        int pos = super.getView().getTextArea().getCaretPosition();
-        getView().getTextArea().setCaretPosition(pos);
+        int pos = view.getTextArea().getCaretPosition();
 
-        ScriptNode currNode = super.getView().getNodeAtPos(actualScript.getCurrentRoot(), pos);
+
+        ScriptNode currNode = view.getNodeAtPos(actualScript.getCurrentRoot(), pos);
 
         if(currNode.equals(actualScript.getCurrentRoot())) {
             model = new DebugModel(actualScript, associatedProof);
         }else{
             model = new DebugModel(actualScript, associatedProof, currNode, currNode.getProofNode());
         }
-        stepOverListener = new StepOverListener(model, super.getView());
-
-        super.getView().getTextArea().setCurrentLineHighlightColor(Color.lightGray);
-        super.getView().getTextArea().setHighlightCurrentLine(true);
-        super.getView().getTextArea().repaint();
-
-        super.getView().getTextArea().addKeyListener(stepOverListener);
+        stepOverListener = new StepOverListener(model, view);
+        view.getTextArea().removeAllLineHighlights();
+        view.getTextArea().setCurrentLineHighlightColor(Color.lightGray);
+        view.getTextArea().highlightLine(view.getTextArea().getCaretLineNumber());
+        view.getTextArea().repaint();
+        view.getTextArea().setCaretPosition(pos);
+        view.getTextArea().addKeyListener(stepOverListener);
 
     }
 

@@ -73,34 +73,32 @@ public class TextPopupMouseListener extends MouseAdapter {
             pm.add(m);
         }*/
         {
-            JMenuItem m = new JMenuItem("Show in proof tree");
+            JMenuItem m = new JMenuItem(new GoToNodeAction(this.view));
             if (node == null) {
                 m.setEnabled(false);
             }
-            m.addActionListener(new GoToNodeAction(this.view, script));
+
             pm.add(m);
         }
         {
-            JMenuItem m = new JMenuItem("Show Path");
+            JMenuItem m = new JMenuItem(new ShowPathAction(this.view));
             if (node == null) {
                 m.setEnabled(true);
             }
-            m.addActionListener(new ShowPathAction(this.view, script));
             pm.add(m);
         }
 
         pm.addSeparator();
         {
-            JMenuItem m = new JMenuItem("(Re)parse");
+            JMenuItem m = new JMenuItem(new ParseScriptAction(this.view));
             if (script.getAssociatedProof() == null) {
                 m.setEnabled(false);
             }
-            m.addActionListener(new ParseScriptAction(this.view, script));
+
             pm.add(m);
         }
         {
-            JMenuItem m = new JMenuItem("(Re)connect to proof");
-            m.addActionListener(new ResetScriptAction(this.view, script));
+            JMenuItem m = new JMenuItem(new ResetScriptAction(this.view));
             pm.add(m);
         }
         view.getTextArea().setComponentPopupMenu(pm);
