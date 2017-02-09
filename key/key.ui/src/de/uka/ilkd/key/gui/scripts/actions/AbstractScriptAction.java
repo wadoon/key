@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.gui.scripts.actions;
 
-import de.uka.ilkd.key.gui.scripts.ActualScript;
 import de.uka.ilkd.key.gui.scripts.ScriptView;
 
 import javax.swing.*;
@@ -20,19 +19,10 @@ public abstract class AbstractScriptAction extends AbstractAction {
 
     private ScriptView view;
 
-    public ActualScript getActualScript() {
-        return actualScript;
-    }
 
-    public void setActualScript(ActualScript actualScript) {
-        this.actualScript = actualScript;
-    }
 
-    private ActualScript actualScript;
-
-    public AbstractScriptAction(String name, ScriptView view, ActualScript script){
+    public AbstractScriptAction(String name, ScriptView view){
         super(name);
-        this.actualScript = script;
         this.view = view;
     }
 

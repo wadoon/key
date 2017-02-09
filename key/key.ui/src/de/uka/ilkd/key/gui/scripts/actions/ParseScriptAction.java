@@ -18,9 +18,9 @@ public class ParseScriptAction extends AbstractScriptAction {
     private ActualScript script;
 
     public static final String name = "Parse Script";
-    public ParseScriptAction(ScriptView view, ActualScript script){
-        super(name, view, script);
-        this.script = script;
+    public ParseScriptAction(ScriptView view){
+        super(name, view);
+        this.script = view.getCurrentScript();
         this.view = view;
     }
 
