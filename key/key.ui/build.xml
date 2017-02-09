@@ -10,7 +10,7 @@
 	  <pathelement path="${basedir}/../key.core.testgen/bin"/>
 	  <pathelement location="${basedir}/../key.core/lib/antlr.jar"/>
 	  <pathelement location="${basedir}/../key.core/lib/recoderKey.jar"/>
-		<pathelement location="${basedir}/../key.core/lib/rt.jar"/>
+          <pathelement location="${basedir}/../key.core/lib/rt.jar"/>
 	</path>
 
 	<path id="key.ui.run.class.path">

@@ -62,7 +62,7 @@ KEY_LIB="$KEY_HOME/key.core/lib"
 # KeY CLASSPATH
 #
 
-key_ext_jars="antlr.jar recoderKey.jar"
+key_ext_jars="antlr.jar recoderKey.jar rt.jar"
 
 keyclasspath="$KEY_HOME/key.core/bin:$KEY_HOME/key.ui/bin:$KEY_HOME/key.util/bin:$KEY_HOME/key.core.proof_reference/bin:$KEY_HOME/key.core.symbolic_execution/bin:$KEY_HOME/key.core.testgen/bin"
 
