@@ -25,20 +25,26 @@ public class ScriptTextArea extends RSyntaxTextArea {
         }
     }
 
-    //has a bug
+    /**
+     * Highlight the lines that fall into the range from and to
+     * @param from
+     * @param to
+     */
     public void highlightLinesatPos(int from, int to){
-
 
         String[] split = this.getText().split("\n");
         IntArrayList lines = new IntArrayList();
+
         String s;
         int size;
-        int counter = -1;
+
+        int counter = 0;
+
         for(int i = 0; i < split.length; i++){
             s = split[i];
             size = s.length();
             counter += size;
-            if(counter >= from && counter <= to){
+            if(counter > from && counter <= to){
                 lines.add(i);
                 System.out.println("Line "+i);
 
