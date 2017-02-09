@@ -3,27 +3,45 @@ package de.uka.ilkd.key.gui.scripts.actions;
 import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.scripts.ActualScript;
 import de.uka.ilkd.key.gui.scripts.DebugModel;
+import de.uka.ilkd.key.gui.scripts.ScriptTextArea;
 import de.uka.ilkd.key.gui.scripts.ScriptView;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.macros.scripts.ScriptNode;
 import de.uka.ilkd.key.proof.Proof;
 
-import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
 /**
+ * Controller for managing the debugmodes.
  * Created by sarah on 2/6/17.
  */
 public class StepModeAction extends AbstractScriptAction {
-    private JButton stepMode;
+
 
 
     public static final String START = "Start Step Mode";
     public static final String STOP = "Stop Step Mode";
 
+    /**
+     * Controller to step Forward
+     */
     private StepOverListener stepOverListener;
+
+    /**
+     *  Controller to step backwards through script
+     */
+    //private StepBackListener stepBackListener;
+
+    /**
+     * Controller to step into a macro
+     */
+    //private StepIntoListsner stepintoListsner;
+
+    /**
+     * Controller to return from step into
+     */
+    //private StepReturnListener stepReturnListsner;
 
     public StepModeAction(ScriptView scriptView) {
         super(START, scriptView);
@@ -39,7 +57,6 @@ public class StepModeAction extends AbstractScriptAction {
                 ExceptionDialog.showDialog(getView().getMainWindow(), new ScriptException("There is no script to step through"));
 
             }
-
         }else{
             stopStepMode(getView().getCurrentScript(), getView().getCurrentScript().getAssociatedProof());
             putValue(NAME, START);
@@ -47,6 +64,11 @@ public class StepModeAction extends AbstractScriptAction {
         }
     }
 
+    /**
+     * Stop stepping through the script
+     * @param actualScript
+     * @param associatedProof
+     */
     private void stopStepMode(ActualScript actualScript, Proof associatedProof) {
         ScriptView view = super.getView();
         view.getTextArea().removeKeyListener(stepOverListener);
@@ -57,13 +79,20 @@ public class StepModeAction extends AbstractScriptAction {
         view.getTextArea().repaint();
     }
 
+    /**
+     * Start stepping through script
+     * @param actualScript
+     * @param associatedProof
+     */
     private void startStepMode(ActualScript actualScript, Proof associatedProof){
+        DebugModel model;
+
 
         ScriptView view = super.getView();
         view.disableReset();
 
-        DebugModel model;
-        int pos = view.getTextArea().getCaretPosition();
+        ScriptTextArea textArea = view.getTextArea();
+        int pos = textArea.getCaretPosition();
 
 
         ScriptNode currNode = view.getNodeAtPos(actualScript.getCurrentRoot(), pos);
@@ -74,12 +103,12 @@ public class StepModeAction extends AbstractScriptAction {
             model = new DebugModel(actualScript, associatedProof, currNode, currNode.getProofNode());
         }
         stepOverListener = new StepOverListener(model, view);
-        view.getTextArea().removeAllLineHighlights();
-        view.getTextArea().setCurrentLineHighlightColor(Color.lightGray);
-        view.getTextArea().highlightLine(view.getTextArea().getCaretLineNumber());
-        view.getTextArea().repaint();
-        view.getTextArea().setCaretPosition(pos);
-        view.getTextArea().addKeyListener(stepOverListener);
+        textArea.removeAllLineHighlights();
+        textArea.setCurrentLineHighlightColor(Color.lightGray);
+        textArea.highlightLine(textArea.getCaretLineNumber());
+        textArea.repaint();
+        textArea.setCaretPosition(pos);
+        textArea.addKeyListener(stepOverListener);
 
     }
 
