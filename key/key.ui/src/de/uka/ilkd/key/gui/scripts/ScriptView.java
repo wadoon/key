@@ -3,19 +3,20 @@ package de.uka.ilkd.key.gui.scripts;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ExceptionDialog;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.scripts.actions.GoToNodeAction;
-import de.uka.ilkd.key.gui.scripts.actions.ParseScriptAction;
-import de.uka.ilkd.key.gui.scripts.actions.ResetScriptAction;
-import de.uka.ilkd.key.gui.scripts.actions.StepModeAction;
+import de.uka.ilkd.key.gui.scripts.actions.*;
 import de.uka.ilkd.key.macros.scripts.ScriptNode;
 import de.uka.ilkd.key.proof.Node;
 import org.fife.ui.rtextarea.RTextScrollPane;
 
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.MouseEvent;
+import java.util.*;
+import java.util.List;
 
 /**
+ * fehlt: Persistenz von Scripts, das muss über Datenstruktur und Bookkeeping geregelt werden
  * Created by sarah on 2/7/17.
  */
 public class ScriptView {
@@ -25,8 +26,9 @@ public class ScriptView {
         return currentScript;
     }
 
-    private ActualScript currentScript;
-
+    public Component getPanel() {
+        return view;
+    }
 
     public ScriptTextArea getTextArea() {
         return textArea;
@@ -40,25 +42,51 @@ public class ScriptView {
         return mediator;
     }
 
+
+    /**
+     * Textarea for script
+     */
     private ScriptTextArea textArea;
     private MainWindow mainWindow;
     private KeYMediator mediator;
+
+    /**
+     * The script view
+     */
     private JPanel view;
 
+    /**
+     * The pointer to the script of the currently selected proof
+     */
+    private ActualScript currentScript;
 
+    public List<ActualScript> getActiveScripts() {
+        return activeScripts;
+    }
 
-
-
+    private List<ActualScript> activeScripts;
+    /**
+     * Toolbar with buttons for script actions
+     */
     private JToolBar bar;
+
+
+    private ProofListener proofChangedListener;
 
     public ScriptView(KeYMediator mediator, MainWindow mainWindow){
         this.mainWindow = mainWindow;
         this.mediator = mediator;
-
+        this.activeScripts = new LinkedList<ActualScript>();
         this.currentScript = new ActualScript(mediator);
+        this.activeScripts.add(this.currentScript);
+        this.proofChangedListener = new ProofListener(this);
+        mediator.addKeYSelectionListener(proofChangedListener);
         initPanel();
     }
 
+    /**
+     * Initialization of Scriptview
+     */
    @SuppressWarnings("serial")
     private void initPanel() {
         view = new JPanel(new BorderLayout());
@@ -89,9 +117,6 @@ public class ScriptView {
         }
 
         {
-
-
-             // textArea = new RSyntaxTextArea() {
             textArea = new ScriptTextArea() {
 
                 @Override
@@ -135,6 +160,12 @@ public class ScriptView {
         }
     }
 
+    /**
+     * Return the ScriptNode at a given position (from the textarea), given the current scriptroot
+     * @param node
+     * @param pos
+     * @return
+     */
     public ScriptNode getNodeAtPos(ScriptNode node, int pos) {
         if(node.getFromPos() <= pos && pos < node.getToPos()) {
             return node;
@@ -150,6 +181,10 @@ public class ScriptView {
         return null;
     }
 
+    /**
+     * Show the node in the sequentview which is the starting point for the currently selected proof script command
+     * @param pos
+     */
     public void goTo(int pos) {
         if(currentScript.getCurrentRoot() == null)
             ExceptionDialog.showDialog(getMainWindow(), new Exception("There is currently no parsed script tree to browse."));
@@ -162,19 +197,25 @@ public class ScriptView {
             }
         }
     }
-    public Component getPanel() {
-        return view;
-    }
 
+    /**
+     * Disable the reset Button
+     */
     public void disableReset(){
         bar.getComponent(0).setEnabled(false);
 
     }
 
+    /**
+     * Enable the reset button
+     */
     public void enableReset(){
         bar.getComponent(0).setEnabled(true);
 
     }
 
 
+    public void setCurrentScript(ActualScript currentScript) {
+        this.currentScript = currentScript;
+    }
 }
