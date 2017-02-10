@@ -10,7 +10,7 @@ import java.awt.event.ActionEvent;
  */
 public class ResetScriptAction extends AbstractScriptAction {
 
-    private final ActualScript currentScript;
+    private ActualScript currentScript;
     private ScriptView view;
 
     public static final String name ="Reset State";
@@ -22,6 +22,7 @@ public class ResetScriptAction extends AbstractScriptAction {
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
+        this.currentScript = view.getCurrentScript();
         currentScript.setAssociatedProof(view.getMediator().getSelectedProof());
         currentScript.setCurrentRoot(null);
     }

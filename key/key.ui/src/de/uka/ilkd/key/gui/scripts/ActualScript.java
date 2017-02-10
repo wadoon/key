@@ -24,6 +24,11 @@ public class ActualScript {
      */
     private Proof associatedProof;
 
+    public String getTextReprOfScript() {
+        return textReprOfScript;
+    }
+
+    private String textReprOfScript;
 
     /**
      * The data structure representing the script as tree
@@ -53,6 +58,7 @@ public class ActualScript {
         this.associatedProof = mediator.getSelectedProof();
         this.currentArgMap = new HashMap<String, String>();
         this.currentRoot = null;
+        this.textReprOfScript = "";
     }
 
     /**
@@ -71,7 +77,8 @@ public class ActualScript {
     }
 
     public void parse(StringReader reader) throws IOException, ScriptException, InterruptedException {
-        if(associatedProof != mediator.getSelectedProof())
+
+        if (associatedProof != mediator.getSelectedProof())
             throw new ScriptException("wrong proof selected");
 
         ScriptNode newroot = ScriptTreeParser.parse(reader);
@@ -80,7 +87,7 @@ public class ActualScript {
 
         try {
             mediator.stopInterface(true);
-            if(currentRoot != null) {
+            if (currentRoot != null) {
                 currentRoot.dump(0);
                 newroot.dump(0);
             }
@@ -242,4 +249,7 @@ public class ActualScript {
     }
 
 
+    public void setTextReprOfScript(String textReprOfScript) {
+        this.textReprOfScript = textReprOfScript;
+    }
 }

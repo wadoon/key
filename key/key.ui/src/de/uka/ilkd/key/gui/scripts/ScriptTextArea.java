@@ -7,7 +7,7 @@ import javax.swing.text.BadLocationException;
 import java.awt.*;
 
 /**
- * Created by sarah on 2/8/17.
+ * Textarea for the proof script
  */
 public class ScriptTextArea extends RSyntaxTextArea {
 
@@ -46,14 +46,26 @@ public class ScriptTextArea extends RSyntaxTextArea {
             counter += size;
             if(counter > from && counter <= to){
                 lines.add(i);
-                System.out.println("Line "+i);
-
             }
 
         }
         for (int line : lines) {
             highlightLine(line);
         }
+
+    }
+
+    public void loadCurrentScriptToTextarea(ScriptView view){
+
+        ActualScript script = view.getCurrentScript();
+        if(script.getCurrentRoot() != null ) {
+            String repr = script.getTextReprOfScript();
+
+            this.setText(repr);
+        }else{
+            this.setText("");
+        }
+        this.repaint();
 
     }
 

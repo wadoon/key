@@ -28,7 +28,11 @@ public class ParseScriptAction extends AbstractScriptAction {
     public void actionPerformed(ActionEvent actionEvent) {
 
         try {
-            script.parse(new StringReader(view.getTextArea().getText()));
+            this.script = view.getCurrentScript();
+            String text = view.getTextArea().getText();
+            script.setTextReprOfScript(text);
+            script.parse(new StringReader(text));
+
         } catch (IOException e) {
             e.printStackTrace();
         } catch (ScriptException e) {
