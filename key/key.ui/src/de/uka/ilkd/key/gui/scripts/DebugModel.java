@@ -91,7 +91,7 @@ public class DebugModel {
 
 
     public void computeNextState(){
-        this.currentState = computeNextState_1();
+        this.currentState = computeChildState();
     }
 
     public void computePrevState(){
@@ -130,6 +130,7 @@ public class DebugModel {
         ScriptNode parentPointer = currentPointer.getParent();
         List<ScriptNode> state;
         if(parentPointer != null){
+            this.currentPointerToScript = parentPointer;
             ScriptNode parentOfParent = parentPointer.getParent();
             if (parentPointer.getParent() != null) {
                 state = parentOfParent.getChildren();
@@ -139,13 +140,16 @@ public class DebugModel {
             }
         }else{
             state = currentState;
+
         }
-        this.currentPointerToScript = parentPointer;
         return state;
     }
 
-
-    private List<ScriptNode> computeNextState_1(){
+    /**
+     * Computes teh child state from the current Pointer on and sets the pointer to the first child
+     * @return
+     */
+    private List<ScriptNode> computeChildState(){
         ScriptNode currentPointer = this.currentPointerToScript;
         List<ScriptNode> nextState;
         if (currentPointer == null){
