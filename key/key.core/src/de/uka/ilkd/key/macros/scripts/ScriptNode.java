@@ -11,11 +11,13 @@ public class ScriptNode {
     private Map<String, String> command;
     private int fromPos;
     private int toPos;
+    private ScriptNode parent;
     private List<ScriptNode> children = new LinkedList<>();
     private Node proofNode;
     private Throwable encounteredException;
 
-    public ScriptNode(Map<String, String> command, int fromPos, int toPos) {
+    public ScriptNode(ScriptNode parent, Map<String, String> command, int fromPos, int toPos) {
+        this.parent = parent;
         this.command = command;
         this.fromPos = fromPos;
         this.toPos = toPos;
@@ -70,6 +72,12 @@ public class ScriptNode {
 
     public void setEncounteredException(Throwable encounteredException) {
         this.encounteredException = encounteredException;
+    }
+    public ScriptNode getParent(){
+        return parent;
+    }
+    public boolean isRoot(){
+        return (parent == null);
     }
 
 

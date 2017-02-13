@@ -10,39 +10,16 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
-/*
-rule impRight;
-rule impRight;
-rule notRight;
-rule notLeft;
 
-rule impRight;
-rule impLeft;
-branches;
-	rule impRight;
-	rule notLeft;
-	rule notRight;
-next;
-	rule impRight;
-	rule notLeft;
-	rule notRight;
-end;
-
-*/
 /**
- * Created by sarah on 2/8/17.
+ * Controller to handle stepping back in debug mode
+ * Created by sarah on 2/10/17.
  */
-public class StepOverListener extends KeyAdapter {
-
+public class StepBackListener extends KeyAdapter {
     private DebugModel model;
     private ScriptView view;
 
-    /**
-     * Controller to step over a state in the script
-     * @param model
-     * @param view
-     */
-    public StepOverListener(DebugModel model, ScriptView view){
+    public StepBackListener(DebugModel model, ScriptView view) {
         super();
         this.model = model;
         this.view  = view;
@@ -52,23 +29,21 @@ public class StepOverListener extends KeyAdapter {
     @Override
     public void keyPressed(KeyEvent keyEvent) {
         super.keyPressed(keyEvent);
-        if (keyEvent.getKeyCode() == KeyEvent.VK_F3) {
+        if (keyEvent.getKeyCode() == KeyEvent.VK_F4) {
             view.getTextArea().removeAllLineHighlights();
             view.getTextArea().repaint();
-            stepOver();
+            stepBack();
         }
     }
 
-    /**
-     * Step Over a command and change goal view as well
-     */
-    private void stepOver(){
+    private void stepBack() {
         view.getTextArea().removeAllLineHighlights();
         view.getTextArea().repaint();
-        model.computeNextState();
+        //this not only return the state but also sets the currentpointer
+        model.computePrevState();
         List<ScriptNode> state = model.getCurrentState();
         if (state == null) {
-            System.out.println("State is null");
+            System.out.println("Previous state is null");
         }
 
         if(state.size() == 1){
@@ -76,7 +51,6 @@ public class StepOverListener extends KeyAdapter {
             int from = n.getFromPos();
             int to = n.getToPos();
             view.getTextArea().highlightLinesatPos(from, to, Color.darkGray);
-//            view.getTextArea().highlightLinesatPos(from, to);
             view.getTextArea().setCaretPosition(to);
             view.goTo(to);
 
@@ -94,9 +68,11 @@ public class StepOverListener extends KeyAdapter {
                     view.goTo(to);
                 }else{
                     view.getTextArea().highlightLinesatPos(from, to, Color.lightGray);
+
                 }
             }
         }
 
     }
+
 }

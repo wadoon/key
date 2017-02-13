@@ -31,7 +31,7 @@ public class StepModeAction extends AbstractScriptAction {
     /**
      *  Controller to step backwards through script
      */
-    //private StepBackListener stepBackListener;
+    private StepBackListener stepBackListener;
 
     /**
      * Controller to step into a macro
@@ -43,6 +43,7 @@ public class StepModeAction extends AbstractScriptAction {
      */
     //private StepReturnListener stepReturnListsner;
 
+    private SelectDebugFocusAction selectDebugFocus;
     public StepModeAction(ScriptView scriptView) {
         super(START, scriptView);
     }
@@ -71,11 +72,11 @@ public class StepModeAction extends AbstractScriptAction {
      */
     private void stopStepMode(ActualScript actualScript, Proof associatedProof) {
         ScriptView view = super.getView();
+        view.getTextArea().setFocusTraversalKeysEnabled(true);
         view.getTextArea().removeKeyListener(stepOverListener);
+        view.getTextArea().removeKeyListener(stepBackListener);
         view.enableReset();
         view.getTextArea().removeAllLineHighlights();
-        view.getTextArea().setCurrentLineHighlightColor(new Color(1f, 1f, 0.5f, 0.8f));
-        view.getTextArea().setHighlightCurrentLine(true);
         view.getTextArea().repaint();
     }
 
@@ -102,13 +103,17 @@ public class StepModeAction extends AbstractScriptAction {
         }else{
             model = new DebugModel(actualScript, associatedProof, currNode, currNode.getProofNode());
         }
+        textArea.setFocusTraversalKeysEnabled(false);
+        selectDebugFocus = new SelectDebugFocusAction(model, view);
         stepOverListener = new StepOverListener(model, view);
+        stepBackListener = new StepBackListener(model, view);
         textArea.removeAllLineHighlights();
-        textArea.setCurrentLineHighlightColor(Color.lightGray);
-        textArea.highlightLine(textArea.getCaretLineNumber());
+        //textArea.setCurrentLineHighlightColor(Color.lightGray);
+        textArea.highlightLine(textArea.getCaretLineNumber(), Color.darkGray);
         textArea.repaint();
         textArea.setCaretPosition(pos);
         textArea.addKeyListener(stepOverListener);
+        textArea.addKeyListener(stepBackListener);
 
     }
 

@@ -24,6 +24,10 @@ public class ParseScriptAction extends AbstractScriptAction {
         this.view = view;
     }
 
+    /**
+     * Parse a script and set the textual representation
+     * @param actionEvent
+     */
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
 

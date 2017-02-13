@@ -26,10 +26,14 @@ public class ProofListener implements KeYSelectionListener{
 
     }
 
+    /**
+     * When proof changes, the script has to change as well
+     * @param e
+     */
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
 
-      /*  String text = view.getTextArea().getText();
+       /* String text = view.getTextArea().getText();
         System.out.println("Old Script: "+text);
         ActualScript script= view.getCurrentScript();
         List<ActualScript> activeScripts = view.getActiveScripts();
@@ -38,14 +42,13 @@ public class ProofListener implements KeYSelectionListener{
         }
         if(!activeScripts.contains(script)){
             view.getActiveScripts().add(script);
-        }*/
-        view.setCurrentScript(null);
+        }
+        view.setCurrentScript(null);*/
         List<ActualScript> activeScripts = view.getActiveScripts();
         for (ActualScript activeScript : activeScripts) {
             //is null at the beginning
             Proof activeProof = activeScript.getAssociatedProof();
             if (activeProof != null) {
-
                 if (activeProof.equals(e.getSource().getSelectedProof())) {
                     view.setCurrentScript(activeScript);
                     break;
