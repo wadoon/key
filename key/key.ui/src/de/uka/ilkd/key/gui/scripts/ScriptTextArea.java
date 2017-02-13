@@ -16,10 +16,10 @@ public class ScriptTextArea extends RSyntaxTextArea {
         this.setHighlightCurrentLine(false);
     }
 
-    public void highlightLine(int line){
-        Color c = this.getCurrentLineHighlightColor();
+    public void highlightLine(int line, Color color){
+       // Color c = this.getCurrentLineHighlightColor();
         try {
-            this.addLineHighlight(line, c);
+            this.addLineHighlight(line, color);
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
@@ -30,7 +30,7 @@ public class ScriptTextArea extends RSyntaxTextArea {
      * @param from
      * @param to
      */
-    public void highlightLinesatPos(int from, int to){
+    public void highlightLinesatPos(int from, int to, Color c){
 
         String[] split = this.getText().split("\n");
         IntArrayList lines = new IntArrayList();
@@ -50,7 +50,7 @@ public class ScriptTextArea extends RSyntaxTextArea {
 
         }
         for (int line : lines) {
-            highlightLine(line);
+            highlightLine(line, c);
         }
 
     }

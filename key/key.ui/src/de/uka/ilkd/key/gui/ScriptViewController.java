@@ -320,7 +320,7 @@ public class ScriptViewController implements ActionListener{
 
             while(children.size() < leaves.size()) {
                 // Adding phantom skip nodes ...
-                children.add(new ScriptNode(SKIP, -1, -1));
+                children.add(new ScriptNode(null, SKIP, -1, -1));
             }
 
             for(int i=0; i < children.size(); i++) {

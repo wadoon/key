@@ -14,15 +14,41 @@ import java.util.List;
  */
 public class DebugModel {
 
+    /**
+     * Parsed Script that will be debugged
+     */
     private ActualScript script;
+
+    /**
+     * Highlighted and selected ScriptNode
+     */
     private ScriptNode currentPointerToScript;
+
+    /**
+     * Debugstate in focus (all siblings of selected ScriptNode including selected Node)
+     */
     private List<ScriptNode> currentState;
 
-    private List<ScriptNode> prevState;
-    private ScriptNode prevPointer;
+    /**
+     * Previous Debugstate (maybe null if current is root)
+     */
+  //  private List<ScriptNode> prevState;
 
+    /**
+     * Pointer to parent ScriptNode (if null, then current ScriptNode is root)
+     */
+  //  private ScriptNode prevPointer;
+
+    /**
+     * Associated Proof Tree that resulted from executing teh proof script
+     */
     private Proof assocProofTree;
+
+    /**
+     * Pointer to Node in the proof tree of current
+     */
     private Node pointerToProofTreeNode;
+
     private List<Node> overallProofState;
 
     /**
@@ -34,14 +60,14 @@ public class DebugModel {
         this.script = script;
         this.currentPointerToScript = script.getCurrentRoot();
         this.currentState = new LinkedList<ScriptNode>();
-        this.overallProofState = new LinkedList<Node>();
+     //   this.overallProofState = new LinkedList<Node>();
 
         this.currentState.add(currentPointerToScript);
-        this.prevState = this.currentState;
-        this.prevPointer = this.currentPointerToScript;
+    //    this.prevState = null;
+     //   this.prevPointer = null;
         this.assocProofTree = assocProofTree;
         this.pointerToProofTreeNode = assocProofTree.root();
-        this.overallProofState.add(pointerToProofTreeNode);
+   //     this.overallProofState.add(pointerToProofTreeNode);
     }
 
     /**
@@ -57,55 +83,21 @@ public class DebugModel {
         this.pointerToProofTreeNode = proofNodeToStart;
         this.currentPointerToScript = nodeToStart;
         this.currentState = new LinkedList<ScriptNode>();
-        this.overallProofState = new LinkedList<Node>();
+ //       this.overallProofState = new LinkedList<Node>();
         this.currentState.add(nodeToStart);
-        this.overallProofState.addAll(proofNodeToStart.parent().children());
+ //       this.overallProofState.addAll(proofNodeToStart.parent().children());
 
     }
 
-    private List<ScriptNode> computeParentState(ScriptNode child){
-        List<ScriptNode> parentState = new LinkedList<>();
-        ScriptNode root = script.getCurrentRoot();
-        if(root.getChildren().contains(child)){
-            parentState.add(root);
-            return parentState;
-        }else{
-            //recursive
-        }
 
-
-
-        return parentState;
+    public void computeNextState(){
+        this.currentState = computeNextState_1();
     }
-    /**
-     * Get next state according to current state
-     * @return
-     */
-    public List<ScriptNode> getNextScriptState(){
-        //save previous state
-        this.prevState = this.currentState;
-        this.prevPointer = currentPointerToScript;
 
-        this.currentState = currentPointerToScript.getChildren();
-        //in case the children contain a scriptNiode with bad from/to pos
-        // (open goal node in proof tree; end of debug possibility in script) then change to scriptstate
-        List<ScriptNode> children = new LinkedList<ScriptNode>();
-        boolean openGoals = false;
-        for (ScriptNode scriptNode : this.currentState) {
-            if(scriptNode.getFromPos() < 0 || scriptNode.getToPos() <0){
-              //  children.add(scriptNode.getParent()); TODO maybe we need this method
-                children.add(currentPointerToScript);
-                openGoals = true;
-            }else{
-                children.add(scriptNode);
-            }
-        }
-        if(openGoals){
-            this.currentState = children;
-        }
-        this.currentPointerToScript = this.currentState.get(0);
-        return this.currentState;
+    public void computePrevState(){
+        this.currentState = computeParentState();
     }
+
 
     /**
      * Set selection pointer if user chooses between different states
@@ -120,16 +112,76 @@ public class DebugModel {
         }
     }
 
-    public List<Node> getNextProofTreeNode(){
+/*    public List<Node> getNextProofTreeNode(){
         overallProofState = pointerToProofTreeNode.children();
         return overallProofState;
-    }
+    }*/
 
     public ScriptNode getCurrentPointerToScript() {
         return currentPointerToScript;
     }
 
-    public List<ScriptNode> getPreviousState(){
-        return prevState;
+    /**
+     * Computes the parent state and sets the currentpointer to the parent
+     * @return
+     */
+    private List<ScriptNode> computeParentState(){
+        ScriptNode currentPointer = this.currentPointerToScript;
+        ScriptNode parentPointer = currentPointer.getParent();
+        List<ScriptNode> state;
+        if(parentPointer != null){
+            ScriptNode parentOfParent = parentPointer.getParent();
+            if (parentPointer.getParent() != null) {
+                state = parentOfParent.getChildren();
+            }else{
+                state = new LinkedList<>();
+                state.add(parentPointer);
+            }
+        }else{
+            state = currentState;
+        }
+        this.currentPointerToScript = parentPointer;
+        return state;
     }
+
+
+    private List<ScriptNode> computeNextState_1(){
+        ScriptNode currentPointer = this.currentPointerToScript;
+        List<ScriptNode> nextState;
+        if (currentPointer == null){
+            nextState = new LinkedList();
+            nextState.add(script.getCurrentRoot());
+            this.currentPointerToScript = script.getCurrentRoot();
+            return nextState;
+        }else{
+            nextState = currentPointer.getChildren();
+        }
+        //in case the children contain a scriptNode with bad from/to pos
+        // (open goal node in proof tree; end of debug possibility in script) then change to scriptstate
+
+        List<ScriptNode> children = new LinkedList<ScriptNode>();
+        boolean openGoals = false;
+        for (ScriptNode scriptNode : nextState) {
+            //in case a SKIP Node is in the next state
+            if(scriptNode.getFromPos() < 0 || scriptNode.getToPos() <0){
+
+                children.add(currentPointer);
+                openGoals = true;
+            }else{
+                children.add(scriptNode);
+            }
+        }
+        if(openGoals){
+            nextState = children;
+        }
+
+        this.currentPointerToScript = nextState.get(0);
+        return nextState;
+    }
+    public List<ScriptNode> getCurrentState() {
+        return this.currentState;
+    }
+
+
+
 }

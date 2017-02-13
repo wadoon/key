@@ -24,10 +24,12 @@ public class ActualScript {
      */
     private Proof associatedProof;
 
-    public String getTextReprOfScript() {
-        return textReprOfScript;
-    }
 
+
+
+    /**
+     * String representation of the script
+     */
     private String textReprOfScript;
 
     /**
@@ -51,6 +53,13 @@ public class ActualScript {
 
     public void setCurrentRoot(ScriptNode currentRoot) {
         this.currentRoot = currentRoot;
+    }
+
+    public String getTextReprOfScript() {
+        return textReprOfScript;
+    }
+    public void setTextReprOfScript(String textReprOfScript) {
+        this.textReprOfScript = textReprOfScript;
     }
 
     public ActualScript(KeYMediator mediator){
@@ -142,7 +151,7 @@ public class ActualScript {
 
             while(children.size() < leaves.size()) {
                 // Adding phantom skip nodes ...
-                children.add(new ScriptNode(SKIP, -1, -1));
+                children.add(new ScriptNode(newnode, SKIP, -1, -1));
             }
 
             for(int i=0; i < children.size(); i++) {
@@ -249,7 +258,5 @@ public class ActualScript {
     }
 
 
-    public void setTextReprOfScript(String textReprOfScript) {
-        this.textReprOfScript = textReprOfScript;
-    }
+
 }

@@ -38,7 +38,7 @@ public class ScriptTreeParser {
                 branchStack.pop();
                 break;
             default:
-                ScriptNode node = new ScriptNode(command, from, to);
+                ScriptNode node = new ScriptNode(last, command, from, to);
                 if(root == null) {
                     root = node;
                 } else if(last == null) {
