@@ -112,6 +112,7 @@ public class StepModeAction extends AbstractScriptAction {
         textArea.highlightLine(textArea.getCaretLineNumber(), Color.darkGray);
         textArea.repaint();
         textArea.setCaretPosition(pos);
+        textArea.addKeyListener(selectDebugFocus);
         textArea.addKeyListener(stepOverListener);
         textArea.addKeyListener(stepBackListener);
 
