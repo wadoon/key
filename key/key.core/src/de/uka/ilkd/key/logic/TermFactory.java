@@ -117,6 +117,10 @@ public final class TermFactory {
     public Term createTerm(Operator op, Term[] subs, ImmutableArray<TermLabel> labels) {
     	return createTerm(op, createSubtermArray(subs), null, null, labels);
     }
+    
+     public Term createTerm(Operator op, ImmutableArray<Term> subs, ImmutableArray<TermLabel> labels) {
+         return createTerm(op, subs, null, null, labels);
+     }
 
     public Term createTerm(Operator op, Term sub, ImmutableArray<TermLabel> labels) {
     	return createTerm(op, new ImmutableArray<Term>(sub), null, null, labels);

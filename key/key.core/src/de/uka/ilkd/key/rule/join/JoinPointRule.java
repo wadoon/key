@@ -47,25 +47,6 @@ public class JoinPointRule implements BuiltInRule {
                 .getActiveStatement(
                         JoinRuleUtils.getJavaBlockRecursive(pio.subTerm()));
 
-//        String[] params = jPS.getJoinParams();
-//
-//        JoinProcedure concreteRule = jPS.getJoinProc();
-//
-//        if (concreteRule.toString().equals("JoinByPredicateAbstraction")) {
-//            PredicateAbstractionJoinParams joinParams = new PredicateAbstractionJoinParams(
-//                    new Pair<>(params[0], params[1]));
-//            //TODO
-//
-//            Class<? extends AbstractPredicateAbstractionLattice> latticeType = translateLatticeType(
-//                    params[0]);
-//            List<AbstractionPredicate> predicates = PredicateAbstractionJoinParams
-//                    .parsePredicateSpec(params[1], services);
-//            final JoinWithPredicateAbstractionFactory absPredicateFactory = (JoinWithPredicateAbstractionFactory) concreteRule;
-//            concreteRule = absPredicateFactory.instantiate(predicates,
-//                    latticeType,
-//                    new LinkedHashMap<ProgramVariable, AbstractDomainElement>());
-//        }
-
         ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                 .findPotentialJoinPartners(goal, pio, goal.proof().root());
 

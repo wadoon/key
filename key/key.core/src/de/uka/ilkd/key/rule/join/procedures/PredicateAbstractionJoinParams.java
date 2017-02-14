@@ -42,7 +42,7 @@ public class PredicateAbstractionJoinParams extends JoinParams {
     private List<AbstractionPredicate> predicates;
 
     /**
-     * TODO: This getter is probably not good design... We could alredy offer
+     * TODO: This getter is probably not good design... We could already offer
      * the parsing here!
      * 
      * @param params
@@ -52,6 +52,23 @@ public class PredicateAbstractionJoinParams extends JoinParams {
 
         this.params = params;
         this.latticeType = latticeTypeFromString();
+    }
+
+    /**
+     * Direct instantiation of the {@link PredicateAbstractionJoinParams}
+     * without detour over {@link #PredicateAbstractionJoinParams(Pair)}.
+     * 
+     * @param latticeType
+     * @param predicates
+     */
+    public PredicateAbstractionJoinParams(
+            Class<? extends AbstractPredicateAbstractionLattice> latticeType,
+            List<AbstractionPredicate> predicates) {
+        super(JoinWithPredicateAbstraction.class);
+
+        this.params = null;
+        this.latticeType = latticeType;
+        this.predicates = predicates;
     }
 
     @Override
@@ -99,7 +116,8 @@ public class PredicateAbstractionJoinParams extends JoinParams {
             return DisjunctivePredicateAbstractionLattice.class;
         default:
             throw new RuntimeException(
-                    "PredicateAbstractionJoinParams: Unexpected lattice type: " + params.first);
+                    "PredicateAbstractionJoinParams: Unexpected lattice type: "
+                            + params.first);
         }
     }
 
@@ -122,7 +140,7 @@ public class PredicateAbstractionJoinParams extends JoinParams {
                 for (int i = 1; i < m.groupCount(); i += 2) {
 
                     final String phStr = m.group(i);
-                    final String[] predStr = m.group(i + 1).split(", ");
+                    final String[] predStr = m.group(i + 1).split(",");
 
                     // Parse the placeholder
                     Pair<Sort, Name> ph = null;

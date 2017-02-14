@@ -6,6 +6,8 @@ import java.util.HashMap;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
+import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.SimplePredicateAbstractionLattice;
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
 import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
@@ -15,6 +17,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.statement.Break;
 import de.uka.ilkd.key.java.statement.JoinPointStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
@@ -25,6 +28,7 @@ import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -32,15 +36,15 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
+import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.rule.join.procedures.PredicateAbstractionJoinParams;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
@@ -334,11 +338,14 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      *            loop.
      * @param loopScopeIdxVar
      *            The variable used as a loop scope index.
+     * @param invTerm
+     *            TODO
      * @return The new program with the loop scope.
      */
     private ProgramElement newProgram(Services services, final While loop,
             ArrayList<Label> labels, Statement stmtToReplace,
-            final JavaBlock origProg, final ProgramVariable loopScopeIdxVar) {
+            final JavaBlock origProg, final ProgramVariable loopScopeIdxVar,
+            Term invTerm) {
 
         final ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
 
@@ -360,18 +367,29 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         if (mergeAfterLoopScope) {
             final String loopScopeIdxVarName = loopScopeIdxVar.name()
                     .toString();
+            final KeYJavaType loopScopeIdxVarType = loopScopeIdxVar
+                    .getKeYJavaType();
+
             // Base the name of the name of the loopScope index variable (remove
             // the temporary suffix)
-            final ProgramVariable joinPointReturnVar = //
-                    KeYJavaASTFactory.localVariable( //
-                            services.getTermBuilder().newName("return_"
-                                    + loopScopeIdxVarName.substring( //
-                                            0, loopScopeIdxVarName
-                                                    .indexOf('#'))),
-                            loopScopeIdxVar.getKeYJavaType());
+            final String suffix = loopScopeIdxVarName.substring( //
+                    0, loopScopeIdxVarName.indexOf('#'));
+
+            final ProgramVariable joinPointReturnVar = KeYJavaASTFactory
+                    .localVariable(services.getTermBuilder()
+                            .newName("return_" + suffix), loopScopeIdxVarType);
+            final ProgramVariable joinPointBreakVar = KeYJavaASTFactory
+                    .localVariable(services.getTermBuilder()
+                            .newName("break_" + suffix), loopScopeIdxVarType);
+
+            // TODO What happens here for void methods?
+            IProgramVariable resultVar = ((StatementBlock) origProg.program())
+                    .getInnerMostMethodFrame().getProgramVariable();
 
             ifBody = insertJoinPointStatementsForReturn(services, ifBody,
-                    joinPointReturnVar);
+                    joinPointReturnVar, resultVar);
+            ifBody = insertJoinPointStatementsForBreak(services, ifBody,
+                    joinPointBreakVar, invTerm);
         }
 
         for (int i = labels.size() - 1; i >= 0; i--) {
@@ -433,15 +451,75 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * 
      * @param services
      * @param ifBody
+     * @param joinPointBreakVar
+     * @param invTerm
+     *            TODO
+     * @return
+     */
+    private Statement insertJoinPointStatementsForBreak(Services services,
+            Statement ifBody, final ProgramVariable joinPointBreakVar,
+            Term invTerm) {
+        // Add a JoinPointStatement before each break.
+        // TODO: What about labeled breaks / continues?
+
+        final TermProgramVariableCollector progVarCol = new TermProgramVariableCollector(
+                services);
+        invTerm.execPostOrder(progVarCol);
+
+        ArrayList<AbstractionPredicate> predicates = new ArrayList<>();
+        for (ProgramVariable var : progVarCol.result()) {
+            String phName = services.getTermBuilder().newName("_ph");
+            LocationVariable phVariable = new LocationVariable(
+                    new ProgramElementName(phName), var.sort());
+            services.getNamespaces().programVariables().add(phVariable);
+
+            if (var.sort() == services.getTypeConverter().getHeapLDT()
+                    .targetSort()) {
+                continue;
+            }
+
+            Term relevantTerm = OpReplacer.replace(var, phVariable,
+                    extractPOSubWithVar(services, invTerm, var),
+                    services.getTermFactory());
+
+            predicates.add(AbstractionPredicate.create(relevantTerm, phVariable,
+                    services));
+        }
+
+        final PredicateAbstractionJoinParams predAbstrJoinParams = //
+                new PredicateAbstractionJoinParams(
+                        SimplePredicateAbstractionLattice.class, predicates);
+
+        final JoinPointStatement jps = new JoinPointStatement(
+                joinPointBreakVar);
+
+        services.getSpecificationRepository().addJoinPointMergeSpec(jps,
+                predAbstrJoinParams);
+
+        // Add a JPS before every return statement.
+        // We only do this for non-void methods so far.
+        ifBody = (Statement) new ProgramElementPrepender(
+                (JavaProgramElement) ifBody, services)
+                        .append(elem -> (elem instanceof Break)
+                                && ((Break) elem).getLabel() == null, jps);
+
+        return ifBody;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param services
+     * @param ifBody
      * @param joinPointReturnVar
+     * @param resultVar
+     *            TODO
      * @return
      */
     private Statement insertJoinPointStatementsForReturn(Services services,
-            Statement ifBody, final ProgramVariable joinPointReturnVar) {
+            Statement ifBody, final ProgramVariable joinPointReturnVar,
+            IProgramVariable resultVar) {
         // Add a JoinPointStatement before each return.
-
-        // TODO: Also add JPSs before breaks and continues.
-        // TODO: What about labeled breaks / continues?
 
         // Structure of first proof node is "==> Pre -> {U} \<{ P }\> Post
         assert services.getProof().root().sequent().size() == 1;
@@ -455,17 +533,22 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         ) // Modality with post condition
                 .sub(0); // Post condition
 
-        final String postCond = LogicPrinter.quickPrintTerm(
-                extractPOSubWithResultVar(services, PO), services);
+        String phName = services.getTermBuilder().newName("_ph");
+        LocationVariable phVariable = new LocationVariable(
+                new ProgramElementName(phName), resultVar.sort());
+        services.getNamespaces().programVariables().add(phVariable);
+        
+        Term predicateTerm = OpReplacer.replace(resultVar, phVariable,
+                extractPOSubWithVar(services, PO, resultVar),
+                services.getTermFactory());
 
-        // TODO: This is quite fragile, we should find a way around these
-        // String manipulations.
-        final String predSpec = "(\\int _ph -> {"
-                + postCond.replaceAll("result", "_ph") + "}";
+        ArrayList<AbstractionPredicate> predicates = new ArrayList<>();
+        predicates.add(AbstractionPredicate.create(predicateTerm, phVariable,
+                services));
 
         final PredicateAbstractionJoinParams predAbstrJoinParams = //
                 new PredicateAbstractionJoinParams(
-                        new Pair<String, String>("\\simple", predSpec));
+                        SimplePredicateAbstractionLattice.class, predicates);
 
         final JoinPointStatement jps = new JoinPointStatement(
                 joinPointReturnVar);
@@ -490,19 +573,20 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * 
      * @param services
      *            The {@link Services} object.
-     * @param PO
+     * @param postCondition
      *            The proof obligation that should be reduced to the parts about
      *            the result variable.
+     * @param resultVar
+     *            TODO
      * @return A subformula including the result variable.
      */
-    private Term extractPOSubWithResultVar(Services services,
-            Term postCondition) {
+    private Term extractPOSubWithVar(Services services, Term postCondition,
+            IProgramVariable resultVar) {
         Term newSubterm = null;
         while (true) {
             for (Term sub : postCondition.subs()) {
                 if (JoinRuleUtils.getLocationVariablesHashSet(sub, services)
-                        .contains((LocationVariable) services.getNamespaces()
-                                .programVariables().lookup("result"))) {
+                        .contains(resultVar)) {
                     if (newSubterm == null) {
                         newSubterm = sub;
                     } else {
@@ -610,7 +694,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final ProgramVariable loopScopeIdxVar = loopScopeIdxVar(services);
 
         final ProgramElement newProg = newProgram(services, loop, labels,
-                stmtToReplace, origJavaBlock, loopScopeIdxVar);
+                stmtToReplace, origJavaBlock, loopScopeIdxVar, invTerm);
 
         final Term labeledIdxVar = tb.label(tb.var(loopScopeIdxVar),
                 ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL);
