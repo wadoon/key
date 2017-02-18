@@ -436,7 +436,7 @@ public class BlockContractRule implements BuiltInRule {
 
         if (((BlockContractBuiltInRuleApp) application).getContract()
                 .getJoinProcedure() != null) {
-            return applyJoinBlockContract(goal, services,
+            return applyMergeBlockContract(goal, services,
                     (BlockContractBuiltInRuleApp) application);
         }
 
@@ -445,7 +445,7 @@ public class BlockContractRule implements BuiltInRule {
                     (BlockContractBuiltInRuleApp) application);
     }
 
-    private ImmutableList<Goal> applyJoinBlockContract(final Goal goal,
+    private ImmutableList<Goal> applyMergeBlockContract(final Goal goal,
             final Services services,
             final BlockContractBuiltInRuleApp application)
             throws RuleAbortException {
@@ -463,13 +463,13 @@ public class BlockContractRule implements BuiltInRule {
                             .getTemporaryNameProposal("join_point"),
                     new KeYJavaType(PrimitiveType.JAVA_BOOLEAN, Sort.ANY));
             
-            JoinPointStatement jPS = new JoinPointStatement(progVar);
+            MergePointStatement mps = new MergePointStatement(progVar);
             
-            services.getSpecificationRepository().addMergeSpecs(jPS, application.getContract().getJoinProcedure(),
+            services.getSpecificationRepository().addMergeSpecs(mps, application.getContract().getJoinProcedure(),
                     application.getContract().getJoinParams());
 
             StatementBlock newBlock = KeYJavaASTFactory.block(
-                    instantiation.block, jPS
+                    instantiation.block, mps
                     );
 
             Statement newProgram = (Statement) new ProgramElementReplacer(

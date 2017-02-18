@@ -2,21 +2,21 @@ package de.uka.ilkd.key.rule.join;
 
 import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.statement.JoinPointStatement;
+import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.*;
 
-public class DeleteJoinPointRule implements BuiltInRule {
+public class DeleteMergePointRule implements BuiltInRule {
 
-    public static final DeleteJoinPointRule INSTANCE = new DeleteJoinPointRule();
+    public static final DeleteMergePointRule INSTANCE = new DeleteMergePointRule();
 
     private static final String DISPLAY_NAME = "DeleteJoinPoint";
     private static final Name RULE_NAME = new Name(DISPLAY_NAME);
 
-    public DeleteJoinPointRule() {
+    public DeleteMergePointRule() {
 
     }
 
@@ -61,31 +61,21 @@ public class DeleteJoinPointRule implements BuiltInRule {
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
 
         if (pio != null
-                && JavaTools.getActiveStatement(
-                        TermBuilder.goBelowUpdates(pio.subTerm())
-                                .javaBlock()) instanceof JoinPointStatement) {
-            
-            JoinPointStatement jPS = (JoinPointStatement) JavaTools.getActiveStatement(
-                    TermBuilder.goBelowUpdates(pio.subTerm())
-                    .javaBlock());
-            for(Goal g: goal.proof().openGoals()){
-                if(!g.equals(goal) && !g.isLinked() && JoinPointRule.containsJPS(g, jPS )) return false;
-            }
-            int i = 0;
-            ImmutableList<RuleApp> ruleApps = goal.appliedRuleApps();
+            && JavaTools
+                .getActiveStatement(TermBuilder.goBelowUpdates(pio.subTerm())
+                        .javaBlock()) instanceof MergePointStatement) {
 
-            while (!ruleApps.isEmpty() && i < 15) {
-                if (ruleApps.head() instanceof JoinRuleBuiltInRuleApp && JavaTools.getActiveStatement(
-                        TermBuilder.goBelowUpdates(ruleApps.head().posInOccurrence().subTerm())
-                        .javaBlock()).equals(jPS)) {
-                   
-                    return true;
-                }
-                else {
-                    ruleApps = ruleApps.tail();
-                    i++;
+            MergePointStatement mps = (MergePointStatement) JavaTools
+                    .getActiveStatement(TermBuilder
+                            .goBelowUpdates(pio.subTerm()).javaBlock());
+            for (Goal g : goal.proof().openGoals()) {
+                if (!g.equals(goal) && !g.isLinked() && MergePointRule
+                        .containsMergePoint(g, mps, goal.proof().getServices())){
+                    return false;
                 }
             }
+            return true;
+
         }
         return false;
     }
@@ -98,7 +88,7 @@ public class DeleteJoinPointRule implements BuiltInRule {
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos,
             TermServices services) {
-        return new DeleteJoinPointBuiltInRuleApp(this, pos);
+        return new DeleteMergePointBuiltInRuleApp(this, pos);
     }
 
 }

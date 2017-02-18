@@ -32,7 +32,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.statement.JoinPointStatement;
+import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -128,8 +128,8 @@ public final class SpecificationRepository {
             new LinkedHashMap<IObserverFunction, IObserverFunction>();
     private final Map<IObserverFunction, ImmutableSet<Taclet>> unlimitedToLimitTaclets =
             new LinkedHashMap<IObserverFunction, ImmutableSet<Taclet>>();
-    private final Map<JoinPointStatement, Pair<JoinProcedure, String>> mergeSpecs = 
-            new LinkedHashMap<JoinPointStatement, Pair<JoinProcedure, String>>();
+    private final Map<MergePointStatement, Pair<JoinProcedure, String>> mergeSpecs = 
+            new LinkedHashMap<MergePointStatement, Pair<JoinProcedure, String>>();
 
     /**
      * <p>
@@ -1642,12 +1642,12 @@ public final class SpecificationRepository {
         return result;
     }
     
-    public Pair<JoinProcedure, String> getMergeSpecs(JoinPointStatement jPS){
+    public Pair<JoinProcedure, String> getMergeSpecs(MergePointStatement jPS){
         Pair<JoinProcedure, String> specs = mergeSpecs.get(jPS);
         return specs;
     }
     
-    public void addMergeSpecs(JoinPointStatement jPS, JoinProcedure joinProc, String  joinParams){
+    public void addMergeSpecs(MergePointStatement jPS, JoinProcedure joinProc, String  joinParams){
         final Pair<JoinProcedure, String> specs = new Pair<JoinProcedure, String>(joinProc, joinParams);
         mergeSpecs.put(jPS, specs);
     }

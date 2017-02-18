@@ -148,7 +148,7 @@ import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.ForUpdates;
 import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.If;
-import de.uka.ilkd.key.java.statement.JoinPointStatement;
+import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.java.statement.LoopStatement;
@@ -855,7 +855,7 @@ public abstract class SimultaneousJavaASTVisitor extends
     }
 
     @Override
-    public void visit(JoinPointStatement x1, JoinPointStatement x2) {
+    public void visit(MergePointStatement x1, MergePointStatement x2) {
         doDefaultAction(x1, x2);
     }
 

@@ -559,7 +559,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
     
     @Override
-    public void performActionOnJoinPointStatement(JoinPointStatement x){
+    public void performActionOnMergePointStatement(MergePointStatement x){
 	doDefaultAction(x);
     }
 

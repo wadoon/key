@@ -18,7 +18,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.axiom_abstraction.AbstractDomainElement;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.*;
 import de.uka.ilkd.key.java.*;
-import de.uka.ilkd.key.java.statement.JoinPointStatement;
+import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.ContainsStatementVisitor;
 import de.uka.ilkd.key.logic.*;
@@ -35,13 +35,13 @@ import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 
-public class JoinPointRule implements BuiltInRule {
-    public static final JoinPointRule INSTANCE = new JoinPointRule();
+public class MergePointRule implements BuiltInRule {
+    public static final MergePointRule INSTANCE = new MergePointRule();
 
     private static final String DISPLAY_NAME = "Join Point";
     private static final Name RULE_NAME = new Name(DISPLAY_NAME);
 
-    public JoinPointRule() {
+    public MergePointRule() {
 
     }
 
@@ -56,16 +56,15 @@ public class JoinPointRule implements BuiltInRule {
         StatementBlock block = (StatementBlock) JoinRuleUtils
                 .getJavaBlockRecursive(pio.subTerm()).program();
 
-        JoinPointStatement jPS = ((JoinPointStatement) block
+        MergePointStatement mps = ((MergePointStatement) block
                 .getInnerMostMethodFrame().getBody().getFirstElement());
 
         Pair<JoinProcedure, String> specs = services
-                .getSpecificationRepository().getMergeSpecs(jPS);
+                .getSpecificationRepository().getMergeSpecs(mps);
         JoinProcedure concreteRule = specs.first;
-        String params = specs.second;
-
+        
         if (concreteRule.toString().equals("JoinByPredicateAbstraction")) {
-            concreteRule = getProcedure(params, concreteRule, services);
+            concreteRule = getProcedure(specs.second, concreteRule, services);
         }
 
         ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
@@ -155,68 +154,77 @@ public class JoinPointRule implements BuiltInRule {
                 && !goal.isLinked()
                 && JavaTools.getActiveStatement(
                         TermBuilder.goBelowUpdates(pio.subTerm())
-                                .javaBlock()) instanceof JoinPointStatement) {
-
-            JoinPointStatement jPS = (JoinPointStatement) JavaTools
+                                .javaBlock()) instanceof MergePointStatement) {
+            Services services = goal.proof().getServices();
+            MergePointStatement mps = (MergePointStatement) JavaTools
                     .getActiveStatement(TermBuilder
                             .goBelowUpdates(pio.subTerm()).javaBlock());
+
             ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                     .findPotentialJoinPartners(goal, pio);
-            Pair<JoinProcedure, String> specs = goal.node().proof()
-                    .getServices().getSpecificationRepository()
-                    .getMergeSpecs(jPS);
-            JoinProcedure joinProc = specs.first;
-            String params = specs.second;
 
-            if (!joinPartners.isEmpty() && (!joinProc.toString()
+            Pair<JoinProcedure, String> specs = services
+                    .getSpecificationRepository().getMergeSpecs(mps);
+
+            if (joinPartners.isEmpty() || (specs.first.toString()
                     .equals("JoinByPredicateAbstraction")
-                    || !hasCorrectParams(params, goal.proof().getServices()))) {
+                    && !hasCorrectParams(specs.second, services)))
+                return false;
 
-                ImmutableList<Goal> joinPartnersGoal = ImmutableSLList.nil();
+            ImmutableList<Goal> joinPartnersGoal = ImmutableSLList.nil();
+            for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> p : joinPartners) {
+                joinPartnersGoal = joinPartnersGoal.append(p.first);
+            }
 
-                for (Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> p : joinPartners) {
-                    joinPartnersGoal = joinPartnersGoal.append(p.first);
-                }
+            ImmutableList<Goal> openGoals = goal.node().proof().openGoals();
+            for (Goal g : openGoals) {
+                if (!g.equals(goal) && !g.isLinked()
+                        && !joinPartnersGoal.contains(g)
+                        && containsMergePoint(g, mps, services))
+                    return false;
 
-                ImmutableList<Goal> openGoals = goal.node().proof().openGoals();
-                for (Goal g : openGoals) {
-                    if (!g.equals(goal) && !g.isLinked()
-                            && !joinPartnersGoal.contains(g)
-                            && containsJPS(g, jPS)) {
-                        return false;
-                    }
-                }
-                return true;
+            }
+            return true;
+
+        }
+        return false;
+    }
+
+    /**
+     * @param g
+     * @param jps
+     * @param services
+     * @return
+     */
+    public static boolean containsMergePoint(Goal g, MergePointStatement mps,
+            Services services) {
+        Semisequent succedent = g.node().sequent().succedent();
+        for (int i = 0; i < succedent.size(); i++) {
+            MethodFrame mF = JavaTools.getInnermostMethodFrame(JoinRuleUtils
+                    .getJavaBlockRecursive(succedent.get(i).formula()),
+                    services);
+            if (mF != null) {
+                ContainsStatementVisitor visitor = new ContainsStatementVisitor(
+                        mF, mps, services);
+                visitor.start();
+                if (visitor.isContained())
+                    return true;
             }
         }
         return false;
     }
 
-    public static boolean containsJPS(Goal g, JoinPointStatement jPS) {
-        Services services = g.proof().getServices();
-        Term t;
-        Semisequent sequent = g.node().sequent().succedent();
-        for (int i = 0; i < g.node().sequent().succedent().size(); i++) {
-            t = sequent.get(i).formula();
-            MethodFrame mF = JavaTools.getInnermostMethodFrame(
-                    JoinRuleUtils.getJavaBlockRecursive(t), services);
-            if(mF != null){
-            ContainsStatementVisitor visitor = new ContainsStatementVisitor(mF,
-                    jPS, services);
-           visitor.start();
-           if(visitor.isContained()) return true;
-            }
-        }
-        return false;
-    }
-
-
+    /**
+     * @param params
+     * @param services
+     * @return
+     */
     private boolean hasCorrectParams(String params, Services services) {
-        /* params string  = latticeType(...)
-         * Matcher separates the string in m.group(1) = laticeType
-         * m.group(2) = string contained between the parenthesis
+        /*
+         * params string = latticeType(...) Matcher separates the string in
+         * m.group(1) = laticeType m.group(2) = string contained between the
+         * parenthesis
          */
-        
         Pattern p = Pattern.compile("([a-z]+)\\s*\\((.+?)\\)");
         Matcher m = p.matcher(params);
         boolean matched = false;
@@ -225,28 +233,32 @@ public class JoinPointRule implements BuiltInRule {
             matched = true;
             if (m.groupCount() != 2)
                 return false;
-            else {
-                List<AbstractionPredicate> predicates = getPredicates(
-                        m.group(2), services);
-                if (((m.group(1).equals("conjunctive")
-                        || m.group(1).equals("disjunctive")
-                        || m.group(1).equals("simple")) && predicates.isEmpty())
-                        || !m.group(1).equals("rep"))
-                    return false;
-            }
+            List<AbstractionPredicate> predicates = getPredicates(m.group(2),
+                    services);
+            String l = m.group(1);
+            if (!predicates.isEmpty()
+                            && !(l.equals("simple") || l.equals("conjunctive")
+                                    || l.equals("disjunctive")))
+                return false;
         }
         return matched;
     }
 
+    /**
+     * @param predicatesStr
+     * @param services
+     * @return
+     */
     private List<AbstractionPredicate> getPredicates(String predicatesStr,
             Services services) {
         List<AbstractionPredicate> result = new ArrayList<AbstractionPredicate>();
-        /* parameters string should have the following structure
-        * placeholder -> {predicate, predicate1, ...} (whitespaces are optional)
-        * m.group(1) = placeholder and m.group(2) = all the predicates
-        * Placeholder structure: SORT var (NOTE: space between the sort and the variable is obligatory) 
-        * Example: int x 
-        */
+        /*
+         * parameters string should have the following structure placeholder ->
+         * {predicate, predicate1, ...} (whitespaces are optional) m.group(1) =
+         * placeholder and m.group(2) = all the predicates Placeholder
+         * structure: SORT var (NOTE: space between the sort and the variable is
+         * obligatory) Example: int x
+         */
         Pattern p = Pattern.compile("(.+?)\\s*->\\s*\\{(.+?)\\}");
         Matcher m = p.matcher(predicatesStr);
         while (m.find()) {
@@ -298,7 +310,7 @@ public class JoinPointRule implements BuiltInRule {
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos,
             TermServices services) {
-        return new JoinPointBuiltInRuleApp(this, pos);
+        return new MergePointBuiltInRuleApp(this, pos);
     }
 
 }

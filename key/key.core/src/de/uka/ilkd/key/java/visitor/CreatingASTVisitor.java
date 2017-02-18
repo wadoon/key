@@ -185,11 +185,11 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         doDefaultAction(x);
     }
     
-    public void performActionOnJoinPointStatement(JoinPointStatement x){
+    public void performActionOnMergePointStatement(MergePointStatement x){
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
                 Pair<JoinProcedure, String> specs = services.getSpecificationRepository().getMergeSpecs(x);
-                JoinPointStatement newJPS = new JoinPointStatement(changeList.get(ProgramVariable.class));
+                MergePointStatement newJPS = new MergePointStatement(changeList.get(ProgramVariable.class));
                 services.getSpecificationRepository().addMergeSpecs(newJPS, specs.first, specs.second);
                 return newJPS;
             }

@@ -7,7 +7,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.statement.JoinPointStatement;
+import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
@@ -17,11 +17,11 @@ import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.joinrule.JoinRuleUtils;
 import junit.framework.TestCase;
 
-public class JoinPointRuleTests extends TestCase {
+public class MergePointRuleTests extends TestCase {
 
-    private static final String TEST_RESOURCES_DIR_PREFIX = "resources/testcase/joinPoint/";
+    private static final String TEST_RESOURCES_DIR_PREFIX = "resources/testcase/mergePoint/";
 
-    public JoinPointRuleTests() {
+    public MergePointRuleTests() {
         
     }
 
@@ -101,7 +101,7 @@ public class JoinPointRuleTests extends TestCase {
                 .getInnerMostMethodFrame().getBody();
 
         assertTrue(((StatementBlock) blockWithJP.getChildAt(0)).getChildAt(1).equals(blockWithoutJP.getChildAt(0)));
-        assertTrue(((StatementBlock) blockWithJP.getChildAt(0)).getChildAt(2) instanceof JoinPointStatement);
+        assertTrue(((StatementBlock) blockWithJP.getChildAt(0)).getChildAt(2) instanceof MergePointStatement);
 
         for (int j = 1; j < blockWithoutJP.getChildCount(); j++) {
             assertTrue(blockWithJP.getChildAt(j).equals(blockWithoutJP.getChildAt(j)));

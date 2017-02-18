@@ -3147,8 +3147,8 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    public void printJoinPoint(JoinPointStatement joinPointStatement) throws IOException {
-       write(joinPointStatement.toString());
+    public void printMergePoint(MergePointStatement mps) throws IOException {
+       write(mps.toString());
         
     }
 

@@ -456,7 +456,7 @@ public interface Visitor {
 
     public void performActionOnEmptyMapLiteral(EmptyMapLiteral aThis);
 
-    public void performActionOnJoinPointStatement(
-            JoinPointStatement joinPointStatement);
+    public void performActionOnMergePointStatement(
+            MergePointStatement mergePointStatement);
 
 }
