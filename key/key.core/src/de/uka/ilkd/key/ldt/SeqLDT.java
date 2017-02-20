@@ -32,181 +32,180 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 
 public final class SeqLDT extends LDT {
-    
-    public static final Name NAME = new Name("Seq");
-    public static final Name SEQGET_NAME = new Name("seqGet");
+	public static final Name NAME = new Name("Seq");
+	public static final Name SEQGET_NAME = new Name("seqGet");
+	public static final Name HIST_NAME = new Name("hist");
+	//TODO maybe needed
+//  public static final Name[] VALID_SEQ_NAMES = { NAME, SEQGET_NAME, HIST_NAME };
+	//             maybe emptySeq (something) needed and ^ not?
 
-    //getters
-    private final SortDependingFunction seqGet;
-    private final Function seqLen;
-    private final Function seqIndexOf; 
-    
-    //constructors
-    private final Function seqEmpty;
-    private final Function seqSingleton;
-    private final Function seqConcat;
-    private final Function seqSub;
-    private final Function seqReverse;   
-    private final Function seqDef;
-    private final Function values;
-    
-    public SeqLDT(TermServices services) {
+	//getters
+	private final SortDependingFunction seqGet;
+	private final Function seqLen;
+	private final Function seqIndexOf; 
+
+	//constructors
+	private final Function seqEmpty;
+	private final Function seqSingleton;
+	private final Function seqConcat;
+	private final Function seqSub;
+	private final Function seqReverse;   
+	private final Function seqDef;
+	private final Function values;
+
+	//history (of Remote method events)
+	private LocationVariable hist;
+
+	public SeqLDT(TermServices services) {
 	super(NAME, services);
-        seqGet        = addSortDependingFunction(services, "seqGet");
-        seqLen        = addFunction(services, "seqLen");
-        seqEmpty      = addFunction(services, "seqEmpty");
-        seqSingleton  = addFunction(services, "seqSingleton");
-        seqConcat     = addFunction(services, "seqConcat");
-        seqSub        = addFunction(services, "seqSub");
-        seqReverse    = addFunction(services, "seqReverse");
-        seqIndexOf    = addFunction(services, "seqIndexOf");
-        seqDef         = addFunction(services, "seqDef");
-        values			= addFunction(services, "values");
-    }
-    
-    
-    public Function getSeqGet(Sort instanceSort, TermServices services) {
-	return seqGet.getInstanceFor(instanceSort, services);
-    }
-    
-    
-    public Function getSeqLen() {
-	return seqLen;
-    }    
-    
-    
-    public Function getSeqEmpty() {
-	return seqEmpty;
-    }
-    
-    
-    public Function getSeqSingleton() {
-	return seqSingleton;
-    }
+		seqGet       = addSortDependingFunction(services, "seqGet");
+		seqLen       = addFunction(services, "seqLen");
+		seqEmpty     = addFunction(services, "seqEmpty");
+		seqSingleton = addFunction(services, "seqSingleton");
+		seqConcat    = addFunction(services, "seqConcat");
+		seqSub       = addFunction(services, "seqSub");
+		seqReverse   = addFunction(services, "seqReverse");
+		seqIndexOf   = addFunction(services, "seqIndexOf");
+		seqDef       = addFunction(services, "seqDef");
+		values       = addFunction(services, "values");
+		hist         = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
+	}
 
-    
-    public Function getSeqConcat() {
-	return seqConcat;
-    }
-    
+	public Function getSeqGet(Sort instanceSort, TermServices services) {
+    	return seqGet.getInstanceFor(instanceSort, services);
+	}
 
-    public Function getSeqSub() {
-	return seqSub;
-    }
+	public Function getSeqLen() {
+		return seqLen;
+	}    
     
     
-    public Function getSeqReverse() {
-	return seqReverse;
-    }
+	public Function getSeqEmpty() {
+		return seqEmpty;
+	}
 
-    
-    public Function getSeqDef() {
-	return seqDef;
-    }
-    
-    /** Placeholder for the sequence of values observed through the execution of an enhanced for loop.
-     * Follows David Cok's proposal to adapt JML to Java5.
-     * @return
-     */
-    public Function getValues(){
-    	return values;
-    }
+	public Function getSeqSingleton() {
+		return seqSingleton;
+	}
 
-    
-    @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-                                 Term[] subs, 
-                                 Services services, 
-                                 ExecutionContext ec) {
+	public Function getSeqConcat() {
+		return seqConcat;
+	}
+
+	public Function getSeqSub() {
+		return seqSub;
+	}
+
+	public Function getSeqReverse() {
+		return seqReverse;
+	}
+
+	public Function getSeqDef() {
+		return seqDef;
+	}
+
+	/** Placeholder for the sequence of values observed through the execution of an enhanced for loop.
+	 * Follows David Cok's proposal to adapt JML to Java5.
+	 * @return
+	 */
+	public Function getValues(){
+		return values;
+	}
+
+	@Override
+	public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
+	                             Term[] subs, 
+	                             Services services, 
+	                             ExecutionContext ec) {
 	return isResponsible(op, (Term)null, services, ec);
-    }
-    
-
-    @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-                		 Term left, 
-                		 Term right, 
-                		 Services services, 
-                		 ExecutionContext ec) {
-	return false;
-    }
-
-    
-    @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-	    			 Term sub, 
-	    			 TermServices services, 
-	    			 ExecutionContext ec) {
-	return op instanceof SeqSingleton
-	       || op instanceof SeqConcat
-	       || op instanceof SeqSub
-	       || op instanceof SeqReverse
-	       || op instanceof SeqIndexOf
-	       || op instanceof SeqGet
-	       || op instanceof SeqLength;
-    }
-
-
-    @Override
-    public Term translateLiteral(Literal lit, Services services) {
-	assert lit instanceof EmptySeqLiteral;
-	return services.getTermBuilder().func(seqEmpty);
-    }
-    
-
-    @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, 
-	    			   Services serv, 
-	    			   ExecutionContext ec) {
-	if(op instanceof SeqSingleton) {
-	    return seqSingleton;
-	} else if(op instanceof SeqConcat) {
-	    return seqConcat;
-	} else if(op instanceof SeqSub) {
-	    return seqSub;
-	} else if(op instanceof SeqReverse) {
-	    return seqReverse;
-	} else if(op instanceof SeqIndexOf) {
-	    return seqIndexOf;
-	} else if(op instanceof SeqGet){
-	    return seqGet;
-	} else if(op instanceof SeqLength){
-	    return seqLen;
 	}
-	assert false;
-	return null;
-    }
 
-    
-    @Override
-    public boolean hasLiteralFunction(Function f) {
-	return f.equals(seqEmpty);
-    }
-
-    
-    @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
-	if(t.op().equals(seqEmpty)) {
-	    return EmptySeqLiteral.INSTANCE;
+	@Override
+	public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
+	                             Term left, 
+	                             Term right, 
+	                             Services services, 
+	                             ExecutionContext ec) {
+		return false;
 	}
-	assert false;
-	return null;
-    }
-    
-    
-    @Override
-    public final Type getType(Term t) {
-	assert false;
-	return null;
-    }
 
+	@Override
+	public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
+	                             Term sub, 
+	                             TermServices services, 
+	                             ExecutionContext ec) {
+		return op instanceof SeqSingleton
+		    || op instanceof SeqConcat
+		    || op instanceof SeqSub
+		    || op instanceof SeqReverse
+		    || op instanceof SeqIndexOf
+		    || op instanceof SeqGet
+		    || op instanceof SeqLength;
+	}
 
-    public Function getSeqIndexOf() {
-	return seqIndexOf;
-    }    
+	@Override
+	public Term translateLiteral(Literal lit, Services services) {
+		assert lit instanceof EmptySeqLiteral;
+		return services.getTermBuilder().func(seqEmpty);
+	}
+
+	@Override
+	public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, 
+	                               Services serv, 
+	                               ExecutionContext ec) {
+		if(op instanceof SeqSingleton) {
+			return seqSingleton;
+		} else if(op instanceof SeqConcat) {
+			return seqConcat;
+		} else if(op instanceof SeqSub) {
+			return seqSub;
+		} else if(op instanceof SeqReverse) {
+			return seqReverse;
+		} else if(op instanceof SeqIndexOf) {
+			return seqIndexOf;
+		} else if(op instanceof SeqGet){
+			return seqGet;
+		} else if(op instanceof SeqLength){
+			return seqLen;
+		}
+		assert false;
+		return null;
+	}
+
+	@Override
+	public boolean hasLiteralFunction(Function f) {
+		return f.equals(seqEmpty);
+	}
+
+	@Override
+	public Expression translateTerm(Term t, ExtList children, Services services) {
+		if(t.op().equals(seqEmpty)) {
+			return EmptySeqLiteral.INSTANCE;
+		}
+		assert false;
+		return null;
+	}
+
+	@Override
+	public final Type getType(Term t) {
+		assert false;
+		return null;
+	}
+
+	public Function getSeqIndexOf() {
+		return seqIndexOf;
+	}
+
+	/**
+	 * @return the history of Remote method events;
+	 */
+	public LocationVariable getHist() {
+		return hist;
+	}
 }

@@ -96,23 +96,22 @@ public class Namespace implements java.io.Serializable {
      * replaced by <code>sym</code>. Use addSafely() instead if possible.
      * TODO:The problem of saving to localSym, symbols, and symbolRefs is not solved yet.*/
     public void add(Named sym) {
-	if (numLocalSyms>0) {
-                if (symbols == null) {
-                    symbols = new LinkedHashMap<Name, Named>();
-                    if (localSym != null) {
-                        symbols.put(localSym.name(), localSym);
-                        localSym = null;
-                    }
-                }
-                symbols.put(sym.name(), sym);
-            }
-	else localSym=sym;
-	numLocalSyms++;
-        if (protocol != null) {
-	    protocol.put(sym.name(),sym); 
-        }
-    }
-    
+    	if (numLocalSyms>0) {
+    		if (symbols == null) {
+    			symbols = new LinkedHashMap<Name, Named>();
+    			if (localSym != null) {
+    				symbols.put(localSym.name(), localSym);
+    				localSym = null;
+    			}
+    		}
+    		symbols.put(sym.name(), sym);
+    	} else localSym=sym;
+    	numLocalSyms++;
+    	if (protocol != null) {
+    		protocol.put(sym.name(),sym); 
+    	}
+	}
+
     public void remove(Name name){
     	if(symbols != null && symbols.containsKey(name)){
     		symbols.remove(name);
