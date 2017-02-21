@@ -29,6 +29,7 @@ import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
@@ -75,6 +76,8 @@ public final class SeqLDT extends LDT {
 		seqDef       = addFunction(services, "seqDef");
 		values       = addFunction(services, "values");
 		hist         = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
+		// TODO remove again
+		System.out.println(hist);
 	}
 
 	public Function getSeqGet(Sort instanceSort, TermServices services) {
