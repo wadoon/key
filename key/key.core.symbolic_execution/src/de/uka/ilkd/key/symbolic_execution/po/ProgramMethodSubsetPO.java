@@ -247,9 +247,10 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
                                KeYJavaType selfKJT,
                                ImmutableList<ProgramVariable> paramVars,
                                List<LocationVariable> heaps,
+                               LocationVariable hist, //TODO KD
                                Services proofServices) {
       ImmutableList<ProgramVariable> paramVarsList = convert(undeclaredVariableCollector.result());
-      return super.buildFreePre(selfVar, selfKJT, paramVarsList, heaps, proofServices);
+      return super.buildFreePre(selfVar, selfKJT, paramVarsList, heaps, hist, proofServices); // TODO KD
    }
 
    /**
