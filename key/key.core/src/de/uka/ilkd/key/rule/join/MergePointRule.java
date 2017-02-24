@@ -85,35 +85,13 @@ public class MergePointRule implements BuiltInRule {
             JoinProcedure joinProc, Services services) {
         Class<? extends AbstractPredicateAbstractionLattice> latticeType = null;
         List<AbstractionPredicate> predicates = null;
-        Pattern p = Pattern.compile("([a-z]+)\\s*\\((.+?)\\)");
+        Pattern p = Pattern.compile("([a-z]+)\\s*\\((.+?)\\)", Pattern.DOTALL | Pattern.MULTILINE);
         Matcher m = p.matcher(params);
+        
         while (m.find()) {
-            if (m.group(1).equals("rep")) {
-
-                URL path = JMLSpecFactory.class.getResource("domains.txt");
-                String line = "";
-                File f = new File(path.getFile());
-                boolean found = false;
-                try (BufferedReader br = new BufferedReader(
-                        new FileReader(f))) {
-                    while ((line = br.readLine()) != null && !found) {
-                        String[] content = line.split(",", 3);
-                        if (m.group(2).equals(content[0])) {
-                            found = true;
-                            latticeType = translateLatticeType(content[1]);
-                            predicates = getPredicates(content[2], services);
-                        }
-                    }
-                }
-                catch (IOException e) {
-
-                }
-
-            }
-            else {
-                latticeType = translateLatticeType(m.group(1));
+             latticeType = translateLatticeType(m.group(1));
                 predicates = getPredicates(m.group(2), services);
-            }
+       
         }
         final JoinWithPredicateAbstractionFactory absPredicateFactory = (JoinWithPredicateAbstractionFactory) joinProc;
         return absPredicateFactory.instantiate(predicates, latticeType,
@@ -165,7 +143,7 @@ public class MergePointRule implements BuiltInRule {
 
             Pair<JoinProcedure, String> specs = services
                     .getSpecificationRepository().getMergeSpecs(mps);
-
+            
             if (joinPartners.isEmpty() || (specs.first.toString()
                     .equals("JoinByPredicateAbstraction")
                     && !hasCorrectParams(specs.second, services)))
@@ -225,7 +203,7 @@ public class MergePointRule implements BuiltInRule {
          * m.group(1) = laticeType m.group(2) = string contained between the
          * parenthesis
          */
-        Pattern p = Pattern.compile("([a-z]+)\\s*\\((.+?)\\)");
+        Pattern p = Pattern.compile("([a-z]+)\\s*\\((.+?)\\)", Pattern.DOTALL | Pattern.MULTILINE);
         Matcher m = p.matcher(params);
         boolean matched = false;
 

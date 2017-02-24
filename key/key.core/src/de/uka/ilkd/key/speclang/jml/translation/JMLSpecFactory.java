@@ -550,9 +550,14 @@ public class JMLSpecFactory {
         if (params == null || params.size() == 0) {
             return null;
         }
-        else
-            return params.head().text.substring(12,
+        else{
+            String input  = params.head().text.substring(12,
                     params.head().text.length() - 1);
+            input = input.replaceAll("@", "");
+            return input;
+            }
+        
+           
 
     }
 
