@@ -230,7 +230,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
           }
 
           final Term pre =
-                  tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, heaps, proofServices),
+                  tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, heaps, null, proofServices),
                           permsFor, getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices));
           // build program term
           Term postTerm = getPost(modHeaps, selfVar, paramVars, resultVar, null, atPreVars, proofServices);
@@ -379,7 +379,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
          }
 
          // build precondition
-         Term pre = tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, modHeaps, proofServices),
+         Term pre = tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, modHeaps, prehist, proofServices),
                                  permsFor, getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices));
          if(isTransactionApplicable()) {
              // Need to add assumptions about the transaction depth
@@ -512,6 +512,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                KeYJavaType selfKJT,
                                ImmutableList<ProgramVariable> paramVars,
                                List<LocationVariable> heaps,
+                               LocationVariable prehist,
                                Services services) {
       // "self != null"
       final Term selfNotNull = generateSelfNotNull(getProgramMethod(), selfVar);
@@ -539,9 +540,18 @@ public abstract class AbstractOperationPO extends AbstractPO {
             wellFormed = tb.and(wellFormed, wf);
          }
       }
-
-      return tb.and(wellFormed != null ? wellFormed : tb.tt(), selfNotNull,
-              selfCreated, selfExactType, paramsOK, mbyAtPreDef);
+      
+      //TODO: For test. Add here the well formed for the history
+      Term wfHist;
+      if (prehist != null) {
+         wfHist = tb.wellFormedHist(tb.var(prehist));
+      } else {
+          wfHist = tb.tt();
+      }
+      // End test
+      
+      return tb.and(tb.and(wellFormed != null ? wellFormed : tb.tt(), selfNotNull,
+              selfCreated, selfExactType, paramsOK, mbyAtPreDef), wfHist);
    }
 
    /**

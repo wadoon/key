@@ -42,6 +42,7 @@ public final class SeqLDT extends LDT {
 	public static final Name NAME = new Name("Seq");
 	public static final Name SEQGET_NAME = new Name("seqGet");
 	public static final Name HIST_NAME = new Name("hist");
+	public static final Name WFHIST_NAME = new Name("wfHist");
 	//TODO maybe needed
 //  public static final Name[] VALID_SEQ_NAMES = { NAME, SEQGET_NAME, HIST_NAME };
 	//             maybe emptySeq (something) needed and ^ not?
@@ -59,6 +60,7 @@ public final class SeqLDT extends LDT {
 	private final Function seqReverse;   
 	private final Function seqDef;
 	private final Function values;
+	private final Function wfHist;
 
 	//history (of Remote method events) ... copy of: key.core/resources/de/uka/ilkd/key/proof/rules/events.key -> Seq hist;
 	private LocationVariable hist;
@@ -76,6 +78,8 @@ public final class SeqLDT extends LDT {
 		seqDef       = addFunction(services, "seqDef");
 		values       = addFunction(services, "values");
 		hist         = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
+		wfHist       = addFunction(services, WFHIST_NAME.toString());
+		
 	}
 
 	public Function getSeqGet(Sort instanceSort, TermServices services) {
@@ -86,6 +90,9 @@ public final class SeqLDT extends LDT {
 		return seqLen;
 	}    
     
+	public Function getWellFormedHist() {
+	    return wfHist;
+	}
     
 	public Function getSeqEmpty() {
 		return seqEmpty;
