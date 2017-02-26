@@ -249,7 +249,7 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
                                List<LocationVariable> heaps,
                                Services proofServices) {
       ImmutableList<ProgramVariable> paramVarsList = convert(undeclaredVariableCollector.result());
-      return super.buildFreePre(selfVar, selfKJT, paramVarsList, heaps, proofServices);
+      return super.buildFreePre(selfVar, selfKJT, paramVarsList, heaps, proofServices); // TODO KD
    }
 
    /**

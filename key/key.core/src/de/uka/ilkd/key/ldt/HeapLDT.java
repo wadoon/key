@@ -92,7 +92,7 @@ public final class HeapLDT extends LDT {
     private final Function reach;
     private final Function prec;
     
-    //heap pv
+    //heap pv ... copys of: key.core/resources/de/uka/ilkd/key/proof/rules/heap.key -> Heap heap, savedHeap, permissions;
     private ImmutableList<LocationVariable> heaps;
     
     

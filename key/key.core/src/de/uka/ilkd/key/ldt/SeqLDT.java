@@ -60,7 +60,7 @@ public final class SeqLDT extends LDT {
 	private final Function seqDef;
 	private final Function values;
 
-	//history (of Remote method events)
+	//history (of Remote method events) ... copy of: key.core/resources/de/uka/ilkd/key/proof/rules/events.key -> Seq hist;
 	private LocationVariable hist;
 
 	public SeqLDT(TermServices services) {
@@ -76,8 +76,6 @@ public final class SeqLDT extends LDT {
 		seqDef       = addFunction(services, "seqDef");
 		values       = addFunction(services, "values");
 		hist         = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
-		// TODO remove again
-		System.out.println(hist);
 	}
 
 	public Function getSeqGet(Sort instanceSort, TermServices services) {
