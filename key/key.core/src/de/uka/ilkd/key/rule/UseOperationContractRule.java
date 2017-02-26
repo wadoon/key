@@ -826,13 +826,20 @@ public final class UseOperationContractRule implements BuiltInRule {
              atPreUpdates = up;
            }else{
              atPreUpdates = tb.parallel(atPreUpdates, up);
-           }
+           }           
            if(reachableState == null) {
              reachableState = tb.wellFormed(heap);
            }else{
              reachableState = tb.and(reachableState, tb.wellFormed(heap));
            }
         }
+        
+        //TODO: Test here. Add the updates to the history variable to the atPreUpdates?
+        //Add here the adding of the new events, if there the method is a remote one.
+          Term historyUpdate = tb.elementary(services.getTypeConverter().getSeqLDT().getHist(), tb.var(services.getTypeConverter().getSeqLDT().getHist()));
+          anonUpdate = tb.parallel(anonUpdate, historyUpdate);
+       // End test
+        
 
         final Term excNull = tb.equals(tb.var(excVar), tb.NULL());
         final Term excCreated = tb.created(tb.var(excVar));
