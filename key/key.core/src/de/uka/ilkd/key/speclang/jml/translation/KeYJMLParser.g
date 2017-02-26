@@ -595,6 +595,7 @@ infflowspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil
     ;
 
 
+
 signalsclause returns [Term ret=null] throws SLTranslationException
 @init {
     Term pred = null;
