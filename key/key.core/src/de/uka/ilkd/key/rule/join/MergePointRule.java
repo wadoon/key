@@ -27,6 +27,8 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
@@ -62,17 +64,19 @@ public class MergePointRule implements BuiltInRule {
         Pair<JoinProcedure, String> specs = services
                 .getSpecificationRepository().getMergeSpecs(mps);
         JoinProcedure concreteRule = specs.first;
-        
+
         if (concreteRule.toString().equals("JoinByPredicateAbstraction")) {
             concreteRule = getProcedure(specs.second, concreteRule, services);
         }
 
         ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners = JoinRule
                 .findPotentialJoinPartners(goal, pio, goal.proof().root());
+        ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> newJoinPartners = getNewJoinP(
+                joinPartners, services.getProof(), goal, pio);
 
         app.setJoinNode(goal.node());
         app.setConcreteRule(concreteRule);
-        app.setJoinPartners(joinPartners);
+        app.setJoinPartners(newJoinPartners);
 
         ImmutableList<Goal> newGoals = goal.split(1);
         Goal g = newGoals.head();
@@ -81,17 +85,46 @@ public class MergePointRule implements BuiltInRule {
         return newGoals;
     }
 
+    private ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> getNewJoinP(
+            ImmutableList<Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>>> joinPartners, Proof proof, Goal goal, PosInOccurrence pio) {
+        boolean changed = false;
+        for(Triple<Goal, PosInOccurrence, HashMap<ProgramVariable, ProgramVariable>> jp: joinPartners){
+            Goal g = jp.first;
+            Node parent = g.node().parent();
+            boolean containsMPS = getActive(parent);
+            
+            while(containsMPS){
+                proof.pruneProof(g.node().parent());
+                parent = parent.parent();
+                containsMPS = getActive(parent);
+                changed = true;
+            }
+        }
+        return (changed ? JoinRule
+                .findPotentialJoinPartners(goal, pio, goal.proof().root()): joinPartners);
+    }
+    
+    private boolean getActive(Node g){
+        boolean containsMPS = false;
+        Semisequent succ = g.sequent().succedent();
+        for(int i  = 0; i< succ.size() && !containsMPS; i++){
+            containsMPS = JavaTools.getActiveStatement(JoinRuleUtils.getJavaBlockRecursive(succ.get(i).formula()))instanceof MergePointStatement;
+        }
+        return containsMPS;
+    }
+
     private JoinWithPredicateAbstraction getProcedure(String params,
             JoinProcedure joinProc, Services services) {
         Class<? extends AbstractPredicateAbstractionLattice> latticeType = null;
         List<AbstractionPredicate> predicates = null;
-        Pattern p = Pattern.compile("([a-z]+)\\s*\\((.+?)\\)", Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern p = Pattern.compile("([a-z]+)\\s*\\(\\s*(.+?)\\)",
+                Pattern.DOTALL | Pattern.MULTILINE);
         Matcher m = p.matcher(params);
-        
+
         while (m.find()) {
-             latticeType = translateLatticeType(m.group(1));
-                predicates = getPredicates(m.group(2), services);
-       
+            latticeType = translateLatticeType(m.group(1));
+            predicates = getPredicates(m.group(2), services);
+
         }
         final JoinWithPredicateAbstractionFactory absPredicateFactory = (JoinWithPredicateAbstractionFactory) joinProc;
         return absPredicateFactory.instantiate(predicates, latticeType,
@@ -143,7 +176,7 @@ public class MergePointRule implements BuiltInRule {
 
             Pair<JoinProcedure, String> specs = services
                     .getSpecificationRepository().getMergeSpecs(mps);
-            
+
             if (joinPartners.isEmpty() || (specs.first.toString()
                     .equals("JoinByPredicateAbstraction")
                     && !hasCorrectParams(specs.second, services)))
@@ -170,9 +203,11 @@ public class MergePointRule implements BuiltInRule {
 
     /**
      * @param g
-     * @param jps
+     *            goal that may contain the merge point statement
+     * @param mps
+     *            MergePointStatement to be matched
      * @param services
-     * @return
+     * @return true if the given goal g contains mps
      */
     public static boolean containsMergePoint(Goal g, MergePointStatement mps,
             Services services) {
@@ -203,7 +238,8 @@ public class MergePointRule implements BuiltInRule {
          * m.group(1) = laticeType m.group(2) = string contained between the
          * parenthesis
          */
-        Pattern p = Pattern.compile("([a-z]+)\\s*\\((.+?)\\)", Pattern.DOTALL | Pattern.MULTILINE);
+        Pattern p = Pattern.compile("([a-z]+)\\s*\\(\\s*(.+?)\\)",
+                Pattern.DOTALL | Pattern.MULTILINE);
         Matcher m = p.matcher(params);
         boolean matched = false;
 
@@ -214,9 +250,8 @@ public class MergePointRule implements BuiltInRule {
             List<AbstractionPredicate> predicates = getPredicates(m.group(2),
                     services);
             String l = m.group(1);
-            if (!predicates.isEmpty()
-                            && !(l.equals("simple") || l.equals("conjunctive")
-                                    || l.equals("disjunctive")))
+            if (!predicates.isEmpty() && !(l.equals("simple")
+                    || l.equals("conjunctive") || l.equals("disjunctive")))
                 return false;
         }
         return matched;
