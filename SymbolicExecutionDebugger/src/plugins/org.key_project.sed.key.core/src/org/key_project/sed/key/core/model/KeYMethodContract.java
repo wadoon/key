@@ -22,6 +22,7 @@ import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceRange;
+import org.eclipse.jdt.core.JavaModelException;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
 import org.key_project.sed.core.model.ISEMethodContract;
@@ -296,7 +297,12 @@ public class KeYMethodContract extends AbstractSEMethodContract implements IKeYS
          if (location.getCharEnd() >= 0) {
             ICompilationUnit compilationUnit = KeYModelUtil.findCompilationUnit(new SourceRequest(getDebugTarget(), getContractSourcePath()));
             if (compilationUnit != null) {
-               IMethod method = JDTUtil.findJDTMethod(compilationUnit, location.getCharEnd());
+                IMethod method;
+                try {
+                    method = JDTUtil.findJDTMethod(compilationUnit, location.getCharEnd());
+                } catch (JavaModelException e) {
+                    return SourceLocation.UNDEFINED;
+                }
                if (method != null) {
                   ISourceRange range = method.getNameRange();
                   location = new SourceLocation(-1, range.getOffset(), range.getOffset() + range.getLength());

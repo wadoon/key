@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.speclang;
 
 import java.io.File;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -122,7 +123,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 //external or internal path?
                 File file = new File(filePath);
                 if(file.isFile()) {
-                	rs = RuleSourceFactory.initRuleFile(file);
+                    rs = RuleSourceFactory.initRuleFile(file);
                 } else {
                     URL url = KeYResourceManager.getManager().getResourceFile(
                 				Recoder2KeY.class, 
@@ -183,7 +184,11 @@ public final class SLEnvInput extends AbstractEnvInput {
 
         
         //read DL library specs before any other specs
-        ImmutableSet<PositionedString> warnings = createDLLibrarySpecs();
+        
+        ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();;
+        if ( initConfig.getServices().getSpecificationRepository().getAllContracts().size() == 0 ) {// otherwise libs have been already parsed 
+            warnings = createDLLibrarySpecs(); 
+        }
        
         //sort types alphabetically (necessary for deterministic names)
         final Set<KeYJavaType> allKeYJavaTypes = javaInfo.getAllKeYJavaTypes();
