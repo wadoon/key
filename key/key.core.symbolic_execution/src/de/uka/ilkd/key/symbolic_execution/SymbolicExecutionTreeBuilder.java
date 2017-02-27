@@ -916,7 +916,7 @@ public class SymbolicExecutionTreeBuilder {
             executionNode = createExecutionTreeModelRepresentation(parentToAddTo, node, statement);
             parentToAddTo = addNodeToTreeAndUpdateParent(node, parentToAddTo, executionNode);
             // Check if execution node is a method return
-            executionNode = createMehtodReturn(parentToAddTo, node, statement, completions);
+            executionNode = createMethodReturn(parentToAddTo, node, statement, completions);
             parentToAddTo = addNodeToTreeAndUpdateParent(node, parentToAddTo, executionNode);
          }
          else {
@@ -1425,7 +1425,7 @@ public class SymbolicExecutionTreeBuilder {
     * @param completions The {@link SymbolicExecutionCompletions} to update.
     * @return The created {@link AbstractExecutionMethodReturn}.
     */
-   protected AbstractExecutionMethodReturn<?> createMehtodReturn(AbstractExecutionNode<?> parent,
+   protected AbstractExecutionMethodReturn<?> createMethodReturn(AbstractExecutionNode<?> parent,
                                                                  Node node, 
                                                                  SourceElement statement,
                                                                  SymbolicExecutionCompletions completions) {

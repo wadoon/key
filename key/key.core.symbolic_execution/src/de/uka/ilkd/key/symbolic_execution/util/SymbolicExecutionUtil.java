@@ -1066,12 +1066,12 @@ public final class SymbolicExecutionUtil {
       if (pm != null) {
          if (KeYTypeUtil.isImplicitConstructor(pm)) {
             IProgramMethod explicitConstructor = KeYTypeUtil.findExplicitConstructor(services, pm);
-            return explicitConstructor != null && 
-                   !KeYTypeUtil.isLibraryClass(explicitConstructor.getContainerType());
+            return explicitConstructor != null; //&& 
+                   //!KeYTypeUtil.isLibraryClass(explicitConstructor.getContainerType());
          }
          else {
-            return !pm.isImplicit() && // Do not include implicit methods, but always constructors
-                   !KeYTypeUtil.isLibraryClass(pm.getContainerType());
+            return !pm.isImplicit();// && // Do not include implicit methods, but always constructors
+                   //!KeYTypeUtil.isLibraryClass(pm.getContainerType());
          }
       }
       else {
