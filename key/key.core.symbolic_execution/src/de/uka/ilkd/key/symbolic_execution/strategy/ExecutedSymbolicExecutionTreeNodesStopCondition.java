@@ -13,17 +13,12 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy;
 
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.*;
 
-import de.uka.ilkd.key.proof.ApplyStrategy;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -76,19 +71,28 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
     */
    private final Map<Node, Boolean> goalAllowedResultPerSetNode = new LinkedHashMap<Node, Boolean>();
    
+   private final Set<Node> restartFirstOrderReasoning = new HashSet<Node>();
+   
    /**
     * Constructor to stop after one executed symbolic execution tree node.
     */
    public ExecutedSymbolicExecutionTreeNodesStopCondition() {
-      this(1);
+      this(1, null);
    }
 
    /**
     * Constructor to stop after the given number of symbolic execution tree nodes.
     * @param maximalNumberOfSetNodesToExecutePerGoal The maximal number of allowed symbolic execution tree nodes per goal.
     */
-   public ExecutedSymbolicExecutionTreeNodesStopCondition(int maximalNumberOfSetNodesToExecutePerGoal) {
+   public ExecutedSymbolicExecutionTreeNodesStopCondition(int maximalNumberOfSetNodesToExecutePerGoal, Proof proof) {
       this.maximalNumberOfSetNodesToExecutePerGoal = maximalNumberOfSetNodesToExecutePerGoal;
+
+      if (proof != null) {
+          for (Goal g :  proof.openGoals()) {
+              restartFirstOrderReasoning.add(g.node()); 
+          }
+      }
+   
    }
 
    /**
@@ -147,7 +151,25 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
             }
          }
          else {
-            return true;
+            for (Term term : SymbolicExecutionUtil.listSemisequentTerms(node.sequent().succedent())) {
+                if (SymbolicExecutionUtil.containsSymbolicExecutionLabel(term)) {
+                    return true;
+                }
+            }
+            Node parent = node;
+            int count = 0;
+            while (parent != null) {
+                if (!SymbolicExecutionUtil.isSymbolicExecutionTreeNode(parent, parent.getAppliedRuleApp())) {
+                    count ++;
+                } else {
+                    if (!SymbolicExecutionUtil.isTerminationNode(parent, parent.getAppliedRuleApp())) {
+                        count = 0;
+                    }
+                    break;
+                }
+                parent = parent.parent();
+            }
+            return count < 100;
          }
       }
       else {

@@ -42,7 +42,7 @@ public class SymbolicExecutionBreakpointStopCondition extends ExecutedSymbolicEx
     * @param breakpoints The {@link IBreakpoint} to use.
     */
    public SymbolicExecutionBreakpointStopCondition(IBreakpoint... breakpoints) {
-      super(Integer.MAX_VALUE);
+      super(Integer.MAX_VALUE, null);
       if (breakpoints != null) {
          for (IBreakpoint breakpoint : breakpoints) {
             this.breakpoints.add(breakpoint);

@@ -98,7 +98,7 @@ public class Main {
                                                                             false); // true to perform alias checks during symbolic execution
             // Optionally, add a more advanced stop conditions like breakpoints
             CompoundStopCondition stopCondition = new CompoundStopCondition();
-            stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(100)); // Stop after 100 nodes have been explored on each branch.
+            stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(100, proof)); // Stop after 100 nodes have been explored on each branch.
 //            stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition()); // Perform only a step over
 //            stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition()); // Perform only a step return
             IBreakpoint breakpoint = new ExceptionBreakpoint(proof, "java.lang.NullPointerException", true, true, true, true, 1);

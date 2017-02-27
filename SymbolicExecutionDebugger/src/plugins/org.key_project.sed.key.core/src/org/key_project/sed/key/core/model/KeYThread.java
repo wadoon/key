@@ -648,7 +648,7 @@ public class KeYThread extends AbstractSEThread implements IKeYSENode<IExecution
          SymbolicExecutionUtil.initializeStrategy(getBuilder());
          // Update stop condition
          CompoundStopCondition stopCondition = new CompoundStopCondition();
-         stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfSetNodesToExecute));
+         stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfSetNodesToExecute, proof));
          SymbolicExecutionBreakpointStopCondition breakpointParentStopCondition = getBreakpointManager().getBreakpointStopCondition();
          stopCondition.addChildren(breakpointParentStopCondition);
          proof.getServices().setFactory(createNewFactory(breakpointParentStopCondition));

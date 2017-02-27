@@ -114,7 +114,8 @@ public class SymbolicExecutionEnvironment<U extends UserInterfaceControl> extend
          StrategyProperties strategyProperties = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(true, methodTreatmentContract, loopTreatmentInvariant, blockTreatmentContract, nonExecutionBranchHidingSideProofs, aliasChecks);
          proof.setActiveStrategy(proof.getActiveStrategyFactory().create(proof, strategyProperties));
          proof.getSettings().getStrategySettings().setCustomApplyStrategyGoalChooser(new SymbolicExecutionGoalChooser());
-         proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfNodesPerBranch));
+         proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(
+                 new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfNodesPerBranch, proof));
          SymbolicExecutionUtil.updateStrategySettings(proof, strategyProperties);
       }
    }

@@ -1009,7 +1009,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
       Proof proof = builder.getProof();
       CompoundStopCondition stopCondition = new CompoundStopCondition();
-      stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
+      stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, proof));
       stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
@@ -1045,7 +1045,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
       Proof proof = builder.getProof();
       CompoundStopCondition stopCondition = new CompoundStopCondition();
-      stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
+      stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(
+              ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, proof));
       stopCondition.addChildren(new StepReturnSymbolicExecutionTreeNodesStopCondition());
       stopCondition.addChildren(lineBreakpoints);
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
@@ -1079,7 +1080,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
       // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
       Proof proof = builder.getProof();
       CompoundStopCondition stopCondition = new CompoundStopCondition();
-      stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN));
+      stopCondition.addChildren(new ExecutedSymbolicExecutionTreeNodesStopCondition(
+              ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, proof));
       stopCondition.addChildren(new StepOverSymbolicExecutionTreeNodesStopCondition());
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
@@ -1112,7 +1114,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                                           File baseDir) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
       // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
       Proof proof = builder.getProof();
-      ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP);
+      ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_FOR_ONE_STEP, proof);
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
       ui.getProofControl().startAndWaitForAutoMode(proof);
@@ -1142,7 +1144,8 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
                                 File baseDir) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
       // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
       Proof proof = builder.getProof();
-      ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN);
+      ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(
+              ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, proof);
       proof.getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       // Run proof
       ui.getProofControl().startAndWaitForAutoMode(proof);
@@ -1972,7 +1975,7 @@ public class AbstractSymbolicExecutionTestCase extends TestCase {
     */
    private void internalDoSETTest(File oracleFile, SymbolicExecutionEnvironment<DefaultUserInterfaceControl> env, String oraclePathInBaseDirFile, int maximalNumberOfExecutedSetNodes, boolean includeConstraints, boolean includeVariables, boolean includeCallStack, boolean includeReturnValues) throws IOException, ProofInputException, ParserConfigurationException, SAXException {
       // Set stop condition to stop after a number of detected symbolic execution tree nodes instead of applied rules
-      ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes);
+      ExecutedSymbolicExecutionTreeNodesStopCondition stopCondition = new ExecutedSymbolicExecutionTreeNodesStopCondition(maximalNumberOfExecutedSetNodes,null);
       env.getProof().getSettings().getStrategySettings().setCustomApplyStrategyStopCondition(stopCondition);
       int nodeCount;
       // Execute auto mode until no more symbolic execution tree nodes are found or no new rules are applied.
