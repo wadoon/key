@@ -73,7 +73,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * Clear the heap of applicable rules
      */
     @Override
-    public void clearCache() {
+    public synchronized void clearCache() {
         queue = null;
         previousMinimum = null;
         IfInstantiationCache.ifInstCache.reset(null);
@@ -175,7 +175,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      *         cache again.
      */
     @Override
-    public RuleApp peekNext() {
+    public synchronized RuleApp peekNext() {
         ensureQueueExists();
 
         final long currentTime = goal.getTime();
