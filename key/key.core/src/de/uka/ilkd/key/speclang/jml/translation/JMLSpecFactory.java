@@ -1285,16 +1285,11 @@ public class JMLSpecFactory {
         throws SLTranslationException {
         assert kjt != null;
         assert spec != null;
-        
-        System.out.println(spec);
-        
-        //translateToTerm expression
-        //TODO: continue parsing here!!!! formula then becomes part of ModelBasedSecSpec
+
+        //TODO: model based spec parsing here!!!! currently parser tries to build a infflowspec (obviously failing) instead of a ModelBasedSecSpec
         InfFlowSpec parseTest = JMLTranslator.translate(spec, kjt, null, null, null,
                                      null, null, InfFlowSpec.class, services);
-        System.out.println("HERE - " + parseTest.preExpressions);
-        System.out.println(parseTest.postExpressions);
-        System.out.println(parseTest.newObjects);
+
         return new ModelBasedSecSpecImpl(kjt);
     }
 

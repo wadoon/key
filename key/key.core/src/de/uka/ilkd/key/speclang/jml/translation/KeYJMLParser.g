@@ -613,7 +613,7 @@ mbsecspecclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] 
     
     
 //to check whether the preserving keyword appears (not inside a parantheses expression) before the expression is terminated by a semicolon. To prevent ambiguity of determines and determines mbs
-//TODO: more elegant solution? Left factoring would be complicated
+//TODO: more elegant solution? Left factoring would be complicated. parentheses counting doesn't even work with syntactic predicates, so something needs to be done here anyway
 expression_with_preserving
 @init {
     int parenthesesCounter = 0;
