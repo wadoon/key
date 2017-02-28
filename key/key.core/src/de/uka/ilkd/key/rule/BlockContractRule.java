@@ -460,17 +460,17 @@ public class BlockContractRule implements BuiltInRule {
 
             final ProgramVariable progVar = KeYJavaASTFactory.localVariable(
                     services.getVariableNamer()
-                            .getTemporaryNameProposal("join_point"),
+                            .getTemporaryNameProposal("merge_point"),
                     new KeYJavaType(PrimitiveType.JAVA_BOOLEAN, Sort.ANY));
-            
+
             MergePointStatement mps = new MergePointStatement(progVar);
-            
-            services.getSpecificationRepository().addMergeSpecs(mps, application.getContract().getJoinProcedure(),
+
+            services.getSpecificationRepository().addMergeSpecs(mps,
+                    application.getContract().getJoinProcedure(),
                     application.getContract().getJoinParams());
 
-            StatementBlock newBlock = KeYJavaASTFactory.block(
-                    instantiation.block, mps
-                    );
+            StatementBlock newBlock = KeYJavaASTFactory
+                    .block(instantiation.block, mps);
 
             Statement newProgram = (Statement) new ProgramElementReplacer(
                     jB.program(), services).replace(instantiation.block,
