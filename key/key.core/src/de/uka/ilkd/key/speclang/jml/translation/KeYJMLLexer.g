@@ -9,7 +9,7 @@ lexer grammar KeYJMLLexer;
    public void reportError(RecognitionException e) {
       if (e instanceof MismatchedTokenException) {
          MismatchedTokenException m = (MismatchedTokenException) e;
-         String message = "Unexpected character '" + (char) e.c + "' in line "
+         String message = "Unexpected character '" + (char) e.c  + "'" + " (" + e.c + ") in line "
                + e.line + ":" + e.charPositionInLine
                + ". Expected character is: '" + (char) m.expecting + "'";
          message += "\nFile name: " + getSourceName();
@@ -49,6 +49,7 @@ lexer grammar KeYJMLLexer;
     MODEL_METHOD_AXIOM    : 'model_method_axiom';  //KeY extension, not official JML
     NON_NULL        : 'non_null';
     NULLABLE        : 'nullable';
+    PRESERVING	    : 'preserving'; //KeY extension, not official JML
     REPRESENTS      : 'represents';
     REQUIRES        : 'requires';
     REQUIRES_FREE   : 'requires_free';
@@ -64,7 +65,8 @@ lexer grammar KeYJMLLexer;
     BACKUP               : '\\backup';  //KeY extension, not official JML
     BIGINT               : '\\bigint';
     BSUM                 : '\\bsum';  //KeY extension, not official JML
-    BY                   : '\\by';  //KeY extension, not official JML
+    BY                   : '\\by'|'by';  //KeY extension, not official JML
+    CALL		 : '\\call'; //KeY extension, not official JML
     DECLASSIFIES         : '\\declassifies';  //KeY extension, not official JML
     DISJOINT             : '\\disjoint';  //KeY extension, not official JML
     DOMAIN_IMPLIES_CREATED : '\\domain_implies_created';  //KeY extension, not official JML
@@ -139,6 +141,7 @@ lexer grammar KeYJMLLexer;
     SUBSET               : '\\subset';
     SUCH_THAT            : '\\such_that';
     SUM                  : '\\sum';
+    TERMINATION          : '\\termination'; //KeY extension, not official JML
     TRANSACTIONUPDATED   : '\\transactionUpdated';  //KeY extension, not official JML
     TRANSIENT            : '\\transient';  //KeY extension, not official JML
     TYPE                 : '\\TYPE';

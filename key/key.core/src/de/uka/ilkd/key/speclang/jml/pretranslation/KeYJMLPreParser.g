@@ -47,6 +47,7 @@ options {
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
+    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLModelBasedSecSpec;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 }
 
@@ -228,6 +229,7 @@ classlevel_element[ImmutableList<String> mods]
 :
         result=class_invariant[mods]
     |   (accessible_keyword expression) => result=depends_clause[mods]
+    |	(determines_keyword expression_with_preserving) => result=determines_clause_mbs[mods] //TODO: Adjust Name of Rule? This is for model based NI specification
     |   result=method_specification[mods]
     |   result=field_or_method_declaration[mods]
     |   result=represents_clause[mods]
@@ -242,6 +244,7 @@ classlevel_element[ImmutableList<String> mods]
     |   result=assert_statement[mods] //RecodeR workaround
     |   result=assume_statement[mods] //RecodeR workaround
     |   result=nowarn_pragma[mods]
+    
 ;
 
 
@@ -387,6 +390,43 @@ initially_clause[ImmutableList<String> mods]
         }
     }
 ;
+
+//-----------------------------------------------------------------------------
+//class level NI
+//-----------------------------------------------------------------------------
+//TODO: do mods make sense here?
+determines_clause_mbs[ImmutableList<String> mods]
+        returns [ImmutableList<TextualJMLConstruct> result = null]
+        throws SLTranslationException
+:
+    determines_keyword ps=expression  //BY expression PRESERVING expression TODO: expressions have to end with semicolons, thats why we can't have the more detailed syntax in the PreParser
+    {
+    	    ps = ps.prepend("determines ");
+	    TextualJMLModelBasedSecSpec mbs = new TextualJMLModelBasedSecSpec(mods, ps);
+	    result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(mbs);
+	    //TODO: Throw exception if stupid mods found
+    }
+;
+
+//to check whether the preserving keyword appears (not inside a parantheses "expression") before the "expression" is terminated by a semicolon. To prevent ambiguity of determines and determines mbs
+//TODO: more elegant solution? Left factoring would be complicated
+expression_with_preserving
+@init {
+    int parenthesesCounter = 0;
+}
+:
+    (
+        (
+            LPAREN { parenthesesCounter++; }
+        |   RPAREN { parenthesesCounter--; }
+        |   { parenthesesCounter > 0 }? SEMICOLON
+        |   ~(LPAREN | RPAREN | SEMICOLON | PRESERVING)
+        )
+    )*
+    { parenthesesCounter == 0 }? PRESERVING
+;
+
+
 
 //-----------------------------------------------------------------------------
 //method specifications
@@ -1510,6 +1550,7 @@ expression returns [PositionedString result = null]
        result = createPositionedString(coveredText, begin);
     }
 ;
+
 
 initialiser returns [String s = null]
     :

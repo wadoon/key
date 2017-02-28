@@ -380,7 +380,7 @@ options {
     }
 }
 
-top returns [Object ret = null] throws  SLTranslationException
+top returns [Object ret = null] throws SLTranslationException
 :
     (   accessibleclause { ret = $accessibleclause.ret; }
     |   assignableclause { ret = $assignableclause.ret; }
@@ -395,6 +395,7 @@ top returns [Object ret = null] throws  SLTranslationException
     |   joinprocclause { ret = $joinprocclause.ret; }
     |   requiresfreeclause { ret = $requiresfreeclause.ret; }
     |   decreasesclause { ret = $decreasesclause.ret; }
+    | 	(DETERMINES expression_with_preserving) => mbsecspecclause {  ret = $mbsecspecclause.result; }
     |   separatesclause { ret = $separatesclause.result; } // old information flow syntax
     |   determinesclause { ret = $determinesclause.result; } // new information flow syntax
     |   loopseparatesclause { ret = $loopseparatesclause.result; } // old information flow syntax
@@ -593,6 +594,39 @@ infflowspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil
     (COMMA term = termexpression { result = result.append(term); })*
         { result = translator.translate("infflowspeclist", ImmutableList.class, result, services); }
     ;
+    
+    
+mbsecspecclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException
+@init {
+    ImmutableList<Term> decl = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> erases = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
+}
+:
+    DETERMINES (NOTHING {det=ImmutableSLList.<Term>nil();} | det = infflowspeclist)
+    BY (NOTHING {by = ImmutableSLList.<Term>nil();} | (ITSELF {by = det;}) | by = infflowspeclist)
+    PRESERVING (NOTHING {det=ImmutableSLList.<Term>nil();} | newobs = infflowspeclist)
+    {det = det.append(erases);
+     by = by.append(decl);
+     result = new InfFlowSpec(by, det, newObs);}
+    ;
+    
+    
+//to check whether the preserving keyword appears (not inside a parantheses expression) before the expression is terminated by a semicolon. To prevent ambiguity of determines and determines mbs
+//TODO: more elegant solution? Left factoring would be complicated
+expression_with_preserving
+@init {
+    int parenthesesCounter = 0;
+}
+:
+    (
+        LPAREN { parenthesesCounter++; }
+    |   RPAREN { parenthesesCounter--; }
+    |   { parenthesesCounter > 0 }? SEMI
+    |   ~(LPAREN | RPAREN | SEMI | PRESERVING)
+    )*
+    { parenthesesCounter == 0 }? PRESERVING
+;
 
 
 signalsclause returns [Term ret=null] throws SLTranslationException
@@ -1784,6 +1818,8 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
          => result = sequence    
     
     |   LPAREN result=expression RPAREN
+    | 	CALL {result = new SLExpression(tb.call(), new KeYJavaType(Sort.MESSAGETYPE));}
+    |	TERMINATION {result = new SLExpression(tb.termination(), new KeYJavaType(Sort.MESSAGETYPE));}
 ;
 
 

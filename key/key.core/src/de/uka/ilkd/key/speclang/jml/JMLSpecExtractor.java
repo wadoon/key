@@ -60,6 +60,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.ModelBasedSecSpec;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SpecExtractor;
 import de.uka.ilkd.key.speclang.SpecificationElement;
@@ -72,6 +73,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLDepends;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLInitially;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLModelBasedSecSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
@@ -329,14 +331,14 @@ public final class JMLSpecExtractor implements SpecExtractor {
             //concatenate comments, determine position
             String concatenatedComment = concatenate(comments);
             Position pos = comments[0].getStartPosition();
-
+//TODO: Just a reminder that classlevel parsing seems to start here (JK) but wait what? In extractMethodSpecs parse classlevel is called? What does class and method level even mean???
             //call preparser
             KeYJMLPreParser preParser
                 = new KeYJMLPreParser(concatenatedComment, fileName, pos);
             ImmutableList<TextualJMLConstruct> constructs
                 = preParser.parseClasslevelComment();
             warnings = warnings.union(preParser.getWarnings());
-
+            
             //create class invs out of textual constructs, add them to result
             for(TextualJMLConstruct c : constructs) {
         	try {
@@ -362,9 +364,13 @@ public final class JMLSpecExtractor implements SpecExtractor {
         	    } else if (c instanceof TextualJMLClassAxiom){
         		ClassAxiom ax = jsf.createJMLClassAxiom(kjt, (TextualJMLClassAxiom)c);
         		result = result.add(ax);
-        	    } else {
-        	        // DO NOTHING
-                        // There may be other kinds of JML constructs which are not specifications.
+        	    } else if (c instanceof TextualJMLModelBasedSecSpec){
+                TextualJMLModelBasedSecSpec textspec = (TextualJMLModelBasedSecSpec)c;
+                ModelBasedSecSpec spec = jsf.createJMLModelBasedSecSpec(kjt, textspec.getSpec());
+                result = result.add(spec);
+                } else {
+    	        // DO NOTHING
+                    // There may be other kinds of JML constructs which are not specifications.
         	    }
         	} catch (SLWarningException e) {
         	    warnings = warnings.add(e.getWarning());

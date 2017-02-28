@@ -244,7 +244,7 @@ public abstract class AbstractProblemLoader {
             try {
                 if (poContainer == null) {
                     if (askUiToSelectAProofObligationIfNotDefinedByLoadedFile) {
-                        if (control.selectProofObligation(initConfig)) {
+                        if (control.selectProofObligation(initConfig)) {    //TODO: here the user is presented with the choice of po JK
                             return;
                         } else {
                             // That message would be reported otherwise. Undesired.

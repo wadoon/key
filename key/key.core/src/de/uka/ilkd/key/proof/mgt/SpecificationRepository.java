@@ -73,6 +73,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
+import de.uka.ilkd.key.speclang.ModelBasedSecSpec;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.speclang.QueryAxiom;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
@@ -731,6 +732,10 @@ public final class SpecificationRepository {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract> nil();
         for (ImmutableSet<Contract> s : contracts.values()) {
             result = result.union(s);
+        }
+        //TODO remove debug output
+        for (Contract c : result) {            
+            System.out.println(c.getClass());
         }
         return WellDefinednessCheck.isOn() ? result : removeWdChecks(result);
     }
@@ -1523,6 +1528,8 @@ public final class SpecificationRepository {
                 addLoopInvariant((LoopInvariant) spec);
             } else if (spec instanceof BlockContract) {
                 addBlockContract((BlockContract) spec);
+            } else if (spec instanceof ModelBasedSecSpec) {
+                assert false : "model based NI specification not implemented yet"; //TODO: handle model based NI specs
             } else {
                 assert false : "unexpected spec: " + spec + "\n("
                         + spec.getClass() + ")";

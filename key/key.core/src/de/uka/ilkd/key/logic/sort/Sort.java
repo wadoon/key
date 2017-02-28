@@ -42,7 +42,12 @@ public interface Sort extends Named {
     /**
      * Any is a supersort of all sorts.
      */
-    final Sort ANY = new SortImpl(new Name("any"));    
+    final Sort ANY = new SortImpl(new Name("any"));  
+    
+    /**
+     * Sort representing the messagetypes in a component based system, i.e. call and termination TODO is this the right way to do this? JK
+     */
+    final Sort MESSAGETYPE = new SortImpl(new Name("messagetype"));
     
     public final Name CAST_NAME = new Name("cast");
     final Name INSTANCE_NAME = new Name("instance");

@@ -48,6 +48,7 @@ import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.MessageTypeValue;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -88,6 +89,8 @@ public class TermBuilder {
     private final TermFactory tf;
     private final Term tt;
     private final Term ff;
+    private final Term call;
+    private final Term termination;
 
     protected final Services services; // TODO; Make private
     
@@ -97,6 +100,9 @@ public class TermBuilder {
        this.tf = tf;
        this.tt = tf.createTerm(Junctor.TRUE);
        this.ff = tf.createTerm(Junctor.FALSE);
+       this.call = tf.createTerm(MessageTypeValue.CALL);
+       this.termination = tf.createTerm(MessageTypeValue.TERMINATION);
+               
     }
 
 
@@ -2348,4 +2354,17 @@ public class TermBuilder {
                                 "__EQUALS__LOCS__POST__")), // TODO: define string constant elsewhere
                                 heap1_pre, heap1_post, locset1, heap2_pre, heap2_post, locset2);
     }
+    
+    //-------------------------------------------------------------------------
+    // component based systems operators
+    //-------------------------------------------------------------------------
+    
+    public Term call() {
+        return this.call;
+    }
+    
+    public Term termination() {
+        return this.termination;
+    }
+    
 }

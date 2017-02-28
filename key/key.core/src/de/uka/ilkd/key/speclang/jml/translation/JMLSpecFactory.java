@@ -66,6 +66,8 @@ import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.InitiallyClauseImpl;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.LoopInvariantImpl;
+import de.uka.ilkd.key.speclang.ModelBasedSecSpec;
+import de.uka.ilkd.key.speclang.ModelBasedSecSpecImpl;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
 import de.uka.ilkd.key.speclang.SimpleBlockContract;
@@ -1275,6 +1277,25 @@ public class JMLSpecFactory {
     	assert dep != null;
     	assert targetHeap != null;
         return createJMLDependencyContract(kjt, targetHeap, dep);
+    }
+    
+    //TODO: Is Dummy atm, implement after semantics of ModelBasedSecSpec are defined
+    public ModelBasedSecSpec createJMLModelBasedSecSpec(KeYJavaType kjt,
+            PositionedString spec)
+        throws SLTranslationException {
+        assert kjt != null;
+        assert spec != null;
+        
+        System.out.println(spec);
+        
+        //translateToTerm expression
+        //TODO: continue parsing here!!!! formula then becomes part of ModelBasedSecSpec
+        InfFlowSpec parseTest = JMLTranslator.translate(spec, kjt, null, null, null,
+                                     null, null, InfFlowSpec.class, services);
+        System.out.println("HERE - " + parseTest.preExpressions);
+        System.out.println(parseTest.postExpressions);
+        System.out.println(parseTest.newObjects);
+        return new ModelBasedSecSpecImpl(kjt);
     }
 
 
