@@ -1285,9 +1285,12 @@ public class JMLSpecFactory {
         throws SLTranslationException {
         assert kjt != null;
         assert spec != null;
-
-        //TODO: model based spec parsing here!!!! currently parser tries to build a infflowspec (obviously failing) instead of a ModelBasedSecSpec
-        InfFlowSpec parseTest = JMLTranslator.translate(spec, kjt, null, null, null,
+        
+        //TODO: we probably need a selfvar here... how can we get one? this way? what is meant by "registering" it? Could there also be a static context?
+        ProgramVariable selfVar = TB.selfVar(kjt, false);
+        //TODO: model based spec parsing here!!!! currently parser tries to build a infflowspec (obviously failing) instead of a ModelBasedSecSpec. 
+        //Obviously MessageTypes can't be properly handled by the parser atm 
+        InfFlowSpec parseTest = JMLTranslator.translate(spec, kjt, selfVar, null, null,
                                      null, null, InfFlowSpec.class, services);
 
         return new ModelBasedSecSpecImpl(kjt);
