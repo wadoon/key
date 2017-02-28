@@ -392,8 +392,8 @@ top returns [Object ret = null] throws  SLTranslationException
     |   representsclause { ret = $representsclause.result; }
     |   axiomsclause { ret = $axiomsclause.ret; }
     |   requiresclause { ret = $requiresclause.ret; }
-    |   joinparamsclause { ret = $joinparamsclause.ret; }
-    |   joinprocclause { ret = $joinprocclause.ret; }
+    |   mergeparamsclause { ret = $mergeparamsclause.ret; }
+    |   mergeprocclause { ret = $mergeprocclause.ret; }
     |   requiresfreeclause { ret = $requiresfreeclause.ret; }
     |   decreasesclause { ret = $decreasesclause.ret; }
     |   separatesclause { ret = $separatesclause.result; } // old information flow syntax
@@ -456,15 +456,15 @@ requiresfreeclause returns [Term ret = null] throws SLTranslationException
             { ret = translator.translate(req.getText(), Term.class, result, services); }
     ;
 
-joinparamsclause returns [Term ret = null] throws SLTranslationException
+mergeparamsclause returns [Term ret = null] throws SLTranslationException
 :
-    jparams=JOIN_PARAMS result=predornot
+    mparams=MERGE_PARAMS result=predornot
             { ret = translator.translate(jparams.getText(), Term.class, result, services); }
     ;
 
-joinprocclause returns [Term ret = null] throws SLTranslationException
+mergeprocclause returns [Term ret = null] throws SLTranslationException
 :
-    jpr=JOIN_PROC result=predornot
+    jpr=MRGE_PROC result=predornot
             { ret = translator.translate(jpr.getText(), Term.class, result, services); }
     ;
 

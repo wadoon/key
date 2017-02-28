@@ -28,13 +28,13 @@ public class Gcd {
      @*/
     public static int gcdMergeContractITE(int a, int b) {
         
-        /*@ join_proc "JoinByIfThenElse";
+        /*@ merge_proc "JoinByIfThenElse";
          @*/
         {
         if (a < 0) a = -a;
         }
         
-        /*@ join_proc "JoinByIfThenElse";
+        /*@ merge_proc "JoinByIfThenElse";
          @*/
         {
         if (b < 0) b = -b;
@@ -61,15 +61,15 @@ public class Gcd {
      @*/
     public static int gcdPredAbstr(int a, int b) {
         
-        /*@ join_proc "JoinByPredicateAbstraction";
-         @ join_params conjunctive(int i -> {i >= 0, i = a | i = -a});
+        /*@ merge_proc "JoinByPredicateAbstraction";
+         @ merge_params conjunctive(int i -> {i >= 0, i = a | i = -a});
          @*/
         {
             if (a < 0) a = -a;
         }
         
-        /*@ join_proc "JoinByPredicateAbstraction";
-         @ join_params conjunctive(int i2 -> {i2 >= 0, i2 = b | i2 = -b});
+        /*@ merge_proc "JoinByPredicateAbstraction";
+         @ merge_params conjunctive(int i2 -> {i2 >= 0, i2 = b | i2 = -b});
          @*/
         {
             if (b < 0) b = -b;

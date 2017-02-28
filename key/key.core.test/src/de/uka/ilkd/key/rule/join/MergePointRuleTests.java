@@ -35,7 +35,7 @@ public class MergePointRuleTests extends TestCase {
     @Test
     public void testPredicateAbstraction() {
         final Proof proof = loadProof(
-                "Gcd.predAbstr.key");
+                "Gcd.predAbstr.open.key");
         startAutomaticStrategy(proof);
         assertTrue(proof.closed());
     }

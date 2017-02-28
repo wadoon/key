@@ -193,8 +193,8 @@ public class JMLSpecFactory {
         public Term returns;
         public Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
-        public JoinProcedure joinProcedure;
-        public String joinParams;
+        public JoinProcedure mergeProcedure;
+        public String mergeParams;
     }
 
     // -------------------------------------------------------------------------
@@ -450,17 +450,13 @@ public class JMLSpecFactory {
                 progVars.paramVars, progVars.resultVar, progVars.excVar,
                 textualSpecCase.getInfFlowSpecs());
 
-        clauses.joinProcedure = translateJoinProcedure(
-                textualSpecCase.getJoinProcs());
+        clauses.mergeProcedure = translateMergeProcedure(
+                textualSpecCase.getMergeProcs());
 
-        clauses.joinParams = translateJoinParams(
-                textualSpecCase.getJoinParams());
+        clauses.mergeParams = translateMergeParams(
+                textualSpecCase.getMergeParams());
 
-        /*
-         * if (clauses.joinProcedure instanceof JoinWithPredicateAbstraction)
-         * ((JoinWithPredicateAbstraction)clauses.joinProcedure).setPredicates(
-         * translateJoinPredicate(textualSpecCase.getJoinPredicate()));
-         */
+        
         return clauses;
     }
 
@@ -518,7 +514,7 @@ public class JMLSpecFactory {
         }
     }
 
-    private JoinProcedure translateJoinProcedure(
+    private JoinProcedure translateMergeProcedure(
             ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
         if (originalClauses == null || originalClauses.size() == 0) {
@@ -526,8 +522,8 @@ public class JMLSpecFactory {
         }
 
         // Extract the name of the join procedure: Remove beginning
-        // <code>"join_proc<code> and trailing <code>;"</code>.
-        String joinProcName = originalClauses.head().text.substring(11,
+        // <code>"merge_proc<code> and trailing <code>;"</code>.
+        String joinProcName = originalClauses.head().text.substring(12,
                 originalClauses.head().text.length() - 2);
 
         JoinProcedure chosenProc = JoinProcedure
@@ -544,14 +540,14 @@ public class JMLSpecFactory {
         return chosenProc;
     }
 
-    private String translateJoinParams(ImmutableList<PositionedString> params)
+    private String translateMergeParams(ImmutableList<PositionedString> params)
             throws SLTranslationException {
 
         if (params == null || params.size() == 0) {
             return null;
         }
         else{
-            String input  = params.head().text.substring(12,
+            String input  = params.head().text.substring(13,
                     params.head().text.length() - 1);
             input = input.replaceAll("@", "");
             return input;
@@ -1261,7 +1257,7 @@ public class JMLSpecFactory {
                 specificationCase, programVariables, behavior);
         return new SimpleBlockContract.Creator(block, labels, method, behavior,
                 variables, clauses.requires, clauses.ensures,
-                clauses.infFlowSpecs, clauses.joinProcedure, clauses.joinParams,
+                clauses.infFlowSpecs, clauses.mergeProcedure, clauses.mergeParams,
                 clauses.breaks, clauses.continues, clauses.returns,
                 clauses.signals, clauses.signalsOnly, clauses.diverges,
                 clauses.assignables, clauses.hasMod, services).create();

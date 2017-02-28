@@ -53,8 +53,8 @@ lexer grammar KeYJMLLexer;
     REQUIRES        : 'requires';
     REQUIRES_FREE   : 'requires_free';
     RETURNS         : 'returns';  //KeY extension, not official JML
-    JOIN_PARAMS     : 'join_params'; //KeY extension, not official JML
-    JOIN_PROC       : 'join_proc';  //KeY extension, not official JML
+    MERGE_PARAMS     : 'merge_params'; //KeY extension, not official JML
+    MERGE_PROC       : 'merge_proc';  //KeY extension, not official JML
     SEPARATES       : 'separates';  //KeY extension, not official JML
     SIGNALS         : 'signals';
     SIGNALS_ONLY    : 'signals_only';

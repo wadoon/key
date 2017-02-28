@@ -49,9 +49,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> returns =
             ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> joinProcs =
+    private ImmutableList<PositionedString> mergeProcs =
             ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> joinParams =
+    private ImmutableList<PositionedString> mergeParams =
             ImmutableSLList.<PositionedString>nil();
 
     private ImmutableList<Triple<PositionedString,PositionedString,PositionedString>> abbreviations =
@@ -130,8 +130,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         res.addInfFlowSpecs(tsc.getInfFlowSpecs());
         res.addDiverges(tsc.getDiverges());
         res.addMeasuredBy(tsc.getMeasuredBy());
-        res.addJoinProcs(tsc.getJoinProcs());
-        res.addJoinParams(tsc.getJoinParams());
+        res.addMergeProcs(tsc.getMergeProcs());
+        res.addMergeParams(tsc.getMergeParams());
         return res;
     }
 
@@ -155,8 +155,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         res.breaks = breaks;
         res.continues = continues;
         res.returns = returns;
-        res.joinProcs = joinProcs;
-        res.joinParams = joinParams;
+        res.mergeProcs = mergeProcs;
+        res.mergeParams = mergeParams;
         res.measuredBy = measuredBy;
         res.name = name;
         res.workingSpace = workingSpace;
@@ -319,21 +319,21 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         returns = returns.append(l);
     }
 
-    public void addJoinParams(PositionedString ps) {
-        joinParams = joinParams.append(ps);
+    public void addMergeParams(PositionedString ps) {
+        mergeParams = mergeParams.append(ps);
         setPosition(ps);
     }
 
-    public void addJoinParams(ImmutableList<PositionedString> l) {
-        joinParams = joinParams.append(l);
+    public void addMergeParams(ImmutableList<PositionedString> l) {
+        mergeParams = mergeParams.append(l);
     }
-    public void addJoinProcs(PositionedString ps) {
-        joinProcs = joinProcs.append(ps);
+    public void addMergeProcs(PositionedString ps) {
+        mergeProcs = mergeProcs.append(ps);
         setPosition(ps);
     }
 
-    public void addJoinProcs(ImmutableList<PositionedString> l) {
-        joinProcs = joinProcs.append(l);
+    public void addMergeProcs(ImmutableList<PositionedString> l) {
+        mergeProcs = mergeProcs.append(l);
     }
 
     public void addAbbreviation(PositionedString[] pss) {
@@ -473,12 +473,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return returns;
     }
 
-    public ImmutableList<PositionedString> getJoinParams() {
-        return joinParams;
+    public ImmutableList<PositionedString> getMergeParams() {
+        return mergeParams;
     }
 
-    public ImmutableList<PositionedString> getJoinProcs() {
-        return joinProcs;
+    public ImmutableList<PositionedString> getMergeProcs() {
+        return mergeProcs;
     }
 
     public ImmutableList<Triple<PositionedString,PositionedString,PositionedString>> getAbbreviations() {
@@ -586,13 +586,13 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("determines: ").append(it.next()).append("\n");
         }
-        it = joinProcs.iterator();
+        it = mergeProcs.iterator();
         while (it.hasNext()) {
-            sb.append("join procedure: ").append(it.next()).append("\n");
+            sb.append("merge procedure: ").append(it.next()).append("\n");
         }
-        it = joinParams.iterator();
+        it = mergeParams.iterator();
         while (it.hasNext()) {
-            sb.append("join parameters: ").append(it.next()).append("\n");
+            sb.append("merge parameters: ").append(it.next()).append("\n");
         }
         return sb.toString();
     }
@@ -621,8 +621,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && breaks.equals(sc.breaks)
                && continues.equals(sc.continues)
                && returns.equals(sc.returns)
-               && joinProcs.equals(sc.joinProcs)
-               && joinParams.equals(sc.joinParams)
+               && mergeProcs.equals(sc.mergeProcs)
+               && mergeParams.equals(sc.mergeParams)
                && infFlowSpecs.equals(sc.infFlowSpecs);
     }
 
@@ -646,8 +646,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + breaks.hashCode()
                + continues.hashCode()
                + returns.hashCode()
-               + joinProcs.hashCode()
-               + joinParams.hashCode()
+               + mergeProcs.hashCode()
+               + mergeParams.hashCode()
                + infFlowSpecs.hashCode();
     }
 }

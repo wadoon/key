@@ -18,6 +18,7 @@ import junit.framework.TestCase;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 
@@ -115,34 +116,24 @@ public class TestJMLPreTranslator extends TestCase {
     }
     
     public void testJoinITESpecs() throws SLTranslationException {
-        ImmutableList<TextualJMLConstruct> constructs = parseMethodSpec("/*@  join_proc \"JoinByIfThenElse\";\n" +
+        ImmutableList<TextualJMLConstruct> constructs = parseMethodSpec("/*@  merge_proc \"JoinByIfThenElse23\";\n" +
                                                                           "@\n" +
                                                                           "@*/");
         assertTrue(constructs != null);
         TextualJMLSpecCase specCase = (TextualJMLSpecCase) constructs.head();
-        System.out.println(specCase.getJoinProcs().head());
-        //assertTrue(specCase.getJoinProcs().head());
+        assertTrue(specCase.getMergeProcs().size() == 1);
         
     }
     
     public void testJoinPredicateSpecs() throws SLTranslationException {
-        ImmutableList<TextualJMLConstruct> constructs = parseMethodSpec("/*@  join_proc \"JoinByPredicateAbstraction\";\n" +
-                                                                          "@\n" +
+        ImmutableList<TextualJMLConstruct> constructs = parseMethodSpec("/*@  merge_proc \"JoinByPredicateAbstraction\";\n" +
+                                                                          "@\n merge_params simple(int y -> {y >=0});" +
                                                                           "@*/");
         assertTrue(constructs != null);
         TextualJMLSpecCase specCase = (TextualJMLSpecCase) constructs.head();
-        System.out.println(specCase.getJoinProcs().head());
-        //assertTrue(specCase.getJoinProcs().head());
-        
-    } 
-    public void testJoinITEAntecedentSpecs() throws SLTranslationException {
-        ImmutableList<TextualJMLConstruct> constructs = parseMethodSpec("/*@  join_proc \"JoinByIfThenElseAntecedent\";\n" +
-                                                                          "@\n" +
-                                                                          "@*/");
-        assertTrue(constructs != null);
-        TextualJMLSpecCase specCase = (TextualJMLSpecCase) constructs.head();
-        System.out.println(specCase.getJoinProcs().head());
-        //assertTrue(specCase.getJoinProcs().head());
+        System.out.println(specCase.getMergeProcs().head());
+        assertTrue(specCase.getMergeProcs().size() == 1);
+        assertTrue(specCase.getMergeParams().size() == 1);
         
     } 
     

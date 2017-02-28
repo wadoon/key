@@ -231,9 +231,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         final Feature joinRuleF = setupJoinRule();
         
-        final Feature joinPointRuleF = joinPointRuleFeature(longConst(-3000));
+        final Feature mergePointRuleF = mergePointRuleFeature(longConst(-10000));
 
-        final Feature deleteJoinPointF = deleteJoinPointFeature(longConst(-8000));
+        final Feature deleteMergePointF = deleteMergePointFeature(longConst(-8000));
 
         // final Feature smtF = smtFeature(inftyConst());
 
@@ -242,7 +242,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 // splitF,
                 // strengthenConstraints,
                 AgeFeature.INSTANCE, oneStepSimplificationF, joinRuleF,
-                deleteJoinPointF, joinPointRuleF,
+                deleteMergePointF, mergePointRuleF,
                 // smtF,
                 methodSpecF, queryF, depSpecF, loopInvF, blockFeature,
                 ifMatchedF, dispatcher);

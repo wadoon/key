@@ -23,10 +23,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElse;
-import de.uka.ilkd.key.rule.join.procedures.JoinIfThenElseAntecedent;
-import de.uka.ilkd.key.rule.join.procedures.JoinWeaken;
-import de.uka.ilkd.key.rule.join.procedures.JoinWithPredicateAbstractionFactory;
+import de.uka.ilkd.key.rule.join.procedures.*;
 import de.uka.ilkd.key.util.joinrule.SymbolicExecutionState;
 
 /**

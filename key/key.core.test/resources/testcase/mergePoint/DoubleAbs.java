@@ -6,7 +6,7 @@ public class DoubleAbs {
     public int doubleAbs(int num) {
         int y = 0, x = 0;
         
-        //@ join_proc "JoinByPredicateAbstraction";
+        //@ merge_proc "JoinByPredicateAbstraction";
         {
             if (num < 0) {
                 y = -num;
@@ -15,8 +15,8 @@ public class DoubleAbs {
             }
         }
         
-        /*@ join_proc "JoinByPredicateAbstraction";
-         @  join_params "simple(int x -> {x >= 0})";
+        /*@ merge_proc "JoinByPredicateAbstraction";
+         @  merge_params "simple(int x -> {x >= 0})";
          @*/         {
             if (num < 0) {
                 x = -num;
@@ -33,8 +33,8 @@ public class DoubleAbs {
     public int doubleAbsPredAbstr(int num) {
         int y = 0, x = 0;
         
-        /*@ join_proc "JoinByPredicateAbstraction";
-         @ join_params "simple(int x -> {x >= 0})";
+        /*@ merge_proc "JoinByPredicateAbstraction";
+         @ merge_params "simple(int x -> {x >= 0})";
          @*/
         {
             if (num < 0) {
@@ -44,8 +44,8 @@ public class DoubleAbs {
             }
         }
         
-        /*@ join_proc "JoinByPredicateAbstraction";
-         @ join_params "simple(int x -> {x >= 0})";
+        /*@ merge_proc "JoinByPredicateAbstraction";
+         @ merge_params "simple(int x -> {x >= 0})";
          @*/
         {
             if (num < 0) {

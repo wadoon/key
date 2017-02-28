@@ -130,8 +130,8 @@ public final class JMLTranslator {
         REQUIRES_FREE ("requires_free"),
         SIGNALS ("signals"),
         SIGNALS_ONLY ("signals_only"),
-        JOIN_PROC ("join_proc"),
-        JOIN_PARAMS("join_params"),
+        MERGE_PROC ("merge_proc"),
+        MERGE_PARAMS("merge_params"),
 
         // quantifiers and "generalized quantifiers"
         FORALL ("\\forall"),
@@ -347,7 +347,7 @@ public final class JMLTranslator {
         });
         translationMethods.put(JMLKeyWord.REQUIRES, termTranslationMethod);
         translationMethods.put(JMLKeyWord.REQUIRES_FREE, termTranslationMethod);
-        translationMethods.put(JMLKeyWord.JOIN_PROC, new JMLTranslationMethod() {
+        translationMethods.put(JMLKeyWord.MERGE_PROC, new JMLTranslationMethod() {
             
             @Override
             public Object translate(SLTranslationExceptionManager excManager,
@@ -357,7 +357,7 @@ public final class JMLTranslator {
                 return null;
             }
         });
-        translationMethods.put(JMLKeyWord.JOIN_PARAMS, new JMLTranslationMethod() {
+        translationMethods.put(JMLKeyWord.MERGE_PARAMS, new JMLTranslationMethod() {
             
             @Override
             public Object translate(SLTranslationExceptionManager excManager,

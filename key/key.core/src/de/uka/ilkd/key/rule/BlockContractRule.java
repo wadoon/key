@@ -467,7 +467,7 @@ public class BlockContractRule implements BuiltInRule {
 
             services.getSpecificationRepository().addMergeSpecs(mps,
                     application.getContract().getJoinProcedure(),
-                    application.getContract().getJoinParams());
+                    application.getContract().getMergeParams());
 
             StatementBlock newBlock = KeYJavaASTFactory
                     .block(instantiation.block, mps);

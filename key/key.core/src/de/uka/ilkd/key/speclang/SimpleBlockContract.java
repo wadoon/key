@@ -66,7 +66,7 @@ public final class SimpleBlockContract implements BlockContract {
     private final Map<LocationVariable, Term> modifiesClauses;
     private ImmutableList<InfFlowSpec> infFlowSpecs;
     private JoinProcedure joinProcedure;
-    private String joinParams;
+    private String mergeParams;
 
     private final Variables variables;
 
@@ -81,7 +81,7 @@ public final class SimpleBlockContract implements BlockContract {
             final Map<LocationVariable, Term> postconditions,
             final Map<LocationVariable, Term> modifiesClauses,
             final ImmutableList<InfFlowSpec> infFlowSpecs,
-            final JoinProcedure joinProcedure, final String joinParams,
+            final JoinProcedure joinProcedure, final String mergeParams,
             final Variables variables, final boolean transactionApplicable,
             final Map<LocationVariable, Boolean> hasMod) {
         assert block != null;
@@ -106,7 +106,7 @@ public final class SimpleBlockContract implements BlockContract {
         this.modifiesClauses = modifiesClauses;
         this.infFlowSpecs = infFlowSpecs;
         this.joinProcedure = joinProcedure;
-        this.joinParams = joinParams;
+        this.mergeParams = mergeParams;
         this.variables = variables;
         this.transactionApplicable = transactionApplicable;
         this.hasMod = hasMod;
@@ -323,8 +323,8 @@ public final class SimpleBlockContract implements BlockContract {
         return joinProcedure;
     }
 
-    public String getJoinParams() {
-        return joinParams;
+    public String getMergeParams() {
+        return mergeParams;
     }
 
     @Override
@@ -510,18 +510,18 @@ public final class SimpleBlockContract implements BlockContract {
             final Map<LocationVariable, Term> newPostconditions,
             final Map<LocationVariable, Term> newModifiesClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs,
-            final JoinProcedure newJoinProcedure, final String newJoinParams,
+            final JoinProcedure newJoinProcedure, final String newMergeParams,
             final Variables newVariables) {
         return new SimpleBlockContract(newBlock, labels, method, modality,
                 newPreconditions, newPostconditions, newModifiesClauses,
-                newinfFlowSpecs, newJoinProcedure, newJoinParams, newVariables,
+                newinfFlowSpecs, newJoinProcedure, newMergeParams, newVariables,
                 transactionApplicable, hasMod);
     }
 
     @Override
     public BlockContract setBlock(StatementBlock newBlock) {
         return update(newBlock, preconditions, postconditions, modifiesClauses,
-                infFlowSpecs, joinProcedure, joinParams, variables);
+                infFlowSpecs, joinProcedure, mergeParams, variables);
     }
 
     public BlockContract setTarget(KeYJavaType newKJT,
@@ -530,7 +530,7 @@ public final class SimpleBlockContract implements BlockContract {
         assert newKJT.equals(newPM.getContainerType());
         return new SimpleBlockContract(block, labels, (IProgramMethod) newPM,
                 modality, preconditions, postconditions, modifiesClauses,
-                infFlowSpecs, joinProcedure, joinParams, variables,
+                infFlowSpecs, joinProcedure, mergeParams, variables,
                 transactionApplicable, hasMod);
     }
 
@@ -589,11 +589,11 @@ public final class SimpleBlockContract implements BlockContract {
         }
         else if (!joinProcedure.equals(other.joinProcedure))
             return false;
-        if (joinParams == null) {
-            if (other.joinParams != null)
+        if (mergeParams == null) {
+            if (other.mergeParams != null)
                 return false;
         }
-        else if (!joinParams.equals(other.joinParams))
+        else if (!mergeParams.equals(other.mergeParams))
             return false;
         if (labels == null) {
             if (other.labels != null)
@@ -688,7 +688,7 @@ public final class SimpleBlockContract implements BlockContract {
                 + ", preconditions=" + preconditions + ", postconditions="
                 + postconditions + ", modifiesClauses=" + modifiesClauses
                 + ", infFlowSpecs=" + infFlowSpecs + ", joinProcedure="
-                + joinProcedure + ", variables=" + variables
+                + joinProcedure + " with parameters= " + mergeParams +  ", variables=" + variables
                 + ", transactionApplicable=" + transactionApplicable
                 + ", hasMod=" + hasMod + "]";
     }
@@ -897,7 +897,7 @@ public final class SimpleBlockContract implements BlockContract {
         private final Map<LocationVariable, Term> ensures;
         private final ImmutableList<InfFlowSpec> infFlowSpecs;
         private final JoinProcedure joinProcedure;
-        private final String joinParams;
+        private final String mergeParams;
         private final Map<Label, Term> breaks;
         private final Map<Label, Term> continues;
         private final Term returns;
@@ -914,7 +914,7 @@ public final class SimpleBlockContract implements BlockContract {
                 final Map<LocationVariable, Term> requires,
                 final Map<LocationVariable, Term> ensures,
                 final ImmutableList<InfFlowSpec> infFlowSpecs,
-                final JoinProcedure joinProcedure, final String joinParams,
+                final JoinProcedure joinProcedure, final String mergeParams,
                 final Map<Label, Term> breaks, final Map<Label, Term> continues,
                 final Term returns, final Term signals, final Term signalsOnly,
                 final Term diverges,
@@ -931,7 +931,7 @@ public final class SimpleBlockContract implements BlockContract {
             this.ensures = ensures;
             this.infFlowSpecs = infFlowSpecs;
             this.joinProcedure = joinProcedure;
-            this.joinParams = joinParams;
+            this.mergeParams = mergeParams;
             this.breaks = breaks;
             this.continues = continues;
             this.returns = returns;
@@ -946,7 +946,7 @@ public final class SimpleBlockContract implements BlockContract {
         public ImmutableSet<BlockContract> create() {
             return create(buildPreconditions(), buildPostconditions(),
                     buildModifiesClauses(), infFlowSpecs, joinProcedure,
-                    joinParams);
+                    mergeParams);
         }
 
         private Map<LocationVariable, Term> buildPreconditions() {
@@ -1125,14 +1125,14 @@ public final class SimpleBlockContract implements BlockContract {
                 final Map<LocationVariable, Term> postconditions,
                 final Map<LocationVariable, Term> modifiesClauses,
                 final ImmutableList<InfFlowSpec> infFlowSpecs,
-                final JoinProcedure joinProcedure, final String joinParams) {
+                final JoinProcedure joinProcedure, final String mergeParams) {
             ImmutableSet<BlockContract> result = DefaultImmutableSet.nil();
             final boolean transactionApplicable = modifiesClauses.get(services
                     .getTypeConverter().getHeapLDT().getSavedHeap()) != null;
             result = result.add(new SimpleBlockContract(block, labels, method,
                     diverges.equals(ff()) ? Modality.DIA : Modality.BOX,
                     preconditions, postconditions, modifiesClauses,
-                    infFlowSpecs, joinProcedure, joinParams, variables,
+                    infFlowSpecs, joinProcedure, mergeParams, variables,
                     transactionApplicable, hasMod));
             if (ifDivergesConditionCannotBeExpressedByAModality()) {
                 result = result.add(new SimpleBlockContract(block, labels,
@@ -1140,7 +1140,7 @@ public final class SimpleBlockContract implements BlockContract {
                         addNegatedDivergesConditionToPreconditions(
                                 preconditions),
                         postconditions, modifiesClauses, infFlowSpecs,
-                        joinProcedure, joinParams, variables,
+                        joinProcedure, mergeParams, variables,
                         transactionApplicable, hasMod));
             }
             return result;
@@ -1227,7 +1227,7 @@ public final class SimpleBlockContract implements BlockContract {
             return new SimpleBlockContract(head.getBlock(), head.getLabels(),
                     head.getMethod(), head.getModality(), preconditions,
                     postconditions, modifiesClauses, head.getInfFlowSpecs(),
-                    head.getJoinProcedure(), head.getJoinParams(),
+                    head.getJoinProcedure(), head.getMergeParams(),
                     placeholderVariables, head.isTransactionApplicable(),
                     hasMod);
         }

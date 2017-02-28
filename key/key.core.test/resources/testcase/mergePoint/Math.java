@@ -6,7 +6,7 @@ public class Math {
      @*/
     public int absContract(int num) {
         int y;
-        /*@  join_proc "JoinByIfThenElse";
+        /*@  merge_proc "JoinByIfThenElse";
          @*/
         {
             if (num < 0) {
@@ -24,8 +24,8 @@ public class Math {
     @*/
     public int absContractPredAbstr(int num) {
         int y;
-        /*@ join_proc "JoinByPredicateAbstraction";
-         @ join_params conjunctive(int x -> {x >= 0});
+        /*@ merge_proc "JoinByPredicateAbstraction";
+         @ merge_params conjunctive(int x -> {x >= 0});
          @*/
         {
             if (num < 0) {
@@ -71,8 +71,8 @@ public class Math {
      @ ensures \result >= 0;
      @*/
     public int distMergeContract(int x, int y) {
-        /*@ join_proc "JoinByPredicateAbstraction";
-         @ join_params conjunctive(int ph -> {ph >= 0, ph <= _y});
+        /*@ merge_proc "JoinByPredicateAbstraction";
+         @ merge_params conjunctive(int ph -> {ph >= 0, ph <= _y});
          @*/
         {
             if (y < x) {
@@ -89,7 +89,7 @@ public class Math {
      @ ensures \result >= 0;
      @*/
     public int distMergeContractITE(int x, int y) {
-        /*@ join_proc "JoinByIfThenElse";
+        /*@ merge_proc "JoinByIfThenElse";
          @*/
         {
             if (y < x) {
@@ -106,7 +106,7 @@ public class Math {
      @ ensures \result >= 0;
      @*/
     public int distMergeContractError(int x, int y) {
-        /*@ join_proc "JoinByIfThenElse";
+        /*@ merge_proc "JoinByIfThenElse";
          @
          @*/
         {
@@ -145,7 +145,7 @@ public class Math {
     public int notNullContract(int num){
         int y;
         
-        /*@  join_proc "JoinByIfThenElse";
+        /*@  merge_proc "JoinByIfThenElse";
          @*/
         {
             if (num < 0) {
@@ -184,14 +184,14 @@ public class Math {
     public int notNullNested(int num) {
         int y;
         
-        /*@  join_proc "JoinByIfThenElse";
+        /*@  merge_proc "JoinByIfThenElse";
          @*/
         {
             if (num < 0) {
                 y = -num;
             }
             else {
-                /*@  join_proc "JoinByIfThenElse";
+                /*@  merge_proc "JoinByIfThenElse";
                  @*/
                 {
                     if(num == 0){
@@ -212,11 +212,11 @@ public class Math {
     public int notNullNested2(int num) {
         int y;
         
-        /*@  join_proc "JoinByIfThenElse";
+        /*@  merge_proc "JoinByIfThenElse";
          @*/
         {
             if (num <= 0) {
-                /*@  join_proc "JoinByIfThenElse";
+                /*@  merge_proc "JoinByIfThenElse";
                  @*/
                 {
                     if(num == 0){
@@ -242,7 +242,7 @@ public class Math {
      @*/
     public int divContract(int divident, int divisor) {
         int result;
-        /*@  join_proc "JoinByIfThenElse";
+        /*@  merge_proc "JoinByIfThenElse";
          @*/
         {
             try {

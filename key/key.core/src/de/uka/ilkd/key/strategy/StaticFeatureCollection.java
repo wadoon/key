@@ -72,13 +72,13 @@ public class StaticFeatureCollection {
         return ConditionalFeature.createConditional(filter, cost);
     }
     
-    protected static Feature deleteJoinPointFeature(Feature cost) {
+    protected static Feature deleteMergePointFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(DeleteMergePointRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
     
-    protected static Feature joinPointRuleFeature(Feature cost) {
+    protected static Feature mergePointRuleFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(MergePointRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
