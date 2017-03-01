@@ -58,6 +58,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private ImmutableList<PositionedString> infFlowSpecs =
             ImmutableSLList.<PositionedString>nil();
     
+    private ImmutableList<PositionedString> dependencyClusters =
+            ImmutableSLList.<PositionedString>nil();
+    
     private Map<String, ImmutableList<PositionedString>>
       accessibles = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
@@ -349,6 +352,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public void addInfFlowSpecs(ImmutableList<PositionedString> l) {
         infFlowSpecs = infFlowSpecs.append(l);
     }
+    
+    public void addDepClusterSpecs(PositionedString ps) {
+        dependencyClusters = infFlowSpecs.append(ps);
+    }
+
+
+    public void addDepClusterSpecs(ImmutableList<PositionedString> l) {
+        dependencyClusters = infFlowSpecs.append(l);
+    }
 
 
     public Behavior getBehavior() {
@@ -473,6 +485,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public ImmutableList<PositionedString> getInfFlowSpecs() {
         return infFlowSpecs;
     }
+    
+    public ImmutableList<PositionedString> getDependencyClusters() {
+        return dependencyClusters;
+    }
 
 
     @Override
@@ -570,6 +586,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("determines: ").append(it.next()).append("\n");
         }
+        it = dependencyClusters.iterator();
+        while (it.hasNext()) {
+            sb.append("cluster: ").append(it.next()).append("\n");
+        }
         it = joinProcs.iterator();
         while (it.hasNext()) {
             sb.append("join procedure: ").append(it.next()).append("\n");
@@ -602,7 +622,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && continues.equals(sc.continues)
                && returns.equals(sc.returns)
                && joinProcs.equals(sc.joinProcs)
-               && infFlowSpecs.equals(sc.infFlowSpecs);
+               && infFlowSpecs.equals(sc.infFlowSpecs)
+               && dependencyClusters.equals(sc.dependencyClusters);
     }
 
 
@@ -626,6 +647,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + continues.hashCode()
                + returns.hashCode()
                + joinProcs.hashCode()
-               + infFlowSpecs.hashCode();
+               + infFlowSpecs.hashCode()
+               + dependencyClusters.hashCode();
     }
 }

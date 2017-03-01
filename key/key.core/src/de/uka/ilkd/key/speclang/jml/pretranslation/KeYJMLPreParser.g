@@ -244,7 +244,6 @@ classlevel_element[ImmutableList<String> mods]
     |   result=assert_statement[mods] //RecodeR workaround
     |   result=assume_statement[mods] //RecodeR workaround
     |   result=nowarn_pragma[mods]
-    
 ;
 
 
@@ -773,7 +772,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=ensures_clause        { sc.addEnsures(ps); }
 	|   ps=ensures_free_clause   { sc.addEnsuresFree(ps); }
 	|   ps=signals_clause        { sc.addSignals(ps); }
-   |   ps=joinproc_clause        { sc.addJoinProcs(ps); }
+   	|   ps=joinproc_clause        { sc.addJoinProcs(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
 	|   ps=measured_by_clause    { sc.addMeasuredBy(ps); }
@@ -787,6 +786,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=returns_clause        { sc.addReturns(ps); }
         |   ps=separates_clause      { sc.addInfFlowSpecs(ps); }
         |   ps=determines_clause      { sc.addInfFlowSpecs(ps); }
+        |   ps=dependency_cluster_spec	{sc.addDepClusterSpecs(ps);}
     )
     {
 	if(b == Behavior.EXCEPTIONAL_BEHAVIOR
@@ -849,6 +849,15 @@ determines_clause
 determines_keyword
 :
         DETERMINES
+;
+
+dependency_cluster_spec
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    CLUSTER result=expression { result = result.prepend("cluster "); }
 ;
 
 

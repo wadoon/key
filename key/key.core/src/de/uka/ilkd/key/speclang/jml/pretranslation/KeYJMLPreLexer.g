@@ -41,6 +41,7 @@ lexer grammar KeYJMLPreLexer;
     BY				: 'by';
     CAPTURES 			: 'captures';
     CAPTURES_RED 		: 'captures_redundantly';
+    CLUSTER			: 'cluster';
     CODE 			: 'code';
     CODE_BIGINT_MATH 		: 'code_bigint_math';
     CODE_JAVA_MATH 		: 'code_java_math';

@@ -733,10 +733,7 @@ public final class SpecificationRepository {
         for (ImmutableSet<Contract> s : contracts.values()) {
             result = result.union(s);
         }
-        //TODO remove debug output
-        for (Contract c : result) {            
-            System.out.println(c.getClass());
-        }
+
         return WellDefinednessCheck.isOn() ? result : removeWdChecks(result);
     }
 
