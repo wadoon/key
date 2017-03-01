@@ -21,6 +21,7 @@ import java.util.Map;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.DependencyClusterContractImpl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
@@ -36,6 +37,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.util.DependencyClusterSpec;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
@@ -51,6 +53,8 @@ public class ContractFactory {
             "Symbolic Execution";
     public static final String INFORMATION_FLOW_CONTRACT_BASENAME =
             "Non-interference contract";
+    public static final String DEP_CLUSTER_CONTRACT_BASENAME =
+            "Service-local dependency cluster";
     
     private static final String INVALID_ID = "INVALID_ID";
     private static final String UNKNOWN_CONTRACT_IMPLEMENTATION = "unknown contract implementation";
@@ -281,6 +285,33 @@ public class ContractFactory {
                 INFORMATION_FLOW_CONTRACT_BASENAME, forClass, pm, specifiedIn,
                 modality, requires, measuredBy, modifies, hasMod, self, params,
                 result, exc, atPre, accessible, infFlowSpecs, toBeSaved);
+    }
+    
+    //TODO take a closer look, what does it do?
+    public DependencyClusterContract createDependencyClusterContract(
+            KeYJavaType forClass,
+            IProgramMethod pm,
+            KeYJavaType specifiedIn,
+            Modality modality,
+            Term requires,
+            Term measuredBy,
+            Term modifies,
+            boolean hasMod,
+            ProgramVariableCollection progVars,
+            Term accessible,
+            ImmutableList<DependencyClusterSpec> dependencyClusterSpecs,
+            boolean toBeSaved) {
+        final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+        final Term atPre = tb.var(progVars.atPreVars.get(baseHeap));
+        final Term self = progVars.selfVar != null ? tb.var(progVars.selfVar) : null;
+        final ImmutableList<Term> params = tb.var(progVars.paramVars);
+        final Term result = progVars.resultVar != null ? tb.var(
+                progVars.resultVar) : null;
+        final Term exc = progVars.excVar != null ? tb.var(progVars.excVar) : null;
+        return new DependencyClusterContractImpl(
+                DEP_CLUSTER_CONTRACT_BASENAME, forClass, pm, specifiedIn,
+                modality, requires, measuredBy, modifies, hasMod, self, params,
+                result, exc, atPre, accessible, dependencyClusterSpecs, toBeSaved);
     }
 
     @Override

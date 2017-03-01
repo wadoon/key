@@ -25,6 +25,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.DependencyClusterContractImpl;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
@@ -190,6 +191,34 @@ public class JMLSpecFactory {
             }
         }
         return symbDatas;
+    }
+    
+    //TODO understand!
+    private ImmutableSet<Contract>
+    createDependencyClusterContracts(ContractClauses clauses,
+                                   IProgramMethod pm,
+                                   ProgramVariableCollection progVars) {
+        LocationVariable heap =
+                services.getTypeConverter().getHeapLDT().getHeap();
+        
+        ImmutableSet<Contract> contracts =
+                DefaultImmutableSet.<Contract>nil();
+        
+        if (clauses.dependencyClusterSpecs != null && !clauses.dependencyClusterSpecs.isEmpty()) {
+            //contracts = contracts.add(DependencyClusterContractImpl.DUMMY_DEP_CLUSTER_CONTRACT);
+            contracts = contracts.add(cf.createDependencyClusterContract(pm.getContainerType(), pm, 
+                                                                         pm.getContainerType(), 
+                                                                         Modality.BOX,
+                                                                         clauses.requires.get(heap),
+                                                                         clauses.measuredBy,
+                                                                         clauses.assignables.get(heap),
+                                                                         !clauses.hasMod.get(heap),
+                                                                         progVars,
+                                                                         clauses.accessibles.get(heap),
+                                                                         clauses.dependencyClusterSpecs,
+                                                                         false));
+        }
+        return contracts;
     }
 
 
@@ -553,11 +582,12 @@ public class JMLSpecFactory {
                                  ImmutableSLList.<DependencyClusterSpec>nil();
         for (PositionedString expr : originalClauses) {
 //TODO extend Parser to handle dependency cluster specs
-            DependencyClusterSpec translated =
-                        JMLTranslator.translate(expr, pm.getContainerType(),
-                                                selfVar, paramVars, resultVar,
-                                                excVar, null, DependencyClusterSpec.class, services);
-            result = result.append(translated);
+            //DependencyClusterSpec translated =
+            //            JMLTranslator.translate(expr, pm.getContainerType(),
+            //                                    selfVar, paramVars, resultVar,
+            //                                    excVar, null, DependencyClusterSpec.class, services);
+            //result = result.append(translated);
+            result = result.append(new DependencyClusterSpec(expr.text));
         }
         return result;
     }
@@ -1361,6 +1391,8 @@ public class JMLSpecFactory {
                                                                  clauses, posts, axioms));
         result = result.union(createDependencyOperationContract(pm, progVars,
                                                                 clauses));
+        result = result.union(createDependencyClusterContracts(clauses, pm,
+                                                               progVars));
 
         return result;
     }
