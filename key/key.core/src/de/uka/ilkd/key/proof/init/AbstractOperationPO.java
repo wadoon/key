@@ -230,7 +230,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 			}
 
 			final Term pre =
-					tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, heaps, hist, proofServices), //TODO KD hist -> null?
+					tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, heaps, hist, proofServices),
 					permsFor, getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices));
 			// build program term
 			Term postTerm = getPost(modHeaps, selfVar, paramVars, resultVar, null, atPreVars, proofServices);
@@ -352,7 +352,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 					}
 				}
 
-				//////////TODO For testing only
+				//////////TODO KD For testing only
 				//build the logical variable for pre- and post hist
 				ProgramElementName prehistname = new ProgramElementName("histAtPre");
 				LocationVariable prehist = new LocationVariable(prehistname, (Sort) proofServices.getNamespaces().sorts().lookup(new Name("Seq")));
@@ -511,7 +511,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 			KeYJavaType selfKJT,
 			ImmutableList<ProgramVariable> paramVars,
 			List<LocationVariable> heaps,
-			LocationVariable hist, // TODO KD
+			LocationVariable preHist,
 			Services services) {
 		// "self != null"
 		final Term selfNotNull = generateSelfNotNull(getProgramMethod(), selfVar);
@@ -538,27 +538,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				wellFormed = tb.and(wellFormed, wf);
 			}
 		}
-/*		if (hist != null) { // TODO KD how to do wellformed histories?
-			System.out.println("wellformed hist added");
-			final Term wf = tb.func(services.getTypeConverter().getSeqLDT().getWellFormed(), tb.var(hist)); // TODO KD how to wellformed seq, ist; how to tb.var(hist);
-			if (wellFormed == null) {
-				wellFormed = wf;
-			} else {
-				wellFormed = tb.and(wellFormed, wf);
-			}
-		}
-*/
 
-		//TODO: For test. Add here the well formed for the history
-		Term wfHist;
-		if (hist != null) {
-			wfHist = tb.wellFormedHist(tb.var(hist));
+		//for Remote Methods
+		final Term wfHist = tb.wellFormedHist(tb.var((preHist)));
+		if (wellFormed == null) {
+			wellFormed = wfHist;
 		} else {
-			wfHist = tb.tt();
+			wellFormed = tb.and(wellFormed, wfHist);
 		}
-		// End test
 
-		return tb.and(wellFormed != null ? wellFormed : tb.tt(), selfNotNull,
+		return tb.and((wellFormed != null ? wellFormed : tb.tt()), selfNotNull,
 				selfCreated, selfExactType, paramsOK, mbyAtPreDef);
 	}
 
@@ -972,7 +961,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
    protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
                               ImmutableList<LocationVariable> formalParamVars,
                               Map<LocationVariable, LocationVariable> atPreVars,
-                              LocationVariable preHist, LocationVariable hist,
+                              LocationVariable preHist,
+                              LocationVariable hist,
                               Services services) {
       Term update = null;
       for(Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
@@ -992,7 +982,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
           }
        }
 
-       //TODO: Add here the update for the history
+       //TODO KD Add here the update for the history
        Term histupdate = tb.elementary(hist, tb.var(preHist));
        update = tb.parallel(update,histupdate);
        // End adding

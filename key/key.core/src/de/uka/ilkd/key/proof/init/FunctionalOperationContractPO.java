@@ -275,7 +275,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
                                ImmutableList<LocationVariable> formalParamVars,
                                Map<LocationVariable,LocationVariable> atPreVars,
-                               LocationVariable prehist, LocationVariable hist,
+                               LocationVariable prehist,
+                               LocationVariable hist,
                                Services services) {
        Term update = null;
        for(Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
@@ -295,7 +296,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             update = tb.parallel(update, paramUpdate);
         }
         
-        //TODO: Add here the update for the history
+        //TODO KD Add here the update for the history
         Term histupdate = tb.elementary(hist, tb.var(prehist));
         update = tb.parallel(update,histupdate);
         // End adding
