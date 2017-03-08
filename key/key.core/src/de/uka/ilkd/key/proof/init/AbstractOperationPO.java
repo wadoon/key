@@ -230,7 +230,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 			}
 
 			final Term pre =
-					tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, heaps, hist, proofServices),
+					tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, heaps, hist, proofServices), //TODO KD hist -> null?
 					permsFor, getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices));
 			// build program term
 			Term postTerm = getPost(modHeaps, selfVar, paramVars, resultVar, null, atPreVars, proofServices);
@@ -548,6 +548,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
 			}
 		}
 */
+
+		//TODO: For test. Add here the well formed for the history
+		Term wfHist;
+		if (hist != null) {
+			wfHist = tb.wellFormedHist(tb.var(hist));
+		} else {
+			wfHist = tb.tt();
+		}
+		// End test
+
 		return tb.and(wellFormed != null ? wellFormed : tb.tt(), selfNotNull,
 				selfCreated, selfExactType, paramsOK, mbyAtPreDef);
 	}

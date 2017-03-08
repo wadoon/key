@@ -40,6 +40,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -275,7 +276,11 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
                                ImmutableList<LocationVariable> formalParamVars,
                                Map<LocationVariable,LocationVariable> atPreVars,
+<<<<<<< HEAD
                                LocationVariable preHist, LocationVariable hist,
+=======
+                               LocationVariable prehist, LocationVariable hist,
+>>>>>>> refs/heads/diekhoffEvents
                                Services services) {
        Term update = null;
        for(Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
@@ -294,12 +299,20 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             Term paramUpdate = tb.elementary(formalParamIt.next(), tb.var(paramIt.next()));
             update = tb.parallel(update, paramUpdate);
         }
+<<<<<<< HEAD
 
         //TODO: Add here the update for the history
         Term histupdate = tb.elementary(hist, tb.var(preHist));
         update = tb.parallel(update,histupdate);
         // End adding
 
+=======
+        
+        //TODO: Add here the update for the history
+        Term histupdate = tb.elementary(hist, tb.var(prehist));
+        update = tb.parallel(update,histupdate);
+        // End adding
+>>>>>>> refs/heads/diekhoffEvents
         return update;
     }
 

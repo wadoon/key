@@ -1599,6 +1599,10 @@ public class TermBuilder {
     public Term wellFormed(Term heap) {
         return func(services.getTypeConverter().getHeapLDT().getWellFormed(), heap);
     }
+    
+    public Term wellFormedHist(Term hist) {
+        return func(services.getTypeConverter().getSeqLDT().getWellFormedHist(), hist);
+    }
 
     public Term wellFormed(LocationVariable heap) {
         return wellFormed(var(heap));
