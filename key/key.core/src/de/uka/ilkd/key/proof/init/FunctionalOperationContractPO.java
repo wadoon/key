@@ -274,7 +274,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     @Override
     protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
                                ImmutableList<LocationVariable> formalParamVars,
-                               Map<LocationVariable,LocationVariable> atPreVars, Services services) {
+                               Map<LocationVariable,LocationVariable> atPreVars,
+                               LocationVariable preHist, LocationVariable hist,
+                               Services services) {
        Term update = null;
        for(Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
           final LocationVariable heap = atPreEntry.getKey();
@@ -292,6 +294,12 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             Term paramUpdate = tb.elementary(formalParamIt.next(), tb.var(paramIt.next()));
             update = tb.parallel(update, paramUpdate);
         }
+
+        //TODO: Add here the update for the history
+        Term histupdate = tb.elementary(hist, tb.var(preHist));
+        update = tb.parallel(update,histupdate);
+        // End adding
+
         return update;
     }
 

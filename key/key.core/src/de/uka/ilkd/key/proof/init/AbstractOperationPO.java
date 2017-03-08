@@ -352,6 +352,15 @@ public abstract class AbstractOperationPO extends AbstractPO {
 					}
 				}
 
+				//////////TODO For testing only
+				//build the logical variable for pre- and post hist
+				ProgramElementName prehistname = new ProgramElementName("histAtPre");
+				LocationVariable prehist = new LocationVariable(prehistname, (Sort) proofServices.getNamespaces().sorts().lookup(new Name("Seq")));
+				ProgramElementName posthistname = new ProgramElementName("histAtPre");
+				LocationVariable posthist = new LocationVariable(posthistname, (Sort) proofServices.getNamespaces().sorts().lookup(new Name("Seq")));
+				LocationVariable hist = proofServices.getTypeConverter().getSeqLDT().getHist();
+				///////// End for testing only
+
 				// build program block to execute in try clause (must be done before pre condition is created.
 				final ImmutableList<StatementBlock> sb =
 						buildOperationBlocks(formalParamVars, selfVar, resultVar, proofServices);
@@ -366,8 +375,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
 						permsFor = tb.and(permsFor, pf);
 					}
 				}
-				
-				LocationVariable hist = proofServices.getTypeConverter().getSeqLDT().getHist();
 
 				// build precondition
 				Term pre = tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, modHeaps, hist, proofServices),
@@ -406,7 +413,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 						tb.var(paramVars), proofServices);
 
 				final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar,
-						exceptionVar, atPreVars, post, sb, proofServices);
+						exceptionVar, atPreVars, post, sb, prehist, hist, proofServices);
 				final Term preImpliesProgPost = tb.imp(pre, progPost);
 				final Term applyGlobalUpdate = globalUpdate == null ?
 						preImpliesProgPost : tb.apply(globalUpdate, preImpliesProgPost);
@@ -823,6 +830,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                    Map<LocationVariable, LocationVariable> atPreVars,
                                    Term postTerm,
                                    ImmutableList<StatementBlock> sb,
+                                   LocationVariable preHist,
+                                   LocationVariable hist,
                                    Services services) {
 
       // create java block
@@ -839,7 +848,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
       }
 
       // create update
-      Term update = buildUpdate(paramVars, formalParamVars, atPreVars, services);
+      Term update = buildUpdate(paramVars, formalParamVars, atPreVars, preHist, hist, services);
 
       return tb.apply(update, programTerm, null);
    }
@@ -952,7 +961,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
     */
    protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
                               ImmutableList<LocationVariable> formalParamVars,
-                              Map<LocationVariable, LocationVariable> atPreVars, Services services) {
+                              Map<LocationVariable, LocationVariable> atPreVars,
+                              LocationVariable preHist, LocationVariable hist,
+                              Services services) {
       Term update = null;
       for(Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
          final Term u = tb.elementary(atPreEntry.getValue(), tb.getBaseHeap());
@@ -970,6 +981,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
               update = tb.parallel(update, paramUpdate);
           }
        }
+
+       //TODO: Add here the update for the history
+       Term histupdate = tb.elementary(hist, tb.var(preHist));
+       update = tb.parallel(update,histupdate);
+       // End adding
+       
        return update;
    }
 
