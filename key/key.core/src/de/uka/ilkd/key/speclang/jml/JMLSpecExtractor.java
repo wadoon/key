@@ -331,7 +331,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
             //concatenate comments, determine position
             String concatenatedComment = concatenate(comments);
             Position pos = comments[0].getStartPosition();
-//TODO: Just a reminder that classlevel parsing seems to start here (JK) but wait what? In extractMethodSpecs parse classlevel is called? What does class and method level even mean???
+//TODO JK Just a reminder that classlevel parsing seems to start here (JK) but wait what? In extractMethodSpecs parse classlevel is called? What does class and method level even mean???
             //call preparser
             KeYJMLPreParser preParser
                 = new KeYJMLPreParser(concatenatedComment, fileName, pos);

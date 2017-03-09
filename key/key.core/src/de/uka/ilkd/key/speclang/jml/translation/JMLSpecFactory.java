@@ -193,7 +193,7 @@ public class JMLSpecFactory {
         return symbDatas;
     }
     
-    //TODO understand!
+    //TODO JK understand!
     private ImmutableSet<Contract>
     createDependencyClusterContracts(ContractClauses clauses,
                                    IProgramMethod pm,
@@ -205,7 +205,6 @@ public class JMLSpecFactory {
                 DefaultImmutableSet.<Contract>nil();
         
         if (clauses.dependencyClusterSpecs != null && !clauses.dependencyClusterSpecs.isEmpty()) {
-            //contracts = contracts.add(DependencyClusterContractImpl.DUMMY_DEP_CLUSTER_CONTRACT);
             contracts = contracts.add(cf.createDependencyClusterContract(pm.getContainerType(), pm, 
                                                                          pm.getContainerType(), 
                                                                          Modality.BOX,
@@ -582,12 +581,12 @@ public class JMLSpecFactory {
                                  ImmutableSLList.<DependencyClusterSpec>nil();
         for (PositionedString expr : originalClauses) {
 //TODO extend Parser to handle dependency cluster specs
-            //DependencyClusterSpec translated =
-            //            JMLTranslator.translate(expr, pm.getContainerType(),
-            //                                    selfVar, paramVars, resultVar,
-            //                                    excVar, null, DependencyClusterSpec.class, services);
-            //result = result.append(translated);
-            result = result.append(new DependencyClusterSpec(expr.text));
+            DependencyClusterSpec translated =
+                        JMLTranslator.translate(expr, pm.getContainerType(),
+                                                selfVar, paramVars, resultVar,
+                                                excVar, null, DependencyClusterSpec.class, services);
+            result = result.append(translated);
+            //result = result.append(new DependencyClusterSpec(expr.text));
         }
         return result;
     }

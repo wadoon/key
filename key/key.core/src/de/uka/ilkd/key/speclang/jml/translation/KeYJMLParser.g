@@ -29,12 +29,15 @@ options {
     import de.uka.ilkd.key.util.Pair;
     import de.uka.ilkd.key.util.Triple;
     import de.uka.ilkd.key.util.InfFlowSpec;
+    import de.uka.ilkd.key.util.DependencyClusterSpec;
+    import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 
     import java.math.BigInteger;
     import java.util.List;
     import java.util.Map;
     import java.util.LinkedHashMap;
     import java.util.ArrayList;
+
 }
 
 @members {
@@ -404,6 +407,7 @@ top returns [Object ret = null] throws SLTranslationException
     |   signalsclause { ret = $signalsclause.ret; }
     |   signalsonlyclause { ret = $signalsonlyclause.result; }
     |   termexpression { ret = $termexpression.result; }
+    |	dependencyclusterspec { ret = $dependencyclusterspec.result; }
     )
     (SEMI)? EOF
     ;
@@ -595,6 +599,83 @@ infflowspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil
         { result = translator.translate("infflowspeclist", ImmutableList.class, result, services); }
     ;
     
+dependencyclusterspec returns  [DependencyClusterSpec result = DependencyClusterSpec.EMPTY_DEP_CLUSTER_SPEC] throws SLTranslationException
+@init {
+    ImmutableList<Term> lowIn = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> lowOut = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> lowState = ImmutableSLList.<Term>nil();
+    ImmutableList<Term> visible = ImmutableSLList.<Term>nil(); //TODO JK A List of simple terms wont do it I think
+    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
+}
+://TODO JK check which parts can be made optional, work on nice syntax
+    CLUSTER 
+    	LOWIN (NOTHING | tmp = depclusterspeclist {lowIn = lowIn.append(tmp); System.out.println("lowin " + tmp);}) 
+    	LOWOUT (NOTHING | tmp = depclusterspeclist {lowOut = lowOut.append(tmp); System.out.println("lowout " + tmp);}) 
+    	LOWSTATE (NOTHING | tmp = infflowspeclist {lowState = lowState.append(tmp); System.out.println("lowstate " + tmp);}) 
+    	VISIBLE (NOTHING | tmp = visibilitylist {visible = visible.append(tmp); System.out.println("visible " + tmp);})
+    	NEW_OBJECTS (NOTHING | tmp = infflowspeclist {newObs = newObs.append(tmp); System.out.println("newobs " + tmp);})
+
+    {result = new DependencyClusterSpec(lowIn, lowOut, lowState, visible, newObs);}
+    ;
+    
+depclusterspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
+://TODO JK restore the possibility to directly use expressions (implicitly in the context of the current service)
+
+      terms = lowmessagespeclist {result = result.append(terms);}//
+    //| term = termexpression {result = result.append(term);} //TODO JK I suspect this needs refinement, maybe because of result keyword. ambiguity because of depclusterspeclist_service? means expressions directly on parameters (if in) or result (if out)
+   
+    ( COMMA terms = lowmessagespeclist {result = result.append(terms);})*
+    //| term = termexpression {result = result.append(term);})*
+    
+        //{ result = translator.translate("infflowspeclist", ImmutableList.class, result, services); }//This translation seems to execute code in JMLTranslator, atm line 1723ff what does it do and do I need it for my specs???
+    ;
+    
+lowmessagespeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException //TODO JK this is for component.service(expression with parameters)
+://TODO JK add flexibility to choosing component, for example allow accessing components in arrays
+    component = (IDENT|THIS) DOT service= IDENT LPAREN terms = relativelowmessagespeclist[component.getText(), service.getText()] {result = terms;} RPAREN
+    
+    ;
+
+//TODO JK not ready
+visibilitylist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
+:
+    term = termexpression { result = result.append(term); }
+    (COMMA term = termexpression { result = result.append(term); })*
+    
+    ;
+    
+relativelowmessagespeclist [String component, String service] returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
+@init {
+        IProgramMethod pm = null;
+        KeYJavaType receiverType = null;
+
+        if (component.equals("this")) {
+            receiverType = selfVar.getKeYJavaType();
+        } else {
+            receiverType = resolverManager.resolve(null, component, null).getType();
+        }
+        
+        ImmutableList<IProgramMethod> methods = javaInfo.getAllProgramMethods(receiverType);
+          for (IProgramMethod method : methods) {
+             if (method.getName().equals(service)) {
+                 //TODO JK allow inheritance because it's no true ambiguity! Should not be too hard to deal with...
+                 if (pm != null) {
+                     throw new SLTranslationException("Method " + receiverType.getFullName() + "." + service + " ambiguous (can't handle overloading and inheritance atm)!");
+                 }
+                 pm = method;
+                 System.out.println("Found the method " + receiverType.getFullName() + "." + service + ". It has the following parameters:");
+                 for (ParameterDeclaration param: pm.getParameters()) {
+                      System.out.println(param.getVariableSpecification().getName());
+                 }                  
+             }
+          }
+}
+:
+    term = termexpression { result = result.append(term); }
+    (COMMA term = termexpression { result = result.append(term); })*
+    
+    ;
+    
     
 mbsecspecclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException
 @init {
@@ -613,7 +694,7 @@ mbsecspecclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] 
     
     
 //to check whether the preserving keyword appears (not inside a parantheses expression) before the expression is terminated by a semicolon. To prevent ambiguity of determines and determines mbs
-//TODO: more elegant solution? Left factoring would be complicated. parentheses counting doesn't even work with syntactic predicates, so something needs to be done here anyway
+//TODO JK more elegant solution? Left factoring would be complicated. parentheses counting doesn't even work with syntactic predicates, so something needs to be done here anyway
 expression_with_preserving
 @init {
     int parenthesesCounter = 0;

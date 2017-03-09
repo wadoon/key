@@ -191,6 +191,15 @@ ST : '<:';
 UNSIGNEDSHIFTRIGHT : '>>>';
 XOR : '^';
 
+//TODO JK einsortieren, Zeug für Komponenten NI
+CLUSTER	:	'cluster';
+LOWIN	:	'\\lowIn';
+LOWOUT	:	'\\lowOut';
+LOWSTATE:	'\\lowState';
+VISIBLE	:	'\\visible';
+
+
+
 GT : '>';
 fragment LT : '<';
 

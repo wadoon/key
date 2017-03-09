@@ -287,7 +287,7 @@ public class ContractFactory {
                 result, exc, atPre, accessible, infFlowSpecs, toBeSaved);
     }
     
-    //TODO take a closer look, what does it do?
+    //TODO JK take a closer look, what does it do?
     public DependencyClusterContract createDependencyClusterContract(
             KeYJavaType forClass,
             IProgramMethod pm,

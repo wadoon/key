@@ -49,6 +49,7 @@ public class DependencyClusterContractImpl
     
     final boolean hasRealModifiesClause;
     
+    /*
     private DependencyClusterContractImpl() {
         this.id = INVALID_ID;
         this.name = null;
@@ -70,7 +71,7 @@ public class DependencyClusterContractImpl
         this.origDependencyClusterSpecs = null;
         this.hasRealModifiesClause = false;
     }
-    
+    */
     public DependencyClusterContractImpl(String baseName,
             KeYJavaType forClass,
             IProgramMethod pm,
