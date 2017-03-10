@@ -20,12 +20,17 @@ public class InductionHypothesisFinder {
 	 * just mostly used in this context.
  	 * @return An ImmutableSet&lt;Sort&gt; the types of all variables in the given formula
 	 */
-	public ImmutableSet<Sort> collectTypesFromTerm(Term allQuantifiedTerm){
-		ImmutableSet<QuantifiableVariable> variables = new ImmutableSet<QuantifiableVariable>();
-		
+	public ImmutableSet<Sort> collectSortsFromTerm(Term allQuantifiedTerm){
+				
 		//get all variables from the given term
 		ImmutableArray<QuantifiableVariable> boundVars = allQuantifiedTerm.boundVars();
-		ImmutableSet<QuantifiableVariable> freeVars = allQuantifiedTerm.freeVars();
+		ImmutableSet<QuantifiableVariable> variables = allQuantifiedTerm.freeVars();
+		for(QuantifiableVariable bv: boundVars){
+			variables.add(bv);
+		}
+		
+		ImmutableSet<Sort> sorts
+		for()
 		
 		
 		return null;
