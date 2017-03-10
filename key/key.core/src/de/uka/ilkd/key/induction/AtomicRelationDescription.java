@@ -35,7 +35,7 @@ public class AtomicRelationDescription {
 	 */
 	public Set<Variable> getRelevantVariables(){
 		//TODO: collect the variables from rangeFormula and domainSubstitution
-		Set<Variable> relevantVars = new Set<Variable>();	//Find the most useful type of set
+		Set<Variable> relevantVars = null;	//Find the most useful type of set
 		
 		ImmutableSet<QuantifiableVariable> freeVarsOfRangeFormula = rangeFormula.freeVars();	//transform into variables
 		ImmutableArray<QuantifiableVariable> boundVarsOfRangeFormula = rangeFormula.boundVars();	//transform into variables
