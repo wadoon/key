@@ -49,6 +49,7 @@ options {
     private KeYJavaType containerType;
     private IntegerLDT intLDT;
     private HeapLDT heapLDT;
+    private SeqLDT seqLDT;
     private LocSetLDT locSetLDT;
     private BooleanLDT booleanLDT;
     private SLTranslationExceptionManager excManager;
@@ -61,6 +62,9 @@ options {
     private ProgramVariable resultVar;
     private ProgramVariable excVar;
     private Map<LocationVariable,Term> atPres;
+    
+    //TODO JK Hack to make cluster parsing easier
+    private IProgramMethod serviceContext = null;
 
     // Helper objects
     private JMLResolverManager resolverManager;
@@ -87,6 +91,7 @@ options {
 	this.heapLDT        = services.getTypeConverter().getHeapLDT();
 	this.locSetLDT      = services.getTypeConverter().getLocSetLDT();
 	this.booleanLDT     = services.getTypeConverter().getBooleanLDT();
+        this.seqLDT         = services.getTypeConverter().getSeqLDT();
 	this.excManager     = new SLTranslationExceptionManager(this,
 				    				fileName,
 				    				new Position(0,0));
@@ -646,8 +651,8 @@ visibilitylist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil(
     
 relativelowmessagespeclist [String component, String service] returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
 @init {
-        IProgramMethod pm = null;
         KeYJavaType receiverType = null;
+        serviceContext = null;
 
         if (component.equals("this")) {
             receiverType = selfVar.getKeYJavaType();
@@ -659,17 +664,17 @@ relativelowmessagespeclist [String component, String service] returns  [Immutabl
           for (IProgramMethod method : methods) {
              if (method.getName().equals(service)) {
                  //TODO JK allow inheritance because it's no true ambiguity! Should not be too hard to deal with...
-                 if (pm != null) {
+                 if (serviceContext != null) {
                      throw new SLTranslationException("Method " + receiverType.getFullName() + "." + service + " ambiguous (can't handle overloading and inheritance atm)!");
                  }
-                 pm = method;
-                 System.out.println("Found the method " + receiverType.getFullName() + "." + service + ". It has the following parameters:");
-                 for (ParameterDeclaration param: pm.getParameters()) {
-                      System.out.println(param.getVariableSpecification().getName());
-                 }                  
+                 serviceContext = method;                 
              }
           }
+        if (serviceContext == null) {
+            throw new SLTranslationException("Method " + receiverType.getFullName() + "." + service + " not found!");
+        }
 }
+@after {serviceContext = null;}
 :
     term = termexpression { result = result.append(term); }
     (COMMA term = termexpression { result = result.append(term); })*
@@ -1388,13 +1393,43 @@ primaryexpr returns [SLExpression ret=null] throws SLTranslationException
 @after {ret = result;}
 :
 	result = constant
-    |   id=IDENT     { result = lookupIdentifier(id.getText(), null, null, id); }
+    |   id=IDENT     { 
+            if (serviceContext != null) {
+                //TODO JK Remember that there can be identifiers which aren't directly parameters. Handle those too! For example param.id or id(param). I'm not perfectly sure which cases are possible and how these things are parsed or represented internally
+                ImmutableArray<ParameterDeclaration> params = serviceContext.getParameters();
+                int parameterIndex = -1;
+                for (int i = 0; i < params.size(); i++) {
+                    if (params.get(i).getVariableSpecification().getName().equals(id.getText())) {
+                        parameterIndex = i;
+                    }
+                }
+                
+                if (parameterIndex < 0) {
+                    result = null;
+                    //throw new SLTranslationException(id.getText() + " is not a parameter of " + serviceContext + "and other kinds of IDs in service contexts aren't handled atm!");
+                } else {                  
+                    KeYJavaType parameterKeYJavaType = params.get(parameterIndex).getTypeReference().getKeYJavaType();
+                    Sort parameterSort = parameterKeYJavaType.getSort();
+                    System.out.println(id.getText() + " is parameter number " + parameterIndex + " of service " + serviceContext + " and is of sort " + parameterSort);
+
+
+                    //result = tb.seqGet(parameterSort, );
+
+                    result = new SLExpression(tb.seqGet(parameterSort, tb.var(seqLDT.getCurrentParams()), tb.zTerm(parameterIndex)), parameterKeYJavaType);
+                }
+            } 
+            
+            if (result == null) {
+                result = lookupIdentifier(id.getText(), null, null, id);
+            }
+        } 
+                   
     |   inv=INV      { result = translator.translate(inv.getText(),services,
                                 selfVar==null? null: tb.var(selfVar),containerType);}
     |   TRUE         { result = new SLExpression(tb.tt()); }
     |   FALSE        { result = new SLExpression(tb.ff()); }
     |   NULL         { result = new SLExpression(tb.NULL()); }
-    |   result=jmlprimary
+    |   result=jmlprimary   //TODO JK \result is probably in there, it needs special handling in a service context!!!
     |   THIS
         {
             if(selfVar == null) {
