@@ -23,7 +23,8 @@ public class AtomicRelationDescription {
 	
 	/** TODO: find fitting description. 
 	 * this should not be empty */
-	private Set<Substitution> domainSubstitution;
+	private Set<Substitution> domainSubstitution;	//use linkedhashset or immutableset to generate the same proof for the same problem.
+	//use single substitution pair<variable, term>
 	
 	public AtomicRelationDescription(){
 		//TODO: generate the range formula and the set of substitutions
