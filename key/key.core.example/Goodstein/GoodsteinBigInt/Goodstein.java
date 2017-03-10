@@ -1,5 +1,4 @@
-import java.io.*;
-import java.math.BigInteger;
+import java.io.*; import java.math.BigInteger;
 
 public class Goodstein{
   static BigInteger mIn;
