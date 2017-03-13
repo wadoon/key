@@ -45,6 +45,7 @@ import de.uka.ilkd.key.gui.joinrule.JoinRuleMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
+import de.uka.ilkd.key.induction.SortsDialog;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -100,6 +101,10 @@ public class TacletMenu extends JMenu {
 	private static final String ENTER_LOOP_SPECIFICATION = "Enter Loop Specification";
 	private static final String APPLY_RULE = "Apply Rule";
 	private static final String NO_RULES_APPLICABLE = "No rules applicable.";
+	
+	//Added by roettgerStructuralInduction
+	private static final String SHOW_SORTS = "Show all variable sorts";
+	
 	/**
      *
      */
@@ -244,6 +249,9 @@ public class TacletMenu extends JMenu {
 		}
 	    }
 	}
+	
+	//added by roettgerStructuralInduction
+	addShowSortsItem(control);
 
     }
 
@@ -439,6 +447,16 @@ public class TacletMenu extends JMenu {
 	JMenuItem item = new JMenuItem(COPY_TO_CLIPBOARD);
 	item.addActionListener(control);
 	add(item);
+    }
+    
+    /**
+     * @information: roettgerStructuralInduction
+     * @param control
+     */
+    private void addShowSortsItem(MenuControl control){
+    	JMenuItem item = new JMenuItem(SHOW_SORTS);
+    	item.addActionListener(control);
+    	add(item);
     }
 
 
@@ -673,9 +691,20 @@ public class TacletMenu extends JMenu {
 		    				  message,
 						  "Name creation info",
 		  				  JOptionPane.INFORMATION_MESSAGE);
-		}
+		} //added by roettgerStructuralInduction 
+		else if(((JMenuItem)e.getSource()).getText().
+				 startsWith(SHOW_SORTS)){
+			try{
+				PosInOccurrence occ = pos.getPosInOccurrence();
+				new SortsDialog(new JFrame(), occ.subTerm());
+			}
+			catch(NullPointerException npException){
+				//cause there is no problem then. Just moved mouse while clicking.
+			}
+			
 	    }
 	}
+    }
     }
 
 
