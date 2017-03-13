@@ -617,11 +617,11 @@ dependencyclusterspec returns  [DependencyClusterSpec result = DependencyCluster
 }
 ://TODO JK check which parts can be made optional, work on nice syntax
     CLUSTER 
-    	LOWIN (NOTHING | tmpLowIn = depclusterspeclist {lowIn = lowIn.append(tmpLowIn); System.out.println("lowin " + tmpLowIn);}) 
-    	LOWOUT (NOTHING | tmpLowOut = depclusterspeclist {lowOut = lowOut.append(tmpLowOut); System.out.println("lowout " + tmpLowOut);}) 
-    	LOWSTATE (NOTHING | tmpLowState = infflowspeclist {lowState = lowState.append(tmpLowState); System.out.println("lowstate " + tmpLowState);}) 
-    	VISIBLE (NOTHING | tmpVisible = visibilitylist {visible = visible.append(tmpVisible); System.out.println("visible " + tmpVisible);})
-    	NEW_OBJECTS (NOTHING | tmpNew = infflowspeclist {newObs = newObs.append(tmpNew); System.out.println("newobs " + tmpNew);})
+    	LOWIN (NOTHING | tmpLowIn = depclusterspeclist {lowIn = lowIn.append(tmpLowIn);}) 
+    	LOWOUT (NOTHING | tmpLowOut = depclusterspeclist {lowOut = lowOut.append(tmpLowOut);}) 
+    	LOWSTATE (NOTHING | tmpLowState = infflowspeclist {lowState = lowState.append(tmpLowState);}) 
+    	VISIBLE (NOTHING | tmpVisible = visibilitylist {visible = visible.append(tmpVisible);})
+    	NEW_OBJECTS (NOTHING | tmpNew = infflowspeclist {newObs = newObs.append(tmpNew);})
 
     {result = new DependencyClusterSpec(lowIn, lowOut, lowState, visible, newObs);}
     ;

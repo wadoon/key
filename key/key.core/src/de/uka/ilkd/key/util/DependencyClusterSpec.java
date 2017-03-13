@@ -36,4 +36,34 @@ public class DependencyClusterSpec {
         this.visible = ImmutableSLList.<VisibilityCondition>nil();
         this.newObjects = ImmutableSLList.<Term>nil();
     }
+
+    public ImmutableList<Lowlist> getLowOut() {
+        return lowOut;
+    }
+
+    public ImmutableList<Lowlist> getLowIn() {
+        return lowIn;
+    }
+
+    public ImmutableList<Term> getLowState() {
+        return lowState;
+    }
+
+    public ImmutableList<Term> getNewObjects() {
+        return newObjects;
+    }
+
+    public ImmutableList<VisibilityCondition> getVisible() {
+        return visible;
+    }
+    
+    
+    @Override
+    public String toString() {
+        return "LowIn: " + lowIn + "\n" +
+                "LowOut: " + lowOut + "\n" +
+                "lowState: " + lowState + "\n" +
+                "Visible: " + visible + "\n" +
+                "New Objects: " + newObjects;
+    }
 }

@@ -258,9 +258,13 @@ public class DependencyClusterContractImpl
     @Override
     public String getHTMLText(Services services) {
         // TODO implement
-        return "<html><b>HTML text for:</b>"
-        + origDependencyClusterSpecs.head()
-        + "</html>";
+        return "<html>" +
+        "<b>LowIn </b>" + origDependencyClusterSpecs.head().getLowIn() +"<br>" +
+        "<b>LowOut </b>" + origDependencyClusterSpecs.head().getLowOut() +"<br>" +
+        "<b>LowState </b>" + origDependencyClusterSpecs.head().getLowState() +"<br>" +
+        "<b>Visible </b>" + origDependencyClusterSpecs.head().getVisible() +"<br>" +
+        "<b>New Objects </b>" + origDependencyClusterSpecs.head().getNewObjects() +"<br>" +
+        "</html>";
     }
 
     @Override
