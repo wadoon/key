@@ -9,19 +9,19 @@ public class DependencyClusterSpec {
     public static final DependencyClusterSpec EMPTY_DEP_CLUSTER_SPEC = new DependencyClusterSpec();
     
     //TODO JK build class
-    private final ImmutableList<Term> lowIn;
-    private final ImmutableList<Term> lowOut;
+    private final ImmutableList<Lowlist> lowIn;
+    private final ImmutableList<Lowlist> lowOut;
     private final ImmutableList<Term> lowState;
     private final ImmutableList<Term> newObjects;
     
-    private final ImmutableList<Term> visible; //TODO JK simple terms wont do it I suspect...
+    private final ImmutableList<VisibilityCondition> visible; //TODO JK simple terms wont do it I suspect...
 
 
-    public DependencyClusterSpec(ImmutableList<Term> lowIn, ImmutableList<Term> lowOut, ImmutableList<Term> lowState, ImmutableList<Term> visible) {
+    public DependencyClusterSpec(ImmutableList<Lowlist> lowIn, ImmutableList<Lowlist> lowOut, ImmutableList<Term> lowState, ImmutableList<VisibilityCondition> visible) {
         this(lowIn, lowOut,lowState, visible, null);
     }
     
-    public DependencyClusterSpec(ImmutableList<Term> lowIn, ImmutableList<Term> lowOut, ImmutableList<Term> lowState, ImmutableList<Term> visible, ImmutableList<Term> newObjects) {
+    public DependencyClusterSpec(ImmutableList<Lowlist> lowIn, ImmutableList<Lowlist> lowOut, ImmutableList<Term> lowState, ImmutableList<VisibilityCondition> visible, ImmutableList<Term> newObjects) {
         this.lowIn = lowIn;
         this.lowOut = lowOut;
         this.lowState = lowState;
@@ -30,10 +30,10 @@ public class DependencyClusterSpec {
     }
     
     private DependencyClusterSpec() {
-        this.lowIn = ImmutableSLList.<Term>nil();
-        this.lowOut = ImmutableSLList.<Term>nil();
+        this.lowIn = ImmutableSLList.<Lowlist>nil();
+        this.lowOut = ImmutableSLList.<Lowlist>nil();
         this.lowState = ImmutableSLList.<Term>nil();
-        this.visible = ImmutableSLList.<Term>nil();
+        this.visible = ImmutableSLList.<VisibilityCondition>nil();
         this.newObjects = ImmutableSLList.<Term>nil();
     }
 }

@@ -1,4 +1,4 @@
-package de.uka.ilkd.key;
+package de.uka.ilkd.key.speclang;
 
 import java.util.List;
 import java.util.Map;

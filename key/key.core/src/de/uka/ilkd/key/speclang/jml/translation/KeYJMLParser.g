@@ -29,8 +29,10 @@ options {
     import de.uka.ilkd.key.util.Pair;
     import de.uka.ilkd.key.util.Triple;
     import de.uka.ilkd.key.util.InfFlowSpec;
+    import de.uka.ilkd.key.util.Lowlist;
     import de.uka.ilkd.key.util.DependencyClusterSpec;
     import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+    import de.uka.ilkd.key.util.VisibilityCondition;
 
     import java.math.BigInteger;
     import java.util.List;
@@ -65,6 +67,7 @@ options {
     
     //TODO JK Hack to make cluster parsing easier
     private IProgramMethod serviceContext = null;
+    private SLExpression componentContext = null;
 
     // Helper objects
     private JMLResolverManager resolverManager;
@@ -606,79 +609,113 @@ infflowspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil
     
 dependencyclusterspec returns  [DependencyClusterSpec result = DependencyClusterSpec.EMPTY_DEP_CLUSTER_SPEC] throws SLTranslationException
 @init {
-    ImmutableList<Term> lowIn = ImmutableSLList.<Term>nil();
-    ImmutableList<Term> lowOut = ImmutableSLList.<Term>nil();
+    ImmutableList<Lowlist> lowIn = ImmutableSLList.<Lowlist>nil();
+    ImmutableList<Lowlist> lowOut = ImmutableSLList.<Lowlist>nil();
     ImmutableList<Term> lowState = ImmutableSLList.<Term>nil();
-    ImmutableList<Term> visible = ImmutableSLList.<Term>nil(); //TODO JK A List of simple terms wont do it I think
+    ImmutableList<VisibilityCondition> visible = ImmutableSLList.<VisibilityCondition>nil(); //TODO JK A List of simple terms wont do it I think, create visibleList class
     ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
 }
 ://TODO JK check which parts can be made optional, work on nice syntax
     CLUSTER 
-    	LOWIN (NOTHING | tmp = depclusterspeclist {lowIn = lowIn.append(tmp); System.out.println("lowin " + tmp);}) 
-    	LOWOUT (NOTHING | tmp = depclusterspeclist {lowOut = lowOut.append(tmp); System.out.println("lowout " + tmp);}) 
-    	LOWSTATE (NOTHING | tmp = infflowspeclist {lowState = lowState.append(tmp); System.out.println("lowstate " + tmp);}) 
-    	VISIBLE (NOTHING | tmp = visibilitylist {visible = visible.append(tmp); System.out.println("visible " + tmp);})
-    	NEW_OBJECTS (NOTHING | tmp = infflowspeclist {newObs = newObs.append(tmp); System.out.println("newobs " + tmp);})
+    	LOWIN (NOTHING | tmpLowIn = depclusterspeclist {lowIn = lowIn.append(tmpLowIn); System.out.println("lowin " + tmpLowIn);}) 
+    	LOWOUT (NOTHING | tmpLowOut = depclusterspeclist {lowOut = lowOut.append(tmpLowOut); System.out.println("lowout " + tmpLowOut);}) 
+    	LOWSTATE (NOTHING | tmpLowState = infflowspeclist {lowState = lowState.append(tmpLowState); System.out.println("lowstate " + tmpLowState);}) 
+    	VISIBLE (NOTHING | tmpVisible = visibilitylist {visible = visible.append(tmpVisible); System.out.println("visible " + tmpVisible);})
+    	NEW_OBJECTS (NOTHING | tmpNew = infflowspeclist {newObs = newObs.append(tmpNew); System.out.println("newobs " + tmpNew);})
 
     {result = new DependencyClusterSpec(lowIn, lowOut, lowState, visible, newObs);}
     ;
     
-depclusterspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
+depclusterspeclist returns  [ImmutableList<Lowlist> result = ImmutableSLList.<Lowlist>nil()] throws SLTranslationException
 ://TODO JK restore the possibility to directly use expressions (implicitly in the context of the current service)
 
-      terms = lowmessagespeclist {result = result.append(terms);}//
+      lowlist = lowmessagespeclist {result = result.append(lowlist);}//
     //| term = termexpression {result = result.append(term);} //TODO JK I suspect this needs refinement, maybe because of result keyword. ambiguity because of depclusterspeclist_service? means expressions directly on parameters (if in) or result (if out)
    
-    ( COMMA terms = lowmessagespeclist {result = result.append(terms);})*
+    ( COMMA lowlist = lowmessagespeclist {result = result.append(lowlist);})*
     //| term = termexpression {result = result.append(term);})*
     
         //{ result = translator.translate("infflowspeclist", ImmutableList.class, result, services); }//This translation seems to execute code in JMLTranslator, atm line 1723ff what does it do and do I need it for my specs???
     ;
     
-lowmessagespeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException //TODO JK this is for component.service(expression with parameters)
-://TODO JK add flexibility to choosing component, for example allow accessing components in arrays
-    component = (IDENT|THIS) DOT service= IDENT LPAREN terms = relativelowmessagespeclist[component.getText(), service.getText()] {result = terms;} RPAREN
-    
-    ;
-
-//TODO JK not ready
-visibilitylist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
+lowmessagespeclist returns  [Lowlist result = null] throws SLTranslationException //TODO JK this is for component.service(expression with parameters)
+@after {
+    serviceContext = null;
+    componentContext = null;
+}
 :
-    term = termexpression { result = result.append(term); }
-    (COMMA term = termexpression { result = result.append(term); })*
+//TODO JK add flexibility to choosing component, for example allow accessing components in arrays
+    servicecontext LPAREN list = termlist RPAREN
+    
+    {result = new Lowlist(componentContext, serviceContext, list);}
     
     ;
     
-relativelowmessagespeclist [String component, String service] returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
+servicecontext throws SLTranslationException
 @init {
-        KeYJavaType receiverType = null;
-        serviceContext = null;
-
-        if (component.equals("this")) {
-            receiverType = selfVar.getKeYJavaType();
-        } else {
-            receiverType = resolverManager.resolve(null, component, null).getType();
+String serviceName = "";
+String receiverName = "";
+}
+@after {
+        if (componentContext != null)
+        {
+            throw new SLTranslationException("componentContext already set!");
         }
+        
+        if (serviceContext != null)
+        {
+            throw new SLTranslationException("serviceContext already set!");
+        }
+              
+        KeYJavaType receiverType = null;
+        
+        ImmutableList<Term> terms = ImmutableSLList.<Term>nil();
+
+        if (receiverName.equals("this")) {
+            componentContext = new SLExpression(tb.var(selfVar), containerType);
+        } else {
+            componentContext = resolverManager.resolve(null, receiverName, null);
+        }
+        
+        receiverType = componentContext.getType();
         
         ImmutableList<IProgramMethod> methods = javaInfo.getAllProgramMethods(receiverType);
           for (IProgramMethod method : methods) {
-             if (method.getName().equals(service)) {
+             if (method.getName().equals(serviceName)) {
                  //TODO JK allow inheritance because it's no true ambiguity! Should not be too hard to deal with...
                  if (serviceContext != null) {
-                     throw new SLTranslationException("Method " + receiverType.getFullName() + "." + service + " ambiguous (can't handle overloading and inheritance atm)!");
+                     throw new SLTranslationException("Method " + receiverType.getFullName() + "." + serviceName + " ambiguous (can't handle overloading and inheritance atm)!");
                  }
                  serviceContext = method;                 
              }
           }
         if (serviceContext == null) {
-            throw new SLTranslationException("Method " + receiverType.getFullName() + "." + service + " not found!");
+            throw new SLTranslationException("Method " + receiverType.getFullName() + "." + serviceName + " not found!");
         }
 }
-@after {serviceContext = null;}
+:
+    component = (IDENT|THIS) DOT service = IDENT
+    {receiverName = component.getText();
+    serviceName = service.getText();}
+    ;
+    
+termlist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
 :
     term = termexpression { result = result.append(term); }
     (COMMA term = termexpression { result = result.append(term); })*
+    ;
+
+//TODO JK not ready
+visibilitylist returns  [ImmutableList<VisibilityCondition> result = ImmutableSLList.<VisibilityCondition>nil()] throws SLTranslationException
+:
+    servicecontext DOT mtype = messagetype LPAREN term = termexpression RPAREN {result = result.append(new VisibilityCondition(componentContext, serviceContext, mtype, term)); componentContext = null; serviceContext = null;}  
+    (COMMA servicecontext DOT mtype = messagetype LPAREN term = termexpression RPAREN {result = result.append(new VisibilityCondition(componentContext, serviceContext, mtype, term)); componentContext = null; serviceContext = null;})*
+    ;
     
+messagetype returns [MessageTypeValue result = null]
+:
+        CALL {result = MessageTypeValue.CALL;}
+    |   TERMINATION {result = MessageTypeValue.TERMINATION;}
     ;
     
     
@@ -1410,7 +1447,7 @@ primaryexpr returns [SLExpression ret=null] throws SLTranslationException
                 } else {                  
                     KeYJavaType parameterKeYJavaType = params.get(parameterIndex).getTypeReference().getKeYJavaType();
                     Sort parameterSort = parameterKeYJavaType.getSort();
-                    System.out.println(id.getText() + " is parameter number " + parameterIndex + " of service " + serviceContext + " and is of sort " + parameterSort);
+                    //System.out.println(id.getText() + " is parameter number " + parameterIndex + " of service " + serviceContext + " and is of sort " + parameterSort);
 
 
                     //result = tb.seqGet(parameterSort, );
@@ -1429,7 +1466,7 @@ primaryexpr returns [SLExpression ret=null] throws SLTranslationException
     |   TRUE         { result = new SLExpression(tb.tt()); }
     |   FALSE        { result = new SLExpression(tb.ff()); }
     |   NULL         { result = new SLExpression(tb.NULL()); }
-    |   result=jmlprimary   //TODO JK \result is probably in there, it needs special handling in a service context!!!
+    |   result=jmlprimary   //TODO JK \result is probably in there, it needs special handling in a service context!!!!!!
     |   THIS
         {
             if(selfVar == null) {
