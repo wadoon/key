@@ -352,14 +352,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
 					}
 				}
 
-				//////////TODO KD For testing only
-				//build the logical variable for pre- and post hist
-				ProgramElementName prehistname = new ProgramElementName("histAtPre");
-				LocationVariable prehist = new LocationVariable(prehistname, (Sort) proofServices.getNamespaces().sorts().lookup(new Name("Seq")));
-//				ProgramElementName posthistname = new ProgramElementName("histAtPre");
-//				LocationVariable posthist = new LocationVariable(posthistname, (Sort) proofServices.getNamespaces().sorts().lookup(new Name("Seq")));
+				//TODO KD are these the correct hist and preHist?
+				//build the logical variable for pre- and (post) hist
 				LocationVariable hist = proofServices.getTypeConverter().getSeqLDT().getHist();
-				///////// End for testing only
+				ProgramElementName preHistName = new ProgramElementName("histAtPre");
+				Sort seqSort = (Sort) proofServices.getNamespaces().sorts().lookup(new Name("Seq"));
+				LocationVariable preHist = new LocationVariable(preHistName, seqSort); // Specify?
 
 				// build program block to execute in try clause (must be done before pre condition is created.
 				final ImmutableList<StatementBlock> sb =
@@ -376,6 +374,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 					}
 				}
 
+				// TODO KD should be correct hist (for wfHist(hist))
 				// build precondition
 				Term pre = tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, modHeaps, hist, proofServices),
 						permsFor, getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices));
@@ -412,8 +411,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				final Term globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm,
 						tb.var(paramVars), proofServices);
 
+				// TODO KD should be correct hist and preHist (for histAtPre := hist)
 				final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar,
-						exceptionVar, atPreVars, post, sb, hist, prehist, proofServices);
+						exceptionVar, atPreVars, post, sb, hist, preHist, proofServices);
 				final Term preImpliesProgPost = tb.imp(pre, progPost);
 				final Term applyGlobalUpdate = globalUpdate == null ?
 						preImpliesProgPost : tb.apply(globalUpdate, preImpliesProgPost);
@@ -540,7 +540,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 		}
 
 		//for Remote Methods
-		final Term wfHist = tb.wellFormedHist(tb.var((preHist)));
+		final Term wfHist = tb.wellFormedHist(tb.var(preHist));
 		if (wellFormed == null) {
 			wellFormed = wfHist;
 		} else {
@@ -819,8 +819,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @param atPreVars Mapping of {@link LocationVariable} to the {@link LocationVariable} which contains the initial value.
     * @param postTerm The post condition.
     * @param sb The {@link StatementBlock} to execute in try block.
-    * @param hist TODO KD
-    * @param preHist TODO KD
+    * @param hist The logical variable for the global history (of Remote-Method events).
+    * @param preHist The logical variable for histAtPre (the history before the start of the method).
     * @param services TODO
     * @return The created {@link Term}.
     */
@@ -958,8 +958,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
 	 * @param paramVars Formal parameters of method call.
 	 * @param formalParamVars Arguments from formal parameters for method call.
 	 * @param atPreVars Mapping of {@link LocationVariable} to the {@link LocationVariable} which contains the initial value.
-	 * @param hist TODO KD
-	 * @param preHist TODO KD
+	 * @param hist The logical variable for the global history (of Remote-Method events).
+	 * @param preHist The logical variable for histAtPre (the history before the start of the method).
 	 * @param services TODO
 	 * @return The {@link Term} representing the initial updates.
 	 */

@@ -380,6 +380,10 @@ public class MethodDeclaration extends JavaDeclaration
         return super.isSynchronized();
     }
 
+    @Override
+    public boolean isRemote() {
+    	return super.isRemote();
+    }
     
     @Override
     public void visit(Visitor v) {

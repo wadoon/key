@@ -29,7 +29,6 @@ import de.uka.ilkd.key.java.expression.operator.adt.SeqSingleton;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqSub;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;

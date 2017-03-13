@@ -296,7 +296,7 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             update = tb.parallel(update, paramUpdate);
         }
         
-        //TODO KD anything else to do here? add to atPreVars instead? AbstractOperationPO
+        //TODO KD anything else to do here? add to atPreVars instead? in AbstractOperationPO as well?
 		// hist := histAtPre
         Term histupdate = tb.elementary(preHist, tb.var(hist));
         update = tb.parallel(update, histupdate);

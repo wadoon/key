@@ -236,6 +236,13 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
     }
 
     /**
+     * Test whether the decleration has the Remote annotation.
+     */
+    protected boolean isRemote() {
+    	return true; //TODO KD implement
+    } // TODO KD also: move to MethodDeclaration.java ?
+
+    /**
      * Returns all modifiers of type AnnotationUseSpecification.
      * @return all annotations
      */
