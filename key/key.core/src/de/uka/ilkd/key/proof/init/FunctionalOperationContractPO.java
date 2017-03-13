@@ -275,8 +275,8 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
                                ImmutableList<LocationVariable> formalParamVars,
                                Map<LocationVariable,LocationVariable> atPreVars,
-                               LocationVariable prehist,
                                LocationVariable hist,
+                               LocationVariable preHist,
                                Services services) {
        Term update = null;
        for(Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
@@ -296,10 +296,10 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
             update = tb.parallel(update, paramUpdate);
         }
         
-        //TODO KD Add here the update for the history
-        Term histupdate = tb.elementary(hist, tb.var(prehist));
-        update = tb.parallel(update,histupdate);
-        // End adding
+        //TODO KD anything else to do here? add to atPreVars instead? AbstractOperationPO
+		// hist := histAtPre
+        Term histupdate = tb.elementary(preHist, tb.var(hist));
+        update = tb.parallel(update, histupdate);
 
         return update;
     }

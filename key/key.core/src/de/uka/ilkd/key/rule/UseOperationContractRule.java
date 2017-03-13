@@ -834,12 +834,11 @@ public final class UseOperationContractRule implements BuiltInRule {
            }
         }
         
-        //TODO: Test here. Add the updates to the history variable to the atPreUpdates?
+        //TODO KD Test here. Add the updates to the history variable to the atPreUpdates?
         //Add here the adding of the new events, if there the method is a remote one.
         Term historyUpdate = tb.elementary(services.getTypeConverter().getSeqLDT().getHist(), tb.var(services.getTypeConverter().getSeqLDT().getHist()));
         anonUpdate = tb.parallel(anonUpdate, historyUpdate);
         // End test
-        // TODO KD not sure what this does
         
 
         final Term excNull = tb.equals(tb.var(excVar), tb.NULL());

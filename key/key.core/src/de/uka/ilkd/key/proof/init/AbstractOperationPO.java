@@ -356,8 +356,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				//build the logical variable for pre- and post hist
 				ProgramElementName prehistname = new ProgramElementName("histAtPre");
 				LocationVariable prehist = new LocationVariable(prehistname, (Sort) proofServices.getNamespaces().sorts().lookup(new Name("Seq")));
-				ProgramElementName posthistname = new ProgramElementName("histAtPre");
-				LocationVariable posthist = new LocationVariable(posthistname, (Sort) proofServices.getNamespaces().sorts().lookup(new Name("Seq")));
+//				ProgramElementName posthistname = new ProgramElementName("histAtPre");
+//				LocationVariable posthist = new LocationVariable(posthistname, (Sort) proofServices.getNamespaces().sorts().lookup(new Name("Seq")));
 				LocationVariable hist = proofServices.getTypeConverter().getSeqLDT().getHist();
 				///////// End for testing only
 
@@ -407,13 +407,13 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				Term post = tb.and(postTerm, frameTerm);
 				post = modifyPostTerm(proofServices, post);
 
-				final LocationVariable baseHeap = proofServices.getTypeConverter().getHeapLDT().getHeap(); // TODO KD how to do the update stuff for history?
+				final LocationVariable baseHeap = proofServices.getTypeConverter().getHeapLDT().getHeap();
 				final Term selfVarTerm = selfVar==null? null: tb.var(selfVar);
 				final Term globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm,
 						tb.var(paramVars), proofServices);
 
 				final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar,
-						exceptionVar, atPreVars, post, sb, prehist, hist, proofServices);
+						exceptionVar, atPreVars, post, sb, hist, prehist, proofServices);
 				final Term preImpliesProgPost = tb.imp(pre, progPost);
 				final Term applyGlobalUpdate = globalUpdate == null ?
 						preImpliesProgPost : tb.apply(globalUpdate, preImpliesProgPost);
@@ -812,13 +812,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * Creates the {@link Term} which contains the modality including
     * the complete program to execute.
     * @param paramVars Formal parameters of method call.
-    * @param formalParVars Arguments from formal parameters for method call.
+    * @param formalParamVars Arguments from formal parameters for method call.
     * @param selfVar The self variable.
     * @param resultVar The result variable.
     * @param exceptionVar The {@link ProgramVariable} used to store caught exceptions.
     * @param atPreVars Mapping of {@link LocationVariable} to the {@link LocationVariable} which contains the initial value.
     * @param postTerm The post condition.
     * @param sb The {@link StatementBlock} to execute in try block.
+    * @param hist TODO KD
+    * @param preHist TODO KD
+    * @param services TODO
     * @return The created {@link Term}.
     */
    protected Term buildProgramTerm(ImmutableList<ProgramVariable> paramVars,
@@ -829,8 +832,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                    Map<LocationVariable, LocationVariable> atPreVars,
                                    Term postTerm,
                                    ImmutableList<StatementBlock> sb,
-                                   LocationVariable preHist,
                                    LocationVariable hist,
+                                   LocationVariable preHist,
                                    Services services) {
 
       // create java block
@@ -847,7 +850,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
       }
 
       // create update
-      Term update = buildUpdate(paramVars, formalParamVars, atPreVars, preHist, hist, services);
+      Term update = buildUpdate(paramVars, formalParamVars, atPreVars, hist, preHist, services);
 
       return tb.apply(update, programTerm, null);
    }
@@ -950,45 +953,47 @@ public abstract class AbstractOperationPO extends AbstractPO {
     */
    protected abstract Modality getTerminationMarker();
 
-   /**
-    * Builds the initial updates.
-    * @param paramVars Formal parameters of method call.
-    * @param atPreVars Mapping of {@link LocationVariable} to the {@link LocationVariable} which contains the initial value.
-    * @param services TODO
-    * @param formalParVars Arguments from formal parameters for method call.
-    * @return The {@link Term} representing the initial updates.
-    */
-   protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
-                              ImmutableList<LocationVariable> formalParamVars,
-                              Map<LocationVariable, LocationVariable> atPreVars,
-                              LocationVariable preHist,
-                              LocationVariable hist,
-                              Services services) {
-      Term update = null;
-      for(Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
-         final Term u = tb.elementary(atPreEntry.getValue(), tb.getBaseHeap());
-         if(update == null) {
-            update = u;
-         }else{
-            update = tb.parallel(update, u);
-         }
-       }
-       if (isCopyOfMethodArgumentsUsed()) {
-          Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
-          Iterator<ProgramVariable> paramIt = paramVars.iterator();
-          while (formalParamIt.hasNext()) {
-              Term paramUpdate = tb.elementary(formalParamIt.next(), tb.var(paramIt.next()));
-              update = tb.parallel(update, paramUpdate);
-          }
-       }
+	/**
+	 * Builds the initial updates.
+	 * @param paramVars Formal parameters of method call.
+	 * @param formalParamVars Arguments from formal parameters for method call.
+	 * @param atPreVars Mapping of {@link LocationVariable} to the {@link LocationVariable} which contains the initial value.
+	 * @param hist TODO KD
+	 * @param preHist TODO KD
+	 * @param services TODO
+	 * @return The {@link Term} representing the initial updates.
+	 */
+	protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
+			ImmutableList<LocationVariable> formalParamVars,
+			Map<LocationVariable, LocationVariable> atPreVars,
+			LocationVariable hist,
+			LocationVariable preHist,
+			Services services) {
+		Term update = null;
+		for (Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
+			final Term u = tb.elementary(atPreEntry.getValue(), tb.getBaseHeap());
+			if (update == null) {
+				update = u;
+			} else {
+				update = tb.parallel(update, u);
+			}
+		}
+		if (isCopyOfMethodArgumentsUsed()) {
+			Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
+			Iterator<ProgramVariable> paramIt = paramVars.iterator();
+			while (formalParamIt.hasNext()) {
+				Term paramUpdate = tb.elementary(formalParamIt.next(), tb.var(paramIt.next()));
+				update = tb.parallel(update, paramUpdate);
+			}
+		}
 
-       //TODO KD Add here the update for the history
-       Term histupdate = tb.elementary(hist, tb.var(preHist));
-       update = tb.parallel(update,histupdate);
-       // End adding
-       
-       return update;
-   }
+		//TODO KD anything else to do here?
+		// hist := histAtPre
+		Term histupdate = tb.elementary(preHist, tb.var(hist));
+		update = tb.parallel(update, histupdate);
+
+		return update;
+	}
 
    /**
     * Checks if a copy of the method call arguments are used instead

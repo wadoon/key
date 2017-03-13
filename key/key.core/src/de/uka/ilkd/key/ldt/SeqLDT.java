@@ -42,9 +42,6 @@ public final class SeqLDT extends LDT {
 	public static final Name NAME = new Name("Seq");
 	public static final Name SEQGET_NAME = new Name("seqGet");
 	public static final Name HIST_NAME = new Name("hist");
-	//TODO KD maybe needed
-//  public static final Name[] VALID_SEQ_NAMES = { NAME, SEQGET_NAME, HIST_NAME };
-	//             maybe emptySeq (something) needed and ^ not?
 
 	//getters
 	private final SortDependingFunction seqGet;
