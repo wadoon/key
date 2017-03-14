@@ -837,9 +837,11 @@ public final class UseOperationContractRule implements BuiltInRule {
         //if called method is remote add event to history
         if (contract.getTarget().getMethodDeclaration().isRemote()) {
         	LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
-        	Term newEvent = tb.var(services.getTypeConverter().getHeapLDT().getHeap()); // how to?
-        	Term histUpdate = tb.seqConcat(tb.var(hist),
-        			tb.seqSingleton(newEvent)); // already needs sequence?
+        	Term newEvent = tb.evConst(
+        			null, //services.getTypeConverter().getRemoteMethodEventLDT().evOutgoing(),
+        			null, //services.getTypeConverter().getRemoteMethodEventLDT().evCall(),
+        			null, null, null, null); //TODO KD how to Function -> Term
+        	Term histUpdate = tb.seqConcat(tb.var(hist), tb.seqSingleton(newEvent));
         	Term upd = tb.elementary(hist, histUpdate);
         	anonUpdate = tb.parallel(anonUpdate, upd);
         }

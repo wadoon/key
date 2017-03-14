@@ -31,7 +31,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -857,6 +856,7 @@ public class TermBuilder {
               TRUE());
     }
 
+    //------------------------------
     // Functions for wellfoundedness
     //------------------------------
 
@@ -2037,6 +2037,15 @@ public class TermBuilder {
         return all(heapLV, t);
     }
 
+    //-------------------------------------------------------------------------
+    //event & history operators
+    //-------------------------------------------------------------------------
+
+    public Term evConst(Term dir, Term type, Term partner, Term method,
+    		Term args, Term heap) {
+    	return func(services.getTypeConverter().getRemoteMethodEventLDT().
+    			evConst(), dir, type, partner, method, args, heap);
+    }
 
     //-------------------------------------------------------------------------
     //reachability operators
