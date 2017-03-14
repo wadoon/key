@@ -108,9 +108,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     //constructors
     //-------------------------------------------------------------------------
 
-    private UseOperationContractRule() {
-    }
-
+    private UseOperationContractRule() {}
 
 
     //-------------------------------------------------------------------------
@@ -835,12 +833,15 @@ public final class UseOperationContractRule implements BuiltInRule {
         }
 
         //TODO KD unfinished
+        //FIXME KD this is only reached when the called Method has a contract
         //if called method is remote add event to history
         if (contract.getTarget().getMethodDeclaration().isRemote()) {
-        	LocationVariable hist = services.getTypeConverter().getSeqLDT().getHist();
-        	Term entry = tb.func(services.getTypeConverter().getSeqLDT().getSeqDef()/*, new Event(...)*/);
-        	Term historyUpdate = tb.func(services.getTypeConverter().getSeqLDT().getSeqConcat(), tb.var(hist), entry);
-        	anonUpdate = tb.parallel(anonUpdate, historyUpdate);
+        	LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
+        	Term newEvent = tb.var(services.getTypeConverter().getHeapLDT().getHeap()); // how to?
+        	Term histUpdate = tb.seqConcat(tb.var(hist),
+        			tb.seqSingleton(newEvent)); // already needs sequence?
+        	Term upd = tb.elementary(hist, histUpdate);
+        	anonUpdate = tb.parallel(anonUpdate, upd);
         }
 
         final Term excNull = tb.equals(tb.var(excVar), tb.NULL());

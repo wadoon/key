@@ -381,8 +381,12 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
     @Override
+    public boolean hasAnnotation(String name) { //TODO KD but why?
+    	return super.hasAnnotation(name);
+    }
+
     public boolean isRemote() {
-    	return super.isRemote();
+    	return hasAnnotation("Remote");
     }
     
     @Override

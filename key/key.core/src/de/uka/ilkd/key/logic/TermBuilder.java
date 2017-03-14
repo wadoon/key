@@ -2068,7 +2068,6 @@ public class TermBuilder {
                     idx);
     }
 
-
     public Term seqLen(Term s) {
         return func(services.getTypeConverter().getSeqLDT().getSeqLen(), s);
     }
@@ -2077,7 +2076,6 @@ public class TermBuilder {
     public Term indexOf(Term s, Term x){
         return func(services.getTypeConverter().getSeqLDT().getSeqIndexOf(),s,x);
     }
-
 
     public Term seqEmpty() {
         return func(services.getTypeConverter().getSeqLDT().getSeqEmpty());
@@ -2117,11 +2115,11 @@ public class TermBuilder {
     }
 
     public Term seqSub(Term s, Term from, Term to) {
-    return func(services.getTypeConverter().getSeqLDT().getSeqSub(), s, from, to);
+    	return func(services.getTypeConverter().getSeqLDT().getSeqSub(), s, from, to);
     }
 
     public Term seqReverse(Term s) {
-    return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
+    	return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
     }
 
     //-------------------------------------------------------------------------

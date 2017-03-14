@@ -208,7 +208,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 					}
 				}
 			}
-			final LocationVariable hist = proofServices.getTypeConverter().getSeqLDT().getHist();
+			final LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
 
 			Term permsFor = tb.tt();
 			if(pm.getHeapCount(proofServices) == 2 && proofServices.getTypeConverter().getHeapLDT().getPermissionHeap() != null) {
@@ -354,7 +354,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
 				//TODO KD are these the correct hist and preHist?
 				//build the logical variable for pre- and (post) hist
-				LocationVariable hist = proofServices.getTypeConverter().getSeqLDT().getHist();
+				LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
 				ProgramElementName preHistName = new ProgramElementName("histAtPre");
 				Sort seqSort = (Sort) proofServices.getNamespaces().sorts().lookup(new Name("Seq"));
 				LocationVariable preHist = new LocationVariable(preHistName, seqSort); // Specify?

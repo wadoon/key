@@ -19,6 +19,7 @@ import java.util.List;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.Declaration;
 import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
 import de.uka.ilkd.key.java.declaration.modifier.Abstract;
@@ -236,11 +237,17 @@ public abstract class JavaDeclaration extends JavaNonTerminalProgramElement
     }
 
     /**
-     * Test whether the decleration has the Remote annotation.
+     * Test whether the decleration has the specified annotation.
+     * @param name the name of the annotation to check for.
      */
-    protected boolean isRemote() {
-    	return true; //TODO KD implement
-    } // TODO KD also: move to MethodDeclaration.java ?
+    protected boolean hasAnnotation(String name) {
+    	for (AnnotationUseSpecification annot : getAnnotations()) {
+    		if (((TypeReference) annot.getChildAt(0)).getName().equals(name)) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
 
     /**
      * Returns all modifiers of type AnnotationUseSpecification.

@@ -40,7 +40,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public final class SeqLDT extends LDT {
 	public static final Name NAME = new Name("Seq");
 	public static final Name SEQGET_NAME = new Name("seqGet");
-	public static final Name HIST_NAME = new Name("hist");
 
 	//getters
 	private final SortDependingFunction seqGet;
@@ -57,9 +56,6 @@ public final class SeqLDT extends LDT {
 	private final Function values;
 	private final Function wfHist;
 
-	//history (of Remote method events) ... copy of: key.core/resources/de/uka/ilkd/key/proof/rules/events.key -> Seq hist;
-	private LocationVariable hist;
-
 	public SeqLDT(TermServices services) {
 	super(NAME, services);
 		seqGet       = addSortDependingFunction(services, "seqGet");
@@ -72,9 +68,7 @@ public final class SeqLDT extends LDT {
 		seqIndexOf   = addFunction(services, "seqIndexOf");
 		seqDef       = addFunction(services, "seqDef");
 		values       = addFunction(services, "values");
-		hist         = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
 		wfHist       = addFunction(services, "wfHist");
-		
 	}
 
 	public Function getSeqGet(Sort instanceSort, TermServices services) {
@@ -203,12 +197,5 @@ public final class SeqLDT extends LDT {
 
 	public Function getSeqIndexOf() {
 		return seqIndexOf;
-	}
-
-	/**
-	 * @return the history of Remote method events;
-	 */
-	public LocationVariable getHist() {
-		return hist;
 	}
 }
