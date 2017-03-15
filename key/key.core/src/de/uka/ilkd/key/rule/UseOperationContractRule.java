@@ -839,11 +839,10 @@ public final class UseOperationContractRule implements BuiltInRule {
         	LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
         	Term direction = tb.evOutgoing();
         	Term type = tb.evCall();
-        	Term partner = null; //how to get partner
-        	Term method = null; //contract.getTarget()
-        	Term args = null; //contract.getTarget().getParameters()
-        	Term heap = tb.var(services.getTypeConverter().getHeapLDT().getHeap()); // TODO KD see above
-        	Term newEvent = tb.evConst(direction, type, partner, method, args, heap);
+        	Term partner = null; //no idea
+        	Term method = null; //idea: contract.getTarget()
+        	Term args = tb.seq(contractParams); //check if this is right, other idea: contract.getTarget().getParameters()
+        	Term newEvent = tb.evConst(direction, type, partner, method, args, baseHeapTerm);// TODO KD see above, check if baseHeapTerm is right
         	Term newHist = tb.seqConcat(tb.var(hist), tb.seqSingleton(newEvent));
         	Term histUpdate = tb.elementary(hist, newHist);
         	anonUpdate = tb.parallel(anonUpdate, histUpdate);
