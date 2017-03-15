@@ -5,6 +5,7 @@ import org.key_project.util.ExtList;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.declaration.MethodDeclaration;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -13,10 +14,12 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 public class RemoteMethodEventLDT extends LDT {
 	public static final Name NAME = new Name("Event");
 	public static final Name HIST_NAME = new Name("hist");
+	public static final Name METHOD_SORT = new Name("Method");
 
 	private final Function evConst;
 	private final Function evGetDir;
@@ -98,6 +101,15 @@ public class RemoteMethodEventLDT extends LDT {
 	 */
 	public LocationVariable getHist() {
 		return hist;
+	}
+	
+	public Function getMethodIdentifier(MethodDeclaration md, TermServices services) {
+	    Function f = (Function)services.getNamespaces().methodIdentifier().lookup(md.getProgramElementName());
+	    if (f == null) {
+	        //add the function
+	        f = new Function(md.getProgramElementName(), (Sort)services.getNamespaces().sorts().lookup(METHOD_SORT));
+	    }
+	    return f;
 	}
 
 	// TODO KD check all @Override methods again

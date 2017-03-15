@@ -25,6 +25,7 @@ public class NamespaceSet {
     private Namespace ruleSetNS      = new Namespace();
     private Namespace sortNS         = new Namespace();
     private Namespace choiceNS       = new Namespace();
+    private Namespace methodIdentifierNS = new Namespace();
 
     
     public NamespaceSet() {
@@ -35,13 +36,15 @@ public class NamespaceSet {
                         Namespace sortNS, 
                         Namespace ruleSetNS,
 			Namespace choiceNS, 
-			Namespace programVarNS) {
+			Namespace programVarNS,
+			Namespace methodIdsNS) {
 	this.varNS     = varNS;
 	this.progVarNS = programVarNS;
 	this.funcNS    = funcNS;
 	this.sortNS    = sortNS;
 	this.ruleSetNS = ruleSetNS;
 	this.choiceNS  = choiceNS;
+	this.methodIdentifierNS = methodIdsNS;
     }
 
     public Namespace variables() {
@@ -92,6 +95,14 @@ public class NamespaceSet {
 	this.choiceNS = choiceNS;
     }
     
+    public Namespace methodIdentifier() {
+        return this.methodIdentifierNS;
+    }
+    
+    public void setMethodIdentifier(Namespace methodIdsNS) {
+        this.methodIdentifierNS = methodIdsNS;
+    }
+    
     public void add(NamespaceSet ns) {
 	variables().add(ns.variables());
 	programVariables().add(ns.programVariables());
@@ -99,6 +110,7 @@ public class NamespaceSet {
 	ruleSets().add(ns.ruleSets());
 	functions().add(ns.functions());
 	choices().add(ns.choices());
+	methodIdentifierNS.add(ns.methodIdentifier());
     }
 
     public NamespaceSet copy() {
@@ -109,6 +121,7 @@ public class NamespaceSet {
 	c.setVariables(variables().copy());
 	c.setProgramVariables(programVariables().copy());
 	c.setChoices(choices().copy());
+	c.setMethodIdentifier(methodIdentifier().copy());
 	return c;
     }
     
@@ -122,6 +135,7 @@ public class NamespaceSet {
 	ruleSets().startProtocol();
 	functions().startProtocol();
 	choices().startProtocol();
+	methodIdentifier().startProtocol();
     }
        
     /**
@@ -133,7 +147,8 @@ public class NamespaceSet {
         		       sorts(), 
         		       ruleSets(), 
         		       functions(),
-        		       choices()
+        		       choices(),
+        		       methodIdentifier()
         };
     }
     
@@ -203,6 +218,7 @@ public class NamespaceSet {
 	    "Functions: " + functions() + "\n" +
 	    "Variables: " + variables() + "\n" +
 	    "ProgramVariables: " + programVariables() + "\n" +
+	    "MethodIdentifier: " + methodIdentifier() + "\n" +
 	    "Heuristics: " + ruleSets() + "\n" +
 	    "Taclet Options: " + choices() + "\n";
     }
