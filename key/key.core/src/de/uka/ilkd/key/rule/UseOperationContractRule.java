@@ -38,6 +38,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -832,18 +833,20 @@ public final class UseOperationContractRule implements BuiltInRule {
            }
         }
 
-        //TODO KD unfinished
         //FIXME KD this is only reached when the called Method has a contract
         //if called method is remote add event to history
         if (contract.getTarget().getMethodDeclaration().isRemote()) {
         	LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
-        	Term newEvent = tb.evConst(
-        			null, //services.getTypeConverter().getRemoteMethodEventLDT().evOutgoing(),
-        			null, //services.getTypeConverter().getRemoteMethodEventLDT().evCall(),
-        			null, null, null, null); //TODO KD how to Function -> Term
-        	Term histUpdate = tb.seqConcat(tb.var(hist), tb.seqSingleton(newEvent));
-        	Term upd = tb.elementary(hist, histUpdate);
-        	anonUpdate = tb.parallel(anonUpdate, upd);
+        	Term direction = tb.evOutgoing();
+        	Term type = tb.evCall();
+        	Term partner = null; //how to get partner
+        	Term method = null; //contract.getTarget()
+        	Term args = null; //contract.getTarget().getParameters()
+        	Term heap = tb.var(services.getTypeConverter().getHeapLDT().getHeap()); // TODO KD see above
+        	Term newEvent = tb.evConst(direction, type, partner, method, args, heap);
+        	Term newHist = tb.seqConcat(tb.var(hist), tb.seqSingleton(newEvent));
+        	Term histUpdate = tb.elementary(hist, newHist);
+        	anonUpdate = tb.parallel(anonUpdate, histUpdate);
         }
 
         final Term excNull = tb.equals(tb.var(excVar), tb.NULL());

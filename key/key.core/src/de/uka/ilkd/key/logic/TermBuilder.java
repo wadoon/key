@@ -2037,15 +2037,33 @@ public class TermBuilder {
         return all(heapLV, t);
     }
 
-    //-------------------------------------------------------------------------
-    //event & history operators
-    //-------------------------------------------------------------------------
+	//-------------------------------------------------------------------------
+	//event & history operators
+	//-------------------------------------------------------------------------
 
-    public Term evConst(Term dir, Term type, Term partner, Term method,
-    		Term args, Term heap) {
-    	return func(services.getTypeConverter().getRemoteMethodEventLDT().
-    			evConst(), dir, type, partner, method, args, heap);
-    }
+	public Term evConst(Term dir, Term type, Term partner, Term method,
+			Term args, Term heap) {
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().
+				evConst(), dir, type, partner, method, args, heap);
+	}
+
+	// TODO KD add destructors
+
+	public Term evIncoming() {
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().evIncoming());
+	}
+
+	public Term evOutgoing() {
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().evOutgoing());
+	}
+
+	public Term evCall() {
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().evCall());
+	}
+
+	public Term evTerm() {
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().evTerm());
+	}
 
     //-------------------------------------------------------------------------
     //reachability operators
@@ -2113,7 +2131,6 @@ public class TermBuilder {
         }
         return result;
     }
-
 
     public Term seq(ImmutableList<Term> terms) {
         Term result = seqEmpty();

@@ -36,10 +36,10 @@ public class RemoteMethodEventLDT extends LDT {
 	public RemoteMethodEventLDT (TermServices services) {
 		super(NAME, services);
 		evConst = addFunction(services, "event");
-		evGetDir = addFunction(services, "getDirectionFormEvent");
+		evGetDir = addFunction(services, "getDirectionFromEvent");
 		evGetType = addFunction(services, "getTypeFromEvent");
 		evGetPartner = addFunction(services, "getPartnerFromEvent");
-		evGetMethod = addFunction(services, "getFunctionFromEvent");
+		evGetMethod = addFunction(services, "getMethodFromEvent");
 		evGetArgs = addFunction(services, "getArgumentsFromEvent");
 		evGetHeap = addFunction(services, "getHeapFromEvent");
 		evIncoming = addFunction(services, "incoming");
