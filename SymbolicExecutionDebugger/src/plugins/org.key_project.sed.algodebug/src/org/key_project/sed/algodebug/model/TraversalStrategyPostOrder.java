@@ -1,4 +1,4 @@
-package org.key_project.sed.ui.action;
+package org.key_project.sed.algodebug.model;
 
 import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.annotation.impl.AlgorithmicDebugCorrectAnnotationType;
@@ -6,10 +6,10 @@ import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.util.SEAnnotationUtil;
 
-public class TraversalStrategyPreOrder implements TraversalStrategy {
+public class TraversalStrategyPostOrder implements TraversalStrategy {
 
    public ISENode algorithm(ISENode node) {
-      return preOrderTraversal(getRoot(node));
+      return postOrderTraversal(getRoot(node));
    }
    
    /**
@@ -19,7 +19,9 @@ public class TraversalStrategyPreOrder implements TraversalStrategy {
     */
    private ISENode getRoot(ISENode node){
       try {
-         if( node.getParent() instanceof ISEThread)
+         if(node.getParent() == null) //Dann haben wir bereits den Root-Knoten gefunden
+            return node;
+         else if( node.getParent() instanceof ISEThread)
             return node.getParent();
          else
             return getRoot(node.getParent());
@@ -33,31 +35,27 @@ public class TraversalStrategyPreOrder implements TraversalStrategy {
    }
    
    /**
-    * Method to walk the tree in preorder sequence
+    * Method to walk the tree and process the leafs before the other nodes.
     * @param node    The selected {@link ISENode}.
     * @return        The next node {@link ISENode} or null if every node was visited.
     */
-   private ISENode preOrderTraversal(ISENode node){
+   private ISENode postOrderTraversal(ISENode node){
       try {
-       if(node.getAnnotationLinks(SEAnnotationUtil.getAnnotationtype(AlgorithmicDebugCorrectAnnotationType.TYPE_ID)).length == 0)
-          return node;
-             else{
-                if(node.hasChildren()){
-                   for(ISENode child : node.getChildren()){
-                      ISENode nextchild = preOrderTraversal(child);
-                      if(nextchild != null)
-                         return nextchild;
-                      }
-                }
-                else
-                   return null;
-             }
-       }
+         if(node.hasChildren()){ //Knoten hat Kinder
+            for(ISENode child : node.getChildren()){
+               ISENode nextchild = postOrderTraversal(child);
+               if(nextchild != null)
+                  return nextchild;
+               }
+            }
+         if(node.getAnnotationLinks(SEAnnotationUtil.getAnnotationtype(AlgorithmicDebugCorrectAnnotationType.TYPE_ID)).length == 0){ //Knoten bereits korrekt markiert
+            return node;
+            }
+         }
     catch (DebugException e) {
        // TODO Auto-generated catch block
        e.printStackTrace();
     }
        return null;
    }
-
 }

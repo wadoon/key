@@ -50,6 +50,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.views.properties.IPropertySheetPage;
 import org.key_project.sed.core.model.ISEDebugElement;
 import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.ui.util.SEDUIUtil;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ExecutionTreeDiagramEditor;
 import org.key_project.sed.ui.visualization.execution_tree.editor.ReadonlyDiagramEditorActionBarContributor;
@@ -175,6 +176,12 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
     * The last unhandled {@link SelectionChangedEvent} because an update on the content provider of {@link #getDebugView()} was in progress or a {@link Job} was running.
     */
    private SelectionChangedEvent eventToHandle;
+   
+   /**
+    * @author Peter Schauberger
+    * The last single {@code ISENode} selected by the user
+    */
+   private ISENode selectedNode;
    
    /**
     * Constructor.
@@ -356,6 +363,11 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
             }
             // Select in debug viewer
             SEDUIUtil.selectInDebugView(getEditorPart(), getDebugView(), businessObjects);
+            //Set the selected node variable
+            if(businessObjects.size() == 1){
+               if(businessObjects.get(0) instanceof ISENode)
+                  selectedNode = (ISENode)businessObjects.get(0);
+            }
          }
       }
    }
@@ -496,5 +508,13 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
          }
       }
       super.dispose();
+   }
+
+   /**
+    * @author Peter Schauberger
+    * @return Selected {@code ISENode} of the Execution Tree.
+    */
+   public ISENode getSelectedNode() {
+      return selectedNode;
    }
 }

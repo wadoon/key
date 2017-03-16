@@ -1,4 +1,4 @@
-package org.key_project.sed.ui.action;
+package org.key_project.sed.algodebug.LinkAction;
 
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -17,7 +17,7 @@ import org.key_project.sed.core.util.SEAnnotationUtil;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IFilter;
 
-public class AlgorithmicDebugFalseAnnotationLinkAction implements ISEAnnotationLinkAction {
+public class AlgorithmicDebugFalseAnnotationLinkAction  {
    
    private ISEAnnotationType annotationTypeFalse;
    private ISEAnnotationType annotationTypeCorrect;
@@ -27,7 +27,6 @@ public class AlgorithmicDebugFalseAnnotationLinkAction implements ISEAnnotationL
    /**
     * @author Peter Schauberger
     */
-   @Override
    public void run(Shell shell, ISENode node) {
       //TODO: Hier muss die Annotation erzeugt und registriert werden
       
@@ -35,10 +34,7 @@ public class AlgorithmicDebugFalseAnnotationLinkAction implements ISEAnnotationL
       this.annotationTypeCorrect = SEAnnotationUtil.getAnnotationtype(AlgorithmicDebugCorrectAnnotationType.TYPE_ID);
       this.registeredAnnotationsFalse = node.getDebugTarget().getRegisteredAnnotations(annotationTypeFalse);
       this.registeredAnnotationsCorrect = node.getDebugTarget().getRegisteredAnnotations(annotationTypeCorrect);
-      
-//      Assert.isNotNull(node);
-//      Assert.isNotNull(annotationTypeFalse);
-      
+
       ISEDebugTarget target = node.getDebugTarget();
       ISEAnnotation annotationFalse = ArrayUtil.search(registeredAnnotationsFalse, new IFilter<ISEAnnotation>() {
            @Override
@@ -64,19 +60,9 @@ public class AlgorithmicDebugFalseAnnotationLinkAction implements ISEAnnotationL
       //If AnnotationLink was not found, we create a new one and attach it to the node
         if(node.getAnnotationLinks(annotationTypeFalse).length == 0){
            if(annotationCorrect == null || node.getAnnotationLinks(annotationTypeCorrect).length == 0){
-              
-//              MessageBox mb = new MessageBox(shell);
-//              mb.setText("Hint");
-//              mb.setMessage("Correct Annotation nicht gefunden, markiere False");
-//              mb.open();
               node.addAnnotationLink(annotationTypeFalse.createLink(annotationFalse, node));
               }
-           else{
-//              MessageBox mb = new MessageBox(shell);
-//              mb.setText("Hint");
-//              mb.setMessage("Node already marked as Correct. Toggle annotation to False");
-//              mb.open();
-             
+           else{ 
               node.removeAnnotationLink(annotationTypeCorrect.createLink(annotationCorrect, node));
               node.addAnnotationLink(annotationTypeFalse.createLink(annotationFalse, node));
            }

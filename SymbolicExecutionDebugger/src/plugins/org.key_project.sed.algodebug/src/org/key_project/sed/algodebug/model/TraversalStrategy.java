@@ -1,4 +1,4 @@
-package org.key_project.sed.ui.action;
+package org.key_project.sed.algodebug.model;
 
 import org.key_project.sed.core.model.ISENode;
 
