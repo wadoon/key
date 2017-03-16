@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.dependencycluster.po.DependencyClusterContractPO;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -21,7 +22,6 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.DependencyClusterContract;
 import de.uka.ilkd.key.util.DependencyClusterSpec;
-import de.uka.ilkd.key.util.InfFlowSpec;
 
 public class DependencyClusterContractImpl
         implements DependencyClusterContract {
@@ -129,6 +129,27 @@ public class DependencyClusterContractImpl
         this.toBeSaved = toBeSaved;
         this.origDep = dep;
         this.origDependencyClusterSpecs = dependencyClusterSpecs;
+        /*
+        System.out.println("id: " + this.id);
+        System.out.println("baseName: " + this.baseName);
+        System.out.println("name: " + this.name);
+        System.out.println("forClass: " + this.forClass);
+        System.out.println("pm: " + this.pm);
+        System.out.println("specifiedIn: " + this.specifiedIn);
+        System.out.println("origPre: " + this.origPre);
+        System.out.println("origMby: " + this.origMby);
+        System.out.println("origMod: " + this.origMod);
+        System.out.println("origSelf: " + this.origSelf);
+        System.out.println("origParams: " + this.origParams);
+        System.out.println("origResult: " + this.origResult);
+        System.out.println("origExc: " + this.origExc);
+        System.out.println("origAtPre: " + this.origAtPre);
+        System.out.println("modality: " + this.modality);
+        System.out.println("hasRealModifiesClause: " + this.hasRealModifiesClause);
+        System.out.println("toBeSaved: " + this.toBeSaved);
+        System.out.println("origDep: " + this.origDep);
+        System.out.println("origDependencyClusterSpecs: " + this.origDependencyClusterSpecs);
+        */
     }
 
     @Override
@@ -293,8 +314,7 @@ public class DependencyClusterContractImpl
 
     @Override
     public ContractPO createProofObl(InitConfig initConfig) {
-        // TODO Auto-generated method stub
-        return null;
+        return new DependencyClusterContractPO(initConfig, this);
     }
 
     @Override
@@ -305,15 +325,16 @@ public class DependencyClusterContractImpl
     @Override
     public ProofOblInput createProofObl(InitConfig initConfig,
             Contract contract) {
-        // TODO Auto-generated method stub
-        return null;
+        return new DependencyClusterContractPO(initConfig, (DependencyClusterContract) contract);
     }
 
     @Override
     public ProofOblInput createProofObl(InitConfig initConfig,
             Contract contract, boolean supportSymbolicExecutionAPI) {
-        // TODO Auto-generated method stub
-        return null;
+        //TODO JK what does this do?
+        throw new IllegalStateException("TODO JK why am I here?");
+        //return createProofObl(initConfig, contract);
+
     }
 
     @Override
@@ -359,6 +380,72 @@ public class DependencyClusterContractImpl
     @Override
     public KeYJavaType getKJT() {
         return forClass;
+    }
+
+    @Override
+    public Modality getModality() {
+        return modality;
+    }
+
+    @Override
+    public KeYJavaType getSpecifiedIn() {
+        return specifiedIn;
+    }
+
+    @Override
+    public Term getPre() {
+        return origPre;
+    }
+
+    @Override
+    public Term getMod() {
+        return origMod;
+    }
+
+    @Override
+    public boolean hasModifiesClause() {
+        return hasRealModifiesClause;
+    }
+
+    @Override
+    public Term getSelfVar() {
+       
+        return origSelf;
+    }
+
+    @Override
+    public ImmutableList<Term> getParams() {
+        
+        return origParams;
+    }
+
+    @Override
+    public Term getResult() {
+
+        return origResult;
+    }
+
+    @Override
+    public Term getExc() {
+        
+        return origExc;
+    }
+
+    @Override
+    public Term getDep() {
+        
+        return origDep;
+    }
+
+    @Override
+    public Term getHeapAtPre() {
+       
+        return origAtPre;
+    }
+
+    @Override
+    public ImmutableList<DependencyClusterSpec> getSpecs() {
+        return origDependencyClusterSpecs;
     }
 
 }
