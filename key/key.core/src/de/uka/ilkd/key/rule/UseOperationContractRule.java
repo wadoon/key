@@ -38,7 +38,6 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -833,20 +832,21 @@ public final class UseOperationContractRule implements BuiltInRule {
            }
         }
 
-        //FIXME KD this is only reached when the called Method has a contract
+        //FIXME the code within the if should also run, if the called method does not have a contract.
+        //FIXME specifications have to be placed before Annotations for some reason
         //if called method is remote add event to history
         if (contract.getTarget().getMethodDeclaration().isRemote()) {
         	LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
         	Term direction = tb.evOutgoing();
         	Term type = tb.evCall();
-        	Term partner = contractSelf;  //Test only. does this produce the called object? 
-        	//Term method = null; //idea: contract.getTarget()
+        	Term partner = contractSelf;  //TODO KD ask: this is not "contractOther"? + Caller/Callee example does not work
         	Term method = tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(contract.getTarget().getMethodDeclaration(), services)); 
-        	Term args = tb.seq(contractParams); //check if this is right, other idea: contract.getTarget().getParameters()
-        	Term newEvent = tb.evConst(direction, type, partner, method, args, baseHeapTerm);// TODO KD see above, check if baseHeapTerm is right
+        	Term args = tb.seq(contractParams);
+        	Term newEvent = tb.evConst(direction, type, partner, method, args, baseHeapTerm);
         	Term newHist = tb.seqConcat(tb.var(hist), tb.seqSingleton(newEvent));
         	Term histUpdate = tb.elementary(hist, newHist);
-        	anonUpdate = tb.parallel(anonUpdate, histUpdate);
+        	anonUpdate = tb.parallel(anonUpdate, histUpdate); // what does parallel / sequential change?
+        	//TODO KD "outgoing termination", "incoming call" and "incoming termination" still missing
         }
 
         final Term excNull = tb.equals(tb.var(excVar), tb.NULL());

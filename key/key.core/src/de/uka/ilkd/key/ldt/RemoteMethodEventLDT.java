@@ -102,7 +102,8 @@ public class RemoteMethodEventLDT extends LDT {
 	public LocationVariable getHist() {
 		return hist;
 	}
-	
+
+	// TODO KD ask: is this the right place for the method?
 	public Function getMethodIdentifier(MethodDeclaration md, TermServices services) {
 	    Function f = (Function)services.getNamespaces().methodIdentifier().lookup(md.getProgramElementName());
 	    if (f == null) {
@@ -112,7 +113,7 @@ public class RemoteMethodEventLDT extends LDT {
 	    return f;
 	}
 
-	// TODO KD check all @Override methods again
+	// TODO KD implement @Override Methods
 	@Override
 	public boolean isResponsible(Operator op, Term[] subs, Services services, ExecutionContext ec) {
 		return false;
@@ -125,38 +126,33 @@ public class RemoteMethodEventLDT extends LDT {
 
 	@Override
 	public boolean isResponsible(Operator op, Term sub, TermServices services, ExecutionContext ec) {
-		//TODO KD add event constructors here
 		return false;
 	}
 
 	@Override
 	public Term translateLiteral(Literal lit, Services services) {
-		//TODO KD add literals here (any?)
 		return null;
 	}
 
 	@Override
 	public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
-		// TODO KD add Functions
 		assert false;
 		return null;
 	}
 
 	@Override
 	public boolean hasLiteralFunction(Function f) {
-		// TODO KD return true if TranslateLiteral would work (I think)
+		//return true if TranslateLiteral would work (I think)
 		return false;
 	}
 
 	@Override
 	public Expression translateTerm(Term t, ExtList children, Services services) {
-		// TODO KD
 		return null;
 	}
 
 	@Override
 	public Type getType(Term t) {
-		// TODO KD idk
 		return null;
 	}
 }

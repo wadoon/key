@@ -43,6 +43,7 @@ import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.Finally;
 import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -352,12 +353,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
 					}
 				}
 
-				//TODO KD are these the correct hist and preHist?
-				//build the logical variable for pre- and (post) hist
+				//build the variable for pre- and (post-) hist
 				LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
 				ProgramElementName preHistName = new ProgramElementName("histAtPre");
-				Sort seqSort = (Sort) proofServices.getNamespaces().sorts().lookup(new Name("Seq"));
-				LocationVariable preHist = new LocationVariable(preHistName, seqSort); // Specify?
+				Sort seqSort = (Sort) proofServices.getNamespaces().sorts().lookup(SeqLDT.NAME);
+				LocationVariable preHist = new LocationVariable(preHistName, seqSort); //TODO KD heap?
 
 				// build program block to execute in try clause (must be done before pre condition is created.
 				final ImmutableList<StatementBlock> sb =
@@ -374,7 +374,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
 					}
 				}
 
-				// TODO KD should be correct hist (for wfHist(hist))
 				// build precondition
 				Term pre = tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, modHeaps, hist, proofServices),
 						permsFor, getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices));
@@ -411,7 +410,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				final Term globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm,
 						tb.var(paramVars), proofServices);
 
-				// TODO KD should be correct hist and preHist (for histAtPre := hist)
 				final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar,
 						exceptionVar, atPreVars, post, sb, hist, preHist, proofServices);
 				final Term preImpliesProgPost = tb.imp(pre, progPost);

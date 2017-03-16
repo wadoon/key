@@ -31,6 +31,7 @@ public class NamespaceSet {
     public NamespaceSet() {
     }
 
+    // TODO might not be able to load proofs anymore
     public NamespaceSet(Namespace varNS, 
 	    		Namespace funcNS, 
                         Namespace sortNS, 

@@ -207,14 +207,14 @@ public class TestTriggersSet extends TestCase {
 		proof.add(g);
 
 		proof.setNamespaces(new NamespaceSet(variables, functions, sorts,
-				new Namespace(), new Namespace(),new Namespace() ));
+				new Namespace(), new Namespace(), new Namespace(), new Namespace()));
 
 	}
 
 	private Term parseTerm(String termstr) {
 		return TacletForTests.parseTerm(termstr, new NamespaceSet(
 				variables, functions, sorts, new Namespace(),
-				new Namespace(), new Namespace()));
+				new Namespace(), new Namespace(), new Namespace()));
 	}
 
 	public void testTrigger1(){
