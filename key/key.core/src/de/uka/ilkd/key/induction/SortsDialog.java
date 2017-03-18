@@ -27,7 +27,7 @@ public class SortsDialog extends JDialog {
 	}
 	
 	private void displaySorts(Term t){
-		InductionHypothesisFinder ihf = new InductionHypothesisFinder();
+		SortExtractor ihf = new SortExtractor();
 		ihf.addTermWithAllSubterms(t);
 		ImmutableArray<Sort> sorts = ihf.getSorts();
 		JLabel sortsAsText = new JLabel();

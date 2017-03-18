@@ -15,14 +15,14 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
 
-public class InductionHypothesisFinder {
+public class SortExtractor {
 
 	private QuantifiableVariable inductionVariable;
 	private LinkedList<QuantifiableVariable> variables;
 	private LinkedList<Term> terms;
 	private LinkedList<Substitution> substitutions;
 	
-	public InductionHypothesisFinder() {
+	public SortExtractor() {
 		variables = new LinkedList<QuantifiableVariable>();
 		terms = new LinkedList<Term>();
 		substitutions = new LinkedList<Substitution>();
@@ -34,8 +34,8 @@ public class InductionHypothesisFinder {
 	 * @param t
 	 */
 	public void addTerm(Term t){
-		if(InductionHypothesisFinder.addIfNotContained(terms, t)){
-			InductionHypothesisFinder.addAllIfNotContained(variables, InductionHypothesisFinder.collectVariablesFromTerm(t));
+		if(SortExtractor.addIfNotContained(terms, t)){
+			SortExtractor.addAllIfNotContained(variables, SortExtractor.collectVariablesFromTerm(t));
 		}
 	}
 	
@@ -56,8 +56,8 @@ public class InductionHypothesisFinder {
 	}
 	
 	public void addSubstitution(Substitution subst){
-		if(InductionHypothesisFinder.addIfNotContained(this.substitutions, subst)){
-			InductionHypothesisFinder.addAllIfNotContained(variables, InductionHypothesisFinder.collectVariablesFromSubstitution(subst));
+		if(SortExtractor.addIfNotContained(this.substitutions, subst)){
+			SortExtractor.addAllIfNotContained(variables, SortExtractor.collectVariablesFromSubstitution(subst));
 		}
 	}
 	
@@ -107,8 +107,8 @@ public class InductionHypothesisFinder {
 	private static LinkedList<QuantifiableVariable> collectVariablesFromTerm(Term allQuantifiedTerm){
 		LinkedList<QuantifiableVariable> collectedVariables = new LinkedList<QuantifiableVariable>();
 		
-		InductionHypothesisFinder.addIterableToList(allQuantifiedTerm.freeVars(), collectedVariables);
-		InductionHypothesisFinder.addIterableToList(allQuantifiedTerm.boundVars(), collectedVariables);
+		SortExtractor.addIterableToList(allQuantifiedTerm.freeVars(), collectedVariables);
+		SortExtractor.addIterableToList(allQuantifiedTerm.boundVars(), collectedVariables);
 				
 		return collectedVariables;
 	}
@@ -130,8 +130,8 @@ public class InductionHypothesisFinder {
 			collectedVariables.add(var);
 			
 			currentTerm = varMap.get(var); 
-			InductionHypothesisFinder.addIterableToList(currentTerm.boundVars(), collectedVariables);
-			InductionHypothesisFinder.addIterableToList(currentTerm.freeVars(), collectedVariables);
+			SortExtractor.addIterableToList(currentTerm.boundVars(), collectedVariables);
+			SortExtractor.addIterableToList(currentTerm.freeVars(), collectedVariables);
 			
 		}
 		
