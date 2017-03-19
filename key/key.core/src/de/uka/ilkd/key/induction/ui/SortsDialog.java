@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.induction;
+package de.uka.ilkd.key.induction.ui;
 
 import java.awt.Frame;
 
@@ -9,6 +9,7 @@ import javax.swing.JTextPane;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import de.uka.ilkd.key.induction.SortExtractor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 
