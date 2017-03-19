@@ -42,7 +42,6 @@ public final class SeqLDT extends LDT {
     
     public static final Name NAME = new Name("Seq");
     public static final Name SEQGET_NAME = new Name("seqGet");
-    public static final Name CURRENT_PARAMS_NAME = new Name("currentParams");
 
     //getters
     private final SortDependingFunction seqGet;
@@ -58,7 +57,6 @@ public final class SeqLDT extends LDT {
     private final Function seqDef;
     private final Function values;
     
-    private final LocationVariable currentParams;
     
     public SeqLDT(TermServices services) {
 	super(NAME, services);
@@ -74,7 +72,6 @@ public final class SeqLDT extends LDT {
         seqIndexOf    = addFunction(services, "seqIndexOf");
         seqDef         = addFunction(services, "seqDef");
         values			= addFunction(services, "values");
-        currentParams = (LocationVariable) progVars.lookup(CURRENT_PARAMS_NAME);
     }
     
     
@@ -116,10 +113,7 @@ public final class SeqLDT extends LDT {
     public Function getSeqDef() {
 	return seqDef;
     }
-    
-    public LocationVariable getCurrentParams() {
-        return currentParams;
-    }
+
     
     /** Placeholder for the sequence of values observed through the execution of an enhanced for loop.
      * Follows David Cok's proposal to adapt JML to Java5.

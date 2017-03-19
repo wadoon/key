@@ -1452,7 +1452,7 @@ primaryexpr returns [SLExpression ret=null] throws SLTranslationException
 
                     //result = tb.seqGet(parameterSort, );
 
-                    result = new SLExpression(tb.seqGet(parameterSort, tb.var(seqLDT.getCurrentParams()), tb.zTerm(parameterIndex)), parameterKeYJavaType);
+                    result = new SLExpression(tb.seqGet(parameterSort, tb.var(services.getTypeConverter().getTempEventLDT().getCurrentParams()), tb.zTerm(parameterIndex)), parameterKeYJavaType);
                 }
             } 
             
