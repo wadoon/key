@@ -25,7 +25,7 @@ public class Math {
     public int absContractPredAbstr(int num) {
         int y;
         /*@ merge_proc "JoinByPredicateAbstraction";
-         @ merge_params conjunctive(int x -> {x >= 0});
+         @ merge_params "conjunctive(int x -> {x >= 0})";
          @*/
         {
             if (num < 0) {
@@ -72,7 +72,7 @@ public class Math {
      @*/
     public int distMergeContract(int x, int y) {
         /*@ merge_proc "JoinByPredicateAbstraction";
-         @ merge_params conjunctive(int ph -> {ph >= 0, ph <= _y});
+         @ merge_params "conjunctive(int ph -> {ph >= 0, ph <= _y})";
          @*/
         {
             if (y < x) {

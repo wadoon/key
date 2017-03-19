@@ -44,7 +44,7 @@ public class JoinWithSignLattice extends JoinWithLatticeAbstraction {
         return INSTANCE;
     }
 
-    private static final String DISPLAY_NAME = "JoinBySignLatticeAbstraction";
+    //private static final String DISPLAY_NAME = "JoinBySignLatticeAbstraction";
 
     /*
      * (non-Javadoc)
@@ -76,10 +76,6 @@ public class JoinWithSignLattice extends JoinWithLatticeAbstraction {
         }
     }
 
-    @Override
-    public String toString() {
-        return DISPLAY_NAME;
-    }
 
     @Override
     public LinkedHashMap<ProgramVariable, AbstractDomainElement> getUserChoices() {
