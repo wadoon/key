@@ -103,7 +103,7 @@ public class RemoteMethodEventLDT extends LDT {
 		return hist;
 	}
 
-	// TODO KD ask: is this the right place for the method?
+	//maybe change places to somewhere else
 	public Function getMethodIdentifier(MethodDeclaration md, TermServices services) {
 	    Function f = (Function)services.getNamespaces().methodIdentifier().lookup(md.getProgramElementName());
 	    if (f == null) {

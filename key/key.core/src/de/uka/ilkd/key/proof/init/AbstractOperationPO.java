@@ -161,7 +161,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void readProblem() throws ProofInputException {
+	public void readProblem() throws ProofInputException { // TODO KD add updates to hist somewhere in here, check carefully what heap does
 		assert proofConfig == null;
 		final Services proofServices = postInit();
 		final IProgramMethod pm = getProgramMethod();
@@ -357,7 +357,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
 				ProgramElementName preHistName = new ProgramElementName("histAtPre");
 				Sort seqSort = (Sort) proofServices.getNamespaces().sorts().lookup(SeqLDT.NAME);
-				LocationVariable preHist = new LocationVariable(preHistName, seqSort); //TODO KD heap?
+				LocationVariable preHist = new LocationVariable(preHistName, seqSort); //TODO KD check heap
 
 				// build program block to execute in try clause (must be done before pre condition is created.
 				final ImmutableList<StatementBlock> sb =
@@ -985,7 +985,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
 			}
 		}
 
-		//TODO KD anything else to do here?
 		// hist := histAtPre
 		Term histupdate = tb.elementary(preHist, tb.var(hist));
 		update = tb.parallel(update, histupdate);

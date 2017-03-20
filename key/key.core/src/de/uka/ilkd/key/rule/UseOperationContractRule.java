@@ -837,16 +837,17 @@ public final class UseOperationContractRule implements BuiltInRule {
         //if called method is remote add event to history
         if (contract.getTarget().getMethodDeclaration().isRemote()) {
         	LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
-        	Term direction = tb.evOutgoing();
-        	Term type = tb.evCall();
-        	Term partner = contractSelf;  //TODO KD ask: this is not "contractOther"? + Caller/Callee example does not work
-        	Term method = tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(contract.getTarget().getMethodDeclaration(), services)); 
-        	Term args = tb.seq(contractParams);
-        	Term newEvent = tb.evConst(direction, type, partner, method, args, baseHeapTerm);
-        	Term newHist = tb.seqConcat(tb.var(hist), tb.seqSingleton(newEvent));
+        	//contractSelt == null ? ... : contractSelf;
+        	Term method = tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(contract.getTarget().getMethodDeclaration(), services));
+        	//check method for constructor (StackOverflow?)
+        	System.out.println("contractSelf = " + contractSelf);
+        	System.out.println("inst.actualSelf = " + inst.actualSelf);
+        	Term outCallEvent = tb.evConst(tb.evOutgoing(), tb.evCall(), contractSelf, method, tb.seq(contractParams), baseHeapTerm); // TODO KD can anything else be null?
+        	Term resultTerm = (contract.getResult() == null) ? tb.seqEmpty() : tb.seqSingleton(contract.getResult());
+        	Term inTermEvent  = tb.evConst(tb.evIncoming(), tb.evTerm(), contractSelf, method, resultTerm, baseHeapTerm); // TODO KD ask: this is the same heap, should it not have \return now?
+        	Term newHist = tb.seq(tb.var(hist), tb.seqSingleton(outCallEvent), tb.seqSingleton(inTermEvent));
         	Term histUpdate = tb.elementary(hist, newHist);
-        	anonUpdate = tb.parallel(anonUpdate, histUpdate); // what does parallel / sequential change?
-        	//TODO KD "outgoing termination", "incoming call" and "incoming termination" still missing
+        	anonUpdate = tb.parallel(anonUpdate, histUpdate);
         }
 
         final Term excNull = tb.equals(tb.var(excVar), tb.NULL());
