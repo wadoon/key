@@ -103,7 +103,7 @@ public class RemoteMethodEventLDT extends LDT {
 		return hist;
 	}
 
-	//maybe change places to somewhere else
+	//maybe put somewhere else?
 	public Function getMethodIdentifier(MethodDeclaration md, TermServices services) {
 	    Function f = (Function)services.getNamespaces().methodIdentifier().lookup(md.getProgramElementName());
 	    if (f == null) {
@@ -136,13 +136,11 @@ public class RemoteMethodEventLDT extends LDT {
 
 	@Override
 	public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
-		assert false;
 		return null;
 	}
 
 	@Override
 	public boolean hasLiteralFunction(Function f) {
-		//return true if TranslateLiteral would work (I think)
 		return false;
 	}
 

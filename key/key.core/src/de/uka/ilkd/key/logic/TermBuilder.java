@@ -2143,6 +2143,14 @@ public class TermBuilder {
         }
     }
 
+    public Term seqConcat(Term... terms) {
+    	Term result = seqEmpty();
+    	for (Term term : terms) {
+    		result = seqConcat(result, term);
+    	}
+    	return result;
+    }
+
     public Term seq(Term... terms) {
         Term result = seqEmpty();
         for (Term term : terms) {

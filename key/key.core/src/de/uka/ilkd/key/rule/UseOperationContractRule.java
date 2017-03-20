@@ -836,16 +836,16 @@ public final class UseOperationContractRule implements BuiltInRule {
         //FIXME specifications have to be placed before Annotations for some reason
         //if called method is remote add event to history
         if (contract.getTarget().getMethodDeclaration().isRemote()) {
+        	// TODO KD check heap stuff
         	LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
-        	//contractSelt == null ? ... : contractSelf;
+        	// TODO KD contractSelf is null for static methods
         	Term method = tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(contract.getTarget().getMethodDeclaration(), services));
-        	//check method for constructor (StackOverflow?)
-        	System.out.println("contractSelf = " + contractSelf);
-        	System.out.println("inst.actualSelf = " + inst.actualSelf);
-        	Term outCallEvent = tb.evConst(tb.evOutgoing(), tb.evCall(), contractSelf, method, tb.seq(contractParams), baseHeapTerm); // TODO KD can anything else be null?
+        	// TODO KD what happens with Remote Constructor Methods
+        	Term outCallEvent = tb.evConst(tb.evOutgoing(), tb.evCall(), contractSelf, method, tb.seq(contractParams), baseHeapTerm);
         	Term resultTerm = (contract.getResult() == null) ? tb.seqEmpty() : tb.seqSingleton(contract.getResult());
-        	Term inTermEvent  = tb.evConst(tb.evIncoming(), tb.evTerm(), contractSelf, method, resultTerm, baseHeapTerm); // TODO KD ask: this is the same heap, should it not have \return now?
-        	Term newHist = tb.seq(tb.var(hist), tb.seqSingleton(outCallEvent), tb.seqSingleton(inTermEvent));
+        	Term inTermEvent  = tb.evConst(tb.evIncoming(), tb.evTerm(), contractSelf, method, resultTerm, baseHeapTerm);
+        	// TODO KD shouldn't the heap be another one?
+        	Term newHist = tb.seqConcat(tb.var(hist), tb.seqSingleton(outCallEvent), tb.seqSingleton(inTermEvent));
         	Term histUpdate = tb.elementary(hist, newHist);
         	anonUpdate = tb.parallel(anonUpdate, histUpdate);
         }

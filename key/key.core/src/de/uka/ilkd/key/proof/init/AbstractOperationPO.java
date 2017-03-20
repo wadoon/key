@@ -354,10 +354,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				}
 
 				//build the variable for pre- and (post-) hist
-				LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
 				ProgramElementName preHistName = new ProgramElementName("histAtPre");
 				Sort seqSort = (Sort) proofServices.getNamespaces().sorts().lookup(SeqLDT.NAME);
-				LocationVariable preHist = new LocationVariable(preHistName, seqSort); //TODO KD check heap
+				LocationVariable preHist = new LocationVariable(preHistName, seqSort);
+				LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
 
 				// build program block to execute in try clause (must be done before pre condition is created.
 				final ImmutableList<StatementBlock> sb =
