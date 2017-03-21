@@ -386,7 +386,7 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
     public boolean isRemote() {
-    	return hasAnnotation("Remote"); // TODO KD check class (not possible, see this.parentIsInterfaceDeclaration)
+    	return hasAnnotation("Remote"); // TODO KD z Method should be checked as well
     }
     
     @Override

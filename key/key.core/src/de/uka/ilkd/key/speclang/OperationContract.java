@@ -64,7 +64,7 @@ public interface OperationContract extends Contract {
                            ImmutableList<ProgramVariable> paramVars,
                            Map<LocationVariable,? extends ProgramVariable> atPreVars,
                            Services services);
-    
+
     public Term getFreePre(LocationVariable heap,
                            Term heapTerm,
                            Term selfTerm,

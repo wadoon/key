@@ -61,6 +61,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
@@ -161,7 +162,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public void readProblem() throws ProofInputException { // TODO KD add updates to hist somewhere in here, check carefully what heap does
+	public void readProblem() throws ProofInputException {
 		assert proofConfig == null;
 		final Services proofServices = postInit();
 		final IProgramMethod pm = getProgramMethod();
@@ -390,6 +391,32 @@ public abstract class AbstractOperationPO extends AbstractPO {
 								"in your project.");
 					}
 				}
+				if (pm.getMethodDeclaration().isRemote()) {
+		        	// FIXME KD contractSelf is null for static methods
+		        	Term method = tb.func(proofServices.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), proofServices));
+		        	// FIXME KD Constructors with the @Remote Annotation cause an StackOverflowError
+		        	Term inCallEvent = tb.evConst(tb.evIncoming(), tb.evCall(), tb.var(selfVar), method, tb.seqEmpty(), tb.getBaseHeap());
+		        	// TODO KD a selfVar incorrect
+		        	// TODO KD a empty Arguments incorrect
+		        	Term newHist = tb.seqConcat(tb.var(hist), tb.seqSingleton(inCallEvent));
+		        	Term histUpdate = tb.elementary(hist, newHist);
+		        	pre = tb.and(pre, tb.apply(histUpdate, tb.tt()));
+		        	// TODO KD a what should i apply the Update to?
+				}
+				// TODO KD a probably comes later
+				if (pm.getMethodDeclaration().isRemote()) {
+		        	// FIXME KD contractSelf is null for static methods
+		        	Term method = tb.func(proofServices.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), proofServices));
+		        	// FIXME KD Constructors with the @Remote Annotation cause an StackOverflowError
+		        	Term result = resultVar == null? tb.seqEmpty() : tb.var(resultVar);
+		        	Term outTermEvent = tb.evConst(tb.evOutgoing(), tb.evTerm(), tb.var(selfVar), method, result, tb.getBaseHeap());
+		        	// TODO KD a selfVar incorrect
+		        	Term newHist = tb.seqConcat(tb.var(hist), tb.seqSingleton(outTermEvent));
+		        	Term histUpdate = tb.elementary(hist, newHist);
+		        	pre = tb.and(pre, tb.apply(histUpdate, tb.tt()));
+		        	// TODO KD a what should i apply the Update to?
+				}
+
 				// build program term
 				Term postTerm =
 						getPost(modHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars, proofServices);
