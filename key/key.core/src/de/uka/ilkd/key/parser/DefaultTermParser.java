@@ -59,7 +59,8 @@ public final class DefaultTermParser {
 				      sort_ns, 
 				      new Namespace(),
 				      new Namespace(),
-				      progVar_ns),		     
+				      progVar_ns,
+				      new Namespace()),		     
 		     scm);
     }
 

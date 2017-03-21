@@ -117,17 +117,17 @@ public class TempEventLDT extends LDT {
         return hist;
     }
 
-    /*
+    
     // TODO KD ask: is this the right place for the method?
     public Function getMethodIdentifier(MethodDeclaration md, TermServices services) {
-        Function f = (Function)services.getNamespaces().methodIdentifier().lookup(md.getProgramElementName());
+        Function f = (Function)services.getNamespaces().methodIdentifiers().lookup(md.getProgramElementName());
         if (f == null) {
             //add the function
             f = new Function(md.getProgramElementName(), (Sort)services.getNamespaces().sorts().lookup(METHOD_SORT));
         }
         return f;
     }
-    */
+    
     // TODO KD implement @Override Methods
     @Override
     public boolean isResponsible(Operator op, Term[] subs, Services services, ExecutionContext ec) {

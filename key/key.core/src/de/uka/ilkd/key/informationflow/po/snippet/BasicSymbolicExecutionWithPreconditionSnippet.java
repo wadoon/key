@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.informationflow.po.snippet.BasicSnippetData.Key;
+import de.uka.ilkd.key.ldt.TempEventLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 
@@ -25,17 +26,7 @@ class BasicSymbolicExecutionWithPreconditionSnippet extends ReplaceAndRegisterMe
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.FREE_PRE);
         final Term contractPre =
                 symbExecFactory.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
-        
-        
-        
-        //TODO JK put this somewhere else to not break christoph's  NI stuff
-        //final Term event = d.tb.func(eventFunction, calltype, callDirection, d.origVars.self, d.get(Key.TARGET_METHOD), d.tb.seq(poVars.formalParams), poVars.pre.heap)
-        //final Term actualHistory = d.tb.select(asSort, h, o, f);
-        //final Term historyWithCallEvent = d.tb.seqSingleton(event);
-        //final Term initHistory = d.tb.equals(actualHistory, historyWithCallEvent);
-        
-        
-        
+      
         
         final Term pre = d.tb.and(freePre, contractPre);
 

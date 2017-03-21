@@ -10,12 +10,15 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.InfFlowProofSymbols;
+import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.TempEventLDT;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -128,11 +131,39 @@ public class DependencyClusterContractPO extends AbstractOperationPO
         InfFlowPOSnippetFactory f =
                 POSnippetFactory.getInfFlowFactory(infFlowContract, ifVars.c1,
                                                    ifVars.c2, proofServices);
+        
+        //BasicPOSnippetFactory f1 =
+        //        POSnippetFactory.getBasicFactory(contract, ifVars.c1, proofServices);
+        
+        
+        //TODO JK wahrscheinlich noch nicht ganz korrekt, z.B. noch "richtige" hist auswählen...
+        final TempEventLDT ldt = proofServices.getTypeConverter().getTempEventLDT();
+        final Term event = tb.func(ldt.evConst(), 
+                tb.func(ldt.evCall()), 
+                tb.func(ldt.evIncoming()), 
+                symbExecVars.pre.self, //TODO JK richtige self variable?
+                tb.func(ldt.getMethodIdentifier(contract.getTarget().getMethodDeclaration(), proofServices)),
+                tb.seq(symbExecVars.formalParams), 
+                symbExecVars.pre.heap);
+        final Term actualHistory = tb.var(ldt.getHist());
+        final Term historyWithCallEvent = tb.seqSingleton(event);
+        final Term initHistory = tb.equals(actualHistory, historyWithCallEvent);
+     
+        
+        
+        
+  
         final Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
+
         final Term post =
                 f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
+        
         final Term finalTerm = tb.imp(selfComposedExec, post);
+        //final Term finalTerm = tb.imp(selfComposedExec, post);
+        
+        
+        
         //addLabeledIFSymbol(selfComposedExec);
         assignPOTerms(finalTerm);
         
