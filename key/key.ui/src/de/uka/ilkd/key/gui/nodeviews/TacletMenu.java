@@ -45,6 +45,7 @@ import de.uka.ilkd.key.gui.joinrule.JoinRuleMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
+import de.uka.ilkd.key.induction.ui.ConstructorDialog;
 import de.uka.ilkd.key.induction.ui.SortsDialog;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -716,6 +717,11 @@ public class TacletMenu extends JMenu {
 			}
 			
 	    }
+		else if(((JMenuItem)e.getSource()).getText().
+				 startsWith(SHOW_CONSTRUCTORS)){
+			PosInOccurrence occ = pos.getPosInOccurrence();
+			new ConstructorDialog(new JFrame(), occ.subTerm(), mediator.func_ns());
+		}
 	}
     }
     }
