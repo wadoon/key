@@ -448,4 +448,12 @@ public class DependencyClusterContractImpl
         return origDependencyClusterSpecs;
     }
 
+    @Override
+    public Term getSelf() {
+        if (origSelf == null){
+            assert pm.isStatic() : "missing self variable in non-static method contract";
+            return null;
+        }
+        return origSelf;
+    }
 }

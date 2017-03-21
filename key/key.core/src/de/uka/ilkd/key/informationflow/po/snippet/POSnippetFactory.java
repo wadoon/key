@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.DependencyClusterContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -92,5 +93,11 @@ public class POSnippetFactory {
             ProofObligationVars vars1,
             ProofObligationVars vars2) {
         return new InfFlowPOSnippetFactoryImpl(data, vars1, vars2);
+    }
+
+    public static BasicPOSnippetFactory getBasicFactory(
+            DependencyClusterContract contract, ProofObligationVars vars,
+            Services services) {
+        return new BasicPOSnippetFactoryImpl(contract, vars, services);
     }
 }

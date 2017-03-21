@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.BlockContract.Variables;
+import de.uka.ilkd.key.speclang.DependencyClusterContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -250,6 +251,27 @@ class BasicSnippetData {
                                  vars.result, vars.exception, heap);
     }
 
+
+    public BasicSnippetData(DependencyClusterContract contract,
+            Services services) {
+        this.hasMby = contract.hasMby();
+        this.services = services;
+        this.tb = services.getTermBuilder();
+
+        contractContents.put(Key.TARGET_METHOD, contract.getTarget());
+        contractContents.put(Key.FOR_CLASS, contract.getKJT());
+        contractContents.put(Key.PRECONDITION, contract.getPre());        
+        contractContents.put(Key.MODIFIES, contract.getMod());
+        contractContents.put(Key.DEPENDENS, contract.getDep());
+        contractContents.put(Key.MEASURED_BY, contract.getMby());
+        contractContents.put(Key.MODALITY, contract.getModality());
+        //contractContents.put(depclusterspecs?, contract.getdepclusterspecs?);
+
+        final Term heap = tb.getBaseHeap();
+        origVars =
+                new StateVars(contract.getSelf(), contract.getParams(),
+                              contract.getResult(), contract.getExc(), heap);
+    }
 
     private ImmutableList<Term> toTermList(ImmutableSet<ProgramVariable> vars) {
         ImmutableList<Term> result = ImmutableSLList.<Term>nil();

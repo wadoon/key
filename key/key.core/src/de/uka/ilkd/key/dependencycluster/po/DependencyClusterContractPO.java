@@ -132,8 +132,8 @@ public class DependencyClusterContractPO extends AbstractOperationPO
                 POSnippetFactory.getInfFlowFactory(infFlowContract, ifVars.c1,
                                                    ifVars.c2, proofServices);
         
-        //BasicPOSnippetFactory f1 =
-        //        POSnippetFactory.getBasicFactory(contract, ifVars.c1, proofServices);
+        BasicPOSnippetFactory f1 =
+                POSnippetFactory.getBasicFactory(contract, ifVars.c1, proofServices);
         
         
         //TODO JK wahrscheinlich noch nicht ganz korrekt, z.B. noch "richtige" hist auswählen...

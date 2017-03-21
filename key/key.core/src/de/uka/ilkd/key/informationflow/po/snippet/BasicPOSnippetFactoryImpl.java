@@ -10,6 +10,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.DependencyClusterContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
@@ -77,6 +78,14 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
                               ExecutionContext context,
                               Services services) {
         this.data = new BasicSnippetData(contract, context, services);
+        this.poVars = poVars;
+        registerFactoryMethods();
+    }
+
+
+    public BasicPOSnippetFactoryImpl(DependencyClusterContract contract,
+            ProofObligationVars poVars, Services services) {
+        this.data = new BasicSnippetData(contract, services);
         this.poVars = poVars;
         registerFactoryMethods();
     }
