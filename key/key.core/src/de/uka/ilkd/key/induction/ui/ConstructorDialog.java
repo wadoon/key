@@ -30,7 +30,7 @@ public class ConstructorDialog extends JDialog {
 		JLabel constructorsAsText = new JLabel();
 		
 		StringBuilder sb = new StringBuilder();
-		sb.append("Constructos: ");
+		sb.append("Constructors: ");
 		boolean first = true;
 		for(Function f: constructors){
 			if(!first){
