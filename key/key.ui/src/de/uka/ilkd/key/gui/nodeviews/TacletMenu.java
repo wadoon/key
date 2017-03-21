@@ -45,7 +45,8 @@ import de.uka.ilkd.key.gui.joinrule.JoinRuleMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
-import de.uka.ilkd.key.induction.SortsDialog;
+import de.uka.ilkd.key.induction.ui.ConstructorDialog;
+import de.uka.ilkd.key.induction.ui.SortsDialog;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -104,6 +105,7 @@ public class TacletMenu extends JMenu {
 	
 	//Added by roettgerStructuralInduction
 	private static final String SHOW_SORTS = "Show all variable sorts";
+	private static final String SHOW_CONSTRUCTORS = "Show constructors";
 	
 	/**
      *
@@ -252,10 +254,11 @@ public class TacletMenu extends JMenu {
 	
 	//added by roettgerStructuralInduction
 	addShowSortsItem(control);
+	addShowConstructorsItem(control);
 
     }
 
-    private void createBuiltInRuleMenu(ImmutableList<BuiltInRule> builtInList,
+	private void createBuiltInRuleMenu(ImmutableList<BuiltInRule> builtInList,
 				       MenuControl            control) {
 
 	if (!builtInList.isEmpty()) {
@@ -458,6 +461,17 @@ public class TacletMenu extends JMenu {
     	item.addActionListener(control);
     	add(item);
     }
+
+    /**
+     * @information: roettgerStructuralInduction
+     * @param control
+     */
+    private void addShowConstructorsItem(MenuControl control) {
+    	JMenuItem item = new JMenuItem(SHOW_CONSTRUCTORS);
+    	item.addActionListener(control);
+    	add(item);
+	}
+
 
 
     /** adds a TacletMenuItem for each taclet in the list and sets
@@ -703,6 +717,11 @@ public class TacletMenu extends JMenu {
 			}
 			
 	    }
+		else if(((JMenuItem)e.getSource()).getText().
+				 startsWith(SHOW_CONSTRUCTORS)){
+			PosInOccurrence occ = pos.getPosInOccurrence();
+			new ConstructorDialog(new JFrame(), occ.subTerm(), mediator.func_ns());
+		}
 	}
     }
     }
