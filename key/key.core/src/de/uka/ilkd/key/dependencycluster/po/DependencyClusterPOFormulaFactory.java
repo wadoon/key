@@ -86,11 +86,15 @@ public class DependencyClusterPOFormulaFactory {
     }
     
     public Term consequence() {
-        return preStateEquivImpliesPostStateEquiv();
+        return tb.and(preStateEquivImpliesPostStateEquiv(), wellformedHistories());
     }
     
     public Term preStateEquivImpliesPostStateEquiv() {
         return f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
+    }
+    
+    public Term wellformedHistories() {
+        return tb.and(a.wellformedHistory(), b.wellformedHistory());
     }
     
     public Term completeFormula() {

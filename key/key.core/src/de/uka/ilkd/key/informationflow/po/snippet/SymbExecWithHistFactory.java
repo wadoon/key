@@ -290,4 +290,8 @@ public class SymbExecWithHistFactory {
         return formalParVars;
     }
 
+    public Term wellformedHistory() {
+        return tb.and(tb.func(ldt.wellformedList(), postHistory),tb.func(ldt.wellformedListCoop(), postHistory));
+    }
+
 }

@@ -36,15 +36,19 @@ public class TempEventLDT extends LDT {
     private final Function evCall;
     private final Function evTerm;
     
+    private final Function wellformedList;
+    private final Function wellformedListCoop;
+    
     private final LocationVariable currentParams;
 
     //history (of Remote method events) ... copy of: key.core/resources/de/uka/ilkd/key/proof/rules/events.key -> Seq hist;
+    //TODO JK well, doesn't work if I put it there, in my case its in seq.key instead
     private LocationVariable hist;
     
     private LocationVariable hist_A;
     private LocationVariable hist_B;
 
-    //TODO JK since we get a calltype from here, the sort i implemented probably isn't necessary anymore. Remove it!
+    //TODO JK since we get a calltype from here, the sort I implemented probably isn't necessary anymore. Remove it!
     public TempEventLDT (TermServices services) {
         super(NAME, services);
         evConst = addFunction(services, "event");
@@ -54,13 +58,17 @@ public class TempEventLDT extends LDT {
         evGetMethod = addFunction(services, "evMethod");
         evGetArgs = addFunction(services, "evParams");
         
-        //TODO rename properly to fit simons events.key file
         evGetHeap = addFunction(services, "evHeap");
         
         evIncoming = addFunction(services, "in");
         evOutgoing = addFunction(services, "out");
         evCall = addFunction(services, "servcall");
         evTerm = addFunction(services, "servterm");
+        
+        wellformedList = addFunction(services, "wellformedList");
+        wellformedListCoop = addFunction(services, "wellformedListCoop");
+        
+        
         hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
         
         hist_A = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_A_NAME);
@@ -132,6 +140,16 @@ public class TempEventLDT extends LDT {
     public LocationVariable getHist_B() {
         return hist_B;
     }
+    
+
+    public Function wellformedList() {
+        return wellformedList;
+    }
+
+    public Function wellformedListCoop() {
+        return wellformedListCoop;
+    }
+
 
     
     // TODO KD ask: is this the right place for the method?
