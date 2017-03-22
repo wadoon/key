@@ -19,6 +19,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public class TempEventLDT extends LDT {
     public static final Name NAME = new Name("Event");
     public static final Name HIST_NAME = new Name("hist");
+    public static final Name HIST_A_NAME = new Name("hist_A");
+    public static final Name HIST_B_NAME = new Name("hist_B");
     public static final Name METHOD_SORT = new Name("Method");
     public static final Name CURRENT_PARAMS_NAME = new Name("currentParams");
 
@@ -38,6 +40,9 @@ public class TempEventLDT extends LDT {
 
     //history (of Remote method events) ... copy of: key.core/resources/de/uka/ilkd/key/proof/rules/events.key -> Seq hist;
     private LocationVariable hist;
+    
+    private LocationVariable hist_A;
+    private LocationVariable hist_B;
 
     //TODO JK since we get a calltype from here, the sort i implemented probably isn't necessary anymore. Remove it!
     public TempEventLDT (TermServices services) {
@@ -57,6 +62,9 @@ public class TempEventLDT extends LDT {
         evCall = addFunction(services, "servcall");
         evTerm = addFunction(services, "servterm");
         hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
+        
+        hist_A = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_A_NAME);
+        hist_B = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_B_NAME);
 
         currentParams = (LocationVariable) services.getNamespaces().programVariables().lookup(CURRENT_PARAMS_NAME);
 
@@ -115,6 +123,14 @@ public class TempEventLDT extends LDT {
      */
     public LocationVariable getHist() {
         return hist;
+    }
+    
+    public LocationVariable getHist_A() {
+        return hist_A;
+    }
+    
+    public LocationVariable getHist_B() {
+        return hist_B;
     }
 
     

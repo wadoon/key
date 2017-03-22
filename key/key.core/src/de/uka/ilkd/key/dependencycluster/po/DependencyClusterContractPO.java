@@ -2,6 +2,7 @@ package de.uka.ilkd.key.dependencycluster.po;
 
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -134,38 +136,67 @@ public class DependencyClusterContractPO extends AbstractOperationPO
         
         BasicPOSnippetFactory f1 =
                 POSnippetFactory.getBasicFactory(contract, ifVars.c1, proofServices);
-        
-        
-        //TODO JK wahrscheinlich noch nicht ganz korrekt, z.B. noch "richtige" hist auswählen...
+                
+        //TODO JK build some kind of factory for this stuff
         final TempEventLDT ldt = proofServices.getTypeConverter().getTempEventLDT();
-        final Term event = tb.func(ldt.evConst(), 
+        final Term actualHistory = tb.var(ldt.getHist());
+        
+        final Term callEvent = tb.func(ldt.evConst(), 
                 tb.func(ldt.evCall()), 
                 tb.func(ldt.evIncoming()), 
-                symbExecVars.pre.self, //TODO JK richtige self variable?
+                symbExecVars.pre.self,  //TODO JK use another partner instead of self
                 tb.func(ldt.getMethodIdentifier(contract.getTarget().getMethodDeclaration(), proofServices)),
                 tb.seq(symbExecVars.formalParams), 
-                symbExecVars.pre.heap);
-        final Term actualHistory = tb.var(ldt.getHist());
-        final Term historyWithCallEvent = tb.seqSingleton(event);
-        final Term initHistory = tb.equals(actualHistory, historyWithCallEvent);
+                ifVars.c1.pre.heap);
+        final Term historyWithCallEvent = tb.seqSingleton(callEvent);       
+        final Term updateHistoryWithCallEvent = tb.elementary(actualHistory, historyWithCallEvent);
+        final Term initHistoryEquality = tb.equals(actualHistory, historyWithCallEvent);
+        
+        
+        final Term termEvent = tb.func(ldt.evConst(), 
+                tb.func(ldt.evTerm()), 
+                tb.func(ldt.evOutgoing()), 
+                symbExecVars.pre.self,  //TODO JK use another partner instead of self
+                tb.func(ldt.getMethodIdentifier(contract.getTarget().getMethodDeclaration(), proofServices)),
+                tb.seq(ifVars.c1.post.result), 
+                ifVars.c1.post.heap);    
+        final Term historyWithTermEvent = tb.seqConcat(actualHistory, tb.seqSingleton(termEvent));
+        final Term updateHistoryWithTermEvent = tb.elementary(actualHistory, historyWithTermEvent);
+        final Term postHistory = tb.var(ldt.getHist_A());
+        final Term postHistoryEquality = tb.equals(postHistory, historyWithTermEvent);
+        
+        
+        final Term freePre =
+                f1.create(BasicPOSnippetFactory.Snippet.FREE_PRE);
+        final Term contractPre =
+                f1.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
+        final Term symExec =
+                f1.create(BasicPOSnippetFactory.Snippet.SYMBOLIC_EXEC);
+        
+        final Term exec1 = tb.and(freePre, initHistoryEquality, contractPre, symExec, postHistoryEquality);
+
+        final Term updateHeap = tb.elementary(tb.getBaseHeap(), ifVars.c1.pre.heap);
+        
+        final Term updatedExec1 =
+                tb.apply(updateHeap,
+                        tb.apply(updateHistoryWithCallEvent, exec1));
+
      
         
         
         
-  
+        /*
         final Term selfComposedExec =
                 f.create(InfFlowPOSnippetFactory.Snippet.SELFCOMPOSED_EXECUTION_WITH_PRE_RELATION);
 
         final Term post =
-                f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
+                f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);      
         
         final Term finalTerm = tb.imp(selfComposedExec, post);
-        //final Term finalTerm = tb.imp(selfComposedExec, post);
-        
-        
-        
+        */
+      
         //addLabeledIFSymbol(selfComposedExec);
-        assignPOTerms(finalTerm);
+        assignPOTerms(updatedExec1);
         
         collectClassAxioms(contract.getKJT(), proofConfig);
         
