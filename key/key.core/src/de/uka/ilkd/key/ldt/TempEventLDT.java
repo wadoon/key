@@ -39,14 +39,20 @@ public class TempEventLDT extends LDT {
     private final Function wellformedList;
     private final Function wellformedListCoop;
     
+    private final Function coopListEquiv;
+    private final Function equivHistory;
+    private final Function filterVisible;
+    
     private final LocationVariable currentParams;
 
     //history (of Remote method events) ... copy of: key.core/resources/de/uka/ilkd/key/proof/rules/events.key -> Seq hist;
     //TODO JK well, doesn't work if I put it there, in my case its in seq.key instead
-    private LocationVariable hist;
+    private final LocationVariable hist;
     
-    private LocationVariable hist_A;
-    private LocationVariable hist_B;
+    private final LocationVariable hist_A;
+    private final LocationVariable hist_B;
+    
+
 
     //TODO JK since we get a calltype from here, the sort I implemented probably isn't necessary anymore. Remove it!
     public TempEventLDT (TermServices services) {
@@ -68,6 +74,9 @@ public class TempEventLDT extends LDT {
         wellformedList = addFunction(services, "wellformedList");
         wellformedListCoop = addFunction(services, "wellformedListCoop");
         
+        coopListEquiv = addFunction(services, "coopListEquiv");
+        equivHistory = addFunction(services, "equivHistory");
+        filterVisible = addFunction(services, "filterVisible");
         
         hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
         
@@ -161,6 +170,20 @@ public class TempEventLDT extends LDT {
         }
         return f;
     }
+    
+
+    public Function coopListEquiv() {
+        return coopListEquiv;
+    }
+
+    public Function equivHistory() {
+        return equivHistory;
+    }
+
+    public Function filterVisible() {
+        return filterVisible;
+    }
+
     
     // TODO KD implement @Override Methods
     @Override

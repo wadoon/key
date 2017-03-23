@@ -70,7 +70,7 @@ public class SymbExecWithHistFactory {
                 tb.func(ldt.evIncoming()), 
                 symbExecVars.pre.self,  //TODO JK use another partner instead of self
                 tb.func(ldt.getMethodIdentifier(contract.getTarget().getMethodDeclaration(), services)),
-                tb.seq(symbExecVars.formalParams), 
+                tb.seq(ifVars.formalParams), 
                 ifVars.pre.heap);
     }
     
@@ -78,7 +78,6 @@ public class SymbExecWithHistFactory {
         return tb.seqSingleton(callEvent());
     }
     
-  //TODO JK this isn't really needed, is it?
     public Term updateHistoryWithCallEvent() {
         return tb.elementary(realHistory(), historyWithCallEvent());
     }
@@ -153,7 +152,11 @@ public class SymbExecWithHistFactory {
         final Term updateHeap = tb.elementary(tb.getBaseHeap(), ifVars.pre.heap);
         
         //TODO JK no need to update the history I think
-        return tb.apply(updateHeap, execWithPre);
+        return tb.apply(updateHeap, tb.apply(updateHistoryWithCallEvent(), execWithPre));
+    }
+    
+    public Term filteredPostHistory() {
+        return tb.func(ldt.filterVisible(), postHistory);
     }
     
     
