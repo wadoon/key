@@ -138,10 +138,14 @@ public final class MethodCallToLogicRule implements BuiltInRule {
 
         // create the function application
         // XXX What to do with no_state and two_state model methods?
-        Term[] args = new Term[inst.actualParams.size() + 2];
+        int i = inst.pm.isStatic() ? 1 : 2;
+        
+        Term[] args = new Term[inst.actualParams.size() + i];
         args[0] = baseHeapTerm;
-        args[1] = inst.actualSelf;
-        int i = 2;
+        
+        if (!inst.pm.isStatic()) {
+        	args[1] = inst.actualSelf;
+        }
         for (Term arg : inst.actualParams) {
             args[i] = arg;
             i++;
