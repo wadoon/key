@@ -73,6 +73,10 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
     /** @return IList<T> this list without the first <code>n</code> elements  */
     ImmutableList<T> take(int n);
 
+
+    // TODO comment
+    T get(int n);
+
     /**
      * Reverses this list
      */

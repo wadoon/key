@@ -159,6 +159,10 @@ public abstract class ImmutableSLList<T> implements ImmutableList<T> {
 	return rest;
     }
 
+    @Override
+    public T get(int n) {
+        return take(n).head();
+    }
 
     private static class Cons<S> extends ImmutableSLList<S> {
 
