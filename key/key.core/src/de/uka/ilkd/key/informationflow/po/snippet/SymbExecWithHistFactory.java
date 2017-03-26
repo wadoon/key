@@ -155,8 +155,13 @@ public class SymbExecWithHistFactory {
         return tb.apply(updateHeap, tb.apply(updateHistoryWithCallEvent(), execWithPre));
     }
     
-    public Term filteredPostHistory() {
+    public Term visibilityFilteredPostHistory() {
         return tb.func(ldt.filterVisible(), postHistory);
+    }
+    
+    public Term callEventFromPostHist() {
+        //TODO JK how to get the event sort properly?
+        return tb.seqGet(callEvent().sort(), postHistory, tb.zero());
     }
     
     

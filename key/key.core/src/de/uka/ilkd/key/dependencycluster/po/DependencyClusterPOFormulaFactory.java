@@ -86,7 +86,13 @@ public class DependencyClusterPOFormulaFactory {
     }
     
     public Term consequence() {
-        return tb.and(preStateEquivImpliesPostStateEquiv(), wellformedHistories());
+        //TODO JK preStateEquivImpliesPostStateEquiv isnt correct here
+        return tb.and(preStateEquivImpliesPostStateEquiv());
+    }
+    
+    public Term assumptions() {
+        //TODO JK add initialStateEquivalence
+        return tb.and(bothExecutions(), wellformedHistories(), cooperationalEquivalence(), callEventEquivalence());
     }
     
     public Term preStateEquivImpliesPostStateEquiv() {
@@ -97,8 +103,18 @@ public class DependencyClusterPOFormulaFactory {
         return tb.and(a.wellformedHistory(), b.wellformedHistory());
     }
     
+    //services called with equivalent events are guaranteed to terminate with equivalent events
+    public Term cooperationalEquivalence() {
+        return tb.func(ldt.coopListEquiv(), a.visibilityFilteredPostHistory(), b.visibilityFilteredPostHistory());      
+    }
+    
+    public Term callEventEquivalence() {
+        return tb.func(ldt.equivEvent(), a.callEventFromPostHist(), b.callEventFromPostHist());
+    }
+    
+    
     public Term completeFormula() {
-        return tb.imp(bothExecutions(), consequence());
+        return tb.imp(assumptions(), consequence());
     }
 
 }
