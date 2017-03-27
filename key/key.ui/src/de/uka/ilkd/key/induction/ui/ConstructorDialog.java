@@ -11,6 +11,7 @@ import javax.swing.JLabel;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.induction.ConstructorExtractor;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
@@ -18,14 +19,14 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 public class ConstructorDialog extends JDialog {
 
-	public ConstructorDialog(Frame parent, Term t, Namespace func_ns) {
+	public ConstructorDialog(Frame parent, Term t, Services s) {
 		super(parent, "Constructors");
 		
 		this.setVisible(true);
 		this.setSize(350, 175);
 		
 		//display constructors
-		ConstructorExtractor ce = new ConstructorExtractor(t, func_ns);
+		ConstructorExtractor ce = new ConstructorExtractor(t, s);
 		ImmutableArray<Function> constructors = ce.getConstructors();
 		JLabel constructorsAsText = new JLabel();
 		
