@@ -53,6 +53,14 @@ public class POSnippetFactory {
         return new BasicPOSnippetFactoryImpl(contract, vars, context, services);
     }
 
+    static BasicPOSnippetWithHistFactory getBasicFactoryWithHist(
+            DependencyClusterContract contract,
+            Services services,
+            ProofObligationVars poVars,
+            SymbExecWithHistFactory helperFactory) {
+        return new BasicPOSnippetWithHistFactory(new BasicSnippetData(contract, services), poVars, helperFactory);
+    }
+    
     static BasicPOSnippetFactory getBasicFactory(
             BasicSnippetData data,
             ProofObligationVars poVars) {

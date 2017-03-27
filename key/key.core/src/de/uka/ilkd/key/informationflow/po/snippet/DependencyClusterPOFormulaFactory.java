@@ -1,4 +1,7 @@
-package de.uka.ilkd.key.dependencycluster.po;
+package de.uka.ilkd.key.informationflow.po.snippet;
+//TODO JK move this to de.uka.ilkd.key.dependencycluster.po as soon as I find a way to reuse christophs code without code duplication and ugly hacks like this
+
+import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -26,10 +29,14 @@ public class DependencyClusterPOFormulaFactory {
     private final TempEventLDT ldt;
     private final ProofObligationVars symbExecVars;
     
-    private final InfFlowPOSnippetFactory f;
+    
     
     private final SymbExecWithHistFactory a;
     private final SymbExecWithHistFactory b;
+    
+    //TODO JK try better code reuse and remove these later
+    private final InfFlowPOSnippetFactory f;
+    private final InformationFlowContract infFlowContract;
 
     
     public DependencyClusterPOFormulaFactory(DependencyClusterContract contract, ProofObligationVars symbExecVars, IFProofObligationVars ifVars, Services services) {
@@ -43,11 +50,11 @@ public class DependencyClusterPOFormulaFactory {
         ImmutableList<InfFlowSpec> infFlowSpecs = ImmutableSLList.<InfFlowSpec>nil();
         
         for (DependencyClusterSpec spec: contract.getSpecs()) {
-            InfFlowSpec infFlowSpec = new InfFlowSpec(spec.getLowState(), spec.getLowState(), ImmutableSLList.<Term>nil());
+            InfFlowSpec infFlowSpec = new InfFlowSpec(spec.getLowState(), spec.getLowState(), spec.getNewObjects());
             infFlowSpecs = infFlowSpecs.append(infFlowSpec);
         }
         
-        InformationFlowContract infFlowContract = 
+        infFlowContract = 
                 new InformationFlowContractImpl(contract.getName(), 
                         contract.getKJT(), 
                         contract.getTarget(), 
@@ -86,8 +93,11 @@ public class DependencyClusterPOFormulaFactory {
     }
     
     public Term consequence() {
+        //TODO JK HERE NEXT!!!
         //TODO JK preStateEquivImpliesPostStateEquiv isnt correct here
-        return tb.and(preStateEquivImpliesPostStateEquiv());
+        
+        return tb.ff();
+        //return tb.and(preStateEquivImpliesPostStateEquiv());
     }
     
     public Term assumptions() {
@@ -99,6 +109,7 @@ public class DependencyClusterPOFormulaFactory {
         return f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
     }
     
+   
     public Term wellformedHistories() {
         return tb.and(a.wellformedHistory(), b.wellformedHistory());
     }

@@ -24,17 +24,17 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
     /**
      * Collection of data important for the production of snippets.
      */
-    private final BasicSnippetData data;
+    protected final BasicSnippetData data;
     
     /**
      * Variables belonging to the proof obligation.
      */
-    private final ProofObligationVars poVars;
+    protected final ProofObligationVars poVars;
 
     /**
      * Registered snippet factory methods.
      */
-    private final EnumMap<Snippet, FactoryMethod> factoryMethods
+    protected final EnumMap<Snippet, FactoryMethod> factoryMethods
              = new EnumMap<Snippet, FactoryMethod>(Snippet.class);
 
 

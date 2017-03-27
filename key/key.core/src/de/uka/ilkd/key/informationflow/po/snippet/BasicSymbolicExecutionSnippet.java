@@ -62,7 +62,7 @@ class BasicSymbolicExecutionSnippet extends ReplaceAndRegisterMethod
         return prog;
     }
 
-    private Term buildProgramTerm(BasicSnippetData d,
+    protected Term buildProgramTerm(BasicSnippetData d,
                                   ProofObligationVars vs,
                                   Term postTerm,
                                   TermBuilder tb) {

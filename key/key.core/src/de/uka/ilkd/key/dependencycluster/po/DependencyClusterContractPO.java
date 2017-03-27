@@ -12,6 +12,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.InfFlowProofSymbols;
 import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
+import de.uka.ilkd.key.informationflow.po.snippet.DependencyClusterPOFormulaFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
