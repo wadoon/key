@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
 
@@ -35,11 +36,12 @@ public class RelationDescription {
 	private static LinkedList<Term> createRangeFormulas(Term t, Services s){
 		ImmutableList<Named> namedrules = s.getNamespaces().ruleSets().elements();
 		LinkedList<FindTaclet> rules = new LinkedList<FindTaclet>();
+		//TODO: check for optimizations
 		for(Named n : namedrules){
 			Rule r = (Rule)n;
 			if(r instanceof FindTaclet){
 				FindTaclet ft = (FindTaclet)r;
-				if(findTacletMatches(ft, t)){
+				if(findTacletMatches(ft, t, s)){
 					rules.add(ft);
 				}
 			}
@@ -47,9 +49,11 @@ public class RelationDescription {
 		return null;
 	}
 	
-	private static boolean findTacletMatches(FindTaclet ft, Term t){
+	private static boolean findTacletMatches(FindTaclet ft, Term t, Services s){
 		//TODO: return whether the given term fits to the findtaclet or not.
-		return false;
+		MatchConditions mc = new MatchConditions();
+		mc = ft.getMatcher().matchFind(t, mc, s);
+		return mc != null;
 	}
 	
 	private static Substitution createSubstitution(Function f, Services s){
