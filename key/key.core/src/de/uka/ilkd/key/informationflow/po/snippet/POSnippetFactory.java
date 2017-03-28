@@ -4,6 +4,7 @@
  */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
+import de.uka.ilkd.key.dependencycluster.po.SymbExecWithHistFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
@@ -53,7 +54,7 @@ public class POSnippetFactory {
         return new BasicPOSnippetFactoryImpl(contract, vars, context, services);
     }
 
-    static BasicPOSnippetWithHistFactory getBasicFactoryWithHist(
+    public static BasicPOSnippetWithHistFactory getBasicFactoryWithHist(
             DependencyClusterContract contract,
             Services services,
             ProofObligationVars poVars,

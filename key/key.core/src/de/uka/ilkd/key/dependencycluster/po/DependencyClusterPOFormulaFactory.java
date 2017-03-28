@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.informationflow.po.snippet;
+package de.uka.ilkd.key.dependencycluster.po;
 //TODO JK move this to de.uka.ilkd.key.dependencycluster.po as soon as I find a way to reuse christophs code without code duplication and ugly hacks like this
 
 import java.util.Iterator;
@@ -9,7 +9,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
-import de.uka.ilkd.key.informationflow.po.snippet.SymbExecWithHistFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.TempEventLDT;
 import de.uka.ilkd.key.logic.Term;

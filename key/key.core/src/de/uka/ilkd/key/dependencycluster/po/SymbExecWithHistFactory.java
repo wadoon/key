@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.informationflow.po.snippet;
+package de.uka.ilkd.key.dependencycluster.po;
 //TODO JK move this to de.uka.ilkd.key.dependencycluster.po as soon as I find a way to reuse christophs code without code duplication and ugly hacks like this
 
 import java.util.Iterator;
@@ -10,7 +10,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory.Snippet;
-import de.uka.ilkd.key.informationflow.po.snippet.BasicSnippetData;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -63,7 +62,7 @@ public class SymbExecWithHistFactory {
         this.postHistory = postHistory;
         
         //f = POSnippetFactory.getBasicFactory(contract, ifVars, services);
-        //TODO JK Can I really pass this while I'm still in the constructor???
+        //TODO JK Can I really pass "this" while I'm still in the constructor???
         f = POSnippetFactory.getBasicFactoryWithHist(contract, services, ifVars, this);
     }
     
