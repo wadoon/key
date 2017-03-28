@@ -17,6 +17,7 @@ import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Serializable {
 
@@ -185,5 +186,8 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
         }
         return ret.reverse();
     }
-    
+
+    public Stream<S> stream() {
+        return Arrays.stream(content);
+    }
 }

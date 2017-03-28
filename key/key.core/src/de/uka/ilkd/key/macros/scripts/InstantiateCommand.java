@@ -16,8 +16,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -28,105 +26,108 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
- *
  * instantiate var=a occ=2 with="a_8" hide
- *
+ * <p>
  * instantiate formula="\forall int a; phi(a)" with="a_8"
  *
  * @author mulbrich
- *
  */
-public class InstantiateCommand extends AbstractCommand {
+public class InstantiateCommand
+        implements ProofScriptCommand<InstantiateCommand.Parameters> {
 
-    private static class Parameters {
-        Term formula;
-        String var;
-        int occ = 1;
-        boolean hide;
-        public Term with;
+    public static class Parameters {
+        @ValueInjector.Option("formula") Term formula;
+        @ValueInjector.Option("var") String var;
+        @ValueInjector.Option("occ") int occ = 1;
+        @ValueInjector.Flag(arg = "#2", value = "hide") boolean hide;
+        @ValueInjector.Option("with") public Term with;
     }
 
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
+    @Override public Parameters evaluateArguments(EngineState state,
+            Map<String, String> arguments) {
+        return state.getValueInjector().inject(new Parameters(), arguments);
+    }
 
-        Goal goal = getFirstOpenGoal(proof, state);
+    @Override public void execute(AbstractUserInterfaceControl uiControl,
+            Parameters params, EngineState state)
+            throws ScriptException, InterruptedException {
 
-        Parameters params = parseParameters(proof, goal, args, state);
+        Goal goal = state.getFirstOpenGoal();
 
-        if((params.var == null) == (params.formula == null)) {
-            throw new ScriptException("One of 'var' or 'formula' must be specified");
+        if ((params.var == null) == (params.formula == null)) {
+            throw new ScriptException(
+                    "One of 'var' or 'formula' must be specified");
         }
 
-        if(params.var != null) {
+        if (params.var != null) {
             computeFormula(params, goal);
         }
 
         assert params.formula != null;
 
-        TacletApp theApp = findTacletApp(proof, params, state);
-        if(theApp == null) {
+        TacletApp theApp = findTacletApp(params, state);
+        if (theApp == null) {
             throw new ScriptException("No taclet application found");
         }
 
         SchemaVariable sv = theApp.uninstantiatedVars().iterator().next();
 
-        theApp = theApp.addInstantiation(sv, params.with, true /*???*/, proof.getServices());
+        theApp = theApp.addInstantiation(sv, params.with, true /*???*/,
+                state.getProof().getServices());
 
-        theApp = theApp.tryToInstantiate(proof.getServices());
+        theApp = theApp.tryToInstantiate(state.getProof().getServices());
 
-        Goal g = getFirstOpenGoal(proof, state);
+        Goal g = state.getFirstOpenGoal();
         g.apply(theApp);
     }
 
-    private TacletApp findTacletApp(Proof proof, Parameters p, Map<String, Object> state)
+    private TacletApp findTacletApp(Parameters p, EngineState state)
             throws ScriptException {
-
-        ImmutableList<TacletApp> allApps = findAllTacletApps(proof, p, state);
+        ImmutableList<TacletApp> allApps = findAllTacletApps(p, state);
         TacletApp matchingApp = filterList(p, allApps);
 
-        if(matchingApp == null) {
+        if (matchingApp == null) {
             throw new ScriptException("No matching applications.");
         }
 
         return matchingApp;
     }
 
-    private ImmutableList<TacletApp> findAllTacletApps(Proof proof, Parameters p, Map<String, Object> state)
-            throws ScriptException {
+    private ImmutableList<TacletApp> findAllTacletApps(Parameters p,
+            EngineState state) throws ScriptException {
 
         String rulename;
-        if(p.formula.op() == Quantifier.ALL) {
+        if (p.formula.op() == Quantifier.ALL) {
             rulename = "allLeft" + (p.hide ? "Hide" : "");
-        } else {
+        }
+        else {
             rulename = "exRight" + (p.hide ? "Hide" : "");
         }
 
+        Proof proof = state.getProof();
         Services services = proof.getServices();
         TacletFilter filter = new TacletNameFilter(rulename);
-        Goal g = getFirstOpenGoal(proof, state);
-        RuleAppIndex index = g.ruleAppIndex ();
-        index.autoModeStopped ();
+        Goal g = state.getFirstOpenGoal();
+        RuleAppIndex index = g.ruleAppIndex();
+        index.autoModeStopped();
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if(p.formula != null && !sf.formula().equals(p.formula)) {
+            if (p.formula != null && !sf.formula().equals(p.formula)) {
                 continue;
             }
-            allApps = allApps.append(
-                    index.getTacletAppAtAndBelow(filter,
-                            new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
-                            services));
+            allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
+                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
+                    services));
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if(p.formula != null && !sf.formula().equals(p.formula)) {
+            if (p.formula != null && !sf.formula().equals(p.formula)) {
                 continue;
             }
-            allApps = allApps.append(
-                    index.getTacletAppAtAndBelow(filter,
-                            new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
-                            services));
+            allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
+                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
+                    services));
         }
 
         return allApps;
@@ -137,9 +138,9 @@ public class InstantiateCommand extends AbstractCommand {
      */
     private TacletApp filterList(Parameters p, ImmutableList<TacletApp> list) {
         for (TacletApp tacletApp : list) {
-            if(tacletApp instanceof PosTacletApp) {
+            if (tacletApp instanceof PosTacletApp) {
                 PosTacletApp pta = (PosTacletApp) tacletApp;
-                if(pta.posInOccurrence().subTerm().equals(p.formula)) {
+                if (pta.posInOccurrence().subTerm().equals(p.formula)) {
                     return pta;
                 }
             }
@@ -155,27 +156,25 @@ public class InstantiateCommand extends AbstractCommand {
             this.rulename = new Name(rulename);
         }
 
-        @Override
-        protected boolean filter(Taclet taclet) {
+        @Override protected boolean filter(Taclet taclet) {
             return taclet.name().equals(rulename);
         }
 
     }
 
-
-
-    private void computeFormula(Parameters params, Goal goal) throws ScriptException {
+    private void computeFormula(Parameters params, Goal goal)
+            throws ScriptException {
         Node n = goal.node();
         Sequent seq = n.sequent();
         int occ = params.occ;
-        for(SequentFormula form : seq.antecedent().asList()) {
+        for (SequentFormula form : seq.antecedent().asList()) {
             Term term = form.formula();
             Term stripped = stripUpdates(term);
-            if(stripped.op() == Quantifier.ALL) {
+            if (stripped.op() == Quantifier.ALL) {
                 String varName = stripped.boundVars().get(0).name().toString();
-                if(params.var.equals(varName)) {
-                    occ --;
-                    if(occ == 0) {
+                if (params.var.equals(varName)) {
+                    occ--;
+                    if (occ == 0) {
                         params.formula = term;
                         return;
                     }
@@ -183,14 +182,14 @@ public class InstantiateCommand extends AbstractCommand {
             }
         }
 
-        for(SequentFormula form : seq.succedent().asList()) {
+        for (SequentFormula form : seq.succedent().asList()) {
             Term term = form.formula();
             Term stripped = stripUpdates(term);
-            if(stripped.op() == Quantifier.EX) {
+            if (stripped.op() == Quantifier.EX) {
                 String varName = stripped.boundVars().get(0).name().toString();
-                if(params.var.equals(varName)) {
-                    occ --;
-                    if(occ == 0) {
+                if (params.var.equals(varName)) {
+                    occ--;
+                    if (occ == 0) {
                         params.formula = term;
                         return;
                     }
@@ -198,19 +197,21 @@ public class InstantiateCommand extends AbstractCommand {
             }
         }
 
-        throw new ScriptException("Variable '" + params.var +
-                "' has no occurrence no. '" + params.occ + "'.");
+        throw new ScriptException(
+                "Variable '" + params.var + "' has no occurrence no. '"
+                        + params.occ + "'.");
     }
 
     private Term stripUpdates(Term term) {
-        while(term.op() == UpdateApplication.UPDATE_APPLICATION) {
+        while (term.op() == UpdateApplication.UPDATE_APPLICATION) {
             term = term.sub(1);
         }
         return term;
     }
 
-    private Parameters parseParameters(Proof proof, Goal goal, Map<String, String> args, Map<String, Object> state)
-            throws ScriptException {
+    /*
+    public Parameters createArguments(EngineState state,
+            Map<String, String> args) throws ScriptException {
         Parameters params = new Parameters();
 
         //
@@ -221,10 +222,11 @@ public class InstantiateCommand extends AbstractCommand {
         // formula="toplevel formula in which it appears"
         // formula="\forall int a; phi(a)"
         String formStr = args.get("formula");
-        if(formStr != null) {
+        if (formStr != null) {
             try {
-                params.formula = toTerm(proof, goal, state, formStr, Sort.FORMULA);
-            } catch (Exception e) {
+                params.formula = toTerm(proof, state, formStr, Sort.FORMULA);
+            }
+            catch (Exception e) {
                 throw new ScriptException(e);
             }
         }
@@ -232,10 +234,11 @@ public class InstantiateCommand extends AbstractCommand {
         //
         // occurrence number;
         String occStr = args.get("occ");
-        if(occStr != null) {
+        if (occStr != null) {
             try {
                 params.occ = Integer.parseInt(occStr);
-            } catch (NumberFormatException e) {
+            }
+            catch (NumberFormatException e) {
                 throw new ScriptException(e);
             }
         }
@@ -243,13 +246,15 @@ public class InstantiateCommand extends AbstractCommand {
         //
         // instantiation
         String withStr = args.get("with");
-        if(withStr != null) {
+        if (withStr != null) {
             try {
-                params.with = toTerm(proof, goal, state, withStr, null);
-            } catch (ParserException e) {
+                params.with = toTerm(proof, state, withStr, null);
+            }
+            catch (ParserException e) {
                 throw new ScriptException(e);
             }
-        } else {
+        }
+        else {
             throw new ScriptException("'with' must be specified");
         }
 
@@ -257,12 +262,10 @@ public class InstantiateCommand extends AbstractCommand {
         // hide
         params.hide = args.containsKey("#2") && args.get("#2").equals("hide");
 
-
         return params;
     }
-
-    @Override
-    public String getName() {
+*/
+    @Override public String getName() {
         return "instantiate";
     }
 
