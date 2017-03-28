@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import de.uka.ilkd.key.parser.ParserException;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -27,19 +28,80 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
-public class RuleCommand extends AbstractCommand {
+public class RuleCommand implements ProofScriptCommand<RuleCommand.Parameters> {
 
-    @Override
-    public String getName() {
+    public static class Parameters {
+        @ValueInjector.Option("#2") String rulename;
+        @ValueInjector.Option("on") Term on;
+        @ValueInjector.Option("formula") Term formula;
+        @ValueInjector.Option("occ") int occ = -1;
+        Map<String, Term> instantiations = new HashMap<>();
+    }
+
+    @Override public String getName() {
         return "rule";
     }
 
-    private static class Parameters {
-        String rulename;
-        Term on;
-        Term formula;
-        int occ = -1;
-        Map<String, Term> instantiations = new HashMap<>();
+    @Override public Parameters evaluateArguments(EngineState state,
+            Map<String, String> arguments) {
+        Parameters p = state.getValueInjector()
+                .inject(new Parameters(), arguments);
+
+        // instantiation
+        arguments.forEach((String s, String value) -> {
+            if (s.startsWith("inst_")) {
+                s = s.substring(5);
+            }
+
+            try {
+                p.instantiations.put(s, state.toTerm(value, null));
+            }
+            catch (ParserException | ScriptException e) {
+                e.printStackTrace();
+            }
+        });
+        return p;
+    }
+
+    @Override public void execute(AbstractUserInterfaceControl uiControl,
+            Parameters args, EngineState state)
+            throws ScriptException, InterruptedException {
+        Proof proof = state.getProof();
+        TacletApp theApp = makeTacletApp(args, state);
+        assert theApp != null;
+
+        ImmutableList<TacletApp> assumesCandidates = theApp
+                .findIfFormulaInstantiations(
+                        state.getFirstOpenGoal().sequent(),
+                        proof.getServices());
+
+        if (assumesCandidates.size() != 1) {
+            throw new ScriptException("Not a unique \\assumes instantiation");
+        }
+
+        theApp = assumesCandidates.head();
+
+        for (SchemaVariable sv : theApp.uninstantiatedVars()) {
+            if (theApp.isInstantiationRequired(sv)) {
+                Term inst = args.instantiations.get(sv.name().toString());
+                if (inst == null) {
+                    throw new ScriptException(
+                            "missing instantiation for " + sv);
+                }
+                theApp = theApp
+                        .addInstantiation(sv, inst, true, proof.getServices());
+            }
+        }
+
+        // instantiate remaining symbols
+        theApp = theApp.tryToInstantiate(proof.getServices());
+
+        if (theApp == null) {
+            throw new ScriptException("Cannot instantiate this rule");
+        }
+
+        Goal g = state.getFirstOpenGoal();
+        g.apply(theApp);
     }
 
     private static class TacletNameFilter extends TacletFilter {
@@ -50,94 +112,57 @@ public class RuleCommand extends AbstractCommand {
             this.rulename = new Name(rulename);
         }
 
-        @Override
-        protected boolean filter(Taclet taclet) {
+        @Override protected boolean filter(Taclet taclet) {
             return taclet.name().equals(rulename);
         }
 
     }
 
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args, Map<String, Object> state) throws ScriptException, InterruptedException {
+    private TacletApp makeTacletApp(Parameters p, EngineState state)
+            throws ScriptException {
 
-        Parameters p = parseArgs(proof, args, state);
-        TacletApp theApp = makeTacletApp(proof, p, state);
-        assert theApp != null;
-
-        ImmutableList<TacletApp> assumesCandidates =
-                theApp.findIfFormulaInstantiations(getFirstOpenGoal(proof, state).sequent(), proof.getServices());
-
-        if(assumesCandidates.size() != 1) {
-            throw new ScriptException("Not a unique \\assumes instantiation");
-        }
-
-        theApp = assumesCandidates.head();
-
-        for (SchemaVariable sv : theApp.uninstantiatedVars()) {
-			if (theApp.isInstantiationRequired(sv)) {
-				Term inst = p.instantiations.get(sv.name().toString());
-				if (inst == null) {
-					throw new ScriptException("missing instantiation for " + sv);
-				}
-				theApp = theApp.addInstantiation(sv, inst, true, proof.getServices());
-			}
-		}
-
-        // instantiate remaining symbols
-        theApp = theApp.tryToInstantiate(proof.getServices());
-
-        if(theApp == null) {
-            throw new ScriptException("Cannot instantiate this rule");
-        }
-
-        Goal g = getFirstOpenGoal(proof, state);
-        g.apply(theApp);
-    }
-
-    private TacletApp makeTacletApp(Proof proof, Parameters p,
-            Map<String, Object> state) throws ScriptException {
-
+        Proof proof = state.getProof();
         Taclet taclet = proof.getEnv().getInitConfigForEnvironment().
                 lookupActiveTaclet(new Name(p.rulename));
 
-        if(taclet == null) {
+        if (taclet == null) {
             throw new ScriptException("Taclet '" + p.rulename + "' not known.");
         }
 
-        if(taclet instanceof NoFindTaclet) {
-            return makeNoFindTacletApp(taclet, proof, p, state);
-        } else {
-            return findTacletApp(proof, p, state);
+        if (taclet instanceof NoFindTaclet) {
+            return makeNoFindTacletApp(taclet);
+        }
+        else {
+            return findTacletApp(p, state);
         }
 
     }
 
-    private TacletApp makeNoFindTacletApp(Taclet taclet, Proof proof, Parameters p,
-            Map<String, Object> state) {
-
+    private TacletApp makeNoFindTacletApp(Taclet taclet/*, Parameters p,
+            EngineState state*/) {
         TacletApp app = NoPosTacletApp.createNoPosTacletApp(taclet);
-
         return app;
     }
 
-    private TacletApp findTacletApp(Proof proof, Parameters p, Map<String, Object> state)
+    private TacletApp findTacletApp(Parameters p, EngineState state)
             throws ScriptException {
 
-        ImmutableList<TacletApp> allApps = findAllTacletApps(proof, p, state);
+        ImmutableList<TacletApp> allApps = findAllTacletApps(p, state);
         List<TacletApp> matchingApps = filterList(p, allApps);
 
-        if(matchingApps.isEmpty()) {
+        if (matchingApps.isEmpty()) {
             throw new ScriptException("No matching applications.");
         }
 
-        if(p.occ < 0) {
-            if(matchingApps.size() > 1)  {
-                throw new ScriptException("More than one applicable occurrence");
+        if (p.occ < 0) {
+            if (matchingApps.size() > 1) {
+                throw new ScriptException(
+                        "More than one applicable occurrence");
             }
             return matchingApps.get(0);
-        } else {
-            if(p.occ >= matchingApps.size()) {
+        }
+        else {
+            if (p.occ >= matchingApps.size()) {
                 throw new ScriptException("Occurence " + p.occ
                         + " has been specified, but there are only "
                         + matchingApps.size() + " hits.");
@@ -146,46 +171,49 @@ public class RuleCommand extends AbstractCommand {
         }
     }
 
-    private ImmutableList<TacletApp> findAllTacletApps(Proof proof, Parameters p, Map<String, Object> state)
-            throws ScriptException {
-        Services services = proof.getServices();
+    private ImmutableList<TacletApp> findAllTacletApps(Parameters p,
+            EngineState state) throws ScriptException {
+        Services services = state.getProof().getServices();
         TacletFilter filter = new TacletNameFilter(p.rulename);
-        Goal g = getFirstOpenGoal(proof, state);
-        RuleAppIndex index = g.ruleAppIndex ();
-        index.autoModeStopped ();
+        Goal g = state.getFirstOpenGoal();
+        RuleAppIndex index = g.ruleAppIndex();
+        index.autoModeStopped();
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if(p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
+            if (p.formula != null && !sf.formula()
+                    .equalsModRenaming(p.formula)) {
                 continue;
             }
-            allApps = allApps.append(
-                    index.getTacletAppAtAndBelow(filter,
-                            new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
-                            services));
+            allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
+                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
+                    services));
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if(p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
+            if (p.formula != null && !sf.formula()
+                    .equalsModRenaming(p.formula)) {
                 continue;
             }
-            allApps = allApps.append(
-                    index.getTacletAppAtAndBelow(filter,
-                            new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
-                            services));
+            allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
+                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
+                    services));
         }
 
         return allApps;
     }
+
     /*
      * Filter those apps from a list that are according to the parameters.
      */
-    private List<TacletApp> filterList(Parameters p, ImmutableList<TacletApp> list) {
+    private List<TacletApp> filterList(Parameters p,
+            ImmutableList<TacletApp> list) {
         List<TacletApp> matchingApps = new ArrayList<TacletApp>();
         for (TacletApp tacletApp : list) {
-            if(tacletApp instanceof PosTacletApp) {
+            if (tacletApp instanceof PosTacletApp) {
                 PosTacletApp pta = (PosTacletApp) tacletApp;
-                if(p.on == null || pta.posInOccurrence().subTerm().equals(p.on)) {
+                if (p.on == null || pta.posInOccurrence().subTerm()
+                        .equalsModRenaming(p.on)) {
                     matchingApps.add(pta);
                 }
             }
@@ -193,49 +221,53 @@ public class RuleCommand extends AbstractCommand {
         return matchingApps;
     }
 
-    private static Parameters parseArgs(Proof proof, Map<String, String> args, Map<String, Object> state)
-            throws ScriptException {
+    /*
+    private static Parameters parseArgs(
+            Map<String, String> args,
+            EngineState state) throws ScriptException {
 
         Parameters result = new Parameters();
 
         try {
-        	for (Entry<String, String> arg : args.entrySet()) {
+            for (Entry<String, String> arg : args.entrySet()) {
                 switch (arg.getKey()) {
-        		    case "#2":
-        		        // rule name
-        		        result.rulename = args.get("#2");
-        		        break;
-        			case "on":
-        			    // on="term to apply to as find"
-        				result.on = toTerm(proof, state, arg.getValue(), null);
-        				break;
-        			case "formula":
-        			    // formula="toplevel formula in which it appears"
-        				result.formula = toTerm(proof, state, arg.getValue(), null);
-        				break;
-        			case "occ":
-        			    // occurrence number;
-        				result.occ = Integer.parseInt(arg.getValue());
-        				break;
-        			default:
-        			    // instantiation
+                case "#2":
+                    // rule name
+                    result.rulename = args.get("#2");
+                    break;
+                case "on":
+                    // on="term to apply to as find"
+                    result.on = state.toTerm(proof, state, arg.getValue(), null);
+                    break;
+                case "formula":
+                    // formula="toplevel formula in which it appears"
+                    result.formula = state.toTerm(proof, state, arg.getValue(), null);
+                    break;
+                case "occ":
+                    // occurrence number;
+                    result.occ = Integer.parseInt(arg.getValue());
+                    break;
+                default:
+                    // instantiation
                     String s = arg.getKey();
-        			    if (!s.startsWith("#")) {
+                    if (!s.startsWith("#")) {
                         if (s.startsWith("inst_")) {
-        			            s = s.substring(5);
-        			        }
-                        result.instantiations.put(s, toTerm(proof, state, arg.getValue(), null));
-        			    }
-         		}
-        	}
-        } catch(Exception e) {
+                            s = s.substring(5);
+                        }
+                        result.instantiations.put(s,
+                                toTerm(proof, state, arg.getValue(), null));
+                    }
+                }
+            }
+        }
+        catch (Exception e) {
             throw new ScriptException(e);
         }
 
-        if(result.rulename == null) {
+        if (result.rulename == null) {
             throw new ScriptException("Rule name must be set");
         }
 
         return result;
-    }
+    }*/
 }

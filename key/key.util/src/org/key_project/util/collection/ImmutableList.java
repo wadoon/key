@@ -14,6 +14,7 @@
 package org.key_project.util.collection;
 
 import java.util.Iterator;
+import java.util.stream.Stream;
 
 /**
  * List interface to be implemented by non-destructive lists
@@ -111,4 +112,11 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      * Convert the list to a Java array (O(n))
      */
     <S> S[] toArray(Class<S> type);
+
+    /**
+     * 
+     * @return
+     */
+    Stream<T> stream();
+
 }

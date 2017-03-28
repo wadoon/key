@@ -6,32 +6,30 @@ import java.util.Properties;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
 
-public class SetCommand extends AbstractCommand {
+public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
 
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args, Map<String, Object> state) throws ScriptException,
-            InterruptedException {
+    static class Parameters {
+        @ValueInjector.Option("key") String key;
+        @ValueInjector.Option("value") String value;
 
-        if(!args.containsKey("key")) {
-            throw new ScriptException("set needs a key");
+        public Properties getProperties() {
+            Properties p = new Properties();
+            p.setProperty(key, value);
+            return p;
         }
-
-        if(!args.containsKey("value")) {
-            throw new ScriptException("set needs a value");
-        }
-
-        String key = args.get("key");
-        String value = args.get("value");
-        Properties p = new Properties();
-        p.put(key, value);
-
-        proof.getSettings().update(p);
     }
 
-    @Override
-    public String getName() {
+    @Override public Parameters evaluateArguments(EngineState state,
+            Map<String, String> arguments) {
+        return state.getValueInjector().inject(new Parameters(), arguments);
+    }
+
+    @Override public void execute(Parameters args)
+            throws ScriptException, InterruptedException {
+        state.getProof().getSettings().update(args.getProperties());
+    }
+
+    @Override public String getName() {
         return "set";
     }
-
 }

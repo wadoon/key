@@ -14,47 +14,49 @@ import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Proof;
 
-public class JavascriptCommand extends AbstractCommand {
+public class JavascriptCommand
+        extends AbstractCommand<JavascriptCommand.Parameters> {
+    public static class Parameters {
+        @ValueInjector.Option("#2") String script;
+    }
 
     public static class JavascriptInterface {
         private final Proof proof;
-        private final Map<String, Object> state;
+        private final EngineState state;
 
-        public JavascriptInterface(Proof proof, Map<String, Object> state) {
+        public JavascriptInterface(Proof proof, EngineState state) {
             this.proof = proof;
             this.state = state;
         }
 
-        public int arg() { return 0; }
+        public int arg() {
+            return 0;
+        }
 
         public Sequent getSelectedGoal() throws ScriptException {
-            return getFirstOpenGoal(proof, state).sequent();
+            return state.getFirstOpenGoal().sequent();
         }
 
         public void setVar(String var, Term term) throws ScriptException {
 
-            if(!var.matches("@[a-zA-Z0-9_]") ) {
-                throw new ScriptException("Is not a variable name: " +var);
+            if (!var.matches("@[a-zA-Z0-9_]")) {
+                throw new ScriptException("Is not a variable name: " + var);
             }
 
             var = var.substring(1);
-
-            AbbrevMap abbrMap = (AbbrevMap)state.get(ABBREV_KEY);
-            if(abbrMap == null) {
-                abbrMap = new AbbrevMap();
-                state.put(ABBREV_KEY, abbrMap);
-            }
             try {
-                abbrMap.put(term, var, true);
-            } catch (AbbrevException e) {
+                state.getAbbreviations().put(term, var, true);
+            }
+            catch (AbbrevException e) {
                 throw new ScriptException();
             }
         }
 
         public void setVar(String var, String term) throws ScriptException {
             try {
-                setVar(var, toTerm(proof, state, term, null));
-            } catch (ParserException e) {
+                setVar(var, state.toTerm(term, null));
+            }
+            catch (ParserException e) {
                 throw new ScriptException(e);
             }
         }
@@ -62,33 +64,33 @@ public class JavascriptCommand extends AbstractCommand {
     }
 
     private static final String PREAMBLE =
-            "var goal = __state.getSelectedGoal();\n" +
-            "function setVar(v, t) { __state.setVar(v,t); }\n";
+            "var goal = __state.getSelectedGoal();\n"
+                    + "function setVar(v, t) { __state.setVar(v,t); }\n";
 
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args, Map<String, Object> stateMap)
+    @Override public void execute(Parameters args)
             throws ScriptException, InterruptedException {
-
-        String script = args.get("#2");
-
         ScriptEngineManager factory = new ScriptEngineManager();
         // create JavaScript engine
         ScriptEngine engine = factory.getEngineByName("JavaScript");
         // evaluate JavaScript code from given file - specified by first argument
-        JavascriptInterface jsIntf = new JavascriptInterface(proof, stateMap);
+        JavascriptInterface jsIntf = new JavascriptInterface(proof, state);
 
         engine.getBindings(ScriptContext.GLOBAL_SCOPE).put("__state", jsIntf);
         try {
             engine.eval(PREAMBLE);
-            engine.eval(script);
-        } catch (javax.script.ScriptException e) {
+            engine.eval(args.script);
+        }
+        catch (javax.script.ScriptException e) {
             throw new ScriptException(e);
         }
     }
 
-    @Override
-    public String getName() {
+    @Override public Parameters evaluateArguments(EngineState state,
+            Map<String, String> arguments) throws ScriptException {
+        return ValueInjector.injection(new Parameters(), arguments);
+    }
+
+    @Override public String getName() {
         return "javascript";
     }
 
