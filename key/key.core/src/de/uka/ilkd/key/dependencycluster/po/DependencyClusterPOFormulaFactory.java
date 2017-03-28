@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.dependencycluster.po;
 //TODO JK move this to de.uka.ilkd.key.dependencycluster.po as soon as I find a way to reuse christophs code without code duplication and ugly hacks like this
 
-import java.util.Iterator;
-
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -48,6 +46,7 @@ public class DependencyClusterPOFormulaFactory {
         
         ImmutableList<InfFlowSpec> infFlowSpecs = ImmutableSLList.<InfFlowSpec>nil();
         
+        //TODO JK think about how to handle multiple clusters! Check whether all cluster specs make it to this point!
         for (DependencyClusterSpec spec: contract.getSpecs()) {
             InfFlowSpec infFlowSpec = new InfFlowSpec(spec.getLowState(), spec.getLowState(), spec.getNewObjects());
             infFlowSpecs = infFlowSpecs.append(infFlowSpec);
@@ -101,7 +100,7 @@ public class DependencyClusterPOFormulaFactory {
     
     public Term assumptions() {
         //TODO JK add initialStateEquivalence
-        return tb.and(bothExecutions(), wellformedHistories(), cooperationalEquivalence(), callEventEquivalence());
+        return tb.imp(bothExecutions(), tb.and(wellformedHistories(), cooperationalEquivalence(), callEventEquivalence()));
     }
     
     public Term preStateEquivImpliesPostStateEquiv() {
