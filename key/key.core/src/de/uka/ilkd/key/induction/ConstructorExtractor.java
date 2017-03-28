@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
@@ -17,9 +18,9 @@ public class ConstructorExtractor {
 	private Namespace namespace;
 	private ImmutableArray<Sort> sortsOfTerm;
 	
-	public ConstructorExtractor(Term t, Namespace nspace) {
+	public ConstructorExtractor(Term t, Services s) {
 		this.term = t;
-		this.namespace = nspace;
+		this.namespace = s.getNamespaces().functions();
 		
 		//extract sorts from term
 		SortExtractor extractor = new SortExtractor();

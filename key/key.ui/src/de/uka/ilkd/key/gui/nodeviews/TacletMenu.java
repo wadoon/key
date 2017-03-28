@@ -720,7 +720,7 @@ public class TacletMenu extends JMenu {
 		else if(((JMenuItem)e.getSource()).getText().
 				 startsWith(SHOW_CONSTRUCTORS)){
 			PosInOccurrence occ = pos.getPosInOccurrence();
-			new ConstructorDialog(new JFrame(), occ.subTerm(), mediator.func_ns());
+			new ConstructorDialog(new JFrame(), occ.subTerm(), mediator.getServices());
 		}
 	}
     }
