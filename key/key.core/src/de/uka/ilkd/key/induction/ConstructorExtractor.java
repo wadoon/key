@@ -43,6 +43,9 @@ public class ConstructorExtractor {
 					constructors.add(f);
 				}
 			}
+			else{
+				//TODO: Debugausgabe und Exception
+			}
 		}
 		
 		return new ImmutableArray<Function>(constructors);
