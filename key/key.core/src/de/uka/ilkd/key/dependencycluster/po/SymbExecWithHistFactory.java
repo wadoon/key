@@ -46,6 +46,10 @@ public class SymbExecWithHistFactory {
                 ifVars.pre.heap);
     }
     
+    public Term postHistory() {
+        return this.postHistory;
+    }
+    
     public Term historyWithCallEvent() {
         return tb.seqSingleton(callEvent());
     }
@@ -77,7 +81,7 @@ public class SymbExecWithHistFactory {
     }
     
     public Term postHistoryEquality() {
-        return tb.equals(postHistory, historyWithTermEvent());
+        return tb.equals(postHistory(), historyWithTermEvent());
     }
     
     public Term pre() {
@@ -101,12 +105,12 @@ public class SymbExecWithHistFactory {
     }
     
     public Term visibilityFilteredPostHistory() {
-        return tb.func(ldt.filterVisible(), postHistory);
+        return tb.func(ldt.filterVisible(), postHistory());
     }
     
     public Term callEventFromPostHist() {
         //TODO JK how to get the event sort properly?
-        return tb.seqGet(callEvent().sort(), postHistory, tb.zero());
+        return tb.seqGet(callEvent().sort(), postHistory(), tb.zero());
     }
     
     
@@ -116,6 +120,6 @@ public class SymbExecWithHistFactory {
     
 
     public Term wellformedHistory() {
-        return tb.and(tb.func(ldt.wellformedList(), postHistory),tb.func(ldt.wellformedListCoop(), postHistory));
+        return tb.and(tb.func(ldt.wellformedList(), postHistory()),tb.func(ldt.wellformedListCoop(), postHistory()));
     }
 }

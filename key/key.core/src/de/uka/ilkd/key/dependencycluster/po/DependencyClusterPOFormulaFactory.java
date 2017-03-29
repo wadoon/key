@@ -92,9 +92,8 @@ public class DependencyClusterPOFormulaFactory {
         return tb.and(a.updatedExecutionWithPreAndPost(), b.updatedExecutionWithPreAndPost());
     }
     
-    public Term consequence() {
-        //TODO JK HERE NEXT!!!        
-        return tb.and(postStateEquivalence());
+    public Term consequence() {       
+        return tb.and(postStateEquivalence(), equivalentHistories());
     }
     
     public Term assumptions() {
@@ -115,6 +114,10 @@ public class DependencyClusterPOFormulaFactory {
         BasicSnippetData d = new BasicSnippetData(infFlowContract, services);
         
         return snippet.produceOutputRelation(d, ifVars.c1, ifVars.c2);
+    }
+    
+    public Term equivalentHistories() {
+        return tb.func(ldt.equivHistory(), a.postHistory(), b.postHistory());
     }
     
    
