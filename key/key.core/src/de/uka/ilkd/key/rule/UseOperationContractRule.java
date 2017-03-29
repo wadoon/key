@@ -832,21 +832,18 @@ public final class UseOperationContractRule implements BuiltInRule {
            }
         }
 
-        //FIXME KD the code within the if should also run, if the called method does not have a contract.
-        //FIXME KD specifications have to be placed before Annotations for some reason
         //if called method is remote add event to history
-        if (contract.getTarget().getMethodDeclaration().isRemote()) {
+        if (contract.getTarget().getMethodDeclaration().isRemote()) { // TODO KD check for self?
         	LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
-        	// FIXME KD contractSelf is null for static methods
         	Term method = tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(contract.getTarget().getMethodDeclaration(), services));
-        	// FIXME KD Constructors with the @Remote Annotation cause an StackOverflowError
-        	Term outCallEvent = tb.evConst(tb.evOutgoing(), tb.evCall(), contractSelf, method, tb.seq(contractParams), baseHeapTerm);
+        	Term outCallEvent = tb.evConst(tb.evOutgoing(), tb.evCall(), contractSelf, method, tb.seq(contractParams), anonUpdateDatas.head().methodHeapAtPre);
         	Term resultTerm = (contract.getResult() == null) ? tb.seqEmpty() : tb.seqSingleton(contract.getResult());
-        	Term inTermEvent  = tb.evConst(tb.evIncoming(), tb.evTerm(), contractSelf, method, resultTerm, baseHeapTerm);
-        	// TODO KD z shouldn't the heap be another one?
+        	Term inTermEvent  = tb.evConst(tb.evIncoming(), tb.evTerm(), contractSelf, method, resultTerm, anonUpdateDatas.reverse().head().methodHeap);
+        	// TODO KD a are these the right heaps (heapAfter_setTrue does not seem right)
+        	// TODO KD a what to apply the update to?
         	Term newHist = tb.seqConcat(tb.var(hist), tb.seqSingleton(outCallEvent), tb.seqSingleton(inTermEvent));
         	Term histUpdate = tb.elementary(hist, newHist);
-        	anonUpdate = tb.parallel(anonUpdate, histUpdate);
+        	anonUpdate = tb.sequential(anonUpdate, histUpdate);
         }
 
         final Term excNull = tb.equals(tb.var(excVar), tb.NULL());

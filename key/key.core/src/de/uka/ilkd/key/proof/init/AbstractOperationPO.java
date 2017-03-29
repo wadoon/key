@@ -61,7 +61,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 
@@ -391,32 +390,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
 								"in your project.");
 					}
 				}
-				if (pm.getMethodDeclaration().isRemote()) {
-		        	// FIXME KD contractSelf is null for static methods
-		        	Term method = tb.func(proofServices.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), proofServices));
-		        	// FIXME KD Constructors with the @Remote Annotation cause an StackOverflowError
-		        	Term inCallEvent = tb.evConst(tb.evIncoming(), tb.evCall(), tb.var(selfVar), method, tb.seqEmpty(), tb.getBaseHeap());
-		        	// TODO KD a selfVar incorrect
-		        	// TODO KD a empty Arguments incorrect
-		        	Term newHist = tb.seqConcat(tb.var(hist), tb.seqSingleton(inCallEvent));
-		        	Term histUpdate = tb.elementary(hist, newHist);
-		        	pre = tb.and(pre, tb.apply(histUpdate, tb.tt()));
-		        	// TODO KD a what should i apply the Update to?
-				}
-				// TODO KD a probably comes later
-				if (pm.getMethodDeclaration().isRemote()) {
-		        	// FIXME KD contractSelf is null for static methods
-		        	Term method = tb.func(proofServices.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), proofServices));
-		        	// FIXME KD Constructors with the @Remote Annotation cause an StackOverflowError
-		        	Term result = resultVar == null? tb.seqEmpty() : tb.var(resultVar);
-		        	Term outTermEvent = tb.evConst(tb.evOutgoing(), tb.evTerm(), tb.var(selfVar), method, result, tb.getBaseHeap());
-		        	// TODO KD a selfVar incorrect
-		        	Term newHist = tb.seqConcat(tb.var(hist), tb.seqSingleton(outTermEvent));
-		        	Term histUpdate = tb.elementary(hist, newHist);
-		        	pre = tb.and(pre, tb.apply(histUpdate, tb.tt()));
-		        	// TODO KD a what should i apply the Update to?
-				}
-
 				// build program term
 				Term postTerm =
 						getPost(modHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars, proofServices);
@@ -436,6 +409,22 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				final Term selfVarTerm = selfVar==null? null: tb.var(selfVar);
 				final Term globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm,
 						tb.var(paramVars), proofServices);
+
+				// add history update to globalUpdate
+				if (pm.getMethodDeclaration().isRemote()) {
+					LocationVariable caller = new LocationVariable(new ProgramElementName("Caller"), proofServices.getJavaInfo().objectSort());
+		        	Term method = tb.func(proofServices.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), proofServices));
+		        	Term result = resultVar == null? tb.seqEmpty() : tb.var(resultVar);
+		        	Term inCallEvent = tb.evConst(tb.evIncoming(), tb.evCall(), tb.var(caller), method, tb.seq(tb.var(paramVars)), tb.getBaseHeap());
+		        	Term outTermEvent = tb.evConst(tb.evOutgoing(), tb.evTerm(), tb.var(caller), method, result, tb.getBaseHeap());
+		        	// TODO KD a what heaps to use?
+		        	Term histAtCall = tb.seqConcat(tb.var(hist), tb.seqSingleton(inCallEvent));
+		        	Term histAfterTerm = tb.seqConcat(tb.var(hist), tb.seqSingleton(outTermEvent));
+					Term histUpdateAtCall = tb.elementary(hist, histAtCall);
+					Term histUpdateAfterTerm = tb.elementary(hist, histAfterTerm);
+					// I probably need 2 updates to different things
+					// TODO KD a what to apply the Updates to?
+				}
 
 				final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar,
 						exceptionVar, atPreVars, post, sb, hist, preHist, proofServices);
