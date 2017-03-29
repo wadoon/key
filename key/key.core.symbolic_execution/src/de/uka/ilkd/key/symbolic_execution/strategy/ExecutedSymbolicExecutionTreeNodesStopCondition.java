@@ -158,18 +158,21 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements IStopCon
             }
             Node parent = node;
             int count = 0;
+            int branches = 0;
             while (parent != null) {
+                branches += parent.childrenCount() > 1 ? 1 : 0;
                 if (!SymbolicExecutionUtil.isSymbolicExecutionTreeNode(parent, parent.getAppliedRuleApp())) {
                     count ++;
                 } else {
                     if (!SymbolicExecutionUtil.isTerminationNode(parent, parent.getAppliedRuleApp())) {
                         count = 0;
+                        branches = 0;
                     }
                     break;
                 }
                 parent = parent.parent();
             }
-            return count < 100;
+            return count < 100 && branches < 4;
          }
       }
       else {
