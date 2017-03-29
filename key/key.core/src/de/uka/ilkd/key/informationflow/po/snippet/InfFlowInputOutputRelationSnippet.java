@@ -61,6 +61,66 @@ public class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
 
         return d.tb.and(relations);
     }
+    
+    public Term produceInputRelation(BasicSnippetData d,
+            ProofObligationVars poVars1,
+            ProofObligationVars poVars2) {
+        if (d.get(BasicSnippetData.Key.INF_FLOW_SPECS) == null) {
+            throw new UnsupportedOperationException("Tried to produce " +
+                    "information flow relations for a contract without " +
+                    "information flow specification.");
+        }
+        assert ImmutableList.class.equals(BasicSnippetData.Key.INF_FLOW_SPECS.getType());
+        @SuppressWarnings("unchecked")
+        ImmutableList<InfFlowSpec>
+            origInfFlowSpecs =
+                (ImmutableList<InfFlowSpec>) d.get(BasicSnippetData.Key.INF_FLOW_SPECS);
+        
+        //TODO JK handle multiple specs later
+        assert origInfFlowSpecs.size() == 1;
+        
+        InfFlowSpec[] infFlowSpecsAtPre1 = replace(origInfFlowSpecs, d.origVars, poVars1.pre, d.tb);
+        InfFlowSpec[] infFlowSpecsAtPre2 = replace(origInfFlowSpecs, d.origVars, poVars2.pre, d.tb);
+        
+        final Term[] relations = new Term[infFlowSpecsAtPre1.length];
+        for (int i = 0; i < infFlowSpecsAtPre1.length; i++) {
+            relations[i] = buildInputRelation(d, poVars1, poVars2,
+                                                    infFlowSpecsAtPre1[i],
+                                                    infFlowSpecsAtPre2[i]);
+        }      
+                
+        return relations[0];
+    }
+    
+    public Term produceOutputRelation(BasicSnippetData d,
+            ProofObligationVars poVars1,
+            ProofObligationVars poVars2) {
+        if (d.get(BasicSnippetData.Key.INF_FLOW_SPECS) == null) {
+            throw new UnsupportedOperationException("Tried to produce " +
+                    "information flow relations for a contract without " +
+                    "information flow specification.");
+        }
+        assert ImmutableList.class.equals(BasicSnippetData.Key.INF_FLOW_SPECS.getType());
+        @SuppressWarnings("unchecked")
+        ImmutableList<InfFlowSpec>
+            origInfFlowSpecs =
+                (ImmutableList<InfFlowSpec>) d.get(BasicSnippetData.Key.INF_FLOW_SPECS);
+        
+        //TODO JK handle multiple specs later
+        assert origInfFlowSpecs.size() == 1;
+        
+        InfFlowSpec[] infFlowSpecsAtPost1 = replace(origInfFlowSpecs, d.origVars, poVars1.post, d.tb);
+        InfFlowSpec[] infFlowSpecsAtPost2 = replace(origInfFlowSpecs, d.origVars, poVars2.post, d.tb);
+        
+        final Term[] relations = new Term[infFlowSpecsAtPost1.length];
+        for (int i = 0; i < infFlowSpecsAtPost1.length; i++) {
+            relations[i] = buildOutputRelation(d, poVars1, poVars2,
+                    infFlowSpecsAtPost1[i],
+                    infFlowSpecsAtPost2[i]);
+        }      
+                
+        return relations[0];
+    }
 
 
     private Term buildInputOutputRelation(BasicSnippetData d,
@@ -83,7 +143,7 @@ public class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     }
 
 
-    public Term buildInputRelation(BasicSnippetData d,
+    private Term buildInputRelation(BasicSnippetData d,
                                     ProofObligationVars vs1,
                                     ProofObligationVars vs2,
                                     InfFlowSpec infFlowSpec1,
@@ -110,7 +170,7 @@ public class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         return d.tb.and(eqAtLocs);
     }
 
-    public Term buildOutputRelation(BasicSnippetData d,
+    private Term buildOutputRelation(BasicSnippetData d,
                                      ProofObligationVars vs1,
                                      ProofObligationVars vs2,
                                      InfFlowSpec infFlowSpec1,

@@ -33,7 +33,7 @@ import de.uka.ilkd.key.util.MiscTools;
  * <p/>
  * @author christoph
  */
-class BasicSnippetData {
+public class BasicSnippetData {
 
     /**
      * Tells whether the contract contains a measured_by clause.
@@ -191,7 +191,7 @@ class BasicSnippetData {
     }
     
     
-    BasicSnippetData(InformationFlowContract contract,
+    public BasicSnippetData(InformationFlowContract contract,
                      Services services) {
         this.hasMby = contract.hasMby();
         this.services = services;

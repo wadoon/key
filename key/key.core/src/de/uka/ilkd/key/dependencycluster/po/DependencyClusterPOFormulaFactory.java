@@ -5,6 +5,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
+import de.uka.ilkd.key.informationflow.po.snippet.BasicSnippetData;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowInputOutputRelationSnippet;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
@@ -92,23 +93,28 @@ public class DependencyClusterPOFormulaFactory {
     }
     
     public Term consequence() {
-        //TODO JK HERE NEXT!!!
-        //TODO JK preStateEquivImpliesPostStateEquiv isnt correct here
-        
-        return tb.ff();
-        //return tb.and(preStateEquivImpliesPostStateEquiv());
+        //TODO JK HERE NEXT!!!        
+        return tb.and(postStateEquivalence());
     }
     
     public Term assumptions() {
-        //TODO JK add initialStateEquivalence
-        return tb.imp(bothExecutions(), tb.and(wellformedHistories(), cooperationalEquivalence(), callEventEquivalence()));
+        return tb.and(wellformedHistories(), cooperationalEquivalence(), callEventEquivalence(), preStateEquivalence());
     }
     
     public Term preStateEquivalence() {
         InfFlowInputOutputRelationSnippet snippet = new InfFlowInputOutputRelationSnippet();
         
-        //return snippet.buildInputRelation(d, vs1, vs2, infFlowSpec1, infFlowSpec2)
-        return null;
+        BasicSnippetData d = new BasicSnippetData(infFlowContract, services);
+        
+        return snippet.produceInputRelation(d, ifVars.c1, ifVars.c2);
+    }
+    
+    public Term postStateEquivalence() {
+        InfFlowInputOutputRelationSnippet snippet = new InfFlowInputOutputRelationSnippet();
+        
+        BasicSnippetData d = new BasicSnippetData(infFlowContract, services);
+        
+        return snippet.produceOutputRelation(d, ifVars.c1, ifVars.c2);
     }
     
    
@@ -127,7 +133,7 @@ public class DependencyClusterPOFormulaFactory {
     
     
     public Term completeFormula() {
-        return tb.imp(assumptions(), consequence());
+        return tb.imp(bothExecutions(), tb.imp(assumptions(), consequence()));
     }
 
 }
