@@ -5,6 +5,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
+import de.uka.ilkd.key.informationflow.po.snippet.InfFlowInputOutputRelationSnippet;
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
@@ -103,8 +104,11 @@ public class DependencyClusterPOFormulaFactory {
         return tb.imp(bothExecutions(), tb.and(wellformedHistories(), cooperationalEquivalence(), callEventEquivalence()));
     }
     
-    public Term preStateEquivImpliesPostStateEquiv() {
-        return f.create(InfFlowPOSnippetFactory.Snippet.INF_FLOW_INPUT_OUTPUT_RELATION);
+    public Term preStateEquivalence() {
+        InfFlowInputOutputRelationSnippet snippet = new InfFlowInputOutputRelationSnippet();
+        
+        //return snippet.buildInputRelation(d, vs1, vs2, infFlowSpec1, infFlowSpec2)
+        return null;
     }
     
    

@@ -22,7 +22,7 @@ import de.uka.ilkd.key.util.InfFlowSpec;
  *
  * @author christoph
  */
-class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
+public class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     implements InfFlowFactoryMethod {
     @Override
     public Term produce(BasicSnippetData d,
@@ -83,7 +83,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
     }
 
 
-    private Term buildInputRelation(BasicSnippetData d,
+    public Term buildInputRelation(BasicSnippetData d,
                                     ProofObligationVars vs1,
                                     ProofObligationVars vs2,
                                     InfFlowSpec infFlowSpec1,
@@ -110,7 +110,7 @@ class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
         return d.tb.and(eqAtLocs);
     }
 
-    private Term buildOutputRelation(BasicSnippetData d,
+    public Term buildOutputRelation(BasicSnippetData d,
                                      ProofObligationVars vs1,
                                      ProofObligationVars vs2,
                                      InfFlowSpec infFlowSpec1,
