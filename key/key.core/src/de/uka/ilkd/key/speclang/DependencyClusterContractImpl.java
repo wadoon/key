@@ -48,30 +48,7 @@ public class DependencyClusterContractImpl
     private final ImmutableList<DependencyClusterSpec> origDependencyClusterSpecs;
     
     final boolean hasRealModifiesClause;
-    
-    /*
-    private DependencyClusterContractImpl() {
-        this.id = INVALID_ID;
-        this.name = null;
-        this.baseName = null;
-        this.forClass = null;
-        this.pm = null;
-        this.specifiedIn = null;
-        this.origPre = null;
-        this.origMby = null;
-        this.origMod = null;
-        this.origSelf = null;
-        this.origParams = null;
-        this.origResult = null;
-        this.origExc = null;
-        this.origAtPre = null;
-        this.modality = null;
-        this.toBeSaved = false;
-        this.origDep = null;
-        this.origDependencyClusterSpecs = null;
-        this.hasRealModifiesClause = false;
-    }
-    */
+
     public DependencyClusterContractImpl(String baseName,
             KeYJavaType forClass,
             IProgramMethod pm,
@@ -129,27 +106,7 @@ public class DependencyClusterContractImpl
         this.toBeSaved = toBeSaved;
         this.origDep = dep;
         this.origDependencyClusterSpecs = dependencyClusterSpecs;
-        /*
-        System.out.println("id: " + this.id);
-        System.out.println("baseName: " + this.baseName);
-        System.out.println("name: " + this.name);
-        System.out.println("forClass: " + this.forClass);
-        System.out.println("pm: " + this.pm);
-        System.out.println("specifiedIn: " + this.specifiedIn);
-        System.out.println("origPre: " + this.origPre);
-        System.out.println("origMby: " + this.origMby);
-        System.out.println("origMod: " + this.origMod);
-        System.out.println("origSelf: " + this.origSelf);
-        System.out.println("origParams: " + this.origParams);
-        System.out.println("origResult: " + this.origResult);
-        System.out.println("origExc: " + this.origExc);
-        System.out.println("origAtPre: " + this.origAtPre);
-        System.out.println("modality: " + this.modality);
-        System.out.println("hasRealModifiesClause: " + this.hasRealModifiesClause);
-        System.out.println("toBeSaved: " + this.toBeSaved);
-        System.out.println("origDep: " + this.origDep);
-        System.out.println("origDependencyClusterSpecs: " + this.origDependencyClusterSpecs);
-        */
+
     }
 
     @Override

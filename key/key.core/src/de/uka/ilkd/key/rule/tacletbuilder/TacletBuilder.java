@@ -191,6 +191,7 @@ public abstract class TacletBuilder<T extends Taclet> {
      * the Taclet: v is new.
      */
     public void addVarsNew(NewVarcond nv){
+    
 	if (!(nv.getSchemaVariable() instanceof ProgramSV)) {
 	    throw new TacletBuilderException(this, 
                     "Tried to add condition:" + nv + 
@@ -198,6 +199,7 @@ public abstract class TacletBuilder<T extends Taclet> {
                     "match more than program"
                     +" variables.");
 	} 
+	
 	varsNew = varsNew.prepend(nv);
     }
     

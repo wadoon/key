@@ -130,6 +130,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         //store them in appsTakenOver and their taclets in result
         for(NoPosTacletApp app : allApps) {
             final Taclet tac = app.taclet();
+
             if(!(tac instanceof RewriteTaclet)
                             || !tac.hasReplaceWith()
                             || !tac.ifSequent().isEmpty()

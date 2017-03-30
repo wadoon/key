@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.TempEventLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -25,12 +26,22 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.ProofAggregate;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.proof.mgt.AxiomJustification;
+import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyClusterContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -40,8 +51,7 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 
 public class DependencyClusterContractPO extends AbstractOperationPO
         implements ContractPO {
-
-
+    
     private final DependencyClusterContract contract;
     
     private final ProofObligationVars symbExecVars;
@@ -60,27 +70,9 @@ public class DependencyClusterContractPO extends AbstractOperationPO
         symbExecVars =
                 new ProofObligationVars(pm, contract.getKJT(), environmentServices);
 
-        /*
-        System.out.println(symbExecVars.formalParams);
-        System.out.println(symbExecVars.exceptionParameter);
-        System.out.println(symbExecVars.pre);
-        System.out.println(symbExecVars.post);
-        */
-        
         assert (symbExecVars.pre.self == null) == (pm.isStatic());
         ifVars = new IFProofObligationVars(symbExecVars, environmentServices);
         
-        /*
-        System.out.println(ifVars.c1.formalParams);
-        System.out.println(ifVars.c1.exceptionParameter);
-        System.out.println(ifVars.c1.pre);
-        System.out.println(ifVars.c1.post);
-        
-        System.out.println(ifVars.c2.formalParams);
-        System.out.println(ifVars.c2.exceptionParameter);
-        System.out.println(ifVars.c2.pre);
-        System.out.println(ifVars.c2.post);
-        */
         
         for (Term formalParam : symbExecVars.formalParams) {
             infFlowSymbols.add(formalParam);
@@ -105,6 +97,40 @@ public class DependencyClusterContractPO extends AbstractOperationPO
         assignPOTerms(factory.completeFormula());
         
         collectClassAxioms(contract.getKJT(), proofConfig);
+
+        RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
+        
+        tacletBuilder.setDisplayName("AAAEquivEventDef");
+        tacletBuilder.setName(new Name("AAAEquivEventDef"));
+        
+
+        Sort eventSort = (Sort)proofConfig.getServices().getNamespaces().sorts().lookup("Event");
+        
+        //TODO JK what about rigidness and strictness values??? Is TermSV right? Or do we need another kind of SV?
+        SchemaVariable e1 = SchemaVariableFactory.createTermSV(new Name("e1"), eventSort, false, false);
+        SchemaVariable e2 = SchemaVariableFactory.createTermSV(new Name("e2"), eventSort, false, false);
+        
+        
+        Term find = tb.func(proofConfig.getServices().getTypeConverter().getTempEventLDT().equivEvent(), tb.var(e1), tb.var(e2));
+        Term replaceWith = tb.func(proofConfig.getServices().getTypeConverter().getTempEventLDT().equivEvent(), tb.var(e2), tb.var(e1));
+        
+        
+        
+
+        tacletBuilder.setFind(find);
+        tacletBuilder.addGoalTerm(replaceWith);
+        
+        tacletBuilder.addRuleSet((RuleSet)proofConfig.ruleSetNS().lookup(new Name("simplify_enlarging")));  
+        
+        RewriteTaclet equivEventDef = tacletBuilder.getRewriteTaclet();
+
+        
+        register(equivEventDef, proofConfig);
+        //TODO JK is another justification better?
+        proofConfig.registerRule(equivEventDef, AxiomJustification.INSTANCE);
+
+        
+        
         
     }
 

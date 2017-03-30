@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
@@ -52,7 +53,7 @@ public class TempEventLDT extends LDT {
     
     private final LocationVariable hist_A;
     private final LocationVariable hist_B;
-    
+   
 
 
     //TODO JK since we get a calltype from here, the sort I implemented probably isn't necessary anymore. Remove it!
@@ -79,7 +80,7 @@ public class TempEventLDT extends LDT {
         equivHistory = addFunction(services, "equivHistory");
         equivEvent = addFunction(services, "equivEvent");
         filterVisible = addFunction(services, "filterVisible");
-        
+                
         hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
         
         hist_A = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_A_NAME);

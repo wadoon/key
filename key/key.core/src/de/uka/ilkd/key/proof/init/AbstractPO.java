@@ -157,8 +157,8 @@ public abstract class AbstractPO implements IPersistablePO {
         return true;
     }
 
-
-    private void register(Taclet t, InitConfig proofConfig) {
+//TODO: JK Removed private just for test
+    public void register(Taclet t, InitConfig proofConfig) {
         assert t != null;
         taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(t));
         proofConfig.registerRule(t, AxiomJustification.INSTANCE);
