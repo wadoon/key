@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -179,11 +180,19 @@ public final class DependencyContractImpl implements DependencyContract {
             paramVars = paramVars.tail();
         }
         if(atPreVars != null && originalAtPreVars != null) {
+        	TermBuilder tb = services.getTermBuilder();
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
-                if(atPreVars.get(h) != null && originalAtPreVar != null) {
-                    map.put(services.getTermBuilder().var(originalAtPreVar), services.getTermBuilder().var(atPreVars.get(h)));
+            	ProgramVariable atPreVar = atPreVars.get(h);
+            	ProgramVariable originalAtPreVar = originalAtPreVars.get(h);
+                if(atPreVar != null && originalAtPreVar != null) {
+                    map.put(tb.var(originalAtPreVar), tb.var(atPreVar));
                 }
+            }
+            LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
+            ProgramVariable atPreVar = atPreVars.get(hist);
+            ProgramVariable originalAtPreVar = originalAtPreVars.get(hist); // always null!
+            if (atPreVar != null && originalAtPreVar != null) {
+            	map.put(atPreVar, originalAtPreVar); // TODO KD f what does this do?
             }
         }
 
@@ -191,6 +200,7 @@ public final class DependencyContractImpl implements DependencyContract {
         return or.replace(originalPres.get(heap));
     }
 
+    @Override
     public Term getPre(List<LocationVariable> heapContext,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
@@ -242,7 +252,7 @@ public final class DependencyContractImpl implements DependencyContract {
         return or.replace(originalPres.get(heap));
     }
 
-
+    @Override
     public Term getPre(List<LocationVariable> heapContext,
             Map<LocationVariable,Term> heapTerms,
             Term selfTerm,

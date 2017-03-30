@@ -50,12 +50,15 @@ public class MethodDeclaration extends JavaDeclaration
     protected final Throws exceptions;
     protected final StatementBlock body;
 
-
     /** this field stores if parent is an InterfaceDeclaration because we will be
      * unable to walk the tree upwards to check this
      */
     protected final boolean parentIsInterfaceDeclaration;
 
+    /**
+     * This flag tells, if the class or interface of this method has the Remote annotation.
+     */ // TODO KD f need to check super classes / interfaces as well?
+    protected final boolean parentIsRemoteInterface;
 
     /**
      *      Method declaration.
@@ -65,8 +68,8 @@ public class MethodDeclaration extends JavaDeclaration
      * several ParameterDeclaration (as parameters of the declared method), a
      * StatementBlock (as body of the declared method), several Modifier 
      * (taken as modifiers of the declaration), a Comment
-     * @param parentIsInterfaceDeclaration a boolean set true iff
-     * parent is an InterfaceDeclaration 
+     * @param parentIsInterfaceDeclaration a boolean set true iff parent is an InterfaceDeclaration
+     * @param parantIsRemoteInterface a boolean set true iff parent has a Remote annotation
      */
     public MethodDeclaration(ExtList children, 
 			     boolean parentIsInterfaceDeclaration,
@@ -81,10 +84,10 @@ public class MethodDeclaration extends JavaDeclaration
 	exceptions = children.get(Throws.class);
 	body = children.get(StatementBlock.class);
 	this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
+	this.parentIsRemoteInterface = parentIsRemoteInterface;
 	assert returnType == null || voidComments == null;
     }
 
-    
     /**
      * Method declaration.
      * @param modifiers a modifier array
@@ -93,8 +96,8 @@ public class MethodDeclaration extends JavaDeclaration
      * @param parameters a parameter declaration mutable list.
      * @param exceptions a throws.     
      * @param body a statement block.
-     * @param parentIsInterfaceDeclaration a boolean set true iff
-     * parent is an InterfaceDeclaration 
+     * @param parentIsInterfaceDeclaration a boolean set true iff parent is an InterfaceDeclaration
+     * @param parantIsRemoteInterface a boolean set true iff parent has a Remote annotation
      */
     public MethodDeclaration(Modifier[] modifiers, 
 	    		     TypeReference returnType, 
@@ -113,8 +116,7 @@ public class MethodDeclaration extends JavaDeclaration
 	     parentIsInterfaceDeclaration,
 	     parentIsRemoteInterface);
     }
-    
-    
+
     /**
      * Method declaration.
      * @param modifiers a modifier array
@@ -123,8 +125,8 @@ public class MethodDeclaration extends JavaDeclaration
      * @param parameters a parameter declaration mutable list.
      * @param exceptions a throws.     
      * @param body a statement block.
-     * @param parentIsInterfaceDeclaration a boolean set true iff
-     * parent is an InterfaceDeclaration 
+     * @param parentIsInterfaceDeclaration a boolean set true iff parent is an InterfaceDeclaration
+     * @param parantIsRemoteInterface a boolean set true iff parent has a Remote annotation
      */
     public MethodDeclaration(Modifier[] modifiers, 
 	    		     TypeReference returnType, 
@@ -142,26 +144,23 @@ public class MethodDeclaration extends JavaDeclaration
         this.exceptions = exceptions;
 	this.body = body;
 	this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
+	this.parentIsRemoteInterface = parentIsRemoteInterface;
     }
 
-    
     @Override    
     public ProgramElementName getProgramElementName(){
 	return name;
     }
-
 
     @Override    
     public SourceElement getFirstElement() {
         return getChildAt(0);
     }
 
-    
     @Override    
     public SourceElement getLastElement() {
         return getChildAt(getChildCount() - 1).getLastElement();
     }
-
 
     @Override
     public int getChildCount() {
@@ -175,7 +174,6 @@ public class MethodDeclaration extends JavaDeclaration
         return result;
     }
 
-    
     @Override
     public ProgramElement getChildAt(int index) {
         int len;
@@ -211,7 +209,6 @@ public class MethodDeclaration extends JavaDeclaration
         throw new ArrayIndexOutOfBoundsException();
     }
 
-
     @Override
     public int getStatementCount() {
         return (body != null) ? 1 : 0;
@@ -241,13 +238,11 @@ public class MethodDeclaration extends JavaDeclaration
         throw new IndexOutOfBoundsException();
     }
 
-    
     @Override
     public int getParameterDeclarationCount() {
         return (parameters != null) ? parameters.size() : 0;
     }
 
-    
     @Override
     public ParameterDeclaration getParameterDeclarationAt(int index) {
         if (parameters != null) {
@@ -256,7 +251,6 @@ public class MethodDeclaration extends JavaDeclaration
         throw new IndexOutOfBoundsException();
     }
 
-    
     /**
      *      Get return type.
      *      @return the type reference.
@@ -264,58 +258,48 @@ public class MethodDeclaration extends JavaDeclaration
     public TypeReference getTypeReference() {
         return returnType;
     }
-    
-    
+
     public Comment[] getVoidComments() {
 	return voidComments;
     }
-
 
     @Override    
     public final String getName() {
         return (name == null) ? null : name.toString();
     }
 
-
     public ImmutableArray<ParameterDeclaration> getParameters() {
         return parameters;
     }
 
-    
     @Override    
     public String getFullName() {
 	return getName();
     }
 
-
     public Throws getThrown() {
         return exceptions;
     }
 
-
     public StatementBlock getBody() {
         return body;
     }
-
 
     @Override
     public boolean isFinal() {
         return super.isFinal();
     }
 
-    
     @Override
     public boolean isPrivate() {
         return super.isPrivate();
     }
 
-    
     @Override    
     public boolean isProtected() {
         return super.isProtected();
     }
 
-    
     /**
      * Test whether the declaration is public. Methods of interfaces
      * are always public.
@@ -325,13 +309,11 @@ public class MethodDeclaration extends JavaDeclaration
         return parentIsInterfaceDeclaration || super.isPublic();
     }
 
-    
     @Override
     public boolean isStatic() {
         return super.isStatic();
     }
 
-    
     @Override
     public boolean isModel() {
         return super.isModel();
@@ -352,13 +334,11 @@ public class MethodDeclaration extends JavaDeclaration
         return parameters.get(parameters.size() - 1).isVarArg();
     }
 
-    
     @Override
     public boolean isStrictFp() {
         return super.isStrictFp();
     }
 
-    
     /**
      * Test whether the declaration is abstract. Methods of interfaces
      * are always abstract.
@@ -368,7 +348,6 @@ public class MethodDeclaration extends JavaDeclaration
         return  parentIsInterfaceDeclaration || super.isAbstract();
     }
 
-    
     /**
      * Test whether the declaration is native. Constructors
      * are never native.
@@ -390,7 +369,7 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
     public boolean isRemote() {
-    	return hasAnnotation("Remote"); // TODO KD z ckeck methods + maybe check for static / constructor
+    	return parentIsRemoteInterface || hasAnnotation("Remote"); // TODO KD z check for static / constructor? + make "Remote" a constant?
     }
     
     @Override

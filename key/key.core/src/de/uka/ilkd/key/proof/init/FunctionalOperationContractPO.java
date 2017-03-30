@@ -272,41 +272,6 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
      * {@inheritDoc}
      */
     @Override
-    protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
-                               ImmutableList<LocationVariable> formalParamVars,
-                               Map<LocationVariable,LocationVariable> atPreVars,
-                               LocationVariable hist,
-                               LocationVariable preHist,
-                               Services services) {
-       Term update = null;
-       for(Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
-          final LocationVariable heap = atPreEntry.getKey();
-          final Term u = tb.elementary(atPreEntry.getValue(), heap == getSavedHeap(services) ?
-                  tb.getBaseHeap() : tb.var(heap));
-          if(update == null) {
-             update = u;
-          }else{
-             update = tb.parallel(update, u);
-          }
-        }
-        Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
-        Iterator<ProgramVariable> paramIt = paramVars.iterator();
-        while (formalParamIt.hasNext()) {
-            Term paramUpdate = tb.elementary(formalParamIt.next(), tb.var(paramIt.next()));
-            update = tb.parallel(update, paramUpdate);
-        }
-
-		// hist := histAtPre
-        Term histupdate = tb.elementary(preHist, tb.var(hist));
-        update = tb.parallel(update, histupdate);
-
-        return update;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected String buildPOName(boolean transactionFlag) {
        return getContract().getName()+"."+TRANSACTION_TAGS.get(transactionFlag);
     }
