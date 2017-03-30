@@ -411,7 +411,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 						tb.var(paramVars), proofServices);
 
 				// add history update to globalUpdate
-				if (pm.getMethodDeclaration().isRemote()) {
+/*				if (pm.getMethodDeclaration().isRemote()) {
 					LocationVariable caller = new LocationVariable(new ProgramElementName("Caller"), proofServices.getJavaInfo().objectSort());
 		        	Term method = tb.func(proofServices.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), proofServices));
 		        	Term result = resultVar == null? tb.seqEmpty() : tb.var(resultVar);
@@ -425,7 +425,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 					// I probably need 2 updates to different things
 					// TODO KD a what to apply the Updates to?
 				}
-
+*/
 				final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar,
 						exceptionVar, atPreVars, post, sb, hist, preHist, proofServices);
 				final Term preImpliesProgPost = tb.imp(pre, progPost);

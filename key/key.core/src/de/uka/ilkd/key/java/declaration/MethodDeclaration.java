@@ -70,6 +70,7 @@ public class MethodDeclaration extends JavaDeclaration
      */
     public MethodDeclaration(ExtList children, 
 			     boolean parentIsInterfaceDeclaration,
+			     boolean parentIsRemoteInterface,
 			     Comment[] voidComments) {
 	super(children);
 	returnType = children.get(TypeReference.class);
@@ -101,14 +102,16 @@ public class MethodDeclaration extends JavaDeclaration
 			     ParameterDeclaration[] parameters, 
 			     Throws exceptions, 
 			     StatementBlock body, 
-			     boolean parentIsInterfaceDeclaration) { 
+			     boolean parentIsInterfaceDeclaration,
+			     boolean parentIsRemoteInterface) { 
 	this(modifiers, 
 	     returnType, 
 	     name, 
 	     new ImmutableArray<ParameterDeclaration>(parameters),
 	     exceptions, 
 	     body, 
-	     parentIsInterfaceDeclaration);
+	     parentIsInterfaceDeclaration,
+	     parentIsRemoteInterface);
     }
     
     
@@ -129,7 +132,8 @@ public class MethodDeclaration extends JavaDeclaration
 			     ImmutableArray<ParameterDeclaration> parameters, 
 			     Throws exceptions, 
 			     StatementBlock body, 
-			     boolean parentIsInterfaceDeclaration) { 
+			     boolean parentIsInterfaceDeclaration,
+			     boolean parentIsRemoteInterface) { 
 	super(modifiers);
 	this.returnType = returnType;
 	this.voidComments = null;

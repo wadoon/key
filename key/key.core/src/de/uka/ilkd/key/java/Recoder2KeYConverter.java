@@ -1315,6 +1315,7 @@ public class Recoder2KeYConverter {
             	= new MethodDeclaration(
                     collectChildren(md),
                     md.getASTParent() instanceof recoder.java.declaration.InterfaceDeclaration,
+                    false, //TODO KD isRemote?
                     voidComments);
             recoder.abstraction.ClassType cont
             	= getServiceConfiguration().getCrossReferenceSourceInfo()

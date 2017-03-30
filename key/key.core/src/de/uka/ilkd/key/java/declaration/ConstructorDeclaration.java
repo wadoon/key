@@ -47,7 +47,7 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
      */
     public ConstructorDeclaration(ExtList children,
 				  boolean parentIsInterfaceDeclaration) {
-	super(children, parentIsInterfaceDeclaration, null);	
+	super(children, parentIsInterfaceDeclaration, false/*TODO KD isRemote?*/, null);
     }
 
     
@@ -68,13 +68,14 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
 				  Throws exceptions, 
 				  StatementBlock body, 
 				  boolean parentIsInterfaceDeclaration) { 
-	super(modifiers, 
+	super(modifiers,
 	      null, 
 	      name,
 	      parameters, 
 	      exceptions, 
 	      body, 
-	      parentIsInterfaceDeclaration);
+	      parentIsInterfaceDeclaration,
+	      false); //TODO KD isRemote? + override isRemote? (from MethodDeclaration?)
     }
 
     

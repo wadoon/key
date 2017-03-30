@@ -1600,12 +1600,16 @@ public class TermBuilder {
         return func(services.getTypeConverter().getHeapLDT().getWellFormed(), heap);
     }
     
+    public Term wellFormed(LocationVariable heap) {
+        return wellFormed(var(heap));
+    }
+
     public Term wellFormedHist(Term hist) {
         return func(services.getTypeConverter().getSeqLDT().getWellFormedHist(), hist);
     }
 
-    public Term wellFormed(LocationVariable heap) {
-        return wellFormed(var(heap));
+    public Term wellFormedHist (LocationVariable hist) {
+    	return wellFormedHist(var(hist));
     }
 
     public Term permissionsFor(Term permHeap, Term regularHeap) {
