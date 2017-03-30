@@ -49,6 +49,8 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     super(root, services);
         assert services != null;
         collectHeapVariables();
+        //Add the history Variable
+        collectHistVariable();
     }
 
     protected void collectHeapVariables() {
@@ -56,6 +58,10 @@ public class ProgramVariableCollector extends JavaASTVisitor {
        for(LocationVariable heap: ldt.getAllHeaps()) {
           result.add(heap);
        }
+    }
+    
+    protected void collectHistVariable() {
+        result.add(services.getTypeConverter().getRemoteMethodEventLDT().getHist());
     }
 
 
