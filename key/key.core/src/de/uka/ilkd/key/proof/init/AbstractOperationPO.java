@@ -315,15 +315,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				final Map<LocationVariable, LocationVariable> atPreVars =
 						HeapContext.getBeforeAtPreVars(modHeaps, proofServices, "AtPre");
 
-				//TODO KD
 				LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
 				LocationVariable histAtPre = new LocationVariable(new ProgramElementName(tb.newName(hist + "AtPre")), new KeYJavaType(hist.sort()));
 				atPreVars.put(hist, histAtPre);
-				System.out.println("paramVars: " + paramVars);
-				System.out.println("selfVar: " + selfVar);
-				System.out.println("resultVar: " + resultVar);
-				System.out.println("modHeaps: " + modHeaps);
-				System.out.println("atPreVars: " + atPreVars);
+				//TODO KD a where else to add hist stuff? (histAtPre done)
 
 //				final Map<LocationVariable, Map<Term, Term>> heapToAtPre =
 //						new LinkedHashMap<LocationVariable, Map<Term, Term>>();
@@ -427,13 +422,13 @@ public abstract class AbstractOperationPO extends AbstractPO {
 		        	Term result = resultVar == null? tb.seqEmpty() : tb.var(resultVar);
 		        	Term inCallEvent = tb.evConst(tb.evIncoming(), tb.evCall(), tb.var(caller), method, tb.seq(tb.var(paramVars)), tb.getBaseHeap());
 		        	Term outTermEvent = tb.evConst(tb.evOutgoing(), tb.evTerm(), tb.var(caller), method, result, tb.getBaseHeap());
-		        	// TODO KD a what heaps to use?
+		        	// TODO KD b what heaps to use?
 		        	Term histAtCall = tb.seqConcat(tb.var(hist), tb.seqSingleton(inCallEvent));
 		        	Term histAfterTerm = tb.seqConcat(tb.var(hist), tb.seqSingleton(outTermEvent));
 					Term histUpdateAtCall = tb.elementary(hist, histAtCall);
 					Term histUpdateAfterTerm = tb.elementary(hist, histAfterTerm);
 					// I probably need 2 updates to different things
-					// TODO KD a what to apply the Updates to?
+					// TODO KD b what to apply the Updates to?
 				}
 */
 				final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar,
@@ -557,7 +552,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 		for (LocationVariable heap : heaps) {
 			final Term wf = tb.wellFormed(tb.var(heap));
 			wellFormed = tb.and(wellFormed, wf);
-		} // TODO KD simplified
+		}
 
 		//for Remote Methods
 		final Term wfHist = tb.wellFormedHist(tb.var(hist));
@@ -979,20 +974,18 @@ public abstract class AbstractOperationPO extends AbstractPO {
 	 * @param services TODO
 	 * @return The {@link Term} representing the initial updates.
 	 */
-	protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
+	protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars, // TODO KD f is this ever called?
 			ImmutableList<LocationVariable> formalParamVars,
 			Map<LocationVariable, LocationVariable> atPreVars,
 			LocationVariable hist,
 			LocationVariable preHist,
 			Services services) {
-		Term update = null;
+		Term update = tb.skip();
 		for (Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
-			final Term u = tb.elementary(atPreEntry.getValue(), tb.getBaseHeap());
-			if (update == null) {
-				update = u;
-			} else {
-				update = tb.parallel(update, u);
-			}
+			final LocationVariable key = atPreEntry.getKey();
+			final Term u = tb.elementary(atPreEntry.getValue(), key == getSavedHeap(services) ?
+					tb.getBaseHeap() : tb.var(key)); //TODO KD z why differentiation?
+			update = tb.parallel(update, u);
 		}
 		if (isCopyOfMethodArgumentsUsed()) {
 			Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
@@ -1003,10 +996,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
 			}
 		}
 
-		// hist := histAtPre
-		Term histupdate = tb.elementary(preHist, tb.var(hist));
+        // TODO KD z contained in atPreVars right now
+		// histAtPre := hist
+/*		Term histupdate = tb.elementary(preHist, tb.var(hist));
 		update = tb.parallel(update, histupdate);
-
+*/
 		return update;
 	}
 

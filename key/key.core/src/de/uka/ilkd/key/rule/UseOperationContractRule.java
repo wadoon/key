@@ -51,7 +51,6 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Throw;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.RemoteMethodEventLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -789,51 +788,29 @@ public final class UseOperationContractRule implements BuiltInRule {
 		excPostGoal.setBranchLabel("Exceptional Post"+ " ("+contract.getTarget().getName()+")");
 
 		//prepare common stuff for the three branches
-		Term anonAssumption = null;
-		Term anonUpdate = null;
-		Term wellFormedAnon = null;
-		Term atPreUpdates = null;
-		Term reachableState = null;
+		Term anonAssumption = tb.tt();
+		Term anonUpdate = tb.skip();
+		Term wellFormedAnon = tb.tt();
+		Term atPreUpdates = tb.skip();
+		Term reachableState = tb.tt();
 		ImmutableList<AnonUpdateData> anonUpdateDatas =
 				ImmutableSLList.<AnonUpdateData>nil();
 
 		for(LocationVariable heap : heapContext) {
-			final AnonUpdateData tAnon;
 			if (!contract.hasModifiesClause(heap)) {
-				tAnon = new AnonUpdateData(tb.tt(), tb.skip(), tb.var(heap), tb.var(heap), tb.var(heap));
-			} else {
-				tAnon = createAnonUpdate(heap, inst.pm, mods.get(heap), services);
+				continue;
 			}
+			final AnonUpdateData tAnon = createAnonUpdate(heap, inst.pm, mods.get(heap), services);
 			anonUpdateDatas = anonUpdateDatas.append(tAnon);
-			if (anonAssumption == null) {
-				anonAssumption = tAnon.assumption;
-			} else {
-				anonAssumption = tb.and(anonAssumption, tAnon.assumption);
-			}
-			if (anonUpdate == null) {
-				anonUpdate = tAnon.anonUpdate;
-			} else {
-				anonUpdate = tb.parallel(anonUpdate, tAnon.anonUpdate);
-			}
-			if (wellFormedAnon == null) {
-				wellFormedAnon = tb.wellFormed(tAnon.anonHeap);
-			} else {
-				wellFormedAnon = tb.and(wellFormedAnon, tb.wellFormed(tAnon.anonHeap));
-			}
+			anonAssumption = tb.and(anonAssumption, tAnon.assumption);
+			anonUpdate = tb.parallel(anonUpdate, tAnon.anonUpdate);
+			wellFormedAnon = tb.and(wellFormedAnon, tb.wellFormed(tAnon.anonHeap));
 			final Term up = tb.elementary(atPreVars.get(heap), tb.var(heap));
-			if (atPreUpdates == null) {
-				atPreUpdates = up;
-			} else {
-				atPreUpdates = tb.parallel(atPreUpdates, up);
-			}
-			if (reachableState == null) {
-				reachableState = tb.wellFormed(heap);
-			} else {
-				reachableState = tb.and(reachableState, tb.wellFormed(heap));
-			}
+			atPreUpdates = tb.parallel(atPreUpdates, up);
+			reachableState = tb.and(reachableState, tb.wellFormed(heap));
 		}
 
-		//if called method is remote add outgoing call and incoming termination events to history
+		//if called method is remote add "outgoing call" and "incoming termination" events to history
 		if (contract.getTarget().getMethodDeclaration().isRemote()) { // TODO KD z check for self?
 			LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
 			IProgramMethod pm = contract.getTarget();
@@ -843,7 +820,6 @@ public final class UseOperationContractRule implements BuiltInRule {
 			Term outCallEvent = tb.evConst(tb.evOutgoing(), tb.evCall(), contractSelf, method, tb.seq(contractParams), anonUpdateDatas.head().methodHeapAtPre);
 			Term inTermEvent  = tb.evConst(tb.evIncoming(), tb.evTerm(), contractSelf, method, resultTerm, anonUpdateDatas.reverse().head().methodHeap);
 			Term newHist = tb.seqConcat(tb.var(hist), tb.seqSingleton(outCallEvent), tb.seqSingleton(inTermEvent));
-			// TODO KD a are these the right heaps (heapAfter_setTrue does not seem right)
 
 			final Name methodHistName = new Name(tb.newName(hist + "After_" + pm.getName()));
 			final Function methodHistFunc = new Function(methodHistName, hist.sort(), true);

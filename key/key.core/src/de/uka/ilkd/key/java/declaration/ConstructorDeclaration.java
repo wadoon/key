@@ -20,7 +20,6 @@ import de.uka.ilkd.key.java.abstraction.Constructor;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
-
 /**
  *  The getTypeReference method returns null - constructors do not have
  *  explicite return types.  A constructor declaration contains its own
@@ -47,10 +46,9 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
      */
     public ConstructorDeclaration(ExtList children,
 				  boolean parentIsInterfaceDeclaration) {
-	super(children, parentIsInterfaceDeclaration, false/*TODO KD isRemote?*/, null);
+	super(children, parentIsInterfaceDeclaration, false, null);
     }
 
-    
     /**
      * Constructor declaration.
      * @param modifiers a modifier array.
@@ -75,10 +73,9 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
 	      exceptions, 
 	      body, 
 	      parentIsInterfaceDeclaration,
-	      false); //TODO KD isRemote? + override isRemote? (from MethodDeclaration?)
+	      false);
     }
 
-    
     /**
      * Constructors are never abstract.
      */
@@ -87,7 +84,6 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
         return false;
     }
 
-    
     /**
      * Constructors are never final.
      */
@@ -96,7 +92,6 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
         return false;
     }
 
-    
     /**
      * Constructors are never native.
      */
@@ -105,7 +100,6 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
         return false;
     }
 
-    
     /**
      * Constructors are never static.
      */
@@ -114,7 +108,6 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
         return false;
     }
 
-    
     /**
      * Constructors are never strictfp.
      */
@@ -123,7 +116,6 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
         return false;
     }
 
-    
     /**
      * Constructors are never synchronized.
      */
@@ -132,6 +124,10 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
         return false;
     }
 
+    @Override
+    public boolean isRemote() {
+    	return false; // TODO KD f check corectness
+    }
 
     @Override    
     public void visit(Visitor v) {
