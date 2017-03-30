@@ -1274,6 +1274,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     @Deprecated
+    @Override
     public final Term getPre(LocationVariable heap, ProgramVariable selfVar,
                              ImmutableList<ProgramVariable> paramVars,
                              Map<LocationVariable, ? extends ProgramVariable> atPreVars,
@@ -1282,6 +1283,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     @Deprecated
+    @Override
     public final Term getPre(List<LocationVariable> heapContext,
                              ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
                              Map<LocationVariable, ? extends ProgramVariable> atPreVars,
@@ -1290,6 +1292,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     @Deprecated
+    @Override
     public final Term getPre(LocationVariable heap, Term heapTerm, Term selfTerm,
                              ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
                              Services services) throws UnsupportedOperationException {
@@ -1297,6 +1300,7 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     @Deprecated
+    @Override
     public final Term getPre(List<LocationVariable> heapContext,
                              Map<LocationVariable, Term> heapTerms, Term selfTerm,
                              ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,

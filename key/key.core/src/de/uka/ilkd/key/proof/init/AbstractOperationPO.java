@@ -315,6 +315,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				final Map<LocationVariable, LocationVariable> atPreVars =
 						HeapContext.getBeforeAtPreVars(modHeaps, proofServices, "AtPre");
 
+				//TODO KD
+				LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
+				LocationVariable histAtPre = new LocationVariable(new ProgramElementName(tb.newName(hist + "AtPre")), new KeYJavaType(hist.sort()));
+				atPreVars.put(hist, histAtPre);
+				System.out.println("paramVars: " + paramVars);
+				System.out.println("selfVar: " + selfVar);
+				System.out.println("resultVar: " + resultVar);
+				System.out.println("modHeaps: " + modHeaps);
+				System.out.println("atPreVars: " + atPreVars);
+
 //				final Map<LocationVariable, Map<Term, Term>> heapToAtPre =
 //						new LinkedHashMap<LocationVariable, Map<Term, Term>>();
 				final Map<Term, Term> heapToAtPre = new LinkedHashMap<Term, Term>();
@@ -357,7 +367,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				ProgramElementName preHistName = new ProgramElementName("histAtPre");
 				Sort seqSort = (Sort) proofServices.getNamespaces().sorts().lookup(SeqLDT.NAME);
 				LocationVariable preHist = new LocationVariable(preHistName, seqSort);
-				LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
+//				LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
 
 				// build program block to execute in try clause (must be done before pre condition is created.
 				final ImmutableList<StatementBlock> sb =
@@ -525,7 +535,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 			KeYJavaType selfKJT,
 			ImmutableList<ProgramVariable> paramVars,
 			List<LocationVariable> heaps,
-			LocationVariable preHist,
+			LocationVariable hist,
 			Services services) {
 		// "self != null"
 		final Term selfNotNull = generateSelfNotNull(getProgramMethod(), selfVar);
@@ -543,23 +553,15 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
 		// initial value of measured_by clause
 		final Term mbyAtPreDef = generateMbyAtPreDef(selfVar, paramVars, services);
-		Term wellFormed = null;
+		Term wellFormed = tb.tt();
 		for (LocationVariable heap : heaps) {
 			final Term wf = tb.wellFormed(tb.var(heap));
-			if (wellFormed == null) {
-				wellFormed = wf;
-			} else {
-				wellFormed = tb.and(wellFormed, wf);
-			}
-		}
+			wellFormed = tb.and(wellFormed, wf);
+		} // TODO KD simplified
 
 		//for Remote Methods
-		final Term wfHist = tb.wellFormedHist(tb.var(preHist));
-		if (wellFormed == null) {
-			wellFormed = wfHist;
-		} else {
-			wellFormed = tb.and(wellFormed, wfHist);
-		}
+		final Term wfHist = tb.wellFormedHist(tb.var(hist));
+		wellFormed = tb.and(wellFormed, wfHist);
 
 		return tb.and((wellFormed != null ? wellFormed : tb.tt()), selfNotNull,
 				selfCreated, selfExactType, paramsOK, mbyAtPreDef);
