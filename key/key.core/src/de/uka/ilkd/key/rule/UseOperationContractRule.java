@@ -811,12 +811,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 		}
 
 		//if called method is remote add "outgoing call" and "incoming termination" events to history
-		if (contract.getTarget().getMethodDeclaration().isRemote()) { // TODO KD z check for self?
+		if (contract.getTarget().getMethodDeclaration().isRemote()) {
 			LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
-			IProgramMethod pm = contract.getTarget();
+			IProgramMethod pm = contract.getTarget(); // TODO KD z make Term out of IProgramMethod?
 
 			Term method = tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(contract.getTarget().getMethodDeclaration(), services));
-			Term resultTerm = (contract.getResult() == null) ? tb.seqEmpty() : tb.seqSingleton(contract.getResult());
+			Term resultTerm = contract.hasResultVar() ? tb.seqSingleton(contract.getResult()) : tb.seqEmpty();
 			Term outCallEvent = tb.evConst(tb.evOutgoing(), tb.evCall(), contractSelf, method, tb.seq(contractParams), anonUpdateDatas.head().methodHeapAtPre);
 			Term inTermEvent  = tb.evConst(tb.evIncoming(), tb.evTerm(), contractSelf, method, resultTerm, anonUpdateDatas.reverse().head().methodHeap);
 			Term newHist = tb.seqConcat(tb.var(hist), tb.seqSingleton(outCallEvent), tb.seqSingleton(inTermEvent));
@@ -834,9 +834,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 			LocationVariable beforeHist = new LocationVariable(new ProgramElementName(tb.newName(hist + "Before_" + pm.getName())), new KeYJavaType(hist.sort()));
 
 			anonAssumption = tb.and(anonAssumption, assumption);
-			anonUpdate = tb.sequential(anonUpdate, anonHistUpdate);
-			wellFormedAnon = tb.and(wellFormedAnon, tb.wellFormedHist(anonHist));
-			atPreUpdates = tb.sequential(atPreUpdates, tb.elementary(beforeHist, tb.var(hist)));
+			anonUpdate = tb.parallel(anonUpdate, anonHistUpdate);
+			wellFormedAnon = tb.and(wellFormedAnon, tb.wellFormedHist(anonHist)); //TODO KD s what does this do? Maybe remove!
+			atPreUpdates = tb.parallel(atPreUpdates, tb.elementary(beforeHist, tb.var(hist)));
 			reachableState = tb.and(reachableState, tb.wellFormedHist(hist));
 		}
 

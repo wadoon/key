@@ -28,6 +28,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
@@ -35,6 +36,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
@@ -61,212 +63,207 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
     }
 
 
-    @Override
-    public Term transform(Term term,
-                  SVInstantiations svInst,
-                  Services services) {
-        final TermBuilder TB = services.getTermBuilder();
-        final Term target = term.sub(0);
+	@Override
+	public Term transform(Term term,
+			SVInstantiations svInst,
+			Services services) {
+		final TermBuilder tb = services.getTermBuilder();
+		final Term target = term.sub(0);
 
-        //the target term should have a Java block
-        final ProgramElement pe = target.javaBlock().program();
-        assert pe != null;
+		//the target term should have a Java block
+		final ProgramElement pe = target.javaBlock().program();
+		assert pe != null;
 
-        //collect all loops in the innermost method frame
-        final Triple<MethodFrame,
-                     ImmutableSet<LoopStatement>,
-                     ImmutableSet<StatementBlock>> frameAndLoopsAndBlocks =
-              new JavaASTVisitor(pe, services) {
-            private MethodFrame frame = null;
-            private ImmutableSet<LoopStatement> loops
-                = DefaultImmutableSet.<LoopStatement>nil();
-            private ImmutableSet<StatementBlock> blocks
-                = DefaultImmutableSet.nil();
-            protected void doDefaultAction(SourceElement node) {
-                if(node instanceof MethodFrame && frame == null) {
-                    frame = (MethodFrame) node;
-                } else if(frame == null && node instanceof LoopStatement) {
-                    loops = loops.add((LoopStatement) node);
-                }
-                else if (frame == null && node instanceof StatementBlock) {
-                    blocks = blocks.add((StatementBlock) node);
-                }
-            }
-            public Triple<MethodFrame,
-                          ImmutableSet<LoopStatement>,
-                          ImmutableSet<StatementBlock>> run() {
-                walk(root());
-                return new Triple<MethodFrame,
-                                  ImmutableSet<LoopStatement>,
-                                  ImmutableSet<StatementBlock>>(
-                        frame, loops, blocks);
-            }
-        }.run();
-        final MethodFrame frame = frameAndLoopsAndBlocks.first;
-        final ImmutableSet<LoopStatement> loops = frameAndLoopsAndBlocks.second;
+		//collect all loops in the innermost method frame
+		final Triple<MethodFrame,
+				ImmutableSet<LoopStatement>,
+				ImmutableSet<StatementBlock>> frameAndLoopsAndBlocks =
+				new JavaASTVisitor (pe, services) {
+					private MethodFrame frame = null;
+					private ImmutableSet<LoopStatement> loops
+							= DefaultImmutableSet.<LoopStatement>nil();
+					private ImmutableSet<StatementBlock> blocks
+							= DefaultImmutableSet.nil();
+					protected void doDefaultAction (SourceElement node) {
+						if (node instanceof MethodFrame && frame == null) {
+							frame = (MethodFrame) node;
+						} else if (frame == null && node instanceof LoopStatement) {
+							loops = loops.add((LoopStatement) node);
+						} else if (frame == null && node instanceof StatementBlock) {
+							blocks = blocks.add((StatementBlock) node);
+						}
+					}
+					public Triple<MethodFrame,
+							ImmutableSet<LoopStatement>,
+							ImmutableSet<StatementBlock>> run() {
+								walk(root());
+								return new Triple<MethodFrame,
+										ImmutableSet<LoopStatement>,
+										ImmutableSet<StatementBlock>>(
+										frame, loops, blocks);
+							}
+				}.run();
+		final MethodFrame frame = frameAndLoopsAndBlocks.first;
+		final ImmutableSet<LoopStatement> loops = frameAndLoopsAndBlocks.second;
 
-        //determine "self"
-        Term selfTerm;
-        final ExecutionContext ec
-            = (ExecutionContext) frame.getExecutionContext();
-        final ReferencePrefix rp = ec.getRuntimeInstance();
-        if(rp == null || rp instanceof TypeReference) {
-            selfTerm = null;
-        } else {
-            selfTerm = services.getTypeConverter().convertToLogicElement(rp);
-        }
+		//determine "self"
+		Term selfTerm;
+		final ExecutionContext ec
+				= (ExecutionContext) frame.getExecutionContext();
+		final ReferencePrefix rp = ec.getRuntimeInstance();
+		if (rp == null || rp instanceof TypeReference) {
+			selfTerm = null;
+		} else {
+			selfTerm = services.getTypeConverter().convertToLogicElement(rp);
+		}
 
-        //create atPre heap
-        final String methodName = frame.getProgramMethod().getName();
+		// create atPre heap
+		final String methodName = frame.getProgramMethod().getName();
 
-        Term atPreUpdate = null;
-        Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
-        Map<LocationVariable,LocationVariable> atPreVars = new LinkedHashMap<LocationVariable, LocationVariable>();
-        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-          final LocationVariable l = TB.heapAtPreVar(heap.name()+"Before_" + methodName, heap.sort(), true);
-          // buf fix. see #1197
-          services.getNamespaces().programVariables().addSafely(l);
-          final Term u = TB.elementary(l, TB.var(heap));
-          if(atPreUpdate == null) {
-             atPreUpdate = u;
-          }else{
-             atPreUpdate = TB.parallel(atPreUpdate, u);
-          }
-          atPres.put(heap, TB.var(l));
-          atPreVars.put(heap, l);
-        }
+		Term atPreUpdate = tb.skip();
+		Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
+		for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+			final LocationVariable l = tb.heapAtPreVar(heap.name() + "Before_" + methodName, heap.sort(), true);
+			// buf fix. see #1197
+			services.getNamespaces().programVariables().addSafely(l);
+			final Term u = tb.elementary(l, tb.var(heap));
+			atPreUpdate = tb.parallel(atPreUpdate, u);
+			atPres.put(heap, tb.var(l));
+		}
 
-        //create atPre for parameters
-        for (LoopStatement loop : loops) {
-            LoopSpecification inv
-               = services.getSpecificationRepository().getLoopSpec(loop);
-            if(inv != null) {
-                // Nasty bug! The order of these things was not constant! Would fail indeterministically
-                // when reloading. Better sort the variables.
-                List<LocationVariable> keys = new ArrayList<LocationVariable>(inv.getInternalAtPres().keySet());
-                Collections.sort(keys, LOCVAR_COMPARATOR);
-                for (LocationVariable var : keys) {
-                    if(atPres.containsKey(var)) {
-                        // heaps have already been considered, or more than one loop
-                        continue;
-                    }
-                    final LocationVariable l = TB.heapAtPreVar(var.name()+"Before_" + methodName, var.sort(), true);
-                    services.getNamespaces().programVariables().addSafely(l);
-                    final Term u = TB.elementary(l, TB.var(var));
-                    if(atPreUpdate == null) {
-                        atPreUpdate = u;
-                    } else {
-                        atPreUpdate = TB.parallel(atPreUpdate, u);
-                    }
-                    atPres.put(var, TB.var(l));
-                    atPreVars.put(var, l);
-                }
-            }
-        }
+		// create Before hist // TODO KD s not sure, what I am doing
+		LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
+		LocationVariable h = new LocationVariable(new ProgramElementName(tb.newName(hist + "Before_" + methodName)), new KeYJavaType(hist.sort()));
+		services.getNamespaces().programVariables().addSafely(h);
+		final Term update = tb.elementary(h, tb.var(hist));
+		atPreUpdate = tb.parallel(atPreUpdate, update);
+		atPres.put(hist, tb.var(h));
+		// TODO KD a add "incoming call" event here?
 
-        //update loop invariants
-        for(LoopStatement loop : loops) {
-            LoopSpecification spec
-                = services.getSpecificationRepository().getLoopSpec(loop);
-            if(spec != null) {
-                if(selfTerm != null && spec.getInternalSelfTerm() == null) {
-                    //we're calling a static method from an instance context
-                    selfTerm = null;
-                }
+		// create atPre for parameters
+		for (LoopStatement loop : loops) {
+			LoopSpecification inv
+					= services.getSpecificationRepository().getLoopSpec(loop);
+			if(inv != null) {
+				// Nasty bug! The order of these things was not constant! Would fail indeterministically
+				// when reloading. Better sort the variables.
+				List<LocationVariable> keys = new ArrayList<LocationVariable>(inv.getInternalAtPres().keySet());
+				Collections.sort(keys, LOCVAR_COMPARATOR);
+				for (LocationVariable var : keys) {
+					if(atPres.containsKey(var)) {
+						// heaps have already been considered, or more than one loop
+						continue;
+					}
+					final LocationVariable l = tb.heapAtPreVar(var.name() + "Before_" + methodName, var.sort(), true);
+					services.getNamespaces().programVariables().addSafely(l);
+					final Term u = tb.elementary(l, tb.var(var));
+					atPreUpdate = tb.parallel(atPreUpdate, u);
+					atPres.put(var, tb.var(l));
+				}
+			}
+		}
 
-                final Term newVariant
-                    = spec.getVariant(selfTerm, atPres, services);
+		// update loop invariants
+		for(LoopStatement loop : loops) {
+			LoopSpecification spec
+					= services.getSpecificationRepository().getLoopSpec(loop);
+			if(spec != null) {
+				if(selfTerm != null && spec.getInternalSelfTerm() == null) {
+					//we're calling a static method from an instance context
+					selfTerm = null;
+				}
 
-                Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
-                Map<LocationVariable,
-                    ImmutableList<InfFlowSpec>> newInfFlowSpecs
-                                 = new LinkedHashMap<LocationVariable,
-                                                     ImmutableList<InfFlowSpec>>();
-                //LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
-                Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
-                Map<LocationVariable,Term> newFreeInvariants = new LinkedHashMap<LocationVariable,Term>(); // TODO Jonas: init
-                for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
-                  if(heap == services.getTypeConverter().getHeapLDT().getSavedHeap()
-                     &&
-                     spec.getInternalModifies().get(services.getTypeConverter().getHeapLDT().getHeap()).equals(TB.strictlyNothing())) {
-                    continue;
-                  }
-                  final Term m = spec.getModifies(heap, selfTerm, atPres, services);
-                  final ImmutableList<InfFlowSpec> infFlowSpecs =
-                                 spec.getInfFlowSpecs(heap, selfTerm, atPres, services);
-                  final Term inv = spec.getInvariant(heap, selfTerm, atPres, services);
-                  if(inv != null) { newInvariants.put(heap, inv); }
-                  if(m != null) { newMods.put(heap, m); }
-                  newInfFlowSpecs.put(heap, infFlowSpecs);
-                  final Term freeInv = spec.getFreeInvariant(heap, selfTerm, atPres, services);
-                  if(freeInv != null) { newFreeInvariants.put(heap, freeInv); }
-                }
-                ImmutableList<Term> newLocalIns = TB.var(MiscTools.getLocalIns(loop, services));
-                ImmutableList<Term> newLocalOuts = TB.var(MiscTools.getLocalOuts(loop, services));
-                final LoopSpecification newInv
-                       = spec.create(loop,
-                                    frame.getProgramMethod(),
-                                    frame.getProgramMethod().getContainerType(),
-                                    newInvariants,
-                                    newFreeInvariants,
-                                    newMods,
-                                    newInfFlowSpecs,
-                                    newVariant,
-                                    selfTerm,
-                                    newLocalIns,
-                                    newLocalOuts,
-                                    atPres);
-                services.getSpecificationRepository().addLoopInvariant(newInv);
-            }
-        }
+				final Term newVariant
+						= spec.getVariant(selfTerm, atPres, services);
 
-        /*//update block contracts
-        for (StatementBlock block : blocks) {
-            ImmutableSet<BlockContract> contracts =
-                    services.getSpecificationRepository().getBlockContracts(block);
-            for (BlockContract contract : contracts) {
-                final BlockContract.Variables variables = contract.getPlaceholderVariables();
-                final BlockContract.Variables newVariables = new BlockContract.Variables(
-                        variables.self,
-                        variables.breakFlags,
-                        variables.continueFlags,
-                        variables.returnFlag,
-                        variables.result,
-                        variables.exception,
-                        atPreVars,
-                        variables.remembranceLocalVariables
-                );
-                final Map<LocationVariable, Term> newPreconditions =
-                        new LinkedHashMap<LocationVariable, Term>();
-                final Map<LocationVariable, Term> newPostconditions =
-                        new LinkedHashMap<LocationVariable, Term>();
-                final Map<LocationVariable, Term> newModifiesClauses =
-                        new LinkedHashMap<LocationVariable, Term>();
-                ImmutableList<Triple<ImmutableList<Term>,
-                                     ImmutableList<Term>,
-                                     ImmutableList<Term>>> newRespectsClause =
-                        ImmutableSLList.<Triple<ImmutableList<Term>,
-                                                ImmutableList<Term>,
-                                                ImmutableList<Term>>>nil();
-                for (LocationVariable heap : HeapContext.getModHeaps(services, transaction)) {
-                    newPreconditions.put(heap,
-                                         contract.getPrecondition(heap, newVariables.self,
-                                                                  atPreVars, services));
-                    newPostconditions.put(heap,
-                                          contract.getPostcondition(heap, newVariables, services));
-                    newModifiesClauses.put(heap,
-                                           contract.getModifiesClause(heap, newVariables.self,
-                                                                      services));
-                    newRespectsClause = contract.getRespectsClause(newVariables.self,
-                                                                   services);
-                }
-                final BlockContract newBlockContract =
-                        contract.update(block, newPreconditions, newPostconditions,
-                                        newModifiesClauses, newRespectsClause, newVariables);
-                services.getSpecificationRepository().addBlockContract(newBlockContract);
-            }
-        }*/
+				Map<LocationVariable,Term> newMods = new LinkedHashMap<LocationVariable,Term>();
+				Map<LocationVariable,
+						ImmutableList<InfFlowSpec>> newInfFlowSpecs
+						= new LinkedHashMap<LocationVariable,
+						ImmutableList<InfFlowSpec>>();
+				//LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+				Map<LocationVariable,Term> newInvariants = new LinkedHashMap<LocationVariable,Term>();
+				Map<LocationVariable,Term> newFreeInvariants = new LinkedHashMap<LocationVariable,Term>(); // TODO Jonas: init
+				for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+					if(heap == services.getTypeConverter().getHeapLDT().getSavedHeap() &&
+							spec.getInternalModifies().get(services.getTypeConverter().getHeapLDT().getHeap()).equals(tb.strictlyNothing())) {
+						continue;
+					}
+					final Term m = spec.getModifies(heap, selfTerm, atPres, services);
+					final ImmutableList<InfFlowSpec> infFlowSpecs =
+							spec.getInfFlowSpecs(heap, selfTerm, atPres, services);
+					final Term inv = spec.getInvariant(heap, selfTerm, atPres, services);
+					if(inv != null) { newInvariants.put(heap, inv); }
+					if(m != null) { newMods.put(heap, m); }
+					newInfFlowSpecs.put(heap, infFlowSpecs);
+					final Term freeInv = spec.getFreeInvariant(heap, selfTerm, atPres, services);
+					if(freeInv != null) { newFreeInvariants.put(heap, freeInv); }
+				}
+				ImmutableList<Term> newLocalIns = tb.var(MiscTools.getLocalIns(loop, services));
+				ImmutableList<Term> newLocalOuts = tb.var(MiscTools.getLocalOuts(loop, services));
+				final LoopSpecification newInv
+						= spec.create(loop,
+						frame.getProgramMethod(),
+						frame.getProgramMethod().getContainerType(),
+						newInvariants,
+						newFreeInvariants,
+						newMods,
+						newInfFlowSpecs,
+						newVariant,
+						selfTerm,
+						newLocalIns,
+						newLocalOuts,
+						atPres);
+				services.getSpecificationRepository().addLoopInvariant(newInv);
+			}
+		}
 
-        return TB.apply(atPreUpdate, target, null);
-    }
+		// update block contracts
+/*		for (StatementBlock block : blocks) {
+			ImmutableSet<BlockContract> contracts =
+					services.getSpecificationRepository().getBlockContracts(block);
+			for (BlockContract contract : contracts) {
+				final BlockContract.Variables variables = contract.getPlaceholderVariables();
+				final BlockContract.Variables newVariables = new BlockContract.Variables(
+						variables.self,
+						variables.breakFlags,
+						variables.continueFlags,
+						variables.returnFlag,
+						variables.result,
+						variables.exception,
+						atPreVars,
+						variables.remembranceLocalVariables);
+				final Map<LocationVariable, Term> newPreconditions =
+						new LinkedHashMap<LocationVariable, Term>();
+				final Map<LocationVariable, Term> newPostconditions =
+						new LinkedHashMap<LocationVariable, Term>();
+				final Map<LocationVariable, Term> newModifiesClauses =
+						new LinkedHashMap<LocationVariable, Term>();
+				ImmutableList<Triple<ImmutableList<Term>,
+						ImmutableList<Term>,
+						ImmutableList<Term>>> newRespectsClause =
+						ImmutableSLList.<Triple<ImmutableList<Term>,
+						ImmutableList<Term>,
+						ImmutableList<Term>>>nil();
+				for (LocationVariable heap : HeapContext.getModHeaps(services, transaction)) {
+					newPreconditions.put(heap,
+							contract.getPrecondition(heap, newVariables.self,
+							atPreVars, services));
+					newPostconditions.put(heap,
+							contract.getPostcondition(heap, newVariables, services));
+					newModifiesClauses.put(heap,
+							contract.getModifiesClause(heap, newVariables.self,
+							services));
+					newRespectsClause = contract.getRespectsClause(newVariables.self,
+							services);
+				}
+				final BlockContract newBlockContract =
+						contract.update(block, newPreconditions, newPostconditions,
+						newModifiesClauses, newRespectsClause, newVariables);
+				services.getSpecificationRepository().addBlockContract(newBlockContract);
+			}
+		}
+*/
+		return tb.apply(atPreUpdate, target, null);
+	}
 }

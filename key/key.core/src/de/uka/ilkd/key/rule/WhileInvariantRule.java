@@ -78,7 +78,7 @@ import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
 
-public final class WhileInvariantRule implements BuiltInRule {
+public final class WhileInvariantRule implements BuiltInRule { // TODO KD s loop invariant support? if so look here (Strg + f "Before")
     /**
      * The hint used to refactor the initial invariant.
      */

@@ -349,7 +349,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 }
             }
         }
-        return result;
+        return result; //TODO KD a put hist?
     }
 
 

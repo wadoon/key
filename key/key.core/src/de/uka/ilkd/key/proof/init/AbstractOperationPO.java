@@ -43,7 +43,6 @@ import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.Finally;
 import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.java.statement.Try;
-import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -315,11 +314,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				final Map<LocationVariable, LocationVariable> atPreVars =
 						HeapContext.getBeforeAtPreVars(modHeaps, proofServices, "AtPre");
 
-				LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
-				LocationVariable histAtPre = new LocationVariable(new ProgramElementName(tb.newName(hist + "AtPre")), new KeYJavaType(hist.sort()));
-				atPreVars.put(hist, histAtPre);
-				//TODO KD a where else to add hist stuff? (histAtPre done)
-
 //				final Map<LocationVariable, Map<Term, Term>> heapToAtPre =
 //						new LinkedHashMap<LocationVariable, Map<Term, Term>>();
 				final Map<Term, Term> heapToAtPre = new LinkedHashMap<Term, Term>();
@@ -357,13 +351,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
 						formalParamVars = formalParamVars.append((LocationVariable)paramVar); // The cast is ugly but legal. It is a bigger task to refactor TB.paramVars to return a list of LocationVariabe instead of ProgramVariable.
 					}
 				}
-
-				//build the variable for pre- and (post-) hist
-				ProgramElementName preHistName = new ProgramElementName("histAtPre");
-				Sort seqSort = (Sort) proofServices.getNamespaces().sorts().lookup(SeqLDT.NAME);
-				LocationVariable preHist = new LocationVariable(preHistName, seqSort);
-//				LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
-
 				// build program block to execute in try clause (must be done before pre condition is created.
 				final ImmutableList<StatementBlock> sb =
 						buildOperationBlocks(formalParamVars, selfVar, resultVar, proofServices);
@@ -378,6 +365,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
 						permsFor = tb.and(permsFor, pf);
 					}
 				}
+
+				// build/get variables hist and histAtPre
+				LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
+				LocationVariable histAtPre = new LocationVariable(new ProgramElementName(tb.newName(hist + "AtPre")), new KeYJavaType(hist.sort()));
+				//TODO KD z need to register anything?
 
 				// build precondition
 				Term pre = tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, modHeaps, hist, proofServices),
@@ -395,6 +387,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 								"in your project.");
 					}
 				}
+
 				// build program term
 				Term postTerm =
 						getPost(modHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars, proofServices);
@@ -412,27 +405,36 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
 				final LocationVariable baseHeap = proofServices.getTypeConverter().getHeapLDT().getHeap();
 				final Term selfVarTerm = selfVar==null? null: tb.var(selfVar);
-				final Term globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm,
+				final Term globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm, // TODO KD z always null?
 						tb.var(paramVars), proofServices);
 
-				// add history update to globalUpdate
-/*				if (pm.getMethodDeclaration().isRemote()) {
+				//if method to prove is remote add "incoming call" and "outgoing termination" events to history
+				if (pm.getMethodDeclaration().isRemote()) {
 					LocationVariable caller = new LocationVariable(new ProgramElementName("Caller"), proofServices.getJavaInfo().objectSort());
 		        	Term method = tb.func(proofServices.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), proofServices));
-		        	Term result = resultVar == null? tb.seqEmpty() : tb.var(resultVar);
-		        	Term inCallEvent = tb.evConst(tb.evIncoming(), tb.evCall(), tb.var(caller), method, tb.seq(tb.var(paramVars)), tb.getBaseHeap());
-		        	Term outTermEvent = tb.evConst(tb.evOutgoing(), tb.evTerm(), tb.var(caller), method, result, tb.getBaseHeap());
-		        	// TODO KD b what heaps to use?
-		        	Term histAtCall = tb.seqConcat(tb.var(hist), tb.seqSingleton(inCallEvent));
-		        	Term histAfterTerm = tb.seqConcat(tb.var(hist), tb.seqSingleton(outTermEvent));
-					Term histUpdateAtCall = tb.elementary(hist, histAtCall);
-					Term histUpdateAfterTerm = tb.elementary(hist, histAfterTerm);
-					// I probably need 2 updates to different things
-					// TODO KD b what to apply the Updates to?
+
+		        	Term inCallEvent = tb.evConst(tb.evIncoming(), tb.evCall(), tb.var(caller), method, tb.seq(tb.var(paramVars)), tb.getBaseHeap()); // TODO KD a+b heap + caller?
+		        	Term histBeforeCall = tb.seqConcat(tb.var(hist), tb.seqSingleton(inCallEvent));
+		        	final Name beforeHistName = new Name(tb.newName(hist + "Before_" + pm.getName()));
+		        	final Function beforeHistFunc = new Function(beforeHistName, hist.sort(), true);
+		        	proofServices.getNamespaces().functions().addSafely(beforeHistFunc);
+		        	final Term beforeHist = tb.func(beforeHistFunc); // TODO KD a do I need to do a new LocationVariable? look at histAtPre
+		        	final Term beforeAssumption = tb.equals(histBeforeCall, beforeHist); // TODO KD a look what anonAssumption does in UseOperationContractRule
+		        	final Term beforeHistUpdate = tb.elementary(hist, beforeHist); // TODO KD a look what anonUpdate does in UseOperationContractRule
+
+		        	Term resultTerm = (resultVar == null) ? tb.seqEmpty() : tb.seqSingleton(tb.var(resultVar));
+		        	Term outTermEvent = tb.evConst(tb.evOutgoing(), tb.evTerm(), tb.var(caller), method, resultTerm, tb.getBaseHeap()); // TODO KD a+b heap + caller?
+		        	Term histAfterTerm = tb.seqConcat(tb.var(hist), tb.seqSingleton(outTermEvent)); // TODO KD a what hist to use?
+		        	final Name afterHistName = new Name(tb.newName(hist + "After_" + pm.getName()));
+		        	final Function afterHistFunc = new Function(afterHistName, hist.sort(), true);
+		        	proofServices.getNamespaces().functions().addSafely(afterHistFunc);
+		        	final Term afterHist = tb.func(afterHistFunc); // TODO KD a do I need to do a new LocationVariable?
+		        	final Term afterAssumption = tb.equals(histAfterTerm, afterHist); // TODO KD a look what anonAssumption does in UseOperationContractRule
+		        	final Term afterHistUpdate = tb.elementary(hist, afterHist); // TODO KD a look what anonUpdate does in UseOperationContractRule // TODO KD a ^6
 				}
-*/
+
 				final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar,
-						exceptionVar, atPreVars, post, sb, hist, preHist, proofServices);
+						exceptionVar, atPreVars, post, sb, hist, histAtPre, proofServices);
 				final Term preImpliesProgPost = tb.imp(pre, progPost);
 				final Term applyGlobalUpdate = globalUpdate == null ?
 						preImpliesProgPost : tb.apply(globalUpdate, preImpliesProgPost);
@@ -987,6 +989,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
 					tb.getBaseHeap() : tb.var(key)); //TODO KD z why differentiation?
 			update = tb.parallel(update, u);
 		}
+
+		// histAtPre := hist
+
+		Term histupdate = tb.elementary(preHist, tb.var(hist));
+		update = tb.parallel(update, histupdate);
 		if (isCopyOfMethodArgumentsUsed()) {
 			Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
 			Iterator<ProgramVariable> paramIt = paramVars.iterator();
@@ -996,11 +1003,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
 			}
 		}
 
-        // TODO KD z contained in atPreVars right now
-		// histAtPre := hist
-/*		Term histupdate = tb.elementary(preHist, tb.var(hist));
-		update = tb.parallel(update, histupdate);
-*/
 		return update;
 	}
 
