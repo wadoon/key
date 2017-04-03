@@ -27,7 +27,7 @@ public class SchemaVarCommand
     }
 
     @Override public Parameters evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws ScriptException {
+            Map<String, String> arguments) throws Exception {
         return state.getValueInjector().inject(new Parameters(), arguments);
     }
 

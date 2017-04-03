@@ -25,8 +25,6 @@ public class ActualScript {
     private Proof associatedProof;
 
 
-
-
     /**
      * String representation of the script
      */
@@ -223,14 +221,17 @@ public class ActualScript {
         }
 
         //hier Behandlung von skip, dass execute nicht auf skip angewandt wird
-        HashMap<String, Object> state = new HashMap<String, Object>();
-        state.put(AbstractCommand.GOAL_KEY, node);
+        EngineState state = new EngineState(getAssociatedProof());
+        state.setGoal(node);
         try {
             if(!name.equals("skip")) {
-                command.execute(mediator.getUI(), getAssociatedProof(), argMap, state);
+                //TODO weigl: refactor this in the proofscriptengine
+                // needed on multiple places.
+                Object para = command.evaluateArguments(state, argMap);
+                command.execute(mediator.getUI(), para, state);
             }
 
-        } catch (ScriptException e) {
+        } catch (Exception e) {
             associatedProof.pruneProof(node);
             newnode.setEncounteredException(e);
             newnode.clearChildren();

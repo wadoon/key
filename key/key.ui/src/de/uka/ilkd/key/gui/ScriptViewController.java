@@ -18,11 +18,11 @@ import java.util.*;
 /**
  * Created by sarah on 12/20/16.
  */
-public class ScriptViewController implements ActionListener{
+public class ScriptViewController implements ActionListener {
     private static final Map<String, ProofScriptCommand> COMMANDS = loadCommands();
 
-    private static final Map<String, String> SKIP = Collections.singletonMap("#1", "skip");
-
+    private static final Map<String, String> SKIP = Collections
+            .singletonMap("#1", "skip");
 
     private KeYMediator mediator;
     private MainWindow mainWindow;
@@ -31,7 +31,7 @@ public class ScriptViewController implements ActionListener{
     private Proof associatedProof;
 
     private JPanel view;
-   // private JTextArea textArea;
+    // private JTextArea textArea;
 
     private RSyntaxTextArea textArea;
 
@@ -41,8 +41,7 @@ public class ScriptViewController implements ActionListener{
         initPanel();
     }
 
-    @SuppressWarnings("serial")
-    private void initPanel() {
+    @SuppressWarnings("serial") private void initPanel() {
         view = new JPanel(new BorderLayout());
         {
             JToolBar bar = new JToolBar();
@@ -76,26 +75,30 @@ public class ScriptViewController implements ActionListener{
 
         {
 
-              textArea = new RSyntaxTextArea() {
-                @Override
-                public String getToolTipText(MouseEvent e) {
+            textArea = new RSyntaxTextArea() {
+                @Override public String getToolTipText(MouseEvent e) {
                     int pos = viewToModel(e.getPoint());
                     if (oldroot != null) {
                         ScriptNode node = getNodeAtPos(oldroot, pos);
                         if (node != null) {
                             StringBuilder sb = new StringBuilder();
                             if (node.getProofNode() != null)
-                                sb.append("\u2192" + node.getProofNode().serialNr());
+                                sb.append("\u2192" + node.getProofNode()
+                                        .serialNr());
                             else
                                 sb.append("X");
                             if (node.getEncounteredException() != null) {
-                                sb.append(" ").append(node.getEncounteredException().getMessage());
+                                sb.append(" ")
+                                        .append(node.getEncounteredException()
+                                                .getMessage());
                             }
                             return sb.toString();
-                        } else {
+                        }
+                        else {
                             return "no node";
                         }
-                    } else {
+                    }
+                    else {
                         return "not parsed yet";
                     }
                 }
@@ -114,9 +117,8 @@ public class ScriptViewController implements ActionListener{
             view.add(scrollpane, BorderLayout.CENTER);
 
             textArea.addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if(SwingUtilities.isRightMouseButton(e)) {
+                @Override public void mouseClicked(MouseEvent e) {
+                    if (SwingUtilities.isRightMouseButton(e)) {
                         int pos = textArea.viewToModel(e.getPoint());
                         textPopup(e.getPoint(), pos);
                     }
@@ -129,17 +131,17 @@ public class ScriptViewController implements ActionListener{
         return view;
     }
 
-
     protected void textPopup(Point p, final int pos) {
         final ScriptNode node;
-        if(oldroot != null) {
+        if (oldroot != null) {
             node = getNodeAtPos(oldroot, pos);
-        } else {
+        }
+        else {
             node = null;
         }
 
         JPopupMenu pm = textArea.getPopupMenu();
-                //new JPopupMenu();
+        //new JPopupMenu();
         {
             JMenuItem m = new JMenuItem("Show node exception");
             if (node == null || node.getEncounteredException() == null) {
@@ -147,7 +149,8 @@ public class ScriptViewController implements ActionListener{
             }
             m.addActionListener(new ActionListener() {
                 public void actionPerformed(ActionEvent e) {
-                    ExceptionDialog.showDialog(mainWindow, node.getEncounteredException());
+                    ExceptionDialog.showDialog(mainWindow,
+                            node.getEncounteredException());
                 }
             });
             pm.add(m);
@@ -156,8 +159,7 @@ public class ScriptViewController implements ActionListener{
             // TODO Implement me!
             JMenuItem m = new JMenuItem("Reparse from here");
             m.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent actionEvent) {
+                @Override public void actionPerformed(ActionEvent actionEvent) {
                     reparseFromCurrentPos();
                 }
             });
@@ -173,8 +175,7 @@ public class ScriptViewController implements ActionListener{
                 m.setEnabled(false);
             }
             m.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
+                @Override public void actionPerformed(ActionEvent e) {
                     textArea.setCaretPosition(pos);
                     goTo();
                 }
@@ -188,8 +189,7 @@ public class ScriptViewController implements ActionListener{
             }
             m.addActionListener(new ActionListener() {
 
-                @Override
-                public void actionPerformed(ActionEvent e) {
+                @Override public void actionPerformed(ActionEvent e) {
                     textArea.setCaretPosition(pos);
                     showPath();
                 }
@@ -204,11 +204,11 @@ public class ScriptViewController implements ActionListener{
                 m.setEnabled(false);
             }
             m.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
+                @Override public void actionPerformed(ActionEvent e) {
                     try {
                         parse();
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex) {
                         ExceptionDialog.showDialog(mainWindow, ex);
                     }
                 }
@@ -218,8 +218,7 @@ public class ScriptViewController implements ActionListener{
         {
             JMenuItem m = new JMenuItem("(Re)connect to proof");
             m.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
+                @Override public void actionPerformed(ActionEvent e) {
                     reset();
                 }
             });
@@ -232,36 +231,37 @@ public class ScriptViewController implements ActionListener{
     private void reparseFromCurrentPos() {
         int pos = textArea.getCaretPosition();
         ScriptNode snode = getNodeAtPos(oldroot, pos);
-        if(snode != null) {
+        if (snode != null) {
             Node proofNode = snode.getProofNode();
-            if(proofNode != null) {
+            if (proofNode != null) {
                 mediator.getSelectionModel().setSelectedNode(proofNode);
             }
         }
     }
 
-    @Override
-    public void actionPerformed(ActionEvent e) {
+    @Override public void actionPerformed(ActionEvent e) {
         try {
-            switch(e.getActionCommand()) {
-                case "reset":
-                    reset();
-                    break;
-                case "parse":
-                    parse();
-                    break;
-                case "goto":
-                    goTo();
-                    break;
-                case "showPath":
-                    showPath();
-                    break;
-                case "stepping":
-                    stepMode();
-                    break;
-                default: throw new Error();
+            switch (e.getActionCommand()) {
+            case "reset":
+                reset();
+                break;
+            case "parse":
+                parse();
+                break;
+            case "goto":
+                goTo();
+                break;
+            case "showPath":
+                showPath();
+                break;
+            case "stepping":
+                stepMode();
+                break;
+            default:
+                throw new Error();
             }
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             ExceptionDialog.showDialog(mainWindow, ex);
         }
     }
@@ -272,10 +272,9 @@ public class ScriptViewController implements ActionListener{
 
         goTo();
         textArea.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent keyEvent) {
+            @Override public void keyPressed(KeyEvent keyEvent) {
                 super.keyPressed(keyEvent);
-                if (keyEvent.equals(KeyEvent.VK_F3)){
+                if (keyEvent.equals(KeyEvent.VK_F3)) {
                     System.out.println("F3");
                 }
             }
@@ -283,18 +282,19 @@ public class ScriptViewController implements ActionListener{
 
     }
 
-    private void showPath(){
+    private void showPath() {
         int pos = textArea.getCaretPosition();
 
-        if(oldroot == null)
-            ExceptionDialog.showDialog(mainWindow, new Exception("There is currently no parsed script tree to browse."));
+        if (oldroot == null)
+            ExceptionDialog.showDialog(mainWindow, new Exception(
+                    "There is currently no parsed script tree to browse."));
         ScriptNode snode = getNodeAtPos(oldroot, pos);
-        if(snode != null) {
+        if (snode != null) {
             Node proofNode = snode.getProofNode();
-            if(proofNode != null) {
+            if (proofNode != null) {
                 LinkedList<Node> nodes = getPaths(proofNode);
                 for (Node node : nodes) {
-                    System.out.println("Node number: "+node.serialNr());
+                    System.out.println("Node number: " + node.serialNr());
                 }
                 //Filter Nodes acc. to nodes List
                 PathFilter pf = new PathFilter(nodes);
@@ -302,133 +302,147 @@ public class ScriptViewController implements ActionListener{
             }
         }
     }
+
     private void reset() {
         associatedProof = mediator.getSelectedProof();
         oldroot = null;
     }
 
-    private void parse() throws IOException, ScriptException, InterruptedException {
-        if(associatedProof != mediator.getSelectedProof())
+    private void parse()
+            throws IOException, ScriptException, InterruptedException {
+        if (associatedProof != mediator.getSelectedProof())
             throw new ScriptException("wrong proof selected");
 
-        ScriptNode newroot = ScriptTreeParser.parse(new StringReader(textArea.getText()));
+        ScriptNode newroot = ScriptTreeParser
+                .parse(new StringReader(textArea.getText()));
         newroot.setProofNode(associatedProof.root());
 
         try {
             mediator.stopInterface(true);
-            if(oldroot != null) {
+            if (oldroot != null) {
                 oldroot.dump(0);
                 newroot.dump(0);
             }
             compareAndAct(newroot, oldroot);
             oldroot = newroot;
 
-        } finally {
+        }
+        finally {
             mediator.startInterface(true);
         }
     }
 
     /**
      * Retrieve Path in Proof tree for a given node up to the root of the tree
+     *
      * @param node
      * @return
      */
-    private LinkedList<Node> getPaths(Node node){
+    private LinkedList<Node> getPaths(Node node) {
         LinkedList<Node> nodes = new LinkedList<>();
         nodes.add(node);
         int i = node.serialNr();
         Node tempN = node;
         Node tempParent = node.parent();
-        while(i != 0 && tempParent != null){
+        while (i != 0 && tempParent != null) {
             nodes.add(tempParent);
             i = extractParentNr(tempN);
-            tempN= tempParent;
+            tempN = tempParent;
             tempParent = tempN.parent();
         }
         return nodes;
 
     }
-    private int extractParentNr(Node n){
-        if(n.parent() != null) return n.parent().serialNr();
-        else return 0;
+
+    private int extractParentNr(Node n) {
+        if (n.parent() != null)
+            return n.parent().serialNr();
+        else
+            return 0;
     }
 
-    private java.util.List<Node> act(ScriptNode newnode) throws ScriptException, InterruptedException{
+    private java.util.List<Node> act(ScriptNode newnode)
+            throws ScriptException, InterruptedException {
 
-            Node node = newnode.getProofNode();
-            if(node == null) {
-                throw new ScriptException("No Matching Proof Node found");
-            }
-            mediator.setBack(node);
+        Node node = newnode.getProofNode();
+        if (node == null) {
+            throw new ScriptException("No Matching Proof Node found");
+        }
+        mediator.setBack(node);
 
-            Map<String, String> argMap = newnode.getCommand();
-            String name = argMap.get("#1");
-            if(name == null) {
-                throw new ScriptException("No command");
-            }
+        Map<String, String> argMap = newnode.getCommand();
+        String name = argMap.get("#1");
+        if (name == null) {
+            throw new ScriptException("No command");
+        }
 
-            ProofScriptCommand command = COMMANDS.get(name);
-
+        ProofScriptCommand command = COMMANDS.get(name);
 
         //assume command may be a macro call
-            if(command == null && !name.equals("skip")){
+        if (command == null && !name.equals("skip")) {
 
-                name = "macro";
-                argMap.put("#2", argMap.get("#1"));
-                argMap.put("#1", name);
-                command = COMMANDS.get(name);
+            name = "macro";
+            argMap.put("#2", argMap.get("#1"));
+            argMap.put("#1", name);
+            command = COMMANDS.get(name);
 
-                String lit = argMap.get("#literal");
-                argMap.put("#literal", "macro "+lit);
+            String lit = argMap.get("#literal");
+            argMap.put("#literal", "macro " + lit);
 
+        }
+
+        //hier Behandlung von skip, dass execute nicht auf skip angewandt wird
+        HashMap<String, Object> state = new HashMap<String, Object>();
+        throw new IllegalStateException("WEIGL: deactivated this code, due to a change api of proof scripts. "
+                + "\nPlease adapt this section, if this class is needed. Hint: Use the ProofScriptEngine");
+        //state.put(AbstractCommand.GOAL_KEY, node);
+        /*try {
+            if (!name.equals("skip")) {
+          //      command.execute(mediator.getUI(), associatedProof, argMap,
+          //              state);
             }
 
-            //hier Behandlung von skip, dass execute nicht auf skip angewandt wird
-            HashMap<String, Object> state = new HashMap<String, Object>();
-            state.put(AbstractCommand.GOAL_KEY, node);
-            try {
-                if(!name.equals("skip")) {
-                    command.execute(mediator.getUI(), associatedProof, argMap, state);
-                }
+        }
+        catch (ScriptException e) {
+            associatedProof.pruneProof(node);
+            newnode.setEncounteredException(e);
+            newnode.clearChildren();
+        }
 
-            } catch (ScriptException e) {
-                associatedProof.pruneProof(node);
-                newnode.setEncounteredException(e);
-                newnode.clearChildren();
-            }
-
-            java.util.List<Node> leaves = new ArrayList<Node>();
-            findLeaves(node, leaves);
-            leaves.remove(node);
-          //  getPaths(node);
+        java.util.List<Node> leaves = new ArrayList<Node>();
+        findLeaves(node, leaves);
+        leaves.remove(node);
+        //  getPaths(node);
         return leaves;
-
+        */
     }
 
-    private void compareAndAct(ScriptNode newnode, ScriptNode oldnode) throws ScriptException, InterruptedException {
+    private void compareAndAct(ScriptNode newnode, ScriptNode oldnode)
+            throws ScriptException, InterruptedException {
 
-        if(oldnode != null && newnode.getCommand().equals(oldnode.getCommand())) {
+        if (oldnode != null && newnode.getCommand()
+                .equals(oldnode.getCommand())) {
             Iterator<ScriptNode> nIt = newnode.getChildren().iterator();
             Iterator<ScriptNode> oIt = oldnode.getChildren().iterator();
-            while(oIt.hasNext() && nIt.hasNext()) {
+            while (oIt.hasNext() && nIt.hasNext()) {
                 ScriptNode n = nIt.next();
                 ScriptNode o = oIt.next();
                 n.setProofNode(o.getProofNode());
                 getPaths(n.getProofNode());
                 compareAndAct(n, o);
             }
-            while(oIt.hasNext()) {
+            while (oIt.hasNext()) {
                 // old node has more than new node: prune these
                 mediator.setBack(oIt.next().getProofNode());
             }
-            while(nIt.hasNext()) {
+            while (nIt.hasNext()) {
                 // XXX This is not good and will definitely fail.
                 // new node has more than old node: go into these too.
                 compareAndAct(nIt.next(), null);
             }
 
-        } else {
-
+        }
+        else {
 
             java.util.List<Node> leaves = act(newnode);
             java.util.List<ScriptNode> children = newnode.getChildren();
@@ -439,19 +453,19 @@ public class ScriptViewController implements ActionListener{
             //                        " children, but received " + children.size());
             //            }
 
-            if(children.size() > leaves.size()) {
+            if (children.size() > leaves.size()) {
                 throw new ScriptException("Command " +
                         //argMap.get("#literal") +
-                        " requires " + leaves.size() +
-                        " children, but received " + children.size());
+                        " requires " + leaves.size()
+                        + " children, but received " + children.size());
             }
 
-            while(children.size() < leaves.size()) {
+            while (children.size() < leaves.size()) {
                 // Adding phantom skip nodes ...
                 children.add(new ScriptNode(null, SKIP, -1, -1));
             }
 
-            for(int i=0; i < children.size(); i++) {
+            for (int i = 0; i < children.size(); i++) {
                 children.get(i).setProofNode(leaves.get(i));
             }
 
@@ -464,11 +478,11 @@ public class ScriptViewController implements ActionListener{
 
     private void findLeaves(Node node, java.util.List<Node> leaves) {
 
-        while(node.childrenCount() == 1) {
+        while (node.childrenCount() == 1) {
             node = node.child(0);
         }
 
-        if(node.leaf() && !node.isClosed())
+        if (node.leaf() && !node.isClosed())
             leaves.add(node);
 
         for (Node child : node.children()) {
@@ -478,25 +492,26 @@ public class ScriptViewController implements ActionListener{
 
     private void goTo() {
         int pos = textArea.getCaretPosition();
-        if(oldroot == null)
-            ExceptionDialog.showDialog(mainWindow, new Exception("There is currently no parsed script tree to browse."));
+        if (oldroot == null)
+            ExceptionDialog.showDialog(mainWindow, new Exception(
+                    "There is currently no parsed script tree to browse."));
         ScriptNode snode = getNodeAtPos(oldroot, pos);
-        if(snode != null) {
+        if (snode != null) {
             Node proofNode = snode.getProofNode();
-            if(proofNode != null) {
+            if (proofNode != null) {
                 mediator.getSelectionModel().setSelectedNode(proofNode);
             }
         }
     }
 
     private ScriptNode getNodeAtPos(ScriptNode node, int pos) {
-        if(node.getFromPos() <= pos && pos < node.getToPos()) {
+        if (node.getFromPos() <= pos && pos < node.getToPos()) {
             return node;
         }
 
         for (ScriptNode child : node.getChildren()) {
             ScriptNode result = getNodeAtPos(child, pos);
-            if(result != null) {
+            if (result != null) {
                 return result;
             }
         }
@@ -506,7 +521,8 @@ public class ScriptViewController implements ActionListener{
 
     private static Map<String, ProofScriptCommand> loadCommands() {
         Map<String, ProofScriptCommand> result = new HashMap<String, ProofScriptCommand>();
-        ServiceLoader<ProofScriptCommand> loader = ServiceLoader.load(ProofScriptCommand.class);
+        ServiceLoader<ProofScriptCommand> loader = ServiceLoader
+                .load(ProofScriptCommand.class);
 
         for (ProofScriptCommand cmd : loader) {
             result.put(cmd.getName(), cmd);

@@ -19,54 +19,40 @@ import java.util.Set;
 
 /**
  * Hide all formulas that are not selected
- *  Created by sarah on 1/12/17.
+ * Created by sarah on 1/12/17.
  */
-public class FocusOnSelectionAndHideCommand extends AbstractCommand {
-    private Proof proof;
-    private Map<String, String> args;
-    private Map<String, Object> stateMap;
-    private String[] termsToKeep;
+public class FocusOnSelectionAndHideCommand extends AbstractCommand<Sequent> {
     private Sequent toKeep;
 
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Proof proof, Map<String, String> args,
-                        Map<String, Object> stateMap) throws ScriptException, InterruptedException {
-
-        this.proof = proof;
-        this.stateMap = stateMap;
-        this.args = args;
-
-        String sequentString = args.get("#2");
-        if(sequentString == null) {
+    @Override public void execute(Sequent s)
+            throws ScriptException, InterruptedException {
+        if (s == null) {
             throw new ScriptException("Missing 'sequent' argument for focus");
         }
 
-        toKeep = parseSequent(sequentString, getGoalFromCurrentState());
+        toKeep = s;
+
+        //toKeep = parseSequent(sequentString, getGoalFromCurrentState());
         try {
             hideAll();
-        } catch (ParserException e) {
+        }
+        catch (ParserException e) {
             e.printStackTrace();
         }
 
     }
 
-    @Override
-    public String getName() {
+    @Override public Sequent evaluateArguments(EngineState state,
+            Map<String, String> arguments) throws Exception {
+        return state.toSequent(arguments.get("#2"));
+    }
+
+    @Override public String getName() {
         return "focus";
     }
 
-    private Sequent parseSequent(String sequentString, Goal g)  throws ScriptException {
-    try {
-         return toSequent(proof, g, stateMap, sequentString);
-
-        } catch (Exception e) {
-            throw new ScriptException(e);
-        }
-
-    }
-
-    private Goal getGoalFromCurrentState(){
+    /*
+    private Goal getGoalFromCurrentState() {
         Object fixedGoal = stateMap.get(GOAL_KEY);
         if (fixedGoal instanceof Node) {
             Node fixed = (Node) fixedGoal;
@@ -75,23 +61,23 @@ public class FocusOnSelectionAndHideCommand extends AbstractCommand {
                 assert fixed.childrenCount() == 1;
                 fixed = fixed.child(0);
             }
-            Goal g = getGoal(proof.openGoals(), fixed);
+            Goal g = state.getGoal(proof.openGoals(), fixed);
             return g;
         }
         return null;
     }
-
-
+    */
 
     /**
      * Hide all formulas of the sequent that are not focus sequent
+     *
      * @throws ParserException
      * @throws ScriptException
      */
-    private void hideAll() throws ParserException, ScriptException{
-        while(true){
+    private void hideAll() throws ParserException, ScriptException {
+        while (true) {
             //get current goal
-            Goal g = getGoalFromCurrentState();
+            Goal g = state.getFirstOpenGoal();
             //find formulas that should be hidden in sequent of current goal
 
             //hide
@@ -103,23 +89,26 @@ public class FocusOnSelectionAndHideCommand extends AbstractCommand {
                 if (toHide != null) {
                     boolean antec = false;
 
-                        Taclet tac;
-                        if (g.sequent().antecedent().contains(toHide)) {
-                            tac = getTaclet(toHide.formula(), "left");
-                            antec = true;
+                    Taclet tac;
+                    if (g.sequent().antecedent().contains(toHide)) {
+                        tac = getTaclet(toHide.formula(), "left");
+                        antec = true;
 
-                        } else {
-                            tac = getTaclet(toHide.formula(), "right");
+                    }
+                    else {
+                        tac = getTaclet(toHide.formula(), "right");
 
-                        }
-                        makeTacletApp(g, toHide, tac, antec);
+                    }
+                    makeTacletApp(g, toHide, tac, antec);
 
-                } else {
+                }
+                else {
                     //no formulas to hide any more on sequent
                     break;
                 }
 
-            }else{
+            }
+            else {
                 //goal is null
                 break;
             }
@@ -127,40 +116,41 @@ public class FocusOnSelectionAndHideCommand extends AbstractCommand {
 
     }
 
-
     //determine where formula in sequent and apply either hide_left or hide_right
-    private Taclet getTaclet(Term t, String pos) throws ScriptException{
+    private Taclet getTaclet(Term t, String pos) throws ScriptException {
         String ruleName;
         Taclet tac;
-        switch(pos){
-            case "left":
-                ruleName = "hide_left";
-                break;
-            case "right":
-                ruleName ="hide_right";
-                break;
-            default:
-                ruleName ="";
-                throw new ScriptException("Position of term "+t.toString()+ "unknown");
+        switch (pos) {
+        case "left":
+            ruleName = "hide_left";
+            break;
+        case "right":
+            ruleName = "hide_right";
+            break;
+        default:
+            ruleName = "";
+            throw new ScriptException(
+                    "Position of term " + t.toString() + "unknown");
         }
 
-        tac = proof.getEnv().getInitConfigForEnvironment().lookupActiveTaclet(new Name(ruleName));
+        tac = proof.getEnv().getInitConfigForEnvironment()
+                .lookupActiveTaclet(new Name(ruleName));
 
         return tac;
-
 
     }
 
     /**
      * Iterate through sequent and find first formula that is not in the list of formulas to keep and return this formula
+     *
      * @param g
      * @return formula to hide, if all formulas in the sequent should be kept, returns null
      * @throws ScriptException
      * @throws ParserException
-     *
      */
 
-    private SequentFormula iterateThroughSequentAndFindNonMatch(Goal g) throws ScriptException, ParserException {
+    private SequentFormula iterateThroughSequentAndFindNonMatch(Goal g)
+            throws ScriptException, ParserException {
         Semisequent focusedAntec = toKeep.antecedent();
         Semisequent focusedSucc = toKeep.succedent();
 
@@ -168,10 +158,9 @@ public class FocusOnSelectionAndHideCommand extends AbstractCommand {
         Semisequent currentAntec = currentGoalSeq.antecedent();
         Semisequent currentSucc = currentGoalSeq.succedent();
 
-
         //first iterate through antecedent
         Iterator<SequentFormula> iterator = currentAntec.iterator();
-        while(iterator.hasNext()) {
+        while (iterator.hasNext()) {
             SequentFormula form = iterator.next();
             Iterator<SequentFormula> focusAntecIter = focusedAntec.iterator();
 
@@ -195,19 +184,19 @@ public class FocusOnSelectionAndHideCommand extends AbstractCommand {
         //if in antecedent no formula to hide iterate through succedent
         Iterator<SequentFormula> iteratorSucc = currentSucc.iterator();
 
-        while(iteratorSucc.hasNext()) {
+        while (iteratorSucc.hasNext()) {
             Boolean isIn = false;
             SequentFormula form = iteratorSucc.next();
             Iterator<SequentFormula> focusSuccIter = focusedSucc.iterator();
 
             while (focusSuccIter.hasNext()) {
-               SequentFormula toKeepForm = focusSuccIter.next();
-               if (toKeepForm.equals(form)) {
+                SequentFormula toKeepForm = focusSuccIter.next();
+                if (toKeepForm.equals(form)) {
                     isIn = true;
                     break;
-               }
+                }
             }
-            if(!isIn){
+            if (!isIn) {
                 return form;
             }
         }
@@ -217,35 +206,36 @@ public class FocusOnSelectionAndHideCommand extends AbstractCommand {
 
     /**
      * Make tacletApp for one sequentformula to hide on the seuqent
-     * @param g the goal on which this hide rule should be applied to
+     *
+     * @param g      the goal on which this hide rule should be applied to
      * @param toHide the sequentformula to hide
-     * @param tac the taclet top apply (either hide_left or hide_right)
-     * @param antec whether teh formula is in the antecedent
+     * @param tac    the taclet top apply (either hide_left or hide_right)
+     * @param antec  whether teh formula is in the antecedent
      * @throws ScriptException
      */
-    private void makeTacletApp(Goal g, SequentFormula toHide, Taclet tac, boolean antec) throws ScriptException{
+    private void makeTacletApp(Goal g, SequentFormula toHide, Taclet tac,
+            boolean antec) throws ScriptException {
 
-
-       //hide rules only applicable to top-level terms/sequent formulas
+        //hide rules only applicable to top-level terms/sequent formulas
         PosInTerm pit = PosInTerm.getTopLevel();
 
         PosInOccurrence pio = new PosInOccurrence(toHide, pit, antec);
 
         Set<SchemaVariable> svs = tac.collectSchemaVars();
-        assert  svs.size() == 1;
+        assert svs.size() == 1;
         Iterator iter = svs.iterator();
         SchemaVariable sv = (SchemaVariable) iter.next();
 
         SVInstantiations inst = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 
-        TacletApp app = PosTacletApp.createPosTacletApp((FindTaclet) tac, inst , pio, proof.getServices());
-        app = app.addCheckedInstantiation(sv, toHide.formula(), proof.getServices(), true);
+        TacletApp app = PosTacletApp
+                .createPosTacletApp((FindTaclet) tac, inst, pio,
+                        proof.getServices());
+        app = app.addCheckedInstantiation(sv, toHide.formula(),
+                proof.getServices(), true);
         g.apply(app);
 
-
-
     }
-
 
 }
 

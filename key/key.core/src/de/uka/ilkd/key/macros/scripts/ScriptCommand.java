@@ -41,7 +41,7 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
     }
 
     @Override public Parameters evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws ScriptException {
+            Map<String, String> arguments) throws Exception {
         return ValueInjector.injection(new Parameters(), arguments);
     }
 

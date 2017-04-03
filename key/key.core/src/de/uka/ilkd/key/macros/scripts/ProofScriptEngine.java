@@ -13,6 +13,10 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Proof;
 
+/**
+ * @author Mattias Ulbrich
+ * @author Alexander Weigl
+ */
 public class ProofScriptEngine {
     private static final int MAX_CHARS_PER_COMMAND = 80;
     private static final Map<String, ProofScriptCommand> COMMANDS = loadCommands();

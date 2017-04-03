@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
@@ -30,13 +32,13 @@ public class EngineState {
      */
     private Observer observer;
     private File baseFileName = new File(".");
-    private ValueInjector valueInjector = ValueInjector.getDefault();
+    private ValueInjector valueInjector = ValueInjector.createDefault();
     private Goal goal;
 
     public EngineState(Proof proof) {
         this.proof = proof;
-        valueInjector.converters.put(Term.class, (String s) -> toTerm(s, null));
-        valueInjector.converters.put(Sort.class, this::toSort);
+        valueInjector.addConverter(Term.class, (String s) -> toTerm(s, null));
+        valueInjector.addConverter(Sort.class, this::toSort);
     }
 
     public void setGoal(Goal g) {
@@ -117,6 +119,23 @@ public class EngineState {
         return sort;
     }
 
+    public Sequent toSequent(String sequent)
+            throws ParserException, ScriptException {
+        StringReader reader = new StringReader(sequent);
+        Services services = proof.getServices();
+
+        NamespaceSet nss = getFirstOpenGoal() == null ?
+                services.getNamespaces() :
+                getFirstOpenGoal().getLocalNamespaces();
+
+        Sequent seq = PARSER
+                .parseSeq(reader, services, nss, getAbbreviations());
+        //Sequent seq = null;
+        return seq;
+        //Term formula = PARSER.parse(reader, sort, services, nss, abbrMap);
+        //return formula;
+    }
+
     protected static Goal getGoal(ImmutableList<Goal> openGoals, Node node) {
         for (Goal goal : openGoals) {
             if (goal.node() == node) {
@@ -168,5 +187,9 @@ public class EngineState {
 
     public AbbrevMap getAbbreviations() {
         return abbrevMap;
+    }
+
+    public void setGoal(Node node) {
+        setGoal(getGoal(proof.openGoals(), node));
     }
 }
