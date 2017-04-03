@@ -41,7 +41,7 @@ public class RuleExtractor {
 	 * @return true if the name convention is true, false else.
 	 */
 	private boolean checkNameConvention(Rule r){
-		String rulename = r.displayName(); 
+		String rulename = r.name().toString();
 		return (rulename.startsWith(RULENAME_PREFIX)) && (rulename.endsWith(RULENAME_POSTFIX));
 	}
 }
