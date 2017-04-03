@@ -21,7 +21,7 @@ public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     }
 
     @Override public Parameters evaluateArguments(EngineState state,
-            Map<String, String> arguments) {
+            Map<String, String> arguments) throws Exception {
         return state.getValueInjector().inject(new Parameters(), arguments);
     }
 

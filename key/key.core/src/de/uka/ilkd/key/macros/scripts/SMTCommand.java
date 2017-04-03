@@ -1,26 +1,13 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import com.sun.xml.internal.ws.api.pipe.Engine;
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
-import de.uka.ilkd.key.smt.RuleAppSMT;
-import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.*;
 import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
-import de.uka.ilkd.key.smt.SolverLauncher;
-import de.uka.ilkd.key.smt.SolverType;
-import de.uka.ilkd.key.smt.SolverTypeCollection;
+
+import java.util.*;
 
 public class SMTCommand
         extends AbstractCommand<SMTCommand.SMTCommandArguments> {
@@ -31,7 +18,7 @@ public class SMTCommand
     private static final Map<String, SolverType> SOLVER_MAP = computeSolverMap();
 
     @Override public SMTCommandArguments evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws ScriptException {
+            Map<String, String> arguments) throws Exception {
         return ValueInjector.injection(new SMTCommandArguments(), arguments);
     }
 

@@ -25,7 +25,7 @@ public interface ProofScriptCommand<T> {
      * @return
      */
     T evaluateArguments(EngineState state, Map<String, String> arguments)
-            throws ScriptException;
+            throws Exception;
 
     /**
      * @param uiControl

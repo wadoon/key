@@ -5,19 +5,14 @@ import java.util.Map;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
 
-public class SkipCommand extends AbstractCommand {
-
-    @Override
-    public void execute(AbstractUserInterfaceControl uiControl, Proof proof,
-            Map<String, String> args, Map<String, Object> stateMap)
+public class SkipCommand extends NoArgumentCommand {
+    @Override public void execute(AbstractUserInterfaceControl uiControl,
+            Void args, EngineState stateMap)
             throws ScriptException, InterruptedException {
-        
-        // just do nothing
 
     }
 
-    @Override
-    public String getName() {
+    @Override public String getName() {
         return "skip";
     }
 

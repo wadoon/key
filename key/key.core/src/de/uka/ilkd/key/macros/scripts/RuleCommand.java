@@ -43,7 +43,7 @@ public class RuleCommand implements ProofScriptCommand<RuleCommand.Parameters> {
     }
 
     @Override public Parameters evaluateArguments(EngineState state,
-            Map<String, String> arguments) {
+            Map<String, String> arguments) throws Exception {
         Parameters p = state.getValueInjector()
                 .inject(new Parameters(), arguments);
 
