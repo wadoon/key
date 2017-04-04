@@ -93,5 +93,31 @@ public class AtomicRelationDescription {
 	 */
 	public Term getRange(){
 		return this.rangeFormula;
-	}	
+	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public String toString(){
+		StringBuilder sb = new StringBuilder();
+		boolean firstElement = true;
+		sb.append("Range Formula:");
+		sb.append(this.rangeFormula.toString());
+		sb.append(", Substitutions: ");
+		for(Pair<QuantifiableVariable, Term> subst : this.domainSubstitution){
+			if(!firstElement){
+				sb.append(", ");
+			}
+			else{
+				firstElement = false;
+			}
+			sb.append("{");
+			sb.append(subst.first.toString());
+			sb.append("\\");
+			sb.append(subst.second.toString());
+			sb.append("}");
+		}
+		return sb.toString();
+	}
 }

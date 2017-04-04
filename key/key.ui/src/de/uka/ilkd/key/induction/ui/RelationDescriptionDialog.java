@@ -4,88 +4,45 @@ import java.awt.Dialog;
 import java.awt.Frame;
 import java.awt.GraphicsConfiguration;
 import java.awt.Window;
+import java.util.LinkedList;
 
 import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+import de.uka.ilkd.key.induction.AtomicRelationDescription;
+import de.uka.ilkd.key.induction.RelationDescription;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
 
 public class RelationDescriptionDialog extends JDialog {
 
-	public RelationDescriptionDialog() {
-		// TODO Auto-generated constructor stub
+	private JLabel headline;
+	private JLabel content;
+	private RelationDescription relationdescription;
+	
+	public RelationDescriptionDialog(JFrame parent, Term term, Services s) {
+		super(parent, "Atomic Relation Descriptions");
+		this.setVisible(true);
+		this.setSize(350, 175);
+		
+		this.headline = new JLabel("Relationen Descriptions for " + term.toString());
+		this.content = new JLabel();
+		
+		this.add(headline);
+		this.add(content);
+		
+		this.relationdescription = new RelationDescription(term, s);
+		this.displayRelationDescriptions();
 	}
 
-	public RelationDescriptionDialog(Frame arg0) {
-		super(arg0);
-		// TODO Auto-generated constructor stub
+	private void displayRelationDescriptions(){
+		LinkedList<AtomicRelationDescription> loard = relationdescription.getAtomics();
+		
+		StringBuilder sb = new StringBuilder();
+		for(AtomicRelationDescription ard : loard){
+			sb.append(ard.toString());
+		}
+		
 	}
-
-	public RelationDescriptionDialog(Dialog arg0) {
-		super(arg0);
-		// TODO Auto-generated constructor stub
-	}
-
-	public RelationDescriptionDialog(Window arg0) {
-		super(arg0);
-		// TODO Auto-generated constructor stub
-	}
-
-	public RelationDescriptionDialog(Frame arg0, boolean arg1) {
-		super(arg0, arg1);
-		// TODO Auto-generated constructor stub
-	}
-
-	public RelationDescriptionDialog(Frame arg0, String arg1) {
-		super(arg0, arg1);
-		// TODO Auto-generated constructor stub
-	}
-
-	public RelationDescriptionDialog(Dialog arg0, boolean arg1) {
-		super(arg0, arg1);
-		// TODO Auto-generated constructor stub
-	}
-
-	public RelationDescriptionDialog(Dialog arg0, String arg1) {
-		super(arg0, arg1);
-		// TODO Auto-generated constructor stub
-	}
-
-	public RelationDescriptionDialog(Window arg0, ModalityType arg1) {
-		super(arg0, arg1);
-		// TODO Auto-generated constructor stub
-	}
-
-	public RelationDescriptionDialog(Window arg0, String arg1) {
-		super(arg0, arg1);
-		// TODO Auto-generated constructor stub
-	}
-
-	public RelationDescriptionDialog(Frame arg0, String arg1, boolean arg2) {
-		super(arg0, arg1, arg2);
-		// TODO Auto-generated constructor stub
-	}
-
-	public RelationDescriptionDialog(Dialog arg0, String arg1, boolean arg2) {
-		super(arg0, arg1, arg2);
-		// TODO Auto-generated constructor stub
-	}
-
-	public RelationDescriptionDialog(Window arg0, String arg1, ModalityType arg2) {
-		super(arg0, arg1, arg2);
-		// TODO Auto-generated constructor stub
-	}
-
-	public RelationDescriptionDialog(Frame arg0, String arg1, boolean arg2, GraphicsConfiguration arg3) {
-		super(arg0, arg1, arg2, arg3);
-		// TODO Auto-generated constructor stub
-	}
-
-	public RelationDescriptionDialog(Dialog arg0, String arg1, boolean arg2, GraphicsConfiguration arg3) {
-		super(arg0, arg1, arg2, arg3);
-		// TODO Auto-generated constructor stub
-	}
-
-	public RelationDescriptionDialog(Window arg0, String arg1, ModalityType arg2, GraphicsConfiguration arg3) {
-		super(arg0, arg1, arg2, arg3);
-		// TODO Auto-generated constructor stub
-	}
-
 }
