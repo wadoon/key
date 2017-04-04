@@ -32,7 +32,7 @@ public class RelationDescription {
 		ImmutableArray<Function> constructors = ce.getConstructors();
 		LinkedList<Term> rangeFormulas;
 		for(Function f : constructors){
-			possibleSubstitutions.add(createSubstitutions(f, serv));
+			possibleSubstitutions.addAll(createSubstitutions(f, serv));
 		}
 		rangeFormulas = createRangeFormulas(t, serv);
 	}
@@ -40,6 +40,8 @@ public class RelationDescription {
 	private static LinkedList<Term> createRangeFormulas(Term t, Services s){
 		ImmutableList<Named> namedrules = s.getNamespaces().ruleSets().elements();
 		LinkedList<FindTaclet> rules = new LinkedList<FindTaclet>();
+		LinkedList<Term> possibleRangeFormulas = new LinkedList<Term>();
+		TermBuilder tb = s.getTermBuilder();
 		//TODO: check for optimizations
 		for(Named n : namedrules){
 			Rule r = (Rule)n;
@@ -51,14 +53,21 @@ public class RelationDescription {
 			}
 		}
 		//TODO: compute the range formula
-		return null;
+		for(FindTaclet ft : rules){
+			Term term = ft.find();
+			//TODO: find condition which substitutions the "variables" of t should match in the given rules
+			//TODO: create cases for those.
+		}
+		return possibleRangeFormulas;
 	}
 	
 	private static boolean findTacletMatches(FindTaclet ft, Term t, Services s){
-		//TODO: return whether the given term fits to the findtaclet or not.
-		MatchConditions mc = new MatchConditions();
-		mc = ft.getMatcher().matchFind(t, mc, s);
-		return mc != null;
+		//MatchConditions mc = new MatchConditions();
+		//mc = ft.getMatcher().matchFind(t, mc, s);
+		//return mc != null;
+		
+		//TODO: check down to the lowest "function" of t		
+		return ft.find().op().equals(t.op());	//just check for top level equality
 	}
 	
 	private static LinkedList<Pair<QuantifiableVariable, Term>> createSubstitutions(Function f, Services s){
