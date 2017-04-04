@@ -48,11 +48,8 @@ public class RelationDescription {
 			Rule r = (Rule)n;
 			if(r instanceof FindTaclet){
 				FindTaclet ft = (FindTaclet)r;
-				/*if(findTacletMatches(ft, t, s)){
-					rules.add(ft);
-				}*/
 				//check whether the find term of the the FindTaclet is an instance of the given term
-				Term rangeFormula = createRangeFormulaIfPossible(t, ft.find());
+				Term rangeFormula = createRangeFormula(t, ft.find(), s);
 				//TODO: find a way to express multiple rangeformulas in one
 				/*
 				 * E.g. if there are rangeformulas int x: x = 0, x = 1, x = 2
@@ -77,32 +74,27 @@ public class RelationDescription {
 	 * which condition the term would be the same as the findTerm. E.g. term = f(a), findTerm = f(g(x)) this function
 	 * would return a = g(x). 
 	 */
-	private static Term createRangeFormulaIfPossible(Term term, Term findTerm){
-		if(term.arity() > 0 && findTerm.op().equals(term.op())){
-			//TODO: return the conjunction of all subterm:
-			/*
-			 * createRangeFormulaIfPossible(firstSubtermOfTerm, firstSubtermofFindTerm)
-			 * & createRangeFormulaIfPossible(secondSubTermOfTerm, secondSubTermOfFindTerm) ... 
-			 */
-			return null;
-		}
-		else{
-			if(term.arity() == 0){
-				return findTerm;	//TODO: return term = findTerm as formula
+	private static Term createRangeFormula(Term term, Term findTerm, Services s){
+		TermBuilder tb = s.getTermBuilder();
+		
+		if(findTerm.op().equals(term.op())){
+			if(term.arity() > 0){
+				LinkedList<Term> subterms = new LinkedList<Term>();
+				for(int i = 0; i < term.arity(); i++){
+					subterms.add(createRangeFormula(term.sub(i), findTerm.sub(i), s));
+				}
+				return tb.and(subterms);
 			}
 			else{
-				return null;	//TODO: maybe throw exception cause in this case no rangeformula will be created.
+				//TODO:[optional] Maybe check arity for negative values
+				return tb.equals(term, findTerm);
 			}
 		}
-	}
-	
-	private static boolean findTacletMatches(FindTaclet ft, Term t, Services s){
-		//MatchConditions mc = new MatchConditions();
-		//mc = ft.getMatcher().matchFind(t, mc, s);
-		//return mc != null;
+		else{
+			return tb.FALSE();
+		}
 		
-		//TODO: check down to the lowest "function" of t		
-		return ft.find().op().equals(t.op());	//just check for top level equality
+		
 	}
 	
 	private static LinkedList<Pair<QuantifiableVariable, Term>> createSubstitutions(Function f, Services s){
