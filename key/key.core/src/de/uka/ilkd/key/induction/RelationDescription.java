@@ -53,6 +53,11 @@ public class RelationDescription {
 				}*/
 				//check whether the find term of the the FindTaclet is an instance of the given term
 				Term rangeFormula = createRangeFormulaIfPossible(t, ft.find());
+				//TODO: find a way to express multiple rangeformulas in one
+				/*
+				 * E.g. if there are rangeformulas int x: x = 0, x = 1, x = 2
+				 * make a new rangeformula x >= 0 && x <= 2 and throw the others away.
+				 */
 			}
 		}
 		//TODO: compute the range formula
@@ -64,6 +69,14 @@ public class RelationDescription {
 		return possibleRangeFormulas;
 	}
 	
+	/**
+	 * 
+	 * @param term
+	 * @param findTerm
+	 * @return if the findTerm is an instance of the given term this function returns a term which shows under 
+	 * which condition the term would be the same as the findTerm. E.g. term = f(a), findTerm = f(g(x)) this function
+	 * would return a = g(x). 
+	 */
 	private static Term createRangeFormulaIfPossible(Term term, Term findTerm){
 		if(term.arity() > 0 && findTerm.op().equals(term.op())){
 			//TODO: return the conjunction of all subterm:
