@@ -40,7 +40,14 @@ public class RelationDescription {
 		
 		//TODO: generate AtomicRelationDescription for all possibleRangeFormulas
 		for(Term range : possibleRangeFormulas){
-			
+			/*
+			 * How to select the right substitutions? Is another ConstructorExctractor needed?
+			 * If yes is the one above needed?
+			 */
+			atomics.add(new AtomicRelationDescription(
+					range,
+					possibleSubstitutions	//TODO: filter this list.
+					));
 		}
 	}
 	
@@ -67,7 +74,7 @@ public class RelationDescription {
 				for(int i = 0; i < nos; i++){
 					if(rangeFormula.sub(i).equals(tb.FALSE())){
 						falseIsDirectSubterm = true;	//does the "and" operator work with this?
-						break;
+						break;							//@see createRangeFormula
 					}
 				}
 				if(!falseIsDirectSubterm){
