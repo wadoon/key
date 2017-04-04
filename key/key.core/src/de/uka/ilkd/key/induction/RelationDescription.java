@@ -27,16 +27,21 @@ public class RelationDescription {
 
 	private LinkedList<AtomicRelationDescription> atomics;
 	private LinkedList<Pair<QuantifiableVariable, Term>> possibleSubstitutions;
+	private LinkedList<Term> possibleRangeFormulas;
 	
 	
 	public RelationDescription(Term t, Services serv){
 		ConstructorExtractor ce = new ConstructorExtractor(t, serv);
 		ImmutableArray<Function> constructors = ce.getConstructors();
-		LinkedList<Term> rangeFormulas;
 		for(Function f : constructors){
 			possibleSubstitutions.addAll(createSubstitutions(f, serv));
 		}
-		rangeFormulas = createRangeFormulas(t, serv);
+		possibleRangeFormulas = createRangeFormulas(t, serv);
+		
+		//TODO: generate AtomicRelationDescription for all possibleRangeFormulas
+		for(Term range : possibleRangeFormulas){
+			
+		}
 	}
 	
 	private static LinkedList<Term> createRangeFormulas(Term t, Services s){
@@ -50,7 +55,7 @@ public class RelationDescription {
 				FindTaclet ft = (FindTaclet)r;
 				//check whether the find term of the the FindTaclet is an instance of the given term
 				Term rangeFormula = createRangeFormula(t, ft.find(), s);
-				//TODO:[optional] find a way to express multiple rangeformulas in one
+				//TODO:[optional] find a way to express multiple rangeformulas in one (optimization)
 				/*
 				 * E.g. if there are rangeformulas int x: x = 0, x = 1, x = 2
 				 * make a new rangeformula x >= 0 && x <= 2 and throw the others away.
@@ -61,7 +66,7 @@ public class RelationDescription {
 				boolean falseIsDirectSubterm = false;
 				for(int i = 0; i < nos; i++){
 					if(rangeFormula.sub(i).equals(tb.FALSE())){
-						falseIsDirectSubterm = true;
+						falseIsDirectSubterm = true;	//does the "and" operator work with this?
 						break;
 					}
 				}
@@ -90,7 +95,7 @@ public class RelationDescription {
 				for(int i = 0; i < term.arity(); i++){
 					subterms.add(createRangeFormula(term.sub(i), findTerm.sub(i), s));
 				}
-				return tb.and(subterms);
+				return tb.and(subterms);	//how does add work? two parameters or more?
 			}
 			else{
 				//TODO:[optional] Maybe check arity for negative values and their handling

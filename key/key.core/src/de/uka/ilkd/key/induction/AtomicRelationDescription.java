@@ -49,6 +49,11 @@ public class AtomicRelationDescription {
 		return relevantVars;
 	}
 	
+	/**
+	 * 
+	 * @param list
+	 * @param element this element is added to the given list if the list does not already contain it.
+	 */
 	private <T> void addIfNotContains(LinkedList<T> list, T element){
 		if(!list.contains(element)){
 			list.add(element);
@@ -75,7 +80,7 @@ public class AtomicRelationDescription {
 	
 	/**
 	 * @see getRelevantVariables
-	 * @return Set&lt;Varaible&gt;: all relevant variables which occur in an element of domainSubstitution.
+	 * @return Set&lt;Variable&gt;: all relevant variables which occur in an element of domainSubstitution.
 	 */
 	public Set<Variable> getInductionVariables(){
 		//TODO: implementation
