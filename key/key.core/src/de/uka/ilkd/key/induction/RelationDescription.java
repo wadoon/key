@@ -43,7 +43,7 @@ public class RelationDescription {
 		LinkedList<FindTaclet> rules = new LinkedList<FindTaclet>();
 		LinkedList<Term> possibleRangeFormulas = new LinkedList<Term>();
 		TermBuilder tb = s.getTermBuilder();
-		//TODO: check for optimizations
+		//TODO:[optional] check for optimizations
 		for(Named n : namedrules){
 			Rule r = (Rule)n;
 			if(r instanceof FindTaclet){
@@ -55,6 +55,8 @@ public class RelationDescription {
 				 * E.g. if there are rangeformulas int x: x = 0, x = 1, x = 2
 				 * make a new rangeformula x >= 0 && x <= 2 and throw the others away.
 				 */
+				
+				//TODO:[optional] check for optimization
 				int nos = rangeFormula.subs().size();
 				boolean falseIsDirectSubterm = false;
 				for(int i = 0; i < nos; i++){
@@ -67,12 +69,6 @@ public class RelationDescription {
 					possibleRangeFormulas.add(rangeFormula);
 				}
 			}
-		}
-		//TODO: compute the range formula
-		for(FindTaclet ft : rules){
-			Term term = ft.find();
-			//TODO: find condition which substitutions the "variables" of t should match in the given rules
-			//TODO: create cases for those.
 		}
 		return possibleRangeFormulas;
 	}
@@ -104,13 +100,15 @@ public class RelationDescription {
 		else{
 			return tb.FALSE();
 		}
-		
-		
 	}
 	
+	/**
+	 * 
+	 * @param f: a constructor
+	 * @param s
+	 * @return a LinkedList&lt;Pair&lt;QuantifiableVariable, Term&gt;&gt; which contains constructor substitutions
+	 */
 	private static LinkedList<Pair<QuantifiableVariable, Term>> createSubstitutions(Function f, Services s){
-		//How to create a Substitution and new QuantifiableVariables.
-		//TODO: return a substitution with a new QuantifiableVariable and the function with new variables as term.
 		Sort returnSort = f.sort();
 		Namespace vars = s.getNamespaces().variables();
 		TermBuilder tb = s.getTermBuilder();
