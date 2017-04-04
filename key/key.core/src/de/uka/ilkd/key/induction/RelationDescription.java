@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.FindTaclet;
@@ -47,9 +48,11 @@ public class RelationDescription {
 			Rule r = (Rule)n;
 			if(r instanceof FindTaclet){
 				FindTaclet ft = (FindTaclet)r;
-				if(findTacletMatches(ft, t, s)){
+				/*if(findTacletMatches(ft, t, s)){
 					rules.add(ft);
-				}
+				}*/
+				//check whether the find term of the the FindTaclet is an instance of the given term
+				Term rangeFormula = createRangeFormulaIfPossible(t, ft.find());
 			}
 		}
 		//TODO: compute the range formula
@@ -59,6 +62,25 @@ public class RelationDescription {
 			//TODO: create cases for those.
 		}
 		return possibleRangeFormulas;
+	}
+	
+	private static Term createRangeFormulaIfPossible(Term term, Term findTerm){
+		if(term.arity() > 0 && findTerm.op().equals(term.op())){
+			//TODO: return the conjunction of all subterm:
+			/*
+			 * createRangeFormulaIfPossible(firstSubtermOfTerm, firstSubtermofFindTerm)
+			 * & createRangeFormulaIfPossible(secondSubTermOfTerm, secondSubTermOfFindTerm) ... 
+			 */
+			return null;
+		}
+		else{
+			if(term.arity() == 0){
+				return findTerm;	//TODO: return term = findTerm as formula
+			}
+			else{
+				return null;	//TODO: maybe throw exception cause in this case no rangeformula will be created.
+			}
+		}
 	}
 	
 	private static boolean findTacletMatches(FindTaclet ft, Term t, Services s){
