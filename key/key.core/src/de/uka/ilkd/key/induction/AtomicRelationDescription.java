@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.induction;
 
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.Set;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -11,6 +12,7 @@ import de.uka.ilkd.key.java.abstraction.Variable;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
+import de.uka.ilkd.key.util.Pair;
 
 public class AtomicRelationDescription {
 	
@@ -23,29 +25,52 @@ public class AtomicRelationDescription {
 	
 	/** TODO: find fitting description. 
 	 * this should not be empty */
-	private Set<Substitution> domainSubstitution;
+	private LinkedList<Pair<QuantifiableVariable, Term>> domainSubstitution;
 	
-	public AtomicRelationDescription(){
-		//TODO: generate the range formula and the set of substitutions
+	public AtomicRelationDescription(Term range, LinkedList<Pair<QuantifiableVariable, Term>> substitions){
+		rangeFormula = range;
+		domainSubstitution = substitions;
 	}
 	
 	/**
 	 * 
 	 * @return Set&lt;Variable&gt;: all variables used in rangeFormula and/or domainSubstitution.
 	 */
-	public Set<Variable> getRelevantVariables(){
-		//TODO: collect the variables from rangeFormula and domainSubstitution
-		Set<Variable> relevantVars = null;	//Find the most useful type of set
+	public LinkedList<QuantifiableVariable> getRelevantVariables(){
+		LinkedList<QuantifiableVariable> relevantVars = null;	//Find the most useful type of set
 		
-		ImmutableSet<QuantifiableVariable> freeVarsOfRangeFormula = rangeFormula.freeVars();	//transform into variables
-		ImmutableArray<QuantifiableVariable> boundVarsOfRangeFormula = rangeFormula.boundVars();	//transform into variables
+		addTermVars(relevantVars, rangeFormula);
 		
-		for(Substitution substitution: domainSubstitution){
-			ImmutableMap<QuantifiableVariable, Term> freeVarsOfSubstitution = substitution.getVarMap();	//transform into variables
+		for(Pair<QuantifiableVariable, Term> subst : this.domainSubstitution){
+			addIfNotContains(relevantVars, subst.first);
+			addTermVars(relevantVars, subst.second);
 		}
 		
-		//TODO collect the variables and add them to the set of relevant variables.
 		return relevantVars;
+	}
+	
+	private <T> void addIfNotContains(LinkedList<T> list, T element){
+		if(!list.contains(element)){
+			list.add(element);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param list a list of QuantifiableVariables
+	 * @param t the term whose variables should be added to the given list.
+	 */
+	private void addTermVars(LinkedList<QuantifiableVariable> list, Term t){
+		ImmutableSet<QuantifiableVariable> freeVarsOfRangeFormula = t.freeVars();	//transform into variables
+		ImmutableArray<QuantifiableVariable> boundVarsOfRangeFormula = t.boundVars();	//transform into variables
+		
+		for(QuantifiableVariable qv : freeVarsOfRangeFormula){
+			addIfNotContains(list, qv);
+		}
+		
+		for(QuantifiableVariable qv : boundVarsOfRangeFormula){
+			addIfNotContains(list, qv);
+		}
 	}
 	
 	/**
@@ -59,11 +84,9 @@ public class AtomicRelationDescription {
 	}
 	
 	/**
-	 * 
+	 * @return the rangeformula of this AtomicRelationDescription as Term.
 	 */
-	//TODO: replace void with a returntype for "Relation"
-	public void getRange(){
-		
-	}
-	
+	public Term getRange(){
+		return this.rangeFormula;
+	}	
 }

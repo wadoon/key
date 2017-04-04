@@ -28,6 +28,7 @@ public class RelationDescription {
 	private LinkedList<AtomicRelationDescription> atomics;
 	private LinkedList<Pair<QuantifiableVariable, Term>> possibleSubstitutions;
 	
+	
 	public RelationDescription(Term t, Services serv){
 		ConstructorExtractor ce = new ConstructorExtractor(t, serv);
 		ImmutableArray<Function> constructors = ce.getConstructors();
@@ -40,7 +41,6 @@ public class RelationDescription {
 	
 	private static LinkedList<Term> createRangeFormulas(Term t, Services s){
 		ImmutableList<Named> namedrules = s.getNamespaces().ruleSets().elements();
-		LinkedList<FindTaclet> rules = new LinkedList<FindTaclet>();
 		LinkedList<Term> possibleRangeFormulas = new LinkedList<Term>();
 		TermBuilder tb = s.getTermBuilder();
 		//TODO:[optional] check for optimizations
