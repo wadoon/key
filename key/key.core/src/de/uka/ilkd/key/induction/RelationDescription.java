@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.Rule;
@@ -51,6 +52,10 @@ public class RelationDescription {
 		}
 	}
 	
+	public LinkedList<AtomicRelationDescription> getAtomics(){
+		return this.atomics;
+	}
+	
 	private static LinkedList<Term> createRangeFormulas(Term t, Services s){
 		ImmutableList<Named> namedrules = s.getNamespaces().ruleSets().elements();
 		LinkedList<Term> possibleRangeFormulas = new LinkedList<Term>();
@@ -72,7 +77,7 @@ public class RelationDescription {
 				int nos = rangeFormula.subs().size();
 				boolean falseIsDirectSubterm = false;
 				for(int i = 0; i < nos; i++){
-					if(rangeFormula.sub(i).equals(tb.FALSE())){
+					if(rangeFormula.sub(i).equals(tb.ff())){
 						falseIsDirectSubterm = true;	//does the "and" operator work with this?
 						break;							//@see createRangeFormula
 					}
@@ -96,7 +101,7 @@ public class RelationDescription {
 	private static Term createRangeFormula(Term term, Term findTerm, Services s){
 		TermBuilder tb = s.getTermBuilder();
 		
-		if(findTerm.op().equals(term.op())){
+		if(findTerm.op() == term.op()){
 			if(term.arity() > 0){
 				LinkedList<Term> subterms = new LinkedList<Term>();
 				for(int i = 0; i < term.arity(); i++){
@@ -110,7 +115,7 @@ public class RelationDescription {
 			}
 		}
 		else{
-			return tb.FALSE();
+			return tb.ff();
 		}
 	}
 	
