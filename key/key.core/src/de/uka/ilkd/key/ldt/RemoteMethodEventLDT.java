@@ -35,6 +35,7 @@ public class RemoteMethodEventLDT extends LDT {
 
 	//history (of Remote method events) ... copy of: key.core/resources/de/uka/ilkd/key/proof/rules/events.key -> Seq hist;
 	private LocationVariable hist;
+	private LocationVariable caller;
 
 	public RemoteMethodEventLDT (TermServices services) {
 		super(NAME, services);
@@ -50,6 +51,7 @@ public class RemoteMethodEventLDT extends LDT {
 		evCall = addFunction(services, "methodCall");
 		evTerm = addFunction(services, "methodTermination");
 		hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
+		caller = (LocationVariable) services.getNamespaces().programVariables().lookup("caller");
 	}
 
 	public Function evConst() {
@@ -103,6 +105,10 @@ public class RemoteMethodEventLDT extends LDT {
 		return hist;
 	}
 
+	public LocationVariable getCaller() {
+		return caller;
+	}
+
 	//maybe put somewhere else?
 	public Function getMethodIdentifier(MethodDeclaration md, TermServices services) {
 	    Function f = (Function)services.getNamespaces().methodIdentifier().lookup(md.getProgramElementName());
@@ -113,44 +119,52 @@ public class RemoteMethodEventLDT extends LDT {
 	    return f;
 	}
 
-	// TODO KD i implement @Override Methods
+	// TODO KD z add Operators / Literals / Types?
+
 	@Override
 	public boolean isResponsible(Operator op, Term[] subs, Services services, ExecutionContext ec) {
-		return false;
+		assert false : "RemoteMethodEventLDT: There are no Operatiors for Events.";
+		return false; // add Operators to java.expression.operator.adt?
 	}
 
 	@Override
 	public boolean isResponsible(Operator op, Term left, Term right, Services services, ExecutionContext ec) {
-		return false;
+		assert false : "RemoteMethodEventLDT: There are no Operators for Events.";
+		return false; // add Operators to java.expression.operator.adt?
 	}
 
 	@Override
 	public boolean isResponsible(Operator op, Term sub, TermServices services, ExecutionContext ec) {
-		return false;
+		assert false : "RemoteMethodEventLDT: There are no Operators for Events.";
+		return false; // add Operators to java.expression.operator.adt?
 	}
 
 	@Override
 	public Term translateLiteral(Literal lit, Services services) {
-		return null;
+		assert false : "RemoteMethodEventLDT: There are no Literals for Events.";
+		return null; // add Literals to java.expression.literal?
 	}
 
 	@Override
 	public Function getFunctionFor(Operator op, Services services, ExecutionContext ec) {
-		return null;
+		assert false : "RemoteMethodEventLDT: There are no Operators for Events.";
+		return null; // add Operators to java.expression.operator.adt?
 	}
 
 	@Override
 	public boolean hasLiteralFunction(Function f) {
-		return false;
+		return containsFunction(f) && f.arity() == 0; // should return false I think
 	}
 
 	@Override
 	public Expression translateTerm(Term t, ExtList children, Services services) {
-		return null;
+		assert false : "RemoteMethodEventLDT: Could not translate Term: " + t;
+		return null; // not sure if I can translate any terms at all
 	}
 
 	@Override
 	public Type getType(Term t) {
-		return null;
+		assert false : "RemoteMethodEventLDT: No Types are associated with Events.";
+		return null; // add Types to java.abstraction.PrimitiveType?
 	}
 }

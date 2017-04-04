@@ -40,6 +40,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -118,7 +119,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 		}
 
 		// create atPre heap
-		final String methodName = frame.getProgramMethod().getName();
+		final IProgramMethod pm = frame.getProgramMethod();
+		final String methodName = pm.getName();
 
 		Term atPreUpdate = tb.skip();
 		Map<LocationVariable,Term> atPres = new LinkedHashMap<LocationVariable,Term>();
@@ -131,14 +133,23 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 			atPres.put(heap, tb.var(l));
 		}
 
-		// create Before hist // TODO KD s not sure, what I am doing
+		// create Before hist // TODO KD b check if update stays when needed
+		// if method to prove is remote add "incoming call" event to history
 		LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
 		LocationVariable h = new LocationVariable(new ProgramElementName(tb.newName(hist + "Before_" + methodName)), new KeYJavaType(hist.sort()));
 		services.getNamespaces().programVariables().addSafely(h);
-		final Term update = tb.elementary(h, tb.var(hist));
+		Term histBeforeCall;
+		if (pm.getMethodDeclaration().isRemote()) {
+			LocationVariable caller = services.getTypeConverter().getRemoteMethodEventLDT().getCaller();
+			Term method = tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), services));
+			Term inCallEvent = tb.evConst(tb.evIncoming(), tb.evCall(), tb.var(caller), method, tb.seq(tb.var(tb.paramVars(pm, false))), tb.getBaseHeap()); // TODO KD a parameter is missing at heap
+			histBeforeCall = tb.seqConcat(tb.var(hist), tb.seqSingleton(inCallEvent));
+		} else {
+			histBeforeCall = tb.var(hist);
+		}
+		final Term update = tb.elementary(h, histBeforeCall);
 		atPreUpdate = tb.parallel(atPreUpdate, update);
-		atPres.put(hist, tb.var(h));
-		// TODO KD a add "incoming call" event here?
+		atPres.put(hist, histBeforeCall);
 
 		// create atPre for parameters
 		for (LoopStatement loop : loops) {
@@ -203,8 +214,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 				ImmutableList<Term> newLocalOuts = tb.var(MiscTools.getLocalOuts(loop, services));
 				final LoopSpecification newInv
 						= spec.create(loop,
-						frame.getProgramMethod(),
-						frame.getProgramMethod().getContainerType(),
+						pm,
+						pm.getContainerType(),
 						newInvariants,
 						newFreeInvariants,
 						newMods,

@@ -408,22 +408,13 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				final Term globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm, // TODO KD z always null?
 						tb.var(paramVars), proofServices);
 
-				//if method to prove is remote add "incoming call" and "outgoing termination" events to history
+				// if method to prove is remote add "outgoing termination" events to history
 				if (pm.getMethodDeclaration().isRemote()) {
-					LocationVariable caller = new LocationVariable(new ProgramElementName("Caller"), proofServices.getJavaInfo().objectSort());
+					LocationVariable caller = proofServices.getTypeConverter().getRemoteMethodEventLDT().getCaller();
 		        	Term method = tb.func(proofServices.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), proofServices));
-
-		        	Term inCallEvent = tb.evConst(tb.evIncoming(), tb.evCall(), tb.var(caller), method, tb.seq(tb.var(paramVars)), tb.getBaseHeap()); // TODO KD a+b heap + caller?
-		        	Term histBeforeCall = tb.seqConcat(tb.var(hist), tb.seqSingleton(inCallEvent));
-		        	final Name beforeHistName = new Name(tb.newName(hist + "Before_" + pm.getName()));
-		        	final Function beforeHistFunc = new Function(beforeHistName, hist.sort(), true);
-		        	proofServices.getNamespaces().functions().addSafely(beforeHistFunc);
-		        	final Term beforeHist = tb.func(beforeHistFunc); // TODO KD a do I need to do a new LocationVariable? look at histAtPre
-		        	final Term beforeAssumption = tb.equals(histBeforeCall, beforeHist); // TODO KD a look what anonAssumption does in UseOperationContractRule
-		        	final Term beforeHistUpdate = tb.elementary(hist, beforeHist); // TODO KD a look what anonUpdate does in UseOperationContractRule
-
 		        	Term resultTerm = (resultVar == null) ? tb.seqEmpty() : tb.seqSingleton(tb.var(resultVar));
-		        	Term outTermEvent = tb.evConst(tb.evOutgoing(), tb.evTerm(), tb.var(caller), method, resultTerm, tb.getBaseHeap()); // TODO KD a+b heap + caller?
+		        	Term heap = (globalUpdate != null) ? tb.apply(globalUpdate, tb.getBaseHeap()) : tb.getBaseHeap(); // TODO KD s does that make sense?
+		        	Term outTermEvent = tb.evConst(tb.evOutgoing(), tb.evTerm(), tb.var(caller), method, resultTerm, heap);
 		        	Term histAfterTerm = tb.seqConcat(tb.var(hist), tb.seqSingleton(outTermEvent)); // TODO KD a what hist to use?
 		        	final Name afterHistName = new Name(tb.newName(hist + "After_" + pm.getName()));
 		        	final Function afterHistFunc = new Function(afterHistName, hist.sort(), true);
@@ -431,6 +422,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
 		        	final Term afterHist = tb.func(afterHistFunc); // TODO KD a do I need to do a new LocationVariable?
 		        	final Term afterAssumption = tb.equals(histAfterTerm, afterHist); // TODO KD a look what anonAssumption does in UseOperationContractRule
 		        	final Term afterHistUpdate = tb.elementary(hist, afterHist); // TODO KD a look what anonUpdate does in UseOperationContractRule // TODO KD a ^6
+				} else {
+					// TODO KD a what else?
 				}
 
 				final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar,
@@ -976,7 +969,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 	 * @param services TODO
 	 * @return The {@link Term} representing the initial updates.
 	 */
-	protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars, // TODO KD f is this ever called?
+	protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
 			ImmutableList<LocationVariable> formalParamVars,
 			Map<LocationVariable, LocationVariable> atPreVars,
 			LocationVariable hist,
@@ -986,12 +979,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
 		for (Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
 			final LocationVariable key = atPreEntry.getKey();
 			final Term u = tb.elementary(atPreEntry.getValue(), key == getSavedHeap(services) ?
-					tb.getBaseHeap() : tb.var(key)); //TODO KD z why differentiation?
+					tb.getBaseHeap() : tb.var(key));
 			update = tb.parallel(update, u);
 		}
 
 		// histAtPre := hist
-
 		Term histupdate = tb.elementary(preHist, tb.var(hist));
 		update = tb.parallel(update, histupdate);
 		if (isCopyOfMethodArgumentsUsed()) {

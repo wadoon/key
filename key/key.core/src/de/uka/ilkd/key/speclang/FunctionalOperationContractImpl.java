@@ -262,7 +262,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             }
             LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
             ProgramVariable atPreVar = atPreVars.get(hist);
-            ProgramVariable originalAtPreVar = originalAtPreVars.get(hist); // always null!
+            ProgramVariable originalAtPreVar = originalAtPreVars.get(hist); // always null?!
             if (atPreVar != null && originalAtPreVar != null) {
             	result.put(atPreVar, originalAtPreVar); // TODO KD f what does this do?
             }
@@ -349,7 +349,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 }
             }
         }
-        return result; //TODO KD a put hist?
+        return result; //TODO KD b put hist?
     }
 
 

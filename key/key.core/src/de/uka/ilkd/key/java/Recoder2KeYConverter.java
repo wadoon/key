@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -1311,11 +1312,30 @@ public class Recoder2KeYConverter {
         	}
             }
 
+            // check if parent has Remote Annotation
+            NonTerminalProgramElement parent = md.getASTParent();
+            List<recoder.java.declaration.AnnotationUseSpecification> annotations = new LinkedList<>();
+            if (parent instanceof recoder.java.declaration.ClassDeclaration) {
+            	recoder.java.declaration.ClassDeclaration parentClass = (recoder.java.declaration.ClassDeclaration) parent;
+            	annotations.addAll(parentClass.getAnnotations());
+            }
+            if (md.getASTParent() instanceof recoder.java.declaration.InterfaceDeclaration) {
+            	recoder.java.declaration.InterfaceDeclaration parentClass = (recoder.java.declaration.InterfaceDeclaration) parent;
+            	annotations.addAll(parentClass.getAnnotations());
+            }
+            boolean isRemote = false;
+            for (recoder.java.declaration.AnnotationUseSpecification a : annotations) {
+            	recoder.java.reference.TypeReference tr = (recoder.java.reference.TypeReference) a.getChildAt(0);
+            	if (tr.getName().equals("Remote")) { // TODO KD z make "Remote" a constant
+            		isRemote = true;
+            	}
+            } // TODO KD s do I need to check (implemented interfaces / extended classes) as well?
+
             final MethodDeclaration methDecl
             	= new MethodDeclaration(
                     collectChildren(md),
                     md.getASTParent() instanceof recoder.java.declaration.InterfaceDeclaration,
-                    false, //TODO KD i isRemote?
+                    isRemote,
                     voidComments);
             recoder.abstraction.ClassType cont
             	= getServiceConfiguration().getCrossReferenceSourceInfo()

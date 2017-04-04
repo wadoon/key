@@ -369,9 +369,9 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
     public boolean isRemote() {
-    	return parentIsRemoteInterface || hasAnnotation("Remote"); // TODO KD z check for static / constructor? + make "Remote" a constant?
+    	return parentIsRemoteInterface || hasAnnotation("Remote"); // TODO KD z check for static / final / constructor? + make "Remote" a constant?
     }
-    
+
     @Override
     public void visit(Visitor v) {
 	v.performActionOnMethodDeclaration(this);

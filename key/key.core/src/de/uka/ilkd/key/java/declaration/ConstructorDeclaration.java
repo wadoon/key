@@ -126,7 +126,8 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
 
     @Override
     public boolean isRemote() {
-    	return false; // TODO KD f check corectness
+    	assert !super.isRemote() : "Constructors may not be part of a remote business interface.";
+    	return false;
     }
 
     @Override    

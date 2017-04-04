@@ -811,34 +811,34 @@ public final class UseOperationContractRule implements BuiltInRule {
 		}
 
 		//if called method is remote add "outgoing call" and "incoming termination" events to history
+		LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
+		IProgramMethod pm = contract.getTarget();
+		LocationVariable beforeHist = new LocationVariable(new ProgramElementName(tb.newName(hist + "Before_" + pm.getName())), new KeYJavaType(hist.sort()));
+		final Name methodHistName = new Name(tb.newName(hist + "After_" + pm.getName()));
+		final Function methodHistFunc = new Function(methodHistName, hist.sort(), true);
+		services.getNamespaces().functions().addSafely(methodHistFunc);
+		final Term methodHist = tb.func(methodHistFunc);
+		final Name anonHistName = new Name(tb.newName("anon_" + hist + "_" + pm.getName()));
+		final Function anonHistFunc = new Function(anonHistName, hist.sort());
+		services.getNamespaces().functions().addSafely(anonHistFunc);
+		final Term anonHist = tb.label(tb.func(anonHistFunc), new ParameterlessTermLabel(new Name("anonHistFunction"))); // TODO KD z add to de.uka.ilkd.key.logic.label/ParameterlessTermLabel ?
+		final Term anonHistUpdate = tb.elementary(hist, methodHist);
+		Term newHist;
 		if (contract.getTarget().getMethodDeclaration().isRemote()) {
-			LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
-			IProgramMethod pm = contract.getTarget(); // TODO KD z make Term out of IProgramMethod?
-
 			Term method = tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(contract.getTarget().getMethodDeclaration(), services));
 			Term resultTerm = contract.hasResultVar() ? tb.seqSingleton(contract.getResult()) : tb.seqEmpty();
 			Term outCallEvent = tb.evConst(tb.evOutgoing(), tb.evCall(), contractSelf, method, tb.seq(contractParams), anonUpdateDatas.head().methodHeapAtPre);
 			Term inTermEvent  = tb.evConst(tb.evIncoming(), tb.evTerm(), contractSelf, method, resultTerm, anonUpdateDatas.reverse().head().methodHeap);
-			Term newHist = tb.seqConcat(tb.var(hist), tb.seqSingleton(outCallEvent), tb.seqSingleton(inTermEvent));
-
-			final Name methodHistName = new Name(tb.newName(hist + "After_" + pm.getName()));
-			final Function methodHistFunc = new Function(methodHistName, hist.sort(), true);
-			services.getNamespaces().functions().addSafely(methodHistFunc);
-			final Term methodHist = tb.func(methodHistFunc);
-			final Name anonHistName = new Name(tb.newName("anon_" + hist + "_" + pm.getName()));
-			final Function anonHistFunc = new Function(anonHistName, hist.sort());
-			services.getNamespaces().functions().addSafely(anonHistFunc);
-			final Term anonHist = tb.label(tb.func(anonHistFunc), new ParameterlessTermLabel(new Name("anonHistFunction"))); // TODO KD z add to de.uka.ilkd.key.logic.label/ParameterlessTermLabel ?
-			final Term assumption = tb.equals(newHist, methodHist);
-			final Term anonHistUpdate = tb.elementary(hist, methodHist);
-			LocationVariable beforeHist = new LocationVariable(new ProgramElementName(tb.newName(hist + "Before_" + pm.getName())), new KeYJavaType(hist.sort()));
-
-			anonAssumption = tb.and(anonAssumption, assumption);
-			anonUpdate = tb.parallel(anonUpdate, anonHistUpdate);
-			wellFormedAnon = tb.and(wellFormedAnon, tb.wellFormedHist(anonHist)); //TODO KD s what does this do? Maybe remove!
-			atPreUpdates = tb.parallel(atPreUpdates, tb.elementary(beforeHist, tb.var(hist)));
-			reachableState = tb.and(reachableState, tb.wellFormedHist(hist));
+			newHist = tb.seqConcat(tb.var(hist), tb.seqSingleton(outCallEvent), tb.seqSingleton(inTermEvent));
+		} else {
+			newHist = tb.var(hist);
 		}
+		final Term assumption = tb.equals(newHist, methodHist);
+		anonAssumption = tb.and(anonAssumption, assumption);
+		anonUpdate = tb.parallel(anonUpdate, anonHistUpdate);
+		wellFormedAnon = tb.and(wellFormedAnon, tb.wellFormedHist(anonHist)); //TODO KD s what does this do? Maybe remove!
+		atPreUpdates = tb.parallel(atPreUpdates, tb.elementary(beforeHist, tb.var(hist)));
+		reachableState = tb.and(reachableState, tb.wellFormedHist(hist));
 
 		final Term excNull = tb.equals(tb.var(excVar), tb.NULL());
 		final Term excCreated = tb.created(tb.var(excVar));
