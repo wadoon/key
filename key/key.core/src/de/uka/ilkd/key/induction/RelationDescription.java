@@ -50,11 +50,22 @@ public class RelationDescription {
 				FindTaclet ft = (FindTaclet)r;
 				//check whether the find term of the the FindTaclet is an instance of the given term
 				Term rangeFormula = createRangeFormula(t, ft.find(), s);
-				//TODO: find a way to express multiple rangeformulas in one
+				//TODO:[optional] find a way to express multiple rangeformulas in one
 				/*
 				 * E.g. if there are rangeformulas int x: x = 0, x = 1, x = 2
 				 * make a new rangeformula x >= 0 && x <= 2 and throw the others away.
 				 */
+				int nos = rangeFormula.subs().size();
+				boolean falseIsDirectSubterm = false;
+				for(int i = 0; i < nos; i++){
+					if(rangeFormula.sub(i).equals(tb.FALSE())){
+						falseIsDirectSubterm = true;
+						break;
+					}
+				}
+				if(!falseIsDirectSubterm){
+					possibleRangeFormulas.add(rangeFormula);
+				}
 			}
 		}
 		//TODO: compute the range formula
@@ -86,7 +97,7 @@ public class RelationDescription {
 				return tb.and(subterms);
 			}
 			else{
-				//TODO:[optional] Maybe check arity for negative values
+				//TODO:[optional] Maybe check arity for negative values and their handling
 				return tb.equals(term, findTerm);
 			}
 		}
