@@ -2046,21 +2046,20 @@ public class TermBuilder {
 	//-------------------------------------------------------------------------
 
     //event constructor
-	public Term evConst(Term dir, Term type, Term partner, Term method,
-			Term args, Term heap) {
+	public Term evConst(Term type, Term caller, Term callee, Term method, Term args, Term heap) {
 		return func(services.getTypeConverter().getRemoteMethodEventLDT().
-				evConst(), dir, type, partner, method, args, heap);
+				evConst(), type, caller, callee, method, args, heap);
 	}
 
-	//event destructors (/getetrs)
-	public Term evGetDir(Term event) {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().evGetDir(), event);
-	}
+	//event destructor (/getters)
 	public Term evGetType(Term event) {
 		return func(services.getTypeConverter().getRemoteMethodEventLDT().evGetType(), event);
 	}
-	public Term evGetPartner(Term event) {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().evGetPartner(), event);
+	public Term evGetCaller(Term event) {
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().evGetCaller(), event);
+	}
+	public Term evGetCallee(Term event) {
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().evGetCallee(), event);
 	}
 	public Term evGetMethod(Term event) {
 		return func(services.getTypeConverter().getRemoteMethodEventLDT().evGetMethod(), event);
@@ -2070,14 +2069,6 @@ public class TermBuilder {
 	}
 	public Term evGetHeap(Term event) {
 		return func(services.getTypeConverter().getRemoteMethodEventLDT().evGetHeap(), event);
-	}
-
-	//event direction constructors
-	public Term evIncoming() {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().evIncoming());
-	}
-	public Term evOutgoing() {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().evOutgoing());
 	}
 
 	//event type constructors

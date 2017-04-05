@@ -22,14 +22,12 @@ public class RemoteMethodEventLDT extends LDT {
 	public static final Name METHOD_SORT = new Name("Method");
 
 	private final Function evConst;
-	private final Function evGetDir;
 	private final Function evGetType;
-	private final Function evGetPartner;
+	private final Function evGetCaller;
+	private final Function evGetCallee;
 	private final Function evGetMethod;
 	private final Function evGetArgs;
 	private final Function evGetHeap;
-	private final Function evIncoming;
-	private final Function evOutgoing;
 	private final Function evCall;
 	private final Function evTerm;
 
@@ -40,14 +38,12 @@ public class RemoteMethodEventLDT extends LDT {
 	public RemoteMethodEventLDT (TermServices services) {
 		super(NAME, services);
 		evConst = addFunction(services, "event");
-		evGetDir = addFunction(services, "getDirectionFromEvent");
 		evGetType = addFunction(services, "getTypeFromEvent");
-		evGetPartner = addFunction(services, "getPartnerFromEvent");
+		evGetCaller = addFunction(services, "getCallerFromEvent");
+		evGetCallee = addFunction(services, "getCalleeFromEvent");
 		evGetMethod = addFunction(services, "getMethodFromEvent");
 		evGetArgs = addFunction(services, "getArgumentsFromEvent");
 		evGetHeap = addFunction(services, "getHeapFromEvent");
-		evIncoming = addFunction(services, "incoming");
-		evOutgoing = addFunction(services, "outgoing");
 		evCall = addFunction(services, "methodCall");
 		evTerm = addFunction(services, "methodTermination");
 		hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
@@ -58,16 +54,16 @@ public class RemoteMethodEventLDT extends LDT {
 		return evConst;
 	}
 
-	public Function evGetDir() {
-		return evGetDir;
-	}
-
 	public Function evGetType() {
 		return evGetType;
 	}
 
-	public Function evGetPartner() {
-		return evGetPartner;
+	public Function evGetCaller() {
+		return evGetCaller;
+	}
+
+	public Function evGetCallee() {
+		return evGetCallee;
 	}
 
 	public Function evGetMethod() {
@@ -80,14 +76,6 @@ public class RemoteMethodEventLDT extends LDT {
 
 	public Function evGetHeap() {
 		return evGetHeap;
-	}
-	
-	public Function evIncoming() {
-		return evIncoming;
-	}
-
-	public Function evOutgoing() {
-		return evOutgoing;
 	}
 
 	public Function evCall() {
@@ -120,6 +108,7 @@ public class RemoteMethodEventLDT extends LDT {
 	}
 
 	// TODO KD z add Operators / Literals / Types?
+	// TODO KD s code review
 
 	@Override
 	public boolean isResponsible(Operator op, Term[] subs, Services services, ExecutionContext ec) {

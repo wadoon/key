@@ -133,23 +133,14 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 			atPres.put(heap, tb.var(l));
 		}
 
-		// create Before hist // TODO KD b check if update stays when needed
-		// if method to prove is remote add "incoming call" event to history
+		// create Before hist
 		LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
 		LocationVariable h = new LocationVariable(new ProgramElementName(tb.newName(hist + "Before_" + methodName)), new KeYJavaType(hist.sort()));
 		services.getNamespaces().programVariables().addSafely(h);
-		Term histBeforeCall;
-		if (pm.getMethodDeclaration().isRemote()) {
-			LocationVariable caller = services.getTypeConverter().getRemoteMethodEventLDT().getCaller();
-			Term method = tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), services));
-			Term inCallEvent = tb.evConst(tb.evIncoming(), tb.evCall(), tb.var(caller), method, tb.seq(tb.var(tb.paramVars(pm, false))), tb.getBaseHeap()); // TODO KD a parameter is missing at heap
-			histBeforeCall = tb.seqConcat(tb.var(hist), tb.seqSingleton(inCallEvent));
-		} else {
-			histBeforeCall = tb.var(hist);
-		}
-		final Term update = tb.elementary(h, histBeforeCall);
+		Term histVar = tb.var(hist);
+		final Term update = tb.elementary(h, histVar);
 		atPreUpdate = tb.parallel(atPreUpdate, update);
-		atPres.put(hist, histBeforeCall);
+		atPres.put(hist, histVar);
 
 		// create atPre for parameters
 		for (LoopStatement loop : loops) {

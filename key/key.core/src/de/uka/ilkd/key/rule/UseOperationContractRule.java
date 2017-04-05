@@ -675,7 +675,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 		final FunctionalOperationContract contract =
 				(FunctionalOperationContract)((AbstractContractRuleApp) ruleApp)
 				.getInstantiation();
-		assert contract.getTarget().equals(inst.pm);
+		IProgramMethod pm = contract.getTarget();
+		assert pm.equals(inst.pm);
 
 		final List<LocationVariable> heapContext =
 				HeapContext.getModHeaps(goal.proof().getServices(), inst.transaction);
@@ -783,9 +784,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 			preGoal = result.head();
 			nullGoal = null;
 		}
-		preGoal.setBranchLabel("Pre"+ " ("+contract.getTarget().getName()+")");
-		postGoal.setBranchLabel("Post"+ " ("+contract.getTarget().getName()+")");
-		excPostGoal.setBranchLabel("Exceptional Post"+ " ("+contract.getTarget().getName()+")");
+		preGoal.setBranchLabel("Pre"+ " ("+pm.getName()+")");
+		postGoal.setBranchLabel("Post"+ " ("+pm.getName()+")");
+		excPostGoal.setBranchLabel("Exceptional Post"+ " ("+pm.getName()+")");
 
 		//prepare common stuff for the three branches
 		Term anonAssumption = tb.tt();
@@ -812,32 +813,30 @@ public final class UseOperationContractRule implements BuiltInRule {
 
 		//if called method is remote add "outgoing call" and "incoming termination" events to history
 		LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
-		IProgramMethod pm = contract.getTarget();
-		LocationVariable beforeHist = new LocationVariable(new ProgramElementName(tb.newName(hist + "Before_" + pm.getName())), new KeYJavaType(hist.sort()));
+//		LocationVariable beforeHist = new LocationVariable(new ProgramElementName(tb.newName(hist + "Before_" + pm.getName())), new KeYJavaType(hist.sort()));
 		final Name methodHistName = new Name(tb.newName(hist + "After_" + pm.getName()));
 		final Function methodHistFunc = new Function(methodHistName, hist.sort(), true);
 		services.getNamespaces().functions().addSafely(methodHistFunc);
 		final Term methodHist = tb.func(methodHistFunc);
-		final Name anonHistName = new Name(tb.newName("anon_" + hist + "_" + pm.getName()));
-		final Function anonHistFunc = new Function(anonHistName, hist.sort());
-		services.getNamespaces().functions().addSafely(anonHistFunc);
-		final Term anonHist = tb.label(tb.func(anonHistFunc), new ParameterlessTermLabel(new Name("anonHistFunction"))); // TODO KD z add to de.uka.ilkd.key.logic.label/ParameterlessTermLabel ?
 		final Term anonHistUpdate = tb.elementary(hist, methodHist);
 		Term newHist;
-		if (contract.getTarget().getMethodDeclaration().isRemote()) {
-			Term method = tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(contract.getTarget().getMethodDeclaration(), services));
+		if (pm.getMethodDeclaration().isRemote()) {
+			assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
+			// TODO KD z could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor()
+			final ProgramVariable selfVar = tb.selfVar(pm, contract.getKJT(), false);
+			final Term selfVarTerm = tb.var(selfVar); // throws Exception if pm.getMethodDeclaration().isStatic()
+			Term method = tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), services));
 			Term resultTerm = contract.hasResultVar() ? tb.seqSingleton(contract.getResult()) : tb.seqEmpty();
-			Term outCallEvent = tb.evConst(tb.evOutgoing(), tb.evCall(), contractSelf, method, tb.seq(contractParams), anonUpdateDatas.head().methodHeapAtPre);
-			Term inTermEvent  = tb.evConst(tb.evIncoming(), tb.evTerm(), contractSelf, method, resultTerm, anonUpdateDatas.reverse().head().methodHeap);
-			newHist = tb.seqConcat(tb.var(hist), tb.seqSingleton(outCallEvent), tb.seqSingleton(inTermEvent));
+			Term outCallEvent = tb.evConst(tb.evCall(), selfVarTerm, contractSelf, method, tb.seq(contractParams), anonUpdateDatas.head().methodHeapAtPre);
+			Term inTermEvent  = tb.evConst(tb.evTerm(), selfVarTerm, contractSelf, method, resultTerm, anonUpdateDatas.reverse().head().methodHeap);
+			newHist = tb.seqConcat(tb.var(hist), tb.seq(outCallEvent, inTermEvent));
 		} else {
-			newHist = tb.var(hist);
+			newHist = tb.var(hist); // TODO KD s do I need to change this, because methods could change the history?
 		}
 		final Term assumption = tb.equals(newHist, methodHist);
 		anonAssumption = tb.and(anonAssumption, assumption);
 		anonUpdate = tb.parallel(anonUpdate, anonHistUpdate);
-		wellFormedAnon = tb.and(wellFormedAnon, tb.wellFormedHist(anonHist)); //TODO KD s what does this do? Maybe remove!
-		atPreUpdates = tb.parallel(atPreUpdates, tb.elementary(beforeHist, tb.var(hist)));
+//		atPreUpdates = tb.parallel(atPreUpdates, tb.elementary(beforeHist, tb.var(hist))); TODO KD a confused!
 		reachableState = tb.and(reachableState, tb.wellFormedHist(hist));
 
 		final Term excNull = tb.equals(tb.var(excVar), tb.NULL());
@@ -870,7 +869,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 		//create "Pre" branch
 		int i = 0;
 		for(Term arg : contractParams) {
-			KeYJavaType argKJT = contract.getTarget().getParameterType(i++);
+			KeYJavaType argKJT = pm.getParameterType(i++);
 			reachableState = tb.and(reachableState,
 					tb.reachableValue(arg, argKJT));
 		}
