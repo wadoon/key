@@ -1,5 +1,9 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,14 +17,15 @@ public class ValueInjector {
     private static ValueInjector INSTANCE;
 
     public <T> T inject(T obj, Map<String, String> arguments) throws Exception {
-        for (java.lang.reflect.Field field : obj.getClass().getFields()) {
+        for (java.lang.reflect.Field field : obj.getClass()
+                .getDeclaredFields()) {
             Option option = field.getDeclaredAnnotation(Option.class);
             if (option != null) {
                 injectIntoField(arguments.get(option.value()), obj, field);
             }
 
             Flag flag = field.getDeclaredAnnotation(Flag.class);
-            if(flag!=null){
+            if (flag != null) {
                 //TODO handle flag
             }
         }
@@ -29,7 +34,10 @@ public class ValueInjector {
 
     private <T> void injectIntoField(String s, T obj, Field field)
             throws Exception {
-        Converter converter = getConverter(s.getClass());
+        if (s == null)
+            return;
+
+        Converter converter = getConverter(field.getType());
         if (converter == null)
             throw new ScriptException(
                     "No converter registered for class: " + s.getClass());
@@ -78,12 +86,13 @@ public class ValueInjector {
     /**
      *
      */
-    public @interface Option {
+    @Target(ElementType.FIELD) @Retention(RetentionPolicy.RUNTIME) public @interface Option {
         String value();
     }
 
     public @interface Flag {
         String arg();
+
         String value();
     }
 }

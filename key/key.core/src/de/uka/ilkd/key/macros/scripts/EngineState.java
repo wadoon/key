@@ -179,9 +179,6 @@ public class EngineState {
     }
 
     public ValueInjector getValueInjector() {
-        if (valueInjector == null) {
-
-        }
         return valueInjector;
     }
 
