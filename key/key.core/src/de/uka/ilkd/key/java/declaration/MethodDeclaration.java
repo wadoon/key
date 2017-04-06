@@ -57,7 +57,7 @@ public class MethodDeclaration extends JavaDeclaration
 
     /**
      * This flag tells, if the class or interface of this method has the Remote annotation.
-     */ // TODO KD f need to check super classes / interfaces as well?
+     */ // TODO KD r need to check super classes / interfaces as well?
     protected final boolean parentIsRemoteInterface;
 
     /**

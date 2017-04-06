@@ -813,7 +813,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
 		//if called method is remote add "outgoing call" and "incoming termination" events to history
 		LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
-//		LocationVariable beforeHist = new LocationVariable(new ProgramElementName(tb.newName(hist + "Before_" + pm.getName())), new KeYJavaType(hist.sort()));
+		LocationVariable beforeHist = new LocationVariable(new ProgramElementName(tb.newName(hist + "Before_" + pm.getName())), new KeYJavaType(hist.sort()));
 		final Name methodHistName = new Name(tb.newName(hist + "After_" + pm.getName()));
 		final Function methodHistFunc = new Function(methodHistName, hist.sort(), true);
 		services.getNamespaces().functions().addSafely(methodHistFunc);
@@ -831,12 +831,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 			Term inTermEvent  = tb.evConst(tb.evTerm(), selfVarTerm, contractSelf, method, resultTerm, anonUpdateDatas.reverse().head().methodHeap);
 			newHist = tb.seqConcat(tb.var(hist), tb.seq(outCallEvent, inTermEvent));
 		} else {
-			newHist = tb.var(hist); // TODO KD s do I need to change this, because methods could change the history?
+			newHist = tb.var(hist); // TODO KD s do I need to change this, because methods could change the history? do I need anon after all?
 		}
 		final Term assumption = tb.equals(newHist, methodHist);
 		anonAssumption = tb.and(anonAssumption, assumption);
 		anonUpdate = tb.parallel(anonUpdate, anonHistUpdate);
-//		atPreUpdates = tb.parallel(atPreUpdates, tb.elementary(beforeHist, tb.var(hist))); TODO KD a confused!
+		atPreUpdates = tb.parallel(atPreUpdates, tb.elementary(beforeHist, tb.var(hist)));
 		reachableState = tb.and(reachableState, tb.wellFormedHist(hist));
 
 		final Term excNull = tb.equals(tb.var(excVar), tb.NULL());

@@ -413,6 +413,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				// (b) next up things
 				// (f) questions to research
 				// (i) needs to be implemented
+				// (p) paused
+				// (r) research
 				// (s) ask Simon
 				// (z) not important now (maybe does not happen)
 				// a add events within method (so wfHist and other stuff holds)
@@ -423,21 +425,21 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				if (pm.getMethodDeclaration().isRemote()) {
 					assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
 					// TODO KD z could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor()
-					LocationVariable caller = new LocationVariable(new ProgramElementName("Caller"), proofServices.getJavaInfo().objectSort()); // TODO KD b make sure it is the same caller
+					LocationVariable caller = new LocationVariable(new ProgramElementName("Caller"), proofServices.getJavaInfo().objectSort());
 					Term method = tb.func(proofServices.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), proofServices));
 					Term resultTerm = (resultVar == null) ? tb.seqEmpty() : tb.seqSingleton(tb.var(resultVar));
 
-					Term inCallEvent = tb.evConst(tb.evCall(), tb.var(caller), selfVarTerm, method, tb.seq(tb.var(tb.paramVars(pm, false))), tb.getBaseHeap()/*FIXME KD wrong heap*/);
-					Term histBeforeCall = tb.seqConcat(tb.var(hist)/*TODO KD a right hist?*/, tb.seqSingleton(inCallEvent));
-					Term outTermEvent = tb.evConst(tb.evTerm(), tb.var(caller), selfVarTerm, method, resultTerm, tb.getBaseHeap()/*FIXME KD wrong heap*/); // throws Exception if pm.getMethodDeclaration().isStatic()
-					Term histAfterTerm = tb.seqConcat(tb.var(hist)/*FIXME KD wrong hist*/, tb.seqSingleton(outTermEvent));
+					Term inCallEvent = tb.evConst(tb.evCall(), tb.var(caller), selfVarTerm, method, tb.seq(tb.var(tb.paramVars(pm, false))), tb.getBaseHeap()/*FIXME KD wrong heap?*/);
+					Term histBeforeCall = tb.seqConcat(tb.var(hist)/*FIXME KD right hist?*/, tb.seqSingleton(inCallEvent));
+					Term outTermEvent = tb.evConst(tb.evTerm(), tb.var(caller), selfVarTerm, method, resultTerm, tb.getBaseHeap()/*FIXME KD wrong heap?*/); // throws Exception if pm.getMethodDeclaration().isStatic()
+					Term histAfterTerm = tb.seqConcat(tb.var(hist)/*FIXME KD wrong hist?*/, tb.seqSingleton(outTermEvent));
 
 					final Name afterHistName = new Name(tb.newName(hist + "After_" + pm.getName()));
 					final Function afterHistFunc = new Function(afterHistName, hist.sort(), true);
 					proofServices.getNamespaces().functions().addSafely(afterHistFunc);
-					final Term afterHist = tb.func(afterHistFunc); // TODO KD a do I need to do a new LocationVariable?
-					final Term afterAssumption = tb.equals(histAfterTerm, afterHist); // TODO KD a look what anonAssumption does in UseOperationContractRule
-					final Term afterHistUpdate = tb.elementary(hist, afterHist); // TODO KD a look what anonUpdate does in UseOperationContractRule // TODO KD a ^6
+					final Term afterHist = tb.func(afterHistFunc); // TODO KD p do I need to do a new LocationVariable?
+					final Term afterAssumption = tb.equals(histAfterTerm, afterHist); // TODO KD p look what anonAssumption does in UseOperationContractRule
+					final Term afterHistUpdate = tb.elementary(hist/*FIXME KD wrong hist?*/, afterHist); // TODO KD p look what anonUpdate does in UseOperationContractRule
 				} // TODO KD s nothing else right?
 
 				final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar,

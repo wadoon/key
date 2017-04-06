@@ -197,6 +197,7 @@ public final class DependencyContractImpl implements DependencyContract {
         }
 
         OpReplacer or = new OpReplacer(map, services.getTermFactory());
+        System.out.println("DependencyContractImpl.getPre(...) = " + or.replace(originalPres.get(heap))); // TODO KD
         return or.replace(originalPres.get(heap));
     }
 

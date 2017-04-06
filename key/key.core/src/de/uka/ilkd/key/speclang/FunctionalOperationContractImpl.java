@@ -114,19 +114,19 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
      * Using this constructor is discouraged: it may change in the future.
      * Please use the factory methods in {@link de.uka.ilkd.key.speclang.ContractFactory}.
      * @param baseName base name of the contract (does not have to be unique)
-    * @param pm the IProgramMethod to which the contract belongs
-    * @param modality the modality of the contract
-    * @param mby the measured_by clause of the contract
-    * @param selfVar the variable used for the receiver object
-    * @param paramVars the variables used for the operation parameters
-    * @param resultVar the variables used for the operation result
-    * @param excVar the variable used for the thrown exception
-    * @param globalDefs definitions for the whole contract
-    * @param services TODO
-    * @param pre the precondition of the contract
-    * @param post the postcondition of the contract
-    * @param mod the modifies clause of the contract
-    * @param heapAtPreVar the variable used for the pre-heap
+     * @param pm the IProgramMethod to which the contract belongs
+     * @param modality the modality of the contract
+     * @param mby the measured_by clause of the contract
+     * @param selfVar the variable used for the receiver object
+     * @param paramVars the variables used for the operation parameters
+     * @param resultVar the variables used for the operation result
+     * @param excVar the variable used for the thrown exception
+     * @param globalDefs definitions for the whole contract
+     * @param services TODO
+     * @param pre the precondition of the contract
+     * @param post the postcondition of the contract
+     * @param mod the modifies clause of the contract
+     * @param heapAtPreVar the variable used for the pre-heap
      */
     FunctionalOperationContractImpl(String baseName,
                                     String name,
@@ -268,6 +268,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             }
         }
 
+        System.out.println("FunctionalOperationContractImpl.getReplaceMap(...) = " + result); // TODO KD
         return result;
     }
 
@@ -299,8 +300,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         final Map<Term,Term> result = new LinkedHashMap<Term,Term>();
 
         //heaps
-
-        for(LocationVariable heap : heapTerms.keySet()) {
+        for (LocationVariable heap : heapTerms.keySet()) {
             final Term heapTerm = heapTerms.get(heap);
             assert heapTerm == null || heapTerm.sort().equals(services.getTypeConverter()
                     .getHeapLDT()
@@ -309,13 +309,13 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         }
 
         //self
-        if(selfTerm != null) {
+        if (selfTerm != null) {
             assertSubSort(selfTerm, originalSelfVar);
             result.put(tb.var(originalSelfVar), selfTerm);
         }
 
         //parameters
-        if(paramTerms != null) {
+        if (paramTerms != null) {
             assert originalParamVars.size() == paramTerms.size();
             final Iterator<ProgramVariable> it1 = originalParamVars.iterator();
             final Iterator<Term> it2 = paramTerms.iterator();
@@ -329,18 +329,24 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         }
 
         //result
-        if(resultTerm != null) {
+        if (resultTerm != null) {
             assertSubSort(resultTerm, originalResultVar);
             result.put(tb.var(originalResultVar), resultTerm);
         }
 
         //exception
-        if(excTerm != null) {
+        if (excTerm != null) {
             assertEqualSort(originalExcVar, excTerm);
             result.put(tb.var(originalExcVar), excTerm);
         }
-
-        if(atPres != null) {
+/*
+        //hist
+        if (histTerm != null) {
+        	assertEqualSort(originalHistVar, histTerm);
+        	result.put(tb.var(originalHistVar), histTerm);
+        } // TODO KD a put hist? (big change!)
+*/
+        if (atPres != null) {
             final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
             for(LocationVariable h : heapLDT.getAllHeaps()) {
                 if(atPres.get(h) != null) {
@@ -349,7 +355,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 }
             }
         }
-        return result; //TODO KD b put hist?
+
+        System.out.println("FunctionalOperationContractImpl.getReplaceMap(...) = " + result); // TODO KD (look for this and similar outputs in console)
+        return result;
     }
 
 
