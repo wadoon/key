@@ -264,11 +264,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             ProgramVariable atPreVar = atPreVars.get(hist);
             ProgramVariable originalAtPreVar = originalAtPreVars.get(hist); // always null?!
             if (atPreVar != null && originalAtPreVar != null) {
-            	result.put(atPreVar, originalAtPreVar); // TODO KD f what does this do?
+            	result.put(atPreVar, originalAtPreVar); // TODO KD zf what does this do?
             }
         }
 
-        System.out.println("FunctionalOperationContractImpl.getReplaceMap(...) = " + result); // TODO KD
         return result;
     }
 
@@ -344,7 +343,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         if (histTerm != null) {
         	assertEqualSort(originalHistVar, histTerm);
         	result.put(tb.var(originalHistVar), histTerm);
-        } // TODO KD a put hist? (big change!)
+        } // TODO KD za put hist? (big change!)
 */
         if (atPres != null) {
             final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
@@ -356,7 +355,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             }
         }
 
-        System.out.println("FunctionalOperationContractImpl.getReplaceMap(...) = " + result); // TODO KD (look for this and similar outputs in console)
         return result;
     }
 

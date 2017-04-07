@@ -108,7 +108,6 @@ public class RemoteMethodEventLDT extends LDT {
 	}
 
 	// TODO KD z add Operators / Literals / Types?
-	// TODO KD s code review
 
 	@Override
 	public boolean isResponsible(Operator op, Term[] subs, Services services, ExecutionContext ec) {
@@ -142,6 +141,7 @@ public class RemoteMethodEventLDT extends LDT {
 
 	@Override
 	public boolean hasLiteralFunction(Function f) {
+		assert false; // TODO KD z just to be sure
 		return containsFunction(f) && f.arity() == 0; // should return false I think
 	}
 

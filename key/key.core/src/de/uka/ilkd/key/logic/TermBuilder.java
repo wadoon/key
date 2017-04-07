@@ -2045,6 +2045,11 @@ public class TermBuilder {
 	//event & history operators
 	//-------------------------------------------------------------------------
 
+    //getHistory
+    public Term getHist() {
+    	return var(services.getTypeConverter().getRemoteMethodEventLDT().getHist());
+    }
+
     //event constructor
 	public Term evConst(Term type, Term caller, Term callee, Term method, Term args, Term heap) {
 		return func(services.getTypeConverter().getRemoteMethodEventLDT().

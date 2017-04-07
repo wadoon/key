@@ -208,7 +208,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
 					}
 				}
 			}
-			final LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
 
 			Term permsFor = tb.tt();
 			if(pm.getHeapCount(proofServices) == 2 && proofServices.getTypeConverter().getHeapLDT().getPermissionHeap() != null) {
@@ -230,7 +229,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 			}
 
 			final Term pre =
-					tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, heaps, hist, proofServices),
+					tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, heaps, proofServices),
 					permsFor, getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices));
 			// build program term
 			Term postTerm = getPost(modHeaps, selfVar, paramVars, resultVar, null, atPreVars, proofServices);
@@ -366,13 +365,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
 					}
 				}
 
-				// build/get variables hist and histAtPre
-				LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
-				LocationVariable histAtPre = new LocationVariable(new ProgramElementName(tb.newName(hist + "AtPre")), new KeYJavaType(hist.sort()));
-				//TODO KD z need to register anything?
-
 				// build precondition
-				Term pre = tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, modHeaps, hist, proofServices),
+				Term pre = tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, modHeaps, proofServices),
 						permsFor, getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices));
 				if(isTransactionApplicable()) {
 					// Need to add assumptions about the transaction depth
@@ -422,28 +416,43 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				// b+f maybe add fresh result as well
 
 				// if method to prove is remote add "outgoing termination" events to history
+				// TODO KD a re-think (do without functions)
+				Term histAtCallUpdate = tb.skip();
 				if (pm.getMethodDeclaration().isRemote()) {
 					assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
 					// TODO KD z could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor()
+
+					LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
 					LocationVariable caller = new LocationVariable(new ProgramElementName("Caller"), proofServices.getJavaInfo().objectSort());
 					Term method = tb.func(proofServices.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), proofServices));
-					Term resultTerm = (resultVar == null) ? tb.seqEmpty() : tb.seqSingleton(tb.var(resultVar));
+					Term resultTerm = (resultVar != null) ? tb.seqSingleton(tb.var(resultVar)) : tb.seqEmpty();
 
-					Term inCallEvent = tb.evConst(tb.evCall(), tb.var(caller), selfVarTerm, method, tb.seq(tb.var(tb.paramVars(pm, false))), tb.getBaseHeap()/*FIXME KD wrong heap?*/);
-					Term histBeforeCall = tb.seqConcat(tb.var(hist)/*FIXME KD right hist?*/, tb.seqSingleton(inCallEvent));
-					Term outTermEvent = tb.evConst(tb.evTerm(), tb.var(caller), selfVarTerm, method, resultTerm, tb.getBaseHeap()/*FIXME KD wrong heap?*/); // throws Exception if pm.getMethodDeclaration().isStatic()
-					Term histAfterTerm = tb.seqConcat(tb.var(hist)/*FIXME KD wrong hist?*/, tb.seqSingleton(outTermEvent));
+					final Name histAtCallName = new Name(tb.newName(hist + "At_" + pm.getName() + "Call"));
+					final Function histAtCallFunc = new Function(histAtCallName, hist.sort(), true);
+					proofServices.getNamespaces().functions().addSafely(histAtCallFunc);
+					final Term histAtCall = tb.func(histAtCallFunc);
+					// throws Exception if pm.getMethodDeclaration().isStatic()
+					Term inCallEvent = tb.evConst(tb.evCall(), tb.var(caller), selfVarTerm, method, tb.seq(tb.var(tb.paramVars(pm, false))), tb.getBaseHeap());
+					Term newHistAtCall = tb.seqConcat(tb.getHist(), tb.seqSingleton(inCallEvent));
+					final Term histAtCallAssumption = tb.equals(newHistAtCall, histAtCall);
+					histAtCallUpdate = tb.elementary(hist, histAtCall);
 
-					final Name afterHistName = new Name(tb.newName(hist + "After_" + pm.getName()));
-					final Function afterHistFunc = new Function(afterHistName, hist.sort(), true);
-					proofServices.getNamespaces().functions().addSafely(afterHistFunc);
-					final Term afterHist = tb.func(afterHistFunc); // TODO KD p do I need to do a new LocationVariable?
-					final Term afterAssumption = tb.equals(histAfterTerm, afterHist); // TODO KD p look what anonAssumption does in UseOperationContractRule
-					final Term afterHistUpdate = tb.elementary(hist/*FIXME KD wrong hist?*/, afterHist); // TODO KD p look what anonUpdate does in UseOperationContractRule
-				} // TODO KD s nothing else right?
+					final Name histAtTermName = new Name(tb.newName(hist + "At_" + pm.getName() + "Term"));
+					final Function histAtTermFunc = new Function(histAtTermName, hist.sort(), true);
+					proofServices.getNamespaces().functions().addSafely(histAtTermFunc);
+					final Term histAtTerm = tb.func(histAtTermFunc);
+					// throws Exception if pm.getMethodDeclaration().isStatic()
+					Term outTermEvent = tb.evConst(tb.evTerm(), tb.var(caller), selfVarTerm, method, resultTerm, tb.getBaseHeap());
+					Term newHistAtTerm = tb.seqConcat(tb.getHist(), tb.seqSingleton(outTermEvent));
+					final Term histAtTermAssumption = tb.equals(newHistAtTerm, histAtTerm);
+					final Term histAtTermUpdate = tb.elementary(hist, histAtTerm); // hist := histAtTerm
+
+					pre = tb.and(pre, histAtCallAssumption, histAtTermAssumption);
+					post = tb.apply(histAtTermUpdate, post);
+				}
 
 				final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar,
-						exceptionVar, atPreVars, post, sb, hist, histAtPre, proofServices);
+						exceptionVar, atPreVars, histAtCallUpdate, post, sb, proofServices);
 				final Term preImpliesProgPost = tb.imp(pre, progPost);
 				final Term applyGlobalUpdate = globalUpdate == null ?
 						preImpliesProgPost : tb.apply(globalUpdate, preImpliesProgPost);
@@ -534,14 +543,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
 	 * @param selfKJT The {@link KeYJavaType} of the self variable.
 	 * @param paramVars The parameters {@link ProgramVariable}s.
 	 * @param heaps The heaps.
-	 * @param hist The history of Remote method events.
 	 * @return The {@link Term} containing the general assumptions.
 	 */
 	protected Term buildFreePre(ProgramVariable selfVar,
 			KeYJavaType selfKJT,
 			ImmutableList<ProgramVariable> paramVars,
 			List<LocationVariable> heaps,
-			LocationVariable hist,
 			Services services) {
 		// "self != null"
 		final Term selfNotNull = generateSelfNotNull(getProgramMethod(), selfVar);
@@ -566,7 +573,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 		}
 
 		//for Remote Methods
-		final Term wfHist = tb.wellFormedHist(tb.var(hist));
+		final Term wfHist = tb.wellFormedHist(tb.getHist());
 		wellFormed = tb.and(wellFormed, wfHist);
 
 		return tb.and((wellFormed != null ? wellFormed : tb.tt()), selfNotNull,
@@ -841,8 +848,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @param atPreVars Mapping of {@link LocationVariable} to the {@link LocationVariable} which contains the initial value.
     * @param postTerm The post condition.
     * @param sb The {@link StatementBlock} to execute in try block.
-    * @param hist The logical variable for the global history (of Remote-Method events).
-    * @param preHist The logical variable for histAtPre (the history before the start of the method).
     * @param services TODO
     * @return The created {@link Term}.
     */
@@ -852,10 +857,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                    ProgramVariable resultVar,
                                    ProgramVariable exceptionVar,
                                    Map<LocationVariable, LocationVariable> atPreVars,
+                                   Term histAtCallUpdate,
                                    Term postTerm,
                                    ImmutableList<StatementBlock> sb,
-                                   LocationVariable hist,
-                                   LocationVariable preHist,
                                    Services services) {
 
       // create java block
@@ -872,7 +876,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
       }
 
       // create update
-      Term update = buildUpdate(paramVars, formalParamVars, atPreVars, hist, preHist, services);
+      Term update = buildUpdate(paramVars, formalParamVars, histAtCallUpdate, atPreVars, services);
 
       return tb.apply(update, programTerm, null);
    }
@@ -980,16 +984,13 @@ public abstract class AbstractOperationPO extends AbstractPO {
 	 * @param paramVars Formal parameters of method call.
 	 * @param formalParamVars Arguments from formal parameters for method call.
 	 * @param atPreVars Mapping of {@link LocationVariable} to the {@link LocationVariable} which contains the initial value.
-	 * @param hist The logical variable for the global history (of Remote-Method events).
-	 * @param preHist The logical variable for histAtPre (the history before the start of the method).
 	 * @param services TODO
 	 * @return The {@link Term} representing the initial updates.
 	 */
 	protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
 			ImmutableList<LocationVariable> formalParamVars,
+			Term histAtCallUpdate,
 			Map<LocationVariable, LocationVariable> atPreVars,
-			LocationVariable hist,
-			LocationVariable preHist,
 			Services services) {
 		Term update = tb.skip();
 		for (Entry<LocationVariable, LocationVariable> atPreEntry : atPreVars.entrySet()) {
@@ -1000,7 +1001,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
 		}
 
 		// histAtPre := hist
-		Term histupdate = tb.elementary(preHist, tb.var(hist));
+		LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
+		LocationVariable histAtPre = new LocationVariable(new ProgramElementName(tb.newName(hist + "AtPre")), new KeYJavaType(hist.sort()));
+		Term histupdate = tb.elementary(histAtPre, tb.getHist());
 		update = tb.parallel(update, histupdate);
 		if (isCopyOfMethodArgumentsUsed()) {
 			Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
@@ -1010,6 +1013,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				update = tb.parallel(update, paramUpdate);
 			}
 		}
+
+		// hist := histAtCall
+		update = tb.sequential(update, histAtCallUpdate);
 
 		return update;
 	}

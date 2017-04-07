@@ -359,7 +359,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
                         IMPLICIT_ARRAY_CREATION_HELPER),
                 new ParameterDeclaration[0], null,
                 getCreateArrayHelperBody(length, fields, false,
-                        null), false, false); //TODO KD s isRemote?
+                        null), false, false);
 
         return new ProgramMethod(md, 
         			 arrayType, 
@@ -447,7 +447,7 @@ public final class CreateArrayMethodBuilder extends KeYJavaASTFactory {
                 new Modifier[] { new Private()}, arrayRef,
                 new ProgramElementName(
                         PrepareObjectBuilder.IMPLICIT_OBJECT_PREPARE),
-                new ParameterDeclaration[0], null, body, false, false); //TODO KD s isRemote?
+                new ParameterDeclaration[0], null, body, false, false);
 
         return new ProgramMethod(md, 
         	                 arrayType, 

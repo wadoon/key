@@ -192,12 +192,11 @@ public final class DependencyContractImpl implements DependencyContract {
             ProgramVariable atPreVar = atPreVars.get(hist);
             ProgramVariable originalAtPreVar = originalAtPreVars.get(hist); // always null?!
             if (atPreVar != null && originalAtPreVar != null) {
-            	map.put(atPreVar, originalAtPreVar); // TODO KD f what does this do?
+            	map.put(atPreVar, originalAtPreVar); // TODO KD zf what does this do?
             }
         }
 
         OpReplacer or = new OpReplacer(map, services.getTermFactory());
-        System.out.println("DependencyContractImpl.getPre(...) = " + or.replace(originalPres.get(heap))); // TODO KD
         return or.replace(originalPres.get(heap));
     }
 

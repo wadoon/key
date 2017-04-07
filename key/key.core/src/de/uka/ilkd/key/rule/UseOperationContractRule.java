@@ -812,13 +812,15 @@ public final class UseOperationContractRule implements BuiltInRule {
 		}
 
 		//if called method is remote add "outgoing call" and "incoming termination" events to history
+		// TODO KD i re-check
 		LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
-		LocationVariable beforeHist = new LocationVariable(new ProgramElementName(tb.newName(hist + "Before_" + pm.getName())), new KeYJavaType(hist.sort()));
-		final Name methodHistName = new Name(tb.newName(hist + "After_" + pm.getName()));
-		final Function methodHistFunc = new Function(methodHistName, hist.sort(), true);
-		services.getNamespaces().functions().addSafely(methodHistFunc);
-		final Term methodHist = tb.func(methodHistFunc);
-		final Term anonHistUpdate = tb.elementary(hist, methodHist);
+		ProgramElementName beforeHistName = new ProgramElementName(tb.newName(hist + "Before_" + pm.getName()));
+		LocationVariable beforeHist = new LocationVariable(beforeHistName, new KeYJavaType(hist.sort()));
+		final Name afterHistName = new Name(tb.newName(hist + "After_" + pm.getName()));
+		final Function afterHistFunc = new Function(afterHistName, hist.sort(), true);
+		services.getNamespaces().functions().addSafely(afterHistFunc);
+		final Term afterHist = tb.func(afterHistFunc);
+		final Term anonHistUpdate = tb.elementary(hist, afterHist);
 		Term newHist;
 		if (pm.getMethodDeclaration().isRemote()) {
 			assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
@@ -831,9 +833,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 			Term inTermEvent  = tb.evConst(tb.evTerm(), selfVarTerm, contractSelf, method, resultTerm, anonUpdateDatas.reverse().head().methodHeap);
 			newHist = tb.seqConcat(tb.var(hist), tb.seq(outCallEvent, inTermEvent));
 		} else {
-			newHist = tb.var(hist); // TODO KD s do I need to change this, because methods could change the history? do I need anon after all?
+			newHist = tb.var(hist); // TODO KD i anonHist (+ properties)
 		}
-		final Term assumption = tb.equals(newHist, methodHist);
+		final Term assumption = tb.equals(newHist, afterHist);
 		anonAssumption = tb.and(anonAssumption, assumption);
 		anonUpdate = tb.parallel(anonUpdate, anonHistUpdate);
 		atPreUpdates = tb.parallel(atPreUpdates, tb.elementary(beforeHist, tb.var(hist)));
