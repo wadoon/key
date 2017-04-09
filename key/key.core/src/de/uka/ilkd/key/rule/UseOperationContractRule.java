@@ -319,24 +319,24 @@ public final class UseOperationContractRule implements BuiltInRule {
 	                                     	   Services services) {
 	assert pm != null;
 	assert mod != null;
-	final TermBuilder TB = services.getTermBuilder();
+	final TermBuilder tb = services.getTermBuilder();
 
 	final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-	final Name methodHeapName = new Name(TB.newName(heap + "After_" + pm.getName()));
+	final Name methodHeapName = new Name(tb.newName(heap + "After_" + pm.getName()));
 	final Function methodHeapFunc = new Function(methodHeapName, heapLDT.targetSort(), true);
 	services.getNamespaces().functions().addSafely(methodHeapFunc);
-	final Term methodHeap = TB.func(methodHeapFunc);
-	final Name anonHeapName = new Name(TB.newName("anon_" + heap + "_" + pm.getName()));
+	final Term methodHeap = tb.func(methodHeapFunc);
+	final Name anonHeapName = new Name(tb.newName("anon_" + heap + "_" + pm.getName()));
 	final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
 	services.getNamespaces().functions().addSafely(anonHeapFunc);
-	final Term anonHeap = TB.label(TB.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
+	final Term anonHeap = tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
 	final Term assumption =
-	        TB.equals(TB.anon(TB.var(heap), mod, anonHeap),
+	        tb.equals(tb.anon(tb.var(heap), mod, anonHeap),
                           methodHeap); 
-	final Term anonUpdate = TB.elementary(heap, methodHeap);
+	final Term anonUpdate = tb.elementary(heap, methodHeap);
 
 	return new AnonUpdateData(assumption, anonUpdate, methodHeap,
-	                          TB.getBaseHeap(), anonHeap);
+	                          tb.getBaseHeap(), anonHeap);
     }
 
     /**
@@ -747,8 +747,10 @@ public final class UseOperationContractRule implements BuiltInRule {
 		final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
 
 		for(LocationVariable heap : heapContext) {
-			final Term m = contract.getMod(heap, tb.var(heap),
-					contractSelf,contractParams, services);
+			// TODO KD z hacky
+			final Term m = contract.getTarget().getMethodDeclaration().isRemote() ?
+					tb.empty() :
+					contract.getMod(heap, tb.var(heap), contractSelf,contractParams, services);
 			mods.put(heap, m);
 		}
 
@@ -811,35 +813,44 @@ public final class UseOperationContractRule implements BuiltInRule {
 			reachableState = tb.and(reachableState, tb.wellFormed(heap));
 		}
 
-		//if called method is remote add "outgoing call" and "incoming termination" events to history
-		// TODO KD i re-check
-		LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
-		ProgramElementName beforeHistName = new ProgramElementName(tb.newName(hist + "Before_" + pm.getName()));
-		LocationVariable beforeHist = new LocationVariable(beforeHistName, new KeYJavaType(hist.sort()));
-		final Name afterHistName = new Name(tb.newName(hist + "After_" + pm.getName()));
-		final Function afterHistFunc = new Function(afterHistName, hist.sort(), true);
-		services.getNamespaces().functions().addSafely(afterHistFunc);
-		final Term afterHist = tb.func(afterHistFunc);
-		final Term anonHistUpdate = tb.elementary(hist, afterHist);
-		Term newHist;
-		if (pm.getMethodDeclaration().isRemote()) {
-			assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
-			// TODO KD z could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor()
-			final ProgramVariable selfVar = tb.selfVar(pm, contract.getKJT(), false);
-			final Term selfVarTerm = tb.var(selfVar); // throws Exception if pm.getMethodDeclaration().isStatic()
-			Term method = tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), services));
-			Term resultTerm = contract.hasResultVar() ? tb.seqSingleton(contract.getResult()) : tb.seqEmpty();
-			Term outCallEvent = tb.evConst(tb.evCall(), selfVarTerm, contractSelf, method, tb.seq(contractParams), anonUpdateDatas.head().methodHeapAtPre);
-			Term inTermEvent  = tb.evConst(tb.evTerm(), selfVarTerm, contractSelf, method, resultTerm, anonUpdateDatas.reverse().head().methodHeap);
-			newHist = tb.seqConcat(tb.var(hist), tb.seq(outCallEvent, inTermEvent));
-		} else {
-			newHist = tb.var(hist); // TODO KD i anonHist (+ properties)
-		}
-		final Term assumption = tb.equals(newHist, afterHist);
-		anonAssumption = tb.and(anonAssumption, assumption);
-		anonUpdate = tb.parallel(anonUpdate, anonHistUpdate);
-		atPreUpdates = tb.parallel(atPreUpdates, tb.elementary(beforeHist, tb.var(hist)));
-		reachableState = tb.and(reachableState, tb.wellFormedHist(hist));
+		// modify history if called method belongs to self or a remote business interface
+		final ProgramVariable selfVar = tb.selfVar(pm, contract.getKJT(), false);
+		final Term selfVarTerm = (selfVar != null) ? tb.var(selfVar) : null;
+		if (pm.getMethodDeclaration().isRemote() || selfVarTerm.equalsModRenaming(contractSelf)) { // FIXME KD how do I test this correctly?
+			LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
+			ProgramElementName beforeHistName = new ProgramElementName(tb.newName(hist + "Before_" + pm.getName()));
+			LocationVariable beforeHist = new LocationVariable(beforeHistName, new KeYJavaType(hist.sort()));
+			final Name afterHistName = new Name(tb.newName(hist + "After_" + pm.getName()));
+			final Function afterHistFunc = new Function(afterHistName, hist.sort(), true);
+			services.getNamespaces().functions().addSafely(afterHistFunc);
+			final Term afterHist = tb.func(afterHistFunc);
+			final Term anonHistUpdate = tb.elementary(hist, afterHist);
+			Term newHist;
+			// if called method belongs to a business remote interface, add "outgoing call" and "incoming termination" events to history
+			if (pm.getMethodDeclaration().isRemote()) {
+				assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
+				// TODO KD z could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor() and selfVarTerm != contractSelf
+				Term method = tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), services));
+				Term resultTerm = contract.hasResultVar() ? tb.seqSingleton(contract.getResult()) : tb.seqEmpty();
+				// throws Exception if pm.getMethodDeclaration().isStatic()
+				Term outCallEvent = tb.evConst(tb.evCall(), selfVarTerm, contractSelf, method, tb.seq(contractParams), anonUpdateDatas.head().methodHeapAtPre);
+				// throws Exception if pm.getMethodDeclaration().isStatic()
+				Term inTermEvent  = tb.evConst(tb.evTerm(), selfVarTerm, contractSelf, method, resultTerm, anonUpdateDatas.reverse().head().methodHeap);
+				newHist = tb.seqConcat(tb.var(hist), tb.seq(outCallEvent, inTermEvent));
+			// if called method belongs to self, add unknown changes to the history
+			} else { // method belongs to self // FIXME KD how do I test this correctly?
+				final Name anonHistName = new Name(tb.newName("anon_" + hist + "_" + pm.getName()));
+				final Function anonHistFunc = new Function(anonHistName, hist.sort());
+				services.getNamespaces().functions().addSafely(anonHistFunc);
+				final Term anonHist = tb.label(tb.func(anonHistFunc), new ParameterlessTermLabel(new Name("anonHistFunction")));
+				newHist = tb.seqConcat(tb.var(hist), anonHist); // TODO KD z more properties (e.g. wfHist(anonHist))?
+			}
+			final Term assumption = tb.equals(newHist, afterHist);
+			anonAssumption = tb.and(anonAssumption, assumption);
+			anonUpdate = tb.parallel(anonUpdate, anonHistUpdate);
+			atPreUpdates = tb.parallel(atPreUpdates, tb.elementary(beforeHist, tb.var(hist)));
+			reachableState = tb.and(reachableState, tb.wellFormedHist(hist));
+		} // TODO KD else?
 
 		final Term excNull = tb.equals(tb.var(excVar), tb.NULL());
 		final Term excCreated = tb.created(tb.var(excVar));

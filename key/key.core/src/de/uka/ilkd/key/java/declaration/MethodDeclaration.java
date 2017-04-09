@@ -57,7 +57,7 @@ public class MethodDeclaration extends JavaDeclaration
 
     /**
      * This flag tells, if the class or interface of this method has the Remote annotation.
-     */ // TODO KD r need to check super classes / interfaces as well?
+     */
     protected final boolean parentIsRemoteInterface;
 
     /**
@@ -369,6 +369,7 @@ public class MethodDeclaration extends JavaDeclaration
     }
 
     public boolean isRemote() {
+    	// TODO KD z hasAnnotation("Remote") not possible
     	return parentIsRemoteInterface || hasAnnotation("Remote"); // TODO KD z check for static / final / constructor? + make "Remote" a constant?
     }
 

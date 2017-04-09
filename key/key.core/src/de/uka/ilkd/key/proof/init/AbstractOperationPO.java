@@ -402,52 +402,25 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				final Term globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm, // TODO KD z always null?
 						tb.var(paramVars), proofServices);
 
-				// TODO KD  list
-				// (a) working on right now
-				// (b) next up things
-				// (f) questions to research
-				// (i) needs to be implemented
-				// (p) paused
-				// (r) research
-				// (s) ask Simon
-				// (z) not important now (maybe does not happen)
-				// a add events within method (so wfHist and other stuff holds)
-				// b add free pure to ensures of remote methods
-				// b+f maybe add fresh result as well
+				// TODO KD fresh arguments / result how to?
 
 				// if method to prove is remote add "outgoing termination" events to history
-				// TODO KD a re-think (do without functions)
 				Term histAtCallUpdate = tb.skip();
 				if (pm.getMethodDeclaration().isRemote()) {
 					assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
-					// TODO KD z could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor()
-
+					// TODO KD z could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor() (caller cannot be selfVarTerm)
 					LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
 					LocationVariable caller = new LocationVariable(new ProgramElementName("Caller"), proofServices.getJavaInfo().objectSort());
 					Term method = tb.func(proofServices.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), proofServices));
 					Term resultTerm = (resultVar != null) ? tb.seqSingleton(tb.var(resultVar)) : tb.seqEmpty();
-
-					final Name histAtCallName = new Name(tb.newName(hist + "At_" + pm.getName() + "Call"));
-					final Function histAtCallFunc = new Function(histAtCallName, hist.sort(), true);
-					proofServices.getNamespaces().functions().addSafely(histAtCallFunc);
-					final Term histAtCall = tb.func(histAtCallFunc);
 					// throws Exception if pm.getMethodDeclaration().isStatic()
-					Term inCallEvent = tb.evConst(tb.evCall(), tb.var(caller), selfVarTerm, method, tb.seq(tb.var(tb.paramVars(pm, false))), tb.getBaseHeap());
+					Term inCallEvent = tb.evConst(tb.evCall(), tb.var(caller), selfVarTerm, method, tb.seq(tb.var(paramVars)), tb.getBaseHeap());
 					Term newHistAtCall = tb.seqConcat(tb.getHist(), tb.seqSingleton(inCallEvent));
-					final Term histAtCallAssumption = tb.equals(newHistAtCall, histAtCall);
-					histAtCallUpdate = tb.elementary(hist, histAtCall);
-
-					final Name histAtTermName = new Name(tb.newName(hist + "At_" + pm.getName() + "Term"));
-					final Function histAtTermFunc = new Function(histAtTermName, hist.sort(), true);
-					proofServices.getNamespaces().functions().addSafely(histAtTermFunc);
-					final Term histAtTerm = tb.func(histAtTermFunc);
+					histAtCallUpdate = tb.elementary(hist, newHistAtCall);
 					// throws Exception if pm.getMethodDeclaration().isStatic()
 					Term outTermEvent = tb.evConst(tb.evTerm(), tb.var(caller), selfVarTerm, method, resultTerm, tb.getBaseHeap());
 					Term newHistAtTerm = tb.seqConcat(tb.getHist(), tb.seqSingleton(outTermEvent));
-					final Term histAtTermAssumption = tb.equals(newHistAtTerm, histAtTerm);
-					final Term histAtTermUpdate = tb.elementary(hist, histAtTerm); // hist := histAtTerm
-
-					pre = tb.and(pre, histAtCallAssumption, histAtTermAssumption);
+					final Term histAtTermUpdate = tb.elementary(hist, newHistAtTerm);
 					post = tb.apply(histAtTermUpdate, post);
 				}
 

@@ -1329,7 +1329,7 @@ public class Recoder2KeYConverter {
             	if (tr.getName().equals("Remote")) { // TODO KD z make "Remote" a constant
             		isRemote = true;
             	}
-            } // TODO KD r do I need to check (implemented interfaces / extended classes) as well?
+            } // FIXME KD re-implement with specifications I found
 
             final MethodDeclaration methDecl
             	= new MethodDeclaration(
