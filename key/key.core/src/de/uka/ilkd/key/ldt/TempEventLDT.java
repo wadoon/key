@@ -43,6 +43,7 @@ public class TempEventLDT extends LDT {
     private final Function coopListEquiv;
     private final Function equivHistory;
     private final Function equivEvent;
+    private final Function invEvent;
     private final Function filterVisible;
     
     private final LocationVariable currentParams;
@@ -80,6 +81,7 @@ public class TempEventLDT extends LDT {
         equivHistory = addFunction(services, "equivHistory");
         equivEvent = addFunction(services, "equivEvent");
         filterVisible = addFunction(services, "filterVisible");
+        invEvent = addFunction(services, "invEvent");
                 
         hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
         
@@ -233,6 +235,10 @@ public class TempEventLDT extends LDT {
     @Override
     public Type getType(Term t) {
         return null;
+    }
+
+    public Function invEvent() {
+        return invEvent;
     }
 
 }

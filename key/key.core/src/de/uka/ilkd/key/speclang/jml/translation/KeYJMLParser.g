@@ -616,9 +616,10 @@ dependencyclusterspec returns  [DependencyClusterSpec result = DependencyCluster
     ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
 }
 ://TODO JK check which parts can be made optional, work on nice syntax
+//TODO JK make sure there aren't multiple lists for the same kind of event (ie same partner, direction and service)
     CLUSTER 
-    	LOWIN (NOTHING | tmpLowIn = depclusterspeclist {lowIn = lowIn.append(tmpLowIn);}) 
-    	LOWOUT (NOTHING | tmpLowOut = depclusterspeclist {lowOut = lowOut.append(tmpLowOut);}) 
+    	LOWIN (NOTHING | tmpLowIn = depclusterspeclist[Lowlist.Direction.IN] {lowIn = lowIn.append(tmpLowIn);}) 
+    	LOWOUT (NOTHING | tmpLowOut = depclusterspeclist[Lowlist.Direction.OUT] {lowOut = lowOut.append(tmpLowOut);}) 
     	LOWSTATE (NOTHING | tmpLowState = infflowspeclist {lowState = lowState.append(tmpLowState);}) 
     	VISIBLE (NOTHING | tmpVisible = visibilitylist {visible = visible.append(tmpVisible);})
     	NEW_OBJECTS (NOTHING | tmpNew = infflowspeclist {newObs = newObs.append(tmpNew);})
@@ -626,19 +627,19 @@ dependencyclusterspec returns  [DependencyClusterSpec result = DependencyCluster
     {result = new DependencyClusterSpec(lowIn, lowOut, lowState, visible, newObs);}
     ;
     
-depclusterspeclist returns  [ImmutableList<Lowlist> result = ImmutableSLList.<Lowlist>nil()] throws SLTranslationException
+depclusterspeclist[Lowlist.Direction dir] returns  [ImmutableList<Lowlist> result = ImmutableSLList.<Lowlist>nil()] throws SLTranslationException
 ://TODO JK restore the possibility to directly use expressions (implicitly in the context of the current service)
 
-      lowlist = lowmessagespeclist {result = result.append(lowlist);}//
+      lowlist = lowmessagespeclist[dir] {result = result.append(lowlist);}//
     //| term = termexpression {result = result.append(term);} //TODO JK I suspect this needs refinement, maybe because of result keyword. ambiguity because of depclusterspeclist_service? means expressions directly on parameters (if in) or result (if out)
    
-    ( COMMA lowlist = lowmessagespeclist {result = result.append(lowlist);})*
+    ( COMMA lowlist = lowmessagespeclist[dir] {result = result.append(lowlist);})*
     //| term = termexpression {result = result.append(term);})*
     
         //{ result = translator.translate("infflowspeclist", ImmutableList.class, result, services); }//This translation seems to execute code in JMLTranslator, atm line 1723ff what does it do and do I need it for my specs???
     ;
     
-lowmessagespeclist returns  [Lowlist result = null] throws SLTranslationException //TODO JK this is for component.service(expression with parameters)
+lowmessagespeclist[Lowlist.Direction dir] returns  [Lowlist result = null] throws SLTranslationException //TODO JK this is for component.service(expression with parameters)
 @after {
     serviceContext = null;
     componentContext = null;
@@ -647,7 +648,22 @@ lowmessagespeclist returns  [Lowlist result = null] throws SLTranslationExceptio
 //TODO JK add flexibility to choosing component, for example allow accessing components in arrays
     servicecontext LPAREN list = termlist RPAREN
     
-    {result = new Lowlist(componentContext, serviceContext, list);}
+    {
+    Lowlist.CallType callType;
+    if (componentContext.getTerm().equals(tb.var(selfVar))) {
+        if (dir == Lowlist.Direction.IN) {
+            callType = Lowlist.CallType.CALL;
+        } else {
+            callType = Lowlist.CallType.TERMINATION;
+        }
+    } else {
+        if (dir == Lowlist.Direction.OUT) {
+            callType = Lowlist.CallType.CALL;
+        } else {
+            callType = Lowlist.CallType.TERMINATION;
+        }
+    }
+    result = new Lowlist(componentContext, serviceContext, dir, callType, list);}
     
     ;
     

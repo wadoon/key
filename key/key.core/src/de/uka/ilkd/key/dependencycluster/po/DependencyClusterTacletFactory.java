@@ -1,0 +1,216 @@
+package de.uka.ilkd.key.dependencycluster.po;
+
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import de.uka.ilkd.key.ldt.TempEventLDT;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.speclang.DependencyClusterContract;
+import de.uka.ilkd.key.util.Lowlist;
+
+public class DependencyClusterTacletFactory {
+    private final DependencyClusterContract contract;
+    private final InitConfig proofConfig;
+    private final TermBuilder tb;
+    private final TempEventLDT ldt;
+    
+    Term calltype1;
+    Term calltype2;
+    
+    Term direction1;
+    Term direction2;
+    
+    Term component1;
+    Term component2;
+    
+    Term service1;
+    Term service2;
+    
+    Term params1;
+    Term params2;
+    
+    Term heap1;
+    Term heap2;
+    
+    Term event1;
+    Term event2;
+    
+    Term updatedParams1;
+    Term updatedParams2;
+    
+    public DependencyClusterTacletFactory(DependencyClusterContract contract, InitConfig proofConfig) {
+        this.contract = contract;
+        this.proofConfig = proofConfig;
+        ldt = proofConfig.getServices().getTypeConverter().getTempEventLDT();
+        
+        tb = proofConfig.getServices().getTermBuilder();
+        
+        Sort calltypeSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("Calltype");
+        Sort dirSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("CallDirection");
+        Sort objectSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("java.lang.Object");
+        Sort methodSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("Method");
+        Sort seqSort = proofConfig.getServices().getTypeConverter().getSeqLDT().targetSort();
+        Sort heapSort = proofConfig.getServices().getTypeConverter().getHeapLDT().targetSort();
+        
+        calltype1 = tb.var(SchemaVariableFactory.createTermSV(new Name("calltype1"), calltypeSort, false, false));
+        calltype2 = tb.var(SchemaVariableFactory.createTermSV(new Name("calltype2"), calltypeSort, false, false));
+        
+        direction1 = tb.var(SchemaVariableFactory.createTermSV(new Name("direction1"), dirSort, false, false));
+        direction2 = tb.var(SchemaVariableFactory.createTermSV(new Name("direction1"), dirSort, false, false));    
+        
+        component1 = tb.var(SchemaVariableFactory.createTermSV(new Name("component1"), objectSort, false, false));
+        component2 = tb.var(SchemaVariableFactory.createTermSV(new Name("component2"), objectSort, false, false));
+        
+        service1 = tb.var(SchemaVariableFactory.createTermSV(new Name("service1"), methodSort, false, false));
+        service2 = tb.var(SchemaVariableFactory.createTermSV(new Name("service2"), methodSort, false, false));
+        
+        params1 = tb.var(SchemaVariableFactory.createTermSV(new Name("params1"), seqSort, false, false));
+        params2 = tb.var(SchemaVariableFactory.createTermSV(new Name("params2"), seqSort, false, false));
+        
+        heap1 = tb.var(SchemaVariableFactory.createTermSV(new Name("heap1"), heapSort, false, false));
+        heap2 = tb.var(SchemaVariableFactory.createTermSV(new Name("heap2"), heapSort, false, false));
+        
+        event1 = tb.func(ldt.evConst(), calltype1, direction1, component1, service1, params1, heap1);
+        event2 = tb.func(ldt.evConst(), calltype2, direction2, component2, service2, params2, heap2);
+        
+        updatedParams1 =tb.elementary(ldt.getCurrentParams(), params1);
+        updatedParams2 =tb.elementary(ldt.getCurrentParams(), params2); //TODO JK probably we'll need to make an updated heap as well. In the long run use a function here anyway...
+    }
+    
+    public Term findTerm() {
+        Term find = tb.func(ldt.equivEvent(), event1, event2);
+        return find;
+    }
+    
+    public Term bothEventsInvisible() {
+        Term event1Invis = tb.func(ldt.invEvent(), event1);
+        Term event2Invis = tb.func(ldt.invEvent(), event2);
+        Term bothInvis = tb.and(event1Invis, event2Invis);
+        return bothInvis;
+    }
+    
+    public Term equalMetadata() {
+        Term equalType = tb.equals(calltype1, calltype2);
+        Term equalDirection = tb.equals(direction1, direction2);
+        Term equalPartner = tb.equals(component1, component2); //TODO JK does simple equality work here??? Probably change this!
+        Term equalService = tb.equals(service1, service2);
+        Term equalMetadata = tb.and(equalType, equalDirection, equalPartner, equalService);
+        return equalMetadata;
+    }
+    
+    public Term equivalenceInVisibleCase() {
+        Term visibleEquivalence = tb.and(equalMetadata(), tb.or(collectedConditionsForEquivalenceOfVisibleEvents()));
+        return visibleEquivalence;
+    }
+    
+    public Term replaceTerm() {
+        Term replaceWith = tb.or(bothEventsInvisible(), equivalenceInVisibleCase());
+        return replaceWith;
+    }
+    
+    public RewriteTaclet getEventEquivalenceTaclet() {
+        RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
+        
+        //TODO JK remove preceding As
+        tacletBuilder.setDisplayName("AAAEquivEventDef");
+        tacletBuilder.setName(new Name("AAAEquivEventDef"));
+        
+        tacletBuilder.setFind(findTerm());
+        
+        tacletBuilder.addGoalTerm(replaceTerm());
+        
+        //TODO JK which ruleset is correct?
+        tacletBuilder.addRuleSet((RuleSet)proofConfig.ruleSetNS().lookup(new Name("simplify_enlarging")));  
+        
+        RewriteTaclet taclet = tacletBuilder.getRewriteTaclet();
+        return taclet;
+    }
+    
+    public ImmutableList<Term> collectedConditionsForEquivalenceOfVisibleEvents() {
+        ImmutableList<Term> collectedConditionsForEquivalenceOfVisibleEvents = ImmutableSLList.<Term>nil();
+        for (Lowlist list: contract.getSpecs().head().getLowIn()) {
+            Term checkDirection = tb.func(ldt.evIncoming());
+            Term checkCalltype;
+            if (list.getCallType() == Lowlist.CallType.CALL) {
+                checkCalltype = tb.func(ldt.evCall());
+            } else {
+                checkCalltype = tb.func(ldt.evTerm());
+            }
+            Term checkComponent = list.getComponent().getTerm(); //TODO JK probably not that easy! Maybe we need to evaluate the component on a specific Heap or something
+            Term checkService = tb.func(ldt.getMethodIdentifier(list.getService().getMethodDeclaration(), proofConfig.getServices()));
+            
+            Term dirEq = tb.equals(direction1, checkDirection);
+            Term typeEq = tb.equals(calltype1, checkCalltype);
+            Term compEq = tb.equals(component1, checkComponent); //TODO JK probably not that easy! Object equalities are annoying...
+            Term servEq = tb.equals(service1, checkService);
+            Term metadataFits = tb.and(dirEq, typeEq, compEq, servEq);
+
+            ImmutableList<Term> expressionsEq = ImmutableSLList.<Term>nil();
+            for (Term term: list.getLowTerms()) {
+                System.out.println(checkDirection + "." + checkComponent + "." + checkService + "." + checkCalltype + ":" + term + " is of sort " + term.sort());
+                
+                Term expressionComparison = null;
+                
+                //TODO JK Parser returns some "boolean" expressions (for example with > operator) as Formulas, not as expressions, so we need special treatment for those (can't be in sequences, dont have a = relation...)
+                if (term.sort().equals(tb.tt().sort())) {   
+                    Term t1 = tb.apply(updatedParams1, term);
+                    Term t2 = tb.apply(updatedParams1, term);
+                    expressionComparison = tb.equals(t1, t2);
+                }
+                
+                //TODO JK continue here, cases for objects and basic types
+                
+                if (!(expressionComparison == null)) {
+                    expressionsEq = expressionsEq.append(expressionComparison);
+                }
+
+            }
+            
+            if (!expressionsEq.isEmpty()) {
+                collectedConditionsForEquivalenceOfVisibleEvents = collectedConditionsForEquivalenceOfVisibleEvents.append(tb.and(metadataFits, tb.and(expressionsEq)));
+            }
+        }
+        return collectedConditionsForEquivalenceOfVisibleEvents;
+    }
+    
+    private ImmutableList<Term> getFormulas(ImmutableList<Term> list) {
+        ImmutableList<Term> formulas = ImmutableSLList.<Term>nil();
+        for (Term term: list) {
+            if (term.sort().equals(tb.tt().sort())) {
+                formulas = formulas.append(term);
+            }
+        }
+        return formulas;
+    }
+    
+    private ImmutableList<Term> getObjects(ImmutableList<Term> list) {
+        Sort objectSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("java.lang.Object");
+        ImmutableList<Term> formulas = ImmutableSLList.<Term>nil();
+        for (Term term: list) {
+            if (term.sort().extendsTrans(objectSort)) {
+                formulas = formulas.append(term);
+            }
+        }
+        return formulas;
+    }
+    
+    private ImmutableList<Term> getBuiltInTypeExpressions(ImmutableList<Term> list) {
+        Sort objectSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("java.lang.Object");
+        ImmutableList<Term> formulas = ImmutableSLList.<Term>nil();
+        for (Term term: list) {
+            if (!(term.sort().extendsTrans(objectSort) || term.sort().equals(tb.tt().sort()))) {
+                formulas = formulas.append(term);
+            }
+        }
+        return formulas;
+    }
+
+}
