@@ -44,17 +44,20 @@ public class RelationDescription {
 		}
 		possibleRangeFormulas = createRangeFormulas(t, serv);
 		
+		System.out.println("number of range formulas: " + possibleRangeFormulas.size());
+		
+		atomics = new LinkedList<AtomicRelationDescription>();
 		for(Term range : possibleRangeFormulas){
 			/*
 			 * How to select the right substitutions? Is another ConstructorExctractor needed?
 			 * If yes is the one above needed?
 			 */
-			System.out.println("\tAdded range: " + range.toString());
 			atomics.add(new AtomicRelationDescription(
 					range,
 					possibleSubstitutions	//TODO: filter this list.
 					));
 		}
+		
 	}
 	
 	public LinkedList<AtomicRelationDescription> getAtomics(){
@@ -68,8 +71,12 @@ public class RelationDescription {
 		//TODO:[optional] check for optimizations
 		for(Named n : namedrules){
 			if(n instanceof Rule){
+				System.out.println("Rule detected: " + n.toString());
 				Rule r = (Rule)n;
 				if(r instanceof FindTaclet){
+					
+					System.out.println("\tfindtaclet found: " + r.toString());
+					
 					FindTaclet ft = (FindTaclet)r;
 					//check whether the find term of the the FindTaclet is an instance of the given term
 					Term rangeFormula = createRangeFormula(t, ft.find(), s);
