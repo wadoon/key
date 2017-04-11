@@ -154,25 +154,28 @@ public class DependencyClusterTacletFactory {
             Term metadataFits = tb.and(dirEq, typeEq, compEq, servEq);
 
             ImmutableList<Term> expressionsEq = ImmutableSLList.<Term>nil();
-            for (Term term: list.getLowTerms()) {
-                System.out.println(checkDirection + "." + checkComponent + "." + checkService + "." + checkCalltype + ":" + term + " is of sort " + term.sort());
-                
-                Term expressionComparison = null;
-                
+            
+            //Formulas
+            for (Term term: getFormulas(list.getLowTerms())) {             
                 //TODO JK Parser returns some "boolean" expressions (for example with > operator) as Formulas, not as expressions, so we need special treatment for those (can't be in sequences, dont have a = relation...)
-                if (term.sort().equals(tb.tt().sort())) {   
-                    Term t1 = tb.apply(updatedParams1, term);
-                    Term t2 = tb.apply(updatedParams1, term);
-                    expressionComparison = tb.equals(t1, t2);
-                }
-                
-                //TODO JK continue here, cases for objects and basic types
-                
-                if (!(expressionComparison == null)) {
-                    expressionsEq = expressionsEq.append(expressionComparison);
-                }
+                Term t1 = tb.apply(updatedParams1, term);
+                Term t2 = tb.apply(updatedParams2, term);
+                Term expressionComparison = tb.equals(t1, t2);
 
+                expressionsEq = expressionsEq.append(expressionComparison);
             }
+            
+            //BuiltIn types
+            if (!getBuiltInTypeExpressions(list.getLowTerms()).isEmpty()) {
+                Term builtin = tb.seq(getBuiltInTypeExpressions(list.getLowTerms()));
+                Term t1 = tb.apply(updatedParams1, builtin);
+                Term t2 = tb.apply(updatedParams2, builtin);
+                
+                expressionsEq = expressionsEq.append(tb.equals(t1, t2));
+            }
+            
+            //TODO JK Objects
+
             
             if (!expressionsEq.isEmpty()) {
                 collectedConditionsForEquivalenceOfVisibleEvents = collectedConditionsForEquivalenceOfVisibleEvents.append(tb.and(metadataFits, tb.and(expressionsEq)));
