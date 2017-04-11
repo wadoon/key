@@ -136,9 +136,22 @@ public class DependencyClusterTacletFactory {
     }
     
     public ImmutableList<Term> collectedConditionsForEquivalenceOfVisibleEvents() {
+        ImmutableList<Term> collectedConditionsForEquivalenceOfVisibleEvents = equivalenceConditionsForLowlist(contract.getSpecs().head().getLowIn());
+        collectedConditionsForEquivalenceOfVisibleEvents = collectedConditionsForEquivalenceOfVisibleEvents.append(equivalenceConditionsForLowlist(contract.getSpecs().head().getLowOut()));
+        return collectedConditionsForEquivalenceOfVisibleEvents;
+    }
+    
+    private ImmutableList<Term> equivalenceConditionsForLowlist(ImmutableList<Lowlist> lowlists) {
         ImmutableList<Term> collectedConditionsForEquivalenceOfVisibleEvents = ImmutableSLList.<Term>nil();
-        for (Lowlist list: contract.getSpecs().head().getLowIn()) {
-            Term checkDirection = tb.func(ldt.evIncoming());
+        for (Lowlist list: lowlists) {
+            
+            Term checkDirection;
+            if (list.getDirection() == Lowlist.Direction.IN){
+                checkDirection = tb.func(ldt.evIncoming());
+            } else {
+                checkDirection = tb.func(ldt.evOutgoing());
+            } 
+                        
             Term checkCalltype;
             if (list.getCallType() == Lowlist.CallType.CALL) {
                 checkCalltype = tb.func(ldt.evCall());
