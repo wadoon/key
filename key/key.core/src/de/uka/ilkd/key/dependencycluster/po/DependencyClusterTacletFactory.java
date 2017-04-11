@@ -7,6 +7,7 @@ import de.uka.ilkd.key.ldt.TempEventLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -175,6 +176,21 @@ public class DependencyClusterTacletFactory {
             }
             
             //TODO JK Objects
+            if (!getObjects(list.getLowTerms()).isEmpty()) {
+                Term objects = tb.seq(getObjects(list.getLowTerms()));
+                Term t1 = tb.apply(updatedParams1, objects);
+                Term t2 = tb.apply(updatedParams2, objects);
+                
+                Function objectsIsoFunction =
+                        (Function)proofConfig.getServices().getNamespaces().functions().lookup("objectsIsomorphic");
+                Function sameTypesFunction =
+                        (Function)proofConfig.getServices().getNamespaces().functions().lookup("sameTypes");
+                
+                Term objectsIso = tb.func(objectsIsoFunction, t1, t1, t2, t2);
+                Term sameTypes = tb.func(sameTypesFunction, t1, t2);
+                
+                expressionsEq = expressionsEq.append(tb.and(sameTypes, objectsIso));
+            }
 
             
             if (!expressionsEq.isEmpty()) {
