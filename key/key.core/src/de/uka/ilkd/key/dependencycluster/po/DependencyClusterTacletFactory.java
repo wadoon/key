@@ -182,8 +182,7 @@ public class DependencyClusterTacletFactory {
             Term servEq = tb.equals(service1, checkService);
             Term metadataFits = tb.and(dirEq, typeEq, compEq, servEq);
             
-            conditions = conditions.append(tb.apply(updatedParams1, condition.getTerm()));
-    
+            conditions = conditions.append(tb.and(metadataFits, tb.apply(updatedParams1, condition.getTerm())));
         }
         return tb.or(conditions);
     }
