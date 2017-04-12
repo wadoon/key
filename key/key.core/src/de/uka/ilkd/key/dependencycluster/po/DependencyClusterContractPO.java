@@ -107,6 +107,11 @@ public class DependencyClusterContractPO extends AbstractOperationPO
         //TODO JK is another justification better? Reference the contract for example?
         proofConfig.registerRule(equivEventTaclet, AxiomJustification.INSTANCE);
         
+        RewriteTaclet invisibilityTaclet = tacletFactory.getInvisibilityTaclet();             
+        register(invisibilityTaclet, proofConfig);
+        //TODO JK is another justification better? Reference the contract for example?
+        proofConfig.registerRule(invisibilityTaclet, AxiomJustification.INSTANCE);
+        
     }
 
     @Override
@@ -265,7 +270,7 @@ public class DependencyClusterContractPO extends AbstractOperationPO
         for (Lowlist list: contract.getSpecs().head().getLowIn()) {
             Term checkDirection = tb.func(ldt.evIncoming());
             Term checkCalltype;
-            if (list.getCallType() == Lowlist.CallType.CALL) {
+            if (list.getCallType() == Lowlist.MessageType.CALL) {
                 checkCalltype = tb.func(ldt.evCall());
             } else {
                 checkCalltype = tb.func(ldt.evTerm());

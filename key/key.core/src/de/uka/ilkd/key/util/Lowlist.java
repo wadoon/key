@@ -12,17 +12,17 @@ public class Lowlist {
     private final IProgramMethod service;
     private final ImmutableList<Term> lowTerms;
     private final Direction direction;
-    private final CallType callType;
+    private final MessageType callType;
     
     public enum Direction {
         IN, OUT
     }
     
-    public enum CallType {
+    public enum MessageType {
         CALL, TERMINATION
     }
 
-    public Lowlist(SLExpression component, IProgramMethod service, Direction direction, CallType callType,
+    public Lowlist(SLExpression component, IProgramMethod service, Direction direction, MessageType callType,
             ImmutableList<Term> lowTerms) {
         this.component = component;
         this.service = service;
@@ -52,7 +52,7 @@ public class Lowlist {
         return component.getTerm() + "." + service.getName() + "." + direction.name() + lowTerms;
     }
 
-    public CallType getCallType() {
+    public MessageType getCallType() {
         return callType;
     }
     

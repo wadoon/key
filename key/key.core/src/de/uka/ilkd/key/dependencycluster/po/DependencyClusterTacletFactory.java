@@ -135,7 +135,7 @@ public class DependencyClusterTacletFactory {
         return taclet;
     }
     
-    public RewriteTaclet invisibilityTaclet() {
+    public RewriteTaclet getInvisibilityTaclet() {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
         
         //TODO JK remove preceding As
@@ -157,7 +157,7 @@ public class DependencyClusterTacletFactory {
     }
 
     public Term eventVisible() {
-        //TODO JK continue here contract.getSpecs().head().get
+        System.out.println(contract.getSpecs().head().getVisible().head());
         return null;
     }
 
@@ -183,7 +183,7 @@ public class DependencyClusterTacletFactory {
             } 
                         
             Term checkCalltype;
-            if (list.getCallType() == Lowlist.CallType.CALL) {
+            if (list.getCallType() == Lowlist.MessageType.CALL) {
                 checkCalltype = tb.func(ldt.evCall());
             } else {
                 checkCalltype = tb.func(ldt.evTerm());

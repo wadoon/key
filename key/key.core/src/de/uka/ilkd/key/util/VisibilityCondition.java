@@ -8,15 +8,25 @@ import de.uka.ilkd.key.speclang.translation.SLExpression;
 public class VisibilityCondition {
     private final SLExpression componentContext;
     private final IProgramMethod serviceContext; 
-    private final MessageTypeValue messageType;
+    private final MessageType messageType;
     private final Term term;
+    private final Direction direction;
+    
+    public enum Direction {
+        IN, OUT
+    }
+    
+    public enum MessageType {
+        CALL, TERMINATION
+    }
 
     public VisibilityCondition(SLExpression componentContext,
-            IProgramMethod serviceContext, MessageTypeValue messageType, Term term) {
+            IProgramMethod serviceContext, MessageType messageType, Direction direction, Term term) {
         this.componentContext = componentContext;
         this.serviceContext = serviceContext;
         this.messageType = messageType;
         this.term = term;
+        this.direction = direction;
     }
 
     public SLExpression getComponentContext() {
@@ -27,7 +37,7 @@ public class VisibilityCondition {
         return serviceContext;
     }
 
-    public MessageTypeValue getMessageType() {
+    public MessageType getMessageType() {
         return messageType;
     }
 
@@ -37,7 +47,11 @@ public class VisibilityCondition {
 
     @Override
     public String toString() {
-        return componentContext.getTerm() + "." + serviceContext.getName() + "." + messageType.name() + "(" + term + ")";
+        return "(" + direction.name() + ")" + componentContext.getTerm() + "." + serviceContext.getName() + "." + messageType.name() + "(" + term + ")";
+    }
+
+    public Direction getDirection() {
+        return direction;
     }
     
 }

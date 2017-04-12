@@ -649,21 +649,21 @@ lowmessagespeclist[Lowlist.Direction dir] returns  [Lowlist result = null] throw
     servicecontext LPAREN list = termlist RPAREN
     
     {
-    Lowlist.CallType callType;
+    Lowlist.MessageType mType;
     if (componentContext.getTerm().equals(tb.var(selfVar))) {
         if (dir == Lowlist.Direction.IN) {
-            callType = Lowlist.CallType.CALL;
+            mType = Lowlist.MessageType.CALL;
         } else {
-            callType = Lowlist.CallType.TERMINATION;
+            mType = Lowlist.MessageType.TERMINATION;
         }
     } else {
         if (dir == Lowlist.Direction.OUT) {
-            callType = Lowlist.CallType.CALL;
+            mType = Lowlist.MessageType.CALL;
         } else {
-            callType = Lowlist.CallType.TERMINATION;
+            mType = Lowlist.MessageType.TERMINATION;
         }
     }
-    result = new Lowlist(componentContext, serviceContext, dir, callType, list);}
+    result = new Lowlist(componentContext, serviceContext, dir, mType, list);}
     
     ;
     
@@ -721,11 +721,45 @@ termlist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] thr
     (COMMA term = termexpression { result = result.append(term); })*
     ;
 
-//TODO JK not ready
+//TODO JK not ready (why not ready?)
 visibilitylist returns  [ImmutableList<VisibilityCondition> result = ImmutableSLList.<VisibilityCondition>nil()] throws SLTranslationException
 :
-    servicecontext DOT mtype = messagetype LPAREN term = termexpression RPAREN {result = result.append(new VisibilityCondition(componentContext, serviceContext, mtype, term)); componentContext = null; serviceContext = null;}  
-    (COMMA servicecontext DOT mtype = messagetype LPAREN term = termexpression RPAREN {result = result.append(new VisibilityCondition(componentContext, serviceContext, mtype, term)); componentContext = null; serviceContext = null;})*
+    servicecontext DOT mtype = messagetype LPAREN term = termexpression RPAREN 
+    {
+        if (mtype == MessageTypeValue.CALL) {
+            if (componentContext.getTerm().equals(tb.var(selfVar))) {
+                result = result.append(new VisibilityCondition(componentContext, serviceContext, VisibilityCondition.MessageType.CALL, VisibilityCondition.Direction.IN, term)); 
+            } else {
+                result = result.append(new VisibilityCondition(componentContext, serviceContext, VisibilityCondition.MessageType.CALL, VisibilityCondition.Direction.OUT, term));
+            }
+        } else {
+            if (componentContext.getTerm().equals(tb.var(selfVar))) {
+                result = result.append(new VisibilityCondition(componentContext, serviceContext, VisibilityCondition.MessageType.TERMINATION, VisibilityCondition.Direction.OUT, term)); 
+            } else {
+                result = result.append(new VisibilityCondition(componentContext, serviceContext, VisibilityCondition.MessageType.TERMINATION, VisibilityCondition.Direction.IN, term));
+            }
+        }
+        componentContext = null; 
+        serviceContext = null;
+    }  
+    (COMMA servicecontext DOT mtype = messagetype LPAREN term = termexpression RPAREN 
+    {
+        if (mtype == MessageTypeValue.CALL) {
+            if (componentContext.getTerm().equals(tb.var(selfVar))) {
+                result = result.append(new VisibilityCondition(componentContext, serviceContext, VisibilityCondition.MessageType.CALL, VisibilityCondition.Direction.IN, term)); 
+            } else {
+                result = result.append(new VisibilityCondition(componentContext, serviceContext, VisibilityCondition.MessageType.CALL, VisibilityCondition.Direction.OUT, term));
+            }
+        } else {
+            if (componentContext.getTerm().equals(tb.var(selfVar))) {
+                result = result.append(new VisibilityCondition(componentContext, serviceContext, VisibilityCondition.MessageType.TERMINATION, VisibilityCondition.Direction.OUT, term)); 
+            } else {
+                result = result.append(new VisibilityCondition(componentContext, serviceContext, VisibilityCondition.MessageType.TERMINATION, VisibilityCondition.Direction.IN, term));
+            }
+        }
+        componentContext = null; 
+        serviceContext = null;
+    })*
     ;
     
 messagetype returns [MessageTypeValue result = null]
