@@ -40,7 +40,7 @@ public class SymbExecWithHistFactory {
         return tb.func(ldt.evConst(), 
                 tb.func(ldt.evCall()), 
                 tb.func(ldt.evIncoming()), 
-                symbExecVars.pre.self,  //TODO JK use another partner instead of self
+                tb.var(ldt.getEnvironmentCaller()),
                 tb.func(ldt.getMethodIdentifier(contract.getTarget().getMethodDeclaration(), services)),
                 tb.seq(ifVars.formalParams), 
                 ifVars.pre.heap);
@@ -66,7 +66,7 @@ public class SymbExecWithHistFactory {
        return tb.func(ldt.evConst(), 
                 tb.func(ldt.evTerm()), 
                 tb.func(ldt.evOutgoing()), 
-                symbExecVars.pre.self,  //TODO JK use another partner instead of self
+                tb.var(ldt.getEnvironmentCaller()),
                 tb.func(ldt.getMethodIdentifier(contract.getTarget().getMethodDeclaration(), services)),
                 tb.seq(ifVars.post.result), 
                 ifVars.post.heap);    

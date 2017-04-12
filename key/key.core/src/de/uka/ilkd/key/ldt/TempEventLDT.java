@@ -54,10 +54,11 @@ public class TempEventLDT extends LDT {
     
     private final LocationVariable hist_A;
     private final LocationVariable hist_B;
+    private final LocationVariable environmentCaller;
    
 
 
-    //TODO JK since we get a calltype from here, the sort I implemented probably isn't necessary anymore. Remove it!
+    //TODO JK since we get a calltype from here, the sort I implemented isn't necessary anymore. Remove it!
     public TempEventLDT (TermServices services) {
         super(NAME, services);
         evConst = addFunction(services, "event");
@@ -84,6 +85,8 @@ public class TempEventLDT extends LDT {
         invEvent = addFunction(services, "invEvent");
                 
         hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
+        
+        environmentCaller = (LocationVariable) services.getNamespaces().programVariables().lookup("environmentCaller");
         
         hist_A = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_A_NAME);
         hist_B = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_B_NAME);
@@ -239,6 +242,10 @@ public class TempEventLDT extends LDT {
 
     public Function invEvent() {
         return invEvent;
+    }
+
+    public LocationVariable getEnvironmentCaller() {
+        return environmentCaller;
     }
 
 }
