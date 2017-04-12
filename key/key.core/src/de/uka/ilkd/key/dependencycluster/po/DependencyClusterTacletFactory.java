@@ -86,7 +86,7 @@ public class DependencyClusterTacletFactory {
         updatedParams2 =tb.elementary(ldt.getCurrentParams(), params2); //TODO JK probably we'll need to make an updated heap as well. In the long run use a function here anyway...
     }
     
-    public Term findTerm() {
+    public Term findTermEquivalence() {
         Term find = tb.func(ldt.equivEvent(), event1, event2);
         return find;
     }
@@ -101,7 +101,7 @@ public class DependencyClusterTacletFactory {
     public Term equalMetadata() {
         Term equalType = tb.equals(calltype1, calltype2);
         Term equalDirection = tb.equals(direction1, direction2);
-        Term equalPartner = tb.equals(component1, component2); //TODO JK does simple equality work here??? Probably change this!
+        Term equalPartner = tb.equals(component1, component2); //TODO JK does simple equality work here???
         Term equalService = tb.equals(service1, service2);
         Term equalMetadata = tb.and(equalType, equalDirection, equalPartner, equalService);
         return equalMetadata;
@@ -112,7 +112,7 @@ public class DependencyClusterTacletFactory {
         return visibleEquivalence;
     }
     
-    public Term replaceTerm() {
+    public Term replaceTermEquivalence() {
         Term replaceWith = tb.or(bothEventsInvisible(), equivalenceInVisibleCase());
         return replaceWith;
     }
@@ -124,9 +124,9 @@ public class DependencyClusterTacletFactory {
         tacletBuilder.setDisplayName("AAAEquivEventDef");
         tacletBuilder.setName(new Name("AAAEquivEventDef"));
         
-        tacletBuilder.setFind(findTerm());
+        tacletBuilder.setFind(findTermEquivalence());
         
-        tacletBuilder.addGoalTerm(replaceTerm());
+        tacletBuilder.addGoalTerm(replaceTermEquivalence());
         
         //TODO JK which ruleset is correct?
         tacletBuilder.addRuleSet((RuleSet)proofConfig.ruleSetNS().lookup(new Name("simplify_enlarging")));  
@@ -135,6 +135,36 @@ public class DependencyClusterTacletFactory {
         return taclet;
     }
     
+    public RewriteTaclet invisibilityTaclet() {
+        RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
+        
+        //TODO JK remove preceding As
+        tacletBuilder.setDisplayName("AAAEventInvisibilityDef");
+        tacletBuilder.setName(new Name("AAAEventInvisibilityDef"));
+
+        tacletBuilder.setFind(findTermInvisibility());
+        tacletBuilder.setFind(replaceTermInvisibility());
+        
+        //TODO JK which ruleset is correct?
+        tacletBuilder.addRuleSet((RuleSet)proofConfig.ruleSetNS().lookup(new Name("simplify_enlarging")));  
+        
+        RewriteTaclet taclet = tacletBuilder.getRewriteTaclet();
+        return taclet;
+    }
+    
+    public Term replaceTermInvisibility() {
+        return tb.not(eventVisible());
+    }
+
+    public Term eventVisible() {
+        //TODO JK continue here contract.getSpecs().head().get
+        return null;
+    }
+
+    public Term findTermInvisibility() {
+        return tb.func(ldt.invEvent(), event1);
+    }
+
     public ImmutableList<Term> collectedConditionsForEquivalenceOfVisibleEvents() {
         ImmutableList<Term> collectedConditionsForEquivalenceOfVisibleEvents = equivalenceConditionsForLowlist(contract.getSpecs().head().getLowIn());
         collectedConditionsForEquivalenceOfVisibleEvents = collectedConditionsForEquivalenceOfVisibleEvents.append(equivalenceConditionsForLowlist(contract.getSpecs().head().getLowOut()));
