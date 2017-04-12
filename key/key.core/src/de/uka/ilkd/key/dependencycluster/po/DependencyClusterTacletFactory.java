@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.speclang.DependencyClusterContract;
 import de.uka.ilkd.key.util.Lowlist;
+import de.uka.ilkd.key.util.VisibilityCondition;
 
 public class DependencyClusterTacletFactory {
     private final DependencyClusterContract contract;
@@ -143,7 +144,7 @@ public class DependencyClusterTacletFactory {
         tacletBuilder.setName(new Name("AAAEventInvisibilityDef"));
 
         tacletBuilder.setFind(findTermInvisibility());
-        tacletBuilder.setFind(replaceTermInvisibility());
+        tacletBuilder.addGoalTerm(replaceTermInvisibility());
         
         //TODO JK which ruleset is correct?
         tacletBuilder.addRuleSet((RuleSet)proofConfig.ruleSetNS().lookup(new Name("simplify_enlarging")));  
@@ -157,8 +158,34 @@ public class DependencyClusterTacletFactory {
     }
 
     public Term eventVisible() {
-        System.out.println(contract.getSpecs().head().getVisible().head());
-        return null;
+        ImmutableList<Term> conditions = ImmutableSLList.<Term>nil();
+        for (VisibilityCondition condition: contract.getSpecs().head().getVisible()) {
+            Term checkDirection;
+            if (condition.getDirection() == VisibilityCondition.Direction.IN){
+                checkDirection = tb.func(ldt.evIncoming());
+            } else {
+                checkDirection = tb.func(ldt.evOutgoing());
+            } 
+                        
+            Term checkCalltype;
+            if (condition.getMessageType() == VisibilityCondition.MessageType.CALL) {
+                checkCalltype = tb.func(ldt.evCall());
+            } else {
+                checkCalltype = tb.func(ldt.evTerm());
+            }
+            Term checkComponent = condition.getComponentContext().getTerm(); //TODO JK probably not that easy! Maybe we need to evaluate the component on a specific Heap or something
+            Term checkService = tb.func(ldt.getMethodIdentifier(condition.getServiceContext().getMethodDeclaration(), proofConfig.getServices()));
+            
+            Term dirEq = tb.equals(direction1, checkDirection);
+            Term typeEq = tb.equals(calltype1, checkCalltype);
+            Term compEq = tb.equals(component1, checkComponent); //TODO JK probably not that easy! Object equalities are annoying...
+            Term servEq = tb.equals(service1, checkService);
+            Term metadataFits = tb.and(dirEq, typeEq, compEq, servEq);
+            
+            conditions = conditions.append(tb.apply(updatedParams1, condition.getTerm()));
+    
+        }
+        return tb.or(conditions);
     }
 
     public Term findTermInvisibility() {
