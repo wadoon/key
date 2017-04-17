@@ -58,7 +58,7 @@ public class MethodDeclaration extends JavaDeclaration
     /**
      * This flag tells, if the class or interface of this method has the Remote annotation.
      */
-    protected final boolean parentIsRemoteInterface;
+    protected final boolean belongsToRemoteInterface;
 
     /**
      *      Method declaration.
@@ -73,7 +73,7 @@ public class MethodDeclaration extends JavaDeclaration
      */
     public MethodDeclaration(ExtList children, 
 			     boolean parentIsInterfaceDeclaration,
-			     boolean parentIsRemoteInterface,
+			     boolean belongsToRemoteInterface,
 			     Comment[] voidComments) {
 	super(children);
 	returnType = children.get(TypeReference.class);
@@ -84,7 +84,7 @@ public class MethodDeclaration extends JavaDeclaration
 	exceptions = children.get(Throws.class);
 	body = children.get(StatementBlock.class);
 	this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
-	this.parentIsRemoteInterface = parentIsRemoteInterface;
+	this.belongsToRemoteInterface = belongsToRemoteInterface;
 	assert returnType == null || voidComments == null;
     }
 
@@ -135,7 +135,7 @@ public class MethodDeclaration extends JavaDeclaration
 			     Throws exceptions, 
 			     StatementBlock body, 
 			     boolean parentIsInterfaceDeclaration,
-			     boolean parentIsRemoteInterface) { 
+			     boolean belongsToRemoteInterface) { 
 	super(modifiers);
 	this.returnType = returnType;
 	this.voidComments = null;
@@ -144,7 +144,7 @@ public class MethodDeclaration extends JavaDeclaration
         this.exceptions = exceptions;
 	this.body = body;
 	this.parentIsInterfaceDeclaration = parentIsInterfaceDeclaration;
-	this.parentIsRemoteInterface = parentIsRemoteInterface;
+	this.belongsToRemoteInterface = belongsToRemoteInterface;
     }
 
     @Override    
@@ -370,7 +370,7 @@ public class MethodDeclaration extends JavaDeclaration
 
     public boolean isRemote() {
     	// TODO KD z hasAnnotation("Remote") not possible
-    	return parentIsRemoteInterface || hasAnnotation("Remote"); // TODO KD z check for static / final / constructor? + make "Remote" a constant?
+    	return belongsToRemoteInterface || hasAnnotation("Remote"); // TODO KD z check for static / final / constructor? + make "Remote" a constant?
     }
 
     @Override

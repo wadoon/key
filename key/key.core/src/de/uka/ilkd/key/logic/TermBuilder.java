@@ -1358,19 +1358,17 @@ public class TermBuilder {
     }
 
     public Term empty() {
-    return func(services.getTypeConverter().getLocSetLDT().getEmpty());
+    	return func(services.getTypeConverter().getLocSetLDT().getEmpty());
     }
 
 
     public Term allLocs() {
-    return func(services.getTypeConverter().getLocSetLDT().getAllLocs());
+    	return func(services.getTypeConverter().getLocSetLDT().getAllLocs());
     }
 
 
     public Term singleton(Term o, Term f) {
-    return func(services.getTypeConverter().getLocSetLDT().getSingleton(),
-            o,
-            f);
+    	return func(services.getTypeConverter().getLocSetLDT().getSingleton(), o, f);
     }
 
 

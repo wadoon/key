@@ -399,7 +399,7 @@ class TermImpl implements Term {
 	    nat = checkNat(nat);
 	    if (!((ProgramVariable) t0.op()).equalsModRenaming(
 		    (ProgramVariable) t1.op(), nat)) {
-		return FAILED; // TODO KD note for fixme: self == self fails here
+		return FAILED;
 	    }
 	}
 
