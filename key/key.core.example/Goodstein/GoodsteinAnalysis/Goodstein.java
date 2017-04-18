@@ -17,8 +17,7 @@ public class Goodstein{
           @*/
 	  while   (m > 0) {
 	      m = nextExpand(m,base);
-              if (m>0) {m = m-1;}
-              else {break;}
+              m = m-1;
               base = base+1;
 	  }    
         }
