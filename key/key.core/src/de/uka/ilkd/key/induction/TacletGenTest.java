@@ -1,9 +1,15 @@
 package de.uka.ilkd.key.induction;
 
+import java.util.LinkedList;
+
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -27,9 +33,15 @@ public class TacletGenTest {
 		RuleSet ruleset = (RuleSet)services.getNamespaces().ruleSets().elements().head();//TODO: check if this works
 		
 		//TODO: fix ClassCastException here
-		ImmutableList<ProgramVariable> programVars = (ImmutableList<ProgramVariable>) services.getNamespaces().programVariables();
+		ImmutableList<ProgramVariable> programVars = ImmutableSLList.nil();
+		//= (ImmutableList<ProgramVariable>) services.getNamespaces().programVariables();
+		Namespace progVarNamespace = services.getNamespaces().programVariables();
+		for(Named n : progVarNamespace.elements()){
+			programVars.append((ProgramVariable)n);
+		}
+		//TODO: programVars = ??? (progVars)
 		Taclet tac = generator.generateRewriteTaclet(
-				tacletName, 
+				tacletName, //muss eindeutig sein
 				term,
 				term, 
 				programVars, 

@@ -8,6 +8,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -16,6 +17,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.FindTaclet;
@@ -133,6 +135,22 @@ public class RelationDescription {
 		}
 	}
 	
+	private static Pair<QuantifiableVariable, Term> createSubstitutionForFunction(Function f, Services s){
+		QuantifiableVariable result = null; //TODO: create new QuantifiableVariable
+		QuantifiableVariable[] parameters = new QuantifiableVariable[f.arity()];
+		TermBuilder tb = s.getTermBuilder();
+		//TermSV var = new TermSV(new Name("AddedANameHere"), f.argSort(0), false, true);
+		
+		for(int i = 0; i < f.arity(); i++){
+			parameters[i] = null; //TODO: create new QuantifiableVariable
+		}
+		
+		return new Pair<QuantifiableVariable, Term>(
+				result, 
+				tb.func(f, varsToTerm(parameters, tb), new ImmutableArray<QuantifiableVariable>()
+		);
+	}
+	
 	/**
 	 * 
 	 * @param f: a constructor
@@ -143,6 +161,8 @@ public class RelationDescription {
 		
 		//ONLY FOR TESTING
 		System.out.println("Function: " + f.toString());
+		
+		//neue SchemaVariablen für Substitution erstellen
 		
 		Sort returnSort = f.sort();
 		Namespace vars = s.getNamespaces().variables();
@@ -156,7 +176,7 @@ public class RelationDescription {
 		if(f.arity() == 0){
 			return null;
 		}
-		
+		 
 		LinkedList<QuantifiableVariable>[] possibleParameters = new LinkedList[f.arity()]; 
 		
 		//transform Named to QuantifiableVariable
