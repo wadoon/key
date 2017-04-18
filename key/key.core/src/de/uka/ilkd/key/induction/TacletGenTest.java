@@ -26,7 +26,8 @@ public class TacletGenTest {
 		Name tacletName = new Name("testtaclet");
 		RuleSet ruleset = (RuleSet)services.getNamespaces().ruleSets().elements().head();//TODO: check if this works
 		
-		ImmutableList<ProgramVariable> programVars = null;
+		//TODO: fix ClassCastException here
+		ImmutableList<ProgramVariable> programVars = (ImmutableList<ProgramVariable>) services.getNamespaces().programVariables();
 		Taclet tac = generator.generateRewriteTaclet(
 				tacletName, 
 				term,
