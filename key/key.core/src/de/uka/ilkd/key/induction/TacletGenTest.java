@@ -24,6 +24,7 @@ public class TacletGenTest {
 		TacletGenerator generator = getTacletGenerator();
 		
 		Name tacletName = new Name("testtaclet");
+		RuleSet ruleset = (RuleSet)services.getNamespaces().ruleSets().elements().head();//TODO: check if this works
 		
 		ImmutableList<ProgramVariable> programVars = null;
 		Taclet tac = generator.generateRewriteTaclet(
@@ -31,9 +32,13 @@ public class TacletGenTest {
 				term,
 				term, 
 				programVars, 
-				services.getNamespaces().ruleSets(), 
+				ruleset, 
 				services
 				);
+		
+		//ONLY FOR TESTING
+		System.out.println(tac.toString());
+		
 	}
 	
 	private TacletGenerator getTacletGenerator(){
