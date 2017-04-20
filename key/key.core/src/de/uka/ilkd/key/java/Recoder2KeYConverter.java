@@ -29,6 +29,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
+import recoder.java.Identifier;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTList;
@@ -1313,10 +1314,13 @@ public class Recoder2KeYConverter {
 			}
 
 			// check if method belongs to a Remote InterfaceNonTerminalProgramElement parent = md.getASTParent();
-/*	        List<recoder.java.declaration.AnnotationUseSpecification> annotations = new LinkedList<>();
-			if (parent instanceof recoder.java.declaration.ClassDeclaration) {
-			recoder.java.declaration.ClassDeclaration parentClass = (recoder.java.declaration.ClassDeclaration) parent;
-			annotations.addAll(parentClass.getAnnotations());
+			NonTerminalProgramElement parent = md.getASTParent();
+			boolean isRemote = false;
+/*			List<recoder.java.declaration.AnnotationUseSpecification> annotations = new LinkedList<>();
+	        if (parent instanceof recoder.java.declaration.ClassDeclaration) {
+				recoder.java.declaration.ClassDeclaration parentClass = (recoder.java.declaration.ClassDeclaration) parent;
+				annotations.addAll(parentClass.getAnnotations());
+			}
 			if (md.getASTParent() instanceof recoder.java.declaration.InterfaceDeclaration) {
 				recoder.java.declaration.InterfaceDeclaration parentClass = (recoder.java.declaration.InterfaceDeclaration) parent;
 				annotations.addAll(parentClass.getAnnotations());
@@ -1330,34 +1334,34 @@ public class Recoder2KeYConverter {
 				}
 			}
 */
-			boolean isRemote = false;
-			NonTerminalProgramElement parent = md.getASTParent();
+			// TODO KD z if <>-Method don't do?
 			if (parent instanceof recoder.java.declaration.ClassDeclaration) {
 				recoder.java.declaration.ClassDeclaration parentClass = (recoder.java.declaration.ClassDeclaration) parent;
 				for (recoder.java.declaration.AnnotationUseSpecification annotation : parentClass.getAnnotations()) {
-					System.out.println(md.getName());
-					System.out.println(parentClass.getName());
 					assert annotation.getChildAt(0) instanceof recoder.java.reference.TypeReference : "The 1st child of an annotation should be its type.";
 					if (((recoder.java.reference.TypeReference) annotation.getChildAt(0)).getName().equals("Remote")) {
 						if (annotation.getChildCount() > 1) {
-							System.out.println("Specified Interfaces:");
 							assert annotation.getChildAt(1) instanceof recoder.java.declaration.AnnotationElementValuePair;
 							recoder.java.declaration.AnnotationElementValuePair pair = (recoder.java.declaration.AnnotationElementValuePair) annotation.getChildAt(1);
-							assert pair.getChildAt(0) instanceof recoder.java.reference.MetaClassReference;
+							assert pair.getChildCount() > 0 && pair.getChildAt(0) instanceof recoder.java.reference.MetaClassReference;
 							recoder.java.reference.MetaClassReference classRef = (recoder.java.reference.MetaClassReference) pair.getChildAt(0);
-							assert classRef.getChildAt(0) instanceof recoder.java.reference.TypeReference;
+							assert classRef.getChildCount() > 0 && classRef.getChildAt(0) instanceof recoder.java.reference.TypeReference;
 							recoder.java.reference.TypeReference typeRef = (recoder.java.reference.TypeReference) classRef.getChildAt(0);
-							System.out.println(typeRef.getName()); // TODO KD i finish; InterfaceName :D
+							String interfaceName = typeRef.getName();
+							for (int i = 0; i < parentClass.getImplementedTypes().getChildCount(); i++) {
+								System.out.println(parentClass.getImplementedTypes().getChildAt(i));
+								recoder.java.reference.TypeReference tr = (recoder.java.reference.TypeReference) parentClass.getImplementedTypes().getChildAt(i);
+								System.out.println(tr.getParent());
+							}
 /*
-							for (Interface interface : information) {
+ 							for (Interface interface : information) {
 								if (interface.contains(method)) {
 									return true;
 								}
 							}
 							return false;
 */
-						} else {
-							System.out.println("no specified Interfaces:");
+						} else { // no Interfaces are specified with the Remote annotation
 /*
 							boolean interfaceHasRemoteAnnotation = false;
 							boolean nonRemoteInterfaceContainsMethod = false;
@@ -1374,13 +1378,20 @@ public class Recoder2KeYConverter {
 							return !interfaceHasRemoteAnnotation && nonRemoteInterfaceContainsMethod;
 */
 						}
-						System.out.println();
+						break;
+					}
+					break; // TODO KD z what happens with more then 1 Remote annotation?
+				}
+			} else if (parent instanceof recoder.java.declaration.InterfaceDeclaration) {
+				recoder.java.declaration.InterfaceDeclaration parentInterface = (recoder.java.declaration.InterfaceDeclaration) parent;
+				for (recoder.java.declaration.AnnotationUseSpecification annotation : parentInterface.getAnnotations()) {
+					assert annotation.getChildAt(0) instanceof recoder.java.reference.TypeReference : "The 1st child of an annotation should be its type.";
+					if (((recoder.java.reference.TypeReference) annotation.getChildAt(0)).getName().equals("Remote")) {
+						isRemote = true;
 						break;
 					}
 				}
-			} else if (parent instanceof recoder.java.declaration.InterfaceDeclaration) {
-				// TODO KD f think /read what to do
-			} else {
+			} else { // parent of method is neither a class nor an interface
 				assert false : "Methods should belong to Classes or Inetrfaces."; // TODO KD f right?
 			}
 

@@ -1526,7 +1526,7 @@ public class TermBuilder {
     }
 
 
-    public Term createdInHeap(Term s, Term h) {
+    public Term createdInHeap(Term s, Term h) { 
         final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
         if(s.op() == ldt.getEmpty()) {
             return tt();

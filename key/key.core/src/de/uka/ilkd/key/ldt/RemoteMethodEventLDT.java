@@ -103,6 +103,7 @@ public class RemoteMethodEventLDT extends LDT {
 	    if (f == null) {
 	        //add the function
 	        f = new Function(md.getProgramElementName(), (Sort)services.getNamespaces().sorts().lookup(METHOD_SORT));
+	        services.getNamespaces().methodIdentifier().addSafely(f);
 	    }
 	    return f;
 	}
