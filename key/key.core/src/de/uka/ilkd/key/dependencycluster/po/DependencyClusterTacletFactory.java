@@ -280,7 +280,7 @@ public class DependencyClusterTacletFactory {
     }
     
     private ImmutableList<Term> getObjects(ImmutableList<Term> list) {
-        Sort objectSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("java.lang.Object");
+        Sort objectSort = proofConfig.getServices().getJavaInfo().objectSort();
         ImmutableList<Term> formulas = ImmutableSLList.<Term>nil();
         for (Term term: list) {
             if (term.sort().extendsTrans(objectSort)) {
