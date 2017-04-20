@@ -173,7 +173,7 @@ public class DependencyClusterTacletFactory {
             } else {
                 checkCalltype = tb.func(ldt.evTerm());
             }
-            Term checkComponent = condition.getComponentContext().getTerm(); //TODO JK probably not that easy! Maybe we need to evaluate the component on a specific Heap or something
+            Term checkComponent = condition.getCommunicationPartner().getTerm(); //TODO JK probably not that easy! Maybe we need to evaluate the component on a specific Heap or something
             Term checkService = tb.func(ldt.getMethodIdentifier(condition.getServiceContext().getMethodDeclaration(), proofConfig.getServices()));
             
             Term dirEq = tb.equals(direction1, checkDirection);
@@ -214,7 +214,7 @@ public class DependencyClusterTacletFactory {
             } else {
                 checkCalltype = tb.func(ldt.evTerm());
             }
-            Term checkComponent = list.getComponent().getTerm(); //TODO JK probably not that easy! Maybe we need to evaluate the component on a specific Heap or something
+            Term checkComponent = list.getCommunicationPartner().getTerm(); //TODO JK probably not that easy! Maybe we need to evaluate the component on a specific Heap or something
             Term checkService = tb.func(ldt.getMethodIdentifier(list.getService().getMethodDeclaration(), proofConfig.getServices()));
             
             Term dirEq = tb.equals(direction1, checkDirection);

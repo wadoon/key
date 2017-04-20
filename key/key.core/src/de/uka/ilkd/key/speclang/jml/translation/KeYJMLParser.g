@@ -649,21 +649,25 @@ lowmessagespeclist[Lowlist.Direction dir] returns  [Lowlist result = null] throw
     servicecontext LPAREN list = termlist RPAREN
     
     {
+    SLExpression partner;
     Lowlist.MessageType mType;
     if (componentContext.getTerm().equals(tb.var(selfVar))) {
+        Term environmentCaller = tb.var(services.getTypeConverter().getTempEventLDT().getEnvironmentCaller());
+        partner = new SLExpression(environmentCaller, new KeYJavaType(environmentCaller.sort()));
         if (dir == Lowlist.Direction.IN) {
             mType = Lowlist.MessageType.CALL;
         } else {
             mType = Lowlist.MessageType.TERMINATION;
         }
     } else {
+        partner = componentContext;
         if (dir == Lowlist.Direction.OUT) {
             mType = Lowlist.MessageType.CALL;
         } else {
             mType = Lowlist.MessageType.TERMINATION;
         }
     }
-    result = new Lowlist(componentContext, serviceContext, dir, mType, list);}
+    result = new Lowlist(componentContext, serviceContext, partner, dir, mType, list);}
     
     ;
     
@@ -726,17 +730,24 @@ visibilitylist returns  [ImmutableList<VisibilityCondition> result = ImmutableSL
 :
     servicecontext DOT mtype = messagetype LPAREN term = termexpression RPAREN 
     {
+        SLExpression partner;
+        if (componentContext.getTerm().equals(tb.var(selfVar))) {
+            Term environmentCaller = tb.var(services.getTypeConverter().getTempEventLDT().getEnvironmentCaller());
+            partner = new SLExpression(environmentCaller, new KeYJavaType(environmentCaller.sort()));
+        } else {
+            partner = componentContext;
+        }
         if (mtype == MessageTypeValue.CALL) {
             if (componentContext.getTerm().equals(tb.var(selfVar))) {
-                result = result.append(new VisibilityCondition(componentContext, serviceContext, VisibilityCondition.MessageType.CALL, VisibilityCondition.Direction.IN, term)); 
+                result = result.append(new VisibilityCondition(componentContext, serviceContext, partner, VisibilityCondition.MessageType.CALL, VisibilityCondition.Direction.IN, term)); 
             } else {
-                result = result.append(new VisibilityCondition(componentContext, serviceContext, VisibilityCondition.MessageType.CALL, VisibilityCondition.Direction.OUT, term));
+                result = result.append(new VisibilityCondition(componentContext, serviceContext, partner, VisibilityCondition.MessageType.CALL, VisibilityCondition.Direction.OUT, term));
             }
         } else {
             if (componentContext.getTerm().equals(tb.var(selfVar))) {
-                result = result.append(new VisibilityCondition(componentContext, serviceContext, VisibilityCondition.MessageType.TERMINATION, VisibilityCondition.Direction.OUT, term)); 
+                result = result.append(new VisibilityCondition(componentContext, serviceContext, partner, VisibilityCondition.MessageType.TERMINATION, VisibilityCondition.Direction.OUT, term)); 
             } else {
-                result = result.append(new VisibilityCondition(componentContext, serviceContext, VisibilityCondition.MessageType.TERMINATION, VisibilityCondition.Direction.IN, term));
+                result = result.append(new VisibilityCondition(componentContext, serviceContext, partner, VisibilityCondition.MessageType.TERMINATION, VisibilityCondition.Direction.IN, term));
             }
         }
         componentContext = null; 
@@ -744,17 +755,24 @@ visibilitylist returns  [ImmutableList<VisibilityCondition> result = ImmutableSL
     }  
     (COMMA servicecontext DOT mtype = messagetype LPAREN term = termexpression RPAREN 
     {
+        SLExpression partner;
+        if (componentContext.getTerm().equals(tb.var(selfVar))) {
+            Term environmentCaller = tb.var(services.getTypeConverter().getTempEventLDT().getEnvironmentCaller());
+            partner = new SLExpression(environmentCaller, new KeYJavaType(environmentCaller.sort()));
+        } else {
+            partner = componentContext;
+        }
         if (mtype == MessageTypeValue.CALL) {
             if (componentContext.getTerm().equals(tb.var(selfVar))) {
-                result = result.append(new VisibilityCondition(componentContext, serviceContext, VisibilityCondition.MessageType.CALL, VisibilityCondition.Direction.IN, term)); 
+                result = result.append(new VisibilityCondition(componentContext, serviceContext, partner, VisibilityCondition.MessageType.CALL, VisibilityCondition.Direction.IN, term)); 
             } else {
-                result = result.append(new VisibilityCondition(componentContext, serviceContext, VisibilityCondition.MessageType.CALL, VisibilityCondition.Direction.OUT, term));
+                result = result.append(new VisibilityCondition(componentContext, serviceContext, partner, VisibilityCondition.MessageType.CALL, VisibilityCondition.Direction.OUT, term));
             }
         } else {
             if (componentContext.getTerm().equals(tb.var(selfVar))) {
-                result = result.append(new VisibilityCondition(componentContext, serviceContext, VisibilityCondition.MessageType.TERMINATION, VisibilityCondition.Direction.OUT, term)); 
+                result = result.append(new VisibilityCondition(componentContext, serviceContext, partner, VisibilityCondition.MessageType.TERMINATION, VisibilityCondition.Direction.OUT, term)); 
             } else {
-                result = result.append(new VisibilityCondition(componentContext, serviceContext, VisibilityCondition.MessageType.TERMINATION, VisibilityCondition.Direction.IN, term));
+                result = result.append(new VisibilityCondition(componentContext, serviceContext, partner, VisibilityCondition.MessageType.TERMINATION, VisibilityCondition.Direction.IN, term));
             }
         }
         componentContext = null; 

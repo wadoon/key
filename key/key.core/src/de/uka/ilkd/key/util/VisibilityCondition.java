@@ -11,6 +11,7 @@ public class VisibilityCondition {
     private final MessageType messageType;
     private final Term term;
     private final Direction direction;
+    private final SLExpression partner;
     
     public enum Direction {
         IN, OUT
@@ -21,16 +22,21 @@ public class VisibilityCondition {
     }
 
     public VisibilityCondition(SLExpression componentContext,
-            IProgramMethod serviceContext, MessageType messageType, Direction direction, Term term) {
+            IProgramMethod serviceContext, SLExpression partner, MessageType messageType, Direction direction, Term term) {
         this.componentContext = componentContext;
         this.serviceContext = serviceContext;
         this.messageType = messageType;
         this.term = term;
         this.direction = direction;
+        this.partner = partner;
     }
 
     public SLExpression getComponentContext() {
         return componentContext;
+    }
+    
+    public SLExpression getCommunicationPartner() {        
+        return partner;
     }
 
     public IProgramMethod getServiceContext() {

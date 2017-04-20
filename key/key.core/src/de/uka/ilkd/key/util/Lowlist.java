@@ -13,6 +13,7 @@ public class Lowlist {
     private final ImmutableList<Term> lowTerms;
     private final Direction direction;
     private final MessageType callType;
+    private final SLExpression partner;
     
     public enum Direction {
         IN, OUT
@@ -22,13 +23,14 @@ public class Lowlist {
         CALL, TERMINATION
     }
 
-    public Lowlist(SLExpression component, IProgramMethod service, Direction direction, MessageType callType,
+    public Lowlist(SLExpression component, IProgramMethod service, SLExpression partner, Direction direction, MessageType callType,
             ImmutableList<Term> lowTerms) {
         this.component = component;
         this.service = service;
         this.lowTerms = lowTerms;
         this.direction = direction;
         this.callType = callType;
+        this.partner = partner;
     }
 
     public SLExpression getComponent() {
@@ -39,6 +41,10 @@ public class Lowlist {
         return service;
     }
 
+    public SLExpression getCommunicationPartner() {        
+        return partner;
+    }
+    
     public ImmutableList<Term> getLowTerms() {
         return lowTerms;
     }
