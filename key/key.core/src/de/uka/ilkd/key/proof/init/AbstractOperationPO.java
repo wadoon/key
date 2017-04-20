@@ -402,8 +402,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				final Term globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm, // TODO KD z always null?
 						tb.var(paramVars), proofServices);
 
-				// TODO KD fresh arguments / result how to?
-
 				// if method to prove is remote add "outgoing termination" events to history
 				Term histAtCallUpdate = tb.skip();
 				if (pm.getMethodDeclaration().isRemote()) {
