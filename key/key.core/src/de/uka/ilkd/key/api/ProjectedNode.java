@@ -4,6 +4,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,21 +12,24 @@ import java.util.List;
  * Created by S.Grebing
  */
 public class ProjectedNode {
-    private Node proofNode;
 
-    private ProjectedNode parent;
+    private final Node proofNode;
 
-    private List<ProjectedNode> children;
+    private final ProjectedNode parent;
 
-    private NodeInfo nodeInfo;
+    private final List<ProjectedNode> children;
+
+
+
     /**Creates the wrapper object for a proof node
      *
      * @param node
+     * @param parent
      */
-    public ProjectedNode(Node node){
+    public ProjectedNode(Node node, ProjectedNode parent){
         this.proofNode = node;
-        this.nodeInfo = node.getNodeInfo();
-        
+        this.children = new ArrayList<>();
+        this.parent = parent;
     }
 
     /**
@@ -40,4 +44,13 @@ public class ProjectedNode {
         return this.parent;
     }
 
+    public boolean isRoot(){
+        return getParent() == null;
+    }
+
+    public NodeInfo getNodeInfo() {
+        return proofNode.getNodeInfo();
+    }
+
+    //isPseudoNode() <=> proofNode = null
 }
