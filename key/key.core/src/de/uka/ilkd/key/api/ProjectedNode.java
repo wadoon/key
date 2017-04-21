@@ -9,7 +9,9 @@ import java.util.List;
 
 /**
  * Wrapper for a proof node with utilities methods to
- * Created by S.Grebing
+ *
+ * @author Sarah Grebing
+ * @author Alexander Weigl
  */
 public class ProjectedNode {
 
@@ -17,34 +19,33 @@ public class ProjectedNode {
 
     private final ProjectedNode parent;
 
-    private final List<ProjectedNode> children;
+    private final List<ProjectedNode> children = new ArrayList<>();
 
-
-
-    /**Creates the wrapper object for a proof node
+    /**
+     * Creates the wrapper object for a proof node
      *
      * @param node
      * @param parent
      */
-    public ProjectedNode(Node node, ProjectedNode parent){
+    public ProjectedNode(Node node, ProjectedNode parent) {
         this.proofNode = node;
-        this.children = new ArrayList<>();
         this.parent = parent;
     }
 
     /**
      * Return the sequent of a proof node
+     *
      * @return de.uka.ilkd.key.logic.Sequent s
      */
-    public Sequent getSequent(){
+    public Sequent getSequent() {
         return proofNode.sequent();
     }
 
-    public ProjectedNode getParent(){
+    public ProjectedNode getParent() {
         return this.parent;
     }
 
-    public boolean isRoot(){
+    public boolean isRoot() {
         return getParent() == null;
     }
 
@@ -52,5 +53,7 @@ public class ProjectedNode {
         return proofNode.getNodeInfo();
     }
 
-    //isPseudoNode() <=> proofNode = null
+    public boolean isPseudoNode() {
+        return proofNode == null;
+    }
 }
