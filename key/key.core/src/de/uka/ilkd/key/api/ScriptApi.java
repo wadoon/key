@@ -1,19 +1,51 @@
 package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.macros.scripts.EngineState;
+import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by sarah on 4/5/17.
+ *
+ * @author Alexander Weigl
  */
-public abstract class ScriptApi {
-    private KeYEnvironment env;
+public class ScriptApi {
+    private final ProofApi api;
+    private final EngineState state;
+
+    public ScriptApi(ProofApi proofApi) {
+        api = proofApi;
+        state = new EngineState(api.getProof());
+    }
+
     /**
      * Execute ScriptCommand onto goal node
+     *
      * @param command to be applied with parameters set
      * @return List of new proof goals (possibly empty)
      * Should throw an Exception if command not applicable?
      */
-    //public abstract List<ProjectedNode> executeScriptCommand(ProofScriptCommand command (Parameter?), ProjectNode pn, varsAssignment, KeYEnvironment env);
+    public <T> ScriptResults executeScriptCommand(
+            ProofScriptCommandCall<T> call, ProjectedNode onNode,
+            VariableAssignments varsAssignment) {
+        //TODO VariableAssignments should be in instantiateCommand
+        return null; // TODO
+    }
+
+    /**
+     * @param arguments
+     * @param <T>
+     * @return
+     */
+    public <T> ProofScriptCommandCall<T> instantiateCommand(
+            ProofScriptCommand<T> command, Map<String, String> arguments)
+            throws Exception {
+        return new ProofScriptCommandCall<>(command,
+                command.evaluateArguments(state, arguments));
+    }
 
     //matching Seq Term: matchResult
     //
@@ -27,9 +59,7 @@ public abstract class ScriptApi {
     //getIntermediateTree (ScriptResults old, ScriptResults new) ~> Beweisbaum -> Shallow Copy
     //hier implementieren
 
-
     //isclosable
     //derivable : mache cut und dann auto, falls nicht schließt prune proof
-
 
 }
