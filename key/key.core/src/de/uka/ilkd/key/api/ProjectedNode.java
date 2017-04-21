@@ -2,6 +2,7 @@ package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
 
 import java.util.List;
 
@@ -16,12 +17,15 @@ public class ProjectedNode {
 
     private List<ProjectedNode> children;
 
+    private NodeInfo nodeInfo;
     /**Creates the wrapper object for a proof node
      *
      * @param node
      */
     public ProjectedNode(Node node){
         this.proofNode = node;
+        this.nodeInfo = node.getNodeInfo();
+        
     }
 
     /**
