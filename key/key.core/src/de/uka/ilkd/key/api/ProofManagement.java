@@ -32,8 +32,10 @@ public abstract class ProofManagement {
      */
     public abstract List<Contract> getProofContracts();
 
+    //getProofObligation(Contract)
+    //loadProof (javadatei)
     /**
-     * Save current Proof
+     * Save current Proof-> ProofApi
      */
     public abstract void saveProof();
 
