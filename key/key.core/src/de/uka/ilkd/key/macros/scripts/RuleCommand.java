@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
+import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.parser.ParserException;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -28,15 +28,20 @@ import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
-public class RuleCommand implements ProofScriptCommand<RuleCommand.Parameters> {
+public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
     public static class Parameters {
-        @ValueInjector.Option("#2") String rulename;
-        @ValueInjector.Option("on") Term on;
-        @ValueInjector.Option("formula") Term formula;
-        @ValueInjector.Option("occ") int occ = -1;
+        @Option("#2") String rulename;
+        @Option("on") Term on;
+        @Option("formula") Term formula;
+        @Option("occ") int occ = -1;
         Map<String, Term> instantiations = new HashMap<>();
     }
+
+    public RuleCommand() {
+        super(Parameters.class);
+    }
+
 
     @Override public String getName() {
         return "rule";

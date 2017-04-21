@@ -1,17 +1,20 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import de.uka.ilkd.key.macros.scripts.meta.Option;
+import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
+
 import java.io.File;
 import java.nio.file.NoSuchFileException;
 import java.util.Map;
-import java.util.Observer;
-
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.proof.Proof;
 
 public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
 
+    public ScriptCommand() {
+        super(Parameters.class);
+    }
+
     public static class Parameters {
-        @ValueInjector.Option("#2") String filname;
+        @Option("#2") String filename;
     }
 
     @Override public void execute(Parameters args)
@@ -19,7 +22,7 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
         File root = state.getBaseFileName();
         if (!root.isDirectory())
             root = root.getParentFile();
-        File file = new File(root, args.filname);
+        File file = new File(root, args.filename);
 
         System.err.println("Included script " + file);
 
@@ -40,13 +43,7 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
         }
     }
 
-    @Override public Parameters evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws Exception {
-        return ValueInjector.injection(new Parameters(), arguments);
-    }
-
     @Override public String getName() {
         return "script";
     }
-
 }

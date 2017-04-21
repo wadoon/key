@@ -7,17 +7,21 @@ import java.util.ServiceLoader;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
 
-public class MacroCommand
-        implements ProofScriptCommand<MacroCommand.Parameters> {
+public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
+
+    public MacroCommand() {
+        super(Parameters.class);
+    }
 
     static class Parameters {
-        @ValueInjector.Option("#2") String macroName;
+        @Option("#2") String macroName;
     }
+
     private static Map<String, ProofMacro> macroMap = loadMacroMap();
 
     @Override public Parameters evaluateArguments(EngineState state,
@@ -28,7 +32,6 @@ public class MacroCommand
     @Override public String getName() {
         return "macro";
     }
-
 
     @Override public void execute(AbstractUserInterfaceControl uiControl,
             Parameters args, EngineState state)

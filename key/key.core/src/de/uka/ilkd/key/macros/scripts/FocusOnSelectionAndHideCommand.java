@@ -1,12 +1,10 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -14,37 +12,39 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 /**
  * Hide all formulas that are not selected
  * Created by sarah on 1/12/17.
  */
-public class FocusOnSelectionAndHideCommand extends AbstractCommand<Sequent> {
-    private Sequent toKeep;
+public class FocusOnSelectionAndHideCommand
+        extends AbstractCommand<FocusOnSelectionAndHideCommand.Parameters> {
 
-    @Override public void execute(Sequent s)
+    public FocusOnSelectionAndHideCommand() {
+        super(Parameters.class);
+    }
+
+    static class Parameters {
+        @Option("#2") Sequent toKeep;
+    }
+
+    @Override public void execute(Parameters s)
             throws ScriptException, InterruptedException {
         if (s == null) {
             throw new ScriptException("Missing 'sequent' argument for focus");
         }
 
-        toKeep = s;
+        Sequent toKeep = s.toKeep;
 
         //toKeep = parseSequent(sequentString, getGoalFromCurrentState());
         try {
-            hideAll();
+            hideAll(toKeep);
         }
         catch (ParserException e) {
             e.printStackTrace();
         }
 
-    }
-
-    @Override public Sequent evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws Exception {
-        return state.toSequent(arguments.get("#2"));
     }
 
     @Override public String getName() {
@@ -71,10 +71,12 @@ public class FocusOnSelectionAndHideCommand extends AbstractCommand<Sequent> {
     /**
      * Hide all formulas of the sequent that are not focus sequent
      *
+     * @param toKeep
      * @throws ParserException
      * @throws ScriptException
      */
-    private void hideAll() throws ParserException, ScriptException {
+    private void hideAll(Sequent toKeep)
+            throws ParserException, ScriptException {
         while (true) {
             //get current goal
             Goal g = state.getFirstOpenGoal();
@@ -84,7 +86,8 @@ public class FocusOnSelectionAndHideCommand extends AbstractCommand<Sequent> {
 
             if (g != null) {
 
-                SequentFormula toHide = iterateThroughSequentAndFindNonMatch(g);
+                SequentFormula toHide = iterateThroughSequentAndFindNonMatch(g,
+                        toKeep);
                 //as long as there is a match
                 if (toHide != null) {
                     boolean antec = false;
@@ -144,13 +147,14 @@ public class FocusOnSelectionAndHideCommand extends AbstractCommand<Sequent> {
      * Iterate through sequent and find first formula that is not in the list of formulas to keep and return this formula
      *
      * @param g
+     * @param toKeep
      * @return formula to hide, if all formulas in the sequent should be kept, returns null
      * @throws ScriptException
      * @throws ParserException
      */
 
-    private SequentFormula iterateThroughSequentAndFindNonMatch(Goal g)
-            throws ScriptException, ParserException {
+    private SequentFormula iterateThroughSequentAndFindNonMatch(Goal g,
+            Sequent toKeep) throws ScriptException, ParserException {
         Semisequent focusedAntec = toKeep.antecedent();
         Semisequent focusedSucc = toKeep.succedent();
 

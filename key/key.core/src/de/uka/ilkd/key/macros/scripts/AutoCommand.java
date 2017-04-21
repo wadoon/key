@@ -3,6 +3,8 @@ package de.uka.ilkd.key.macros.scripts;
 import java.util.Map;
 import java.util.Optional;
 
+import de.uka.ilkd.key.macros.scripts.meta.Option;
+import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -16,7 +18,11 @@ import de.uka.ilkd.key.proof.init.Profile;
  * @author Mattias Ulbrich
  * @author Alexander Weigl
  */
-public class AutoCommand implements ProofScriptCommand<AutoCommand.Parameters> {
+public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
+
+    public AutoCommand() {
+        super(Parameters.class);
+    }
 
     @Override public String getName() {
         return "auto";
@@ -87,10 +93,9 @@ public class AutoCommand implements ProofScriptCommand<AutoCommand.Parameters> {
     }
 
     static class Parameters {
-        @ValueInjector.Option("all") boolean onAllOpenGoals = false;
+        @Option("all") boolean onAllOpenGoals = false;
 
-        @ValueInjector.Option("steps") Optional<Integer> maxSteps = Optional
-                .empty();
+        @Option("steps") Optional<Integer> maxSteps = Optional.empty();
 
         public boolean isOnAllOpenGoals() {
             return onAllOpenGoals;

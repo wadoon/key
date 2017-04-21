@@ -2,16 +2,20 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.TryCloseMacro;
+import de.uka.ilkd.key.macros.scripts.meta.Option;
+import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.ProverTaskListener;
 
 public class TryCloseCommand
         extends AbstractCommand<TryCloseCommand.TryCloseArguments> {
     static class TryCloseArguments {
-        @ValueInjector.Option("steps") Integer steps;
-        @ValueInjector.Option("#2") String branch;
+        @Option("steps") Integer steps;
+        @Option("#2") String branch;
+    }
+
+    public TryCloseCommand() {
+        super(TryCloseArguments.class);
     }
 
     @Override public TryCloseArguments evaluateArguments(EngineState state,

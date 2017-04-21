@@ -1,9 +1,7 @@
-package de.uka.ilkd.key.macros.scripts;
+package de.uka.ilkd.key.macros.scripts.meta;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import de.uka.ilkd.key.macros.scripts.ScriptException;
+
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
@@ -76,23 +74,4 @@ public class ValueInjector {
         return (Converter<T>) converters.get(clazz);
     }
 
-    /**
-     * @param <T>
-     */
-    public static interface Converter<T> {
-        T convert(String s) throws Exception;
-    }
-
-    /**
-     *
-     */
-    @Target(ElementType.FIELD) @Retention(RetentionPolicy.RUNTIME) public @interface Option {
-        String value();
-    }
-
-    public @interface Flag {
-        String arg();
-
-        String value();
-    }
 }

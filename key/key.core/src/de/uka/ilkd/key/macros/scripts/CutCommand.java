@@ -4,17 +4,23 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.util.rifl.SpecificationEntity;
 
 import java.util.Map;
 
-public class CutCommand implements ProofScriptCommand<CutCommand.Parameters> {
+public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
     private static final Name CUT_TACLET_NAME = new Name("cut");
 
+    public CutCommand() {
+        super(Parameters.class);
+    }
+
     static class Parameters {
-        @ValueInjector.Option("#2") Term formula;
+        @Option("#2") Term formula;
     }
 
     @Override public String getName() {

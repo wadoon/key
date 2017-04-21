@@ -4,21 +4,24 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Map;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 
 public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public class Parameters {
-        @ValueInjector.Option("formula") Term formula;
+        @Option("formula") Term formula;
     }
+
+    public SelectCommand() {
+        super(Parameters.class);
+    }
+
 
     @Override public Parameters evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
