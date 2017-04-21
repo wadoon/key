@@ -1,11 +1,18 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.StreamSupport;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.pp.AbbrevMap;
 
-public class LetCommand implements ProofScriptCommand<Map<String, String>> {
+public class LetCommand extends AbstractCommand<Map<String, String>> {
+
+    public LetCommand() {
+        super(null);
+    }
+
     @Override public Map<String, String> evaluateArguments(EngineState state,
             Map<String, String> arguments) {
         return arguments;

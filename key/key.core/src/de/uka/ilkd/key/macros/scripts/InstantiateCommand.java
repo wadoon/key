@@ -2,6 +2,8 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
 
+import de.uka.ilkd.key.macros.scripts.meta.Flag;
+import de.uka.ilkd.key.macros.scripts.meta.Option;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -33,14 +35,18 @@ import de.uka.ilkd.key.rule.TacletApp;
  * @author mulbrich
  */
 public class InstantiateCommand
-        implements ProofScriptCommand<InstantiateCommand.Parameters> {
+        extends AbstractCommand<InstantiateCommand.Parameters> {
+
+    public InstantiateCommand() {
+        super(Parameters.class);
+    }
 
     public static class Parameters {
-        @ValueInjector.Option("formula") Term formula;
-        @ValueInjector.Option("var") String var;
-        @ValueInjector.Option("occ") int occ = 1;
-        @ValueInjector.Flag(arg = "#2", value = "hide") boolean hide;
-        @ValueInjector.Option("with") public Term with;
+        @Option("formula") Term formula;
+        @Option("var") String var;
+        @Option("occ") int occ = 1;
+        @Flag(arg = "#2", value = "hide") boolean hide;
+        @Option("with") public Term with;
     }
 
     @Override public Parameters evaluateArguments(EngineState state,

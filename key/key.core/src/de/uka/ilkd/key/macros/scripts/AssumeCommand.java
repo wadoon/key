@@ -2,23 +2,24 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.macros.scripts.meta.Option;
+import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
 public class AssumeCommand
         extends AbstractCommand<AssumeCommand.FormulaParameter> {
+    public AssumeCommand() {
+        super(FormulaParameter.class);
+    }
+
     public static class FormulaParameter {
-        @ValueInjector.Option("#2") Term formula;
+        @Option("#2") Term formula;
     }
 
     private static final Name TACLET_NAME = new Name("UNSOUND_ASSUME");

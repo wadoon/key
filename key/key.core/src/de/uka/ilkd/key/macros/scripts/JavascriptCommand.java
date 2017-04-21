@@ -6,18 +6,23 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.macros.scripts.meta.Option;
+import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevException;
-import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Proof;
 
 public class JavascriptCommand
         extends AbstractCommand<JavascriptCommand.Parameters> {
+
+    public JavascriptCommand() {
+        super(Parameters.class);
+    }
+
     public static class Parameters {
-        @ValueInjector.Option("#2") String script;
+        @Option("#2") String script;
     }
 
     public static class JavascriptInterface {

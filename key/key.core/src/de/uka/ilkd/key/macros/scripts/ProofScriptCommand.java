@@ -1,9 +1,10 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
 
 /**
  * A {@link ProofScriptCommand} is an executable mutation on the given proof.
@@ -20,6 +21,12 @@ import de.uka.ilkd.key.proof.Proof;
  * @author Alexander Weigl
  */
 public interface ProofScriptCommand<T> {
+
+    /**
+     *
+     */
+    List<ProofScriptArgument> getArguments();
+
     /**
      * @param arguments
      * @return

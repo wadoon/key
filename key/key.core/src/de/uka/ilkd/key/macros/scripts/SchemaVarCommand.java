@@ -2,18 +2,13 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.pp.AbbrevException;
+import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.pp.AbbrevMap;
-import de.uka.ilkd.key.proof.Proof;
 
 /**
  *
@@ -22,9 +17,14 @@ public class SchemaVarCommand
         extends AbstractCommand<SchemaVarCommand.Parameters> {
 
     public static class Parameters {
-        @ValueInjector.Option("#2") String type;
-        @ValueInjector.Option("#3") String var;
+        @Option("#2") String type;
+        @Option("#3") String var;
     }
+
+    public SchemaVarCommand() {
+        super(Parameters.class);
+    }
+
 
     @Override public Parameters evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {

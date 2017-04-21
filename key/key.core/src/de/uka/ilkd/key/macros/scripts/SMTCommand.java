@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import de.uka.ilkd.key.macros.scripts.meta.Option;
+import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -12,7 +14,11 @@ import java.util.*;
 public class SMTCommand
         extends AbstractCommand<SMTCommand.SMTCommandArguments> {
     static class SMTCommandArguments {
-        @ValueInjector.Option("solver") String solver = "Z3";
+        @Option("solver") String solver = "Z3";
+    }
+
+    public SMTCommand() {
+        super(SMTCommandArguments.class);
     }
 
     private static final Map<String, SolverType> SOLVER_MAP = computeSolverMap();

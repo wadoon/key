@@ -1,22 +1,25 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import de.uka.ilkd.key.macros.scripts.meta.Option;
+
 import java.util.Map;
 import java.util.Properties;
-
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.proof.Proof;
 
 public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
 
     static class Parameters {
-        @ValueInjector.Option("key") String key;
-        @ValueInjector.Option("value") String value;
+        @Option("key") String key;
+        @Option("value") String value;
 
         public Properties getProperties() {
             Properties p = new Properties();
             p.setProperty(key, value);
             return p;
         }
+    }
+
+    public SetCommand() {
+        super(Parameters.class);
     }
 
     @Override public Parameters evaluateArguments(EngineState state,
