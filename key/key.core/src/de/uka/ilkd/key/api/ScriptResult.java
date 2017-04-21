@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.api;
 
+import de.uka.ilkd.key.java.Position;
 import de.uka.ilkd.key.macros.scripts.ScriptCommand;
+import de.uka.ilkd.key.util.Pair;
 
 import java.util.List;
 import java.util.Set;
@@ -30,12 +32,18 @@ public class ScriptResult {
     /**
      * The reference to the varaibleassingments for this result
      */
-    //private VariableAssignemnts assignment;
+    private VariableAssignments assignments;
 
     /**
      * The list of labels for the result
      */
     private List<Set<String>>  labels;
+
+    /**
+     * List with line numbers
+     *
+     */
+     private List<Pair<Position, Position>> linenumbers;
 
     public ScriptResult(){
 
