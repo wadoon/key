@@ -1,0 +1,27 @@
+.label {
+    -fx-font-size: 16pt;
+    -fx-background-color: #ece;
+}
+
+.pane {
+    -fx-background-color: red;
+}
+
+.paren-hl {
+    -fx-background-color: yellowgreen;
+}
+
+.hl {
+    -fx-background-color: goldenrod;
+    -fx-border-color: darkred;
+    -fx-border-width: 3px;
+}
+
+.separator, #sequent-separator {
+    -fx-stroke: green;
+    -fx-stroke-width: 5;
+    -fx-stroke-dash-array: 12 2 4 2;
+    -fx-stroke-dash-offset: 6;
+    -fx-stroke-line-cap: butt;
+    -fx-fill: red;
+}
