@@ -7,15 +7,19 @@ import java.io.File;
 import java.util.List;
 
 /**
- * Creates all other APIs
- * init keyenv, scriptapi, proofmgt
- * Create at 6.4.17
+ * The Entry Point.
+ * <p>
+ * This facility is the entry point to the different KeY apis.
+ * Currently it support the bootstrapping of the {@link KeYEnvironment} and the loading of proofs.
+ * <p>
+ * Created at 6.4.17
  *
  * @author Sarah Grebing
  * @author Alexander Weigl
+ * @see ProofScriptCommandApi
  */
 public abstract class KeYApi {
-    private ProofScriptCommandApi scriptCommandApi;
+    private ProofScriptCommandApi scriptCommandApi = new ProofScriptCommandApi();
 
     /**
      * Create a new KeY API and create the sub APIs
@@ -23,12 +27,15 @@ public abstract class KeYApi {
     private KeYApi() {
     }
 
+    /**
+     *
+     * @return non-null
+     */
     public ProofScriptCommandApi getScriptCommandApi() {
         return scriptCommandApi;
     }
 
     /**
-     *
      * @param keyFile
      * @return
      * @throws ProblemLoaderException
@@ -39,7 +46,6 @@ public abstract class KeYApi {
     }
 
     /**
-     *
      * @param location
      * @param classPath
      * @param bootClassPath
@@ -55,7 +61,6 @@ public abstract class KeYApi {
     }
 
     /**
-     *
      * @param javaSourceCode
      * @return
      * @throws ProblemLoaderException
@@ -67,13 +72,13 @@ public abstract class KeYApi {
 
     /**
      * Load a proof file, creates a KeY environment that can be accessed with other methods from this facade
-     * @param file Path to the source code folder/file or to a *.proof file
-     * @param classPaths Optionally: Additional specifications for API classes
-     * @param bootClassPath Optionally: Different default specifications for Java API
-     * @param includes Optionally: Additional includes to consider
      *
+     * @param file          Path to the source code folder/file or to a *.proof file
+     * @param classPaths    Optionally: Additional specifications for API classes
+     * @param bootClassPath Optionally: Different default specifications for Java API
+     * @param includes      Optionally: Additional includes to consider
      */
     public abstract void loadProofFile(File file, List<File> classPaths,
-            File bootClassPath,  List<File> includes);
+            File bootClassPath, List<File> includes);
 
 }
