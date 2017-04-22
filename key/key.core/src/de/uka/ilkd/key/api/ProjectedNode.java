@@ -56,4 +56,8 @@ public class ProjectedNode {
     public boolean isPseudoNode() {
         return proofNode == null;
     }
+
+    Node getProofNode() {
+        return proofNode;
+    }
 }
