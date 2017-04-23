@@ -136,7 +136,7 @@ public class LogicPrinter {
 
     private final SelectPrinter selectPrinter = new SelectPrinter(this);
     private final StorePrinter storePrinter = new StorePrinter(this);
-    
+
     protected HeapLDT getHeapLDT() {
         return services == null ? null : services.getTypeConverter().getHeapLDT();
     }
@@ -2384,7 +2384,7 @@ public class LogicPrinter {
      * layouter with the various static <code>MARK_</code> objects
      * declared {@link LogicPrinter}.
      */
-    private static class PosTableStringBackend extends StringBackend {
+    public static class PosTableStringBackend extends StringBackend {
 
         /** The top PositionTable */
         private final InitialPositionTable initPosTbl
@@ -2420,7 +2420,7 @@ public class LogicPrinter {
         private final Stack<Integer> javaBlockStarts = new Stack<Integer>();
 
 
-        PosTableStringBackend(int lineWidth) {
+        public PosTableStringBackend(int lineWidth) {
             super(lineWidth);
         }
 
