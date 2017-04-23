@@ -16,5 +16,14 @@
     <orderEntry type="module" module-name="key.util" exported="" />
     <orderEntry type="module" module-name="key.core.testgen" exported="" />
     <orderEntry type="module" module-name="key.core.symbolic_execution" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../key.core/lib/rt.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
   </component>
 </module>
