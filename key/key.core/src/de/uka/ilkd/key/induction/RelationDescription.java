@@ -17,12 +17,14 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
 import de.uka.ilkd.key.util.Pair;
 
@@ -67,21 +69,23 @@ public class RelationDescription {
 	}
 	
 	private static LinkedList<Term> createRangeFormulas(Term t, Services s){
-		ImmutableList<Named> namedrules = s.getNamespaces().ruleSets().elements();
+		ImmutableList<Named> namedrulesets = s.getNamespaces().ruleSets().elements();
 		LinkedList<Term> possibleRangeFormulas = new LinkedList<Term>();
 		TermBuilder tb = s.getTermBuilder();
 		//TODO:[optional] check for optimizations
-		for(Named n : namedrules){
-			if(n instanceof Rule){
-				System.out.println("Rule detected: " + n.toString());
-				Rule r = (Rule)n;
-				if(r instanceof FindTaclet){
+		for(Named n : namedrulesets){
+			if(n instanceof RuleSet){
+				RuleSet rs = (RuleSet)n;
+				System.out.println("RuleSet detected: " + rs.toString());
+				//Rule r = (Rule)n;
+				/*if(rs instanceof FindTaclet){
 					
-					System.out.println("\tfindtaclet found: " + r.toString());
+					System.out.println("\tfindtaclet found: " + rs.toString());
 					
 					FindTaclet ft = (FindTaclet)r;
 					//check whether the find term of the the FindTaclet is an instance of the given term
 					Term rangeFormula = createRangeFormula(t, ft.find(), s);
+					*/
 					//TODO:[optional] find a way to express multiple rangeformulas in one (optimization)
 					/*
 					 * E.g. if there are rangeformulas int x: x = 0, x = 1, x = 2
@@ -89,6 +93,7 @@ public class RelationDescription {
 					 */
 					
 					//TODO:[optional] check for optimization
+					/*
 					int nos = rangeFormula.subs().size();
 					boolean falseIsDirectSubterm = false;
 					for(int i = 0; i < nos; i++){
@@ -99,8 +104,8 @@ public class RelationDescription {
 					}
 					if(!falseIsDirectSubterm){
 						possibleRangeFormulas.add(rangeFormula);
-					}
-				}
+					}*/
+				//}
 			}
 		}
 		return possibleRangeFormulas;
@@ -135,19 +140,29 @@ public class RelationDescription {
 		}
 	}
 	
+	/**
+	 * 
+	 * @param f a Function
+	 * @param s the Services (they are required to get the TermBuilder)
+	 * @return a Pair&lt;QuantifiableVariable, Term&gt; which holds the Term consisting of the given function
+	 * and new QuantifiableVariables as parameters and a new QuantifiableVariable.
+	 * (maybe this QuantifiableVariable should not be part of the return value. It might be that
+	 * this substitution has to be created for each existing QuantifiableVariable which has the same
+	 * type 
+	 */
 	private static Pair<QuantifiableVariable, Term> createSubstitutionForFunction(Function f, Services s){
 		QuantifiableVariable result = null; //TODO: create new QuantifiableVariable
 		QuantifiableVariable[] parameters = new QuantifiableVariable[f.arity()];
 		TermBuilder tb = s.getTermBuilder();
 		//TermSV var = new TermSV(new Name("AddedANameHere"), f.argSort(0), false, true);
-		
+		//SchemaVariableFactory.createTermSV(name, sort)
 		for(int i = 0; i < f.arity(); i++){
 			parameters[i] = null; //TODO: create new QuantifiableVariable
 		}
 		
 		return new Pair<QuantifiableVariable, Term>(
 				result, 
-				tb.func(f, varsToTerm(parameters, tb), new ImmutableArray<QuantifiableVariable>()
+				tb.func(f, varsToTerm(parameters, tb), new ImmutableArray<QuantifiableVariable>())
 		);
 	}
 	

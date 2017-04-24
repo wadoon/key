@@ -36,9 +36,9 @@ public class TacletGenTest {
 		ImmutableList<ProgramVariable> programVars = ImmutableSLList.nil();
 		//= (ImmutableList<ProgramVariable>) services.getNamespaces().programVariables();
 		Namespace progVarNamespace = services.getNamespaces().programVariables();
-		for(Named n : progVarNamespace.elements()){
+		/*for(Named n : progVarNamespace.elements()){
 			programVars.append((ProgramVariable)n);
-		}
+		}*/ //not need cause this taclet does not introduces this variables
 		//TODO: programVars = ??? (progVars)
 		Taclet tac = generator.generateRewriteTaclet(
 				tacletName, //muss eindeutig sein
