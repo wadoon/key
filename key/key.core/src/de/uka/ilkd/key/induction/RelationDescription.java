@@ -43,7 +43,7 @@ public class RelationDescription {
 		LinkedList<Term> findTerms;
 		for(Function f : constructors){
 			try{
-				possibleSubstitutions.addAll(createSubstitutions(f, serv));
+				possibleSubstitutions.add(this.createSubstitutionForFunction(f, serv));
 			} catch (NullPointerException npe){
 				//no substitutions for the function f were found
 				//TODO: [optional] show the user that there are no rules for this function (maybe ask whether intended or not). 
@@ -56,7 +56,7 @@ public class RelationDescription {
 		/*for(Term findTerm : findTerms){
 			atomics.add(new AtomicRelationDescription(
 					createRangeFormula(t, findTerm, serv),
-					possibleSubstitutions	//TODO: filter this list.
+					possibleSubstitutions
 					));
 		}*/
 	}
