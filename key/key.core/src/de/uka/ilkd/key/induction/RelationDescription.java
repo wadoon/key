@@ -51,18 +51,6 @@ public class RelationDescription {
 		}
 		
 		//TODO: get the findTerms
-		//findTerms = serv. 
-		for(Named n : serv.getNamespaces().ruleSets().elements()){
-			StringBuilder sb = new StringBuilder();
-			
-			sb.append("entity with name: ");
-			sb.append(n.name().toString());
-			if(n instanceof FindTaclet){
-				sb.append("is a FindTaclet ");
-			}
-			
-			System.out.println(sb.toString());
-		};
 		
 		atomics = new LinkedList<AtomicRelationDescription>();
 		/*for(Term findTerm : findTerms){

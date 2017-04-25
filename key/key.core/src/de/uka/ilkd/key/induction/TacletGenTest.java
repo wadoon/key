@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 
 public class TacletGenTest {
@@ -49,6 +50,9 @@ public class TacletGenTest {
 		//ONLY FOR TESTING
 		System.out.println(tac.toString());
 		System.out.println(services.getProfile().getJustification(tac).toString());
+		
+		SVInstantiations insts = null; //TODO: create this.
+		services.getProof().openGoals().head().addTaclet(tac, insts, true);
 		
 	}
 }
