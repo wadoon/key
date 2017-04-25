@@ -32,7 +32,7 @@ public class RelationDescription {
 
 	private LinkedList<AtomicRelationDescription> atomics;
 	private LinkedList<Pair<QuantifiableVariable, Term>> possibleSubstitutions;
-	private LinkedList<Term> possibleRangeFormulas;
+	private Term rangeFormula;
 	
 	private static int varCounter = 0;
 	
@@ -47,18 +47,15 @@ public class RelationDescription {
 				//TODO: [optional] show the user that there are no rules for this function (maybe ask whether intended or not). 
 			}
 		}
-		possibleRangeFormulas = createRangeFormulas(t, serv);
 		
-		System.out.println("number of range formulas: " + possibleRangeFormulas.size());
+		//TODO: build the disjunction of all findTerms which the given term matches.
+		
+		rangeFormula = createRangeFormula(t, serv);
 		
 		atomics = new LinkedList<AtomicRelationDescription>();
-		for(Term range : possibleRangeFormulas){
-			/*
-			 * How to select the right substitutions? Is another ConstructorExctractor needed?
-			 * If yes is the one above needed?
-			 */
-			atomics.add(new AtomicRelationDescription(
-					range,
+		
+		atomics.add(new AtomicRelationDescription(
+					rangeFormula,
 					possibleSubstitutions	//TODO: filter this list.
 					));
 		}
