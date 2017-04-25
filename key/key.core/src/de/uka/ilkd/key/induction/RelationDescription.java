@@ -38,7 +38,9 @@ public class RelationDescription {
 	
 	public RelationDescription(Term t, Services serv){
 		ConstructorExtractor ce = new ConstructorExtractor(t, serv);
+		TermBuilder tb = serv.getTermBuilder();
 		ImmutableArray<Function> constructors = ce.getConstructors();
+		LinkedList<Term> findTerms;
 		for(Function f : constructors){
 			try{
 				possibleSubstitutions.addAll(createSubstitutions(f, serv));
@@ -48,18 +50,33 @@ public class RelationDescription {
 			}
 		}
 		
-		//TODO: build the disjunction of all findTerms which the given term matches.
-		
-		rangeFormula = createRangeFormula(t, serv);
+		//TODO: get the findTerms
+		//findTerms = 
+		for(Named n : serv.getNamespaces().ruleSets().elements()){
+			StringBuilder sb = new StringBuilder();
+			
+			sb.append("entity with name: ");
+			sb.append(n.name().toString());
+			if(n instanceof RuleSet){
+				sb.append("is a ruleset ");
+			}
+			if(n instanceof Rule){
+				sb.append("is a rule ");
+			}
+			if(n instanceof FindTaclet){
+				sb.append("is a FindTaclet ");
+			}
+			
+			System.out.println(sb.toString());
+		};
 		
 		atomics = new LinkedList<AtomicRelationDescription>();
-		
-		atomics.add(new AtomicRelationDescription(
-					rangeFormula,
+		/*for(Term findTerm : findTerms){
+			atomics.add(new AtomicRelationDescription(
+					createRangeFormula(t, findTerm, serv),
 					possibleSubstitutions	//TODO: filter this list.
 					));
-		}
-		
+		}*/
 	}
 	
 	public LinkedList<AtomicRelationDescription> getAtomics(){
