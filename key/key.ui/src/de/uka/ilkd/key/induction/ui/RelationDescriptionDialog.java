@@ -10,11 +10,15 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import org.key_project.util.collection.ImmutableList;
+
 import de.uka.ilkd.key.induction.AtomicRelationDescription;
 import de.uka.ilkd.key.induction.RelationDescription;
 import de.uka.ilkd.key.induction.TacletGenTest;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.TacletApp;
 
 public class RelationDescriptionDialog extends JDialog {
 

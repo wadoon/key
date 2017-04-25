@@ -43,11 +43,12 @@ public class TacletGenTest {
 				services
 				);
 		
-		//register Taclet
 		//services.getSpecificationRepository() //RuleJustification?
+		
 				
 		//ONLY FOR TESTING
 		System.out.println(tac.toString());
+		System.out.println(services.getProfile().getJustification(tac).toString());
 		
 	}
 }

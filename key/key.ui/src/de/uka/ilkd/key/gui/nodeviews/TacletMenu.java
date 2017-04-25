@@ -476,6 +476,7 @@ public class TacletMenu extends JMenu {
 	}
 
     /**
+     * @param builtInList 
      * @information: roettgerStructuralInduction
      * @param control
      */
@@ -736,7 +737,11 @@ public class TacletMenu extends JMenu {
 		}
 		else if(((JMenuItem)e.getSource()).getText().
 				 startsWith(GENERATE_RDESCRIPTIONS)){
-			new RelationDescriptionDialog(new JFrame(), pos.getPosInOccurrence().subTerm(), mediator.getServices());
+			new RelationDescriptionDialog(
+					new JFrame(), 
+					pos.getPosInOccurrence().subTerm(), 
+					mediator.getServices()
+			);
 		}
 			
 	}

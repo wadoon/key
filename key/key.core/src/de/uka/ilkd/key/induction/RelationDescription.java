@@ -51,18 +51,12 @@ public class RelationDescription {
 		}
 		
 		//TODO: get the findTerms
-		//findTerms = 
+		//findTerms = serv. 
 		for(Named n : serv.getNamespaces().ruleSets().elements()){
 			StringBuilder sb = new StringBuilder();
 			
 			sb.append("entity with name: ");
 			sb.append(n.name().toString());
-			if(n instanceof RuleSet){
-				sb.append("is a ruleset ");
-			}
-			if(n instanceof Rule){
-				sb.append("is a rule ");
-			}
 			if(n instanceof FindTaclet){
 				sb.append("is a FindTaclet ");
 			}
