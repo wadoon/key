@@ -34,6 +34,7 @@ public class RelationDescription {
 	private LinkedList<Pair<QuantifiableVariable, Term>> possibleSubstitutions;
 	private LinkedList<Term> possibleRangeFormulas;
 	
+	private static int varCounter = 0;
 	
 	public RelationDescription(Term t, Services serv){
 		ConstructorExtractor ce = new ConstructorExtractor(t, serv);
@@ -151,19 +152,38 @@ public class RelationDescription {
 	 * type 
 	 */
 	private static Pair<QuantifiableVariable, Term> createSubstitutionForFunction(Function f, Services s){
-		QuantifiableVariable result = null; //TODO: create new QuantifiableVariable
+		QuantifiableVariable result = SchemaVariableFactory.createVariableSV(generateName(f, s, "res"), f.sort());
 		QuantifiableVariable[] parameters = new QuantifiableVariable[f.arity()];
 		TermBuilder tb = s.getTermBuilder();
-		//TermSV var = new TermSV(new Name("AddedANameHere"), f.argSort(0), false, true);
-		//SchemaVariableFactory.createTermSV(name, sort)
 		for(int i = 0; i < f.arity(); i++){
-			parameters[i] = null; //TODO: create new QuantifiableVariable
+			parameters[i] = SchemaVariableFactory.createVariableSV(generateName(f, s, "arg" + i), f.argSort(i));
 		}
 		
 		return new Pair<QuantifiableVariable, Term>(
 				result, 
 				tb.func(f, varsToTerm(parameters, tb), new ImmutableArray<QuantifiableVariable>())
 		);
+	}
+	
+	/**
+	 * 
+	 * @param f a function
+	 * @param s the Services (might needed later)
+	 * @param suffix a String
+	 * @return a new Name with a String which starts with the given Functions name then the given 
+	 * suffix and the private variable varCounter. All separated by the char "_". varCounter is 
+	 * increased by one for each call of this function to ensure the uniqueness of the names.
+	 */
+	private static Name generateName(Function f, Services s, String suffix){
+		//TODO: better name generation maybe by existing code.
+		StringBuilder sb = new StringBuilder();
+		sb.append(f.name().toString());
+		sb.append("_");
+		sb.append(suffix);
+		sb.append("_");
+		sb.append(varCounter);
+		varCounter++;
+		return new Name(sb.toString());
 	}
 	
 	/**
