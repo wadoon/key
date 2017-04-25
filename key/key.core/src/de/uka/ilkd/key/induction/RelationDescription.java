@@ -69,49 +69,6 @@ public class RelationDescription {
 		return this.atomics;
 	}
 	
-	private static LinkedList<Term> createRangeFormulas(Term t, Services s){
-		ImmutableList<Named> namedrulesets = s.getNamespaces().ruleSets().elements();
-		LinkedList<Term> possibleRangeFormulas = new LinkedList<Term>();
-		TermBuilder tb = s.getTermBuilder();
-		//TODO:[optional] check for optimizations
-		for(Named n : namedrulesets){
-			if(n instanceof RuleSet){
-				RuleSet rs = (RuleSet)n;
-				System.out.println("RuleSet detected: " + rs.toString());
-				//Rule r = (Rule)n;
-				/*if(rs instanceof FindTaclet){
-					
-					System.out.println("\tfindtaclet found: " + rs.toString());
-					
-					FindTaclet ft = (FindTaclet)r;
-					//check whether the find term of the the FindTaclet is an instance of the given term
-					Term rangeFormula = createRangeFormula(t, ft.find(), s);
-					*/
-					//TODO:[optional] find a way to express multiple rangeformulas in one (optimization)
-					/*
-					 * E.g. if there are rangeformulas int x: x = 0, x = 1, x = 2
-					 * make a new rangeformula x >= 0 && x <= 2 and throw the others away.
-					 */
-					
-					//TODO:[optional] check for optimization
-					/*
-					int nos = rangeFormula.subs().size();
-					boolean falseIsDirectSubterm = false;
-					for(int i = 0; i < nos; i++){
-						if(rangeFormula.sub(i).equals(tb.ff())){
-							falseIsDirectSubterm = true;	//does the "and" operator work with this?
-							break;							//@see createRangeFormula
-						}
-					}
-					if(!falseIsDirectSubterm){
-						possibleRangeFormulas.add(rangeFormula);
-					}*/
-				//}
-			}
-		}
-		return possibleRangeFormulas;
-	}
-	
 	/**
 	 * 
 	 * @param term
