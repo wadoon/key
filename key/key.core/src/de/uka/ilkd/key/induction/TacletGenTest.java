@@ -27,18 +27,12 @@ public class TacletGenTest {
 	}
 	
 	public void tacletGen(){
-		TacletGenerator generator = getTacletGenerator();
-		
+		//create Taclet
+		TacletGenerator generator = TacletGenerator.getInstance();
 		Name tacletName = new Name("testtaclet");
 		RuleSet ruleset = (RuleSet)services.getNamespaces().ruleSets().elements().head();//TODO: check if this works
-		
-		//TODO: fix ClassCastException here
 		ImmutableList<ProgramVariable> programVars = ImmutableSLList.nil();
-		//= (ImmutableList<ProgramVariable>) services.getNamespaces().programVariables();
 		Namespace progVarNamespace = services.getNamespaces().programVariables();
-		/*for(Named n : progVarNamespace.elements()){
-			programVars.append((ProgramVariable)n);
-		}*/ //not need cause this taclet does not introduces this variables
 		//TODO: programVars = ??? (progVars)
 		Taclet tac = generator.generateRewriteTaclet(
 				tacletName, //muss eindeutig sein
@@ -49,14 +43,9 @@ public class TacletGenTest {
 				services
 				);
 		
+		//
 		//ONLY FOR TESTING
 		System.out.println(tac.toString());
 		
 	}
-	
-	private TacletGenerator getTacletGenerator(){
-		//TODO: get a tacletgenerator.
-		return TacletGenerator.getInstance();
-	}
-
 }
