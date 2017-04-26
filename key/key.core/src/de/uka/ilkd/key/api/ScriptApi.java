@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.api;
 
+import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.EngineState;
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
+import de.uka.ilkd.key.macros.scripts.ScriptException;
 
 import java.util.List;
 import java.util.Map;
@@ -30,8 +32,10 @@ public class ScriptApi {
      */
     public <T> ScriptResults executeScriptCommand(
             ProofScriptCommandCall<T> call, ProjectedNode onNode,
-            VariableAssignments varsAssignment) {
+            VariableAssignments varsAssignment) throws ScriptException, InterruptedException {
         //TODO VariableAssignments should be in instantiateCommand
+        call.command.execute((AbstractUserInterfaceControl) api.getEnv().getUi(),
+                call.parameter, state);
         return null; // TODO
     }
 

@@ -18,12 +18,11 @@ public class ProofScriptCommandApi {
     private Map<String, ProofScriptCommand> commandMap = new HashMap<>();
 
     public ProofScriptCommandApi() {
-
+        initialize();
     }
 
     private void initialize() {
-        ServiceLoader<ProofScriptCommand> loader = ServiceLoader
-                .load(ProofScriptCommand.class);
+        ServiceLoader<ProofScriptCommand> loader = ServiceLoader.load(ProofScriptCommand.class);
         loader.forEach(psc -> commandMap.put(psc.getName(), psc));
     }
 

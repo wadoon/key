@@ -54,11 +54,10 @@ public class ProofManagementApi {
         Set<KeYJavaType> kjts = currentEnv.getJavaInfo().getAllKeYJavaTypes();
         for (KeYJavaType type : kjts) {
             if (!KeYTypeUtil.isLibraryClass(type)) {
-                ImmutableSet<IObserverFunction> targets = currentEnv
-                        .getSpecificationRepository().getContractTargets(type);
+                ImmutableSet<IObserverFunction> targets = currentEnv.getSpecificationRepository()
+                        .getContractTargets(type);
                 for (IObserverFunction target : targets) {
-                    ImmutableSet<Contract> contracts = currentEnv
-                            .getSpecificationRepository()
+                    ImmutableSet<Contract> contracts = currentEnv.getSpecificationRepository()
                             .getContracts(type, target);
                     for (Contract contract : contracts) {
                         proofContracts.add(contract);
@@ -69,23 +68,24 @@ public class ProofManagementApi {
     }
 
     /**
-     *
      * @param contract
      * @return
      * @throws ProofInputException
      */
-    public ProofApi startProof(ProofOblInput contract)
-            throws ProofInputException {
+    public ProofApi startProof(ProofOblInput contract) throws ProofInputException {
         return new ProofApi(currentEnv.createProof(contract), currentEnv);
     }
 
     /**
-     *
      * @param contract
      * @return
      * @throws ProofInputException
      */
     public ProofApi startProof(Contract contract) throws ProofInputException {
-        return startProof(contract.createProofObl(currentEnv.getInitConfig(),contract));
+        return startProof(contract.createProofObl(currentEnv.getInitConfig(), contract));
+    }
+
+    public ProofApi getLoadedProof() {
+        return new ProofApi(currentEnv.getLoadedProof(), currentEnv);
     }
 }
