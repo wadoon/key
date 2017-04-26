@@ -19,7 +19,7 @@ import java.util.List;
  * @see ProofScriptCommandApi
  */
 public abstract class KeYApi {
-    private ProofScriptCommandApi scriptCommandApi = new ProofScriptCommandApi();
+    private static ProofScriptCommandApi scriptCommandApi = new ProofScriptCommandApi();
 
     /**
      * Create a new KeY API and create the sub APIs
@@ -31,7 +31,7 @@ public abstract class KeYApi {
      *
      * @return non-null
      */
-    public ProofScriptCommandApi getScriptCommandApi() {
+    public static ProofScriptCommandApi getScriptCommandApi() {
         return scriptCommandApi;
     }
 
