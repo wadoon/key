@@ -41,6 +41,7 @@ public interface ProofScriptCommand<T> {
      * @throws ScriptException
      * @throws InterruptedException
      */
+    //TODO downgrade AbstractUserInterfaceControl to UserInterfaceControl
     void execute(AbstractUserInterfaceControl uiControl, T args,
             EngineState stateMap) throws ScriptException, InterruptedException;
 
