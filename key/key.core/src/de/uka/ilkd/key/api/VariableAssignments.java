@@ -31,6 +31,7 @@ public class VariableAssignments {
      * Type Map of assignments
      */
     private Map<String, VariableAssignments.VarType> typeMap;
+
     /**
      * Create new, empty variable assignment, to add variables
      * @param parent

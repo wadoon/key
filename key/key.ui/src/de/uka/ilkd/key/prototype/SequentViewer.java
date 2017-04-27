@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.prototype;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.control.instantiation_model.TacletAssumesModel;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.parser.*;
@@ -52,7 +51,7 @@ public class SequentViewer extends Application {
         DefaultTermParser dtp = new DefaultTermParser();
         StringReader r = new StringReader(// "a=5 ==> \\<{int i = 0;}\\>(a=5)");
                 //   "(5 = a) & (15 = add(b, -3)) ==> (mul(a, b) = 90)");
-                " fi(c) ==> p(d), fi(c)");
+                " fi(c) ==> p(c), fi(d)");
         nss = env.getServices().getNamespaces();
 
         AbbrevMap abbrev = new AbbrevMap();
@@ -97,12 +96,8 @@ public class SequentViewer extends Application {
 
         LegacyTacletMatcher ltm = new LegacyTacletMatcher(t);
 
-        //do we need taclet choice model?
-       /* ltm.matchIf(( i < asize ?
-                      antecCand : succCand ), ifFma, matchCond, services).getFormulas ()
-*/
 
-        //===============================
+
         MatchConditions mc = MatchConditions.EMPTY_MATCHCONDITIONS;
         Sequent ifseq = t.ifSequent();
         int asize = ifseq.antecedent().size();
@@ -117,116 +112,67 @@ public class SequentViewer extends Application {
                     IfFormulaInstSeq.createList(seq, false);
 
             Iterator<SequentFormula> pattern = ifseq.iterator();
-//           // while(it.hasNext()) {
-//            MatchConditions mat = ltm.matchIf(antecCand, mc, services);
-//            System.out.println("Inst after antec: "+mc.getInstantiations());
-//            System.out.println(mat.getInstantiations());
-//            MatchConditions mb = ltm.matchIf(succCand, mat, services);
-//            System.out.println("Inst after succ: "+mc.getInstantiations());
-//            System.out.println(mb.getInstantiations());
-//            //}
+
 
             MatchConditions matchCond = MatchConditions.EMPTY_MATCHCONDITIONS;
 
-            //TacletAssumesModel[] ifChoiceModel = new TacletAssumesModel[size];
 
             for (int i = 0; i < size; i++) {
                 final Term patternTerm = pattern.next().formula();
                 System.out.println(patternTerm);
-//                ifChoiceModel[i] =
-//                        new TacletAssumesModel(ifFma,
-//                                ltm.matchIf((i < asize ?
-//                                        antecCand : succCand), ifFma, matchCond, services).getFormulas(),
-//                                services, nss, abbrev);
 
                 boolean inAntecedent = i < asize;
                 IfMatchResult ma = ltm.matchIf((inAntecedent ?
                         antecCand : succCand), patternTerm, matchCond, services);
 
-                ImmutableList<MatchConditions> testma = ma.getMatchConditions();
 
-                matchCond = ma.getMatchConditions().head();
-                /*
-                for (MatchConditions matchConditions : testma) {
-                    System.out.println(  matchConditions.getInstantiations());
-                }*/
-
+                if(!ma.getMatchConditions().isEmpty()){
+                    ImmutableList<MatchConditions> testma = ma.getMatchConditions();
+                    matchCond = ma.getMatchConditions().head();
+                    System.out.println("Inst in "+ i+ " "+ matchCond.getInstantiations());
+                }else{
+                    System.out.println("EmptyMatch");
+                }
             }
-        } else{
-            TacletAssumesModel[] ifChoiceModel = new TacletAssumesModel [ 0 ];
 
         }
 
 
 
-        //==========================
-/*
-        ImmutableList<IfFormulaInstantiation> listAnte = IfFormulaInstSeq.createList(seq, true);
-        ImmutableList<IfFormulaInstantiation> listSucc = IfFormulaInstSeq.createList(seq, false);
-        //ltm.matchIf();
-        MatchConditions x = ltm.matchIf(listAnte, mc, services);
-        System.out.println(x);
-
-
-        //hier wird null zurückgegeben, weil die letzte Formel nicht matcht,
-        //problem, dass die Position doch keine Rolle spielt
-        MatchConditions x1 = ltm.matchIf(listSucc, x, services);
-        System.out.println(x.getInstantiations());
-        System.out.println(x1);
-    //    System.out.println(x1.getInstantiations());
-
-        //Aufteilen: antec+succ hintereinander: Frage welche Match-Methode
-        // matchfind: find darf nicht mehrere top level formeln enthalten
-
-      //  final TacletMatcher matcher = t.getMatcher();
-
-        // IfMatchResult imr = t.getMatcher().matchIf()
-       // IfMatchResult mr = t.getMatcher().matchIf(p_toMatch, p_ifSeqTail.head().formula(), p_matchCond, p_services);
-
-       // System.out.println(matcher);
-
-       // TacletMatchProgram.createProgram(
-                //"p(x) ==> p(x)")
-
-     //   MatchConditions ma = t.getMatcher().matchFind(s.succedent().get(0).formula(), mc, services);
-        //System.out.println(mc);
-     //   System.out.println(ma);
-        //System.out.println(matchConditions);
-      //  System.out.println(s.succedent().get(0).formula());
-      */
         return seq;
 
     }
 
-/*    private void initIfChoiceModels() {
- 	Sequent ifseq   = taclet().ifSequent();
-	int     asize   = ifseq.antecedent().size();
-	int     size    = asize + ifseq.succedent().size();
 
-	if ( size > 0 ) {
-	    ImmutableList<IfFormulaInstantiation> antecCand =
-		IfFormulaInstSeq.createList ( seq, true );
-	    ImmutableList<IfFormulaInstantiation> succCand  =
-		IfFormulaInstSeq.createList ( seq, false );
+    /**
+     * TODO: richtige Signatur noch zu tun, atm. erst einmal Testweise
+     * Es muessten noch die Assignments mit gegebene werden mit Typeninfo
+     */
+    public void matchPattern(String pattern, Sequent currentSeq, Services services){
+        //Aufbau der Deklarationen für den NameSpace
+        //Zusammenbau des Pseudotaclets
+        //Parsen des Taclets
+        String patternString = "matchPattern{\\assumes("+pattern+") \\find (==>)  \\add (==>)}";
 
-	    Iterator<SequentFormula> it        = ifseq.iterator();
-	    Term                         ifFma;
-	    MatchConditions              matchCond = app.matchConditions ();
+        Taclet t = parseTaclet(patternString);
 
-	    ifChoiceModel                          = new TacletAssumesModel[size];
+        //Build Matcher for Matchpattern
+        LegacyTacletMatcher ltm = new LegacyTacletMatcher(t);
 
-	    for (int i=0; i<size; i++) {
-		ifFma            = it.next ().formula ();
-		ifChoiceModel[i] =
-		    new TacletAssumesModel ( ifFma,
-					taclet ().getMatcher().matchIf(( i < asize ?
-                      antecCand : succCand ), ifFma, matchCond, services).getFormulas (),
-					services, nss, scm);
-	    }
-	} else
-	    ifChoiceModel = EMPTY_IF_CHOICES;
-    }*/
+        //matching Algorithmus
 
+        NamespaceSet nss = services.getNamespaces();
+        //Init mit leeren Matchconditions, die gefüllt werden
+        MatchConditions matchCond = MatchConditions.EMPTY_MATCHCONDITIONS;
+
+        //Iteratoren durch die Sequent
+        ImmutableList<IfFormulaInstantiation> antecCand =
+                    IfFormulaInstSeq.createList(currentSeq, true);
+        ImmutableList<IfFormulaInstantiation> succCand =
+                    IfFormulaInstSeq.createList(currentSeq, false);
+
+
+    }
 
     private KeYParserF stringDeclParser(String s) {
         return new KeYParserF(ParserMode.DECLARATION,
