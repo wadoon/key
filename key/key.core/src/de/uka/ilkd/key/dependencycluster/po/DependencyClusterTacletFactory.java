@@ -66,7 +66,7 @@ public class DependencyClusterTacletFactory {
         calltype2 = tb.var(SchemaVariableFactory.createTermSV(new Name("calltype2"), calltypeSort, false, false));
         
         direction1 = tb.var(SchemaVariableFactory.createTermSV(new Name("direction1"), dirSort, false, false));
-        direction2 = tb.var(SchemaVariableFactory.createTermSV(new Name("direction1"), dirSort, false, false));    
+        direction2 = tb.var(SchemaVariableFactory.createTermSV(new Name("direction2"), dirSort, false, false));    
         
         component1 = tb.var(SchemaVariableFactory.createTermSV(new Name("component1"), objectSort, false, false));
         component2 = tb.var(SchemaVariableFactory.createTermSV(new Name("component2"), objectSort, false, false));
