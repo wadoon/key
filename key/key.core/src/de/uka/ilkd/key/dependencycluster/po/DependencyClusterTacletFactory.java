@@ -1,8 +1,11 @@
 package de.uka.ilkd.key.dependencycluster.po;
 
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.ldt.TempEventLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -108,8 +111,45 @@ public class DependencyClusterTacletFactory {
         return equalMetadata;
     }
     
+    public Term equalContent() {
+        //TODO JK wait thats bullshit, that only works for the call input message! Handling objects in messages correctly here seems ugly and difficult, but its serious!
+        /*
+        ImmutableArray<KeYJavaType> params = contract.getTarget().getParamTypes();
+        ImmutableList<Term> objects1 = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> objects2 = ImmutableSLList.<Term>nil();
+        ImmutableList<Term> others = ImmutableSLList.<Term>nil();
+        for (int i = 0; i < params.size(); i++) {
+            if (params.get(i).getSort().extendsTrans(proofConfig.getServices().getJavaInfo().objectSort())) {
+                objects1 = objects1.append(tb.seqGet(params.get(i).getSort(), params1, tb.zTerm(i)));
+                objects2 = objects2.append(tb.seqGet(params.get(i).getSort(), params2, tb.zTerm(i)));
+            } else {
+                Term equality = tb.equals(tb.seqGet(params.get(i).getSort(), params1, tb.zTerm(i)), tb.seqGet(params.get(i).getSort(), params2, tb.zTerm(i)));
+                others = others.append(equality);
+            }
+        }
+
+        Term objectsIsomorphic = tb.tt();
+        if (objects1.size() != 0) {
+            Function objectsIsoFunction =
+                    (Function)proofConfig.getServices().getNamespaces().functions().lookup("objectsIsomorphic");
+            Function sameTypesFunction =
+                    (Function)proofConfig.getServices().getNamespaces().functions().lookup("sameTypes");
+            Term objectSeq1 = tb.seq(objects1);
+            Term objectSeq2 = tb.seq(objects2);
+            objectsIsomorphic = tb.and(tb.func(sameTypesFunction, objectSeq1, objectSeq1), tb.func(objectsIsoFunction, objectSeq1, objectSeq2));
+        }
+
+        Term nonObjectEquality = tb.and(others);
+        
+        return tb.and(nonObjectEquality, objectsIsomorphic);
+        */
+        return tb.equals(params1, params2);
+        //TODO JK serious! doesn't handle objects correctly, but how do I find out which elements ARE objects? Also, expressions which have to be evaluated on a heap won't work as well
+    }
+    
     public Term equivalenceInVisibleCase() {
-        Term visibleEquivalence = tb.and(equalMetadata(), tb.or(collectedConditionsForEquivalenceOfVisibleEvents()));
+
+        Term visibleEquivalence = tb.and(equalMetadata(), tb.or(tb.or(collectedConditionsForEquivalenceOfVisibleEvents()), equalContent()));
         return visibleEquivalence;
     }
     
