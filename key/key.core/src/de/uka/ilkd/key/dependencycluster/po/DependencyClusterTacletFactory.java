@@ -143,10 +143,10 @@ public class DependencyClusterTacletFactory {
         
         return tb.and(nonObjectEquality, objectsIsomorphic);
         */
-        Term heapUpdate1 = tb.elementary(tb.getBaseHeap(), heap1);
-        Term heapUpdate2 = tb.elementary(tb.getBaseHeap(), heap2);
-        return tb.equals(tb.apply(heapUpdate1, params1), tb.apply(heapUpdate2, params2));
-        //TODO JK serious! doesn't handle objects correctly, but how do I find out which elements ARE objects? Also, expressions which have to be evaluated on a heap won't work as well
+        
+        
+        return tb.equals(params1, params2);
+        //TODO JK serious! doesn't handle objects correctly, but how do I find out which elements ARE objects? How can I guarantee equality for them??? I'd need equality for their serializations, wouldn't I? HOW???
     }
     
     public Term equivalenceInVisibleCase() {
