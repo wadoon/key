@@ -1534,7 +1534,7 @@ primaryexpr returns [SLExpression ret=null] throws SLTranslationException
     |   TRUE         { result = new SLExpression(tb.tt()); }
     |   FALSE        { result = new SLExpression(tb.ff()); }
     |   NULL         { result = new SLExpression(tb.NULL()); }
-    |   result=jmlprimary   //TODO JK \result is probably in there, it needs special handling in a service context!!!!!!
+    |   result=jmlprimary
     |   THIS
         {
             if(selfVar == null) {
@@ -1757,10 +1757,17 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
 :
 	RESULT
 	{
-	    if(resultVar==null) {
-		raiseError("\\result used in wrong context");
-	    } else
+	  if (serviceContext != null) {
+	     KeYJavaType parameterType = serviceContext.getReturnType();
+	     Sort parameterSort = parameterType.getSort();
+	     Term resultTerm = tb.seqGet(parameterSort, tb.var(services.getTypeConverter().getTempEventLDT().getCurrentParams()), tb.zero());
+	     result = new SLExpression(resultTerm, parameterType);
+	  } else {
+   	  if(resultVar==null) {
+   		 raiseError("\\result used in wrong context");
+   	  } else
 	    result = new SLExpression(tb.var(resultVar), resultVar.getKeYJavaType());
+	  }
 	}
 	|
 	  EXCEPTION 
