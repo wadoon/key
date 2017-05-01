@@ -86,8 +86,8 @@ public class DependencyClusterTacletFactory {
         event1 = tb.func(ldt.evConst(), calltype1, direction1, component1, service1, params1, heap1);
         event2 = tb.func(ldt.evConst(), calltype2, direction2, component2, service2, params2, heap2);
         
-        updatedParams1 =tb.elementary(ldt.getCurrentParams(), params1);
-        updatedParams2 =tb.elementary(ldt.getCurrentParams(), params2); //TODO JK probably we'll need to make an updated heap as well. In the long run use a function here anyway...
+        updatedParams1 = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1), tb.elementary(ldt.getCurrentParams(), params1));
+        updatedParams2 = tb.parallel(tb.elementary(tb.getBaseHeap(), heap2), tb.elementary(ldt.getCurrentParams(), params2));
     }
     
     public Term findTermEquivalence() {
@@ -143,7 +143,9 @@ public class DependencyClusterTacletFactory {
         
         return tb.and(nonObjectEquality, objectsIsomorphic);
         */
-        return tb.equals(params1, params2);
+        Term heapUpdate1 = tb.elementary(tb.getBaseHeap(), heap1);
+        Term heapUpdate2 = tb.elementary(tb.getBaseHeap(), heap2);
+        return tb.equals(tb.apply(heapUpdate1, params1), tb.apply(heapUpdate2, params2));
         //TODO JK serious! doesn't handle objects correctly, but how do I find out which elements ARE objects? Also, expressions which have to be evaluated on a heap won't work as well
     }
     

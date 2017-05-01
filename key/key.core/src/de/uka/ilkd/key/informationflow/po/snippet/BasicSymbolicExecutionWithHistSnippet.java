@@ -21,13 +21,12 @@ public class BasicSymbolicExecutionWithHistSnippet
             posts = posts.append(d.tb.equals(poVars.post.self, poVars.pre.self));
         }
         
-        //TODO JK I don't think we need a result var
-        /*
-        if (ifVars.post.result != null) {
-            posts = posts.append(tb.equals(ifVars.post.result,
-                    ifVars.pre.result));
+
+        if (poVars.post.result != null) {
+            posts = posts.append(d.tb.equals(poVars.post.result,
+                    poVars.pre.result));
         }
-        */
+
         posts = posts.append(d.tb.equals(poVars.post.exception,
                 poVars.pre.exception));
         posts = posts.append(d.tb.equals(poVars.post.heap, d.tb.getBaseHeap()));
