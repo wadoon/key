@@ -51,7 +51,7 @@ public class TacletGenTest {
 		System.out.println(tac.toString());
 		System.out.println(services.getProfile().getJustification(tac).toString());
 		
-		SVInstantiations insts = null; //TODO: create this.
+		SVInstantiations insts = SVInstantiations.EMPTY_SVINSTANTIATIONS;
 		services.getProof().openGoals().head().addTaclet(tac, insts, true);
 		
 	}

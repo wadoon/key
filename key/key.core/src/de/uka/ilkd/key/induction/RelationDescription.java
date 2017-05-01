@@ -25,6 +25,7 @@ import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
 import de.uka.ilkd.key.util.Pair;
 
@@ -40,7 +41,7 @@ public class RelationDescription {
 		ConstructorExtractor ce = new ConstructorExtractor(t, serv);
 		TermBuilder tb = serv.getTermBuilder();
 		ImmutableArray<Function> constructors = ce.getConstructors();
-		LinkedList<Term> findTerms;
+		Iterable<Taclet> findTerms;
 		for(Function f : constructors){
 			try{
 				possibleSubstitutions.addAll(createSubstitutions(f, serv));
@@ -50,15 +51,19 @@ public class RelationDescription {
 			}
 		}
 		
-		//TODO: get the findTerms
+		//TODO: check for cast error
+		findTerms = serv.getProof().getInitConfig().activatedTaclets();
+		
+		
 		
 		atomics = new LinkedList<AtomicRelationDescription>();
-		/*for(Term findTerm : findTerms){
+		for(Taclet findTaclet : findTerms){
+			//TODO: solve error
 			atomics.add(new AtomicRelationDescription(
-					createRangeFormula(t, findTerm, serv),
+					createRangeFormula(t, findTaclet, serv),
 					possibleSubstitutions	//TODO: filter this list.
 					));
-		}*/
+		}
 	}
 	
 	public LinkedList<AtomicRelationDescription> getAtomics(){
@@ -129,6 +134,7 @@ public class RelationDescription {
 	 */
 	private static Name generateName(Function f, Services s, String suffix){
 		//TODO: better name generation maybe by existing code.
+		//
 		StringBuilder sb = new StringBuilder();
 		sb.append(f.name().toString());
 		sb.append("_");
