@@ -111,47 +111,51 @@ public class DependencyClusterTacletFactory {
         return equalMetadata;
     }
     
-    public Term equalContent() {
-        //TODO JK wait thats bullshit, that only works for the call input message! Handling objects in messages correctly here seems ugly and difficult, but its serious!
-        /*
-        ImmutableArray<KeYJavaType> params = contract.getTarget().getParamTypes();
-        ImmutableList<Term> objects1 = ImmutableSLList.<Term>nil();
-        ImmutableList<Term> objects2 = ImmutableSLList.<Term>nil();
-        ImmutableList<Term> others = ImmutableSLList.<Term>nil();
-        for (int i = 0; i < params.size(); i++) {
-            if (params.get(i).getSort().extendsTrans(proofConfig.getServices().getJavaInfo().objectSort())) {
-                objects1 = objects1.append(tb.seqGet(params.get(i).getSort(), params1, tb.zTerm(i)));
-                objects2 = objects2.append(tb.seqGet(params.get(i).getSort(), params2, tb.zTerm(i)));
+    public Term equivalenceForMessagesWithoutLowPart() {
+        ImmutableList<Term> collectedTerms = ImmutableSLList.<Term>nil();
+        for (Lowlist list:contract.getSpecs().head().getLowIn().append(contract.getSpecs().head().getLowOut())) {
+            Term specifiedCalltype;
+            if (list.getCallType() == Lowlist.MessageType.CALL) {
+                specifiedCalltype = tb.func(ldt.evCall());
             } else {
-                Term equality = tb.equals(tb.seqGet(params.get(i).getSort(), params1, tb.zTerm(i)), tb.seqGet(params.get(i).getSort(), params2, tb.zTerm(i)));
-                others = others.append(equality);
+                specifiedCalltype = tb.func(ldt.evTerm());
             }
+            Term specifiedDirection;
+            if (list.getDirection() == Lowlist.Direction.IN) {
+                specifiedDirection = tb.func(ldt.evIncoming());
+            } else {
+                specifiedDirection = tb.func(ldt.evOutgoing());
+            }
+            Term specifiedComponent = list.getCommunicationPartner().getTerm();
+            Term specifiedService = tb.func(ldt.getMethodIdentifier(list.getService().getMethodDeclaration(), proofConfig.getServices()));
+            
+            
+            
+            Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
+            Term equalDirections1 = tb.equals(direction1, specifiedDirection);
+            Term equalComponents1 = tb.equals(component1, specifiedComponent); //TODO JK arrrgh object equality stuff again... fix later?
+            Term equalServices1 = tb.equals(service1, specifiedService);
+            Term message1fitsSpec = tb.and(equalCalltypes1, equalDirections1, equalComponents1, equalServices1);
+            
+            Term equalCalltypes2 = tb.equals(calltype2, specifiedCalltype);
+            Term equalDirections2 = tb.equals(direction2, specifiedDirection);
+            Term equalComponents2 = tb.equals(component2, specifiedComponent); //TODO JK arrrgh object equality stuff again... fix later?
+            Term equalServices2 = tb.equals(service2, specifiedService);
+            Term message2fitsSpec = tb.and(equalCalltypes2, equalDirections2, equalComponents2, equalServices2);
+            
+            Term atLeastOneFitsSpec = tb.or(message1fitsSpec, message2fitsSpec);
+        
+            Term messageEquivalenceNotRestrictedByThisList = tb.not(atLeastOneFitsSpec);
+            collectedTerms = collectedTerms.append(messageEquivalenceNotRestrictedByThisList);
         }
-
-        Term objectsIsomorphic = tb.tt();
-        if (objects1.size() != 0) {
-            Function objectsIsoFunction =
-                    (Function)proofConfig.getServices().getNamespaces().functions().lookup("objectsIsomorphic");
-            Function sameTypesFunction =
-                    (Function)proofConfig.getServices().getNamespaces().functions().lookup("sameTypes");
-            Term objectSeq1 = tb.seq(objects1);
-            Term objectSeq2 = tb.seq(objects2);
-            objectsIsomorphic = tb.and(tb.func(sameTypesFunction, objectSeq1, objectSeq1), tb.func(objectsIsoFunction, objectSeq1, objectSeq2));
-        }
-
-        Term nonObjectEquality = tb.and(others);
-        
-        return tb.and(nonObjectEquality, objectsIsomorphic);
-        */
-        
-        
-        return tb.equals(params1, params2);
-        //TODO JK serious! doesn't handle objects correctly, but how do I find out which elements ARE objects? How can I guarantee equality for them??? I'd need equality for their serializations, wouldn't I? HOW???
+        return tb.and(collectedTerms);
     }
     
     public Term equivalenceInVisibleCase() {
-
-        Term visibleEquivalence = tb.and(equalMetadata(), tb.or(tb.or(collectedConditionsForEquivalenceOfVisibleEvents()), equalContent()));
+        //TODO JK next! make "everything" equivalent if nothings low 
+        Term equivMessagesWithLowPart = tb.and(equalMetadata(), tb.or(collectedConditionsForEquivalenceOfVisibleEvents()));
+        Term equivMessagesWithoutLowPart = equivalenceForMessagesWithoutLowPart();
+        Term visibleEquivalence = tb.or(equivMessagesWithLowPart, equivMessagesWithoutLowPart);
         return visibleEquivalence;
     }
     

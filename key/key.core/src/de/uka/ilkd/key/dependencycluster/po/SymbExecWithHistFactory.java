@@ -42,7 +42,7 @@ public class SymbExecWithHistFactory {
                 tb.func(ldt.evIncoming()), 
                 tb.var(ldt.getEnvironmentCaller()),
                 tb.func(ldt.getMethodIdentifier(contract.getTarget().getMethodDeclaration(), services)),
-                tb.seq(ifVars.formalParams), 
+                tb.seq(ifVars.pre.localVars), //TODO JK falsche variable
                 ifVars.pre.heap);
     }
     
