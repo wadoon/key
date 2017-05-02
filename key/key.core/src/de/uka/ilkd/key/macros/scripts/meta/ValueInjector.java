@@ -1,9 +1,6 @@
 package de.uka.ilkd.key.macros.scripts.meta;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Alexander Weigl
@@ -48,7 +45,12 @@ public class ValueInjector {
     }
 
     private Map getStringMap(Object obj, ProofScriptArgument vararg) throws IllegalAccessException {
-        return (Map) vararg.getField().get(obj);
+        Map map = (Map) vararg.getField().get(obj);
+        if (map == null) {
+            map = new HashMap();
+            vararg.getField().set(obj,map);
+        }
+        return map;
     }
 
     private void injectIntoField(ProofScriptArgument meta, Map<String, String> args, Object obj)
