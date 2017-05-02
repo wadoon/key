@@ -59,10 +59,10 @@ public class RelationDescription {
 		atomics = new LinkedList<AtomicRelationDescription>();
 		for(Taclet findTaclet : findTerms){
 			//TODO: solve error
-			atomics.add(new AtomicRelationDescription(
+			/*atomics.add(new AtomicRelationDescription(
 					createRangeFormula(t, findTaclet, serv),
 					possibleSubstitutions	//TODO: filter this list.
-					));
+					));*/
 		}
 	}
 	
