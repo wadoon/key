@@ -42,13 +42,14 @@ public class RelationDescription {
 		TermBuilder tb = serv.getTermBuilder();
 		ImmutableArray<Function> constructors = ce.getConstructors();
 		Iterable<Taclet> findTerms;
+		
+		possibleSubstitutions = new LinkedList<Pair<QuantifiableVariable, Term>>();
+		
+		System.out.println("Number of constructors: " + constructors.size());
+		
 		for(Function f : constructors){
-			try{
-				possibleSubstitutions.add(this.createSubstitutionForFunction(f, serv));
-			} catch (NullPointerException npe){
-				//no substitutions for the function f were found
-				//TODO: [optional] show the user that there are no rules for this function (maybe ask whether intended or not). 
-			}
+			System.out.println("Constructor: " + f.toString());
+			possibleSubstitutions.add(createSubstitutionForFunction(f, serv));
 		}
 		
 		//TODO: check for cast error
@@ -59,7 +60,7 @@ public class RelationDescription {
 		for(Taclet findTaclet : findTerms){
 			if(findTaclet instanceof FindTaclet){
 				Term rangeFormula = createRangeFormula(t, ((FindTaclet) findTaclet).find(), serv);
-				if(rangeFormula != tb.ff()){
+				if(rangeFormula != tb.ff()){	//just use rangeformula which are not false.
 					atomics.add(new AtomicRelationDescription(
 							rangeFormula,
 							possibleSubstitutions
@@ -86,14 +87,9 @@ public class RelationDescription {
 	 */
 	private static Term createRangeFormula(Term term, Term findTerm, Services s){
 		TermBuilder tb = s.getTermBuilder();
-		
-		System.out.println("Term: " + term + " has arity: " + term.arity());
-		
+				
 		if(term.arity() > 0){
 			if(findTerm.op() == term.op()){
-				System.out.println("Found top level match in: " + term.toString() + " vs. " + findTerm.toString());
-				
-				
 					LinkedList<Term> subterms = new LinkedList<Term>();
 					for(int i = 0; i < term.arity(); i++){
 						subterms.add(createRangeFormula(term.sub(i), findTerm.sub(i), s));

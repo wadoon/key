@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JTextArea;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -29,11 +30,6 @@ public class RelationDescriptionDialog extends JDialog {
 	public RelationDescriptionDialog(JFrame parent, Term term, Services s) {
 		super(parent, "Atomic Relation Descriptions");
 		
-		//TODO: REMOVE this is only for testing
-		//TacletGenTest tgt = new TacletGenTest(term, s);
-		//tgt.tacletGen();
-		//until here
-		
 		this.setVisible(true);
 		this.setSize(350, 175);
 		
@@ -53,7 +49,16 @@ public class RelationDescriptionDialog extends JDialog {
 		StringBuilder sb = new StringBuilder();
 		for(AtomicRelationDescription ard : loard){
 			sb.append(ard.toString());
+			sb.append("\n\n");
 		}
+		
+		JTextArea textarea = new JTextArea(30,10);
+		textarea.setLineWrap(true);
+		textarea.setWrapStyleWord(true);
+		textarea.setText(sb.toString());
+		textarea.setEditable(false);
+		
+		this.add(textarea);
 		
 	}
 }
