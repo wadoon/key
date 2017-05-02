@@ -58,10 +58,13 @@ public class RelationDescription {
 
 		for(Taclet findTaclet : findTerms){
 			if(findTaclet instanceof FindTaclet){
-				atomics.add(new AtomicRelationDescription(
-						createRangeFormula(t, ((FindTaclet) findTaclet).find(), serv),
-						possibleSubstitutions
-						));
+				Term rangeFormula = createRangeFormula(t, ((FindTaclet) findTaclet).find(), serv);
+				if(rangeFormula != tb.ff()){
+					atomics.add(new AtomicRelationDescription(
+							rangeFormula,
+							possibleSubstitutions
+							));
+				}
 			}
 		}
 		
@@ -83,6 +86,8 @@ public class RelationDescription {
 	 */
 	private static Term createRangeFormula(Term term, Term findTerm, Services s){
 		TermBuilder tb = s.getTermBuilder();
+		
+		System.out.println("Term: " + term + " has arity: " + term.arity());
 		
 		if(term.arity() > 0){
 			if(findTerm.op() == term.op()){
