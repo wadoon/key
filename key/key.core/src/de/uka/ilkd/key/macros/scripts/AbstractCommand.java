@@ -2,6 +2,7 @@ package de.uka.ilkd.key.macros.scripts;
 
 import java.io.StringReader;
 import java.util.*;
+import java.util.logging.Logger;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.scripts.meta.ArgumentsLifter;
@@ -33,6 +34,8 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
     protected EngineState state;
     protected AbstractUserInterfaceControl uiControl;
 
+    protected static Logger log = Logger.getLogger(ProofScriptCommand.class.getName());
+
     public AbstractCommand(Class<T> clazz) {
         this.parameterClazz = clazz;
     }
@@ -43,8 +46,7 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
         return ArgumentsLifter.inferScriptArguments(parameterClazz);
     }
 
-    @Override public T evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws Exception {
+    @Override public T evaluateArguments(EngineState state, Map<String, String> arguments) throws Exception {
         if (parameterClazz != null) {
             T obj = parameterClazz.newInstance();
             return state.getValueInjector().inject(obj, arguments);
@@ -52,8 +54,7 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
         return null;
     }
 
-    @Override public void execute(AbstractUserInterfaceControl uiControl,
-            T args, EngineState stateMap)
+    @Override public void execute(AbstractUserInterfaceControl uiControl, T args, EngineState stateMap)
             throws ScriptException, InterruptedException {
         proof = stateMap.getProof();
         service = proof.getServices();
@@ -76,8 +77,7 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
      * @throws ScriptException
      * @throws InterruptedException
      */
-    protected void execute(T args)
-            throws ScriptException, InterruptedException {
+    protected void execute(T args) throws ScriptException, InterruptedException {
 
     }
 }

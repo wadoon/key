@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.macros.scripts.meta.Option;
+import de.uka.ilkd.key.macros.scripts.meta.Varargs;
 import de.uka.ilkd.key.parser.ParserException;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -35,6 +36,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         @Option("on") Term on;
         @Option("formula") Term formula;
         @Option("occ") int occ = -1;
+        @Varargs(as=Term.class, prefix="inst_")
         Map<String, Term> instantiations = new HashMap<>();
     }
 
@@ -53,6 +55,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                 .inject(new Parameters(), arguments);
 
         // instantiation
+        /*
         arguments.forEach((String s, String value) -> {
             if (s.startsWith("inst_")) {
                 s = s.substring(5);
@@ -65,6 +68,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                 e.printStackTrace();
             }
         });
+        */
         return p;
     }
 
@@ -110,17 +114,13 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     }
 
     private static class TacletNameFilter extends TacletFilter {
-
         private final Name rulename;
-
         public TacletNameFilter(String rulename) {
             this.rulename = new Name(rulename);
         }
-
         @Override protected boolean filter(Taclet taclet) {
             return taclet.name().equals(rulename);
         }
-
     }
 
     private TacletApp makeTacletApp(Parameters p, EngineState state)

@@ -11,10 +11,11 @@ import java.lang.reflect.Field;
 public class ProofScriptArgument<T> {
     private ProofScriptCommand<T> command;
     private String name;
-    private Type type;
+    private Class type;
     private boolean required;
     private boolean flag;
     private Field field;
+    private boolean hasVariableArguments;
 
     public ProofScriptCommand<T> getCommand() {
         return command;
@@ -34,11 +35,11 @@ public class ProofScriptArgument<T> {
         return this;
     }
 
-    public Type getType() {
+    public Class getType() {
         return type;
     }
 
-    public ProofScriptArgument setType(Type type) {
+    public ProofScriptArgument setType(Class type) {
         this.type = type;
         return this;
     }
@@ -97,5 +98,14 @@ public class ProofScriptArgument<T> {
 
     public Field getField() {
         return field;
+    }
+
+    public ProofScriptArgument setVariableArguments(boolean hasVariableArguments) {
+        this.hasVariableArguments = hasVariableArguments;
+        return this;
+    }
+
+    public boolean hasVariableArguments() {
+        return hasVariableArguments;
     }
 }
