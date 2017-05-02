@@ -30,8 +30,8 @@ public class RelationDescriptionDialog extends JDialog {
 		super(parent, "Atomic Relation Descriptions");
 		
 		//TODO: REMOVE this is only for testing
-		TacletGenTest tgt = new TacletGenTest(term, s);
-		tgt.tacletGen();
+		//TacletGenTest tgt = new TacletGenTest(term, s);
+		//tgt.tacletGen();
 		//until here
 		
 		this.setVisible(true);

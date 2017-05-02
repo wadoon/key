@@ -54,16 +54,19 @@ public class RelationDescription {
 		//TODO: check for cast error
 		findTerms = serv.getProof().getInitConfig().activatedTaclets();
 		
-		
-		
 		atomics = new LinkedList<AtomicRelationDescription>();
 
-		/*for(Term findTerm : findTerms){
-			atomics.add(new AtomicRelationDescription(
-					createRangeFormula(t, findTerm, serv),
-					possibleSubstitutions
-					));
-		}*/
+		for(Taclet findTaclet : findTerms){
+			if(findTaclet instanceof FindTaclet){
+				atomics.add(new AtomicRelationDescription(
+						createRangeFormula(t, ((FindTaclet) findTaclet).find(), serv),
+						possibleSubstitutions
+						));
+			}
+		}
+		
+		System.out.println("number of atomics: " + atomics.size());
+		System.out.println("The first atomic: " + atomics.get(0).toString());
 	}
 	
 	public LinkedList<AtomicRelationDescription> getAtomics(){
@@ -81,22 +84,26 @@ public class RelationDescription {
 	private static Term createRangeFormula(Term term, Term findTerm, Services s){
 		TermBuilder tb = s.getTermBuilder();
 		
-		if(findTerm.op() == term.op()){
-			if(term.arity() > 0){
-				LinkedList<Term> subterms = new LinkedList<Term>();
-				for(int i = 0; i < term.arity(); i++){
-					subterms.add(createRangeFormula(term.sub(i), findTerm.sub(i), s));
-				}
-				return tb.and(subterms);	//how does add work? two parameters or more?
+		if(term.arity() > 0){
+			if(findTerm.op() == term.op()){
+				System.out.println("Found top level match in: " + term.toString() + " vs. " + findTerm.toString());
+				
+				
+					LinkedList<Term> subterms = new LinkedList<Term>();
+					for(int i = 0; i < term.arity(); i++){
+						subterms.add(createRangeFormula(term.sub(i), findTerm.sub(i), s));
+					}
+					return tb.and(subterms);
 			}
 			else{
-				//TODO:[optional] Maybe check arity for negative values and their handling
-				return tb.equals(term, findTerm);
+				return tb.ff();
 			}
 		}
 		else{
-			return tb.ff();
+			//TODO:[optional] Maybe check arity for negative values and their handling
+			return tb.equals(term, findTerm);
 		}
+		
 	}
 	
 	/**
@@ -152,10 +159,7 @@ public class RelationDescription {
 	 * @return a LinkedList&lt;Pair&lt;QuantifiableVariable, Term&gt;&gt; which contains constructor substitutions
 	 */
 	private static LinkedList<Pair<QuantifiableVariable, Term>> createSubstitutions(Function f, Services s){
-		
-		//ONLY FOR TESTING
-		System.out.println("Function: " + f.toString());
-		
+				
 		//neue SchemaVariablen für Substitution erstellen
 		
 		Sort returnSort = f.sort();

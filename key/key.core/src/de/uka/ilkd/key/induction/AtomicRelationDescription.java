@@ -105,18 +105,23 @@ public class AtomicRelationDescription {
 		sb.append("Range Formula:");
 		sb.append(this.rangeFormula.toString());
 		sb.append(", Substitutions: ");
-		for(Pair<QuantifiableVariable, Term> subst : this.domainSubstitution){
-			if(!firstElement){
-				sb.append(", ");
+		if(this.domainSubstitution != null){
+			for(Pair<QuantifiableVariable, Term> subst : this.domainSubstitution){
+				if(!firstElement){
+					sb.append(", ");
+				}
+				else{
+					firstElement = false;
+				}
+				sb.append("{");
+				sb.append(subst.first.toString());
+				sb.append("\\");
+				sb.append(subst.second.toString());
+				sb.append("}");
 			}
-			else{
-				firstElement = false;
-			}
-			sb.append("{");
-			sb.append(subst.first.toString());
-			sb.append("\\");
-			sb.append(subst.second.toString());
-			sb.append("}");
+		}
+		else{
+			sb.append("no substitution found.");
 		}
 		return sb.toString();
 	}
