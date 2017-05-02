@@ -5,6 +5,11 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.macros.scripts.EngineState;
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.PosTacletApp;
+import de.uka.ilkd.key.rule.TacletApp;
+import org.key_project.util.collection.ImmutableList;
 
 import java.util.List;
 import java.util.Map;
@@ -34,9 +39,19 @@ public class ScriptApi {
             ProofScriptCommandCall<T> call, ProjectedNode onNode,
             VariableAssignments varsAssignment) throws ScriptException, InterruptedException {
         //TODO VariableAssignments should be in instantiateCommand
+
+        state.setGoal(onNode.getProofNode());
         call.command.execute((AbstractUserInterfaceControl) api.getEnv().getUi(),
                 call.parameter, state);
-        return null; // TODO
+
+        ImmutableList<Goal> goals = api.getProof()
+                .getSubtreeGoals(onNode.getProofNode());
+        //TODO filter for open goals if necessary
+        ScriptResults sr = new ScriptResults();
+
+        goals.forEach(g -> sr.add(ScriptResult.create(g.node(), onNode, call)));
+
+        return sr;
     }
 
     /**
@@ -49,6 +64,13 @@ public class ScriptApi {
             throws Exception {
         return new ProofScriptCommandCall<>(command,
                 command.evaluateArguments(state, arguments));
+    }
+
+    //TODO
+    public void applyRule(String ruleName, String posInOcc) {
+        //TacletApp app = new PosTacletApp();
+        //TODO over RuleCommand
+
     }
 
     //matching Seq Term: matchResult

@@ -2,6 +2,7 @@ package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.macros.scripts.ScriptCommand;
+import de.uka.ilkd.key.proof.Node;
 
 import java.util.List;
 import java.util.Set;
@@ -26,12 +27,12 @@ public class ScriptResult {
     /**
      * The scriptcommand that lead to this result
      */
-    private ScriptCommand command;
+    private ProofScriptCommandCall call;
 
     /**
      * The reference to the variableassingments for this result
      */
-    private VariableAssignments assignments;
+    //private VariableAssignments assignments;
 
     /**
      * The list of labels for the result
@@ -40,17 +41,24 @@ public class ScriptResult {
 
     /**
      * List with line numbers
-     *
      */
-     private List<PositionInfo> linenumbers;
+    private List<PositionInfo> linenumbers;
 
     //getLineNumbers hier
 
     /**
      *
      */
-    ScriptResult(){
-    //nulls
+    ScriptResult() {
+        //nulls
+    }
+
+    public static <T> ScriptResult create(Node node, ProjectedNode onNode, ProofScriptCommandCall<T> call) {
+        ScriptResult sr = new ScriptResult();
+        sr.parentNode = onNode;
+        sr.newNode = new ProjectedNode(node, onNode);
+        sr.call = call;
+        return sr;
     }
 
     //setter
