@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -68,14 +69,12 @@ public class RelationDescription {
 				}
 			}
 		}
-		
-		System.out.println("number of atomics: " + atomics.size());
-		System.out.println("The first atomic: " + atomics.get(0).toString());
 	}
 	
 	public LinkedList<AtomicRelationDescription> getAtomics(){
 		return this.atomics;
 	}
+	
 	
 	/**
 	 * 
