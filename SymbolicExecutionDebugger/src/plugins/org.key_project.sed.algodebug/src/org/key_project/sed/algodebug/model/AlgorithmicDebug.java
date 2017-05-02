@@ -5,15 +5,29 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.sed.algodebug.LinkAction.AlgorithmicDebugCorrectAnnotationLinkAction;
 import org.key_project.sed.algodebug.LinkAction.AlgorithmicDebugFalseAnnotationLinkAction;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotationType;
+import org.key_project.sed.core.annotation.impl.AlgorithmicDebugCorrectAnnotation;
 import org.key_project.sed.core.annotation.impl.AlgorithmicDebugCorrectAnnotationType;
+import org.key_project.sed.core.annotation.impl.AlgorithmicDebugFalseAnnotation;
+import org.key_project.sed.core.annotation.impl.AlgorithmicDebugFalseAnnotationType;
+import org.key_project.sed.core.annotation.impl.HighlightAnnotation;
+import org.key_project.sed.core.annotation.impl.HighlightAnnotationType;
+import org.key_project.sed.core.model.ISEBranchCondition;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.util.SEAnnotationUtil;
+import org.key_project.util.java.ArrayUtil;
+import org.key_project.util.java.IFilter;
 
 /**
  * @author Peter Schauberger
  */
 public class AlgorithmicDebug  {
+   
+   //Letzten Call zwischenspeichern um Rückgängigmachen des Highlighting in unhighlight zu ermöglichen
+   private Call lastHighlightedCall;
    
    public AlgorithmicDebug() {
       path = null;
@@ -84,7 +98,14 @@ public class AlgorithmicDebug  {
       Shell shell = Display.getCurrent().getActiveShell();
       
       while(  !(node instanceof ISEThread)){
-         if(node == call.getCall()){
+//         try {
+//            System.out.println("annotiere: "+node.getName().toString() +" und hasUnAnnotatedChildren(node) ist: "+hasUnAnnotatedChildren(node));
+//         }
+//         catch (DebugException e1) {
+//            // TODO Auto-generated catch block
+//            e1.printStackTrace();
+//         }
+         if(node == call.getCall() || (node instanceof ISEBranchCondition && hasUnAnnotatedChildren(node))){
             annotateNode(shell, node, bool); //annotieren
             break;
             }
@@ -102,13 +123,116 @@ public class AlgorithmicDebug  {
       
       }
    
+
+   
+   public void highlightCall(Call call){
+
+      ISENode node = call.getRet();
+      Shell shell = Display.getCurrent().getActiveShell();
+      
+      while(  !(node instanceof ISEThread)){
+         try {
+            System.out.println("++++Highlighte Node: "+node.getName().toString());
+         }
+         catch (DebugException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+         }
+            if(node == call.getCall() || (node instanceof ISEBranchCondition && hasUnAnnotatedChildren(node))){
+               highlightNode(shell, node); //annotieren
+               break;
+               }
+            else{
+               highlightNode(shell, node); //annotieren
+            }
+      
+
+         try {
+            node = node.getParent();
+         }
+         catch (DebugException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+      }
+      lastHighlightedCall = call;
+      
+      }
+   
+   public void unhighlight(){
+      
+      if(lastHighlightedCall != null){
+         ISENode node = lastHighlightedCall.getRet();
+         ISEAnnotationType annotationTypeHighlight = SEAnnotationUtil.getAnnotationtype(HighlightAnnotationType.TYPE_ID);
+         ISEAnnotation[]  registeredAnnotationsHighlight = node.getDebugTarget().getRegisteredAnnotations(annotationTypeHighlight);
+   
+         
+         try {
+            while(  !(node instanceof ISEThread) ){ //!(node == lastHighlightedCall.getCall())){
+               System.out.println("----UNhighlighte Node: "+node.getName().toString());
+
+               ISEAnnotation annotationHighlight = ArrayUtil.search(registeredAnnotationsHighlight, new IFilter<ISEAnnotation>() {
+                  @Override
+                  public boolean select(ISEAnnotation element) {
+                     return element instanceof HighlightAnnotation; 
+                  }
+               });
+               if(annotationHighlight != null){
+                  node.removeAnnotationLink(annotationTypeHighlight.createLink(annotationHighlight, node));
+                  System.out.println("Highlight zum löschen gefunden :-]");
+               }
+               
+               try {
+                  node = node.getParent();
+               }
+               catch (DebugException e) {
+                  // TODO Auto-generated catch block
+                  e.printStackTrace();
+                  }
+               }
+         }
+         catch (DebugException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+         }
+   }
+   
+ public void highlightNode(Shell shell, ISENode node) {  
+  
+    ISEAnnotationType annotationTypeHighlight = SEAnnotationUtil.getAnnotationtype(HighlightAnnotationType.TYPE_ID);   
+    ISEAnnotation[] registeredAnnotationsHighlight = node.getDebugTarget().getRegisteredAnnotations(annotationTypeHighlight);
+    
+    ISEAnnotation annotationHighlight = ArrayUtil.search(registeredAnnotationsHighlight, new IFilter<ISEAnnotation>() {
+       @Override
+       public boolean select(ISEAnnotation element) {
+          return element instanceof HighlightAnnotation; 
+       }
+    });
+      
+      if(annotationHighlight == null){
+         ISEDebugTarget target = node.getDebugTarget();
+         annotationHighlight = annotationTypeHighlight.createAnnotation();
+         target.registerAnnotation(annotationHighlight);
+      }
+
+      //If AnnotationLink was not found, we create a new one and attach it to the node
+        if(node.getAnnotationLinks(annotationTypeHighlight).length == 0){
+           node.addAnnotationLink(annotationTypeHighlight.createLink(annotationHighlight, node));
+        }
+        
+   }
+ 
    /*
     * Gibt wahr zurück wenn es Kinder gibt die nicht korrekt annotiert wurden
     */
    private boolean hasUnAnnotatedChildren(ISENode node){
       try {
          for(ISENode child : node.getChildren()){
-            if(node.getAnnotationLinks(SEAnnotationUtil.getAnnotationtype(AlgorithmicDebugCorrectAnnotationType.TYPE_ID)).length == 0){ //Knoten bereits korrekt markiert
+            int len = node.getAnnotationLinks(SEAnnotationUtil.getAnnotationtype(AlgorithmicDebugCorrectAnnotationType.TYPE_ID)).length;
+            //System.out.println("Anzahl Correkt Markierungen:" +len);
+            if(len == 0){ //Knoten bereits korrekt markiert
+               //System.out.println(child.getName().toString());
                return true;
                }
          }

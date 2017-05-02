@@ -21,6 +21,7 @@ import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.util.ColorConstant;
 import org.eclipse.swt.graphics.RGB;
 import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.impl.HighlightAnnotation;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.ui.visualization.util.GraphitiUtil;
 import org.key_project.sed.ui.visualization.util.VisualizationPreferences;
@@ -78,6 +79,27 @@ public final class ExecutionTreeStyleUtil {
       return style;
    }
 
+   public static int getLineWidthForDebugNode(ISEAnnotation[] annotations){
+      int width = 1;
+      ISEAnnotation highlightAnnotation = searchHighlightAnnotation(annotations);
+      if (highlightAnnotation != null) {
+         width = 4;
+         }
+      return width;
+   }
+   
+   /**
+    * @author Peter Schauberger
+    */
+   public static ISEAnnotation searchHighlightAnnotation(ISEAnnotation[] annotations) {
+      return ArrayUtil.search(annotations, new IFilter<ISEAnnotation>() {
+         @Override
+         public boolean select(ISEAnnotation element) {
+               return  element instanceof HighlightAnnotation;
+            }
+      });
+   }
+   
    /**
     * Returns the {@link Style} used for text in {@link ISENode}s.
     * @param annotations The available {@link ISEAnnotation}.

@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.key_project.sed.core.model.ISEBaseMethodReturn;
+import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEMethodCall;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEThread;
@@ -176,7 +177,10 @@ public class CallTree {
             }
             else if(node instanceof ISEMethodCall){
                //System.out.println("Adding Call: From "+node.getName());//+"to"+deque.getFirst().getName());
-               path.addCall(new Call(node, deque.pop()));
+               if(!( deque.peekLast() instanceof ISEExceptionalMethodReturn))
+                  path.addCall(new Call(node, deque.pop()));
+               else
+                  path.addCall(new Call(node, deque.peekLast()));
             }
                node = node.getParent();
             }

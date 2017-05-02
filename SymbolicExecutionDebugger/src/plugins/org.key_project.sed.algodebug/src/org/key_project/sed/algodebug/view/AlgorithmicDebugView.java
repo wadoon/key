@@ -39,7 +39,6 @@ public class AlgorithmicDebugView extends ViewPart implements Observer {
    private Shell shell;
    private Call actualCall;
    
-   
    public AlgorithmicDebugView(){
       debug = new AlgorithmicDebug();
       shell = Display.getCurrent().getActiveShell();
@@ -47,6 +46,8 @@ public class AlgorithmicDebugView extends ViewPart implements Observer {
    
    private void showQuestionCall(Call call){
       try {
+         debug.unhighlight();
+         debug.highlightCall(call);
          methodNameLabel.setText(call.getCall().getName().toString());
          StringBuffer constraintText = new StringBuffer();
          for( ISEConstraint c : call.getRet().getConstraints()){
