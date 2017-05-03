@@ -387,7 +387,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                     // if pm is part of a remote interface ensure free "\fresh" (may still be null though)
             		(pm.getMethodDeclaration().isRemote() && resultTerm.sort().extendsSorts().contains(services.getJavaInfo().objectSort())) ?
             		tb.not(tb.created(heapAtPres.get(services.getTypeConverter().getHeapLDT().getHeap()), resultTerm)) : 
-            		tb.tt()); // TODO KD a re-check
+            		tb.tt());
         } else {
             result = tb.tt();
         }
