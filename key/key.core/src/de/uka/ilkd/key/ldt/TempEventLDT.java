@@ -171,11 +171,11 @@ public class TempEventLDT extends LDT {
     
     // TODO KD ask: is this the right place for the method?
     public Function getMethodIdentifier(MethodDeclaration md, TermServices services) {
-        Function f = (Function)services.getNamespaces().methodIdentifiers().lookup(md.getProgramElementName());
+        Function f = (Function)services.getNamespaces().functions().lookup(md.getProgramElementName());
         if (f == null) {
             //add the function
             f = new Function(md.getProgramElementName(), (Sort)services.getNamespaces().sorts().lookup(METHOD_SORT));
-            services.getNamespaces().methodIdentifiers().addSafely(f);
+            services.getNamespaces().functions().addSafely(f);
         }
         return f;
     }
