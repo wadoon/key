@@ -1785,6 +1785,9 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
          => result = sequence    
     
     |   LPAREN result=expression RPAREN
+    |   METHODID LPAREN classid = IDENT DOT methid = IDENT RPAREN { // TODO KD z hacky
+      result = new SLExpression(tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifierByString(/*classid.getText() + "_" +*/ methid.getText(), services)/*, MRTHODTYPE*/));
+    }
 ;
 
 
@@ -2091,6 +2094,10 @@ builtintype returns [KeYJavaType type = null] throws SLTranslationException
         |   SEQ
             {
                 type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_SEQ);
+            }
+        |   EVENT // TODO KD z maybe hack
+            {
+                type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_EVENT);
             }
         | FREE { type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_FREE_ADT); }
 	)

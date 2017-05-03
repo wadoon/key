@@ -67,8 +67,10 @@ import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -665,6 +667,16 @@ public final class UseOperationContractRule implements BuiltInRule {
         return false;
     }
 
+    private Term filterInv(Term t, Term contractSelf, TermBuilder tb) { // TODO KD z hacky
+    	if (t.op().toString().equals("java.lang.Object::<inv>") && t.sub(1) == contractSelf) {
+    		return tb.tt();
+    	} else if (t.op() == Junctor.AND) {
+    		return tb.and(filterInv(t.sub(0), contractSelf, tb), filterInv(t.sub(1), contractSelf, tb));
+    	} else {
+			return t;
+		}
+    }
+    
 	@Override
 	public ImmutableList<Goal> apply(Goal goal,
 			Services services,
@@ -722,12 +734,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 		}
 		final Term globalDefs = contract.getGlobalDefs(baseHeap, baseHeapTerm, contractSelf,
 				contractParams, services);
-		final Term originalPre  = contract.getPre(heapContext,
-				heapTerms,
-				contractSelf,
-				contractParams,
-				atPres,
-				services);
+		final Term originalPre = pm.getMethodDeclaration().isRemote() ? // TODO KD z hacky
+				filterInv(contract.getPre(heapContext, heapTerms, contractSelf, contractParams, atPres, services), contractSelf, tb) :
+				contract.getPre(heapContext, heapTerms, contractSelf, contractParams, atPres, services);
 		final Term pre = globalDefs==null? originalPre: tb.apply(globalDefs, originalPre);
 		final Term originalPost = contract.getPost(heapContext,
 				heapTerms,
@@ -818,7 +827,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 		}
 
 		// modify history
-		final ProgramVariable selfVar = tb.selfVar(pm, contract.getKJT(), false);
+		final ProgramVariable selfVar = (ProgramVariable)(services.getNamespaces().programVariables().lookup(tb.selfVar(pm, contract.getKJT(), false).name()));
+		//final ProgramVariable selfVar = tb.selfVar(pm, contract.getKJT(), false);
 		final Term selfVarTerm = (selfVar != null) ? tb.var(selfVar) : null;
 		LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
 		ProgramElementName beforeHistName = new ProgramElementName(tb.newName(hist + "Before_" + pm.getName()));
@@ -833,8 +843,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 		if (pm.getMethodDeclaration().isRemote()) {
 			assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
 			// TODO KD z could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor() and selfVarTerm != contractSelf
-			Term method = tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), services));
-			Term resultTerm = contract.hasResultVar() ? tb.seqSingleton(contract.getResult()) : tb.seqEmpty();
+			Term method = tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifierByDeclaration(pm.getMethodDeclaration(), services));
+			Term resultTerm = contractResult != null ? tb.seqSingleton(contractResult) : tb.seqEmpty();
+			//Term resultTerm = inst.actualResult != null ?
+			//		tb.seqSingleton((tb.var((LocationVariable)inst.actualResult))) :
+			//		tb.seqEmpty();
+			
 			// throws Exception if pm.getMethodDeclaration().isStatic()
 			Term outCallEvent = tb.evConst(tb.evCall(), selfVarTerm, contractSelf, method, tb.seq(contractParams), anonUpdateDatas.head().methodHeapAtPre);
 			// throws Exception if pm.getMethodDeclaration().isStatic()

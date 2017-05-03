@@ -29,6 +29,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
+import recoder.java.Identifier;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTList;
@@ -1331,8 +1332,7 @@ public class Recoder2KeYConverter {
 			    	break;
 				}
 			}
-
-/* TODO KD a finish this
+/* TODO KD a implement
 			// TODO KD z if <>-Method don't do?
 			if (parent instanceof recoder.java.declaration.ClassDeclaration) {
 				recoder.java.declaration.ClassDeclaration parentClass = (recoder.java.declaration.ClassDeclaration) parent;
@@ -1387,7 +1387,7 @@ public class Recoder2KeYConverter {
 					}
 				}
 			} else { // parent of method is neither a class nor an interface
-				assert false : "Methods should belong to Classes or Inetrfaces.";
+				assert false : "Methods should belong to Classes or Inetrfaces."; // TODO KD f right?
 			}
 */
 

@@ -97,12 +97,20 @@ public class RemoteMethodEventLDT extends LDT {
 		return caller;
 	}
 
-	//maybe put somewhere else?
-	public Function getMethodIdentifier(MethodDeclaration md, TermServices services) {
-	    Function f = (Function)services.getNamespaces().methodIdentifier().lookup(md.getProgramElementName());
+	// maybe put somewhere else?
+	public Function getMethodIdentifierByDeclaration(MethodDeclaration md, TermServices services) { // TODO KD z use more than just method name
+	    String string = md.getFullName();
+		return getMethodIdentifierByString(string, services);
+	}
+	public Function getMethodIdentifierByString(String string, TermServices services) {
+		Name name = new Name(string);
+		return getMethodIdentifierByName(name, services);
+	}
+	public Function getMethodIdentifierByName(Name name, TermServices services) {
+	    Function f = (Function) services.getNamespaces().methodIdentifier().lookup(name);
 	    if (f == null) {
 	        //add the function
-	        f = new Function(md.getProgramElementName(), (Sort)services.getNamespaces().sorts().lookup(METHOD_SORT));
+	        f = new Function(name, (Sort)services.getNamespaces().sorts().lookup(METHOD_SORT));
 	        services.getNamespaces().methodIdentifier().addSafely(f);
 	    }
 	    return f;
