@@ -4,6 +4,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.ldt.TempEventLDT;
@@ -14,6 +15,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
@@ -26,6 +28,7 @@ public class DependencyClusterTacletFactory {
     private final InitConfig proofConfig;
     private final TermBuilder tb;
     private final TempEventLDT ldt;
+    private final IFProofObligationVars poVars;
     
     Term calltype1;
     Term calltype2;
@@ -51,7 +54,7 @@ public class DependencyClusterTacletFactory {
     Term updatedParams1;
     Term updatedParams2;
     
-    public DependencyClusterTacletFactory(DependencyClusterContract contract, InitConfig proofConfig) {
+    public DependencyClusterTacletFactory(DependencyClusterContract contract, InitConfig proofConfig, IFProofObligationVars poVars) {
         this.contract = contract;
         this.proofConfig = proofConfig;
         ldt = proofConfig.getServices().getTypeConverter().getTempEventLDT();
@@ -88,6 +91,8 @@ public class DependencyClusterTacletFactory {
         
         updatedParams1 = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1), tb.elementary(ldt.getCurrentParams(), params1));
         updatedParams2 = tb.parallel(tb.elementary(tb.getBaseHeap(), heap2), tb.elementary(ldt.getCurrentParams(), params2));
+        
+        this.poVars = poVars;
     }
     
     public Term findTermEquivalence() {
@@ -102,16 +107,24 @@ public class DependencyClusterTacletFactory {
         return bothInvis;
     }
     
+    public Term bothEventsVisible() {
+        Term event1Vis = tb.not(tb.func(ldt.invEvent(), event1));
+        Term event2Vis = tb.not(tb.func(ldt.invEvent(), event2));
+        Term bothVis = tb.and(event1Vis, event2Vis);
+        return bothVis;
+    }
+    
     public Term equalMetadata() {
         Term equalType = tb.equals(calltype1, calltype2);
         Term equalDirection = tb.equals(direction1, direction2);
-        Term equalPartner = tb.equals(component1, component2); //TODO JK does simple equality work here???
+        Term equalPartner = tb.equals(component1, component2);
         Term equalService = tb.equals(service1, service2);
         Term equalMetadata = tb.and(equalType, equalDirection, equalPartner, equalService);
         return equalMetadata;
     }
     
     public Term equivalenceForMessagesWithoutLowPart() {
+        //TODO JK Do I still need this??? When are messages equivalent if they have no specified low parts in their content?
         ImmutableList<Term> collectedTerms = ImmutableSLList.<Term>nil();
         for (Lowlist list:contract.getSpecs().head().getLowIn().append(contract.getSpecs().head().getLowOut())) {
             Term specifiedCalltype;
@@ -127,35 +140,76 @@ public class DependencyClusterTacletFactory {
                 specifiedDirection = tb.func(ldt.evOutgoing());
             }
             Term specifiedComponent = list.getCommunicationPartner().getTerm();
+            Term updateHeapAndSelf = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1), tb.elementary(contract.getSelfVar(), poVars.c1.pre.self));
+            Term updatedspecifiedComponent = tb.apply(updateHeapAndSelf, specifiedComponent);
+            
+            
             Term specifiedService = tb.func(ldt.getMethodIdentifier(list.getService().getMethodDeclaration(), proofConfig.getServices()));
             
             
             
             Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
             Term equalDirections1 = tb.equals(direction1, specifiedDirection);
-            Term equalComponents1 = tb.equals(component1, specifiedComponent); //TODO JK arrrgh object equality stuff again... fix later?
+            Term equalComponents1 = tb.equals(component1, updatedspecifiedComponent);
             Term equalServices1 = tb.equals(service1, specifiedService);
             Term message1fitsSpec = tb.and(equalCalltypes1, equalDirections1, equalComponents1, equalServices1);
             
+            //We don't need that part since the messages have equal metadata here anyway
+            /*
             Term equalCalltypes2 = tb.equals(calltype2, specifiedCalltype);
             Term equalDirections2 = tb.equals(direction2, specifiedDirection);
-            Term equalComponents2 = tb.equals(component2, specifiedComponent); //TODO JK arrrgh object equality stuff again... fix later?
+            Term equalComponents2 = tb.equals(component2, specifiedComponent);
             Term equalServices2 = tb.equals(service2, specifiedService);
             Term message2fitsSpec = tb.and(equalCalltypes2, equalDirections2, equalComponents2, equalServices2);
             
             Term atLeastOneFitsSpec = tb.or(message1fitsSpec, message2fitsSpec);
         
             Term messageEquivalenceNotRestrictedByThisList = tb.not(atLeastOneFitsSpec);
+            */
+            Term messageEquivalenceNotRestrictedByThisList = tb.not(message1fitsSpec);
             collectedTerms = collectedTerms.append(messageEquivalenceNotRestrictedByThisList);
         }
         return tb.and(collectedTerms);
     }
     
+    public Term invisibilityForMessagesWithoutSpec() {
+        ImmutableList<Term> collectedTerms = ImmutableSLList.<Term>nil();
+        for (VisibilityCondition condition:contract.getSpecs().head().getVisible()) {
+            Term specifiedCalltype;
+            if (condition.getMessageType() == VisibilityCondition.MessageType.CALL) {
+                specifiedCalltype = tb.func(ldt.evCall());
+            } else {
+                specifiedCalltype = tb.func(ldt.evTerm());
+            }
+            Term specifiedDirection;
+            if (condition.getDirection() == VisibilityCondition.Direction.IN) {
+                specifiedDirection = tb.func(ldt.evIncoming());
+            } else {
+                specifiedDirection = tb.func(ldt.evOutgoing());
+            }
+            Term specifiedComponent = condition.getCommunicationPartner().getTerm();
+            Term updateHeapAndSelf = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1), tb.elementary(contract.getSelfVar(), poVars.c1.pre.self));
+            Term updatedspecifiedComponent = tb.apply(updateHeapAndSelf, specifiedComponent);
+            
+            
+            Term specifiedService = tb.func(ldt.getMethodIdentifier(condition.getServiceContext().getMethodDeclaration(), proofConfig.getServices()));
+            
+            
+            
+            Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
+            Term equalDirections1 = tb.equals(direction1, specifiedDirection);
+            Term equalComponents1 = tb.equals(component1, updatedspecifiedComponent);
+            Term equalServices1 = tb.equals(service1, specifiedService);
+            Term message1fitsSpec = tb.and(equalCalltypes1, equalDirections1, equalComponents1, equalServices1);
+        
+            Term messageInvisibilityNotRestrictedByThisCondition = tb.not(message1fitsSpec);
+            collectedTerms = collectedTerms.append(messageInvisibilityNotRestrictedByThisCondition);
+        }
+        return tb.and(collectedTerms);
+    }
+    
     public Term equivalenceInVisibleCase() {
-        //TODO JK next! make "everything" equivalent if nothings low 
-        Term equivMessagesWithLowPart = tb.and(equalMetadata(), tb.or(collectedConditionsForEquivalenceOfVisibleEvents()));
-        Term equivMessagesWithoutLowPart = equivalenceForMessagesWithoutLowPart();
-        Term visibleEquivalence = tb.or(equivMessagesWithLowPart, equivMessagesWithoutLowPart);
+        Term visibleEquivalence = tb.and(bothEventsVisible(), equalMetadata(), tb.or(collectedConditionsForEquivalenceOfVisibleEvents()));
         return visibleEquivalence;
     }
     
@@ -200,10 +254,10 @@ public class DependencyClusterTacletFactory {
     }
     
     public Term replaceTermInvisibility() {
-        return tb.not(eventVisible());
+        return tb.or(tb.not(eventVisibleDueToExplicitSpec()), invisibilityForMessagesWithoutSpec());
     }
 
-    public Term eventVisible() {
+    public Term eventVisibleDueToExplicitSpec() {
         ImmutableList<Term> conditions = ImmutableSLList.<Term>nil();
         for (VisibilityCondition condition: contract.getSpecs().head().getVisible()) {
             Term checkDirection;
@@ -219,12 +273,15 @@ public class DependencyClusterTacletFactory {
             } else {
                 checkCalltype = tb.func(ldt.evTerm());
             }
-            Term checkComponent = condition.getCommunicationPartner().getTerm(); //TODO JK probably not that easy! Maybe we need to evaluate the component on a specific Heap or something
+            Term checkComponent = condition.getCommunicationPartner().getTerm();
+            Term updateHeapAndSelf = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1), tb.elementary(contract.getSelfVar(), poVars.c1.pre.self));
+            Term updatedCheckComponent = tb.apply(updateHeapAndSelf, checkComponent);
+            
             Term checkService = tb.func(ldt.getMethodIdentifier(condition.getServiceContext().getMethodDeclaration(), proofConfig.getServices()));
             
             Term dirEq = tb.equals(direction1, checkDirection);
             Term typeEq = tb.equals(calltype1, checkCalltype);
-            Term compEq = tb.equals(component1, checkComponent); //TODO JK probably not that easy! Object equalities are annoying...
+            Term compEq = tb.equals(component1, updatedCheckComponent);
             Term servEq = tb.equals(service1, checkService);
             Term metadataFits = tb.and(dirEq, typeEq, compEq, servEq);
             
@@ -240,6 +297,9 @@ public class DependencyClusterTacletFactory {
     public ImmutableList<Term> collectedConditionsForEquivalenceOfVisibleEvents() {
         ImmutableList<Term> collectedConditionsForEquivalenceOfVisibleEvents = equivalenceConditionsForLowlist(contract.getSpecs().head().getLowIn());
         collectedConditionsForEquivalenceOfVisibleEvents = collectedConditionsForEquivalenceOfVisibleEvents.append(equivalenceConditionsForLowlist(contract.getSpecs().head().getLowOut()));
+        
+        Term equivalenceForMessagesWithoutLowPart = equivalenceForMessagesWithoutLowPart();
+        collectedConditionsForEquivalenceOfVisibleEvents = collectedConditionsForEquivalenceOfVisibleEvents.append(equivalenceForMessagesWithoutLowPart);
         return collectedConditionsForEquivalenceOfVisibleEvents;
     }
     
@@ -260,12 +320,15 @@ public class DependencyClusterTacletFactory {
             } else {
                 checkCalltype = tb.func(ldt.evTerm());
             }
-            Term checkComponent = list.getCommunicationPartner().getTerm(); //TODO JK probably not that easy! Maybe we need to evaluate the component on a specific Heap or something
+            Term checkComponent = list.getCommunicationPartner().getTerm();
+            Term updateHeapAndSelf = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1), tb.elementary(contract.getSelfVar(), poVars.c1.pre.self));
+            Term updatedCheckComponent = tb.apply(updateHeapAndSelf, checkComponent);
+            
             Term checkService = tb.func(ldt.getMethodIdentifier(list.getService().getMethodDeclaration(), proofConfig.getServices()));
             
             Term dirEq = tb.equals(direction1, checkDirection);
             Term typeEq = tb.equals(calltype1, checkCalltype);
-            Term compEq = tb.equals(component1, checkComponent); //TODO JK probably not that easy! Object equalities are annoying...
+            Term compEq = tb.equals(component1, updatedCheckComponent);
             Term servEq = tb.equals(service1, checkService);
             Term metadataFits = tb.and(dirEq, typeEq, compEq, servEq);
 
@@ -290,7 +353,7 @@ public class DependencyClusterTacletFactory {
                 expressionsEq = expressionsEq.append(tb.equals(t1, t2));
             }
             
-            //TODO JK Objects
+            //Objects
             if (!getObjects(list.getLowTerms()).isEmpty()) {
                 Term objects = tb.seq(getObjects(list.getLowTerms()));
                 Term t1 = tb.apply(updatedParams1, objects);
