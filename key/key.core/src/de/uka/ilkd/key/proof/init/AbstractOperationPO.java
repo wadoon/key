@@ -409,7 +409,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 					// TODO KD z could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor() (caller cannot be selfVarTerm)
 					LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
 					LocationVariable caller = new LocationVariable(new ProgramElementName("Caller"), proofServices.getJavaInfo().objectSort());
-					Term method = tb.func(proofServices.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), proofServices));
+					Term method = tb.func(proofServices.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifierByDeclaration(pm.getMethodDeclaration(), proofServices));
 					Term resultTerm = (resultVar != null) ? tb.seqSingleton(tb.var(resultVar)) : tb.seqEmpty();
 					// throws Exception if pm.getMethodDeclaration().isStatic()
 					Term inCallEvent = tb.evConst(tb.evCall(), tb.var(caller), selfVarTerm, method, tb.seq(tb.var(paramVars)), tb.getBaseHeap());

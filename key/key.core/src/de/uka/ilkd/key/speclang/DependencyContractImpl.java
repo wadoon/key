@@ -260,7 +260,7 @@ public final class DependencyContractImpl implements DependencyContract {
             Map<LocationVariable,Term> atPres,
             Services services) {
         Term result = null;
-        for(LocationVariable heap : heapContext) {
+        for(LocationVariable heap : heapContext) { // TODO KD z maybe need to change something for <inv>
             final Term p = getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
             if(result == null) {
                 result = p;

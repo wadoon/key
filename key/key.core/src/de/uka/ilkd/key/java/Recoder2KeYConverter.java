@@ -1316,16 +1316,15 @@ public class Recoder2KeYConverter {
 			// check if method belongs to a Remote InterfaceNonTerminalProgramElement parent = md.getASTParent();
 			NonTerminalProgramElement parent = md.getASTParent();
 			boolean isRemote = false;
-/*			List<recoder.java.declaration.AnnotationUseSpecification> annotations = new LinkedList<>();
+			List<recoder.java.declaration.AnnotationUseSpecification> annotations = md.getAnnotations(); // just in case
 	        if (parent instanceof recoder.java.declaration.ClassDeclaration) {
 				recoder.java.declaration.ClassDeclaration parentClass = (recoder.java.declaration.ClassDeclaration) parent;
 				annotations.addAll(parentClass.getAnnotations());
 			}
-			if (md.getASTParent() instanceof recoder.java.declaration.InterfaceDeclaration) {
+			if (parent instanceof recoder.java.declaration.InterfaceDeclaration) {
 				recoder.java.declaration.InterfaceDeclaration parentClass = (recoder.java.declaration.InterfaceDeclaration) parent;
 				annotations.addAll(parentClass.getAnnotations());
 			}
-			boolean isRemote = false;
 			for (recoder.java.declaration.AnnotationUseSpecification a : annotations) {
 				recoder.java.reference.TypeReference tr = (recoder.java.reference.TypeReference) a.getChildAt(0);
 				if (tr.getName().equals("Remote")) {
@@ -1333,7 +1332,7 @@ public class Recoder2KeYConverter {
 			    	break;
 				}
 			}
-*/
+/* TODO KD a implement
 			// TODO KD z if <>-Method don't do?
 			if (parent instanceof recoder.java.declaration.ClassDeclaration) {
 				recoder.java.declaration.ClassDeclaration parentClass = (recoder.java.declaration.ClassDeclaration) parent;
@@ -1353,30 +1352,26 @@ public class Recoder2KeYConverter {
 								recoder.java.reference.TypeReference tr = (recoder.java.reference.TypeReference) parentClass.getImplementedTypes().getChildAt(i);
 								System.out.println(tr.getParent());
 							}
-/*
- 							for (Interface interface : information) {
-								if (interface.contains(method)) {
-									return true;
-								}
-							}
-							return false;
-*/
+// 							for (Interface interface : information) {
+//								if (interface.contains(method)) {
+//									return true;
+//								}
+//							}
+//							return false;
 						} else { // no Interfaces are specified with the Remote annotation
-/*
-							boolean interfaceHasRemoteAnnotation = false;
-							boolean nonRemoteInterfaceContainsMethod = false;
-							for (Interface interface : class.getInterfaces()) {
-								if (interface.hasAnnotation("Remote")) {
-									interfaceHasRemoteAnnotation = true;
-									if (interface.contains(method)) {
-										return true;
-									}
-								} else {
-									nonRemoteInterfaceContainsMethod = nonRemoteInterfaceContainsMethod || interface.contains(method);
-								}
-							}
-							return !interfaceHasRemoteAnnotation && nonRemoteInterfaceContainsMethod;
-*/
+//							boolean interfaceHasRemoteAnnotation = false;
+//							boolean nonRemoteInterfaceContainsMethod = false;
+//							for (Interface interface : class.getInterfaces()) {
+//								if (interface.hasAnnotation("Remote")) {
+//									interfaceHasRemoteAnnotation = true;
+//									if (interface.contains(method)) {
+//										return true;
+//									}
+//								} else {
+//									nonRemoteInterfaceContainsMethod = nonRemoteInterfaceContainsMethod || interface.contains(method);
+//								}
+//							}
+//							return !interfaceHasRemoteAnnotation && nonRemoteInterfaceContainsMethod;
 						}
 						break;
 					}
@@ -1394,6 +1389,7 @@ public class Recoder2KeYConverter {
 			} else { // parent of method is neither a class nor an interface
 				assert false : "Methods should belong to Classes or Inetrfaces."; // TODO KD f right?
 			}
+*/
 
 			final MethodDeclaration methDecl
 					= new MethodDeclaration(

@@ -370,7 +370,8 @@ public class MethodDeclaration extends JavaDeclaration
 
     public boolean isRemote() {
     	// TODO KD z hasAnnotation("Remote") not possible
-    	return belongsToRemoteInterface || hasAnnotation("Remote"); // TODO KD z check for static / final / constructor? + make "Remote" a constant?
+    	return belongsToRemoteInterface
+    			|| hasAnnotation("Remote"); // just in case // TODO KD z make "Remote" a constant?
     }
 
     @Override

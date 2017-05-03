@@ -149,7 +149,6 @@ public class ContractFactory {
             newPres.put(h, foci.originalPres.get(h));
          }
       }
-
         //create new contract
         return new FunctionalOperationContractImpl(foci.baseName,
                                                    foci.name,
