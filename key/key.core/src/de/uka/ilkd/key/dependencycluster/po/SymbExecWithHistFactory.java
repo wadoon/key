@@ -6,8 +6,10 @@ import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory.Snippet;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.TempEventLDT;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.DependencyClusterContract;
 
@@ -101,7 +103,8 @@ public class SymbExecWithHistFactory {
 
         final Term updateHeap = tb.elementary(tb.getBaseHeap(), ifVars.pre.heap);
         
-        return tb.apply(updateHeap, tb.apply(updateHistoryWithCallEvent(), execWithPre));
+        //return tb.apply(updateHeap, tb.apply(updateHistoryWithCallEvent(), execWithPre));
+        return tb.apply(updateHeap, execWithPre);
     }
     
     public Term visibilityFilteredPostHistory() {
@@ -115,7 +118,12 @@ public class SymbExecWithHistFactory {
     
     
     private Term realHistory() {
-        return tb.var(ldt.getHist());
+        //Instead of the program variable from the ldt we try this with the ghost field in main
+        //return tb.var(ldt.getHist());
+
+        Term historyField = tb.func((Function)services.getNamespaces().lookup(new Name("Main::$hist")));
+        //System.out.println(historyField);
+        return tb.staticDot(services.getTypeConverter().getSeqLDT().targetSort(), historyField);
     }
     
 
