@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.prototype;
+package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;

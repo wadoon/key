@@ -3,26 +3,19 @@ package de.uka.ilkd.key.prototype;
 import de.uka.ilkd.key.api.VariableAssignments;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.parser.*;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.parser.DefaultTermParser;
+import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.match.legacy.LegacyTacletMatcher;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
-import org.antlr.runtime.RecognitionException;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
 
 import java.io.File;
-import java.io.PrintWriter;
 import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -74,16 +67,16 @@ public class SequentViewer extends Application {
         }
 
         String testPattern = "x0=x, x1=x==> fi(x0)";
-        matchPattern(testPattern, seq, testAssign, services);
+        //matchPattern(testPattern, seq, testAssign, services);
 
 
         return seq;
     }
-
+/*
     /**
      * TODO: richtige Signatur noch zu tun, atm. erst einmal Testweise
      * Es muessten noch die Assignments mit gegebene werden mit Typeninfo
-     */
+
     public void matchPattern(String pattern, Sequent currentSeq, VariableAssignments assignments, Services services){
         //Aufbau der Deklarationen für den NameSpace
         buildNameSpace(services, assignments);
@@ -248,7 +241,7 @@ public class SequentViewer extends Application {
             e.printStackTrace(pw);
             throw e;
         }
-    }
+    }*/
     /*Term parseTerm(String s) throws RecognitionException {
         try {
             KeYParserF p = new KeYParserF(ParserMode.TERM, new KeYLexerF(s,
