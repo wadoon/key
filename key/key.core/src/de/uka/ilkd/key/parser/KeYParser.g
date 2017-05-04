@@ -1100,7 +1100,7 @@ options {
      * and is an array of size zero, if an empty argument list was given,
      * for instance `f()'.
      */
-    private Operator lookupVarfuncId(String varfunc_name, Term[] args) 
+    protected Operator lookupVarfuncId(String varfunc_name, Term[] args)
         throws RecognitionException/*NotDeclException, SemanticException*/ {
 
         // case 1: variable

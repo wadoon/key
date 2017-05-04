@@ -12,20 +12,18 @@
 //
 package de.uka.ilkd.key.parser;
 
-import java.util.HashMap;
-
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.TokenStream;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.JavaReader;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
+import org.antlr.runtime.CommonTokenStream;
+import org.antlr.runtime.RecognitionException;
+import org.antlr.runtime.TokenStream;
+import org.key_project.util.collection.ImmutableList;
+
+import java.util.HashMap;
 
 /**
  * Extends generated class {@link KeYParser} with custom constructors.
@@ -75,5 +73,25 @@ public class KeYParserF extends KeYParser {
     public boolean isAtProofScript() {
         return input.LA(1) == PROOFSCRIPT;
     }
+
+/*
+    @Override
+    protected Operator lookupVarfuncId(String varfunc_name, Term[] args)  throws RecognitionException{
+        Operator op ;
+        try {
+           // System.out.println(varfunc_name);
+            op= super.lookupVarfuncId(varfunc_name, args);
+        }
+        catch(RecognitionException e) {
+//            this.namespaces().add();
+            System.out.println("catch");
+            // add variable
+            ///flag und throw
+            System.out.println("Add Type");
+            return super.lookupVarfuncId(varfunc_name, args);
+        }
+        return op;
+    }
+    */
 
 }
