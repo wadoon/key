@@ -91,8 +91,36 @@ public class DependencyClusterPOFormulaFactory {
         return tb.and(a.updatedExecutionWithPreAndPost(), b.updatedExecutionWithPreAndPost());
     }
     
-    public Term consequence() {       
-        return tb.and(postStateEquivalence(), equivalentHistories());
+    public Term callInvisible() {
+        return tb.func(ldt.invEvent(), a.callEventFromPostHist());
+    }
+    
+    public Term invisibleHistory() {
+        return tb.equals(tb.func(ldt.filterVisible(), a.postHistory()), tb.seqEmpty());
+    }
+    
+    //No need to handle objects in a special way here, attacker can compare objects from pre and poststate and will know whether they've changed
+    public Term lowPartsOfPreAndPostEqual() {
+        ImmutableList<Term> collectedTerms = ImmutableSLList.<Term>nil();
+        Term updateHeapPre = tb.elementary(tb.getBaseHeap(), ifVars.c1.pre.heap);
+        Term updateHeapPost = tb.elementary(tb.getBaseHeap(), ifVars.c1.post.heap);
+        for (Term term: contract.getSpecs().head().getLowState()) {
+            Term termAtPre = tb.apply(updateHeapPre, term);
+            Term termAtPost = tb.apply(updateHeapPost, term);
+            collectedTerms = collectedTerms.append(tb.equals(termAtPre, termAtPost));
+        }
+        return tb.and(collectedTerms);
+    }
+    
+    //TODO JK make sure this is correct, but the assumption of an cooperative environment makes sure that its equivalent to the original vis preserving version to make the whole history invisible
+    // This uses the variables from run A by convention
+    public Term visibilityPreserving() {
+        return tb.imp(callInvisible(), tb.and(invisibleHistory(), lowPartsOfPreAndPostEqual()));
+    }
+    
+    public Term consequence() {      
+        //TODO JK next add visibility preserving
+        return tb.and(postStateEquivalence(), visibilityPreserving(), equivalentHistories());
     }
     
     public Term assumptions() {
