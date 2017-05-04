@@ -6,9 +6,9 @@ import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import java.io.File;
 import java.nio.file.NoSuchFileException;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
-
     public ScriptCommand() {
         super(Parameters.class);
     }
@@ -24,7 +24,7 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
             root = root.getParentFile();
         File file = new File(root, args.filename);
 
-        System.err.println("Included script " + file);
+        log.info("Included script " + file);
 
         try {
             ProofScriptEngine pse = new ProofScriptEngine(file);
