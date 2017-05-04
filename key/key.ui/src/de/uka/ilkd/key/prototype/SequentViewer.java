@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.prototype;
 
+import de.uka.ilkd.key.api.VariableAssignments;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -12,6 +13,7 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 
@@ -19,7 +21,8 @@ import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.Iterator;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -39,7 +42,7 @@ public class SequentViewer extends Application {
         stage.show();
     }
 
-    public static final void main(String[] args) {
+    public static void main(String[] args) {
         new SequentViewer().launch(args);
     }
 
@@ -51,7 +54,8 @@ public class SequentViewer extends Application {
         DefaultTermParser dtp = new DefaultTermParser();
         StringReader r = new StringReader(// "a=5 ==> \\<{int i = 0;}\\>(a=5)");
                 //   "(5 = a) & (15 = add(b, -3)) ==> (mul(a, b) = 90)");
-                " fi(c) ==> p(c), fi(d)");
+                // " fi(c), fi(d) ==> fi(d), fi(c)");
+                " c = d , d= c, fi(d) ==> fi(c), fi(d)");
         nss = env.getServices().getNamespaces();
 
         AbbrevMap abbrev = new AbbrevMap();
@@ -60,118 +64,149 @@ public class SequentViewer extends Application {
 
         services = env.getServices();
 
-
-        parseDecls("\\sorts { s; }\n" +
-                "\\functions {\n" +
-                "  s f(s);\n" +
-                "}\n" +
-                //  "\\predicates {\n"+ "fi(s);\n"+ "}\n"+
-                "\\schemaVariables {\n" +
-                "  \\formula b,b0,post;\n" +
-                "  \\program Statement #p1, #s ; \n" +
-                "  \\program Expression #e2, #e ; \n" +
-                "  \\program SimpleExpression #se ; \n" +
-                "  \\program Variable #slhs, #arr, #ar, #ar1 ; \n" +
-                "  \\program LoopInit #i ; \n" +
-                "  \\program Label #lab, #lb0, #lb1 ; \n" +
-                "  \\program Label #inner, #outer ; \n" +
-                "  \\program Type #typ ; \n" +
-                "  \\program Variable #v0, #v, #v1, #k, #boolv ; \n" +
-                "  \\program[list] Catch #cf ; \n" +
-                "  \\term s x,x0,x1 ;\n" +
-                "  \\skolemTerm s sk ;\n" +
-                "  \\variables s z,z0 ;\n" +
-                "}\n"
-        );
-
-        String imprightString =
-                "test{\\assumes( fi(x) ==> fi(x)) \\find (==>)  \\add (==>)}";
-        //"test{\\assumes (==> b -> b0 ) \\find (b) \\add (==> b -> b0)}";
-        // "imp_right{\\find(==> x = x0) \\assumes (==> x1 = x0) \\add(==> x0 = x)}";
-
-        //Term te = parseTerm("p(x) ==> p(x)");
-        //TacletMatchProgram.createProgram(te);
-
-        Taclet t = parseTaclet(imprightString);
-
-        LegacyTacletMatcher ltm = new LegacyTacletMatcher(t);
-
-
-
-        MatchConditions mc = MatchConditions.EMPTY_MATCHCONDITIONS;
-        Sequent ifseq = t.ifSequent();
-        int asize = ifseq.antecedent().size();
-        int size = asize + ifseq.succedent().size();
-        System.out.println("Assumes Clause: " +ifseq);
-
-
-        if (size > 0) {
-            ImmutableList<IfFormulaInstantiation> antecCand =
-                    IfFormulaInstSeq.createList(seq, true);
-            ImmutableList<IfFormulaInstantiation> succCand =
-                    IfFormulaInstSeq.createList(seq, false);
-
-            Iterator<SequentFormula> pattern = ifseq.iterator();
-
-
-            MatchConditions matchCond = MatchConditions.EMPTY_MATCHCONDITIONS;
-
-
-            for (int i = 0; i < size; i++) {
-                final Term patternTerm = pattern.next().formula();
-                System.out.println(patternTerm);
-
-                boolean inAntecedent = i < asize;
-                IfMatchResult ma = ltm.matchIf((inAntecedent ?
-                        antecCand : succCand), patternTerm, matchCond, services);
-
-
-                if(!ma.getMatchConditions().isEmpty()){
-                    ImmutableList<MatchConditions> testma = ma.getMatchConditions();
-                    matchCond = ma.getMatchConditions().head();
-                    System.out.println("Inst in "+ i+ " "+ matchCond.getInstantiations());
-                }else{
-                    System.out.println("EmptyMatch");
-                }
-            }
-
+        VariableAssignments testAssign = new VariableAssignments(null);
+        try {
+            testAssign.addType("x0", VariableAssignments.VarType.INT);
+            testAssign.addType("x1", VariableAssignments.VarType.INT);
+            testAssign.addType("x", VariableAssignments.VarType.INT);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
+        String testPattern = "x0=x, x1=x==> fi(x0)";
+        matchPattern(testPattern, seq, testAssign, services);
 
 
         return seq;
-
     }
-
 
     /**
      * TODO: richtige Signatur noch zu tun, atm. erst einmal Testweise
      * Es muessten noch die Assignments mit gegebene werden mit Typeninfo
      */
-    public void matchPattern(String pattern, Sequent currentSeq, Services services){
+    public void matchPattern(String pattern, Sequent currentSeq, VariableAssignments assignments, Services services){
         //Aufbau der Deklarationen für den NameSpace
+        buildNameSpace(services, assignments);
         //Zusammenbau des Pseudotaclets
         //Parsen des Taclets
         String patternString = "matchPattern{\\assumes("+pattern+") \\find (==>)  \\add (==>)}";
 
-        Taclet t = parseTaclet(patternString);
+        Taclet t = null;
+        try {
+            t = parseTaclet(patternString);
+        } catch (RecognitionException e) {
+            e.printStackTrace();
+        }
 
         //Build Matcher for Matchpattern
         LegacyTacletMatcher ltm = new LegacyTacletMatcher(t);
 
-        //matching Algorithmus
-
         NamespaceSet nss = services.getNamespaces();
-        //Init mit leeren Matchconditions, die gefüllt werden
-        MatchConditions matchCond = MatchConditions.EMPTY_MATCHCONDITIONS;
 
-        //Iteratoren durch die Sequent
-        ImmutableList<IfFormulaInstantiation> antecCand =
+        //patternSequent
+        Sequent patternSeq = t.ifSequent();
+        int asize = patternSeq.antecedent().size();
+        int size = asize + patternSeq.succedent().size();
+        //Iterator durch die Pattern-Sequent
+        if(size > 0) {
+            Iterator<SequentFormula> patternIterator = patternSeq.iterator();
+
+            //Init mit leeren Matchconditions, die gefüllt werden
+            MatchConditions matchCond = MatchConditions.EMPTY_MATCHCONDITIONS;
+
+            //Iteratoren durch die Sequent
+            ImmutableList<IfFormulaInstantiation> antecCand =
                     IfFormulaInstSeq.createList(currentSeq, true);
-        ImmutableList<IfFormulaInstantiation> succCand =
+            ImmutableList<IfFormulaInstantiation> succCand =
                     IfFormulaInstSeq.createList(currentSeq, false);
 
+            SequentFormula[] patternArray = new SequentFormula[patternSeq.size()];
+            {
+                int i = 0;
+                for (SequentFormula fm : patternSeq)
+                    patternArray[i++] = fm;
+            }
 
+
+            Queue<SearchNode> queue = new LinkedList<>();
+            //init
+            queue.add(new SearchNode(patternArray, asize, antecCand, succCand));
+            List<SearchNode> finalCandidates = new ArrayList<>(100);
+
+            while (!queue.isEmpty()) {
+                SearchNode node = queue.remove();
+                boolean inAntecedent = node.isAntecedent();
+                System.out.println(inAntecedent ? "In Antec: " : "In Succ");
+
+                IfMatchResult ma = ltm.matchIf((inAntecedent ?
+                        antecCand : succCand), node.getPatternTerm(), node.mc, services);
+
+                if (!ma.getMatchConditions().isEmpty()) {
+                    ImmutableList<MatchConditions> testma = ma.getMatchConditions();
+
+                    Iterator<MatchConditions> iter = testma.iterator();
+                    while (iter.hasNext()) {
+                        SearchNode sn = new SearchNode(node, iter.next());
+
+                        if (sn.isFinished()) {
+                            finalCandidates.add(sn);
+                        } else {
+                            queue.add(sn);
+                        }
+                    }
+
+
+                } else {
+                    System.out.println("Pattern Empty");
+                }
+            }
+            for (SearchNode finalCandidate : finalCandidates) {
+                System.out.println(finalCandidate.mc.getInstantiations());
+            }
+        }
+    }
+
+    private void buildNameSpace(Services services, VariableAssignments assignments) {
+        String decalarations = buildDecls(assignments);
+        parseDecls(decalarations);
+
+    }
+
+    private String buildDecls(VariableAssignments assignments) {
+        Map<String, VariableAssignments.VarType> typeMap = assignments.getTypeMap();
+        String schemaVars =  "\\schemaVariables {\n" ;
+        final List<String> strn = new ArrayList<>();
+
+        typeMap.forEach((id, type) -> strn.add(toDecl(id,type)));
+        schemaVars += strn.stream().collect(Collectors.joining("\n"));
+        schemaVars +="}";
+        System.out.println(schemaVars);
+        return schemaVars;
+    }
+
+    private String toDecl(String id, VariableAssignments.VarType type){
+        String s ="";
+        switch (type) {
+            case ANY:
+                s += "\\term any "+id+";";
+                break;
+            case BOOL:
+                s += "\\term boolean "+id+";";
+                break;
+            case INT:
+                s+= "\\term int "+id+";";
+                break;
+            case FORMULA:
+                s+= "\\formula "+id+";";
+                break;
+            case INT_ARRAY:
+                s+= "\\term int[] "+id+";";
+                break;
+            default:
+                System.out.println("Sort "+type+" not supported yet");
+                break;
+        }
+        return s;
     }
 
     private KeYParserF stringDeclParser(String s) {
@@ -202,19 +237,19 @@ public class SequentViewer extends Application {
                 nss);
     }
 
-    Taclet parseTaclet(String s) {
+    Taclet parseTaclet(String s) throws RecognitionException {
         try {
             KeYParserF p = stringTacletParser(s);
 
             return p.taclet(DefaultImmutableSet.<Choice>nil());
-        } catch (Exception e) {
+        } catch (RecognitionException e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
-            throw new RuntimeException("Exc while Parsing:\n" + sw );
+            throw e;
         }
     }
-    Term parseTerm(String s) {
+    /*Term parseTerm(String s) throws RecognitionException {
         try {
             KeYParserF p = new KeYParserF(ParserMode.TERM, new KeYLexerF(s,
                 "No file. CreateTacletForTests.stringTacletParser(" + s + ")"),
@@ -222,13 +257,13 @@ public class SequentViewer extends Application {
                 nss);
 
             return p.termEOF();
-        } catch (Exception e) {
+        } catch (RecognitionException e) {
             StringWriter sw = new StringWriter();
             PrintWriter pw = new PrintWriter(sw);
             e.printStackTrace(pw);
-            throw new RuntimeException("Exc while Parsing:\n" + sw );
+            throw e;
         }
-    }
+    }*/
 
     /*private Sequent createTestSequent()
             throws ProblemLoaderException, ParserException {

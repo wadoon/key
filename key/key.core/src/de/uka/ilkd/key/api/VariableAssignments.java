@@ -13,8 +13,13 @@ public class VariableAssignments {
         INT,
         BOOL,
         ANY,
-        TERM,
-        OBJECT;
+        INT_ARRAY,
+        OBJECT,
+        HEAP,
+        FIELD,
+        LOCSET,
+        NULL,
+        FORMULA;
     }
 
     /**
@@ -111,6 +116,14 @@ public class VariableAssignments {
         }else{
             typeMap.put(varName, type);
         }
+    }
+
+    /**
+     * Returns the map of ID -> Type mappings
+     * @return
+     */
+    public Map getTypeMap(){
+        return this.typeMap;
     }
 /*    public Object getValue(String name) {
         return null;
