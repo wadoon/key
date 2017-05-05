@@ -32,12 +32,12 @@ import de.uka.ilkd.key.rule.TacletApp;
 public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
     public static class Parameters {
-        @Option("#2") String rulename;
-        @Option("on") Term on;
-        @Option("formula") Term formula;
-        @Option("occ") int occ = -1;
+        @Option("#2") public  String rulename;
+        @Option("on") public Term on;
+        @Option("formula") public Term formula;
+        @Option("occ") public  int occ = -1;
         @Varargs(as=Term.class, prefix="inst_")
-        Map<String, Term> instantiations = new HashMap<>();
+        public Map<String, Term> instantiations = new HashMap<>();
     }
 
     public RuleCommand() {
