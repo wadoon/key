@@ -26,9 +26,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Created by sarah on 4/5/17.
+ * This API class offers methods to apply script commands and match commands
  *
  * @author Alexander Weigl
+ * @author S. Grebing
  */
 public class ScriptApi {
     private final ProofApi api;
@@ -85,10 +86,14 @@ public class ScriptApi {
     }
 
     /**
-     * TODO: richtige Signatur noch zu tun, atm. erst einmal Testweise
-     * U.a. is Rueckgabewert noch unklar, evtl. Liste mit instantiantions die leer sein kann bei misserfolg
+     * Matches a sequqnet against a sequent pattern (a schematic sequent) returns a list of Nodes containing matching
+     * results from where the infomration about instatiated schema variabels can be extracted. If no match was possible the list is exmpt.
+     * @param pattern a string represnetation of the pattern sequent against which the current sequent should be matched
+     * @param currentSeq current concrete sequent
+     * @param assignments variables appearing in the pattern as schemavariables with their corresponding type in KeY
+     * @param services
      */
-    public void matchPattern(String pattern, Sequent currentSeq, VariableAssignments assignments, Services services){
+    public List<SearchNode> matchPattern(String pattern, Sequent currentSeq, VariableAssignments assignments, Services services){
         //Aufbau der Deklarationen für den NameSpace
         buildNameSpace(services, assignments);
         //Zusammenbau des Pseudotaclets
@@ -112,6 +117,8 @@ public class ScriptApi {
         int asize = patternSeq.antecedent().size();
         int size = asize + patternSeq.succedent().size();
         //Iterator durch die Pattern-Sequent
+
+        List<SearchNode> finalCandidates = new ArrayList<>(100);
         if(size > 0) {
             Iterator<SequentFormula> patternIterator = patternSeq.iterator();
 
@@ -135,7 +142,7 @@ public class ScriptApi {
             Queue<SearchNode> queue = new LinkedList<>();
             //init
             queue.add(new SearchNode(patternArray, asize, antecCand, succCand));
-            List<SearchNode> finalCandidates = new ArrayList<>(100);
+
 
             while (!queue.isEmpty()) {
                 SearchNode node = queue.remove();
@@ -168,14 +175,25 @@ public class ScriptApi {
                 System.out.println(finalCandidate.mc.getInstantiations());
             }
         }
+        return finalCandidates;
     }
 
+    /**
+     * Adds the variables of VariableAssignments to the namespace
+     * @param services
+     * @param assignments VariabelAssignments containing variable names and types
+     */
     private void buildNameSpace(Services services, VariableAssignments assignments) {
         String decalarations = buildDecls(assignments);
         parseDecls(decalarations);
 
     }
 
+    /**
+     * Builds a string that is used to create a new schemavariable declaration for the matchpattern
+     * @param assignments varaiables appearing as schema varaibels in the match pattern and their types (in KeY)
+     * @return a String representing the declaration part of a taclet for teh matchpattern
+     */
     private String buildDecls(VariableAssignments assignments) {
         Map<String, VariableAssignments.VarType> typeMap = assignments.getTypeMap();
         String schemaVars =  "\\schemaVariables {\n" ;
@@ -207,11 +225,13 @@ public class ScriptApi {
                 s+= "\\term int[] "+id+";";
                 break;
             default:
+                //TODO missing types
                 System.out.println("Sort "+type+" not supported yet");
                 break;
         }
         return s;
     }
+
 
     private KeYParserF stringDeclParser(String s) {
         return new KeYParserF(ParserMode.DECLARATION,
@@ -219,7 +239,10 @@ public class ScriptApi {
                         "No file. parser/TestTacletParser.stringDeclParser(" + s + ")"),
                 api.getEnv().getServices(), api.getEnv().getServices().getNamespaces());
     }
-
+    /**
+     * Parse the declaration string for the current pattern and add the variables to the namespace
+     * @param s declaration part of a taclet
+     */
     public void parseDecls(String s) {
         try {
             KeYParserF p = stringDeclParser(s);

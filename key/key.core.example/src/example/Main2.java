@@ -30,7 +30,7 @@ public class Main2 {
                     Map cArgs = new HashMap<>();
                     VariableAssignments va = new VariableAssignments();
                     cArgs.put("#2", "impRight");
-                    cArgs.put("on", openGoal.getSequent());
+                   // cArgs.put("on", openGoal.getSequent().toString());
                     ProofScriptCommandCall impRight = scrapi.instantiateCommand(rc, cArgs);
                     scrapi.executeScriptCommand(impRight, openGoal, va);
                     System.out.println(papi.getFirstOpenGoal().getSequent());

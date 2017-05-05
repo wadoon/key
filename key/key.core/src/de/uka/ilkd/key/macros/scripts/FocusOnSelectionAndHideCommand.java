@@ -16,6 +16,8 @@ import java.util.Set;
 
 /**
  * Hide all formulas that are not selected
+ * Parameter:
+ * * The sequent with those formuals that should not be hidden
  * Created by sarah on 1/12/17.
  */
 public class FocusOnSelectionAndHideCommand
