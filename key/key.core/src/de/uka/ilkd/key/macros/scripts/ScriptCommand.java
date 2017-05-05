@@ -14,7 +14,7 @@ public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
     }
 
     public static class Parameters {
-        @Option("#2") String filename;
+        @Option("#2") public  String filename;
     }
 
     @Override public void execute(Parameters args)

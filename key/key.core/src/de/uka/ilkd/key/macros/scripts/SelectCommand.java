@@ -15,13 +15,12 @@ import de.uka.ilkd.key.proof.Proof;
 
 public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public class Parameters {
-        @Option("formula") Term formula;
+        @Option("formula") public Term formula;
     }
 
     public SelectCommand() {
         super(Parameters.class);
     }
-
 
     @Override public Parameters evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {

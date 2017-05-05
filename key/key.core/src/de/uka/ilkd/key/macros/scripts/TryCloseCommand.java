@@ -10,8 +10,8 @@ import de.uka.ilkd.key.proof.Node;
 public class TryCloseCommand
         extends AbstractCommand<TryCloseCommand.TryCloseArguments> {
     static class TryCloseArguments {
-        @Option("steps") Integer steps;
-        @Option("#2") String branch;
+        @Option("steps") public Integer steps;
+        @Option("#2") public String branch;
     }
 
     public TryCloseCommand() {

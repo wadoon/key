@@ -28,7 +28,7 @@ public class FocusOnSelectionAndHideCommand
     }
 
     static class Parameters {
-        @Option("#2") Sequent toKeep;
+        @Option("#2") public Sequent toKeep;
     }
 
     @Override public void execute(Parameters s)

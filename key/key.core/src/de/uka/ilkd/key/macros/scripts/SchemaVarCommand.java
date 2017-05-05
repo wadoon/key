@@ -17,8 +17,8 @@ public class SchemaVarCommand
         extends AbstractCommand<SchemaVarCommand.Parameters> {
 
     public static class Parameters {
-        @Option("#2") String type;
-        @Option("#3") String var;
+        @Option("#2") public String type;
+        @Option("#3") public String var;
     }
 
     public SchemaVarCommand() {

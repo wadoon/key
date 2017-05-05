@@ -16,6 +16,7 @@ import java.util.Optional;
 /**
  * The AutoCommand invokes the automatic strategy "Auto"
  * It has no parameters
+ *
  * @author Mattias Ulbrich
  * @author Alexander Weigl
  */
@@ -94,9 +95,9 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
     }
 
     static class Parameters {
-        @Option("all") boolean onAllOpenGoals = false;
+        @Option("all") public boolean onAllOpenGoals = false;
 
-        @Option("steps") Optional<Integer> maxSteps = Optional.empty();
+        @Option("steps") public Optional<Integer> maxSteps = Optional.empty();
 
         public boolean isOnAllOpenGoals() {
             return onAllOpenGoals;

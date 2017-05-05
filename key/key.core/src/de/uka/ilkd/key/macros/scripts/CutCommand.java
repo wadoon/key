@@ -20,7 +20,7 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
     }
 
     static class Parameters {
-        @Option("#2") Term formula;
+        @Option("#2") public Term formula;
     }
 
     @Override public String getName() {
