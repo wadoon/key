@@ -121,8 +121,7 @@ public class InfFlowInputOutputRelationSnippet extends ReplaceAndRegisterMethod
                 
         return relations[0];
     }
-
-
+    
     private Term buildInputOutputRelation(BasicSnippetData d,
                                           ProofObligationVars vs1,
                                           ProofObligationVars vs2,

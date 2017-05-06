@@ -260,6 +260,7 @@ public class DependencyClusterTacletFactory {
     public Term eventVisibleDueToExplicitSpec() {
         ImmutableList<Term> conditions = ImmutableSLList.<Term>nil();
         for (VisibilityCondition condition: contract.getSpecs().head().getVisible()) {
+
             Term checkDirection;
             if (condition.getDirection() == VisibilityCondition.Direction.IN){
                 checkDirection = tb.func(ldt.evIncoming());
@@ -284,8 +285,8 @@ public class DependencyClusterTacletFactory {
             Term compEq = tb.equals(component1, updatedCheckComponent);
             Term servEq = tb.equals(service1, checkService);
             Term metadataFits = tb.and(dirEq, typeEq, compEq, servEq);
-            
-            conditions = conditions.append(tb.and(metadataFits, tb.apply(updatedParams1, condition.getTerm())));
+
+            conditions = conditions.append(tb.and(metadataFits, tb.apply(updatedParams1, tb.convertToFormula(condition.getTerm()))));
         }
         return tb.or(conditions);
     }
