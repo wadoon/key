@@ -87,7 +87,7 @@ public class RelationDescription {
 	private static Term createRangeFormula(Term term, Term findTerm, Services s){
 		TermBuilder tb = s.getTermBuilder();
 				
-		if(term.arity() > 0){
+		if(term.arity() > 0 && findTerm.arity() > 0){
 			if(findTerm.op() == term.op()){
 					LinkedList<Term> subterms = new LinkedList<Term>();
 					for(int i = 0; i < term.arity(); i++){
