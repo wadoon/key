@@ -87,28 +87,22 @@ public class RelationDescription {
 	private static Term createRangeFormula(Term term, Term findTerm, Services s){
 		TermBuilder tb = s.getTermBuilder();
 		
-		if(!term.sort().equals(findTerm.sort())){
-			return tb.ff();
-		}
-		
-		if(term.arity() > 0 && findTerm.arity() > 0){
-			if(findTerm.op() == term.op()){
-					LinkedList<Term> subterms = new LinkedList<Term>();
-					for(int i = 0; i < term.arity(); i++){
-						subterms.add(createRangeFormula(term.sub(i), findTerm.sub(i), s));
-					}
-					return tb.and(subterms);
+		if(term.arity() > 0 && findTerm.arity() > 0 && findTerm.op() == term.op()){
+			LinkedList<Term> subterms = new LinkedList<Term>();
+			for(int i = 0; i < term.arity(); i++){
+				subterms.add(createRangeFormula(term.sub(i), findTerm.sub(i), s));
 			}
-			else{
-				return tb.ff();
-			}
+			return tb.and(subterms);
 		}
 		else{
 			//TODO:[optional] Maybe check arity for negative values and their handling
 			
-			System.out.println(term.toString() + " = " + findTerm.toString());
-			
-			return tb.equals(term, findTerm);
+			if(!term.sort().equals(findTerm.sort())){
+				return tb.ff();
+			}
+			else{
+				return tb.equals(term, findTerm);
+			}
 		}
 		
 	}
