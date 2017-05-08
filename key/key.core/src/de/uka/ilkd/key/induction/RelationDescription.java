@@ -38,7 +38,12 @@ public class RelationDescription {
 	
 	private static int varCounter = 0;
 	
-	public RelationDescription(Term t, Services serv){
+	/**
+	 * @use RelationDescriptionFactory to generate
+	 * @param t
+	 * @param serv
+	 */
+	protected RelationDescription(Term t, Services serv){
 		ConstructorExtractor ce = new ConstructorExtractor(t, serv);
 		TermBuilder tb = serv.getTermBuilder();
 		ImmutableArray<Function> constructors = ce.getConstructors();
@@ -121,7 +126,7 @@ public class RelationDescription {
 				if(rangeFormula != tb.ff()){	//just use rangeformula which are not false.
 					atomicRDs.add(new AtomicRelationDescription(
 							rangeFormula,
-							subst
+							subst	//TODO: only use the substitutions gained from this given term (the term might be a subterm)
 							));
 				}
 			}
