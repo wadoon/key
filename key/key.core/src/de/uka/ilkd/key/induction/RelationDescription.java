@@ -43,6 +43,7 @@ public class RelationDescription {
 		TermBuilder tb = serv.getTermBuilder();
 		ImmutableArray<Function> constructors = ce.getConstructors();
 		Iterable<Taclet> findTerms;
+		LinkedList<Term> functionTerms = new LinkedList<Term>();
 		
 		possibleSubstitutions = new LinkedList<Pair<QuantifiableVariable, Term>>();
 		
@@ -56,19 +57,7 @@ public class RelationDescription {
 		//TODO: check for cast error
 		findTerms = serv.getProof().getInitConfig().activatedTaclets();
 		
-		atomics = new LinkedList<AtomicRelationDescription>();
-
-		for(Taclet findTaclet : findTerms){
-			if(findTaclet instanceof FindTaclet){
-				Term rangeFormula = createRangeFormula(t, ((FindTaclet) findTaclet).find(), serv);
-				if(rangeFormula != tb.ff()){	//just use rangeformula which are not false.
-					atomics.add(new AtomicRelationDescription(
-							rangeFormula,
-							possibleSubstitutions
-							));
-				}
-			}
-		}
+		atomics = createAtomics(findTerms, t, possibleSubstitutions, serv);
 	}
 	
 	public LinkedList<AtomicRelationDescription> getAtomics(){
@@ -105,6 +94,51 @@ public class RelationDescription {
 			}
 		}
 		
+	}
+	
+	private static LinkedList<AtomicRelationDescription> createAtomics(
+			Iterable<Taclet> findTerms, 
+			Term term, 
+			LinkedList<Pair<QuantifiableVariable, Term>> subst, 
+			Services serv
+	){
+		LinkedList<Term> functionTerms = new LinkedList<Term>();
+		LinkedList<AtomicRelationDescription> atomicRDs = new LinkedList<AtomicRelationDescription>();
+		TermBuilder tb = serv.getTermBuilder();
+		
+		/*TODO: check whether relation descriptions have to be created for 
+		have terms. Do this for all functions in the given term (t)
+		*/
+		functionTerms.add(term);
+		
+		for(Taclet findTaclet : findTerms){
+			if(findTaclet instanceof FindTaclet){
+				Term rangeFormula = createRangeFormula(
+						term, 
+						((FindTaclet) findTaclet).find(), 
+						serv
+				);
+				if(rangeFormula != tb.ff()){	//just use rangeformula which are not false.
+					atomicRDs.add(new AtomicRelationDescription(
+							rangeFormula,
+							subst
+							));
+				}
+			}
+		}
+		
+		for(Term sub : term.subs()){
+			if(sub.arity() > 0){	//TODO: [optional] exclude variables
+				atomicRDs.addAll(createAtomics(
+					findTerms,
+					sub,
+					subst,
+					serv
+				));
+			}
+		}
+		
+		return atomicRDs;
 	}
 	
 	/**
