@@ -18,6 +18,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.induction.AtomicRelationDescription;
 import de.uka.ilkd.key.induction.RelationDescription;
+import de.uka.ilkd.key.induction.RelationDescriptionFactory;
 import de.uka.ilkd.key.induction.TacletGenTest;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -31,7 +32,7 @@ public class RelationDescriptionDialog extends JDialog {
 	
 	private JLabel headline;
 	private JLabel content;
-	private RelationDescription relationdescription;
+	private LinkedList<RelationDescription> relationdescriptions;
 	
 	public RelationDescriptionDialog(JFrame parent, Term term, Services s) {
 		super(parent, "Atomic Relation Descriptions");
@@ -51,18 +52,21 @@ public class RelationDescriptionDialog extends JDialog {
 		this.add(headline);
 		this.add(content);
 		
-		this.relationdescription = new RelationDescription(term, s);
+		this.relationdescriptions = RelationDescriptionFactory.generate(term, s);
 		this.displayRelationDescriptions();
 	}
 
 	private void displayRelationDescriptions(){
-		LinkedList<AtomicRelationDescription> loard = relationdescription.getAtomics();
 		JTextArea textarea = new JTextArea(30,10);
 		JScrollPane scrollpane;
 		StringBuilder sb = new StringBuilder();
-		for(AtomicRelationDescription ard : loard){
-			sb.append(ard.toString());
-			sb.append("\n\n");
+		for(RelationDescription rd : relationdescriptions){
+			sb.append("Relation Description:(");
+			for(AtomicRelationDescription ard : rd.getAtomics()){
+				sb.append(ard.toString());
+				sb.append("\n\n");
+			}
+			sb.append(")\n\n\n");
 		}
 		
 		textarea.setLineWrap(true);

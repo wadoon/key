@@ -107,14 +107,12 @@ public class RelationDescription {
 			LinkedList<Pair<QuantifiableVariable, Term>> subst, 
 			Services serv
 	){
-		LinkedList<Term> functionTerms = new LinkedList<Term>();
 		LinkedList<AtomicRelationDescription> atomicRDs = new LinkedList<AtomicRelationDescription>();
 		TermBuilder tb = serv.getTermBuilder();
 		
 		/*TODO: check whether relation descriptions have to be created for 
 		have terms. Do this for all functions in the given term (t)
 		*/
-		functionTerms.add(term);
 		
 		for(Taclet findTaclet : findTerms){
 			if(findTaclet instanceof FindTaclet){
@@ -129,17 +127,6 @@ public class RelationDescription {
 							subst	//TODO: only use the substitutions gained from this given term (the term might be a subterm)
 							));
 				}
-			}
-		}
-		
-		for(Term sub : term.subs()){
-			if(sub.arity() > 0){	//TODO: [optional] exclude variables
-				atomicRDs.addAll(createAtomics(
-					findTerms,
-					sub,
-					subst,
-					serv
-				));
 			}
 		}
 		
