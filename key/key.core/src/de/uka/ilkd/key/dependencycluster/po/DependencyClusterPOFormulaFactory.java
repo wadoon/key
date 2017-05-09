@@ -123,8 +123,13 @@ public class DependencyClusterPOFormulaFactory {
         return tb.and(postStateEquivalence(), visibilityPreserving(), equivalentHistories());
     }
     
+    //self is implicitly considered to be low
+    public Term selfAtPreEquality() {
+        return tb.equals(ifVars.c1.pre.self, ifVars.c2.pre.self);
+    }
+    
     public Term assumptions() {
-        return tb.and(wellformedHistories(), cooperationalEquivalence(), callEventEquivalence(), preStateEquivalence());
+        return tb.and(wellformedHistories(), cooperationalEquivalence(), selfAtPreEquality(), callEventEquivalence(), preStateEquivalence());
     }
     
     public Term preStateEquivalence() {
