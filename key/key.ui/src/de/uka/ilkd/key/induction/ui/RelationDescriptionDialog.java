@@ -1,12 +1,8 @@
 package de.uka.ilkd.key.induction.ui;
 
-import java.awt.Dialog;
-import java.awt.Frame;
-import java.awt.GraphicsConfiguration;
-import java.awt.Toolkit;
 import java.awt.Dimension;
-import java.awt.Window;
-import java.util.LinkedList;
+import java.awt.Toolkit;
+import java.util.List;
 
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -14,16 +10,11 @@ import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.induction.AtomicRelationDescription;
 import de.uka.ilkd.key.induction.RelationDescription;
 import de.uka.ilkd.key.induction.RelationDescriptionFactory;
-import de.uka.ilkd.key.induction.TacletGenTest;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.TacletApp;
 
 public class RelationDescriptionDialog extends JDialog {
 
@@ -32,7 +23,7 @@ public class RelationDescriptionDialog extends JDialog {
 	
 	private JLabel headline;
 	private JLabel content;
-	private LinkedList<RelationDescription> relationdescriptions;
+	private List<RelationDescription> relationdescriptions;
 	
 	public RelationDescriptionDialog(JFrame parent, Term term, Services s) {
 		super(parent, "Atomic Relation Descriptions");
@@ -61,7 +52,9 @@ public class RelationDescriptionDialog extends JDialog {
 		JScrollPane scrollpane;
 		StringBuilder sb = new StringBuilder();
 		for(RelationDescription rd : relationdescriptions){
-			sb.append("Relation Description:(");
+			sb.append("Relation Description for ");
+			sb.append(rd.getOperator().name().toString());
+			sb.append("(");
 			for(AtomicRelationDescription ard : rd.getAtomics()){
 				sb.append(ard.toString());
 				sb.append("\n\n");

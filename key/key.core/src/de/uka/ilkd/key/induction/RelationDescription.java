@@ -2,32 +2,21 @@ package de.uka.ilkd.key.induction;
 
 import java.util.LinkedList;
 
-import org.key_project.util.collection.DefaultImmutableMap;
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
 import de.uka.ilkd.key.util.Pair;
 
 public class RelationDescription {
@@ -35,6 +24,7 @@ public class RelationDescription {
 	private LinkedList<AtomicRelationDescription> atomics;
 	private LinkedList<Pair<QuantifiableVariable, Term>> possibleSubstitutions;
 	private Term rangeFormula;
+	private Term term;
 	
 	private static int varCounter = 0;
 	
@@ -49,6 +39,8 @@ public class RelationDescription {
 		ImmutableArray<Function> constructors = ce.getConstructors();
 		Iterable<Taclet> findTerms;
 		LinkedList<Term> functionTerms = new LinkedList<Term>();
+		
+		this.term = t;
 		
 		possibleSubstitutions = new LinkedList<Pair<QuantifiableVariable, Term>>();
 		
@@ -82,7 +74,7 @@ public class RelationDescription {
 		TermBuilder tb = s.getTermBuilder();
 		
 		if(term.arity() > 0 && findTerm.arity() > 0 && findTerm.op() == term.op()){
-			LinkedList<Term> subterms = new LinkedList<Term>();
+			LinkedList<Term> subterms = new LinkedList<>();
 			for(int i = 0; i < term.arity(); i++){
 				subterms.add(createRangeFormula(term.sub(i), findTerm.sub(i), s));
 			}
@@ -91,7 +83,7 @@ public class RelationDescription {
 		else{
 			//TODO:[optional] Maybe check arity for negative values and their handling
 			
-			if(!term.sort().equals(findTerm.sort())){
+			if(!term.sort().equals(findTerm.sort())){	//TODO: take a closer look at this
 				return tb.ff();
 			}
 			else{
@@ -290,5 +282,9 @@ public class RelationDescription {
 			terms[i] = tb.var(qvs[i]);
 		}
 		return terms;
+	}
+
+	public Operator getOperator() {
+		return term.op();
 	}
 }
