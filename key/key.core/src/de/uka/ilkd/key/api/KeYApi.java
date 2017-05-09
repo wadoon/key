@@ -19,7 +19,8 @@ import java.util.List;
  * @see ProofScriptCommandApi
  */
 public abstract class KeYApi {
-    private static ProofScriptCommandApi scriptCommandApi = new ProofScriptCommandApi();
+    private static final ProofMacroApi proofMacroApi = new ProofMacroApi();
+    private static final ProofScriptCommandApi scriptCommandApi = new ProofScriptCommandApi();
 
     /**
      * Create a new KeY API and create the sub APIs
@@ -28,11 +29,17 @@ public abstract class KeYApi {
     }
 
     /**
-     *
      * @return non-null
      */
     public static ProofScriptCommandApi getScriptCommandApi() {
         return scriptCommandApi;
+    }
+
+    /**
+     * @return a non-null references to the macro api
+     */
+    public static ProofMacroApi getMacroApi() {
+        return proofMacroApi;
     }
 
     /**

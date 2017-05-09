@@ -82,7 +82,6 @@ public class ScriptApi {
     public void applyRule(String ruleName, String posInOcc) {
         //TacletApp app = new PosTacletApp();
         //TODO over RuleCommand
-
     }
 
     /**
