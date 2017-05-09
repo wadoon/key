@@ -1387,7 +1387,7 @@ public class Recoder2KeYConverter {
 					}
 				}
 			} else { // parent of method is neither a class nor an interface
-				assert false : "Methods should belong to Classes or Inetrfaces."; // TODO KD f right?
+				assert false : "Methods should belong to Classes or Inetrfaces.";
 			}
 */
 
