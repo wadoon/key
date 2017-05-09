@@ -171,7 +171,9 @@ public class TempEventLDT extends LDT {
     
     // TODO KD ask: is this the right place for the method?
     public Function getMethodIdentifier(MethodDeclaration md, TermServices services) {
+        //TODO JK important! add class name to the identifier to prevent unnecessary ambiguity!
         Function f = (Function)services.getNamespaces().functions().lookup(md.getProgramElementName());
+
         if (f == null) {
             //add the function
             f = new Function(md.getProgramElementName(), (Sort)services.getNamespaces().sorts().lookup(METHOD_SORT));
