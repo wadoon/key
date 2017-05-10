@@ -23,18 +23,29 @@ public class Main2 {
                 ProofApi papi= api.getLoadedProof();
                 ScriptApi scrapi = papi.getScriptApi();
                 System.out.println(papi.getFirstOpenGoal().getSequent().toString());
-                List<ProjectedNode> openGoals = papi.getOpenGoals();
-                for (ProjectedNode openGoal : openGoals) {
-                    RuleCommand rc = (RuleCommand)
-                    KeYApi.getScriptCommandApi().getScriptCommands("rule");
-                    Map cArgs = new HashMap<>();
-                    VariableAssignments va = new VariableAssignments();
-                    cArgs.put("#2", "impRight");
-                   // cArgs.put("on", openGoal.getSequent().toString());
-                    ProofScriptCommandCall impRight = scrapi.instantiateCommand(rc, cArgs);
-                    scrapi.executeScriptCommand(impRight, openGoal, va);
-                    System.out.println(papi.getFirstOpenGoal().getSequent());
+                ProjectedNode openGoal = papi.getFirstOpenGoal();
+                RuleCommand rc = (RuleCommand)
+                KeYApi.getScriptCommandApi().getScriptCommands("rule");
+                Map cArgs = new HashMap<>();
+                VariableAssignments va = new VariableAssignments();
+                cArgs.put("#2", "impRight");
+                ProofScriptCommandCall impRight = scrapi.instantiateCommand(rc, cArgs);
+                scrapi.executeScriptCommand(impRight, openGoal, va);
+                VariableAssignments va2 = new VariableAssignments(va);
+                va2.addType("X", VariableAssignments.VarType.FORMULA);
+                va2.addType("Y", VariableAssignments.VarType.FORMULA);
+
+                List<VariableAssignments> matches = scrapi.matchPattern("==> X -> Y", openGoal.getSequent(), va2);
+                for (VariableAssignments match : matches) {
+                    System.out.println(match);
                 }
+                if(matches.isEmpty()){
+                    System.out.println("No match found");
+                }else{
+                    List<VariableAssignments> matches2 = scrapi.matchPattern("==> X -> Y", openGoal.getSequent(), va2);
+
+                }
+
 
             } catch (ProblemLoaderException e) {
                 System.out.println("Could not load file");

@@ -1,43 +1,45 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.macros.scripts.meta.Option;
+import de.uka.ilkd.key.macros.scripts.meta.Varargs;
+import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.RuleAppIndex;
+import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
+import de.uka.ilkd.key.rule.*;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.uka.ilkd.key.macros.scripts.meta.Option;
-import de.uka.ilkd.key.macros.scripts.meta.Varargs;
-import de.uka.ilkd.key.parser.ParserException;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.NoFindTaclet;
-import de.uka.ilkd.key.rule.NoPosTacletApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-
+/**
+ * Command that applies a calculus rule
+ * All parameters are passed as strings and converted by the command.
+ * The parameters are:
+ * <ol>
+ *     <li>#2 = <String>rule name</String></li>
+ *     <li>on= key.core.logic.Term on which the rule should be applied to as String (find part of the rule) </li>
+ *     <li>formula= toplevel formula in which term appears in</li>
+ *     <li>occ = occurrence number</li>
+ *     <li>inst_= instantiation</li>
+ * </ol>
+ */
 public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
     public static class Parameters {
-        @Option("#2") String rulename;
-        @Option("on") Term on;
-        @Option("formula") Term formula;
-        @Option("occ") int occ = -1;
+        public @Option("#2") String rulename;
+        public @Option(value="on",required=false) Term on;
+        public @Option(value="formula",required=false) Term formula;
+        public @Option(value="occ",required=false) int occ = -1;
         @Varargs(as=Term.class, prefix="inst_")
-        Map<String, Term> instantiations = new HashMap<>();
+        public Map<String, Term> instantiations = new HashMap<>();
     }
 
     public RuleCommand() {

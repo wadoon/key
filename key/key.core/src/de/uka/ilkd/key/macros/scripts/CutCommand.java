@@ -8,10 +8,14 @@ import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.util.rifl.SpecificationEntity;
 
 import java.util.Map;
 
+/**
+ * The command object CutCommand has as scriptcommand name "cut"
+ * As parameters:
+ * a formula with the id "#2"
+ */
 public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
     private static final Name CUT_TACLET_NAME = new Name("cut");
 
@@ -32,6 +36,14 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
         return state.getValueInjector().inject(new Parameters(), arguments);
     }
 
+    /**
+     *
+     * @param uiControl
+     * @param args
+     * @param state
+     * @throws ScriptException
+     * @throws InterruptedException
+     */
     @Override public void execute(AbstractUserInterfaceControl uiControl,
             Parameters args, EngineState state)
             throws ScriptException, InterruptedException {

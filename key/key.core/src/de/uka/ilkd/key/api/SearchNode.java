@@ -18,6 +18,7 @@ public class SearchNode {
     ImmutableList<IfFormulaInstantiation> succ;
 
 
+
     public SearchNode(SequentFormula[] pattern, int succAntPos, ImmutableList<IfFormulaInstantiation> antec, ImmutableList<IfFormulaInstantiation> succ) {
         this.pattern = pattern;
         this.succAntPos = succAntPos;
@@ -47,4 +48,5 @@ public class SearchNode {
     public boolean isFinished() {
         return pos >= pattern.length;
     }
+
 }
