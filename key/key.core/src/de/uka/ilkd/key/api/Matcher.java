@@ -19,12 +19,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Created by sarah on 5/10/17.
+ * Matcher to deal with matching a string pattern against a sequent
+ * @author S.Grebing
  */
 public class Matcher {
 
     private ProofApi api;
 
+    /**
+     *
+     * @param api reference to proof api in order to get access to the key environment
+     */
     public Matcher(ProofApi api){
 
         this.api = api;
@@ -62,7 +67,8 @@ public class Matcher {
 
         NamespaceSet nss = copyServices.getNamespaces();
 
-        //patternSequent
+        //patternSequent should not be null, as we have created it
+        assert t.ifSequent() != null;
         Sequent patternSeq = t.ifSequent();
         int asize = patternSeq.antecedent().size();
         int size = asize + patternSeq.succedent().size();
@@ -140,7 +146,7 @@ public class Matcher {
      * @param sn SearchNode
      * @return VariableAssigments containing the assignments fo matching results to schemavariables
      */
-    VariableAssignments extractAssignments(SearchNode sn, VariableAssignments assignments){
+    private VariableAssignments extractAssignments(SearchNode sn, VariableAssignments assignments){
         VariableAssignments va = new VariableAssignments();
         SVInstantiations insts = sn.mc.getInstantiations();
         Set<String> varNames = assignments.getTypeMap().keySet();
@@ -148,7 +154,7 @@ public class Matcher {
             SchemaVariable sv = insts.lookupVar(new Name(varName));
             Object value = insts.getInstantiation(sv);
             va.addAssignmentWithType(varName, value, (VariableAssignments.VarType) assignments.getTypeMap().get(varName));
-            System.out.println("Looking up "+sv.toString()+" value "+value.toString());
+            //System.out.println("Looking up "+sv.toString()+" value "+value.toString());
 
         }
         return va;
