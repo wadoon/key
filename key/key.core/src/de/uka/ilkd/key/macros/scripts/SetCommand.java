@@ -8,8 +8,8 @@ import java.util.Properties;
 public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
 
     static class Parameters {
-        @Option("key") String key;
-        @Option("value") String value;
+        @Option("key") public String key;
+        @Option("value") public String value;
 
         public Properties getProperties() {
             Properties p = new Properties();

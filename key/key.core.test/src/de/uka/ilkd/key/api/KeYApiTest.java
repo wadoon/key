@@ -61,6 +61,7 @@ public class KeYApiTest {
         ProofManagementApi pm = KeYApi.loadFromKeyFile(
                 new File("../key.ui/examples/standard_key/prop_log/contraposition.key").getAbsoluteFile());
 
+        pm.getRuleNames();
         System.out.println(pm.getLoadedProof().getProof());
         for (Contract c : pm.getProofContracts()) {
             System.out.println(c);

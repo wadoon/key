@@ -22,7 +22,7 @@ public class JavascriptCommand
     }
 
     public static class Parameters {
-        @Option("#2") String script;
+        @Option("#2") public String script;
     }
 
     public static class JavascriptInterface {

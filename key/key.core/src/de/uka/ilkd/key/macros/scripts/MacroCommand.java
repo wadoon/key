@@ -19,7 +19,7 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
     }
 
     static class Parameters {
-        @Option("#2") String macroName;
+        @Option("#2") public String macroName;
     }
 
     private static Map<String, ProofMacro> macroMap = loadMacroMap();

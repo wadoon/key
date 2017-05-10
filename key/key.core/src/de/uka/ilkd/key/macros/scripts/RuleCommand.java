@@ -34,10 +34,10 @@ import java.util.Map;
 public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
     public static class Parameters {
-        public @Option("#2") String rulename;
-        public @Option(value="on",required=false) Term on;
-        public @Option(value="formula",required=false) Term formula;
-        public @Option(value="occ",required=false) int occ = -1;
+        @Option(value="#2") public  String rulename;
+        @Option(value="on", required = false) public Term on;
+        @Option(value="formula", required = false) public Term formula;
+        @Option(value="occ", required = false) public  int occ = -1;
         @Varargs(as=Term.class, prefix="inst_")
         public Map<String, Term> instantiations = new HashMap<>();
     }

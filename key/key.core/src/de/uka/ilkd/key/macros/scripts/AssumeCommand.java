@@ -23,7 +23,7 @@ public class AssumeCommand
     }
 
     public static class FormulaParameter {
-        @Option("#2") Term formula;
+        @Option("#2") public Term formula;
     }
 
     private static final Name TACLET_NAME = new Name("UNSOUND_ASSUME");

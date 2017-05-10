@@ -11,11 +11,11 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import java.util.Map;
-import java.util.Optional;
 
 /**
  * The AutoCommand invokes the automatic strategy "Auto"
  * It has no parameters
+ *
  * @author Mattias Ulbrich
  * @author Alexander Weigl
  */
@@ -66,8 +66,8 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         //
         // set the max number of steps if given
         int oldNumberOfSteps = state.getMaxAutomaticSteps();
-        state.setMaxAutomaticSteps(
-                arguments.getSteps().orElse(oldNumberOfSteps));
+        if (arguments.getSteps() > 0)
+            state.setMaxAutomaticSteps(arguments.getSteps());
 
         //
         // Give some feedback
@@ -94,9 +94,9 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
     }
 
     static class Parameters {
-        @Option("all") boolean onAllOpenGoals = false;
+        @Option(value = "all", required = false) public boolean onAllOpenGoals = false;
 
-        @Option("steps") Optional<Integer> maxSteps = Optional.empty();
+        @Option(value = "steps", required = false) public int maxSteps = -1;
 
         public boolean isOnAllOpenGoals() {
             return onAllOpenGoals;
@@ -106,7 +106,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
             this.onAllOpenGoals = onAllOpenGoals;
         }
 
-        public Optional<Integer> getSteps() {
+        public int getSteps() {
             return maxSteps;
         }
 

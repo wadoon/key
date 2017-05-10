@@ -13,11 +13,12 @@ import java.util.Map;
  * Created by sarah on 5/4/17.
  */
 public class Main2 {
-    static final File testFile = new File("/home/sarah/Documents/KIT_Mitarbeiter/KeYDevelopment/KeYGitDir/key/key/key.ui/examples/standard_key/prop_log/contraposition.key");
+    static final File testFile = new File("key.ui/examples/standard_key/prop_log/contraposition.key");
     static  ProofManagementApi api;
 
         public static void main(String[] args) {
             try {
+                System.out.println(testFile.exists());
 
                 api = KeYApi.loadFromKeyFile(testFile);
                 ProofApi papi= api.getLoadedProof();
@@ -49,6 +50,7 @@ public class Main2 {
 
             } catch (ProblemLoaderException e) {
                 System.out.println("Could not load file");
+                e.printStackTrace();
             } catch (Exception e) {
                 e.printStackTrace();
             }

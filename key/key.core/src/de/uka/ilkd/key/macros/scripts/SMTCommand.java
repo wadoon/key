@@ -14,7 +14,7 @@ import java.util.*;
 public class SMTCommand
         extends AbstractCommand<SMTCommand.SMTCommandArguments> {
     static class SMTCommandArguments {
-        @Option("solver") String solver = "Z3";
+        @Option("solver") public  String solver = "Z3";
     }
 
     public SMTCommand() {
