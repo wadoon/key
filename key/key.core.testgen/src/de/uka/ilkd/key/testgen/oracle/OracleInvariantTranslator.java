@@ -32,6 +32,7 @@ public class OracleInvariantTranslator {
 		Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
 
 		LogicVariable h = new LogicVariable(new Name("h"), heapSort);
+		LogicVariable hist = new LogicVariable(new Name("history"), services.getTypeConverter().getSeqLDT().targetSort());
 
 
 		KeYJavaType kjt = info.getKeYJavaType(s);
@@ -58,7 +59,7 @@ public class OracleInvariantTranslator {
 					 Term[] heaps = new Term[1];
                      heaps[0] = tb.var(h);
 
-                     Term inv = tb.inv(heaps, tb.var(o));
+                     Term inv = tb.inv(heaps, tb.var(hist), tb.var(o));
                      Term left = t.sub(0);
                      Term right = t.sub(1);
                      

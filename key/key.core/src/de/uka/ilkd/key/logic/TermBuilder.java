@@ -1619,10 +1619,11 @@ public class TermBuilder {
         return permissionsFor(var(permHeap),var(regularHeap));
     }
 
-    public Term inv(Term[] h, Term o) {
-        Term[] p = new Term[h.length + 1];
+    public Term inv(Term[] h, Term hist, Term o) {
+        Term[] p = new Term[h.length + 1+1];
         System.arraycopy(h, 0, p, 0, h.length);
-        p[h.length] = o;
+        p[h.length] = hist;
+        p[h.length+1] = o;
         return func(services.getJavaInfo().getInv(), p);
     }
 
@@ -1634,20 +1635,26 @@ public class TermBuilder {
         for(LocationVariable heap : heaps) {
             hs[i++] = var(heap);
         }
-        return inv(hs, o);
+        return inv(hs, var(services.getTypeConverter().getRemoteMethodEventLDT().getHist()) ,o);
     }
 
-    public Term staticInv(Term[] h, KeYJavaType t){
-        return func(services.getJavaInfo().getStaticInv(t), h);
+    public Term staticInv(Term[] h, Term hist , KeYJavaType t){
+        Term[] p = new Term[h.length+1];
+        for (int i = 0; i < h.length; i++) {
+            p[i] = h[i];
+        }
+        p[p.length-1] = hist;
+        return func(services.getJavaInfo().getStaticInv(t), p);
     }
 
     public Term staticInv(KeYJavaType t){
         List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
-        Term[] hs = new Term[heaps.size()];
+        Term[] hs = new Term[heaps.size()+1];
         int i=0;
         for(LocationVariable heap : heaps) {
             hs[i++] = var(heap);
         }
+        hs[i++] = var(services.getTypeConverter().getRemoteMethodEventLDT().getHist());
         return func(services.getJavaInfo().getStaticInv(t), hs);
     }
 

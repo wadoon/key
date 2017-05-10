@@ -675,7 +675,7 @@ public abstract class WellDefinednessCheck implements Contract {
         final Term wellFormed = TB.wellFormed(TB.var(heap));
 
         final Term invTerm = self != null && this instanceof ClassWellDefinedness ?
-                TB.inv(new Term[] {TB.var(heap)}, TB.var(self)) : TB.tt();
+                TB.inv(new Term[] {TB.var(heap)}, TB.var(services.getTypeConverter().getRemoteMethodEventLDT().getHist()), TB.var(self)) : TB.tt();
 
         final Term[] result;
         if (!taclet) {

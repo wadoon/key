@@ -102,8 +102,10 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
         SpecificationRepository spec = services.getSpecificationRepository();
 
         Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
+        Sort histSort = services.getTypeConverter().getSeqLDT().targetSort();
 
         LogicVariable h = new LogicVariable(new Name("h"), heapSort);
+        LogicVariable hist = new LogicVariable(new Name("history"), histSort);
 
 
 
@@ -146,8 +148,9 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
 
                             Term[] heaps = new Term[1];
                             heaps[0] = tb.var(h);
+                            Term histTerm = tb.var(hist);
 
-                            Term inv = tb.inv(heaps, tb.var(o));
+                            Term inv = tb.inv(heaps, histTerm, tb.var(o));
 
                             if(left.op().name().equals(inv.op().name())){
 

@@ -87,13 +87,15 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
         final LocationVariable heap = services.getTypeConverter().getHeapLDT().getHeap();
         final SchemaVariable heapSV =
                 SchemaVariableFactory.createTermSV(new Name("h"), heap.sort());
+        final SchemaVariable histSV = 
+                SchemaVariableFactory.createTermSV(new Name("history"), services.getTypeConverter().getSeqLDT().targetSort());
         final SchemaVariable sv =
                 SchemaVariableFactory.createTermSV(new Name("a"), kjt.getSort());
         final Term var = TB.var(sv);
         final Term wdSelf = TB.wd(var);
         final Term[] heaps = new Term[] {TB.var(heapSV)};
-        final Term staticInvTerm = TB.staticInv(heaps, kjt);
-        final Term invTerm = TB.inv(heaps, var);
+        final Term staticInvTerm = TB.staticInv(heaps, TB.var(histSV), kjt);
+        final Term invTerm = TB.inv(heaps, TB.var(histSV), var);
         final Term wdHeaps = TB.and(TB.wd(heaps));
         final Term wellFormed = TB.wellFormed(TB.var(heapSV));
         final Term pre = TB.and(wdSelf, wdHeaps, wellFormed);
