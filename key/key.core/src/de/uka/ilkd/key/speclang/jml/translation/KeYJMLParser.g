@@ -627,6 +627,7 @@ dependencyclusterspec returns  [DependencyClusterSpec result = DependencyCluster
     {result = new DependencyClusterSpec(lowIn, lowOut, lowState, visible, newObs);}
     ;
     
+      
 depclusterspeclist[Lowlist.Direction dir] returns  [ImmutableList<Lowlist> result = ImmutableSLList.<Lowlist>nil()] throws SLTranslationException
 ://TODO JK restore the possibility to directly use expressions (implicitly in the context of the current service)
 

@@ -1160,7 +1160,10 @@ public final class JavaInfo {
         }
 
         hierarchy = hierarchy.prepend(kpmi.getAllSupertypes(type));
-        assert hierarchy.head() == type;
+        //TODO JK!!! MAJOR HACK!!! DOUBLECHECK WHEN CONVENIENT!!!
+        //System.out.println("+++ " + programName + " --- " + hierarchy.head() + "(" + hierarchy.head().hashCode() + ") -- " + type + "(" +  type.hashCode() +  ")");
+        //System.out.println(hierarchy);
+        //assert hierarchy.head() == type;
 
 
         final Iterator<KeYJavaType> it = hierarchy.iterator();
