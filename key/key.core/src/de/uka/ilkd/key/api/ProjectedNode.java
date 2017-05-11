@@ -60,4 +60,8 @@ public class ProjectedNode {
     Node getProofNode() {
         return proofNode;
     }
+
+    public static ProjectedNode pseudoRoot() {
+        return new ProjectedNode(null, null);
+    }
 }

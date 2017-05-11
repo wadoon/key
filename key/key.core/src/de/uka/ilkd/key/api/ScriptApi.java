@@ -2,10 +2,7 @@ package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.macros.scripts.EngineState;
 import de.uka.ilkd.key.macros.scripts.ProofScriptCommand;
 import de.uka.ilkd.key.macros.scripts.ScriptCommand;
@@ -14,6 +11,7 @@ import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.legacy.LegacyTacletMatcher;
@@ -46,14 +44,15 @@ public class ScriptApi {
     /**
      * Matches a sequent against a sequent pattern (a schematic sequent) returns a list of Nodes containing matching
      * results from where the information about instantiated schema variables can be extracted. If no match was possible the list is exmpt.
-     * @param pattern a string representation of the pattern sequent against which the current sequent should be matched
-     * @param currentSeq current concrete sequent
-     * @param assignments variables appearing in the pattern as schemavariables with their corresponding type in KeY
      *
+     * @param pattern     a string representation of the pattern sequent against which the current sequent should be matched
+     * @param currentSeq  current concrete sequent
+     * @param assignments variables appearing in the pattern as schemavariables with their corresponding type in KeY
      * @return List of VariableAssignments (possibly empty if no match was found)
      */
-    public List<VariableAssignments> matchPattern(String pattern, Sequent currentSeq, VariableAssignments assignments){
-        return matcher.matchPattern(pattern,currentSeq,assignments);
+    public List<VariableAssignments> matchPattern(String pattern,
+            Sequent currentSeq, VariableAssignments assignments) {
+        return matcher.matchPattern(pattern, currentSeq, assignments);
     }
 
     /**
@@ -64,13 +63,14 @@ public class ScriptApi {
      * Should throw an Exception if command not applicable?
      */
     public <T> ScriptResults executeScriptCommand(
-            ProofScriptCommandCall<T> call, ProjectedNode onNode,
-            VariableAssignments varsAssignment) throws ScriptException, InterruptedException {
+            ProofScriptCommandCall<T> call, ProjectedNode onNode)
+            throws ScriptException, InterruptedException {
         //TODO VariableAssignments should be in instantiateCommand
 
         state.setGoal(onNode.getProofNode());
-        call.command.execute((AbstractUserInterfaceControl) api.getEnv().getUi(),
-                call.parameter, state);
+        call.command
+                .execute((AbstractUserInterfaceControl) api.getEnv().getUi(),
+                        call.parameter, state);
 
         ImmutableList<Goal> goals = api.getProof()
                 .getSubtreeGoals(onNode.getProofNode());
@@ -100,18 +100,44 @@ public class ScriptApi {
         //TODO over RuleCommand
     }
 
+    /**
+     * @param term
+     * @param assignments
+     * @return
+     * @throws Exception either for Syntax or Type error
+     */
+    public Term toTerm(String term, VariableAssignments assignments)
+            throws Exception {
+        //TODO
+        return null;
+    }
+
+    /**
+     * ~> Beweisbaum -> Shallow Copy
+     * hier implementieren
+     *
+     * @param root
+     * @param end
+     * @return
+     */
+    public ProjectedNode getIntermediateTree(ScriptResults root,
+            ScriptResults end) {
+        /*
+            Baum suche, startet bei allen Nodes von root.
+
+            Endet sobald ein Node von end erreicht ist.
+         */
+        ProjectedNode pseudoRoot = ProjectedNode.pseudoRoot();
+        Queue<Node> queue = new LinkedList<>();
+        root.forEach(r -> queue.add(r.getProjectedNode().getProofNode()));
+
+        while(!queue.isEmpty()){
+
+        }
 
 
-
-    //toTerm(String, vars)
-
-    //[(label, goal, vars)]
-    //variablen klasse mit maps typen und werte linked hashmap
-    //
-    //chain of responsibility
-
-    //getIntermediateTree (ScriptResults old, ScriptResults new) ~> Beweisbaum -> Shallow Copy
-    //hier implementieren
+        return pseudoRoot;
+    }
 
     //isclosable
     //derivable : mache cut und dann auto, falls nicht schließt prune proof
@@ -119,20 +145,21 @@ public class ScriptApi {
     //public ProofApi openSpeculatedProof(ProjectedNode){
     //copy node + env
     // }
+
     /**
      * Method tries to close proof by applying the script command. If it succeeds the method returns true otherwise false.
      * In any case the proof is rolled back and the proof state is not changed visibly.
-     * @param com Proof command that should close the goal
+     *
+     * @param com  Proof command that should close the goal
      * @param node goal node to close
      * @return true iff proof can be found using com, false otherwise
      */
-    public boolean isClosable(ScriptCommand com, ProjectedNode node){
-
+    public boolean isClosable(ScriptCommand com, ProjectedNode node) {
 
         return false;
     }
 
-    public boolean isDerivable(String formula, ProjectedNode node){
+    public boolean isDerivable(String formula, ProjectedNode node) {
         return false;
     }
     //new env, new PO, closable

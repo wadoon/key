@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.macros.scripts.ScriptCommand;
 import de.uka.ilkd.key.proof.Node;
 
 import java.util.List;
@@ -61,5 +60,52 @@ public class ScriptResult {
         return sr;
     }
 
-    //setter
+    public ProjectedNode getNewNode() {
+        return newNode;
+    }
+
+    public ScriptResult setNewNode(ProjectedNode newNode) {
+        this.newNode = newNode;
+        return this;
+    }
+
+    public ProjectedNode getParentNode() {
+        return parentNode;
+    }
+
+    public ScriptResult setParentNode(ProjectedNode parentNode) {
+        this.parentNode = parentNode;
+        return this;
+    }
+
+    public ProofScriptCommandCall getCall() {
+        return call;
+    }
+
+    public ScriptResult setCall(ProofScriptCommandCall call) {
+        this.call = call;
+        return this;
+    }
+
+    public Set<List<String>> getLabels() {
+        return labels;
+    }
+
+    public ScriptResult setLabels(Set<List<String>> labels) {
+        this.labels = labels;
+        return this;
+    }
+
+    public List<PositionInfo> getLinenumbers() {
+        return linenumbers;
+    }
+
+    public ScriptResult setLinenumbers(List<PositionInfo> linenumbers) {
+        this.linenumbers = linenumbers;
+        return this;
+    }
+
+    public ProjectedNode getProjectedNode() {
+        return getNewNode();
+    }
 }

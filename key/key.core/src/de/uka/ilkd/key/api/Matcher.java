@@ -46,7 +46,7 @@ public class Matcher {
      */
     //List of VarAssignment
     public List<VariableAssignments> matchPattern(String pattern, Sequent currentSeq, VariableAssignments assignments){
-        //copy services in order to not accidently set assignments and namespace for enviroenment
+        //copy services in order to not accidently set assignments and namespace for environment
         Services copyServices = api.getEnv().getServices().copy(false);
         //services.copy(false);
         //Aufbau der Deklarationen für den NameSpace
