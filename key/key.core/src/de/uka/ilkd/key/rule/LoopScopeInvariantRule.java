@@ -62,8 +62,11 @@ import de.uka.ilkd.key.util.Pair;
  * \Gamma ==> {U}Inv, \Delta
  * \Gamma, {U'}Inv ==> \Delta, {U'}[\pi
  *    boolean x = true;
- *    loop-scope(x){
- *      if(nse) l1: ... ln:  { p x = false; }
+ *    if(nse) {
+ *      l1: ... ln:
+ *      loop-scope(x){
+ *        p
+ *      }
  *    } \omega]
  *    ((x = TRUE -> \phi) & (x = FALSE -> Inv))
  * ------------------------------------------------------------------- loopInvariant
@@ -316,35 +319,22 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     private ProgramElement newProgram(Services services, final While loop,
             ArrayList<Label> labels, Statement stmtToReplace,
             final JavaBlock origProg, final ProgramVariable loopScopeIdxVar) {
-        final ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
 
-        if (loop.getBody() instanceof StatementBlock) {
-            ((StatementBlock) loop.getBody()).getBody()
-                    .forEach(elem -> stmnt.add(elem));
-        } else {
-            stmnt.add(loop.getBody());
-        }
-        
-        // If this assignment of "false" to the loop scope index is reached, we
-        // are in the standard "preserved" case and have to show the invariant.
-        
-        stmnt.add(KeYJavaASTFactory.assign(loopScopeIdxVar,
-                KeYJavaASTFactory.falseLiteral()));
+        final LoopScopeBlock loopScope = new LoopScopeBlock(loopScopeIdxVar,
+                loop.getBody() instanceof StatementBlock
+                        ? (StatementBlock) loop.getBody()
+                        : KeYJavaASTFactory.block(loop.getBody()));
 
-        Statement ifBody = new StatementBlock(
-                stmnt.toArray(new Statement[stmnt.size()]));
-
+        Statement ifBody = loopScope;
         for (int i = labels.size() - 1; i >= 0; i--) {
             Label label = labels.get(i);
             ifBody = KeYJavaASTFactory.labeledStatement(label, ifBody,
                     ifBody.getPositionInfo());
         }
 
-        final Statement newIf = KeYJavaASTFactory
-                .ifThen(loop.getGuardExpression(), ifBody);
-
-        final LoopScopeBlock loopScope = new LoopScopeBlock(loopScopeIdxVar,
-                KeYJavaASTFactory.block(newIf));
+        final Statement newIf = KeYJavaASTFactory.ifThen(
+                loop.getGuardExpression(), ifBody instanceof StatementBlock
+                        ? ifBody : KeYJavaASTFactory.block(ifBody));
 
         // NOTE (important): The assignment of the initial value "true" for the
         // loop scope index variable is crucial here; otherwise, the handling of
@@ -353,10 +343,13 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         // differs from Nathan Wasser's thesis and the paper on loop scope
         // invariants, where we instead use an artificial "continue" statement.
         // We wanted to get rid of this.
-        
-        final StatementBlock newBlock = KeYJavaASTFactory
-                .block(KeYJavaASTFactory.declare(loopScopeIdxVar,
-                        KeYJavaASTFactory.trueLiteral()), loopScope);
+
+        final StatementBlock newBlock = KeYJavaASTFactory.block( //
+                KeYJavaASTFactory.declare( //
+                        loopScopeIdxVar, //
+                        KeYJavaASTFactory.trueLiteral() //
+                ), //
+                newIf);
 
         final ProgramElement result = new ProgramElementReplacer(
                 origProg.program(), services).replace(stmtToReplace, newBlock);
