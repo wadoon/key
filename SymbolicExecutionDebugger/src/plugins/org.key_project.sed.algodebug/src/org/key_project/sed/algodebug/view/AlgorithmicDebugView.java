@@ -46,6 +46,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer {
    
    private void showQuestionCall(Call call){
       try {
+         //System.out.println("Showing Return: " + call.getRet().getName().toString());
          debug.unhighlight();
          debug.highlightCall(call);
          methodNameLabel.setText(call.getCall().getName().toString());
@@ -197,7 +198,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer {
     
       // set FormDate for button
       buttonMoreInfo.setLayoutData(formData);
-    
+      
       //TODO: False Button
       // create a button or any other widget
       Button buttonFalse = new Button(parent, SWT.BORDER);
@@ -205,16 +206,25 @@ public class AlgorithmicDebugView extends ViewPart implements Observer {
       buttonFalse.setText("False");
       Color red = display.getSystemColor(SWT.COLOR_RED);
       buttonFalse.setBackground(red);
+      
       buttonFalse.addListener(SWT.Selection, new Listener() {
          public void handleEvent(Event e) {
            switch (e.type) {
            case SWT.Selection:
-              debug.annotateNode(AlgorithmicDebugView.this.shell, actualNode, false);
-              MessageBox mb = new MessageBox(parent.getShell());
-              mb.setText("Hint");
-              mb.setMessage("Found wrong Method: "+actualNode.toString());
+              debug.annotateCall(actualCall, false);
+             
+              MessageBox mb = new MessageBox( parent.getShell());
+              mb.setText("Hint!");
+              try {
+               mb.setMessage("Found wrong Method: "+actualCall.getCall().getName().toString());
+            }
+            catch (DebugException e1) {
+               // TODO Auto-generated catch block
+               e1.printStackTrace();
+            }
               mb.open();
-             break;
+              
+              break;
            }
          }
        });

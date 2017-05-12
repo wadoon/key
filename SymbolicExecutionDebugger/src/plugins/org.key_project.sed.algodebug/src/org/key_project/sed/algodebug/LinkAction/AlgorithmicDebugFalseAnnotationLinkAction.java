@@ -67,13 +67,5 @@ public class AlgorithmicDebugFalseAnnotationLinkAction  {
               node.addAnnotationLink(annotationTypeFalse.createLink(annotationFalse, node));
            }
         }
-        else{
-         node.removeAnnotationLink(annotationTypeFalse.createLink(annotationFalse, node));
-           
-         MessageBox mb = new MessageBox(shell);
-         mb.setText("Hint");
-         mb.setMessage("Node already marked as False");
-         mb.open();
-        }
    }
 }
