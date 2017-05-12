@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.rule;
 
-import java.util.ArrayList;
+import java.util.Optional;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -63,9 +63,10 @@ import de.uka.ilkd.key.util.Pair;
  * \Gamma, {U'}Inv ==> \Delta, {U'}[\pi
  *    boolean x = true;
  *    if(nse) {
- *      l1: ... ln:
+ *      l1: ... l(n-1):
  *      loop-scope(x){
- *        p
+ *        ln:
+ *        { p }
  *      }
  *    } \omega]
  *    ((x = TRUE -> \phi) & (x = FALSE -> Inv))
@@ -145,7 +146,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         Goal initiallyGoal = goals.tail().head();
         Goal preservesGoal = goals.head();
 
-        Pair<ArrayList<Label>, Statement> labelAndStmtToReplace = extractLabels(
+        Pair<Optional<Label>, Statement> loopWithLoopLabel = findLoopLabel(
                 ruleApp, loopInvInfo.inst.loop);
 
         // Create the "Initially" goal
@@ -155,8 +156,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         // Create the "Invariant Preserved and Use Case" goal
         constructPresrvAndUCGoal(loopInvInfo.services, loopInvInfo.ruleApp,
-                preservesGoal, loopInvInfo.inst, labelAndStmtToReplace.first,
-                labelAndStmtToReplace.second, loopInvInfo.anonUpdate,
+                preservesGoal, loopInvInfo.inst, loopWithLoopLabel.first,
+                loopWithLoopLabel.second, loopInvInfo.anonUpdate,
                 loopInvInfo.wellFormedAnon, loopInvInfo.uAnonInv,
                 loopInvInfo.frameCondition, loopInvInfo.variantPO,
                 loopInvInfo.termLabelState, loopInvInfo.invTerm,
@@ -224,8 +225,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * @param inst
      *            The {@link Instantiation} of parameters for the
      *            {@link LoopScopeInvariantRule} app.
-     * @param labels
-     *            The {@link Label}s before the {@link While} loop.
+     * @param loopLabel
+     *            The {@link Label} before the {@link While} loop.
      * @param stmtToReplace
      *            The {@link Statement} to replace (either a {@link While} loop
      *            or a {@link LabeledStatement} including the {@link While}
@@ -252,14 +253,14 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      */
     private void constructPresrvAndUCGoal(Services services, RuleApp ruleApp,
             Goal presrvAndUCGoal, final Instantiation inst,
-            ArrayList<Label> labels, Statement stmtToReplace, Term anonUpdate,
+            Optional<Label> loopLabel, Statement stmtToReplace, Term anonUpdate,
             Term wellFormedAnon, final Term uAnonInv, Term frameCondition,
             Term variantPO, TermLabelState termLabelState, Term invTerm,
             Term[] uBeforeLoopDefAnonVariant) {
         final While loop = inst.loop;
 
         final Term newFormula = formulaWithLoopScope(services, inst, anonUpdate,
-                loop, labels, stmtToReplace, frameCondition, variantPO,
+                loop, loopLabel, stmtToReplace, frameCondition, variantPO,
                 termLabelState, presrvAndUCGoal, uBeforeLoopDefAnonVariant,
                 invTerm);
 
@@ -303,8 +304,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      *            The {@link Services} object.
      * @param loop
      *            The original {@link While} loop that is going to be replaced.
-     * @param labels
-     *            The {@link Label}s before the {@link While} loop.
+     * @param loopLabel
+     *            The {@link Label} before the {@link While} loop.
      * @param stmtToReplace
      *            The {@link Statement} to replace (either a {@link While} loop
      *            or a {@link LabeledStatement} including the {@link While}
@@ -317,24 +318,22 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      * @return The new program with the loop scope.
      */
     private ProgramElement newProgram(Services services, final While loop,
-            ArrayList<Label> labels, Statement stmtToReplace,
+            Optional<Label> loopLabel, Statement stmtToReplace,
             final JavaBlock origProg, final ProgramVariable loopScopeIdxVar) {
 
-        final LoopScopeBlock loopScope = new LoopScopeBlock(loopScopeIdxVar,
-                loop.getBody() instanceof StatementBlock
-                        ? (StatementBlock) loop.getBody()
-                        : KeYJavaASTFactory.block(loop.getBody()));
+        Statement loopBodyBlock = ensureIsStatmentBlock(loop.getBody());
 
-        Statement ifBody = loopScope;
-        for (int i = labels.size() - 1; i >= 0; i--) {
-            Label label = labels.get(i);
-            ifBody = KeYJavaASTFactory.labeledStatement(label, ifBody,
-                    ifBody.getPositionInfo());
+        if (loopLabel.isPresent()) {
+            final Label label = loopLabel.get();
+            loopBodyBlock = KeYJavaASTFactory.labeledStatement( //
+                    label, loopBodyBlock, loopBodyBlock.getPositionInfo());
         }
 
-        final Statement newIf = KeYJavaASTFactory.ifThen(
-                loop.getGuardExpression(), ifBody instanceof StatementBlock
-                        ? ifBody : KeYJavaASTFactory.block(ifBody));
+        final LoopScopeBlock loopScope = new LoopScopeBlock(loopScopeIdxVar,
+                (StatementBlock) ensureIsStatmentBlock(loopBodyBlock));
+
+        final Statement newIf = KeYJavaASTFactory
+                .ifThen(loop.getGuardExpression(), loopScope);
 
         // NOTE (important): The assignment of the initial value "true" for the
         // loop scope index variable is crucial here; otherwise, the handling of
@@ -355,6 +354,17 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                 origProg.program(), services).replace(stmtToReplace, newBlock);
 
         return result;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param stmt
+     * @return
+     */
+    private static Statement ensureIsStatmentBlock(Statement stmt) {
+        return stmt instanceof StatementBlock ? stmt
+                : KeYJavaASTFactory.block(stmt);
     }
 
     /**
@@ -399,8 +409,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      *            The anonymized update {@link Term}.
      * @param loop
      *            The original {@link While} loop that is going to be replaced.
-     * @param labels
-     *            The {@link Label}s before the {@link While} loop.
+     * @param loopLabel
+     *            The {@link Label} before the {@link While} loop.
      * @param stmtToReplace
      *            The {@link Statement} to replace (either a {@link While} loop
      *            or a {@link LabeledStatement} including the {@link While}
@@ -425,7 +435,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      */
     private Term formulaWithLoopScope(Services services,
             final Instantiation inst, Term anonUpdate, final While loop,
-            ArrayList<Label> labels, Statement stmtToReplace,
+            Optional<Label> loopLabel, Statement stmtToReplace,
             Term frameCondition, Term variantPO, TermLabelState termLabelState,
             Goal presrvAndUCGoal, final Term[] uBeforeLoopDefAnonVariant,
             Term invTerm) {
@@ -443,7 +453,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         final ProgramVariable loopScopeIdxVar = loopScopeIdxVar(services);
 
-        final ProgramElement newProg = newProgram(services, loop, labels,
+        final ProgramElement newProg = newProgram(services, loop, loopLabel,
                 stmtToReplace, origJavaBlock, loopScopeIdxVar);
 
         final Term labeledIdxVar = tb.label(tb.var(loopScopeIdxVar),
@@ -465,8 +475,9 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     }
 
     /**
-     * Extracts all the {@link Label}s before the {@link While} loop
-     * <code>whileLoop</code>.
+     * If the {@link While} loop has a loop label, returns this and the labeled
+     * statement. Otherwise, returns an empty {@link Optional} and the given
+     * loop statement.
      * 
      * @param ruleApp
      *            The current {@link RuleApp}.
@@ -474,36 +485,26 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      *            The {@link While} loop of interest.
      * @return All the {@link Label}s before <code>whileLoop</code>.
      */
-    private Pair<ArrayList<Label>, Statement> extractLabels(RuleApp ruleApp,
+    private Pair<Optional<Label>, Statement> findLoopLabel(RuleApp ruleApp,
             While whileLoop) {
-        ArrayList<Label> labels = new ArrayList<>();
+        Optional<Label> loopLabel = Optional.empty();
+        Statement stmtToRepl = whileLoop;
 
         ImmutableArray<ProgramPrefix> prefixElems = ((StatementBlock) TermBuilder
                 .goBelowUpdates(ruleApp.posInOccurrence().subTerm()).javaBlock()
                 .program()).getPrefixElements();
 
-        Statement lastStatement = whileLoop;
-
-        boolean cont = false;
-        for (int i = prefixElems.size() - 1; i >= 0; i--) {
-            ProgramPrefix lastPrefix = prefixElems.get(i);
-
-            if (!(lastPrefix instanceof LabeledStatement)) {
-                break;
-            }
-
-            final LabeledStatement lastLabeledStatement = (LabeledStatement) lastPrefix;
-
-            if (cont || lastLabeledStatement.getBody().equals(whileLoop)) {
-                labels.add(0, lastLabeledStatement.getLabel());
-                lastStatement = lastLabeledStatement;
-                cont = true;
-            } else {
-                break;
-            }
+        if (prefixElems.size() > 0
+                && (prefixElems.last() instanceof LabeledStatement)
+                && ((LabeledStatement) prefixElems.last()).getBody()
+                        .equals(whileLoop)) {
+            final LabeledStatement lastLabeledStmt = (LabeledStatement) prefixElems
+                    .last();
+            loopLabel = Optional.of(lastLabeledStmt.getLabel());
+            stmtToRepl = lastLabeledStmt.getBody();
         }
 
-        return new Pair<>(labels, lastStatement);
+        return new Pair<>(loopLabel, stmtToRepl);
     }
 
 }
