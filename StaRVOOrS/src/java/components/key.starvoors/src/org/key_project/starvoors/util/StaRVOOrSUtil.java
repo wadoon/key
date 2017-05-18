@@ -93,7 +93,7 @@ public final class StaRVOOrSUtil {
                   ImmutableSet<Contract> contracts = env.getSpecificationRepository().getContracts(type, target);
                   for (Contract contract : contracts) {
                      StaRVOOrSProof proofResult = null;
-                     try {                         
+                     try {   
                           proofResult = verify(env, contract, useOperationContracts, useLoopInvarints);
                      } catch (Exception e) {
                          System.out.println("PROBLEM");
