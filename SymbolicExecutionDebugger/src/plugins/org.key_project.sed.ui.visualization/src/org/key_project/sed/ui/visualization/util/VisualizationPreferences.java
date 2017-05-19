@@ -16,7 +16,8 @@ package org.key_project.sed.ui.visualization.util;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.swt.graphics.RGB;
-import org.key_project.sed.core.model.ISEDDebugNode;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISENodeLink;
 import org.key_project.sed.ui.visualization.Activator;
 
 /**
@@ -36,17 +37,17 @@ public class VisualizationPreferences {
    public static final String SWITCH_TO_STATE_VISUALIZATION_PERSPECTIVE = "org.key_project.sed.ui.visualization.preference.switchToStateVisualizationPerspective";
 
    /**
-    * Preference key for the first background color of {@link ISEDDebugNode}s.
+    * Preference key for the first background color of {@link ISENode}s.
     */
    public static final String EXECUTION_TREE_NODE_FIRST_BACKGROUND_COLOR = "org.key_project.sed.ui.visualization.preference.executionTreeNodeFirstBackgroundColor";
 
    /**
-    * Preference key for the second background color of {@link ISEDDebugNode}s.
+    * Preference key for the second background color of {@link ISENode}s.
     */
    public static final String EXECUTION_TREE_NODE_SECOND_BACKGROUND_COLOR = "org.key_project.sed.ui.visualization.preference.executionTreeNodeSecondBackgroundColor";
 
    /**
-    * Preference key for the direction of background colors in {@link ISEDDebugNode}s.
+    * Preference key for the direction of background colors in {@link ISENode}s.
     */
    public static final String EXECUTION_TREE_NODE_BACKGROUND_DIRECTION = "org.key_project.sed.ui.visualization.preference.executionTreeNodeBackgroundDirection";
 
@@ -61,19 +62,24 @@ public class VisualizationPreferences {
    public static final String EXECUTION_TREE_NODE_BACKGROUND_DIRECTION_VERTICAL = "vertical";
 
    /**
-    * Preference key for the foreground color of {@link ISEDDebugNode}s.
+    * Preference key for the foreground color of {@link ISENode}s.
     */
    public static final String EXECUTION_TREE_NODE_FOREGROUND_COLOR = "org.key_project.sed.ui.visualization.preference.executionTreeNodeForegroundColor";
 
    /**
-    * Preference key for the text color of {@link ISEDDebugNode}s.
+    * Preference key for the text color of {@link ISENode}s.
     */
    public static final String EXECUTION_TREE_NODE_TEXT_COLOR = "org.key_project.sed.ui.visualization.preference.executionTreeNodeTextColor";
 
    /**
-    * Preference key for the connection color between {@link ISEDDebugNode}s.
+    * Preference key for the connection color between {@link ISENode}s.
     */
    public static final String EXECUTION_TREE_NODE_CONNECTION_COLOR = "org.key_project.sed.ui.visualization.preference.executionTreeNodeConnectionColor";
+
+   /**
+    * Preference key for the link color between {@link ISENode}s as defined by {@link ISENodeLink} instances.
+    */
+   public static final String EXECUTION_TREE_NODE_LINK_COLOR = "org.key_project.sed.ui.visualization.preference.executionTreeNodeLinkColor";
 
    /**
     * Returns the managed {@link IPreferenceStore}.
@@ -305,5 +311,37 @@ public class VisualizationPreferences {
     */
    public static void setDefaultExecutionTreeNodeConnectionColor(RGB defaultValue) {
       PreferenceConverter.setDefault(getStore(), EXECUTION_TREE_NODE_CONNECTION_COLOR, defaultValue);
+   }
+   
+   /**
+    * Returns the current value.
+    * @return The current value.
+    */
+   public static RGB getExecutionTreeNodeLinkColor() {
+      return PreferenceConverter.getColor(getStore(), EXECUTION_TREE_NODE_LINK_COLOR);
+   }
+   
+   /**
+    * Returns the default value.
+    * @return The default value.
+    */
+   public static RGB getDefaultExecutionTreeNodeLinkColor() {
+      return PreferenceConverter.getDefaultColor(getStore(), EXECUTION_TREE_NODE_LINK_COLOR);
+   }
+   
+   /**
+    * Sets the current value.
+    * @param value The new value to set.
+    */
+   public static void setExecutionTreeNodeLinkColor(RGB value) {
+      PreferenceConverter.setValue(getStore(), EXECUTION_TREE_NODE_LINK_COLOR, value);
+   }
+   
+   /**
+    * Returns the current value.
+    * @return The current value.
+    */
+   public static void setDefaultExecutionTreeNodeLinkColor(RGB defaultValue) {
+      PreferenceConverter.setDefault(getStore(), EXECUTION_TREE_NODE_LINK_COLOR, defaultValue);
    }
 }

@@ -67,7 +67,7 @@ public class CasesGeneratorMain {
          }
       }
       else {
-         System.out.println("The file to analyse and the path to the result file are expected as first two parameters.");
+         System.out.println("The program to be analysed and the path to the output folder are expected as the first two parameters.");
          System.out.println();
          System.out.println("Additional parameters:");
          System.out.println(INLINE_METHODS + ": Inline method bodies instead of applying method contracts.");

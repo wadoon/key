@@ -40,8 +40,10 @@ import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.reference.MethodReference;
 import de.uka.ilkd.key.java.statement.BranchStatement;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.Throw;
@@ -56,9 +58,12 @@ import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBaseMethodReturn;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockContract;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBlockStartNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchCondition;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionBranchStatement;
@@ -706,6 +711,9 @@ public class ExecutionNodeReader {
       else if (ExecutionNodeWriter.TAG_LOOP_INVARIANT.equals(qName)) {
          return new KeYlessLoopInvariant(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isInitiallyValid(attributes));
       }
+      else if (ExecutionNodeWriter.TAG_BLOCK_CONTRACT.equals(qName)) {
+         return new KeYlessBlockContract(parent, getName(attributes), getPathCondition(attributes), isPathConditionChanged(attributes), isPreconditionComplied(attributes));
+      }
       else {
          throw new SAXException("Unknown tag \"" + qName + "\".");
       }
@@ -1048,6 +1056,14 @@ public class ExecutionNodeReader {
        */
       @Override
       public Proof getProof() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public RuleApp getAppliedRuleApp() {
          return null;
       }
 
@@ -1648,6 +1664,8 @@ public class ExecutionNodeReader {
          switch (getTerminationKind()) {
             case EXCEPTIONAL : return "Exceptional Termination";
             case LOOP_BODY : return "Loop Body Termination";
+            case BLOCK_CONTRACT_EXCEPTIONAL : return "Block Contract Exceptional Termination";
+            case BLOCK_CONTRACT_NORMAL : return "Block Contract Termination";
             default : return "Termination";
          }
       }
@@ -1705,7 +1723,7 @@ public class ExecutionNodeReader {
     * from KeY and provides such only children and default attributes.
     * @author Martin Hentschel
     */
-   public static class KeYlessLoopCondition extends AbstractKeYlessExecutionBlockStartNode<LoopStatement> implements IExecutionLoopCondition {
+   public static class KeYlessLoopCondition extends AbstractKeYlessExecutionBlockStartNode<JavaStatement> implements IExecutionLoopCondition {
       /**
        * Constructor.
        * @param parent The parent {@link IExecutionNode}.
@@ -2466,6 +2484,67 @@ public class ExecutionNodeReader {
       @Override
       public boolean isInitiallyValid() {
          return initiallyValid;
+      }
+   }
+
+   /**
+    * An implementation of {@link IExecutionBlockContract} which is independent
+    * from KeY and provides such only children and default attributes.
+    * @author Martin Hentschel
+    */
+   public static class KeYlessBlockContract extends AbstractKeYlessExecutionNode<SourceElement> implements IExecutionBlockContract {
+      /**
+       * Precondition complied?
+       */
+      private final boolean preconditionComplied;
+
+      /**
+       * Constructor.
+       * @param parent The parent {@link IExecutionNode}.
+       * @param name The name of this node.
+       * @param pathConditionChanged Is the path condition changed compared to parent?
+       * @param formatedPathCondition The formated path condition.
+       * @param preconditionComplied Precondition complied?
+       */
+      public KeYlessBlockContract(IExecutionNode<?> parent, 
+                                  String name, 
+                                  String formatedPathCondition,
+                                  boolean pathConditionChanged,
+                                  boolean preconditionComplied) {
+         super(parent, name, formatedPathCondition, pathConditionChanged);
+         this.preconditionComplied = preconditionComplied;
+      }
+      
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public String getElementType() {
+         return "Block Contract";
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public BlockContract getContract() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public StatementBlock getBlock() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isPreconditionComplied() {
+         return preconditionComplied;
       }
    }
    

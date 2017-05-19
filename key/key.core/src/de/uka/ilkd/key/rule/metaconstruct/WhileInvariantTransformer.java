@@ -53,10 +53,9 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 
@@ -128,7 +127,7 @@ public final class WhileInvariantTransformer {
     
     
     /** calculates the resulting term. */
-    public Term transform(TermLabelState termLabelState, Rule rule, Goal goal, Sequent applicationSequent, PosInOccurrence applicationPos, Term initialPost, Term invariantFramingTermination, SVInstantiations svInst, Services services) {
+    public Term transform(TermLabelState termLabelState, Rule rule, RuleApp ruleApp, Goal goal, Sequent applicationSequent, PosInOccurrence applicationPos, Term initialPost, Term invariantFramingTermination, SVInstantiations svInst, Services services) {
         
         // global initialisation
         init(initialPost, invariantFramingTermination, services);
@@ -206,6 +205,7 @@ public final class WhileInvariantTransformer {
                                      thrownException, 
                                      post,
                                      rule,
+                                     ruleApp,
                                      goal,
                                      applicationPos,
                                      services));
@@ -217,7 +217,7 @@ public final class WhileInvariantTransformer {
                 typeConv.convertToLogicElement(returnFlag);
             resultSubterms.add
             (returnCase(termLabelState, returnFlag, returnType,
-                        returnExpression, post, rule, goal, applicationPos, services));
+                        returnExpression, post, rule, ruleApp, goal, applicationPos, services));
             
             if (returnType != null) {
                 stmnt.add(KeYJavaASTFactory.declare
@@ -236,6 +236,7 @@ public final class WhileInvariantTransformer {
                                          post, 
                                          breakIfCascade,
                                          rule,
+                                         ruleApp,
                                          goal,
                                          applicationPos,
                                          services)); 
@@ -254,8 +255,8 @@ public final class WhileInvariantTransformer {
         
         
         resultSubterms.add
-        (normalCaseAndContinue(termLabelState, services, applicationPos, rule, goal, applicationSequent, contFlagTerm, returnFlagTerm,
-                               breakFlagTerm, excFlagTerm, addUninterpretedPredicateIfRequired(services, inv)));
+        (normalCaseAndContinue(termLabelState, services, applicationPos, rule, ruleApp, goal, applicationSequent, contFlagTerm, returnFlagTerm,
+                               breakFlagTerm, excFlagTerm, AbstractOperationPO.addUninterpretedPredicateIfRequired(services, inv)));
         
         Term result = createLongJunctorTerm(Junctor.AND, resultSubterms);
         
@@ -277,33 +278,13 @@ public final class WhileInvariantTransformer {
         return services.getTermBuilder().prog(loopBodyModality, 
                                    mainJavaBlock, 
                                    result,
-                                   computeLoopBodyModalityLabels(termLabelState, services, applicationPos, rule, goal, loopBodyModality, result, mainJavaBlock, applicationSequent, initialPost.getLabels())); 
-    }
-    
-    /**
-     * This method adds the uninterpreted predicate to the given {@link Term}
-     * if the used {@link ProofOblInput} is an instance of {@link AbstractOperationPO}
-     * and {@link AbstractOperationPO#isAddUninterpretedPredicate()} is {@code true}.
-     * Otherwise the given {@link Term} is returned.  
-     * @param services The {@link Services} which provides the {@link Proof} and its {@link ProofOblInput}.
-     * @param term The {@link Term} to modify.
-     * @return The modified or original {@link Term}.
-     */
-    private Term addUninterpretedPredicateIfRequired(Services services, Term term) {
-       ProofOblInput problem = services.getSpecificationRepository().getProofOblInput(services.getProof());
-       if (problem instanceof AbstractOperationPO) {
-          AbstractOperationPO operationPO = (AbstractOperationPO)problem;
-          if (operationPO.isAddUninterpretedPredicate()) {
-             term = services.getTermBuilder().and(term, operationPO.getUninterpretedPredicate());
-          }
-       }
-       return term;
+                                   computeLoopBodyModalityLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, loopBodyModality, result, mainJavaBlock, applicationSequent, initialPost.getLabels())); 
     }
     
     /**
      * Computes the {@link TermLabel} which should be added to the created
      * loop body modality {@link Term}.
-    * @param termLabelState The {@link TermLabelState} of the current rule application.
+     * @param termLabelState The {@link TermLabelState} of the current rule application.
      * @param services The {@link Services}.
      * @param applicationPos The {@link PosInOccurrence} in the {@link Sequent} to rewrite.
      * @param rule The {@link Rule} to apply.
@@ -318,13 +299,14 @@ public final class WhileInvariantTransformer {
                                                                     Services services,
                                                                     PosInOccurrence applicationPos, 
                                                                     Rule rule, 
+                                                                    RuleApp ruleApp,
                                                                     Goal goal, 
                                                                     Operator loopBodyModality, 
                                                                     Term result, 
                                                                     JavaBlock mainJavaBlock, 
                                                                     Sequent applicationSequent,
                                                                     ImmutableArray<TermLabel> newTermOriginalLabels) {
-       return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, goal, "LoopBodyModality", null, loopBodyModality, new ImmutableArray<Term>(result), null, mainJavaBlock, newTermOriginalLabels);
+       return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, "LoopBodyModality", null, loopBodyModality, new ImmutableArray<Term>(result), null, mainJavaBlock, newTermOriginalLabels);
     }
 
     /**
@@ -420,6 +402,7 @@ public final class WhileInvariantTransformer {
                             ProgramVariable returnExpression,
                             Term post,
                             Rule rule,
+                            RuleApp ruleApp,
                             Goal goal,
                             PosInOccurrence applicationPos, 
                             Services services) {
@@ -427,7 +410,7 @@ public final class WhileInvariantTransformer {
         Term executeReturn = services.getTermBuilder().prog(modality, 
                                                  returnJavaBlock, 
                                                  post,
-                                                 TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, goal, "ReturnCaseModality", null, modality, new ImmutableArray<Term>(post), null, returnJavaBlock, post.getLabels()));
+                                                 TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, "ReturnCaseModality", null, modality, new ImmutableArray<Term>(post), null, returnJavaBlock, post.getLabels()));
         
         return services.getTermBuilder().imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(returnFlag), typeConv.getBooleanLDT().getTrueTerm()),
                                   executeReturn);
@@ -451,6 +434,7 @@ public final class WhileInvariantTransformer {
                            Term post,
                            ArrayList<If> breakIfCascade,
                            Rule rule,
+                           RuleApp ruleApp,
                            Goal goal,
                            PosInOccurrence applicationPos, 
                            Services services) {
@@ -458,7 +442,7 @@ public final class WhileInvariantTransformer {
         Term executeBreak = services.getTermBuilder().prog(modality, 
                                                 executeJavaBlock, 
                                                 post,
-                                                TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, goal, "BreakCaseModality", null, modality, new ImmutableArray<Term>(post), null, executeJavaBlock, post.getLabels()));
+                                                TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, "BreakCaseModality", null, modality, new ImmutableArray<Term>(post), null, executeJavaBlock, post.getLabels()));
         return services.getTermBuilder().imp(services.getTermBuilder().equals(typeConv.convertToLogicElement(breakFlag), 
                                 typeConv.getBooleanLDT().getTrueTerm()), 
                                 executeBreak); 
@@ -469,6 +453,7 @@ public final class WhileInvariantTransformer {
                                         Services services,
                                         PosInOccurrence applicationPos,
                                         Rule rule,
+                                        RuleApp ruleApp,
                                         Goal goal,
                                         Sequent applicationSequent,
                                         Term contFlagTerm,
@@ -491,11 +476,11 @@ public final class WhileInvariantTransformer {
 
         if (al.size() == 0) {
             if (contFlagTerm == null) {
-                ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState, services, applicationPos, rule, goal, inv.op(), inv.subs(), applicationSequent);
+                ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, inv.op(), inv.subs(), applicationSequent);
                 return TB.label(inv, labels);
             }
             else {
-                ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState, services, applicationPos, rule, goal, Junctor.IMP, new ImmutableArray<Term>(contFlagTerm, inv), applicationSequent);
+                ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, Junctor.IMP, new ImmutableArray<Term>(contFlagTerm, inv), applicationSequent);
                 return TB.imp(contFlagTerm, inv, labels);
             }
         } else {
@@ -503,7 +488,7 @@ public final class WhileInvariantTransformer {
             if (contFlagTerm != null)
                 premiss = TB.imp(contFlagTerm, premiss);            
             
-            ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState, services, applicationPos, rule, goal, Junctor.IMP, new ImmutableArray<Term>(premiss, inv), applicationSequent);
+            ImmutableArray<TermLabel> labels = computeLoopBodyImplicatonLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, Junctor.IMP, new ImmutableArray<Term>(premiss, inv), applicationSequent);
             return TB.imp(premiss, inv, labels);
         }       
     }
@@ -525,11 +510,12 @@ public final class WhileInvariantTransformer {
                                                                       Services services,
                                                                       PosInOccurrence applicationPos, 
                                                                       Rule rule, 
+                                                                      RuleApp ruleApp,
                                                                       Goal goal, 
                                                                       Operator operator, 
                                                                       ImmutableArray<Term> subs, 
                                                                       Sequent applicationSequent) {
-       return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, goal, "LoopBodyImplication", null, operator, subs, null, null, post.getLabels());
+       return TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, "LoopBodyImplication", null, operator, subs, null, null, post.getLabels());
     }
     
 
@@ -538,6 +524,7 @@ public final class WhileInvariantTransformer {
                            ProgramVariable thrownException,
                            Term post,
                            Rule rule,
+                           RuleApp ruleApp,
                            Goal goal,
                            PosInOccurrence applicationPos, 
                            Services services) {
@@ -546,7 +533,7 @@ public final class WhileInvariantTransformer {
         Term throwException = TB.prog(modality, 
                                                   throwJavaBlock, 
                                                   post,
-                                                  TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, goal, "ThrowCaseModality", null, modality, new ImmutableArray<Term>(post), null, throwJavaBlock, post.getLabels()));
+                                                  TermLabelManager.instantiateLabels(termLabelState, services, applicationPos, rule, ruleApp, goal, "ThrowCaseModality", null, modality, new ImmutableArray<Term>(post), null, throwJavaBlock, post.getLabels()));
         return TB.imp( 
               TB.equals(typeConv.convertToLogicElement(excFlag), 
         	       typeConv.getBooleanLDT().getTrueTerm()), 

@@ -31,7 +31,7 @@ import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.junit.Test;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.test.testcase.swtbot.AbstractKeYDebugTargetTestCase;
 import org.key_project.sed.key.example.ui.test.Activator;
@@ -54,6 +54,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
                           null,
                           "data/oracle/example1/Number.xml",
                           false,
+                          false,
                           false);
    }
    
@@ -63,11 +64,11 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
    @Test
    public void testExample2_noPrecondition() throws Exception {
       doStepIntoTest("SWTBotSEDExampleNewWizardTest_testExample2_noPrecondition",
-                     createMethodSelector("example2.QuickSort", "sort"),
+                     createMethodSelector("example2.Mergesort", "sort", "[I"),
                      false,
                      null,
                      3,
-                     "data/oracle/example2/QuickSort_NoPrecondition.xml");
+                     "data/oracle/example2/Mergesort_NoPrecondition.xml");
    }
    
    /**
@@ -76,11 +77,11 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
    @Test
    public void testExample2_withPrecondition() throws Exception {
       doStepIntoTest("SWTBotSEDExampleNewWizardTest_testExample2_withPrecondition",
-                     createMethodSelector("example2.QuickSort", "sort"),
+                     createMethodSelector("example2.Mergesort", "sort", "[I"),
                      false,
-                     "numbers != null & numbers.length >= 1",
+                     "intArr != null",
                      5,
-                     "data/oracle/example2/QuickSort_WithPrecondition.xml");
+                     "data/oracle/example2/Mergesort_WithPrecondition.xml");
    }
    
    /**
@@ -93,6 +94,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
                           true,
                           "example3.ArrayUtil[example3.ArrayUtil::indexOf([Ljava.lang.Object,example3.ArrayUtil.Filter)].JML normal_behavior operation contract.0",
                           "data/oracle/example3/ArrayUtil.xml",
+                          true,
                           true,
                           true);
    }
@@ -107,6 +109,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
                           false,
                           null,
                           "data/oracle/example4/AVLTree.xml",
+                          false,
                           false,
                           false);
       // TODO: Test symbolic memory configuration visualization
@@ -133,7 +136,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
          public void doTest(IJavaProject javaProject) throws Exception {
             IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
                @Override
-               public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {
+               public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {
                   SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0); // Select thread
                   for (int i = 0; i < numberOfStepIntos; i++) {
                      stepInto(bot, item, target);
@@ -141,7 +144,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
                   assertDebugTargetViaOracle(target, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false, false);
                }
             };
-            doKeYDebugTargetTest(javaProject, true, true, selector, useExistingContract, preconditionOrExistingContract, false, false, false, false, false, false, true, false, false, 10, executor);
+            doKeYDebugTargetTest(javaProject, true, true, selector, useExistingContract, preconditionOrExistingContract, false, false, false, false, false, false, true, false, false, true, false, 10, executor);
          }
       };
       doExampleTest(projectName, steps);
@@ -156,6 +159,7 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
     * @param expectedModelPathInBundle The path to the oracle file.
     * @param useMethodContracts Use method contracts?
     * @param useLoopInvariants Use loop invariants?
+    * @param useBlockContracts Use Block Contracts?
     * @throws Exception Occurred Exception.
     */
    protected void doExampleResumeTest(String projectName, 
@@ -164,12 +168,13 @@ public class SWTBotSEDExampleNewWizardTest extends AbstractKeYDebugTargetTestCas
                                       final String preconditionOrExistingContract,
                                       final String expectedModelPathInBundle,
                                       final boolean useMethodContracts,
-                                      final boolean useLoopInvariants) throws Exception {
+                                      final boolean useLoopInvariants,
+                                      final boolean useBlockContracts) throws Exception {
       IExampleTestSteps steps = new IExampleTestSteps() {
          @Override
          public void doTest(IJavaProject javaProject) throws Exception {
-            IKeYDebugTargetTestExecutor executor = createResumeExecutor(false, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false, false, false, false, useMethodContracts, useLoopInvariants, false, false);
-            doKeYDebugTargetTest(javaProject, true, true, selector, useExistingContract, preconditionOrExistingContract, false, false, false, false, false, false, true, false, false, 10, executor);
+            IKeYDebugTargetTestExecutor executor = createResumeExecutor(false, Activator.PLUGIN_ID, expectedModelPathInBundle, false, false, false, false, false, useMethodContracts, useLoopInvariants, useBlockContracts, false, false);
+            doKeYDebugTargetTest(javaProject, true, true, selector, useExistingContract, preconditionOrExistingContract, false, false, false, false, false, false, true, false, false, true, false, 10, executor);
          }
       };
       doExampleTest(projectName, steps);

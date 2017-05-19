@@ -406,7 +406,20 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
          completedBlocks = completedBlocks.append(completedBlock);
       }
    }
-
+   
+   /**
+    * Removes the given {@link IExecutionBlockStartNode} from registration.
+    * @param completedBlock The {@link IExecutionBlockStartNode} to be remove.
+    * @author Anna Filighera
+    */
+   public void removeCompletedBlock(IExecutionBlockStartNode<?> completedBlock) {
+      if (completedBlock != null && completedBlocks.contains(completedBlock)) {
+         completedBlocks = completedBlocks.removeAll(completedBlock);
+         blockCompletionConditions.remove(completedBlock);
+         formatedBlockCompletionConditions.remove(completedBlock);
+      }
+   }
+   
    /**
     * {@inheritDoc}
     */
@@ -440,7 +453,7 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
     */
    protected Object lazyComputeBlockCompletionCondition(IExecutionBlockStartNode<?> completedNode, boolean returnFormatedCondition) throws ProofInputException {
       final InitConfig initConfig = getInitConfig();
-      if (initConfig != null && // Ohterwise Proof is disposed.
+      if (initConfig != null && // Otherwise Proof is disposed.
           completedBlocks.contains(completedNode)) {
          final Services services = initConfig.getServices();
          // Collect branch conditions
@@ -448,14 +461,20 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
          AbstractExecutionNode<?> parent = getParent();
          while (parent != null && parent != completedNode) {
             if (parent instanceof IExecutionBranchCondition) {
-               bcs.add(((IExecutionBranchCondition)parent).getBranchCondition());
+               Term bc = ((IExecutionBranchCondition)parent).getBranchCondition();
+               if (bc == null) {
+                  return null; // Proof disposed in between, computation not possible
+               }
+               bcs.add(bc);
             }
             parent = parent.getParent();
          }
          // Add current branch condition to path
          Term condition = services.getTermBuilder().and(bcs);
          // Simplify path condition
-         condition = SymbolicExecutionUtil.simplify(initConfig, getProof(), condition);
+         if (getSettings().isSimplifyConditions()) {
+            condition = SymbolicExecutionUtil.simplify(initConfig, getProof(), condition);
+         }
          condition = SymbolicExecutionUtil.improveReadability(condition, services);
          // Format path condition
          String formatedCondition = formatTerm(condition, services);
@@ -467,5 +486,13 @@ public abstract class AbstractExecutionNode<S extends SourceElement> extends Abs
       else {
          return null;
       }
+   }
+   /**
+    * Removes the given child.
+    * @param child The child to be removed.
+    * @author Anna Filighera
+    */
+   public void removeChild(IExecutionNode<?> child) {
+      children.remove(child);
    }
 }

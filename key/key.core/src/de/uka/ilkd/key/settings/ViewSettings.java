@@ -39,6 +39,7 @@ public class ViewSettings implements Settings, Cloneable {
     private static final String SHOW_JAVA_WARNING = "[View]ShowJavaWarning";
     private static final String PRETTY_SYNTAX = "[View]PrettySyntax";
     private static final String USE_UNICODE = "[View]UseUnicodeSymbols";
+    private static final String SYNTAX_HIGHLIGHTING = "[View]SyntaxHighlighting";
     private static final String HIDE_PACKAGE_PREFIX = "[View]HidePackagePrefix";
     private static final String CONFIRM_EXIT = "[View]ConfirmExit";
     
@@ -61,6 +62,7 @@ public class ViewSettings implements Settings, Cloneable {
     /** Pretty Syntax is true by default, use Unicode symbols not */
     private boolean usePretty = true;
     private boolean useUnicode = false;
+    private boolean useSyntaxHighlighting = true;
     private boolean hidePackagePrefix = false;
     /** confirm exiting by default */
     private boolean confirmExit = true;
@@ -233,6 +235,7 @@ public class ViewSettings implements Settings, Cloneable {
 		String val7 = props.getProperty(SHOW_JAVA_WARNING);
 		String val8 = props.getProperty(PRETTY_SYNTAX);
 		String val9 = props.getProperty(USE_UNICODE);
+        String val10 = props.getProperty(SYNTAX_HIGHLIGHTING);
 		String hidePackage = props.getProperty(HIDE_PACKAGE_PREFIX);
 		String confirmExit = props.getProperty(CONFIRM_EXIT);
 		if (val1 != null) {
@@ -267,6 +270,9 @@ public class ViewSettings implements Settings, Cloneable {
 		if (val9 != null) {
 		    useUnicode = Boolean.valueOf(val9).booleanValue();
 		}
+        if (val10 != null) {
+            useSyntaxHighlighting = Boolean.valueOf(val10).booleanValue();
+        }
 		if (hidePackage != null) {
 		    hidePackagePrefix = Boolean.valueOf(hidePackage);
 		}
@@ -299,6 +305,7 @@ public class ViewSettings implements Settings, Cloneable {
     	props.setProperty(SHOW_JAVA_WARNING, "" + notifyLoadBehaviour);
     	props.setProperty(PRETTY_SYNTAX, ""+ usePretty);
     	props.setProperty(USE_UNICODE, "" + useUnicode);
+        props.setProperty(SYNTAX_HIGHLIGHTING, "" + useSyntaxHighlighting);
         props.setProperty(HIDE_PACKAGE_PREFIX, "" + hidePackagePrefix);
     	props.setProperty(CONFIRM_EXIT, ""+confirmExit);
     }
@@ -320,16 +327,27 @@ public class ViewSettings implements Settings, Cloneable {
 	listenerList.add(l);
     }
 
+    /**
+     * removes the listener from the settings object
+     * @param l the listener to remove
+     */
+    public void removeSettingsListener(SettingsListener l) {
+   listenerList.remove(l);
+    }
+
 public boolean isUsePretty() {
 	return usePretty;
 }
 
 public void setUsePretty(boolean usePretty) {
+   final boolean originalUsePretty = this.usePretty;
 	this.usePretty = usePretty;
 	if(!usePretty){
 	    setUseUnicode(false);
 	}
-	fireSettingsChanged();
+	if (originalUsePretty != this.usePretty) {
+	   fireSettingsChanged();
+	}
 }
 /**
  * Use Unicode Symbols is only allowed if pretty syntax is used
@@ -346,21 +364,36 @@ public boolean isUseUnicode() {
 }
 
 public void setUseUnicode(boolean useUnicode) {
+   final boolean originalUseUnicode = this.useUnicode;
 	if(isUsePretty()){
 	 this.useUnicode = useUnicode;
 	} else {
 	 this.useUnicode = false;
 	}
-	fireSettingsChanged();
+	if (originalUseUnicode != this.useUnicode) {
+	   fireSettingsChanged();
+	}
 }
 
-    public boolean hidePackagePrefix() {
+    public boolean isUseSyntaxHighlighting() {
+        return useSyntaxHighlighting;
+    }
+
+    public void setUseSyntaxHighlighting(boolean useSyntaxHighlighting) {
+        this.useSyntaxHighlighting = useSyntaxHighlighting;
+        fireSettingsChanged();
+    }
+
+    public boolean isHidePackagePrefix() {
         return hidePackagePrefix;
     }
 
     public void setHidePackagePrefix(boolean hide) {
+        final boolean originalHide = hidePackagePrefix;
         hidePackagePrefix = hide;
-        fireSettingsChanged();
+        if (originalHide != hide) {
+           fireSettingsChanged();
+        }
     }
 
     /** Whether to display the confirmation dialog upon exiting the main window. */

@@ -92,7 +92,12 @@ public final class StaRVOOrSUtil {
                for (IObserverFunction target : targets) {
                   ImmutableSet<Contract> contracts = env.getSpecificationRepository().getContracts(type, target);
                   for (Contract contract : contracts) {
-                     StaRVOOrSProof proofResult = verify(env, contract, useOperationContracts, useLoopInvarints);
+                     StaRVOOrSProof proofResult = null;
+                     try {   
+                          proofResult = verify(env, contract, useOperationContracts, useLoopInvarints);
+                     } catch (Exception e) {
+                         System.out.println("PROBLEM");
+                     }
                      if (proofResult != null) {
                         result.addProof(proofResult);
                      }
@@ -136,10 +141,11 @@ public final class StaRVOOrSUtil {
                                                                          ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, 
                                                                          useOperationContracts, 
                                                                          useLoopInvarints, 
+                                                                         useOperationContracts,
                                                                          nonExecutionBranchHidingSideProofs, 
                                                                          aliasChecks);
          // Create symbolic execution tree which contains only the start node at beginning
-         SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, false, false, true, false);
+         SymbolicExecutionTreeBuilder builder = new SymbolicExecutionTreeBuilder(proof, false, false, true, false,true);
          builder.analyse();
          // Run auto mode
          env.getProofControl().startAndWaitForAutoMode(proof);

@@ -24,21 +24,24 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-import org.key_project.sed.core.annotation.ISEDAnnotation;
-import org.key_project.sed.core.annotation.ISEDAnnotationLink;
-import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDBranchStatement;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDExceptionalMethodReturn;
-import org.key_project.sed.core.model.ISEDExceptionalTermination;
-import org.key_project.sed.core.model.ISEDLoopBodyTermination;
-import org.key_project.sed.core.model.ISEDLoopCondition;
-import org.key_project.sed.core.model.ISEDLoopInvariant;
-import org.key_project.sed.core.model.ISEDLoopStatement;
-import org.key_project.sed.core.model.ISEDMethodCall;
-import org.key_project.sed.core.model.ISEDMethodContract;
-import org.key_project.sed.core.model.ISEDMethodReturn;
-import org.key_project.sed.core.model.ISEDTermination;
+import org.key_project.sed.core.annotation.ISEAnnotation;
+import org.key_project.sed.core.annotation.ISEAnnotationLink;
+import org.key_project.sed.core.model.ISEBlockContract;
+import org.key_project.sed.core.model.ISEBlockContractExceptionalTermination;
+import org.key_project.sed.core.model.ISEBlockContractTermination;
+import org.key_project.sed.core.model.ISEBranchCondition;
+import org.key_project.sed.core.model.ISEBranchStatement;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
+import org.key_project.sed.core.model.ISEExceptionalTermination;
+import org.key_project.sed.core.model.ISELoopBodyTermination;
+import org.key_project.sed.core.model.ISELoopCondition;
+import org.key_project.sed.core.model.ISELoopInvariant;
+import org.key_project.sed.core.model.ISELoopStatement;
+import org.key_project.sed.core.model.ISEMethodCall;
+import org.key_project.sed.core.model.ISEMethodContract;
+import org.key_project.sed.core.model.ISEMethodReturn;
+import org.key_project.sed.core.model.ISETermination;
 import org.key_project.sed.ui.Activator;
 import org.key_project.util.eclipse.BundleUtil;
 
@@ -155,42 +158,42 @@ public final class SEDImages {
     public static final String LOOP_BODY_TERMINATION_NOT_VERIFIED = "org.key_project.sed.ui.images.loopBodyTerminationNotVerified";
     
     /**
-     * The key for the image that is used to edit an {@link ISEDAnnotation}.
+     * The key for the image that is used to edit an {@link ISEAnnotation}.
      */
     public static final String ANNOTATION_EDIT = "org.key_project.sed.ui.images.annotation.edit";
     
     /**
-     * The key for the image that is used to edit an {@link ISEDAnnotation}.
+     * The key for the image that is used to edit an {@link ISEAnnotation}.
      */
     public static final String ANNOTATION_EDIT_WIZARD = "org.key_project.sed.ui.images.annotation.editWizard";
     
     /**
-     * The key for the image that is used to move an {@link ISEDAnnotation} up.
+     * The key for the image that is used to move an {@link ISEAnnotation} up.
      */
     public static final String ANNOTATION_MOVE_UP = "org.key_project.sed.ui.images.annotation.moveUp";
     
     /**
-     * The key for the image that is used to move an {@link ISEDAnnotation} down.
+     * The key for the image that is used to move an {@link ISEAnnotation} down.
      */
     public static final String ANNOTATION_MOVE_DOWN = "org.key_project.sed.ui.images.annotation.moveDown";
     
     /**
-     * The key for the image that is used to delete an {@link ISEDAnnotation}.
+     * The key for the image that is used to delete an {@link ISEAnnotation}.
      */
     public static final String ANNOTATION_DELETE = "org.key_project.sed.ui.images.annotation.delete";
 
     /**
-     * The key for the image that is used to show links of an {@link ISEDAnnotation}.
+     * The key for the image that is used to show links of an {@link ISEAnnotation}.
      */
     public static final String ANNOTATION_LINKS = "org.key_project.sed.ui.images.annotation.links";
 
     /**
-     * The key for the image that is used to show links of an {@link ISEDAnnotation}.
+     * The key for the image that is used to show links of an {@link ISEAnnotation}.
      */
     public static final String ANNOTATION_LINKS_WIZARD = "org.key_project.sed.ui.images.annotation.linksWizard";
 
     /**
-     * The key for the image that is used to follow an {@link ISEDAnnotationLink}.
+     * The key for the image that is used to follow an {@link ISEAnnotationLink}.
      */
     public static final String ANNOTATION_GO_TO = "org.key_project.sed.ui.images.annotation.goTo";
 
@@ -233,6 +236,36 @@ public final class SEDImages {
      * The key for the image that is used for comment wizard.
      */
     public static final String COMMENT_WIZARD = "org.key_project.sed.ui.images.commentWizard";
+    
+    /**
+     * The key for the image that is used for block contract.
+     */
+    public static final String BLOCK_CONTRACT = "org.key_project.sed.ui.images.blockContract";
+    
+    /**
+     * The key for the image that is used for block contract.
+     */
+    public static final String BLOCK_CONTRACT_NOT_PRE = "org.key_project.sed.ui.images.blockContractNotPre";
+    
+    /**
+     * The key for the image that is used for loop body termination.
+     */
+    public static final String BLOCK_CONTRACT_TERMINATION = "org.key_project.sed.ui.images.blockContractTermination";
+    
+    /**
+     * The key for the image that is used for loop body termination.
+     */
+    public static final String BLOCK_CONTRACT_TERMINATION_NOT_VERIFIED = "org.key_project.sed.ui.images.blockContractTerminationNotVerified";
+    
+    /**
+     * The key for the image that is used for exceptional loop body termination.
+     */
+    public static final String BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION = "org.key_project.sed.ui.images.blockContractExceptionalTermination";
+    
+    /**
+     * The key for the image that is used for exceptional loop body termination.
+     */
+    public static final String BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION_NOT_VERIFIED = "org.key_project.sed.ui.images.blockContractExceptinalTerminationNotVerified";
     
     /**
      * Forbid instances.
@@ -343,7 +376,7 @@ public final class SEDImages {
            path = "icons/loop_invariant.gif";
         }
         else if (LOOP_INVARIANT_INITIALLY_INVALID.equals(key)) {
-           path = "icons/loop_invariant _initially_invalid.gif";
+           path = "icons/loop_invariant_initially_invalid.gif";
         }
         else if (LOOP_BODY_TERMINATION.equals(key)) {
            path = "icons/loop_body_termination.gif";
@@ -401,6 +434,24 @@ public final class SEDImages {
         else if (COMMENT_WIZARD.equals(key)) {
            path = "icons/comment_wizard.png";
         }
+        else if (BLOCK_CONTRACT.equals(key)) {
+           path = "icons/block_contract.gif";
+        }
+        else if (BLOCK_CONTRACT_NOT_PRE.equals(key)) {
+           path = "icons/block_contract_not_pre.gif";
+        }
+        else if (BLOCK_CONTRACT_TERMINATION.equals(key)) {
+           path = "icons/block_contract_termination.gif";
+        }
+        else if (BLOCK_CONTRACT_TERMINATION_NOT_VERIFIED.equals(key)) {
+           path = "icons/block_contract_termination_not_verified.gif";
+        }
+        else if (BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION.equals(key)) {
+           path = "icons/block_contract_exceptional_termination.gif";
+        }
+        else if (BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION_NOT_VERIFIED.equals(key)) {
+           path = "icons/block_contract_exceptional_termination_not_verified.gif";
+        }
         // Load image if possible
         if (path != null) {
            InputStream in = null;
@@ -429,22 +480,22 @@ public final class SEDImages {
     }
     
     /**
-     * Returns the type icon of the given {@link ISEDDebugNode}.
-     * @param element The {@link ISEDDebugNode} to get type icon for.
+     * Returns the type icon of the given {@link ISENode}.
+     * @param element The {@link ISENode} to get type icon for.
      * @return The type icon.
      */
-    public static Image getNodeImage(ISEDDebugNode element) {
-       if (element instanceof ISEDMethodCall) {
+    public static Image getNodeImage(ISENode element) {
+       if (element instanceof ISEMethodCall) {
           return getImage(SEDImages.METHOD_CALL);
        }
-       else if (element instanceof ISEDMethodReturn) {
+       else if (element instanceof ISEMethodReturn) {
           return getImage(SEDImages.METHOD_RETURN);
        }
-       else if (element instanceof ISEDExceptionalMethodReturn) {
+       else if (element instanceof ISEExceptionalMethodReturn) {
           return getImage(SEDImages.EXCEPTIONAL_METHOD_RETURN);
        }
-       else if (element instanceof ISEDExceptionalTermination) {
-          ISEDExceptionalTermination node = (ISEDExceptionalTermination)element;
+       else if (element instanceof ISEExceptionalTermination) {
+          ISEExceptionalTermination node = (ISEExceptionalTermination)element;
           if (node.isVerified()) {
              return getImage(SEDImages.EXCEPTIONAL_TERMINATION);
           }
@@ -452,8 +503,8 @@ public final class SEDImages {
              return getImage(SEDImages.EXCEPTIONAL_TERMINATION_NOT_VERIFIED);
           }
        }
-       else if (element instanceof ISEDLoopBodyTermination) {
-          ISEDLoopBodyTermination node = (ISEDLoopBodyTermination)element;
+       else if (element instanceof ISELoopBodyTermination) {
+          ISELoopBodyTermination node = (ISELoopBodyTermination)element;
           if (node.isVerified()) {
              return getImage(SEDImages.LOOP_BODY_TERMINATION);
           }
@@ -461,8 +512,26 @@ public final class SEDImages {
              return getImage(SEDImages.LOOP_BODY_TERMINATION_NOT_VERIFIED);
           }
        }
-       else if (element instanceof ISEDTermination) {
-          ISEDTermination node = (ISEDTermination)element;
+       else if (element instanceof ISEBlockContractExceptionalTermination) {
+          ISEBlockContractExceptionalTermination node = (ISEBlockContractExceptionalTermination)element;
+          if (node.isVerified()) {
+             return getImage(SEDImages.BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION);
+          }
+          else {
+             return getImage(SEDImages.BLOCK_CONTRACT_EXCEPTIONAL_TERMINATION_NOT_VERIFIED);
+          }
+       }
+       else if (element instanceof ISEBlockContractTermination) {
+          ISEBlockContractTermination node = (ISEBlockContractTermination)element;
+          if (node.isVerified()) {
+             return getImage(SEDImages.BLOCK_CONTRACT_TERMINATION);
+          }
+          else {
+             return getImage(SEDImages.BLOCK_CONTRACT_TERMINATION_NOT_VERIFIED);
+          }
+       }
+       else if (element instanceof ISETermination) {
+          ISETermination node = (ISETermination)element;
           if (node.isVerified()) {
              return getImage(SEDImages.TERMINATION);
           }
@@ -470,20 +539,20 @@ public final class SEDImages {
              return getImage(SEDImages.TERMINATION_NOT_VERIFIED);
           }
        }
-       else if (element instanceof ISEDBranchCondition) {
+       else if (element instanceof ISEBranchCondition) {
           return getImage(SEDImages.BRANCH_CONDITION);
        }
-       else if (element instanceof ISEDBranchStatement) {
+       else if (element instanceof ISEBranchStatement) {
           return getImage(SEDImages.BRANCH_STATEMENT);
        }
-       else if (element instanceof ISEDLoopStatement) {
+       else if (element instanceof ISELoopStatement) {
           return getImage(SEDImages.LOOP_STATEMENT);
        }
-       else if (element instanceof ISEDLoopCondition) {
+       else if (element instanceof ISELoopCondition) {
           return getImage(SEDImages.LOOP_CONDITION);
        }
-       else if (element instanceof ISEDMethodContract) {
-          ISEDMethodContract node = (ISEDMethodContract)element;
+       else if (element instanceof ISEMethodContract) {
+          ISEMethodContract node = (ISEMethodContract)element;
           if (node.isPreconditionComplied()) {
              if (!node.hasNotNullCheck() || node.isNotNullCheckComplied()) {
                 return getImage(SEDImages.METHOD_CONTRACT);
@@ -501,8 +570,8 @@ public final class SEDImages {
              }
           }
        }
-       else if (element instanceof ISEDLoopInvariant) {
-          ISEDLoopInvariant node = (ISEDLoopInvariant)element;
+       else if (element instanceof ISELoopInvariant) {
+          ISELoopInvariant node = (ISELoopInvariant)element;
           if (node.isInitiallyValid()) {
              return getImage(SEDImages.LOOP_INVARIANT);
           }
@@ -521,6 +590,15 @@ public final class SEDImages {
           }
           else {
              return DebugPluginImages.getImage(IDebugUIConstants.IMG_OBJS_THREAD_RUNNING);
+          }
+       }
+       else if (element instanceof ISEBlockContract) {
+          ISEBlockContract bc = (ISEBlockContract) element;
+          if (bc.isPreconditionComplied()) {
+             return getImage(SEDImages.BLOCK_CONTRACT);
+          }
+          else {
+             return getImage(SEDImages.BLOCK_CONTRACT_NOT_PRE);
           }
        }
        else {

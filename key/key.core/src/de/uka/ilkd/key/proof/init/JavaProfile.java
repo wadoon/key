@@ -25,15 +25,21 @@ import de.uka.ilkd.key.proof.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
+import de.uka.ilkd.key.rule.AbstractContractRuleApp;
+import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.join.JoinRule;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
+import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 
 /**
@@ -60,7 +66,7 @@ public class JavaProfile extends AbstractProfile {
     private boolean permissions = false;
 
     public final static StrategyFactory DEFAULT =
-        new JavaCardDLStrategy.Factory();
+        new JavaCardDLStrategyFactory();
 
     private OneStepSimplifier oneStepSimpilifier;
 
@@ -122,7 +128,8 @@ public class JavaProfile extends AbstractProfile {
                                    .prepend(BlockContractRule.INSTANCE)
                                    .prepend(UseDependencyContractRule.INSTANCE)
                                    .prepend(getOneStepSimpilifier())
-                                   .prepend(QueryExpand.INSTANCE);
+                                   .prepend(QueryExpand.INSTANCE)
+                                   .prepend(JoinRule.INSTANCE);
   
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact 
         // that Contract insertion rule is the FIRST element of this list!
@@ -213,4 +220,14 @@ public class JavaProfile extends AbstractProfile {
 	public boolean withPermissions() {
 		return permissions;
 	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+   @Override
+   public boolean isSpecificationInvolvedInRuleApp(RuleApp app) {
+      return app instanceof LoopInvariantBuiltInRuleApp ||
+             app instanceof AbstractContractRuleApp ||
+             app instanceof BlockContractBuiltInRuleApp;
+   }
 }

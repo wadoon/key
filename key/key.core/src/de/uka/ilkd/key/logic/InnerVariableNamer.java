@@ -58,6 +58,7 @@ public class InnerVariableNamer extends VariableNamer {
 	//prepare renaming of inner var
 	final NameCreationInfo nci = MethodStackInfo.create(getProgramFromPIO(posOfFind));
 	ProgramElementName newname = null;
+   ProgramElementName branchUniqueName = null;
 
 	// Name proposal = services.getProof().getNameRecorder().getProposal();
         Name proposal = services.getNameRecorder().getProposal();
@@ -75,8 +76,9 @@ public class InnerVariableNamer extends VariableNamer {
                             getProgramFromPIO(posOfFind),
                             null);
             final NamespaceSet namespaces = services.getNamespaces();
+            
             while (!isUniqueInGlobals(newname.toString(), globals) ||
-                    namespaces.lookupLogicSymbol(newname)!=null) {
+                  namespaces.lookupLogicSymbol(newname)!=null) {
 	        newcounter += 1;
 	        newname = createName(bai.basename, newcounter, nci);
 	    }
