@@ -116,6 +116,13 @@ public class SymbolicExecutionJavaProfile extends JavaProfile {
    }
 
    /**
+    *  the default strategy factory to be used
+    */
+   public StrategyFactory getDefaultStrategyFactory() {
+       return SYMBOLIC_EXECUTION_FACTORY;
+   }
+   
+   /**
     * {@inheritDoc}
     */
    @Override
