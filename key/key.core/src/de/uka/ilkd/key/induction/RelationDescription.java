@@ -23,10 +23,7 @@ public class RelationDescription {
 
 	private LinkedList<AtomicRelationDescription> atomics;
 	private LinkedList<Pair<QuantifiableVariable, Term>> possibleSubstitutions;
-	private Term rangeFormula;
 	private Term term;
-	
-	private static int varCounter = 0;
 	
 	/**
 	 * @use RelationDescriptionFactory to generate
@@ -35,26 +32,19 @@ public class RelationDescription {
 	 */
 	protected RelationDescription(Term t, Services serv){
 		ConstructorExtractor ce = new ConstructorExtractor(t, serv);
-		TermBuilder tb = serv.getTermBuilder();
 		ImmutableArray<Function> constructors = ce.getConstructors();
 		Iterable<Taclet> findTerms;
-		LinkedList<Term> functionTerms = new LinkedList<Term>();
 		
 		this.term = t;
 		
 		possibleSubstitutions = new LinkedList<Pair<QuantifiableVariable, Term>>();
 		
-		System.out.println("Number of constructors: " + constructors.size());
-		
-		for(Function f : constructors){
-			System.out.println("Constructor: " + f.toString());
-			possibleSubstitutions.add(createSubstitutionForFunction(f, serv));
-		}
+		System.out.println("The term: " + t + " has " + constructors.size() + " constructors.");
 		
 		//TODO: check for cast error
 		findTerms = serv.getProof().getInitConfig().activatedTaclets();
 		
-		atomics = createAtomics(findTerms, t, possibleSubstitutions, serv);
+		atomics = createAtomics(findTerms, t, constructors, possibleSubstitutions, serv);
 	}
 	
 	public LinkedList<AtomicRelationDescription> getAtomics(){
@@ -96,6 +86,7 @@ public class RelationDescription {
 	private static LinkedList<AtomicRelationDescription> createAtomics(
 			Iterable<Taclet> findTerms, 
 			Term term, 
+			ImmutableArray<Function> constructors,
 			LinkedList<Pair<QuantifiableVariable, Term>> subst, 
 			Services serv
 	){
@@ -116,113 +107,15 @@ public class RelationDescription {
 				if(rangeFormula != tb.ff()){	//just use rangeformula which are not false.
 					atomicRDs.add(new AtomicRelationDescription(
 							rangeFormula,
-							subst	//TODO: only use the substitutions gained from this given term (the term might be a subterm)
+							constructors,
+							subst,	//TODO: only use the substitutions gained from this given term (the term might be a subterm)
+							serv
 							));
 				}
 			}
 		}
 		
 		return atomicRDs;
-	}
-	
-	/**
-	 * 
-	 * @param f a Function
-	 * @param s the Services (they are required to get the TermBuilder)
-	 * @return a Pair&lt;QuantifiableVariable, Term&gt; which holds the Term consisting of the given function
-	 * and new QuantifiableVariables as parameters and a new QuantifiableVariable.
-	 * (maybe this QuantifiableVariable should not be part of the return value. It might be that
-	 * this substitution has to be created for each existing QuantifiableVariable which has the same
-	 * type 
-	 */
-	private static Pair<QuantifiableVariable, Term> createSubstitutionForFunction(Function f, Services s){
-		QuantifiableVariable result = SchemaVariableFactory.createVariableSV(generateName(f, s, "res"), f.sort());
-		QuantifiableVariable[] parameters = new QuantifiableVariable[f.arity()];
-		TermBuilder tb = s.getTermBuilder();
-		for(int i = 0; i < f.arity(); i++){
-			parameters[i] = SchemaVariableFactory.createVariableSV(generateName(f, s, "arg" + i), f.argSort(i));
-		}
-		
-		return new Pair<QuantifiableVariable, Term>(
-				result, 
-				tb.func(f, varsToTerm(parameters, tb), new ImmutableArray<QuantifiableVariable>())
-		);
-	}
-	
-	/**
-	 * 
-	 * @param f a function
-	 * @param s the Services (might needed later)
-	 * @param suffix a String
-	 * @return a new Name with a String which starts with the given Functions name then the given 
-	 * suffix and the private variable varCounter. All separated by the char "_". varCounter is 
-	 * increased by one for each call of this function to ensure the uniqueness of the names.
-	 */
-	private static Name generateName(Function f, Services s, String suffix){
-		//TODO: better name generation maybe by existing code.
-		//
-		StringBuilder sb = new StringBuilder();
-		sb.append(f.name().toString());
-		sb.append("_");
-		sb.append(suffix);
-		sb.append("_");
-		sb.append(varCounter);
-		varCounter++;
-		return new Name(sb.toString());
-	}
-	
-	/**
-	 * 
-	 * @param f: a constructor
-	 * @param s
-	 * @return a LinkedList&lt;Pair&lt;QuantifiableVariable, Term&gt;&gt; which contains constructor substitutions
-	 */
-	private static LinkedList<Pair<QuantifiableVariable, Term>> createSubstitutions(Function f, Services s){
-				
-		//neue SchemaVariablen für Substitution erstellen
-		
-		Sort returnSort = f.sort();
-		Namespace vars = s.getNamespaces().variables();
-		TermBuilder tb = s.getTermBuilder();
-		LinkedList<QuantifiableVariable[]> parameters = new LinkedList<QuantifiableVariable[]>();
-		Term t;
-		LinkedList<Pair<QuantifiableVariable, Term>> substitutions = new LinkedList<Pair<QuantifiableVariable, Term>>();
-		QuantifiableVariable qv = null;
-		LinkedList<QuantifiableVariable> qvs = new LinkedList<QuantifiableVariable>();
-		
-		if(f.arity() == 0){
-			return null;
-		}
-		 
-		LinkedList<QuantifiableVariable>[] possibleParameters = new LinkedList[f.arity()]; 
-		
-		//transform Named to QuantifiableVariable
-		for(Named n : vars.elements()){
-			if(n instanceof QuantifiableVariable){
-				qvs.add((QuantifiableVariable)n);
-			}
-		}
-		
-		//TODO: [optional] check for optimization. The for loop should more or less do the same.
-		for(int i = 0; i < f.arity(); i++){
-			Sort sortAtPosition = f.argSort(i);
-			possibleParameters[i] = getAllVariablesOfSort(qvs, sortAtPosition);
-		}
-
-		parameters = allCombinations(possibleParameters, 0);
-		
-		for(QuantifiableVariable[] combination : parameters){
-			t  = tb.func(f, varsToTerm(combination, tb), new ImmutableArray<QuantifiableVariable>());
-			for(QuantifiableVariable q : qvs){
-				if(q.sort().equals(returnSort)){
-					substitutions.add(new Pair<QuantifiableVariable, Term>(q, t));
-				}
-			}
-		}
-		
-		
-		
-		return substitutions;
 	}
 	
 	/**
@@ -270,19 +163,6 @@ public class RelationDescription {
 		return combis;
 	}
 	
-	/**
-	 * 
-	 * @param qvs
-	 * @param tb
-	 * @return the terms which only consist of the given variables.
-	 */
-	private static Term[] varsToTerm(QuantifiableVariable[] qvs, TermBuilder tb){
-		Term[] terms = new Term[qvs.length];
-		for(int i = 0; i < qvs.length; i++){
-			terms[i] = tb.var(qvs[i]);
-		}
-		return terms;
-	}
 
 	public Operator getOperator() {
 		return term.op();

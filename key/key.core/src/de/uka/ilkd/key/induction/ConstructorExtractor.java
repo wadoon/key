@@ -20,8 +20,8 @@ public class ConstructorExtractor {
 	
 	public ConstructorExtractor(Term t, Services s) {
 		this.term = t;
-		this.namespace = s.getNamespaces().functions();
-		
+		this.namespace = //s.getProof().getInitConfig().funcNS();
+		s.getProof().getNamespaces().functions();
 		//extract sorts from term
 		SortExtractor extractor = new SortExtractor();
 		extractor.addTermWithAllSubterms(this.term);

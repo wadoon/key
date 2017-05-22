@@ -11,6 +11,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableMap;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
@@ -21,12 +22,13 @@ public class SortExtractor {
 	private LinkedList<QuantifiableVariable> variables;
 	private LinkedList<Term> terms;
 	private LinkedList<Substitution> substitutions;
+	private LinkedList<Sort> sortsFromOperators;
 	
 	public SortExtractor() {
 		variables = new LinkedList<QuantifiableVariable>();
 		terms = new LinkedList<Term>();
 		substitutions = new LinkedList<Substitution>();
-		
+		sortsFromOperators = new LinkedList<>();
 	}
 	
 	/**
@@ -36,9 +38,19 @@ public class SortExtractor {
 	public void addTerm(Term t){
 		if(SortExtractor.addIfNotContained(terms, t)){
 			SortExtractor.addAllIfNotContained(variables, SortExtractor.collectVariablesFromTerm(t));
+			operatorSortsFromTerm(t);
 		}
 	}
 	
+	private void operatorSortsFromTerm(Term t) {
+		SortExtractor.addIfNotContained(sortsFromOperators, t.op().sort(t.subs()));
+		if(t.op().arity() > 1){
+			for(Term sub : t.subs()){
+				operatorSortsFromTerm(sub);
+			}
+		}
+	}
+
 	/**
 	 * 
 	 * @param t and all its subterms will be added recursive.
@@ -48,11 +60,10 @@ public class SortExtractor {
 		addTerm(t);
 		
 		ImmutableArray<Term> subtermArray = t.subs();
-		if(subtermArray.size() > 0){
-			for(Term subterm: subtermArray){
-				addTermWithAllSubterms(subterm);
-			}
+		for(Term subterm: subtermArray){
+			addTermWithAllSubterms(subterm);
 		}
+	
 	}
 	
 	public void addSubstitution(Substitution subst){
@@ -69,7 +80,7 @@ public class SortExtractor {
 	 */
 	private static <T> boolean addIfNotContained(Collection<T> collection, T element){
 		//for some special cases this may need a closer look!
-		if(collection == null || !collection.contains(element)){	//maybe contains is not strong enough to compare to Sorts or QuantifiableVariables
+		if(collection != null && !collection.contains(element)){	//maybe contains is not strong enough to compare to Sorts or QuantifiableVariables
 			collection.add(element);
 			return true;
 		}
@@ -157,7 +168,8 @@ public class SortExtractor {
 	 * does not have any duplicates and is in lexicographic order.
 	 */
 	public ImmutableArray<Sort> getSorts(){
-		LinkedList<Sort> sorts = new LinkedList<Sort>();
+		LinkedList<Sort> sorts = new LinkedList<>();
+		sorts.addAll(sortsFromOperators);
 		for(QuantifiableVariable v: variables){
 			Sort s = v.sort();
 			if(!sorts.contains(s)){	//avoid duplicates
