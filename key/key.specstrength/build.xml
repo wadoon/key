@@ -44,7 +44,7 @@
 	</target>
 
 	<target name="jar" depends="build">
-		<jar destfile="${destfile}" basedir="${build.dir}" includes="**/*.class">
+		<jar destfile="${destfile}" basedir="${build.dir}" includes="**/*">
 			<zipgroupfileset dir="${ext.dir}" includes="*.jar" />
 			<!--<fileset dir="." includes="gpl.txt" />-->
 			<manifest>
