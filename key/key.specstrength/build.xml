@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="all" name="Specification Strength Estimation">
+	<property name="src.dir" value="${basedir}/src" />
+	<property name="build.dir" value="${basedir}/bin" />
+	<property name="ext.dir" value="${basedir}/lib" />
+	<property name="destfile" value="key.specstrength.jar" />
+
+	<path id="classpath">
+		<fileset dir="${ext.dir}" includes="commons-cli-1.3.1.jar" />
+		<fileset dir="${ext.dir}" includes="log4j-api-2.6.2.jar" />
+		<fileset dir="${ext.dir}" includes="log4j-core-2.6.2.jar" />
+		<pathelement path="${basedir}/../key.core/bin" />
+		<pathelement path="${basedir}/../key.util/bin" />
+	</path>
+
+	<target name="clean" description="Deletes all generated files and folders.">
+		<delete failonerror="false" includeemptydirs="true">
+			<fileset dir="${build.dir}" includes="**/*" />
+		</delete>
+		<delete file="${destfile}" />
+	</target>
+
+	<target name="copy" description="Copy all resources into the binary directory.">
+		<copy todir="${build.dir}">
+			<fileset dir="${basedir}/resources/" />
+		</copy>
+		<copy todir="${build.dir}/META-INF">
+			<fileset dir="${basedir}/META-INF/" />
+		</copy>
+	</target>
+
+	<target name="build" depends="copy">
+		<mkdir dir="${build.dir}" />
+		<javac
+			srcdir="${src.dir}"
+			destdir="${build.dir}"
+			includes="**/*.java"
+			classpathref="classpath"
+			includeantruntime="false"
+			deprecation="true"
+			debug="true"
+			debuglevel="lines,vars,source"
+			source="1.8" />
+	</target>
+
+	<target name="jar" depends="build">
+		<jar destfile="${destfile}" basedir="${build.dir}" includes="**/*.class">
+			<zipgroupfileset dir="${ext.dir}" includes="*.jar" />
+			<!--<fileset dir="." includes="gpl.txt" />-->
+			<manifest>
+				<attribute name="Main-Class" value="de.tud.cs.se.ds.specstr.cli.Main" />
+			</manifest>
+		</jar>
+		<chmod file="${destfile}" perm="ugo+x" />
+	</target>
+
+	<target name="run" depends="jar">
+		<java jar="${destfile}" fork="true">
+			<classpath>
+				<pathelement location="${destfile}" />
+			</classpath>
+		</java>
+	</target>
+
+	<target name="all" depends="build,jar" />
+</project>
