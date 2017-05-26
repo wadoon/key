@@ -140,7 +140,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         // Initial assertions
         assert ruleApp instanceof LoopInvariantBuiltInRuleApp;
 
-        LoopInvariantInformation loopInvInfo = doPreparations(goal, services,
+        LoopInvariantInformation loopInvInfo = doPreparationsAndSplit(goal, services,
                 ruleApp);
 
         ImmutableList<Goal> goals = loopInvInfo.goals;

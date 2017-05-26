@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -32,13 +33,14 @@ import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 /**
  * An abstract super class for loop invariant rules. Extending rules should
- * usually call {@link #doPreparations(Goal, Services, RuleApp)} directly at the
+ * usually call {@link #doPreparationsAndSplit(Goal, Services, RuleApp)} directly at the
  * beginning of the {@link #apply(Goal, Services, RuleApp)} method.
  *
  * @see LoopScopeInvariantRule
@@ -81,7 +83,35 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      *         for the application of loop invariant rules.
      * @throws RuleAbortException
      */
-    public LoopInvariantInformation doPreparations(Goal goal, Services services,
+    protected LoopInvariantInformation doPreparationsAndSplit(Goal goal, Services services,
+            RuleApp ruleApp) throws RuleAbortException {
+        
+        LoopInvariantInformation inf = doPreparations(goal.node(), services, ruleApp);
+
+        // Prepare the new goals
+        ImmutableList<Goal> goals = goal.split(getNrOfGoals());
+
+        inf.goal = goal;
+        inf.goals = goals;
+        
+        return inf;
+    }
+
+    /**
+     * Constructs the data needed for the currently implemented loop invariants.
+     * 
+     * @param goal
+     *            the Goal on which to apply <tt>ruleApp</tt>
+     * @param services
+     *            the Services with the necessary information about the java
+     *            programs
+     * @param ruleApp
+     *            the rule application to be executed
+     * @return The {@link LoopInvariantInformation} object containing the data
+     *         for the application of loop invariant rules.
+     * @throws RuleAbortException
+     */
+    public LoopInvariantInformation doPreparations(Node node, Services services,
             RuleApp ruleApp) throws RuleAbortException {
         // Basic objects needed for rule application
         final TermBuilder tb = services.getTermBuilder();
@@ -137,14 +167,13 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final Term[] uBeforeLoopDefAnonVariant = new Term[] { inst.u,
                 beforeLoopUpdate, additionalHeapTerms.anonUpdate,
                 variantUpdate };
-        final Term uAnonInv = tb.applySequential(uAnon,
-                tb.and(tb.and(invTerm, reachableOut), invFreeTerm));
+        final Term uAnonInv = tb.label(
+                tb.applySequential(uAnon,
+                        tb.and(tb.and(invTerm, reachableOut), invFreeTerm)),
+                ParameterlessTermLabel.LOOP_INV_ANON_LABEL);
 
-        // Prepare the new goals
-        ImmutableList<Goal> goals = goal.split(getNrOfGoals());
-
-        return new LoopInvariantInformation(goal, services, inst, loopRuleApp,
-                goals, termLabelState, invTerm, variantPO,
+        return new LoopInvariantInformation(null, services, inst, loopRuleApp,
+                null, termLabelState, invTerm, variantPO,
                 additionalHeapTerms.reachableState,
                 additionalHeapTerms.anonUpdate,
                 additionalHeapTerms.wellFormedAnon, uAnonInv,
@@ -206,7 +235,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             final ImmutableSet<ProgramVariable> localOuts,
             final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop) {
         final TermBuilder tb = services.getTermBuilder();
-        final Namespace progVarNS = services.getNamespaces().programVariables();
+        final Namespace<IProgramVariable> progVarNS = services.getNamespaces().programVariables();
 
         Term beforeLoopUpdate = null;
         for (LocationVariable heap : heapContext) {
@@ -644,7 +673,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * {@link While} loop the {@link LoopScopeInvariantRule} should be applied
      * to, the {@link LoopSpecification}, the the self {@link Term}.
      */
-    protected static final class Instantiation {
+    public static final class Instantiation {
         public final Term u;
         public final Term progPost;
         public final While loop;
@@ -693,9 +722,9 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * A container object containing the information required for the concrete
      * loop invariant rules to create the sequents for the new goals.
      */
-    protected static class LoopInvariantInformation {
+    public static class LoopInvariantInformation {
         /** The original goal. */
-        public final Goal goal;
+        public Goal goal;
 
         /** The {@link Services} object. */
         public final Services services;
@@ -716,7 +745,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
          * The goals created by the invariant rules application; those are
          * filled with content by the concrete loop invariant rules.
          */
-        public final ImmutableList<Goal> goals;
+        public ImmutableList<Goal> goals;
 
         /** The {@link TermLabelState}. */
         public final TermLabelState termLabelState;
@@ -804,7 +833,6 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
                 Term anonUpdate, Term wellFormedAnon, Term uAnonInv,
                 Term frameCondition, Term[] uBeforeLoopDefAnonVariant,
                 ImmutableList<AnonUpdateData> anonUpdateData) {
-            super();
             this.goal = goal;
             this.services = services;
             this.inst = inst;

@@ -22,22 +22,26 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.tud.cs.se.ds.specstr.util.InformationExtraction;
 import de.tud.cs.se.ds.specstr.util.Utilities;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
-import de.uka.ilkd.key.macros.TryCloseMacro;
+import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -47,12 +51,50 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  */
 public class SymbExInterface {
     private KeYEnvironment<DefaultUserInterfaceControl> env;
+    private File file;
     private static final Logger logger = LogManager.getFormatterLogger();
 
-    public SymbExInterface(KeYEnvironment<DefaultUserInterfaceControl> env) {
-        this.env = env;
+    public SymbExInterface(File file) throws ProblemLoaderException {
+        this.file = file;
+        initializeKeYEnv();
     }
 
+    /**
+     * TODO
+     * 
+     * @throws ProblemLoaderException
+     */
+    private void initializeKeYEnv() throws ProblemLoaderException {
+        logger.trace("Building KeY environment for file %s", file);
+        // @formatter:off
+        env = KeYEnvironment.load(
+//                JavaProfile.getDefaultInstance(),
+                SymbolicExecutionJavaProfile.getDefaultInstance(),
+                file,     // location
+                null,     // class path
+                null,     // boot class path
+                null,     // includes
+                true);    // forceNewProfileOfNewProofs
+        // @formatter:on
+        logger.trace("Built up environment.");
+    }
+
+    /**
+     * TODO
+     * 
+     * @see InformationExtraction#getDeclaredTypes(KeYEnvironment)
+     * @return
+     */
+    public List<KeYJavaType> getDeclaredTypes() {
+        return InformationExtraction.getDeclaredTypes(env);
+    }
+
+    /**
+     * TODO
+     * 
+     * @param pm
+     * @return
+     */
     public Goal runUntilLoop(ProgramMethod pm) {
         final ImmutableSet<Contract> contracts = env
                 .getSpecificationRepository()
@@ -88,7 +130,8 @@ public class SymbExInterface {
             // XXX <-- Test Code
 
             List<Goal> whileLoopGoals = Utilities.toStream(proof.openGoals())
-                    .filter(g -> Utilities.toStream(g.node().sequent().succedent())
+                    .filter(g -> Utilities
+                            .toStream(g.node().sequent().succedent())
                             .filter(f -> SymbolicExecutionUtil
                                     .hasSymbolicExecutionLabel(f.formula()))
                             .filter(f -> JavaTools.getActiveStatement(
@@ -109,22 +152,51 @@ public class SymbExInterface {
             Utilities.logErrorAndThrowRTE(logger,
                     "Exception at '%s' of %s:\n%s", contract.getDisplayName(),
                     contract.getTarget(), e.getMessage());
-            
+
             return null;
         }
 
     }
-    
+
+    /**
+     * TODO
+     * 
+     * @param node
+     */
+    public void finishSEForNode(Node node) {
+        List<Node> openNodesWithModality;
+        while (!(openNodesWithModality = Utilities
+                .toStream(node.proof().getSubtreeGoals(node)).map(g -> g.node())
+                .filter(n -> Utilities.toStream(n.sequent().succedent())
+                        .anyMatch(
+                                f -> f.formula().containsJavaBlockRecursive()))
+                .collect(Collectors.toList())).isEmpty()) {
+            openNodesWithModality.forEach(
+                    n -> applyMacro(new FinishSymbolicExecutionMacro(), n));
+        }
+        ;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param macro
+     * @param node
+     */
     public void applyMacro(AbstractProofMacro macro, Node node) {
         try {
-            macro.applyTo(env.getUi(),
-                    node, null, env.getUi());
+            macro.applyTo(env.getUi(), node, null, env.getUi());
         } catch (Exception e) {
             Utilities.logErrorAndThrowRTE(logger,
                     "Problem in applying macro, message: %s", e.getMessage());
         }
     }
 
+    /**
+     * TODO
+     * 
+     * @param proof
+     */
     private static void setupStrategy(Proof proof) {
         // Set proof strategy options
         final StrategyProperties sp = strategyProperties(proof);

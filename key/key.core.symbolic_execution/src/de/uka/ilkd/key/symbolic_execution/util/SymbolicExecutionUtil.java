@@ -4083,7 +4083,7 @@ public final class SymbolicExecutionUtil {
     * @param variable The {@link IProgramVariable} for that the value is needed.
     * @return The found value or {@code null} if it is not defined in the given update term.
     */
-	protected static ImmutableArray<Term> extractValueFromUpdate(Term term, IProgramVariable variable) {
+	public static ImmutableArray<Term> extractValueFromUpdate(Term term, IProgramVariable variable) {
 		ImmutableArray<Term> result = null;
 		if (term.op() instanceof ElementaryUpdate) {
 			ElementaryUpdate update = (ElementaryUpdate) term.op();

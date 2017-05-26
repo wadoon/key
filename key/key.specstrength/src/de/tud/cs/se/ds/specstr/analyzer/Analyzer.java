@@ -15,36 +15,56 @@ package de.tud.cs.se.ds.specstr.analyzer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableArray;
 
 import de.tud.cs.se.ds.specstr.util.InformationExtraction;
 import de.tud.cs.se.ds.specstr.util.Utilities;
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
-import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.JavaTools;
+import de.uka.ilkd.key.java.KeYJavaASTFactory;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.macros.FullPropositionalExpansionMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.rule.AbstractLoopInvariantRule.LoopInvariantInformation;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
-import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
+import de.uka.ilkd.key.rule.RuleAbortException;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * TODO
@@ -56,7 +76,7 @@ public class Analyzer {
 
     private File file;
     private String className, methodName, methodTypeStr;
-    private KeYEnvironment<DefaultUserInterfaceControl> environment;
+    private SymbExInterface seIf;
 
     public Analyzer(File file, String method) throws ProblemLoaderException {
         this.file = file;
@@ -67,30 +87,18 @@ public class Analyzer {
             throw new RuntimeException(errorMsg);
         }
 
-        logger.trace("Building KeY environment for file %s", file);
-        // @formatter:off
-        environment = KeYEnvironment.load(
-//                JavaProfile.getDefaultInstance(),
-                SymbolicExecutionJavaProfile.getDefaultInstance(),
-                file,     // location
-                null,     // class path
-                null,     // boot class path
-                null,     // includes
-                true);    // forceNewProfileOfNewProofs
-        // @formatter:on
-        logger.trace("Built up environment.");
+        this.seIf = new SymbExInterface(file);
     }
 
     public AnalyzerResult analyze() {
         logger.info("Analyzing Java file %s", file);
 
-        List<KeYJavaType> declaredTypes = InformationExtraction
-                .getDeclaredTypes(environment);
+        final List<KeYJavaType> declaredTypes = seIf.getDeclaredTypes();
 
         assert declaredTypes
                 .size() > 0 : "Unexpectedly, no type is declared in the supplied Java file.";
 
-        List<ClassDeclaration> matchingClassDecls = declaredTypes.stream()
+        final List<ClassDeclaration> matchingClassDecls = declaredTypes.stream()
                 .filter(t -> t.getJavaType().getFullName().equals(className))
                 .filter(t -> t.getJavaType() instanceof ClassDeclaration)
                 .map(t -> (ClassDeclaration) t.getJavaType())
@@ -107,7 +115,7 @@ public class Analyzer {
         assert declaredTypes
                 .size() == 1 : "There should be only one type of a given name";
 
-        List<ProgramMethod> matchingMethods = Utilities
+        final List<ProgramMethod> matchingMethods = Utilities
                 .toStream(matchingClassDecls.get(0).getMembers())
                 .filter(m -> m instanceof ProgramMethod)
                 .map(m -> (ProgramMethod) m)
@@ -129,14 +137,20 @@ public class Analyzer {
 
         final ProgramMethod method = matchingMethods.get(0);
 
-        SymbExInterface seIf = new SymbExInterface(environment);
+        logger.info("Analyzing method %s::%s%s", className, methodName,
+                methodTypeStr);
 
         // Run until while loop
         final Goal whileGoal = seIf.runUntilLoop(method);
         final Node whileNode = whileGoal.node();
 
+        // Extract basic infrastructure objects
+        final Proof proof = whileGoal.proof();
+        final Services services = proof.getServices();
+        final TermBuilder tb = services.getTermBuilder();
+
         // Apply loop invariant rule
-        SequentFormula whileSeqFor = Utilities
+        final SequentFormula whileSeqFor = Utilities
                 .toStream(whileGoal.node().sequent().succedent())
                 .filter(f -> SymbolicExecutionUtil
                         .hasSymbolicExecutionLabel(f.formula()))
@@ -145,11 +159,33 @@ public class Analyzer {
                                 .javaBlock()) instanceof While)
                 .findFirst().get();
 
-        PosInOccurrence whilePio = new PosInOccurrence(whileSeqFor,
+        final PosInOccurrence whilePio = new PosInOccurrence(whileSeqFor,
                 PosInTerm.getTopLevel(), false);
-        whileGoal.apply(LoopScopeInvariantRule.INSTANCE
+
+        final RuleApp loopInvRuleApp = LoopScopeInvariantRule.INSTANCE
                 .createApp(whilePio, whileGoal.proof().getServices())
-                .tryToInstantiate(whileGoal));
+                .tryToInstantiate(whileGoal);
+
+        While loop = null;
+        List<Term> loopInvUpdates = new ArrayList<>();
+
+        try {
+            LoopInvariantInformation loopInvInf = LoopScopeInvariantRule.INSTANCE
+                    .doPreparations(whileNode, services, loopInvRuleApp);
+            
+            loop = loopInvInf.inst.loop;
+            
+            Term tmp = loopInvInf.uAnonInv;
+            while (tmp.op() instanceof UpdateApplication) {
+                loopInvUpdates.add(tmp.sub(0));
+                tmp = tmp.sub(1);
+            }
+        } catch (RuleAbortException e) {
+            Utilities.logErrorAndThrowRTE(logger,
+                    "Problem in instantiating rule app: %s", e.getMessage());
+        }
+
+        whileGoal.apply(loopInvRuleApp);
 
         // Try to close first open goal
         seIf.applyMacro(new TryCloseMacro(1000), whileNode.child(0));
@@ -160,21 +196,210 @@ public class Analyzer {
 
         // Finish symbolic execution for second open goal
         final Node preservesAndUCNode = whileNode.child(1);
-        seIf.applyMacro(new FinishSymbolicExecutionMacro(), preservesAndUCNode);
-
-        ImmutableList<Goal> openSubtreeGoals = whileGoal.proof()
-                .getSubtreeGoals(preservesAndUCNode);
-
-        // TODO: Treat invalid invariants specially
-        logger.info("Invariant to weak for %s goals (or invalid)"
-                + openSubtreeGoals.size());
+        seIf.finishSEForNode(preservesAndUCNode);
 
         // Try to close remaining open goals
-        seIf.applyMacro(new TryCloseMacro(10000), preservesAndUCNode);
+        // seIf.applyMacro(new TryCloseMacro(10000), preservesAndUCNode);
 
-        // Apply OSS to the remaining open goals
+        if (proof.getSubtreeGoals(preservesAndUCNode).size() > 0) {
+            // Retrieve loop scope index
+            final LocationVariable loopScopeIndex = findLoopScopeIndex(proof,
+                    preservesAndUCNode);
 
-        // Construct "psi"
+            // Find "preserves" and "use case" branches
+            final List<Node> preservedNodes = new ArrayList<>();
+            final List<Node> useCaseNodes = new ArrayList<>();
+
+            for (Goal g : proof.getSubtreeGoals(preservesAndUCNode)) {
+                Optional<Term> rhs = Utilities
+                        .toStream(g.node().sequent().succedent())
+                        .map(sf -> sf.formula())
+                        .filter(f -> f.op() instanceof UpdateApplication)
+                        .map(f -> {
+                            ImmutableArray<Term> values = SymbolicExecutionUtil
+                                    .extractValueFromUpdate(f.sub(0),
+                                            loopScopeIndex);
+
+                            return values == null || values.size() != 1
+                                    ? (Term) null : (Term) values.get(0);
+                        }).filter(t -> t != null).findAny();
+
+                if (rhs.isPresent()) {
+                    final Operator op = rhs.get().op();
+                    if (op == services.getTermBuilder().TRUE().op()) {
+                        useCaseNodes.add(g.node());
+                    } else if (op == services.getTermBuilder().FALSE().op()) {
+                        preservedNodes.add(g.node());
+                    } else {
+                        Utilities.logErrorAndThrowRTE(logger,
+                                "Unexpected (not simplified?) value for loop scope index %s in goal %s: %s",
+                                loopScopeIndex, g.node().serialNr(), rhs);
+                    }
+                } else {
+                    logger.trace(
+                            "Couldn't find the value for loop scope index %s in goal #%s",
+                            loopScopeIndex, g.node().serialNr());
+                }
+            }
+
+            // Try to close the "preserved" nodes
+            preservedNodes
+                    .forEach(n -> seIf.applyMacro(new TryCloseMacro(10000), n));
+
+            List<Node> openPreservedNodes = preservedNodes.stream()
+                    .filter(n -> !n.isClosed()).collect(Collectors.toList());
+            if (!openPreservedNodes.isEmpty()) {
+                logger.warn(
+                        "Loop invariant could be invalid: %s open preserves goals",
+                        preservedNodes.size());
+            }
+
+            // Apply OSS and propositional simplification to the remaining open
+            // goals
+            final List<Node> obsoleteUseCaseNodes = new ArrayList<>();
+            final List<Node> newUseCaseNodes = new ArrayList<>();
+            useCaseNodes.stream()
+                    .map(n -> new Pair<Node, Optional<SequentFormula>>( //
+                            n, //
+                            Utilities.toStream(n.sequent().succedent())
+                                    .filter(f -> f.formula()
+                                            .op() instanceof UpdateApplication)
+                                    .findFirst()))
+                    .filter(p -> p.second.isPresent()).forEach(p -> {
+                        proof.getGoal(p.first).apply(MiscTools
+                                .findOneStepSimplifier(proof).createApp(
+                                        new PosInOccurrence(p.second.get(),
+                                                PosInTerm.getTopLevel(), false),
+                                        services));
+
+                        // Note: Will simplify only for nodes with update
+                        // applications, but we assume that after symb ex all
+                        // relevant nodes in any case have update applications
+                        // left over
+                        proof.getSubtreeGoals(p.first)
+                                .forEach(g -> seIf.applyMacro(
+                                        new FullPropositionalExpansionMacro(),
+                                        g.node()));
+
+                        if (!proof.isGoal(p.first)) {
+                            obsoleteUseCaseNodes.add(p.first);
+                            newUseCaseNodes.addAll(Utilities
+                                    .toStream(proof.getSubtreeGoals(p.first))
+                                    .map(g -> g.node())
+                                    .collect(Collectors.toList()));
+                        }
+                    });
+
+            useCaseNodes.removeAll(obsoleteUseCaseNodes);
+            useCaseNodes.addAll(newUseCaseNodes);
+
+            // Construct "phi"
+            Set<Term> phiAntecedentForms = new LinkedHashSet<>();
+            Set<Term> phiSuccedentForms = new LinkedHashSet<>();
+
+            for (SequentFormula sf : preservesAndUCNode.sequent()
+                    .antecedent()) {
+                final Term f = sf.formula();
+                if (!f.containsLabel(
+                        ParameterlessTermLabel.LOOP_INV_ANON_LABEL)) {
+                    phiAntecedentForms.add(f);
+                } else {
+                    phiSuccedentForms.add(f);
+                }
+            }
+
+            for (SequentFormula sf : preservesAndUCNode.sequent().succedent()) {
+                final Term f = sf.formula();
+                if (!SymbolicExecutionUtil.containsSymbolicExecutionLabel(f)) {
+                    phiSuccedentForms.add(f);
+                }
+            }
+
+            // Add negated guard to phi
+            final LocationVariable loopVar = new LocationVariable(
+                    new ProgramElementName(
+                            tb.newName("b", whileGoal.getLocalNamespaces())),
+                    services.getJavaInfo().getPrimitiveKeYJavaType("boolean"));
+            whileGoal.getLocalNamespaces().programVariables().add(loopVar);
+            whileGoal.getLocalNamespaces().flushToParent();
+
+            Term negatedGuardTerm = tb.box(
+                    JavaBlock.createJavaBlock(
+                            KeYJavaASTFactory.block(KeYJavaASTFactory.declare(
+                                    loopVar, loop.getGuardExpression()))),
+                    tb.equals(tb.var(loopVar), tb.FALSE()));
+            
+            for (int i = loopInvUpdates.size() - 1; i >= 0; i--) {
+                negatedGuardTerm = tb.apply(loopInvUpdates.get(i), negatedGuardTerm);
+            }
+
+            phiAntecedentForms.add(negatedGuardTerm);
+
+            // Construct "psi"
+            ArrayList<Pair<Set<Term>, Set<Term>>> psiISet = new ArrayList<>();
+            for (Node n : useCaseNodes) {
+                final Set<Term> commonAntecedentFormulas = //
+                        Utilities.toStream(n.sequent().antecedent())
+                                .map(sf -> sf.formula())
+                                .collect(Collectors.toCollection(
+                                        () -> new LinkedHashSet<>()));
+
+                for (SequentFormula sf : n.sequent().succedent()) {
+                    Set<Term> antecedentFormulas = new LinkedHashSet<>(
+                            commonAntecedentFormulas);
+                    Set<Term> succedentFormulas = new LinkedHashSet<>();
+
+                    succedentFormulas.add(sf.formula());
+                    antecedentFormulas
+                            .addAll(Utilities.toStream(n.sequent().succedent())
+                                    .filter(otherSf -> otherSf != sf)
+                                    .map(otherSf -> otherSf.formula())
+                                    .collect(Collectors.toList()));
+
+                    psiISet.add(new Pair<Set<Term>, Set<Term>>(
+                            antecedentFormulas, succedentFormulas));
+                }
+            }
+
+            logger.info("Collected %s facts", psiISet.size());
+
+            int k = 0;
+            final int n = psiISet.size();
+
+            for (Pair<Set<Term>, Set<Term>> psiIInf : psiISet) {
+                final Set<Term> commonFormulas = new LinkedHashSet<>(phiAntecedentForms);
+                commonFormulas.retainAll(psiIInf.first);
+
+                final Set<Term> phiAntecSpecificFormulas = new LinkedHashSet<>(
+                        phiAntecedentForms);
+                phiAntecSpecificFormulas.removeAll(commonFormulas);
+
+                final Set<Term> psiAntecSpecificFormulas = new LinkedHashSet<>(
+                        psiIInf.first);
+                psiAntecSpecificFormulas.removeAll(commonFormulas);
+
+                final Term psiI = tb.or(tb.or(psiAntecSpecificFormulas.stream()
+                        .map(t -> tb.not(t)).collect(Collectors.toList())),
+                        tb.or(psiIInf.second));
+
+                final Term phi = tb.or(tb.or(phiAntecSpecificFormulas.stream()
+                        .map(t -> tb.not(t)).collect(Collectors.toList())),
+                        tb.or(phiSuccedentForms));
+
+                final Term toShow = tb.imp(tb.and(commonFormulas),
+                        tb.imp(phi, psiI));
+
+                if (MergeRuleUtils.isProvableWithSplitting( //
+                        toShow, services, 10000)) {
+                    k++;
+                }
+            }
+
+            System.out.println(Utilities.format("k: %s, n: %s", k, n));
+
+        } else {
+            logger.info("Invariant strong enough for postcondition and valid");
+        }
 
         // XXX Test Code -->
         try {
@@ -187,6 +412,44 @@ public class Analyzer {
 
         logger.info("Finished analysis of Java file %s", file);
         return null;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param proof
+     * @param preservesAndUCNode
+     * @param loopScopeIndex
+     * @throws RuntimeException
+     */
+    private LocationVariable findLoopScopeIndex(final Proof proof,
+            final Node preservesAndUCNode) throws RuntimeException {
+        LocationVariable loopScopeIndex = null;
+
+        for (Goal g : proof.getSubtreeGoals(preservesAndUCNode)) {
+            for (SequentFormula sf : g.node().sequent().succedent()) {
+                final LoopScopeIdxVisitor loopScopeSearcher = new LoopScopeIdxVisitor();
+                sf.formula().execPostOrder(loopScopeSearcher);
+
+                if (loopScopeSearcher.getLoopScopeIdxVar().isPresent()) {
+                    loopScopeIndex = //
+                            loopScopeSearcher.getLoopScopeIdxVar().get();
+                    break;
+                }
+            }
+
+            if (loopScopeIndex != null) {
+                break;
+            }
+        }
+
+        if (loopScopeIndex == null) {
+            Utilities.logErrorAndThrowRTE(logger,
+                    "Could not find loop scope index; assumed "
+                            + "it to be present in first open goal");
+        }
+
+        return loopScopeIndex;
     }
 
     private boolean parseMethodString(String methodStr) {
@@ -220,7 +483,31 @@ public class Analyzer {
         return true;
     }
 
-    class AnalyzerResult {
+    /**
+     * TODO
+     *
+     * @author Dominic Steinhöfel
+     */
+    private static class LoopScopeIdxVisitor extends DefaultVisitor {
+        private Optional<LocationVariable> loopScopeIndexVar = Optional.empty();
+
+        @Override
+        public void visit(Term visited) {
+            if (visited.op() instanceof LocationVariable
+                    && visited.containsLabel(
+                            ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)) {
+                loopScopeIndexVar = Optional
+                        .of((LocationVariable) visited.op());
+            }
+        }
+
+        public Optional<LocationVariable> getLoopScopeIdxVar() {
+            return loopScopeIndexVar;
+        }
+
+    }
+
+    static class AnalyzerResult {
         private final int loopInvStrength;
 
         public AnalyzerResult(int loopInvStrength) {
