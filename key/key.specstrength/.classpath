@@ -7,5 +7,6 @@
 	<classpathentry kind="lib" path="lib/log4j-core-2.6.2.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/key.core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/key.util"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/key.core.symbolic_execution"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -11,6 +11,7 @@
 		<fileset dir="${ext.dir}" includes="log4j-core-2.6.2.jar" />
 		<pathelement path="${basedir}/../key.core/bin" />
 		<pathelement path="${basedir}/../key.util/bin" />
+		<pathelement path="${basedir}/../key.core.symbolic_execution/bin" />
 	</path>
 
 	<target name="clean" description="Deletes all generated files and folders.">

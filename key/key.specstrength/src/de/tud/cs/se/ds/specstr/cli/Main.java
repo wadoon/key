@@ -25,6 +25,9 @@ import org.apache.commons.cli.ParseException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import de.tud.cs.se.ds.specstr.analyzer.Analyzer;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+
 /**
  * TODO
  *
@@ -80,18 +83,21 @@ public class Main {
                 System.out.println("Please supply an existing Java file.\n");
                 printHelp(options);
             }
+            
+            Analyzer analyzer = new Analyzer(inputFile, theMethod);
+            analyzer.analyze();
 
             System.exit(0);
         } catch (ParseException exp) {
             printHelp(options);
             System.exit(0);
         }
-        // catch (ProblemLoaderException e) {
-        // logger.error("Problem in loading the file to analyze, message:\n%s",
-        // e.getMessage());
-        // }
+        catch (ProblemLoaderException e) {
+            logger.error("Problem in loading the file to analyze, message:\n%s",
+                    e.getMessage());
+        }
         catch (RuntimeException e) {
-            logger.error("Problem occurred during compilation:\n%s",
+            logger.error("Problem occurred during the analysis:\n%s",
                     e.getMessage());
         }
 
