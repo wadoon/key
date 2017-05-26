@@ -172,9 +172,9 @@ public class Analyzer {
         try {
             LoopInvariantInformation loopInvInf = LoopScopeInvariantRule.INSTANCE
                     .doPreparations(whileNode, services, loopInvRuleApp);
-            
+
             loop = loopInvInf.inst.loop;
-            
+
             Term tmp = loopInvInf.uAnonInv;
             while (tmp.op() instanceof UpdateApplication) {
                 loopInvUpdates.add(tmp.sub(0));
@@ -295,7 +295,7 @@ public class Analyzer {
 
             // Construct "phi"
             Set<Term> phiAntecedentForms = new LinkedHashSet<>();
-            Set<Term> phiSuccedentForms = new LinkedHashSet<>();
+            Set<Term> phiSuccedentForms = new LinkedHashSet<>(); // Singleton
 
             for (SequentFormula sf : preservesAndUCNode.sequent()
                     .antecedent()) {
@@ -307,6 +307,15 @@ public class Analyzer {
                     phiSuccedentForms.add(f);
                 }
             }
+
+            // TODO Remove this or other update retrieval -->
+            loopInvUpdates.clear();
+            Term tmp = phiSuccedentForms.iterator().next();
+            while (tmp.op() instanceof UpdateApplication) {
+                loopInvUpdates.add(tmp.sub(0));
+                tmp = tmp.sub(1);
+            }
+            // TODO <-- Remove this or other update retrieval
 
             for (SequentFormula sf : preservesAndUCNode.sequent().succedent()) {
                 final Term f = sf.formula();
@@ -328,9 +337,10 @@ public class Analyzer {
                             KeYJavaASTFactory.block(KeYJavaASTFactory.declare(
                                     loopVar, loop.getGuardExpression()))),
                     tb.equals(tb.var(loopVar), tb.FALSE()));
-            
+
             for (int i = loopInvUpdates.size() - 1; i >= 0; i--) {
-                negatedGuardTerm = tb.apply(loopInvUpdates.get(i), negatedGuardTerm);
+                negatedGuardTerm = tb.apply(loopInvUpdates.get(i),
+                        negatedGuardTerm);
             }
 
             phiAntecedentForms.add(negatedGuardTerm);
@@ -338,27 +348,20 @@ public class Analyzer {
             // Construct "psi"
             ArrayList<Pair<Set<Term>, Set<Term>>> psiISet = new ArrayList<>();
             for (Node n : useCaseNodes) {
-                final Set<Term> commonAntecedentFormulas = //
+                final Set<Term> antecedentFormulas = //
                         Utilities.toStream(n.sequent().antecedent())
                                 .map(sf -> sf.formula())
                                 .collect(Collectors.toCollection(
                                         () -> new LinkedHashSet<>()));
 
-                for (SequentFormula sf : n.sequent().succedent()) {
-                    Set<Term> antecedentFormulas = new LinkedHashSet<>(
-                            commonAntecedentFormulas);
-                    Set<Term> succedentFormulas = new LinkedHashSet<>();
+                final Set<Term> succedentFormulas = //
+                        Utilities.toStream(n.sequent().succedent())
+                                .map(sf -> sf.formula())
+                                .collect(Collectors.toCollection(
+                                        () -> new LinkedHashSet<>()));
 
-                    succedentFormulas.add(sf.formula());
-                    antecedentFormulas
-                            .addAll(Utilities.toStream(n.sequent().succedent())
-                                    .filter(otherSf -> otherSf != sf)
-                                    .map(otherSf -> otherSf.formula())
-                                    .collect(Collectors.toList()));
-
-                    psiISet.add(new Pair<Set<Term>, Set<Term>>(
-                            antecedentFormulas, succedentFormulas));
-                }
+                psiISet.add(new Pair<Set<Term>, Set<Term>>(antecedentFormulas,
+                        succedentFormulas));
             }
 
             logger.info("Collected %s facts", psiISet.size());
@@ -367,7 +370,8 @@ public class Analyzer {
             final int n = psiISet.size();
 
             for (Pair<Set<Term>, Set<Term>> psiIInf : psiISet) {
-                final Set<Term> commonFormulas = new LinkedHashSet<>(phiAntecedentForms);
+                final Set<Term> commonFormulas = new LinkedHashSet<>(
+                        phiAntecedentForms);
                 commonFormulas.retainAll(psiIInf.first);
 
                 final Set<Term> phiAntecSpecificFormulas = new LinkedHashSet<>(
@@ -389,9 +393,19 @@ public class Analyzer {
                 final Term toShow = tb.imp(tb.and(commonFormulas),
                         tb.imp(phi, psiI));
 
+                String s = LogicPrinter.quickPrintTerm(toShow, services);
+
                 if (MergeRuleUtils.isProvableWithSplitting( //
                         toShow, services, 10000)) {
                     k++;
+                } else {
+                    // XXX remove test code
+                    // System.out.println(s);
+                    System.out.println(Utilities.format(
+                            "Could not prove the following fact:\n"
+                                    + "======================\n" + "%s\n"
+                                    + "======================",
+                            LogicPrinter.quickPrintTerm(psiI, services)));
                 }
             }
 

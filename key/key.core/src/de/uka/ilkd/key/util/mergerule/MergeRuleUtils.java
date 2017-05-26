@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.util.mergerule;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -70,6 +71,7 @@ import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.parser.ParserMode;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -1806,6 +1808,15 @@ public class MergeRuleUtils {
                 doSplit, "Provability check", timeout);
         final Proof proof = proofResult.getProof();
         boolean result = proof.closed();
+        
+        //XXX Remove -->
+        if (!result) {
+            for (Goal g : proof.openGoals()) {
+               System.out.println(LogicPrinter.quickPrintSequent(g.sequent(), services));
+               System.out.println();
+            }
+        }
+        //XXX <-- Remove
 
         return result;
 
