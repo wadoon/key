@@ -16,7 +16,7 @@ public class RelationDescriptionGenerator {
 		LinkedList<RelationDescription> rds = new LinkedList<RelationDescription>();
 		Operator op = term.op();
 		if(op.arity() > 0){
-			if(IGNORED_OPERATORS.contains(op.name().toString())){
+			if(!IGNORED_OPERATORS.contains(op.name().toString())){
 				rds.add(new RelationDescription(term, services));
 			}
 			for(Term sub : term.subs()){
