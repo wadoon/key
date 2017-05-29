@@ -17,7 +17,7 @@ public class InductionTacletGenerator {
 	
 	private static final String COUNTER_NAME = "inductionRewrite";
 	
-	public static void generate(Term t, Services s){
+	public static void generate(Term t, Services s, RelationDescription selected){
 		TacletGenerator generator = TacletGenerator.getInstance();
 		Name tacletName = new Name("inductionRewrite_" + s.getCounter(COUNTER_NAME).getCountPlusPlus());
 		RuleSet ruleset = (RuleSet)s.getNamespaces().ruleSets().elements().head();//TODO: check if this works
@@ -25,7 +25,7 @@ public class InductionTacletGenerator {
 		Taclet tac = generator.generateRewriteTaclet(
 				tacletName,
 				t,
-				InductionFormulaCreator.buildFormula(t, s), 
+				InductionFormulaCreator.buildFormula(t, s, selected), 
 				programVars, 
 				ruleset, 
 				s

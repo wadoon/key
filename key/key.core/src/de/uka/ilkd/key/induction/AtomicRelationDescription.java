@@ -13,6 +13,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.op.TermSV;
 import de.uka.ilkd.key.util.Pair;
 
 public class AtomicRelationDescription {
@@ -39,8 +40,7 @@ public class AtomicRelationDescription {
 			Services serv
 	){
 		vars = new LinkedList<>();
-		rangeFormula = range;
-		
+		rangeFormula = range;		
 		
 		for(Function f : constructors){
 			substitutions.add(createSubstitutionForFunction(f, serv));
@@ -100,7 +100,7 @@ public class AtomicRelationDescription {
 			vars.add(parameters[i]);
 		}
 		
-		vars.add(result);
+		//vars.add(result);
 		
 		return new Pair<QuantifiableVariable, Term>(
 				result, 
