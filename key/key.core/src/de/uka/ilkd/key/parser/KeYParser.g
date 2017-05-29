@@ -135,6 +135,8 @@ options {
          prooflabel2tag.put("newnames", ProofElementID.NEW_NAMES);
          prooflabel2tag.put("autoModeTime", ProofElementID.AUTOMODE_TIME);  
          prooflabel2tag.put("mergeProc", ProofElementID.MERGE_PROCEDURE);
+         prooflabel2tag.put("invTerm", ProofElementID.INV_TERM);
+         prooflabel2tag.put("localOuts", ProofElementID.LOCAL_OUTS);
          prooflabel2tag.put("abstractionPredicates", ProofElementID.MERGE_ABSTRACTION_PREDICATES);
          prooflabel2tag.put("latticeType", ProofElementID.MERGE_PREDICATE_ABSTRACTION_LATTICE_TYPE);
          prooflabel2tag.put("nrMergePartners", ProofElementID.NUMBER_MERGE_PARTNERS);

@@ -17,6 +17,7 @@ import static de.uka.ilkd.key.util.mergerule.MergeRuleUtils.sequentToSETriple;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,6 +53,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -89,6 +91,7 @@ import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstractionFactory;
+import de.uka.ilkd.key.rule.strengthanalysis.AnalyzeInvImpliesLoopEffectsRule;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.smt.RuleAppSMT;
@@ -536,6 +539,8 @@ public class IntermediateProofReplayer {
 
         Contract currContract = null;
         ImmutableList<PosInOccurrence> builtinIfInsts = null;
+        Term currInvTerm = null;
+        List<LocationVariable> currLocalOuts = null;
 
         // Load contracts, if applicable
         if (currInterm.getContract() != null) {
@@ -576,6 +581,20 @@ public class IntermediateProofReplayer {
                             + NOT_APPLICABLE, e);
                 }
             }
+        }
+        
+        if (currInterm.getInvTerm() != null) {
+            currInvTerm = MergeRuleUtils.translateToFormula(
+                    currGoal.proof().getServices(),
+                    currGoal.getLocalNamespaces(), currInterm.getInvTerm());
+        }
+        
+        if (currInterm.getCurrLocalOuts() != null) {
+            currLocalOuts = Arrays
+                    .stream(currInterm.getCurrLocalOuts().split(","))
+                    .map(str -> (LocationVariable) currGoal.getLocalNamespaces()
+                            .programVariables().lookup(str))
+                    .collect(Collectors.toList());
         }
 
         if (RuleAppSMT.rule.name().toString().equals(ruleName)) {
@@ -647,6 +666,12 @@ public class IntermediateProofReplayer {
                 builtinIfInsts = null;
             }
             return ourApp;
+        }
+        
+        if (AnalyzeInvImpliesLoopEffectsRule.INSTANCE.name().toString()
+                .equals(ruleName)) {
+            return AnalyzeInvImpliesLoopEffectsRule.INSTANCE.createApp(pos,
+                    currGoal.proof().getServices(), currInvTerm, currLocalOuts);
         }
 
         final ImmutableSet<IBuiltInRuleApp> ruleApps = collectAppsForRule(

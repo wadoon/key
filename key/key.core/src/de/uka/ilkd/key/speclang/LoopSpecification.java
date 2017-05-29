@@ -197,4 +197,6 @@ public interface LoopSpecification extends SpecificationElement {
      */
     public OriginalVariables getOrigVars();
 
+    ImmutableList<Term> getLocalOuts();
+
 }

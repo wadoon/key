@@ -254,6 +254,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         else {
             mergeRuleF = mergeRuleFeature(inftyConst());
         }
+        
+        final Feature strengthAnalysisFeature = strengthAnalysisFeature(inftyConst());
 
         // final Feature smtF = smtFeature(inftyConst());
 
@@ -263,6 +265,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 // splitF,
                 // strengthenConstraints,
                 AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF,
+                strengthAnalysisFeature,
                 // smtF,
                 methodSpecF, queryF, depSpecF, loopInvF, blockFeature,
                 ifMatchedF, dispatcher);

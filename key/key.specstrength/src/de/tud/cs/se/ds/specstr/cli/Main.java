@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.tud.cs.se.ds.specstr.analyzer.Analyzer;
+import de.tud.cs.se.ds.specstr.util.Utilities;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
@@ -83,20 +84,34 @@ public class Main {
                 System.out.println("Please supply an existing Java file.\n");
                 printHelp(options);
             }
-            
+
             Analyzer analyzer = new Analyzer(inputFile, theMethod);
-            analyzer.analyze();
+            Analyzer.AnalyzerResult result = analyzer.analyze();
+            
+            System.out.printf("Covered %s out of %s facts; Strength: %.2f%%\n",
+                    result.numCoveredFacts(), result.numFacts(),
+                    100d * ((double) result.numCoveredFacts())
+                            / ((double) result.numFacts()));
+
+            // @formatter:off
+            System.out.println("\n================\n"
+                               + "Uncovered Facts:\n"
+                               + "================\n");
+            // @formatter:on
+
+            result.getUnCoveredFacts().forEach(f -> {
+                System.out.println(f);
+                System.out.println();
+            });
 
             System.exit(0);
         } catch (ParseException exp) {
             printHelp(options);
             System.exit(0);
-        }
-        catch (ProblemLoaderException e) {
+        } catch (ProblemLoaderException e) {
             logger.error("Problem in loading the file to analyze, message:\n%s",
                     e.getMessage());
-        }
-        catch (RuntimeException e) {
+        } catch (RuntimeException e) {
             logger.error("Problem occurred during the analysis:\n%s",
                     e.getMessage());
         }
@@ -105,7 +120,7 @@ public class Main {
     }
 
     /**
-     * Prints a standard help line for Alfred.
+     * Prints a standard help line.
      *
      * @param options
      *            Command line options supplied.
@@ -113,10 +128,8 @@ public class Main {
     private static void printHelp(Options options) {
         System.out.println(INFO_STRING);
         HelpFormatter helpFormatter = new HelpFormatter();
-        helpFormatter.printHelp(
-                "java -jar key.specstrength.jar"
-                + "\t[input Java file]"
-                + "\t[fully qualified method name]",
+        helpFormatter.printHelp("java -jar key.specstrength.jar"
+                + "\t[input Java file]" + "\t[fully qualified method name]",
                 options);
     }
 
