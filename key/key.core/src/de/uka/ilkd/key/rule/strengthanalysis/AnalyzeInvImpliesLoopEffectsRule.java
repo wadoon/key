@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.rule.strengthanalysis;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -86,16 +88,39 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
                 .map(lhs -> tb.elementary(lhs, updateContent.get(lhs)))
                 .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
 
-        final ImmutableList<Goal> goals = goal.split(localOuts.size() + 1);
-
-        final Goal[] goalArray = goals.toArray(Goal.class);
+        Map<LocationVariable, List<Term>> newGoalInformation = new LinkedHashMap<>();
 
         for (int i = 0; i < localOuts.size(); i++) {
             final LocationVariable currLocalOut = localOuts.get(i);
+            
+            if (updateContent.get(currLocalOut) == null) {
+                continue;
+            }
+
+            // TODO Excluding the heap here is a hack made because KeY otherwise
+            // gets stuck in an endless cascade of equation shuffling
+            newGoalInformation.put(currLocalOut,
+                    Arrays.asList(new Term[] {
+                            tb.apply(updateWithoutLocalOuts, invTerm),
+                            tb.and(updateContent.keySet().stream()
+                                    .filter(lhs -> lhs != currLocalOut)
+                                    .filter(lhs -> !lhs.sort().name().toString()
+                                            .equals("Heap"))
+                                    .map(lhs -> tb.equals(tb.var(lhs),
+                                            updateContent.get(lhs)))
+                                    .collect(Collectors.toList())) }));
+        }
+
+        final ImmutableList<Goal> goals = goal
+                .split(newGoalInformation.size() + 1);
+        final Goal[] goalArray = goals.toArray(Goal.class);
+
+        int i = 0;
+        for (LocationVariable currLocalOut : newGoalInformation.keySet()) {
+            final Goal analysisGoal = goalArray[i++];
+
             final Term currAnalysisTerm = tb.equals(tb.var(currLocalOut),
                     updateContent.get(currLocalOut));
-
-            final Goal analysisGoal = goalArray[i];
 
             analysisGoal
                     .setBranchLabel(
@@ -107,23 +132,13 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
                                     + "\"");
 
             analysisGoal.removeFormula(pio);
-            analysisGoal.addFormula(new SequentFormula(currAnalysisTerm), //
-                    false, true);
-            analysisGoal.addFormula(
-                    new SequentFormula(
-                            tb.apply(updateWithoutLocalOuts, invTerm)),
-                    true, true);
-            // TODO Excluding the heap here is a hack made because KeY otherwise
-            // gets stuck in an endless cascade of equation shuffling
-            analysisGoal.addFormula(
-                    new SequentFormula(tb.and(updateContent.keySet().stream()
-                            .filter(lhs -> lhs != currLocalOut)
-                            .filter(lhs -> !lhs.sort().name().toString()
-                                    .equals("Heap"))
-                            .map(lhs -> tb.equals(tb.var(lhs),
-                                    updateContent.get(lhs)))
-                            .collect(Collectors.toList()))),
-                    true, true);
+            analysisGoal.addFormula(new SequentFormula(currAnalysisTerm), false,
+                    true);
+
+            for (Term newAntecTerm : newGoalInformation.get(currLocalOut)) {
+                analysisGoal.addFormula(new SequentFormula(newAntecTerm), true,
+                        true);
+            }
         }
 
         goalArray[goalArray.length - 1].setBranchLabel("Invariant preserved");
