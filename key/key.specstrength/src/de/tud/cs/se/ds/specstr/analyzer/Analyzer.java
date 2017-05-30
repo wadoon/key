@@ -72,8 +72,10 @@ public class Analyzer {
     private File file;
     private String className, methodName, methodTypeStr;
     private SymbExInterface seIf;
+    private Optional<File> outProofFile;
 
-    public Analyzer(File file, String method) throws ProblemLoaderException {
+    public Analyzer(File file, String method, Optional<File> outProofFile)
+            throws ProblemLoaderException {
         this.file = file;
         if (!parseMethodString(method)) {
             final String errorMsg = Utilities
@@ -83,6 +85,7 @@ public class Analyzer {
         }
 
         this.seIf = new SymbExInterface(file);
+        this.outProofFile = outProofFile;
     }
 
     public AnalyzerResult analyze() {
@@ -285,9 +288,9 @@ public class Analyzer {
 
         List<Fact> coveredFacts = new ArrayList<>();
         List<Fact> unCoveredFacts = new ArrayList<>();
-        
+
         logger.info("Proving facts, this may take some time...");
-        
+
         for (Fact fact : facts) {
             final Node factNode = fact.goal.node();
             seIf.applyMacro(new TryCloseMacro(10000), factNode);
@@ -297,20 +300,20 @@ public class Analyzer {
                 unCoveredFacts.add(fact);
             }
         }
-        
+
         logger.trace("Done proving facts.");
 
-        // XXX Test Code -->
-        try {
-            whileGoal.proof().saveToFile(new File("inclLoop.proof"));
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        if (outProofFile.isPresent()) {
+            try {
+                whileGoal.proof().saveToFile(outProofFile.get());
+            } catch (IOException e) {
+                logger.error("Problem writing proof to file %s, message:\n%s",
+                        outProofFile.get(), e.getMessage());
+            }
         }
-        // XXX <-- Test Code
 
         logger.info("Finished analysis of Java file %s", file);
-        
+
         return new AnalyzerResult(coveredFacts, unCoveredFacts);
     }
 
@@ -507,7 +510,7 @@ public class Analyzer {
     public static class AnalyzerResult {
         private final List<Fact> coveredFacts;
         private final List<Fact> unCoveredFacts;
-        
+
         public AnalyzerResult(List<Fact> coveredFacts,
                 List<Fact> unCoveredFacts) {
             this.coveredFacts = coveredFacts;
@@ -521,15 +524,15 @@ public class Analyzer {
         public List<Fact> getUnCoveredFacts() {
             return unCoveredFacts;
         }
-        
+
         public int numCoveredFacts() {
             return coveredFacts.size();
         }
-        
+
         public int numUncoveredFacts() {
             return unCoveredFacts.size();
         }
-        
+
         public int numFacts() {
             return numCoveredFacts() + numUncoveredFacts();
         }

@@ -14,6 +14,10 @@
 package de.tud.cs.se.ds.specstr.cli;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.Optional;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -56,10 +60,20 @@ public class Main {
     public static void main(String[] args) {
         Options options = new Options();
 
+        Option outFileOpt = Option.builder("o").longOpt("out-file")
+                .desc("Save output to this file").hasArg().required(false)
+                .build();
+
+        Option outFileProofOpt = Option.builder("p").longOpt("proof-out-file")
+                .desc("Save proof to this file").hasArg().required(false)
+                .build();
+
         Option helpOpt = Option.builder("h").longOpt("help")
                 .desc("Display help (this text) and terminate").required(false)
                 .build();
 
+        options.addOption(outFileOpt);
+        options.addOption(outFileProofOpt);
         options.addOption(helpOpt);
 
         CommandLineParser parser = new DefaultParser();
@@ -84,26 +98,46 @@ public class Main {
                 printHelp(options);
             }
 
-            Analyzer analyzer = new Analyzer(inputFile, theMethod);
+            Optional<File> outProof = line.hasOption(outFileProofOpt.getOpt())
+                    ? Optional.of(new File(
+                            line.getOptionValue(outFileProofOpt.getOpt())))
+                    : Optional.empty();
+
+            Analyzer analyzer = new Analyzer(inputFile, theMethod, outProof);
             Analyzer.AnalyzerResult result = analyzer.analyze();
 
-            System.out.printf("Covered %s out of %s facts; Strength: %.2f%%\n",
-                    result.numCoveredFacts(), result.numFacts(),
-                    100d * ((double) result.numCoveredFacts())
-                            / ((double) result.numFacts()));
+            PrintStream ps = null;
+            if (line.hasOption(outFileOpt.getOpt())) {
+                File file = new File(line.getOptionValue(outFileOpt.getOpt()));
+                try {
+                    ps = new PrintStream(new FileOutputStream(file));
+                } catch (FileNotFoundException e) {
+                    logger.error("Could not open file %s", file.getName());
+                }
+            }
+
+            if (ps == null) {
+                ps = System.out;
+            }
 
             if (result.numUncoveredFacts() > 0) {
                 // @formatter:off
-                System.out.println("\n================\n"
-                                   + "Uncovered Facts:\n"
-                                   + "================\n");
+                ps.println("\n================\n"
+                           + "Uncovered Facts:\n"
+                           + "================\n");
                 // @formatter:on
 
+                final PrintStream fPs = ps;
                 result.getUnCoveredFacts().forEach(f -> {
-                    System.out.println(f);
-                    System.out.println();
+                    fPs.println(f);
+                    fPs.println();
                 });
             }
+
+            ps.printf("Covered %s out of %s facts; Strength: %.2f%%\n",
+                    result.numCoveredFacts(), result.numFacts(),
+                    100d * ((double) result.numCoveredFacts())
+                            / ((double) result.numFacts()));
 
             System.exit(0);
         } catch (ParseException exp) {
