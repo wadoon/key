@@ -1602,14 +1602,6 @@ public class TermBuilder {
         return wellFormed(var(heap));
     }
 
-    public Term wellFormedHist(Term hist) {
-        return func(services.getTypeConverter().getSeqLDT().getWellFormedHist(), hist);
-    }
-
-    public Term wellFormedHist (LocationVariable hist) {
-    	return wellFormedHist(var(hist));
-    }
-
     public Term permissionsFor(Term permHeap, Term regularHeap) {
         return func(services.getTypeConverter().getPermissionLDT().getPermissionsFor(),
                 permHeap, regularHeap);
@@ -2058,36 +2050,44 @@ public class TermBuilder {
     //event constructor
 	public Term evConst(Term type, Term caller, Term callee, Term method, Term args, Term heap) {
 		return func(services.getTypeConverter().getRemoteMethodEventLDT().
-				evConst(), type, caller, callee, method, args, heap);
+				eventConstructor(), type, caller, callee, method, args, heap);
 	}
 
 	//event destructor (/getters)
 	public Term evGetType(Term event) {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().evGetType(), event);
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().getTypeFromEvent(), event);
 	}
 	public Term evGetCaller(Term event) {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().evGetCaller(), event);
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().getCallerFromEvent(), event);
 	}
 	public Term evGetCallee(Term event) {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().evGetCallee(), event);
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().getCalleeFromEvent(), event);
 	}
 	public Term evGetMethod(Term event) {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().evGetMethod(), event);
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().getServiceFromEvent(), event);
 	}
 	public Term evGetArgs(Term event) {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().evGetArgs(), event);
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().getContentFromEvent(), event);
 	}
 	public Term evGetHeap(Term event) {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().evGetHeap(), event);
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().getHeapFromEvent(), event);
 	}
 
 	//event type constructors
 	public Term evCall() {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().evCall());
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().serviceCallConstant());
 	}
 	public Term evTerm() {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().evTerm());
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().serviceTerminationConstant());
 	}
+
+	//well formed
+    public Term wellFormedHist(Term hist) {
+        return func(services.getTypeConverter().getSeqLDT().getWellFormedHist(), hist);
+    }
+    public Term wellFormedHist (LocationVariable hist) {
+    	return wellFormedHist(var(hist));
+    }
 
     //-------------------------------------------------------------------------
     //reachability operators

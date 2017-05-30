@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.ldt;
 
 import org.key_project.util.ExtList;
+import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -19,17 +20,17 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public class RemoteMethodEventLDT extends LDT {
 	public static final Name NAME = new Name("Event");
 	public static final Name HIST_NAME = new Name("hist");
-	public static final Name METHOD_SORT = new Name("Method");
+	public static final Name METHOD_SORT = new Name("MethodIdentifier");
 
-	private final Function evConst;
-	private final Function evGetType;
-	private final Function evGetCaller;
-	private final Function evGetCallee;
-	private final Function evGetMethod;
-	private final Function evGetArgs;
-	private final Function evGetHeap;
-	private final Function evCall;
-	private final Function evTerm;
+	private final Function event;
+	private final Function evType;
+	private final Function evCaller;
+	private final Function evCallee;
+	private final Function evService;
+	private final Function evContent;
+	private final Function evHeap;
+	private final Function serviceCall;
+	private final Function serviceTerm;
 
 	//history (of Remote method events) ... copy of: key.core/resources/de/uka/ilkd/key/proof/rules/events.key -> Seq hist;
 	private LocationVariable hist;
@@ -37,53 +38,53 @@ public class RemoteMethodEventLDT extends LDT {
 
 	public RemoteMethodEventLDT (TermServices services) {
 		super(NAME, services);
-		evConst = addFunction(services, "event");
-		evGetType = addFunction(services, "getTypeFromEvent");
-		evGetCaller = addFunction(services, "getCallerFromEvent");
-		evGetCallee = addFunction(services, "getCalleeFromEvent");
-		evGetMethod = addFunction(services, "getMethodFromEvent");
-		evGetArgs = addFunction(services, "getArgumentsFromEvent");
-		evGetHeap = addFunction(services, "getHeapFromEvent");
-		evCall = addFunction(services, "methodCall");
-		evTerm = addFunction(services, "methodTermination");
+		event = addFunction(services, "event");
+		evType = addFunction(services, "evType");
+		evCaller = addFunction(services, "evCaller");
+		evCallee = addFunction(services, "evCallee");
+		evService = addFunction(services, "evService");
+		evContent = addFunction(services, "evContent");
+		evHeap = addFunction(services, "evHeap");
+		serviceCall = addFunction(services, "serviceCall");
+		serviceTerm = addFunction(services, "serviceTermination");
 		hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
 		caller = (LocationVariable) services.getNamespaces().programVariables().lookup("caller");
 	}
 
-	public Function evConst() {
-		return evConst;
+	public Function eventConstructor() {
+		return event;
 	}
 
-	public Function evGetType() {
-		return evGetType;
+	public Function getTypeFromEvent() {
+		return evType;
 	}
 
-	public Function evGetCaller() {
-		return evGetCaller;
+	public Function getCallerFromEvent() {
+		return evCaller;
 	}
 
-	public Function evGetCallee() {
-		return evGetCallee;
+	public Function getCalleeFromEvent() {
+		return evCallee;
 	}
 
-	public Function evGetMethod() {
-		return evGetMethod;
+	public Function getServiceFromEvent() {
+		return evService;
 	}
 
-	public Function evGetArgs() {
-		return evGetArgs;
+	public Function getContentFromEvent() {
+		return evContent;
 	}
 
-	public Function evGetHeap() {
-		return evGetHeap;
+	public Function getHeapFromEvent() {
+		return evHeap;
 	}
 
-	public Function evCall() {
-		return evCall;
+	public Function serviceCallConstant() {
+		return serviceCall;
 	}
 
-	public Function evTerm() {
-		return evTerm;
+	public Function serviceTerminationConstant() {
+		return serviceTerm;
 	}
 
 	/**
@@ -110,7 +111,7 @@ public class RemoteMethodEventLDT extends LDT {
 	    Function f = (Function) services.getNamespaces().methodIdentifier().lookup(name);
 	    if (f == null) {
 	        //add the function
-	        f = new Function(name, (Sort)services.getNamespaces().sorts().lookup(METHOD_SORT));
+	        f = new Function(name, (Sort)services.getNamespaces().sorts().lookup(METHOD_SORT), new ImmutableArray<Sort>(), null, true);
 	        services.getNamespaces().methodIdentifier().addSafely(f);
 	    }
 	    return f;

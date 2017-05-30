@@ -668,8 +668,9 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
     private Term filterInv(Term t, Term contractSelf, TermBuilder tb) { // TODO KD z hacky
-    	if (t.op().toString().equals("java.lang.Object::<inv>") && t.sub(1) == contractSelf) {
-    		return tb.tt();
+    	// TODO KD c inv hack made t.sub(1) hist, careful, when changing again
+    	if (t.op().toString().contains("<inv>") && t.sub(2) == contractSelf) {
+        	return tb.tt();
     	} else if (t.op() == Junctor.AND) {
     		return tb.and(filterInv(t.sub(0), contractSelf, tb), filterInv(t.sub(1), contractSelf, tb));
     	} else {
@@ -845,10 +846,6 @@ public final class UseOperationContractRule implements BuiltInRule {
 			// TODO KD z could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor() and selfVarTerm != contractSelf
 			Term method = tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifierByDeclaration(pm.getMethodDeclaration(), services));
 			Term resultTerm = contractResult != null ? tb.seqSingleton(contractResult) : tb.seqEmpty();
-			//Term resultTerm = inst.actualResult != null ?
-			//		tb.seqSingleton((tb.var((LocationVariable)inst.actualResult))) :
-			//		tb.seqEmpty();
-			
 			// throws Exception if pm.getMethodDeclaration().isStatic()
 			Term outCallEvent = tb.evConst(tb.evCall(), selfVarTerm, contractSelf, method, tb.seq(contractParams), anonUpdateDatas.head().methodHeapAtPre);
 			// throws Exception if pm.getMethodDeclaration().isStatic()
