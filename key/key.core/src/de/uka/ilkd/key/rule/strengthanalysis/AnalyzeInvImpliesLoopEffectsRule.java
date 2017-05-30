@@ -16,6 +16,7 @@ package de.uka.ilkd.key.rule.strengthanalysis;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -28,6 +29,9 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
@@ -91,7 +95,7 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
 
         for (int i = 0; i < localOuts.size(); i++) {
             final LocationVariable currLocalOut = localOuts.get(i);
-            
+
             if (updateContent.get(currLocalOut) == null) {
                 continue;
             }
@@ -156,10 +160,79 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
     }
 
     @Override
+    public String toString() {
+        return displayName();
+    }
+
+    @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        // TODO Refine
-        return pio != null && pio.isTopLevel()
-                && pio.subTerm().op() instanceof UpdateApplication;
+        // Rule is applicable if the goal corresponds to one case of the
+        // "preserved" part of a loop (scope) invariant rule application; the
+        // pio must refer to a formula with a leading update where the loop
+        // scope index of the loop is set to FALSE. The formula must have an
+        // empty Java block.
+
+        return retrieveLoopScopeIndex(pio, goal.proof().getServices())
+                .isPresent();
+    }
+
+    /**
+     * TODO
+     * 
+     * @param pio
+     * @param services
+     * @return
+     */
+    public static Optional<LocationVariable> retrieveLoopScopeIndex(
+            PosInOccurrence pio, Services services) {
+        final Optional<LocationVariable> failedResult = Optional.empty();
+
+        final Term formula;
+        if (pio == null //
+                || !pio.isTopLevel() //
+                || (formula = pio.subTerm()).containsJavaBlockRecursive()
+                || !(formula.op() instanceof UpdateApplication)) {
+            return failedResult;
+        }
+
+        // @formatter:off
+        
+        // Expected structure:
+        // {U}((x<<loopScopeIndex>> = TRUE  -> ...) & 
+        //      x<<loopScopeIndex>> = FALSE -> ...)
+        
+        // @formatter:on
+
+        if (formula.sub(1).op() != Junctor.AND
+                || formula.sub(1).sub(0).op() != Junctor.IMP
+                || formula.sub(1).sub(1).op() != Junctor.IMP
+                || formula.sub(1).sub(0).sub(0).op() != Equality.EQUALS
+                || formula.sub(1).sub(1).sub(0).op() != Junctor.NOT || formula
+                        .sub(1).sub(1).sub(0).sub(0).op() != Equality.EQUALS) {
+            return failedResult;
+        }
+
+        final Term loopScopeVar = formula.sub(1).sub(0).sub(0).sub(0);
+        final Term negatedLoopScopeVar = formula.sub(1).sub(0).sub(0).sub(0);
+
+        if (!(loopScopeVar.op() instanceof LocationVariable)
+                || !loopScopeVar.hasLabels()
+                || loopScopeVar.getLabel(
+                        ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL_NAME) == null
+                || loopScopeVar != negatedLoopScopeVar) {
+            return failedResult;
+        }
+
+        final LocationVariable loopScopeIdxVar = //
+                (LocationVariable) loopScopeVar.op();
+
+        // Loop scope index has to be false
+        if (MergeRuleUtils.getUpdateRightSideFor(formula.sub(0),
+                loopScopeIdxVar) != services.getTermBuilder().FALSE()) {
+            return failedResult;
+        }
+
+        return Optional.of(loopScopeIdxVar);
     }
 
     @Override

@@ -26,7 +26,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.tud.cs.se.ds.specstr.util.InformationExtraction;
 import de.tud.cs.se.ds.specstr.util.Utilities;
@@ -37,7 +36,6 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
@@ -53,9 +51,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.rule.AbstractLoopInvariantRule.LoopInvariantInformation;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
-import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.strengthanalysis.AnalyzeInvImpliesLoopEffectsRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -116,7 +112,6 @@ public class Analyzer {
 
         // Extract basic infrastructure objects
         final Proof proof = whileGoal.proof();
-        final Services services = proof.getServices();
 
         // Apply loop invariant rule
         final SequentFormula whileSeqFor = Utilities
@@ -136,24 +131,6 @@ public class Analyzer {
                 .tryToInstantiate(whileGoal);
 
         whileGoal.apply(loopInvRuleApp);
-
-        // Collect information about the loop
-        List<LocationVariable> localOuts = null;
-        Term loopInvTerm = null;
-
-        try {
-            final LoopInvariantInformation loopInvInf = //
-                    LoopScopeInvariantRule.INSTANCE.doPreparations( //
-                            whileNode, services, loopInvRuleApp);
-
-            loopInvTerm = loopInvInf.invTerm;
-            localOuts = Utilities.toStream(loopInvInf.inst.inv.getLocalOuts())
-                    .map(t -> (LocationVariable) t.op())
-                    .collect(Collectors.toList());
-        } catch (RuleAbortException e) {
-            Utilities.logErrorAndThrowRTE(logger,
-                    "Problem in instantiating rule app: %s", e.getMessage());
-        }
 
         // Try to close first open goal ("initially valid")
         seIf.applyMacro(new TryCloseMacro(1000), whileNode.child(0));
@@ -176,7 +153,7 @@ public class Analyzer {
         // Extract facts
         final List<Fact> facts = new ArrayList<>();
         extractLoopBodyFactsAndShowValidity( //
-                proof, localOuts, loopInvTerm, preservedNodes, facts);
+                proof, preservedNodes, facts);
         extractUseCaseFacts(proof, preservesAndUCNode, useCaseNodes, facts);
 
         logger.info("Collected %s facts", facts.size());
@@ -266,10 +243,7 @@ public class Analyzer {
 
         useCaseNodes.removeAll(obsoleteUseCaseNodes);
         useCaseNodes.addAll(newUseCaseNodes);
-
-        // TODO Should better extract relevant parts of these facts, that
-        // is, the stuff which is not also contained in the invariant / the
-        // negated guard, or in the "common" preconditions
+        
         facts.addAll(useCaseNodes.stream()
                 .map(n -> new Fact(
                         polishFactDescription(n.sequent(),
@@ -386,13 +360,10 @@ public class Analyzer {
      * 
      * @param proof
      * @param services
-     * @param localOuts
-     * @param loopInvTerm
      * @param preservedNodes
      * @param facts
      */
     private void extractLoopBodyFactsAndShowValidity(final Proof proof,
-            List<LocationVariable> localOuts, Term loopInvTerm,
             final List<Node> preservedNodes, final List<Fact> facts) {
         final Services services = proof.getServices();
 
@@ -427,7 +398,8 @@ public class Analyzer {
             final PosInOccurrence proofOblPio = new PosInOccurrence(
                     updPostCondSeqFor, PosInTerm.getTopLevel(), false);
             final RuleApp app = AnalyzeInvImpliesLoopEffectsRule.INSTANCE
-                    .createApp(proofOblPio, services, loopInvTerm, localOuts);
+                    .createApp(proofOblPio, services)
+                    .forceInstantiate(proof.getGoal(preservedNode));
 
             final Goal[] preservedGoals = proof.getSubtreeGoals(preservedNode)
                     .head().apply(app).toArray(Goal.class);

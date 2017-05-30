@@ -454,6 +454,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final JavaBlock origJavaBlock = progPost.javaBlock();
 
         final ProgramVariable loopScopeIdxVar = loopScopeIdxVar(services);
+        presrvAndUCGoal.getLocalNamespaces().programVariables().add(loopScopeIdxVar);
 
         final ProgramElement newProg = newProgram(services, loop, loopLabel,
                 stmtToReplace, origJavaBlock, loopScopeIdxVar);
