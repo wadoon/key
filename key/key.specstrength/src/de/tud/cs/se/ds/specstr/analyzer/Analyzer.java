@@ -26,6 +26,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.tud.cs.se.ds.specstr.util.InformationExtraction;
 import de.tud.cs.se.ds.specstr.util.Utilities;
@@ -34,13 +35,13 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -74,6 +75,14 @@ public class Analyzer {
     private SymbExInterface seIf;
     private Optional<File> outProofFile;
 
+    /**
+     * TODO
+     * 
+     * @param file
+     * @param method
+     * @param outProofFile
+     * @throws ProblemLoaderException
+     */
     public Analyzer(File file, String method, Optional<File> outProofFile)
             throws ProblemLoaderException {
         this.file = file;
@@ -88,6 +97,11 @@ public class Analyzer {
         this.outProofFile = outProofFile;
     }
 
+    /**
+     * TODO
+     * 
+     * @return
+     */
     public AnalyzerResult analyze() {
         logger.info("Analyzing Java file %s", file);
 
@@ -121,49 +135,219 @@ public class Analyzer {
                 .createApp(whilePio, whileGoal.proof().getServices())
                 .tryToInstantiate(whileGoal);
 
-        List<Term> loopInvUpdates = new ArrayList<>();
+        whileGoal.apply(loopInvRuleApp);
+
+        // Collect information about the loop
         List<LocationVariable> localOuts = null;
         Term loopInvTerm = null;
 
         try {
-            LoopInvariantInformation loopInvInf = LoopScopeInvariantRule.INSTANCE
-                    .doPreparations(whileNode, services, loopInvRuleApp);
+            final LoopInvariantInformation loopInvInf = //
+                    LoopScopeInvariantRule.INSTANCE.doPreparations( //
+                            whileNode, services, loopInvRuleApp);
 
             loopInvTerm = loopInvInf.invTerm;
             localOuts = Utilities.toStream(loopInvInf.inst.inv.getLocalOuts())
                     .map(t -> (LocationVariable) t.op())
                     .collect(Collectors.toList());
-
-            Term tmp = loopInvInf.uAnonInv;
-            while (tmp.op() instanceof UpdateApplication) {
-                loopInvUpdates.add(tmp.sub(0));
-                tmp = tmp.sub(1);
-            }
         } catch (RuleAbortException e) {
             Utilities.logErrorAndThrowRTE(logger,
                     "Problem in instantiating rule app: %s", e.getMessage());
         }
 
-        whileGoal.apply(loopInvRuleApp);
-
-        // Try to close first open goal
+        // Try to close first open goal ("initially valid")
         seIf.applyMacro(new TryCloseMacro(1000), whileNode.child(0));
 
         if (!whileNode.child(0).isClosed()) {
             logger.warn("The loop's invariant is not initially valid");
         }
 
-        // Finish symbolic execution for second open goal
+        // Finish symbolic execution preserved & use case goal
         final Node preservesAndUCNode = whileNode.child(1);
         seIf.finishSEForNode(preservesAndUCNode);
-
-        // Retrieve loop scope index
-        final LocationVariable loopScopeIndex = findLoopScopeIndex(proof,
-                preservesAndUCNode);
 
         // Find "preserves" and "use case" branches
         final List<Node> preservedNodes = new ArrayList<>();
         final List<Node> useCaseNodes = new ArrayList<>();
+
+        extractPreservedAndUseCaseNodes(proof, preservesAndUCNode,
+                preservedNodes, useCaseNodes);
+
+        // Extract facts
+        final List<Fact> facts = new ArrayList<>();
+        extractLoopBodyFactsAndShowValidity( //
+                proof, localOuts, loopInvTerm, preservedNodes, facts);
+        extractUseCaseFacts(proof, preservesAndUCNode, useCaseNodes, facts);
+
+        logger.info("Collected %s facts", facts.size());
+
+        logger.info("Proving facts, this may take some time...");
+
+        List<Fact> coveredFacts = new ArrayList<>();
+        List<Fact> unCoveredFacts = new ArrayList<>();
+
+        for (Fact fact : facts) {
+            logger.trace("Proving fact %s", fact.descr);
+            final Node factNode = fact.goal.node();
+            seIf.applyMacro(new TryCloseMacro(10000), factNode);
+            if (factNode.isClosed()) {
+                coveredFacts.add(fact);
+            } else {
+                unCoveredFacts.add(fact);
+            }
+        }
+
+        logger.trace("Done proving facts.");
+
+        if (outProofFile.isPresent()) {
+            try {
+                logger.info("Writing proof to file %s", outProofFile.get());
+                whileGoal.proof().saveToFile(outProofFile.get());
+            } catch (IOException e) {
+                logger.error("Problem writing proof to file %s, message:\n%s",
+                        outProofFile.get(), e.getMessage());
+            }
+        }
+
+        logger.trace("Finished analysis of Java file %s", file);
+
+        return new AnalyzerResult(coveredFacts, unCoveredFacts);
+    }
+
+    /**
+     * TODO
+     * 
+     * @param proof
+     * @param preservesAndUCNode
+     * @param useCaseNodes
+     * @param facts
+     * @param services
+     */
+    private void extractUseCaseFacts(final Proof proof, Node preservesAndUCNode,
+            final List<Node> useCaseNodes, final List<Fact> facts) {
+        final Services services = proof.getServices();
+
+        // Apply OSS and propositional simplification to the open goals of
+        // the post condition "facts"
+        final List<Node> obsoleteUseCaseNodes = new ArrayList<>();
+        final List<Node> newUseCaseNodes = new ArrayList<>();
+
+        useCaseNodes.stream().map(n -> new Pair<Node, List<SequentFormula>>( //
+                n, //
+                Utilities.toStream(n.sequent()).filter(
+                        f -> f.formula().op() instanceof UpdateApplication)
+                        .collect(Collectors.toList())))
+                .filter(p -> !p.second.isEmpty()) //
+                .forEach(p -> {
+                    p.second.forEach(sf -> proof.getSubtreeGoals(p.first).head()
+                            .apply(MiscTools.findOneStepSimplifier(proof)
+                                    .createApp(
+                                            findInSequent(sf,
+                                                    p.first.sequent()),
+                                            services)));
+
+                    // Note: Will simplify only for nodes with update
+                    // applications, but we assume that after symb ex all
+                    // relevant nodes in any case have update applications
+                    // left over
+                    proof.getSubtreeGoals(p.first)
+                            .forEach(g -> seIf.applyMacro(
+                                    new FullPropositionalExpansionMacro(),
+                                    g.node()));
+
+                    if (!proof.isGoal(p.first)) {
+                        obsoleteUseCaseNodes.add(p.first);
+                        newUseCaseNodes.addAll(Utilities
+                                .toStream(proof.getSubtreeGoals(p.first))
+                                .map(g -> g.node())
+                                .collect(Collectors.toList()));
+                    }
+                });
+
+        useCaseNodes.removeAll(obsoleteUseCaseNodes);
+        useCaseNodes.addAll(newUseCaseNodes);
+
+        // TODO Should better extract relevant parts of these facts, that
+        // is, the stuff which is not also contained in the invariant / the
+        // negated guard, or in the "common" preconditions
+        facts.addAll(useCaseNodes.stream()
+                .map(n -> new Fact(
+                        polishFactDescription(n.sequent(),
+                                preservesAndUCNode.sequent(), services),
+                        true, proof.getGoal(n)))
+                .collect(Collectors.toList()));
+    }
+
+    /**
+     * TODO
+     * 
+     * @param factSeq
+     * @param originSeq
+     * @param services
+     * @return
+     */
+    private static String polishFactDescription(Sequent factSeq,
+            Sequent originSeq, Services services) {
+        final List<SequentFormula> newAntec = Utilities
+                .toStream(factSeq.antecedent()).collect(Collectors.toList());
+        newAntec.removeAll(Utilities.toStream(originSeq.antecedent())
+                .collect(Collectors.toList()));
+
+        final List<SequentFormula> newSucc = Utilities
+                .toStream(factSeq.succedent()).collect(Collectors.toList());
+        newSucc.removeAll(Utilities.toStream(originSeq.succedent())
+                .collect(Collectors.toList()));
+
+        Sequent newSequent = Sequent.EMPTY_SEQUENT;
+        for (SequentFormula antecF : newAntec) {
+            newSequent = newSequent.addFormula(antecF, true, false).sequent();
+        }
+        for (SequentFormula antecF : newSucc) {
+            newSequent = newSequent.addFormula(antecF, false, false).sequent();
+        }
+
+        return LogicPrinter.quickPrintSequent(newSequent, services);
+    }
+
+    /**
+     * TODO
+     * 
+     * @param sf
+     * @param seq
+     * @return
+     */
+    private static PosInOccurrence findInSequent(SequentFormula sf,
+            Sequent seq) {
+        for (SequentFormula otherSf : seq.antecedent()) {
+            if (otherSf.formula().equals(sf.formula())) {
+                return new PosInOccurrence(sf, PosInTerm.getTopLevel(), true);
+            }
+        }
+
+        for (SequentFormula otherSf : seq.succedent()) {
+            if (otherSf.formula().equals(sf.formula())) {
+                return new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param proof
+     * @param services
+     * @param preservesAndUCNode
+     * @param preservedNodes
+     * @param useCaseNodes
+     */
+    private void extractPreservedAndUseCaseNodes(final Proof proof,
+            final Node preservesAndUCNode, final List<Node> preservedNodes,
+            final List<Node> useCaseNodes) {
+        final Services services = proof.getServices();
+        final LocationVariable loopScopeIndex = SymbExInterface
+                .findLoopScopeIndex(proof, preservesAndUCNode);
 
         for (Goal g : proof.getSubtreeGoals(preservesAndUCNode)) {
             Optional<Term> rhs = Utilities
@@ -195,24 +379,58 @@ public class Analyzer {
                         loopScopeIndex, g.node().serialNr());
             }
         }
+    }
 
-        final List<Fact> facts = new ArrayList<>();
+    /**
+     * TODO
+     * 
+     * @param proof
+     * @param services
+     * @param localOuts
+     * @param loopInvTerm
+     * @param preservedNodes
+     * @param facts
+     */
+    private void extractLoopBodyFactsAndShowValidity(final Proof proof,
+            List<LocationVariable> localOuts, Term loopInvTerm,
+            final List<Node> preservedNodes, final List<Fact> facts) {
+        final Services services = proof.getServices();
+
         int invariantGoalsNotPreserved = 0;
 
         for (Node preservedNode : preservedNodes) {
-            // TODO Clean this up, especially finding of sequent with
-            // update!
-            final Goal g = proof.getSubtreeGoals(preservedNode).head();
+            Utilities.toStream(preservedNode.parent().sequent().succedent())
+                    .filter(sf -> SymbolicExecutionUtil
+                            .hasSymbolicExecutionLabel(sf.formula()))
+                    .findAny();
+
+            int pos = -1;
+            {
+                int i = 0;
+                for (SequentFormula sf : preservedNode.parent().sequent()
+                        .succedent()) {
+                    if (SymbolicExecutionUtil
+                            .hasSymbolicExecutionLabel(sf.formula())) {
+                        pos = i;
+                        break;
+                    }
+
+                    i++;
+                }
+            }
+
+            assert pos != -1 : "There should be a formula with SE label";
+
             final ImmutableList<SequentFormula> succList = preservedNode
                     .sequent().succedent().asList();
-            final SequentFormula updPostCondSeqFor = succList
-                    .take(succList.size() - 1).head();
+            final SequentFormula updPostCondSeqFor = succList.take(pos).head();
             final PosInOccurrence proofOblPio = new PosInOccurrence(
                     updPostCondSeqFor, PosInTerm.getTopLevel(), false);
-            RuleApp app = AnalyzeInvImpliesLoopEffectsRule.INSTANCE
+            final RuleApp app = AnalyzeInvImpliesLoopEffectsRule.INSTANCE
                     .createApp(proofOblPio, services, loopInvTerm, localOuts);
 
-            Goal[] preservedGoals = g.apply(app).toArray(Goal.class);
+            final Goal[] preservedGoals = proof.getSubtreeGoals(preservedNode)
+                    .head().apply(app).toArray(Goal.class);
             for (int i = 0; i < preservedGoals.length - 1; i++) {
                 facts.add(
                         new Fact(
@@ -235,86 +453,6 @@ public class Analyzer {
                     "Loop invariant could be invalid: %s open preserves goals",
                     invariantGoalsNotPreserved);
         }
-
-        // Apply OSS and propositional simplification to the open goals of
-        // the post condition "facts"
-        final List<Node> obsoleteUseCaseNodes = new ArrayList<>();
-        final List<Node> newUseCaseNodes = new ArrayList<>();
-        useCaseNodes.stream()
-                .map(n -> new Pair<Node, Optional<SequentFormula>>( //
-                        n, //
-                        Utilities.toStream(n.sequent().succedent()).filter(
-                                f -> f.formula()
-                                        .op() instanceof UpdateApplication)
-                                .findFirst()))
-                .filter(p -> p.second.isPresent()).forEach(p -> {
-                    proof.getGoal(p.first).apply(
-                            MiscTools.findOneStepSimplifier(proof).createApp(
-                                    new PosInOccurrence(p.second.get(),
-                                            PosInTerm.getTopLevel(), false),
-                                    services));
-
-                    // Note: Will simplify only for nodes with update
-                    // applications, but we assume that after symb ex all
-                    // relevant nodes in any case have update applications
-                    // left over
-                    proof.getSubtreeGoals(p.first)
-                            .forEach(g -> seIf.applyMacro(
-                                    new FullPropositionalExpansionMacro(),
-                                    g.node()));
-
-                    if (!proof.isGoal(p.first)) {
-                        obsoleteUseCaseNodes.add(p.first);
-                        newUseCaseNodes.addAll(Utilities
-                                .toStream(proof.getSubtreeGoals(p.first))
-                                .map(g -> g.node())
-                                .collect(Collectors.toList()));
-                    }
-                });
-
-        useCaseNodes.removeAll(obsoleteUseCaseNodes);
-        useCaseNodes.addAll(newUseCaseNodes);
-
-        // TODO Should better extract relevant parts of these facts, that
-        // is, the stuff which is not also contained in the invariant / the
-        // negated guard, or in the "common" preconditions
-        facts.addAll(
-                useCaseNodes.stream()
-                        .map(n -> new Fact(LogicPrinter.quickPrintSequent(
-                                n.sequent(), services), true, proof.getGoal(n)))
-                        .collect(Collectors.toList()));
-
-        logger.info("Collected %s facts", facts.size());
-
-        List<Fact> coveredFacts = new ArrayList<>();
-        List<Fact> unCoveredFacts = new ArrayList<>();
-
-        logger.info("Proving facts, this may take some time...");
-
-        for (Fact fact : facts) {
-            final Node factNode = fact.goal.node();
-            seIf.applyMacro(new TryCloseMacro(10000), factNode);
-            if (factNode.isClosed()) {
-                coveredFacts.add(fact);
-            } else {
-                unCoveredFacts.add(fact);
-            }
-        }
-
-        logger.trace("Done proving facts.");
-
-        if (outProofFile.isPresent()) {
-            try {
-                whileGoal.proof().saveToFile(outProofFile.get());
-            } catch (IOException e) {
-                logger.error("Problem writing proof to file %s, message:\n%s",
-                        outProofFile.get(), e.getMessage());
-            }
-        }
-
-        logger.info("Finished analysis of Java file %s", file);
-
-        return new AnalyzerResult(coveredFacts, unCoveredFacts);
     }
 
     /**
@@ -372,41 +510,9 @@ public class Analyzer {
     /**
      * TODO
      * 
-     * @param proof
-     * @param preservesAndUCNode
-     * @param loopScopeIndex
-     * @throws RuntimeException
+     * @param methodStr
+     * @return
      */
-    private LocationVariable findLoopScopeIndex(final Proof proof,
-            final Node preservesAndUCNode) throws RuntimeException {
-        LocationVariable loopScopeIndex = null;
-
-        for (Goal g : proof.getSubtreeGoals(preservesAndUCNode)) {
-            for (SequentFormula sf : g.node().sequent().succedent()) {
-                final LoopScopeIdxVisitor loopScopeSearcher = new LoopScopeIdxVisitor();
-                sf.formula().execPostOrder(loopScopeSearcher);
-
-                if (loopScopeSearcher.getLoopScopeIdxVar().isPresent()) {
-                    loopScopeIndex = //
-                            loopScopeSearcher.getLoopScopeIdxVar().get();
-                    break;
-                }
-            }
-
-            if (loopScopeIndex != null) {
-                break;
-            }
-        }
-
-        if (loopScopeIndex == null) {
-            Utilities.logErrorAndThrowRTE(logger,
-                    "Could not find loop scope index; assumed "
-                            + "it to be present in first open goal");
-        }
-
-        return loopScopeIndex;
-    }
-
     private boolean parseMethodString(String methodStr) {
         // @ formatter:off
         // Expected format:
@@ -436,30 +542,6 @@ public class Analyzer {
         methodTypeStr = m.group(3);
 
         return true;
-    }
-
-    /**
-     * TODO
-     *
-     * @author Dominic Steinhöfel
-     */
-    private static class LoopScopeIdxVisitor extends DefaultVisitor {
-        private Optional<LocationVariable> loopScopeIndexVar = Optional.empty();
-
-        @Override
-        public void visit(Term visited) {
-            if (visited.op() instanceof LocationVariable
-                    && visited.containsLabel(
-                            ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)) {
-                loopScopeIndexVar = Optional
-                        .of((LocationVariable) visited.op());
-            }
-        }
-
-        public Optional<LocationVariable> getLoopScopeIdxVar() {
-            return loopScopeIndexVar;
-        }
-
     }
 
     public static class Fact {

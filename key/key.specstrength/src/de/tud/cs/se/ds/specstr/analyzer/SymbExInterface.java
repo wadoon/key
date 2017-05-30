@@ -15,6 +15,7 @@ package de.tud.cs.se.ds.specstr.analyzer;
 
 import java.io.File;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -28,7 +29,12 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
@@ -186,6 +192,44 @@ public class SymbExInterface {
      * TODO
      * 
      * @param proof
+     * @param preservesAndUCNode
+     * @param loopScopeIndex
+     * @throws RuntimeException
+     */
+    public static LocationVariable findLoopScopeIndex(final Proof proof,
+            final Node preservesAndUCNode) throws RuntimeException {
+        LocationVariable loopScopeIndex = null;
+
+        for (Goal g : proof.getSubtreeGoals(preservesAndUCNode)) {
+            for (SequentFormula sf : g.node().sequent().succedent()) {
+                final LoopScopeIdxVisitor loopScopeSearcher = new LoopScopeIdxVisitor();
+                sf.formula().execPostOrder(loopScopeSearcher);
+
+                if (loopScopeSearcher.getLoopScopeIdxVar().isPresent()) {
+                    loopScopeIndex = //
+                            loopScopeSearcher.getLoopScopeIdxVar().get();
+                    break;
+                }
+            }
+
+            if (loopScopeIndex != null) {
+                break;
+            }
+        }
+
+        if (loopScopeIndex == null) {
+            Utilities.logErrorAndThrowRTE(logger,
+                    "Could not find loop scope index; assumed "
+                            + "it to be present in first open goal");
+        }
+
+        return loopScopeIndex;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param proof
      */
     private static void setupStrategy(Proof proof) {
         // Set proof strategy options
@@ -227,5 +271,29 @@ public class SymbExInterface {
                 .setActiveStrategyProperties(sp);
 
         return sp;
+    }
+
+    /**
+     * TODO
+     *
+     * @author Dominic Steinhöfel
+     */
+    private static class LoopScopeIdxVisitor extends DefaultVisitor {
+        private Optional<LocationVariable> loopScopeIndexVar = Optional.empty();
+
+        @Override
+        public void visit(Term visited) {
+            if (visited.op() instanceof LocationVariable
+                    && visited.containsLabel(
+                            ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)) {
+                loopScopeIndexVar = Optional
+                        .of((LocationVariable) visited.op());
+            }
+        }
+
+        public Optional<LocationVariable> getLoopScopeIdxVar() {
+            return loopScopeIndexVar;
+        }
+
     }
 }
