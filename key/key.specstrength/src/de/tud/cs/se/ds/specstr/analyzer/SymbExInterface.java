@@ -14,7 +14,6 @@
 package de.tud.cs.se.ds.specstr.analyzer;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -119,15 +118,6 @@ public class SymbExInterface {
 
             // Start auto mode
             env.getUi().getProofControl().startAndWaitForAutoMode(proof);
-
-            // XXX Test Code -->
-            try {
-                proof.saveToFile(new File("untilLoop.proof"));
-            } catch (IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            // XXX <-- Test Code
 
             List<Goal> whileLoopGoals = Utilities.toStream(proof.openGoals())
                     .filter(g -> Utilities
