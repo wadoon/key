@@ -13,8 +13,8 @@
 
 package de.uka.ilkd.key.rule.strengthanalysis;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -36,6 +36,7 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
@@ -67,42 +68,62 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
 
         assert updateTerm.op() instanceof UpdateJunctor;
 
-        final List<Term> effectTerms = StreamSupport
+        final Map<LocationVariable, Term> updateContent = StreamSupport
                 .stream( //
                         MergeRuleUtils.getUpdateLeftSideLocations(updateTerm)
                                 .spliterator(),
                         true)
-                .map(lhs -> tb.equals(tb.var(lhs),
-                        MergeRuleUtils.getUpdateRightSideFor(updateTerm, lhs)))
-                .collect(Collectors.toList());
+                .collect(Collectors.toMap(
+                        lhs -> lhs, lhs -> MergeRuleUtils
+                                .getUpdateRightSideFor(updateTerm, lhs),
+                        (u, v) -> {
+                            throw new IllegalStateException(
+                                    String.format("Duplicate key %s", u));
+                        }, LinkedHashMap::new));
+
+        final Term updateWithoutLocalOuts = updateContent.keySet().stream()
+                .filter(lhs -> !localOuts.contains(lhs))
+                .map(lhs -> tb.elementary(lhs, updateContent.get(lhs)))
+                .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
 
         final ImmutableList<Goal> goals = goal.split(localOuts.size() + 1);
 
         final Goal[] goalArray = goals.toArray(Goal.class);
 
-        int goalIdx = 0;
-        for (int i = 0; i < effectTerms.size() - 1; i++) {
-            final List<Term> effectTermsCopy = new ArrayList<>(effectTerms);
-            final Term currAnalysisTerm = effectTermsCopy.remove(i);
-            
-            if (!localOuts.contains(currAnalysisTerm.sub(0).op())) {
-                continue;
-            }
-            
-            final Goal analysisGoal = goalArray[goalIdx];
+        for (int i = 0; i < localOuts.size(); i++) {
+            final LocationVariable currLocalOut = localOuts.get(i);
+            final Term currAnalysisTerm = tb.equals(tb.var(currLocalOut),
+                    updateContent.get(currLocalOut));
 
-            analysisGoal.setBranchLabel("Covers fact \""
-                    + LogicPrinter.quickPrintTerm(currAnalysisTerm, services)
-                            .replaceAll("(\\r|\\n|\\r\\n)+", "") + "\"");
+            final Goal analysisGoal = goalArray[i];
+
+            analysisGoal
+                    .setBranchLabel(
+                            "Covers fact \""
+                                    + LogicPrinter
+                                            .quickPrintTerm(currAnalysisTerm,
+                                                    services)
+                                            .replaceAll("(\\r|\\n|\\r\\n)+", "")
+                                    + "\"");
 
             analysisGoal.removeFormula(pio);
-            analysisGoal.addFormula(new SequentFormula(currAnalysisTerm), false,
-                    true);
-            analysisGoal.addFormula(new SequentFormula(invTerm), true, true);
-            effectTermsCopy.forEach(f -> analysisGoal
-                    .addFormula(new SequentFormula(f), true, false));
-            
-            goalIdx++;
+            analysisGoal.addFormula(new SequentFormula(currAnalysisTerm), //
+                    false, true);
+            analysisGoal.addFormula(
+                    new SequentFormula(
+                            tb.apply(updateWithoutLocalOuts, invTerm)),
+                    true, true);
+            // TODO Excluding the heap here is a hack made because KeY otherwise
+            // gets stuck in an endless cascade of equation shuffling
+            analysisGoal.addFormula(
+                    new SequentFormula(tb.and(updateContent.keySet().stream()
+                            .filter(lhs -> lhs != currLocalOut)
+                            .filter(lhs -> !lhs.sort().name().toString()
+                                    .equals("Heap"))
+                            .map(lhs -> tb.equals(tb.var(lhs),
+                                    updateContent.get(lhs)))
+                            .collect(Collectors.toList()))),
+                    true, true);
         }
 
         goalArray[goalArray.length - 1].setBranchLabel("Invariant preserved");

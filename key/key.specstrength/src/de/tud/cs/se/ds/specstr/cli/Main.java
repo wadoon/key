@@ -26,7 +26,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.tud.cs.se.ds.specstr.analyzer.Analyzer;
-import de.tud.cs.se.ds.specstr.util.Utilities;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
@@ -87,22 +86,24 @@ public class Main {
 
             Analyzer analyzer = new Analyzer(inputFile, theMethod);
             Analyzer.AnalyzerResult result = analyzer.analyze();
-            
+
             System.out.printf("Covered %s out of %s facts; Strength: %.2f%%\n",
                     result.numCoveredFacts(), result.numFacts(),
                     100d * ((double) result.numCoveredFacts())
                             / ((double) result.numFacts()));
 
-            // @formatter:off
-            System.out.println("\n================\n"
-                               + "Uncovered Facts:\n"
-                               + "================\n");
-            // @formatter:on
+            if (result.numUncoveredFacts() > 0) {
+                // @formatter:off
+                System.out.println("\n================\n"
+                                   + "Uncovered Facts:\n"
+                                   + "================\n");
+                // @formatter:on
 
-            result.getUnCoveredFacts().forEach(f -> {
-                System.out.println(f);
-                System.out.println();
-            });
+                result.getUnCoveredFacts().forEach(f -> {
+                    System.out.println(f);
+                    System.out.println();
+                });
+            }
 
             System.exit(0);
         } catch (ParseException exp) {
