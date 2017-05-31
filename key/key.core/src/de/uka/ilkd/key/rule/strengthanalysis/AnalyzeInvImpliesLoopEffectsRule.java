@@ -124,19 +124,8 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
 
             final Term currAnalysisTerm = tb.equals(tb.var(currLocalOut),
                     updateContent.get(currLocalOut));
-
-            analysisGoal
-                    .setBranchLabel(
-                            "Covers fact \""
-                                    + LogicPrinter
-                                            .quickPrintTerm(currAnalysisTerm,
-                                                    services)
-                                            .replaceAll("(\\r|\\n|\\r\\n)+", "")
-                                    + "\"");
-
-            analysisGoal.removeFormula(pio);
-            analysisGoal.addFormula(new SequentFormula(currAnalysisTerm), false,
-                    true);
+            
+            prepareGoal(pio, analysisGoal, currAnalysisTerm);
 
             for (Term newAntecTerm : newGoalInformation.get(currLocalOut)) {
                 analysisGoal.addFormula(new SequentFormula(newAntecTerm), true,
@@ -172,8 +161,30 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
         // scope index of the loop is set to FALSE. The formula must have an
         // empty Java block.
 
-        return retrieveLoopScopeIndex(pio, goal.proof().getServices())
-                .isPresent();
+        final Services services = goal.proof().getServices();
+
+        Optional<LocationVariable> lsi = null;
+        return (lsi = retrieveLoopScopeIndex(pio, services)).isPresent()
+                && MergeRuleUtils
+                        .getUpdateRightSideFor(pio.subTerm().sub(0), lsi.get())
+                        .equals(services.getTermBuilder().FALSE());
+    }
+
+    @Override
+    public boolean isApplicableOnSubTerms() {
+        return false;
+    }
+
+    @Override
+    public IBuiltInRuleApp createApp(PosInOccurrence pos,
+            TermServices services) {
+        return new AnalyzeInvImpliesLoopEffectsRuleApp(this, pos, null, null);
+    }
+
+    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services,
+            Term invTerm, List<LocationVariable> localOuts) {
+        return new AnalyzeInvImpliesLoopEffectsRuleApp(this, pos, invTerm,
+                localOuts);
     }
 
     /**
@@ -223,33 +234,32 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
             return failedResult;
         }
 
-        final LocationVariable loopScopeIdxVar = //
-                (LocationVariable) loopScopeVar.op();
-
-        // Loop scope index has to be false
-        if (MergeRuleUtils.getUpdateRightSideFor(formula.sub(0),
-                loopScopeIdxVar) != services.getTermBuilder().FALSE()) {
-            return failedResult;
-        }
-
-        return Optional.of(loopScopeIdxVar);
+        return Optional.of((LocationVariable) loopScopeVar.op());
     }
 
-    @Override
-    public boolean isApplicableOnSubTerms() {
-        return false;
-    }
+    /**
+     * TODO
+     * 
+     * @param pio
+     * @param analysisGoal
+     * @param fact
+     */
+    public static void prepareGoal(final PosInOccurrence pio, final Goal analysisGoal,
+            final Term fact) {
+        final Services services = analysisGoal.proof().getServices();
 
-    @Override
-    public IBuiltInRuleApp createApp(PosInOccurrence pos,
-            TermServices services) {
-        return new AnalyzeInvImpliesLoopEffectsRuleApp(this, pos, null, null);
-    }
+        analysisGoal
+                .setBranchLabel(
+                        "Covers fact \""
+                                + LogicPrinter
+                                        .quickPrintTerm(fact,
+                                                services)
+                                        .replaceAll("(\\r|\\n|\\r\\n)+", "")
+                                + "\"");
 
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services,
-            Term invTerm, List<LocationVariable> localOuts) {
-        return new AnalyzeInvImpliesLoopEffectsRuleApp(this, pos, invTerm,
-                localOuts);
+        analysisGoal.removeFormula(pio);
+        analysisGoal.addFormula(new SequentFormula(fact), false,
+                true);
     }
 
 }

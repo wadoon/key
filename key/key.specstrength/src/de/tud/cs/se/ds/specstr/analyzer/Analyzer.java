@@ -170,7 +170,7 @@ public class Analyzer {
         for (Fact fact : facts) {
             logger.trace("Proving fact %s", fact.descr);
             final Node factNode = fact.goal.node();
-            seIf.applyMacro(new TryCloseMacro(10000), factNode);
+//            seIf.applyMacro(new TryCloseMacro(10000), factNode);
             if (factNode.isClosed()) {
                 coveredFacts.add(fact);
             } else {
