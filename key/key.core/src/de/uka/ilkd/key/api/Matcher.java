@@ -154,8 +154,6 @@ public class Matcher {
             SchemaVariable sv = insts.lookupVar(new Name(varName));
             Object value = insts.getInstantiation(sv);
             va.addAssignmentWithType(varName, value, (VariableAssignments.VarType) assignments.getTypeMap().get(varName));
-            //System.out.println("Looking up "+sv.toString()+" value "+value.toString());
-
         }
         return va;
 
@@ -189,29 +187,7 @@ public class Matcher {
     }
 
     private String toDecl(String id, VariableAssignments.VarType type){
-        String s ="";
-        switch (type) {
-            case ANY:
-                s += "\\term any "+id+";";
-                break;
-            case BOOL:
-                s += "\\term boolean "+id+";";
-                break;
-            case INT:
-                s+= "\\term int "+id+";";
-                break;
-            case FORMULA:
-                s+= "\\formula "+id+";";
-                break;
-            case INT_ARRAY:
-                s+= "\\term int[] "+id+";";
-                break;
-            default:
-                //TODO missing types
-                System.out.println("Sort "+type+" not supported yet");
-                break;
-        }
-        return s;
+        return type.getKeYDeclarationPrefix()+" "+id+";";
     }
 
 
@@ -245,7 +221,7 @@ public class Matcher {
                 services, services.getNamespaces());
     }
 
-    Taclet parseTaclet(String s, Services services) throws RecognitionException {
+    private Taclet parseTaclet(String s, Services services) throws RecognitionException {
         try {
             KeYParserF p = stringTacletParser(s, services);
 

@@ -10,16 +10,25 @@ public class VariableAssignments {
 
 
     public enum VarType {
-        INT,
-        BOOL,
-        ANY,
-        INT_ARRAY,
-        OBJECT,
-        HEAP,
-        FIELD,
-        LOCSET,
-        NULL,
-        FORMULA;
+        INT("\\term int"),
+        BOOL("\\term bool"),
+        ANY("\\term any"),
+        INT_ARRAY("\\term int[]"),
+        OBJECT("\\term Object"),
+        HEAP("\\term Heap"),
+        FIELD("\\term Field"),
+        LOCSET("\\term LocSet"),
+        FORMULA("\\formula");
+
+        private final String declPrefix;
+
+        VarType(String declPrefix) {
+            this.declPrefix = declPrefix;
+        }
+
+        public String getKeYDeclarationPrefix() {
+            return declPrefix;
+        }
     }
 
     /**
@@ -122,9 +131,11 @@ public class VariableAssignments {
      * Returns the map of ID -> Type mappings
      * @return
      */
-    public Map getTypeMap(){
+    public Map<String, VariableAssignments.VarType> getTypeMap(){
         return this.typeMap;
     }
+
+
 /*    public Object getValue(String name) {
         return null;
     }

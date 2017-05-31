@@ -48,7 +48,7 @@ public class ScriptApi {
      * @param pattern     a string representation of the pattern sequent against which the current sequent should be matched
      * @param currentSeq  current concrete sequent
      * @param assignments variables appearing in the pattern as schemavariables with their corresponding type in KeY
-     * @return List of VariableAssignments (possibly empty if no match was found)
+     *  @return List of VariableAssignments (possibly empty if no match was found)
      */
     public List<VariableAssignments> matchPattern(String pattern,
             Sequent currentSeq, VariableAssignments assignments) {
