@@ -114,15 +114,19 @@ public class Analyzer {
         final Proof proof = whileGoal.proof();
 
         // Apply loop invariant rule
-        final SequentFormula whileSeqFor = Utilities
+        final Optional<SequentFormula> maybeWhileSeqFor = Utilities
                 .toStream(whileGoal.node().sequent().succedent())
                 .filter(f -> SymbolicExecutionUtil
                         .hasSymbolicExecutionLabel(f.formula()))
                 .filter(f -> JavaTools.getActiveStatement(
                         TermBuilder.goBelowUpdates(f.formula())
                                 .javaBlock()) instanceof While)
-                .findFirst().get();
+                .findFirst();
+        
+        assert maybeWhileSeqFor.isPresent();
 
+        final SequentFormula whileSeqFor = maybeWhileSeqFor.get();
+        
         final PosInOccurrence whilePio = new PosInOccurrence(whileSeqFor,
                 PosInTerm.getTopLevel(), false);
 
