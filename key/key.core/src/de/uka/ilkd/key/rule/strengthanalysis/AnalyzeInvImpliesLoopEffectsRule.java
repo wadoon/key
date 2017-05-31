@@ -60,6 +60,10 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services,
             RuleApp ruleApp) throws RuleAbortException {
+        // TODO: We also have to include facts about heap changes, as in
+        // AnalyzePostCondImpliesMethodEffectsRule. See find_instance_strong
+        // example, probably there is something that we don't check.
+
         assert ruleApp instanceof AnalyzeInvImpliesLoopEffectsRuleApp;
 
         final TermBuilder tb = services.getTermBuilder();
@@ -124,7 +128,7 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
 
             final Term currAnalysisTerm = tb.equals(tb.var(currLocalOut),
                     updateContent.get(currLocalOut));
-            
+
             prepareGoal(pio, analysisGoal, currAnalysisTerm);
 
             for (Term newAntecTerm : newGoalInformation.get(currLocalOut)) {
@@ -244,22 +248,19 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
      * @param analysisGoal
      * @param fact
      */
-    public static void prepareGoal(final PosInOccurrence pio, final Goal analysisGoal,
-            final Term fact) {
+    public static void prepareGoal(final PosInOccurrence pio,
+            final Goal analysisGoal, final Term fact) {
         final Services services = analysisGoal.proof().getServices();
 
         analysisGoal
                 .setBranchLabel(
                         "Covers fact \""
-                                + LogicPrinter
-                                        .quickPrintTerm(fact,
-                                                services)
+                                + LogicPrinter.quickPrintTerm(fact, services)
                                         .replaceAll("(\\r|\\n|\\r\\n)+", "")
                                 + "\"");
 
         analysisGoal.removeFormula(pio);
-        analysisGoal.addFormula(new SequentFormula(fact), false,
-                true);
+        analysisGoal.addFormula(new SequentFormula(fact), false, true);
     }
 
 }
