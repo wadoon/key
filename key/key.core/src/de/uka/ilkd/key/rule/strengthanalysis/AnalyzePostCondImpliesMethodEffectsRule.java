@@ -105,6 +105,13 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                 final Term field = currHeapTerm.sub(2);
                 final Term value = currHeapTerm.sub(3);
 
+                // Note: value could contain method-local variables, in which
+                // case the fact is likely to be uncovered by the post
+                // condition. Still, we don't remove it, since then indeed, this
+                // reflects behavior that is not shown to the outside, and thus
+                // indicates that we're not using the strongest possible post
+                // condition.
+
                 storeEqualities.add(tb.equals(tb.select(value.sort(),
                         tb.getBaseHeap(), targetObj, field), value));
 
@@ -130,6 +137,8 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                             throw new IllegalStateException(
                                     String.format("Duplicate key %s", u));
                         }, LinkedHashMap::new));
+        
+        final boolean hasResultVar = resultVar != null && updateContent.get(resultVar) != null;
 
         final Term updateWithoutVarsOfInterest = updateContent.keySet().stream()
                 .filter(lhs -> pm.isVoid() || lhs.equals(resultVar))
@@ -138,10 +147,10 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                 .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
 
         final ImmutableList<Goal> goals = goal.split(
-                (resultVar == null ? 0 : 1) + storeEqualities.size() + 1);
+                (hasResultVar ? 1 : 0) + storeEqualities.size() + 1);
         final Goal[] goalArray = goals.toArray(Goal.class);
 
-        if (resultVar != null) {
+        if (hasResultVar) {
             final Goal analysisGoal = goalArray[0];
 
             final Term currAnalysisTerm = tb.equals(tb.var(resultVar),

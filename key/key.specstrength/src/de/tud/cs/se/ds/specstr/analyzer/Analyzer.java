@@ -54,6 +54,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.strengthanalysis.AnalyzeInvImpliesLoopEffectsRule;
+import de.uka.ilkd.key.rule.strengthanalysis.AnalyzePostCondImpliesMethodEffectsRule;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -122,11 +123,11 @@ public class Analyzer {
                         TermBuilder.goBelowUpdates(f.formula())
                                 .javaBlock()) instanceof While)
                 .findFirst();
-        
+
         assert maybeWhileSeqFor.isPresent();
 
         final SequentFormula whileSeqFor = maybeWhileSeqFor.get();
-        
+
         final PosInOccurrence whilePio = new PosInOccurrence(whileSeqFor,
                 PosInTerm.getTopLevel(), false);
 
@@ -147,6 +148,11 @@ public class Analyzer {
         final Node preservesAndUCNode = whileNode.child(1);
         seIf.finishSEForNode(preservesAndUCNode);
 
+        final List<Fact> facts = new ArrayList<>();
+
+        // Post condition facts
+        extractPostCondFacts(proof, facts);
+
         // Find "preserves" and "use case" branches
         final List<Node> preservedNodes = new ArrayList<>();
         final List<Node> useCaseNodes = new ArrayList<>();
@@ -154,8 +160,7 @@ public class Analyzer {
         extractPreservedAndUseCaseNodes(proof, preservesAndUCNode,
                 preservedNodes, useCaseNodes);
 
-        // Extract facts
-        final List<Fact> facts = new ArrayList<>();
+        // Loop facts
         extractLoopBodyFactsAndShowValidity( //
                 proof, preservedNodes, facts);
         extractUseCaseFacts(proof, preservesAndUCNode, useCaseNodes, facts);
@@ -170,7 +175,7 @@ public class Analyzer {
         for (Fact fact : facts) {
             logger.trace("Proving fact %s", fact.descr);
             final Node factNode = fact.goal.node();
-//            seIf.applyMacro(new TryCloseMacro(10000), factNode);
+            seIf.applyMacro(new TryCloseMacro(10000), factNode);
             if (factNode.isClosed()) {
                 coveredFacts.add(fact);
             } else {
@@ -247,13 +252,51 @@ public class Analyzer {
 
         useCaseNodes.removeAll(obsoleteUseCaseNodes);
         useCaseNodes.addAll(newUseCaseNodes);
-        
+
         facts.addAll(useCaseNodes.stream()
                 .map(n -> new Fact(
                         polishFactDescription(n.sequent(),
                                 preservesAndUCNode.sequent(), services),
-                        true, proof.getGoal(n)))
+                        FactType.LOOP_USE_CASE_FACT, proof.getGoal(n)))
                 .collect(Collectors.toList()));
+    }
+
+    /**
+     * TODO
+     * 
+     * @param proof
+     * @param facts
+     */
+    private void extractPostCondFacts(Proof proof, List<Fact> facts) {
+        for (Goal g : proof.openGoals()) {
+            final Node postCondNode = g.node();
+            final Optional<PosInOccurrence> maybePio = //
+                    getPioOfFormulaWhichHadSELabel(postCondNode);
+
+            if (!maybePio.isPresent()) {
+                continue;
+            }
+
+            if (AnalyzePostCondImpliesMethodEffectsRule.INSTANCE.isApplicable( //
+                    g, maybePio.get())) {
+                g.apply(AnalyzePostCondImpliesMethodEffectsRule.INSTANCE
+                        .createApp(maybePio.get(), proof.getServices()));
+
+                boolean first = true;
+                for (Goal analysisGoal : g.proof()
+                        .getSubtreeGoals(postCondNode)) {
+                    if (first) {
+                        first = false;
+                        continue;
+                    }
+
+                    facts.add(new Fact(
+                            analysisGoal.node().getNodeInfo().getBranchLabel()
+                                    .split("\"")[1],
+                            FactType.POST_COND_FACT, analysisGoal));
+                }
+            }
+        }
     }
 
     /**
@@ -328,6 +371,15 @@ public class Analyzer {
                 .findLoopScopeIndex(proof, preservesAndUCNode);
 
         for (Goal g : proof.getSubtreeGoals(preservesAndUCNode)) {
+            if (g.node().parent().getAppliedRuleApp()
+                    .rule() == AnalyzePostCondImpliesMethodEffectsRule.INSTANCE
+                    && g != proof.getSubtreeGoals(g.node().parent()).head()) {
+                // We ignore the goals for the strength analysis of post
+                // conditions; only the first one after such a rule app will be
+                // considered.
+                continue;
+            }
+
             Optional<Term> rhs = Utilities
                     .toStream(g.node().sequent().succedent())
                     .map(sf -> sf.formula())
@@ -374,45 +426,23 @@ public class Analyzer {
         int invariantGoalsNotPreserved = 0;
 
         for (Node preservedNode : preservedNodes) {
-            Utilities.toStream(preservedNode.parent().sequent().succedent())
-                    .filter(sf -> SymbolicExecutionUtil
-                            .hasSymbolicExecutionLabel(sf.formula()))
-                    .findAny();
+            final Optional<PosInOccurrence> proofOblPio = getPioOfFormulaWhichHadSELabel(
+                    preservedNode);
 
-            int pos = -1;
-            {
-                int i = 0;
-                for (SequentFormula sf : preservedNode.parent().sequent()
-                        .succedent()) {
-                    if (SymbolicExecutionUtil
-                            .hasSymbolicExecutionLabel(sf.formula())) {
-                        pos = i;
-                        break;
-                    }
+            assert proofOblPio
+                    .isPresent() : "There should be a formula with SE label";
 
-                    i++;
-                }
-            }
-
-            assert pos != -1 : "There should be a formula with SE label";
-
-            final ImmutableList<SequentFormula> succList = preservedNode
-                    .sequent().succedent().asList();
-            final SequentFormula updPostCondSeqFor = succList.take(pos).head();
-            final PosInOccurrence proofOblPio = new PosInOccurrence(
-                    updPostCondSeqFor, PosInTerm.getTopLevel(), false);
             final RuleApp app = AnalyzeInvImpliesLoopEffectsRule.INSTANCE
-                    .createApp(proofOblPio, services)
+                    .createApp(proofOblPio.get(), services)
                     .forceInstantiate(proof.getGoal(preservedNode));
 
             final Goal[] preservedGoals = proof.getSubtreeGoals(preservedNode)
                     .head().apply(app).toArray(Goal.class);
             for (int i = 0; i < preservedGoals.length - 1; i++) {
-                facts.add(
-                        new Fact(
-                                preservedGoals[i].node().getNodeInfo()
-                                        .getBranchLabel().split("\"")[1],
-                                false, preservedGoals[i]));
+                facts.add(new Fact(
+                        preservedGoals[i].node().getNodeInfo().getBranchLabel()
+                                .split("\"")[1],
+                        FactType.LOOP_BODY_FACT, preservedGoals[i]));
             }
 
             final Node actualPreservedNode = preservedGoals[preservedGoals.length
@@ -429,6 +459,42 @@ public class Analyzer {
                     "Loop invariant could be invalid: %s open preserves goals",
                     invariantGoalsNotPreserved);
         }
+    }
+
+    /**
+     * TODO
+     * 
+     * @param preservedNode
+     * @return
+     */
+    private Optional<PosInOccurrence> getPioOfFormulaWhichHadSELabel(
+            Node preservedNode) {
+        int pos = -1;
+        {
+            int i = 0;
+            for (SequentFormula sf : preservedNode.parent().sequent()
+                    .succedent()) {
+                if (SymbolicExecutionUtil
+                        .hasSymbolicExecutionLabel(sf.formula())) {
+                    pos = i;
+                    break;
+                }
+
+                i++;
+            }
+        }
+
+        if (pos == -1) {
+            return Optional.empty();
+        }
+
+        final ImmutableList<SequentFormula> succList = preservedNode.sequent()
+                .succedent().asList();
+        final SequentFormula updPostCondSeqFor = succList.take(pos).head();
+        final PosInOccurrence proofOblPio = new PosInOccurrence(
+                updPostCondSeqFor, PosInTerm.getTopLevel(), false);
+
+        return Optional.of(proofOblPio);
     }
 
     /**
@@ -520,16 +586,20 @@ public class Analyzer {
         return true;
     }
 
+    public static enum FactType {
+        LOOP_BODY_FACT, LOOP_USE_CASE_FACT, POST_COND_FACT
+    }
+
     public static class Fact {
         private final String descr;
-        private final boolean postCondFact;
+        private final FactType factType;
         private final int goalNr;
         private final Goal goal;
         private boolean covered = false;
 
-        public Fact(String descr, boolean postCondFact, Goal goal) {
+        public Fact(String descr, FactType factType, Goal goal) {
             this.descr = descr;
-            this.postCondFact = postCondFact;
+            this.factType = factType;
             this.goalNr = goal.node().serialNr();
             this.goal = goal;
         }
@@ -546,8 +616,8 @@ public class Analyzer {
             return descr;
         }
 
-        public boolean isPostCondFact() {
-            return postCondFact;
+        public FactType getFactType() {
+            return factType;
         }
 
         public int getGoalNr() {
@@ -560,8 +630,23 @@ public class Analyzer {
 
         @Override
         public String toString() {
-            return (postCondFact ? "Post condition" : "Loop body")
-                    + " fact at goal " + goalNr + "\n" + descr;
+            return factTypeToString(factType) + " at goal " + goalNr + "\n"
+                    + descr;
+        }
+
+        private static String factTypeToString(FactType ft) {
+            switch (ft) {
+            case LOOP_BODY_FACT:
+                return "Loop body fact";
+            case LOOP_USE_CASE_FACT:
+                return "Loop use case fact";
+            case POST_COND_FACT:
+                return "Post condition fact";
+            default:
+                Utilities.logErrorAndThrowRTE( //
+                        logger, "Unknown fact type: %s", ft);
+                return null;
+            }
         }
     }
 
