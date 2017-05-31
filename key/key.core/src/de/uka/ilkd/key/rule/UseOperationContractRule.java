@@ -70,7 +70,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -667,19 +666,23 @@ public final class UseOperationContractRule implements BuiltInRule {
         return false;
     }
 
-    private Term filterInv(Term t, Term contractSelf, TermBuilder tb) { // TODO KD z hacky
+    // TODO KD z hacky
+    private Term getInv(Term t, Term contractSelf, TermBuilder tb) {
     	// TODO KD c inv hack made t.sub(1) hist, careful, when changing again
     	if (t.op().toString().contains("<inv>") && t.sub(2) == contractSelf) {
-        	return tb.tt();
+        	return t;
     	} else if (t.op() == Junctor.AND) {
-    		return tb.and(filterInv(t.sub(0), contractSelf, tb), filterInv(t.sub(1), contractSelf, tb));
+    		return tb.and(getInv(t.sub(0), contractSelf, tb), getInv(t.sub(1), contractSelf, tb));
     	} else {
-			return t;
+			return tb.tt();
 		}
     }
-    
+
+    // TODO KD a search fresh and check and correct it
+    // TODO KD a- add wfHist(anonHist) for (non service) methods
+    // TODO KD a- gather all changes and put them in one if statement
 	@Override
-	public ImmutableList<Goal> apply(Goal goal,
+	public ImmutableList<Goal> apply(Goal goal, 
 			Services services,
 			RuleApp ruleApp) {
 		final TermLabelState termLabelState = new TermLabelState();
@@ -735,11 +738,22 @@ public final class UseOperationContractRule implements BuiltInRule {
 		}
 		final Term globalDefs = contract.getGlobalDefs(baseHeap, baseHeapTerm, contractSelf,
 				contractParams, services);
-		final Term originalPre = pm.getMethodDeclaration().isRemote() ? // TODO KD z hacky
-				filterInv(contract.getPre(heapContext, heapTerms, contractSelf, contractParams, atPres, services), contractSelf, tb) :
-				contract.getPre(heapContext, heapTerms, contractSelf, contractParams, atPres, services);
-		final Term pre = globalDefs==null? originalPre: tb.apply(globalDefs, originalPre);
-		final Term originalPost = contract.getPost(heapContext,
+		Term updateOther = tb.skip();
+		if (pm.getMethodDeclaration().isRemote()) {
+			// TODO KD a implement anonHeap change for updateOther
+			// TODO KD a implement anonHist change for updateOther
+		}
+		final Term originalPre = tb.apply(updateOther, contract.getPre(heapContext, heapTerms, contractSelf, contractParams, atPres, services));
+		final Term pre = tb.apply(globalDefs != null ? globalDefs : tb.skip(), originalPre);
+		final Term originalPost = tb.apply(updateOther, contract.getPost(heapContext,
+				heapTerms,
+				contractSelf,
+				contractParams,
+				contractResult,
+				tb.var(excVar),
+				atPres,
+				services));
+		Term originalFreePost = contract.getFreePost(heapContext, // TODO KD a apply updateOther?
 				heapTerms,
 				contractSelf,
 				contractParams,
@@ -747,17 +761,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 				tb.var(excVar),
 				atPres,
 				services);
-		Term originalFreePost = contract.getFreePost(heapContext,
-				heapTerms,
-				contractSelf,
-				contractParams,
-				contractResult,
-				tb.var(excVar),
-				atPres,
-				services);
-		originalFreePost = originalFreePost != null ? originalFreePost : tb.tt();
-		final Term post = globalDefs==null? originalPost: tb.apply(globalDefs, originalPost);
-		final Term freeSpecPost = globalDefs==null? originalFreePost: tb.apply(globalDefs, originalFreePost);
+		final Term post = tb.apply(globalDefs != null ? globalDefs : tb.skip(), originalPost);
+		final Term freeSpecPost = tb.apply(globalDefs != null ? globalDefs : tb.skip(), originalFreePost);
 		final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
 
 		for(LocationVariable heap : heapContext) {
@@ -865,6 +870,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 		atPreUpdates = tb.parallel(atPreUpdates, tb.elementary(beforeHist, tb.var(hist)));
 		reachableState = tb.and(reachableState, tb.wellFormedHist(hist));
 
+		Term similarFormula = tb.tt();
+		if (pm.getMethodDeclaration().isRemote()) {
+			// TODO KD a implement similar heap values for similarFormula (needed?)
+			// TODO KD a implement similar hist values for similarFormula
+		}
+
 		final Term excNull = tb.equals(tb.var(excVar), tb.NULL());
 		final Term excCreated = tb.created(tb.var(excVar));
 		final Term freePost = getFreePost(heapContext,
@@ -882,12 +893,13 @@ public final class UseOperationContractRule implements BuiltInRule {
 				= tb.applySequential(new Term[]{inst.u, atPreUpdates},
 				tb.and(anonAssumption,
 				tb.apply(anonUpdate,
-				tb.and(excNull, freePost, post),
+				tb.and(excNull, similarFormula, freePost, post),
 				null)));
 		final Term excPostAssumption
 				= tb.applySequential(new Term[]{inst.u, atPreUpdates},
 				tb.and(anonAssumption,
 				tb.apply(anonUpdate, tb.and(tb.not(excNull),
+				similarFormula,
 				excCreated,
 				freeExcPost,
 				post), null)));
@@ -933,6 +945,11 @@ public final class UseOperationContractRule implements BuiltInRule {
 		finalPreTerm = TermLabelManager.refactorTerm(termLabelState, services, null, finalPreTerm, this, preGoal, FINAL_PRE_TERM_HINT, null);
 		preGoal.changeFormula(new SequentFormula(finalPreTerm),
 				ruleApp.posInOccurrence());
+
+		preGoal.addFormula(new SequentFormula(similarFormula), true, false); // TODO KD a U^pre_cont missing
+		if (pm.getMethodDeclaration().isRemote()) {
+			preGoal.addFormula(new SequentFormula(getInv(originalPre, contractSelf, tb)), true, false);
+		}
 
 		TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this, preGoal, null, null);
 

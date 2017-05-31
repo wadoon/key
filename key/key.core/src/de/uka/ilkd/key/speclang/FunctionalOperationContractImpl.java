@@ -1237,18 +1237,14 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                             Term excTerm,
                             Map<LocationVariable,Term> atPres,
                             Services services) {
-        Term result = null;
+        Term result = tb.tt();
         for(LocationVariable heap : heapContext) {
             final Term p = getFreePost(heap, heapTerms.get(heap), selfTerm, paramTerms,
                                        resultTerm, excTerm, atPres, services);
             if(p == null) {
                 continue;
             }
-            if(result == null) {
-                result = p;
-            }else{
-                result = tb.and(result, p);
-            }
+            result = tb.and(result, p);
         }
         return result;
     };

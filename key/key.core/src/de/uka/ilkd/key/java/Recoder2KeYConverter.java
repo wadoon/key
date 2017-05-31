@@ -1332,7 +1332,8 @@ public class Recoder2KeYConverter {
 			    	break;
 				}
 			}
-/* TODO KD a implement
+/* TODO KD b implement
+			// TODO KD z mind public only
 			// TODO KD z if <>-Method don't do?
 			if (parent instanceof recoder.java.declaration.ClassDeclaration) {
 				recoder.java.declaration.ClassDeclaration parentClass = (recoder.java.declaration.ClassDeclaration) parent;
