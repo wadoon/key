@@ -45,6 +45,18 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
     }
     
     @Test
+    public void testFindInstanceWeak() {
+        final AnalyzerResult result = analyzeMethod(
+                "findMethods/FindMethods.java", "FindMethods::find_instance_weak([II)V");
+
+        assertEquals(2, result.numUncoveredFacts());
+        assertEquals(Analyzer.FactType.POST_COND_FACT,
+                result.getUnCoveredFacts().get(0).getFactType());
+        assertEquals(Analyzer.FactType.LOOP_BODY_FACT,
+                result.getUnCoveredFacts().get(1).getFactType());
+    }
+    
+    @Test
     public void testFindInstance() {
         final AnalyzerResult result = analyzeMethod(
                 "findMethods/FindMethods.java", "FindMethods::find_instance([II)V");
