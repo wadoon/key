@@ -30,7 +30,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.tud.cs.se.ds.specstr.analyzer.Analyzer;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
  * TODO
@@ -143,9 +142,6 @@ public class Main {
         } catch (ParseException exp) {
             printHelp(options);
             System.exit(0);
-        } catch (ProblemLoaderException e) {
-            logger.error("Problem in loading the file to analyze, message:\n%s",
-                    e.getMessage());
         } catch (RuntimeException e) {
             logger.error("Problem occurred during the analysis:\n%s",
                     e.getMessage());

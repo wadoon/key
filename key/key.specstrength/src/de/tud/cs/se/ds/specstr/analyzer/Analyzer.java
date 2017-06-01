@@ -80,8 +80,7 @@ public class Analyzer {
      * @param outProofFile
      * @throws ProblemLoaderException
      */
-    public Analyzer(File file, String method, Optional<File> outProofFile)
-            throws ProblemLoaderException {
+    public Analyzer(File file, String method, Optional<File> outProofFile) {
         this.file = file;
         if (!parseMethodString(method)) {
             final String errorMsg = Utilities
@@ -90,7 +89,13 @@ public class Analyzer {
             throw new RuntimeException(errorMsg);
         }
 
-        this.seIf = new SymbExInterface(file);
+        try {
+            this.seIf = new SymbExInterface(file);
+        } catch (ProblemLoaderException e) {
+            Utilities.logErrorAndThrowRTE(logger,
+                    "ProblemLoaderException occurred while loading file %s\nMessage:\n%s",
+                    file.getName(), e.getMessage());
+        }
         this.outProofFile = outProofFile;
     }
 
