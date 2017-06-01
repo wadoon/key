@@ -29,6 +29,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
@@ -36,7 +37,9 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.LinkedHashMap;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
@@ -85,10 +88,27 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
                                     String.format("Duplicate key %s", u));
                         }, LinkedHashMap::new));
 
+        final LocationVariable heapVar = services.getTypeConverter()
+                .getHeapLDT().getHeap();
+
         final Term updateWithoutLocalOuts = updateContent.keySet().stream()
                 .filter(lhs -> !localOuts.contains(lhs))
+                .filter(lhs -> !lhs.equals(heapVar))
                 .map(lhs -> tb.elementary(lhs, updateContent.get(lhs)))
                 .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
+
+        // Retrieve store equalities
+        final FunctionalOperationContract fContract = //
+                StrengthAnalysisUtilities.getFOContract(services);
+        final IProgramMethod pm = fContract.getTarget();
+        final Term origHeapTerm = MergeRuleUtils
+                .getUpdateRightSideFor(updateTerm, heapVar);
+
+        final Pair<Term, List<Term>> storeEqsAndInnerHeapTerm = //
+                StrengthAnalysisUtilities.extractStoreEqsAndInnerHeapTerm( //
+                        services, pm, origHeapTerm);
+        final Term innerHeapTerm = storeEqsAndInnerHeapTerm.first;
+        final List<Term> storeEqualities = storeEqsAndInnerHeapTerm.second;
 
         Map<LocationVariable, List<Term>> newGoalInformation = new LinkedHashMap<>();
 
@@ -101,20 +121,23 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
 
             // TODO Excluding the heap here is a hack made because KeY otherwise
             // gets stuck in an endless cascade of equation shuffling
-            newGoalInformation.put(currLocalOut,
-                    Arrays.asList(new Term[] {
-                            tb.apply(updateWithoutLocalOuts, invTerm),
-                            tb.and(updateContent.keySet().stream()
-                                    .filter(lhs -> lhs != currLocalOut)
-                                    .filter(lhs -> !lhs.sort().name().toString()
-                                            .equals("Heap"))
-                                    .map(lhs -> tb.equals(tb.var(lhs),
-                                            updateContent.get(lhs)))
-                                    .collect(Collectors.toList())) }));
+            newGoalInformation
+                    .put(currLocalOut,
+                            Arrays.asList(new Term[] {
+                                    tb.apply(tb.parallel(
+                                            tb.elementary(tb.var(heapVar),
+                                                    origHeapTerm),
+                                            updateWithoutLocalOuts), invTerm),
+                                    tb.and(updateContent.keySet().stream()
+                                            .filter(lhs -> lhs != currLocalOut)
+                                            .filter(lhs -> !lhs.equals(heapVar))
+                                            .map(lhs -> tb.equals(tb.var(lhs),
+                                                    updateContent.get(lhs)))
+                                            .collect(Collectors.toList())) }));
         }
 
         final ImmutableList<Goal> goals = goal
-                .split(newGoalInformation.size() + 1);
+                .split(newGoalInformation.size() + storeEqualities.size() + 1);
         final Goal[] goalArray = goals.toArray(Goal.class);
 
         int i = 0;
@@ -124,12 +147,35 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
             final Term currAnalysisTerm = tb.equals(tb.var(currLocalOut),
                     updateContent.get(currLocalOut));
 
-            StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal, currAnalysisTerm);
+            StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal,
+                    currAnalysisTerm);
 
             for (Term newAntecTerm : newGoalInformation.get(currLocalOut)) {
                 analysisGoal.addFormula(new SequentFormula(newAntecTerm), true,
                         true);
             }
+        }
+
+        for (Term heapEquality : storeEqualities) {
+            final Goal analysisGoal = goalArray[i++];
+
+            StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal,
+                    heapEquality);
+
+            final Term update = tb.parallel( //
+                    tb.elementary(tb.var(heapVar), innerHeapTerm), //
+                    updateWithoutLocalOuts);
+
+            final List<Term> newPres = Arrays
+                    .asList(new Term[] { tb.apply(update, invTerm),
+                            tb.and(updateContent.keySet().stream()
+                                    .filter(lhs -> !lhs.equals(heapVar))
+                                    .map(lhs -> tb.equals(tb.var(lhs),
+                                            updateContent.get(lhs)))
+                                    .collect(Collectors.toList())) });
+
+            newPres.forEach(t -> analysisGoal.addFormula(new SequentFormula(t),
+                    true, true));
         }
 
         goalArray[goalArray.length - 1].setBranchLabel("Invariant preserved");
@@ -163,7 +209,8 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
         final Services services = goal.proof().getServices();
 
         Optional<LocationVariable> lsi = null;
-        return (lsi = StrengthAnalysisUtilities.retrieveLoopScopeIndex(pio, services)).isPresent()
+        return (lsi = StrengthAnalysisUtilities.retrieveLoopScopeIndex(pio,
+                services)).isPresent()
                 && MergeRuleUtils
                         .getUpdateRightSideFor(pio.subTerm().sub(0), lsi.get())
                         .equals(services.getTermBuilder().FALSE());
