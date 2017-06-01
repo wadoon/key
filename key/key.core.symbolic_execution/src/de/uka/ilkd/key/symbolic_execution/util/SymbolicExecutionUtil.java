@@ -121,12 +121,14 @@ import de.uka.ilkd.key.rule.AbstractContractRuleApp;
 import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -1784,11 +1786,18 @@ public final class SymbolicExecutionUtil {
       else if (parent.getAppliedRuleApp() instanceof ContractRuleApp) {
         return computeContractRuleAppBranchCondition(parent, node, simplify, improveReadability);
       }
-      else if (parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
+      else if (parent.getAppliedRuleApp().rule() == WhileInvariantRule.INSTANCE) {
          return computeLoopInvariantBuiltInRuleAppBranchCondition(parent, node, simplify, improveReadability);
       }
+      else if (parent.getAppliedRuleApp().rule() == LoopScopeInvariantRule.INSTANCE) {
+          return node.proof().getServices().getTermBuilder().tt();
+       }
       else if (parent.getAppliedRuleApp() instanceof BlockContractBuiltInRuleApp) {
          return computeBlockContractBuiltInRuleAppBranchCondition(parent, node, simplify, improveReadability);
+      }
+      else if (parent.getAppliedRuleApp().rule().name().toString().equals("AnalyzePostCondImpliesMethodEffects") ||
+              parent.getAppliedRuleApp().rule().name().toString().equals("AnalyzeInvImpliesLoopEffects")) {
+          return node.proof().getServices().getTermBuilder().tt();
       }
       else {
          throw new ProofInputException("Unsupported RuleApp in branch computation \"" + parent.getAppliedRuleApp() + "\".");

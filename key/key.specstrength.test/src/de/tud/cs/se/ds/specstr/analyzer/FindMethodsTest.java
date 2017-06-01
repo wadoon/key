@@ -27,6 +27,16 @@ import de.tud.cs.se.ds.specstr.analyzer.Analyzer.AnalyzerResult;
 public class FindMethodsTest extends AbstractAnalyzerTest {
     
     @Test
+    public void testWeakPostCondFind() {
+        final AnalyzerResult result = analyzeMethod(
+                "findMethods/FindMethods.java", "FindMethods::find_weak_postcond([II)I");
+
+        assertEquals(1, result.numUncoveredFacts());
+        assertEquals(Analyzer.FactType.LOOP_BODY_FACT,
+                result.getUnCoveredFacts().get(0).getFactType());
+    }
+    
+    @Test
     public void testSimpleFind() {
         final AnalyzerResult result = analyzeMethod(
                 "findMethods/FindMethods.java", "FindMethods::find([II)I");

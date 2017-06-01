@@ -177,4 +177,34 @@ public class FindMethods {
     return result;
   }
 
+  //TODO: Why doesn't the weaker post condition make a difference? Can we do something about that?
+  /*@ public normal_behavior
+    @ ensures
+    @   \result == -1 || arr[\result] == n
+    @   ;
+    @*/
+  public static int find_weak_postcond(int[] arr, int n) {
+    int i = 0;
+    int result = -1;
+
+    /*@ loop_invariant
+      @   //true
+      @      i >= 0 && i <= arr.length
+      @   && (result != -1 || (\forall int k; k >= 0 && k < i; arr[k] != n))
+      @   && (result == -1 || arr[result] == n && result == i-1)
+      @   ;
+      @ decreases arr.length - i;
+      @ assignable \nothing;
+      @*/
+    while (result == -1 && i < arr.length) {
+        if (arr[i] == n) {
+          result = i;
+        }
+
+        i++;
+    }
+
+    return result;
+  }
+
 }

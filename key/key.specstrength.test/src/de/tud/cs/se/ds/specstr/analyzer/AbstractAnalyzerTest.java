@@ -14,6 +14,9 @@
 package de.tud.cs.se.ds.specstr.analyzer;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
@@ -65,6 +68,8 @@ public abstract class AbstractAnalyzerTest {
             String fullyQualifiedMethodDescriptor) {
         final File outProofFile = new File(TMP_DIR,
                 fullyQualifiedMethodDescriptor + ".proof");
+        final File outResultsFile = new File(TMP_DIR,
+                fullyQualifiedMethodDescriptor + ".txt");
 
         logger.info("Output file for proof: %s",
                 outProofFile.getAbsolutePath());
@@ -72,6 +77,16 @@ public abstract class AbstractAnalyzerTest {
         final Analyzer analyzer = new Analyzer(
                 new File(functionalTestsDir, relPathToJavaFile),
                 fullyQualifiedMethodDescriptor, Optional.of(outProofFile));
-        return analyzer.analyze();
+        final AnalyzerResult result = analyzer.analyze();
+
+        try {
+            Analyzer.printResults(result,
+                    new PrintStream(new FileOutputStream(outResultsFile)));
+        } catch (FileNotFoundException e) {
+            logger.error("Couldn't write results to file %s",
+                    outResultsFile.getAbsolutePath());
+        }
+
+        return result;
     }
 }

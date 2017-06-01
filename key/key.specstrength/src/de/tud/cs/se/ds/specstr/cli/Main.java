@@ -119,24 +119,7 @@ public class Main {
                 ps = System.out;
             }
 
-            if (result.numUncoveredFacts() > 0) {
-                // @formatter:off
-                ps.println("\n================\n"
-                           + "Uncovered Facts:\n"
-                           + "================\n");
-                // @formatter:on
-
-                final PrintStream fPs = ps;
-                result.getUnCoveredFacts().forEach(f -> {
-                    fPs.println(f);
-                    fPs.println();
-                });
-            }
-
-            ps.printf("Covered %s out of %s facts; Strength: %.2f%%\n",
-                    result.numCoveredFacts(), result.numFacts(),
-                    100d * ((double) result.numCoveredFacts())
-                            / ((double) result.numFacts()));
+            Analyzer.printResults(result, ps);
 
             System.exit(0);
         } catch (ParseException exp) {

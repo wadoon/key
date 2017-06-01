@@ -15,6 +15,7 @@ package de.tud.cs.se.ds.specstr.analyzer;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +51,7 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -258,11 +260,11 @@ public class Analyzer {
         useCaseNodes.removeAll(obsoleteUseCaseNodes);
         useCaseNodes.addAll(newUseCaseNodes);
 
-        facts.addAll(useCaseNodes.stream()
-                .map(n -> new Fact(
-                        polishFactDescription(n.sequent(),
-                                preservesAndUCNode.sequent(), services),
-                        FactType.LOOP_USE_CASE_FACT, proof.getGoal(n)))
+        facts.addAll(useCaseNodes.stream().map(n -> new Fact(
+                polishFactDescription(n.sequent(), preservesAndUCNode.sequent(),
+                        services),
+                extractReadablePathCondition(proof.getSubtreeGoals(n).head()),
+                FactType.LOOP_USE_CASE_FACT, proof.getGoal(n)))
                 .collect(Collectors.toList()));
     }
 
@@ -295,13 +297,39 @@ public class Analyzer {
                         continue;
                     }
 
+                    extractReadablePathCondition(analysisGoal);
+
                     facts.add(new Fact(
                             analysisGoal.node().getNodeInfo().getBranchLabel()
                                     .split("\"")[1],
+                            extractReadablePathCondition(analysisGoal),
                             FactType.POST_COND_FACT, analysisGoal));
                 }
             }
         }
+    }
+
+    /**
+     * TODO
+     * 
+     * @param analysisGoal
+     * @return
+     */
+    private static String extractReadablePathCondition(Goal analysisGoal) {
+        String pathCond = "";
+        try {
+            pathCond = LogicPrinter
+                    .quickPrintTerm(
+                            SymbolicExecutionUtil.computePathCondition(
+                                    analysisGoal.node(), true, true),
+                            analysisGoal.proof().getServices())
+                    .replaceAll("(\\r|\\n|\\r\\n)+", " ");
+        } catch (ProofInputException e) {
+            logger.error("Couldn't compute path comdition for goal %s"
+                    + analysisGoal.node().serialNr());
+        }
+
+        return pathCond;
     }
 
     /**
@@ -447,6 +475,7 @@ public class Analyzer {
                 facts.add(new Fact(
                         preservedGoals[i].node().getNodeInfo().getBranchLabel()
                                 .split("\"")[1],
+                        extractReadablePathCondition(preservedGoals[i]),
                         FactType.LOOP_BODY_FACT, preservedGoals[i]));
             }
 
@@ -541,8 +570,8 @@ public class Analyzer {
 
         if (matchingMethods.isEmpty()) {
             final String errorMsg = Utilities.format(
-                    "Could not find method %s%s in class %s", className,
-                    methodTypeStr, file.getName());
+                    "Could not find method %s%s in class %s", methodName,
+                    methodTypeStr, className);
             logger.error(errorMsg);
             throw new RuntimeException(errorMsg);
         }
@@ -591,19 +620,49 @@ public class Analyzer {
         return true;
     }
 
+    /**
+     * TODO
+     * 
+     * @param result
+     * @param ps
+     */
+    public static void printResults(AnalyzerResult result, PrintStream ps) {
+        if (result.numUncoveredFacts() > 0) {
+            // @formatter:off
+            ps.println("================\n"
+                     + "Uncovered Facts:\n"
+                     + "================\n");
+            // @formatter:on
+
+            final PrintStream fPs = ps;
+            result.getUnCoveredFacts().forEach(f -> {
+                fPs.println(f);
+                fPs.println();
+            });
+        }
+
+        ps.printf("Covered %s out of %s facts; Strength: %.2f%%\n",
+                result.numCoveredFacts(), result.numFacts(),
+                100d * ((double) result.numCoveredFacts())
+                        / ((double) result.numFacts()));
+    }
+
     public static enum FactType {
         LOOP_BODY_FACT, LOOP_USE_CASE_FACT, POST_COND_FACT
     }
 
     public static class Fact {
         private final String descr;
+        private final String pathCond;
         private final FactType factType;
         private final int goalNr;
         private final Goal goal;
         private boolean covered = false;
 
-        public Fact(String descr, FactType factType, Goal goal) {
+        public Fact(String descr, String pathCond, FactType factType,
+                Goal goal) {
             this.descr = descr;
+            this.pathCond = pathCond;
             this.factType = factType;
             this.goalNr = goal.node().serialNr();
             this.goal = goal;
@@ -621,6 +680,10 @@ public class Analyzer {
             return descr;
         }
 
+        public String getPathCond() {
+            return pathCond;
+        }
+
         public FactType getFactType() {
             return factType;
         }
@@ -635,8 +698,8 @@ public class Analyzer {
 
         @Override
         public String toString() {
-            return factTypeToString(factType) + " at goal " + goalNr + "\n"
-                    + descr;
+            return String.format("%s at goal %s\n%s\nPath condition: %s",
+                    factTypeToString(factType), goalNr, descr, pathCond);
         }
 
         private static String factTypeToString(FactType ft) {
