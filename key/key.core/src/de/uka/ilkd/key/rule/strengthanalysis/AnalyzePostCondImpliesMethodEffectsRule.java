@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.rule.strengthanalysis;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -35,14 +34,13 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.init.ContractPO;
-import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.LinkedHashMap;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
@@ -70,12 +68,8 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final LocationVariable heapVar = heapLDT.getHeap();
 
-        final ContractPO contractPO = services.getSpecificationRepository()
-                .getContractPOForProof(goal.proof());
-        assert contractPO != null
-                && contractPO instanceof FunctionalOperationContractPO;
         final FunctionalOperationContract fContract = //
-                ((FunctionalOperationContractPO) contractPO).getContract();
+                StrengthAnalysisUtilities.getFOContract(services);
 
         // Note: That's a very hackish way of retrieving the post condition, but
         // I did not find a clean one to get it with the correct variable
@@ -89,38 +83,13 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         // The variables that we're interested in are the heap (for non-static,
         // non-pure methods) and the result variable (for non-void methods),
         // because changes to them describe the method's behavior
-        final List<Term> storeEqualities = new ArrayList<>();
         final Term origHeapTerm = MergeRuleUtils
                 .getUpdateRightSideFor(updateTerm, heapVar);
-        Term innerHeapTerm = origHeapTerm;
-        if (!pm.isStatic()) {
-            // TODO Should we also check whether pm is pure? How to do this?
-
-            // TODO: Is it justified to assume that a heap is of the form
-            // store(store(...(anon/heap...))), i.e. if there is a store, then
-            // we have a store sequence at the beginning?
-            Term currHeapTerm = innerHeapTerm;
-            while (currHeapTerm.op() == heapLDT.getStore()) {
-                final Term targetObj = currHeapTerm.sub(1);
-                final Term field = currHeapTerm.sub(2);
-                final Term value = currHeapTerm.sub(3);
-
-                // Note: value could contain method-local variables, in which
-                // case the fact is likely to be uncovered by the post
-                // condition. Still, we don't remove it, since then indeed, this
-                // reflects behavior that is not shown to the outside, and thus
-                // indicates that we're not using the strongest possible post
-                // condition.
-
-                storeEqualities.add(tb.equals(tb.select(value.sort(),
-                        tb.getBaseHeap(), targetObj, field), value));
-
-                currHeapTerm = currHeapTerm.sub(0);
-            }
-
-            // Here, currHeapTerm should be the "core" without any stores.
-            innerHeapTerm = currHeapTerm;
-        }
+        final Pair<Term, List<Term>> storeEqsAndInnerHeapTerm = //
+                StrengthAnalysisUtilities.extractStoreEqsAndInnerHeapTerm( //
+                        services, pm, origHeapTerm);
+        final Term innerHeapTerm = storeEqsAndInnerHeapTerm.first;
+        final List<Term> storeEqualities = storeEqsAndInnerHeapTerm.second;
 
         final LocationVariable resultVar = pm.isVoid() ? null
                 : (LocationVariable) fContract.getResult().op();
@@ -137,8 +106,9 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                             throw new IllegalStateException(
                                     String.format("Duplicate key %s", u));
                         }, LinkedHashMap::new));
-        
-        final boolean hasResultVar = resultVar != null && updateContent.get(resultVar) != null;
+
+        final boolean hasResultVar = resultVar != null
+                && updateContent.get(resultVar) != null;
 
         final Term updateWithoutVarsOfInterest = updateContent.keySet().stream()
                 .filter(lhs -> pm.isVoid() || lhs.equals(resultVar))
@@ -146,8 +116,8 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                 .map(lhs -> tb.elementary(lhs, updateContent.get(lhs)))
                 .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
 
-        final ImmutableList<Goal> goals = goal.split(
-                (hasResultVar ? 1 : 0) + storeEqualities.size() + 1);
+        final ImmutableList<Goal> goals = goal
+                .split((hasResultVar ? 1 : 0) + storeEqualities.size() + 1);
         final Goal[] goalArray = goals.toArray(Goal.class);
 
         if (hasResultVar) {
@@ -157,7 +127,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                     MergeRuleUtils.getUpdateRightSideFor(updateTerm,
                             resultVar));
 
-            AnalyzeInvImpliesLoopEffectsRule.prepareGoal(pio, analysisGoal,
+            StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal,
                     currAnalysisTerm);
 
             final List<Term> newPres = Arrays
@@ -184,7 +154,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
             final Goal analysisGoal = goalArray[i
                     + (resultVar == null ? 0 : 1)];
 
-            AnalyzeInvImpliesLoopEffectsRule.prepareGoal(pio, analysisGoal,
+            StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal,
                     storeEquality);
 
             final Term update = tb.parallel( //
@@ -236,9 +206,8 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         return pio != null && pio.isTopLevel() && !pio.isInAntec()
                 && !(f = pio.subTerm()).containsJavaBlockRecursive()
                 && f.op() instanceof UpdateApplication
-                && (!(lsi = AnalyzeInvImpliesLoopEffectsRule
-                        .retrieveLoopScopeIndex(pio,
-                                goal.proof().getServices())).isPresent()
+                && (!(lsi = StrengthAnalysisUtilities.retrieveLoopScopeIndex(
+                        pio, goal.proof().getServices())).isPresent()
                         || MergeRuleUtils
                                 .getUpdateRightSideFor(f.sub(0), lsi.get())
                                 .equals(tb.TRUE()));

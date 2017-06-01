@@ -29,13 +29,8 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -129,7 +124,7 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
             final Term currAnalysisTerm = tb.equals(tb.var(currLocalOut),
                     updateContent.get(currLocalOut));
 
-            prepareGoal(pio, analysisGoal, currAnalysisTerm);
+            StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal, currAnalysisTerm);
 
             for (Term newAntecTerm : newGoalInformation.get(currLocalOut)) {
                 analysisGoal.addFormula(new SequentFormula(newAntecTerm), true,
@@ -168,7 +163,7 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
         final Services services = goal.proof().getServices();
 
         Optional<LocationVariable> lsi = null;
-        return (lsi = retrieveLoopScopeIndex(pio, services)).isPresent()
+        return (lsi = StrengthAnalysisUtilities.retrieveLoopScopeIndex(pio, services)).isPresent()
                 && MergeRuleUtils
                         .getUpdateRightSideFor(pio.subTerm().sub(0), lsi.get())
                         .equals(services.getTermBuilder().FALSE());
@@ -189,78 +184,6 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
             Term invTerm, List<LocationVariable> localOuts) {
         return new AnalyzeInvImpliesLoopEffectsRuleApp(this, pos, invTerm,
                 localOuts);
-    }
-
-    /**
-     * TODO
-     * 
-     * @param pio
-     * @param services
-     * @return
-     */
-    public static Optional<LocationVariable> retrieveLoopScopeIndex(
-            PosInOccurrence pio, Services services) {
-        final Optional<LocationVariable> failedResult = Optional.empty();
-
-        final Term formula;
-        if (pio == null //
-                || !pio.isTopLevel() //
-                || (formula = pio.subTerm()).containsJavaBlockRecursive()
-                || !(formula.op() instanceof UpdateApplication)) {
-            return failedResult;
-        }
-
-        // @formatter:off
-        
-        // Expected structure:
-        // {U}((x<<loopScopeIndex>> = TRUE  -> ...) & 
-        //      x<<loopScopeIndex>> = FALSE -> ...)
-        
-        // @formatter:on
-
-        if (formula.sub(1).op() != Junctor.AND
-                || formula.sub(1).sub(0).op() != Junctor.IMP
-                || formula.sub(1).sub(1).op() != Junctor.IMP
-                || formula.sub(1).sub(0).sub(0).op() != Equality.EQUALS
-                || formula.sub(1).sub(1).sub(0).op() != Junctor.NOT || formula
-                        .sub(1).sub(1).sub(0).sub(0).op() != Equality.EQUALS) {
-            return failedResult;
-        }
-
-        final Term loopScopeVar = formula.sub(1).sub(0).sub(0).sub(0);
-        final Term negatedLoopScopeVar = formula.sub(1).sub(0).sub(0).sub(0);
-
-        if (!(loopScopeVar.op() instanceof LocationVariable)
-                || !loopScopeVar.hasLabels()
-                || loopScopeVar.getLabel(
-                        ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL_NAME) == null
-                || loopScopeVar != negatedLoopScopeVar) {
-            return failedResult;
-        }
-
-        return Optional.of((LocationVariable) loopScopeVar.op());
-    }
-
-    /**
-     * TODO
-     * 
-     * @param pio
-     * @param analysisGoal
-     * @param fact
-     */
-    public static void prepareGoal(final PosInOccurrence pio,
-            final Goal analysisGoal, final Term fact) {
-        final Services services = analysisGoal.proof().getServices();
-
-        analysisGoal
-                .setBranchLabel(
-                        "Covers fact \""
-                                + LogicPrinter.quickPrintTerm(fact, services)
-                                        .replaceAll("(\\r|\\n|\\r\\n)+", "")
-                                + "\"");
-
-        analysisGoal.removeFormula(pio);
-        analysisGoal.addFormula(new SequentFormula(fact), false, true);
     }
 
 }

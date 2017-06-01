@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.key_project.util.java.IOUtil;
 
 import de.tud.cs.se.ds.specstr.analyzer.Analyzer.AnalyzerResult;
+import de.tud.cs.se.ds.specstr.util.Utilities;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
@@ -42,6 +43,14 @@ public abstract class AbstractAnalyzerTest {
         final File projectRoot = IOUtil
                 .getProjectRoot(AbstractAnalyzerTest.class);
         functionalTestsDir = projectRoot + FUNCTIONAL_TESTS_RELATIVE_DIR;
+
+        if (!TMP_DIR.exists()) {
+            if (!TMP_DIR.mkdirs()) {
+                Utilities.logErrorAndThrowRTE(logger,
+                        "Could not create temporary directory %s",
+                        TMP_DIR.getAbsolutePath());
+            }
+        }
     }
 
     /**

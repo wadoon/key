@@ -84,7 +84,7 @@ public class AnalyzeInvImpliesLoopEffectsRuleApp
         LocationVariable loopScopeIdxVar = null;
 
         for (SequentFormula sf : goal.node().sequent().succedent()) {
-            Optional<LocationVariable> maybeIdxVar = AnalyzeInvImpliesLoopEffectsRule
+            Optional<LocationVariable> maybeIdxVar = StrengthAnalysisUtilities
                     .retrieveLoopScopeIndex(new PosInOccurrence(sf,
                             PosInTerm.getTopLevel(), false), services);
 
