@@ -27,6 +27,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
@@ -64,6 +65,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
    public ImmutableList<Name> getSupportedRuleNames() {
       return ImmutableSLList.<Name>nil().prepend(UseOperationContractRule.INSTANCE.name())
                                         .prepend(WhileInvariantRule.INSTANCE.name())
+                                        .prepend(LoopScopeInvariantRule.INSTANCE.name())
                                         .prepend(BlockContractRule.INSTANCE.name());
    }
 
@@ -85,7 +87,7 @@ public class RemoveInCheckBranchesTermLabelRefactoring implements TermLabelRefac
                 goal.node().getNodeInfo().getBranchLabel().startsWith("Null reference"))) {
             return RefactoringScope.SEQUENT;
          }
-         else if (rule instanceof WhileInvariantRule &&
+         else if ((rule instanceof WhileInvariantRule || rule instanceof LoopScopeInvariantRule) &&
                   goal.node().getNodeInfo().getBranchLabel().startsWith("Invariant Initially Valid")) {
             return RefactoringScope.SEQUENT;
          }

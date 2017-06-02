@@ -25,6 +25,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
@@ -160,6 +161,9 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
          Proof proof = goal.proof();
          if ((rule instanceof WhileInvariantRule && WhileInvariantRule.INITIAL_INVARIANT_ONLY_HINT.equals(hint)) ||
              (rule instanceof WhileInvariantRule && WhileInvariantRule.FULL_INVARIANT_TERM_HINT.equals(hint)) ||
+             (rule instanceof LoopScopeInvariantRule && LoopScopeInvariantRule.INITIAL_INVARIANT_ONLY_HINT.equals(hint)) ||
+             (rule instanceof LoopScopeInvariantRule && LoopScopeInvariantRule.FULL_INVARIANT_TERM_HINT.equals(hint)) ||
+             (rule instanceof LoopScopeInvariantRule && LoopScopeInvariantRule.ANON_INVARIANT_TERM_HINT.equals(hint)) ||
              (rule instanceof UseOperationContractRule && UseOperationContractRule.FINAL_PRE_TERM_HINT.equals(hint)) ||
              (rule instanceof BlockContractRule && BlockContractRule.FULL_PRECONDITION_TERM_HINT.equals(hint)) ||
              (rule instanceof BlockContractRule && BlockContractRule.NEW_POSTCONDITION_TERM_HINT.equals(hint)) ||
