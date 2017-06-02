@@ -2089,6 +2089,11 @@ public class TermBuilder {
     	return wellFormedHist(var(hist));
     }
 
+    // similar predicates
+    public Term similarHist(Term hist1, Term hist2, Term callee) {
+    	return func(services.getTypeConverter().getRemoteMethodEventLDT().similarHist(), hist1, hist2, callee);
+    }
+
     //-------------------------------------------------------------------------
     //reachability operators
     //-------------------------------------------------------------------------

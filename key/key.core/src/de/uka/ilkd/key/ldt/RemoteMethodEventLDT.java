@@ -31,6 +31,9 @@ public class RemoteMethodEventLDT extends LDT {
 	private final Function evHeap;
 	private final Function serviceCall;
 	private final Function serviceTerm;
+	private final Function similarHist;
+	private final Function similarEvent;
+	private final Function similar;
 
 	//history (of Remote method events) ... copy of: key.core/resources/de/uka/ilkd/key/proof/rules/events.key -> Seq hist;
 	private LocationVariable hist;
@@ -47,6 +50,9 @@ public class RemoteMethodEventLDT extends LDT {
 		evHeap = addFunction(services, "evHeap");
 		serviceCall = addFunction(services, "serviceCall");
 		serviceTerm = addFunction(services, "serviceTermination");
+		similarHist = addFunction(services, "similarHist");
+		similarEvent = addFunction(services, "similarEvent");
+		similar = addFunction(services, "similar");
 		hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
 		caller = (LocationVariable) services.getNamespaces().programVariables().lookup("caller");
 	}
@@ -85,6 +91,18 @@ public class RemoteMethodEventLDT extends LDT {
 
 	public Function serviceTerminationConstant() {
 		return serviceTerm;
+	}
+
+	public Function similarHist() {
+		return similarHist;
+	}
+
+	public Function similarEvent() {
+		return similarEvent;
+	}
+
+	public Function similar() {
+		return similar;
 	}
 
 	/**
