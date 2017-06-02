@@ -95,6 +95,11 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      */
     public static final String FULL_INVARIANT_TERM_HINT = "fullInvariant";
 
+    /**
+     * The hint used to refactor the full invariant.
+     */
+    public static final String ANON_INVARIANT_TERM_HINT = "anonInvariant";
+
     private static final Name NAME = new Name("Loop (Scope) Invariant");
 
     @Override
@@ -260,13 +265,18 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             Term[] uBeforeLoopDefAnonVariant) {
         final While loop = inst.loop;
 
+        presrvAndUCGoal.setBranchLabel("Invariant Preserved and Used");
+
         final Term newFormula = formulaWithLoopScope(services, inst, anonUpdate,
                 loop, loopLabel, stmtToReplace, frameCondition, variantPO,
                 termLabelState, presrvAndUCGoal, uBeforeLoopDefAnonVariant,
                 invTerm);
+        
+        final Term labeledUAnonInv = TermLabelManager.refactorTerm(
+                termLabelState, services, null, uAnonInv, this, presrvAndUCGoal,
+                ANON_INVARIANT_TERM_HINT, null);
 
-        presrvAndUCGoal.setBranchLabel("Invariant Preserved and Used");
-        presrvAndUCGoal.addFormula(new SequentFormula(uAnonInv), true, false);
+        presrvAndUCGoal.addFormula(new SequentFormula(labeledUAnonInv), true, false);
         presrvAndUCGoal.addFormula(new SequentFormula(wellFormedAnon), true,
                 false);
         presrvAndUCGoal.changeFormula(new SequentFormula(newFormula),
