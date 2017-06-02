@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.rule.strengthanalysis;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -33,6 +34,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -91,8 +93,12 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         final Term innerHeapTerm = storeEqsAndInnerHeapTerm.first;
         final List<Term> storeEqualities = storeEqsAndInnerHeapTerm.second;
 
+        // We have to look the variable up from the current namespaces, since
+        // otherwise we will obtain a different object...
         final LocationVariable resultVar = pm.isVoid() ? null
-                : (LocationVariable) fContract.getResult().op();
+                : (LocationVariable) goal.getLocalNamespaces()
+                        .programVariables()
+                        .lookup(fContract.getResult().op().name());
 
         final Map<LocationVariable, Term> updateContent = StreamSupport
                 .stream( //
@@ -111,15 +117,49 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                 && updateContent.get(resultVar) != null;
 
         final Term updateWithoutVarsOfInterest = updateContent.keySet().stream()
-                .filter(lhs -> pm.isVoid() || lhs.equals(resultVar))
+                .filter(lhs -> pm.isVoid() || !lhs.equals(resultVar))
                 .filter(lhs -> !lhs.equals(heapVar))
                 .map(lhs -> tb.elementary(lhs, updateContent.get(lhs)))
                 .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
 
-        final ImmutableList<Goal> goals = goal
-                .split((hasResultVar ? 1 : 0) + storeEqualities.size() + 1);
+        final Term postCond;
+        final List<Term> invElems;
+        if (StrengthAnalysisUtilities
+                .retrieveLoopScopeIndex(pio, goal.proof().getServices())
+                .isPresent()) {
+            // We can check strength of the post condition relative to the
+            // invariant, since there was a loop scope inv rule application
+
+            // Expected formula structure:
+            // {U}((x = TRUE -> <postcond>) & (x = FALSE -> <invariant>))
+
+            // invariant structure:
+            // <inv> & <assignable> & <prec-clause>
+
+            final Term topLevelFormula = pio.sequentFormula().formula();
+            final Term invariant;
+            try {
+                postCond = topLevelFormula.sub(1).sub(0).sub(1);
+                invariant = topLevelFormula.sub(1).sub(1).sub(1).sub(0).sub(0);
+            } catch (Exception e) {
+                throw new RuntimeException(String.format(
+                        "[%s] Problem in analyzing formula %s; probably unexpected structure",
+                        getClass().getName(), LogicPrinter
+                                .quickPrintTerm(topLevelFormula, services)));
+            }
+
+            // TODO: Here, we should do a real CNF conversion before!
+            invElems = MergeRuleUtils.getConjunctiveElementsFor(invariant);
+        } else {
+            invElems = Collections.emptyList();
+            postCond = null;
+        }
+
+        final ImmutableList<Goal> goals = goal.split((hasResultVar ? 1 : 0)
+                + storeEqualities.size() + invElems.size() + 1);
         final Goal[] goalArray = goals.toArray(Goal.class);
 
+        // Add result var goal
         if (hasResultVar) {
             final Goal analysisGoal = goalArray[0];
 
@@ -149,10 +189,29 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                     true, true));
         }
 
-        int i = 0;
+        int i = hasResultVar ? 1 : 0;
+
+        // Add goal for invariant elements
+        for (Term invElem : invElems) {
+            final Goal analysisGoal = goalArray[i];
+
+            final Term update = tb.parallel( //
+                    tb.elementary(tb.var(heapVar), innerHeapTerm), //
+                    updateWithoutVarsOfInterest);
+
+            StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal,
+                    tb.apply(update, invElem), "Covers invariant fact");
+
+            analysisGoal.addFormula(
+                    new SequentFormula(tb.apply(update, postCond)), true,
+                    false);
+
+            i++;
+        }
+
+        // Add goals for store equalities
         for (Term storeEquality : storeEqualities) {
-            final Goal analysisGoal = goalArray[i
-                    + (resultVar == null ? 0 : 1)];
+            final Goal analysisGoal = goalArray[i];
 
             StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal,
                     storeEquality);

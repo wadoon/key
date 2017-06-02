@@ -56,12 +56,12 @@ public class StrengthAnalysisUtilities {
             final Term origHeapTerm) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final TermBuilder tb = services.getTermBuilder();
-    
+
         final List<Term> storeEqualities = new ArrayList<>();
         Term innerHeapTerm = origHeapTerm;
         if (!pm.isStatic()) {
             // TODO Should we also check whether pm is pure? How to do this?
-    
+
             // TODO: Is it justified to assume that a heap is of the form
             // store(store(...(anon/heap...))), i.e. if there is a store,
             // then we have a store sequence at the beginning?
@@ -70,20 +70,20 @@ public class StrengthAnalysisUtilities {
                 final Term targetObj = currHeapTerm.sub(1);
                 final Term field = currHeapTerm.sub(2);
                 final Term value = currHeapTerm.sub(3);
-    
+
                 // Note: value could contain method-local variables, in which
                 // case the fact is likely to be uncovered by the post
                 // condition. Still, we don't remove it, since then indeed, this
                 // reflects behavior that is not shown to the outside, and thus
                 // indicates that we're not using the strongest possible post
                 // condition.
-    
+
                 storeEqualities.add(tb.equals(tb.select(value.sort(),
                         tb.getBaseHeap(), targetObj, field), value));
-    
+
                 currHeapTerm = currHeapTerm.sub(0);
             }
-    
+
             // Here, currHeapTerm should be the "core" without any stores.
             innerHeapTerm = currHeapTerm;
         }
@@ -96,8 +96,7 @@ public class StrengthAnalysisUtilities {
      * @param services
      * @return
      */
-    public static FunctionalOperationContract getFOContract(
-            Services services) {
+    public static FunctionalOperationContract getFOContract(Services services) {
         final ContractPO contractPO = services.getSpecificationRepository()
                 .getContractPOForProof(services.getProof());
         assert contractPO != null
@@ -117,7 +116,7 @@ public class StrengthAnalysisUtilities {
     public static Optional<LocationVariable> retrieveLoopScopeIndex(
             PosInOccurrence pio, Services services) {
         final Optional<LocationVariable> failedResult = Optional.empty();
-    
+
         final Term formula;
         if (pio == null //
                 || !pio.isTopLevel() //
@@ -125,7 +124,7 @@ public class StrengthAnalysisUtilities {
                 || !(formula.op() instanceof UpdateApplication)) {
             return failedResult;
         }
-    
+
         // @formatter:off
         
         // Expected structure:
@@ -133,7 +132,7 @@ public class StrengthAnalysisUtilities {
         //      x<<loopScopeIndex>> = FALSE -> ...)
         
         // @formatter:on
-    
+
         if (formula.sub(1).op() != Junctor.AND
                 || formula.sub(1).sub(0).op() != Junctor.IMP
                 || formula.sub(1).sub(1).op() != Junctor.IMP
@@ -142,10 +141,10 @@ public class StrengthAnalysisUtilities {
                         .sub(1).sub(1).sub(0).sub(0).op() != Equality.EQUALS) {
             return failedResult;
         }
-    
+
         final Term loopScopeVar = formula.sub(1).sub(0).sub(0).sub(0);
         final Term negatedLoopScopeVar = formula.sub(1).sub(0).sub(0).sub(0);
-    
+
         if (!(loopScopeVar.op() instanceof LocationVariable)
                 || !loopScopeVar.hasLabels()
                 || loopScopeVar.getLabel(
@@ -153,8 +152,29 @@ public class StrengthAnalysisUtilities {
                 || loopScopeVar != negatedLoopScopeVar) {
             return failedResult;
         }
-    
+
         return Optional.of((LocationVariable) loopScopeVar.op());
+    }
+
+    /**
+     * 
+     * TODO
+     * 
+     * @param pio
+     * @param analysisGoal
+     * @param fact
+     * @param descr
+     */
+    public static void prepareGoal(final PosInOccurrence pio,
+            final Goal analysisGoal, final Term fact, final String descr) {
+        final Services services = analysisGoal.proof().getServices();
+
+        analysisGoal.setBranchLabel(String.format("%s \"%s\"", descr,
+                LogicPrinter.quickPrintTerm(fact, services)
+                        .replaceAll("(\\r|\\n|\\r\\n)+", "").trim()));
+
+        analysisGoal.removeFormula(pio);
+        analysisGoal.addFormula(new SequentFormula(fact), false, true);
     }
 
     /**
@@ -166,17 +186,7 @@ public class StrengthAnalysisUtilities {
      */
     public static void prepareGoal(final PosInOccurrence pio,
             final Goal analysisGoal, final Term fact) {
-        final Services services = analysisGoal.proof().getServices();
-    
-        analysisGoal
-                .setBranchLabel(
-                        "Covers fact \""
-                                + LogicPrinter.quickPrintTerm(fact, services)
-                                        .replaceAll("(\\r|\\n|\\r\\n)+", "")
-                                + "\"");
-    
-        analysisGoal.removeFormula(pio);
-        analysisGoal.addFormula(new SequentFormula(fact), false, true);
+        prepareGoal(pio, analysisGoal, fact, "Covers fact");
     }
 
 }
