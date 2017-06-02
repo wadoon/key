@@ -318,10 +318,18 @@ public class Analyzer {
     private static String extractReadablePathCondition(Goal analysisGoal) {
         String pathCond = "";
         try {
-            pathCond = LogicPrinter
-                    .quickPrintTerm(
-                            SymbolicExecutionUtil.computePathCondition(
-                                    analysisGoal.node(), true, true),
+            boolean problem = false;
+            Term pathCondTerm = analysisGoal.proof().getServices().getTermBuilder().tt();
+            
+            try {
+                pathCondTerm = SymbolicExecutionUtil
+                        .computePathCondition(analysisGoal.node(), true, true);
+            } catch (RuntimeException e1) {
+                problem = true;
+            }
+            
+            pathCond = (problem ? "ERROR-PC " : "") + LogicPrinter
+                    .quickPrintTerm(pathCondTerm,
                             analysisGoal.proof().getServices())
                     .replaceAll("(\\r|\\n|\\r\\n)+", " ");
         } catch (ProofInputException e) {

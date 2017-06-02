@@ -74,7 +74,8 @@ public class SymbExInterface {
         // @formatter:off
         env = KeYEnvironment.load(
 //                JavaProfile.getDefaultInstance(),
-                SymbolicExecutionJavaProfile.getDefaultInstance(),
+//                SymbolicExecutionJavaProfile.getDefaultInstance(),
+                SymbolicExecutionJavaProfile.getDefaultInstance(true),
                 file,     // location
                 null,     // class path
                 null,     // boot class path

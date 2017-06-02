@@ -58,10 +58,6 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services,
             RuleApp ruleApp) throws RuleAbortException {
-        // TODO: We also have to include facts about heap changes, as in
-        // AnalyzePostCondImpliesMethodEffectsRule. See find_instance_strong
-        // example, probably there is something that we don't check.
-
         assert ruleApp instanceof AnalyzeInvImpliesLoopEffectsRuleApp;
 
         final TermBuilder tb = services.getTermBuilder();

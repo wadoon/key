@@ -14,16 +14,27 @@
 package de.uka.ilkd.key.rule.strengthanalysis;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -31,8 +42,10 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.Pair;
 
@@ -157,7 +170,6 @@ public class StrengthAnalysisUtilities {
     }
 
     /**
-     * 
      * TODO
      * 
      * @param pio
@@ -170,8 +182,11 @@ public class StrengthAnalysisUtilities {
         final Services services = analysisGoal.proof().getServices();
 
         analysisGoal.setBranchLabel(String.format("%s \"%s\"", descr,
-                LogicPrinter.quickPrintTerm(fact, services)
-                        .replaceAll("(\\r|\\n|\\r\\n)+", "").trim()));
+                LogicPrinter
+                        .quickPrintTerm(TermBuilder.goBelowUpdates(fact),
+                                services)
+                        .replaceAll("(\\r|\\n|\\r\\n)+", "")
+                        .replaceAll("<<[^>]+>>", "").trim()));
 
         analysisGoal.removeFormula(pio);
         analysisGoal.addFormula(new SequentFormula(fact), false, true);
@@ -187,6 +202,112 @@ public class StrengthAnalysisUtilities {
     public static void prepareGoal(final PosInOccurrence pio,
             final Goal analysisGoal, final Term fact) {
         prepareGoal(pio, analysisGoal, fact, "Covers fact");
+    }
+
+    /**
+     * TODO
+     * 
+     * @param analysisGoal
+     * @param firstLabel
+     */
+    public static OriginOfFormula findOriginOfTermLabel(final Goal analysisGoal,
+            final TermLabel firstLabel) {
+        Node currNode = analysisGoal.node();
+        SequentFormula originForm = null;
+
+        while (!currNode.root()) {
+            ImmutableList<TermLabel> allLabelsInNode = ImmutableSLList
+                    .<TermLabel> nil();
+            final Node parent = currNode.parent();
+            for (SequentFormula oSf : parent.sequent()) {
+                final Set<TermLabel> labelsInSeqFor = //
+                        extractLabelsOfTerm(oSf.formula());
+
+                allLabelsInNode = allLabelsInNode.prepend(labelsInSeqFor);
+                if (labelsInSeqFor.contains(firstLabel)) {
+                    originForm = oSf;
+                    break;
+                }
+            }
+
+            if (!allLabelsInNode.contains(firstLabel)) {
+                break;
+            } else {
+                currNode = parent;
+            }
+        }
+
+        return new OriginOfFormula(currNode, originForm);
+    }
+
+    /**
+     * TODO
+     * 
+     * @param t
+     * @return
+     */
+    public static Set<TermLabel> extractLabelsOfTerm(Term t) {
+        final Set<TermLabel> labelsInSeqFor = new LinkedHashSet<TermLabel>();
+        t.execPreOrder(new DefaultVisitor() {
+            @Override
+            public void visit(Term visited) {
+                if (visited.hasLabels()) {
+                    labelsInSeqFor.addAll(StreamSupport
+                            .stream(visited.getLabels().spliterator(), true)
+                            .collect(Collectors.toList()));
+                }
+            }
+        });
+        return labelsInSeqFor;
+    }
+
+    /**
+     * TODO
+     * 
+     * @param analysisGoal
+     */
+    static void removeLoopInvFormulasFromAntec(final Goal analysisGoal) {
+        for (SequentFormula sf : analysisGoal.sequent().antecedent()) {
+            final ImmutableArray<TermLabel> labels = sf.formula().getLabels();
+            if (labels.size() > 0) {
+                final TermLabel firstLabel = labels.get(0);
+
+                // Find origin of this label
+                final OriginOfFormula origin = //
+                        findOriginOfTermLabel(analysisGoal, firstLabel);
+
+                if (origin.getNode().parent()
+                        .getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
+                    // This has to be the anonymized invariant (or part of
+                    // it) -- remove it
+                    analysisGoal.removeFormula(new PosInOccurrence(sf,
+                            PosInTerm.getTopLevel(), true));
+                }
+            }
+        }
+    }
+
+    /**
+     * TODO
+     *
+     * @author Dominic Steinhöfel
+     */
+    public static class OriginOfFormula {
+        private final Node node;
+        private final SequentFormula seqFor;
+
+        public OriginOfFormula(Node node, SequentFormula seqFor) {
+            this.node = node;
+            this.seqFor = seqFor;
+        }
+
+        public Node getNode() {
+            return node;
+        }
+
+        public SequentFormula getSeqFor() {
+            return seqFor;
+        }
     }
 
 }

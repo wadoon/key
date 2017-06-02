@@ -13,11 +13,13 @@
 
 package de.uka.ilkd.key.rule.strengthanalysis;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -31,6 +33,8 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -38,8 +42,10 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.strengthanalysis.StrengthAnalysisUtilities.OriginOfFormula;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
@@ -124,6 +130,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
 
         final Term postCond;
         final List<Term> invElems;
+        final List<Term> anonLoopInvUpdates = new ArrayList<>();
         if (StrengthAnalysisUtilities
                 .retrieveLoopScopeIndex(pio, goal.proof().getServices())
                 .isPresent()) {
@@ -140,7 +147,39 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
             final Term invariant;
             try {
                 postCond = topLevelFormula.sub(1).sub(0).sub(1);
-                invariant = topLevelFormula.sub(1).sub(1).sub(1).sub(0).sub(0);
+                final Term invInPostCond = topLevelFormula.sub(1).sub(1).sub(1)
+                        .sub(0).sub(0);
+
+                final Set<TermLabel> invLabels = StrengthAnalysisUtilities
+                        .extractLabelsOfTerm(invInPostCond);
+
+                assert invLabels
+                        .size() > 0 : "There should be <<F>> term labels in the invariant term";
+
+                final OriginOfFormula origin = StrengthAnalysisUtilities
+                        .findOriginOfTermLabel(goal,
+                                invLabels.stream().findFirst().get());
+
+                assert origin.getNode().parent().getAppliedRuleApp()
+                        .rule() == LoopScopeInvariantRule.INSTANCE;
+
+                final Optional<SequentFormula> maybeAnonInv = StreamSupport
+                        .stream(origin.getNode().sequent().antecedent()
+                                .spliterator(), true)
+                        .filter(sf -> sf.formula().containsLabel(
+                                ParameterlessTermLabel.LOOP_INV_ANON_LABEL))
+                        .findFirst();
+
+                assert maybeAnonInv
+                        .isPresent() : "Could not find anonymized invariant formula";
+
+                Term currTerm = maybeAnonInv.get().formula();
+                while (currTerm.op() instanceof UpdateApplication) {
+                    anonLoopInvUpdates.add(currTerm.sub(0));
+                    currTerm = currTerm.sub(1);
+                }
+
+                invariant = currTerm;
             } catch (Exception e) {
                 throw new RuntimeException(String.format(
                         "[%s] Problem in analyzing formula %s; probably unexpected structure",
@@ -195,15 +234,21 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         for (Term invElem : invElems) {
             final Goal analysisGoal = goalArray[i];
 
-            final Term update = tb.parallel( //
-                    tb.elementary(tb.var(heapVar), innerHeapTerm), //
-                    updateWithoutVarsOfInterest);
+            for (int k = anonLoopInvUpdates.size() - 1; k >= 0; k--) {
+                Term updElem = anonLoopInvUpdates.get(k);
+                invElem = tb.apply(updElem, invElem);
+            }
 
-            StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal,
-                    tb.apply(update, invElem), "Covers invariant fact");
+            StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal, invElem,
+                    "Covers invariant fact");
+
+            // Remove anonymized invariant formulas from the antecedent,
+            // otherwise it's trivial to close this goal.
+            StrengthAnalysisUtilities
+                    .removeLoopInvFormulasFromAntec(analysisGoal);
 
             analysisGoal.addFormula(
-                    new SequentFormula(tb.apply(update, postCond)), true,
+                    new SequentFormula(tb.apply(updateTerm, postCond)), true,
                     false);
 
             i++;
