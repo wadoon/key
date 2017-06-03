@@ -25,63 +25,66 @@ import de.tud.cs.se.ds.specstr.analyzer.Analyzer.AnalyzerResult;
  * @author Dominic Steinhöfel
  */
 public class FindMethodsTest extends AbstractAnalyzerTest {
-    
+
     @Test
     public void testWeakPostCondFind() {
         final AnalyzerResult result = analyzeMethod(
-                "findMethods/FindMethods.java", "FindMethods::find_weak_postcond([II)I");
+                "findMethods/FindMethods.java",
+                "FindMethods::find_weak_postcond([II)I");
 
         assertEquals(1, result.numUncoveredFacts());
         assertEquals(Analyzer.FactType.LOOP_BODY_FACT,
                 result.getUnCoveredFacts().get(0).getFactType());
     }
-    
+
     @Test
     public void testSimpleFind() {
         final AnalyzerResult result = analyzeMethod(
                 "findMethods/FindMethods.java", "FindMethods::find([II)I");
 
-        assertEquals(1, result.numUncoveredFacts());
-        assertEquals(Analyzer.FactType.LOOP_BODY_FACT,
-                result.getUnCoveredFacts().get(0).getFactType());
+        assertEquals(8, result.numUncoveredFacts());
+        assertEquals(1,
+                result.getUnCoveredFacts()
+                        .stream().filter(
+                                f -> f.getFactType() == Analyzer.FactType.LOOP_BODY_FACT)
+                        .count());
+        assertEquals(1,
+                result.getUnCoveredFacts()
+                        .stream().filter(
+                                f -> f.getFactType() == Analyzer.FactType.POST_COND_FACT)
+                        .count());
+        assertEquals(6,
+                result.getUnCoveredFacts()
+                        .stream().filter(
+                                f -> f.getFactType() == Analyzer.FactType.POST_COND_INV_FACT)
+                        .count());
     }
-    
+
     @Test
     public void testStrongFind() {
         final AnalyzerResult result = analyzeMethod(
-                "findMethods/FindMethods.java", "FindMethods::find_strong([II)I");
+                "findMethods/FindMethods.java",
+                "FindMethods::find_strong([II)I");
 
         assertEquals(0, result.numUncoveredFacts());
     }
-    
-    @Test
-    public void testFindInstanceWeak() {
-        final AnalyzerResult result = analyzeMethod(
-                "findMethods/FindMethods.java", "FindMethods::find_instance_weak([II)V");
 
-        assertEquals(2, result.numUncoveredFacts());
-        assertEquals(Analyzer.FactType.POST_COND_FACT,
-                result.getUnCoveredFacts().get(0).getFactType());
-        assertEquals(Analyzer.FactType.LOOP_BODY_FACT,
-                result.getUnCoveredFacts().get(1).getFactType());
-    }
-    
     @Test
-    public void testFindInstance() {
+    public void testFindStronger() {
         final AnalyzerResult result = analyzeMethod(
-                "findMethods/FindMethods.java", "FindMethods::find_instance([II)V");
-
-        assertEquals(1, result.numUncoveredFacts());
-        assertEquals(Analyzer.FactType.POST_COND_FACT,
-                result.getUnCoveredFacts().get(0).getFactType());
-    }
-    
-    @Test
-    public void testFindInstanceStrong() {
-        final AnalyzerResult result = analyzeMethod(
-                "findMethods/FindMethods.java", "FindMethods::find_instance_strong([II)V");
+                "findMethods/FindMethods.java",
+                "FindMethods::find_stronger([II)I");
 
         assertEquals(0, result.numUncoveredFacts());
     }
-    
+
+    @Test
+    public void testFindStrongest() {
+        final AnalyzerResult result = analyzeMethod(
+                "findMethods/FindMethods.java",
+                "FindMethods::find_strongest([II)I");
+
+        assertEquals(0, result.numUncoveredFacts());
+    }
+
 }

@@ -1,118 +1,87 @@
 public class FindMethods {
-  private int result;
-  private int i;
+  //@ ghost int g_i;
+  //@ ghost int iLastRun;
 
+  // This method triggers a bug in FormulaTagManager
   /*@ public normal_behavior
     @ ensures
-    @   //true
-    @      ((\exists int k; k >= 0 && k < arr.length; arr[k] == n) ==> arr[result] == n && result == i - 1)
-    @   && ((\forall int k; k >= 0 && k < arr.length; arr[k] != n) ==> result == -1)
+    @      ((\exists int k; k >= 0 && k < arr.length; arr[k] == n) ==> arr[\result] == n && \result == g_i - 1)
+    @   && ((\forall int k; k >= 0 && k < arr.length; arr[k] != n) ==> \result == -1)
+    @   && g_i >= 0
     @ ;
-    @ assignable result, i;
+    @ assignable g_i, iLastRun;
     @*/
-  public void find_instance_strong(int[] arr, int n) {
-    i = 0;
-    result = -1;
-
-    //@ ghost int iLastRun = i - 1;
+  public int find_strongest(int[] arr, int n) {
+    int i = 0;
+    int result = -1;
+    //@ set g_i = i;
+    //@ set iLastRun = i - 1;
 
     /*@ loop_invariant
-      @   //true
       @      i >= 0 && i <= arr.length
+      @   && g_i == i
       @   && i == iLastRun + 1
-      @   && (arr[i] == n ==> i == iLastRun + 1)
       @   && (result != -1 || (\forall int k; k >= 0 && k < i; arr[k] != n))
       @   && (result == -1 || arr[result] == n && result == i-1)
       @   ;
       @ decreases arr.length - i;
-      @ assignable result, i;
+      @ assignable g_i, iLastRun;
       @*/
     while (result == -1 && i < arr.length) {
         //@ set iLastRun = i;
+        //@ set g_i = i;
         if (arr[i] == n) {
           result = i;
         }
 
         i++;
-    }
-  }
-
-  /*@ public normal_behavior
-    @ ensures
-    @   //true
-    @      ((\exists int i; i >= 0 && i < arr.length; arr[i] == n) ==> arr[result] == n)
-    @   && ((\forall int i; i >= 0 && i < arr.length; arr[i] != n) ==> result == -1)
-    @ ;
-    @ assignable result;
-    @*/
-  public void find_instance(int[] arr, int n) {
-    int i = 0;
-    // NOTE: The analyzer thinks this method's 100% strong if we directly
-    // use the field. This is because then after the loop, this.result is
-    // anonymized and we don't get a fact out of it. Might be undesired
-    // behavior... Maybe not, on the other hand...
-    int result = -1;
-
-    //@ ghost int iLastRun = i - 1;
-
-    /*@ loop_invariant
-      @   //true
-      @      i >= 0 && i <= arr.length
-      @   && i == iLastRun + 1
-      @   && (arr[i] == n ==> i == iLastRun + 1)
-      @   && (result != -1 || (\forall int k; k >= 0 && k < i; arr[k] != n))
-      @   && (result == -1 || arr[result] == n && result == i-1)
-      @   ;
-      @ decreases arr.length - i;
-      @ assignable result;
-      @*/
-    while (result == -1 && i < arr.length) {
-        //@ set iLastRun = i;
-        if (arr[i] == n) {
-          result = i;
-        }
-
-        i++;
-    }
-
-    this.result = result;
-  }
-
-  /*@ public normal_behavior
-    @ ensures
-    @   //true
-    @      ((\exists int i; i >= 0 && i < arr.length; arr[i] == n) ==> arr[result] == n)
-    @   && ((\forall int i; i >= 0 && i < arr.length; arr[i] != n) ==> result == -1)
-    @ ;
-    @ assignable result;
-    @*/
-  public void find_instance_weak(int[] arr, int n) {
-    int i = 0;
-    int result = -1;
-
-    /*@ loop_invariant
-      @   //true
-      @      i >= 0 && i <= arr.length
-      @   && (result != -1 || (\forall int k; k >= 0 && k < i; arr[k] != n))
-      @   && (result == -1 || arr[result] == n && result == i-1)
-      @   ;
-      @ decreases arr.length - i;
-      @ assignable result;
-      @*/
-    while (result == -1 && i < arr.length) {
-        if (arr[i] == n) {
-          result = i;
-        }
-
-        i++;
+        //@ set g_i = i;
+        {}
     }
     
-    this.result = result;
+    return result;
   }
 
   /*@ public normal_behavior
     @ ensures
-    @   //\result == -1 || arr[\result] == n
+    @      ((\exists int k; k >= 0 && k < arr.length; arr[k] == n) ==> arr[\result] == n && \result == g_i - 1)
+    @   && ((\forall int k; k >= 0 && k < arr.length; arr[k] != n) ==> \result == -1)
+    @ ;
+    @ assignable g_i, iLastRun;
+    @*/
+  public int find_stronger(int[] arr, int n) {
+    int i = 0;
+    int result = -1;
+    //@ set g_i = i;
+    //@ set iLastRun = i - 1;
+
+    /*@ loop_invariant
+      @      i >= 0 && i <= arr.length
+      @   && g_i == i
+      @   && i == iLastRun + 1
+      @   && (result != -1 || (\forall int k; k >= 0 && k < i; arr[k] != n))
+      @   && (result == -1 || arr[result] == n && result == i-1)
+      @   ;
+      @ decreases arr.length - i;
+      @ assignable g_i, iLastRun;
+      @*/
+    while (result == -1 && i < arr.length) {
+      //@ set iLastRun = i;
+      //@ set g_i = i;
+      if (arr[i] == n) {
+        result = i;
+      }
+
+      i++;
+      //@ set g_i = i;
+      {}
+    }
+  
+    return result;
+  }
+
+  /*@ public normal_behavior
+    @ ensures
     @      ((\exists int i; i >= 0 && i < arr.length; arr[i] == n) ==> arr[\result] == n)
     @   && ((\forall int i; i >= 0 && i < arr.length; arr[i] != n) ==> \result == -1)
     @   ;
@@ -124,7 +93,6 @@ public class FindMethods {
     //@ ghost int iLastRun = i - 1;
 
     /*@ loop_invariant
-      @   //true
       @      i >= 0 && i <= arr.length
       @   && i == iLastRun + 1
       @   && (arr[i] == n ==> i == iLastRun + 1)
@@ -146,9 +114,15 @@ public class FindMethods {
     return result;
   }
 
+  // Missing facts (all but the last two "post condition -> invariant" facts):
+  // (2x) i == arr.length        (titled "result_1 != -1" in the proof)
+  // (2x) i <= arr.length
+  // (1x) i >= 0                 (for the case that n wasn't found)
+  // (1x) result_1_0 = i_0 - 1   (titled "result_1 = -1" in the proof, for the case that n wasn't found)
+  // (1x) i = 1 + i_0            (loop body fact)
+  // (1x) result = i_0 - 1       (post condition fact -- for the case that n wasn't found)
   /*@ public normal_behavior
     @ ensures
-    @   //\result == -1 || arr[\result] == n
     @      ((\exists int i; i >= 0 && i < arr.length; arr[i] == n) ==> arr[\result] == n)
     @   && ((\forall int i; i >= 0 && i < arr.length; arr[i] != n) ==> \result == -1)
     @   ;
@@ -158,7 +132,6 @@ public class FindMethods {
     int result = -1;
 
     /*@ loop_invariant
-      @   //true
       @      i >= 0 && i <= arr.length
       @   && (result != -1 || (\forall int k; k >= 0 && k < i; arr[k] != n))
       @   && (result == -1 || arr[result] == n && result == i-1)
@@ -177,7 +150,6 @@ public class FindMethods {
     return result;
   }
 
-  //TODO: Why doesn't the weaker post condition make a difference? Can we do something about that?
   /*@ public normal_behavior
     @ ensures
     @   \result == -1 || arr[\result] == n
@@ -188,7 +160,6 @@ public class FindMethods {
     int result = -1;
 
     /*@ loop_invariant
-      @   //true
       @      i >= 0 && i <= arr.length
       @   && (result != -1 || (\forall int k; k >= 0 && k < i; arr[k] != n))
       @   && (result == -1 || arr[result] == n && result == i-1)
