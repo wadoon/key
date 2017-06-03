@@ -211,6 +211,12 @@ public class FormulaTagManager {
             // present, but has a different <<F>> term label. This hack looks
             // for a visually equivalent formula in the map, and removes term
             // label parts of the string before
+            
+            System.err.println(String.format(
+                      "BUG in formula tag manager triggered this"
+                    + " ugly hack: Could not find the tag for PIO %s",
+                    oldPIO));
+            
             tag = pioToTag.get(pioToTag.keySet().stream()
                     .filter(pio -> pio.sequentFormula().toString()
                             .replaceAll("<<[^>]+>>", "")
