@@ -234,9 +234,11 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         for (Term invElem : invElems) {
             final Goal analysisGoal = goalArray[i];
 
+            Term anonPostCond = postCond;
             for (int k = anonLoopInvUpdates.size() - 1; k >= 0; k--) {
                 Term updElem = anonLoopInvUpdates.get(k);
                 invElem = tb.apply(updElem, invElem);
+                anonPostCond = tb.apply(updElem, anonPostCond);
             }
 
             StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal, invElem,
@@ -248,7 +250,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                     .removeLoopInvFormulasFromAntec(analysisGoal);
 
             analysisGoal.addFormula(
-                    new SequentFormula(tb.apply(updateTerm, postCond)), true,
+                    new SequentFormula(tb.apply(updateTerm, anonPostCond)), true,
                     false);
 
             i++;

@@ -103,7 +103,6 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
         final Pair<Term, List<Term>> storeEqsAndInnerHeapTerm = //
                 StrengthAnalysisUtilities.extractStoreEqsAndInnerHeapTerm( //
                         services, pm, origHeapTerm);
-        final Term innerHeapTerm = storeEqsAndInnerHeapTerm.first;
         final List<Term> storeEqualities = storeEqsAndInnerHeapTerm.second;
 
         Map<LocationVariable, List<Term>> newGoalInformation = new LinkedHashMap<>();
@@ -157,18 +156,19 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
 
             StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal,
                     heapEquality);
+            
+            final Term update = updateWithoutLocalOuts;
 
-            final Term update = tb.parallel( //
-                    tb.elementary(tb.var(heapVar), innerHeapTerm), //
-                    updateWithoutLocalOuts);
-
-            final List<Term> newPres = Arrays
-                    .asList(new Term[] { tb.apply(update, invTerm),
-                            tb.and(updateContent.keySet().stream()
-                                    .filter(lhs -> !lhs.equals(heapVar))
-                                    .map(lhs -> tb.equals(tb.var(lhs),
-                                            updateContent.get(lhs)))
-                                    .collect(Collectors.toList())) });
+            final List<Term> newPres = Arrays.asList(new Term[] { //
+                    tb.apply(update, invTerm),
+                    tb.and(updateContent.keySet().stream()
+                            .filter(lhs -> !lhs.equals(heapVar))
+                            .map(lhs -> tb.equals(tb.var(lhs),
+                                    updateContent.get(lhs)))
+                            .collect(Collectors.toList())),
+                    tb.and(storeEqualities.stream()
+                            .filter(se -> se != heapEquality)
+                            .collect(Collectors.toList())) });
 
             newPres.forEach(t -> analysisGoal.addFormula(new SequentFormula(t),
                     true, true));
