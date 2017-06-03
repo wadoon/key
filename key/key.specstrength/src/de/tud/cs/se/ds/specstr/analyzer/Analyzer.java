@@ -299,11 +299,14 @@ public class Analyzer {
 
                     extractReadablePathCondition(analysisGoal);
 
-                    facts.add(new Fact(
-                            analysisGoal.node().getNodeInfo().getBranchLabel()
-                                    .split("\"")[1],
+                    final String branchLabel = analysisGoal.node().getNodeInfo()
+                            .getBranchLabel();
+                    facts.add(new Fact(branchLabel.split("\"")[1],
                             extractReadablePathCondition(analysisGoal),
-                            FactType.POST_COND_FACT, analysisGoal));
+                            branchLabel.contains("invariant fact")
+                                    ? FactType.POST_COND_INV_FACT
+                                    : FactType.POST_COND_FACT,
+                            analysisGoal));
                 }
             }
         }
@@ -319,15 +322,16 @@ public class Analyzer {
         String pathCond = "";
         try {
             boolean problem = false;
-            Term pathCondTerm = analysisGoal.proof().getServices().getTermBuilder().tt();
-            
+            Term pathCondTerm = analysisGoal.proof().getServices()
+                    .getTermBuilder().tt();
+
             try {
                 pathCondTerm = SymbolicExecutionUtil
                         .computePathCondition(analysisGoal.node(), true, true);
             } catch (RuntimeException e1) {
                 problem = true;
             }
-            
+
             pathCond = (problem ? "ERROR-PC " : "") + LogicPrinter
                     .quickPrintTerm(pathCondTerm,
                             analysisGoal.proof().getServices())
@@ -656,7 +660,7 @@ public class Analyzer {
     }
 
     public static enum FactType {
-        LOOP_BODY_FACT, LOOP_USE_CASE_FACT, POST_COND_FACT
+        LOOP_BODY_FACT, LOOP_USE_CASE_FACT, POST_COND_FACT, POST_COND_INV_FACT
     }
 
     public static class Fact {
@@ -717,7 +721,9 @@ public class Analyzer {
             case LOOP_USE_CASE_FACT:
                 return "Loop use case fact";
             case POST_COND_FACT:
-                return "Post condition fact";
+                return "Post condition implies final state fact";
+            case POST_COND_INV_FACT:
+                return "Post condition (WP) implies invariant fact";
             default:
                 Utilities.logErrorAndThrowRTE( //
                         logger, "Unknown fact type: %s", ft);
