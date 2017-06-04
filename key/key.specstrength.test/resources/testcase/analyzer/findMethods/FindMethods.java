@@ -41,6 +41,9 @@ public class FindMethods {
     
     return result;
   }
+  
+  // This method is only missing the fact that "i >= 0", which can be provided
+  // by just adding it to the post condition.
 
   /*@ public normal_behavior
     @ ensures
@@ -80,13 +83,22 @@ public class FindMethods {
     return result;
   }
 
+  // This covers the fact of "find"
+  //   i = 1 + i_0            (loop body fact)
+  // but, since now the invariant is stronger than what the post condition
+  // can reason about, adds 3 additional "post condition -> invariant" facts.
+  //
+  // Note: Among the 3 is the previously closed "i >= 0", since a formula
+  // "!i_0 < arr_0.length" is replaced by "1 + iLastRun_0 < arr_0.length" and
+  // the post condition does not provide additional knowledge about iLastRun.
+  
   /*@ public normal_behavior
     @ ensures
     @      ((\exists int i; i >= 0 && i < arr.length; arr[i] == n) ==> arr[\result] == n)
     @   && ((\forall int i; i >= 0 && i < arr.length; arr[i] != n) ==> \result == -1)
     @   ;
     @*/
-  public static int find_strong(int[] arr, int n) {
+  public static int find_strong_inv(int[] arr, int n) {
     int i = 0;
     int result = -1;
 
@@ -95,7 +107,6 @@ public class FindMethods {
     /*@ loop_invariant
       @      i >= 0 && i <= arr.length
       @   && i == iLastRun + 1
-      @   && (arr[i] == n ==> i == iLastRun + 1)
       @   && (result != -1 || (\forall int k; k >= 0 && k < i; arr[k] != n))
       @   && (result == -1 || arr[result] == n && result == i-1)
       @   ;
