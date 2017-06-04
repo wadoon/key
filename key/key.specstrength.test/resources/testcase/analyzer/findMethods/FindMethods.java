@@ -2,7 +2,8 @@ public class FindMethods {
   //@ ghost int g_i;
   //@ ghost int iLastRun;
 
-  // This method triggers a bug in FormulaTagManager
+  // [This method triggers a bug in FormulaTagManager]
+    
   /*@ public normal_behavior
     @ ensures
     @      ((\exists int k; k >= 0 && k < arr.length; arr[k] == n) ==> arr[\result] == n && \result == g_i - 1)
@@ -131,7 +132,7 @@ public class FindMethods {
   // (1x) i >= 0                 (for the case that n wasn't found)
   // (1x) result_1_0 = i_0 - 1   (titled "result_1 = -1" in the proof, for the case that n wasn't found)
   // (1x) i = 1 + i_0            (loop body fact)
-  // (1x) result = i_0 - 1       (post condition fact -- for the case that n wasn't found)
+  // (1x) result = i_0 - 1       (post condition fact -- for the case that n was found
   /*@ public normal_behavior
     @ ensures
     @      ((\exists int i; i >= 0 && i < arr.length; arr[i] == n) ==> arr[\result] == n)
@@ -161,6 +162,11 @@ public class FindMethods {
     return result;
   }
 
+  // This method adds a second post condition weakness to those of 
+  // the "find" method:
+  //
+  // "result = -1" for the case where n was not found
+  
   /*@ public normal_behavior
     @ ensures
     @   \result == -1 || arr[\result] == n
