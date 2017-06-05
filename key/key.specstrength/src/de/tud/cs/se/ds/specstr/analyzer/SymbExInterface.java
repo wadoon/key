@@ -114,9 +114,12 @@ public class SymbExInterface {
      * TODO
      * 
      * @param pm
-     * @return
      */
-    public Optional<Goal> finishSEUntilLoopOrEnd(ProgramMethod pm) {
+    private void initProof(ProgramMethod pm) {
+        if (proof != null) {
+            return;
+        }
+        
         final ImmutableSet<Contract> contracts = env
                 .getSpecificationRepository()
                 .getContracts(pm.getContainerType(), pm);
@@ -143,40 +146,45 @@ public class SymbExInterface {
 
             proof = env.createProof(po);
             setupStrategy(proof);
-
-            // Start auto mode
-            // env.getUi().getProofControl().startAndWaitForAutoMode(proof);
-            applyMacro(new FinishSymbolicExecutionMacro(), proof.root());
-
-            final List<Goal> whileLoopGoals = Utilities
-                    .toStream(proof.openGoals())
-                    .filter(g -> Utilities
-                            .toStream(g.node().sequent().succedent())
-                            .filter(f -> SymbolicExecutionUtil
-                                    .hasSymbolicExecutionLabel(f.formula()))
-                            .filter(f -> JavaTools.getActiveStatement(
-                                    TermBuilder.goBelowUpdates(f.formula())
-                                            .javaBlock()) instanceof While)
-                            .findAny().isPresent())
-                    .collect(Collectors.toList());
-
-            if (whileLoopGoals.size() == 0) {
-                return Optional.empty();
-            } else if (whileLoopGoals.size() > 1) {
-                Utilities.logErrorAndThrowRTE(logger,
-                        "Expected no or one goal with a while loop, got %s",
-                        whileLoopGoals.size());
-            }
-
-            return Optional.of(whileLoopGoals.get(0));
-
         } catch (ProofInputException e) {
             Utilities.logErrorAndThrowRTE(logger,
                     "Exception at '%s' of %s:\n%s", contract.getDisplayName(),
                     contract.getTarget(), e.getMessage());
-
-            return null;
         }
+    }
+
+    /**
+     * TODO
+     * 
+     * @param pm
+     * @return
+     */
+    public Optional<Goal> finishSEUntilLoopOrEnd(ProgramMethod pm) {
+        initProof(pm);
+
+        // Start auto mode
+        // env.getUi().getProofControl().startAndWaitForAutoMode(proof);
+        applyMacro(new FinishSymbolicExecutionMacro(), proof.root());
+
+        final List<Goal> whileLoopGoals = Utilities.toStream(proof.openGoals())
+                .filter(g -> Utilities.toStream(g.node().sequent().succedent())
+                        .filter(f -> SymbolicExecutionUtil
+                                .hasSymbolicExecutionLabel(f.formula()))
+                        .filter(f -> JavaTools.getActiveStatement(
+                                TermBuilder.goBelowUpdates(f.formula())
+                                        .javaBlock()) instanceof While)
+                        .findAny().isPresent())
+                .collect(Collectors.toList());
+
+        if (whileLoopGoals.size() == 0) {
+            return Optional.empty();
+        } else if (whileLoopGoals.size() > 1) {
+            Utilities.logErrorAndThrowRTE(logger,
+                    "Expected no or one goal with a while loop, got %s",
+                    whileLoopGoals.size());
+        }
+
+        return Optional.of(whileLoopGoals.get(0));
 
     }
 
