@@ -41,10 +41,12 @@ import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -116,15 +118,23 @@ public class SymbExInterface {
         }
 
         final Contract contract = contracts.iterator().next();
+        assert contract instanceof FunctionalOperationContract;
 
         Proof proof = null;
         try {
-            proof = env.createProof(contract.createProofObl( //
-                    env.getInitConfig(), contract, true));
+            final FunctionalOperationContractPO po = //
+                    new FunctionalOperationContractPO( //
+                            env.getInitConfig(), //
+                            (FunctionalOperationContract) contract, //
+                            false, // add uninterpreted predicate
+                            true); // add symbolic execution label
+
+            proof = env.createProof(po);
             setupStrategy(proof);
 
             // Start auto mode
-            env.getUi().getProofControl().startAndWaitForAutoMode(proof);
+//            env.getUi().getProofControl().startAndWaitForAutoMode(proof);
+            applyMacro(new FinishSymbolicExecutionMacro(), proof.root());
 
             List<Goal> whileLoopGoals = Utilities.toStream(proof.openGoals())
                     .filter(g -> Utilities
