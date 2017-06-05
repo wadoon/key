@@ -57,9 +57,11 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * @author Dominic Steinhöfel
  */
 public class SymbExInterface {
+    private static final Logger logger = LogManager.getFormatterLogger();
+
     private KeYEnvironment<DefaultUserInterfaceControl> env;
     private File file;
-    private static final Logger logger = LogManager.getFormatterLogger();
+    private Proof proof;
 
     public SymbExInterface(File file) throws ProblemLoaderException {
         this.file = file;
@@ -98,12 +100,23 @@ public class SymbExInterface {
     }
 
     /**
+     * Returns the {@link Proof} object if already initialized; make sure to
+     * call {@link #finishSEUntilLoopOrEnd(ProgramMethod)} before calling this
+     * method.
+     * 
+     * @return
+     */
+    public Proof proof() {
+        return proof;
+    }
+
+    /**
      * TODO
      * 
      * @param pm
      * @return
      */
-    public Goal runUntilLoop(ProgramMethod pm) {
+    public Optional<Goal> finishSEUntilLoopOrEnd(ProgramMethod pm) {
         final ImmutableSet<Contract> contracts = env
                 .getSpecificationRepository()
                 .getContracts(pm.getContainerType(), pm);
@@ -120,7 +133,6 @@ public class SymbExInterface {
         final Contract contract = contracts.iterator().next();
         assert contract instanceof FunctionalOperationContract;
 
-        Proof proof = null;
         try {
             final FunctionalOperationContractPO po = //
                     new FunctionalOperationContractPO( //
@@ -133,10 +145,11 @@ public class SymbExInterface {
             setupStrategy(proof);
 
             // Start auto mode
-//            env.getUi().getProofControl().startAndWaitForAutoMode(proof);
+            // env.getUi().getProofControl().startAndWaitForAutoMode(proof);
             applyMacro(new FinishSymbolicExecutionMacro(), proof.root());
 
-            List<Goal> whileLoopGoals = Utilities.toStream(proof.openGoals())
+            final List<Goal> whileLoopGoals = Utilities
+                    .toStream(proof.openGoals())
                     .filter(g -> Utilities
                             .toStream(g.node().sequent().succedent())
                             .filter(f -> SymbolicExecutionUtil
@@ -147,13 +160,15 @@ public class SymbExInterface {
                             .findAny().isPresent())
                     .collect(Collectors.toList());
 
-            if (whileLoopGoals.size() != 1) {
+            if (whileLoopGoals.size() == 0) {
+                return Optional.empty();
+            } else if (whileLoopGoals.size() > 1) {
                 Utilities.logErrorAndThrowRTE(logger,
-                        "Expected exactly 1 goal with a while loop, got %s",
+                        "Expected no or one goal with a while loop, got %s",
                         whileLoopGoals.size());
             }
 
-            return whileLoopGoals.get(0);
+            return Optional.of(whileLoopGoals.get(0));
 
         } catch (ProofInputException e) {
             Utilities.logErrorAndThrowRTE(logger,

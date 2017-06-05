@@ -115,62 +115,70 @@ public class Analyzer {
                 methodTypeStr);
 
         // Run until while loop
-        final Goal whileGoal = seIf.runUntilLoop(method);
-        final Node whileNode = whileGoal.node();
+        final Optional<Goal> maybeWhileGoal = seIf
+                .finishSEUntilLoopOrEnd(method);
+        final Proof proof = seIf.proof();
 
-        // Extract basic infrastructure objects
-        final Proof proof = whileGoal.proof();
-
-        // Apply loop invariant rule
-        final Optional<SequentFormula> maybeWhileSeqFor = Utilities
-                .toStream(whileGoal.node().sequent().succedent())
-                .filter(f -> SymbolicExecutionUtil
-                        .hasSymbolicExecutionLabel(f.formula()))
-                .filter(f -> JavaTools.getActiveStatement(
-                        TermBuilder.goBelowUpdates(f.formula())
-                                .javaBlock()) instanceof While)
-                .findFirst();
-
-        assert maybeWhileSeqFor.isPresent();
-
-        final SequentFormula whileSeqFor = maybeWhileSeqFor.get();
-
-        final PosInOccurrence whilePio = new PosInOccurrence(whileSeqFor,
-                PosInTerm.getTopLevel(), false);
-
-        final RuleApp loopInvRuleApp = LoopScopeInvariantRule.INSTANCE
-                .createApp(whilePio, whileGoal.proof().getServices())
-                .tryToInstantiate(whileGoal);
-
-        whileGoal.apply(loopInvRuleApp);
-
-        // Try to close first open goal ("initially valid")
-        seIf.applyMacro(new TryCloseMacro(1000), whileNode.child(0));
-
-        if (!whileNode.child(0).isClosed()) {
-            logger.warn("The loop's invariant is not initially valid");
-        }
-
-        // Finish symbolic execution preserved & use case goal
-        final Node preservesAndUCNode = whileNode.child(1);
-        seIf.finishSEForNode(preservesAndUCNode);
-
+        final List<Node> postConditionNodes = new ArrayList<>();
         final List<Fact> facts = new ArrayList<>();
-
-        // Post condition facts
-        extractPostCondFacts(proof, facts);
-
-        // Find "preserves" and "use case" branches
-        final List<Node> preservedNodes = new ArrayList<>();
-        final List<Node> useCaseNodes = new ArrayList<>();
-
-        extractPreservedAndUseCaseNodes(proof, preservesAndUCNode,
-                preservedNodes, useCaseNodes);
-
-        // Loop facts
-        extractLoopBodyFactsAndShowValidity( //
-                proof, preservedNodes, facts);
-        extractUseCaseFacts(proof, preservesAndUCNode, useCaseNodes, facts);
+        
+        Node useCasePredecessor = proof.root();
+        
+        if (maybeWhileGoal.isPresent()) {
+            final Goal whileGoal = maybeWhileGoal.get();
+            final Node whileNode = whileGoal.node();
+    
+            // Apply loop invariant rule
+            final Optional<SequentFormula> maybeWhileSeqFor = Utilities
+                    .toStream(whileGoal.node().sequent().succedent())
+                    .filter(f -> SymbolicExecutionUtil
+                            .hasSymbolicExecutionLabel(f.formula()))
+                    .filter(f -> JavaTools.getActiveStatement(
+                            TermBuilder.goBelowUpdates(f.formula())
+                                    .javaBlock()) instanceof While)
+                    .findFirst();
+    
+            assert maybeWhileSeqFor.isPresent();
+    
+            final SequentFormula whileSeqFor = maybeWhileSeqFor.get();
+    
+            final PosInOccurrence whilePio = new PosInOccurrence(whileSeqFor,
+                    PosInTerm.getTopLevel(), false);
+    
+            final RuleApp loopInvRuleApp = LoopScopeInvariantRule.INSTANCE
+                    .createApp(whilePio, whileGoal.proof().getServices())
+                    .tryToInstantiate(whileGoal);
+    
+            whileGoal.apply(loopInvRuleApp);
+    
+            // Try to close first open goal ("initially valid")
+            seIf.applyMacro(new TryCloseMacro(1000), whileNode.child(0));
+    
+            if (!whileNode.child(0).isClosed()) {
+                logger.warn("The loop's invariant is not initially valid");
+            }
+    
+            // Finish symbolic execution preserved & use case goal
+            final Node preservesAndUCNode = whileNode.child(1);
+            seIf.finishSEForNode(preservesAndUCNode);
+    
+            // Post condition facts
+            extractPostCondFacts(proof, facts);
+    
+            // Find "preserves" and "use case" branches
+            final List<Node> preservedNodes = new ArrayList<>();
+    
+            extractPreservedAndUseCaseNodes(proof, preservesAndUCNode,
+                    preservedNodes, postConditionNodes);
+    
+            // Loop facts
+            extractLoopBodyFactsAndShowValidity( //
+                    proof, preservedNodes, facts);
+            
+            useCasePredecessor = preservesAndUCNode;
+        }
+        
+        extractUseCaseFacts(proof, useCasePredecessor, postConditionNodes, facts);
 
         logger.info("Collected %s facts", facts.size());
 
@@ -195,7 +203,7 @@ public class Analyzer {
         if (outProofFile.isPresent()) {
             try {
                 logger.info("Writing proof to file %s", outProofFile.get());
-                whileGoal.proof().saveToFile(outProofFile.get());
+                proof.saveToFile(outProofFile.get());
             } catch (IOException e) {
                 logger.error("Problem writing proof to file %s, message:\n%s",
                         outProofFile.get(), e.getMessage());
