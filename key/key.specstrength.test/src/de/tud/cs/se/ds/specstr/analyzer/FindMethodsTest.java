@@ -13,6 +13,7 @@
 
 package de.tud.cs.se.ds.specstr.analyzer;
 
+import static de.tud.cs.se.ds.specstr.analyzer.Analyzer.FactType.*;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
@@ -32,23 +33,11 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
                 "findMethods/FindMethods.java",
                 "FindMethods::find_weak_postcond([II)I");
 
-        assertEquals(1,
-                result.getUnCoveredFacts()
-                        .stream().filter(
-                                f -> f.getFactType() == Analyzer.FactType.LOOP_BODY_FACT)
-                        .count());
-        assertEquals(2,
-                result.getUnCoveredFacts()
-                        .stream().filter(
-                                f -> f.getFactType() == Analyzer.FactType.POST_COND_FACT)
-                        .count());
-        
+        assertEquals(1, result.getUncoveredFactsOfType(LOOP_BODY_FACT).size());
+        assertEquals(2, result.getUncoveredFactsOfType(POST_COND_FACT).size());
         assertEquals(6,
-                result.getUnCoveredFacts()
-                        .stream().filter(
-                                f -> f.getFactType() == Analyzer.FactType.POST_COND_INV_FACT)
-                        .count());
-        
+                result.getUncoveredFactsOfType(POST_COND_INV_FACT).size());
+
         assertEquals(9, result.numUncoveredFacts());
     }
 
@@ -57,22 +46,11 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
         final AnalyzerResult result = analyzeMethod(
                 "findMethods/FindMethods.java", "FindMethods::find([II)I");
 
-        assertEquals(1,
-                result.getUnCoveredFacts()
-                        .stream().filter(
-                                f -> f.getFactType() == Analyzer.FactType.LOOP_BODY_FACT)
-                        .count());
-        assertEquals(1,
-                result.getUnCoveredFacts()
-                        .stream().filter(
-                                f -> f.getFactType() == Analyzer.FactType.POST_COND_FACT)
-                        .count());
+        assertEquals(1, result.getUncoveredFactsOfType(LOOP_BODY_FACT).size());
+        assertEquals(1, result.getUncoveredFactsOfType(POST_COND_FACT).size());
         assertEquals(6,
-                result.getUnCoveredFacts()
-                        .stream().filter(
-                                f -> f.getFactType() == Analyzer.FactType.POST_COND_INV_FACT)
-                        .count());
-        
+                result.getUncoveredFactsOfType(POST_COND_INV_FACT).size());
+
         assertEquals(8, result.numUncoveredFacts());
     }
 
@@ -82,22 +60,11 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
                 "findMethods/FindMethods.java",
                 "FindMethods::find_strong_inv([II)I");
 
-        assertEquals(0,
-                result.getUnCoveredFacts()
-                        .stream().filter(
-                                f -> f.getFactType() == Analyzer.FactType.LOOP_BODY_FACT)
-                        .count());
-        assertEquals(1,
-                result.getUnCoveredFacts()
-                        .stream().filter(
-                                f -> f.getFactType() == Analyzer.FactType.POST_COND_FACT)
-                        .count());
+        assertEquals(0, result.getUncoveredFactsOfType(LOOP_BODY_FACT).size());
+        assertEquals(1, result.getUncoveredFactsOfType(POST_COND_FACT).size());
         assertEquals(9,
-                result.getUnCoveredFacts()
-                        .stream().filter(
-                                f -> f.getFactType() == Analyzer.FactType.POST_COND_INV_FACT)
-                        .count());
-        
+                result.getUncoveredFactsOfType(POST_COND_INV_FACT).size());
+
         assertEquals(10, result.numUncoveredFacts());
     }
 
@@ -107,14 +74,11 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
                 "findMethods/FindMethods.java",
                 "FindMethods::find_stronger([II)I");
 
-        assertEquals(1, result.numUncoveredFacts());
-        
         assertEquals(1,
-                result.getUnCoveredFacts()
-                        .stream().filter(
-                                f -> f.getFactType() == Analyzer.FactType.POST_COND_INV_FACT)
-                        .count());
+                result.getUncoveredFactsOfType(POST_COND_INV_FACT).size());
         
+        assertEquals(1, result.numUncoveredFacts());
+
     }
 
     @Test

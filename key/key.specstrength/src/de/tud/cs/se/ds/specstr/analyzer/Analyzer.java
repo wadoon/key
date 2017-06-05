@@ -647,7 +647,7 @@ public class Analyzer {
             // @formatter:on
 
             final PrintStream fPs = ps;
-            result.getUnCoveredFacts().forEach(f -> {
+            result.getUncoveredFacts().forEach(f -> {
                 fPs.println(f);
                 fPs.println();
             });
@@ -734,20 +734,30 @@ public class Analyzer {
 
     public static class AnalyzerResult {
         private final List<Fact> coveredFacts;
-        private final List<Fact> unCoveredFacts;
+        private final List<Fact> uncoveredFacts;
 
         public AnalyzerResult(List<Fact> coveredFacts,
                 List<Fact> unCoveredFacts) {
             this.coveredFacts = coveredFacts;
-            this.unCoveredFacts = unCoveredFacts;
+            this.uncoveredFacts = unCoveredFacts;
         }
 
         public List<Fact> getCoveredFacts() {
             return coveredFacts;
         }
 
-        public List<Fact> getUnCoveredFacts() {
-            return unCoveredFacts;
+        public List<Fact> getUncoveredFacts() {
+            return uncoveredFacts;
+        }
+
+        public List<Fact> getCoveredFactsOfType(FactType type) {
+            return coveredFacts.stream().filter(f -> f.factType == type)
+                    .collect(Collectors.toList());
+        }
+
+        public List<Fact> getUncoveredFactsOfType(FactType type) {
+            return uncoveredFacts.stream().filter(f -> f.factType == type)
+                    .collect(Collectors.toList());
         }
 
         public int numCoveredFacts() {
@@ -755,7 +765,7 @@ public class Analyzer {
         }
 
         public int numUncoveredFacts() {
-            return unCoveredFacts.size();
+            return uncoveredFacts.size();
         }
 
         public int numFacts() {
