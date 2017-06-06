@@ -44,6 +44,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.rule.strengthanalysis.StrengthAnalysisUtilities;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -141,7 +142,7 @@ public class SymbExInterface {
                     new FunctionalOperationContractPO( //
                             env.getInitConfig(), //
                             (FunctionalOperationContract) contract, //
-                            false, // add uninterpreted predicate
+                            true,  // add uninterpreted predicate
                             true); // add symbolic execution label
 
             proof = env.createProof(po);
@@ -166,8 +167,8 @@ public class SymbExInterface {
         // env.getUi().getProofControl().startAndWaitForAutoMode(proof);
         applyMacro(new FinishSymbolicExecutionMacro(), proof.root());
 
-        final List<Goal> whileLoopGoals = Utilities.toStream(proof.openGoals())
-                .filter(g -> Utilities.toStream(g.node().sequent().succedent())
+        final List<Goal> whileLoopGoals = StrengthAnalysisUtilities.toStream(proof.openGoals())
+                .filter(g -> StrengthAnalysisUtilities.toStream(g.node().sequent().succedent())
                         .filter(f -> SymbolicExecutionUtil
                                 .hasSymbolicExecutionLabel(f.formula()))
                         .filter(f -> JavaTools.getActiveStatement(
@@ -195,9 +196,9 @@ public class SymbExInterface {
      */
     public void finishSEForNode(Node node) {
         List<Node> openNodesWithModality;
-        while (!(openNodesWithModality = Utilities
+        while (!(openNodesWithModality = StrengthAnalysisUtilities
                 .toStream(node.proof().getSubtreeGoals(node)).map(g -> g.node())
-                .filter(n -> Utilities.toStream(n.sequent().succedent())
+                .filter(n -> StrengthAnalysisUtilities.toStream(n.sequent().succedent())
                         .anyMatch(
                                 f -> f.formula().containsJavaBlockRecursive()))
                 .collect(Collectors.toList())).isEmpty()) {

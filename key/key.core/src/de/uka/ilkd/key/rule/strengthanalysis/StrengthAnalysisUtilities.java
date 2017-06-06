@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -64,9 +65,13 @@ public class StrengthAnalysisUtilities {
      * @param origHeapTerm
      * @return
      */
-    public static Pair<Term, List<Term>> extractStoreEqsAndInnerHeapTerm(
+    public static Optional<Pair<Term, List<Term>>> extractStoreEqsAndInnerHeapTerm(
             Services services, final IProgramMethod pm,
             final Term origHeapTerm) {
+        if (origHeapTerm == null) {
+            return Optional.empty();
+        }
+
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final TermBuilder tb = services.getTermBuilder();
 
@@ -100,7 +105,9 @@ public class StrengthAnalysisUtilities {
             // Here, currHeapTerm should be the "core" without any stores.
             innerHeapTerm = currHeapTerm;
         }
-        return new Pair<Term, List<Term>>(innerHeapTerm, storeEqualities);
+
+        return Optional
+                .of(new Pair<Term, List<Term>>(innerHeapTerm, storeEqualities));
     }
 
     /**
@@ -262,6 +269,18 @@ public class StrengthAnalysisUtilities {
     }
 
     /**
+     * Converts the given {@link Iterable} to a {@link Stream}.<br/>
+     * TODO is this method needed? Currently seems to be unused.
+     * 
+     * @param it
+     *            The {@link Iterable} to convert to a {@link Stream}.
+     * @return The {@link Stream} for the given {@link Iterable}.
+     */
+    public static <T> Stream<T> toStream(Iterable<T> it) {
+        return StreamSupport.stream(it.spliterator(), false);
+    }
+
+    /**
      * TODO
      * 
      * @param analysisGoal
@@ -289,6 +308,35 @@ public class StrengthAnalysisUtilities {
 
     /**
      * TODO
+     * 
+     * @param tb
+     * @param goal
+     */
+    static void addSETPredicateToAntec(final Goal goal) {
+        final Optional<Pair<SequentFormula, Term>> maybeSETPredicate = //
+                toStream(goal.sequent().succedent()).map(sf -> {
+                    SETPredVisitor v = new SETPredVisitor();
+                    sf.formula().execPostOrder(v);
+                    return new Pair<SequentFormula, Term>(sf,
+                            v.getSetPredTerm());
+                }).filter(p -> p.second != null).findAny();
+
+        assert maybeSETPredicate
+                .isPresent() : "Expected an SETAccumulate predicate";
+
+        Term newFormula = maybeSETPredicate.get().second;
+        final Term seqFor = maybeSETPredicate.get().first.formula();
+        if (seqFor.op() instanceof UpdateApplication) {
+            newFormula = goal.proof().getServices().getTermBuilder()
+                    .apply(seqFor.sub(0), newFormula);
+            assert !(seqFor.sub(1).op() instanceof UpdateApplication);
+        }
+
+        goal.addFormula(new SequentFormula(newFormula), true, false);
+    }
+
+    /**
+     * TODO
      *
      * @author Dominic Steinhöfel
      */
@@ -307,6 +355,22 @@ public class StrengthAnalysisUtilities {
 
         public SequentFormula getSeqFor() {
             return seqFor;
+        }
+    }
+
+    public static class SETPredVisitor extends DefaultVisitor {
+        private static final String SET_ACCUMULATE = "SETAccumulate";
+        private Term setPredTerm = null;
+
+        @Override
+        public void visit(Term visited) {
+            if (visited.op().name().toString().equals(SET_ACCUMULATE)) {
+                setPredTerm = visited;
+            }
+        }
+
+        public Term getSetPredTerm() {
+            return setPredTerm;
         }
     }
 

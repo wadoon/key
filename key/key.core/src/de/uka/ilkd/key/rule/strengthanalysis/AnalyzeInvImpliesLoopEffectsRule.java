@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.rule.strengthanalysis;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -100,10 +101,10 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
         final Term origHeapTerm = MergeRuleUtils
                 .getUpdateRightSideFor(updateTerm, heapVar);
 
-        final Pair<Term, List<Term>> storeEqsAndInnerHeapTerm = //
+        final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
                 StrengthAnalysisUtilities.extractStoreEqsAndInnerHeapTerm( //
                         services, pm, origHeapTerm);
-        final List<Term> storeEqualities = storeEqsAndInnerHeapTerm.second;
+        List<Term> storeEqualities = new ArrayList<>(); 
 
         Map<LocationVariable, List<Term>> newGoalInformation = new LinkedHashMap<>();
 
@@ -151,29 +152,34 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
             }
         }
 
-        for (Term heapEquality : storeEqualities) {
-            final Goal analysisGoal = goalArray[i++];
 
-            StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal,
-                    heapEquality);
-            
-            final Term update = updateWithoutLocalOuts;
-
-            final List<Term> newPres = Arrays.asList(new Term[] { //
-                    tb.apply(update, invTerm),
-                    tb.and(updateContent.keySet().stream()
-                            .filter(lhs -> !lhs.equals(heapVar))
-                            .map(lhs -> tb.equals(tb.var(lhs),
-                                    updateContent.get(lhs)))
-                            .collect(Collectors.toList())),
-                    tb.and(storeEqualities.stream()
-                            .filter(se -> se != heapEquality)
-                            .collect(Collectors.toList())) });
-
-            newPres.forEach(t -> analysisGoal.addFormula(new SequentFormula(t),
-                    true, true));
+        if (storeEqsAndInnerHeapTerm.isPresent()) {
+            storeEqualities = storeEqsAndInnerHeapTerm.get().second;
+            for (Term heapEquality : storeEqualities) {
+                final Goal analysisGoal = goalArray[i++];
+    
+                StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal,
+                        heapEquality);
+                
+                final Term update = updateWithoutLocalOuts;
+    
+                final List<Term> newPres = Arrays.asList(new Term[] { //
+                        tb.apply(update, invTerm),
+                        tb.and(updateContent.keySet().stream()
+                                .filter(lhs -> !lhs.equals(heapVar))
+                                .map(lhs -> tb.equals(tb.var(lhs),
+                                        updateContent.get(lhs)))
+                                .collect(Collectors.toList())),
+                        tb.and(storeEqualities.stream()
+                                .filter(se -> se != heapEquality)
+                                .collect(Collectors.toList())) });
+    
+                newPres.forEach(t -> analysisGoal.addFormula(new SequentFormula(t),
+                        true, true));
+            }
         }
 
+        StrengthAnalysisUtilities.addSETPredicateToAntec(goalArray[goalArray.length - 1]);
         goalArray[goalArray.length - 1].setBranchLabel("Invariant preserved");
 
         return goals;

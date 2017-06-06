@@ -57,6 +57,7 @@ import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.strengthanalysis.AnalyzeInvImpliesLoopEffectsRule;
 import de.uka.ilkd.key.rule.strengthanalysis.AnalyzePostCondImpliesMethodEffectsRule;
+import de.uka.ilkd.key.rule.strengthanalysis.StrengthAnalysisUtilities;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -129,7 +130,7 @@ public class Analyzer {
             final Node whileNode = whileGoal.node();
     
             // Apply loop invariant rule
-            final Optional<SequentFormula> maybeWhileSeqFor = Utilities
+            final Optional<SequentFormula> maybeWhileSeqFor = StrengthAnalysisUtilities
                     .toStream(whileGoal.node().sequent().succedent())
                     .filter(f -> SymbolicExecutionUtil
                             .hasSymbolicExecutionLabel(f.formula()))
@@ -235,7 +236,7 @@ public class Analyzer {
 
         useCaseNodes.stream().map(n -> new Pair<Node, List<SequentFormula>>( //
                 n, //
-                Utilities.toStream(n.sequent()).filter(
+                StrengthAnalysisUtilities.toStream(n.sequent()).filter(
                         f -> f.formula().op() instanceof UpdateApplication)
                         .collect(Collectors.toList())))
                 .filter(p -> !p.second.isEmpty()) //
@@ -258,7 +259,7 @@ public class Analyzer {
 
                     if (!proof.isGoal(p.first)) {
                         obsoleteUseCaseNodes.add(p.first);
-                        newUseCaseNodes.addAll(Utilities
+                        newUseCaseNodes.addAll(StrengthAnalysisUtilities
                                 .toStream(proof.getSubtreeGoals(p.first))
                                 .map(g -> g.node())
                                 .collect(Collectors.toList()));
@@ -362,14 +363,14 @@ public class Analyzer {
      */
     private static String polishFactDescription(Sequent factSeq,
             Sequent originSeq, Services services) {
-        final List<SequentFormula> newAntec = Utilities
+        final List<SequentFormula> newAntec = StrengthAnalysisUtilities
                 .toStream(factSeq.antecedent()).collect(Collectors.toList());
-        newAntec.removeAll(Utilities.toStream(originSeq.antecedent())
+        newAntec.removeAll(StrengthAnalysisUtilities.toStream(originSeq.antecedent())
                 .collect(Collectors.toList()));
 
-        final List<SequentFormula> newSucc = Utilities
+        final List<SequentFormula> newSucc = StrengthAnalysisUtilities
                 .toStream(factSeq.succedent()).collect(Collectors.toList());
-        newSucc.removeAll(Utilities.toStream(originSeq.succedent())
+        newSucc.removeAll(StrengthAnalysisUtilities.toStream(originSeq.succedent())
                 .collect(Collectors.toList()));
 
         Sequent newSequent = Sequent.EMPTY_SEQUENT;
@@ -433,7 +434,7 @@ public class Analyzer {
                 continue;
             }
 
-            Optional<Term> rhs = Utilities
+            Optional<Term> rhs = StrengthAnalysisUtilities
                     .toStream(g.node().sequent().succedent())
                     .map(sf -> sf.formula())
                     .filter(f -> f.op() instanceof UpdateApplication).map(f -> {
@@ -579,7 +580,7 @@ public class Analyzer {
         assert declaredTypes
                 .size() == 1 : "There should be only one type of a given name";
 
-        final List<ProgramMethod> matchingMethods = Utilities
+        final List<ProgramMethod> matchingMethods = StrengthAnalysisUtilities
                 .toStream(matchingClassDecls.get(0).getMembers())
                 .filter(m -> m instanceof ProgramMethod)
                 .map(m -> (ProgramMethod) m)

@@ -93,11 +93,8 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         // because changes to them describe the method's behavior
         final Term origHeapTerm = MergeRuleUtils
                 .getUpdateRightSideFor(updateTerm, heapVar);
-        final Pair<Term, List<Term>> storeEqsAndInnerHeapTerm = //
-                StrengthAnalysisUtilities.extractStoreEqsAndInnerHeapTerm( //
-                        services, pm, origHeapTerm);
-        final Term innerHeapTerm = storeEqsAndInnerHeapTerm.first;
-        final List<Term> storeEqualities = storeEqsAndInnerHeapTerm.second;
+        final boolean hasHeap = origHeapTerm != null;
+        List<Term> storeEqualities = new ArrayList<>();
 
         // We have to look the variable up from the current namespaces, since
         // otherwise we will obtain a different object...
@@ -147,6 +144,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
             final Term invariant;
             try {
                 postCond = topLevelFormula.sub(1).sub(0).sub(1);
+
                 final Term invInPostCond = topLevelFormula.sub(1).sub(1).sub(1)
                         .sub(0).sub(0);
 
@@ -212,10 +210,11 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
             final List<Term> newPres = Arrays
                     .asList(new Term[] {
                             tb.apply(
-                                    tb.parallel(
+                                    hasHeap ? tb.parallel(
                                             tb.elementary(tb.var(heapVar),
                                                     origHeapTerm),
-                                            updateWithoutVarsOfInterest),
+                                            updateWithoutVarsOfInterest)
+                                            : updateWithoutVarsOfInterest,
                                     contract),
                             tb.and(updateContent.keySet().stream()
                                     .filter(lhs -> lhs != resultVar)
@@ -250,39 +249,53 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                     .removeLoopInvFormulasFromAntec(analysisGoal);
 
             analysisGoal.addFormula(
-                    new SequentFormula(tb.apply(updateTerm, anonPostCond)), true,
-                    false);
+                    new SequentFormula(tb.apply(updateTerm, anonPostCond)),
+                    true, false);
 
             i++;
         }
 
-        // Add goals for store equalities
-        for (Term storeEquality : storeEqualities) {
-            final Goal analysisGoal = goalArray[i];
+        final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
+                StrengthAnalysisUtilities.extractStoreEqsAndInnerHeapTerm( //
+                        services, pm, origHeapTerm);
 
-            StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal,
-                    storeEquality);
+        if (hasHeap) {
+            assert storeEqsAndInnerHeapTerm.isPresent();
 
-            final Term update = tb.parallel( //
-                    tb.elementary(tb.var(heapVar), innerHeapTerm), //
-                    updateWithoutVarsOfInterest);
+            final Term innerHeapTerm = storeEqsAndInnerHeapTerm.get().first;
+            storeEqualities = storeEqsAndInnerHeapTerm.get().second;
 
-            final List<Term> newPres = Arrays
-                    .asList(new Term[] { tb.apply(update, contract),
-                            tb.and(updateContent.keySet().stream()
-                                    .filter(lhs -> !lhs.equals(heapVar))
-                                    .map(lhs -> tb.equals(tb.var(lhs),
-                                            updateContent.get(lhs)))
-                                    .collect(Collectors.toList())) });
+            // Add goals for store equalities
+            for (Term storeEquality : storeEqualities) {
+                final Goal analysisGoal = goalArray[i];
 
-            newPres.forEach(t -> analysisGoal.addFormula(new SequentFormula(t),
-                    true, true));
+                StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal,
+                        storeEquality);
 
-            i++;
+                final Term update = tb.parallel( //
+                        tb.elementary(tb.var(heapVar), innerHeapTerm), //
+                        updateWithoutVarsOfInterest);
+
+                final List<Term> newPres = Arrays
+                        .asList(new Term[] { tb.apply(update, contract),
+                                tb.and(updateContent.keySet().stream()
+                                        .filter(lhs -> !lhs.equals(heapVar))
+                                        .map(lhs -> tb.equals(tb.var(lhs),
+                                                updateContent.get(lhs)))
+                                        .collect(Collectors.toList())) });
+
+                newPres.forEach(t -> analysisGoal
+                        .addFormula(new SequentFormula(t), true, true));
+
+                i++;
+            }
         }
 
-        goalArray[goalArray.length - 1]
-                .setBranchLabel("Postcondition satisfied");
+        // Remove SETAccumulate predicate for post condition
+        final Goal postCondGoal = goalArray[goalArray.length - 1];
+        StrengthAnalysisUtilities.addSETPredicateToAntec(postCondGoal);
+
+        postCondGoal.setBranchLabel("Postcondition satisfied");
 
         return goals;
     }

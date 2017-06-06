@@ -16,8 +16,6 @@ package de.tud.cs.se.ds.specstr.util;
 import java.util.Formatter;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import org.apache.logging.log4j.Logger;
 
@@ -27,18 +25,6 @@ import org.apache.logging.log4j.Logger;
  * @author Dominic Steinhöfel
  */
 public class Utilities {
-    /**
-     * Converts the given {@link Iterable} to a {@link Stream}.<br/>
-     * TODO is this method needed? Currently seems to be unused.
-     * 
-     * @param it
-     *            The {@link Iterable} to convert to a {@link Stream}.
-     * @return The {@link Stream} for the given {@link Iterable}.
-     */
-    public static <T> Stream<T> toStream(Iterable<T> it) {
-        return StreamSupport.stream(it.spliterator(), false);
-    }
-
     /**
      * printf-style formats the given {@link String} with the given parameter
      * {@link Object}s. The syntax of {@link Formatter} applies.

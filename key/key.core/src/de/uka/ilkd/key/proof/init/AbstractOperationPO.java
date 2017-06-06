@@ -236,7 +236,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
           // Add uninterpreted predicate
           if (isAddUninterpretedPredicate()) {
               postTerm = tb.and(postTerm,
-                      ensureUninterpretedPredicateExists(paramVars, formalParamVars, null, getUninterpretedPredicateName(), proofServices));
+                      ensureUninterpretedPredicateExists(paramVars, formalParamVars, resultVar, null, getUninterpretedPredicateName(), proofServices));
           }
 
           Term frameTerm = buildFrameClause(heaps, heapToBefore, selfVar, paramVars, proofServices);
@@ -391,8 +391,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
          // Add uninterpreted predicate
          if (isAddUninterpretedPredicate()) {
             postTerm = tb.and(postTerm,
-                              ensureUninterpretedPredicateExists(paramVars, formalParamVars, exceptionVar,
-                                                          getUninterpretedPredicateName(), proofServices));
+                              ensureUninterpretedPredicateExists(paramVars, formalParamVars, resultVar,
+                                                          exceptionVar, getUninterpretedPredicateName(), proofServices));
          }
 
          Term frameTerm = buildFrameClause(modHeaps, heapToAtPre, selfVar, paramVars, proofServices);
@@ -699,36 +699,38 @@ public abstract class AbstractOperationPO extends AbstractPO {
    /**
     * Creates {@link #uninterpretedPredicate}.
     * @param paramVars The parameters {@link ProgramVariable}s.
-    * @param formalParamVars The formal parameters {@link LocationVariable}s.
-    * @param exceptionVar The exception variable.
-    * @param name The name of the uninterpreted predicate.
+ * @param formalParamVars The formal parameters {@link LocationVariable}s.
+ * @param resultVar The result variable.
+ * @param exceptionVar The exception variable.
+ * @param name The name of the uninterpreted predicate.
     * @return The created uninterpreted predicate.
     */
    protected Term ensureUninterpretedPredicateExists(ImmutableList<ProgramVariable> paramVars,
                                                      ImmutableList<LocationVariable> formalParamVars,
+                                                     ProgramVariable resultVar,
                                                      ProgramVariable exceptionVar,
-                                                     String name,
-                                                     Services services) {
+                                                     String name, Services services) {
       // Make sure that the predicate is not already created
       if (uninterpretedPredicate != null) {
          throw new IllegalStateException("The uninterpreted predicate is already available.");
       }
-      uninterpretedPredicate = createUninterpretedPredicate(formalParamVars, tb.var(exceptionVar), name, services);
+      uninterpretedPredicate = createUninterpretedPredicate(formalParamVars, resultVar == null ? null : tb.var(resultVar), tb.var(exceptionVar), name, services);
       return uninterpretedPredicate;
    }
    
    /**
     * Creates a new uninterpreted predicate which is added to {@link #additionalUninterpretedPredicates}.
     * @param formalParamVars The formal parameters {@link LocationVariable}s.
-    * @param exceptionVar The exception variable.
-    * @param name The name of the uninterpreted predicate.
+ * @param resultVar The result variable.
+ * @param exceptionVar The exception variable.
+ * @param name The name of the uninterpreted predicate.
     * @return The created uninterpreted predicate.
     */   
    protected Term newAdditionalUninterpretedPredicate(ImmutableList<LocationVariable> formalParamVars,
+                                                      Term resultVar,
                                                       Term exceptionVar,
-                                                      String name,
-                                                      Services services) {
-      Term up = createUninterpretedPredicate(formalParamVars, exceptionVar, name, services);
+                                                      String name, Services services) {
+      Term up = createUninterpretedPredicate(formalParamVars, resultVar, exceptionVar, name, services);
       additionalUninterpretedPredicates.add(up);
       return up;
    }
@@ -737,18 +739,23 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * Creates a {@link Term} to use in the postcondition of the generated
     * {@link Sequent} which represents the uninterpreted predicate.
     * @param formalParamVars The formal parameters {@link LocationVariable}s.
-    * @param exceptionVar The exception variable.
-    * @param name The name of the uninterpreted predicate.
+ * @param resultVar TODO
+ * @param exceptionVar The exception variable.
+ * @param name The name of the uninterpreted predicate.
     * @return The created uninterpreted predicate.
     */   
    protected Term createUninterpretedPredicate(ImmutableList<LocationVariable> formalParamVars,
+                                               Term resultVar,
                                                Term exceptionVar,
-                                               String name,
-                                               Services services) {
+                                               String name, Services services) {
       // Create parameters for predicate SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
       ImmutableList<Term> arguments = ImmutableSLList.nil(); //tb.var(paramVars); // Method parameters
       for (LocationVariable formalParam : formalParamVars) {
          arguments = arguments.prepend(tb.var(formalParam));
+      }
+      if (resultVar != null) {
+          // There might not be a result variable, in the case of void methods
+          arguments = arguments.prepend(resultVar); // Result variable (As third argument for the predicate)
       }
       arguments = arguments.prepend(exceptionVar); // Exception variable (As second argument for the predicate)
       arguments = arguments.prepend(tb.getBaseHeap()); // Heap (As first argument for the predicate)
@@ -1079,20 +1086,21 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * and {@link AbstractOperationPO#isAddUninterpretedPredicate()} is {@code true}.
     * Otherwise the given {@link Term} is returned.  
     * @param services The {@link Services} which provides the {@link Proof} and its {@link ProofOblInput}.
-    * @param term The {@link Term} to modify.
-    * @param variablesToProtect {@link LocationVariable}s to protect.
-    * @param exceptionVar The exception variable to protect.
+ * @param term The {@link Term} to modify.
+ * @param variablesToProtect {@link LocationVariable}s to protect.
+ * @param resultVar The result variable to protect.
+ * @param exceptionVar The exception variable to protect.
     * @return The modified or original {@link Term}.
     */
    public static Term addAdditionalUninterpretedPredicateIfRequired(Services services, 
                                                                     Term term, 
                                                                     ImmutableList<LocationVariable> variablesToProtect,
-                                                                    Term exceptionVar) {
+                                                                    Term resultVar, Term exceptionVar) {
       ProofOblInput problem = services.getSpecificationRepository().getProofOblInput(services.getProof());
       if (problem instanceof AbstractOperationPO) {
          AbstractOperationPO operationPO = (AbstractOperationPO)problem;
          if (operationPO.isAddUninterpretedPredicate()) {
-            Term up = operationPO.newAdditionalUninterpretedPredicate(variablesToProtect, exceptionVar, operationPO.getUninterpretedPredicateName(), services);
+            Term up = operationPO.newAdditionalUninterpretedPredicate(variablesToProtect, resultVar, exceptionVar, operationPO.getUninterpretedPredicateName(), services);
             term = services.getTermBuilder().and(term, up);
          }
       }

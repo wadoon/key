@@ -258,11 +258,11 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
    @Override
    protected Term ensureUninterpretedPredicateExists(ImmutableList<ProgramVariable> paramVars,
                                               ImmutableList<LocationVariable> formalParamVars,
+                                              ProgramVariable resultVar,
                                               ProgramVariable exceptionVar,
-                                              String name,
-                                              Services proofServices) {
+                                              String name, Services proofServices) {
       ImmutableList<ProgramVariable> paramVarsList = convert(undeclaredVariableCollector.result());
-      return super.ensureUninterpretedPredicateExists(paramVarsList, formalParamVars, exceptionVar, name, proofServices);
+      return super.ensureUninterpretedPredicateExists(paramVarsList, formalParamVars, resultVar, exceptionVar, name, proofServices);
    }
 
    /**
