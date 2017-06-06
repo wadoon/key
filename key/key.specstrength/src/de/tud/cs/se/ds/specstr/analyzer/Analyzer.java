@@ -120,10 +120,6 @@ public class Analyzer {
                 .finishSEUntilLoopOrEnd(method);
         final Proof proof = seIf.proof();
 
-        // We can now close all provable goals, since those of interest have the
-        // SET predicate in the post condition and won't close anyhow
-        seIf.applyMacro(new TryCloseMacro(1000), proof.root());
-
         final List<Node> postConditionNodes = new ArrayList<>();
         final List<Fact> facts = new ArrayList<>();
 
@@ -166,6 +162,11 @@ public class Analyzer {
             // Finish symbolic execution preserved & use case goal
             final Node preservesAndUCNode = whileNode.child(1);
             seIf.finishSEForNode(preservesAndUCNode);
+
+            // TODO: If we add the SET predicate also to the analysis goals, we
+            // can apply try-close to get rid of irrelevant goals. This is about
+            // those that have "false" in the post condition, there, "false &
+            // SETAccumulate(...)" will still be false and closable.
 
             // Post condition facts. Those have to be extracted *before* the use
             // case facts, since the goals might change that are analyzed for

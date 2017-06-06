@@ -98,8 +98,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
                 StrengthAnalysisUtilities.extractStoreEqsAndInnerHeapTerm( //
                         services, pm, origHeapTerm);
-
-        final Term innerHeapTerm = storeEqsAndInnerHeapTerm.get().first;
+        
         final List<Term> storeEqualities = hasHeap
                 ? storeEqsAndInnerHeapTerm.get().second : new ArrayList<>();
 
@@ -263,6 +262,8 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         }
 
         if (hasHeap) {
+            final Term innerHeapTerm = storeEqsAndInnerHeapTerm.get().first;
+            
             // Add goals for store equalities
             for (Term storeEquality : storeEqualities) {
                 final Goal analysisGoal = goalArray[i];
