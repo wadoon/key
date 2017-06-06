@@ -120,15 +120,19 @@ public class Analyzer {
                 .finishSEUntilLoopOrEnd(method);
         final Proof proof = seIf.proof();
 
+        // We can now close all provable goals, since those of interest have the
+        // SET predicate in the post condition and won't close anyhow
+        seIf.applyMacro(new TryCloseMacro(1000), proof.root());
+
         final List<Node> postConditionNodes = new ArrayList<>();
         final List<Fact> facts = new ArrayList<>();
-        
+
         Node useCasePredecessor = proof.root();
-        
+
         if (maybeWhileGoal.isPresent()) {
             final Goal whileGoal = maybeWhileGoal.get();
             final Node whileNode = whileGoal.node();
-    
+
             // Apply loop invariant rule
             final Optional<SequentFormula> maybeWhileSeqFor = StrengthAnalysisUtilities
                     .toStream(whileGoal.node().sequent().succedent())
@@ -138,45 +142,48 @@ public class Analyzer {
                             TermBuilder.goBelowUpdates(f.formula())
                                     .javaBlock()) instanceof While)
                     .findFirst();
-    
+
             assert maybeWhileSeqFor.isPresent();
-    
+
             final SequentFormula whileSeqFor = maybeWhileSeqFor.get();
-    
+
             final PosInOccurrence whilePio = new PosInOccurrence(whileSeqFor,
                     PosInTerm.getTopLevel(), false);
-    
+
             final RuleApp loopInvRuleApp = LoopScopeInvariantRule.INSTANCE
                     .createApp(whilePio, whileGoal.proof().getServices())
                     .tryToInstantiate(whileGoal);
-    
+
             whileGoal.apply(loopInvRuleApp);
-    
+
             // Try to close first open goal ("initially valid")
             seIf.applyMacro(new TryCloseMacro(1000), whileNode.child(0));
-    
+
             if (!whileNode.child(0).isClosed()) {
                 logger.warn("The loop's invariant is not initially valid");
             }
-    
+
             // Finish symbolic execution preserved & use case goal
             final Node preservesAndUCNode = whileNode.child(1);
             seIf.finishSEForNode(preservesAndUCNode);
-    
-            // Post condition facts
+
+            // Post condition facts. Those have to be extracted *before* the use
+            // case facts, since the goals might change that are analyzed for
+            // the use case
             extractPostCondFacts(proof, facts);
-    
+
             // Find "preserves" and "use case" branches
             final List<Node> preservedNodes = new ArrayList<>();
-    
+
             extractPreservedAndUseCaseNodes(proof, preservesAndUCNode,
                     preservedNodes, postConditionNodes);
-    
+
             // Loop facts
             extractLoopBodyFactsAndShowValidity( //
                     proof, preservedNodes, facts);
-            extractUseCaseFacts(proof, useCasePredecessor, postConditionNodes, facts);
-            
+            extractUseCaseFacts(proof, useCasePredecessor, postConditionNodes,
+                    facts);
+
             useCasePredecessor = preservesAndUCNode;
         } else {
             // Post condition facts
@@ -367,13 +374,13 @@ public class Analyzer {
             Sequent originSeq, Services services) {
         final List<SequentFormula> newAntec = StrengthAnalysisUtilities
                 .toStream(factSeq.antecedent()).collect(Collectors.toList());
-        newAntec.removeAll(StrengthAnalysisUtilities.toStream(originSeq.antecedent())
-                .collect(Collectors.toList()));
+        newAntec.removeAll(StrengthAnalysisUtilities
+                .toStream(originSeq.antecedent()).collect(Collectors.toList()));
 
         final List<SequentFormula> newSucc = StrengthAnalysisUtilities
                 .toStream(factSeq.succedent()).collect(Collectors.toList());
-        newSucc.removeAll(StrengthAnalysisUtilities.toStream(originSeq.succedent())
-                .collect(Collectors.toList()));
+        newSucc.removeAll(StrengthAnalysisUtilities
+                .toStream(originSeq.succedent()).collect(Collectors.toList()));
 
         Sequent newSequent = Sequent.EMPTY_SEQUENT;
         for (SequentFormula antecF : newAntec) {

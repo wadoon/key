@@ -321,8 +321,11 @@ public class StrengthAnalysisUtilities {
                             v.getSetPredTerm());
                 }).filter(p -> p.second != null).findAny();
 
-        assert maybeSETPredicate
-                .isPresent() : "Expected an SETAccumulate predicate";
+        if (!maybeSETPredicate.isPresent()) {
+            // There are easy goals where the post condition is just "false", so
+            // that should be OK
+            return;
+        }
 
         Term newFormula = maybeSETPredicate.get().second;
         final Term seqFor = maybeSETPredicate.get().first.formula();
@@ -372,6 +375,19 @@ public class StrengthAnalysisUtilities {
         public Term getSetPredTerm() {
             return setPredTerm;
         }
+    }
+
+    /**
+     * TODO
+     * 
+     * @param node
+     * @return
+     */
+    public static List<Node> extractOpenNodesWithModality(Node node) {
+        return toStream(node.proof().getSubtreeGoals(node)).map(g -> g.node())
+                .filter(n -> toStream(n.sequent().succedent()).anyMatch(
+                        f -> f.formula().containsJavaBlockRecursive()))
+                .collect(Collectors.toList());
     }
 
 }

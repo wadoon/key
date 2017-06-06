@@ -17,10 +17,12 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import de.tud.cs.se.ds.specstr.analyzer.FindMethodsTest;
+import de.tud.cs.se.ds.specstr.analyzer.LoopFreeTest;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    FindMethodsTest.class
+    FindMethodsTest.class,
+    LoopFreeTest.class,
 })
 
 /**

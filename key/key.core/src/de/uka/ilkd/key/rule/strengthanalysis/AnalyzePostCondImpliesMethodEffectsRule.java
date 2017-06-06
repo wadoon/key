@@ -94,7 +94,14 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         final Term origHeapTerm = MergeRuleUtils
                 .getUpdateRightSideFor(updateTerm, heapVar);
         final boolean hasHeap = origHeapTerm != null;
-        List<Term> storeEqualities = new ArrayList<>();
+
+        final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
+                StrengthAnalysisUtilities.extractStoreEqsAndInnerHeapTerm( //
+                        services, pm, origHeapTerm);
+
+        final Term innerHeapTerm = storeEqsAndInnerHeapTerm.get().first;
+        final List<Term> storeEqualities = hasHeap
+                ? storeEqsAndInnerHeapTerm.get().second : new ArrayList<>();
 
         // We have to look the variable up from the current namespaces, since
         // otherwise we will obtain a different object...
@@ -255,16 +262,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
             i++;
         }
 
-        final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
-                StrengthAnalysisUtilities.extractStoreEqsAndInnerHeapTerm( //
-                        services, pm, origHeapTerm);
-
         if (hasHeap) {
-            assert storeEqsAndInnerHeapTerm.isPresent();
-
-            final Term innerHeapTerm = storeEqsAndInnerHeapTerm.get().first;
-            storeEqualities = storeEqsAndInnerHeapTerm.get().second;
-
             // Add goals for store equalities
             for (Term storeEquality : storeEqualities) {
                 final Goal analysisGoal = goalArray[i];

@@ -14,6 +14,7 @@
 package de.tud.cs.se.ds.specstr.analyzer;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -120,7 +121,7 @@ public class SymbExInterface {
         if (proof != null) {
             return;
         }
-        
+
         final ImmutableSet<Contract> contracts = env
                 .getSpecificationRepository()
                 .getContracts(pm.getContainerType(), pm);
@@ -142,7 +143,7 @@ public class SymbExInterface {
                     new FunctionalOperationContractPO( //
                             env.getInitConfig(), //
                             (FunctionalOperationContract) contract, //
-                            true,  // add uninterpreted predicate
+                            true, // add uninterpreted predicate
                             true); // add symbolic execution label
 
             proof = env.createProof(po);
@@ -167,8 +168,10 @@ public class SymbExInterface {
         // env.getUi().getProofControl().startAndWaitForAutoMode(proof);
         finishSEForNode(proof.root());
 
-        final List<Goal> whileLoopGoals = StrengthAnalysisUtilities.toStream(proof.openGoals())
-                .filter(g -> StrengthAnalysisUtilities.toStream(g.node().sequent().succedent())
+        final List<Goal> whileLoopGoals = StrengthAnalysisUtilities
+                .toStream(proof.openGoals())
+                .filter(g -> StrengthAnalysisUtilities
+                        .toStream(g.node().sequent().succedent())
                         .filter(f -> SymbolicExecutionUtil
                                 .hasSymbolicExecutionLabel(f.formula()))
                         .filter(f -> JavaTools.getActiveStatement(
@@ -196,16 +199,15 @@ public class SymbExInterface {
      */
     public void finishSEForNode(Node node) {
         List<Node> openNodesWithModality;
+        List<Node> lastNodesWithModality = new ArrayList<>();
         while (!(openNodesWithModality = StrengthAnalysisUtilities
-                .toStream(node.proof().getSubtreeGoals(node)).map(g -> g.node())
-                .filter(n -> StrengthAnalysisUtilities.toStream(n.sequent().succedent())
-                        .anyMatch(
-                                f -> f.formula().containsJavaBlockRecursive()))
-                .collect(Collectors.toList())).isEmpty()) {
+                .extractOpenNodesWithModality(node)).isEmpty()
+                && !openNodesWithModality.equals(lastNodesWithModality)) {
             openNodesWithModality.forEach(
                     n -> applyMacro(new FinishSymbolicExecutionMacro(), n));
+
+            lastNodesWithModality = new ArrayList<>(openNodesWithModality);
         }
-        ;
     }
 
     /**
