@@ -37,4 +37,45 @@ public class LoopFreeTest extends AbstractAnalyzerTest {
         assertEquals(2, result.numUncoveredFacts());
     }
 
+    @Test
+    public void testAbsStronger1() {
+        // Here, the post condition is "\result >= 0".
+        // This is a case where we could apply the generalization...
+        final AnalyzerResult result = analyzeMethod( //
+                "loopFree/SimpleMath.java", //
+                "SimpleMath::abs_stronger_1(I)I");
+
+        assertEquals(2, result.getUncoveredFactsOfType(POST_COND_FACT).size());
+        assertEquals(2, result.numUncoveredFacts());
+    }
+
+    @Test
+    public void testAbsStronger2() {
+        final AnalyzerResult result = analyzeMethod( //
+                "loopFree/SimpleMath.java", //
+                "SimpleMath::abs_stronger_2(I)I");
+
+        assertEquals(1, result.getUncoveredFactsOfType(POST_COND_FACT).size());
+        assertEquals(1, result.numUncoveredFacts());
+    }
+
+    @Test
+    public void testAbsStronger3() {
+        final AnalyzerResult result = analyzeMethod( //
+                "loopFree/SimpleMath.java", //
+                "SimpleMath::abs_stronger_3(I)I");
+
+        assertEquals(1, result.getUncoveredFactsOfType(POST_COND_FACT).size());
+        assertEquals(1, result.numUncoveredFacts());
+    }
+
+    @Test
+    public void testAbsStrongest() {
+        final AnalyzerResult result = analyzeMethod( //
+                "loopFree/SimpleMath.java", //
+                "SimpleMath::abs_strongest(I)I");
+
+        assertEquals(0, result.numUncoveredFacts());
+    }
+
 }
