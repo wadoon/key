@@ -165,7 +165,7 @@ public class SymbExInterface {
 
         // Start auto mode
         // env.getUi().getProofControl().startAndWaitForAutoMode(proof);
-        applyMacro(new FinishSymbolicExecutionMacro(), proof.root());
+        finishSEForNode(proof.root());
 
         final List<Goal> whileLoopGoals = StrengthAnalysisUtilities.toStream(proof.openGoals())
                 .filter(g -> StrengthAnalysisUtilities.toStream(g.node().sequent().succedent())
