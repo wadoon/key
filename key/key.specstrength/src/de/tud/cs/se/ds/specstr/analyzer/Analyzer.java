@@ -175,11 +175,13 @@ public class Analyzer {
             // Loop facts
             extractLoopBodyFactsAndShowValidity( //
                     proof, preservedNodes, facts);
+            extractUseCaseFacts(proof, useCasePredecessor, postConditionNodes, facts);
             
             useCasePredecessor = preservesAndUCNode;
+        } else {
+            // Post condition facts
+            extractPostCondFacts(proof, facts);
         }
-        
-        extractUseCaseFacts(proof, useCasePredecessor, postConditionNodes, facts);
 
         logger.info("Collected %s facts", facts.size());
 
