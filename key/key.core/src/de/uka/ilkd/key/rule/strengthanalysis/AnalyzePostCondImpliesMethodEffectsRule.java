@@ -36,6 +36,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -98,7 +99,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
                 StrengthAnalysisUtilities.extractStoreEqsAndInnerHeapTerm( //
                         services, pm, origHeapTerm);
-        
+
         final List<Term> storeEqualities = hasHeap
                 ? storeEqsAndInnerHeapTerm.get().second : new ArrayList<>();
 
@@ -263,7 +264,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
 
         if (hasHeap) {
             final Term innerHeapTerm = storeEqsAndInnerHeapTerm.get().first;
-            
+
             // Add goals for store equalities
             for (Term storeEquality : storeEqualities) {
                 final Goal analysisGoal = goalArray[i];
@@ -321,9 +322,13 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         Optional<LocationVariable> lsi = null;
         Term f = null;
 
+        // We exclude facts for sequents of type "\Gamma ==> \Delta, {U}false",
+        // those are irrelevant for us.
+
         return pio != null && pio.isTopLevel() && !pio.isInAntec()
                 && !(f = pio.subTerm()).containsJavaBlockRecursive()
                 && f.op() instanceof UpdateApplication
+                && !TermBuilder.goBelowUpdates(f).op().equals(Junctor.FALSE)
                 && (!(lsi = StrengthAnalysisUtilities.retrieveLoopScopeIndex(
                         pio, goal.proof().getServices())).isPresent()
                         || MergeRuleUtils
