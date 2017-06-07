@@ -95,9 +95,10 @@ import de.uka.ilkd.key.speclang.HeapContext;
  * @author Martin Hentschel
  */
 public abstract class AbstractOperationPO extends AbstractPO {
-   private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
+  public static final String UNINTERPRETED_PREDICATE_NAME = "SETAccumulate";
+  private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
 
-/**
+  /**
     * If this is {@code true} an uninterpreted predicate is added to the
     * postconditions which contains the heap and all parameters as arguments.
     * @see #buildUninterpretedPredicate(ImmutableList, String)
@@ -693,7 +694,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @return The name of the uninterpreted predicate.
     */
    protected String getUninterpretedPredicateName() {
-      return "SETAccumulate";
+      return UNINTERPRETED_PREDICATE_NAME;
    }
 
    /**

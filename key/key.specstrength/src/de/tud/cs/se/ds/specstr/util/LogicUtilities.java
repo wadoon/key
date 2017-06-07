@@ -43,6 +43,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
@@ -159,14 +160,12 @@ public class LogicUtilities {
                 || updateTarget.sub(1).op() != Junctor.IMP
                 || updateTarget.sub(0).sub(0).op() != Equality.EQUALS
                 || updateTarget.sub(1).sub(0).op() != Junctor.NOT
-                || updateTarget.sub(1).sub(0).sub(0)
-                        .op() != Equality.EQUALS) {
+                || updateTarget.sub(1).sub(0).sub(0).op() != Equality.EQUALS) {
             return failedResult;
         }
 
         final Term loopScopeVar = updateTarget.sub(0).sub(0).sub(0);
-        final Term negatedLoopScopeVar = updateTarget.sub(0).sub(0)
-                .sub(0);
+        final Term negatedLoopScopeVar = updateTarget.sub(0).sub(0).sub(0);
 
         if (!(loopScopeVar.op() instanceof LocationVariable)
                 || !loopScopeVar.hasLabels()
@@ -278,9 +277,11 @@ public class LogicUtilities {
      * @return
      */
     public static List<Node> extractOpenNodesWithModality(Node node) {
-        return GeneralUtilities.toStream(node.proof().getSubtreeGoals(node)).map(g -> g.node())
-                .filter(n -> GeneralUtilities.toStream(n.sequent().succedent()).anyMatch(
-                        f -> f.formula().containsJavaBlockRecursive()))
+        return GeneralUtilities.toStream(node.proof().getSubtreeGoals(node))
+                .map(g -> g.node())
+                .filter(n -> GeneralUtilities.toStream(n.sequent().succedent())
+                        .anyMatch(
+                                f -> f.formula().containsJavaBlockRecursive()))
                 .collect(Collectors.toList());
     }
 
@@ -318,12 +319,13 @@ public class LogicUtilities {
      */
     public static void addSETPredicateToAntec(final Goal goal) {
         final Optional<Pair<SequentFormula, Term>> maybeSETPredicate = //
-                GeneralUtilities.toStream(goal.sequent().succedent()).map(sf -> {
-                    SETPredVisitor v = new SETPredVisitor();
-                    sf.formula().execPostOrder(v);
-                    return new Pair<SequentFormula, Term>(sf,
-                            v.getSetPredTerm());
-                }).filter(p -> p.second != null).findAny();
+                GeneralUtilities.toStream(goal.sequent().succedent())
+                        .map(sf -> {
+                            SETPredVisitor v = new SETPredVisitor();
+                            sf.formula().execPostOrder(v);
+                            return new Pair<SequentFormula, Term>(sf,
+                                    v.getSetPredTerm());
+                        }).filter(p -> p.second != null).findAny();
 
         if (!maybeSETPredicate.isPresent()) {
             // There are easy goals where the post condition is just "false", so
@@ -366,7 +368,7 @@ public class LogicUtilities {
     }
 
     public static class SETPredVisitor extends DefaultVisitor {
-        private static final String SET_ACCUMULATE = "SETAccumulate";
+        private static final String SET_ACCUMULATE = AbstractOperationPO.UNINTERPRETED_PREDICATE_NAME;
         private Term setPredTerm = null;
 
         @Override
