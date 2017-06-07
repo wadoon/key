@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.strengthanalysis;
+package de.tud.cs.se.ds.specstr.rule;
 
 import java.util.List;
 import java.util.Optional;

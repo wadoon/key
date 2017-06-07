@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.proof.io;
 
-import static de.uka.ilkd.key.proof.io.IProofFileParser.ProofElementID;
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
@@ -24,7 +22,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
-import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMapEntry;
@@ -42,7 +39,6 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -55,6 +51,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.IPersistablePO;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.io.IProofFileParser.ProofElementID;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationBySpec;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
@@ -73,7 +70,6 @@ import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithLatticeAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
-import de.uka.ilkd.key.rule.strengthanalysis.AnalyzeInvImpliesLoopEffectsRuleApp;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -388,27 +384,6 @@ public class OutputStreamProofSaver {
                         (RuleJustificationBySpec) ruleJusti;
                 tree.append(" (contract \"");
                 tree.append(ruleJustiBySpec.getSpec().getName());
-                tree.append("\")");
-            }
-            
-            if (appliedRuleApp instanceof AnalyzeInvImpliesLoopEffectsRuleApp) {
-                AnalyzeInvImpliesLoopEffectsRuleApp analyzeEffectsApp = //
-                        (AnalyzeInvImpliesLoopEffectsRuleApp) appliedRuleApp;
-                tree.append(" (")
-                        .append(ProofElementID.INV_TERM.getRawName())
-                        .append(" \"");
-                tree.append(escapeCharacters(
-                        printAnything(analyzeEffectsApp.getInvTerm(),
-                                proof.getServices(), false).toString().trim()
-                                        .replaceAll("(\\r|\\n|\\r\\n)+", "")));
-                tree.append("\")");
-                
-                tree.append(" (")
-                        .append(ProofElementID.LOCAL_OUTS.getRawName())
-                        .append(" \"");
-                tree.append(analyzeEffectsApp.getLocalOuts().stream()
-                        .map(LocationVariable::toString)
-                        .collect(Collectors.joining(",")));
                 tree.append("\")");
             }
 

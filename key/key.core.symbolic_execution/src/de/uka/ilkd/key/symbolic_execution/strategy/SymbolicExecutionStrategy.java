@@ -67,7 +67,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
     * @param proof The proof.
     * @param sp The {@link StrategyProperties} to use.
     */
-   private SymbolicExecutionStrategy(Proof proof, StrategyProperties sp) {
+   protected SymbolicExecutionStrategy(Proof proof, StrategyProperties sp) {
       super(proof, sp);
       // Update cost dispatcher
       RuleSetDispatchFeature costRsd = getCostComputationDispatcher();

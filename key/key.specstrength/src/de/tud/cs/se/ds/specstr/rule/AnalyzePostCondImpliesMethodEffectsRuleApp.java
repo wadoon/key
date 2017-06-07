@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.strengthanalysis;
+package de.tud.cs.se.ds.specstr.rule;
 
 import org.key_project.util.collection.ImmutableList;
 

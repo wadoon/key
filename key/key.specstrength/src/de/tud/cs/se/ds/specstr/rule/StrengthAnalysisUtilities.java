@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.strengthanalysis;
+package de.tud.cs.se.ds.specstr.rule;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -153,17 +153,21 @@ public class StrengthAnalysisUtilities {
         
         // @formatter:on
 
-        if (formula.sub(1).op() != Junctor.AND
-                || formula.sub(1).sub(0).op() != Junctor.IMP
-                || formula.sub(1).sub(1).op() != Junctor.IMP
-                || formula.sub(1).sub(0).sub(0).op() != Equality.EQUALS
-                || formula.sub(1).sub(1).sub(0).op() != Junctor.NOT || formula
-                        .sub(1).sub(1).sub(0).sub(0).op() != Equality.EQUALS) {
+        final Term updateTarget = formula.sub(1);
+
+        if (updateTarget.op() != Junctor.AND
+                || updateTarget.sub(0).op() != Junctor.IMP
+                || updateTarget.sub(1).op() != Junctor.IMP
+                || updateTarget.sub(0).sub(0).op() != Equality.EQUALS
+                || updateTarget.sub(1).sub(0).op() != Junctor.NOT
+                || updateTarget.sub(1).sub(0).sub(0)
+                        .op() != Equality.EQUALS) {
             return failedResult;
         }
 
-        final Term loopScopeVar = formula.sub(1).sub(0).sub(0).sub(0);
-        final Term negatedLoopScopeVar = formula.sub(1).sub(0).sub(0).sub(0);
+        final Term loopScopeVar = updateTarget.sub(0).sub(0).sub(0);
+        final Term negatedLoopScopeVar = updateTarget.sub(0).sub(0)
+                .sub(0);
 
         if (!(loopScopeVar.op() instanceof LocationVariable)
                 || !loopScopeVar.hasLabels()

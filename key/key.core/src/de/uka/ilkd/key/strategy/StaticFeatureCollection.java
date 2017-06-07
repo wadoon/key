@@ -12,8 +12,6 @@ import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.rule.strengthanalysis.AnalyzeInvImpliesLoopEffectsRule;
-import de.uka.ilkd.key.rule.strengthanalysis.AnalyzePostCondImpliesMethodEffectsRule;
 import de.uka.ilkd.key.strategy.feature.ApplyTFFeature;
 import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
 import de.uka.ilkd.key.strategy.feature.CompareCostsFeature;
@@ -94,13 +92,6 @@ public class StaticFeatureCollection {
         filter.addRuleToSet(MergeRule.INSTANCE);
         return ConditionalFeature.createConditional(filter,
                 SumFeature.createSum(cost, MergeRuleFeature.INSTANCE));
-    }
-
-    protected static Feature strengthAnalysisFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(AnalyzeInvImpliesLoopEffectsRule.INSTANCE);
-        filter.addRuleToSet(AnalyzePostCondImpliesMethodEffectsRule.INSTANCE);
-        return ConditionalFeature.createConditional(filter, cost);
     }
 
     protected static Feature sequentContainsNoPrograms() {

@@ -23,6 +23,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.tud.cs.se.ds.specstr.profile.StrengthAnalysisSEProfile;
+import de.tud.cs.se.ds.specstr.rule.StrengthAnalysisUtilities;
+import de.tud.cs.se.ds.specstr.strategy.StrengthAnalysisStrategy;
 import de.tud.cs.se.ds.specstr.util.InformationExtraction;
 import de.tud.cs.se.ds.specstr.util.Utilities;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -45,12 +48,11 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.rule.strengthanalysis.StrengthAnalysisUtilities;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
+import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -81,7 +83,8 @@ public class SymbExInterface {
         env = KeYEnvironment.load(
 //                JavaProfile.getDefaultInstance(),
 //                SymbolicExecutionJavaProfile.getDefaultInstance(),
-                SymbolicExecutionJavaProfile.getDefaultInstance(true),
+//                SymbolicExecutionJavaProfile.getDefaultInstance(true),
+                StrengthAnalysisSEProfile.INSTANCE,
                 file,     // location
                 null,     // class path
                 null,     // boot class path
@@ -279,8 +282,8 @@ public class SymbExInterface {
         ProofSettings.DEFAULT_SETTINGS.getStrategySettings()
                 .setActiveStrategyProperties(sp);
         proof.getSettings().getStrategySettings().setMaxSteps(maxSteps);
-        proof.setActiveStrategy(proof.getServices().getProfile()
-                .getDefaultStrategyFactory().create(proof, sp));
+        proof.setActiveStrategy(
+                new StrengthAnalysisStrategy.Factory().create(proof, sp));
     }
 
     /**
