@@ -23,7 +23,9 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.init.AbstractProfile;
 
 /**
@@ -35,6 +37,8 @@ public class CNFConverterTest {
     private CNFConverter conv;
     private TermBuilder tb;
     private Services services;
+
+    private final Sort s = new SortImpl(new Name("S"));
 
     @Before
     public void setUp() throws Exception {
@@ -52,7 +56,7 @@ public class CNFConverterTest {
         final Term input = tb.and(tb.imp(p, q), tb.or(tb.equals(p, q), p));
 
         // (!p || q) && (((!p || q) && (!q || p)) || p)
-        final Term output = tb.and( //
+        final Term expected = tb.and( //
                 tb.or(tb.not(p), q), //
                 tb.or( //
                         tb.and( //
@@ -62,7 +66,43 @@ public class CNFConverterTest {
 
         final Term result = conv.eliminateBiImplications(input);
 
-        assertEquals(output, result);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    public void testPushNegationInvards() {
+        final Term p = predicate("p");
+        final LogicVariable x = qv("x");
+        final LogicVariable y = qv("y");
+        final Term xT = tb.var(x);
+        final Term yT = tb.var(y);
+
+        // !(\forall x; (x != y && (!!p || (\exists y; x == y))))
+        final Term input = //
+                tb.not( //
+                        tb.all(x,
+                                tb.and( //
+                                        tb.not(tb.equals(xT, yT)), //
+                                        tb.or( //
+                                                tb.not(tb.not(p)),
+                                                tb.ex(y, tb.equals(xT, yT))))));
+
+        // (\exists x; (x == y || (p && (\forall y; x != y))))
+        final Term expected = //
+                tb.ex(x, tb.or( //
+                        tb.equals(xT, yT), //
+                        tb.and( //
+                                tb.not(p), //
+                                tb.all(y, tb.not( //
+                                        tb.equals(xT, yT))))));
+
+        final Term result = conv.pushNegationsInvards(input);
+
+        assertEquals(expected, result);
+    }
+
+    private LogicVariable qv(String name) {
+        return new LogicVariable(new Name(name), s);
     }
 
     private Term predicate(String name) {
