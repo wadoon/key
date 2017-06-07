@@ -25,9 +25,9 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.tud.cs.se.ds.specstr.profile.StrengthAnalysisSEProfile;
 import de.tud.cs.se.ds.specstr.strategy.StrengthAnalysisStrategy;
+import de.tud.cs.se.ds.specstr.util.GeneralUtilities;
 import de.tud.cs.se.ds.specstr.util.JavaTypeInterface;
 import de.tud.cs.se.ds.specstr.util.LogicUtilities;
-import de.tud.cs.se.ds.specstr.util.GeneralUtilities;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.JavaTools;
@@ -52,7 +52,6 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
