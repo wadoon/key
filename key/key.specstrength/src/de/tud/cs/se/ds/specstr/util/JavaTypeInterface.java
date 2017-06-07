@@ -29,7 +29,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
  *
  * @author Dominic Steinhöfel
  */
-public class InformationExtraction {
+public class JavaTypeInterface {
 
     /**
      * Retrieves all {@link KeYJavaType}s declared in the given

@@ -23,6 +23,7 @@ import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.tud.cs.se.ds.specstr.util.LogicUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -96,13 +97,13 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
 
         // Retrieve store equalities
         final FunctionalOperationContract fContract = //
-                StrengthAnalysisUtilities.getFOContract(services);
+                LogicUtilities.getFOContract(services);
         final IProgramMethod pm = fContract.getTarget();
         final Term origHeapTerm = MergeRuleUtils
                 .getUpdateRightSideFor(updateTerm, heapVar);
 
         final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
-                StrengthAnalysisUtilities.extractStoreEqsAndInnerHeapTerm( //
+                LogicUtilities.extractStoreEqsAndInnerHeapTerm( //
                         services, pm, origHeapTerm);
 
         final List<Term> storeEqualities = storeEqsAndInnerHeapTerm.isPresent()
@@ -145,7 +146,7 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
             final Term currAnalysisTerm = tb.equals(tb.var(currLocalOut),
                     updateContent.get(currLocalOut));
 
-            StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal,
+            LogicUtilities.prepareGoal(pio, analysisGoal,
                     currAnalysisTerm);
 
             for (Term newAntecTerm : newGoalInformation.get(currLocalOut)) {
@@ -158,7 +159,7 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
             for (Term heapEquality : storeEqualities) {
                 final Goal analysisGoal = goalArray[i++];
 
-                StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal,
+                LogicUtilities.prepareGoal(pio, analysisGoal,
                         heapEquality);
 
                 final Term update = updateWithoutLocalOuts;
@@ -179,7 +180,7 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
             }
         }
 
-        StrengthAnalysisUtilities
+        LogicUtilities
                 .addSETPredicateToAntec(goalArray[goalArray.length - 1]);
         goalArray[goalArray.length - 1].setBranchLabel("Invariant preserved");
 
@@ -212,7 +213,7 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
         final Services services = goal.proof().getServices();
 
         Optional<LocationVariable> lsi = null;
-        return (lsi = StrengthAnalysisUtilities.retrieveLoopScopeIndex(pio,
+        return (lsi = LogicUtilities.retrieveLoopScopeIndex(pio,
                 services)).isPresent()
                 && MergeRuleUtils
                         .getUpdateRightSideFor(pio.subTerm().sub(0), lsi.get())

@@ -20,6 +20,7 @@ import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.tud.cs.se.ds.specstr.util.LogicUtilities;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.While;
@@ -84,7 +85,7 @@ public class AnalyzeInvImpliesLoopEffectsRuleApp
         LocationVariable loopScopeIdxVar = null;
 
         for (SequentFormula sf : goal.node().sequent().succedent()) {
-            Optional<LocationVariable> maybeIdxVar = StrengthAnalysisUtilities
+            Optional<LocationVariable> maybeIdxVar = LogicUtilities
                     .retrieveLoopScopeIndex(new PosInOccurrence(sf,
                             PosInTerm.getTopLevel(), false), services);
 

@@ -25,7 +25,7 @@ import org.junit.Before;
 import org.key_project.util.java.IOUtil;
 
 import de.tud.cs.se.ds.specstr.analyzer.Analyzer.AnalyzerResult;
-import de.tud.cs.se.ds.specstr.util.Utilities;
+import de.tud.cs.se.ds.specstr.util.GeneralUtilities;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
@@ -49,7 +49,7 @@ public abstract class AbstractAnalyzerTest {
 
         if (!TMP_DIR.exists()) {
             if (!TMP_DIR.mkdirs()) {
-                Utilities.logErrorAndThrowRTE(logger,
+                GeneralUtilities.logErrorAndThrowRTE(logger,
                         "Could not create temporary directory %s",
                         TMP_DIR.getAbsolutePath());
             }

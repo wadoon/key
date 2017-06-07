@@ -30,9 +30,8 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.tud.cs.se.ds.specstr.rule.AnalyzeInvImpliesLoopEffectsRule;
 import de.tud.cs.se.ds.specstr.rule.AnalyzePostCondImpliesMethodEffectsRule;
-import de.tud.cs.se.ds.specstr.rule.StrengthAnalysisUtilities;
-import de.tud.cs.se.ds.specstr.util.InformationExtraction;
-import de.tud.cs.se.ds.specstr.util.Utilities;
+import de.tud.cs.se.ds.specstr.util.JavaTypeInterface;
+import de.tud.cs.se.ds.specstr.util.GeneralUtilities;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -86,7 +85,7 @@ public class Analyzer {
     public Analyzer(File file, String method, Optional<File> outProofFile) {
         this.file = file;
         if (!parseMethodString(method)) {
-            final String errorMsg = Utilities
+            final String errorMsg = GeneralUtilities
                     .format("Error in parsing method descriptor %s", method);
             logger.error(errorMsg);
             throw new RuntimeException(errorMsg);
@@ -95,7 +94,7 @@ public class Analyzer {
         try {
             this.seIf = new SymbExInterface(file);
         } catch (ProblemLoaderException e) {
-            Utilities.logErrorAndThrowRTE(logger,
+            GeneralUtilities.logErrorAndThrowRTE(logger,
                     "ProblemLoaderException occurred while loading file %s\nMessage:\n%s",
                     file.getName(), e.getMessage());
         }
@@ -130,7 +129,7 @@ public class Analyzer {
             final Node whileNode = whileGoal.node();
 
             // Apply loop invariant rule
-            final Optional<SequentFormula> maybeWhileSeqFor = StrengthAnalysisUtilities
+            final Optional<SequentFormula> maybeWhileSeqFor = GeneralUtilities
                     .toStream(whileGoal.node().sequent().succedent())
                     .filter(f -> SymbolicExecutionUtil
                             .hasSymbolicExecutionLabel(f.formula()))
@@ -246,7 +245,7 @@ public class Analyzer {
 
         useCaseNodes.stream().map(n -> new Pair<Node, List<SequentFormula>>( //
                 n, //
-                StrengthAnalysisUtilities.toStream(n.sequent()).filter(
+                GeneralUtilities.toStream(n.sequent()).filter(
                         f -> f.formula().op() instanceof UpdateApplication)
                         .collect(Collectors.toList())))
                 .filter(p -> !p.second.isEmpty()) //
@@ -269,7 +268,7 @@ public class Analyzer {
 
                     if (!proof.isGoal(p.first)) {
                         obsoleteUseCaseNodes.add(p.first);
-                        newUseCaseNodes.addAll(StrengthAnalysisUtilities
+                        newUseCaseNodes.addAll(GeneralUtilities
                                 .toStream(proof.getSubtreeGoals(p.first))
                                 .map(g -> g.node())
                                 .collect(Collectors.toList()));
@@ -373,14 +372,14 @@ public class Analyzer {
      */
     private static String polishFactDescription(Sequent factSeq,
             Sequent originSeq, Services services) {
-        final List<SequentFormula> newAntec = StrengthAnalysisUtilities
+        final List<SequentFormula> newAntec = GeneralUtilities
                 .toStream(factSeq.antecedent()).collect(Collectors.toList());
-        newAntec.removeAll(StrengthAnalysisUtilities
+        newAntec.removeAll(GeneralUtilities
                 .toStream(originSeq.antecedent()).collect(Collectors.toList()));
 
-        final List<SequentFormula> newSucc = StrengthAnalysisUtilities
+        final List<SequentFormula> newSucc = GeneralUtilities
                 .toStream(factSeq.succedent()).collect(Collectors.toList());
-        newSucc.removeAll(StrengthAnalysisUtilities
+        newSucc.removeAll(GeneralUtilities
                 .toStream(originSeq.succedent()).collect(Collectors.toList()));
 
         Sequent newSequent = Sequent.EMPTY_SEQUENT;
@@ -444,7 +443,7 @@ public class Analyzer {
                 continue;
             }
 
-            Optional<Term> rhs = StrengthAnalysisUtilities
+            Optional<Term> rhs = GeneralUtilities
                     .toStream(g.node().sequent().succedent())
                     .map(sf -> sf.formula())
                     .filter(f -> f.op() instanceof UpdateApplication).map(f -> {
@@ -463,7 +462,7 @@ public class Analyzer {
                 } else if (op == services.getTermBuilder().FALSE().op()) {
                     preservedNodes.add(g.node());
                 } else {
-                    Utilities.logErrorAndThrowRTE(logger,
+                    GeneralUtilities.logErrorAndThrowRTE(logger,
                             "Unexpected (not simplified?) value for loop scope index %s in goal %s: %s",
                             loopScopeIndex, g.node().serialNr(), rhs);
                 }
@@ -580,7 +579,7 @@ public class Analyzer {
                 .collect(Collectors.toList());
 
         if (matchingClassDecls.isEmpty()) {
-            final String errorMsg = Utilities.format(
+            final String errorMsg = GeneralUtilities.format(
                     "Could not find type %s in class %s", className,
                     file.getName());
             logger.error(errorMsg);
@@ -590,17 +589,17 @@ public class Analyzer {
         assert declaredTypes
                 .size() == 1 : "There should be only one type of a given name";
 
-        final List<ProgramMethod> matchingMethods = StrengthAnalysisUtilities
+        final List<ProgramMethod> matchingMethods = GeneralUtilities
                 .toStream(matchingClassDecls.get(0).getMembers())
                 .filter(m -> m instanceof ProgramMethod)
                 .map(m -> (ProgramMethod) m)
                 .filter(m -> m.getName().equals(methodName))
-                .filter(m -> InformationExtraction.getMethodTypeDescriptor(m)
+                .filter(m -> JavaTypeInterface.getMethodTypeDescriptor(m)
                         .equals(methodTypeStr))
                 .collect(Collectors.toList());
 
         if (matchingMethods.isEmpty()) {
-            final String errorMsg = Utilities.format(
+            final String errorMsg = GeneralUtilities.format(
                     "Could not find method %s%s in class %s", methodName,
                     methodTypeStr, className);
             logger.error(errorMsg);
@@ -744,7 +743,7 @@ public class Analyzer {
             case POST_COND_INV_FACT:
                 return "Post condition (WP) implies invariant fact";
             default:
-                Utilities.logErrorAndThrowRTE( //
+                GeneralUtilities.logErrorAndThrowRTE( //
                         logger, "Unknown fact type: %s", ft);
                 return null;
             }

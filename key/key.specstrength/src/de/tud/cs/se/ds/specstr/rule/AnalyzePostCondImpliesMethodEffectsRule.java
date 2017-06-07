@@ -25,7 +25,8 @@ import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.ImmutableList;
 
-import de.tud.cs.se.ds.specstr.rule.StrengthAnalysisUtilities.OriginOfFormula;
+import de.tud.cs.se.ds.specstr.util.LogicUtilities;
+import de.tud.cs.se.ds.specstr.util.LogicUtilities.OriginOfFormula;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -78,7 +79,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         final LocationVariable heapVar = heapLDT.getHeap();
 
         final FunctionalOperationContract fContract = //
-                StrengthAnalysisUtilities.getFOContract(services);
+                LogicUtilities.getFOContract(services);
 
         // Note: That's a very hackish way of retrieving the post condition, but
         // I did not find a clean one to get it with the correct variable
@@ -97,7 +98,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         final boolean hasHeap = origHeapTerm != null;
 
         final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
-                StrengthAnalysisUtilities.extractStoreEqsAndInnerHeapTerm( //
+                LogicUtilities.extractStoreEqsAndInnerHeapTerm( //
                         services, pm, origHeapTerm);
 
         final List<Term> storeEqualities = hasHeap
@@ -135,7 +136,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         final Term postCond;
         final List<Term> invElems;
         final List<Term> anonLoopInvUpdates = new ArrayList<>();
-        if (StrengthAnalysisUtilities
+        if (LogicUtilities
                 .retrieveLoopScopeIndex(pio, goal.proof().getServices())
                 .isPresent()) {
             // We can check strength of the post condition relative to the
@@ -155,13 +156,13 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                 final Term invInPostCond = topLevelFormula.sub(1).sub(1).sub(1)
                         .sub(0).sub(0);
 
-                final Set<TermLabel> invLabels = StrengthAnalysisUtilities
+                final Set<TermLabel> invLabels = LogicUtilities
                         .extractLabelsOfTerm(invInPostCond);
 
                 assert invLabels
                         .size() > 0 : "There should be <<F>> term labels in the invariant term";
 
-                final OriginOfFormula origin = StrengthAnalysisUtilities
+                final OriginOfFormula origin = LogicUtilities
                         .findOriginOfTermLabel(goal,
                                 invLabels.stream().findFirst().get());
 
@@ -211,7 +212,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                     MergeRuleUtils.getUpdateRightSideFor(updateTerm,
                             resultVar));
 
-            StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal,
+            LogicUtilities.prepareGoal(pio, analysisGoal,
                     currAnalysisTerm);
 
             final List<Term> newPres = Arrays
@@ -247,12 +248,12 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                 anonPostCond = tb.apply(updElem, anonPostCond);
             }
 
-            StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal, invElem,
+            LogicUtilities.prepareGoal(pio, analysisGoal, invElem,
                     "Covers invariant fact");
 
             // Remove anonymized invariant formulas from the antecedent,
             // otherwise it's trivial to close this goal.
-            StrengthAnalysisUtilities
+            LogicUtilities
                     .removeLoopInvFormulasFromAntec(analysisGoal);
 
             analysisGoal.addFormula(
@@ -269,7 +270,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
             for (Term storeEquality : storeEqualities) {
                 final Goal analysisGoal = goalArray[i];
 
-                StrengthAnalysisUtilities.prepareGoal(pio, analysisGoal,
+                LogicUtilities.prepareGoal(pio, analysisGoal,
                         storeEquality);
 
                 final Term update = tb.parallel( //
@@ -293,7 +294,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
 
         // Remove SETAccumulate predicate for post condition
         final Goal postCondGoal = goalArray[goalArray.length - 1];
-        StrengthAnalysisUtilities.addSETPredicateToAntec(postCondGoal);
+        LogicUtilities.addSETPredicateToAntec(postCondGoal);
 
         postCondGoal.setBranchLabel("Postcondition satisfied");
 
@@ -329,7 +330,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                 && !(f = pio.subTerm()).containsJavaBlockRecursive()
                 && f.op() instanceof UpdateApplication
                 && !TermBuilder.goBelowUpdates(f).op().equals(Junctor.FALSE)
-                && (!(lsi = StrengthAnalysisUtilities.retrieveLoopScopeIndex(
+                && (!(lsi = LogicUtilities.retrieveLoopScopeIndex(
                         pio, goal.proof().getServices())).isPresent()
                         || MergeRuleUtils
                                 .getUpdateRightSideFor(f.sub(0), lsi.get())

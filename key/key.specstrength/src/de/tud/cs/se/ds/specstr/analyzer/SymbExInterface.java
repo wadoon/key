@@ -24,10 +24,10 @@ import org.apache.logging.log4j.Logger;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.tud.cs.se.ds.specstr.profile.StrengthAnalysisSEProfile;
-import de.tud.cs.se.ds.specstr.rule.StrengthAnalysisUtilities;
 import de.tud.cs.se.ds.specstr.strategy.StrengthAnalysisStrategy;
-import de.tud.cs.se.ds.specstr.util.InformationExtraction;
-import de.tud.cs.se.ds.specstr.util.Utilities;
+import de.tud.cs.se.ds.specstr.util.JavaTypeInterface;
+import de.tud.cs.se.ds.specstr.util.LogicUtilities;
+import de.tud.cs.se.ds.specstr.util.GeneralUtilities;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.JavaTools;
@@ -97,11 +97,11 @@ public class SymbExInterface {
     /**
      * TODO
      * 
-     * @see InformationExtraction#getDeclaredTypes(KeYEnvironment)
+     * @see JavaTypeInterface#getDeclaredTypes(KeYEnvironment)
      * @return
      */
     public List<KeYJavaType> getDeclaredTypes() {
-        return InformationExtraction.getDeclaredTypes(env);
+        return JavaTypeInterface.getDeclaredTypes(env);
     }
 
     /**
@@ -130,7 +130,7 @@ public class SymbExInterface {
                 .getContracts(pm.getContainerType(), pm);
 
         if (contracts == null || contracts.size() != 1) {
-            final String msg = Utilities.format(
+            final String msg = GeneralUtilities.format(
                     "Expected 1 contract for method %s, found %s",
                     pm.getFullName(), contracts == null ? 0 : contracts.size());
 
@@ -152,7 +152,7 @@ public class SymbExInterface {
             proof = env.createProof(po);
             setupStrategy(proof);
         } catch (ProofInputException e) {
-            Utilities.logErrorAndThrowRTE(logger,
+            GeneralUtilities.logErrorAndThrowRTE(logger,
                     "Exception at '%s' of %s:\n%s", contract.getDisplayName(),
                     contract.getTarget(), e.getMessage());
         }
@@ -171,9 +171,9 @@ public class SymbExInterface {
         // env.getUi().getProofControl().startAndWaitForAutoMode(proof);
         finishSEForNode(proof.root());
 
-        final List<Goal> whileLoopGoals = StrengthAnalysisUtilities
+        final List<Goal> whileLoopGoals = GeneralUtilities
                 .toStream(proof.openGoals())
-                .filter(g -> StrengthAnalysisUtilities
+                .filter(g -> GeneralUtilities
                         .toStream(g.node().sequent().succedent())
                         .filter(f -> SymbolicExecutionUtil
                                 .hasSymbolicExecutionLabel(f.formula()))
@@ -186,7 +186,7 @@ public class SymbExInterface {
         if (whileLoopGoals.size() == 0) {
             return Optional.empty();
         } else if (whileLoopGoals.size() > 1) {
-            Utilities.logErrorAndThrowRTE(logger,
+            GeneralUtilities.logErrorAndThrowRTE(logger,
                     "Expected no or one goal with a while loop, got %s",
                     whileLoopGoals.size());
         }
@@ -203,7 +203,7 @@ public class SymbExInterface {
     public void finishSEForNode(Node node) {
         List<Node> openNodesWithModality;
         List<Node> lastNodesWithModality = new ArrayList<>();
-        while (!(openNodesWithModality = StrengthAnalysisUtilities
+        while (!(openNodesWithModality = LogicUtilities
                 .extractOpenNodesWithModality(node)).isEmpty()
                 && !openNodesWithModality.equals(lastNodesWithModality)) {
             openNodesWithModality.forEach(
@@ -223,7 +223,7 @@ public class SymbExInterface {
         try {
             macro.applyTo(env.getUi(), node, null, env.getUi());
         } catch (Exception e) {
-            Utilities.logErrorAndThrowRTE(logger,
+            GeneralUtilities.logErrorAndThrowRTE(logger,
                     "Problem in applying macro, message: %s", e.getMessage());
         }
     }
@@ -258,7 +258,7 @@ public class SymbExInterface {
         }
 
         if (loopScopeIndex == null) {
-            Utilities.logErrorAndThrowRTE(logger,
+            GeneralUtilities.logErrorAndThrowRTE(logger,
                     "Could not find loop scope index; assumed "
                             + "it to be present in first open goal");
         }

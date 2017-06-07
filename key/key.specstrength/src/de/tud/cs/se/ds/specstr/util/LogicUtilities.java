@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.tud.cs.se.ds.specstr.rule;
+package de.tud.cs.se.ds.specstr.util;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -55,7 +54,7 @@ import de.uka.ilkd.key.util.Pair;
  *
  * @author Dominic Steinhöfel
  */
-public class StrengthAnalysisUtilities {
+public class LogicUtilities {
 
     /**
      * TODO
@@ -273,15 +272,16 @@ public class StrengthAnalysisUtilities {
     }
 
     /**
-     * Converts the given {@link Iterable} to a {@link Stream}.<br/>
-     * TODO is this method needed? Currently seems to be unused.
+     * TODO
      * 
-     * @param it
-     *            The {@link Iterable} to convert to a {@link Stream}.
-     * @return The {@link Stream} for the given {@link Iterable}.
+     * @param node
+     * @return
      */
-    public static <T> Stream<T> toStream(Iterable<T> it) {
-        return StreamSupport.stream(it.spliterator(), false);
+    public static List<Node> extractOpenNodesWithModality(Node node) {
+        return GeneralUtilities.toStream(node.proof().getSubtreeGoals(node)).map(g -> g.node())
+                .filter(n -> GeneralUtilities.toStream(n.sequent().succedent()).anyMatch(
+                        f -> f.formula().containsJavaBlockRecursive()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -289,7 +289,7 @@ public class StrengthAnalysisUtilities {
      * 
      * @param analysisGoal
      */
-    static void removeLoopInvFormulasFromAntec(final Goal analysisGoal) {
+    public static void removeLoopInvFormulasFromAntec(final Goal analysisGoal) {
         for (SequentFormula sf : analysisGoal.sequent().antecedent()) {
             final ImmutableArray<TermLabel> labels = sf.formula().getLabels();
             if (labels.size() > 0) {
@@ -316,9 +316,9 @@ public class StrengthAnalysisUtilities {
      * @param tb
      * @param goal
      */
-    static void addSETPredicateToAntec(final Goal goal) {
+    public static void addSETPredicateToAntec(final Goal goal) {
         final Optional<Pair<SequentFormula, Term>> maybeSETPredicate = //
-                toStream(goal.sequent().succedent()).map(sf -> {
+                GeneralUtilities.toStream(goal.sequent().succedent()).map(sf -> {
                     SETPredVisitor v = new SETPredVisitor();
                     sf.formula().execPostOrder(v);
                     return new Pair<SequentFormula, Term>(sf,
@@ -379,19 +379,6 @@ public class StrengthAnalysisUtilities {
         public Term getSetPredTerm() {
             return setPredTerm;
         }
-    }
-
-    /**
-     * TODO
-     * 
-     * @param node
-     * @return
-     */
-    public static List<Node> extractOpenNodesWithModality(Node node) {
-        return toStream(node.proof().getSubtreeGoals(node)).map(g -> g.node())
-                .filter(n -> toStream(n.sequent().succedent()).anyMatch(
-                        f -> f.formula().containsJavaBlockRecursive()))
-                .collect(Collectors.toList());
     }
 
 }
