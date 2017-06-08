@@ -38,7 +38,7 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
         assertEquals(7,
                 result.getUncoveredFactsOfType(POST_COND_INV_FACT).size());
 
-        assertEquals(9, result.numUncoveredFacts());
+        assertEquals(10, result.numUncoveredFacts());
     }
 
     @Test
@@ -51,7 +51,7 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
         assertEquals(7,
                 result.getUncoveredFactsOfType(POST_COND_INV_FACT).size());
 
-        assertEquals(8, result.numUncoveredFacts());
+        assertEquals(9, result.numUncoveredFacts());
     }
 
     @Test
@@ -65,7 +65,7 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
         assertEquals(10,
                 result.getUncoveredFactsOfType(POST_COND_INV_FACT).size());
 
-        assertEquals(10, result.numUncoveredFacts());
+        assertEquals(11, result.numUncoveredFacts());
     }
 
     @Test
