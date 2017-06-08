@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -33,6 +34,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -363,7 +365,9 @@ public class LogicUtilities {
      */
     public static void addSETPredicateToAntec(final Goal goal) {
         final Optional<Pair<SequentFormula, Term>> maybeSETPredicate = //
-                GeneralUtilities.toStream(goal.sequent().succedent())
+                Stream.concat(
+                        GeneralUtilities.toStream(goal.sequent().succedent()),
+                        GeneralUtilities.toStream(goal.sequent().antecedent()))
                         .map(sf -> {
                             SETPredVisitor v = new SETPredVisitor();
                             sf.formula().execPostOrder(v);
@@ -446,6 +450,30 @@ public class LogicUtilities {
         }
 
         return alreadyAnalysisGoal(n.parent());
+    }
+
+    /**
+     * TODO
+     * 
+     * @param sf
+     * @param seq
+     * @return
+     */
+    public static PosInOccurrence findInSequent(SequentFormula sf,
+            Sequent seq) {
+        for (SequentFormula otherSf : seq.antecedent()) {
+            if (otherSf.formula().equals(sf.formula())) {
+                return new PosInOccurrence(sf, PosInTerm.getTopLevel(), true);
+            }
+        }
+
+        for (SequentFormula otherSf : seq.succedent()) {
+            if (otherSf.formula().equals(sf.formula())) {
+                return new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
+            }
+        }
+
+        return null;
     }
 
 }
