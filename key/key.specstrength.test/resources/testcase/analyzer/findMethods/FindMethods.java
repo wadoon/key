@@ -130,7 +130,7 @@ public class FindMethods {
   // (2x) i == arr.length        (titled "result_1 != -1" in the proof)
   // (2x) i <= arr.length
   // (1x) i >= 0                 (for the case that n wasn't found)
-  // (1x) result_1_0 = i_0 - 1   (titled "result_1 = -1" in the proof, for the case that n wasn't found)
+  // (2x) result_1_0 = i_0 - 1   (titled "result_1 = -1 | ..." in the proof, for the case that n was found - two cases due to CNF conversion)
   // (1x) i = 1 + i_0            (loop body fact)
   // (1x) result = i_0 - 1       (post condition fact -- for the case that n was found
   /*@ public normal_behavior

@@ -35,7 +35,7 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
 
         assertEquals(1, result.getUncoveredFactsOfType(LOOP_BODY_FACT).size());
         assertEquals(2, result.getUncoveredFactsOfType(POST_COND_FACT).size());
-        assertEquals(6,
+        assertEquals(7,
                 result.getUncoveredFactsOfType(POST_COND_INV_FACT).size());
 
         assertEquals(9, result.numUncoveredFacts());
@@ -48,7 +48,7 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
 
         assertEquals(1, result.getUncoveredFactsOfType(LOOP_BODY_FACT).size());
         assertEquals(1, result.getUncoveredFactsOfType(POST_COND_FACT).size());
-        assertEquals(6,
+        assertEquals(7,
                 result.getUncoveredFactsOfType(POST_COND_INV_FACT).size());
 
         assertEquals(8, result.numUncoveredFacts());
@@ -62,7 +62,7 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
 
         assertEquals(0, result.getUncoveredFactsOfType(LOOP_BODY_FACT).size());
         assertEquals(1, result.getUncoveredFactsOfType(POST_COND_FACT).size());
-        assertEquals(9,
+        assertEquals(10,
                 result.getUncoveredFactsOfType(POST_COND_INV_FACT).size());
 
         assertEquals(10, result.numUncoveredFacts());

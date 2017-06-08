@@ -25,6 +25,7 @@ import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.tud.cs.se.ds.specstr.util.CNFConverter;
 import de.tud.cs.se.ds.specstr.util.LogicUtilities;
 import de.tud.cs.se.ds.specstr.util.LogicUtilities.OriginOfFormula;
 import de.uka.ilkd.key.java.Services;
@@ -193,8 +194,8 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                                 .quickPrintTerm(topLevelFormula, services)));
             }
 
-            // TODO: Here, we should do a real CNF conversion before!
-            invElems = MergeRuleUtils.getConjunctiveElementsFor(invariant);
+            final CNFConverter cnf = new CNFConverter(tb);
+            invElems = MergeRuleUtils.getConjunctiveElementsFor(cnf.convertToCNF(invariant));
         } else {
             invElems = Collections.emptyList();
             postCond = null;
