@@ -54,17 +54,11 @@ public class CNFConverter {
      * @return
      */
     public Term convertToCNF(Term t) {
-        // TODO: We can also convert formulas inside universal quantifiers into
-        // CNF and split them then; do this later.
-
-        return splitQuantifiers(
-                pushNegationsInvards(eliminateBiImplications(t)));
-
-        // TODO: Next steps
-        // Distributivity law, (p && q) || r <==> (p || r) && (q || r)
+        return applyDistributivityLaws(splitQuantifiers(
+                pushNegationsInvards(eliminateBiImplications(t))));
     }
 
-    public Term eliminateBiImplications(Term t) {
+    protected Term eliminateBiImplications(Term t) {
         if (t.op() == Junctor.IMP) {
             return tb.or(tb.not(eliminateBiImplications(t.sub(0))),
                     eliminateBiImplications(t.sub(1)));
@@ -81,7 +75,7 @@ public class CNFConverter {
         }
     }
 
-    public Term pushNegationsInvards(Term t) {
+    protected Term pushNegationsInvards(Term t) {
         if (t.op() == Junctor.NOT) {
             final Term sub = t.sub(0);
 
@@ -111,7 +105,7 @@ public class CNFConverter {
         return recurse(t, t1 -> pushNegationsInvards(t1));
     }
 
-    public Term splitQuantifiers(Term t) {
+    protected Term splitQuantifiers(Term t) {
         // (\exists x; q || p), (\forall x; q && p) to
         // (\exists x; q) || (\exists x; p), (\forall x; q) && (\forall x; p)
 
@@ -131,7 +125,7 @@ public class CNFConverter {
         return recurse(t, t1 -> splitQuantifiers(t1));
     }
 
-    public Term applyDistributivityLaws(Term t) {
+    protected Term applyDistributivityLaws(Term t) {
         // (p && q) || r <==> (p || r) && (q || r)
         // r || (p && q) r <==> (r || p) && (r || q)
 

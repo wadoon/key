@@ -18,11 +18,13 @@ import org.junit.runners.Suite;
 
 import de.tud.cs.se.ds.specstr.analyzer.FindMethodsTest;
 import de.tud.cs.se.ds.specstr.analyzer.LoopFreeTest;
+import de.tud.cs.se.ds.specstr.util.CNFConverterTest;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     FindMethodsTest.class,
     LoopFreeTest.class,
+    CNFConverterTest.class,
 })
 
 /**
