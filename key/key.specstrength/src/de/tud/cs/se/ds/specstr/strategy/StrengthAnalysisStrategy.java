@@ -15,6 +15,7 @@ package de.tud.cs.se.ds.specstr.strategy;
 
 import de.tud.cs.se.ds.specstr.rule.AnalyzeInvImpliesLoopEffectsRule;
 import de.tud.cs.se.ds.specstr.rule.AnalyzePostCondImpliesMethodEffectsRule;
+import de.tud.cs.se.ds.specstr.rule.FactAnalysisRule;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -60,6 +61,7 @@ public class StrengthAnalysisStrategy extends SymbolicExecutionStrategy {
         SetRuleFilter filter = new SetRuleFilter();
         filter.addRuleToSet(AnalyzeInvImpliesLoopEffectsRule.INSTANCE);
         filter.addRuleToSet(AnalyzePostCondImpliesMethodEffectsRule.INSTANCE);
+        filter.addRuleToSet(FactAnalysisRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
 }
