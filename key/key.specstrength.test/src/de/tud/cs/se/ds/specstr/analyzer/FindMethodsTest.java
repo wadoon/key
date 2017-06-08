@@ -33,12 +33,12 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
                 "findMethods/FindMethods.java",
                 "FindMethods::find_weak_postcond([II)I");
 
-        assertEquals(1, result.getUncoveredFactsOfType(LOOP_BODY_FACT).size());
+        assertEquals(2, result.getUncoveredFactsOfType(LOOP_BODY_FACT).size());
         assertEquals(2, result.getUncoveredFactsOfType(POST_COND_FACT).size());
         assertEquals(7,
                 result.getUncoveredFactsOfType(POST_COND_INV_FACT).size());
 
-        assertEquals(10, result.numUncoveredFacts());
+        assertEquals(11, result.numUncoveredFacts());
     }
 
     @Test
@@ -46,12 +46,12 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
         final AnalyzerResult result = analyzeMethod(
                 "findMethods/FindMethods.java", "FindMethods::find([II)I");
 
-        assertEquals(1, result.getUncoveredFactsOfType(LOOP_BODY_FACT).size());
+        assertEquals(2, result.getUncoveredFactsOfType(LOOP_BODY_FACT).size());
         assertEquals(1, result.getUncoveredFactsOfType(POST_COND_FACT).size());
         assertEquals(7,
                 result.getUncoveredFactsOfType(POST_COND_INV_FACT).size());
 
-        assertEquals(9, result.numUncoveredFacts());
+        assertEquals(10, result.numUncoveredFacts());
     }
 
     @Test

@@ -25,6 +25,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.tud.cs.se.ds.specstr.logic.label.StrengthAnalysisParameterlessTL;
 import de.tud.cs.se.ds.specstr.rule.AnalyzeInvImpliesLoopEffectsRule;
 import de.tud.cs.se.ds.specstr.rule.AnalyzePostCondImpliesMethodEffectsRule;
 import de.uka.ilkd.key.java.Services;
@@ -200,7 +201,48 @@ public class LogicUtilities {
                         .replaceAll("<<[^>]+>>", "").trim()));
 
         analysisGoal.removeFormula(pio);
-        analysisGoal.addFormula(new SequentFormula(fact), false, true);
+        analysisGoal.addFormula(
+                new SequentFormula(services.getTermBuilder().label(fact,
+                        StrengthAnalysisParameterlessTL.FACT_LABEL)),
+                false, true);
+    }
+
+    /**
+     * TODO
+     * 
+     * @param analysisGoal
+     * @param t
+     * @param addFactPremiseLabel
+     */
+    public static void addFactPrecondition(Goal analysisGoal, Term t,
+            boolean addFactPremiseLabel) {
+        analysisGoal.addFormula(new SequentFormula(addFactPremiseLabel
+                ? analysisGoal.proof().getServices().getTermBuilder().label(t,
+                        StrengthAnalysisParameterlessTL.FACT_PREMISE_LABEL)
+                : t), true, false);
+    }
+
+    /**
+     * TODO
+     * 
+     * @param analysisGoal
+     * @param terms
+     * @param numFactsWithPremiseLabels
+     *            All facts from index <code>0</code> to
+     *            <code>numFactsWithPremiseLabels - 1</code> will be labeled
+     *            with
+     *            {@link StrengthAnalysisParameterlessTL#FACT_PREMISE_LABEL}
+     */
+    public static void addFactPreconditions( //
+            Goal analysisGoal, Iterable<Term> terms,
+            int numFactsWithPremiseLabels) {
+
+        int i = 0;
+        for (Term term : terms) {
+            addFactPrecondition(analysisGoal, term,
+                    i < numFactsWithPremiseLabels);
+            i++;
+        }
     }
 
     /**
@@ -398,11 +440,11 @@ public class LogicUtilities {
                         .rule() == AnalyzeInvImpliesLoopEffectsRule.INSTANCE) {
             return true;
         }
-    
+
         if (n.root()) {
             return false;
         }
-    
+
         return alreadyAnalysisGoal(n.parent());
     }
 

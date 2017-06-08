@@ -13,6 +13,8 @@
 
 package de.tud.cs.se.ds.specstr.rule;
 
+import static de.tud.cs.se.ds.specstr.util.LogicUtilities.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -80,7 +82,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         final LocationVariable heapVar = heapLDT.getHeap();
 
         final FunctionalOperationContract fContract = //
-                LogicUtilities.getFOContract(services);
+                getFOContract(services);
 
         // Note: That's a very hackish way of retrieving the post condition, but
         // I did not find a clean one to get it with the correct variable
@@ -99,7 +101,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         final boolean hasHeap = origHeapTerm != null;
 
         final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
-                LogicUtilities.extractStoreEqsAndInnerHeapTerm( //
+                extractStoreEqsAndInnerHeapTerm( //
                         services, pm, origHeapTerm);
 
         final List<Term> storeEqualities = hasHeap
@@ -214,7 +216,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                     MergeRuleUtils.getUpdateRightSideFor(updateTerm,
                             resultVar));
 
-            LogicUtilities.prepareGoal(pio, analysisGoal, currAnalysisTerm);
+            prepareGoal(pio, analysisGoal, currAnalysisTerm);
 
             final List<Term> newPres = Arrays
                     .asList(new Term[] {
@@ -232,8 +234,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                                             updateContent.get(lhs)))
                                     .collect(Collectors.toList())) });
 
-            newPres.forEach(t -> analysisGoal.addFormula(new SequentFormula(t),
-                    true, true));
+            addFactPreconditions(analysisGoal, newPres, 1);
         }
 
         int i = hasResultVar ? 1 : 0;
@@ -249,16 +250,14 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                 anonPostCond = tb.apply(updElem, anonPostCond);
             }
 
-            LogicUtilities.prepareGoal(pio, analysisGoal, invElem,
+            prepareGoal(pio, analysisGoal, invElem,
                     "Covers invariant fact");
 
             // Remove anonymized invariant formulas from the antecedent,
             // otherwise it's trivial to close this goal.
-            LogicUtilities.removeLoopInvFormulasFromAntec(analysisGoal);
+            removeLoopInvFormulasFromAntec(analysisGoal);
 
-            analysisGoal.addFormula(
-                    new SequentFormula(tb.apply(updateTerm, anonPostCond)),
-                    true, false);
+            addFactPrecondition(analysisGoal, tb.apply(updateTerm, anonPostCond), true);
 
             i++;
         }
@@ -270,7 +269,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
             for (Term storeEquality : storeEqualities) {
                 final Goal analysisGoal = goalArray[i];
 
-                LogicUtilities.prepareGoal(pio, analysisGoal, storeEquality);
+                prepareGoal(pio, analysisGoal, storeEquality);
 
                 final Term update = tb.parallel( //
                         tb.elementary(tb.var(heapVar), innerHeapTerm), //
@@ -284,8 +283,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                                                 updateContent.get(lhs)))
                                         .collect(Collectors.toList())) });
 
-                newPres.forEach(t -> analysisGoal
-                        .addFormula(new SequentFormula(t), true, true));
+                addFactPreconditions(analysisGoal, newPres, 1);
 
                 i++;
             }
@@ -293,7 +291,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
 
         // Remove SETAccumulate predicate for post condition
         final Goal postCondGoal = goalArray[goalArray.length - 1];
-        LogicUtilities.addSETPredicateToAntec(postCondGoal);
+        addSETPredicateToAntec(postCondGoal);
 
         postCondGoal.setBranchLabel("Postcondition satisfied");
 
@@ -329,13 +327,13 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                 && !(f = pio.subTerm()).containsJavaBlockRecursive()
                 && f.op() instanceof UpdateApplication
                 && !TermBuilder.goBelowUpdates(f).op().equals(Junctor.FALSE)
-                && (!(lsi = LogicUtilities.retrieveLoopScopeIndex(pio,
+                && (!(lsi = retrieveLoopScopeIndex(pio,
                         goal.proof().getServices()))
                                 .isPresent()
                         || MergeRuleUtils
                                 .getUpdateRightSideFor(f.sub(0), lsi.get())
                                 .equals(tb.TRUE()))
-                && !LogicUtilities.alreadyAnalysisGoal(goal.node().parent());
+                && !alreadyAnalysisGoal(goal.node().parent());
     }
 
     @Override

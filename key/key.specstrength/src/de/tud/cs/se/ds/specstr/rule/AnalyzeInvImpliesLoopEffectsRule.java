@@ -13,6 +13,8 @@
 
 package de.tud.cs.se.ds.specstr.rule;
 
+import static de.tud.cs.se.ds.specstr.util.LogicUtilities.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,11 +25,9 @@ import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.ImmutableList;
 
-import de.tud.cs.se.ds.specstr.util.LogicUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
@@ -97,13 +97,13 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
 
         // Retrieve store equalities
         final FunctionalOperationContract fContract = //
-                LogicUtilities.getFOContract(services);
+                getFOContract(services);
         final IProgramMethod pm = fContract.getTarget();
         final Term origHeapTerm = MergeRuleUtils
                 .getUpdateRightSideFor(updateTerm, heapVar);
 
         final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
-                LogicUtilities.extractStoreEqsAndInnerHeapTerm( //
+                extractStoreEqsAndInnerHeapTerm( //
                         services, pm, origHeapTerm);
 
         final List<Term> storeEqualities = storeEqsAndInnerHeapTerm.isPresent()
@@ -146,19 +146,17 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
             final Term currAnalysisTerm = tb.equals(tb.var(currLocalOut),
                     updateContent.get(currLocalOut));
 
-            LogicUtilities.prepareGoal(pio, analysisGoal, currAnalysisTerm);
-
-            for (Term newAntecTerm : newGoalInformation.get(currLocalOut)) {
-                analysisGoal.addFormula(new SequentFormula(newAntecTerm), true,
-                        true);
-            }
+            prepareGoal(pio, analysisGoal, currAnalysisTerm);
+            removeLoopInvFormulasFromAntec(analysisGoal);
+            addFactPreconditions(analysisGoal, newGoalInformation.get(currLocalOut), 1);
         }
 
         if (storeEqsAndInnerHeapTerm.isPresent()) {
             for (Term heapEquality : storeEqualities) {
                 final Goal analysisGoal = goalArray[i++];
 
-                LogicUtilities.prepareGoal(pio, analysisGoal, heapEquality);
+                prepareGoal(pio, analysisGoal, heapEquality);
+                removeLoopInvFormulasFromAntec(analysisGoal);
 
                 final Term update = updateWithoutLocalOuts;
 
@@ -173,12 +171,11 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
                                 .filter(se -> se != heapEquality)
                                 .collect(Collectors.toList())) });
 
-                newPres.forEach(t -> analysisGoal
-                        .addFormula(new SequentFormula(t), true, true));
+                addFactPreconditions(analysisGoal, newPres, 1);
             }
         }
 
-        LogicUtilities.addSETPredicateToAntec(goalArray[goalArray.length - 1]);
+        addSETPredicateToAntec(goalArray[goalArray.length - 1]);
         goalArray[goalArray.length - 1].setBranchLabel("Invariant preserved");
 
         return goals;
@@ -210,12 +207,12 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
         final Services services = goal.proof().getServices();
 
         Optional<LocationVariable> lsi = null;
-        return (lsi = LogicUtilities.retrieveLoopScopeIndex(pio, services))
+        return (lsi = retrieveLoopScopeIndex(pio, services))
                 .isPresent()
                 && MergeRuleUtils
                         .getUpdateRightSideFor(pio.subTerm().sub(0), lsi.get())
                         .equals(services.getTermBuilder().FALSE())
-                && !LogicUtilities.alreadyAnalysisGoal(goal.node().parent());
+                && !alreadyAnalysisGoal(goal.node().parent());
     }
 
     @Override
