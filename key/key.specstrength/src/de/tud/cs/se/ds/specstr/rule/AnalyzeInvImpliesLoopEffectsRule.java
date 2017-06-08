@@ -146,8 +146,7 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
             final Term currAnalysisTerm = tb.equals(tb.var(currLocalOut),
                     updateContent.get(currLocalOut));
 
-            LogicUtilities.prepareGoal(pio, analysisGoal,
-                    currAnalysisTerm);
+            LogicUtilities.prepareGoal(pio, analysisGoal, currAnalysisTerm);
 
             for (Term newAntecTerm : newGoalInformation.get(currLocalOut)) {
                 analysisGoal.addFormula(new SequentFormula(newAntecTerm), true,
@@ -159,8 +158,7 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
             for (Term heapEquality : storeEqualities) {
                 final Goal analysisGoal = goalArray[i++];
 
-                LogicUtilities.prepareGoal(pio, analysisGoal,
-                        heapEquality);
+                LogicUtilities.prepareGoal(pio, analysisGoal, heapEquality);
 
                 final Term update = updateWithoutLocalOuts;
 
@@ -180,8 +178,7 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
             }
         }
 
-        LogicUtilities
-                .addSETPredicateToAntec(goalArray[goalArray.length - 1]);
+        LogicUtilities.addSETPredicateToAntec(goalArray[goalArray.length - 1]);
         goalArray[goalArray.length - 1].setBranchLabel("Invariant preserved");
 
         return goals;
@@ -213,11 +210,12 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
         final Services services = goal.proof().getServices();
 
         Optional<LocationVariable> lsi = null;
-        return (lsi = LogicUtilities.retrieveLoopScopeIndex(pio,
-                services)).isPresent()
+        return (lsi = LogicUtilities.retrieveLoopScopeIndex(pio, services))
+                .isPresent()
                 && MergeRuleUtils
                         .getUpdateRightSideFor(pio.subTerm().sub(0), lsi.get())
-                        .equals(services.getTermBuilder().FALSE());
+                        .equals(services.getTermBuilder().FALSE())
+                && !LogicUtilities.alreadyAnalysisGoal(goal.node().parent());
     }
 
     @Override

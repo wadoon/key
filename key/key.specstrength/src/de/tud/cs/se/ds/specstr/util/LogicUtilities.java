@@ -25,6 +25,8 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.tud.cs.se.ds.specstr.rule.AnalyzeInvImpliesLoopEffectsRule;
+import de.tud.cs.se.ds.specstr.rule.AnalyzePostCondImpliesMethodEffectsRule;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
@@ -381,6 +383,27 @@ public class LogicUtilities {
         public Term getSetPredTerm() {
             return setPredTerm;
         }
+    }
+
+    /**
+     * TODO
+     * 
+     * @param n
+     * @return
+     */
+    public static boolean alreadyAnalysisGoal(Node n) {
+        if (n.getAppliedRuleApp()
+                .rule() == AnalyzePostCondImpliesMethodEffectsRule.INSTANCE
+                || n.getAppliedRuleApp()
+                        .rule() == AnalyzeInvImpliesLoopEffectsRule.INSTANCE) {
+            return true;
+        }
+    
+        if (n.root()) {
+            return false;
+        }
+    
+        return alreadyAnalysisGoal(n.parent());
     }
 
 }

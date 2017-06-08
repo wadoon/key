@@ -195,7 +195,8 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
             }
 
             final CNFConverter cnf = new CNFConverter(tb);
-            invElems = MergeRuleUtils.getConjunctiveElementsFor(cnf.convertToCNF(invariant));
+            invElems = MergeRuleUtils
+                    .getConjunctiveElementsFor(cnf.convertToCNF(invariant));
         } else {
             invElems = Collections.emptyList();
             postCond = null;
@@ -213,8 +214,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                     MergeRuleUtils.getUpdateRightSideFor(updateTerm,
                             resultVar));
 
-            LogicUtilities.prepareGoal(pio, analysisGoal,
-                    currAnalysisTerm);
+            LogicUtilities.prepareGoal(pio, analysisGoal, currAnalysisTerm);
 
             final List<Term> newPres = Arrays
                     .asList(new Term[] {
@@ -254,8 +254,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
 
             // Remove anonymized invariant formulas from the antecedent,
             // otherwise it's trivial to close this goal.
-            LogicUtilities
-                    .removeLoopInvFormulasFromAntec(analysisGoal);
+            LogicUtilities.removeLoopInvFormulasFromAntec(analysisGoal);
 
             analysisGoal.addFormula(
                     new SequentFormula(tb.apply(updateTerm, anonPostCond)),
@@ -264,15 +263,14 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
             i++;
         }
 
+        // Add goals for store equalities
         if (hasHeap) {
             final Term innerHeapTerm = storeEqsAndInnerHeapTerm.get().first;
 
-            // Add goals for store equalities
             for (Term storeEquality : storeEqualities) {
                 final Goal analysisGoal = goalArray[i];
 
-                LogicUtilities.prepareGoal(pio, analysisGoal,
-                        storeEquality);
+                LogicUtilities.prepareGoal(pio, analysisGoal, storeEquality);
 
                 final Term update = tb.parallel( //
                         tb.elementary(tb.var(heapVar), innerHeapTerm), //
@@ -331,11 +329,13 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                 && !(f = pio.subTerm()).containsJavaBlockRecursive()
                 && f.op() instanceof UpdateApplication
                 && !TermBuilder.goBelowUpdates(f).op().equals(Junctor.FALSE)
-                && (!(lsi = LogicUtilities.retrieveLoopScopeIndex(
-                        pio, goal.proof().getServices())).isPresent()
+                && (!(lsi = LogicUtilities.retrieveLoopScopeIndex(pio,
+                        goal.proof().getServices()))
+                                .isPresent()
                         || MergeRuleUtils
                                 .getUpdateRightSideFor(f.sub(0), lsi.get())
-                                .equals(tb.TRUE()));
+                                .equals(tb.TRUE()))
+                && !LogicUtilities.alreadyAnalysisGoal(goal.node().parent());
     }
 
     @Override
