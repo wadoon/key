@@ -80,9 +80,6 @@ public class SymbExInterface {
         logger.trace("Building KeY environment for file %s", file);
         // @formatter:off
         env = KeYEnvironment.load(
-//                JavaProfile.getDefaultInstance(),
-//                SymbolicExecutionJavaProfile.getDefaultInstance(),
-//                SymbolicExecutionJavaProfile.getDefaultInstance(true),
                 StrengthAnalysisSEProfile.INSTANCE,
                 file,     // location
                 null,     // class path
@@ -167,7 +164,6 @@ public class SymbExInterface {
         initProof(pm);
 
         // Start auto mode
-        // env.getUi().getProofControl().startAndWaitForAutoMode(proof);
         finishSEForNode(proof.root());
 
         final List<Goal> whileLoopGoals = GeneralUtilities
