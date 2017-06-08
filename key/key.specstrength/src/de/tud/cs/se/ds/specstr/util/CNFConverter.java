@@ -13,7 +13,6 @@
 
 package de.tud.cs.se.ds.specstr.util;
 
-import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -58,12 +57,11 @@ public class CNFConverter {
         // TODO: We can also convert formulas inside universal quantifiers into
         // CNF and split them then; do this later.
 
-        return pushNegationsInvards(eliminateBiImplications(t));
+        return splitQuantifiers(
+                pushNegationsInvards(eliminateBiImplications(t)));
 
         // TODO: Next steps
-        // (1) Splitting quantifiers, that is (\exists x; q || p) and (\forall
-        // x; q && p) into two distinct quantified formulas
-        // (2) Distributivity law, (p && q) || r <==> (p || r) && (q || r)
+        // Distributivity law, (p && q) || r <==> (p || r) && (q || r)
     }
 
     public Term eliminateBiImplications(Term t) {
@@ -131,6 +129,28 @@ public class CNFConverter {
         }
 
         return recurse(t, t1 -> splitQuantifiers(t1));
+    }
+
+    public Term applyDistributivityLaws(Term t) {
+        // (p && q) || r <==> (p || r) && (q || r)
+        // r || (p && q) r <==> (r || p) && (r || q)
+
+        if (t.op() == Junctor.OR) {
+            final Term sub1 = t.sub(0);
+            final Term sub2 = t.sub(1);
+
+            if (sub1.op() == Junctor.AND) {
+                return tb.and( //
+                        applyDistributivityLaws(tb.or(sub1.sub(0), sub2)),
+                        applyDistributivityLaws(tb.or(sub1.sub(1), sub2)));
+            } else if (sub2.op() == Junctor.AND) {
+                return tb.and( //
+                        applyDistributivityLaws(tb.or(sub1, sub2.sub(0))),
+                        applyDistributivityLaws(tb.or(sub1, sub2.sub(1))));
+            }
+        }
+
+        return recurse(t, t1 -> applyDistributivityLaws(t1));
     }
 
     private Term recurse(Term t, Function<Term, Term> f) {

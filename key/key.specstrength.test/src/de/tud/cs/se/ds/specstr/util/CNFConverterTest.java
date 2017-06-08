@@ -121,11 +121,33 @@ public class CNFConverterTest {
         assertEquals(expected, result);
     }
 
+    @Test
+    public void testApplyDistributivity() {
+        final Term a = predicate("a");
+        final Term b = predicate("b");
+        final Term c = predicate("c");
+        final Term d = predicate("d");
+
+        // (a && b) || (c && d)
+        final Term input = //
+                tb.or(tb.and(a, b), tb.and(c, d));
+
+        // (a || c) && (a || d) && (b || c) && (b || d)
+        final Term expected = //
+                tb.and( //
+                        tb.and(tb.or(a, c), tb.or(a, d)),
+                        tb.and(tb.or(b, c), tb.or(b, d)));
+
+        final Term result = conv.applyDistributivityLaws(input);
+
+        assertEquals(expected, result);
+    }
+
     private LogicVariable qv(String name) {
         return new LogicVariable(new Name(name), s);
     }
 
     private Term predicate(String name) {
-        return tb.func(new Function(new Name("p"), Sort.FORMULA));
+        return tb.func(new Function(new Name(name), Sort.FORMULA));
     }
 }
