@@ -162,11 +162,6 @@ public class Analyzer {
             final Node preservesAndUCNode = whileNode.child(1);
             seIf.finishSEForNode(preservesAndUCNode);
 
-            // TODO: If we add the SET predicate also to the analysis goals, we
-            // can apply try-close to get rid of irrelevant goals. This is about
-            // those that have "false" in the post condition, there, "false &
-            // SETAccumulate(...)" will still be false and closable.
-
             // Post condition facts. Those have to be extracted *before* the use
             // case facts, since the goals might change that are analyzed for
             // the use case
