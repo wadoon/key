@@ -48,6 +48,27 @@ public class CNFConverterTest {
     }
 
     @Test
+    public void testCNFConversion() {
+        final Term p = predicate("p");
+        final Term q = predicate("q");
+        final LogicVariable x = qv("x");
+
+        // !(p ==> !q) || !(\forall x; p && !q)
+        final Term input = tb.or(tb.not(tb.imp(p, tb.not(q))),
+                tb.not(tb.all(x, tb.and(p, tb.not(q)))));
+
+        // (p || ((\exists x; !p) || (\exists x; q))) &&
+        // (q || ((\exists x; !p) || (\exists x; q)))
+        final Term expected = tb.and(
+                tb.or(p, tb.or(tb.ex(x, tb.not(p)), tb.ex(x, q))),
+                tb.or(q, tb.or(tb.ex(x, tb.not(p)), tb.ex(x, q))));
+
+        final Term result = conv.convertToCNF(input);
+
+        assertEquals(expected, result);
+    }
+
+    @Test
     public void testBiimplicationElimination() {
         final Term p = predicate("p");
         final Term q = predicate("q");
