@@ -13,6 +13,7 @@
 
 package de.tud.cs.se.ds.specstr.util;
 
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -58,8 +59,11 @@ public class CNFConverter {
         // CNF and split them then; do this later.
 
         return pushNegationsInvards(eliminateBiImplications(t));
-        
-        // TODO: Next step: Distributivity law, (p && q) || r <==> (p || r) && (q || r)
+
+        // TODO: Next steps
+        // (1) Splitting quantifiers, that is (\exists x; q || p) and (\forall
+        // x; q && p) into two distinct quantified formulas
+        // (2) Distributivity law, (p && q) || r <==> (p || r) && (q || r)
     }
 
     public Term eliminateBiImplications(Term t) {
@@ -107,6 +111,26 @@ public class CNFConverter {
         }
 
         return recurse(t, t1 -> pushNegationsInvards(t1));
+    }
+
+    public Term splitQuantifiers(Term t) {
+        // (\exists x; q || p), (\forall x; q && p) to
+        // (\exists x; q) || (\exists x; p), (\forall x; q) && (\forall x; p)
+
+        if (t.op() instanceof Quantifier) {
+            final QuantifiableVariable qv = t.boundVars().get(0);
+            final Term sub = t.sub(0);
+
+            if (t.op() == Quantifier.ALL && sub.op() == Junctor.AND) {
+                return tb.and(splitQuantifiers(tb.all(qv, sub.sub(0))),
+                        splitQuantifiers(tb.all(qv, sub.sub(1))));
+            } else if (t.op() == Quantifier.EX && sub.op() == Junctor.OR) {
+                return tb.or(splitQuantifiers(tb.ex(qv, sub.sub(0))),
+                        splitQuantifiers(tb.ex(qv, sub.sub(1))));
+            }
+        }
+
+        return recurse(t, t1 -> splitQuantifiers(t1));
     }
 
     private Term recurse(Term t, Function<Term, Term> f) {

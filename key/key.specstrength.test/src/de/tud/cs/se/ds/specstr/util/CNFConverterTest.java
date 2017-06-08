@@ -101,6 +101,26 @@ public class CNFConverterTest {
         assertEquals(expected, result);
     }
 
+    @Test
+    public void testSplitQuantifiers() {
+        final Term p = predicate("p");
+        final Term q = predicate("q");
+        final LogicVariable x = qv("x");
+
+        // (\forall x; (p && (\exists x; q || p)))
+        final Term input = //
+                tb.all(x, tb.and(p, tb.ex(x, tb.or(q, p))));
+
+        // (\forall x; p) && (\forall x; ((\exists x; q) || (\exists x; p)))
+        final Term expected = //
+                tb.and(tb.all(x, p),
+                        tb.all(x, tb.or(tb.ex(x, q), tb.ex(x, p))));
+
+        final Term result = conv.splitQuantifiers(input);
+
+        assertEquals(expected, result);
+    }
+
     private LogicVariable qv(String name) {
         return new LogicVariable(new Name(name), s);
     }
