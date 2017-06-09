@@ -16,6 +16,7 @@ package de.tud.cs.se.ds.specstr.strategy;
 import de.tud.cs.se.ds.specstr.rule.AnalyzeInvImpliesLoopEffectsRule;
 import de.tud.cs.se.ds.specstr.rule.AnalyzePostCondImpliesMethodEffectsRule;
 import de.tud.cs.se.ds.specstr.rule.FactAnalysisRule;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -30,6 +31,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
  * @author Dominic Steinhöfel
  */
 public class StrengthAnalysisStrategy extends SymbolicExecutionStrategy {
+    public static final Name NAME = new Name("Strength Analysis Strategy");
 
     /**
      * TODO
@@ -45,6 +47,11 @@ public class StrengthAnalysisStrategy extends SymbolicExecutionStrategy {
         @Override
         public Strategy create(Proof proof, StrategyProperties sp) {
             return new StrengthAnalysisStrategy(proof, sp);
+        }
+
+        @Override
+        public Name name() {
+            return NAME;
         }
     }
     
@@ -63,5 +70,15 @@ public class StrengthAnalysisStrategy extends SymbolicExecutionStrategy {
         filter.addRuleToSet(AnalyzePostCondImpliesMethodEffectsRule.INSTANCE);
         filter.addRuleToSet(FactAnalysisRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
+    }
+
+    @Override
+    public Name name() {
+        return NAME;
+    }
+    
+    @Override
+    public String toString() {
+        return NAME.toString();
     }
 }

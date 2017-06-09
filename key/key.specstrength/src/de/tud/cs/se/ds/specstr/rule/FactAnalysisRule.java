@@ -14,8 +14,10 @@
 package de.tud.cs.se.ds.specstr.rule;
 
 import static de.tud.cs.se.ds.specstr.util.GeneralUtilities.toStream;
+import static de.tud.cs.se.ds.specstr.util.LogicUtilities.removeLoopInvFormulasFromAntec;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
@@ -64,10 +66,15 @@ public class FactAnalysisRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final Node node = goal.node();
 
-        final SequentFormula factSF = toStream(node.sequent().succedent())
-                .filter(sf -> sf.formula().containsLabel(
-                        StrengthAnalysisParameterlessTL.FACT_LABEL))
-                .findAny().get();
+        final Optional<SequentFormula> maybeFactSF = toStream(
+                node.sequent().succedent())
+                        .filter(sf -> sf.formula().containsLabel(
+                                StrengthAnalysisParameterlessTL.FACT_LABEL))
+                        .findAny();
+        
+        assert maybeFactSF.isPresent();
+        
+        final SequentFormula factSF = maybeFactSF.get();
 
         final List<SequentFormula> premiseSFs = toStream(
                 node.sequent().antecedent())
@@ -93,10 +100,13 @@ public class FactAnalysisRule implements BuiltInRule {
         abstractlyCoveredGoal
                 .setBranchLabel(FACT_ABSTRACTLY_COVERED_BRANCH_LABEL);
 
+        // XXX TODO: Remove loop inv premises whenever applicable
+        
         // Fact already covered without specification -- "covered by true"
 
         premiseSFs.forEach(sf -> coveredByTrueGoal.removeFormula(
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)));
+        removeLoopInvFormulasFromAntec(coveredByTrueGoal);
 
         // Facts that are "abstractly covered", that is, the fact with the
         // remaining preconditions implies one of the specification elements, as

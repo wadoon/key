@@ -34,12 +34,6 @@ public class StrengthAnalysisSEProfile extends SymbolicExecutionJavaProfile {
     public static final StrengthAnalysisSEProfile INSTANCE = new StrengthAnalysisSEProfile();
 
     /**
-     * The used {@link StrategyFactory} of the {@link StrengthAnalysisStrategy}.
-     */
-    private final static StrategyFactory STRENGTH_ANALYSIS_FACTORY = //
-            new StrengthAnalysisStrategy.Factory();
-
-    /**
      * @param predicateEvaluationEnabled
      */
     private StrengthAnalysisSEProfile() {
@@ -57,7 +51,7 @@ public class StrengthAnalysisSEProfile extends SymbolicExecutionJavaProfile {
     @Override
     protected ImmutableSet<StrategyFactory> getStrategyFactories() {
         ImmutableSet<StrategyFactory> set = super.getStrategyFactories();
-        set = set.add(STRENGTH_ANALYSIS_FACTORY);
+        set = set.add(new StrengthAnalysisStrategy.Factory());
         return set;
     }
 

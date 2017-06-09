@@ -1,14 +1,13 @@
 public class FindMethods {
   //@ ghost int g_i;
   //@ ghost int iLastRun;
-
-  // [This method triggers a bug in FormulaTagManager]
     
   /*@ public normal_behavior
     @ ensures
     @      ((\exists int k; k >= 0 && k < arr.length; arr[k] == n) ==> arr[\result] == n && \result == g_i - 1)
     @   && ((\forall int k; k >= 0 && k < arr.length; arr[k] != n) ==> \result == -1)
     @   && g_i >= 0
+    @   && g_i == iLastRun + 1 // TODO check if these formulas improve anything
     @ ;
     @ assignable g_i, iLastRun;
     @*/

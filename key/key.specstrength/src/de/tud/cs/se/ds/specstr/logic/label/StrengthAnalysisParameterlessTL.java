@@ -66,4 +66,9 @@ public class StrengthAnalysisParameterlessTL implements TermLabel {
         return delegate.getChildCount();
     }
 
+    @Override
+    public String toString() {
+        return delegate.toString();
+    }
+
 }

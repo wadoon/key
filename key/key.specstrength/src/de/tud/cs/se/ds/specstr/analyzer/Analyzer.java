@@ -327,67 +327,57 @@ public class Analyzer {
 
             if (AnalyzePostCondImpliesMethodEffectsRule.INSTANCE.isApplicable( //
                     g, maybePio.get())) {
-                final Iterable<Goal> analysisGoals = //
-                        g.apply(AnalyzePostCondImpliesMethodEffectsRule.INSTANCE
-                                .createApp(maybePio.get(),
-                                        proof.getServices()));
+                final Iterable<Node> analysisNodes = //
+                        GeneralUtilities
+                                .toStream(
+                                        g.apply(AnalyzePostCondImpliesMethodEffectsRule.INSTANCE
+                                                .createApp(maybePio.get(),
+                                                        proof.getServices())))
+                                .map(goal -> goal.node())
+                                .collect(Collectors.toList());
 
-                for (Goal analysisGoal : analysisGoals) {
-                    if (!analysisGoal.node().getNodeInfo().getBranchLabel()
-                            .equals(AnalyzePostCondImpliesMethodEffectsRule.POSTCONDITION_SATISFIED_BRANCH_LABEL)) {
+                for (Node analysisNode : analysisNodes) {
+                    if (!analysisNode.getNodeInfo().getBranchLabel().equals(
+                            AnalyzePostCondImpliesMethodEffectsRule.POSTCONDITION_SATISFIED_BRANCH_LABEL)) {
 
                         final String readablePathCond = extractReadablePathCondition(
-                                analysisGoal.node().parent());
-                        final String branchLabel = analysisGoal.node()
-                                .getNodeInfo().getBranchLabel();
+                                analysisNode.parent());
+                        final String branchLabel = analysisNode.getNodeInfo()
+                                .getBranchLabel();
 
-                        // TODO: Uncomment and make working
-//                        final Iterable<Node> factAnalysisNodes = //
-//                                GeneralUtilities
-//                                        .toStream(analysisGoal.apply(
-//                                                FactAnalysisRule.INSTANCE.createApp(
-//                                                        null, proof.getServices())))
-//                                        .map(g -> g.node())
-//                                        .collect(Collectors.toList());
-//
-//                        if (factCanBeDiscarded(factAnalysisNodes)) {
-//                            // Discard the fact -- too easy ;)
-//                            continue;
-//                        }
-//
-//                        facts.add(new Fact(branchLabel.split("\"")[1],
-//                                readablePathCondition, FactType.LOOP_BODY_FACT,
-//                                FactAnalysisRule.getFactCoveredNode(factAnalysisNodes),
-//                                FactAnalysisRule.getFactAbstractlyCoveredNode(
-//                                        factAnalysisNodes)));
-                        
-//                        final Iterable<Goal> factAnalysisGoals = //
-//                                analysisGoal.apply(FactAnalysisRule.INSTANCE
-//                                        .createApp(null, proof.getServices()));
-//
-//                        if (factCanBeDiscarded(factAnalysisGoals)) {
-//                            // Discard the fact -- too easy ;)
-//                            continue;
-//                        }
-//
-//                        facts.add(new Fact(branchLabel.split("\"")[1],
-//                                readablePathCond,
-//                                branchLabel.equals( //
-//                                        AnalyzePostCondImpliesMethodEffectsRule.COVERS_INVARIANT_FACT_BRANCH_LABEL)
-//                                                ? FactType.POST_COND_INV_FACT
-//                                                : FactType.POST_COND_FACT,
-//                                FactAnalysisRule
-//                                        .getFactCoveredNode(factAnalysisGoals),
-//                                FactAnalysisRule.getFactAbstractlyCoveredNode(
-//                                        factAnalysisGoals)));
+                        // TODO: Make working
+                        final Iterable<Node> factAnalysisNodes = //
+                                GeneralUtilities
+                                        .toStream(proof.getGoal(analysisNode)
+                                                .apply(FactAnalysisRule.INSTANCE
+                                                        .createApp(null,
+                                                                proof.getServices())))
+                                        .map(_g -> _g.node())
+                                        .collect(Collectors.toList());
 
-                      facts.add(new Fact(branchLabel.split("\"")[1],
-                              readablePathCond,
-                              branchLabel.equals( //
-                                      AnalyzePostCondImpliesMethodEffectsRule.COVERS_INVARIANT_FACT_BRANCH_LABEL)
-                                              ? FactType.POST_COND_INV_FACT
-                                              : FactType.POST_COND_FACT,
-                              analysisGoal.node(), null));
+                        if (factCanBeDiscarded(factAnalysisNodes)) {
+                            // Discard the fact -- too easy ;)
+                            continue;
+                        }
+
+                        facts.add(new Fact(branchLabel.split("\"")[1],
+                                readablePathCond,
+                                branchLabel.equals( //
+                                        AnalyzePostCondImpliesMethodEffectsRule.COVERS_INVARIANT_FACT_BRANCH_LABEL)
+                                                ? FactType.POST_COND_INV_FACT
+                                                : FactType.POST_COND_FACT,
+                                FactAnalysisRule
+                                        .getFactCoveredNode(factAnalysisNodes),
+                                FactAnalysisRule.getFactAbstractlyCoveredNode(
+                                        factAnalysisNodes)));
+
+                        // facts.add(new Fact(branchLabel.split("\"")[1],
+                        // readablePathCond,
+                        // branchLabel.equals( //
+                        // AnalyzePostCondImpliesMethodEffectsRule.COVERS_INVARIANT_FACT_BRANCH_LABEL)
+                        // ? FactType.POST_COND_INV_FACT
+                        // : FactType.POST_COND_FACT,
+                        // analysisGoal.node(), null));
                     }
                 }
             }
@@ -419,21 +409,25 @@ public class Analyzer {
                     .createApp(proofOblPio.get(), services)
                     .forceInstantiate(proof.getGoal(preservedNode));
 
-            final Goal[] preservedGoals = proof.getSubtreeGoals(preservedNode)
-                    .head().apply(app).toArray(Goal.class);
-            for (int i = 0; i < preservedGoals.length - 1; i++) {
-                final Goal analysisGoal = preservedGoals[i];
-                final String branchLabel = analysisGoal.node().getNodeInfo()
+            final List<Node> analysisNodes = GeneralUtilities
+                    .toStream(proof.getSubtreeGoals(preservedNode).head()
+                            .apply(app))
+                    .map(goal -> goal.node())
+                    .filter(n -> !n.getNodeInfo().getBranchLabel()
+                            .equals(AnalyzeInvImpliesLoopEffectsRule.INVARIANT_PRESERVED_BRANCH_LABEL))
+                    .collect(Collectors.toList());
+
+            for (Node analysisNode : analysisNodes) {
+                final String branchLabel = analysisNode.getNodeInfo()
                         .getBranchLabel();
                 final String readablePathCondition = extractReadablePathCondition(
-                        analysisGoal.node().parent());
+                        analysisNode.parent());
 
-                //TODO: Uncomment and make working
+                // TODO: Uncomment and make working
                 final Iterable<Node> factAnalysisNodes = //
-                        GeneralUtilities
-                                .toStream(analysisGoal.apply(
-                                        FactAnalysisRule.INSTANCE.createApp(
-                                                null, proof.getServices())))
+                        GeneralUtilities.toStream(proof.getGoal(analysisNode)
+                                .apply(FactAnalysisRule.INSTANCE.createApp(null,
+                                        proof.getServices())))
                                 .map(g -> g.node())
                                 .collect(Collectors.toList());
 
@@ -448,16 +442,24 @@ public class Analyzer {
                         FactAnalysisRule.getFactAbstractlyCoveredNode(
                                 factAnalysisNodes)));
 
-//                facts.add(new Fact(branchLabel.split("\"")[1],
-//                        readablePathCondition, FactType.LOOP_BODY_FACT,
-//                        analysisGoal.node(),
-//                        null));
+                // facts.add(new Fact(branchLabel.split("\"")[1],
+                // readablePathCondition, FactType.LOOP_BODY_FACT,
+                // analysisGoal.node(),
+                // null));
             }
 
-            final Node actualPreservedNode = preservedGoals[preservedGoals.length
-                    - 1].node();
-            seIf.applyMacro(new TryCloseMacro(10000),
-                    preservedGoals[preservedGoals.length - 1].node());
+            final Optional<Node> maybeActualPreservedNode = GeneralUtilities
+                    .toStream(proof.getSubtreeGoals(preservedNode).head()
+                            .apply(app))
+                    .map(goal -> goal.node())
+                    .filter(n -> n.getNodeInfo().getBranchLabel() != null
+                            && n.getNodeInfo().getBranchLabel()
+                                    .equals(AnalyzeInvImpliesLoopEffectsRule.INVARIANT_PRESERVED_BRANCH_LABEL))
+                    .findAny();
+            assert maybeActualPreservedNode.isPresent();
+
+            final Node actualPreservedNode = maybeActualPreservedNode.get();
+            seIf.applyMacro(new TryCloseMacro(10000), actualPreservedNode);
             if (!actualPreservedNode.isClosed()) {
                 invariantGoalsNotPreserved++;
             }

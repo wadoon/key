@@ -14,6 +14,9 @@
 package de.tud.cs.se.ds.specstr.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
@@ -21,10 +24,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.tud.cs.se.ds.specstr.logic.label.StrengthAnalysisParameterlessTL;
 import de.tud.cs.se.ds.specstr.rule.AnalyzeInvImpliesLoopEffectsRule;
@@ -38,8 +37,8 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -290,29 +289,39 @@ public class LogicUtilities {
      * TODO
      * 
      * @param analysisGoal
-     * @param firstLabel
+     * @param label
      */
     public static OriginOfFormula findOriginOfTermLabel(final Goal analysisGoal,
-            final TermLabel firstLabel) {
+            final FormulaTermLabel label) {
         Node currNode = analysisGoal.node();
         SequentFormula originForm = null;
 
         while (!currNode.root()) {
-            ImmutableList<TermLabel> allLabelsInNode = ImmutableSLList
-                    .<TermLabel> nil();
+            List<String> allLabelsInNode = new ArrayList<>();
             final Node parent = currNode.parent();
             for (SequentFormula oSf : parent.sequent()) {
-                final Set<TermLabel> labelsInSeqFor = //
-                        extractLabelsOfTerm(oSf.formula());
+                final Set<String> labelsInSeqFor = //
+                        formulaTermLabelIDsDeep(oSf.formula());
 
-                allLabelsInNode = allLabelsInNode.prepend(labelsInSeqFor);
-                if (labelsInSeqFor.contains(firstLabel)) {
+                allLabelsInNode.addAll(labelsInSeqFor);
+                if (labelsInSeqFor.contains(label)) {
                     originForm = oSf;
                     break;
                 }
             }
 
-            if (!allLabelsInNode.contains(firstLabel)) {
+            final List<String> termLabelMajorIDsOfLabel = //
+                    getIDsOfFormulaTermLabel(label).stream()
+                            .map(s -> s.split("\\.")[0])
+                            .collect(Collectors.toList());
+            final List<String> termLabelMajorIDsInNode = //
+                    allLabelsInNode.stream().map(s -> s.split("\\.")[0])
+                            .collect(Collectors.toList());
+
+            final long numMatches = termLabelMajorIDsOfLabel.stream()
+                    .filter(s -> termLabelMajorIDsInNode.contains(s)).count();
+
+            if (numMatches == 0) {
                 break;
             } else {
                 currNode = parent;
@@ -322,25 +331,95 @@ public class LogicUtilities {
         return new OriginOfFormula(currNode, originForm);
     }
 
+    public static OriginOfFormula findOriginOfFormula(final Goal analysisGoal,
+            final Term formula) {
+        // First, retrieve all FormulaTermLabels
+        final List<FormulaTermLabel> formulaTermLabels = new ArrayList<FormulaTermLabel>();
+
+        formula.execPreOrder(new DefaultVisitor() {
+            @Override
+            public void visit(Term visited) {
+                if (visited.hasLabels()) {
+                    formulaTermLabels.addAll(
+                            GeneralUtilities.toStream(visited.getLabels())
+                                    .filter(l -> l instanceof FormulaTermLabel)
+                                    .map(l -> (FormulaTermLabel) l)
+                                    .collect(Collectors.toList()));
+                }
+            }
+        });
+
+        assert formulaTermLabels.size() > 0 : //
+        "There should be <<F>> term labels in the invariant term";
+
+        // Get the smallest term label, this should identify the origin
+        Collections.sort(formulaTermLabels, (l1, l2) -> {
+            if (l1.equals(l2)) {
+                return 0;
+            }
+
+            final List<String> idsInFirst = getIDsOfFormulaTermLabel(l1);
+            final List<String> idsInSecond = getIDsOfFormulaTermLabel(l2);
+            final List<String> both = new ArrayList<>(idsInFirst);
+            both.addAll(idsInSecond);
+            Collections.sort(both);
+
+            final String smallest = both.get(0);
+            final int posResult = Integer.parseInt(smallest.split("\\.")[0]);
+            if (idsInFirst.contains(smallest)) {
+                return -posResult;
+            } else {
+                return posResult;
+            }
+        });
+        final FormulaTermLabel smallest = formulaTermLabels.get(0);
+
+        return findOriginOfTermLabel(analysisGoal, smallest);
+    }
+
     /**
      * TODO
      * 
      * @param t
      * @return
      */
-    public static Set<TermLabel> extractLabelsOfTerm(Term t) {
-        final Set<TermLabel> labelsInSeqFor = new LinkedHashSet<TermLabel>();
+    private static Set<String> formulaTermLabelIDsDeep(Term t) {
+        final Set<String> termLabelIDsInSeqFor = new LinkedHashSet<String>();
+
         t.execPreOrder(new DefaultVisitor() {
             @Override
             public void visit(Term visited) {
                 if (visited.hasLabels()) {
-                    labelsInSeqFor.addAll(StreamSupport
-                            .stream(visited.getLabels().spliterator(), true)
-                            .collect(Collectors.toList()));
+                    termLabelIDsInSeqFor.addAll(formulaTermLabelIDs(visited));
                 }
             }
         });
-        return labelsInSeqFor;
+
+        return termLabelIDsInSeqFor;
+    }
+
+    private static List<String> formulaTermLabelIDs(Term t) {
+        final List<String> result = new ArrayList<>();
+
+        if (t.hasLabels()) {
+            StreamSupport.stream(t.getLabels().spliterator(), true)
+                    .filter(label -> (label instanceof FormulaTermLabel))
+                    .map(label -> (FormulaTermLabel) label).forEach(label -> {
+                        result.addAll(getIDsOfFormulaTermLabel(label));
+                    });
+        }
+
+        return result;
+    }
+
+    private static List<String> getIDsOfFormulaTermLabel(FormulaTermLabel l) {
+        final List<String> result = new ArrayList<>();
+
+        result.add(l.getId());
+        result.addAll(
+                Arrays.stream(l.getBeforeIds()).collect(Collectors.toList()));
+
+        return result;
     }
 
     /**
@@ -357,6 +436,8 @@ public class LogicUtilities {
                                 f -> f.formula().containsJavaBlockRecursive()))
                 .collect(Collectors.toList());
     }
+    
+    private static final Set<Term> LOOP_INV_FORMULAS_CACHE = new HashSet<>();
 
     /**
      * TODO
@@ -365,21 +446,23 @@ public class LogicUtilities {
      */
     public static void removeLoopInvFormulasFromAntec(final Goal analysisGoal) {
         for (SequentFormula sf : analysisGoal.sequent().antecedent()) {
-            final ImmutableArray<TermLabel> labels = sf.formula().getLabels();
-            if (labels.size() > 0) {
-                final TermLabel firstLabel = labels.get(0);
-
+            boolean remove = LOOP_INV_FORMULAS_CACHE.contains(sf.formula());
+            
+            if (!remove && sf.formula().hasLabels()) {
                 // Find origin of this label
                 final OriginOfFormula origin = //
-                        findOriginOfTermLabel(analysisGoal, firstLabel);
+                        findOriginOfFormula(analysisGoal, sf.formula());
 
                 if (origin.getNode().parent()
                         .getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
-                    // This has to be the anonymized invariant (or part of
-                    // it) -- remove it
-                    analysisGoal.removeFormula(new PosInOccurrence(sf,
-                            PosInTerm.getTopLevel(), true));
+                    remove = true;
+                    LOOP_INV_FORMULAS_CACHE.add(sf.formula());
                 }
+            }
+            
+            if (remove) {
+                analysisGoal.removeFormula(new PosInOccurrence(sf,
+                        PosInTerm.getTopLevel(), true));
             }
         }
     }
@@ -410,13 +493,32 @@ public class LogicUtilities {
 
         Term newFormula = maybeSETPredicate.get().second;
         final Term seqFor = maybeSETPredicate.get().first.formula();
-        if (seqFor.op() instanceof UpdateApplication) {
+        final List<Term> updates = getUpdates(seqFor);
+        for (int i = updates.size() - 1; i >= 0; i--) {
             newFormula = goal.proof().getServices().getTermBuilder()
-                    .apply(seqFor.sub(0), newFormula);
-            assert !(seqFor.sub(1).op() instanceof UpdateApplication);
+                    .apply(updates.get(i), newFormula);
         }
 
         goal.addFormula(new SequentFormula(newFormula), true, false);
+    }
+
+    /**
+     * TODO Comment.
+     *
+     * @param t
+     * @return
+     */
+    public static List<Term> getUpdates(Term t) {
+        assert t.op() instanceof UpdateApplication : //
+        "Can only extract updates from update apps, got: " + t.op();
+
+        final List<Term> result = new ArrayList<>();
+        while (t.op() instanceof UpdateApplication) {
+            result.add(t.sub(0));
+            t = t.sub(1);
+        }
+
+        return result;
     }
 
     /**

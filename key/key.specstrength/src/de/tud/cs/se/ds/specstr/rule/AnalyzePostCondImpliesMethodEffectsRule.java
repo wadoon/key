@@ -21,7 +21,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -39,11 +38,11 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
@@ -163,15 +162,9 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                 final Term invInPostCond = topLevelFormula.sub(1).sub(1).sub(1)
                         .sub(0).sub(0);
 
-                final Set<TermLabel> invLabels = LogicUtilities
-                        .extractLabelsOfTerm(invInPostCond);
-
-                assert invLabels
-                        .size() > 0 : "There should be <<F>> term labels in the invariant term";
-
                 final OriginOfFormula origin = LogicUtilities
-                        .findOriginOfTermLabel(goal,
-                                invLabels.stream().findFirst().get());
+                        .findOriginOfFormula(goal,
+                                invInPostCond);
 
                 assert origin.getNode().parent().getAppliedRuleApp()
                         .rule() == LoopScopeInvariantRule.INSTANCE;
@@ -332,6 +325,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         return pio != null && pio.isTopLevel() && !pio.isInAntec()
                 && !(f = pio.subTerm()).containsJavaBlockRecursive()
                 && f.op() instanceof UpdateApplication
+                && !(f.sub(1).op() instanceof Modality)
                 && !TermBuilder.goBelowUpdates(f).op().equals(Junctor.FALSE)
                 && (!(lsi = retrieveLoopScopeIndex(pio,
                         goal.proof().getServices()))

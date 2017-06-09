@@ -33,8 +33,8 @@ public class LoopFreeTest extends AbstractAnalyzerTest {
                 "loopFree/SimpleMath.java", //
                 "SimpleMath::abs(I)I");
 
-        assertEquals(2, result.getUncoveredFactsOfType(POST_COND_FACT).size());
-        assertEquals(2, result.numUncoveredFacts());
+        assertEquals(2, result.getAbstractlyCoveredFactsOfType(POST_COND_FACT).size());
+        assertEquals(2, result.numFacts());
     }
 
     @Test
@@ -45,8 +45,8 @@ public class LoopFreeTest extends AbstractAnalyzerTest {
                 "loopFree/SimpleMath.java", //
                 "SimpleMath::abs_stronger_1(I)I");
 
-        assertEquals(2, result.getUncoveredFactsOfType(POST_COND_FACT).size());
-        assertEquals(2, result.numUncoveredFacts());
+        assertEquals(2, result.getAbstractlyCoveredFactsOfType(POST_COND_FACT).size());
+        assertEquals(2, result.numFacts());
     }
 
     @Test
@@ -55,8 +55,9 @@ public class LoopFreeTest extends AbstractAnalyzerTest {
                 "loopFree/SimpleMath.java", //
                 "SimpleMath::abs_stronger_2(I)I");
 
-        assertEquals(1, result.getUncoveredFactsOfType(POST_COND_FACT).size());
-        assertEquals(1, result.numUncoveredFacts());
+        assertEquals(1, result.getAbstractlyCoveredFactsOfType(POST_COND_FACT).size());
+        assertEquals(1, result.getCoveredFactsOfType(POST_COND_FACT).size());
+        assertEquals(2, result.numFacts());
     }
 
     @Test
@@ -65,8 +66,9 @@ public class LoopFreeTest extends AbstractAnalyzerTest {
                 "loopFree/SimpleMath.java", //
                 "SimpleMath::abs_stronger_3(I)I");
 
-        assertEquals(1, result.getUncoveredFactsOfType(POST_COND_FACT).size());
-        assertEquals(1, result.numUncoveredFacts());
+        assertEquals(1, result.getAbstractlyCoveredFactsOfType(POST_COND_FACT).size());
+        assertEquals(1, result.getCoveredFactsOfType(POST_COND_FACT).size());
+        assertEquals(2, result.numFacts());
     }
 
     @Test
