@@ -20,30 +20,31 @@ public class HashTable {
 	/*@ public invariant 
 	  @ size >= 0 && size <= capacity;
 	  @*/	
-	public /*@ spec_public @*/ int size; 
+	public int size; 
 	
 	/*@ public invariant 
 	  @ capacity >= 1;
 	  @*/	
-	public /*@ spec_public @*/ int capacity;
+	public int capacity;
 	
-	/*@ public normal_behavior 
-	  @ requires capacity >= 1;
-	  @ ensures this.capacity == capacity;
-	  @ ensures size == 0;
-	  @ assignable h[*], capacity, size;
-	  @*/	
 	HashTable (int capacity) {
 		h = new Object[capacity]; 
 		this.capacity = capacity;
 		size = 0;
 	}
 	
-	/*@ public normal_behavior
-	  @ requires true; 
-	  @ ensures \result >= 0 && \result < capacity;
-	  @*/	
-	private /*@ pure @*/ int hash_function (int val) {
+	public static final boolean hashfun_ok = true;
+	public static final boolean add_full = true;
+	public static final boolean add_ok = true;
+	
+  /*@ 
+    @ public normal_behaviour
+    @ requires hashfun_ok && val > 0;
+    @ ensures \result >= 0 && \result < capacity;
+    @ assignable \nothing;
+    @ diverges true;
+    @*/
+	private int hash_function (int val) {
         int result = 0;
         
 		if (val >= 0)
@@ -53,48 +54,45 @@ public class HashTable {
 		return result;
 	}
 		
-	// Add an element to the hashtable.
-	/*@ public normal_behavior
-	  @ requires size < capacity; 
-	  @ ensures size == \old(size)+1;
-	  @ ensures (\exists int i; i>= 0 && i < capacity; h[i] == u);	  
-	  @ assignable size, h[*];
-	  @
-	  @ also
-	  @
-	  @ public normal_behavior
-	  @ requires size >= capacity;
-	  @ ensures (\forall int j; j >= 0 && j < capacity; h[j] == \old(h)[j]);
-      @ assignable \nothing;
-	  @	  
-	  @*/
+  /*@ 
+    @ public normal_behaviour
+    @ requires add_ok && size < capacity && key > 0;
+    @ ensures ( \exists int i ;i >= 0 && i < capacity ;h[i]== u) ;
+    @ assignable size, h[*];
+    @ diverges true;
+    @
+    @ also
+    @
+    @ public normal_behaviour
+    @ requires add_full && size >= capacity;
+    @ ensures ( \forall int j ;j >= 0 && j < capacity ;h[j]== \old(h) [ j]);
+    @ assignable \nothing;
+    @ diverges true;
+    @*/
 	public void add (Object u, int key) {
+        if (size < capacity) {
+            int i = hash_function(key);
 
-	    if (size < capacity) {
-    
-	    int i = hash_function(key);
-
-		if (h[i] == null) {
-		    h[i] = u;
-			size++;
-			return;
-			}
-		else {		
-			int j = 0;
-
-		while (h[i] != null && j < capacity)
-		    {
-             if (i == capacity-1) i = 0;
-             else {i++;}
-             
-             j++;
-		    }
-			
-			h[i] = u;
-			size++;
-			return;			
-		  }	
-        } 	
+            if (h[i] == null) {
+               h[i] = u;
+               size++;
+               return;
+            }
+            else {		
+               int j = 0;
+  
+               while (h[i] != null && j < capacity) {
+                     if (i == capacity-1) i = 0;
+                     else {i++;}
+               
+                     j++; 
+               }
+ 			
+               h[i] = u;
+               size++;
+               return;			
+            }	
+         } else { return; }	
 	}   
 
 	// Removes an entry from the hashtable.

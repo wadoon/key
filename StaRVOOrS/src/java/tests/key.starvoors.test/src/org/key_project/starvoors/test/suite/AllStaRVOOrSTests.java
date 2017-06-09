@@ -23,8 +23,8 @@ import org.key_project.starvoors.test.testcase.StaRVOOrSWriteAndReadTest;
  * @author Martin Hentschel
  */
 @RunWith(Suite.class)
-@Suite.SuiteClasses({
-    StaRVOOrSUtilTest.class,
+@Suite.SuiteClasses({ 
+    StaRVOOrSUtilTest.class, //TODO: Adapt to the new version of the API
     StaRVOOrSWriteAndReadTest.class
 })
 public class AllStaRVOOrSTests {

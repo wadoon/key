@@ -1,59 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <result>
-   <proof contractId="HashTable[HashTable::HashTable(int)].JML normal_behavior operation contract.0" contractText="self = new HashTable(capacity) catch(exc)
-pre: capacity &gt;= 1
-post: self.capacity = capacity
-&amp; (self.size = 0 &amp; self.&lt;inv&gt;)
-&amp; exc = null
-mod: self.h.* \cup {(self, HashTable::$size)}
-termination: diamond" type="HashTable" target="HashTable(int)">
-      <executionPath pathCondition="true" verified="true" newPrecondition="capacity &gt;= 1" terminationKind="NORMAL">
-      </executionPath>
-   </proof>
    <proof contractId="HashTable[HashTable::add(java.lang.Object,int)].JML normal_behavior operation contract.0" contractText="self.add(u, key) catch(exc)
-pre: self.size &lt; self.capacity &amp; (self.&lt;inv&gt; &amp; !u = null)
-post: self.size = javaAddInt(self.size@heapAtPre, 1)
-&amp; (  \exists int i;
-       (  i &gt;= 0
-        &amp; i &lt; self.capacity
-        &amp; inInt(i)
-        &amp; self.h[i] = u)
-   &amp; self.&lt;inv&gt;)
+pre: HashTable.add_ok = TRUE
+&amp; self.size &lt; self.capacity
+&amp; key &gt;  0
+&amp; (self.&lt;inv&gt; &amp; !u = null)
+post: \exists int i;
+    (  i &gt;= 0
+     &amp; i &lt; self.capacity
+     &amp; inInt(i)
+     &amp; self.h[i] = u)
+&amp; self.&lt;inv&gt;
 &amp; exc = null
-mod: {(self, HashTable::$size)} \cup self.h.*
-termination: diamond" type="HashTable" target="add(java.lang.Object, int)">
-      <executionPath pathCondition="self.h[self.hash_function(key)] = null" verified="true" newPrecondition="self.size &lt; self.capacity
+mod: {(self, .HashTable::$size)} \cup self.h.*
+termination: box" type="HashTable" target="add(java.lang.Object, int)">
+      <executionPath pathCondition="self.h[self.hash_function(key)] = null" verified="true" newPrecondition="HashTable.add_ok = TRUE
+&amp; self.size &lt; self.capacity
+&amp; key &gt;  0
 &amp; (self.&lt;inv&gt; &amp; !u = null)
 &amp; self.h[self.hash_function(key)] = null" terminationKind="NORMAL">
       </executionPath>
-      <executionPath pathCondition="!self.h[self.hash_function(key)] = null" verified="false" newPrecondition="self.size &lt; self.capacity
+      <executionPath pathCondition="!self.h[self.hash_function(key)] = null" verified="false" newPrecondition="HashTable.add_ok = TRUE
+&amp; self.size &lt; self.capacity
+&amp; key &gt;  0
 &amp; (self.&lt;inv&gt; &amp; !u = null)
 &amp; !self.h[self.hash_function(key)] = null">
       </executionPath>
    </proof>
    <proof contractId="HashTable[HashTable::add(java.lang.Object,int)].JML normal_behavior operation contract.1" contractText="self.add(u, key) catch(exc)
-pre: self.size &gt;= self.capacity &amp; (self.&lt;inv&gt; &amp; !u = null)
+pre: HashTable.add_full = TRUE
+&amp; self.size &gt;= self.capacity
+&amp; (self.&lt;inv&gt; &amp; !u = null)
 post: \forall int j;
     (   j &gt;= 0 &amp; j &lt; self.capacity &amp; inInt(j)
      -&gt; self.h[j] = (self.h@heapAtPre)[j])
 &amp; self.&lt;inv&gt;
 &amp; exc = null
 mod: {}
-termination: diamond" type="HashTable" target="add(java.lang.Object, int)">
-      <executionPath pathCondition="true" verified="true" newPrecondition="self.size &gt;= self.capacity &amp; (self.&lt;inv&gt; &amp; !u = null)" terminationKind="NORMAL">
+termination: box" type="HashTable" target="add(java.lang.Object, int)">
+      <executionPath pathCondition="true" verified="true" newPrecondition="HashTable.add_full = TRUE
+&amp; self.size &gt;= self.capacity
+&amp; (self.&lt;inv&gt; &amp; !u = null)" terminationKind="NORMAL">
       </executionPath>
    </proof>
    <proof contractId="HashTable[HashTable::hash_function(int)].JML normal_behavior operation contract.0" contractText="result = self.hash_function(val) catch(exc)
-pre: self.&lt;inv&gt;
+pre: HashTable.hashfun_ok = TRUE
+&amp; val &gt;  0
+&amp; self.&lt;inv&gt;
 post: result &gt;= 0
 &amp; result &lt; self.capacity
 &amp; self.&lt;inv&gt;
 &amp; exc = null
 mod: {}
-termination: diamond" type="HashTable" target="hash_function(int)">
-      <executionPath pathCondition="val &gt;  -1" verified="true" newPrecondition="self.&lt;inv&gt; &amp; val &gt;  -1" terminationKind="NORMAL">
-      </executionPath>
-      <executionPath pathCondition="val &lt; 0" verified="true" newPrecondition="self.&lt;inv&gt; &amp; val &lt; 0" terminationKind="NORMAL">
+termination: box" type="HashTable" target="hash_function(int)">
+      <executionPath pathCondition="true" verified="true" newPrecondition="HashTable.hashfun_ok = TRUE
+&amp; val &gt;  0
+&amp; self.&lt;inv&gt;" terminationKind="NORMAL">
       </executionPath>
    </proof>
 </result>
