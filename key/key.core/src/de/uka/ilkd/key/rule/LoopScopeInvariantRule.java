@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
 
@@ -455,6 +456,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final Term progPost = splitUpdates(inst.progPost, services).second;
 
         Term fullInvariant = tb.and(invTerm, frameCondition, variantPO);
+        fullInvariant = AbstractOperationPO
+                .addUninterpretedPredicateIfRequired(services, fullInvariant);
         fullInvariant = TermLabelManager.refactorTerm(termLabelState, services,
                 null, fullInvariant, this, presrvAndUCGoal,
                 FULL_INVARIANT_TERM_HINT, null);
