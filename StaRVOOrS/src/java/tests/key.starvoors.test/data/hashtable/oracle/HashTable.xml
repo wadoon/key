@@ -12,7 +12,7 @@ post: \exists int i;
      &amp; self.h[i] = u)
 &amp; self.&lt;inv&gt;
 &amp; exc = null
-mod: {(self, .HashTable::$size)} \cup self.h.*
+mod: {(self, HashTable::$size)} \cup self.h.*
 termination: box" type="HashTable" target="add(java.lang.Object, int)">
       <executionPath pathCondition="self.h[self.hash_function(key)] = null" verified="true" newPrecondition="HashTable.add_ok = TRUE
 &amp; self.size &lt; self.capacity

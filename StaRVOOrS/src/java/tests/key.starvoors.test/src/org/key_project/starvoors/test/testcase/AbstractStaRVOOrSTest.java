@@ -72,13 +72,8 @@ public abstract class AbstractStaRVOOrSTest extends AbstractSymbolicExecutionTes
       if (expected != null) {
          assertNotNull(actual);
          assertEquals(expected.getContractId(), actual.getContractId());
-         if (!StringUtil.equalIgnoreWhiteSpace(expected.getContractText(), actual.getContractText())) {
-        	 System.out.println(expected.getContractText().toString());
-        	 System.out.println("================================================================");
-        	 System.out.println(actual.getContractText().toString());
-        	 System.out.println();
-        	 System.out.println();
-            assertEquals(expected.getContractText(), actual.getContractText());
+         if (!StringUtil.equalIgnoreWhiteSpace(expected.getContractText(), actual.getContractText())) {        
+            assertEquals(expected.getContractText(), actual.getContractText().replaceAll("[\\t\\n\\r]"," "));
          }
          assertPaths(expected.getPaths(), actual.getPaths());
       }
