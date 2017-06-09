@@ -40,6 +40,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelManager;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Junctor;
@@ -52,6 +54,7 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
+import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.Pair;
 
@@ -61,6 +64,9 @@ import de.uka.ilkd.key.util.Pair;
  * @author Dominic Steinhöfel
  */
 public class LogicUtilities {
+
+    private static final String FACT_HINT = "factToAnalyze";
+    private static final Object FACT_PREMISE_HINT = "factPremiseHint";
 
     /**
      * TODO
@@ -189,10 +195,29 @@ public class LogicUtilities {
      * @param pio
      * @param analysisGoal
      * @param fact
-     * @param descr
+     * @param termLabelState
+     * @param rule
      */
     public static void prepareGoal(final PosInOccurrence pio,
-            final Goal analysisGoal, final Term fact, final String descr) {
+            final Goal analysisGoal, final Term fact,
+            TermLabelState termLabelState, Rule rule) {
+        prepareGoal(pio, analysisGoal, fact, "Covers fact", termLabelState,
+                rule);
+    }
+
+    /**
+     * TODO
+     * 
+     * @param pio
+     * @param analysisGoal
+     * @param fact
+     * @param descr
+     * @param termLabelState
+     * @param rule
+     */
+    public static void prepareGoal(final PosInOccurrence pio,
+            final Goal analysisGoal, final Term fact, final String descr,
+            TermLabelState termLabelState, Rule rule) {
         final Services services = analysisGoal.proof().getServices();
 
         analysisGoal.setBranchLabel(String.format("%s \"%s\"", descr,
@@ -203,10 +228,13 @@ public class LogicUtilities {
                         .replaceAll("<<[^>]+>>", "").trim()));
 
         analysisGoal.removeFormula(pio);
-        analysisGoal.addFormula(
-                new SequentFormula(services.getTermBuilder().label(fact,
-                        StrengthAnalysisParameterlessTL.FACT_LABEL)),
-                false, true);
+
+        Term newFormula = services.getTermBuilder().label(fact,
+                StrengthAnalysisParameterlessTL.FACT_LABEL);
+        newFormula = TermLabelManager.refactorTerm(termLabelState, services,
+                null, newFormula, rule, analysisGoal, FACT_HINT, null);
+
+        analysisGoal.addFormula(new SequentFormula(newFormula), false, true);
     }
 
     /**
@@ -215,13 +243,21 @@ public class LogicUtilities {
      * @param analysisGoal
      * @param t
      * @param addFactPremiseLabel
+     * @param termLabelState
+     * @param rule
      */
     public static void addFactPrecondition(Goal analysisGoal, Term t,
-            boolean addFactPremiseLabel) {
-        analysisGoal.addFormula(new SequentFormula(addFactPremiseLabel
+            boolean addFactPremiseLabel, TermLabelState termLabelState,
+            Rule rule) {
+        Term newFormula = addFactPremiseLabel
                 ? analysisGoal.proof().getServices().getTermBuilder().label(t,
                         StrengthAnalysisParameterlessTL.FACT_PREMISE_LABEL)
-                : t), true, false);
+                : t;
+        newFormula = TermLabelManager.refactorTerm(termLabelState,
+                analysisGoal.proof().getServices(), null, newFormula, rule,
+                analysisGoal, FACT_PREMISE_HINT, null);
+
+        analysisGoal.addFormula(new SequentFormula(newFormula), true, false);
     }
 
     /**
@@ -234,29 +270,20 @@ public class LogicUtilities {
      *            <code>numFactsWithPremiseLabels - 1</code> will be labeled
      *            with
      *            {@link StrengthAnalysisParameterlessTL#FACT_PREMISE_LABEL}
+     * @param termLabelState
+     * @param rule
      */
     public static void addFactPreconditions( //
             Goal analysisGoal, Iterable<Term> terms,
-            int numFactsWithPremiseLabels) {
+            int numFactsWithPremiseLabels, TermLabelState termLabelState,
+            Rule rule) {
 
         int i = 0;
         for (Term term : terms) {
             addFactPrecondition(analysisGoal, term,
-                    i < numFactsWithPremiseLabels);
+                    i < numFactsWithPremiseLabels, termLabelState, rule);
             i++;
         }
-    }
-
-    /**
-     * TODO
-     * 
-     * @param pio
-     * @param analysisGoal
-     * @param fact
-     */
-    public static void prepareGoal(final PosInOccurrence pio,
-            final Goal analysisGoal, final Term fact) {
-        prepareGoal(pio, analysisGoal, fact, "Covers fact");
     }
 
     /**

@@ -40,6 +40,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -66,6 +67,9 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
             "AnalyzePostCondImpliesMethodEffects");
     public static final AnalyzePostCondImpliesMethodEffectsRule INSTANCE = //
             new AnalyzePostCondImpliesMethodEffectsRule();
+    
+    public static final String POSTCONDITION_SATISFIED_BRANCH_LABEL = "Postcondition satisfied";
+    public static final String COVERS_INVARIANT_FACT_BRANCH_LABEL = "Covers invariant fact";
 
     private AnalyzePostCondImpliesMethodEffectsRule() {
         // Singleton Constructor
@@ -207,6 +211,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         final ImmutableList<Goal> goals = goal.split((hasResultVar ? 1 : 0)
                 + storeEqualities.size() + invElems.size() + 1);
         final Goal[] goalArray = goals.toArray(Goal.class);
+        final TermLabelState termLabelState = new TermLabelState();
 
         // Add result var goal
         if (hasResultVar) {
@@ -216,7 +221,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                     MergeRuleUtils.getUpdateRightSideFor(updateTerm,
                             resultVar));
 
-            prepareGoal(pio, analysisGoal, currAnalysisTerm);
+            prepareGoal(pio, analysisGoal, currAnalysisTerm, termLabelState, this);
 
             final List<Term> newPres = Arrays
                     .asList(new Term[] {
@@ -234,7 +239,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                                             updateContent.get(lhs)))
                                     .collect(Collectors.toList())) });
 
-            addFactPreconditions(analysisGoal, newPres, 1);
+            addFactPreconditions(analysisGoal, newPres, 1, termLabelState, this);
         }
 
         int i = hasResultVar ? 1 : 0;
@@ -251,13 +256,14 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
             }
 
             prepareGoal(pio, analysisGoal, invElem,
-                    "Covers invariant fact");
+                    COVERS_INVARIANT_FACT_BRANCH_LABEL, termLabelState, this);
 
             // Remove anonymized invariant formulas from the antecedent,
             // otherwise it's trivial to close this goal.
             removeLoopInvFormulasFromAntec(analysisGoal);
 
-            addFactPrecondition(analysisGoal, tb.apply(updateTerm, anonPostCond), true);
+            addFactPrecondition(analysisGoal,
+                    tb.apply(updateTerm, anonPostCond), true, termLabelState, this);
 
             i++;
         }
@@ -269,7 +275,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
             for (Term storeEquality : storeEqualities) {
                 final Goal analysisGoal = goalArray[i];
 
-                prepareGoal(pio, analysisGoal, storeEquality);
+                prepareGoal(pio, analysisGoal, storeEquality, termLabelState, this);
 
                 final Term update = tb.parallel( //
                         tb.elementary(tb.var(heapVar), innerHeapTerm), //
@@ -283,7 +289,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                                                 updateContent.get(lhs)))
                                         .collect(Collectors.toList())) });
 
-                addFactPreconditions(analysisGoal, newPres, 1);
+                addFactPreconditions(analysisGoal, newPres, 1, termLabelState, this);
 
                 i++;
             }
@@ -293,7 +299,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         final Goal postCondGoal = goalArray[goalArray.length - 1];
         addSETPredicateToAntec(postCondGoal);
 
-        postCondGoal.setBranchLabel("Postcondition satisfied");
+        postCondGoal.setBranchLabel(POSTCONDITION_SATISFIED_BRANCH_LABEL);
 
         return goals;
     }

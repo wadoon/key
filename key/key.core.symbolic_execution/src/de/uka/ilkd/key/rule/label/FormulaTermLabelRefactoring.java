@@ -161,6 +161,13 @@ public class FormulaTermLabelRefactoring implements TermLabelRefactoring {
          Proof proof = goal.proof();
          if ((rule instanceof WhileInvariantRule && WhileInvariantRule.INITIAL_INVARIANT_ONLY_HINT.equals(hint)) ||
              (rule instanceof WhileInvariantRule && WhileInvariantRule.FULL_INVARIANT_TERM_HINT.equals(hint)) ||
+             // The following is a bit ugly, but we cannot directly access these rules without cyclic dependences
+             // between the packages. We could add ad custom FormulaTermLabelRefactoring in the strength analysis
+             // package, or switch to a ServiceLoader infrastructure -- for now, this hack suffices.
+             // DS, June 9th, 2017
+             (((rule.displayName().equals("AnalyzeInvImpliesLoopEffects") ||
+                     (rule.displayName().equals("AnalyzePostCondImpliesMethodEffects")))) &&
+                     (hint.equals("factToAnalyze") || hint.equals("factPremiseHint"))) ||
              (rule instanceof LoopScopeInvariantRule && LoopScopeInvariantRule.INITIAL_INVARIANT_ONLY_HINT.equals(hint)) ||
              (rule instanceof LoopScopeInvariantRule && LoopScopeInvariantRule.FULL_INVARIANT_TERM_HINT.equals(hint)) ||
              (rule instanceof LoopScopeInvariantRule && LoopScopeInvariantRule.ANON_INVARIANT_TERM_HINT.equals(hint)) ||

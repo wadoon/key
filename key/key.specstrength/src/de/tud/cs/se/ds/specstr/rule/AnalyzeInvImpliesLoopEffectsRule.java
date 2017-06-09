@@ -31,6 +31,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
@@ -52,6 +53,8 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
     public static final Name NAME = new Name("AnalyzeInvImpliesLoopEffects");
     public static final AnalyzeInvImpliesLoopEffectsRule INSTANCE = new AnalyzeInvImpliesLoopEffectsRule();
+    
+    public static final String INVARIANT_PRESERVED_BRANCH_LABEL = "Invariant preserved";
 
     private AnalyzeInvImpliesLoopEffectsRule() {
         // Singleton Constructor
@@ -138,6 +141,7 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
         final ImmutableList<Goal> goals = goal
                 .split(newGoalInformation.size() + storeEqualities.size() + 1);
         final Goal[] goalArray = goals.toArray(Goal.class);
+        final TermLabelState termLabelState = new TermLabelState();
 
         int i = 0;
         for (LocationVariable currLocalOut : newGoalInformation.keySet()) {
@@ -146,16 +150,16 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
             final Term currAnalysisTerm = tb.equals(tb.var(currLocalOut),
                     updateContent.get(currLocalOut));
 
-            prepareGoal(pio, analysisGoal, currAnalysisTerm);
+            prepareGoal(pio, analysisGoal, currAnalysisTerm, termLabelState, this);
             removeLoopInvFormulasFromAntec(analysisGoal);
-            addFactPreconditions(analysisGoal, newGoalInformation.get(currLocalOut), 1);
+            addFactPreconditions(analysisGoal, newGoalInformation.get(currLocalOut), 1, termLabelState, this);
         }
 
         if (storeEqsAndInnerHeapTerm.isPresent()) {
             for (Term heapEquality : storeEqualities) {
                 final Goal analysisGoal = goalArray[i++];
 
-                prepareGoal(pio, analysisGoal, heapEquality);
+                prepareGoal(pio, analysisGoal, heapEquality, termLabelState, this);
                 removeLoopInvFormulasFromAntec(analysisGoal);
 
                 final Term update = updateWithoutLocalOuts;
@@ -171,12 +175,12 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
                                 .filter(se -> se != heapEquality)
                                 .collect(Collectors.toList())) });
 
-                addFactPreconditions(analysisGoal, newPres, 1);
+                addFactPreconditions(analysisGoal, newPres, 1, termLabelState, this);
             }
         }
 
         addSETPredicateToAntec(goalArray[goalArray.length - 1]);
-        goalArray[goalArray.length - 1].setBranchLabel("Invariant preserved");
+        goalArray[goalArray.length - 1].setBranchLabel(INVARIANT_PRESERVED_BRANCH_LABEL);
 
         return goals;
     }

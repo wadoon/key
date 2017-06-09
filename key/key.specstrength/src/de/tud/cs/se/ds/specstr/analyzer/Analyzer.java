@@ -30,8 +30,10 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.tud.cs.se.ds.specstr.rule.AnalyzeInvImpliesLoopEffectsRule;
 import de.tud.cs.se.ds.specstr.rule.AnalyzePostCondImpliesMethodEffectsRule;
-import de.tud.cs.se.ds.specstr.util.JavaTypeInterface;
+import de.tud.cs.se.ds.specstr.rule.FactAnalysisRule;
 import de.tud.cs.se.ds.specstr.util.GeneralUtilities;
+import de.tud.cs.se.ds.specstr.util.JavaTypeInterface;
+import de.tud.cs.se.ds.specstr.util.LogicUtilities;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -189,17 +191,38 @@ public class Analyzer {
 
         logger.info("Proving facts, this may take some time...");
 
+        // The show-the-facts loop
+
         List<Fact> coveredFacts = new ArrayList<>();
+        List<Fact> abstractlyCoveredFacts = new ArrayList<>();
         List<Fact> unCoveredFacts = new ArrayList<>();
 
         for (Fact fact : facts) {
             logger.trace("Proving fact %s", fact.descr);
-            final Node factNode = fact.goal.node();
+
+            final Node factNode = fact.factCoveredNode;
             seIf.applyMacro(new TryCloseMacro(10000), factNode);
+
             if (factNode.isClosed()) {
+                logger.trace("Fact covered");
                 coveredFacts.add(fact);
             } else {
-                unCoveredFacts.add(fact);
+                final Node abstractlyCoveredNode = fact.factAbstractlyCoveredNode;
+
+                boolean abstractlyCovered = false;
+                if (abstractlyCoveredNode != null) {
+                    seIf.applyMacro(new TryCloseMacro(10000),
+                            abstractlyCoveredNode);
+                    abstractlyCovered = abstractlyCoveredNode.isClosed();
+                }
+
+                if (abstractlyCovered) {
+                    logger.trace("Fact abstractly covered");
+                    abstractlyCoveredFacts.add(fact);
+                } else {
+                    logger.trace("Fact uncovered");
+                    unCoveredFacts.add(fact);
+                }
             }
         }
 
@@ -217,7 +240,8 @@ public class Analyzer {
 
         logger.trace("Finished analysis of Java file %s", file);
 
-        return new AnalyzerResult(coveredFacts, unCoveredFacts);
+        return new AnalyzerResult(coveredFacts, abstractlyCoveredFacts,
+                unCoveredFacts);
     }
 
     /**
@@ -248,7 +272,7 @@ public class Analyzer {
                     p.second.forEach(sf -> proof.getSubtreeGoals(p.first).head()
                             .apply(MiscTools.findOneStepSimplifier(proof)
                                     .createApp(
-                                            findInSequent(sf,
+                                            LogicUtilities.findInSequent(sf,
                                                     p.first.sequent()),
                                             services)));
 
@@ -273,11 +297,15 @@ public class Analyzer {
         useCaseNodes.removeAll(obsoleteUseCaseNodes);
         useCaseNodes.addAll(newUseCaseNodes);
 
-        facts.addAll(useCaseNodes.stream().map(n -> new Fact(
-                polishFactDescription(n.sequent(), preservesAndUCNode.sequent(),
-                        services),
-                extractReadablePathCondition(proof.getSubtreeGoals(n).head()),
-                FactType.LOOP_USE_CASE_FACT, proof.getGoal(n)))
+        // TODO: No abstraction support here so far; keep in mind that the
+        // corresponding Node is set to null.
+        facts.addAll(useCaseNodes.stream()
+                .map(n -> new Fact(
+                        polishFactDescription(n.sequent(),
+                                preservesAndUCNode.sequent(), services),
+                        extractReadablePathCondition(
+                                proof.getSubtreeGoals(n).head().node()),
+                        FactType.LOOP_USE_CASE_FACT, n, null))
                 .collect(Collectors.toList()));
     }
 
@@ -299,27 +327,68 @@ public class Analyzer {
 
             if (AnalyzePostCondImpliesMethodEffectsRule.INSTANCE.isApplicable( //
                     g, maybePio.get())) {
-                g.apply(AnalyzePostCondImpliesMethodEffectsRule.INSTANCE
-                        .createApp(maybePio.get(), proof.getServices()));
+                final Iterable<Goal> analysisGoals = //
+                        g.apply(AnalyzePostCondImpliesMethodEffectsRule.INSTANCE
+                                .createApp(maybePio.get(),
+                                        proof.getServices()));
 
-                boolean first = true;
-                for (Goal analysisGoal : g.proof()
-                        .getSubtreeGoals(postCondNode)) {
-                    if (first) {
-                        first = false;
-                        continue;
+                for (Goal analysisGoal : analysisGoals) {
+                    if (!analysisGoal.node().getNodeInfo().getBranchLabel()
+                            .equals(AnalyzePostCondImpliesMethodEffectsRule.POSTCONDITION_SATISFIED_BRANCH_LABEL)) {
+
+                        final String readablePathCond = extractReadablePathCondition(
+                                analysisGoal.node().parent());
+                        final String branchLabel = analysisGoal.node()
+                                .getNodeInfo().getBranchLabel();
+
+                        // TODO: Uncomment and make working
+//                        final Iterable<Node> factAnalysisNodes = //
+//                                GeneralUtilities
+//                                        .toStream(analysisGoal.apply(
+//                                                FactAnalysisRule.INSTANCE.createApp(
+//                                                        null, proof.getServices())))
+//                                        .map(g -> g.node())
+//                                        .collect(Collectors.toList());
+//
+//                        if (factCanBeDiscarded(factAnalysisNodes)) {
+//                            // Discard the fact -- too easy ;)
+//                            continue;
+//                        }
+//
+//                        facts.add(new Fact(branchLabel.split("\"")[1],
+//                                readablePathCondition, FactType.LOOP_BODY_FACT,
+//                                FactAnalysisRule.getFactCoveredNode(factAnalysisNodes),
+//                                FactAnalysisRule.getFactAbstractlyCoveredNode(
+//                                        factAnalysisNodes)));
+                        
+//                        final Iterable<Goal> factAnalysisGoals = //
+//                                analysisGoal.apply(FactAnalysisRule.INSTANCE
+//                                        .createApp(null, proof.getServices()));
+//
+//                        if (factCanBeDiscarded(factAnalysisGoals)) {
+//                            // Discard the fact -- too easy ;)
+//                            continue;
+//                        }
+//
+//                        facts.add(new Fact(branchLabel.split("\"")[1],
+//                                readablePathCond,
+//                                branchLabel.equals( //
+//                                        AnalyzePostCondImpliesMethodEffectsRule.COVERS_INVARIANT_FACT_BRANCH_LABEL)
+//                                                ? FactType.POST_COND_INV_FACT
+//                                                : FactType.POST_COND_FACT,
+//                                FactAnalysisRule
+//                                        .getFactCoveredNode(factAnalysisGoals),
+//                                FactAnalysisRule.getFactAbstractlyCoveredNode(
+//                                        factAnalysisGoals)));
+
+                      facts.add(new Fact(branchLabel.split("\"")[1],
+                              readablePathCond,
+                              branchLabel.equals( //
+                                      AnalyzePostCondImpliesMethodEffectsRule.COVERS_INVARIANT_FACT_BRANCH_LABEL)
+                                              ? FactType.POST_COND_INV_FACT
+                                              : FactType.POST_COND_FACT,
+                              analysisGoal.node(), null));
                     }
-
-                    extractReadablePathCondition(analysisGoal);
-
-                    final String branchLabel = analysisGoal.node().getNodeInfo()
-                            .getBranchLabel();
-                    facts.add(new Fact(branchLabel.split("\"")[1],
-                            extractReadablePathCondition(analysisGoal),
-                            branchLabel.contains("invariant fact")
-                                    ? FactType.POST_COND_INV_FACT
-                                    : FactType.POST_COND_FACT,
-                            analysisGoal));
                 }
             }
         }
@@ -328,30 +397,122 @@ public class Analyzer {
     /**
      * TODO
      * 
-     * @param analysisGoal
+     * @param proof
+     * @param services
+     * @param preservedNodes
+     * @param facts
+     */
+    private void extractLoopBodyFactsAndShowValidity(final Proof proof,
+            final List<Node> preservedNodes, final List<Fact> facts) {
+        final Services services = proof.getServices();
+
+        int invariantGoalsNotPreserved = 0;
+
+        for (Node preservedNode : preservedNodes) {
+            final Optional<PosInOccurrence> proofOblPio = getPioOfFormulaWhichHadSELabel(
+                    preservedNode);
+
+            assert proofOblPio
+                    .isPresent() : "There should be a formula with SE label";
+
+            final RuleApp app = AnalyzeInvImpliesLoopEffectsRule.INSTANCE
+                    .createApp(proofOblPio.get(), services)
+                    .forceInstantiate(proof.getGoal(preservedNode));
+
+            final Goal[] preservedGoals = proof.getSubtreeGoals(preservedNode)
+                    .head().apply(app).toArray(Goal.class);
+            for (int i = 0; i < preservedGoals.length - 1; i++) {
+                final Goal analysisGoal = preservedGoals[i];
+                final String branchLabel = analysisGoal.node().getNodeInfo()
+                        .getBranchLabel();
+                final String readablePathCondition = extractReadablePathCondition(
+                        analysisGoal.node().parent());
+
+                //TODO: Uncomment and make working
+                final Iterable<Node> factAnalysisNodes = //
+                        GeneralUtilities
+                                .toStream(analysisGoal.apply(
+                                        FactAnalysisRule.INSTANCE.createApp(
+                                                null, proof.getServices())))
+                                .map(g -> g.node())
+                                .collect(Collectors.toList());
+
+                if (factCanBeDiscarded(factAnalysisNodes)) {
+                    // Discard the fact -- too easy ;)
+                    continue;
+                }
+
+                facts.add(new Fact(branchLabel.split("\"")[1],
+                        readablePathCondition, FactType.LOOP_BODY_FACT,
+                        FactAnalysisRule.getFactCoveredNode(factAnalysisNodes),
+                        FactAnalysisRule.getFactAbstractlyCoveredNode(
+                                factAnalysisNodes)));
+
+//                facts.add(new Fact(branchLabel.split("\"")[1],
+//                        readablePathCondition, FactType.LOOP_BODY_FACT,
+//                        analysisGoal.node(),
+//                        null));
+            }
+
+            final Node actualPreservedNode = preservedGoals[preservedGoals.length
+                    - 1].node();
+            seIf.applyMacro(new TryCloseMacro(10000),
+                    preservedGoals[preservedGoals.length - 1].node());
+            if (!actualPreservedNode.isClosed()) {
+                invariantGoalsNotPreserved++;
+            }
+        }
+
+        if (invariantGoalsNotPreserved > 0) {
+            logger.warn(
+                    "Loop invariant could be invalid: %s open preserves goals",
+                    invariantGoalsNotPreserved);
+        }
+    }
+
+    /**
+     * TODO
+     * 
+     * @param analysisGoals
      * @return
      */
-    private static String extractReadablePathCondition(Goal analysisGoal) {
+    private boolean factCanBeDiscarded(Iterable<Node> analysisGoals) {
+        // Discard the fact if it can be proven without the
+        // specification
+        final Node coveredByTrueNode = FactAnalysisRule
+                .getCoveredByTrueNode(analysisGoals);
+        seIf.applyMacro(new TryCloseMacro(1000), coveredByTrueNode);
+
+        return coveredByTrueNode.isClosed();
+    }
+
+    /**
+     * TODO
+     * 
+     * @param analysisNode
+     * @return
+     */
+    private static String extractReadablePathCondition(Node analysisNode) {
         String pathCond = "";
         try {
             boolean problem = false;
-            Term pathCondTerm = analysisGoal.proof().getServices()
+            Term pathCondTerm = analysisNode.proof().getServices()
                     .getTermBuilder().tt();
 
             try {
                 pathCondTerm = SymbolicExecutionUtil
-                        .computePathCondition(analysisGoal.node(), true, true);
+                        .computePathCondition(analysisNode, true, true);
             } catch (RuntimeException e1) {
                 problem = true;
             }
 
             pathCond = (problem ? "ERROR-PC " : "") + LogicPrinter
                     .quickPrintTerm(pathCondTerm,
-                            analysisGoal.proof().getServices())
+                            analysisNode.proof().getServices())
                     .replaceAll("(\\r|\\n|\\r\\n)+", " ");
         } catch (ProofInputException e) {
             logger.error("Couldn't compute path comdition for goal %s"
-                    + analysisGoal.node().serialNr());
+                    + analysisNode.serialNr());
         }
 
         return pathCond;
@@ -369,13 +530,13 @@ public class Analyzer {
             Sequent originSeq, Services services) {
         final List<SequentFormula> newAntec = GeneralUtilities
                 .toStream(factSeq.antecedent()).collect(Collectors.toList());
-        newAntec.removeAll(GeneralUtilities
-                .toStream(originSeq.antecedent()).collect(Collectors.toList()));
+        newAntec.removeAll(GeneralUtilities.toStream(originSeq.antecedent())
+                .collect(Collectors.toList()));
 
         final List<SequentFormula> newSucc = GeneralUtilities
                 .toStream(factSeq.succedent()).collect(Collectors.toList());
-        newSucc.removeAll(GeneralUtilities
-                .toStream(originSeq.succedent()).collect(Collectors.toList()));
+        newSucc.removeAll(GeneralUtilities.toStream(originSeq.succedent())
+                .collect(Collectors.toList()));
 
         Sequent newSequent = Sequent.EMPTY_SEQUENT;
         for (SequentFormula antecF : newAntec) {
@@ -386,30 +547,6 @@ public class Analyzer {
         }
 
         return LogicPrinter.quickPrintSequent(newSequent, services);
-    }
-
-    /**
-     * TODO
-     * 
-     * @param sf
-     * @param seq
-     * @return
-     */
-    private static PosInOccurrence findInSequent(SequentFormula sf,
-            Sequent seq) {
-        for (SequentFormula otherSf : seq.antecedent()) {
-            if (otherSf.formula().equals(sf.formula())) {
-                return new PosInOccurrence(sf, PosInTerm.getTopLevel(), true);
-            }
-        }
-
-        for (SequentFormula otherSf : seq.succedent()) {
-            if (otherSf.formula().equals(sf.formula())) {
-                return new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
-            }
-        }
-
-        return null;
     }
 
     /**
@@ -466,57 +603,6 @@ public class Analyzer {
                         "Couldn't find the value for loop scope index %s in goal #%s",
                         loopScopeIndex, g.node().serialNr());
             }
-        }
-    }
-
-    /**
-     * TODO
-     * 
-     * @param proof
-     * @param services
-     * @param preservedNodes
-     * @param facts
-     */
-    private void extractLoopBodyFactsAndShowValidity(final Proof proof,
-            final List<Node> preservedNodes, final List<Fact> facts) {
-        final Services services = proof.getServices();
-
-        int invariantGoalsNotPreserved = 0;
-
-        for (Node preservedNode : preservedNodes) {
-            final Optional<PosInOccurrence> proofOblPio = getPioOfFormulaWhichHadSELabel(
-                    preservedNode);
-
-            assert proofOblPio
-                    .isPresent() : "There should be a formula with SE label";
-
-            final RuleApp app = AnalyzeInvImpliesLoopEffectsRule.INSTANCE
-                    .createApp(proofOblPio.get(), services)
-                    .forceInstantiate(proof.getGoal(preservedNode));
-
-            final Goal[] preservedGoals = proof.getSubtreeGoals(preservedNode)
-                    .head().apply(app).toArray(Goal.class);
-            for (int i = 0; i < preservedGoals.length - 1; i++) {
-                facts.add(new Fact(
-                        preservedGoals[i].node().getNodeInfo().getBranchLabel()
-                                .split("\"")[1],
-                        extractReadablePathCondition(preservedGoals[i]),
-                        FactType.LOOP_BODY_FACT, preservedGoals[i]));
-            }
-
-            final Node actualPreservedNode = preservedGoals[preservedGoals.length
-                    - 1].node();
-            seIf.applyMacro(new TryCloseMacro(10000),
-                    preservedGoals[preservedGoals.length - 1].node());
-            if (!actualPreservedNode.isClosed()) {
-                invariantGoalsNotPreserved++;
-            }
-        }
-
-        if (invariantGoalsNotPreserved > 0) {
-            logger.warn(
-                    "Loop invariant could be invalid: %s open preserves goals",
-                    invariantGoalsNotPreserved);
         }
     }
 
@@ -666,10 +752,25 @@ public class Analyzer {
             });
         }
 
-        ps.printf("Covered %s out of %s facts; Strength: %.2f%%\n",
-                result.numCoveredFacts(), result.numFacts(),
-                100d * ((double) result.numCoveredFacts())
-                        / ((double) result.numFacts()));
+        if (result.numAbstractlyCoveredFacts() > 0) {
+            // @formatter:off
+            ps.println("=========================\n"
+                     + "Abstractly Covered Facts:\n"
+                     + "=========================\n");
+            // @formatter:on
+
+            final PrintStream fPs = ps;
+            result.getAbstractlyCoveredFacts().forEach(f -> {
+                fPs.println(f);
+                fPs.println();
+            });
+        }
+
+        ps.printf(
+                "Covered %s (%s completely, %s abstractly) out of %s facts; Strength: %.2f%%\n",
+                result.numCoveredFacts() + result.numAbstractlyCoveredFacts(),
+                result.numCoveredFacts(), result.numAbstractlyCoveredFacts(),
+                result.numFacts(), result.strength());
     }
 
     public static enum FactType {
@@ -680,17 +781,23 @@ public class Analyzer {
         private final String descr;
         private final String pathCond;
         private final FactType factType;
-        private final int goalNr;
-        private final Goal goal;
+        private final int nodeNr;
+        private final int abstractlyCoveredNodeNr;
+        private final Node factCoveredNode;
+        private final Node factAbstractlyCoveredNode;
         private boolean covered = false;
+        private boolean abstractlyCovered = false;
 
         public Fact(String descr, String pathCond, FactType factType,
-                Goal goal) {
+                Node factCoveredNode, Node factAbstractlyCoveredNode) {
             this.descr = descr;
             this.pathCond = pathCond;
             this.factType = factType;
-            this.goalNr = goal.node().serialNr();
-            this.goal = goal;
+            this.factCoveredNode = factCoveredNode;
+            this.nodeNr = factCoveredNode.serialNr();
+            this.factAbstractlyCoveredNode = factAbstractlyCoveredNode;
+            this.abstractlyCoveredNodeNr = factAbstractlyCoveredNode == null
+                    ? -1 : factAbstractlyCoveredNode.serialNr();
         }
 
         public boolean isCovered() {
@@ -698,7 +805,19 @@ public class Analyzer {
         }
 
         public void setCovered(boolean covered) {
+            assert !abstractlyCovered || !covered;
+
             this.covered = covered;
+        }
+
+        public boolean isAbstractlyCovered() {
+            return abstractlyCovered;
+        }
+
+        public void setAbstractlyCovered(boolean abstractlyCovered) {
+            assert !abstractlyCovered || !covered;
+
+            this.abstractlyCovered = abstractlyCovered;
         }
 
         public String getDescr() {
@@ -713,18 +832,26 @@ public class Analyzer {
             return factType;
         }
 
-        public int getGoalNr() {
-            return goalNr;
+        public int getFactCoveredNodeNr() {
+            return nodeNr;
         }
 
-        public Goal getGoal() {
-            return goal;
+        public Node getFactCoveredNode() {
+            return factCoveredNode;
+        }
+
+        public int getFactAbstractlyCoveredNodeNr() {
+            return abstractlyCoveredNodeNr;
+        }
+
+        public Node getFactAbstractlyCoveredNode() {
+            return factAbstractlyCoveredNode;
         }
 
         @Override
         public String toString() {
             return String.format("%s at goal %s\n%s\nPath condition: %s",
-                    factTypeToString(factType), goalNr, descr, pathCond);
+                    factTypeToString(factType), nodeNr, descr, pathCond);
         }
 
         private static String factTypeToString(FactType ft) {
@@ -747,16 +874,22 @@ public class Analyzer {
 
     public static class AnalyzerResult {
         private final List<Fact> coveredFacts;
+        private final List<Fact> abstractlyCoveredFacts;
         private final List<Fact> uncoveredFacts;
 
         public AnalyzerResult(List<Fact> coveredFacts,
-                List<Fact> unCoveredFacts) {
+                List<Fact> abstractlyCoveredFacts, List<Fact> unCoveredFacts) {
             this.coveredFacts = coveredFacts;
+            this.abstractlyCoveredFacts = abstractlyCoveredFacts;
             this.uncoveredFacts = unCoveredFacts;
         }
 
         public List<Fact> getCoveredFacts() {
             return coveredFacts;
+        }
+
+        public List<Fact> getAbstractlyCoveredFacts() {
+            return abstractlyCoveredFacts;
         }
 
         public List<Fact> getUncoveredFacts() {
@@ -765,6 +898,12 @@ public class Analyzer {
 
         public List<Fact> getCoveredFactsOfType(FactType type) {
             return coveredFacts.stream().filter(f -> f.factType == type)
+                    .collect(Collectors.toList());
+        }
+
+        public List<Fact> getAbstractlyCoveredFactsOfType(FactType type) {
+            return abstractlyCoveredFacts.stream()
+                    .filter(f -> f.factType == type)
                     .collect(Collectors.toList());
         }
 
@@ -777,12 +916,24 @@ public class Analyzer {
             return coveredFacts.size();
         }
 
+        public int numAbstractlyCoveredFacts() {
+            return abstractlyCoveredFacts.size();
+        }
+
         public int numUncoveredFacts() {
             return uncoveredFacts.size();
         }
 
         public int numFacts() {
-            return numCoveredFacts() + numUncoveredFacts();
+            return numCoveredFacts() + numAbstractlyCoveredFacts()
+                    + numUncoveredFacts();
+        }
+
+        public double strength() {
+            return 100d
+                    * (((double) numCoveredFacts())
+                            + ((double) numAbstractlyCoveredFacts()) * 0.5d)
+                    / ((double) numFacts());
         }
     }
 
