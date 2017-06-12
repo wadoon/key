@@ -14,9 +14,12 @@
 package de.tud.cs.se.ds.specstr.analyzer;
 
 import static de.tud.cs.se.ds.specstr.analyzer.Analyzer.FactType.*;
-import static org.junit.Assert.assertEquals;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
+
+import static org.hamcrest.Matchers.equalTo;
 
 import de.tud.cs.se.ds.specstr.analyzer.Analyzer.AnalyzerResult;
 
@@ -26,6 +29,12 @@ import de.tud.cs.se.ds.specstr.analyzer.Analyzer.AnalyzerResult;
  * @author Dominic Steinhöfel
  */
 public class FindMethodsTest extends AbstractAnalyzerTest {
+    @Rule
+    public final ErrorCollector collector = new ErrorCollector();
+
+    private void assertEquals(long expected, long actual) {
+        collector.checkThat(expected, equalTo(actual));
+    }
 
     @Test
     public void testWeakPostCondFind() {
@@ -33,7 +42,6 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
                 "findMethods/FindMethods.java",
                 "FindMethods::find_weak_postcond([II)I");
 
-        assertEquals(2, result.getUncoveredFactsOfType(LOOP_BODY_FACT).size());
         assertEquals(2, result.getUncoveredFactsOfType(POST_COND_FACT).size());
         assertEquals(7,
                 result.getUncoveredFactsOfType(POST_COND_INV_FACT).size());
@@ -76,7 +84,7 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
 
         assertEquals(1,
                 result.getUncoveredFactsOfType(POST_COND_INV_FACT).size());
-        
+
         assertEquals(1, result.numUncoveredFacts());
 
     }
