@@ -188,6 +188,7 @@ public class Analyzer {
         }
 
         logger.info("Collected %s facts", facts.size());
+        System.out.println(facts.toString());
 
         logger.info("Proving facts, this may take some time...");
 
@@ -262,11 +263,15 @@ public class Analyzer {
         final List<Node> obsoleteUseCaseNodes = new ArrayList<>();
         final List<Node> newUseCaseNodes = new ArrayList<>();
 
-        useCaseNodes.stream().map(n -> new Pair<Node, List<SequentFormula>>( //
-                n, //
-                GeneralUtilities.toStream(n.sequent()).filter(
-                        f -> f.formula().op() instanceof UpdateApplication)
-                        .collect(Collectors.toList())))
+        useCaseNodes.removeIf(n -> !n.getNodeInfo().getBranchLabel().equals(
+                AnalyzePostCondImpliesMethodEffectsRule.POSTCONDITION_SATISFIED_BRANCH_LABEL));
+        useCaseNodes.stream() //
+                .map(n -> new Pair<Node, List<SequentFormula>>( //
+                        n, //
+                        GeneralUtilities.toStream(n.sequent())
+                                .filter(f -> f.formula()
+                                        .op() instanceof UpdateApplication)
+                                .collect(Collectors.toList())))
                 .filter(p -> !p.second.isEmpty()) //
                 .forEach(p -> {
                     p.second.forEach(sf -> proof.getSubtreeGoals(p.first).head()
@@ -361,11 +366,7 @@ public class Analyzer {
                         }
 
                         facts.add(new Fact(branchLabel.split("\"")[1],
-                                readablePathCond,
-                                branchLabel.equals( //
-                                        AnalyzePostCondImpliesMethodEffectsRule.COVERS_INVARIANT_FACT_BRANCH_LABEL)
-                                                ? FactType.POST_COND_INV_FACT
-                                                : FactType.POST_COND_FACT,
+                                readablePathCond, FactType.POST_COND_FACT,
                                 FactAnalysisRule
                                         .getFactCoveredNode(factAnalysisNodes),
                                 FactAnalysisRule.getFactAbstractlyCoveredNode(
@@ -409,10 +410,11 @@ public class Analyzer {
                     .createApp(proofOblPio.get(), services)
                     .forceInstantiate(proof.getGoal(preservedNode));
 
+            final ImmutableList<Goal> analysisNodesImmList = proof
+                    .getSubtreeGoals(preservedNode).head().apply(app);
+
             final List<Node> analysisNodes = GeneralUtilities
-                    .toStream(proof.getSubtreeGoals(preservedNode).head()
-                            .apply(app))
-                    .map(goal -> goal.node())
+                    .toStream(analysisNodesImmList).map(goal -> goal.node())
                     .filter(n -> !n.getNodeInfo().getBranchLabel()
                             .equals(AnalyzeInvImpliesLoopEffectsRule.INVARIANT_PRESERVED_BRANCH_LABEL))
                     .collect(Collectors.toList());
@@ -449,9 +451,7 @@ public class Analyzer {
             }
 
             final Optional<Node> maybeActualPreservedNode = GeneralUtilities
-                    .toStream(proof.getSubtreeGoals(preservedNode).head()
-                            .apply(app))
-                    .map(goal -> goal.node())
+                    .toStream(analysisNodesImmList).map(goal -> goal.node())
                     .filter(n -> n.getNodeInfo().getBranchLabel() != null
                             && n.getNodeInfo().getBranchLabel()
                                     .equals(AnalyzeInvImpliesLoopEffectsRule.INVARIANT_PRESERVED_BRANCH_LABEL))
@@ -558,11 +558,11 @@ public class Analyzer {
      * @param services
      * @param preservesAndUCNode
      * @param preservedNodes
-     * @param useCaseNodes
+     * @param postconditionNodes
      */
     private void extractPreservedAndUseCaseNodes(final Proof proof,
             final Node preservesAndUCNode, final List<Node> preservedNodes,
-            final List<Node> useCaseNodes) {
+            final List<Node> postconditionNodes) {
         final Services services = proof.getServices();
         final LocationVariable loopScopeIndex = SymbExInterface
                 .findLoopScopeIndex(proof, preservesAndUCNode);
@@ -592,7 +592,7 @@ public class Analyzer {
             if (rhs.isPresent()) {
                 final Operator op = rhs.get().op();
                 if (op == services.getTermBuilder().TRUE().op()) {
-                    useCaseNodes.add(g.node());
+                    postconditionNodes.add(g.node());
                 } else if (op == services.getTermBuilder().FALSE().op()) {
                     preservedNodes.add(g.node());
                 } else {
@@ -776,7 +776,7 @@ public class Analyzer {
     }
 
     public static enum FactType {
-        LOOP_BODY_FACT, LOOP_USE_CASE_FACT, POST_COND_FACT, POST_COND_INV_FACT
+        LOOP_BODY_FACT, LOOP_USE_CASE_FACT, POST_COND_FACT
     }
 
     public static class Fact {
@@ -864,8 +864,6 @@ public class Analyzer {
                 return "Loop use case fact";
             case POST_COND_FACT:
                 return "Post condition implies final state fact";
-            case POST_COND_INV_FACT:
-                return "Post condition (WP) implies invariant fact";
             default:
                 GeneralUtilities.logErrorAndThrowRTE( //
                         logger, "Unknown fact type: %s", ft);

@@ -32,8 +32,8 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
     @Rule
     public final ErrorCollector collector = new ErrorCollector();
 
-    private void assertEquals(long expected, long actual) {
-        collector.checkThat(expected, equalTo(actual));
+    private void assertEquals(int expected, int actual) {
+        collector.checkThat(actual, equalTo(expected));
     }
 
     @Test
@@ -43,8 +43,6 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
                 "FindMethods::find_weak_postcond([II)I");
 
         assertEquals(2, result.getUncoveredFactsOfType(POST_COND_FACT).size());
-        assertEquals(7,
-                result.getUncoveredFactsOfType(POST_COND_INV_FACT).size());
 
         assertEquals(11, result.numUncoveredFacts());
     }
@@ -56,8 +54,6 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
 
         assertEquals(2, result.getUncoveredFactsOfType(LOOP_BODY_FACT).size());
         assertEquals(1, result.getUncoveredFactsOfType(POST_COND_FACT).size());
-        assertEquals(7,
-                result.getUncoveredFactsOfType(POST_COND_INV_FACT).size());
 
         assertEquals(10, result.numUncoveredFacts());
     }
@@ -70,8 +66,6 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
 
         assertEquals(0, result.getUncoveredFactsOfType(LOOP_BODY_FACT).size());
         assertEquals(1, result.getUncoveredFactsOfType(POST_COND_FACT).size());
-        assertEquals(10,
-                result.getUncoveredFactsOfType(POST_COND_INV_FACT).size());
 
         assertEquals(11, result.numUncoveredFacts());
     }
@@ -81,9 +75,6 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
         final AnalyzerResult result = analyzeMethod(
                 "findMethods/FindMethods.java",
                 "FindMethods::find_stronger([II)I");
-
-        assertEquals(1,
-                result.getUncoveredFactsOfType(POST_COND_INV_FACT).size());
 
         assertEquals(1, result.numUncoveredFacts());
 

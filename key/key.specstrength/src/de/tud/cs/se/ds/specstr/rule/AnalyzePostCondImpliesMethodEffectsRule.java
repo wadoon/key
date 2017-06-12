@@ -17,7 +17,6 @@ import static de.tud.cs.se.ds.specstr.util.LogicUtilities.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -26,29 +25,22 @@ import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.ImmutableList;
 
-import de.tud.cs.se.ds.specstr.util.CNFConverter;
-import de.tud.cs.se.ds.specstr.util.LogicUtilities;
-import de.tud.cs.se.ds.specstr.util.LogicUtilities.OriginOfFormula;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -68,7 +60,6 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
             new AnalyzePostCondImpliesMethodEffectsRule();
     
     public static final String POSTCONDITION_SATISFIED_BRANCH_LABEL = "Postcondition satisfied";
-    public static final String COVERS_INVARIANT_FACT_BRANCH_LABEL = "Covers invariant fact";
 
     private AnalyzePostCondImpliesMethodEffectsRule() {
         // Singleton Constructor
@@ -139,70 +130,8 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                 .map(lhs -> tb.elementary(lhs, updateContent.get(lhs)))
                 .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
 
-        final Term postCond;
-        final List<Term> invElems;
-        final List<Term> anonLoopInvUpdates = new ArrayList<>();
-        if (LogicUtilities
-                .retrieveLoopScopeIndex(pio, goal.proof().getServices())
-                .isPresent()) {
-            // We can check strength of the post condition relative to the
-            // invariant, since there was a loop scope inv rule application
-
-            // Expected formula structure:
-            // {U}((x = TRUE -> <postcond>) & (x = FALSE -> <invariant>))
-
-            // invariant structure:
-            // <inv> & <assignable> & <prec-clause>
-
-            final Term topLevelFormula = pio.sequentFormula().formula();
-            final Term invariant;
-            try {
-                postCond = topLevelFormula.sub(1).sub(0).sub(1);
-
-                final Term invInPostCond = topLevelFormula.sub(1).sub(1).sub(1)
-                        .sub(0).sub(0);
-
-                final OriginOfFormula origin = LogicUtilities
-                        .findOriginOfFormula(goal,
-                                invInPostCond);
-
-                assert origin.getNode().parent().getAppliedRuleApp()
-                        .rule() == LoopScopeInvariantRule.INSTANCE;
-
-                final Optional<SequentFormula> maybeAnonInv = StreamSupport
-                        .stream(origin.getNode().sequent().antecedent()
-                                .spliterator(), true)
-                        .filter(sf -> sf.formula().containsLabel(
-                                ParameterlessTermLabel.LOOP_INV_ANON_LABEL))
-                        .findFirst();
-
-                assert maybeAnonInv
-                        .isPresent() : "Could not find anonymized invariant formula";
-
-                Term currTerm = maybeAnonInv.get().formula();
-                while (currTerm.op() instanceof UpdateApplication) {
-                    anonLoopInvUpdates.add(currTerm.sub(0));
-                    currTerm = currTerm.sub(1);
-                }
-
-                invariant = currTerm;
-            } catch (Exception e) {
-                throw new RuntimeException(String.format(
-                        "[%s] Problem in analyzing formula %s; probably unexpected structure",
-                        getClass().getName(), LogicPrinter
-                                .quickPrintTerm(topLevelFormula, services)));
-            }
-
-            final CNFConverter cnf = new CNFConverter(tb);
-            invElems = MergeRuleUtils
-                    .getConjunctiveElementsFor(cnf.convertToCNF(invariant));
-        } else {
-            invElems = Collections.emptyList();
-            postCond = null;
-        }
-
         final ImmutableList<Goal> goals = goal.split((hasResultVar ? 1 : 0)
-                + storeEqualities.size() + invElems.size() + 1);
+                + storeEqualities.size() + 1);
         final Goal[] goalArray = goals.toArray(Goal.class);
         final TermLabelState termLabelState = new TermLabelState();
 
@@ -236,30 +165,6 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         }
 
         int i = hasResultVar ? 1 : 0;
-
-        // Add goal for invariant elements
-        for (Term invElem : invElems) {
-            final Goal analysisGoal = goalArray[i];
-
-            Term anonPostCond = postCond;
-            for (int k = anonLoopInvUpdates.size() - 1; k >= 0; k--) {
-                Term updElem = anonLoopInvUpdates.get(k);
-                invElem = tb.apply(updElem, invElem);
-                anonPostCond = tb.apply(updElem, anonPostCond);
-            }
-
-            prepareGoal(pio, analysisGoal, invElem,
-                    COVERS_INVARIANT_FACT_BRANCH_LABEL, termLabelState, this);
-
-            // Remove anonymized invariant formulas from the antecedent,
-            // otherwise it's trivial to close this goal.
-            removeLoopInvFormulasFromAntec(analysisGoal);
-
-            addFactPrecondition(analysisGoal,
-                    tb.apply(updateTerm, anonPostCond), true, termLabelState, this);
-
-            i++;
-        }
 
         // Add goals for store equalities
         if (hasHeap) {
