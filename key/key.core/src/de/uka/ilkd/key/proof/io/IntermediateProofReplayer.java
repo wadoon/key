@@ -185,6 +185,13 @@ public class IntermediateProofReplayer {
                     assert currNodeInterm.getChildren()
                             .size() <= 1 : "Branch node should have exactly one child.";
                     if (currNodeInterm.getChildren().size() == 1) {
+                        final String branchTitle = ((BranchNodeIntermediate) currNodeInterm)
+                                .getBranchTitle();
+                        if (branchTitle != null && !branchTitle.isEmpty()
+                                && !branchTitle.equals(
+                                        OutputStreamProofSaver.DUMMY_ID_BRANCH_LABEL)) {
+                            currNode.getNodeInfo().setBranchLabel(branchTitle);
+                        }
                         queue.addFirst(new Pair<Node, NodeIntermediate>(
                                 currNode, currNodeInterm.getChildren().get(0)));
                     }

@@ -83,6 +83,10 @@ import de.uka.ilkd.key.util.MiscTools;
  */
 public class OutputStreamProofSaver {
 
+    /**
+     * TODO Comment.
+     */
+    static final String DUMMY_ID_BRANCH_LABEL = "dummy ID";
     protected final Proof proof;
     protected final String internalVersion;
 
@@ -547,7 +551,7 @@ public class OutputStreamProofSaver {
     public String node2Proof(Node node) {
         StringBuffer tree = new StringBuffer();
         String s =
-                "(branch \"dummy ID\"\n" + collectProof(node, "", tree) + ")\n";
+                "(branch \"" + DUMMY_ID_BRANCH_LABEL + "\"\n" + collectProof(node, "", tree) + ")\n";
         return s;
     }
 
