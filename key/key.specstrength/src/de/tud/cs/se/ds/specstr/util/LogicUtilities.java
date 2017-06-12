@@ -39,6 +39,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -54,6 +55,7 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.Pair;
 
@@ -64,6 +66,8 @@ import de.uka.ilkd.key.util.Pair;
  */
 public class LogicUtilities {
 
+    public static final String COVERS_FACT_BRANCH_LABEL_PREFIX = "Covers fact";
+    
     private static final String FACT_HINT = "factToAnalyze";
     private static final Object FACT_PREMISE_HINT = "factPremiseHint";
 
@@ -200,8 +204,8 @@ public class LogicUtilities {
     public static void prepareGoal(final PosInOccurrence pio,
             final Goal analysisGoal, final Term fact,
             TermLabelState termLabelState, Rule rule) {
-        prepareGoal(pio, analysisGoal, fact, "Covers fact", termLabelState,
-                rule);
+        prepareGoal(pio, analysisGoal, fact, COVERS_FACT_BRANCH_LABEL_PREFIX,
+                termLabelState, rule);
     }
 
     /**
@@ -334,20 +338,8 @@ public class LogicUtilities {
     public static OriginOfFormula findOriginOfFormula(final Goal analysisGoal,
             final Term formula) {
         // First, retrieve all FormulaTermLabels
-        final List<FormulaTermLabel> formulaTermLabels = new ArrayList<FormulaTermLabel>();
-
-        formula.execPreOrder(new DefaultVisitor() {
-            @Override
-            public void visit(Term visited) {
-                if (visited.hasLabels()) {
-                    formulaTermLabels.addAll(
-                            GeneralUtilities.toStream(visited.getLabels())
-                                    .filter(l -> l instanceof FormulaTermLabel)
-                                    .map(l -> (FormulaTermLabel) l)
-                                    .collect(Collectors.toList()));
-                }
-            }
-        });
+        final List<FormulaTermLabel> formulaTermLabels = //
+                termLabelsOfType(formula, FormulaTermLabel.class);
 
         assert formulaTermLabels.size() > 0 : //
         "There should be <<F>> term labels in the invariant term";
@@ -375,6 +367,32 @@ public class LogicUtilities {
         final FormulaTermLabel smallest = formulaTermLabels.get(0);
 
         return findOriginOfTermLabel(analysisGoal, smallest);
+    }
+
+    /**
+     * TODO Comment.
+     *
+     * @param formula
+     * @param wanted
+     * @return
+     */
+    public static <L extends TermLabel> List<L> termLabelsOfType(
+            final Term formula, Class<L> wanted) {
+        final List<L> labels = new ArrayList<L>();
+
+        formula.execPreOrder(new DefaultVisitor() {
+            @Override
+            public void visit(Term visited) {
+                if (visited.hasLabels()) {
+                    labels.addAll(GeneralUtilities.toStream(visited.getLabels())
+                            .filter(l -> wanted.isInstance(l))
+                            .map(l -> wanted.cast(l))
+                            .collect(Collectors.toList()));
+                }
+            }
+        });
+
+        return labels;
     }
 
     /**
@@ -436,7 +454,7 @@ public class LogicUtilities {
                                 f -> f.formula().containsJavaBlockRecursive()))
                 .collect(Collectors.toList());
     }
-    
+
     private static final Set<Term> LOOP_INV_FORMULAS_CACHE = new HashSet<>();
 
     /**
@@ -447,7 +465,7 @@ public class LogicUtilities {
     public static void removeLoopInvFormulasFromAntec(final Goal analysisGoal) {
         for (SequentFormula sf : analysisGoal.sequent().antecedent()) {
             boolean remove = LOOP_INV_FORMULAS_CACHE.contains(sf.formula());
-            
+
             if (!remove && sf.formula().hasLabels()) {
                 // Find origin of this label
                 final OriginOfFormula origin = //
@@ -459,10 +477,10 @@ public class LogicUtilities {
                     LOOP_INV_FORMULAS_CACHE.add(sf.formula());
                 }
             }
-            
+
             if (remove) {
-                analysisGoal.removeFormula(new PosInOccurrence(sf,
-                        PosInTerm.getTopLevel(), true));
+                analysisGoal.removeFormula(
+                        new PosInOccurrence(sf, PosInTerm.getTopLevel(), true));
             }
         }
     }
@@ -603,6 +621,23 @@ public class LogicUtilities {
         }
 
         return null;
+    }
+
+    /**
+     * TODO Comment.
+     *
+     * @param of
+     *            Must not be a leaf.
+     * @param app
+     * @return
+     */
+    public static Node getAncestorWithRuleApp(Node of,
+            Class<? extends RuleApp> app) {
+        while (!of.root() && !of.getAppliedRuleApp().getClass().equals(app)) {
+            of = of.parent();
+        }
+
+        return of.getAppliedRuleApp().getClass().equals(app) ? of : null;
     }
 
 }

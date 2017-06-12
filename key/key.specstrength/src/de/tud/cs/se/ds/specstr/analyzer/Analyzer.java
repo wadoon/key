@@ -30,6 +30,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.tud.cs.se.ds.specstr.rule.AnalyzeInvImpliesLoopEffectsRule;
 import de.tud.cs.se.ds.specstr.rule.AnalyzePostCondImpliesMethodEffectsRule;
+import de.tud.cs.se.ds.specstr.rule.AnalyzePostCondImpliesMethodEffectsRuleApp;
 import de.tud.cs.se.ds.specstr.rule.FactAnalysisRule;
 import de.tud.cs.se.ds.specstr.util.GeneralUtilities;
 import de.tud.cs.se.ds.specstr.util.JavaTypeInterface;
@@ -45,6 +46,7 @@ import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -188,7 +190,6 @@ public class Analyzer {
         }
 
         logger.info("Collected %s facts", facts.size());
-        System.out.println(facts.toString());
 
         logger.info("Proving facts, this may take some time...");
 
@@ -285,10 +286,9 @@ public class Analyzer {
                     // applications, but we assume that after symb ex all
                     // relevant nodes in any case have update applications
                     // left over
-                    proof.getSubtreeGoals(p.first)
-                            .forEach(g -> seIf.applyMacro(
-                                    new FullPropositionalExpansionMacro(),
-                                    g.node()));
+
+                    seIf.applyMacroExhaustively(
+                            new FullPropositionalExpansionMacro(), p.first);
 
                     if (!proof.isGoal(p.first)) {
                         obsoleteUseCaseNodes.add(p.first);
@@ -302,16 +302,21 @@ public class Analyzer {
         useCaseNodes.removeAll(obsoleteUseCaseNodes);
         useCaseNodes.addAll(newUseCaseNodes);
 
-        // TODO: No abstraction support here so far; keep in mind that the
-        // corresponding Node is set to null.
-        facts.addAll(useCaseNodes.stream()
-                .map(n -> new Fact(
-                        polishFactDescription(n.sequent(),
-                                preservesAndUCNode.sequent(), services),
-                        extractReadablePathCondition(
-                                proof.getSubtreeGoals(n).head().node()),
-                        FactType.LOOP_USE_CASE_FACT, n, null))
-                .collect(Collectors.toList()));
+        for (final Node n : useCaseNodes) {
+            final String factDescr = polishFactDescription(n.sequent(),
+                    services);
+            n.getNodeInfo().setBranchLabel(String.format("%s \"%s\"",
+                    LogicUtilities.COVERS_FACT_BRANCH_LABEL_PREFIX, factDescr));
+
+            final String readablePathCond = extractReadablePathCondition(
+                    LogicUtilities.getAncestorWithRuleApp(n.parent(),
+                            AnalyzePostCondImpliesMethodEffectsRuleApp.class));
+
+            // TODO: No abstraction support here so far; keep in mind that the
+            // corresponding Node is set to null.
+            facts.add(new Fact(factDescr, readablePathCond,
+                    FactType.LOOP_USE_CASE_FACT, n, null));
+        }
     }
 
     /**
@@ -330,56 +335,49 @@ public class Analyzer {
                 continue;
             }
 
-            if (AnalyzePostCondImpliesMethodEffectsRule.INSTANCE.isApplicable( //
+            if (!AnalyzePostCondImpliesMethodEffectsRule.INSTANCE.isApplicable( //
                     g, maybePio.get())) {
-                final Iterable<Node> analysisNodes = //
-                        GeneralUtilities
-                                .toStream(
-                                        g.apply(AnalyzePostCondImpliesMethodEffectsRule.INSTANCE
-                                                .createApp(maybePio.get(),
-                                                        proof.getServices())))
-                                .map(goal -> goal.node())
-                                .collect(Collectors.toList());
+                continue;
+            }
 
-                for (Node analysisNode : analysisNodes) {
-                    if (!analysisNode.getNodeInfo().getBranchLabel().equals(
-                            AnalyzePostCondImpliesMethodEffectsRule.POSTCONDITION_SATISFIED_BRANCH_LABEL)) {
+            final Iterable<Node> analysisNodes = //
+                    GeneralUtilities
+                            .toStream(
+                                    g.apply(AnalyzePostCondImpliesMethodEffectsRule.INSTANCE
+                                            .createApp(maybePio.get(),
+                                                    proof.getServices())))
+                            .map(goal -> goal.node())
+                            .collect(Collectors.toList());
 
-                        final String readablePathCond = extractReadablePathCondition(
-                                analysisNode.parent());
-                        final String branchLabel = analysisNode.getNodeInfo()
-                                .getBranchLabel();
+            for (Node analysisNode : analysisNodes) {
+                if (!analysisNode.getNodeInfo().getBranchLabel().equals(
+                        AnalyzePostCondImpliesMethodEffectsRule.POSTCONDITION_SATISFIED_BRANCH_LABEL)) {
 
-                        // TODO: Make working
-                        final Iterable<Node> factAnalysisNodes = //
-                                GeneralUtilities
-                                        .toStream(proof.getGoal(analysisNode)
-                                                .apply(FactAnalysisRule.INSTANCE
-                                                        .createApp(null,
-                                                                proof.getServices())))
-                                        .map(_g -> _g.node())
-                                        .collect(Collectors.toList());
+                    final String readablePathCond = extractReadablePathCondition(
+                            analysisNode.parent());
+                    final String branchLabel = analysisNode.getNodeInfo()
+                            .getBranchLabel();
 
-                        if (factCanBeDiscarded(factAnalysisNodes)) {
-                            // Discard the fact -- too easy ;)
-                            continue;
-                        }
+                    final Iterable<Node> factAnalysisNodes = //
+                            GeneralUtilities
+                                    .toStream(proof.getGoal(analysisNode)
+                                            .apply(FactAnalysisRule.INSTANCE
+                                                    .createApp(null,
+                                                            proof.getServices())))
+                                    .map(_g -> _g.node())
+                                    .collect(Collectors.toList());
 
-                        facts.add(new Fact(branchLabel.split("\"")[1],
-                                readablePathCond, FactType.POST_COND_FACT,
-                                FactAnalysisRule
-                                        .getFactCoveredNode(factAnalysisNodes),
-                                FactAnalysisRule.getFactAbstractlyCoveredNode(
-                                        factAnalysisNodes)));
-
-                        // facts.add(new Fact(branchLabel.split("\"")[1],
-                        // readablePathCond,
-                        // branchLabel.equals( //
-                        // AnalyzePostCondImpliesMethodEffectsRule.COVERS_INVARIANT_FACT_BRANCH_LABEL)
-                        // ? FactType.POST_COND_INV_FACT
-                        // : FactType.POST_COND_FACT,
-                        // analysisGoal.node(), null));
+                    if (factCanBeDiscarded(factAnalysisNodes)) {
+                        // Discard the fact -- too easy ;)
+                        continue;
                     }
+
+                    facts.add(new Fact(branchLabel.split("\"")[1],
+                            readablePathCond, FactType.POST_COND_FACT,
+                            FactAnalysisRule
+                                    .getFactCoveredNode(factAnalysisNodes),
+                            FactAnalysisRule.getFactAbstractlyCoveredNode(
+                                    factAnalysisNodes)));
                 }
             }
         }
@@ -425,7 +423,6 @@ public class Analyzer {
                 final String readablePathCondition = extractReadablePathCondition(
                         analysisNode.parent());
 
-                // TODO: Uncomment and make working
                 final Iterable<Node> factAnalysisNodes = //
                         GeneralUtilities.toStream(proof.getGoal(analysisNode)
                                 .apply(FactAnalysisRule.INSTANCE.createApp(null,
@@ -443,11 +440,6 @@ public class Analyzer {
                         FactAnalysisRule.getFactCoveredNode(factAnalysisNodes),
                         FactAnalysisRule.getFactAbstractlyCoveredNode(
                                 factAnalysisNodes)));
-
-                // facts.add(new Fact(branchLabel.split("\"")[1],
-                // readablePathCondition, FactType.LOOP_BODY_FACT,
-                // analysisGoal.node(),
-                // null));
             }
 
             final Optional<Node> maybeActualPreservedNode = GeneralUtilities
@@ -524,31 +516,29 @@ public class Analyzer {
      * TODO
      * 
      * @param factSeq
-     * @param originSeq
      * @param services
      * @return
      */
     private static String polishFactDescription(Sequent factSeq,
-            Sequent originSeq, Services services) {
-        final List<SequentFormula> newAntec = GeneralUtilities
-                .toStream(factSeq.antecedent()).collect(Collectors.toList());
-        newAntec.removeAll(GeneralUtilities.toStream(originSeq.antecedent())
-                .collect(Collectors.toList()));
+            Services services) {
+        final List<SequentFormula> sfsWithTL = GeneralUtilities
+                .toStream(factSeq.succedent())
+                .filter(sf -> LogicUtilities
+                        .termLabelsOfType(sf.formula(), FormulaTermLabel.class)
+                        .size() > 0)
+                .collect(Collectors.toList());
 
-        final List<SequentFormula> newSucc = GeneralUtilities
-                .toStream(factSeq.succedent()).collect(Collectors.toList());
-        newSucc.removeAll(GeneralUtilities.toStream(originSeq.succedent())
-                .collect(Collectors.toList()));
+        assert sfsWithTL.size() < 2 : "Wrong assumption that at most one "
+                + "labeled SequentFormula is in the succedent, fix the code";
 
-        Sequent newSequent = Sequent.EMPTY_SEQUENT;
-        for (SequentFormula antecF : newAntec) {
-            newSequent = newSequent.addFormula(antecF, true, false).sequent();
-        }
-        for (SequentFormula antecF : newSucc) {
-            newSequent = newSequent.addFormula(antecF, false, false).sequent();
-        }
+        final Term termToPrint = sfsWithTL.isEmpty() ? services.getTermBuilder()
+                .and(GeneralUtilities.toStream(factSeq.succedent())
+                        .map(sf -> sf.formula()).collect(Collectors.toList()))
+                : sfsWithTL.get(0).formula();
 
-        return LogicPrinter.quickPrintSequent(newSequent, services);
+        return LogicPrinter.quickPrintTerm(
+                SymbolicExecutionUtil.improveReadability(termToPrint, services),
+                services);
     }
 
     /**
@@ -577,7 +567,7 @@ public class Analyzer {
                 continue;
             }
 
-            Optional<Term> rhs = GeneralUtilities
+            final Optional<Term> rhs = GeneralUtilities
                     .toStream(g.node().sequent().succedent())
                     .map(sf -> sf.formula())
                     .filter(f -> f.op() instanceof UpdateApplication).map(f -> {
@@ -719,8 +709,9 @@ public class Analyzer {
         // constructed similarly, only for a single type.
         // @ formatter:on
 
-        Pattern p = Pattern.compile("^([^:]*)::([^\\(]*)(\\([^\\)]*\\).*)$");
-        Matcher m = p.matcher(methodStr);
+        final Pattern p = Pattern
+                .compile("^([^:]*)::([^\\(]*)(\\([^\\)]*\\).*)$");
+        final Matcher m = p.matcher(methodStr);
 
         if (!m.matches() || m.groupCount() != 3) {
             return false;
@@ -852,8 +843,8 @@ public class Analyzer {
 
         @Override
         public String toString() {
-            return String.format("%s at goal %s\n%s\nPath condition: %s",
-                    factTypeToString(factType), nodeNr, descr, pathCond);
+            return String.format("%s: Goal #%s, Path condition \"%s\"\n%s",
+                    factTypeToString(factType), nodeNr, pathCond.trim(), descr);
         }
 
         private static String factTypeToString(FactType ft) {

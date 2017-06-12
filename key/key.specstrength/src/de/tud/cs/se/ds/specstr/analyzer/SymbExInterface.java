@@ -40,8 +40,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
+import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -209,12 +209,31 @@ public class SymbExInterface {
     }
 
     /**
+     * TODO Comment.
+     *
+     * @param macro
+     * @param node
+     */
+    public void applyMacroExhaustively(ProofMacro macro, Node node) {
+        List<Node> openNodes;
+        List<Node> lastNodes = new ArrayList<>();
+
+        while (!(openNodes = //
+                GeneralUtilities.toStream(node.proof().getSubtreeGoals(node))
+                        .map(g -> g.node()).collect(Collectors.toList()))
+                                .equals(lastNodes)) {
+            openNodes.forEach(n -> applyMacro(macro, n));
+            lastNodes = new ArrayList<>(openNodes);
+        }
+    }
+
+    /**
      * TODO
      * 
      * @param macro
      * @param node
      */
-    public void applyMacro(AbstractProofMacro macro, Node node) {
+    public void applyMacro(ProofMacro macro, Node node) {
         try {
             macro.applyTo(env.getUi(), node, null, env.getUi());
         } catch (Exception e) {
