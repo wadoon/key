@@ -151,9 +151,9 @@ public class FactAnalysisRule implements BuiltInRule {
                         .rule()) == AnalyzeInvImpliesLoopEffectsRule.INSTANCE || //
                         rule == AnalyzePostCondImpliesMethodEffectsRule.INSTANCE)
                 && !node.getNodeInfo().getBranchLabel()
-                        .equals(AnalyzeInvImpliesLoopEffectsRule.INVARIANT_PRESERVED_BRANCH_LABEL)
+                        .equals(AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL)
                 && !node.getNodeInfo().getBranchLabel().equals(
-                        AnalyzePostCondImpliesMethodEffectsRule.POSTCONDITION_SATISFIED_BRANCH_LABEL);
+                        AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL);
     }
 
     @Override

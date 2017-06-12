@@ -28,6 +28,7 @@ import org.apache.logging.log4j.Logger;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import de.tud.cs.se.ds.specstr.rule.AbstractAnalysisRule;
 import de.tud.cs.se.ds.specstr.rule.AnalyzeInvImpliesLoopEffectsRule;
 import de.tud.cs.se.ds.specstr.rule.AnalyzePostCondImpliesMethodEffectsRule;
 import de.tud.cs.se.ds.specstr.rule.AnalyzePostCondImpliesMethodEffectsRuleApp;
@@ -265,7 +266,7 @@ public class Analyzer {
         final List<Node> newUseCaseNodes = new ArrayList<>();
 
         useCaseNodes.removeIf(n -> !n.getNodeInfo().getBranchLabel().equals(
-                AnalyzePostCondImpliesMethodEffectsRule.POSTCONDITION_SATISFIED_BRANCH_LABEL));
+                AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL));
         useCaseNodes.stream() //
                 .map(n -> new Pair<Node, List<SequentFormula>>( //
                         n, //
@@ -306,7 +307,7 @@ public class Analyzer {
             final String factDescr = polishFactDescription(n.sequent(),
                     services);
             n.getNodeInfo().setBranchLabel(String.format("%s \"%s\"",
-                    LogicUtilities.COVERS_FACT_BRANCH_LABEL_PREFIX, factDescr));
+                    AbstractAnalysisRule.COVERS_FACT_BRANCH_LABEL_PREFIX, factDescr));
 
             final String readablePathCond = extractReadablePathCondition(
                     LogicUtilities.getAncestorWithRuleApp(n.parent(),
@@ -351,7 +352,7 @@ public class Analyzer {
 
             for (Node analysisNode : analysisNodes) {
                 if (!analysisNode.getNodeInfo().getBranchLabel().equals(
-                        AnalyzePostCondImpliesMethodEffectsRule.POSTCONDITION_SATISFIED_BRANCH_LABEL)) {
+                        AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL)) {
 
                     final String readablePathCond = extractReadablePathCondition(
                             analysisNode.parent());
@@ -414,7 +415,7 @@ public class Analyzer {
             final List<Node> analysisNodes = GeneralUtilities
                     .toStream(analysisNodesImmList).map(goal -> goal.node())
                     .filter(n -> !n.getNodeInfo().getBranchLabel()
-                            .equals(AnalyzeInvImpliesLoopEffectsRule.INVARIANT_PRESERVED_BRANCH_LABEL))
+                            .equals(AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL))
                     .collect(Collectors.toList());
 
             for (Node analysisNode : analysisNodes) {
@@ -446,7 +447,7 @@ public class Analyzer {
                     .toStream(analysisNodesImmList).map(goal -> goal.node())
                     .filter(n -> n.getNodeInfo().getBranchLabel() != null
                             && n.getNodeInfo().getBranchLabel()
-                                    .equals(AnalyzeInvImpliesLoopEffectsRule.INVARIANT_PRESERVED_BRANCH_LABEL))
+                                    .equals(AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL))
                     .findAny();
             assert maybeActualPreservedNode.isPresent();
 

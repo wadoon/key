@@ -39,7 +39,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -53,14 +52,12 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  *
  * @author Dominic Steinhöfel
  */
-public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
+public class AnalyzePostCondImpliesMethodEffectsRule extends AbstractAnalysisRule {
     public static final Name NAME = new Name(
             "AnalyzePostCondImpliesMethodEffects");
     public static final AnalyzePostCondImpliesMethodEffectsRule INSTANCE = //
             new AnalyzePostCondImpliesMethodEffectsRule();
     
-    public static final String POSTCONDITION_SATISFIED_BRANCH_LABEL = "Postcondition satisfied";
-
     private AnalyzePostCondImpliesMethodEffectsRule() {
         // Singleton Constructor
     }
@@ -197,7 +194,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
         final Goal postCondGoal = goalArray[goalArray.length - 1];
         addSETPredicateToAntec(postCondGoal);
 
-        postCondGoal.setBranchLabel(POSTCONDITION_SATISFIED_BRANCH_LABEL);
+        postCondGoal.setBranchLabel(AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL);
 
         return goals;
     }
@@ -238,7 +235,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule implements BuiltInRule {
                         || MergeRuleUtils
                                 .getUpdateRightSideFor(f.sub(0), lsi.get())
                                 .equals(tb.TRUE()))
-                && !alreadyAnalysisGoal(goal.node().parent());
+                && !AbstractAnalysisRule.alreadyAnalysisGoal(goal.node().parent());
     }
 
     @Override

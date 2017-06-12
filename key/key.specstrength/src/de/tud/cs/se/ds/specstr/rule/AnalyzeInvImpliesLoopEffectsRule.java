@@ -55,8 +55,6 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
     public static final Name NAME = new Name("AnalyzeInvImpliesLoopEffects");
     public static final AnalyzeInvImpliesLoopEffectsRule INSTANCE = new AnalyzeInvImpliesLoopEffectsRule();
     
-    public static final String INVARIANT_PRESERVED_BRANCH_LABEL = "Invariant preserved";
-
     private AnalyzeInvImpliesLoopEffectsRule() {
         // Singleton Constructor
     }
@@ -181,7 +179,7 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
         }
 
         addSETPredicateToAntec(goalArray[goalArray.length - 1]);
-        goalArray[goalArray.length - 1].setBranchLabel(INVARIANT_PRESERVED_BRANCH_LABEL);
+        goalArray[goalArray.length - 1].setBranchLabel(AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL);
 
         return goals;
     }
@@ -218,7 +216,7 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
                 && MergeRuleUtils
                         .getUpdateRightSideFor(pio.subTerm().sub(0), lsi.get())
                         .equals(services.getTermBuilder().FALSE())
-                && !alreadyAnalysisGoal(goal.node().parent());
+                && !AbstractAnalysisRule.alreadyAnalysisGoal(goal.node().parent());
     }
 
     @Override

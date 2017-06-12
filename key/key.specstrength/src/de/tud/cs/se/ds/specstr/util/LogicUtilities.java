@@ -26,8 +26,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import de.tud.cs.se.ds.specstr.logic.label.StrengthAnalysisParameterlessTL;
-import de.tud.cs.se.ds.specstr.rule.AnalyzeInvImpliesLoopEffectsRule;
-import de.tud.cs.se.ds.specstr.rule.AnalyzePostCondImpliesMethodEffectsRule;
+import de.tud.cs.se.ds.specstr.rule.AbstractAnalysisRule;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
@@ -65,11 +64,6 @@ import de.uka.ilkd.key.util.Pair;
  * @author Dominic Steinhöfel
  */
 public class LogicUtilities {
-
-    public static final String COVERS_FACT_BRANCH_LABEL_PREFIX = "Covers fact";
-    
-    private static final String FACT_HINT = "factToAnalyze";
-    private static final Object FACT_PREMISE_HINT = "factPremiseHint";
 
     /**
      * TODO
@@ -204,7 +198,7 @@ public class LogicUtilities {
     public static void prepareGoal(final PosInOccurrence pio,
             final Goal analysisGoal, final Term fact,
             TermLabelState termLabelState, Rule rule) {
-        prepareGoal(pio, analysisGoal, fact, COVERS_FACT_BRANCH_LABEL_PREFIX,
+        prepareGoal(pio, analysisGoal, fact, AbstractAnalysisRule.COVERS_FACT_BRANCH_LABEL_PREFIX,
                 termLabelState, rule);
     }
 
@@ -235,7 +229,7 @@ public class LogicUtilities {
         Term newFormula = services.getTermBuilder().label(fact,
                 StrengthAnalysisParameterlessTL.FACT_LABEL);
         newFormula = TermLabelManager.refactorTerm(termLabelState, services,
-                null, newFormula, rule, analysisGoal, FACT_HINT, null);
+                null, newFormula, rule, analysisGoal, AbstractAnalysisRule.FACT_HINT, null);
 
         analysisGoal.addFormula(new SequentFormula(newFormula), false, true);
     }
@@ -258,7 +252,7 @@ public class LogicUtilities {
                 : t;
         newFormula = TermLabelManager.refactorTerm(termLabelState,
                 analysisGoal.proof().getServices(), null, newFormula, rule,
-                analysisGoal, FACT_PREMISE_HINT, null);
+                analysisGoal, AbstractAnalysisRule.FACT_PREMISE_HINT, null);
 
         analysisGoal.addFormula(new SequentFormula(newFormula), true, false);
     }
@@ -576,27 +570,6 @@ public class LogicUtilities {
         public Term getSetPredTerm() {
             return setPredTerm;
         }
-    }
-
-    /**
-     * TODO
-     * 
-     * @param n
-     * @return
-     */
-    public static boolean alreadyAnalysisGoal(Node n) {
-        if (n.getAppliedRuleApp()
-                .rule() == AnalyzePostCondImpliesMethodEffectsRule.INSTANCE
-                || n.getAppliedRuleApp()
-                        .rule() == AnalyzeInvImpliesLoopEffectsRule.INSTANCE) {
-            return true;
-        }
-
-        if (n.root()) {
-            return false;
-        }
-
-        return alreadyAnalysisGoal(n.parent());
     }
 
     /**
