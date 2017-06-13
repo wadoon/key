@@ -607,7 +607,7 @@ public class Analyzer {
             throw new RuntimeException(errorMsg);
         }
 
-        assert declaredTypes
+        assert matchingClassDecls
                 .size() == 1 : "There should be only one type of a given name";
 
         final List<ProgramMethod> matchingMethods = GeneralUtilities
