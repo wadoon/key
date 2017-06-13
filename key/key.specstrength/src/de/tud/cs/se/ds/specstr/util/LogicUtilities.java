@@ -200,7 +200,8 @@ public class LogicUtilities {
     public static void prepareGoal(final PosInOccurrence pio,
             final Goal analysisGoal, final Term fact,
             TermLabelState termLabelState, Rule rule) {
-        prepareGoal(pio, analysisGoal, fact, AbstractAnalysisRule.COVERS_FACT_BRANCH_LABEL_PREFIX,
+        prepareGoal(pio, analysisGoal, fact,
+                AbstractAnalysisRule.COVERS_FACT_BRANCH_LABEL_PREFIX,
                 termLabelState, rule);
     }
 
@@ -231,7 +232,8 @@ public class LogicUtilities {
         Term newFormula = services.getTermBuilder().label(fact,
                 StrengthAnalysisParameterlessTL.FACT_LABEL);
         newFormula = TermLabelManager.refactorTerm(termLabelState, services,
-                null, newFormula, rule, analysisGoal, AbstractAnalysisRule.FACT_HINT, null);
+                null, newFormula, rule, analysisGoal,
+                AbstractAnalysisRule.FACT_HINT, null);
 
         analysisGoal.addFormula(new SequentFormula(newFormula), false, true);
     }
@@ -459,8 +461,17 @@ public class LogicUtilities {
      * @param analysisGoal
      */
     public static void removeLoopInvFormulasFromAntec(final Goal analysisGoal) {
-        //XXX: We also have to remove the "replace known select" taclets etc...
-        
+        // We remove all partially instantiated no pos taclets, such as
+        // replaceKnownAuxiliaryConstant, since otherwise, there could be
+        // invariant formulas contained.
+
+        // TODO: This can be refined, such as inserting all things that taclets
+        // can insert and using the remaining procedure below to get rid of
+        // invariant formulas.
+
+        analysisGoal.indexOfTaclets().removeTaclets(
+                analysisGoal.indexOfTaclets().getPartialInstantiatedApps());
+
         for (SequentFormula sf : analysisGoal.sequent().antecedent()) {
             boolean remove = LOOP_INV_FORMULAS_CACHE.contains(sf.formula());
 
@@ -627,19 +638,18 @@ public class LogicUtilities {
     public static Node quickSimplifyUpdates(final Node n) {
         final Proof proof = n.proof();
         final Services services = proof.getServices();
-    
+
         List<SequentFormula> seqForsWithUpdate = GeneralUtilities
                 .toStream(n.sequent())
                 .filter(f -> f.formula().op() instanceof UpdateApplication)
                 .collect(Collectors.toList());
-    
+
         for (SequentFormula sf : seqForsWithUpdate) {
             proof.getSubtreeGoals(n).head()
                     .apply(MiscTools.findOneStepSimplifier(proof).createApp(
-                            findInSequent(sf, n.sequent()),
-                            services));
+                            findInSequent(sf, n.sequent()), services));
         }
-    
+
         final Node newNode = proof.getSubtreeGoals(n).head().node();
         return newNode;
     }
