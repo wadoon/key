@@ -38,7 +38,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
@@ -66,14 +65,21 @@ public class FactAnalysisRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final Node node = goal.node();
 
+        final AbstractAnalysisRule abstractAnalysisRule = AbstractAnalysisRule
+                .analysisRuleOfThisScope(node).get();
+        final boolean addCoveredWithoutLoopInvGoal = abstractAnalysisRule
+                .addCoveredWithoutLoopInvGoal();
+        final boolean addAbstractlyCoveredGoal = abstractAnalysisRule
+                .addAbstractlyCoveredGoal();
+
         final Optional<SequentFormula> maybeFactSF = toStream(
                 node.sequent().succedent())
                         .filter(sf -> sf.formula().containsLabel(
                                 StrengthAnalysisParameterlessTL.FACT_LABEL))
                         .findAny();
-        
+
         assert maybeFactSF.isPresent();
-        
+
         final SequentFormula factSF = maybeFactSF.get();
 
         final List<SequentFormula> premiseSFs = toStream(
@@ -88,41 +94,61 @@ public class FactAnalysisRule implements BuiltInRule {
         final List<Term> premiseConjElems = MergeRuleUtils
                 .getConjunctiveElementsFor(cnfC.convertToCNF(allPremiseSFs));
 
-        final ImmutableList<Goal> goals = goal.split(3);
+        final ImmutableList<Goal> goals = goal
+                .split(1 + (addAbstractlyCoveredGoal ? 1 : 0)
+                        + (addCoveredWithoutLoopInvGoal ? 1 : 0));
         final Goal[] goalArray = goals.toArray(new Goal[] {});
-        final Goal coveredGoal = goalArray[2];
-        final Goal coveredByTrueGoal = goalArray[1];
-        final Goal abstractlyCoveredGoal = goalArray[0];
+
+        final Goal coveredGoal = goalArray[goalArray.length - 1];
+        final Goal coveredByTrueGoal = addCoveredWithoutLoopInvGoal
+                ? (addAbstractlyCoveredGoal ? goalArray[1] : goalArray[0])
+                : null;
+        final Goal abstractlyCoveredGoal = //
+                addAbstractlyCoveredGoal ? goalArray[0] : null;
+
+        // The "fully covered" goal
 
         coveredGoal.setBranchLabel(FACT_COVERED_BRANCH_LABEL);
-        coveredByTrueGoal.setBranchLabel(
-                FACT_COVERED_WITHOUT_SPECIFICATION_BRANCH_LABEL);
-        abstractlyCoveredGoal
-                .setBranchLabel(FACT_ABSTRACTLY_COVERED_BRANCH_LABEL);
 
-        // XXX TODO: Remove loop inv premises whenever applicable
-        
         // Fact already covered without specification -- "covered by true"
 
-        premiseSFs.forEach(sf -> coveredByTrueGoal.removeFormula(
-                new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)));
-        removeLoopInvFormulasFromAntec(coveredByTrueGoal);
+        if (addCoveredWithoutLoopInvGoal) {
+            coveredByTrueGoal.setBranchLabel(
+                    FACT_COVERED_WITHOUT_SPECIFICATION_BRANCH_LABEL);
+
+            premiseSFs.forEach(sf -> coveredByTrueGoal.removeFormula(
+                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)));
+
+            removeLoopInvFormulasFromAntec(coveredByTrueGoal);
+        }
 
         // Facts that are "abstractly covered", that is, the fact with the
         // remaining preconditions implies one of the specification elements, as
         // in "result > 0" is implied by "result = 3"
-        LogicUtilities.addSETPredicateToAntec(abstractlyCoveredGoal);
-        premiseSFs.forEach(sf -> abstractlyCoveredGoal.removeFormula(
-                new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)));
-        abstractlyCoveredGoal.removeFormula(
-                new PosInOccurrence(factSF, PosInTerm.getTopLevel(), false));
 
-        // Add fact to antecedent
-        abstractlyCoveredGoal.addFormula(factSF, true, false);
+        if (addAbstractlyCoveredGoal) {
+            abstractlyCoveredGoal
+                    .setBranchLabel(FACT_ABSTRACTLY_COVERED_BRANCH_LABEL);
 
-        // Add disjunction of premise formula parts to succedent
-        abstractlyCoveredGoal.addFormula(
-                new SequentFormula(tb.or(premiseConjElems)), false, true);
+            if (addCoveredWithoutLoopInvGoal) {
+                // For these rules, we also have to remove the loop invariant
+                // formulas here
+                removeLoopInvFormulasFromAntec(coveredByTrueGoal);
+            }
+
+            LogicUtilities.addSETPredicateToAntec(abstractlyCoveredGoal);
+            premiseSFs.forEach(sf -> abstractlyCoveredGoal.removeFormula(
+                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)));
+            abstractlyCoveredGoal.removeFormula(new PosInOccurrence(factSF,
+                    PosInTerm.getTopLevel(), false));
+
+            // Add fact to antecedent
+            abstractlyCoveredGoal.addFormula(factSF, true, false);
+
+            // Add disjunction of premise formula parts to succedent
+            abstractlyCoveredGoal.addFormula(
+                    new SequentFormula(tb.or(premiseConjElems)), false, true);
+        }
 
         return goals;
     }
@@ -145,11 +171,9 @@ public class FactAnalysisRule implements BuiltInRule {
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         final Node node = goal.node();
-        Rule rule = null;
         return pio == null && !node.root() && //
-                ((rule = node.parent().getAppliedRuleApp()
-                        .rule()) == AnalyzeInvImpliesLoopEffectsRule.INSTANCE || //
-                        rule == AnalyzePostCondImpliesMethodEffectsRule.INSTANCE)
+                (node.parent().getAppliedRuleApp()
+                        .rule() instanceof AbstractAnalysisRule)
                 && !node.getNodeInfo().getBranchLabel()
                         .equals(AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL)
                 && !node.getNodeInfo().getBranchLabel().equals(

@@ -459,6 +459,8 @@ public class LogicUtilities {
      * @param analysisGoal
      */
     public static void removeLoopInvFormulasFromAntec(final Goal analysisGoal) {
+        //XXX: We also have to remove the "replace known select" taclets etc...
+        
         for (SequentFormula sf : analysisGoal.sequent().antecedent()) {
             boolean remove = LOOP_INV_FORMULAS_CACHE.contains(sf.formula());
 

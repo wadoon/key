@@ -13,6 +13,8 @@
 
 package de.tud.cs.se.ds.specstr.rule;
 
+import java.util.Optional;
+
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.BuiltInRule;
 
@@ -30,6 +32,19 @@ public abstract class AbstractAnalysisRule implements BuiltInRule {
     public static final Object FACT_PREMISE_HINT = "factPremiseHint";
 
     /**
+     * @return true iff the {@link FactAnalysisRule} should add a goal where all
+     *         loop invariant facts are removed.
+     */
+    public abstract boolean addCoveredWithoutLoopInvGoal();
+
+    /**
+     * @return true iff the {@link FactAnalysisRule} should add a goal where the
+     *         fact and the premise are swapped, i.e., the fact is "abstractly
+     *         covered" by the specification.
+     */
+    public abstract boolean addAbstractlyCoveredGoal();
+
+    /**
      * TODO
      * 
      * @param n
@@ -45,6 +60,24 @@ public abstract class AbstractAnalysisRule implements BuiltInRule {
         }
 
         return alreadyAnalysisGoal(n.parent());
+    }
+    
+    /**
+     * TODO Comment.
+     *
+     * @param n
+     * @return
+     */
+    public static Optional<AbstractAnalysisRule> analysisRuleOfThisScope(Node n) {
+        if (n.getAppliedRuleApp().rule() instanceof AbstractAnalysisRule) {
+            return Optional.of((AbstractAnalysisRule) n.getAppliedRuleApp().rule());
+        }
+
+        if (n.root()) {
+            return Optional.empty();
+        }
+        
+        return analysisRuleOfThisScope(n.parent());
     }
 
 }

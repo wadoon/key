@@ -268,18 +268,32 @@ public class Analyzer {
                     getPioOfFormulaWhichHadSELabel(newNode);
             assert maybePioOfApplySeqFor.isPresent();
 
-            final ImmutableList<Goal> factGoals = proof.getGoal(newNode)
-                    .apply(AnalyzeUseCaseRule.INSTANCE
-                            .createApp(maybePioOfApplySeqFor.get(), services));
+            final List<Node> factNodes = GeneralUtilities
+                    .toStream(proof.getGoal(newNode)
+                            .apply(AnalyzeUseCaseRule.INSTANCE.createApp(
+                                    maybePioOfApplySeqFor.get(), services)))
+                    .map(g -> g.node()).collect(Collectors.toList());
 
-            for (final Goal g : factGoals) {
-                final Node factNode = g.node();
+            for (final Node factNode : factNodes) {
+                final Iterable<Node> factAnalysisNodes = //
+                        GeneralUtilities.toStream(proof.getGoal(factNode)
+                                .apply(FactAnalysisRule.INSTANCE.createApp(null,
+                                        proof.getServices())))
+                                .map(g -> g.node())
+                                .collect(Collectors.toList());
 
+                if (factCanBeDiscarded(factAnalysisNodes)) {
+                    // Discard the fact -- too easy ;)
+                    continue;
+                }
+                
                 final String branchLabel = factNode.getNodeInfo()
                         .getBranchLabel();
 
-                facts.add(new Fact(branchLabel.split("\"")[1], readablePathCond,
-                        FactType.LOOP_USE_CASE_FACT, factNode, null));
+                facts.add(new Fact(branchLabel.split("\"")[1],
+                        readablePathCond, FactType.LOOP_USE_CASE_FACT,
+                        FactAnalysisRule.getFactCoveredNode(factAnalysisNodes),
+                        null));
             }
         }
     }
@@ -331,11 +345,6 @@ public class Analyzer {
                                                             proof.getServices())))
                                     .map(_g -> _g.node())
                                     .collect(Collectors.toList());
-
-                    if (factCanBeDiscarded(factAnalysisNodes)) {
-                        // Discard the fact -- too easy ;)
-                        continue;
-                    }
 
                     facts.add(new Fact(branchLabel.split("\"")[1],
                             readablePathCond, FactType.POST_COND_FACT,

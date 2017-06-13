@@ -37,7 +37,6 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -51,7 +50,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  *
  * @author Dominic Steinhöfel
  */
-public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
+public class AnalyzeInvImpliesLoopEffectsRule extends AbstractAnalysisRule {
     public static final Name NAME = new Name("AnalyzeInvImpliesLoopEffects");
     public static final AnalyzeInvImpliesLoopEffectsRule INSTANCE = new AnalyzeInvImpliesLoopEffectsRule();
     
@@ -216,7 +215,7 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
                 && MergeRuleUtils
                         .getUpdateRightSideFor(pio.subTerm().sub(0), lsi.get())
                         .equals(services.getTermBuilder().FALSE())
-                && !AbstractAnalysisRule.alreadyAnalysisGoal(goal.node().parent());
+                && !alreadyAnalysisGoal(goal.node().parent());
     }
 
     @Override
@@ -234,6 +233,16 @@ public class AnalyzeInvImpliesLoopEffectsRule implements BuiltInRule {
             Term invTerm, List<LocationVariable> localOuts) {
         return new AnalyzeInvImpliesLoopEffectsRuleApp(this, pos, invTerm,
                 localOuts);
+    }
+
+    @Override
+    public boolean addCoveredWithoutLoopInvGoal() {
+        return true;
+    }
+
+    @Override
+    public boolean addAbstractlyCoveredGoal() {
+        return true;
     }
 
 }

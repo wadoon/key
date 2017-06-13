@@ -249,4 +249,14 @@ public class AnalyzePostCondImpliesMethodEffectsRule extends AbstractAnalysisRul
         return new AnalyzePostCondImpliesMethodEffectsRuleApp(this, pos);
     }
 
+    @Override
+    public boolean addCoveredWithoutLoopInvGoal() {
+        return false;
+    }
+
+    @Override
+    public boolean addAbstractlyCoveredGoal() {
+        return true;
+    }
+
 }

@@ -137,4 +137,14 @@ public class AnalyzeUseCaseRule extends AbstractAnalysisRule {
         return new AnalyzeUseCaseRuleApp(this, pos);
     }
 
+    @Override
+    public boolean addCoveredWithoutLoopInvGoal() {
+        return true;
+    }
+
+    @Override
+    public boolean addAbstractlyCoveredGoal() {
+        return false;
+    }
+
 }
