@@ -95,10 +95,13 @@ import de.uka.ilkd.key.speclang.HeapContext;
  * @author Martin Hentschel
  */
 public abstract class AbstractOperationPO extends AbstractPO {
-  public static final String UNINTERPRETED_PREDICATE_NAME = "SETAccumulate";
-  private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
+    /**
+     * The name of the uninterpreted predicate for symbolic execution.
+     */
+    public static final String UNINTERPRETED_PREDICATE_NAME = "SETAccumulate";
+   private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
 
-  /**
+/**
     * If this is {@code true} an uninterpreted predicate is added to the
     * postconditions which contains the heap and all parameters as arguments.
     * @see #buildUninterpretedPredicate(ImmutableList, String)
@@ -392,8 +395,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
          // Add uninterpreted predicate
          if (isAddUninterpretedPredicate()) {
             postTerm = tb.and(postTerm,
-                              ensureUninterpretedPredicateExists(paramVars, formalParamVars, resultVar,
-                                                          exceptionVar, getUninterpretedPredicateName(), proofServices));
+                              ensureUninterpretedPredicateExists(paramVars, formalParamVars, resultVar, exceptionVar,
+                                                          getUninterpretedPredicateName(), proofServices));
          }
 
          Term frameTerm = buildFrameClause(modHeaps, heapToAtPre, selfVar, paramVars, proofServices);
@@ -700,17 +703,18 @@ public abstract class AbstractOperationPO extends AbstractPO {
    /**
     * Creates {@link #uninterpretedPredicate}.
     * @param paramVars The parameters {@link ProgramVariable}s.
- * @param formalParamVars The formal parameters {@link LocationVariable}s.
- * @param resultVar The result variable.
- * @param exceptionVar The exception variable.
- * @param name The name of the uninterpreted predicate.
+    * @param formalParamVars The formal parameters {@link LocationVariable}s.
+    * @param resultVar The result variable.
+    * @param exceptionVar The exception variable.
+    * @param name The name of the uninterpreted predicate.
     * @return The created uninterpreted predicate.
     */
    protected Term ensureUninterpretedPredicateExists(ImmutableList<ProgramVariable> paramVars,
                                                      ImmutableList<LocationVariable> formalParamVars,
                                                      ProgramVariable resultVar,
                                                      ProgramVariable exceptionVar,
-                                                     String name, Services services) {
+                                                     String name,
+                                                     Services services) {
       // Make sure that the predicate is not already created
       if (uninterpretedPredicate != null) {
          throw new IllegalStateException("The uninterpreted predicate is already available.");
@@ -722,15 +726,15 @@ public abstract class AbstractOperationPO extends AbstractPO {
    /**
     * Creates a new uninterpreted predicate which is added to {@link #additionalUninterpretedPredicates}.
     * @param formalParamVars The formal parameters {@link LocationVariable}s.
- * @param resultVar The result variable.
- * @param exceptionVar The exception variable.
- * @param name The name of the uninterpreted predicate.
+    * @param resultVar The result variable.
+    * @param exceptionVar The exception variable.
+    * @param name The name of the uninterpreted predicate.
     * @return The created uninterpreted predicate.
     */   
    protected Term newAdditionalUninterpretedPredicate(ImmutableList<LocationVariable> formalParamVars,
-                                                      Term resultVar,
-                                                      Term exceptionVar,
-                                                      String name, Services services) {
+                                                      Term resultVar, Term exceptionVar,
+                                                      String name,
+                                                      Services services) {
       Term up = createUninterpretedPredicate(formalParamVars, resultVar, exceptionVar, name, services);
       additionalUninterpretedPredicates.add(up);
       return up;
@@ -740,15 +744,15 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * Creates a {@link Term} to use in the postcondition of the generated
     * {@link Sequent} which represents the uninterpreted predicate.
     * @param formalParamVars The formal parameters {@link LocationVariable}s.
- * @param resultVar TODO
- * @param exceptionVar The exception variable.
- * @param name The name of the uninterpreted predicate.
+    * @param resultVar The result variable.
+    * @param exceptionVar The exception variable.
+    * @param name The name of the uninterpreted predicate.
     * @return The created uninterpreted predicate.
     */   
    protected Term createUninterpretedPredicate(ImmutableList<LocationVariable> formalParamVars,
-                                               Term resultVar,
-                                               Term exceptionVar,
-                                               String name, Services services) {
+                                               Term resultVar, Term exceptionVar,
+                                               String name,
+                                               Services services) {
       // Create parameters for predicate SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
       ImmutableList<Term> arguments = ImmutableSLList.nil(); //tb.var(paramVars); // Method parameters
       for (LocationVariable formalParam : formalParamVars) {
@@ -1087,10 +1091,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * and {@link AbstractOperationPO#isAddUninterpretedPredicate()} is {@code true}.
     * Otherwise the given {@link Term} is returned.  
     * @param services The {@link Services} which provides the {@link Proof} and its {@link ProofOblInput}.
- * @param term The {@link Term} to modify.
- * @param variablesToProtect {@link LocationVariable}s to protect.
- * @param resultVar The result variable to protect.
- * @param exceptionVar The exception variable to protect.
+    * @param term The {@link Term} to modify.
+    * @param variablesToProtect {@link LocationVariable}s to protect.
+    * @param resultVar The result variable.
+    * @param exceptionVar The exception variable to protect.
     * @return The modified or original {@link Term}.
     */
    public static Term addAdditionalUninterpretedPredicateIfRequired(Services services, 
