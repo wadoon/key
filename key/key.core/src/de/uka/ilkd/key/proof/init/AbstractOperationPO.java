@@ -699,7 +699,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @return The name of the uninterpreted predicate.
     */
    protected String getUninterpretedPredicateName() {
-       return UNINTERPRETED_PREDICATE_NAME;
+        return UNINTERPRETED_PREDICATE_NAME;
    }
 
    /**
@@ -721,7 +721,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
       if (uninterpretedPredicate != null) {
          throw new IllegalStateException("The uninterpreted predicate is already available.");
       }
-      uninterpretedPredicate = createUninterpretedPredicate(formalParamVars,
+        uninterpretedPredicate = createUninterpretedPredicate(formalParamVars,
               resultVar == null ? null : tb.var(resultVar), tb.var(exceptionVar), name, services);
       return uninterpretedPredicate;
    }
@@ -738,9 +738,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                                       Term resultVar, Term exceptionVar,
                                                       String name,
                                                       Services services) {
-       Term up = createUninterpretedPredicate(formalParamVars, resultVar, exceptionVar, name, services);
-       additionalUninterpretedPredicates.add(up);
-       return up;
+        Term up = createUninterpretedPredicate(formalParamVars,
+                resultVar, exceptionVar, name, services);
+        additionalUninterpretedPredicates.add(up);
+        return up;
    }
    
    /**
@@ -761,11 +762,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
       for (LocationVariable formalParam : formalParamVars) {
          arguments = arguments.prepend(tb.var(formalParam));
       }
-        if (resultVar != null) {
+          if (resultVar != null) {
             // There might not be a result variable, in the case of void methods
             // Result variable (As third argument for the predicate)
-            arguments = arguments.prepend(resultVar);
-        }
+              arguments = arguments.prepend(resultVar);
+          }
       arguments = arguments.prepend(exceptionVar); // Exception variable (As second argument for the predicate)
       arguments = arguments.prepend(tb.getBaseHeap()); // Heap (As first argument for the predicate)
       // Create non-rigid predicate with signature: SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
@@ -1103,14 +1104,16 @@ public abstract class AbstractOperationPO extends AbstractPO {
     */
    public static Term addAdditionalUninterpretedPredicateIfRequired(Services services, 
                                                                     Term term, 
-                                                                    ImmutableList<LocationVariable> variablesToProtect,
+                                                                    ImmutableList<LocationVariable>
+                                                                        variablesToProtect,
                                                                     Term resultVar,
                                                                     Term exceptionVar) {
       ProofOblInput problem = services.getSpecificationRepository().getProofOblInput(services.getProof());
       if (problem instanceof AbstractOperationPO) {
          AbstractOperationPO operationPO = (AbstractOperationPO)problem;
-         if (operationPO.isAddUninterpretedPredicate()) {
-             Term up = operationPO.newAdditionalUninterpretedPredicate(variablesToProtect, resultVar, exceptionVar, operationPO.getUninterpretedPredicateName(), services);
+             if (operationPO.isAddUninterpretedPredicate()) {
+             Term up = operationPO.newAdditionalUninterpretedPredicate(variablesToProtect,
+                     resultVar, exceptionVar, operationPO.getUninterpretedPredicateName(), services);
              term = services.getTermBuilder().and(term, up);
          }
       }
