@@ -209,6 +209,8 @@ public class MergeRuleUtils {
      *
      * @param services
      *            The services object.
+     * @param namespaces
+     *            The (usually local) {@link NamespaceSet} to use for parsing.
      * @param toTranslate
      *            The formula to be translated.
      * @return The formula represented by the input or null if not applicable.
