@@ -206,7 +206,8 @@ public class SemisequentChangeInfo {
                         .collect(Collectors.toList());
 
                 assert transitivityCandidates
-                        .size() < 2 : "There are more than 1 'transitive' modifications, check what happens here.";
+                        .size() < 2 : "There are more than 1 'transitive'"
+                                + " modifications, check what happens here.";
 
                 if (!transitivityCandidates.isEmpty()) {
                     predecessor.modifiedFormula(succ.lastFormulaIndex,

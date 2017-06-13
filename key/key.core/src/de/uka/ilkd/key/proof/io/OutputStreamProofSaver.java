@@ -551,7 +551,8 @@ public class OutputStreamProofSaver {
     public String node2Proof(Node node) {
         StringBuffer tree = new StringBuffer();
         String s =
-                "(branch \"" + DUMMY_ID_BRANCH_LABEL + "\"\n" + collectProof(node, "", tree) + ")\n";
+                "(branch \"" + DUMMY_ID_BRANCH_LABEL + "\"\n" 
+                        + collectProof(node, "", tree) + ")\n";
         return s;
     }
 
