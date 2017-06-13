@@ -81,7 +81,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      *            the rule application to be executed
      * @return The {@link LoopInvariantInformation} object containing the data
      *         for the application of loop invariant rules.
-     * @throws RuleAbortException
+     * @throws RuleAbortException If the {@link LoopInvariantBuiltInRuleApp} does not contain a
+     *             {@link LoopSpecification}.
      */
     protected LoopInvariantInformation doPreparationsAndSplit(Goal goal, Services services,
             RuleApp ruleApp) throws RuleAbortException {
@@ -100,8 +101,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     /**
      * Constructs the data needed for the currently implemented loop invariants.
      * 
-     * @param goal
-     *            the Goal on which to apply <tt>ruleApp</tt>
+     * @param node
+     *            the {@link Node} on which to apply <tt>ruleApp</tt>
      * @param services
      *            the Services with the necessary information about the java
      *            programs
@@ -109,7 +110,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      *            the rule application to be executed
      * @return The {@link LoopInvariantInformation} object containing the data
      *         for the application of loop invariant rules.
-     * @throws RuleAbortException
+     * @throws RuleAbortException If the {@link LoopInvariantBuiltInRuleApp} does not contain a
+     *             {@link LoopSpecification}.
      */
     public LoopInvariantInformation doPreparations(Node node, Services services,
             RuleApp ruleApp) throws RuleAbortException {
