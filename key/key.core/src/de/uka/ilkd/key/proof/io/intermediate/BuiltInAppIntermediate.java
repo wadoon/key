@@ -21,20 +21,16 @@ public class BuiltInAppIntermediate extends AppIntermediate {
     private String contract = null;
     private ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts = null;
     private ImmutableList<Name> newNames = null;
-    private String invTerm = null;
-    private String currLocalOuts = null;
 
     public BuiltInAppIntermediate(String ruleName,
             Pair<Integer, PosInTerm> pos, String contract,
             ImmutableList<Pair<Integer, PosInTerm>> builtInIfInsts,
-            ImmutableList<Name> newNames, String invTerm, String currLocalOuts) {
+            ImmutableList<Name> newNames) {
         this.ruleName = ruleName;
         this.posInfo = pos;
         this.contract = contract;
         this.builtInIfInsts = builtInIfInsts;
         this.newNames = newNames;
-        this.invTerm = invTerm;
-        this.currLocalOuts = currLocalOuts;
     }
 
     public String getRuleName() {
@@ -51,14 +47,6 @@ public class BuiltInAppIntermediate extends AppIntermediate {
 
     public ImmutableList<Pair<Integer, PosInTerm>> getBuiltInIfInsts() {
         return builtInIfInsts;
-    }
-    
-    public String getInvTerm() {
-        return invTerm;
-    }
-    
-    public String getCurrLocalOuts() {
-        return currLocalOuts;
     }
 
     /* (non-Javadoc)

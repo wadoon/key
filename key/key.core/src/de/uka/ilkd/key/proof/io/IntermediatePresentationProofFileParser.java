@@ -289,14 +289,6 @@ public class IntermediatePresentationProofFileParser implements
             ((BuiltinRuleInformation) ruleInfo).currUserChoices = str;
             break;
 
-        case INV_TERM: // invariant term for strength analysis
-            ((BuiltinRuleInformation) ruleInfo).currInvTerm = str;
-            break;
-            
-        case LOCAL_OUTS: // local outs of a loop for strength analysis
-            ((BuiltinRuleInformation) ruleInfo).currLocalOuts = str;
-            break;
-
         default:
             break;
         }
@@ -424,9 +416,7 @@ public class IntermediatePresentationProofFileParser implements
                                     builtinInfo.currPosInTerm),
                             builtinInfo.currContract,
                             builtinInfo.builtinIfInsts,
-                            builtinInfo.currNewNames,
-                            builtinInfo.currInvTerm,
-                            builtinInfo.currLocalOuts);
+                            builtinInfo.currNewNames);
         }
 
         return result;
@@ -512,9 +502,6 @@ public class IntermediatePresentationProofFileParser implements
         protected Class<? extends AbstractPredicateAbstractionLattice> currPredAbstraLatticeType = null;
         protected String currAbstractionPredicates = null;
         public String currUserChoices = null;
-        /* > Strength analysis rule */
-        protected String currInvTerm = null;
-        protected String currLocalOuts = null;
 
         public BuiltinRuleInformation(String ruleName) {
             super(ruleName);
