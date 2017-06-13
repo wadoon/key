@@ -13,6 +13,7 @@
 
 package de.tud.cs.se.ds.specstr.util;
 
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -27,6 +28,7 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 
 /**
  * TODO
@@ -54,8 +56,25 @@ public class CNFConverter {
      * @return
      */
     public Term convertToCNF(Term t) {
-        return applyDistributivityLaws(splitQuantifiers(
-                pushNegationsInvards(eliminateBiImplications(t))));
+        List<Term> updates = null;
+
+        if (t.op() instanceof UpdateApplication) {
+            updates = LogicUtilities.getUpdates(t);
+        }
+
+        final Term cnfMatrix = applyDistributivityLaws(
+                splitQuantifiers(pushNegationsInvards(eliminateBiImplications(
+                        TermBuilder.goBelowUpdates(t)))));
+
+        if (updates != null) {
+            Term result = cnfMatrix;
+            for (int i = updates.size() - 1; i >= 0; i--) {
+                result = tb.apply(updates.get(i), result);
+            }
+            return result;
+        } else {
+            return cnfMatrix;
+        }
     }
 
     protected Term eliminateBiImplications(Term t) {
