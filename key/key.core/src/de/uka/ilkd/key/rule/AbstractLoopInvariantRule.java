@@ -86,7 +86,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      */
     protected LoopInvariantInformation doPreparationsAndSplit(Goal goal, Services services,
             RuleApp ruleApp) throws RuleAbortException {
-        
+
         LoopInvariantInformation inf = doPreparations(goal.node(), services, ruleApp);
 
         // Prepare the new goals
@@ -94,13 +94,13 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
         inf.goal = goal;
         inf.goals = goals;
-        
+
         return inf;
     }
 
     /**
      * Constructs the data needed for the currently implemented loop invariants.
-     * 
+     *
      * @param node
      *            the {@link Node} on which to apply <tt>ruleApp</tt>
      * @param services

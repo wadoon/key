@@ -116,7 +116,7 @@ public final class ParameterlessTermLabel implements TermLabel {
     */
    public static final TermLabel LOOP_SCOPE_INDEX_LABEL =
            new ParameterlessTermLabel(LOOP_SCOPE_INDEX_LABEL_NAME);
-   
+
     /**
      * Name of {@link #LOOP_INV_ANON_LABEL}.
      */

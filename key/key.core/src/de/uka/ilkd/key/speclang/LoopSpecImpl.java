@@ -177,7 +177,7 @@ public final class LoopSpecImpl implements LoopSpecification {
     public LoopStatement getLoop() {
         return loop;
     }
-    
+
     @Override
     public ImmutableList<Term> getLocalOuts() {
         return localOuts;

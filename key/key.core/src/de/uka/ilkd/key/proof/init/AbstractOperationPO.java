@@ -240,7 +240,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
           // Add uninterpreted predicate
           if (isAddUninterpretedPredicate()) {
               postTerm = tb.and(postTerm,
-                      ensureUninterpretedPredicateExists(paramVars, formalParamVars, 
+                      ensureUninterpretedPredicateExists(paramVars, formalParamVars,
                               resultVar, null, getUninterpretedPredicateName(), proofServices));
           }
 

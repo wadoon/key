@@ -456,7 +456,7 @@ public class Node  {
                 assert n.siblingNr < Character.MAX_RADIX :
                     "Could fail in getting a unique taclet id "
                   + "due to high sibling number " + n.siblingNr;
-                
+
                 final String convertedSiblingNumber =
                         Integer.toUnsignedString(n.siblingNr, Character.MAX_RADIX);
                 id.append(convertedSiblingNumber);
