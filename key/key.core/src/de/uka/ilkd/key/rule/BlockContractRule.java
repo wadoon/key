@@ -1181,7 +1181,8 @@ public class BlockContractRule implements BuiltInRule {
             Term newPost = tb.and(postconditions);
             newPost = AbstractOperationPO.addAdditionalUninterpretedPredicateIfRequired(
                     services, newPost,
-                    ImmutableSLList.<LocationVariable>nil().prepend(terms.remembranceLocalVariables.keySet()),
+                    ImmutableSLList.<LocationVariable>nil().prepend(
+                            terms.remembranceLocalVariables.keySet()),
                     null, terms.exception);
             newPost = TermLabelManager.refactorTerm(termLabelState, services, null, newPost, rule, goal, BlockContractRule.NEW_POSTCONDITION_TERM_HINT, null);
             goal.changeFormula(new SequentFormula(
