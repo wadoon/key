@@ -49,6 +49,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
@@ -56,6 +57,7 @@ import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -611,6 +613,33 @@ public class LogicUtilities {
         }
 
         return of.getAppliedRuleApp().getClass().equals(app) ? of : null;
+    }
+
+    /**
+     * TODO Comment.
+     * 
+     * @param n
+     *
+     * @return
+     */
+    public static Node quickSimplifyUpdates(final Node n) {
+        final Proof proof = n.proof();
+        final Services services = proof.getServices();
+    
+        List<SequentFormula> seqForsWithUpdate = GeneralUtilities
+                .toStream(n.sequent())
+                .filter(f -> f.formula().op() instanceof UpdateApplication)
+                .collect(Collectors.toList());
+    
+        for (SequentFormula sf : seqForsWithUpdate) {
+            proof.getSubtreeGoals(n).head()
+                    .apply(MiscTools.findOneStepSimplifier(proof).createApp(
+                            findInSequent(sf, n.sequent()),
+                            services));
+        }
+    
+        final Node newNode = proof.getSubtreeGoals(n).head().node();
+        return newNode;
     }
 
 }

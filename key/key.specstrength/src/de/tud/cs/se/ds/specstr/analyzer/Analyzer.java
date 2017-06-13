@@ -31,7 +31,7 @@ import org.key_project.util.collection.ImmutableList;
 import de.tud.cs.se.ds.specstr.rule.AbstractAnalysisRule;
 import de.tud.cs.se.ds.specstr.rule.AnalyzeInvImpliesLoopEffectsRule;
 import de.tud.cs.se.ds.specstr.rule.AnalyzePostCondImpliesMethodEffectsRule;
-import de.tud.cs.se.ds.specstr.rule.AnalyzePostCondImpliesMethodEffectsRuleApp;
+import de.tud.cs.se.ds.specstr.rule.AnalyzeUseCaseRule;
 import de.tud.cs.se.ds.specstr.rule.FactAnalysisRule;
 import de.tud.cs.se.ds.specstr.util.GeneralUtilities;
 import de.tud.cs.se.ds.specstr.util.JavaTypeInterface;
@@ -43,16 +43,13 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.FormulaTermLabel;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.macros.FullPropositionalExpansionMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
@@ -63,8 +60,6 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
-import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
 
 /**
  * TODO
@@ -260,63 +255,32 @@ public class Analyzer {
             final List<Node> useCaseNodes, final List<Fact> facts) {
         final Services services = proof.getServices();
 
-        // Apply OSS and propositional simplification to the open goals of
-        // the post condition "facts"
-        final List<Node> obsoleteUseCaseNodes = new ArrayList<>();
-        final List<Node> newUseCaseNodes = new ArrayList<>();
-
         useCaseNodes.removeIf(n -> !n.getNodeInfo().getBranchLabel().equals(
                 AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL));
-        useCaseNodes.stream() //
-                .map(n -> new Pair<Node, List<SequentFormula>>( //
-                        n, //
-                        GeneralUtilities.toStream(n.sequent())
-                                .filter(f -> f.formula()
-                                        .op() instanceof UpdateApplication)
-                                .collect(Collectors.toList())))
-                .filter(p -> !p.second.isEmpty()) //
-                .forEach(p -> {
-                    p.second.forEach(sf -> proof.getSubtreeGoals(p.first).head()
-                            .apply(MiscTools.findOneStepSimplifier(proof)
-                                    .createApp(
-                                            LogicUtilities.findInSequent(sf,
-                                                    p.first.sequent()),
-                                            services)));
-
-                    // Note: Will simplify only for nodes with update
-                    // applications, but we assume that after symb ex all
-                    // relevant nodes in any case have update applications
-                    // left over
-
-                    seIf.applyMacroExhaustively(
-                            new FullPropositionalExpansionMacro(), p.first);
-
-                    if (!proof.isGoal(p.first)) {
-                        obsoleteUseCaseNodes.add(p.first);
-                        newUseCaseNodes.addAll(GeneralUtilities
-                                .toStream(proof.getSubtreeGoals(p.first))
-                                .map(g -> g.node())
-                                .collect(Collectors.toList()));
-                    }
-                });
-
-        useCaseNodes.removeAll(obsoleteUseCaseNodes);
-        useCaseNodes.addAll(newUseCaseNodes);
 
         for (final Node n : useCaseNodes) {
-            final String factDescr = polishFactDescription(n.sequent(),
-                    services);
-            n.getNodeInfo().setBranchLabel(String.format("%s \"%s\"",
-                    AbstractAnalysisRule.COVERS_FACT_BRANCH_LABEL_PREFIX, factDescr));
-
             final String readablePathCond = extractReadablePathCondition(
-                    LogicUtilities.getAncestorWithRuleApp(n.parent(),
-                            AnalyzePostCondImpliesMethodEffectsRuleApp.class));
+                    n.parent());
 
-            // TODO: No abstraction support here so far; keep in mind that the
-            // corresponding Node is set to null.
-            facts.add(new Fact(factDescr, readablePathCond,
-                    FactType.LOOP_USE_CASE_FACT, n, null));
+            final Node newNode = LogicUtilities.quickSimplifyUpdates(n);
+
+            final Optional<PosInOccurrence> maybePioOfApplySeqFor = //
+                    getPioOfFormulaWhichHadSELabel(newNode);
+            assert maybePioOfApplySeqFor.isPresent();
+
+            final ImmutableList<Goal> factGoals = proof.getGoal(newNode)
+                    .apply(AnalyzeUseCaseRule.INSTANCE
+                            .createApp(maybePioOfApplySeqFor.get(), services));
+
+            for (final Goal g : factGoals) {
+                final Node factNode = g.node();
+
+                final String branchLabel = factNode.getNodeInfo()
+                        .getBranchLabel();
+
+                facts.add(new Fact(branchLabel.split("\"")[1], readablePathCond,
+                        FactType.LOOP_USE_CASE_FACT, factNode, null));
+            }
         }
     }
 
@@ -516,35 +480,6 @@ public class Analyzer {
     /**
      * TODO
      * 
-     * @param factSeq
-     * @param services
-     * @return
-     */
-    private static String polishFactDescription(Sequent factSeq,
-            Services services) {
-        final List<SequentFormula> sfsWithTL = GeneralUtilities
-                .toStream(factSeq.succedent())
-                .filter(sf -> LogicUtilities
-                        .termLabelsOfType(sf.formula(), FormulaTermLabel.class)
-                        .size() > 0)
-                .collect(Collectors.toList());
-
-        assert sfsWithTL.size() < 2 : "Wrong assumption that at most one "
-                + "labeled SequentFormula is in the succedent, fix the code";
-
-        final Term termToPrint = sfsWithTL.isEmpty() ? services.getTermBuilder()
-                .and(GeneralUtilities.toStream(factSeq.succedent())
-                        .map(sf -> sf.formula()).collect(Collectors.toList()))
-                : sfsWithTL.get(0).formula();
-
-        return LogicPrinter.quickPrintTerm(
-                SymbolicExecutionUtil.improveReadability(termToPrint, services),
-                services);
-    }
-
-    /**
-     * TODO
-     * 
      * @param proof
      * @param services
      * @param preservesAndUCNode
@@ -607,11 +542,12 @@ public class Analyzer {
      */
     private Optional<PosInOccurrence> getPioOfFormulaWhichHadSELabel(
             Node preservedNode) {
+        Node currNode = preservedNode;
         int pos = -1;
-        {
+
+        while (!currNode.root() && pos == -1) {
             int i = 0;
-            for (SequentFormula sf : preservedNode.parent().sequent()
-                    .succedent()) {
+            for (SequentFormula sf : currNode.sequent().succedent()) {
                 if (SymbolicExecutionUtil
                         .hasSymbolicExecutionLabel(sf.formula())) {
                     pos = i;
@@ -620,6 +556,8 @@ public class Analyzer {
 
                 i++;
             }
+
+            currNode = currNode.parent();
         }
 
         if (pos == -1) {
