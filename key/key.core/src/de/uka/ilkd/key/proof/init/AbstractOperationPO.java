@@ -762,11 +762,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
       for (LocationVariable formalParam : formalParamVars) {
          arguments = arguments.prepend(tb.var(formalParam));
       }
-          if (resultVar != null) {
+        if (resultVar != null) {
             // There might not be a result variable, in the case of void methods
             // Result variable (As third argument for the predicate)
-              arguments = arguments.prepend(resultVar);
-          }
+            arguments = arguments.prepend(resultVar);
+        }
       arguments = arguments.prepend(exceptionVar); // Exception variable (As second argument for the predicate)
       arguments = arguments.prepend(tb.getBaseHeap()); // Heap (As first argument for the predicate)
       // Create non-rigid predicate with signature: SETAccumulate(HeapSort, MethodParameter1Sort, ... MethodParameterNSort)
@@ -1111,10 +1111,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
       ProofOblInput problem = services.getSpecificationRepository().getProofOblInput(services.getProof());
       if (problem instanceof AbstractOperationPO) {
          AbstractOperationPO operationPO = (AbstractOperationPO)problem;
-             if (operationPO.isAddUninterpretedPredicate()) {
-             Term up = operationPO.newAdditionalUninterpretedPredicate(variablesToProtect,
-                     resultVar, exceptionVar, operationPO.getUninterpretedPredicateName(), services);
-             term = services.getTermBuilder().and(term, up);
+            if (operationPO.isAddUninterpretedPredicate()) {
+                Term up = operationPO.newAdditionalUninterpretedPredicate(variablesToProtect,
+                     resultVar, exceptionVar,
+                     operationPO.getUninterpretedPredicateName(), services);
+                term = services.getTermBuilder().and(term, up);
          }
       }
       return term;
