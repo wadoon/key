@@ -240,7 +240,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
           // Add uninterpreted predicate
           if (isAddUninterpretedPredicate()) {
               postTerm = tb.and(postTerm,
-                      ensureUninterpretedPredicateExists(paramVars, formalParamVars, resultVar, null, getUninterpretedPredicateName(), proofServices));
+                      ensureUninterpretedPredicateExists(paramVars, formalParamVars, 
+                              resultVar, null, getUninterpretedPredicateName(), proofServices));
           }
 
           Term frameTerm = buildFrameClause(heaps, heapToBefore, selfVar, paramVars, proofServices);
@@ -395,8 +396,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
          // Add uninterpreted predicate
          if (isAddUninterpretedPredicate()) {
             postTerm = tb.and(postTerm,
-                              ensureUninterpretedPredicateExists(paramVars, formalParamVars, resultVar, exceptionVar,
-                                                          getUninterpretedPredicateName(), proofServices));
+                              ensureUninterpretedPredicateExists(paramVars,
+                              formalParamVars, resultVar, exceptionVar,
+                              getUninterpretedPredicateName(), proofServices));
          }
 
          Term frameTerm = buildFrameClause(modHeaps, heapToAtPre, selfVar, paramVars, proofServices);
@@ -697,7 +699,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @return The name of the uninterpreted predicate.
     */
    protected String getUninterpretedPredicateName() {
-      return UNINTERPRETED_PREDICATE_NAME;
+       return UNINTERPRETED_PREDICATE_NAME;
    }
 
    /**
@@ -719,7 +721,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
       if (uninterpretedPredicate != null) {
          throw new IllegalStateException("The uninterpreted predicate is already available.");
       }
-      uninterpretedPredicate = createUninterpretedPredicate(formalParamVars, resultVar == null ? null : tb.var(resultVar), tb.var(exceptionVar), name, services);
+      uninterpretedPredicate = createUninterpretedPredicate(formalParamVars,
+              resultVar == null ? null : tb.var(resultVar), tb.var(exceptionVar), name, services);
       return uninterpretedPredicate;
    }
    
@@ -735,9 +738,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                                       Term resultVar, Term exceptionVar,
                                                       String name,
                                                       Services services) {
-      Term up = createUninterpretedPredicate(formalParamVars, resultVar, exceptionVar, name, services);
-      additionalUninterpretedPredicates.add(up);
-      return up;
+       Term up = createUninterpretedPredicate(formalParamVars, resultVar, exceptionVar, name, services);
+       additionalUninterpretedPredicates.add(up);
+       return up;
    }
    
    /**
@@ -760,7 +763,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
       }
       if (resultVar != null) {
           // There might not be a result variable, in the case of void methods
-          arguments = arguments.prepend(resultVar); // Result variable (As third argument for the predicate)
+          // Result variable (As third argument for the predicate)
+          arguments = arguments.prepend(resultVar);
       }
       arguments = arguments.prepend(exceptionVar); // Exception variable (As second argument for the predicate)
       arguments = arguments.prepend(tb.getBaseHeap()); // Heap (As first argument for the predicate)
