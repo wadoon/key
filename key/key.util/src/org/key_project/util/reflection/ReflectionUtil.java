@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 /**
  * TODO
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class ReflectionUtil {
 
