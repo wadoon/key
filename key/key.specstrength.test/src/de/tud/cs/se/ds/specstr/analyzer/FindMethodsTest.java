@@ -110,8 +110,8 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
             assertEquals("i = 1 + i_0", f.getDescr());
         });
 
-        assertContains("& !arr_0[i_0] = n", loopBodyFacts.get(0).getPathCond());
-        assertContains("& arr_0[i_0] = n", loopBodyFacts.get(1).getPathCond());
+        assertContains("& arr_0[i_0] = n", loopBodyFacts.get(0).getPathCond());
+        assertContains("& !arr_0[i_0] = n", loopBodyFacts.get(1).getPathCond());
     }
 
     @Test
@@ -188,7 +188,6 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
                 "findMethods/FindMethods.java",
                 "FindMethods::find_stronger_inv_2a([II)I");
 
-        // TODO: There are open exception branches
         assertEquals(42.86d, result.strength(), .01d);
         assertEquals(0, result.unclosedLoopInvPreservedGoals());
         
@@ -197,8 +196,6 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
                 result.problematicExceptions().get(0).getExcLabel());
         assertContains("arr_0.length > i_0 & (arr_0.length <= i_0 | i_0 < 0)",
                 result.problematicExceptions().get(0).getPathCondition());
-
-        Analyzer.printResults(result, System.out);
 
         final List<Fact> abstrLoopBodyFacts = result
                 .getAbstractlyCoveredFactsOfType(LOOP_BODY_FACT);
@@ -308,9 +305,9 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
             assertEquals("i = 1 + i_0", f.getDescr());
         });
 
-        assertContains("& !arr_0[i_0] = n",
-                abstrLoopBodyFacts.get(0).getPathCond());
         assertContains("& arr_0[i_0] = n",
+                abstrLoopBodyFacts.get(0).getPathCond());
+        assertContains("& !arr_0[i_0] = n",
                 abstrLoopBodyFacts.get(1).getPathCond());
     }
 
@@ -349,8 +346,8 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
             assertEquals("i = 1 + i_0", f.getDescr());
         });
 
-        assertContains("& !arr_0[i_0] = n", loopBodyFacts.get(0).getPathCond());
-        assertContains("& arr_0[i_0] = n", loopBodyFacts.get(1).getPathCond());
+        assertContains("& arr_0[i_0] = n", loopBodyFacts.get(0).getPathCond());
+        assertContains("& !arr_0[i_0] = n", loopBodyFacts.get(1).getPathCond());
     }
 
 }

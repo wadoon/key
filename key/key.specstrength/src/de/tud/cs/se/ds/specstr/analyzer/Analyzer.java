@@ -37,16 +37,13 @@ import de.tud.cs.se.ds.specstr.rule.FactAnalysisRule;
 import de.tud.cs.se.ds.specstr.util.GeneralUtilities;
 import de.tud.cs.se.ds.specstr.util.JavaTypeInterface;
 import de.tud.cs.se.ds.specstr.util.LogicUtilities;
-import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -56,8 +53,10 @@ import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -168,53 +167,15 @@ public class Analyzer {
         LOGGER.info("Analyzing method %s::%s%s", className, methodName,
                 methodTypeStr);
 
-        // Run until while loop
-        final Optional<Goal> maybeWhileGoal = seIf
-                .finishSEUntilLoopOrEnd(method);
+        // Finish symbolic execution
+        seIf.finishSEForMethod(method);
         final Proof proof = seIf.proof();
 
         final List<Node> postConditionNodes = new ArrayList<>();
         final List<Fact> facts = new ArrayList<>();
 
         int unclosedLoopInvPreservedGoals = 0;
-        if (maybeWhileGoal.isPresent()) {
-            final Goal whileGoal = maybeWhileGoal.get();
-            final Node whileNode = whileGoal.node();
-
-            // Apply loop invariant rule
-            final Optional<SequentFormula> maybeWhileSeqFor = GeneralUtilities
-                    .toStream(whileGoal.node().sequent().succedent())
-                    .filter(f -> SymbolicExecutionUtil
-                            .hasSymbolicExecutionLabel(f.formula()))
-                    .filter(f -> JavaTools.getActiveStatement(
-                            TermBuilder.goBelowUpdates(f.formula())
-                                    .javaBlock()) instanceof While)
-                    .findFirst();
-
-            assert maybeWhileSeqFor.isPresent();
-
-            final SequentFormula whileSeqFor = maybeWhileSeqFor.get();
-
-            final PosInOccurrence whilePio = new PosInOccurrence(whileSeqFor,
-                    PosInTerm.getTopLevel(), false);
-
-            final RuleApp loopInvRuleApp = LoopScopeInvariantRule.INSTANCE
-                    .createApp(whilePio, whileGoal.proof().getServices())
-                    .tryToInstantiate(whileGoal);
-
-            whileGoal.apply(loopInvRuleApp);
-
-            // Try to close first open goal ("initially valid")
-            seIf.applyMacro(new TryCloseMacro(1000), whileNode.child(0));
-
-            if (!whileNode.child(0).isClosed()) {
-                LOGGER.warn("The loop's invariant is not initially valid");
-            }
-
-            // Finish symbolic execution preserved & use case goal
-            final Node preservesAndUCNode = whileNode.child(1);
-            seIf.finishSEForNode(preservesAndUCNode);
-
+        if (proofHasLoopInvApp(proof)) {
             // Post condition facts. Those have to be extracted *before* the use
             // case facts, since the goals might change that are analyzed for
             // the use case
@@ -223,14 +184,14 @@ public class Analyzer {
             // Find "preserves" and "use case" branches
             final List<Node> preservedNodes = new ArrayList<>();
 
-            extractPreservedAndUseCaseNodes(proof, preservesAndUCNode,
-                    preservedNodes, postConditionNodes);
+            extractPreservedAndUseCaseNodes(proof, preservedNodes,
+                    postConditionNodes);
 
             // Loop facts
             unclosedLoopInvPreservedGoals = //
-                    extractLoopBodyFactsAndShowValidity( //
+                    extractLoopBodyFactsAndShowValidity(//
                             proof, preservedNodes, facts);
-            extractUseCaseFacts( //
+            extractUseCaseFacts(//
                     proof, postConditionNodes, facts);
         } else {
             // Post condition facts
@@ -241,40 +202,12 @@ public class Analyzer {
 
         LOGGER.info("Proving facts, this may take some time...");
 
-        // The show-the-facts loop
-
         List<Fact> coveredFacts = new ArrayList<>();
         List<Fact> abstractlyCoveredFacts = new ArrayList<>();
         List<Fact> unCoveredFacts = new ArrayList<>();
 
-        for (Fact fact : facts) {
-            LOGGER.trace("Proving fact %s", fact.descr);
-
-            final Node factNode = fact.factCoveredNode;
-            seIf.applyMacro(new TryCloseMacro(10000), factNode);
-
-            if (factNode.isClosed()) {
-                LOGGER.trace("Fact covered");
-                coveredFacts.add(fact);
-            } else {
-                final Node abstractlyCoveredNode = fact.factAbstractlyCoveredNode;
-
-                boolean abstractlyCovered = false;
-                if (abstractlyCoveredNode != null) {
-                    seIf.applyMacro(new TryCloseMacro(10000),
-                            abstractlyCoveredNode);
-                    abstractlyCovered = abstractlyCoveredNode.isClosed();
-                }
-
-                if (abstractlyCovered) {
-                    LOGGER.trace("Fact abstractly covered");
-                    abstractlyCoveredFacts.add(fact);
-                } else {
-                    LOGGER.trace("Fact uncovered");
-                    unCoveredFacts.add(fact);
-                }
-            }
-        }
+        analyzeFacts(facts, coveredFacts, abstractlyCoveredFacts,
+                unCoveredFacts);
 
         LOGGER.trace("Done proving facts.");
 
@@ -282,6 +215,8 @@ public class Analyzer {
 
         final List<ExceptionResult> problematicExceptions = //
                 checkExceptionBranches(proof);
+
+        // TODO also check if loop invariants are initially valid.
 
         LOGGER.trace("Done checking exception branches.");
 
@@ -300,6 +235,73 @@ public class Analyzer {
         return new AnalyzerResult(coveredFacts, abstractlyCoveredFacts,
                 unCoveredFacts, problematicExceptions,
                 unclosedLoopInvPreservedGoals);
+    }
+
+    /**
+     * Analyzes the {@link List} facts of extracted {@link Fact}s by trying to
+     * close the related {@link Goal}s.
+     *
+     * @param facts
+     *            The {@link List} of {@link Fact}s to analyze.
+     * @param coveredFacts
+     *            The {@link List} into which the covered {@link Fact}s should
+     *            be written.
+     * @param abstractlyCoveredFacts
+     *            The {@link List} into which the abstractly covered
+     *            {@link Fact}s should be written.
+     * @param unCoveredFacts
+     *            The {@link List} into which the uncovered {@link Fact}s should
+     *            be written.
+     */
+    private void analyzeFacts(final List<Fact> facts, List<Fact> coveredFacts,
+            List<Fact> abstractlyCoveredFacts, List<Fact> unCoveredFacts) {
+        for (Fact fact : facts) {
+            LOGGER.trace("Proving fact %s", fact.descr);
+
+            final Node factNode = fact.factCoveredNode;
+            seIf.applyMacro(new TryCloseMacro(10000), factNode);
+
+            if (factNode.isClosed()) {
+                LOGGER.trace("Fact covered");
+                coveredFacts.add(fact);
+                fact.setCovered(true);
+            } else {
+                final Node abstractlyCoveredNode = fact.factAbstractlyCoveredNode;
+
+                boolean abstractlyCovered = false;
+                if (abstractlyCoveredNode != null) {
+                    seIf.applyMacro(new TryCloseMacro(10000),
+                            abstractlyCoveredNode);
+                    abstractlyCovered = abstractlyCoveredNode.isClosed();
+                }
+
+                if (abstractlyCovered) {
+                    LOGGER.trace("Fact abstractly covered");
+                    abstractlyCoveredFacts.add(fact);
+                    fact.setAbstractlyCovered(true);
+                } else {
+                    LOGGER.trace("Fact uncovered");
+                    unCoveredFacts.add(fact);
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks whether the given {@link Proof} has a
+     * {@link LoopInvariantBuiltInRuleApp} application.
+     *
+     * @param proof
+     *            The {@link Proof} to check.
+     * @return true iff the {@link Proof} has a
+     *         {@link LoopInvariantBuiltInRuleApp}.
+     */
+    private boolean proofHasLoopInvApp(final Proof proof) {
+        final RuleAppVisitor ruleAppVisitor = new RuleAppVisitor(
+                LoopInvariantBuiltInRuleApp.class);
+        proof.breadthFirstSearch(proof.root(), ruleAppVisitor);
+
+        return ruleAppVisitor.success();
     }
 
     /**
@@ -426,7 +428,7 @@ public class Analyzer {
                 continue;
             }
 
-            if (!AnalyzePostCondImpliesMethodEffectsRule.INSTANCE.isApplicable( //
+            if (!AnalyzePostCondImpliesMethodEffectsRule.INSTANCE.isApplicable(//
                     g, maybePio.get())) {
                 continue;
             }
@@ -620,10 +622,6 @@ public class Analyzer {
      *
      * @param proof
      *            The {@link Proof} to extract the nodes from.
-     * @param preservesAndUCNode
-     *            The parent {@link Node} representing the preserved and use
-     *            case branch after a {@link LoopScopeInvariantRule}
-     *            application.
      * @param preservedNodes
      *            The {@link List} into which to store the preserved nodes.
      * @param postconditionNodes
@@ -631,13 +629,11 @@ public class Analyzer {
      *            condition nodes.
      */
     private void extractPreservedAndUseCaseNodes(final Proof proof,
-            final Node preservesAndUCNode, final List<Node> preservedNodes,
+            final List<Node> preservedNodes,
             final List<Node> postconditionNodes) {
         final Services services = proof.getServices();
-        final LocationVariable loopScopeIndex = SymbExInterface
-                .findLoopScopeIndex(proof, preservesAndUCNode);
 
-        for (Goal g : proof.getSubtreeGoals(preservesAndUCNode)) {
+        for (Goal g : proof.openGoals()) {
             if (g.node().parent().getAppliedRuleApp()
                     .rule() == AnalyzePostCondImpliesMethodEffectsRule.INSTANCE
                     && g != proof.getSubtreeGoals(g.node().parent()).head()) {
@@ -647,13 +643,20 @@ public class Analyzer {
                 continue;
             }
 
+            final Optional<LocationVariable> maybeLoopScopeIndex = SymbExInterface
+                    .findLoopScopeIndex(proof, g.node());
+
+            if (!maybeLoopScopeIndex.isPresent()) {
+                continue;
+            }
+
             final Optional<Term> rhs = GeneralUtilities
                     .toStream(g.node().sequent().succedent())
                     .map(sf -> sf.formula())
                     .filter(f -> f.op() instanceof UpdateApplication).map(f -> {
                         ImmutableArray<Term> values = SymbolicExecutionUtil
                                 .extractValueFromUpdate(f.sub(0),
-                                        loopScopeIndex);
+                                        maybeLoopScopeIndex.get());
 
                         return values == null || values.size() != 1
                                 ? (Term) null : (Term) values.get(0);
@@ -669,12 +672,13 @@ public class Analyzer {
                     GeneralUtilities.logErrorAndThrowRTE(LOGGER,
                             "Unexpected (not simplified?) value for "
                                     + "loop scope index %s in goal %s: %s",
-                            loopScopeIndex, g.node().serialNr(), rhs);
+                            maybeLoopScopeIndex.get(), g.node().serialNr(),
+                            rhs);
                 }
             } else {
                 LOGGER.trace(
                         "Couldn't find the value for loop scope index %s in goal #%s",
-                        loopScopeIndex, g.node().serialNr());
+                        maybeLoopScopeIndex.get(), g.node().serialNr());
             }
         }
     }
@@ -888,6 +892,47 @@ public class Analyzer {
     }
 
     /**
+     * A visitor for checking whether a given {@link RuleApp} type is present in
+     * a {@link Proof} tree.
+     *
+     * @author Dominic Steinhöfel
+     */
+    private static class RuleAppVisitor implements ProofVisitor {
+        /**
+         * See {@link #success()}.
+         */
+        private boolean success = false;
+
+        /**
+         * The {@link RuleApp} {@link Class} type to search for.
+         */
+        private Class<? extends RuleApp> toSearch;
+
+        /**
+         * @param toSearch
+         *            The {@link RuleApp} {@link Class} type to search for.
+         */
+        public RuleAppVisitor(Class<? extends RuleApp> toSearch) {
+            this.toSearch = toSearch;
+        }
+
+        @Override
+        public void visit(Proof proof, Node visitedNode) {
+            if (visitedNode.getAppliedRuleApp() != null
+                    && toSearch.isInstance(visitedNode.getAppliedRuleApp())) {
+                success = true;
+            }
+        }
+
+        /**
+         * @return true iff the {@link RuleApp} type was found.
+         */
+        public boolean success() {
+            return success;
+        }
+    }
+
+    /**
      * Types of extracted {@link Fact}s.
      *
      * @author Dominic Steinhöfel
@@ -1056,7 +1101,7 @@ public class Analyzer {
             case POST_COND_FACT:
                 return "Post condition implies final state fact";
             default:
-                GeneralUtilities.logErrorAndThrowRTE( //
+                GeneralUtilities.logErrorAndThrowRTE(//
                         LOGGER, "Unknown fact type: %s", ft);
                 return null;
             }

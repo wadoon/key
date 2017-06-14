@@ -97,6 +97,11 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      */
     public static final String ANON_INVARIANT_TERM_HINT = "anonInvariant";
 
+    /**
+     * The branch label for the initially valid branch.
+     */
+    public static final String INVARIANT_INITIALLY_VALID_BRANCH_LABEL = "Invariant Initially Valid";
+
     private static final Name NAME = new Name("Loop (Scope) Invariant");
 
     /**
@@ -211,7 +216,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     private void constructInitiallyGoal(Services services, RuleApp ruleApp,
             final TermLabelState termLabelState, Goal initiallyGoal,
             final Instantiation inst, final Term invTerm, Term reachableState) {
-        initiallyGoal.setBranchLabel("Invariant Initially Valid");
+        initiallyGoal.setBranchLabel(INVARIANT_INITIALLY_VALID_BRANCH_LABEL);
         initiallyGoal
                 .changeFormula(
                         initFormula(termLabelState, inst, invTerm,

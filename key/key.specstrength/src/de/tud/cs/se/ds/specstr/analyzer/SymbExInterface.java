@@ -30,13 +30,10 @@ import de.tud.cs.se.ds.specstr.util.JavaTypeInterface;
 import de.tud.cs.se.ds.specstr.util.LogicUtilities;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -52,7 +49,6 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
  * TODO
@@ -102,7 +98,7 @@ public class SymbExInterface {
 
     /**
      * Returns the {@link Proof} object if already initialized; make sure to
-     * call {@link #finishSEUntilLoopOrEnd(ProgramMethod)} before calling this
+     * call {@link #finishSEForMethod(ProgramMethod)} before calling this
      * method.
      * 
      * @return
@@ -160,34 +156,11 @@ public class SymbExInterface {
      * @param pm
      * @return
      */
-    public Optional<Goal> finishSEUntilLoopOrEnd(ProgramMethod pm) {
+    public void finishSEForMethod(ProgramMethod pm) {
         initProof(pm);
 
         // Start auto mode
         finishSEForNode(proof.root());
-
-        final List<Goal> whileLoopGoals = GeneralUtilities
-                .toStream(proof.openGoals())
-                .filter(g -> GeneralUtilities
-                        .toStream(g.node().sequent().succedent())
-                        .filter(f -> SymbolicExecutionUtil
-                                .hasSymbolicExecutionLabel(f.formula()))
-                        .filter(f -> JavaTools.getActiveStatement(
-                                TermBuilder.goBelowUpdates(f.formula())
-                                        .javaBlock()) instanceof While)
-                        .findAny().isPresent())
-                .collect(Collectors.toList());
-
-        if (whileLoopGoals.size() == 0) {
-            return Optional.empty();
-        } else if (whileLoopGoals.size() > 1) {
-            GeneralUtilities.logErrorAndThrowRTE(logger,
-                    "Expected no or one goal with a while loop, got %s",
-                    whileLoopGoals.size());
-        }
-
-        return Optional.of(whileLoopGoals.get(0));
-
     }
 
     /**
@@ -250,7 +223,7 @@ public class SymbExInterface {
      * @param loopScopeIndex
      * @throws RuntimeException
      */
-    public static LocationVariable findLoopScopeIndex(final Proof proof,
+    public static Optional<LocationVariable> findLoopScopeIndex(final Proof proof,
             final Node preservesAndUCNode) throws RuntimeException {
         LocationVariable loopScopeIndex = null;
 
@@ -272,12 +245,10 @@ public class SymbExInterface {
         }
 
         if (loopScopeIndex == null) {
-            GeneralUtilities.logErrorAndThrowRTE(logger,
-                    "Could not find loop scope index; assumed "
-                            + "it to be present in first open goal");
+            return Optional.empty();
         }
 
-        return loopScopeIndex;
+        return Optional.of(loopScopeIndex);
     }
 
     /**
@@ -317,7 +288,7 @@ public class SymbExInterface {
         sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_ON);
         sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
         sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_NONCLOSE);
-        sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_NONE);
+        sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_SCOPE_INVARIANT);
         sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_ON);
         // @formatter:on
 

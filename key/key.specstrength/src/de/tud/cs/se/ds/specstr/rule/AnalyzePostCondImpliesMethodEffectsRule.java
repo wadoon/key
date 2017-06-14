@@ -40,6 +40,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -52,12 +53,13 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  *
  * @author Dominic Steinhöfel
  */
-public class AnalyzePostCondImpliesMethodEffectsRule extends AbstractAnalysisRule {
+public class AnalyzePostCondImpliesMethodEffectsRule
+        extends AbstractAnalysisRule {
     public static final Name NAME = new Name(
             "AnalyzePostCondImpliesMethodEffects");
     public static final AnalyzePostCondImpliesMethodEffectsRule INSTANCE = //
             new AnalyzePostCondImpliesMethodEffectsRule();
-    
+
     private AnalyzePostCondImpliesMethodEffectsRule() {
         // Singleton Constructor
     }
@@ -127,8 +129,8 @@ public class AnalyzePostCondImpliesMethodEffectsRule extends AbstractAnalysisRul
                 .map(lhs -> tb.elementary(lhs, updateContent.get(lhs)))
                 .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
 
-        final ImmutableList<Goal> goals = goal.split((hasResultVar ? 1 : 0)
-                + storeEqualities.size() + 1);
+        final ImmutableList<Goal> goals = goal
+                .split((hasResultVar ? 1 : 0) + storeEqualities.size() + 1);
         final Goal[] goalArray = goals.toArray(Goal.class);
         final TermLabelState termLabelState = new TermLabelState();
 
@@ -140,25 +142,27 @@ public class AnalyzePostCondImpliesMethodEffectsRule extends AbstractAnalysisRul
                     MergeRuleUtils.getUpdateRightSideFor(updateTerm,
                             resultVar));
 
-            prepareGoal(pio, analysisGoal, currAnalysisTerm, termLabelState, this);
+            prepareGoal(pio, analysisGoal, currAnalysisTerm, termLabelState,
+                    this);
 
             final List<Term> newPres = Arrays
                     .asList(new Term[] {
-                            tb.apply(
-                                    hasHeap ? tb.parallel(
-                                            tb.elementary(tb.var(heapVar),
-                                                    origHeapTerm),
-                                            updateWithoutVarsOfInterest)
-                                            : updateWithoutVarsOfInterest,
-                                    contract),
-                            tb.and(updateContent.keySet().stream()
-                                    .filter(lhs -> lhs != resultVar)
-                                    .filter(lhs -> !lhs.equals(heapVar))
-                                    .map(lhs -> tb.equals(tb.var(lhs),
-                                            updateContent.get(lhs)))
-                                    .collect(Collectors.toList())) });
+                        tb.apply(
+                                hasHeap ? tb.parallel(
+                                        tb.elementary(tb.var(heapVar),
+                                                origHeapTerm),
+                                        updateWithoutVarsOfInterest)
+                                        : updateWithoutVarsOfInterest,
+                                contract),
+                        tb.and(updateContent.keySet().stream()
+                                .filter(lhs -> lhs != resultVar)
+                                .filter(lhs -> !lhs.equals(heapVar))
+                                .map(lhs -> tb.equals(tb.var(lhs),
+                                        updateContent.get(lhs)))
+                                .collect(Collectors.toList())) });
 
-            addFactPreconditions(analysisGoal, newPres, 1, termLabelState, this);
+            addFactPreconditions(analysisGoal, newPres, 1, termLabelState,
+                    this);
         }
 
         int i = hasResultVar ? 1 : 0;
@@ -170,7 +174,8 @@ public class AnalyzePostCondImpliesMethodEffectsRule extends AbstractAnalysisRul
             for (Term storeEquality : storeEqualities) {
                 final Goal analysisGoal = goalArray[i];
 
-                prepareGoal(pio, analysisGoal, storeEquality, termLabelState, this);
+                prepareGoal(pio, analysisGoal, storeEquality, termLabelState,
+                        this);
 
                 final Term update = tb.parallel( //
                         tb.elementary(tb.var(heapVar), innerHeapTerm), //
@@ -178,13 +183,14 @@ public class AnalyzePostCondImpliesMethodEffectsRule extends AbstractAnalysisRul
 
                 final List<Term> newPres = Arrays
                         .asList(new Term[] { tb.apply(update, contract),
-                                tb.and(updateContent.keySet().stream()
-                                        .filter(lhs -> !lhs.equals(heapVar))
-                                        .map(lhs -> tb.equals(tb.var(lhs),
-                                                updateContent.get(lhs)))
-                                        .collect(Collectors.toList())) });
+                            tb.and(updateContent.keySet().stream()
+                                    .filter(lhs -> !lhs.equals(heapVar))
+                                    .map(lhs -> tb.equals(tb.var(lhs),
+                                            updateContent.get(lhs)))
+                                    .collect(Collectors.toList())) });
 
-                addFactPreconditions(analysisGoal, newPres, 1, termLabelState, this);
+                addFactPreconditions(analysisGoal, newPres, 1, termLabelState,
+                        this);
 
                 i++;
             }
@@ -194,7 +200,8 @@ public class AnalyzePostCondImpliesMethodEffectsRule extends AbstractAnalysisRul
         final Goal postCondGoal = goalArray[goalArray.length - 1];
         addSETPredicateToAntec(postCondGoal);
 
-        postCondGoal.setBranchLabel(AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL);
+        postCondGoal.setBranchLabel(
+                AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL);
 
         return goals;
     }
@@ -235,7 +242,11 @@ public class AnalyzePostCondImpliesMethodEffectsRule extends AbstractAnalysisRul
                         || MergeRuleUtils
                                 .getUpdateRightSideFor(f.sub(0), lsi.get())
                                 .equals(tb.TRUE()))
-                && !AbstractAnalysisRule.alreadyAnalysisGoal(goal.node().parent());
+                && (goal.node().getNodeInfo().getBranchLabel() == null
+                        || !goal.node().getNodeInfo().getBranchLabel()
+                                .equals(LoopScopeInvariantRule.INVARIANT_INITIALLY_VALID_BRANCH_LABEL))
+                && !AbstractAnalysisRule
+                        .alreadyAnalysisGoal(goal.node().parent());
     }
 
     @Override
