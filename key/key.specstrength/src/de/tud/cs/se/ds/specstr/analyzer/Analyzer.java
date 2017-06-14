@@ -731,8 +731,8 @@ public class Analyzer {
 
         public Fact(String descr, String pathCond, FactType factType,
                 Node factCoveredNode, Node factAbstractlyCoveredNode) {
-            this.descr = descr;
-            this.pathCond = pathCond;
+            this.descr = descr.trim();
+            this.pathCond = pathCond.trim();
             this.factType = factType;
             this.factCoveredNode = factCoveredNode;
             this.nodeNr = factCoveredNode.serialNr();
