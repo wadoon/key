@@ -169,6 +169,39 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
     }
 
     @Test
+    public void testFindStrongerInv2a() {
+        final AnalyzerResult result = analyzeMethod(
+                "findMethods/FindMethods.java",
+                "FindMethods::find_stronger_inv_2a([II)I");
+        
+        //TODO: There are open exception branches
+        assertEquals(42.86d, result.strength(), .01d);
+        
+        Analyzer.printResults(result, System.out);
+
+        final List<Fact> abstrLoopBodyFacts = result
+                .getAbstractlyCoveredFactsOfType(LOOP_BODY_FACT);
+        final List<Fact> abstrPostCondFacts = result
+                .getAbstractlyCoveredFactsOfType(POST_COND_FACT);
+        final List<Fact> uncUseCaseFacts = result
+                .getUncoveredFactsOfType(LOOP_USE_CASE_FACT);
+        final List<Fact> uncPostCondFacts = result
+                .getUncoveredFactsOfType(POST_COND_FACT);
+        final List<Fact> uncLoopBodyFacts = result
+                .getUncoveredFactsOfType(LOOP_BODY_FACT);
+
+        assertEquals(2, abstrLoopBodyFacts.size());
+        assertEquals(2, abstrPostCondFacts.size());
+
+        assertEquals(0, uncUseCaseFacts.size());
+        assertEquals(0, uncPostCondFacts.size());
+        assertEquals(2, uncLoopBodyFacts.size());
+
+        assertEquals(2, result.numUncoveredFacts());
+        assertEquals(4, result.numAbstractlyCoveredFacts());
+    }
+
+    @Test
     public void testFindStrongerInv() {
         final AnalyzerResult result = analyzeMethod(
                 "findMethods/FindMethods.java",

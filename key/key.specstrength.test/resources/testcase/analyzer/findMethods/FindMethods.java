@@ -172,6 +172,39 @@ public class FindMethods {
         return result;
     }
   
+    // Four "abstractly covered" facts:
+    //   Post condition fact: "result = -1"
+    //   Post condition fact: "result = result_1_0"
+    //   Loop body fact "i = 1 + i0"
+    //   Loop body fact: "result = i_0"
+    // Two uncovered facts:
+    //   Loop body fact "i = 1 + i0"
+    //   Loop body fact: "result = -1"
+    /*@ public normal_behavior
+      @ ensures \result == -1 || arr[\result] == n;
+      @*/
+    public static int find_stronger_inv_2a(int[] arr, int n) {
+        int i = 0;
+        int result = -1;
+
+        /*@ loop_invariant
+          @      (result != -1 || (\forall int k; k >= 0 && k < i; arr[k] != n))
+          @   && (result == -1 || arr[result] == n)
+          @   ;
+          @ decreases arr.length - i;
+          @ assignable \nothing;
+          @*/
+        while (result == -1 && i < arr.length) {
+            if (arr[i] == n) {
+                result = i;
+            }
+
+            i++;
+        }
+
+        return result;
+    }
+  
     // Six "abstractly covered" facts:
     //   2x loop body fact "i = 1 + i0", that is exact change of i.
     //   Loop body fact: "result = -1"
