@@ -644,7 +644,7 @@ public class Analyzer {
             }
 
             final Optional<LocationVariable> maybeLoopScopeIndex = SymbExInterface
-                    .findLoopScopeIndex(proof, g.node());
+                    .findLoopScopeIndex(g.node());
 
             if (!maybeLoopScopeIndex.isPresent()) {
                 continue;

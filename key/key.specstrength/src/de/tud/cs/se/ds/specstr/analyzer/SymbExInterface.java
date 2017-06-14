@@ -35,6 +35,7 @@ import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
@@ -45,35 +46,62 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
 /**
- * TODO
+ * Bridge to KeY's symbolic execution engine.
  *
  * @author Dominic Steinhöfel
  */
 public class SymbExInterface {
-    private static final Logger logger = LogManager.getFormatterLogger();
+    /**
+     * The {@link Logger} for this class.
+     */
+    private static final Logger LOGGER = LogManager.getFormatterLogger();
 
+    /**
+     * The {@link KeYEnvironment} for the method to analyze.
+     */
     private KeYEnvironment<DefaultUserInterfaceControl> env;
+
+    /**
+     * The {@link File} containing the method to analyze.
+     */
     private File file;
+
+    /**
+     * The constructed {@link Proof} object.
+     */
     private Proof proof;
 
+    /**
+     * Constructor.
+     *
+     * @param file
+     *            The {@link File} containing the method to analyze.
+     * @throws ProblemLoaderException
+     *             If the {@link File} could not be loaded, e.g. due to syntax
+     *             errors.
+     */
     public SymbExInterface(File file) throws ProblemLoaderException {
         this.file = file;
         initializeKeYEnv();
     }
 
     /**
-     * TODO
-     * 
+     * Builds the {@link KeYEnvironment} for the problem to analyse (based on
+     * the {@link StrengthAnalysisSEProfile}).
+     *
      * @throws ProblemLoaderException
+     *             If the {@link File} could not be loaded, e.g. due to syntax
+     *             errors.
      */
     private void initializeKeYEnv() throws ProblemLoaderException {
-        logger.trace("Building KeY environment for file %s", file);
+        LOGGER.trace("Building KeY environment for file %s", file);
         // @formatter:off
         env = KeYEnvironment.load(
                 StrengthAnalysisSEProfile.INSTANCE,
@@ -83,34 +111,32 @@ public class SymbExInterface {
                 null,     // includes
                 true);    // forceNewProfileOfNewProofs
         // @formatter:on
-        logger.trace("Built up environment.");
+        LOGGER.trace("Built up environment.");
     }
 
     /**
-     * TODO
-     * 
      * @see JavaTypeInterface#getDeclaredTypes(KeYEnvironment)
-     * @return
+     * @return The {@link KeYJavaType}s declared in the {@link KeYEnvironment}.
      */
     public List<KeYJavaType> getDeclaredTypes() {
         return JavaTypeInterface.getDeclaredTypes(env);
     }
 
     /**
-     * Returns the {@link Proof} object if already initialized; make sure to
-     * call {@link #finishSEForMethod(ProgramMethod)} before calling this
-     * method.
-     * 
-     * @return
+     * @return The {@link Proof} object if already initialized; make sure to
+     *         call {@link #finishSEForMethod(ProgramMethod)} before calling
+     *         this method.
      */
     public Proof proof() {
         return proof;
     }
 
     /**
-     * TODO
-     * 
+     * Initializes the {@link Proof} for the given {@link IProgramMethod}.
+     *
      * @param pm
+     *            The {@link IProgramMethod} to analyze.
+     * @see #setupStrategy(Proof)
      */
     private void initProof(ProgramMethod pm) {
         if (proof != null) {
@@ -123,10 +149,10 @@ public class SymbExInterface {
 
         if (contracts == null || contracts.size() != 1) {
             final String msg = GeneralUtilities.format(
-                    "Expected 1 contract for method %s, found %s",
-                    pm.getFullName(), contracts == null ? 0 : contracts.size());
+                "Expected 1 contract for method %s, found %s", pm.getFullName(),
+                contracts == null ? 0 : contracts.size());
 
-            logger.error(msg);
+            LOGGER.error(msg);
             throw new RuntimeException(msg);
         }
 
@@ -135,26 +161,26 @@ public class SymbExInterface {
 
         try {
             final FunctionalOperationContractPO po = //
-                    new FunctionalOperationContractPO( //
-                            env.getInitConfig(), //
-                            (FunctionalOperationContract) contract, //
-                            true, // add uninterpreted predicate
-                            true); // add symbolic execution label
+                    new FunctionalOperationContractPO(//
+                        env.getInitConfig(), //
+                        (FunctionalOperationContract) contract, //
+                        true, // add uninterpreted predicate
+                        true); // add symbolic execution label
 
             proof = env.createProof(po);
             setupStrategy(proof);
         } catch (ProofInputException e) {
-            GeneralUtilities.logErrorAndThrowRTE(logger,
-                    "Exception at '%s' of %s:\n%s", contract.getDisplayName(),
-                    contract.getTarget(), e.getMessage());
+            GeneralUtilities.logErrorAndThrowRTE(LOGGER,
+                "Exception at '%s' of %s:\n%s", contract.getDisplayName(),
+                contract.getTarget(), e.getMessage());
         }
     }
 
     /**
-     * TODO
-     * 
+     * Initializes the {@link Proof} for pm and finishes symbolic execution.
+     *
      * @param pm
-     * @return
+     *            The {@link ProgramMethod} to analyze.
      */
     public void finishSEForMethod(ProgramMethod pm) {
         initProof(pm);
@@ -164,70 +190,86 @@ public class SymbExInterface {
     }
 
     /**
-     * TODO
-     * 
+     * Finishes symbolic execution starting at the given {@link Node}.
+     *
      * @param node
+     *            The {@link Node} to start symbolic execution at.
      */
     public void finishSEForNode(Node node) {
-        List<Node> openNodesWithModality;
+        List<Node> openNodesWithModality = LogicUtilities
+                .extractOpenNodesWithModality(node);
         List<Node> lastNodesWithModality = new ArrayList<>();
-        while (!(openNodesWithModality = LogicUtilities
-                .extractOpenNodesWithModality(node)).isEmpty()
+
+        while (!openNodesWithModality.isEmpty()
                 && !openNodesWithModality.equals(lastNodesWithModality)) {
+
             openNodesWithModality.forEach(
-                    n -> applyMacro(new FinishSymbolicExecutionMacro(), n));
+                n -> applyMacro(new FinishSymbolicExecutionMacro(), n));
 
             lastNodesWithModality = new ArrayList<>(openNodesWithModality);
+
+            openNodesWithModality = LogicUtilities
+                    .extractOpenNodesWithModality(node);
         }
     }
 
     /**
-     * TODO Comment.
+     * Applies the given {@link ProofMacro} exhaustively, i.e. until it does not
+     * change anything anymore.
      *
      * @param macro
+     *            The {@link ProofMacro} to apply.
      * @param node
+     *            The root of the subtree to apply the {@link ProofMacro} to.
      */
     public void applyMacroExhaustively(ProofMacro macro, Node node) {
-        List<Node> openNodes;
+        List<Node> openNodes = GeneralUtilities
+                .toStream(node.proof().getSubtreeGoals(node)).map(g -> g.node())
+                .collect(Collectors.toList());
         List<Node> lastNodes = new ArrayList<>();
 
-        while (!(openNodes = //
-                GeneralUtilities.toStream(node.proof().getSubtreeGoals(node))
-                        .map(g -> g.node()).collect(Collectors.toList()))
-                                .equals(lastNodes)) {
+        while (!openNodes.equals(lastNodes)) {
             openNodes.forEach(n -> applyMacro(macro, n));
             lastNodes = new ArrayList<>(openNodes);
+
+            openNodes = GeneralUtilities
+                    .toStream(node.proof().getSubtreeGoals(node))
+                    .map(g -> g.node()).collect(Collectors.toList());
         }
     }
 
     /**
-     * TODO
-     * 
+     * Applies a {@link ProofMacro} on a given {@link Node}.
+     *
      * @param macro
+     *            The {@link ProofMacro} to apply.
      * @param node
+     *            The {@link Node} to apply the macro on.
      */
     public void applyMacro(ProofMacro macro, Node node) {
         try {
             macro.applyTo(env.getUi(), node, null, env.getUi());
         } catch (Exception e) {
-            GeneralUtilities.logErrorAndThrowRTE(logger,
-                    "Problem in applying macro, message: %s", e.getMessage());
+            GeneralUtilities.logErrorAndThrowRTE(LOGGER,
+                "Problem in applying macro, message: %s", e.getMessage());
         }
     }
 
     /**
-     * TODO
-     * 
-     * @param proof
-     * @param preservesAndUCNode
-     * @param loopScopeIndex
-     * @throws RuntimeException
+     * Attempts to find a loop scope index variable in the {@link Proof} subtree
+     * starting at the given {@link Node}.
+     *
+     * @param node
+     *            To root of the subtree to search.
+     * @return An {@link Optional} loop scope index variable.
+     * @see LoopScopeInvariantRule
      */
-    public static Optional<LocationVariable> findLoopScopeIndex(final Proof proof,
-            final Node preservesAndUCNode) throws RuntimeException {
+    public static Optional<LocationVariable> findLoopScopeIndex(
+            final Node node) {
+        final Proof proof = node.proof();
         LocationVariable loopScopeIndex = null;
 
-        for (Goal g : proof.getSubtreeGoals(preservesAndUCNode)) {
+        for (Goal g : proof.getSubtreeGoals(node)) {
             for (SequentFormula sf : g.node().sequent().succedent()) {
                 final LoopScopeIdxVisitor loopScopeSearcher = new LoopScopeIdxVisitor();
                 sf.formula().execPostOrder(loopScopeSearcher);
@@ -252,9 +294,11 @@ public class SymbExInterface {
     }
 
     /**
-     * TODO
-     * 
+     * Sets up the default strategy settings for strength analysis in the given
+     * {@link Proof}.
+     *
      * @param proof
+     *            The {@link Proof} to set up.
      */
     private static void setupStrategy(Proof proof) {
         // Set proof strategy options
@@ -268,14 +312,15 @@ public class SymbExInterface {
                 .setActiveStrategyProperties(sp);
         proof.getSettings().getStrategySettings().setMaxSteps(maxSteps);
         proof.setActiveStrategy(
-                new StrengthAnalysisStrategy.Factory().create(proof, sp));
+            new StrengthAnalysisStrategy.Factory().create(proof, sp));
     }
 
     /**
-     * TODO
-     * 
+     * Sets and returns the {@link StrategyProperties} for strength analysis.
+     *
      * @param proof
-     * @return
+     *            The {@link Proof} the strategy of which to set.
+     * @return The {@link StrategyProperties} for strength analysis.
      */
     private static StrategyProperties strategyProperties(Proof proof) {
         final StrategyProperties sp;
@@ -286,9 +331,15 @@ public class SymbExInterface {
         sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_CONTRACT);
         sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_ON);
         sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_ON);
-        sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY, StrategyProperties.NON_LIN_ARITH_DEF_OPS);
-        sp.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_NONCLOSE);
-        sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY, StrategyProperties.LOOP_SCOPE_INVARIANT);
+        sp.setProperty(
+                StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
+                StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+        sp.setProperty(
+                StrategyProperties.STOPMODE_OPTIONS_KEY,
+                StrategyProperties.STOPMODE_NONCLOSE);
+        sp.setProperty(
+                StrategyProperties.LOOP_OPTIONS_KEY,
+                StrategyProperties.LOOP_SCOPE_INVARIANT);
         sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_ON);
         // @formatter:on
 
@@ -299,18 +350,21 @@ public class SymbExInterface {
     }
 
     /**
-     * TODO
+     * A visitor for finding a loop scope index variable in a {@link Term}.
      *
      * @author Dominic Steinhöfel
      */
     private static class LoopScopeIdxVisitor extends DefaultVisitor {
+        /**
+         * The result of this visitor.
+         */
         private Optional<LocationVariable> loopScopeIndexVar = Optional.empty();
 
         @Override
         public void visit(Term visited) {
             if (visited.op() instanceof LocationVariable
                     && visited.containsLabel(
-                            ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)) {
+                        ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)) {
                 loopScopeIndexVar = Optional
                         .of((LocationVariable) visited.op());
             }
