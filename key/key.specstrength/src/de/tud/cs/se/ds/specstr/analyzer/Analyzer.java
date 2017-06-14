@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -228,6 +229,13 @@ public class Analyzer {
 
         logger.trace("Done proving facts.");
 
+        logger.trace("Checking exception branches.");
+
+        final List<ExceptionResult> problematicExceptions = //
+                checkExceptionBranches(proof);
+
+        logger.trace("Done checking exception branches.");
+
         if (outProofFile.isPresent()) {
             try {
                 logger.info("Writing proof to file %s", outProofFile.get());
@@ -241,7 +249,46 @@ public class Analyzer {
         logger.trace("Finished analysis of Java file %s", file);
 
         return new AnalyzerResult(coveredFacts, abstractlyCoveredFacts,
-                unCoveredFacts, unclosedLoopInvPreservedGoals);
+                unCoveredFacts, problematicExceptions,
+                unclosedLoopInvPreservedGoals);
+    }
+
+    /**
+     * TODO Comment.
+     *
+     * @param proof
+     * @return
+     */
+    private List<ExceptionResult> checkExceptionBranches(final Proof proof) {
+        final List<ExceptionResult> unclosedExceptions = new ArrayList<>();
+
+        // TODO That's a hackish way of filtering exception branches; can we do
+        // this more systematically? In any case, the list is incomplete.
+        final String[] exceptionBranchLabels = new String[] { //
+                "Null Reference", //
+                "Index Out of Bounds", //
+        };
+
+        final List<Node> exceptionNodes = GeneralUtilities
+                .toStream(proof.openGoals()).map(g -> g.node())
+                .filter(n -> n.getNodeInfo().getBranchLabel() != null
+                        && Arrays.stream(exceptionBranchLabels)
+                                .anyMatch(s -> n.getNodeInfo().getBranchLabel()
+                                        .contains(s)))
+                .collect(Collectors.toList());
+
+        for (final Node excNode : exceptionNodes) {
+            logger.trace("Checking exception node \"%s\"",
+                    excNode.getNodeInfo().getBranchLabel());
+            seIf.applyMacro(new TryCloseMacro(), excNode);
+            if (!excNode.isClosed()) {
+                unclosedExceptions.add(new ExceptionResult(
+                        excNode.getNodeInfo().getBranchLabel(),
+                        extractReadablePathCondition(excNode)));
+            }
+        }
+
+        return unclosedExceptions;
     }
 
     /**
@@ -481,10 +528,9 @@ public class Analyzer {
                 problem = true;
             }
 
-            pathCond = (problem ? "ERROR-PC " : "") + LogicPrinter
-                    .quickPrintTerm(pathCondTerm,
-                            analysisNode.proof().getServices())
-                    .replaceAll("(\\r|\\n|\\r\\n)+", " ");
+            pathCond = (problem ? "ERROR-PC " : "") + GeneralUtilities
+                    .cleanWhitespace(LogicPrinter.quickPrintTerm(pathCondTerm,
+                            analysisNode.proof().getServices()));
         } catch (ProofInputException e) {
             logger.error("Couldn't compute path comdition for goal %s"
                     + analysisNode.serialNr());
@@ -686,6 +732,35 @@ public class Analyzer {
      * @param ps
      */
     public static void printResults(AnalyzerResult result, PrintStream ps) {
+        if (result.unclosedLoopInvPreservedGoals() > 0) {
+            // @formatter:off
+            ps.println(String.format("==========================================\n"
+                                   + "Open \"invariant preserved\" branches: *%s*:\n"
+                                   + "==========================================\n",
+                       result.unclosedLoopInvPreservedGoals()));
+            // @formatter:on
+
+            final PrintStream fPs = ps;
+            result.problematicExceptions().forEach(e -> {
+                fPs.println(e);
+                fPs.println();
+            });
+        }
+        
+        if (result.problematicExceptions().size() > 0) {
+            // @formatter:off
+            ps.println("=====================\n"
+                     + "Unhandled Exceptions:\n"
+                     + "=====================\n");
+            // @formatter:on
+
+            final PrintStream fPs = ps;
+            result.problematicExceptions().forEach(e -> {
+                fPs.println(e);
+                fPs.println();
+            });
+        }
+
         if (result.numUncoveredFacts() > 0) {
             // @formatter:off
             ps.println("================\n"
@@ -818,19 +893,47 @@ public class Analyzer {
         }
     }
 
+    public static class ExceptionResult {
+        private final String excLabel;
+        private final String pathCondition;
+
+        public ExceptionResult(String excLabel, String pathCondition) {
+            this.excLabel = excLabel;
+            this.pathCondition = pathCondition;
+        }
+
+        public String getExcLabel() {
+            return excLabel;
+        }
+
+        public String getPathCondition() {
+            return pathCondition;
+        }
+
+        @Override
+        public String toString() {
+            return String.format(
+                    "Unclosed exception node \"%s\", path condition: \"%s\"",
+                    excLabel, pathCondition);
+        }
+    }
+
     public static class AnalyzerResult {
         private final List<Fact> coveredFacts;
         private final List<Fact> abstractlyCoveredFacts;
         private final List<Fact> uncoveredFacts;
         private final int unclosedLoopInvPreservedGoals;
+        private final List<ExceptionResult> problematicExceptions;
 
         public AnalyzerResult(List<Fact> coveredFacts,
                 List<Fact> abstractlyCoveredFacts, List<Fact> unCoveredFacts,
+                List<ExceptionResult> problematicExceptions,
                 int unclosedLoopInvPreservedGoals) {
             this.coveredFacts = coveredFacts;
             this.abstractlyCoveredFacts = abstractlyCoveredFacts;
             this.uncoveredFacts = unCoveredFacts;
             this.unclosedLoopInvPreservedGoals = unclosedLoopInvPreservedGoals;
+            this.problematicExceptions = problematicExceptions;
         }
 
         public List<Fact> getCoveredFacts() {
@@ -876,6 +979,10 @@ public class Analyzer {
         public int numFacts() {
             return numCoveredFacts() + numAbstractlyCoveredFacts()
                     + numUncoveredFacts();
+        }
+
+        public List<ExceptionResult> problematicExceptions() {
+            return problematicExceptions;
         }
 
         public int unclosedLoopInvPreservedGoals() {

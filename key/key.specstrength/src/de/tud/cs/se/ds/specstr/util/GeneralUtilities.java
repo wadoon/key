@@ -50,6 +50,19 @@ public class GeneralUtilities {
     }
 
     /**
+     * Trims s and replaces all consequitive whitespace characters inside by
+     * only one space.
+     *
+     * @param s
+     *            The {@link String} to clean.
+     * @return A cleaned-up representation of s, no whitespace at beginning and
+     *         end, and at most one whitespace (a space) inside.
+     */
+    public static String cleanWhitespace(String s) {
+        return s.trim().replaceAll("(\\s)+", " ");
+    }
+
+    /**
      * Tries to parse a {@link String} to an {@link Integer}; returns an
      * {@link Optional} containing the {@link Integer} in case of success or an
      * empty {@link Optional} otherwise.

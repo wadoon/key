@@ -151,9 +151,6 @@ public class FindMethods {
         int result = -1;
 
         /*@ loop_invariant
-          @      // TODO: The following line makes a difference between abstract
-          @      //       and uncovered for some facts, create another example
-          @      //       without it, or only with it.
           @      i >= 0 && i <= arr.length
           @   && (result != -1 || (\forall int k; k >= 0 && k < i; arr[k] != n))
           @   && (result == -1 || arr[result] == n)
@@ -172,6 +169,9 @@ public class FindMethods {
         return result;
     }
   
+    // This method is "stonger" than the above find_stronger_inv_2,
+    // but for the price of an open exception branch, since i is
+    // not restrained to the legal rance in arr.
     // Four "abstractly covered" facts:
     //   Post condition fact: "result = -1"
     //   Post condition fact: "result = result_1_0"
@@ -180,6 +180,7 @@ public class FindMethods {
     // Two uncovered facts:
     //   Loop body fact "i = 1 + i0"
     //   Loop body fact: "result = -1"
+    // Open exception: "arr_0 != null, but i Out of Bounds"
     /*@ public normal_behavior
       @ ensures \result == -1 || arr[\result] == n;
       @*/
@@ -213,6 +214,7 @@ public class FindMethods {
     //   Post condition fact: "result = -1"
     // One uncovered fact:
     //   Loop use case fact: "arr_0[result_1_0] = n"
+    // Open exception: "arr_0 != null, but i Out of Bounds"
     /*@ public normal_behavior
       @ ensures \result == -1 || arr[\result] == n;
       @*/
@@ -243,6 +245,7 @@ public class FindMethods {
     // Two uncovered facts:
     //   Post condition fact "result = result_1_0"
     //   Loop use case fact: "arr_0[result_1_0] = n"
+    // Open exception: "arr_0 != null, but i Out of Bounds"
     /*@ public normal_behavior
       @ ensures \result == -1 || arr[\result] == n;
       @*/
@@ -271,6 +274,7 @@ public class FindMethods {
     //   2x loop body fact "i = 1 + i0", that is exact change of i.
     //   Post condition fact: "result = -1"
     //   Post condition fact: "result = result_1_0"
+    // Open exception: "arr_0 != null, but i Out of Bounds"
     /*@ public normal_behavior
       @ ensures true;
       @*/
