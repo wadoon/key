@@ -124,6 +124,7 @@ public class Analyzer {
 
         Node useCasePredecessor = proof.root();
 
+        int unclosedLoopInvPreservedGoals = 0;
         if (maybeWhileGoal.isPresent()) {
             final Goal whileGoal = maybeWhileGoal.get();
             final Node whileNode = whileGoal.node();
@@ -174,10 +175,11 @@ public class Analyzer {
                     preservedNodes, postConditionNodes);
 
             // Loop facts
-            extractLoopBodyFactsAndShowValidity( //
-                    proof, preservedNodes, facts);
-            extractUseCaseFacts(proof, useCasePredecessor, postConditionNodes,
-                    facts);
+            unclosedLoopInvPreservedGoals = //
+                    extractLoopBodyFactsAndShowValidity( //
+                            proof, preservedNodes, facts);
+            extractUseCaseFacts( //
+                    proof, useCasePredecessor, postConditionNodes, facts);
 
             useCasePredecessor = preservesAndUCNode;
         } else {
@@ -239,7 +241,7 @@ public class Analyzer {
         logger.trace("Finished analysis of Java file %s", file);
 
         return new AnalyzerResult(coveredFacts, abstractlyCoveredFacts,
-                unCoveredFacts);
+                unCoveredFacts, unclosedLoopInvPreservedGoals);
     }
 
     /**
@@ -286,14 +288,15 @@ public class Analyzer {
                     // Discard the fact -- too easy ;)
                     continue;
                 }
-                
+
                 final String branchLabel = factNode.getNodeInfo()
                         .getBranchLabel();
 
-                facts.add(new Fact(branchLabel.split("\"")[1],
-                        readablePathCond, FactType.LOOP_USE_CASE_FACT,
-                        FactAnalysisRule.getFactCoveredNode(factAnalysisNodes),
-                        null));
+                facts.add(
+                        new Fact(branchLabel.split("\"")[1], readablePathCond,
+                                FactType.LOOP_USE_CASE_FACT, FactAnalysisRule
+                                        .getFactCoveredNode(factAnalysisNodes),
+                                null));
             }
         }
     }
@@ -364,8 +367,10 @@ public class Analyzer {
      * @param services
      * @param preservedNodes
      * @param facts
+     * 
+     * @return The number of loop invariant goals that are not preserved.
      */
-    private void extractLoopBodyFactsAndShowValidity(final Proof proof,
+    private int extractLoopBodyFactsAndShowValidity(final Proof proof,
             final List<Node> preservedNodes, final List<Fact> facts) {
         final Services services = proof.getServices();
 
@@ -436,6 +441,8 @@ public class Analyzer {
                     "Loop invariant could be invalid: %s open preserves goals",
                     invariantGoalsNotPreserved);
         }
+
+        return invariantGoalsNotPreserved;
     }
 
     /**
@@ -815,12 +822,15 @@ public class Analyzer {
         private final List<Fact> coveredFacts;
         private final List<Fact> abstractlyCoveredFacts;
         private final List<Fact> uncoveredFacts;
+        private final int unclosedLoopInvPreservedGoals;
 
         public AnalyzerResult(List<Fact> coveredFacts,
-                List<Fact> abstractlyCoveredFacts, List<Fact> unCoveredFacts) {
+                List<Fact> abstractlyCoveredFacts, List<Fact> unCoveredFacts,
+                int unclosedLoopInvPreservedGoals) {
             this.coveredFacts = coveredFacts;
             this.abstractlyCoveredFacts = abstractlyCoveredFacts;
             this.uncoveredFacts = unCoveredFacts;
+            this.unclosedLoopInvPreservedGoals = unclosedLoopInvPreservedGoals;
         }
 
         public List<Fact> getCoveredFacts() {
@@ -866,6 +876,10 @@ public class Analyzer {
         public int numFacts() {
             return numCoveredFacts() + numAbstractlyCoveredFacts()
                     + numUncoveredFacts();
+        }
+
+        public int unclosedLoopInvPreservedGoals() {
+            return unclosedLoopInvPreservedGoals;
         }
 
         public double strength() {
