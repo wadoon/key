@@ -71,26 +71,54 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * @author Dominic Steinhöfel
  */
 public class Analyzer {
-    private static final Logger logger = LogManager.getFormatterLogger();
+    /**
+     * The {@link Logger} for this class.
+     */
+    private static final Logger LOGGER = LogManager.getFormatterLogger();
 
+    /**
+     * The {@link File} including the method to analyze.
+     */
     private File file;
-    private String className, methodName, methodTypeStr;
+
+    /**
+     * The class name for the method to parse.
+     */
+    private String className;
+
+    /**
+     * The method name for the method to parse.
+     */
+    private String methodName;
+
+    /**
+     * The type descriptor for the method to parse.
+     */
+    private String methodTypeStr;
+
+    /**
+     * The {@link SymbExInterface} used in the background.
+     */
     private SymbExInterface seIf;
+
+    /**
+     * The {@link Optional} {@link File} to save the output in.
+     */
     private Optional<File> outProofFile;
 
     /**
      * Constructor.
-     * 
+     *
      * @param file
      *            The file containing the method.
      * @param method
      *            The method identifier; should respect the format<br>
      *            <br>
-     * 
+     *
      *            <code>&lt;fully qualified type name&gt;::&lt;method
      *            name&gt;(&lt;arg decl&gt;)&lt;return type decl&gt;</code>,<br>
      *            <br>
-     * 
+     *
      *            where where <code>&lt;arg decl&gt;</code> is according to the
      *            field descriptors in the JVM specification, for instance
      *            <code>[ILjava.lang.Object;D</code> for an integer array, an
@@ -110,14 +138,14 @@ public class Analyzer {
         if (!parseMethodString(method)) {
             final String errorMsg = GeneralUtilities
                     .format("Error in parsing method descriptor %s", method);
-            logger.error(errorMsg);
+            LOGGER.error(errorMsg);
             throw new RuntimeException(errorMsg);
         }
 
         try {
             this.seIf = new SymbExInterface(file);
         } catch (ProblemLoaderException e) {
-            GeneralUtilities.logErrorAndThrowRTE(logger,
+            GeneralUtilities.logErrorAndThrowRTE(LOGGER,
                     "ProblemLoaderException occurred while loading file %s\nMessage:\n%s",
                     file.getName(), e.getMessage());
         }
@@ -126,18 +154,18 @@ public class Analyzer {
 
     /**
      * Performs the actual analysis.
-     * 
+     *
      * @return An {@link AnalyzerResult} object.
      * @throws RuntimeException
      *             If the results file could not be saved due to an
      *             {@link IOException}.
      */
     public AnalyzerResult analyze() {
-        logger.info("Analyzing Java file %s", file);
+        LOGGER.info("Analyzing Java file %s", file);
 
         final ProgramMethod method = findMethod();
 
-        logger.info("Analyzing method %s::%s%s", className, methodName,
+        LOGGER.info("Analyzing method %s::%s%s", className, methodName,
                 methodTypeStr);
 
         // Run until while loop
@@ -180,7 +208,7 @@ public class Analyzer {
             seIf.applyMacro(new TryCloseMacro(1000), whileNode.child(0));
 
             if (!whileNode.child(0).isClosed()) {
-                logger.warn("The loop's invariant is not initially valid");
+                LOGGER.warn("The loop's invariant is not initially valid");
             }
 
             // Finish symbolic execution preserved & use case goal
@@ -209,9 +237,9 @@ public class Analyzer {
             extractPostCondFacts(proof, facts);
         }
 
-        logger.info("Collected %s facts", facts.size());
+        LOGGER.info("Collected %s facts", facts.size());
 
-        logger.info("Proving facts, this may take some time...");
+        LOGGER.info("Proving facts, this may take some time...");
 
         // The show-the-facts loop
 
@@ -220,13 +248,13 @@ public class Analyzer {
         List<Fact> unCoveredFacts = new ArrayList<>();
 
         for (Fact fact : facts) {
-            logger.trace("Proving fact %s", fact.descr);
+            LOGGER.trace("Proving fact %s", fact.descr);
 
             final Node factNode = fact.factCoveredNode;
             seIf.applyMacro(new TryCloseMacro(10000), factNode);
 
             if (factNode.isClosed()) {
-                logger.trace("Fact covered");
+                LOGGER.trace("Fact covered");
                 coveredFacts.add(fact);
             } else {
                 final Node abstractlyCoveredNode = fact.factAbstractlyCoveredNode;
@@ -239,35 +267,35 @@ public class Analyzer {
                 }
 
                 if (abstractlyCovered) {
-                    logger.trace("Fact abstractly covered");
+                    LOGGER.trace("Fact abstractly covered");
                     abstractlyCoveredFacts.add(fact);
                 } else {
-                    logger.trace("Fact uncovered");
+                    LOGGER.trace("Fact uncovered");
                     unCoveredFacts.add(fact);
                 }
             }
         }
 
-        logger.trace("Done proving facts.");
+        LOGGER.trace("Done proving facts.");
 
-        logger.trace("Checking exception branches.");
+        LOGGER.trace("Checking exception branches.");
 
         final List<ExceptionResult> problematicExceptions = //
                 checkExceptionBranches(proof);
 
-        logger.trace("Done checking exception branches.");
+        LOGGER.trace("Done checking exception branches.");
 
         if (outProofFile.isPresent()) {
             try {
-                logger.info("Writing proof to file %s", outProofFile.get());
+                LOGGER.info("Writing proof to file %s", outProofFile.get());
                 proof.saveToFile(outProofFile.get());
             } catch (IOException e) {
-                logger.error("Problem writing proof to file %s, message:\n%s",
+                LOGGER.error("Problem writing proof to file %s, message:\n%s",
                         outProofFile.get(), e.getMessage());
             }
         }
 
-        logger.trace("Finished analysis of Java file %s", file);
+        LOGGER.trace("Finished analysis of Java file %s", file);
 
         return new AnalyzerResult(coveredFacts, abstractlyCoveredFacts,
                 unCoveredFacts, problematicExceptions,
@@ -289,8 +317,8 @@ public class Analyzer {
         // TODO That's a hackish way of filtering exception branches; can we do
         // this more systematically? In any case, the list is incomplete.
         final String[] exceptionBranchLabels = new String[] { //
-                "Null Reference", //
-                "Index Out of Bounds", //
+            "Null Reference", //
+            "Index Out of Bounds", //
         };
 
         final List<Node> exceptionNodes = GeneralUtilities
@@ -302,7 +330,7 @@ public class Analyzer {
                 .collect(Collectors.toList());
 
         for (final Node excNode : exceptionNodes) {
-            logger.trace("Checking exception node \"%s\"",
+            LOGGER.trace("Checking exception node \"%s\"",
                     excNode.getNodeInfo().getBranchLabel());
             seIf.applyMacro(new TryCloseMacro(), excNode);
             if (!excNode.isClosed()) {
@@ -381,7 +409,7 @@ public class Analyzer {
      * Extracts post condition {@link Fact}s, that is equations about the final
      * state after the method execution (or the use case in the presence of a
      * loop).
-     * 
+     *
      * @param proof
      *            The {@link Proof} object.
      * @param facts
@@ -522,7 +550,7 @@ public class Analyzer {
         }
 
         if (invariantGoalsNotPreserved > 0) {
-            logger.warn(
+            LOGGER.warn(
                     "Loop invariant could be invalid: %s open preserves goals",
                     invariantGoalsNotPreserved);
         }
@@ -534,7 +562,7 @@ public class Analyzer {
      * Checks for a list of {@link Node}s of a {@link Fact} whether the fact can
      * be discarded, which is the case if the loop invariant is not needed for
      * showing it.
-     * 
+     *
      * @param analysisNodes
      *            The collection of {@link Node}s for the {@link Fact} to check.
      * @return true iff the fact can be shown without the loop invariant.
@@ -554,7 +582,7 @@ public class Analyzer {
      * path condition could not be computed by the
      * {@link SymbolicExecutionUtil}, a trivial path condition prefixed with
      * "ERROR-PC" is returned.
-     * 
+     *
      * @param analysisNode
      *            The {@link Node} to compute a path condition for.
      * @return The path condition for the {@link Node}.
@@ -577,7 +605,7 @@ public class Analyzer {
                     .cleanWhitespace(LogicPrinter.quickPrintTerm(pathCondTerm,
                             analysisNode.proof().getServices()));
         } catch (ProofInputException e) {
-            logger.error("Couldn't compute path comdition for goal %s"
+            LOGGER.error("Couldn't compute path comdition for goal %s"
                     + analysisNode.serialNr());
         }
 
@@ -589,7 +617,7 @@ public class Analyzer {
      * use case parts after a {@link LoopScopeInvariantRule} application. Writes
      * the result in the given {@link List}s for preserved and post condition
      * {@link Node}s.
-     * 
+     *
      * @param proof
      *            The {@link Proof} to extract the nodes from.
      * @param preservesAndUCNode
@@ -638,12 +666,13 @@ public class Analyzer {
                 } else if (op == services.getTermBuilder().FALSE().op()) {
                     preservedNodes.add(g.node());
                 } else {
-                    GeneralUtilities.logErrorAndThrowRTE(logger,
-                            "Unexpected (not simplified?) value for loop scope index %s in goal %s: %s",
+                    GeneralUtilities.logErrorAndThrowRTE(LOGGER,
+                            "Unexpected (not simplified?) value for "
+                                    + "loop scope index %s in goal %s: %s",
                             loopScopeIndex, g.node().serialNr(), rhs);
                 }
             } else {
-                logger.trace(
+                LOGGER.trace(
                         "Couldn't find the value for loop scope index %s in goal #%s",
                         loopScopeIndex, g.node().serialNr());
             }
@@ -654,7 +683,7 @@ public class Analyzer {
      * Returns the {@link PosInOccurrence} of the {@link SequentFormula} in the
      * given node which had the SE term label before (or still has it). Returns
      * an empty {@link Optional} is it could not be found.
-     * 
+     *
      * @param node
      *            The node to retrieve the {@link PosInOccurrence} from.
      * @return The {@link PosInOccurrence} of the {@link SequentFormula} in the
@@ -713,7 +742,7 @@ public class Analyzer {
             final String errorMsg = GeneralUtilities.format(
                     "Could not find type %s in class %s", className,
                     file.getName());
-            logger.error(errorMsg);
+            LOGGER.error(errorMsg);
             throw new RuntimeException(errorMsg);
         }
 
@@ -733,7 +762,7 @@ public class Analyzer {
             final String errorMsg = GeneralUtilities.format(
                     "Could not find method %s%s in class %s", methodName,
                     methodTypeStr, className);
-            logger.error(errorMsg);
+            LOGGER.error(errorMsg);
             throw new RuntimeException(errorMsg);
         }
 
@@ -747,7 +776,7 @@ public class Analyzer {
     /**
      * Parses a method identifier string; see
      * {@link #Analyzer(File, String, Optional)} for comments on the format.
-     * 
+     *
      * @param methodStr
      *            The string to parse.
      * @return true iff the parsing succeeded, false otherwise.
@@ -787,7 +816,7 @@ public class Analyzer {
     /**
      * Pretty prints an {@link AnalyzerResult} to the given {@link PrintStream},
      * e.g. System.out.
-     * 
+     *
      * @param result
      *            The {@link AnalyzerResult} to print.
      * @param ps
@@ -864,46 +893,128 @@ public class Analyzer {
      * @author Dominic Steinhöfel
      */
     public static enum FactType {
-        LOOP_BODY_FACT, LOOP_USE_CASE_FACT, POST_COND_FACT
+        /** Loop body fact, i.e. an equation of the preserved part. */
+        LOOP_BODY_FACT,
+        /**
+         * Loop use case fact, i.e. a part of the post condition that is to be
+         * proven using the invariant and remaining state changes.
+         */
+        LOOP_USE_CASE_FACT,
+        /**
+         * Post condition fact, i.e. a part of the final state after method
+         * execution that should be shown using the post condition.
+         */
+        POST_COND_FACT
     }
 
+    /**
+     * A fact is a piece of knowledge about a final state or a specification
+     * element which should be shown. A fact can be "covered" or "abstractly
+     * covered"; for each of those cases, it contains a {@link Node} that should
+     * be used for checking which is the case.
+     *
+     * @author Dominic Steinhöfel
+     */
     public static class Fact {
+        /**
+         * Concise description of the fact, e.g. a (better short) formula.
+         */
         private final String descr;
+
+        /**
+         * A {@link String} describing the path condition for this fact.
+         */
         private final String pathCond;
+
+        /**
+         * The {@link FactType} of this {@link Fact}.
+         */
         private final FactType factType;
-        private final int nodeNr;
-        private final int abstractlyCoveredNodeNr;
+
+        /**
+         * The {@link Node} that indicates the {@link Fact} is covered if it can
+         * be closed.
+         */
         private final Node factCoveredNode;
+
+        /**
+         * The {@link Node} that indicates the {@link Fact} is abstractly
+         * covered if it can be closed.
+         */
         private final Node factAbstractlyCoveredNode;
+
+        /**
+         * True iff the fact is covered.
+         */
         private boolean covered = false;
+
+        /**
+         * True iff the fact is not covered, but abstractly covered.
+         */
         private boolean abstractlyCovered = false;
 
+        /**
+         * Constructor. Sets all the final fields, i.e. all but covered and
+         * abstractlyCovered.
+         *
+         * @param descr
+         *            Concise description of the fact, e.g. a (better short)
+         *            formula.
+         * @param pathCond
+         *            A {@link String} describing the path condition for this
+         *            fact.
+         * @param factType
+         *            The {@link FactType} of this {@link Fact}.
+         * @param factCoveredNode
+         *            The {@link Node} that indicates the {@link Fact} is
+         *            covered if it can be closed.
+         * @param factAbstractlyCoveredNode
+         *            The {@link Node} that indicates the {@link Fact} is
+         *            abstractly covered if it can be closed.
+         */
         public Fact(String descr, String pathCond, FactType factType,
                 Node factCoveredNode, Node factAbstractlyCoveredNode) {
             this.descr = descr.trim();
             this.pathCond = pathCond.trim();
             this.factType = factType;
             this.factCoveredNode = factCoveredNode;
-            this.nodeNr = factCoveredNode.serialNr();
             this.factAbstractlyCoveredNode = factAbstractlyCoveredNode;
-            this.abstractlyCoveredNodeNr = factAbstractlyCoveredNode == null
-                    ? -1 : factAbstractlyCoveredNode.serialNr();
         }
 
+        /**
+         * @return true iff the fact has been set to "covered".
+         */
         public boolean isCovered() {
             return covered;
         }
 
+        /**
+         * Sets the "covered" flag of this {@link Fact}.
+         *
+         * @param covered
+         *            true iff the {@link Fact} should be marked as "covered".
+         */
         public void setCovered(boolean covered) {
             assert !abstractlyCovered || !covered;
 
             this.covered = covered;
         }
 
+        /**
+         * @return @return true iff the fact has been set to "abstractly
+         *         covered".
+         */
         public boolean isAbstractlyCovered() {
             return abstractlyCovered;
         }
 
+        /**
+         * Sets the "abstractly covered" flag of this {@link Fact}.
+         *
+         * @param abstractlyCovered
+         *            true iff the {@link Fact} should be marked as "abstractly
+         *            covered".
+         */
         public void setAbstractlyCovered(boolean abstractlyCovered) {
             assert !abstractlyCovered || !covered;
 
@@ -922,16 +1033,8 @@ public class Analyzer {
             return factType;
         }
 
-        public int getFactCoveredNodeNr() {
-            return nodeNr;
-        }
-
         public Node getFactCoveredNode() {
             return factCoveredNode;
-        }
-
-        public int getFactAbstractlyCoveredNodeNr() {
-            return abstractlyCoveredNodeNr;
         }
 
         public Node getFactAbstractlyCoveredNode() {
@@ -940,8 +1043,8 @@ public class Analyzer {
 
         @Override
         public String toString() {
-            return String.format("%s: Goal #%s, Path condition \"%s\"\n%s",
-                    factTypeToString(factType), nodeNr, pathCond.trim(), descr);
+            return String.format("%s, Path condition \"%s\"\n%s",
+                    factTypeToString(factType), pathCond.trim(), descr);
         }
 
         private static String factTypeToString(FactType ft) {
@@ -954,16 +1057,37 @@ public class Analyzer {
                 return "Post condition implies final state fact";
             default:
                 GeneralUtilities.logErrorAndThrowRTE( //
-                        logger, "Unknown fact type: %s", ft);
+                        LOGGER, "Unknown fact type: %s", ft);
                 return null;
             }
         }
     }
 
+    /**
+     * Represents an exception branch that could not be closed.
+     *
+     * @author Dominic Steinhöfel
+     */
     public static class ExceptionResult {
+        /**
+         * A description of the exception, e.g. "Array Index out ouf Bounds".
+         */
         private final String excLabel;
+
+        /**
+         * The path condition of the exception branch.
+         */
         private final String pathCondition;
 
+        /**
+         * Constructor.
+         *
+         * @param excLabel
+         *            A description of the exception, e.g. "Array Index out ouf
+         *            Bounds".
+         * @param pathCondition
+         *            The path condition of the exception branch.
+         */
         public ExceptionResult(String excLabel, String pathCondition) {
             this.excLabel = excLabel;
             this.pathCondition = pathCondition;
@@ -985,13 +1109,53 @@ public class Analyzer {
         }
     }
 
+    /**
+     * Result of a strength analysis as returned by {@link Analyzer#analyze()}.
+     *
+     * @author Dominic Steinhöfel
+     */
     public static class AnalyzerResult {
+        /**
+         * {@link List} of covered {@link Fact}s.
+         */
         private final List<Fact> coveredFacts;
+
+        /**
+         * {@link List} of abstractly covered {@link Fact}s.
+         */
         private final List<Fact> abstractlyCoveredFacts;
+
+        /**
+         * {@link List} of uncovered {@link Fact}s.
+         */
         private final List<Fact> uncoveredFacts;
+
+        /**
+         * The number of loop invariant "preserved" goals that couldn't be
+         * closed.
+         */
         private final int unclosedLoopInvPreservedGoals;
+
+        /**
+         * A {@link List} of {@link ExceptionResult}s for exception branches
+         * that couldn't be closed.
+         */
         private final List<ExceptionResult> problematicExceptions;
 
+        /**
+         * Constructor.
+         *
+         * @param coveredFacts
+         *            See {@link #coveredFacts}
+         * @param abstractlyCoveredFacts
+         *            See {@link #abstractlyCoveredFacts}
+         * @param unCoveredFacts
+         *            See {@link #unCoveredFacts}
+         * @param problematicExceptions
+         *            See {@link #problematicExceptions}
+         * @param unclosedLoopInvPreservedGoals
+         *            See {@link #unclosedLoopInvPreservedGoals}
+         */
         public AnalyzerResult(List<Fact> coveredFacts,
                 List<Fact> abstractlyCoveredFacts, List<Fact> unCoveredFacts,
                 List<ExceptionResult> problematicExceptions,
@@ -1015,47 +1179,94 @@ public class Analyzer {
             return uncoveredFacts;
         }
 
+        /**
+         * Returns the covered {@link Fact}s of {@link FactType} type.
+         *
+         * @param type
+         *            The type of {@link Fact}s to retrieve.
+         * @return The covered {@link Fact}s of {@link FactType} type.
+         */
         public List<Fact> getCoveredFactsOfType(FactType type) {
             return coveredFacts.stream().filter(f -> f.factType == type)
                     .collect(Collectors.toList());
         }
 
+        /**
+         * Returns the abstractly covered {@link Fact}s of {@link FactType}
+         * type.
+         *
+         * @param type
+         *            The type of {@link Fact}s to retrieve.
+         * @return The abstractly covered {@link Fact}s of {@link FactType}
+         *         type.
+         */
         public List<Fact> getAbstractlyCoveredFactsOfType(FactType type) {
             return abstractlyCoveredFacts.stream()
                     .filter(f -> f.factType == type)
                     .collect(Collectors.toList());
         }
 
+        /**
+         * Returns the uncovered {@link Fact}s of {@link FactType} type.
+         *
+         * @param type
+         *            The type of {@link Fact}s to retrieve.
+         * @return The uncovered {@link Fact}s of {@link FactType} type.
+         */
         public List<Fact> getUncoveredFactsOfType(FactType type) {
             return uncoveredFacts.stream().filter(f -> f.factType == type)
                     .collect(Collectors.toList());
         }
 
+        /**
+         * @return The number of covered {@link Fact}s.
+         */
         public int numCoveredFacts() {
             return coveredFacts.size();
         }
 
+        /**
+         * @return The number of abstractly covered {@link Fact}s.
+         */
         public int numAbstractlyCoveredFacts() {
             return abstractlyCoveredFacts.size();
         }
 
+        /**
+         * @return The number of uncovered {@link Fact}s.
+         */
         public int numUncoveredFacts() {
             return uncoveredFacts.size();
         }
 
+        /**
+         * @return The total number of {@link Fact}s.
+         */
         public int numFacts() {
             return numCoveredFacts() + numAbstractlyCoveredFacts()
                     + numUncoveredFacts();
         }
 
+        /**
+         * @return A {@link List} of {@link ExceptionResult}s for exception
+         *         branches that couldn't be closed.
+         */
         public List<ExceptionResult> problematicExceptions() {
             return problematicExceptions;
         }
 
+        /**
+         * @return The number of loop invariant "preserved" goals that couldn't
+         *         be closed.
+         */
         public int unclosedLoopInvPreservedGoals() {
             return unclosedLoopInvPreservedGoals;
         }
 
+        /**
+         * @return The strength of this {@link AnalyzerResult} as a percentage
+         *         value.
+         */
         public double strength() {
             return 100d
                     * (((double) numCoveredFacts())
