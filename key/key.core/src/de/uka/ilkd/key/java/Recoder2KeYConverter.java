@@ -29,7 +29,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import recoder.CrossReferenceServiceConfiguration;
 import recoder.abstraction.ClassType;
 import recoder.abstraction.Type;
-import recoder.java.Identifier;
 import recoder.java.NonTerminalProgramElement;
 import recoder.java.declaration.TypeDeclaration;
 import recoder.list.generic.ASTList;
@@ -1332,7 +1331,7 @@ public class Recoder2KeYConverter {
 			    	break;
 				}
 			}
-/* TODO KD b implement
+/* TODO KD c implement
 			// TODO KD z mind public only
 			// TODO KD z if <>-Method don't do?
 			if (parent instanceof recoder.java.declaration.ClassDeclaration) {

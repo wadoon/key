@@ -383,8 +383,7 @@ public final class UseOperationContractRule implements BuiltInRule {
                     createdForm,
                     tb.exactInstance(kjt.getSort(), selfTerm));
         } else if (resultTerm != null) {
-        	// TODO KD z hacky
-            result = tb.and(tb.reachableValue(resultTerm, pm.getReturnType()), // TODO KD a for fresh
+            result = tb.and(tb.reachableValue(resultTerm, pm.getReturnType()),
                     // if pm is part of a remote interface ensure free "\fresh" (may still be null though)
             		(pm.getMethodDeclaration().isRemote() && resultTerm.sort().extendsSorts().contains(services.getJavaInfo().objectSort())) ?
             		tb.not(tb.created(heapAtPres.get(services.getTypeConverter().getHeapLDT().getHeap()), resultTerm)) : 
@@ -680,6 +679,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
     // TODO KD a- add wfHist(anonHist) for (non service) methods
     // TODO KD a- gather all changes and put them in one if statement
+    // TODO KD b disable / implement service inlining
 	@Override
 	public ImmutableList<Goal> apply(Goal goal, 
 			Services services,
@@ -744,7 +744,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 		ProgramElementName otherPreHeapName = new ProgramElementName(tb.newName("otherHeapBefore_" + pm.getName()));
 		LocationVariable otherPreHeap = new LocationVariable(otherPreHeapName, new KeYJavaType(baseHeap.sort()));
 		ProgramElementName otherHistName = new ProgramElementName(tb.newName("otherHist"));
-		LocationVariable otherHist = new LocationVariable(otherHistName, new KeYJavaType(baseHeap.sort()));
+		LocationVariable otherHist = new LocationVariable(otherHistName, new KeYJavaType(hist.sort()));
 		ProgramElementName otherPreHistName = new ProgramElementName(tb.newName("otherHistBefore_" + pm.getName()));
 		LocationVariable otherPreHist = new LocationVariable(otherPreHistName, new KeYJavaType(hist.sort()));
 		ProgramElementName beforeHistName = new ProgramElementName(tb.newName(hist + "Before_" + pm.getName()));
@@ -781,10 +781,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 		final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
 
 		for(LocationVariable heap : heapContext) {
-			// TODO KD z hacky
 			final Term m = pm.getMethodDeclaration().isRemote() ?
 					tb.empty() : // if pm belongs to remote method interface, add free @pure to ensure clause
-					contract.getMod(heap, tb.var(heap), contractSelf,contractParams, services);
+					contract.getMod(heap, tb.var(heap), contractSelf, contractParams, services);
 			mods.put(heap, m);
 		}
 
@@ -873,7 +872,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 			final Function anonHistFunc = new Function(anonHistName, hist.sort());
 			services.getNamespaces().functions().addSafely(anonHistFunc);
 			final Term anonHist = tb.label(tb.func(anonHistFunc), new ParameterlessTermLabel(new Name("anonHistFunction")));
-			newHist = tb.seqConcat(tb.getHist(), anonHist); // TODO KD z more properties (e.g. wfHist(anonHist))?
+			newHist = tb.seqConcat(tb.getHist(), anonHist);
 		}
 		final Term assumption = tb.equals(newHist, afterHist);
 		anonAssumption = tb.and(anonAssumption, assumption);
@@ -883,13 +882,13 @@ public final class UseOperationContractRule implements BuiltInRule {
 
 		Term similarFormula = tb.tt();
 		if (pm.getMethodDeclaration().isRemote()) {
-			similarFormula = tb.and( // TODO KD a implement similar in eventRules.key
+			similarFormula = tb.and(
 					tb.wellFormed(otherHeap),
 					tb.wellFormed(otherPreHeap),
 					tb.wellFormedHist(otherHist),
 					tb.wellFormedHist(otherPreHist),
-					tb.similarHist(tb.getHist(), tb.var(otherHist), contractSelf),
-					tb.similarHist(tb.var(beforeHist), tb.var(otherPreHist), contractSelf));
+					tb.similarHist(contractSelf, tb.getHist(), tb.var(otherHist)),
+					tb.similarHist(contractSelf, tb.var(beforeHist), tb.var(otherPreHist)));
 		}
 
 		final Term excNull = tb.equals(tb.var(excVar), tb.NULL());
@@ -962,8 +961,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 		preGoal.changeFormula(new SequentFormula(finalPreTerm),
 				ruleApp.posInOccurrence());
 
-		preGoal.addFormula(new SequentFormula(similarFormula), true, false); // TODO KD a U^pre_cont missing
+		preGoal.addFormula(new SequentFormula(tb.applySequential(new Term[]{inst.u, atPreUpdates},similarFormula)), true, false);
 		if (pm.getMethodDeclaration().isRemote()) {
+			// updateOther already applied to originalPre
 			preGoal.addFormula(new SequentFormula(getInv(originalPre, contractSelf, tb)), true, false);
 		}
 

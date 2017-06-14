@@ -2090,8 +2090,14 @@ public class TermBuilder {
     }
 
     // similar predicates
-    public Term similarHist(Term hist1, Term hist2, Term callee) {
-    	return func(services.getTypeConverter().getRemoteMethodEventLDT().similarHist(), hist1, hist2, callee);
+    public Term similarHist(Term callee, Term hist1, Term hist2) {
+    	return func(services.getTypeConverter().getRemoteMethodEventLDT().similarHist(), callee, hist1, hist2);
+    }
+    public Term similarEvent(Term event1, Term event2) {
+    	return func(services.getTypeConverter().getRemoteMethodEventLDT().similarEvent(), event1, event2);
+    }
+    public Term similar(Term any1, Term any2, Term heap1, Term heap2) {
+    	return func(services.getTypeConverter().getRemoteMethodEventLDT().similar(), any1, any2, heap1, heap2);
     }
 
     //-------------------------------------------------------------------------

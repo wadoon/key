@@ -42,7 +42,7 @@ public class TermProgramVariableCollector extends DefaultVisitor {
     public void visit(Term t) {
 	if ( t.op() instanceof LocationVariable ) {
 	    result.add ( (LocationVariable) t.op() );
-	} /*else if (t.op().toString().equals("java.lang.Object::<inv>")) { // TODO KD b hacky and not working
+	} /*else if (t.op().toString().equals("java.lang.Object::<inv>")) { // TODO KD c hacky and not working
 		collectHistVariable();
 	}*/
 	if ( !t.javaBlock ().isEmpty() ) {
