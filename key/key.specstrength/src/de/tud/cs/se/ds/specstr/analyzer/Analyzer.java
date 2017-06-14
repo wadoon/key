@@ -63,7 +63,10 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * TODO
+ * Loads the supplied method and performs the strength analysis. Access
+ * {@link #analyze()} for starting the analysis. The returned
+ * {@link AnalyzerResult} can be printed out using
+ * {@link #printResults(AnalyzerResult, PrintStream)}.
  *
  * @author Dominic Steinhöfel
  */
@@ -76,12 +79,31 @@ public class Analyzer {
     private Optional<File> outProofFile;
 
     /**
-     * TODO
+     * Constructor.
      * 
      * @param file
+     *            The file containing the method.
      * @param method
+     *            The method identifier; should respect the format<br>
+     *            <br>
+     * 
+     *            <code>&lt;fully qualified type name&gt;::&lt;method
+     *            name&gt;(&lt;arg decl&gt;)&lt;return type decl&gt;</code>,<br>
+     *            <br>
+     * 
+     *            where where <code>&lt;arg decl&gt;</code> is according to the
+     *            field descriptors in the JVM specification, for instance
+     *            <code>[ILjava.lang.Object;D</code> for an integer array, an
+     *            Object and a double (not that we would support
+     *            doubles...).<br>
+     *            <code>&lt;return type decl&gt;</code> is constructed
+     *            similarly, only for a single type.
      * @param outProofFile
-     * @throws ProblemLoaderException
+     *            An {@link Optional} {@link File} for writing the analyzer
+     *            results to, when running the {@link Analyzer} from the command
+     *            line and not programmatically.
+     * @throws RuntimeException
+     *             If the method could not be loaded.
      */
     public Analyzer(File file, String method, Optional<File> outProofFile) {
         this.file = file;
@@ -103,9 +125,12 @@ public class Analyzer {
     }
 
     /**
-     * TODO
+     * Performs the actual analysis.
      * 
-     * @return
+     * @return An {@link AnalyzerResult} object.
+     * @throws RuntimeException
+     *             If the results file could not be saved due to an
+     *             {@link IOException}.
      */
     public AnalyzerResult analyze() {
         logger.info("Analyzing Java file %s", file);
@@ -122,8 +147,6 @@ public class Analyzer {
 
         final List<Node> postConditionNodes = new ArrayList<>();
         final List<Fact> facts = new ArrayList<>();
-
-        Node useCasePredecessor = proof.root();
 
         int unclosedLoopInvPreservedGoals = 0;
         if (maybeWhileGoal.isPresent()) {
@@ -180,9 +203,7 @@ public class Analyzer {
                     extractLoopBodyFactsAndShowValidity( //
                             proof, preservedNodes, facts);
             extractUseCaseFacts( //
-                    proof, useCasePredecessor, postConditionNodes, facts);
-
-            useCasePredecessor = preservesAndUCNode;
+                    proof, postConditionNodes, facts);
         } else {
             // Post condition facts
             extractPostCondFacts(proof, facts);
@@ -254,10 +275,13 @@ public class Analyzer {
     }
 
     /**
-     * TODO Comment.
+     * Tries to close exception branches, and returns {@link ExceptionResult}s
+     * for those for which it was not possible.
      *
      * @param proof
-     * @return
+     *            The {@link Proof} object to find the exception branches in.
+     * @return A {@link List} of {@link ExceptionResult}s for exception branches
+     *         that could not be closed.
      */
     private List<ExceptionResult> checkExceptionBranches(final Proof proof) {
         final List<ExceptionResult> unclosedExceptions = new ArrayList<>();
@@ -292,15 +316,20 @@ public class Analyzer {
     }
 
     /**
-     * TODO
-     * 
+     * Extracts "use case facts", that is those of the branches where the method
+     * post condition should be shown. The presence of uncovered use case facts
+     * indicates that either the post condition is wrong, or (which we usually
+     * assume) the invariant is too weak for the post condition.
+     *
      * @param proof
-     * @param preservesAndUCNode
+     *            The {@link Proof} object.
      * @param useCaseNodes
+     *            The {@link List} of use case nodes.
      * @param facts
-     * @param services
+     *            A {@link List} of {@link Fact}s; the method will write
+     *            {@link Fact}s into this list.
      */
-    private void extractUseCaseFacts(final Proof proof, Node preservesAndUCNode,
+    private void extractUseCaseFacts(final Proof proof,
             final List<Node> useCaseNodes, final List<Fact> facts) {
         final Services services = proof.getServices();
 
@@ -349,10 +378,15 @@ public class Analyzer {
     }
 
     /**
-     * TODO
+     * Extracts post condition {@link Fact}s, that is equations about the final
+     * state after the method execution (or the use case in the presence of a
+     * loop).
      * 
      * @param proof
+     *            The {@link Proof} object.
      * @param facts
+     *            A {@link List} of {@link Fact}s; the method will write
+     *            {@link Fact}s into this list.
      */
     private void extractPostCondFacts(Proof proof, List<Fact> facts) {
         for (Goal g : proof.openGoals()) {
@@ -408,13 +442,17 @@ public class Analyzer {
     }
 
     /**
-     * TODO
-     * 
+     * Extracts loop body {@link Fact}s, that is equations about the final state
+     * after execution of a loop body.
+     *
      * @param proof
-     * @param services
+     *            The {@link Proof} object.
      * @param preservedNodes
+     *            The {@link Node}s containing the "preserved" nodes after the
+     *            application of the {@link LoopScopeInvariantRule}.
      * @param facts
-     * 
+     *            A {@link List} of {@link Fact}s; the method will write
+     *            {@link Fact}s into this list.
      * @return The number of loop invariant goals that are not preserved.
      */
     private int extractLoopBodyFactsAndShowValidity(final Proof proof,
@@ -493,26 +531,33 @@ public class Analyzer {
     }
 
     /**
-     * TODO
+     * Checks for a list of {@link Node}s of a {@link Fact} whether the fact can
+     * be discarded, which is the case if the loop invariant is not needed for
+     * showing it.
      * 
-     * @param analysisGoals
-     * @return
+     * @param analysisNodes
+     *            The collection of {@link Node}s for the {@link Fact} to check.
+     * @return true iff the fact can be shown without the loop invariant.
      */
-    private boolean factCanBeDiscarded(Iterable<Node> analysisGoals) {
+    private boolean factCanBeDiscarded(Iterable<Node> analysisNodes) {
         // Discard the fact if it can be proven without the
         // specification
         final Node coveredByTrueNode = FactAnalysisRule
-                .getCoveredByTrueNode(analysisGoals);
+                .getCoveredByTrueNode(analysisNodes);
         seIf.applyMacro(new TryCloseMacro(1000), coveredByTrueNode);
 
         return coveredByTrueNode.isClosed();
     }
 
     /**
-     * TODO
+     * Creates a "readable" path condition for the given {@link Node}. If the
+     * path condition could not be computed by the
+     * {@link SymbolicExecutionUtil}, a trivial path condition prefixed with
+     * "ERROR-PC" is returned.
      * 
      * @param analysisNode
-     * @return
+     *            The {@link Node} to compute a path condition for.
+     * @return The path condition for the {@link Node}.
      */
     private static String extractReadablePathCondition(Node analysisNode) {
         String pathCond = "";
@@ -746,7 +791,7 @@ public class Analyzer {
                 fPs.println();
             });
         }
-        
+
         if (result.problematicExceptions().size() > 0) {
             // @formatter:off
             ps.println("=====================\n"
