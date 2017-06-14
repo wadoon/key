@@ -585,13 +585,22 @@ public class Analyzer {
     }
 
     /**
-     * TODO
+     * Extracts {@link Proof} {@link Node}s that are representing preserved and
+     * use case parts after a {@link LoopScopeInvariantRule} application. Writes
+     * the result in the given {@link List}s for preserved and post condition
+     * {@link Node}s.
      * 
      * @param proof
-     * @param services
+     *            The {@link Proof} to extract the nodes from.
      * @param preservesAndUCNode
+     *            The parent {@link Node} representing the preserved and use
+     *            case branch after a {@link LoopScopeInvariantRule}
+     *            application.
      * @param preservedNodes
+     *            The {@link List} into which to store the preserved nodes.
      * @param postconditionNodes
+     *            The {@link List} into which to store the use case / post
+     *            condition nodes.
      */
     private void extractPreservedAndUseCaseNodes(final Proof proof,
             final Node preservesAndUCNode, final List<Node> preservedNodes,
@@ -642,14 +651,18 @@ public class Analyzer {
     }
 
     /**
-     * TODO
+     * Returns the {@link PosInOccurrence} of the {@link SequentFormula} in the
+     * given node which had the SE term label before (or still has it). Returns
+     * an empty {@link Optional} is it could not be found.
      * 
-     * @param preservedNode
-     * @return
+     * @param node
+     *            The node to retrieve the {@link PosInOccurrence} from.
+     * @return The {@link PosInOccurrence} of the {@link SequentFormula} in the
+     *         given node which has / had the SE term label.
      */
     private Optional<PosInOccurrence> getPioOfFormulaWhichHadSELabel(
-            Node preservedNode) {
-        Node currNode = preservedNode;
+            Node node) {
+        Node currNode = node;
         int pos = -1;
 
         while (!currNode.root() && pos == -1) {
@@ -671,7 +684,7 @@ public class Analyzer {
             return Optional.empty();
         }
 
-        final ImmutableList<SequentFormula> succList = preservedNode.sequent()
+        final ImmutableList<SequentFormula> succList = node.sequent()
                 .succedent().asList();
         final SequentFormula updPostCondSeqFor = succList.take(pos).head();
         final PosInOccurrence proofOblPio = new PosInOccurrence(
@@ -681,9 +694,8 @@ public class Analyzer {
     }
 
     /**
-     * TODO
-     * 
-     * @return
+     * @return The {@link ProgramMethod} designated by the information provided
+     *         to the constructor.
      */
     private ProgramMethod findMethod() {
         final List<KeYJavaType> declaredTypes = seIf.getDeclaredTypes();
@@ -733,10 +745,12 @@ public class Analyzer {
     }
 
     /**
-     * TODO
+     * Parses a method identifier string; see
+     * {@link #Analyzer(File, String, Optional)} for comments on the format.
      * 
      * @param methodStr
-     * @return
+     *            The string to parse.
+     * @return true iff the parsing succeeded, false otherwise.
      */
     private boolean parseMethodString(String methodStr) {
         // @ formatter:off
@@ -771,10 +785,13 @@ public class Analyzer {
     }
 
     /**
-     * TODO
+     * Pretty prints an {@link AnalyzerResult} to the given {@link PrintStream},
+     * e.g. System.out.
      * 
      * @param result
+     *            The {@link AnalyzerResult} to print.
      * @param ps
+     *            The {@link PrintStream} used as an output.
      */
     public static void printResults(AnalyzerResult result, PrintStream ps) {
         if (result.unclosedLoopInvPreservedGoals() > 0) {
@@ -841,6 +858,11 @@ public class Analyzer {
                 result.numFacts(), result.strength());
     }
 
+    /**
+     * Types of extracted {@link Fact}s.
+     *
+     * @author Dominic Steinhöfel
+     */
     public static enum FactType {
         LOOP_BODY_FACT, LOOP_USE_CASE_FACT, POST_COND_FACT
     }
