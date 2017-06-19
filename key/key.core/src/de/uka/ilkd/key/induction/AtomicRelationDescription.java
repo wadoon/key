@@ -1,24 +1,24 @@
 package de.uka.ilkd.key.induction;
 
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
-import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.util.Pair;
 
 public class AtomicRelationDescription {
-	
-	private static final String COUNTER_NAME = "AtomicVariablenames";
 	
 	/** a quantifier-free formula 
 	 * needed: 
@@ -30,23 +30,45 @@ public class AtomicRelationDescription {
 	/** TODO: find fitting description. 
 	 * this should not be empty */
 	private LinkedList<Pair<QuantifiableVariable, Term>> domainSubstitution;
-	
+	private Taclet findTaclet;
+	private Term original;
+	private Services services;
+	private RelationDescription parent;
 	private LinkedList<QuantifiableVariable> vars;
 	
 	public AtomicRelationDescription(
 			Term range, 
 			ImmutableArray<Function> constructors, 
-			LinkedList<Pair<QuantifiableVariable, Term>> substitutions,
+			Term originalTerm, 
+			FindTaclet taclet,
+			RelationDescription parent,
 			Services serv
 	){
 		vars = new LinkedList<>();
 		rangeFormula = range;		
-		
-		for(Function f : constructors){
-			substitutions.add(createSubstitutionForFunction(f, serv));
+		original = originalTerm;
+		domainSubstitution = new LinkedList<>();
+		findTaclet = taclet;
+		services = serv;
+		this.parent = parent;
+		collectVars(range.sub (1));
+	}
+	
+	/**
+	 * This function collects all QuantifiableVariables from a Term and adds them to the private 
+	 * variable vars.
+	 * 
+	 * @param t a formula
+	 */
+	private void collectVars(Term t){
+		if(t.op() instanceof QuantifiableVariable){
+			vars.add((QuantifiableVariable) t.op());
 		}
-		
-		domainSubstitution = substitutions;
+		else{
+			for(Term sub : t.subs()){
+				collectVars(sub);
+			}
+		}
 	}
 	
 	/**
@@ -66,82 +88,25 @@ public class AtomicRelationDescription {
 		return relevantVars;
 	}
 	
+	/**
+	 * 
+	 * @return a List of Pairs of QuantifiableVariable and Term which is the domainSubstitution
+	 */
 	public List<Pair<QuantifiableVariable, Term>> getSubstitutions(){
+		
 		return this.domainSubstitution;
 	}
 	
 	/**
 	 * 
-	 * @param list
-	 * @param element this element is added to the given list if the list does not already contain it.
+	 * @param list a LinkedList of any type
+	 * @param element an element of the same type as the given list. This element is added to the
+	 * list if this list does not contain it already.
 	 */
 	private <T> void addIfNotContains(LinkedList<T> list, T element){
 		if(!list.contains(element)){
 			list.add(element);
 		}
-	}
-	
-	/**
-	 * 
-	 * @param f a Function
-	 * @param s the Services (they are required to get the TermBuilder)
-	 * @return a Pair&lt;QuantifiableVariable, Term&gt; which holds the Term consisting of the given function
-	 * and new QuantifiableVariables as parameters and a new QuantifiableVariable.
-	 * (maybe this QuantifiableVariable should not be part of the return value. It might be that
-	 * this substitution has to be created for each existing QuantifiableVariable which has the same
-	 * type 
-	 */
-	private Pair<QuantifiableVariable, Term> createSubstitutionForFunction(Function f, Services s){
-		QuantifiableVariable result = SchemaVariableFactory.createVariableSV(generateName(f, s, "res"), f.sort());
-		QuantifiableVariable[] parameters = new QuantifiableVariable[f.arity()];
-		TermBuilder tb = s.getTermBuilder();
-		for(int i = 0; i < f.arity(); i++){
-			parameters[i] = SchemaVariableFactory.createVariableSV(generateName(f, s, "arg" + i), f.argSort(i));
-			vars.add(parameters[i]);
-		}
-		
-		//vars.add(result);
-		
-		return new Pair<QuantifiableVariable, Term>(
-				result, 
-				tb.func(f, varsToTerm(parameters, tb), new ImmutableArray<QuantifiableVariable>())
-		);
-	}
-	
-
-	/**
-	 * 
-	 * @param qvs
-	 * @param tb
-	 * @return the terms which only consist of the given variables.
-	 */
-	private static Term[] varsToTerm(QuantifiableVariable[] qvs, TermBuilder tb){
-		Term[] terms = new Term[qvs.length];
-		for(int i = 0; i < qvs.length; i++){
-			terms[i] = tb.var(qvs[i]);
-		}
-		return terms;
-	}
-
-	/**
-	 * 
-	 * @param f a function
-	 * @param s the Services (might needed later)
-	 * @param suffix a String
-	 * @return a new Name with a String which starts with the given Functions name then the given 
-	 * suffix and the private variable varCounter. All separated by the char "_". varCounter is 
-	 * increased by one for each call of this function to ensure the uniqueness of the names.
-	 */
-	private static Name generateName(Function f, Services s, String suffix){
-		//TODO: better name generation maybe by existing code.
-		//
-		StringBuilder sb = new StringBuilder();
-		sb.append(f.name().toString());
-		sb.append("_");
-		sb.append(suffix);
-		sb.append("_");
-		sb.append(s.getCounter(COUNTER_NAME).getCountPlusPlus());
-		return new Name(sb.toString());
 	}
 	
 	/**
@@ -163,19 +128,117 @@ public class AtomicRelationDescription {
 	}
 	
 	/**
-	 * @see getRelevantVariables
-	 * @return Set&lt;Variable&gt;: all relevant variables which occur in an element of domainSubstitution.
+	 * @return a LinkedList of QuantifiableVariables.
 	 */
 	public LinkedList<QuantifiableVariable> getInductionVariables(){
-		//TODO: build the intersection of the variables from the range formula and the substitution.
 		return vars;
 	}
 	
 	/**
-	 * @return the rangeformula of this AtomicRelationDescription as Term.
+	 * @return the range-formula of this AtomicRelationDescription as Term.
 	 */
 	public Term getRange(){
 		return this.rangeFormula;
+	}
+	
+	/**
+	 * 
+	 * @return the Term which represents the induction hypothesis needed to proof case of this 
+	 * atomic relation-description.
+	 */
+	public Term getHypothesis(){
+		ImmutableList<TacletGoalTemplate> goals = findTaclet.goalTemplates();
+		TermBuilder tb = services.getTermBuilder();
+		Term replaceTerm = null;
+		for(TacletGoalTemplate goal : goals){
+			Object obj = goal.replaceWithExpressionAsObject();
+			if(obj instanceof Term){
+				replaceTerm = (Term)obj;
+			}
+		}
+		
+		if(replaceTerm != null){
+			Term buildTerm = parent.getBuildTerm();
+			Term hypothesis = tb.tt();
+			
+			LinkedHashSet<Pair<QuantifiableVariable, Term>> subst = new LinkedHashSet<>();
+			
+			for(Term t : getOccurences((Function) buildTerm.op(), replaceTerm)){
+				subst.addAll(getSubstPart(t, buildTerm));
+			}
+			
+			this.domainSubstitution.addAll(subst);
+			
+			for(Pair<QuantifiableVariable, Term> pair : subst){
+				hypothesis = tb.and(hypothesis, tb.subst(pair.first, pair.second, original.sub(0)));
+			}
+			
+			
+			return hypothesis;
+		}else{
+			return tb.tt();
+		}
+	}
+	
+	/**
+	 * Warning: this function does not check for equality with respect to functions!
+	 * @param newTerm a substituted Term
+	 * @param oldTerm the "older" version of newTerm (without) substitutions.
+	 * @return a LinkedList of Pairs of QuantifiableVariable and Term which contains substitutions 
+	 * which can replace the QuantifiableVariables from oldTerm with the Term which are at the 
+	 * same position at newTerm. This means this function reconstructs the substitutions which are 
+	 * need to build newTerm from oldTerm.
+	 */
+	private LinkedHashSet<Pair<QuantifiableVariable, Term>> getSubstPart(Term newTerm, Term oldTerm){
+		LinkedHashSet<Pair<QuantifiableVariable, Term>> result = new LinkedHashSet<>();
+		
+		if(oldTerm.op() instanceof QuantifiableVariable){
+			for(Term t : getTermOfSort(newTerm)){
+				result.add(new Pair<QuantifiableVariable, Term>((QuantifiableVariable) oldTerm.op(), t));
+			}
+		}
+		else{
+			for(int i = 0; i < oldTerm.arity(); i++){
+				result.addAll(getSubstPart(newTerm.sub(i), oldTerm.sub(i)));
+			}
+		}
+		return result;
+	}
+	
+	/**
+	 * 
+	 * @param t a Term.
+	 * @return a Term which only consists of a QuantifiableVariable. It is the first variable of 
+	 * the variable vars which has the same type as the given term.
+	 */
+	private LinkedHashSet<Term> getTermOfSort(Term t){
+		LinkedHashSet<Term> selection = new LinkedHashSet<>();
+		for(QuantifiableVariable qv : vars){
+			if(qv.sort() == t.sort()){
+				selection.add(this.services.getTermBuilder().var(qv));
+			}
+		}
+		return selection;
+	}
+	
+	/**
+	 * 
+	 * @param f a Function
+	 * @param t a Term
+	 * @return a LinkedList of Terms which contains all occurences of the given Function f in the 
+	 * given Term t.
+	 */
+	private LinkedList<Term> getOccurences(Function f, Term t){
+		LinkedList<Term> terms = new LinkedList<>();
+		if(t.op() == f){
+			terms.add(t);
+		}
+		else{
+			for(Term sub : t.subs()){
+				terms.addAll(getOccurences(f, sub));
+			}
+		}
+		return terms;
 	}
 	
 	/**

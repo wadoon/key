@@ -31,6 +31,13 @@ public class InductionTacletGenerator {
 				s
 				);
 		
+		/*
+		generator.generateAxiomTaclet(tacletName, originalAxiom, programVars, kjt, ruleSet, services)
+		generator.generateContractAxiomTaclets(name, originalPre, originalPost, originalMby, kjt, target, heaps, originalSelfVar, originalResultVar, atPreVars, originalParamVars, toLimit, satisfiabilityGuard, services)
+		generator.generateFunctionalRepresentsTaclets(name, originalPreTerm, originalRepresentsTerm, kjt, target, heaps, self, paramVars, atPreVars, toLimit, satisfiability, services)
+		generator.generatePartialInvTaclet(name, heapSVs, selfSV, eqSV, term, kjt, toLimit, isStatic, eqVersion, services)
+		generator.generateRelationalRepresentsTaclet(tacletName, originalAxiom, kjt, target, heaps, self, paramVars, atPreVars, satisfiabilityGuard, services)
+		*/
 		s.getSpecificationRepository(); //RuleJustification?
 		
 		SVInstantiations insts = SVInstantiations.EMPTY_SVINSTANTIATIONS;

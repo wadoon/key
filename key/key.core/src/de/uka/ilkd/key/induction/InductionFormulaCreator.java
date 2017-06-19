@@ -1,35 +1,66 @@
 package de.uka.ilkd.key.induction;
 
-import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.util.Pair;
 
 public class InductionFormulaCreator {
 	
-	public static Term buildFormula(Term t, Services s, RelationDescription selected){
+	public static Term buildFormula(Term phi, Services s, RelationDescription selected){
 		TermBuilder tb = s.getTermBuilder();
-		
-		if(t.op().name().toString() == "all"){
-			t = t.sub(0);
-		}
+		Term original = phi;
 		RelationDescription rd = selected;
+		LinkedHashSet<QuantifiableVariable> varsToBind = new LinkedHashSet<>();
+		Term inductionFormula = tb.tt();
+		Term stepCases = tb.tt();
+		Term originalWithoutAll;
+		QuantifiableVariable inductionVariable = SchemaVariableFactory.createVariableSV(
+				new Name(tb.newName(rd.getInductionVariable().sort())), 
+				rd.getInductionVariable().sort()
+		);
 		
-		Term inductionFormula = tb.not(conjunctionOfAtomicRanges(rd, s));	//base case
-		LinkedList<QuantifiableVariable> varsToBind = new LinkedList<>();
-		inductionFormula = tb.imp(inductionFormula, t);		
+		if(phi.op().name().toString() == "all"){
+			phi = phi.sub(0);
+		}
+		originalWithoutAll = phi;
+		phi = tb.subst(rd.getInductionVariable(), tb.var(inductionVariable), phi);
+		
 		for(AtomicRelationDescription atomic : rd.getAtomics()){
-			inductionFormula = tb.and(inductionFormula, createCaseTerm(atomic, t, tb));
+			Term range = atomic.getRange();
+			Term hypothesis = atomic.getHypothesis();
+			
+			Term stepTerm = tb.all(
+				inductionVariable, 
+				tb.imp(
+					tb.subst(
+						rd.getInductionVariable(), 
+						tb.var(inductionVariable), 
+						tb.and(range, hypothesis)
+					), 
+					phi
+				)
+			);
+			stepCases = tb.and(stepCases, stepTerm);
+				
+			inductionFormula = tb.and(inductionFormula, createCaseTerm(atomic, originalWithoutAll, tb));
 			varsToBind.addAll(atomic.getInductionVariables());
 		}
+
+		/*
+		 * If you are familiar with the theory of Christoph Walther, you might miss the base case here.
+		 * This case is included in the step cases.
+		 */
+		inductionFormula = stepCases;
 		
 		//this might be a bit overkill but currently it works
 		for(QuantifiableVariable qv : inductionFormula.freeVars()){
@@ -37,14 +68,10 @@ public class InductionFormulaCreator {
 		}
 		
 		//TODO: introduce a forall statement for each variable created by the substitutions
-		inductionFormula = tb.all(varsToBind, inductionFormula);//tb.imp(inductionFormula, t));
+		inductionFormula = tb.all(varsToBind, inductionFormula);
 		
-		
-		//System.out.println("Bound Vars: " + inductionFormula.boundVars());
-		//System.out.println("Free Vars: " + inductionFormula.freeVars());
-		System.out.println("\n\nINDUCTIONFORMULA:" + inductionFormula + "\n\n");
-		
-		return inductionFormula;
+		//todo: (this is a hack)remove tb.or and change the taclet from replace to add.
+		return tb.or(inductionFormula, original);	
 	}
 	
 	/**
@@ -106,22 +133,6 @@ public class InductionFormulaCreator {
 				qvs.tail()
 			);
 		}
-	}
-	
-	/**
-	 * 
-	 * @param rd a RelationDescription
-	 * @param tb a TermBuilder
-	 * @return a term which consists of the conjunction of the range-formula from the AtomicRelationDescriptions
-	 * of the given RelationDescription
-	 */
-	private static Term conjunctionOfAtomicRanges(RelationDescription rd, Services s){
-		TermBuilder tb = s.getTermBuilder();
-		LinkedList<Term> ranges = new LinkedList<Term>();
-		for(AtomicRelationDescription atom : rd.getAtomics()){
-			ranges.add(RelationDescription.replaceTermSVwithVariableSV(atom.getRange(), s, new HashMap<TermSV, QuantifiableVariable>()));
-		}
-		return tb.and(ranges);
 	}
 
 }

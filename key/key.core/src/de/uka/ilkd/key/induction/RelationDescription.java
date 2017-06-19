@@ -24,30 +24,26 @@ import de.uka.ilkd.key.util.Pair;
 public class RelationDescription {
 
 	private LinkedList<AtomicRelationDescription> atomics;
-	private LinkedList<Pair<QuantifiableVariable, Term>> possibleSubstitutions;
 	private Term term;
-	private static final String COUNTER_NAME = "replacement_counter";
+	private QuantifiableVariable inductionVariable;
 	
 	/**
 	 * @use RelationDescriptionFactory to generate
 	 * @param t
 	 * @param serv
 	 */
-	protected RelationDescription(Term t, Services serv){
+	protected RelationDescription(Term t, Term original, Services serv){
 		ConstructorExtractor ce = new ConstructorExtractor(t, serv);
 		ImmutableArray<Function> constructors = ce.getConstructors();
 		Iterable<Taclet> findTerms;
 		
 		this.term = t;
 		
-		possibleSubstitutions = new LinkedList<Pair<QuantifiableVariable, Term>>();
-		
-		//System.out.println("The term: " + t + " has " + constructors.size() + " constructors.");
 		
 		//TODO: check for cast error
 		findTerms = serv.getProof().getInitConfig().activatedTaclets();
 		
-		atomics = createAtomics(findTerms, t, constructors, possibleSubstitutions, serv);
+		atomics = createAtomics(findTerms, t, original, constructors, serv);
 	}
 	
 	public LinkedList<AtomicRelationDescription> getAtomics(){
@@ -66,39 +62,59 @@ public class RelationDescription {
 	private static Term createRangeFormula(Term term, Term findTerm, Services s){
 		TermBuilder tb = s.getTermBuilder();
 		
-		if(term.arity() > 0 && findTerm.arity() > 0 && findTerm.op() == term.op()){
+		if(!term.sort().equals(findTerm.sort())){
+			return tb.ff();
+		}
+		
+		if(
+				term.arity() > 0 && 
+				findTerm.arity() > 0 && 
+				findTerm.op() == term.op()
+		){
 			LinkedList<Term> subterms = new LinkedList<>();
 			for(int i = 0; i < term.arity(); i++){
 				subterms.add(createRangeFormula(term.sub(i), findTerm.sub(i), s));
 			}
 			return tb.and(subterms);
 		}
-		else{
-			//TODO:[optional] Maybe check arity for negative values and their handling
+		else if(opIsConstructor(findTerm.op()) || term.arity() == 0){			
 			
-			if(!term.sort().equals(findTerm.sort())){	//TODO: take a closer look at this
-				return tb.ff();
-			}
-			else{
-				//TODO: replace all TermSV's with VariableSV in the findterm.
-				findTerm = replaceTermSVwithVariableSV(findTerm, s, new HashMap<TermSV, QuantifiableVariable>());
-				return tb.equals(term, findTerm);
-			}
+			findTerm = replaceTermSVwithVariableSV(findTerm, s, new HashMap<TermSV, QuantifiableVariable>());
+			return tb.equals(term, findTerm);
+		}
+		else{
+			return tb.ff();
 		}
 		
+	}
+	
+	private static boolean opIsConstructor(Operator op){
+		if(op instanceof Function){
+			Function f = (Function)op;
+			return f.isUnique();
+		}
+		else{
+			return false;
+		}
 	}
 	
 
 	public static Term replaceTermSVwithVariableSV(Term term, Services s, HashMap<TermSV, QuantifiableVariable> replace) {
 		Operator op = term.op();
 		TermBuilder tb = s.getTermBuilder();
+		/*if(term.sort() == Sort.ANY){
+			return tb.NULL();
+		}*/try{
 		if(op instanceof TermSV){
 			TermSV tsv = (TermSV)op;
 			QuantifiableVariable replacedVar;
 			if(replace.containsKey(tsv)){
 				replacedVar = replace.get(tsv);
 			}else {
-				replacedVar = SchemaVariableFactory.createVariableSV(generateName(s, "replaced_"), term.sort());
+				replacedVar = SchemaVariableFactory.createVariableSV(
+					new Name(tb.newName(term.sort())),
+					term.sort()
+				);
 				replace.put(tsv, replacedVar);
 			}
 			return tb.var(replacedVar);
@@ -127,20 +143,19 @@ public class RelationDescription {
 				//TODO: implement the case that op is not a function.
 			}
 		}
+		}
+		catch(de.uka.ilkd.key.logic.TermCreationException e){
+			//TODO: remove this and find better solution
+			//
+			return term;
+		}
 	}
 
-	private static Name generateName(Services s, String string) {
-		StringBuilder sb = new StringBuilder(string);
-		sb.append("_");
-		sb.append(s.getCounter(COUNTER_NAME).getCountPlusPlus());
-		return new Name(sb.toString());
-	}
-
-	private static LinkedList<AtomicRelationDescription> createAtomics(
+	private LinkedList<AtomicRelationDescription> createAtomics(
 			Iterable<Taclet> findTerms, 
 			Term term, 
+			Term original,
 			ImmutableArray<Function> constructors,
-			LinkedList<Pair<QuantifiableVariable, Term>> subst, 
 			Services serv
 	){
 		LinkedList<AtomicRelationDescription> atomicRDs = new LinkedList<AtomicRelationDescription>();
@@ -154,14 +169,16 @@ public class RelationDescription {
 			if(findTaclet instanceof FindTaclet){
 				Term rangeFormula = createRangeFormula(
 						term, 
-						((FindTaclet) findTaclet).find(), 
+						((FindTaclet) findTaclet).find(),
 						serv
 				);
 				if(rangeFormula != tb.ff()){	//just use rangeformula which are not false.
 					atomicRDs.add(new AtomicRelationDescription(
 							rangeFormula,
 							constructors,
-							subst,	//TODO: only use the substitutions gained from this given term (the term might be a subterm)
+							original,
+							(FindTaclet)findTaclet,
+							this,
 							serv
 							));
 				}
@@ -221,6 +238,10 @@ public class RelationDescription {
 		return term.op();
 	}
 	
+	public Term getBuildTerm(){
+		return this.term;
+	}
+	
 	@Override
 	public String toString(){
 		StringBuilder sb = new StringBuilder("RelationDescription of ");
@@ -228,5 +249,10 @@ public class RelationDescription {
 		sb.append(term.toString());
 		sb.append(")");
 		return sb.toString();
+	}
+
+	public QuantifiableVariable getInductionVariable() {
+		//TODO: find a better (more correct way) to extract the inductionVariable
+		return term.freeVars().iterator().next();
 	}
 }
