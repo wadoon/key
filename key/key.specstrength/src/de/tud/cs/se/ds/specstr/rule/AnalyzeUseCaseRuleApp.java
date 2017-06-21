@@ -20,22 +20,25 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * TODO
+ * The {@link RuleApp} for the {@link AnalyzeUseCaseRule}.
  *
  * @author Dominic Steinhöfel
  */
-public class AnalyzeUseCaseRuleApp
-        extends AbstractBuiltInRuleApp {
+public class AnalyzeUseCaseRuleApp extends AbstractBuiltInRuleApp {
 
     /**
+     * Constructor.
+     *
      * @param rule
+     *            The {@link BuiltInRule} for this app (an
+     *            {@link AnalyzeUseCaseRule}).
      * @param pio
-     * @param localOuts
+     *            The {@link PosInOccurrence} of the rule application.
      */
-    protected AnalyzeUseCaseRuleApp(BuiltInRule rule,
-            PosInOccurrence pio) {
+    protected AnalyzeUseCaseRuleApp(BuiltInRule rule, PosInOccurrence pio) {
         super(rule, pio);
     }
 

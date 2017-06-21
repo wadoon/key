@@ -32,14 +32,20 @@ import org.apache.logging.log4j.Logger;
 import de.tud.cs.se.ds.specstr.analyzer.Analyzer;
 
 /**
- * TODO
+ * Main class for CLI access.
  *
  * @author Dominic Steinhöfel
  */
-public class Main {
+public final class Main {
 
-    private static final Logger logger = LogManager.getFormatterLogger();
+    /**
+     * The {@link Logger} for this class.
+     */
+    private static final Logger LOGGER = LogManager.getFormatterLogger();
 
+    /**
+     * The information {@link String} for the help output to the command line.
+     */
     private static final String INFO_STRING =
             // @formatter:off
               "===========================================\n"
@@ -50,8 +56,15 @@ public class Main {
             // @formatter:on
 
     /**
+     * This is a utility class, the constructor is hidden.
+     */
+    private Main() {
+        // Hidden constructor -- utility class
+    }
+
+    /**
      * The main method for running Alfred from command line.
-     * 
+     *
      * @param args
      *            Command line options; run with -h flag for obtaining
      *            information about available options.
@@ -91,15 +104,15 @@ public class Main {
 
             if (!inputFileName.endsWith(".java") || !inputFile.exists()
                     || !inputFile.isFile()) {
-                System.out.println("Invalid file name or not existing file: "
-                        + inputFileName);
+                System.out.println(
+                    "Invalid file name or not existing file: " + inputFileName);
                 System.out.println("Please supply an existing Java file.\n");
                 printHelp(options);
             }
 
             Optional<File> outProof = line.hasOption(outFileProofOpt.getOpt())
-                    ? Optional.of(new File(
-                            line.getOptionValue(outFileProofOpt.getOpt())))
+                    ? Optional.of(
+                        new File(line.getOptionValue(outFileProofOpt.getOpt())))
                     : Optional.empty();
 
             Analyzer analyzer = new Analyzer(inputFile, theMethod, outProof);
@@ -111,7 +124,7 @@ public class Main {
                 try {
                     ps = new PrintStream(new FileOutputStream(file));
                 } catch (FileNotFoundException e) {
-                    logger.error("Could not open file %s", file.getName());
+                    LOGGER.error("Could not open file %s", file.getName());
                 }
             }
 
@@ -126,8 +139,8 @@ public class Main {
             printHelp(options);
             System.exit(0);
         } catch (RuntimeException e) {
-            logger.error("Problem occurred during the analysis:\n%s",
-                    e.getMessage());
+            LOGGER.error("Problem occurred during the analysis:\n%s",
+                e.getMessage());
         }
 
         System.exit(1);
@@ -144,7 +157,7 @@ public class Main {
         HelpFormatter helpFormatter = new HelpFormatter();
         helpFormatter.printHelp("java -jar key.specstrength.jar"
                 + "\t[input Java file]" + "\t[fully qualified method name]",
-                options);
+            options);
     }
 
 }

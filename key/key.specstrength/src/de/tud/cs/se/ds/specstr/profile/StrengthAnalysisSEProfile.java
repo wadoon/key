@@ -21,21 +21,29 @@ import de.tud.cs.se.ds.specstr.rule.AnalyzePostCondImpliesMethodEffectsRule;
 import de.tud.cs.se.ds.specstr.rule.AnalyzeUseCaseRule;
 import de.tud.cs.se.ds.specstr.rule.FactAnalysisRule;
 import de.tud.cs.se.ds.specstr.strategy.StrengthAnalysisStrategy;
+import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 
 /**
- * TODO
+ * The {@link Profile} for strength analysis.
  *
  * @author Dominic Steinhöfel
  */
-public class StrengthAnalysisSEProfile extends SymbolicExecutionJavaProfile {
+public final class StrengthAnalysisSEProfile extends SymbolicExecutionJavaProfile {
+    /**
+     * Profile name.
+     */
     public static final String NAME = "Java Profile for Strength Analysis";
+
+    /**
+     * Singleton instance.
+     */
     public static final StrengthAnalysisSEProfile INSTANCE = new StrengthAnalysisSEProfile();
 
     /**
-     * @param predicateEvaluationEnabled
+     * Singleton constructor.
      */
     private StrengthAnalysisSEProfile() {
         super(true);

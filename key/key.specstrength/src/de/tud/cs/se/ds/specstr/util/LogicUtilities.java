@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -57,8 +58,10 @@ import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
+import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * TODO
@@ -652,6 +655,26 @@ public class LogicUtilities {
 
         final Node newNode = proof.getSubtreeGoals(n).head().node();
         return newNode;
+    }
+
+    /**
+     * Transforms an update to a {@link Map} from left-hand-sides to
+     * right-hand-sides.
+     *
+     * @param updateTerm
+     *            The {@link Term} to transform.
+     * @return A {@link Map} from update left-hand-sides to right-hand-sides.
+     */
+    public static Map<LocationVariable, Term> updateToMap(final Term updateTerm) {
+        final Map<LocationVariable, Term> updateContent = StreamSupport.stream(//
+            MergeRuleUtils.getUpdateLeftSideLocations(updateTerm).spliterator(),
+            true).collect(Collectors.toMap(lhs -> lhs,
+                lhs -> MergeRuleUtils.getUpdateRightSideFor(updateTerm, lhs),
+                (u, v) -> {
+                    throw new IllegalStateException(
+                        String.format("Duplicate key %s", u));
+                }, LinkedHashMap::new));
+        return updateContent;
     }
 
 }

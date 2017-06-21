@@ -38,22 +38,40 @@ import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.RuleAbortException;
+import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * TODO
+ * The {@link RuleApp} for the {@link AnalyzeInvImpliesLoopEffectsRule}.
  *
  * @author Dominic Steinhöfel
  */
 public class AnalyzeInvImpliesLoopEffectsRuleApp
         extends AbstractBuiltInRuleApp {
 
+    /**
+     * The invariant {@link Term} (without updates).
+     */
     private final Term invTerm;
+
+    /**
+     * The local out {@link LocationVariable}s of the loop, that is those that
+     * are accessible from the outside.
+     */
     private final List<LocationVariable> localOuts;
 
     /**
+     * Constructor.
+     *
      * @param rule
+     *            The {@link BuiltInRule} for this app (an
+     *            {@link AnalyzeInvImpliesLoopEffectsRule}).
      * @param pio
+     *            The {@link PosInOccurrence} of the rule application.
+     * @param invTerm
+     *            The invariant {@link Term} (without updates).
      * @param localOuts
+     *            The local out {@link LocationVariable}s of the loop, that is
+     *            those that are accessible from the outside.
      */
     protected AnalyzeInvImpliesLoopEffectsRuleApp(BuiltInRule rule,
             PosInOccurrence pio, Term invTerm,
@@ -86,8 +104,9 @@ public class AnalyzeInvImpliesLoopEffectsRuleApp
 
         for (SequentFormula sf : goal.node().sequent().succedent()) {
             Optional<LocationVariable> maybeIdxVar = LogicUtilities
-                    .retrieveLoopScopeIndex(new PosInOccurrence(sf,
-                            PosInTerm.getTopLevel(), false), services);
+                    .retrieveLoopScopeIndex(
+                        new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
+                        services);
 
             if (maybeIdxVar.isPresent()) {
                 loopScopeIdxVar = maybeIdxVar.get();
@@ -106,11 +125,10 @@ public class AnalyzeInvImpliesLoopEffectsRuleApp
                     .rule() == LoopScopeInvariantRule.INSTANCE
                     && !currNode.getLocalProgVars().contains(loopScopeIdxVar)) {
 
-                Optional<While> maybeWhile = StreamSupport
-                        .stream(currNode.sequent().succedent().spliterator(),
-                                true)
-                        .map(sf -> JavaTools.getActiveStatement(TermBuilder
-                                .goBelowUpdates(sf.formula()).javaBlock()))
+                Optional<While> maybeWhile = StreamSupport.stream(
+                    currNode.sequent().succedent().spliterator(),
+                    true).map(sf -> JavaTools.getActiveStatement(
+                        TermBuilder.goBelowUpdates(sf.formula()).javaBlock()))
                         .filter(st -> st instanceof While).map(st -> (While) st)
                         .findAny();
 
@@ -123,25 +141,27 @@ public class AnalyzeInvImpliesLoopEffectsRuleApp
 
                 try {
                     final LoopInvariantInformation loopInvInf = //
-                            LoopScopeInvariantRule.INSTANCE.doPreparations( //
-                                    currNode, services,
-                                    currNode.getAppliedRuleApp());
+                            LoopScopeInvariantRule.INSTANCE.doPreparations(//
+                                currNode, services,
+                                currNode.getAppliedRuleApp());
 
                     lLoopInvTerm = loopInvInf.invTerm;
                     lLocalOuts = StreamSupport
                             .stream(loopInvInf.inst.inv.getLocalOuts()
-                                    .spliterator(), true)
+                                    .spliterator(),
+                                true)
                             .map(t -> (LocationVariable) t.op())
                             .collect(Collectors.toList());
                 } catch (RuleAbortException e) {
-                    throw new RuntimeException(String.format(
+                    throw new RuntimeException(
+                        String.format(
                             "%s: Problem in instantiating rule app: %s",
                             this.getClass().getSimpleName(), e.getMessage()),
-                            e);
+                        e);
                 }
 
                 return new AnalyzeInvImpliesLoopEffectsRuleApp(this.builtInRule,
-                        this.pio, lLoopInvTerm, lLocalOuts);
+                    this.pio, lLoopInvTerm, lLocalOuts);
 
             }
 

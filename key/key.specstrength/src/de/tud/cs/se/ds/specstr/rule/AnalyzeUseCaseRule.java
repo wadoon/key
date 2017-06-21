@@ -38,12 +38,21 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
- * TODO
+ * Strength analysis rule for assessing the strength of a loop invariant with
+ * respect to the post condition of the method.
  *
  * @author Dominic Steinhöfel
  */
-public class AnalyzeUseCaseRule extends AbstractAnalysisRule {
+public final class AnalyzeUseCaseRule extends AbstractAnalysisRule {
+
+    /**
+     * The {@link Name} of this {@link AbstractAnalysisRule}.
+     */
     public static final Name NAME = new Name("AnalyzeUseCase");
+
+    /**
+     * Singleton instance of the {@link AnalyzeUseCaseRule}.
+     */
     public static final AnalyzeUseCaseRule INSTANCE = new AnalyzeUseCaseRule();
 
     private AnalyzeUseCaseRule() {
@@ -68,19 +77,17 @@ public class AnalyzeUseCaseRule extends AbstractAnalysisRule {
         int i = 0;
         for (final Goal newGoal : goals) {
             newGoal.removeFormula(ruleApp.posInOccurrence());
-            newGoal.addFormula(
-                    new SequentFormula(tb.label(conjElems.get(i),
-                            StrengthAnalysisParameterlessTL.FACT_LABEL)),
-                    false, false);
+            newGoal.addFormula(new SequentFormula(tb.label(conjElems.get(i),
+                StrengthAnalysisParameterlessTL.FACT_LABEL)), false, false);
 
-            final String factDescr = LogicPrinter.quickPrintTerm( //
-                    SymbolicExecutionUtil.improveReadability( //
-                            conjElems.get(i), services),
-                    services);
+            final String factDescr = LogicPrinter.quickPrintTerm(//
+                SymbolicExecutionUtil.improveReadability(//
+                    conjElems.get(i), services),
+                services);
             newGoal.node().getNodeInfo()
                     .setBranchLabel(String.format("%s \"%s\"",
-                            AbstractAnalysisRule.COVERS_FACT_BRANCH_LABEL_PREFIX,
-                            factDescr));
+                        AbstractAnalysisRule.COVERS_FACT_BRANCH_LABEL_PREFIX,
+                        factDescr));
 
             i++;
         }
@@ -108,15 +115,18 @@ public class AnalyzeUseCaseRule extends AbstractAnalysisRule {
         return pio != null && pio.isTopLevel() && !pio.isInAntec()
                 && !(pio.subTerm().op() instanceof UpdateApplication)
                 && !pio.subTerm().containsJavaBlockRecursive()
-                && nextParentBranchLabel(goal.node()).orElse("")
-                        .equals(AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL);
+                && nextParentBranchLabel(goal.node()).orElse("").equals(
+                    AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL);
     }
 
     /**
-     * TODO Comment.
+     * Returns the label of the next parent node that is branching, i.e. has at
+     * least two children.
      *
      * @param node
-     * @return
+     *            The {@link Node} to start with.
+     * @return The label of the next parent node that is branching, i.e. has at
+     *         least two children.
      */
     private static Optional<String> nextParentBranchLabel(Node node) {
         while (!node.parent().root() && node.parent().childrenCount() < 2) {

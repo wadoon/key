@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.tud.cs.se.ds.specstr.util.LogicUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -40,20 +40,33 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
- * TODO
+ * Strength analysis rule for assessing the strength of a loop invariant with
+ * respect to the actual effects of a loop body.
  *
  * @author Dominic Steinhöfel
  */
-public class AnalyzeInvImpliesLoopEffectsRule extends AbstractAnalysisRule {
+public final class AnalyzeInvImpliesLoopEffectsRule
+        extends AbstractAnalysisRule {
+
+    /**
+     * The {@link Name} of this {@link AbstractAnalysisRule}.
+     */
     public static final Name NAME = new Name("AnalyzeInvImpliesLoopEffects");
-    public static final AnalyzeInvImpliesLoopEffectsRule INSTANCE = new AnalyzeInvImpliesLoopEffectsRule();
-    
+
+    /**
+     * Singleton instance of the {@link AnalyzeInvImpliesLoopEffectsRule}.
+     */
+    public static final AnalyzeInvImpliesLoopEffectsRule INSTANCE = //
+            new AnalyzeInvImpliesLoopEffectsRule();
+
+    /**
+     * Singleton constructor.
+     */
     private AnalyzeInvImpliesLoopEffectsRule() {
         // Singleton Constructor
     }
@@ -74,18 +87,8 @@ public class AnalyzeInvImpliesLoopEffectsRule extends AbstractAnalysisRule {
 
         assert updateTerm.op() instanceof UpdateJunctor;
 
-        final Map<LocationVariable, Term> updateContent = StreamSupport
-                .stream( //
-                        MergeRuleUtils.getUpdateLeftSideLocations(updateTerm)
-                                .spliterator(),
-                        true)
-                .collect(Collectors.toMap(
-                        lhs -> lhs, lhs -> MergeRuleUtils
-                                .getUpdateRightSideFor(updateTerm, lhs),
-                        (u, v) -> {
-                            throw new IllegalStateException(
-                                    String.format("Duplicate key %s", u));
-                        }, LinkedHashMap::new));
+        final Map<LocationVariable, Term> updateContent = LogicUtilities
+                .updateToMap(updateTerm);
 
         final LocationVariable heapVar = services.getTypeConverter()
                 .getHeapLDT().getHeap();
@@ -97,20 +100,107 @@ public class AnalyzeInvImpliesLoopEffectsRule extends AbstractAnalysisRule {
                 .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
 
         // Retrieve store equalities
-        final FunctionalOperationContract fContract = //
-                getFOContract(services);
-        final IProgramMethod pm = fContract.getTarget();
+        final IProgramMethod pm = getFOContract(services).getTarget();
         final Term origHeapTerm = MergeRuleUtils
                 .getUpdateRightSideFor(updateTerm, heapVar);
 
         final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
-                extractStoreEqsAndInnerHeapTerm( //
-                        services, pm, origHeapTerm);
+                extractStoreEqsAndInnerHeapTerm(//
+                    services, pm, origHeapTerm);
 
         final List<Term> storeEqualities = storeEqsAndInnerHeapTerm.isPresent()
                 ? storeEqsAndInnerHeapTerm.get().second : new ArrayList<>();
 
-        Map<LocationVariable, List<Term>> newGoalInformation = new LinkedHashMap<>();
+        final Map<LocationVariable, List<Term>> newGoalInformation = constructNewGoalInformation(
+            tb, invTerm, localOuts, updateContent, heapVar,
+            updateWithoutLocalOuts, origHeapTerm);
+
+        final ImmutableList<Goal> goals = goal
+                .split(newGoalInformation.size() + storeEqualities.size() + 1);
+        final Goal[] goalArray = goals.toArray(Goal.class);
+        final TermLabelState termLabelState = new TermLabelState();
+
+        int i = 0;
+        for (LocationVariable currLocalOut : newGoalInformation.keySet()) {
+            final Goal analysisGoal = goalArray[i++];
+
+            final Term currAnalysisTerm = tb.equals(tb.var(currLocalOut),
+                updateContent.get(currLocalOut));
+
+            prepareGoal(pio, analysisGoal, currAnalysisTerm, termLabelState,
+                this);
+            removeLoopInvFormulasFromAntec(analysisGoal);
+            addFactPreconditions(analysisGoal,
+                newGoalInformation.get(currLocalOut), //
+                1, termLabelState, this);
+        }
+
+        if (storeEqsAndInnerHeapTerm.isPresent()) {
+            for (Term heapEquality : storeEqualities) {
+                final Goal analysisGoal = goalArray[i++];
+
+                prepareGoal(pio, analysisGoal, heapEquality, termLabelState,
+                    this);
+                removeLoopInvFormulasFromAntec(analysisGoal);
+
+                final Term update = updateWithoutLocalOuts;
+
+                final List<Term> newPres = Arrays.asList(new Term[] { //
+                    tb.apply(update, invTerm),
+                    tb.and(updateContent.keySet().stream()
+                            .filter(lhs -> !lhs.equals(heapVar))
+                            .map(lhs -> tb.equals(tb.var(lhs),
+                                updateContent.get(lhs)))
+                            .collect(Collectors.toList())),
+                    tb.and(storeEqualities.stream()
+                            .filter(se -> se != heapEquality)
+                            .collect(Collectors.toList())) });
+
+                addFactPreconditions(analysisGoal, newPres, 1, termLabelState,
+                    this);
+            }
+        }
+
+        addSETPredicateToAntec(goalArray[goalArray.length - 1]);
+        goalArray[goalArray.length - 1].setBranchLabel(
+            AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL);
+
+        return goals;
+    }
+
+    /**
+     * The "new goal information" is a map from a "local out" to a list of two
+     * elements: the loop invariant in the original heap state and the local
+     * state without all "localOuts", and a conjunction of all facts without the
+     * current "local out".
+     *
+     * @param tb
+     *            The {@link TermBuilder} object.
+     * @param invTerm
+     *            The loop invariant {@link Term} (without update).
+     * @param localOuts
+     *            The "local outs", i.e. variables that are available also
+     *            outside the loop.
+     * @param updateContent
+     *            The disassembled update.
+     * @param heapVar
+     *            The heap {@link LocationVariable}.
+     * @param updateWithoutLocalOuts
+     *            The update without all local outs.
+     * @param origHeapTerm
+     *            The original heap term.
+     * @return A map from a "local out" to a list of two elements: the loop
+     *         invariant in the original heap state and the local state without
+     *         all "localOuts", and a conjunction of all facts without the
+     *         current "local out".
+     */
+    private Map<LocationVariable, List<Term>> constructNewGoalInformation(
+            final TermBuilder tb, final Term invTerm,
+            final List<LocationVariable> localOuts,
+            final Map<LocationVariable, Term> updateContent,
+            final LocationVariable heapVar, final Term updateWithoutLocalOuts,
+            final Term origHeapTerm) {
+        final Map<LocationVariable, List<Term>> newGoalInformation = new LinkedHashMap<>();
 
         for (int i = 0; i < localOuts.size(); i++) {
             final LocationVariable currLocalOut = localOuts.get(i);
@@ -123,64 +213,23 @@ public class AnalyzeInvImpliesLoopEffectsRule extends AbstractAnalysisRule {
             // gets stuck in an endless cascade of equation shuffling
             newGoalInformation
                     .put(currLocalOut,
-                            Arrays.asList(new Term[] {
-                                    tb.apply(tb.parallel(
-                                            tb.elementary(tb.var(heapVar),
-                                                    origHeapTerm),
-                                            updateWithoutLocalOuts), invTerm),
-                                    tb.and(updateContent.keySet().stream()
-                                            .filter(lhs -> lhs != currLocalOut)
-                                            .filter(lhs -> !lhs.equals(heapVar))
-                                            .map(lhs -> tb.equals(tb.var(lhs),
-                                                    updateContent.get(lhs)))
-                                            .collect(Collectors.toList())) }));
-        }
-
-        final ImmutableList<Goal> goals = goal
-                .split(newGoalInformation.size() + storeEqualities.size() + 1);
-        final Goal[] goalArray = goals.toArray(Goal.class);
-        final TermLabelState termLabelState = new TermLabelState();
-
-        int i = 0;
-        for (LocationVariable currLocalOut : newGoalInformation.keySet()) {
-            final Goal analysisGoal = goalArray[i++];
-
-            final Term currAnalysisTerm = tb.equals(tb.var(currLocalOut),
-                    updateContent.get(currLocalOut));
-
-            prepareGoal(pio, analysisGoal, currAnalysisTerm, termLabelState, this);
-            removeLoopInvFormulasFromAntec(analysisGoal);
-            addFactPreconditions(analysisGoal, newGoalInformation.get(currLocalOut), 1, termLabelState, this);
-        }
-
-        if (storeEqsAndInnerHeapTerm.isPresent()) {
-            for (Term heapEquality : storeEqualities) {
-                final Goal analysisGoal = goalArray[i++];
-
-                prepareGoal(pio, analysisGoal, heapEquality, termLabelState, this);
-                removeLoopInvFormulasFromAntec(analysisGoal);
-
-                final Term update = updateWithoutLocalOuts;
-
-                final List<Term> newPres = Arrays.asList(new Term[] { //
-                        tb.apply(update, invTerm),
-                        tb.and(updateContent.keySet().stream()
-                                .filter(lhs -> !lhs.equals(heapVar))
-                                .map(lhs -> tb.equals(tb.var(lhs),
+                        Arrays.asList(new Term[] {
+                            // The loop invariant in the original heap state and
+                            // the local state without the "localOuts"
+                            tb.apply(
+                                tb.parallel(tb.elementary(tb.var(heapVar),
+                                    origHeapTerm), updateWithoutLocalOuts),
+                                invTerm),
+                            // The collected equations
+                            tb.and(updateContent.keySet().stream()
+                                    .filter(lhs -> lhs != currLocalOut)
+                                    .filter(lhs -> !lhs.equals(heapVar))
+                                    .map(lhs -> tb.equals(tb.var(lhs),
                                         updateContent.get(lhs)))
-                                .collect(Collectors.toList())),
-                        tb.and(storeEqualities.stream()
-                                .filter(se -> se != heapEquality)
-                                .collect(Collectors.toList())) });
-
-                addFactPreconditions(analysisGoal, newPres, 1, termLabelState, this);
-            }
+                                    .collect(Collectors.toList())) }));
         }
 
-        addSETPredicateToAntec(goalArray[goalArray.length - 1]);
-        goalArray[goalArray.length - 1].setBranchLabel(AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL);
-
-        return goals;
+        return newGoalInformation;
     }
 
     @Override
@@ -209,8 +258,7 @@ public class AnalyzeInvImpliesLoopEffectsRule extends AbstractAnalysisRule {
         final Services services = goal.proof().getServices();
 
         Optional<LocationVariable> lsi = null;
-        return (lsi = retrieveLoopScopeIndex(pio, services))
-                .isPresent()
+        return (lsi = retrieveLoopScopeIndex(pio, services)).isPresent()
                 && !(pio.subTerm().sub(1).op() instanceof Modality)
                 && MergeRuleUtils
                         .getUpdateRightSideFor(pio.subTerm().sub(0), lsi.get())
@@ -227,12 +275,6 @@ public class AnalyzeInvImpliesLoopEffectsRule extends AbstractAnalysisRule {
     public IBuiltInRuleApp createApp(PosInOccurrence pos,
             TermServices services) {
         return new AnalyzeInvImpliesLoopEffectsRuleApp(this, pos, null, null);
-    }
-
-    public IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services,
-            Term invTerm, List<LocationVariable> localOuts) {
-        return new AnalyzeInvImpliesLoopEffectsRuleApp(this, pos, invTerm,
-                localOuts);
     }
 
     @Override

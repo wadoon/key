@@ -20,17 +20,23 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * TODO
+ * The {@link RuleApp} for the {@link FactAnalysisRule}.
  *
  * @author Dominic Steinhöfel
  */
 public class FactAnalysisRuleApp extends AbstractBuiltInRuleApp {
 
     /**
+     * Constructor.
+     *
      * @param rule
+     *            The {@link BuiltInRule} for this app (an
+     *            {@link FactAnalysisRule}).
      * @param pio
+     *            The {@link PosInOccurrence} of the rule application.
      */
     protected FactAnalysisRuleApp(BuiltInRule rule, PosInOccurrence pio) {
         super(rule, pio);

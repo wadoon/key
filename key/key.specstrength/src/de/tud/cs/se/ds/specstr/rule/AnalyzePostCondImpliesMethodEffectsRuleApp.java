@@ -20,9 +20,10 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.RuleApp;
 
 /**
- * TODO
+ * The {@link RuleApp} for the {@link AnalyzePostCondImpliesMethodEffectsRule}.
  *
  * @author Dominic Steinhöfel
  */
@@ -30,9 +31,13 @@ public class AnalyzePostCondImpliesMethodEffectsRuleApp
         extends AbstractBuiltInRuleApp {
 
     /**
+     * Constructor.
+     *
      * @param rule
+     *            The {@link BuiltInRule} for this app (an
+     *            {@link AnalyzePostCondImpliesMethodEffectsRule}).
      * @param pio
-     * @param localOuts
+     *            The {@link PosInOccurrence} of the rule application.
      */
     protected AnalyzePostCondImpliesMethodEffectsRuleApp(BuiltInRule rule,
             PosInOccurrence pio) {

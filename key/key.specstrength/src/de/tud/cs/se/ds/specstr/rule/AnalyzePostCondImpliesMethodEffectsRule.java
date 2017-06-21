@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.tud.cs.se.ds.specstr.util.LogicUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -44,19 +44,29 @@ import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
- * TODO
+ * Strength analysis rule for assessing the strength of a post condition with
+ * respect to the actual effects of the method (modulo abstractions by loop
+ * invariants or method calls by contract).
  *
  * @author Dominic Steinhöfel
  */
-public class AnalyzePostCondImpliesMethodEffectsRule
+public final class AnalyzePostCondImpliesMethodEffectsRule
         extends AbstractAnalysisRule {
+
+    /**
+     * The {@link Name} of this {@link AbstractAnalysisRule}.
+     */
     public static final Name NAME = new Name(
-            "AnalyzePostCondImpliesMethodEffects");
+        "AnalyzePostCondImpliesMethodEffects");
+
+    /**
+     * Singleton instance of the
+     * {@link AnalyzePostCondImpliesMethodEffectsRule}.
+     */
     public static final AnalyzePostCondImpliesMethodEffectsRule INSTANCE = //
             new AnalyzePostCondImpliesMethodEffectsRule();
 
@@ -82,7 +92,6 @@ public class AnalyzePostCondImpliesMethodEffectsRule
         // instantiations
         final Term contract = TermBuilder.goBelowUpdates(goal.proof().root()
                 .sequent().succedent().getFirst().formula().sub(1)).sub(0);
-        // Term contract = fContract.getPost();
 
         final IProgramMethod pm = fContract.getTarget();
 
@@ -94,8 +103,8 @@ public class AnalyzePostCondImpliesMethodEffectsRule
         final boolean hasHeap = origHeapTerm != null;
 
         final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
-                extractStoreEqsAndInnerHeapTerm( //
-                        services, pm, origHeapTerm);
+                extractStoreEqsAndInnerHeapTerm(//
+                    services, pm, origHeapTerm);
 
         final List<Term> storeEqualities = hasHeap
                 ? storeEqsAndInnerHeapTerm.get().second : new ArrayList<>();
@@ -107,18 +116,8 @@ public class AnalyzePostCondImpliesMethodEffectsRule
                         .programVariables()
                         .lookup(fContract.getResult().op().name());
 
-        final Map<LocationVariable, Term> updateContent = StreamSupport
-                .stream( //
-                        MergeRuleUtils.getUpdateLeftSideLocations(updateTerm)
-                                .spliterator(),
-                        true)
-                .collect(Collectors.toMap(
-                        lhs -> lhs, lhs -> MergeRuleUtils
-                                .getUpdateRightSideFor(updateTerm, lhs),
-                        (u, v) -> {
-                            throw new IllegalStateException(
-                                    String.format("Duplicate key %s", u));
-                        }, LinkedHashMap::new));
+        final Map<LocationVariable, Term> updateContent = LogicUtilities
+                .updateToMap(updateTerm);
 
         final boolean hasResultVar = resultVar != null
                 && updateContent.get(resultVar) != null;
@@ -139,30 +138,29 @@ public class AnalyzePostCondImpliesMethodEffectsRule
             final Goal analysisGoal = goalArray[0];
 
             final Term currAnalysisTerm = tb.equals(tb.var(resultVar),
-                    MergeRuleUtils.getUpdateRightSideFor(updateTerm,
-                            resultVar));
+                MergeRuleUtils.getUpdateRightSideFor(updateTerm, resultVar));
 
             prepareGoal(pio, analysisGoal, currAnalysisTerm, termLabelState,
-                    this);
+                this);
 
             final List<Term> newPres = Arrays
                     .asList(new Term[] {
-                        tb.apply(
-                                hasHeap ? tb.parallel(
-                                        tb.elementary(tb.var(heapVar),
-                                                origHeapTerm),
-                                        updateWithoutVarsOfInterest)
-                                        : updateWithoutVarsOfInterest,
-                                contract),
+                        tb.apply(hasHeap
+                                ? tb.parallel(
+                                    tb.elementary(tb.var(heapVar),
+                                        origHeapTerm),
+                                    updateWithoutVarsOfInterest)
+                                : updateWithoutVarsOfInterest,
+                            contract),
                         tb.and(updateContent.keySet().stream()
                                 .filter(lhs -> lhs != resultVar)
                                 .filter(lhs -> !lhs.equals(heapVar))
                                 .map(lhs -> tb.equals(tb.var(lhs),
-                                        updateContent.get(lhs)))
+                                    updateContent.get(lhs)))
                                 .collect(Collectors.toList())) });
 
             addFactPreconditions(analysisGoal, newPres, 1, termLabelState,
-                    this);
+                this);
         }
 
         int i = hasResultVar ? 1 : 0;
@@ -175,22 +173,22 @@ public class AnalyzePostCondImpliesMethodEffectsRule
                 final Goal analysisGoal = goalArray[i];
 
                 prepareGoal(pio, analysisGoal, storeEquality, termLabelState,
-                        this);
+                    this);
 
-                final Term update = tb.parallel( //
-                        tb.elementary(tb.var(heapVar), innerHeapTerm), //
-                        updateWithoutVarsOfInterest);
+                final Term update = tb.parallel(//
+                    tb.elementary(tb.var(heapVar), innerHeapTerm), //
+                    updateWithoutVarsOfInterest);
 
                 final List<Term> newPres = Arrays
                         .asList(new Term[] { tb.apply(update, contract),
                             tb.and(updateContent.keySet().stream()
                                     .filter(lhs -> !lhs.equals(heapVar))
                                     .map(lhs -> tb.equals(tb.var(lhs),
-                                            updateContent.get(lhs)))
+                                        updateContent.get(lhs)))
                                     .collect(Collectors.toList())) });
 
                 addFactPreconditions(analysisGoal, newPres, 1, termLabelState,
-                        this);
+                    this);
 
                 i++;
             }
@@ -201,7 +199,7 @@ public class AnalyzePostCondImpliesMethodEffectsRule
         addSETPredicateToAntec(postCondGoal);
 
         postCondGoal.setBranchLabel(
-                AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL);
+            AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL);
 
         return goals;
     }
@@ -237,14 +235,13 @@ public class AnalyzePostCondImpliesMethodEffectsRule
                 && !(f.sub(1).op() instanceof Modality)
                 && !TermBuilder.goBelowUpdates(f).op().equals(Junctor.FALSE)
                 && (!(lsi = retrieveLoopScopeIndex(pio,
-                        goal.proof().getServices()))
-                                .isPresent()
-                        || MergeRuleUtils
-                                .getUpdateRightSideFor(f.sub(0), lsi.get())
-                                .equals(tb.TRUE()))
+                    goal.proof().getServices())).isPresent() || MergeRuleUtils
+                            .getUpdateRightSideFor(f.sub(0), lsi.get())
+                            .equals(tb.TRUE()))
                 && (goal.node().getNodeInfo().getBranchLabel() == null
                         || !goal.node().getNodeInfo().getBranchLabel()
-                                .equals(LoopScopeInvariantRule.INVARIANT_INITIALLY_VALID_BRANCH_LABEL))
+                                .equals(LoopScopeInvariantRule. //
+                                        INVARIANT_INITIALLY_VALID_BRANCH_LABEL))
                 && !AbstractAnalysisRule
                         .alreadyAnalysisGoal(goal.node().parent());
     }

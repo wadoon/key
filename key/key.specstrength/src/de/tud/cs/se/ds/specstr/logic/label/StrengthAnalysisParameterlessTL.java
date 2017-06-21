@@ -18,12 +18,15 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 
 /**
- * TODO
+ * Static {@link TermLabel}s for strength analysis.
  *
  * @author Dominic Steinhöfel
  */
-public class StrengthAnalysisParameterlessTL implements TermLabel {
+public final class StrengthAnalysisParameterlessTL implements TermLabel {
 
+    /**
+     * {@link Name} for {@link #FACT_LABEL}.
+     */
     public static final Name FACT_LABEL_NAME = new Name("fact");
 
     /**
@@ -34,6 +37,9 @@ public class StrengthAnalysisParameterlessTL implements TermLabel {
 
     ///////////////////
 
+    /**
+     * {@link Name} for {@link #FACT_PREMISE_LABEL}.
+     */
     public static final Name FACT_PREMISE_LABEL_NAME = new Name("factPremise");
 
     /**
@@ -45,9 +51,17 @@ public class StrengthAnalysisParameterlessTL implements TermLabel {
 
     ///////////////////
 
+    /**
+     * Delegate {@link ParameterlessTermLabel} object.
+     */
     private ParameterlessTermLabel delegate;
 
-    public StrengthAnalysisParameterlessTL(Name name) {
+    /**
+     * Constructor.
+     *
+     * @param name {@link Name} for the new {@link StrengthAnalysisParameterlessTL}.
+     */
+    private StrengthAnalysisParameterlessTL(Name name) {
         this.delegate = new ParameterlessTermLabel(name);
     }
 

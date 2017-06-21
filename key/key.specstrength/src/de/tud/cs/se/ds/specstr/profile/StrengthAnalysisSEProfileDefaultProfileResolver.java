@@ -17,7 +17,7 @@ import de.uka.ilkd.key.proof.init.DefaultProfileResolver;
 import de.uka.ilkd.key.proof.init.Profile;
 
 /**
- * TODO
+ * The {@link DefaultProfileResolver} for the {@link StrengthAnalysisSEProfile}.
  *
  * @author Dominic Steinhöfel
  */
