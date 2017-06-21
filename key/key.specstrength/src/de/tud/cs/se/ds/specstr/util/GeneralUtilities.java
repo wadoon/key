@@ -26,11 +26,16 @@ import org.apache.logging.log4j.Logger;
  *
  * @author Dominic Steinhöfel
  */
-public class GeneralUtilities {
+public final class GeneralUtilities {
+
+    private GeneralUtilities() {
+        // Hidden constructor -- it's a utility class.
+    }
+
     /**
      * printf-style formats the given {@link String} with the given parameter
      * {@link Object}s. The syntax of {@link Formatter} applies.
-     * 
+     *
      * @param s
      *            The format {@link String}.
      * @param args
@@ -66,7 +71,7 @@ public class GeneralUtilities {
      * Tries to parse a {@link String} to an {@link Integer}; returns an
      * {@link Optional} containing the {@link Integer} in case of success or an
      * empty {@link Optional} otherwise.
-     * 
+     *
      * @param s
      *            The {@link String} to parse.
      * @return An {@link Optional} containing the {@link Integer} in case of
@@ -84,7 +89,7 @@ public class GeneralUtilities {
     /**
      * Logs an error messages and throws a {@link RuntimeException}; the message
      * for the logging and the exception is configured in printf-style.
-     * 
+     *
      * @see #format(String, Object...)
      * @param logger
      *            The {@link Logger} to which to send the message.
@@ -94,6 +99,7 @@ public class GeneralUtilities {
      *            The argument {@link Object}s to insert into the format
      *            {@link String}.
      * @throws RuntimeException
+     *             Always throws a {@link RuntimeException}.
      */
     public static void logErrorAndThrowRTE(Logger logger, String s,
             Object... args) throws RuntimeException {
@@ -103,12 +109,13 @@ public class GeneralUtilities {
     }
 
     /**
-     * Converts the given {@link Iterable} to a {@link Stream}.<br/>
-     * TODO is this method needed? Currently seems to be unused.
-     * 
+     * Converts the given {@link Iterable} to a {@link Stream}.
+     *
      * @param it
      *            The {@link Iterable} to convert to a {@link Stream}.
      * @return The {@link Stream} for the given {@link Iterable}.
+     * @param <T>
+     *            The type of {@link Iterable}.
      */
     public static <T> Stream<T> toStream(Iterable<T> it) {
         return StreamSupport.stream(it.spliterator(), false);

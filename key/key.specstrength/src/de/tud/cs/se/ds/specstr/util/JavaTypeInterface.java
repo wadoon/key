@@ -19,22 +19,28 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 
 /**
- * TODO
+ * An interface to the String designators for Java types.
  *
  * @author Dominic Steinhöfel
  */
-public class JavaTypeInterface {
+public final class JavaTypeInterface {
+
+    private JavaTypeInterface() {
+        // Hidden utility class constructor
+    }
 
     /**
      * Retrieves all {@link KeYJavaType}s declared in the given
      * {@link KeYEnvironment}.
-     * 
+     *
      * @param environment
      *            The {@link KeYEnvironment} to retrieve all declared
      *            {@link KeYJavaType}s from.
@@ -107,13 +113,13 @@ public class JavaTypeInterface {
         // 'D' - double (unsupported)
 
         final String fullName = type.getFullName();
-        
+
         if (fullName.startsWith("[")) {
             // Array type name -- already correct
             // XXX I know this for primitives, what about object types?
             return fullName;
         }
-        
+
         switch (fullName) {
         case "int":
             return "I";
@@ -160,7 +166,7 @@ public class JavaTypeInterface {
      * Returns a {@link String} describing the given {@link IProgramMethod}, of
      * the form:
      * <code>&lt;type&gt;#&lt;methodName&gt;&lt;methodTypeDescriptor&gt;</code>.
-     * 
+     *
      * @param m
      *            The {@link IProgramMethod} for which a descriptor should be
      *            generated.

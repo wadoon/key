@@ -29,6 +29,7 @@ import java.util.stream.StreamSupport;
 import de.tud.cs.se.ds.specstr.logic.label.StrengthAnalysisParameterlessTL;
 import de.tud.cs.se.ds.specstr.rule.AbstractAnalysisRule;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -55,8 +56,9 @@ import de.uka.ilkd.key.proof.init.AbstractOperationPO;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.MiscTools;
@@ -68,15 +70,32 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  *
  * @author Dominic Steinhöfel
  */
-public class LogicUtilities {
+public final class LogicUtilities {
 
     /**
-     * TODO
-     * 
+     * A cache for formulas that are known to originate from a loop invariant.
+     */
+    private static final Set<Term> LOOP_INV_FORMULAS_CACHE = new HashSet<>();
+
+    private LogicUtilities() {
+        // Hidden constructor -- it's a utility class.
+    }
+
+    /**
+     * Extracts the store terms of the heap {@link Term} origHeapTerm and
+     * returns them along with the inner heap {@link Term}, which is a constant
+     * or a heap with a top level anon operation.
+     *
      * @param services
+     *            The {@link Services} object.
      * @param pm
+     *            The {@link IProgramMethod} under investigation -- only used to
+     *            determine whether it's static and we therefore have to do
+     *            anything at all.
      * @param origHeapTerm
-     * @return
+     *            The heap {@link Term} to analyze.
+     * @return A pair of the inner heap in origHeapTerm and the stores around
+     *         the inner heap.
      */
     public static Optional<Pair<Term, List<Term>>> extractStoreEqsAndInnerHeapTerm(
             Services services, final IProgramMethod pm,
@@ -109,8 +128,9 @@ public class LogicUtilities {
                 // indicates that we're not using the strongest possible post
                 // condition.
 
-                storeEqualities.add(tb.equals(tb.select(value.sort(),
-                        tb.getBaseHeap(), targetObj, field), value));
+                storeEqualities.add(tb.equals(
+                    tb.select(value.sort(), tb.getBaseHeap(), targetObj, field),
+                    value));
 
                 currHeapTerm = currHeapTerm.sub(0);
             }
@@ -124,10 +144,13 @@ public class LogicUtilities {
     }
 
     /**
-     * TODO
-     * 
+     * Returns the {@link FunctionalOperationContract} underlying the current
+     * {@link Proof}.
+     *
      * @param services
-     * @return
+     *            The {@link Services} object of the {@link Proof}.
+     * @return The {@link FunctionalOperationContract} underlying the current
+     *         {@link Proof}.
      */
     public static FunctionalOperationContract getFOContract(Services services) {
         final ContractPO contractPO = services.getSpecificationRepository()
@@ -140,11 +163,16 @@ public class LogicUtilities {
     }
 
     /**
-     * TODO
-     * 
+     * Extracts the loop scope index from the given {@link PosInOccurrence}, if
+     * possible; otherwise, returns an empty {@link Optional}.
+     *
      * @param pio
+     *            The {@link PosInOccurrence} that maybe contains a loop scope
+     *            index.
      * @param services
-     * @return
+     *            The {@link Services} object.
+     * @return Maybe a loop scope index, if it can be found.
+     * @see LoopScopeInvariantRule
      */
     public static Optional<LocationVariable> retrieveLoopScopeIndex(
             PosInOccurrence pio, Services services) {
@@ -159,11 +187,11 @@ public class LogicUtilities {
         }
 
         // @formatter:off
-        
+
         // Expected structure:
-        // {U}((x<<loopScopeIndex>> = TRUE  -> ...) & 
+        // {U}((x<<loopScopeIndex>> = TRUE  -> ...) &
         //      x<<loopScopeIndex>> = FALSE -> ...)
-        
+
         // @formatter:on
 
         final Term updateTarget = formula.sub(1);
@@ -183,7 +211,7 @@ public class LogicUtilities {
         if (!(loopScopeVar.op() instanceof LocationVariable)
                 || !loopScopeVar.hasLabels()
                 || loopScopeVar.getLabel(
-                        ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL_NAME) == null
+                    ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL_NAME) == null
                 || loopScopeVar != negatedLoopScopeVar) {
             return failedResult;
         }
@@ -192,31 +220,55 @@ public class LogicUtilities {
     }
 
     /**
-     * TODO
-     * 
+     * @see #prepareGoal(PosInOccurrence, Goal, Term, String, TermLabelState,
+     *      Rule)
+     *
      * @param pio
+     *            The {@link PosInOccurrence} to remove.
      * @param analysisGoal
+     *            The analysis {@link Goal} with which to work.
      * @param fact
+     *            The fact {@link Term} to add.
      * @param termLabelState
+     *            The {@link TermLabelState} for the ongoing rule application.
      * @param rule
+     *            The {@link Rule} of the current rule application; needed for
+     *            the {@link TermLabel} stuff.
      */
     public static void prepareGoal(final PosInOccurrence pio,
             final Goal analysisGoal, final Term fact,
             TermLabelState termLabelState, Rule rule) {
         prepareGoal(pio, analysisGoal, fact,
-                AbstractAnalysisRule.COVERS_FACT_BRANCH_LABEL_PREFIX,
-                termLabelState, rule);
+            AbstractAnalysisRule.COVERS_FACT_BRANCH_LABEL_PREFIX,
+            termLabelState, rule);
     }
 
     /**
-     * TODO
-     * 
+     * Prepares a {@link Goal} for strength analysis:
+     * <ul>
+     * <li>Sets the branch label of the {@link Goal} according to the given fact
+     * {@link Term}</li>
+     * <li>Removes the given {@link PosInOccurrence} from the
+     * {@link Sequent}</li>
+     * <li>Adds the fact {@link Term} to the succedent</li>
+     * <li>Adds a {@link StrengthAnalysisParameterlessTL#FACT_LABEL}
+     * {@link TermLabel} to the fact {@link Term}</li>
+     * </ul>
+     *
      * @param pio
+     *            The {@link PosInOccurrence} to remove.
      * @param analysisGoal
+     *            The analysis {@link Goal} with which to work.
      * @param fact
+     *            The fact {@link Term} to add.
      * @param descr
+     *            The prefix description for the branch label, e.g. "Covers
+     *            fact" or whatever.
      * @param termLabelState
+     *            The {@link TermLabelState} for the ongoing rule application.
      * @param rule
+     *            The {@link Rule} of the current rule application; needed for
+     *            the {@link TermLabel} stuff.
      */
     public static void prepareGoal(final PosInOccurrence pio,
             final Goal analysisGoal, final Term fact, final String descr,
@@ -224,60 +276,75 @@ public class LogicUtilities {
         final Services services = analysisGoal.proof().getServices();
 
         analysisGoal.setBranchLabel(String.format("%s \"%s\"", descr,
-                LogicPrinter
-                        .quickPrintTerm(TermBuilder.goBelowUpdates(fact),
-                                services)
-                        .replaceAll("(\\r|\\n|\\r\\n)+", "")
-                        .replaceAll("<<[^>]+>>", "").trim()));
+            LogicPrinter
+                    .quickPrintTerm(TermBuilder.goBelowUpdates(fact), services)
+                    .replaceAll("(\\r|\\n|\\r\\n)+", "")
+                    .replaceAll("<<[^>]+>>", "").trim()));
 
         analysisGoal.removeFormula(pio);
 
         Term newFormula = services.getTermBuilder().label(fact,
-                StrengthAnalysisParameterlessTL.FACT_LABEL);
+            StrengthAnalysisParameterlessTL.FACT_LABEL);
         newFormula = TermLabelManager.refactorTerm(termLabelState, services,
-                null, newFormula, rule, analysisGoal,
-                AbstractAnalysisRule.FACT_HINT, null);
+            null, newFormula, rule, analysisGoal,
+            AbstractAnalysisRule.FACT_HINT, null);
 
         analysisGoal.addFormula(new SequentFormula(newFormula), false, true);
     }
 
     /**
-     * TODO
-     * 
+     * Adds a precondition for a fact to the given {@link Goal}.
+     *
      * @param analysisGoal
+     *            The {@link Goal} to work with.
      * @param t
+     *            The fact {@link Term} to add.
      * @param addFactPremiseLabel
+     *            Signals whether the
+     *            {@link StrengthAnalysisParameterlessTL#FACT_PREMISE_LABEL}
+     *            should be added to t.
      * @param termLabelState
+     *            The {@link TermLabelState} for the ongoing rule application.
      * @param rule
+     *            The {@link Rule} of the current rule application; needed for
+     *            the {@link TermLabel} stuff.
      */
     public static void addFactPrecondition(Goal analysisGoal, Term t,
             boolean addFactPremiseLabel, TermLabelState termLabelState,
             Rule rule) {
         Term newFormula = addFactPremiseLabel
                 ? analysisGoal.proof().getServices().getTermBuilder().label(t,
-                        StrengthAnalysisParameterlessTL.FACT_PREMISE_LABEL)
+                    StrengthAnalysisParameterlessTL.FACT_PREMISE_LABEL)
                 : t;
         newFormula = TermLabelManager.refactorTerm(termLabelState,
-                analysisGoal.proof().getServices(), null, newFormula, rule,
-                analysisGoal, AbstractAnalysisRule.FACT_PREMISE_HINT, null);
+            analysisGoal.proof().getServices(), null, newFormula, rule,
+            analysisGoal, AbstractAnalysisRule.FACT_PREMISE_HINT, null);
 
         analysisGoal.addFormula(new SequentFormula(newFormula), true, false);
     }
 
     /**
-     * TODO
-     * 
+     * Adds the given {@link Iterable} of premise {@link Term}s to the succedent
+     * of the given {@link Goal}; labels those from index <code>0</code> to
+     * <code>numFactsWithPremiseLabels - 1</code> with
+     * {@link StrengthAnalysisParameterlessTL#FACT_PREMISE_LABEL}.
+     *
      * @param analysisGoal
+     *            The {@link Goal} to work with.
      * @param terms
+     *            The premises to add.
      * @param numFactsWithPremiseLabels
      *            All facts from index <code>0</code> to
      *            <code>numFactsWithPremiseLabels - 1</code> will be labeled
      *            with
      *            {@link StrengthAnalysisParameterlessTL#FACT_PREMISE_LABEL}
      * @param termLabelState
+     *            The {@link TermLabelState} for the ongoing rule application.
      * @param rule
+     *            The {@link Rule} of the current rule application; needed for
+     *            the {@link TermLabel} stuff.
      */
-    public static void addFactPreconditions( //
+    public static void addFactPreconditions(//
             Goal analysisGoal, Iterable<Term> terms,
             int numFactsWithPremiseLabels, TermLabelState termLabelState,
             Rule rule) {
@@ -285,19 +352,291 @@ public class LogicUtilities {
         int i = 0;
         for (Term term : terms) {
             addFactPrecondition(analysisGoal, term,
-                    i < numFactsWithPremiseLabels, termLabelState, rule);
+                i < numFactsWithPremiseLabels, termLabelState, rule);
             i++;
         }
     }
 
     /**
-     * TODO
-     * 
+     * Recursively tries to find the origin of the given formula {@link Term} by
+     * getting the oldest {@link FormulaTermLabel} and finding the origin of
+     * that.
+     *
      * @param analysisGoal
-     * @param label
+     *            The {@link Goal} to start with.
+     * @param formula
+     *            The formula {@link Term} the origin of which is being looked
+     *            for.
+     * @return The {@link OriginOfFormula} for the given formula {@link Term}.
      */
-    public static OriginOfFormula findOriginOfTermLabel(final Goal analysisGoal,
-            final FormulaTermLabel label) {
+    public static OriginOfFormula findOriginOfFormula(final Goal analysisGoal,
+            final Term formula) {
+        // First, retrieve all FormulaTermLabels
+        final List<FormulaTermLabel> formulaTermLabels = //
+                termLabelsOfType(formula, FormulaTermLabel.class);
+
+        assert formulaTermLabels.size() > 0 : //
+        "There should be <<F>> term labels in the invariant term";
+
+        // Get the smallest term label, this should identify the origin
+        Collections.sort(formulaTermLabels, (l1, l2) -> {
+            if (l1.equals(l2)) {
+                return 0;
+            }
+
+            final List<String> idsInFirst = getIDsOfFormulaTermLabel(l1);
+            final List<String> idsInSecond = getIDsOfFormulaTermLabel(l2);
+            final List<String> both = new ArrayList<>(idsInFirst);
+            both.addAll(idsInSecond);
+            Collections.sort(both);
+
+            final String smallest = both.get(0);
+            final int posResult = Integer.parseInt(smallest.split("\\.")[0]);
+            if (idsInFirst.contains(smallest)) {
+                return -posResult;
+            } else {
+                return posResult;
+            }
+        });
+        final FormulaTermLabel smallest = formulaTermLabels.get(0);
+
+        return findOriginOfTermLabel(analysisGoal, smallest);
+    }
+
+    /**
+     * Extracts the open {@link Node}s that have a modality in the succedent
+     * from the subtree of the given {@link Node}.
+     *
+     * @param node
+     *            The root of the subtree to search.
+     * @return The open {@link Node}s in the subtree of node that have a
+     *         modality in the succedent.
+     */
+    public static List<Node> extractOpenNodesWithModality(Node node) {
+        return GeneralUtilities.toStream(node.proof().getSubtreeGoals(node))
+                .map(g -> g.node())
+                .filter(n -> GeneralUtilities.toStream(n.sequent().succedent())
+                        .anyMatch(
+                            f -> f.formula().containsJavaBlockRecursive()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Removes the formulas from the antecedent of the given {@link Goal} which
+     * are there because of the loop invariant.
+     *
+     * @param analysisGoal
+     *            The {@link Goal} to remove loop invariant formulas form.
+     */
+    public static void removeLoopInvFormulasFromAntec(final Goal analysisGoal) {
+        // We remove all partially instantiated no pos taclets, such as
+        // replaceKnownAuxiliaryConstant, since otherwise, there could be
+        // invariant formulas contained.
+
+        // TODO: This can be refined, such as inserting all things that taclets
+        // can insert and using the remaining procedure below to get rid of
+        // invariant formulas.
+
+        analysisGoal.indexOfTaclets().removeTaclets(
+            analysisGoal.indexOfTaclets().getPartialInstantiatedApps());
+
+        for (SequentFormula sf : analysisGoal.sequent().antecedent()) {
+            boolean remove = LOOP_INV_FORMULAS_CACHE.contains(sf.formula());
+
+            if (!remove && sf.formula().hasLabels()) {
+                // Find origin of this label
+                final OriginOfFormula origin = //
+                        findOriginOfFormula(analysisGoal, sf.formula());
+
+                if (origin.getNode().parent()
+                        .getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
+                    remove = true;
+                    LOOP_INV_FORMULAS_CACHE.add(sf.formula());
+                }
+            }
+
+            if (remove) {
+                analysisGoal.removeFormula(
+                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true));
+            }
+        }
+    }
+
+    /**
+     * Adds the SE predicate to the antecedent of the given {@link Goal} such
+     * that it can be closed even with the SE predicate present in the
+     * succedent.
+     *
+     * @param goal
+     *            The {@link Goal} to add the SE predicate to.
+     */
+    public static void addSETPredicateToAntec(final Goal goal) {
+        final Optional<Pair<SequentFormula, Term>> maybeSETPredicate = //
+                Stream.concat(
+                    GeneralUtilities.toStream(goal.sequent().succedent()),
+                    GeneralUtilities.toStream(goal.sequent().antecedent()))
+                        .map(sf -> {
+                            SETPredVisitor v = new SETPredVisitor();
+                            sf.formula().execPostOrder(v);
+                            return new Pair<SequentFormula, Term>(sf,
+                                v.getSetPredTerm());
+                        }).filter(p -> p.second != null).findAny();
+
+        if (!maybeSETPredicate.isPresent()) {
+            // There are easy goals where the post condition is just "false", so
+            // that should be OK
+            return;
+        }
+
+        Term newFormula = maybeSETPredicate.get().second;
+        final Term seqFor = maybeSETPredicate.get().first.formula();
+        final List<Term> updates = getUpdates(seqFor);
+        for (int i = updates.size() - 1; i >= 0; i--) {
+            newFormula = goal.proof().getServices().getTermBuilder()
+                    .apply(updates.get(i), newFormula);
+        }
+
+        goal.addFormula(new SequentFormula(newFormula), true, false);
+    }
+
+    /**
+     * Returns the list of updates in the {@link Term} t. t has to be an udpate
+     * application.
+     *
+     * @param t
+     *            The {@link UpdateApplication} {@link Term} to return the list
+     *            of update terms for.
+     * @return The list of updates in the {@link Term} t.
+     */
+    public static List<Term> getUpdates(Term t) {
+        assert t.op() instanceof UpdateApplication : //
+        "Can only extract updates from update apps, got: " + t.op();
+
+        final List<Term> result = new ArrayList<>();
+        while (t.op() instanceof UpdateApplication) {
+            result.add(t.sub(0));
+            t = t.sub(1);
+        }
+
+        return result;
+    }
+
+    /**
+     * Performs update simplification via {@link OneStepSimplifier} on the given
+     * {@link Node}.
+     *
+     * @param n
+     *            The {@link Node} to simplify updates in.
+     * @return The resulting node.
+     */
+    public static Node quickSimplifyUpdates(final Node n) {
+        final Proof proof = n.proof();
+        final Services services = proof.getServices();
+
+        List<SequentFormula> seqForsWithUpdate = GeneralUtilities
+                .toStream(n.sequent())
+                .filter(f -> f.formula().op() instanceof UpdateApplication)
+                .collect(Collectors.toList());
+
+        for (SequentFormula sf : seqForsWithUpdate) {
+            proof.getSubtreeGoals(n).head().apply(
+                MiscTools.findOneStepSimplifier(proof)
+                        .createApp(findInSequent(sf, n.sequent()), services));
+        }
+
+        final Node newNode = proof.getSubtreeGoals(n).head().node();
+        return newNode;
+    }
+
+    /**
+     * Transforms an update to a {@link Map} from left-hand-sides to
+     * right-hand-sides.
+     *
+     * @param updateTerm
+     *            The {@link Term} to transform.
+     * @return A {@link Map} from update left-hand-sides to right-hand-sides.
+     */
+    public static Map<LocationVariable, Term> updateToMap(
+            final Term updateTerm) {
+        final Map<LocationVariable, Term> updateContent = StreamSupport.stream(//
+            MergeRuleUtils.getUpdateLeftSideLocations(updateTerm).spliterator(),
+            true).collect(Collectors.toMap(lhs -> lhs,
+                lhs -> MergeRuleUtils.getUpdateRightSideFor(updateTerm, lhs),
+                (u, v) -> {
+                    throw new IllegalStateException(
+                        String.format("Duplicate key %s", u));
+                }, LinkedHashMap::new));
+        return updateContent;
+    }
+
+    private static PosInOccurrence findInSequent(SequentFormula sf,
+            Sequent seq) {
+        for (SequentFormula otherSf : seq.antecedent()) {
+            if (otherSf.formula().equals(sf.formula())) {
+                return new PosInOccurrence(sf, PosInTerm.getTopLevel(), true);
+            }
+        }
+
+        for (SequentFormula otherSf : seq.succedent()) {
+            if (otherSf.formula().equals(sf.formula())) {
+                return new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
+            }
+        }
+
+        return null;
+    }
+
+    private static <L extends TermLabel> List<L> termLabelsOfType(
+            final Term formula, Class<L> wanted) {
+        final List<L> labels = new ArrayList<L>();
+
+        formula.execPreOrder(new DefaultVisitor() {
+            @Override
+            public void visit(Term visited) {
+                if (visited.hasLabels()) {
+                    labels.addAll(GeneralUtilities.toStream(visited.getLabels())
+                            .filter(l -> wanted.isInstance(l))
+                            .map(l -> wanted.cast(l))
+                            .collect(Collectors.toList()));
+                }
+            }
+        });
+
+        return labels;
+    }
+
+    private static Set<String> formulaTermLabelIDsDeep(Term t) {
+        final Set<String> termLabelIDsInSeqFor = new LinkedHashSet<String>();
+
+        t.execPreOrder(new DefaultVisitor() {
+            @Override
+            public void visit(Term visited) {
+                if (visited.hasLabels()) {
+                    termLabelIDsInSeqFor.addAll(formulaTermLabelIDs(visited));
+                }
+            }
+        });
+
+        return termLabelIDsInSeqFor;
+    }
+
+    /**
+     * Recursively tries to find the origin of the given
+     * {@link FormulaTermLabel}.
+     *
+     * @param analysisGoal
+     *            The {@link Goal} to start with.
+     * @param label
+     *            The {@link FormulaTermLabel} the origin of which is being
+     *            looked for.
+     * @return An {@link OriginOfFormula} for the given
+     *         {@link FormulaTermLabel}; elements of this object might be null
+     *         if the origin is not found, which however should not happen if
+     *         the given {@link Goal} is a sensible choice (i.e., the origin is
+     *         in the tree above the {@link Goal}).
+     */
+    private static OriginOfFormula findOriginOfTermLabel(
+            final Goal analysisGoal, final FormulaTermLabel label) {
         Node currNode = analysisGoal.node();
         SequentFormula originForm = null;
 
@@ -336,87 +675,6 @@ public class LogicUtilities {
         return new OriginOfFormula(currNode, originForm);
     }
 
-    public static OriginOfFormula findOriginOfFormula(final Goal analysisGoal,
-            final Term formula) {
-        // First, retrieve all FormulaTermLabels
-        final List<FormulaTermLabel> formulaTermLabels = //
-                termLabelsOfType(formula, FormulaTermLabel.class);
-
-        assert formulaTermLabels.size() > 0 : //
-        "There should be <<F>> term labels in the invariant term";
-
-        // Get the smallest term label, this should identify the origin
-        Collections.sort(formulaTermLabels, (l1, l2) -> {
-            if (l1.equals(l2)) {
-                return 0;
-            }
-
-            final List<String> idsInFirst = getIDsOfFormulaTermLabel(l1);
-            final List<String> idsInSecond = getIDsOfFormulaTermLabel(l2);
-            final List<String> both = new ArrayList<>(idsInFirst);
-            both.addAll(idsInSecond);
-            Collections.sort(both);
-
-            final String smallest = both.get(0);
-            final int posResult = Integer.parseInt(smallest.split("\\.")[0]);
-            if (idsInFirst.contains(smallest)) {
-                return -posResult;
-            } else {
-                return posResult;
-            }
-        });
-        final FormulaTermLabel smallest = formulaTermLabels.get(0);
-
-        return findOriginOfTermLabel(analysisGoal, smallest);
-    }
-
-    /**
-     * TODO Comment.
-     *
-     * @param formula
-     * @param wanted
-     * @return
-     */
-    public static <L extends TermLabel> List<L> termLabelsOfType(
-            final Term formula, Class<L> wanted) {
-        final List<L> labels = new ArrayList<L>();
-
-        formula.execPreOrder(new DefaultVisitor() {
-            @Override
-            public void visit(Term visited) {
-                if (visited.hasLabels()) {
-                    labels.addAll(GeneralUtilities.toStream(visited.getLabels())
-                            .filter(l -> wanted.isInstance(l))
-                            .map(l -> wanted.cast(l))
-                            .collect(Collectors.toList()));
-                }
-            }
-        });
-
-        return labels;
-    }
-
-    /**
-     * TODO
-     * 
-     * @param t
-     * @return
-     */
-    private static Set<String> formulaTermLabelIDsDeep(Term t) {
-        final Set<String> termLabelIDsInSeqFor = new LinkedHashSet<String>();
-
-        t.execPreOrder(new DefaultVisitor() {
-            @Override
-            public void visit(Term visited) {
-                if (visited.hasLabels()) {
-                    termLabelIDsInSeqFor.addAll(formulaTermLabelIDs(visited));
-                }
-            }
-        });
-
-        return termLabelIDsInSeqFor;
-    }
-
     private static List<String> formulaTermLabelIDs(Term t) {
         final List<String> result = new ArrayList<>();
 
@@ -436,130 +694,36 @@ public class LogicUtilities {
 
         result.add(l.getId());
         result.addAll(
-                Arrays.stream(l.getBeforeIds()).collect(Collectors.toList()));
+            Arrays.stream(l.getBeforeIds()).collect(Collectors.toList()));
 
         return result;
     }
 
     /**
-     * TODO
-     * 
-     * @param node
-     * @return
-     */
-    public static List<Node> extractOpenNodesWithModality(Node node) {
-        return GeneralUtilities.toStream(node.proof().getSubtreeGoals(node))
-                .map(g -> g.node())
-                .filter(n -> GeneralUtilities.toStream(n.sequent().succedent())
-                        .anyMatch(
-                                f -> f.formula().containsJavaBlockRecursive()))
-                .collect(Collectors.toList());
-    }
-
-    private static final Set<Term> LOOP_INV_FORMULAS_CACHE = new HashSet<>();
-
-    /**
-     * TODO
-     * 
-     * @param analysisGoal
-     */
-    public static void removeLoopInvFormulasFromAntec(final Goal analysisGoal) {
-        // We remove all partially instantiated no pos taclets, such as
-        // replaceKnownAuxiliaryConstant, since otherwise, there could be
-        // invariant formulas contained.
-
-        // TODO: This can be refined, such as inserting all things that taclets
-        // can insert and using the remaining procedure below to get rid of
-        // invariant formulas.
-
-        analysisGoal.indexOfTaclets().removeTaclets(
-                analysisGoal.indexOfTaclets().getPartialInstantiatedApps());
-
-        for (SequentFormula sf : analysisGoal.sequent().antecedent()) {
-            boolean remove = LOOP_INV_FORMULAS_CACHE.contains(sf.formula());
-
-            if (!remove && sf.formula().hasLabels()) {
-                // Find origin of this label
-                final OriginOfFormula origin = //
-                        findOriginOfFormula(analysisGoal, sf.formula());
-
-                if (origin.getNode().parent()
-                        .getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
-                    remove = true;
-                    LOOP_INV_FORMULAS_CACHE.add(sf.formula());
-                }
-            }
-
-            if (remove) {
-                analysisGoal.removeFormula(
-                        new PosInOccurrence(sf, PosInTerm.getTopLevel(), true));
-            }
-        }
-    }
-
-    /**
-     * TODO
-     * 
-     * @param tb
-     * @param goal
-     */
-    public static void addSETPredicateToAntec(final Goal goal) {
-        final Optional<Pair<SequentFormula, Term>> maybeSETPredicate = //
-                Stream.concat(
-                        GeneralUtilities.toStream(goal.sequent().succedent()),
-                        GeneralUtilities.toStream(goal.sequent().antecedent()))
-                        .map(sf -> {
-                            SETPredVisitor v = new SETPredVisitor();
-                            sf.formula().execPostOrder(v);
-                            return new Pair<SequentFormula, Term>(sf,
-                                    v.getSetPredTerm());
-                        }).filter(p -> p.second != null).findAny();
-
-        if (!maybeSETPredicate.isPresent()) {
-            // There are easy goals where the post condition is just "false", so
-            // that should be OK
-            return;
-        }
-
-        Term newFormula = maybeSETPredicate.get().second;
-        final Term seqFor = maybeSETPredicate.get().first.formula();
-        final List<Term> updates = getUpdates(seqFor);
-        for (int i = updates.size() - 1; i >= 0; i--) {
-            newFormula = goal.proof().getServices().getTermBuilder()
-                    .apply(updates.get(i), newFormula);
-        }
-
-        goal.addFormula(new SequentFormula(newFormula), true, false);
-    }
-
-    /**
-     * TODO Comment.
-     *
-     * @param t
-     * @return
-     */
-    public static List<Term> getUpdates(Term t) {
-        assert t.op() instanceof UpdateApplication : //
-        "Can only extract updates from update apps, got: " + t.op();
-
-        final List<Term> result = new ArrayList<>();
-        while (t.op() instanceof UpdateApplication) {
-            result.add(t.sub(0));
-            t = t.sub(1);
-        }
-
-        return result;
-    }
-
-    /**
-     * TODO
+     * Determines the origin of a {@link SequentFormula} in terms of a
+     * {@link Node} and the original {@link SequentFormula}.
      *
      * @author Dominic Steinhöfel
      */
     public static class OriginOfFormula {
+        /**
+         * The origin {@link Node}.
+         */
         private final Node node;
+
+        /**
+         * The original {@link SequentFormula}.
+         */
         private final SequentFormula seqFor;
 
+        /**
+         * Constructor.
+         *
+         * @param node
+         *            See {@link #node}.
+         * @param seqFor
+         *            See {@link #seqFor}.
+         */
         public OriginOfFormula(Node node, SequentFormula seqFor) {
             this.node = node;
             this.seqFor = seqFor;
@@ -574,13 +738,16 @@ public class LogicUtilities {
         }
     }
 
-    public static class SETPredVisitor extends DefaultVisitor {
-        private static final String SET_ACCUMULATE = AbstractOperationPO.UNINTERPRETED_PREDICATE_NAME;
+    private static class SETPredVisitor extends DefaultVisitor {
+        /**
+         * The result of the {@link Visitor} execution.
+         */
         private Term setPredTerm = null;
 
         @Override
         public void visit(Term visited) {
-            if (visited.op().name().toString().equals(SET_ACCUMULATE)) {
+            if (visited.op().name().toString()
+                    .equals(AbstractOperationPO.UNINTERPRETED_PREDICATE_NAME)) {
                 setPredTerm = visited;
             }
         }
@@ -588,93 +755,6 @@ public class LogicUtilities {
         public Term getSetPredTerm() {
             return setPredTerm;
         }
-    }
-
-    /**
-     * TODO
-     * 
-     * @param sf
-     * @param seq
-     * @return
-     */
-    public static PosInOccurrence findInSequent(SequentFormula sf,
-            Sequent seq) {
-        for (SequentFormula otherSf : seq.antecedent()) {
-            if (otherSf.formula().equals(sf.formula())) {
-                return new PosInOccurrence(sf, PosInTerm.getTopLevel(), true);
-            }
-        }
-
-        for (SequentFormula otherSf : seq.succedent()) {
-            if (otherSf.formula().equals(sf.formula())) {
-                return new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * TODO Comment.
-     *
-     * @param of
-     *            Must not be a leaf.
-     * @param app
-     * @return
-     */
-    public static Node getAncestorWithRuleApp(Node of,
-            Class<? extends RuleApp> app) {
-        while (!of.root() && !of.getAppliedRuleApp().getClass().equals(app)) {
-            of = of.parent();
-        }
-
-        return of.getAppliedRuleApp().getClass().equals(app) ? of : null;
-    }
-
-    /**
-     * TODO Comment.
-     * 
-     * @param n
-     *
-     * @return
-     */
-    public static Node quickSimplifyUpdates(final Node n) {
-        final Proof proof = n.proof();
-        final Services services = proof.getServices();
-
-        List<SequentFormula> seqForsWithUpdate = GeneralUtilities
-                .toStream(n.sequent())
-                .filter(f -> f.formula().op() instanceof UpdateApplication)
-                .collect(Collectors.toList());
-
-        for (SequentFormula sf : seqForsWithUpdate) {
-            proof.getSubtreeGoals(n).head()
-                    .apply(MiscTools.findOneStepSimplifier(proof).createApp(
-                            findInSequent(sf, n.sequent()), services));
-        }
-
-        final Node newNode = proof.getSubtreeGoals(n).head().node();
-        return newNode;
-    }
-
-    /**
-     * Transforms an update to a {@link Map} from left-hand-sides to
-     * right-hand-sides.
-     *
-     * @param updateTerm
-     *            The {@link Term} to transform.
-     * @return A {@link Map} from update left-hand-sides to right-hand-sides.
-     */
-    public static Map<LocationVariable, Term> updateToMap(final Term updateTerm) {
-        final Map<LocationVariable, Term> updateContent = StreamSupport.stream(//
-            MergeRuleUtils.getUpdateLeftSideLocations(updateTerm).spliterator(),
-            true).collect(Collectors.toMap(lhs -> lhs,
-                lhs -> MergeRuleUtils.getUpdateRightSideFor(updateTerm, lhs),
-                (u, v) -> {
-                    throw new IllegalStateException(
-                        String.format("Duplicate key %s", u));
-                }, LinkedHashMap::new));
-        return updateContent;
     }
 
 }
