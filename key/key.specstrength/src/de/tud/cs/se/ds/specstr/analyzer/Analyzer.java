@@ -145,8 +145,8 @@ public class Analyzer {
             this.seIf = new SymbExInterface(file);
         } catch (ProblemLoaderException e) {
             GeneralUtilities.logErrorAndThrowRTE(LOGGER,
-                    "ProblemLoaderException occurred while loading file %s\nMessage:\n%s",
-                    file.getName(), e.getMessage());
+                "ProblemLoaderException occurred while loading file %s\nMessage:\n%s",
+                file.getName(), e.getMessage());
         }
         this.outProofFile = outProofFile;
     }
@@ -165,7 +165,7 @@ public class Analyzer {
         final ProgramMethod method = findMethod();
 
         LOGGER.info("Analyzing method %s::%s%s", className, methodName,
-                methodTypeStr);
+            methodTypeStr);
 
         // Finish symbolic execution
         seIf.finishSEForMethod(method);
@@ -185,14 +185,14 @@ public class Analyzer {
             final List<Node> preservedNodes = new ArrayList<>();
 
             extractPreservedAndUseCaseNodes(proof, preservedNodes,
-                    postConditionNodes);
+                postConditionNodes);
 
             // Loop facts
             unclosedLoopInvPreservedGoals = //
                     extractLoopBodyFactsAndShowValidity(//
-                            proof, preservedNodes, facts);
+                        proof, preservedNodes, facts);
             extractUseCaseFacts(//
-                    proof, postConditionNodes, facts);
+                proof, postConditionNodes, facts);
         } else {
             // Post condition facts
             extractPostCondFacts(proof, facts);
@@ -207,7 +207,7 @@ public class Analyzer {
         List<Fact> unCoveredFacts = new ArrayList<>();
 
         analyzeFacts(facts, coveredFacts, abstractlyCoveredFacts,
-                unCoveredFacts);
+            unCoveredFacts);
 
         LOGGER.trace("Done proving facts.");
 
@@ -226,15 +226,15 @@ public class Analyzer {
                 proof.saveToFile(outProofFile.get());
             } catch (IOException e) {
                 LOGGER.error("Problem writing proof to file %s, message:\n%s",
-                        outProofFile.get(), e.getMessage());
+                    outProofFile.get(), e.getMessage());
             }
         }
 
         LOGGER.trace("Finished analysis of Java file %s", file);
 
         return new AnalyzerResult(coveredFacts, abstractlyCoveredFacts,
-                unCoveredFacts, problematicExceptions,
-                unclosedLoopInvPreservedGoals);
+            unCoveredFacts, problematicExceptions,
+            unclosedLoopInvPreservedGoals);
     }
 
     /**
@@ -271,7 +271,7 @@ public class Analyzer {
                 boolean abstractlyCovered = false;
                 if (abstractlyCoveredNode != null) {
                     seIf.applyMacro(new TryCloseMacro(10000),
-                            abstractlyCoveredNode);
+                        abstractlyCoveredNode);
                     abstractlyCovered = abstractlyCoveredNode.isClosed();
                 }
 
@@ -298,7 +298,7 @@ public class Analyzer {
      */
     private boolean proofHasLoopInvApp(final Proof proof) {
         final RuleAppVisitor ruleAppVisitor = new RuleAppVisitor(
-                LoopInvariantBuiltInRuleApp.class);
+            LoopInvariantBuiltInRuleApp.class);
         proof.breadthFirstSearch(proof.root(), ruleAppVisitor);
 
         return ruleAppVisitor.success();
@@ -326,18 +326,17 @@ public class Analyzer {
         final List<Node> exceptionNodes = GeneralUtilities
                 .toStream(proof.openGoals()).map(g -> g.node())
                 .filter(n -> n.getNodeInfo().getBranchLabel() != null
-                        && Arrays.stream(exceptionBranchLabels)
-                                .anyMatch(s -> n.getNodeInfo().getBranchLabel()
-                                        .contains(s)))
+                        && Arrays.stream(exceptionBranchLabels).anyMatch(
+                            s -> n.getNodeInfo().getBranchLabel().contains(s)))
                 .collect(Collectors.toList());
 
         for (final Node excNode : exceptionNodes) {
             LOGGER.trace("Checking exception node \"%s\"",
-                    excNode.getNodeInfo().getBranchLabel());
+                excNode.getNodeInfo().getBranchLabel());
             seIf.applyMacro(new TryCloseMacro(), excNode);
             if (!excNode.isClosed()) {
-                unclosedExceptions.add(new ExceptionResult(
-                        excNode.getNodeInfo().getBranchLabel(),
+                unclosedExceptions.add(
+                    new ExceptionResult(excNode.getNodeInfo().getBranchLabel(),
                         extractReadablePathCondition(excNode)));
             }
         }
@@ -364,11 +363,11 @@ public class Analyzer {
         final Services services = proof.getServices();
 
         useCaseNodes.removeIf(n -> !n.getNodeInfo().getBranchLabel().equals(
-                AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL));
+            AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL));
 
         for (final Node n : useCaseNodes) {
             final String readablePathCond = extractReadablePathCondition(
-                    n.parent());
+                n.parent());
 
             final Node newNode = LogicUtilities.quickSimplifyUpdates(n);
 
@@ -379,14 +378,14 @@ public class Analyzer {
             final List<Node> factNodes = GeneralUtilities
                     .toStream(proof.getGoal(newNode)
                             .apply(AnalyzeUseCaseRule.INSTANCE.createApp(
-                                    maybePioOfApplySeqFor.get(), services)))
+                                maybePioOfApplySeqFor.get(), services)))
                     .map(g -> g.node()).collect(Collectors.toList());
 
             for (final Node factNode : factNodes) {
                 final Iterable<Node> factAnalysisNodes = //
                         GeneralUtilities.toStream(proof.getGoal(factNode)
                                 .apply(FactAnalysisRule.INSTANCE.createApp(null,
-                                        proof.getServices())))
+                                    proof.getServices())))
                                 .map(g -> g.node())
                                 .collect(Collectors.toList());
 
@@ -398,11 +397,10 @@ public class Analyzer {
                 final String branchLabel = factNode.getNodeInfo()
                         .getBranchLabel();
 
-                facts.add(
-                        new Fact(branchLabel.split("\"")[1], readablePathCond,
-                                FactType.LOOP_USE_CASE_FACT, FactAnalysisRule
-                                        .getFactCoveredNode(factAnalysisNodes),
-                                null));
+                facts.add(new Fact(branchLabel.split("\"")[1], readablePathCond,
+                    FactType.LOOP_USE_CASE_FACT,
+                    FactAnalysisRule.getFactCoveredNode(factAnalysisNodes),
+                    null));
             }
         }
     }
@@ -429,25 +427,25 @@ public class Analyzer {
             }
 
             if (!AnalyzePostCondImpliesMethodEffectsRule.INSTANCE.isApplicable(//
-                    g, maybePio.get())) {
+                g, maybePio.get())) {
                 continue;
             }
 
             final Iterable<Node> analysisNodes = //
                     GeneralUtilities
-                            .toStream(
-                                    g.apply(AnalyzePostCondImpliesMethodEffectsRule.INSTANCE
-                                            .createApp(maybePio.get(),
-                                                    proof.getServices())))
+                            .toStream(g.apply(
+                                AnalyzePostCondImpliesMethodEffectsRule.INSTANCE
+                                        .createApp(maybePio.get(),
+                                            proof.getServices())))
                             .map(goal -> goal.node())
                             .collect(Collectors.toList());
 
             for (Node analysisNode : analysisNodes) {
                 if (!analysisNode.getNodeInfo().getBranchLabel().equals(
-                        AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL)) {
+                    AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL)) {
 
                     final String readablePathCond = extractReadablePathCondition(
-                            analysisNode.parent());
+                        analysisNode.parent());
                     final String branchLabel = analysisNode.getNodeInfo()
                             .getBranchLabel();
 
@@ -456,16 +454,15 @@ public class Analyzer {
                                     .toStream(proof.getGoal(analysisNode)
                                             .apply(FactAnalysisRule.INSTANCE
                                                     .createApp(null,
-                                                            proof.getServices())))
+                                                        proof.getServices())))
                                     .map(_g -> _g.node())
                                     .collect(Collectors.toList());
 
                     facts.add(new Fact(branchLabel.split("\"")[1],
-                            readablePathCond, FactType.POST_COND_FACT,
-                            FactAnalysisRule
-                                    .getFactCoveredNode(factAnalysisNodes),
-                            FactAnalysisRule.getFactAbstractlyCoveredNode(
-                                    factAnalysisNodes)));
+                        readablePathCond, FactType.POST_COND_FACT,
+                        FactAnalysisRule.getFactCoveredNode(factAnalysisNodes),
+                        FactAnalysisRule.getFactAbstractlyCoveredNode(
+                            factAnalysisNodes)));
                 }
             }
         }
@@ -493,7 +490,7 @@ public class Analyzer {
 
         for (Node preservedNode : preservedNodes) {
             final Optional<PosInOccurrence> proofOblPio = getPioOfFormulaWhichHadSELabel(
-                    preservedNode);
+                preservedNode);
 
             assert proofOblPio
                     .isPresent() : "There should be a formula with SE label";
@@ -507,20 +504,20 @@ public class Analyzer {
 
             final List<Node> analysisNodes = GeneralUtilities
                     .toStream(analysisNodesImmList).map(goal -> goal.node())
-                    .filter(n -> !n.getNodeInfo().getBranchLabel()
-                            .equals(AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL))
+                    .filter(n -> !n.getNodeInfo().getBranchLabel().equals(
+                        AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL))
                     .collect(Collectors.toList());
 
             for (Node analysisNode : analysisNodes) {
                 final String branchLabel = analysisNode.getNodeInfo()
                         .getBranchLabel();
                 final String readablePathCondition = extractReadablePathCondition(
-                        analysisNode.parent());
+                    analysisNode.parent());
 
                 final Iterable<Node> factAnalysisNodes = //
                         GeneralUtilities.toStream(proof.getGoal(analysisNode)
                                 .apply(FactAnalysisRule.INSTANCE.createApp(null,
-                                        proof.getServices())))
+                                    proof.getServices())))
                                 .map(g -> g.node())
                                 .collect(Collectors.toList());
 
@@ -530,17 +527,17 @@ public class Analyzer {
                 }
 
                 facts.add(new Fact(branchLabel.split("\"")[1],
-                        readablePathCondition, FactType.LOOP_BODY_FACT,
-                        FactAnalysisRule.getFactCoveredNode(factAnalysisNodes),
-                        FactAnalysisRule.getFactAbstractlyCoveredNode(
-                                factAnalysisNodes)));
+                    readablePathCondition, FactType.LOOP_BODY_FACT,
+                    FactAnalysisRule.getFactCoveredNode(factAnalysisNodes),
+                    FactAnalysisRule
+                            .getFactAbstractlyCoveredNode(factAnalysisNodes)));
             }
 
             final Optional<Node> maybeActualPreservedNode = GeneralUtilities
                     .toStream(analysisNodesImmList).map(goal -> goal.node())
                     .filter(n -> n.getNodeInfo().getBranchLabel() != null
-                            && n.getNodeInfo().getBranchLabel()
-                                    .equals(AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL))
+                            && n.getNodeInfo().getBranchLabel().equals(
+                                AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL))
                     .findAny();
             assert maybeActualPreservedNode.isPresent();
 
@@ -553,8 +550,8 @@ public class Analyzer {
 
         if (invariantGoalsNotPreserved > 0) {
             LOGGER.warn(
-                    "Loop invariant could be invalid: %s open preserves goals",
-                    invariantGoalsNotPreserved);
+                "Loop invariant could be invalid: %s open preserves goals",
+                invariantGoalsNotPreserved);
         }
 
         return invariantGoalsNotPreserved;
@@ -605,7 +602,7 @@ public class Analyzer {
 
             pathCond = (problem ? "ERROR-PC " : "") + GeneralUtilities
                     .cleanWhitespace(LogicPrinter.quickPrintTerm(pathCondTerm,
-                            analysisNode.proof().getServices()));
+                        analysisNode.proof().getServices()));
         } catch (ProofInputException e) {
             LOGGER.error("Couldn't compute path comdition for goal %s"
                     + analysisNode.serialNr());
@@ -656,7 +653,7 @@ public class Analyzer {
                     .filter(f -> f.op() instanceof UpdateApplication).map(f -> {
                         ImmutableArray<Term> values = SymbolicExecutionUtil
                                 .extractValueFromUpdate(f.sub(0),
-                                        maybeLoopScopeIndex.get());
+                                    maybeLoopScopeIndex.get());
 
                         return values == null || values.size() != 1
                                 ? (Term) null : (Term) values.get(0);
@@ -670,15 +667,14 @@ public class Analyzer {
                     preservedNodes.add(g.node());
                 } else {
                     GeneralUtilities.logErrorAndThrowRTE(LOGGER,
-                            "Unexpected (not simplified?) value for "
-                                    + "loop scope index %s in goal %s: %s",
-                            maybeLoopScopeIndex.get(), g.node().serialNr(),
-                            rhs);
+                        "Unexpected (not simplified?) value for "
+                                + "loop scope index %s in goal %s: %s",
+                        maybeLoopScopeIndex.get(), g.node().serialNr(), rhs);
                 }
             } else {
                 LOGGER.trace(
-                        "Couldn't find the value for loop scope index %s in goal #%s",
-                        maybeLoopScopeIndex.get(), g.node().serialNr());
+                    "Couldn't find the value for loop scope index %s in goal #%s",
+                    maybeLoopScopeIndex.get(), g.node().serialNr());
             }
         }
     }
@@ -721,7 +717,7 @@ public class Analyzer {
                 .succedent().asList();
         final SequentFormula updPostCondSeqFor = succList.take(pos).head();
         final PosInOccurrence proofOblPio = new PosInOccurrence(
-                updPostCondSeqFor, PosInTerm.getTopLevel(), false);
+            updPostCondSeqFor, PosInTerm.getTopLevel(), false);
 
         return Optional.of(proofOblPio);
     }
@@ -744,8 +740,8 @@ public class Analyzer {
 
         if (matchingClassDecls.isEmpty()) {
             final String errorMsg = GeneralUtilities.format(
-                    "Could not find type %s in class %s", className,
-                    file.getName());
+                "Could not find type %s in class %s", className,
+                file.getName());
             LOGGER.error(errorMsg);
             throw new RuntimeException(errorMsg);
         }
@@ -764,8 +760,8 @@ public class Analyzer {
 
         if (matchingMethods.isEmpty()) {
             final String errorMsg = GeneralUtilities.format(
-                    "Could not find method %s%s in class %s", methodName,
-                    methodTypeStr, className);
+                "Could not find method %s%s in class %s", methodName,
+                methodTypeStr, className);
             LOGGER.error(errorMsg);
             throw new RuntimeException(errorMsg);
         }
@@ -885,10 +881,10 @@ public class Analyzer {
         }
 
         ps.printf(
-                "Covered %s (%s completely, %s abstractly) out of %s facts; Strength: %.2f%%\n",
-                result.numCoveredFacts() + result.numAbstractlyCoveredFacts(),
-                result.numCoveredFacts(), result.numAbstractlyCoveredFacts(),
-                result.numFacts(), result.strength());
+            "Covered %s (%s completely, %s abstractly) out of %s facts; Strength: %.2f%%\n",
+            result.numCoveredFacts() + result.numAbstractlyCoveredFacts(),
+            result.numCoveredFacts(), result.numAbstractlyCoveredFacts(),
+            result.numFacts(), result.strength());
     }
 
     /**
@@ -1089,7 +1085,7 @@ public class Analyzer {
         @Override
         public String toString() {
             return String.format("%s, Path condition \"%s\"\n%s",
-                    factTypeToString(factType), pathCond.trim(), descr);
+                factTypeToString(factType), pathCond.trim(), descr);
         }
 
         private static String factTypeToString(FactType ft) {
@@ -1102,7 +1098,7 @@ public class Analyzer {
                 return "Post condition implies final state fact";
             default:
                 GeneralUtilities.logErrorAndThrowRTE(//
-                        LOGGER, "Unknown fact type: %s", ft);
+                    LOGGER, "Unknown fact type: %s", ft);
                 return null;
             }
         }
@@ -1149,8 +1145,8 @@ public class Analyzer {
         @Override
         public String toString() {
             return String.format(
-                    "Unclosed exception node \"%s\", path condition: \"%s\"",
-                    excLabel, pathCondition);
+                "Unclosed exception node \"%s\", path condition: \"%s\"",
+                excLabel, pathCondition);
         }
     }
 
@@ -1160,6 +1156,11 @@ public class Analyzer {
      * @author Dominic Steinhöfel
      */
     public static class AnalyzerResult {
+        /**
+         * A weight for "abstractly covered" facts.
+         */
+        private static final double ABSTRACTLY_COVERED_WEIGHT = 0.5d;
+
         /**
          * {@link List} of covered {@link Fact}s.
          */
@@ -1310,13 +1311,75 @@ public class Analyzer {
 
         /**
          * @return The strength of this {@link AnalyzerResult} as a percentage
-         *         value.
+         *         value. Includes abstractly covered facts that are weighted by
+         *         {@link #ABSTRACTLY_COVERED_WEIGHT}.
          */
         public double strength() {
             return 100d
                     * (((double) numCoveredFacts())
-                            + ((double) numAbstractlyCoveredFacts()) * 0.5d)
+                            + ((double) numAbstractlyCoveredFacts())
+                                    * ABSTRACTLY_COVERED_WEIGHT)
                     / ((double) numFacts());
+        }
+
+        /**
+         * @return A strength value <b>without</b> the "abstractly covered"
+         *         facts.
+         */
+        public double coveredStrength() {
+            return 100d * ((double) numCoveredFacts()) / ((double) numFacts());
+        }
+
+        /**
+         * @return A strength value considering only loop body and post cond
+         *         facts (ignoring use case facts); only concretely covered
+         *         facts are counted as covered (abstractly ignored).
+         */
+        public double programEffectsStrength() {
+            final double numCovLoopBodyFacts = getCoveredFactsOfType(
+                FactType.LOOP_BODY_FACT).size();
+            final double numCovPostCondFacts = getCoveredFactsOfType(
+                FactType.POST_COND_FACT).size();
+            final double numAbsCovLoopBodyFacts = getAbstractlyCoveredFactsOfType(
+                FactType.LOOP_BODY_FACT).size();
+            final double numAbsCovPostCondFacts = getAbstractlyCoveredFactsOfType(
+                FactType.POST_COND_FACT).size();
+            final double numUncovLoopBodyFacts = getUncoveredFactsOfType(
+                FactType.LOOP_BODY_FACT).size();
+            final double numUncovPostCondFacts = getUncoveredFactsOfType(
+                FactType.POST_COND_FACT).size();
+
+            return 100d * (numCovLoopBodyFacts + numCovPostCondFacts)
+                    / (numCovLoopBodyFacts + numCovPostCondFacts
+                            + numAbsCovLoopBodyFacts + numAbsCovPostCondFacts
+                            + numUncovLoopBodyFacts + numUncovPostCondFacts);
+        }
+
+        /**
+         * @return A strength value considering only loop body and post cond
+         *         facts (ignoring use case facts); abstractly covered facts are
+         *         included (weighted by {@link #ABSTRACTLY_COVERED_WEIGHT}).
+         */
+        public double programEffectsAbstractStrength() {
+            final double numCovLoopBodyFacts = getCoveredFactsOfType(
+                FactType.LOOP_BODY_FACT).size();
+            final double numCovPostCondFacts = getCoveredFactsOfType(
+                FactType.POST_COND_FACT).size();
+            final double numAbsCovLoopBodyFacts = getAbstractlyCoveredFactsOfType(
+                FactType.LOOP_BODY_FACT).size();
+            final double numAbsCovPostCondFacts = getAbstractlyCoveredFactsOfType(
+                FactType.POST_COND_FACT).size();
+            final double numUncovLoopBodyFacts = getUncoveredFactsOfType(
+                FactType.LOOP_BODY_FACT).size();
+            final double numUncovPostCondFacts = getUncoveredFactsOfType(
+                FactType.POST_COND_FACT).size();
+
+            return 100d * (numCovLoopBodyFacts + numCovPostCondFacts
+                    + (ABSTRACTLY_COVERED_WEIGHT * (numAbsCovLoopBodyFacts
+                            + numAbsCovPostCondFacts)))
+                    / (numCovLoopBodyFacts + numCovPostCondFacts
+                            + numAbsCovLoopBodyFacts + numAbsCovPostCondFacts
+                            + numUncovLoopBodyFacts + numUncovPostCondFacts);
         }
     }
 
