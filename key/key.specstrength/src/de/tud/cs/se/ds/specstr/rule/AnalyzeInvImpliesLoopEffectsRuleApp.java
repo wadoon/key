@@ -33,12 +33,13 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.AbstractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.AbstractLoopInvariantRule.LoopInvariantInformation;
+import de.uka.ilkd.key.rule.AbstractLoopInvariantRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
-import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 /**
  * The {@link RuleApp} for the {@link AnalyzeInvImpliesLoopEffectsRule}.
@@ -139,26 +140,21 @@ public class AnalyzeInvImpliesLoopEffectsRuleApp
                 List<LocationVariable> lLocalOuts = null;
                 Term lLoopInvTerm = null;
 
-                try {
-                    final LoopInvariantInformation loopInvInf = //
-                            LoopScopeInvariantRule.INSTANCE.doPreparations(//
-                                currNode, services,
-                                currNode.getAppliedRuleApp());
+                final LoopInvariantBuiltInRuleApp loopInvApp = (LoopInvariantBuiltInRuleApp) currNode
+                        .getAppliedRuleApp();
+                final LoopSpecification loopSpec = loopInvApp
+                        .retrieveLoopInvariantFromSpecification(services);
 
-                    lLoopInvTerm = loopInvInf.invTerm;
-                    lLocalOuts = StreamSupport
-                            .stream(loopInvInf.inst.inv.getLocalOuts()
-                                    .spliterator(),
-                                true)
-                            .map(t -> (LocationVariable) t.op())
-                            .collect(Collectors.toList());
-                } catch (RuleAbortException e) {
-                    throw new RuntimeException(
-                        String.format(
-                            "%s: Problem in instantiating rule app: %s",
-                            this.getClass().getSimpleName(), e.getMessage()),
-                        e);
-                }
+                lLoopInvTerm = AbstractLoopInvariantRule.conjunctInv(services,
+                    loopInvApp.getHeapContext(), loopSpec,
+                    TermBuilder.goBelowUpdates(
+                        loopInvApp.posInOccurrence().sequentFormula().formula())
+                            .javaBlock());
+
+                lLocalOuts = StreamSupport
+                        .stream(loopSpec.getLocalOuts().spliterator(), true)
+                        .map(t -> (LocationVariable) t.op())
+                        .collect(Collectors.toList());
 
                 return new AnalyzeInvImpliesLoopEffectsRuleApp(this.builtInRule,
                     this.pio, lLoopInvTerm, lLocalOuts);

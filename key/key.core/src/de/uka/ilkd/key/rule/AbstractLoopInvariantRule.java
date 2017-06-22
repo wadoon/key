@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -128,9 +129,10 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final List<LocationVariable> heapContext = ((IBuiltInRuleApp) ruleApp)
                 .getHeapContext();
 
-        final Term invTerm = conjunctInv(services, inst, atPres, heapContext);
+        final Term invTerm = conjunctInv(services, heapContext, inst.inv,
+            inst.progPost.javaBlock());
         final Term invFreeTerm = conjunctFreeInv(services, inst, atPres,
-                heapContext);
+            heapContext);
 
         // Collect input and output local variables,
         // prepare reachableOut.
@@ -303,20 +305,24 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * 
      * @param services
      *            The {@link Services} object.
-     * @param inst
-     *            The {@link Instantiation} for this rule application.
      * @param atPres
      *            TODO
      * @param heapContext
      *            The heap formulas to create a conjunction of invariants for.
+     * @param loopSpec
+     *            TODO
+     * @param javaBlock
+     *            TODO
      * @return A conjunction of all invariant formulas for the
      *         {@link LocationVariable}s in heapContext.
      */
-    protected static Term conjunctInv(Services services, Instantiation inst,
-            final Map<LocationVariable, Term> atPres,
-            final List<LocationVariable> heapContext) {
-        return mapAndConjunct(services, (pv -> inst.inv.getInvariant(pv,
-                inst.selfTerm, atPres, services)), heapContext);
+    public static Term conjunctInv(Services services,
+            final List<LocationVariable> heapContext,
+            LoopSpecification loopSpec, JavaBlock javaBlock) {
+        return mapAndConjunct(services,
+            (pv -> loopSpec.getInvariant(pv, getSelfTerm(javaBlock, services),
+                loopSpec.getInternalAtPres(), services)),
+            heapContext);
     }
 
     /**
@@ -489,27 +495,19 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         // active statement must be while loop
         final While loop = app.getLoopStatement();
 
-        // try to get invariant from JML specification
-        LoopSpecification spec = app.getSpec();
-        if (spec == null) { // may happen after reloading proof
-            throw new RuleAbortException(
-                    "No invariant found. Probably broken after proof reloading...");
-        }
-
         // collect self, execution context
         final MethodFrame innermostMethodFrame = JavaTools
                 .getInnermostMethodFrame(progPost.javaBlock(), services);
-        if (innermostMethodFrame != null) {
-            spec = spec.setTarget(innermostMethodFrame.getProgramMethod());
-        }
-
-        final Term selfTerm = innermostMethodFrame == null ? null
-                : MiscTools.getSelfTerm(innermostMethodFrame, services);
 
         final ExecutionContext innermostExecutionContext = //
                 innermostMethodFrame == null ? null
                         : (ExecutionContext) innermostMethodFrame
                                 .getExecutionContext();
+
+        final Term selfTerm = getSelfTerm(progPost.javaBlock(), services);
+
+        // try to get invariant from JML specification
+        LoopSpecification spec = getInvariant(app, progPost.javaBlock(), services);
         services.getSpecificationRepository().addLoopInvariant(spec);
 
         // cache and return result
@@ -520,6 +518,51 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         lastInstantiation = result;
 
         return result;
+    }
+    
+    /**
+     * Returns the self {@link Term} for a {@link JavaBlock}.
+     *
+     * @param javaBlock
+     * @param services
+     * @return
+     */
+    private static Term getSelfTerm(JavaBlock javaBlock, Services services) {
+        final MethodFrame innermostMethodFrame = JavaTools
+                .getInnermostMethodFrame(javaBlock, services);
+
+        return innermostMethodFrame == null ? null
+                : MiscTools.getSelfTerm(
+                    JavaTools.getInnermostMethodFrame(javaBlock, services),
+                    services);
+    }
+
+    /**
+     * Retrieves the {@link LoopSpecification} from the app and sets the target
+     * to the current {@link ProgramMethod}.
+     *
+     * @param app
+     * @param innermostMethodFrame
+     * @return
+     * @throws RuleAbortException
+     */
+    private static LoopSpecification getInvariant(
+            final LoopInvariantBuiltInRuleApp app, final JavaBlock javaBlock,
+            Services services) throws RuleAbortException {
+        final MethodFrame innermostMethodFrame = JavaTools
+                .getInnermostMethodFrame(javaBlock, services);
+        LoopSpecification spec = app.getSpec();
+
+        if (spec == null) { // may happen after reloading proof
+            throw new RuleAbortException(
+                "No invariant found. Probably broken after proof reloading...");
+        }
+
+        if (innermostMethodFrame != null) {
+            spec = spec.setTarget(innermostMethodFrame.getProgramMethod());
+        }
+
+        return spec;
     }
 
     /**
