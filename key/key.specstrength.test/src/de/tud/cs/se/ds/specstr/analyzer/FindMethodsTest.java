@@ -14,15 +14,10 @@
 package de.tud.cs.se.ds.specstr.analyzer;
 
 import static de.tud.cs.se.ds.specstr.analyzer.Analyzer.FactType.*;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
 
 import java.util.List;
 
-import org.hamcrest.number.IsCloseTo;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ErrorCollector;
 
 import de.tud.cs.se.ds.specstr.analyzer.Analyzer.AnalyzerResult;
 import de.tud.cs.se.ds.specstr.analyzer.Analyzer.Fact;
@@ -34,24 +29,6 @@ import de.tud.cs.se.ds.specstr.analyzer.Analyzer.Fact;
  * @author Dominic Steinhöfel
  */
 public class FindMethodsTest extends AbstractAnalyzerTest {
-    @Rule
-    public final ErrorCollector collector = new ErrorCollector();
-
-    private void assertEquals(int expected, int actual) {
-        collector.checkThat(actual, equalTo(expected));
-    }
-
-    private void assertEquals(String expected, String actual) {
-        collector.checkThat(actual, equalTo(expected));
-    }
-
-    private void assertEquals(double expected, double actual, double error) {
-        collector.checkThat(actual, new IsCloseTo(expected, error));
-    }
-
-    private void assertContains(String expected, String completeString) {
-        collector.checkThat(completeString, containsString(expected));
-    }
 
     @Test
     public void testFindStrongestPost() {

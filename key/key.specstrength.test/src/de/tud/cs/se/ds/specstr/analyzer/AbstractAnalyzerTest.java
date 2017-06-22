@@ -13,6 +13,9 @@
 
 package de.tud.cs.se.ds.specstr.analyzer;
 
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -21,7 +24,10 @@ import java.util.Optional;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hamcrest.number.IsCloseTo;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.ErrorCollector;
 import org.key_project.util.java.IOUtil;
 
 import de.tud.cs.se.ds.specstr.analyzer.Analyzer.AnalyzerResult;
@@ -38,6 +44,25 @@ public abstract class AbstractAnalyzerTest {
     private static final String FUNCTIONAL_TESTS_RELATIVE_DIR = "/resources/testcase/analyzer/";
     private static final File TMP_DIR = new File(
             System.getProperty("java.io.tmpdir") + "/analyzerTests/");
+    
+    @Rule
+    public final ErrorCollector collector = new ErrorCollector();
+
+    public void assertEquals(int expected, int actual) {
+        collector.checkThat(actual, equalTo(expected));
+    }
+
+    public void assertEquals(String expected, String actual) {
+        collector.checkThat(actual, equalTo(expected));
+    }
+
+    public void assertEquals(double expected, double actual, double error) {
+        collector.checkThat(actual, new IsCloseTo(expected, error));
+    }
+
+    public void assertContains(String expected, String completeString) {
+        collector.checkThat(completeString, containsString(expected));
+    }
 
     private String functionalTestsDir;
 
