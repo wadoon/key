@@ -21,9 +21,8 @@ import java.util.stream.StreamSupport;
 import org.key_project.util.collection.ImmutableList;
 
 import de.tud.cs.se.ds.specstr.util.LogicUtilities;
-import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -126,30 +125,21 @@ public class AnalyzeInvImpliesLoopEffectsRuleApp
                     .rule() == LoopScopeInvariantRule.INSTANCE
                     && !currNode.getLocalProgVars().contains(loopScopeIdxVar)) {
 
-                Optional<While> maybeWhile = StreamSupport.stream(
-                    currNode.sequent().succedent().spliterator(),
-                    true).map(sf -> JavaTools.getActiveStatement(
-                        TermBuilder.goBelowUpdates(sf.formula()).javaBlock()))
-                        .filter(st -> st instanceof While).map(st -> (While) st)
-                        .findAny();
-
-                assert maybeWhile.isPresent() : ""
-                        + "There has to be a while loop "
-                        + "somewhere at this node.";
+                final LoopInvariantBuiltInRuleApp loopInvApp = //
+                        (LoopInvariantBuiltInRuleApp) currNode
+                                .getAppliedRuleApp();
 
                 List<LocationVariable> lLocalOuts = null;
                 Term lLoopInvTerm = null;
 
-                final LoopInvariantBuiltInRuleApp loopInvApp = (LoopInvariantBuiltInRuleApp) currNode
-                        .getAppliedRuleApp();
                 final LoopSpecification loopSpec = loopInvApp
                         .retrieveLoopInvariantFromSpecification(services);
 
+                final JavaBlock javaBlock = TermBuilder.goBelowUpdates(
+                    loopInvApp.posInOccurrence().sequentFormula().formula())
+                        .javaBlock();
                 lLoopInvTerm = AbstractLoopInvariantRule.conjunctInv(services,
-                    loopInvApp.getHeapContext(), loopSpec,
-                    TermBuilder.goBelowUpdates(
-                        loopInvApp.posInOccurrence().sequentFormula().formula())
-                            .javaBlock());
+                    loopInvApp.getHeapContext(), loopSpec, javaBlock);
 
                 lLocalOuts = StreamSupport
                         .stream(loopSpec.getLocalOuts().spliterator(), true)
