@@ -115,8 +115,27 @@ public final class AnalyzeUseCaseRule extends AbstractAnalysisRule {
         return pio != null && pio.isTopLevel() && !pio.isInAntec()
                 && !(pio.subTerm().op() instanceof UpdateApplication)
                 && !pio.subTerm().containsJavaBlockRecursive()
-                && nextParentBranchLabel(goal.node()).orElse("").equals(
+                && belowNodeWithBranchLabel(goal.node(),
                     AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL);
+    }
+
+    /**
+     * @param node
+     *            The {@link Node} from which on to search upwards.
+     * @param label
+     *            The label to look for.
+     * @return true iff the given {@link Node} is in the subtree starting with a
+     *         {@link Node} that has the given branch label.
+     */
+    private static boolean belowNodeWithBranchLabel(Node node, String label) {
+        while (!node.parent().root()
+                && !Optional.ofNullable(node.getNodeInfo().getBranchLabel())
+                        .orElse("").equals(label)) {
+            node = node.parent();
+        }
+
+        return Optional.ofNullable(node.getNodeInfo().getBranchLabel())
+                .orElse("").equals(label);
     }
 
     /**
