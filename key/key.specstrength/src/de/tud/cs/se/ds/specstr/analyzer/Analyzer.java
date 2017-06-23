@@ -170,7 +170,7 @@ public class Analyzer {
         // Finish symbolic execution
         seIf.finishSEForMethod(method);
         final Proof proof = seIf.proof();
-        
+
         LOGGER.trace("Collecting facts");
 
         // TODO: Finishing SE with the macro has the side effect that some goals
@@ -885,10 +885,15 @@ public class Analyzer {
         }
 
         ps.printf(
-            "Covered %s (%s completely, %s abstractly) out of %s facts; Strength: %.2f%%\n",
+            "Covered %s (%s concretely, %s abstractly) out of %s facts\n"
+                    + "Overall Strength:          %.2f%%\n"
+                    + "Concrete Effects Strength: %.2f%%\n"
+                    + "Abstract Effects Strength: %.2f%%\n",
             result.numCoveredFacts() + result.numAbstractlyCoveredFacts(),
             result.numCoveredFacts(), result.numAbstractlyCoveredFacts(),
-            result.numFacts(), result.strength());
+            result.numFacts(), result.strength(),
+            result.programEffectsStrength(),
+            result.programEffectsAbstractStrength());
     }
 
     /**

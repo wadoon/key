@@ -193,7 +193,7 @@ public class SymbExInterface {
         // since the non-trivial goals have the uninterpreted SE predicate which
         // prevents closing.
         for (Goal g : proof.openGoals()) {
-            applyMacro(new TryCloseMacro(), g.node());
+            applyMacro(new TryCloseMacro(1000), g.node());
         }
     }
 
@@ -203,7 +203,7 @@ public class SymbExInterface {
      * @param node
      *            The {@link Node} to start symbolic execution at.
      */
-    public void finishSEForNode(Node node) {
+    private void finishSEForNode(Node node) {
         List<Node> openNodesWithModality = LogicUtilities
                 .extractOpenNodesWithModality(node);
         List<Node> lastNodesWithModality = new ArrayList<>();
@@ -211,8 +211,9 @@ public class SymbExInterface {
         while (!openNodesWithModality.isEmpty()
                 && !openNodesWithModality.equals(lastNodesWithModality)) {
 
-            openNodesWithModality.forEach(
-                n -> applyMacro(new FinishSymbolicExecutionMacro(), n));
+            openNodesWithModality.forEach(n -> {
+                applyMacro(new FinishSymbolicExecutionMacro(), n);
+            });
 
             lastNodesWithModality = new ArrayList<>(openNodesWithModality);
 

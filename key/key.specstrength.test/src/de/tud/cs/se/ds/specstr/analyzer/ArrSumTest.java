@@ -16,6 +16,7 @@ package de.tud.cs.se.ds.specstr.analyzer;
 import org.junit.Test;
 
 import de.tud.cs.se.ds.specstr.analyzer.Analyzer.AnalyzerResult;
+import de.tud.cs.se.ds.specstr.analyzer.Analyzer.Fact;
 import de.tud.cs.se.ds.specstr.analyzer.Analyzer.FactType;
 
 /**
@@ -32,12 +33,29 @@ public class ArrSumTest extends AbstractAnalyzerTest {
             "arrSum/ArrSum.java", //
             "ArrSum::arrSumStd([I)[I");
 
+        assertEquals(37.5, result.strength(), 0.0d);
+        assertEquals(0d, result.programEffectsStrength(), 0.0d);
+        assertEquals(16.66, result.programEffectsAbstractStrength(), 0.01d);
+
+        assertEquals(4, result.numFacts());
+        assertEquals(2, result.numUncoveredFacts());
+        assertEquals(1, result.numAbstractlyCoveredFacts());
+        assertEquals(1, result.numCoveredFacts());
+
         assertEquals(2,
             result.getUncoveredFactsOfType(FactType.LOOP_BODY_FACT).size());
-        assertEquals(2, result.numUncoveredFacts());
-        assertEquals(0, result.numAbstractlyCoveredFacts());
-        assertEquals(4, result.numCoveredFacts());
-        assertEquals(6, result.numFacts());
+        assertEquals(1,
+            result.getAbstractlyCoveredFactsOfType(FactType.POST_COND_FACT)
+                    .size());
+        assertEquals(1,
+            result.getCoveredFactsOfType(FactType.LOOP_USE_CASE_FACT).size());
+
+        final Fact absCoveredPostCondFact = result
+                .getAbstractlyCoveredFactsOfType(FactType.POST_COND_FACT)
+                .get(0);
+        assertContains("result = x_arr_2", absCoveredPostCondFact.getDescr());
+        assertEquals("arr_0.length <= i_0",
+            absCoveredPostCondFact.getPathCond());
     }
 
 }
