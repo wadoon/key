@@ -109,8 +109,7 @@ public final class AnalyzeInvImpliesLoopEffectsRule
                 .getUpdateRightSideFor(updateTerm, heapVar);
 
         final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
-                extractStoreEqsAndInnerHeapTerm(//
-                    services, origHeapTerm);
+                extractStoreEqsAndInnerHeapTerm(services, origHeapTerm);
 
         final List<Term> storeEqualities = storeEqsAndInnerHeapTerm.isPresent()
                 ? storeEqsAndInnerHeapTerm.get().second : new ArrayList<>();
@@ -294,7 +293,8 @@ public final class AnalyzeInvImpliesLoopEffectsRule
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos,
             TermServices services) {
-        return new AnalyzeInvImpliesLoopEffectsRuleApp(this, pos, null, null, null);
+        return new AnalyzeInvImpliesLoopEffectsRuleApp(this, pos, null, null,
+            null);
     }
 
     @Override

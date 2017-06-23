@@ -123,7 +123,7 @@ public final class LogicUtilities {
             // indicates that we're not using the strongest possible post
             // condition.
 
-            Sort sort = getHeapStoreTargetSort(services, currHeapTerm);
+            final Sort sort = getHeapStoreTargetSort(services, currHeapTerm);
 
             storeEqualities.add(tb.equals(
                 tb.select(sort, tb.getBaseHeap(), targetObj, field), value));

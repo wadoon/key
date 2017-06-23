@@ -116,18 +116,22 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
                 : (LocationVariable) goal.getLocalNamespaces()
                         .programVariables()
                         .lookup(fContract.getResult().op().name());
+        final LocationVariable excVar = (LocationVariable) goal
+                .getLocalNamespaces().programVariables()
+                .lookup(fContract.getExc().op().name());
 
         final Map<LocationVariable, Term> updateContent = LogicUtilities
                 .updateToMap(updateTerm);
 
-        final boolean hasResultVar = resultVar != null
-                && updateContent.get(resultVar) != null;
-
         final Term updateWithoutVarsOfInterest = updateContent.keySet().stream()
                 .filter(lhs -> isVoid || !lhs.equals(resultVar))
                 .filter(lhs -> !lhs.equals(heapVar))
+                .filter(lhs -> !lhs.equals(excVar))
                 .map(lhs -> tb.elementary(lhs, updateContent.get(lhs)))
                 .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
+
+        final boolean hasResultVar = resultVar != null
+                && updateContent.get(resultVar) != null;
 
         final ImmutableList<Goal> goals = goal
                 .split((hasResultVar ? 1 : 0) + storeEqualities.size() + 1);

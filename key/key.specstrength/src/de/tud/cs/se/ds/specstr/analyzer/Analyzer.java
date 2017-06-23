@@ -166,9 +166,16 @@ public class Analyzer {
         LOGGER.info("Analyzing method %s::%s%s", className, methodName,
             methodTypeStr);
 
+        LOGGER.trace("Building proof tree");
         // Finish symbolic execution
         seIf.finishSEForMethod(method);
         final Proof proof = seIf.proof();
+        
+        LOGGER.trace("Collecting facts");
+
+        // TODO: Finishing SE with the macro has the side effect that some goals
+        // that would be trivially closable, like exception branches, are closed
+        // late since the macro is focusing on SE.
 
         final List<Node> postConditionNodes = new ArrayList<>();
         final List<Fact> facts = new ArrayList<>();

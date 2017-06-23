@@ -38,6 +38,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.macros.FinishSymbolicExecutionMacro;
 import de.uka.ilkd.key.macros.ProofMacro;
+import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -176,6 +177,8 @@ public class SymbExInterface {
 
     /**
      * Initializes the {@link Proof} for pm and finishes symbolic execution.
+     * Trivially closable branches are closed; the others will stay opened since
+     * there is the uninterpreted SE predicate contained.
      *
      * @param pm
      *            The {@link ProgramMethod} to analyze.
@@ -185,6 +188,13 @@ public class SymbExInterface {
 
         // Start auto mode
         finishSEForNode(proof.root());
+
+        // Close provable goals. This does not induce a loss of information,
+        // since the non-trivial goals have the uninterpreted SE predicate which
+        // prevents closing.
+        for (Goal g : proof.openGoals()) {
+            applyMacro(new TryCloseMacro(), g.node());
+        }
     }
 
     /**
