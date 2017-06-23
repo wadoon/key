@@ -16,7 +16,6 @@ package de.tud.cs.se.ds.specstr.analyzer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -31,10 +30,9 @@ import de.tud.cs.se.ds.specstr.util.LogicUtilities;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
@@ -256,41 +254,28 @@ public class SymbExInterface {
     }
 
     /**
-     * Attempts to find a loop scope index variable in the {@link Proof} subtree
+     * Finds all loop scope index variables in the {@link Proof} subtree
      * starting at the given {@link Node}.
      *
      * @param node
      *            To root of the subtree to search.
-     * @return An {@link Optional} loop scope index variable.
+     * @return All loop scope index variables in the {@link Proof} subtree
+     *         starting at the given {@link Node}.
      * @see LoopScopeInvariantRule
      */
-    public static Optional<LocationVariable> findLoopScopeIndex(
-            final Node node) {
+    public static List<LocationVariable> findLoopScopeIndeces(final Node node) {
         final Proof proof = node.proof();
-        LocationVariable loopScopeIndex = null;
+        List<LocationVariable> result = new ArrayList<>();
 
         for (Goal g : proof.getSubtreeGoals(node)) {
             for (SequentFormula sf : g.node().sequent().succedent()) {
-                final LoopScopeIdxVisitor loopScopeSearcher = new LoopScopeIdxVisitor();
-                sf.formula().execPostOrder(loopScopeSearcher);
-
-                if (loopScopeSearcher.getLoopScopeIdxVar().isPresent()) {
-                    loopScopeIndex = //
-                            loopScopeSearcher.getLoopScopeIdxVar().get();
-                    break;
-                }
-            }
-
-            if (loopScopeIndex != null) {
-                break;
+                result.addAll(LogicUtilities.retrieveLoopScopeIndices(
+                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
+                    proof.getServices()));
             }
         }
 
-        if (loopScopeIndex == null) {
-            return Optional.empty();
-        }
-
-        return Optional.of(loopScopeIndex);
+        return result;
     }
 
     /**
@@ -347,32 +332,5 @@ public class SymbExInterface {
                 .setActiveStrategyProperties(sp);
 
         return sp;
-    }
-
-    /**
-     * A visitor for finding a loop scope index variable in a {@link Term}.
-     *
-     * @author Dominic Steinhöfel
-     */
-    private static class LoopScopeIdxVisitor extends DefaultVisitor {
-        /**
-         * The result of this visitor.
-         */
-        private Optional<LocationVariable> loopScopeIndexVar = Optional.empty();
-
-        @Override
-        public void visit(Term visited) {
-            if (visited.op() instanceof LocationVariable
-                    && visited.containsLabel(
-                        ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)) {
-                loopScopeIndexVar = Optional
-                        .of((LocationVariable) visited.op());
-            }
-        }
-
-        public Optional<LocationVariable> getLoopScopeIdxVar() {
-            return loopScopeIndexVar;
-        }
-
     }
 }

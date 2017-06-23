@@ -18,6 +18,7 @@ import java.util.Optional;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.RuleApp;
 
 /**
  * An abstract {@link BuiltInRule} for strength analysis.
@@ -98,18 +99,16 @@ public abstract class AbstractAnalysisRule implements BuiltInRule {
      * @return Either the {@link AbstractAnalysisRule} in the scope of which the
      *         given {@link Node} resides, or an empty {@link Optional}.
      */
-    public static Optional<AbstractAnalysisRule> analysisRuleOfThisScope(
-            Node n) {
+    public static Optional<RuleApp> analysisRuleAppOfThisScope(Node n) {
         if (n.getAppliedRuleApp().rule() instanceof AbstractAnalysisRule) {
-            return Optional
-                    .of((AbstractAnalysisRule) n.getAppliedRuleApp().rule());
+            return Optional.of(n.getAppliedRuleApp());
         }
 
         if (n.root()) {
             return Optional.empty();
         }
 
-        return analysisRuleOfThisScope(n.parent());
+        return analysisRuleAppOfThisScope(n.parent());
     }
 
 }

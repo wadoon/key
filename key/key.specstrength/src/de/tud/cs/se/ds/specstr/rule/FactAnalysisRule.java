@@ -87,8 +87,10 @@ public final class FactAnalysisRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
         final Node node = goal.node();
 
-        final AbstractAnalysisRule abstractAnalysisRule = AbstractAnalysisRule
-                .analysisRuleOfThisScope(node).get();
+        final RuleApp analysisRuleApp = AbstractAnalysisRule
+                .analysisRuleAppOfThisScope(node).get();
+        final AbstractAnalysisRule abstractAnalysisRule = //
+                (AbstractAnalysisRule) analysisRuleApp.rule();
         final boolean addCoveredWithoutLoopInvGoal = abstractAnalysisRule
                 .addCoveredWithoutLoopInvGoal();
         final boolean addAbstractlyCoveredGoal = abstractAnalysisRule
@@ -132,6 +134,14 @@ public final class FactAnalysisRule implements BuiltInRule {
 
         coveredGoal.setBranchLabel(FACT_COVERED_BRANCH_LABEL);
 
+        // Get the loop invariant node for the following two cases -- needed for
+        // the removal of loop invariant formulas
+        Node loopInvNode = null;
+        if (analysisRuleApp instanceof AnalyzeInvImpliesLoopEffectsRuleApp) {
+            loopInvNode = ((AnalyzeInvImpliesLoopEffectsRuleApp) analysisRuleApp)
+                    .getLoopInvNode();
+        }
+
         // Fact already covered without specification -- "covered by true"
 
         if (addCoveredWithoutLoopInvGoal) {
@@ -141,7 +151,7 @@ public final class FactAnalysisRule implements BuiltInRule {
             premiseSFs.forEach(sf -> coveredByTrueGoal.removeFormula(
                 new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)));
 
-            removeLoopInvFormulasFromAntec(coveredByTrueGoal);
+            removeLoopInvFormulasFromAntec(coveredByTrueGoal, loopInvNode);
         }
 
         // Facts that are "abstractly covered", that is, the fact with the
@@ -155,7 +165,7 @@ public final class FactAnalysisRule implements BuiltInRule {
             if (addCoveredWithoutLoopInvGoal) {
                 // For these rules, we also have to remove the loop invariant
                 // formulas here
-                removeLoopInvFormulasFromAntec(coveredByTrueGoal);
+                removeLoopInvFormulasFromAntec(coveredByTrueGoal, loopInvNode);
             }
 
             LogicUtilities.addSETPredicateToAntec(abstractlyCoveredGoal);

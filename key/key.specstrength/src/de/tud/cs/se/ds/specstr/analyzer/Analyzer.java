@@ -45,7 +45,6 @@ import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.TryCloseMacro;
@@ -375,10 +374,11 @@ public class Analyzer {
                     getPioOfFormulaWhichHadSELabel(newNode);
             assert maybePioOfApplySeqFor.isPresent();
 
+            final Goal newGoal = proof.getGoal(newNode);
             final List<Node> factNodes = GeneralUtilities
-                    .toStream(proof.getGoal(newNode)
-                            .apply(AnalyzeUseCaseRule.INSTANCE.createApp(
-                                maybePioOfApplySeqFor.get(), services)))
+                    .toStream(newGoal.apply(AnalyzeUseCaseRule.INSTANCE
+                            .createApp(maybePioOfApplySeqFor.get(), services)
+                            .forceInstantiate(newGoal)))
                     .map(g -> g.node()).collect(Collectors.toList());
 
             for (final Node factNode : factNodes) {
@@ -640,41 +640,38 @@ public class Analyzer {
                 continue;
             }
 
-            final Optional<LocationVariable> maybeLoopScopeIndex = SymbExInterface
-                    .findLoopScopeIndex(g.node());
+            final List<LocationVariable> loopScopeIndices = SymbExInterface
+                    .findLoopScopeIndeces(g.node());
 
-            if (!maybeLoopScopeIndex.isPresent()) {
+            if (loopScopeIndices.isEmpty()) {
                 continue;
             }
 
-            final Optional<Term> rhs = GeneralUtilities
-                    .toStream(g.node().sequent().succedent())
-                    .map(sf -> sf.formula())
-                    .filter(f -> f.op() instanceof UpdateApplication).map(f -> {
-                        ImmutableArray<Term> values = SymbolicExecutionUtil
-                                .extractValueFromUpdate(f.sub(0),
-                                    maybeLoopScopeIndex.get());
+            final boolean isFalseLsiPresent = loopScopeIndices.stream()
+                    .anyMatch(lsi -> {
+                        Optional<Term> maybeRHS = GeneralUtilities
+                                .toStream(g.node().sequent().succedent())
+                                .map(sf -> sf.formula())
+                                .filter(
+                                    f -> f.op() instanceof UpdateApplication)
+                                .map(f -> {
+                                    ImmutableArray<Term> values = SymbolicExecutionUtil
+                                            .extractValueFromUpdate(f.sub(0),
+                                                lsi);
 
-                        return values == null || values.size() != 1
-                                ? (Term) null : (Term) values.get(0);
-                    }).filter(t -> t != null).findAny();
+                                    return values == null || values.size() != 1
+                                            ? (Term) null
+                                            : (Term) values.get(0);
+                                }).filter(t -> t != null).findAny();
 
-            if (rhs.isPresent()) {
-                final Operator op = rhs.get().op();
-                if (op == services.getTermBuilder().TRUE().op()) {
-                    postconditionNodes.add(g.node());
-                } else if (op == services.getTermBuilder().FALSE().op()) {
-                    preservedNodes.add(g.node());
-                } else {
-                    GeneralUtilities.logErrorAndThrowRTE(LOGGER,
-                        "Unexpected (not simplified?) value for "
-                                + "loop scope index %s in goal %s: %s",
-                        maybeLoopScopeIndex.get(), g.node().serialNr(), rhs);
-                }
+                        return maybeRHS.orElse(services.getTermBuilder().TRUE())
+                                .equals(services.getTermBuilder().FALSE());
+                    });
+
+            if (!isFalseLsiPresent) {
+                postconditionNodes.add(g.node());
             } else {
-                LOGGER.trace(
-                    "Couldn't find the value for loop scope index %s in goal #%s",
-                    maybeLoopScopeIndex.get(), g.node().serialNr());
+                preservedNodes.add(g.node());
             }
         }
     }

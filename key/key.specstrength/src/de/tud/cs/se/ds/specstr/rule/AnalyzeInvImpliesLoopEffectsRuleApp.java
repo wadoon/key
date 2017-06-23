@@ -23,8 +23,6 @@ import de.tud.cs.se.ds.specstr.util.LogicUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -38,7 +36,6 @@ import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * The {@link RuleApp} for the {@link AnalyzeInvImpliesLoopEffectsRule}.
@@ -60,6 +57,12 @@ public class AnalyzeInvImpliesLoopEffectsRuleApp
     private final List<LocationVariable> localOuts;
 
     /**
+     * The {@link Node} with the {@link LoopScopeInvariantRule} application for
+     * the loop the effects of are to be studied here.
+     */
+    private final Node loopInvNode;
+
+    /**
      * Constructor.
      *
      * @param rule
@@ -72,13 +75,18 @@ public class AnalyzeInvImpliesLoopEffectsRuleApp
      * @param localOuts
      *            The local out {@link LocationVariable}s of the loop, that is
      *            those that are accessible from the outside.
+     * @param loopInvNode
+     *            The {@link Node} with the {@link LoopScopeInvariantRule}
+     *            application for the loop the effects of are to be studied
+     *            here.
      */
     protected AnalyzeInvImpliesLoopEffectsRuleApp(BuiltInRule rule,
-            PosInOccurrence pio, Term invTerm,
-            List<LocationVariable> localOuts) {
+            PosInOccurrence pio, Term invTerm, List<LocationVariable> localOuts,
+            Node loopInvNode) {
         super(rule, pio);
         this.invTerm = invTerm;
         this.localOuts = localOuts;
+        this.loopInvNode = loopInvNode;
     }
 
     @Override
@@ -100,71 +108,42 @@ public class AnalyzeInvImpliesLoopEffectsRuleApp
     @Override
     public AbstractBuiltInRuleApp tryToInstantiate(Goal goal) {
         final Services services = goal.proof().getServices();
-        LocationVariable loopScopeIdxVar = null;
 
-        for (SequentFormula sf : goal.node().sequent().succedent()) {
-            List<LocationVariable> maybeIdxVar = LogicUtilities
-                    .retrieveLoopScopeIndices(
-                        new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
-                        services);
-
-            if (!maybeIdxVar.isEmpty()) {
-                // As the result of preorder visiting, the outer loop scope
-                // index, the one we're interested in, should be first.
-                // Alternatively, one could get the var with false RHS.
-                final List<LocationVariable> falseLSI = maybeIdxVar.stream()
-                        .filter(lsi -> MergeRuleUtils
-                                .getUpdateRightSideFor(sf.formula().sub(0), lsi)
-                                .equals(services.getTermBuilder().FALSE()))
-                        .collect(Collectors.toList());
-                assert falseLSI
-                        .size() == 1 : "There has to be exaclty one loop scope index that's set to false.";
-                loopScopeIdxVar = falseLSI.get(0);
-                break;
-            }
-        }
+        final LocationVariable loopScopeIdxVar = //
+                LogicUtilities.findLoopScopeIndexVar(goal.node());
 
         if (loopScopeIdxVar == null) {
             return null;
         }
 
         // Find loop where the loop scope index was introduced
-        Node currNode = goal.node().parent();
-        while (!currNode.root()) {
-            if (currNode.getAppliedRuleApp()
-                    .rule() == LoopScopeInvariantRule.INSTANCE
-                    && !currNode.getLocalProgVars().contains(loopScopeIdxVar)) {
+        final Node loopInvNode = LogicUtilities
+                .findCorrespondingLoopInvNode(goal.node(), loopScopeIdxVar);
 
-                final LoopInvariantBuiltInRuleApp loopInvApp = //
-                        (LoopInvariantBuiltInRuleApp) currNode
-                                .getAppliedRuleApp();
-
-                List<LocationVariable> lLocalOuts = null;
-                Term lLoopInvTerm = null;
-
-                final LoopSpecification loopSpec = loopInvApp
-                        .retrieveLoopInvariantFromSpecification(services);
-
-                final JavaBlock javaBlock = TermBuilder.goBelowUpdates(
-                    loopInvApp.posInOccurrence().sequentFormula().formula())
-                        .javaBlock();
-                lLoopInvTerm = AbstractLoopInvariantRule.conjunctInv(services,
-                    loopInvApp.getHeapContext(), loopSpec, javaBlock);
-
-                lLocalOuts = StreamSupport
-                        .stream(loopSpec.getLocalOuts().spliterator(), true)
-                        .map(t -> (LocationVariable) t.op())
-                        .collect(Collectors.toList());
-
-                return new AnalyzeInvImpliesLoopEffectsRuleApp(this.builtInRule,
-                    this.pio, lLoopInvTerm, lLocalOuts);
-
-            }
-
-            currNode = currNode.parent();
+        if (loopInvNode == null) {
+            return null;
         }
 
-        return null;
+        final LoopInvariantBuiltInRuleApp loopInvApp = //
+                (LoopInvariantBuiltInRuleApp) loopInvNode.getAppliedRuleApp();
+
+        final LoopSpecification loopSpec = loopInvApp
+                .retrieveLoopInvariantFromSpecification(services);
+
+        final JavaBlock javaBlock = TermBuilder
+                .goBelowUpdates(
+                    loopInvApp.posInOccurrence().sequentFormula().formula())
+                .javaBlock();
+        Term lLoopInvTerm = AbstractLoopInvariantRule.conjunctInv(services,
+            loopInvApp.getHeapContext(), loopSpec, javaBlock);
+
+        List<LocationVariable> lLocalOuts = StreamSupport
+                .stream(loopSpec.getLocalOuts().spliterator(), true)
+                .map(t -> (LocationVariable) t.op())
+                .collect(Collectors.toList());
+
+        return new AnalyzeInvImpliesLoopEffectsRuleApp(this.builtInRule,
+            this.pio, lLoopInvTerm, lLocalOuts, loopInvNode);
     }
 
     public Term getInvTerm() {
@@ -173,6 +152,10 @@ public class AnalyzeInvImpliesLoopEffectsRuleApp
 
     public List<LocationVariable> getLocalOuts() {
         return localOuts;
+    }
+
+    public Node getLoopInvNode() {
+        return loopInvNode;
     }
 
 }

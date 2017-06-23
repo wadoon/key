@@ -36,6 +36,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -87,6 +88,7 @@ public final class AnalyzeInvImpliesLoopEffectsRule
         final List<LocationVariable> localOuts = aiileApp.getLocalOuts();
         final PosInOccurrence pio = ruleApp.posInOccurrence();
         final Term updateTerm = pio.subTerm().sub(0);
+        final Node loopInvNode = aiileApp.getLoopInvNode();
 
         assert updateTerm.op() instanceof UpdateJunctor;
 
@@ -131,7 +133,7 @@ public final class AnalyzeInvImpliesLoopEffectsRule
 
             prepareGoal(pio, analysisGoal, currAnalysisTerm, termLabelState,
                 this);
-            removeLoopInvFormulasFromAntec(analysisGoal);
+            removeLoopInvFormulasFromAntec(analysisGoal, loopInvNode);
             addFactPreconditions(analysisGoal,
                 newGoalInformation.get(currLocalOut), //
                 1, termLabelState, this);
@@ -143,7 +145,7 @@ public final class AnalyzeInvImpliesLoopEffectsRule
 
                 prepareGoal(pio, analysisGoal, heapEquality, termLabelState,
                     this);
-                removeLoopInvFormulasFromAntec(analysisGoal);
+                removeLoopInvFormulasFromAntec(analysisGoal, loopInvNode);
 
                 final Term update = updateWithoutLocalOuts;
 
@@ -292,7 +294,7 @@ public final class AnalyzeInvImpliesLoopEffectsRule
     @Override
     public IBuiltInRuleApp createApp(PosInOccurrence pos,
             TermServices services) {
-        return new AnalyzeInvImpliesLoopEffectsRuleApp(this, pos, null, null);
+        return new AnalyzeInvImpliesLoopEffectsRuleApp(this, pos, null, null, null);
     }
 
     @Override

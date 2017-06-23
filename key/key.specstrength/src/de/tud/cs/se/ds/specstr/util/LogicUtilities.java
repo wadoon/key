@@ -16,7 +16,6 @@ package de.tud.cs.se.ds.specstr.util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -28,10 +27,13 @@ import java.util.stream.StreamSupport;
 
 import de.tud.cs.se.ds.specstr.logic.label.StrengthAnalysisParameterlessTL;
 import de.tud.cs.se.ds.specstr.rule.AbstractAnalysisRule;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Sequent;
@@ -44,7 +46,10 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.sort.NullSort;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
@@ -72,7 +77,7 @@ public final class LogicUtilities {
     /**
      * A cache for formulas that are known to originate from a loop invariant.
      */
-    private static final Set<Term> LOOP_INV_FORMULAS_CACHE = new HashSet<>();
+    private static final Map<Node, Set<Term>> LOOP_INV_FORMULAS_CACHE = new LinkedHashMap<>();
 
     private LogicUtilities() {
         // Hidden constructor -- it's a utility class.
@@ -118,9 +123,10 @@ public final class LogicUtilities {
             // indicates that we're not using the strongest possible post
             // condition.
 
+            Sort sort = getHeapStoreTargetSort(services, currHeapTerm);
+
             storeEqualities.add(tb.equals(
-                tb.select(value.sort(), tb.getBaseHeap(), targetObj, field),
-                value));
+                tb.select(sort, tb.getBaseHeap(), targetObj, field), value));
 
             currHeapTerm = currHeapTerm.sub(0);
         }
@@ -130,6 +136,44 @@ public final class LogicUtilities {
 
         return Optional
                 .of(new Pair<Term, List<Term>>(innerHeapTerm, storeEqualities));
+    }
+
+    /**
+     * Gets the sort of a "store" expression, that is the sort of the stored
+     * value. Also works for null-assignments and Array types.
+     *
+     * @param services
+     *            The {@link Services} object for {@link NamespaceSet}s and
+     *            {@link JavaInfo}.
+     * @param currHeapTerm
+     *            The heap store {@link Term}.
+     * @return The sort of the store expression.
+     */
+    private static Sort getHeapStoreTargetSort(final Services services,
+            final Term currHeapTerm) {
+        final Term targetObj = currHeapTerm.sub(1);
+        final Term field = currHeapTerm.sub(2);
+        final Term value = currHeapTerm.sub(3);
+
+        Sort sort = null;
+        if (!(value.sort() instanceof NullSort)) {
+            sort = value.sort();
+        } else if (((ProgramVariable) targetObj.op()).getKeYJavaType()
+                .getJavaType() instanceof ArrayDeclaration) {
+            sort = services.getNamespaces().sorts().lookup(
+                ((ArrayDeclaration) ((ProgramVariable) targetObj.op())
+                        .getKeYJavaType().getJavaType()).getBaseType()
+                                .getName());
+        } else {
+            sort = services.getJavaInfo().getAttribute(
+                // Format is "path.to.type::$field"; we have to remove the "$"
+                // to find the field in the JavaInfo.
+                field.toString().replaceAll("\\$", ""),
+                services.getJavaInfo()
+                        .getTypeByClassName(field.toString().split("::")[0]))
+                    .sort();
+        }
+        return sort;
     }
 
     /**
@@ -382,8 +426,17 @@ public final class LogicUtilities {
      *
      * @param analysisGoal
      *            The {@link Goal} to remove loop invariant formulas form.
+     * @param loopInvNode
+     *            The loop invariant {@link Node} designating the invariant
+     *            formulas to remove. May be null; in this case, all loop
+     *            invariant formulas will be removed.
      */
-    public static void removeLoopInvFormulasFromAntec(final Goal analysisGoal) {
+    public static void removeLoopInvFormulasFromAntec(final Goal analysisGoal,
+            Node loopInvNode) {
+        assert loopInvNode == null || loopInvNode
+                .getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp : //
+        "You should pass a node with a loop invariant application.";
+
         // We remove all partially instantiated no pos taclets, such as
         // replaceKnownAuxiliaryConstant, since otherwise, there could be
         // invariant formulas contained.
@@ -396,17 +449,27 @@ public final class LogicUtilities {
             analysisGoal.indexOfTaclets().getPartialInstantiatedApps());
 
         for (SequentFormula sf : analysisGoal.sequent().antecedent()) {
-            boolean remove = LOOP_INV_FORMULAS_CACHE.contains(sf.formula());
+            boolean remove = loopInvNode == null
+                    ? LOOP_INV_FORMULAS_CACHE.values().stream()
+                            .anyMatch(set -> set.contains(sf.formula()))
+                    : LOOP_INV_FORMULAS_CACHE.containsKey(loopInvNode)
+                            && LOOP_INV_FORMULAS_CACHE.get(loopInvNode)
+                                    .contains(sf.formula());
 
             if (!remove && sf.formula().hasLabels()) {
                 // Find origin of this label
                 final OriginOfFormula origin = //
                         findOriginOfFormula(analysisGoal, sf.formula());
 
-                if (origin.getNode().parent()
-                        .getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
+                final Node node = origin.getNode().parent();
+                if ((loopInvNode == null
+                        && node.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp)
+                        || node.equals(loopInvNode)) {
                     remove = true;
-                    LOOP_INV_FORMULAS_CACHE.add(sf.formula());
+
+                    // Add value to the cache
+                    updateCache(sf.formula(), loopInvNode,
+                        analysisGoal.proof().root());
                 }
             }
 
@@ -415,6 +478,34 @@ public final class LogicUtilities {
                     new PosInOccurrence(sf, PosInTerm.getTopLevel(), true));
             }
         }
+    }
+
+    /**
+     * Updates the {@link #LOOP_INV_FORMULAS_CACHE} s.th. the {@link Term}
+     * invFormula is listed as a loop invariant part of the given {@link Node}.
+     * Either loopInvNode of fallbackNode must be non-null.
+     *
+     * @param invFormula
+     *            The invariant formula to cache.
+     * @param loopInvNode
+     *            The loop invariant {@link Node}; may be null, in this case,
+     *            the fallbackNode must be non-null.
+     * @param fallbackNode
+     *            The fallback {@link Node} to use as a key for the cache if
+     *            loopInvNode is null.
+     */
+    private static void updateCache(final Term invFormula,
+            final Node loopInvNode, final Node fallbackNode) {
+        assert loopInvNode != null || fallbackNode != null;
+
+        final Node insertNode = loopInvNode == null ? fallbackNode
+                : loopInvNode;
+        Set<Term> cacheSet = LOOP_INV_FORMULAS_CACHE.get(insertNode);
+        if (cacheSet == null) {
+            cacheSet = new LinkedHashSet<>();
+            LOOP_INV_FORMULAS_CACHE.put(insertNode, cacheSet);
+        }
+        cacheSet.add(invFormula);
     }
 
     /**
@@ -733,6 +824,85 @@ public final class LogicUtilities {
         public List<LocationVariable> getLoopScopeIndeces() {
             return indices;
         }
+    }
+
+    /**
+     * Finds the loop scope index {@link LocationVariable} in the given
+     * {@link Node} that is assigned FALSE; determines the loop the preserved
+     * part of which is being analyzed.
+     * 
+     * @param node
+     *            The {@link Node} to find the loop scope index
+     *            {@link LocationVariable} which is set to false.
+     *
+     * @return The loop scope index {@link LocationVariable} in the given
+     *         {@link Node} that is assigned FALSE.
+     */
+    public static LocationVariable findLoopScopeIndexVar(Node node) {
+        final Services services = node.proof().getServices();
+
+        LocationVariable loopScopeIdxVar = null;
+
+        for (SequentFormula sf : node.sequent().succedent()) {
+            List<LocationVariable> maybeIdxVar = retrieveLoopScopeIndices(
+                new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
+                services);
+
+            if (!maybeIdxVar.isEmpty()) {
+                final List<LocationVariable> falseLSI = maybeIdxVar.stream()
+                        .filter(lsi -> MergeRuleUtils
+                                .getUpdateRightSideFor(sf.formula().sub(0), lsi)
+                                .equals(services.getTermBuilder().FALSE()))
+                        .collect(Collectors.toList());
+                assert falseLSI
+                        .size() == 1 : "There has to be exaclty one loop scope index that's set to false.";
+                loopScopeIdxVar = falseLSI.get(0);
+                break;
+            }
+        }
+
+        return loopScopeIdxVar;
+    }
+
+    /**
+     * Finds the {@link Node} where the given loop scope index has been
+     * introduced. The returned node, if non-null (so it has been found, which
+     * means that the inputs to the method make sense) has guaranteed a
+     * {@link LoopInvariantBuiltInRuleApp} application.
+     *
+     * @param node
+     *            The {@link Node} to start with; will search upwards in the
+     *            {@link Proof} tree from there.
+     * @param loopScopeIdxVar
+     *            The loop scope index {@link LocationVariable} to find the
+     *            introducing {@link Node} for.
+     * @return The {@link Node} where the given loop scope index has been
+     *         introduced, or null, if the inputs do not make sense (i.e., in
+     *         the tree above node there is not the
+     *         {@link LoopScopeInvariantRule} application that is being looked
+     *         for).
+     */
+    public static Node findCorrespondingLoopInvNode(Node node,
+            LocationVariable loopScopeIdxVar) {
+        Node currNode = node.parent();
+        boolean found = false;
+        while (!currNode.root()) {
+            if (currNode.getAppliedRuleApp()
+                    .rule() == LoopScopeInvariantRule.INSTANCE
+                    && !currNode.getLocalProgVars().contains(loopScopeIdxVar)) {
+
+                found = true;
+                break;
+
+            }
+
+            currNode = currNode.parent();
+        }
+
+        if (!found) {
+            currNode = null;
+        }
+        return currNode;
     }
 
 }
