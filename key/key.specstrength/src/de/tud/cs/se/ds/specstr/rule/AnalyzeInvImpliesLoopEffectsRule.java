@@ -32,7 +32,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
@@ -76,6 +75,10 @@ public final class AnalyzeInvImpliesLoopEffectsRule
             RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof AnalyzeInvImpliesLoopEffectsRuleApp;
 
+        // TODO: A use case for an inner loop will be a preserves case for an
+        // outer loop. We have to make sure that we use AnalyzeInvImplies...
+        // here and not AnalyzeUseCase.
+
         final TermBuilder tb = services.getTermBuilder();
 
         final AnalyzeInvImpliesLoopEffectsRuleApp aiileApp = //
@@ -100,13 +103,12 @@ public final class AnalyzeInvImpliesLoopEffectsRule
                 .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
 
         // Retrieve store equalities
-        final IProgramMethod pm = getFOContract(services).getTarget();
         final Term origHeapTerm = MergeRuleUtils
                 .getUpdateRightSideFor(updateTerm, heapVar);
 
         final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
                 extractStoreEqsAndInnerHeapTerm(//
-                    services, pm, origHeapTerm);
+                    services, origHeapTerm);
 
         final List<Term> storeEqualities = storeEqsAndInnerHeapTerm.isPresent()
                 ? storeEqsAndInnerHeapTerm.get().second : new ArrayList<>();
@@ -257,13 +259,29 @@ public final class AnalyzeInvImpliesLoopEffectsRule
 
         final Services services = goal.proof().getServices();
 
-        Optional<LocationVariable> lsi = null;
-        return (lsi = retrieveLoopScopeIndex(pio, services)).isPresent()
+        return pio != null && inAnyPreservedCase(pio, services)
                 && !(pio.subTerm().sub(1).op() instanceof Modality)
-                && MergeRuleUtils
-                        .getUpdateRightSideFor(pio.subTerm().sub(0), lsi.get())
-                        .equals(services.getTermBuilder().FALSE())
                 && !alreadyAnalysisGoal(goal.node().parent());
+    }
+
+    private boolean inAnyPreservedCase(PosInOccurrence pio, Services services) {
+        final List<LocationVariable> indices = //
+                retrieveLoopScopeIndices(pio, services);
+
+        if (indices.isEmpty()) {
+            return false;
+        }
+
+        for (LocationVariable lsi : indices) {
+            final Term rhs = MergeRuleUtils
+                    .getUpdateRightSideFor(pio.subTerm().sub(0), lsi);
+
+            if (rhs != null && rhs.equals(services.getTermBuilder().FALSE())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Override

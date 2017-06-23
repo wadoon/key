@@ -14,7 +14,6 @@
 package de.tud.cs.se.ds.specstr.rule;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -39,6 +38,7 @@ import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * The {@link RuleApp} for the {@link AnalyzeInvImpliesLoopEffectsRule}.
@@ -103,13 +103,23 @@ public class AnalyzeInvImpliesLoopEffectsRuleApp
         LocationVariable loopScopeIdxVar = null;
 
         for (SequentFormula sf : goal.node().sequent().succedent()) {
-            Optional<LocationVariable> maybeIdxVar = LogicUtilities
-                    .retrieveLoopScopeIndex(
+            List<LocationVariable> maybeIdxVar = LogicUtilities
+                    .retrieveLoopScopeIndices(
                         new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
                         services);
 
-            if (maybeIdxVar.isPresent()) {
-                loopScopeIdxVar = maybeIdxVar.get();
+            if (!maybeIdxVar.isEmpty()) {
+                // As the result of preorder visiting, the outer loop scope
+                // index, the one we're interested in, should be first.
+                // Alternatively, one could get the var with false RHS.
+                final List<LocationVariable> falseLSI = maybeIdxVar.stream()
+                        .filter(lsi -> MergeRuleUtils
+                                .getUpdateRightSideFor(sf.formula().sub(0), lsi)
+                                .equals(services.getTermBuilder().FALSE()))
+                        .collect(Collectors.toList());
+                assert falseLSI
+                        .size() == 1 : "There has to be exaclty one loop scope index that's set to false.";
+                loopScopeIdxVar = falseLSI.get(0);
                 break;
             }
         }

@@ -94,6 +94,7 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
                 .sequent().succedent().getFirst().formula().sub(1)).sub(0);
 
         final IProgramMethod pm = fContract.getTarget();
+        boolean isVoid = pm.isVoid();
 
         // The variables that we're interested in are the heap (for non-static,
         // non-pure methods) and the result variable (for non-void methods),
@@ -104,14 +105,14 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
 
         final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
                 extractStoreEqsAndInnerHeapTerm(//
-                    services, pm, origHeapTerm);
+                    services, origHeapTerm);
 
         final List<Term> storeEqualities = hasHeap
                 ? storeEqsAndInnerHeapTerm.get().second : new ArrayList<>();
 
         // We have to look the variable up from the current namespaces, since
         // otherwise we will obtain a different object...
-        final LocationVariable resultVar = pm.isVoid() ? null
+        final LocationVariable resultVar = isVoid ? null
                 : (LocationVariable) goal.getLocalNamespaces()
                         .programVariables()
                         .lookup(fContract.getResult().op().name());
@@ -123,7 +124,7 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
                 && updateContent.get(resultVar) != null;
 
         final Term updateWithoutVarsOfInterest = updateContent.keySet().stream()
-                .filter(lhs -> pm.isVoid() || !lhs.equals(resultVar))
+                .filter(lhs -> isVoid || !lhs.equals(resultVar))
                 .filter(lhs -> !lhs.equals(heapVar))
                 .map(lhs -> tb.elementary(lhs, updateContent.get(lhs)))
                 .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
@@ -221,9 +222,6 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
 
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        final TermBuilder tb = goal.proof().getServices().getTermBuilder();
-
-        Optional<LocationVariable> lsi = null;
         Term f = null;
 
         // We exclude facts for sequents of type "\Gamma ==> \Delta, {U}false",
@@ -234,10 +232,7 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
                 && f.op() instanceof UpdateApplication
                 && !(f.sub(1).op() instanceof Modality)
                 && !TermBuilder.goBelowUpdates(f).op().equals(Junctor.FALSE)
-                && (!(lsi = retrieveLoopScopeIndex(pio,
-                    goal.proof().getServices())).isPresent() || MergeRuleUtils
-                            .getUpdateRightSideFor(f.sub(0), lsi.get())
-                            .equals(tb.TRUE()))
+                && !AnalyzeInvImpliesLoopEffectsRule.INSTANCE.isApplicable(goal, pio)
                 && (goal.node().getNodeInfo().getBranchLabel() == null
                         || !goal.node().getNodeInfo().getBranchLabel()
                                 .equals(LoopScopeInvariantRule. //

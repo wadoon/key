@@ -43,9 +43,6 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -88,18 +85,13 @@ public final class LogicUtilities {
      *
      * @param services
      *            The {@link Services} object.
-     * @param pm
-     *            The {@link IProgramMethod} under investigation -- only used to
-     *            determine whether it's static and we therefore have to do
-     *            anything at all.
      * @param origHeapTerm
      *            The heap {@link Term} to analyze.
      * @return A pair of the inner heap in origHeapTerm and the stores around
      *         the inner heap.
      */
     public static Optional<Pair<Term, List<Term>>> extractStoreEqsAndInnerHeapTerm(
-            Services services, final IProgramMethod pm,
-            final Term origHeapTerm) {
+            Services services, final Term origHeapTerm) {
         if (origHeapTerm == null) {
             return Optional.empty();
         }
@@ -109,35 +101,32 @@ public final class LogicUtilities {
 
         final List<Term> storeEqualities = new ArrayList<>();
         Term innerHeapTerm = origHeapTerm;
-        if (!pm.isStatic()) {
-            // TODO Should we also check whether pm is pure? How to do this?
 
-            // TODO: Is it justified to assume that a heap is of the form
-            // store(store(...(anon/heap...))), i.e. if there is a store,
-            // then we have a store sequence at the beginning?
-            Term currHeapTerm = innerHeapTerm;
-            while (currHeapTerm.op() == heapLDT.getStore()) {
-                final Term targetObj = currHeapTerm.sub(1);
-                final Term field = currHeapTerm.sub(2);
-                final Term value = currHeapTerm.sub(3);
+        // TODO: Is it justified to assume that a heap is of the form
+        // store(store(...(anon/heap...))), i.e. if there is a store,
+        // then we have a store sequence at the beginning?
+        Term currHeapTerm = innerHeapTerm;
+        while (currHeapTerm.op() == heapLDT.getStore()) {
+            final Term targetObj = currHeapTerm.sub(1);
+            final Term field = currHeapTerm.sub(2);
+            final Term value = currHeapTerm.sub(3);
 
-                // Note: value could contain method-local variables, in which
-                // case the fact is likely to be uncovered by the post
-                // condition. Still, we don't remove it, since then indeed, this
-                // reflects behavior that is not shown to the outside, and thus
-                // indicates that we're not using the strongest possible post
-                // condition.
+            // Note: value could contain method-local variables, in which
+            // case the fact is likely to be uncovered by the post
+            // condition. Still, we don't remove it, since then indeed, this
+            // reflects behavior that is not shown to the outside, and thus
+            // indicates that we're not using the strongest possible post
+            // condition.
 
-                storeEqualities.add(tb.equals(
-                    tb.select(value.sort(), tb.getBaseHeap(), targetObj, field),
-                    value));
+            storeEqualities.add(tb.equals(
+                tb.select(value.sort(), tb.getBaseHeap(), targetObj, field),
+                value));
 
-                currHeapTerm = currHeapTerm.sub(0);
-            }
-
-            // Here, currHeapTerm should be the "core" without any stores.
-            innerHeapTerm = currHeapTerm;
+            currHeapTerm = currHeapTerm.sub(0);
         }
+
+        // Here, currHeapTerm should be the "core" without any stores.
+        innerHeapTerm = currHeapTerm;
 
         return Optional
                 .of(new Pair<Term, List<Term>>(innerHeapTerm, storeEqualities));
@@ -163,60 +152,26 @@ public final class LogicUtilities {
     }
 
     /**
-     * Extracts the loop scope index from the given {@link PosInOccurrence}, if
-     * possible; otherwise, returns an empty {@link Optional}.
+     * Extracts all loop scope indices from the given {@link PosInOccurrence},
+     * if possible; otherwise, returns an empty {@link Set}.
      *
      * @param pio
-     *            The {@link PosInOccurrence} that maybe contains a loop scope
-     *            index.
+     *            The {@link PosInOccurrence} that maybe contains one or more
+     *            loop scope indices
      * @param services
      *            The {@link Services} object.
-     * @return Maybe a loop scope index, if it can be found.
+     * @return The {@link Set} of all loop scope indices.
      * @see LoopScopeInvariantRule
+     * @see ParameterlessTermLabel#LOOP_SCOPE_INDEX_LABEL
      */
-    public static Optional<LocationVariable> retrieveLoopScopeIndex(
+    public static List<LocationVariable> retrieveLoopScopeIndices(
             PosInOccurrence pio, Services services) {
-        final Optional<LocationVariable> failedResult = Optional.empty();
-
-        final Term formula;
-        if (pio == null //
-                || !pio.isTopLevel() //
-                || (formula = pio.subTerm()).containsJavaBlockRecursive()
-                || !(formula.op() instanceof UpdateApplication)) {
-            return failedResult;
-        }
-
-        // @formatter:off
-
-        // Expected structure:
-        // {U}((x<<loopScopeIndex>> = TRUE  -> ...) &
-        //      x<<loopScopeIndex>> = FALSE -> ...)
-
-        // @formatter:on
-
-        final Term updateTarget = formula.sub(1);
-
-        if (updateTarget.op() != Junctor.AND
-                || updateTarget.sub(0).op() != Junctor.IMP
-                || updateTarget.sub(1).op() != Junctor.IMP
-                || updateTarget.sub(0).sub(0).op() != Equality.EQUALS
-                || updateTarget.sub(1).sub(0).op() != Junctor.NOT
-                || updateTarget.sub(1).sub(0).sub(0).op() != Equality.EQUALS) {
-            return failedResult;
-        }
-
-        final Term loopScopeVar = updateTarget.sub(0).sub(0).sub(0);
-        final Term negatedLoopScopeVar = updateTarget.sub(0).sub(0).sub(0);
-
-        if (!(loopScopeVar.op() instanceof LocationVariable)
-                || !loopScopeVar.hasLabels()
-                || loopScopeVar.getLabel(
-                    ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL_NAME) == null
-                || loopScopeVar != negatedLoopScopeVar) {
-            return failedResult;
-        }
-
-        return Optional.of((LocationVariable) loopScopeVar.op());
+        final LoopScopeIndexVisitor visitor = new LoopScopeIndexVisitor();
+        // Preorder walking makes sure that the "outer" loop scope index is
+        // visited first.
+        final Term formula = TermBuilder.goBelowUpdates(pio.subTerm());
+        formula.execPreOrder(visitor);
+        return visitor.getLoopScopeIndeces();
     }
 
     /**
@@ -754,6 +709,29 @@ public final class LogicUtilities {
 
         public Term getSetPredTerm() {
             return setPredTerm;
+        }
+    }
+
+    private static class LoopScopeIndexVisitor extends DefaultVisitor {
+        /**
+         * The result of the {@link Visitor} execution.
+         */
+        private List<LocationVariable> indices = new ArrayList<>();
+
+        @Override
+        public void visit(Term visited) {
+            if (visited.op() instanceof LocationVariable && visited.hasLabels()
+                    && visited.containsLabel(
+                        ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)) {
+                final LocationVariable lsi = (LocationVariable) visited.op();
+                if (!indices.contains(lsi)) {
+                    indices.add(lsi);
+                }
+            }
+        }
+
+        public List<LocationVariable> getLoopScopeIndeces() {
+            return indices;
         }
     }
 

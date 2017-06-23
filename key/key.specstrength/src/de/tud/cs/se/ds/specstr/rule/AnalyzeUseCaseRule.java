@@ -115,7 +115,7 @@ public final class AnalyzeUseCaseRule extends AbstractAnalysisRule {
         return pio != null && pio.isTopLevel() && !pio.isInAntec()
                 && !(pio.subTerm().op() instanceof UpdateApplication)
                 && !pio.subTerm().containsJavaBlockRecursive()
-                && belowNodeWithBranchLabel(goal.node(),
+                && aboveNodeWithBranchLabel(goal.node(),
                     AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL);
     }
 
@@ -127,7 +127,7 @@ public final class AnalyzeUseCaseRule extends AbstractAnalysisRule {
      * @return true iff the given {@link Node} is in the subtree starting with a
      *         {@link Node} that has the given branch label.
      */
-    private static boolean belowNodeWithBranchLabel(Node node, String label) {
+    private static boolean aboveNodeWithBranchLabel(Node node, String label) {
         while (!node.parent().root()
                 && !Optional.ofNullable(node.getNodeInfo().getBranchLabel())
                         .orElse("").equals(label)) {
@@ -136,23 +136,6 @@ public final class AnalyzeUseCaseRule extends AbstractAnalysisRule {
 
         return Optional.ofNullable(node.getNodeInfo().getBranchLabel())
                 .orElse("").equals(label);
-    }
-
-    /**
-     * Returns the label of the next parent node that is branching, i.e. has at
-     * least two children.
-     *
-     * @param node
-     *            The {@link Node} to start with.
-     * @return The label of the next parent node that is branching, i.e. has at
-     *         least two children.
-     */
-    private static Optional<String> nextParentBranchLabel(Node node) {
-        while (!node.parent().root() && node.parent().childrenCount() < 2) {
-            node = node.parent();
-        }
-
-        return Optional.ofNullable(node.getNodeInfo().getBranchLabel());
     }
 
     @Override
