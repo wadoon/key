@@ -97,8 +97,8 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
             assertEquals("i = 1 + i_0", f.getDescr());
         });
 
-        assertContains("& arr_0[i_0] = n", loopBodyFacts.get(0).getPathCond());
-        assertContains("& !arr_0[i_0] = n", loopBodyFacts.get(1).getPathCond());
+        assertContains("& !arr_0[i_0] = n", loopBodyFacts.get(0).getPathCond());
+        assertContains("& arr_0[i_0] = n", loopBodyFacts.get(1).getPathCond());
     }
 
     @Test
@@ -221,7 +221,7 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
             "findMethods/FindMethods.java",
             "FindMethods::find_stronger_inv([II)I");
 
-        assertEquals(42.86d, result.strength(), .01d);
+        assertEquals(57.14d, result.strength(), .01d);
         assertEquals(0d, result.programEffectsStrength(), 0d);
         assertEquals(50d, result.programEffectsAbstractStrength(), 0d);
         
@@ -237,23 +237,16 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
                 .getAbstractlyCoveredFactsOfType(LOOP_BODY_FACT);
         final List<Fact> abstrPostCondFacts = result
                 .getAbstractlyCoveredFactsOfType(POST_COND_FACT);
-        final List<Fact> uncUseCaseFacts = result
-                .getUncoveredFactsOfType(LOOP_USE_CASE_FACT);
         final List<Fact> uncPostCondFacts = result
                 .getUncoveredFactsOfType(POST_COND_FACT);
 
         assertEquals(4, abstrLoopBodyFacts.size());
         assertEquals(2, abstrPostCondFacts.size());
 
-        assertEquals(1, uncUseCaseFacts.size());
         assertEquals(0, uncPostCondFacts.size());
 
-        assertEquals(1, result.numUncoveredFacts());
+        assertEquals(0, result.numUncoveredFacts());
         assertEquals(6, result.numAbstractlyCoveredFacts());
-
-        assertEquals("arr_0[result_1_0]@heap[anon({}, anon_heap_LOOP)] = n",
-            uncUseCaseFacts.get(0).getDescr());
-        assertEquals("!result_1_0 = -1", uncUseCaseFacts.get(0).getPathCond());
     }
 
     @Test
@@ -307,9 +300,9 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
             assertEquals("i = 1 + i_0", f.getDescr());
         });
 
-        assertContains("& arr_0[i_0] = n",
-            abstrLoopBodyFacts.get(0).getPathCond());
         assertContains("& !arr_0[i_0] = n",
+            abstrLoopBodyFacts.get(0).getPathCond());
+        assertContains("& arr_0[i_0] = n",
             abstrLoopBodyFacts.get(1).getPathCond());
     }
 
@@ -341,17 +334,17 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
         assertEquals(0, result.numUncoveredFacts());
         assertEquals(4, result.numAbstractlyCoveredFacts());
 
-        assertEquals("result = -1", postCondFacts.get(0).getDescr());
-        assertEquals("result = result_1_0", postCondFacts.get(1).getDescr());
-        assertContains("result_1_0 = -1", postCondFacts.get(0).getPathCond());
-        assertContains("!result_1_0 = -1", postCondFacts.get(1).getPathCond());
+        assertEquals("result = result_1_0", postCondFacts.get(0).getDescr());
+        assertEquals("result = -1", postCondFacts.get(1).getDescr());
+        assertContains("!result_1_0 = -1", postCondFacts.get(0).getPathCond());
+        assertContains("result_1_0 = -1", postCondFacts.get(1).getPathCond());
 
         loopBodyFacts.forEach(f -> {
             assertEquals("i = 1 + i_0", f.getDescr());
         });
 
-        assertContains("& arr_0[i_0] = n", loopBodyFacts.get(0).getPathCond());
-        assertContains("& !arr_0[i_0] = n", loopBodyFacts.get(1).getPathCond());
+        assertContains("& !arr_0[i_0] = n", loopBodyFacts.get(0).getPathCond());
+        assertContains("& arr_0[i_0] = n", loopBodyFacts.get(1).getPathCond());
     }
 
 }
