@@ -951,7 +951,6 @@ public final class SpecificationRepository {
      */
     public void addClassInvariant(ClassInvariant inv) {
         final KeYJavaType kjt = inv.getKJT();
-<<<<<<< HEAD
         final IObserverFunction target = inv.isStatic() ? services
                 .getJavaInfo().getStaticInv(kjt) : services.getJavaInfo()
                 .getInv();
@@ -959,12 +958,6 @@ public final class SpecificationRepository {
         if(!inv.isStatic()) {
             invs.put(kjt, getClassInvariants(kjt).add(inv));
         }
-=======
-        final IObserverFunction target = inv.isStatic()
-                ? services.getJavaInfo().getStaticInv(kjt)
-                : services.getJavaInfo().getInv();
-        invs.put(kjt, getClassInvariants(kjt).add(inv));
->>>>>>> mulbrich1447
         final ImmutableSet<ClassWellDefinedness> cwds = getWdClassChecks(kjt);
         if (cwds.isEmpty()) {
             registerContract(new ClassWellDefinedness(inv, target, null, null,

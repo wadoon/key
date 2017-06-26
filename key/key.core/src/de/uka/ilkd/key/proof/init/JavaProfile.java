@@ -30,11 +30,8 @@ import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.BlockContractRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-<<<<<<< HEAD
 import de.uka.ilkd.key.rule.MethodCallToLogicRule;
-=======
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
->>>>>>> mulbrich1447
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.Rule;
