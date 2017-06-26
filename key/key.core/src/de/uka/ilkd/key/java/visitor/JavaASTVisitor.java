@@ -30,6 +30,7 @@ import de.uka.ilkd.key.rule.AbstractProgramElement;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.speclang.MergeContract;
 
 /** 
  * Extends the JavaASTWalker to use the visitor mechanism. The
@@ -67,6 +68,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker
             for (BlockContract bc : bcs) {
                 performActionOnBlockContract(bc);
             }
+        } else if (node instanceof MergePointStatement && services != null) {
+            ImmutableSet<MergeContract> mcs = services
+                    .getSpecificationRepository()
+                    .getMergeContracts((MergePointStatement) node);
+            mcs.forEach(mc -> performActionOnMergeContract(mc));
         }
     }
     
@@ -454,9 +460,9 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 
     @Override
     public void performActionOnBigintLiteral(BigintLiteral x) {
-    doDefaultAction(x);
+        doDefaultAction(x);
     }
-    
+
     @Override
     public void performActionOnLabeledStatement(LabeledStatement x) {
 	doDefaultAction(x);
@@ -757,6 +763,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     public void performActionOnSynchronizedBlock(SynchronizedBlock x) {
 	doDefaultAction(x);
     }
+    
+    @Override
+    public void performActionOnLoopScopeBlock(LoopScopeBlock x) {
+	doDefaultAction(x);
+    }
 
     @Override
     public void performActionOnThen(Then x) {
@@ -841,12 +852,22 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
     
     @Override
+    public void performActionOnMergePointStatement(MergePointStatement x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnLoopInvariant(LoopSpecification x) {
         //do nothing
     }
     
     @Override
     public void performActionOnBlockContract(BlockContract x) {
+        // do nothing
+    }
+
+    @Override
+    public void performActionOnMergeContract(MergeContract x) {
         //do nothing
     }
 
