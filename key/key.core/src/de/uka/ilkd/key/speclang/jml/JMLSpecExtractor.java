@@ -416,6 +416,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
         if(comments.length != 0) {
             //concatenate comments, determine position
             String concatenatedComment = concatenate(comments);
+            
             Position pos = comments[0].getStartPosition();
 
             //call preparser
@@ -430,6 +431,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
         //create JML contracts out of constructs, add them to result
         TextualJMLConstruct[] constructsArray
         = constructs.toArray(new TextualJMLConstruct[constructs.size()]);
+        
+        //TODO JK remove debugging output
+        //System.out.println(constructs);
 
         int startPos;
         TextualJMLMethodDecl modelMethodDecl = null;

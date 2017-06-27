@@ -48,10 +48,10 @@ public class DependencyClusterPOFormulaFactory {
         ImmutableList<InfFlowSpec> infFlowSpecs = ImmutableSLList.<InfFlowSpec>nil();
         
         //TODO JK think about how to handle multiple clusters! Check whether all cluster specs make it to this point!
-        for (DependencyClusterSpec spec: contract.getSpecs()) {
-            InfFlowSpec infFlowSpec = new InfFlowSpec(spec.getLowState(), spec.getLowState(), spec.getNewObjects());
-            infFlowSpecs = infFlowSpecs.append(infFlowSpec);
-        }
+        DependencyClusterSpec spec = contract.getSpecs();
+        InfFlowSpec infFlowSpec = new InfFlowSpec(spec.getLowState(), spec.getLowState(), spec.getNewObjects());
+        infFlowSpecs = infFlowSpecs.append(infFlowSpec);
+        
         
         infFlowContract = 
                 new InformationFlowContractImpl(contract.getName(), 
@@ -104,7 +104,7 @@ public class DependencyClusterPOFormulaFactory {
         ImmutableList<Term> collectedTerms = ImmutableSLList.<Term>nil();
         Term updateHeapPre = tb.elementary(tb.getBaseHeap(), ifVars.c1.pre.heap);
         Term updateHeapPost = tb.elementary(tb.getBaseHeap(), ifVars.c1.post.heap);
-        for (Term term: contract.getSpecs().head().getLowState()) {
+        for (Term term: contract.getSpecs().getLowState()) {
             Term termAtPre = tb.apply(updateHeapPre, term);
             Term termAtPost = tb.apply(updateHeapPost, term);
             collectedTerms = collectedTerms.append(tb.equals(termAtPre, termAtPost));

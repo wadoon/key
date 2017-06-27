@@ -857,7 +857,7 @@ dependency_cluster_spec
 @init { result = r; }
 @after { r = result; }
 :
-    CLUSTER result=expression { result = result.prepend("cluster "); }
+    CLUSTER result=expression { result = result.prepend("cluster ");}
 ;
 
 

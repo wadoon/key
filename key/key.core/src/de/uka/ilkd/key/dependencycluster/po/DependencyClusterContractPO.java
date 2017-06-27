@@ -267,7 +267,7 @@ public class DependencyClusterContractPO extends AbstractOperationPO
         Term updatedParams2 =tb.elementary(ldt.getCurrentParams(), params2); //TODO JK probably we'll need to make an updated heap as well. In the long run use a function here anyway...
         
         ImmutableList<Term> collectedConditionsForEquivalenceOfVisibleEvents = ImmutableSLList.<Term>nil();
-        for (Lowlist list: contract.getSpecs().head().getLowIn()) {
+        for (Lowlist list: contract.getSpecs().getLowIn()) {
             Term checkDirection = tb.func(ldt.evIncoming());
             Term checkCalltype;
             if (list.getCallType() == Lowlist.MessageType.CALL) {

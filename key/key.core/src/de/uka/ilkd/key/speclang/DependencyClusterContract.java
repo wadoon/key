@@ -33,7 +33,7 @@ public interface DependencyClusterContract extends Contract {
 
     public Term getHeapAtPre();
 
-    public ImmutableList<DependencyClusterSpec> getSpecs();
+    public DependencyClusterSpec getSpecs();
 
     public Term getSelf();
 }

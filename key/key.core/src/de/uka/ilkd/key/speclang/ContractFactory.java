@@ -298,7 +298,7 @@ public class ContractFactory {
             boolean hasMod,
             ProgramVariableCollection progVars,
             Term accessible,
-            ImmutableList<DependencyClusterSpec> dependencyClusterSpecs,
+            DependencyClusterSpec dependencyClusterSpec,
             boolean toBeSaved) {
         final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         final Term atPre = tb.var(progVars.atPreVars.get(baseHeap));
@@ -310,7 +310,7 @@ public class ContractFactory {
         return new DependencyClusterContractImpl(
                 DEP_CLUSTER_CONTRACT_BASENAME, forClass, pm, specifiedIn,
                 modality, requires, measuredBy, modifies, hasMod, self, params,
-                result, exc, atPre, accessible, dependencyClusterSpecs, toBeSaved);
+                result, exc, atPre, accessible, dependencyClusterSpec, toBeSaved);
     }
 
     @Override

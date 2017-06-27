@@ -204,17 +204,20 @@ public class JMLSpecFactory {
                 DefaultImmutableSet.<Contract>nil();
         
         if (clauses.dependencyClusterSpecs != null && !clauses.dependencyClusterSpecs.isEmpty()) {
-            contracts = contracts.add(cf.createDependencyClusterContract(pm.getContainerType(), pm, 
-                                                                         pm.getContainerType(), 
-                                                                         Modality.BOX,
-                                                                         clauses.requires.get(heap),
-                                                                         clauses.measuredBy,
-                                                                         clauses.assignables.get(heap),
-                                                                         !clauses.hasMod.get(heap),
-                                                                         progVars,
-                                                                         clauses.accessibles.get(heap),
-                                                                         clauses.dependencyClusterSpecs,
-                                                                         false));
+            for (DependencyClusterSpec spec: clauses.dependencyClusterSpecs) {
+                contracts = contracts.add(cf.createDependencyClusterContract(pm.getContainerType(), pm, 
+                        pm.getContainerType(), 
+                        Modality.BOX,
+                        clauses.requires.get(heap),
+                        clauses.measuredBy,
+                        clauses.assignables.get(heap),
+                        !clauses.hasMod.get(heap),
+                        progVars,
+                        clauses.accessibles.get(heap),
+                        spec,
+                        false));
+            }
+
         }
         return contracts;
     }
@@ -579,14 +582,15 @@ public class JMLSpecFactory {
         ImmutableList<DependencyClusterSpec> result =
                                  ImmutableSLList.<DependencyClusterSpec>nil();
         for (PositionedString expr : originalClauses) {
-//TODO extend Parser to handle dependency cluster specs
+
             DependencyClusterSpec translated =
                         JMLTranslator.translate(expr, pm.getContainerType(),
                                                 selfVar, paramVars, resultVar,
                                                 excVar, null, DependencyClusterSpec.class, services);
             result = result.append(translated);
-            //result = result.append(new DependencyClusterSpec(expr.text));
         }
+        //TODO JK remove debug output
+        System.out.println("HERE:" + result);
         return result;
     }
 }

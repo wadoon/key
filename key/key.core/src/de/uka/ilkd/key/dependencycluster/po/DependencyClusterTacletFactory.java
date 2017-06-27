@@ -126,7 +126,7 @@ public class DependencyClusterTacletFactory {
     public Term equivalenceForMessagesWithoutLowPart() {
         //TODO JK Do I still need this??? When are messages equivalent if they have no specified low parts in their content?
         ImmutableList<Term> collectedTerms = ImmutableSLList.<Term>nil();
-        for (Lowlist list:contract.getSpecs().head().getLowIn().append(contract.getSpecs().head().getLowOut())) {
+        for (Lowlist list:contract.getSpecs().getLowIn().append(contract.getSpecs().getLowOut())) {
             Term specifiedCalltype;
             if (list.getCallType() == Lowlist.MessageType.CALL) {
                 specifiedCalltype = tb.func(ldt.evCall());
@@ -174,7 +174,7 @@ public class DependencyClusterTacletFactory {
     
     public Term invisibilityForMessagesWithoutSpec() {
         ImmutableList<Term> collectedTerms = ImmutableSLList.<Term>nil();
-        for (VisibilityCondition condition:contract.getSpecs().head().getVisible()) {
+        for (VisibilityCondition condition:contract.getSpecs().getVisible()) {
             Term specifiedCalltype;
             if (condition.getMessageType() == VisibilityCondition.MessageType.CALL) {
                 specifiedCalltype = tb.func(ldt.evCall());
@@ -259,7 +259,7 @@ public class DependencyClusterTacletFactory {
 
     public Term eventVisibleDueToExplicitSpec() {
         ImmutableList<Term> conditions = ImmutableSLList.<Term>nil();
-        for (VisibilityCondition condition: contract.getSpecs().head().getVisible()) {
+        for (VisibilityCondition condition: contract.getSpecs().getVisible()) {
 
             Term checkDirection;
             if (condition.getDirection() == VisibilityCondition.Direction.IN){
@@ -296,8 +296,8 @@ public class DependencyClusterTacletFactory {
     }
 
     public ImmutableList<Term> collectedConditionsForEquivalenceOfVisibleEvents() {
-        ImmutableList<Term> collectedConditionsForEquivalenceOfVisibleEvents = equivalenceConditionsForLowlist(contract.getSpecs().head().getLowIn());
-        collectedConditionsForEquivalenceOfVisibleEvents = collectedConditionsForEquivalenceOfVisibleEvents.append(equivalenceConditionsForLowlist(contract.getSpecs().head().getLowOut()));
+        ImmutableList<Term> collectedConditionsForEquivalenceOfVisibleEvents = equivalenceConditionsForLowlist(contract.getSpecs().getLowIn());
+        collectedConditionsForEquivalenceOfVisibleEvents = collectedConditionsForEquivalenceOfVisibleEvents.append(equivalenceConditionsForLowlist(contract.getSpecs().getLowOut()));
         
         Term equivalenceForMessagesWithoutLowPart = equivalenceForMessagesWithoutLowPart();
         collectedConditionsForEquivalenceOfVisibleEvents = collectedConditionsForEquivalenceOfVisibleEvents.append(equivalenceForMessagesWithoutLowPart);

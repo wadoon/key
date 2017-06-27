@@ -220,6 +220,7 @@ public final class SLEnvInput extends AbstractEnvInput {
                 //contracts
         	final ImmutableSet<SpecificationElement> methodSpecs
         	    = specExtractor.extractMethodSpecs(pm,staticInvPresent);
+
         	specRepos.addSpecs(methodSpecs);
 
                 //loop invariants

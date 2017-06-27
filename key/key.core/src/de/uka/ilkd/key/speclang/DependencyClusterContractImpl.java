@@ -45,7 +45,7 @@ public class DependencyClusterContractImpl
     private final Term origAtPre;
     private final boolean toBeSaved;
     private final Term origDep;
-    private final ImmutableList<DependencyClusterSpec> origDependencyClusterSpecs;
+    private final DependencyClusterSpec origDependencyClusterSpec;
     
     final boolean hasRealModifiesClause;
 
@@ -64,9 +64,9 @@ public class DependencyClusterContractImpl
             Term exc,
             Term heapAtPre,
             Term dep,
-            ImmutableList<DependencyClusterSpec> dependencyClusterSpecs,
+            DependencyClusterSpec dependencyClusterSpec,
             boolean toBeSaved) {
-        this(baseName, forClass, pm, specifiedIn, modality, pre, mby, mod, hasRealMod, self, params, result, exc, heapAtPre, dep, dependencyClusterSpecs, toBeSaved, INVALID_ID);
+        this(baseName, forClass, pm, specifiedIn, modality, pre, mby, mod, hasRealMod, self, params, result, exc, heapAtPre, dep, dependencyClusterSpec, toBeSaved, INVALID_ID);
     }
     
     protected DependencyClusterContractImpl(String baseName,
@@ -84,7 +84,7 @@ public class DependencyClusterContractImpl
                                         Term exc,
                                         Term heapAtPre,
                                         Term dep,
-                                        ImmutableList<DependencyClusterSpec> dependencyClusterSpecs,
+                                        DependencyClusterSpec dependencyClusterSpec,
                                         boolean toBeSaved,
                                         int id) {
         this.id = id;
@@ -105,7 +105,7 @@ public class DependencyClusterContractImpl
         this.hasRealModifiesClause  = hasRealMod;
         this.toBeSaved = toBeSaved;
         this.origDep = dep;
-        this.origDependencyClusterSpecs = dependencyClusterSpecs;
+        this.origDependencyClusterSpec = dependencyClusterSpec;
 
     }
 
@@ -237,11 +237,11 @@ public class DependencyClusterContractImpl
     public String getHTMLText(Services services) {
         // TODO implement
         return "<html>" +
-        "<b>LowIn </b>" + origDependencyClusterSpecs.head().getLowIn() +"<br>" +
-        "<b>LowOut </b>" + origDependencyClusterSpecs.head().getLowOut() +"<br>" +
-        "<b>LowState </b>" + origDependencyClusterSpecs.head().getLowState() +"<br>" +
-        "<b>Visible </b>" + origDependencyClusterSpecs.head().getVisible() +"<br>" +
-        "<b>New Objects </b>" + origDependencyClusterSpecs.head().getNewObjects() +"<br>" +
+        "<b>LowIn </b>" + origDependencyClusterSpec.getLowIn() +"<br>" +
+        "<b>LowOut </b>" + origDependencyClusterSpec.getLowOut() +"<br>" +
+        "<b>LowState </b>" + origDependencyClusterSpec.getLowState() +"<br>" +
+        "<b>Visible </b>" + origDependencyClusterSpec.getVisible() +"<br>" +
+        "<b>New Objects </b>" + origDependencyClusterSpec.getNewObjects() +"<br>" +
         "</html>";
     }
 
@@ -249,7 +249,7 @@ public class DependencyClusterContractImpl
     public String getPlainText(Services services) {
         // TODO implement
         return "plain text for: "
-                + origDependencyClusterSpecs;
+                + origDependencyClusterSpec;
     }
 
     @Override
@@ -297,13 +297,13 @@ public class DependencyClusterContractImpl
     @Override
     public Contract setID(int newId) {
         return new DependencyClusterContractImpl(baseName, forClass, pm, specifiedIn, modality, origPre, origMby, origMod, hasRealModifiesClause, origSelf, origParams, 
-                origResult, origExc, origAtPre, origDep, origDependencyClusterSpecs, toBeSaved, newId);
+                origResult, origExc, origAtPre, origDep, origDependencyClusterSpec, toBeSaved, newId);
     }
 
     @Override
     public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         return new DependencyClusterContractImpl(baseName, newKJT, (IProgramMethod)newPM, specifiedIn, modality, origPre, origMby, origMod, hasRealModifiesClause, origSelf, origParams, 
-                origResult, origExc, origAtPre, origDep, origDependencyClusterSpecs, toBeSaved, id);
+                origResult, origExc, origAtPre, origDep, origDependencyClusterSpec, toBeSaved, id);
     }
 
     @Override
@@ -401,8 +401,8 @@ public class DependencyClusterContractImpl
     }
 
     @Override
-    public ImmutableList<DependencyClusterSpec> getSpecs() {
-        return origDependencyClusterSpecs;
+    public DependencyClusterSpec getSpecs() {
+        return origDependencyClusterSpec;
     }
 
     @Override

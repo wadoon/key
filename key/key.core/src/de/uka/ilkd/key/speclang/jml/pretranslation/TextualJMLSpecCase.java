@@ -354,12 +354,12 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
     
     public void addDepClusterSpecs(PositionedString ps) {
-        dependencyClusters = infFlowSpecs.append(ps);
+        dependencyClusters = dependencyClusters.append(ps);
     }
 
 
     public void addDepClusterSpecs(ImmutableList<PositionedString> l) {
-        dependencyClusters = infFlowSpecs.append(l);
+        dependencyClusters = dependencyClusters.append(l);
     }
 
 
