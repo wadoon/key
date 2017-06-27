@@ -963,6 +963,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
 		preGoal.addFormula(new SequentFormula(tb.applySequential(new Term[]{inst.u, atPreUpdates},similarFormula)), true, false);
 		if (pm.getMethodDeclaration().isRemote()) {
+			// TODO KD a known <inv> and <inv> to prove dont match sometimes
 			// updateOther already applied to originalPre
 			preGoal.addFormula(new SequentFormula(getInv(originalPre, contractSelf, tb)), true, false);
 		}
