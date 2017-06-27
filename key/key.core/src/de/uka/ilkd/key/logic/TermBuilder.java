@@ -89,8 +89,6 @@ public class TermBuilder {
     private final TermFactory tf;
     private final Term tt;
     private final Term ff;
-    private final Term call;
-    private final Term termination;
 
     protected final Services services; // TODO; Make private
     
@@ -99,10 +97,7 @@ public class TermBuilder {
        this.services = services;
        this.tf = tf;
        this.tt = tf.createTerm(Junctor.TRUE);
-       this.ff = tf.createTerm(Junctor.FALSE);
-       this.call = tf.createTerm(MessageTypeValue.CALL);
-       this.termination = tf.createTerm(MessageTypeValue.TERMINATION);
-               
+       this.ff = tf.createTerm(Junctor.FALSE);             
     }
 
 
@@ -2355,16 +2350,17 @@ public class TermBuilder {
                                 heap1_pre, heap1_post, locset1, heap2_pre, heap2_post, locset2);
     }
     
+    //TODO JK handle calls and terminations differently for consistency with depclusters
     //-------------------------------------------------------------------------
     // component based systems operators
     //-------------------------------------------------------------------------
     
     public Term call() {
-        return this.call;
+        return tf.createTerm(MessageTypeValue.CALL);
     }
     
     public Term termination() {
-        return this.termination;
+        return tf.createTerm(MessageTypeValue.TERMINATION);
     }
     
 }
