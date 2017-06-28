@@ -151,10 +151,13 @@ lexer grammar KeYJMLLexer;
     UNIONINF             : '\\infinite_union';  //KeY extension, not official JML
     VALUES               : '\\values';
     WORKINGSPACE         : '\\working_space';
+    EVENT                : '\\event'; //KeY extension, not official JML // TODO KD z maybe hack
     // ONLY_ACCESSED     : '\\only_accessed'; // too many common lexemes
     // ONLY_ASSIGNED     : '\\only_assigned';
     // ONLY_CALLED       : '\\only_called';
     // ONLY_CAPTURED     : '\\only_captured';
+    
+    METHODID             : '\\methodID'; // TODO KD z hacky
 
 AND : '&';
 BITWISENOT : '~';

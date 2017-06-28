@@ -144,136 +144,136 @@ public final class DependencyContractPO extends AbstractPO
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------        
-    
-    @Override
-    public void readProblem() throws ProofInputException {       
-       assert proofConfig == null;
-       IObserverFunction target = contract.getTarget();
-       if(target instanceof IProgramMethod) {
-          target = javaInfo.getToplevelPM(contract.getKJT(),
-                (IProgramMethod)target);
-          // FIXME: for some reason the above method call returns null now and then, the following line (hopefully) is a work-around
-          if (target == null) target = contract.getTarget();
-       }
-       
-       final Services proofServices = postInit();
-       
-       //prepare variables
-       final ProgramVariable selfVar
-       = !contract.getTarget().isStatic() 
-       ? tb.selfVar(contract.getKJT(), true) : null;
-       final ImmutableList<ProgramVariable> paramVars
-       = tb.paramVars(target, true);
 
-       final boolean twoState = (contract.getTarget().getStateCount() == 2);
-       final int heapCount = contract.getTarget().getHeapCount(proofServices);
+	@Override
+	public void readProblem() throws ProofInputException {       
+		assert proofConfig == null;
+		IObserverFunction target = contract.getTarget();
+		if(target instanceof IProgramMethod) {
+			target = javaInfo.getToplevelPM(contract.getKJT(),
+					(IProgramMethod)target);
+			// FIXME: for some reason the above method call returns null now and then, the following line (hopefully) is a work-around
+			if (target == null) target = contract.getTarget();
+		}
 
-       final Map<LocationVariable,LocationVariable> preHeapVars =
-             new LinkedHashMap<LocationVariable, LocationVariable>();
-       final Map<LocationVariable,LocationVariable> preHeapVarsReverse =
-             new LinkedHashMap<LocationVariable, LocationVariable>();
-       List<LocationVariable> heaps = new LinkedList<LocationVariable>();
-       int hc = 0;
-       for(LocationVariable h : HeapContext.getModHeaps(proofServices, false)) {
-          if(hc >= heapCount) {
-             break;
-          }
-          heaps.add(h);
-          LocationVariable preVar = twoState ?
-                tb.heapAtPreVar(h.name()+"AtPre", h.sort(), true)
-                : null ;
-                if(preVar != null) { register(preVar, proofServices); heaps.add(preVar); }
-                preHeapVars.put(h, preVar);
-                if(preVar != null) {
-                   preHeapVarsReverse.put(preVar, h);
-                }
-       }
+		final Services proofServices = postInit();
 
-       Term permsFor = tb.tt();
-       if(heapCount == 2 && proofServices.getTypeConverter().getHeapLDT().getPermissionHeap() != null) {
-           int stateCount = contract.getTarget().getStateCount();
-           for(int i=0;i<stateCount;i++) {
-               LocationVariable h = heaps.get(i);
-               LocationVariable p = heaps.get(i+stateCount);
-               final Term pf = tb.permissionsFor(p, h);
-               permsFor = tb.and(permsFor, pf);
-           }
-       }
+		//prepare variables
+		final ProgramVariable selfVar
+				= !contract.getTarget().isStatic() 
+				? tb.selfVar(contract.getKJT(), true) : null;
+		final ImmutableList<ProgramVariable> paramVars
+				= tb.paramVars(target, true);
 
-       //register the variables and anon heap so they are declared in proof 
-       //header if the proof is saved to a file
-       register(selfVar, proofServices);	
-       register(paramVars, proofServices);
+		final boolean twoState = (contract.getTarget().getStateCount() == 2);
+		final int heapCount = contract.getTarget().getHeapCount(proofServices);
 
-       Term wellFormedHeaps = null;
-       Term update = null;
-       for(LocationVariable h : heaps) {
-          final Term wellFormedHeap = tb.wellFormed(h);
-          if(wellFormedHeaps == null) {
-             wellFormedHeaps = wellFormedHeap;
-          } else {
-             wellFormedHeaps = tb.and(wellFormedHeaps, wellFormedHeap);
-          }
-          //prepare anon heap
-          final Name anonHeapName = new Name(tb.newName("anon_"+h.toString()));
-          final Function anonHeapFunc = new Function(anonHeapName, heapLDT.targetSort());
-          register(anonHeapFunc, proofServices);
-          final Term anonHeap = tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
-          final Term wellFormedAnonHeap = tb.wellFormed(anonHeap);
-          if(wellFormedHeaps == null) {
-             wellFormedHeaps = wellFormedAnonHeap;
-          } else {
-             wellFormedHeaps = tb.and(wellFormedHeaps,wellFormedAnonHeap);
-          }
-          //prepare update
-          final boolean atPre = preHeapVars.values().contains(h);
-          final Term dep = getContract().getDep(atPre ?
-                preHeapVarsReverse.get(h) : h, atPre, selfVar, paramVars, preHeapVars, proofServices);
-          final Term changedHeap =
-                tb.anon(tb.var(h), tb.setMinus(tb.allLocs(), dep),
-                      anonHeap);
-          final Term u = tb.elementary(h, changedHeap);
-          if (update == null) {
-             update = u;
-          } else {
-             update = tb.parallel(update, u);
-          }
-       }
+		final Map<LocationVariable,LocationVariable> preHeapVars =
+				new LinkedHashMap<LocationVariable, LocationVariable>();
+		final Map<LocationVariable,LocationVariable> preHeapVarsReverse =
+				new LinkedHashMap<LocationVariable, LocationVariable>();
+		List<LocationVariable> heaps = new LinkedList<LocationVariable>();
+		int hc = 0;
+		for(LocationVariable h : HeapContext.getModHeaps(proofServices, false)) {
+			if(hc >= heapCount) {
+				break;
+			}
+			heaps.add(h);
+			LocationVariable preVar = twoState ?
+					tb.heapAtPreVar(h.name()+"AtPre", h.sort(), true)
+					: null ;
+			if(preVar != null) { register(preVar, proofServices); heaps.add(preVar); }
+			preHeapVars.put(h, preVar);
+			if(preVar != null) {
+				preHeapVarsReverse.put(preVar, h);
+			}
+		}
 
-       //translate contract
-       final Term pre = tb.and(
-             buildFreePre(heaps, selfVar,
-                   contract.getKJT(), paramVars, wellFormedHeaps, proofServices),
-                   permsFor, contract.getPre(heapLDT.getHeap(), selfVar, paramVars,
-                         null, proofServices));
+		Term permsFor = tb.tt();
+		if(heapCount == 2 && proofServices.getTypeConverter().getHeapLDT().getPermissionHeap() != null) {
+			int stateCount = contract.getTarget().getStateCount();
+			for(int i=0;i<stateCount;i++) {
+				LocationVariable h = heaps.get(i);
+				LocationVariable p = heaps.get(i+stateCount);
+				final Term pf = tb.permissionsFor(p, h);
+				permsFor = tb.and(permsFor, pf);
+			}
+		}
 
-       assert heaps.size() == heapCount * contract.getTarget().getStateCount();
-       //prepare target term
-       final Term[] subs
-       = new Term[paramVars.size() + heaps.size() + (target.isStatic() ? 0 : 1)];
-       int offset = 0;
-       for(LocationVariable heap : heaps) {
-          subs[offset++] = tb.var(heap);
-       }
-       if(!target.isStatic()) {
-          subs[offset++] = tb.var(selfVar);
-       }
-       for(ProgramVariable paramVar : paramVars) {
-          subs[offset++] = tb.var(paramVar);
-       }
-       final Term targetTerm = tb.func(target, subs);
+		//register the variables and anon heap so they are declared in proof 
+		//header if the proof is saved to a file
+		register(selfVar, proofServices);	
+		register(paramVars, proofServices);
 
-       //build po
-       final Term po = tb.imp(pre,
-             tb.equals(targetTerm, 
-                   tb.apply(update, targetTerm, null)));
+		Term wellFormedHeaps = null;
+		Term update = null;
+		for(LocationVariable h : heaps) {
+			final Term wellFormedHeap = tb.wellFormed(h);
+			if(wellFormedHeaps == null) {
+				wellFormedHeaps = wellFormedHeap;
+			} else {
+				wellFormedHeaps = tb.and(wellFormedHeaps, wellFormedHeap);
+			}
+			//prepare anon heap
+			final Name anonHeapName = new Name(tb.newName("anon_"+h.toString()));
+			final Function anonHeapFunc = new Function(anonHeapName, heapLDT.targetSort());
+			register(anonHeapFunc, proofServices);
+			final Term anonHeap = tb.label(tb.func(anonHeapFunc), ParameterlessTermLabel.ANON_HEAP_LABEL);
+			final Term wellFormedAnonHeap = tb.wellFormed(anonHeap);
+			if(wellFormedHeaps == null) {
+				wellFormedHeaps = wellFormedAnonHeap;
+			} else {
+				wellFormedHeaps = tb.and(wellFormedHeaps,wellFormedAnonHeap);
+			}
+			//prepare update
+			final boolean atPre = preHeapVars.values().contains(h);
+			final Term dep = getContract().getDep(atPre ?
+					preHeapVarsReverse.get(h) : h, atPre, selfVar, paramVars, preHeapVars, proofServices);
+			final Term changedHeap =
+					tb.anon(tb.var(h), tb.setMinus(tb.allLocs(), dep),
+					anonHeap);
+			final Term u = tb.elementary(h, changedHeap);
+			if (update == null) {
+				update = u;
+			} else {
+				update = tb.parallel(update, u);
+			}
+		}
 
-       //save in field
-       assignPOTerms(po);
+		//translate contract
+		final Term pre = tb.and(
+				buildFreePre(heaps, selfVar,
+				contract.getKJT(), paramVars, wellFormedHeaps, proofServices),
+				permsFor, contract.getPre(heapLDT.getHeap(), selfVar, paramVars,
+				null, proofServices));
 
-       //add axioms
-       collectClassAxioms(contract.getKJT(), proofConfig);
-    }
+		assert heaps.size() == heapCount * contract.getTarget().getStateCount();
+		//prepare target term
+		final Term[] subs
+				= new Term[paramVars.size() + heaps.size() + (target.isStatic() ? 0 : 1)];
+		int offset = 0;
+		for(LocationVariable heap : heaps) {
+			subs[offset++] = tb.var(heap);
+		}
+		if(!target.isStatic()) {
+			subs[offset++] = tb.var(selfVar);
+		}
+		for(ProgramVariable paramVar : paramVars) {
+			subs[offset++] = tb.var(paramVar);
+		}
+		final Term targetTerm = tb.func(target, subs);
+
+		//build po
+		final Term po = tb.imp(pre,
+				tb.equals(targetTerm, 
+				tb.apply(update, targetTerm, null)));
+
+		//save in field
+		assignPOTerms(po);
+
+		//add axioms
+		collectClassAxioms(contract.getKJT(), proofConfig);
+	}
 
 
 

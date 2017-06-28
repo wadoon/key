@@ -13,7 +13,7 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.DependencyClusterContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 /**
  *
@@ -53,7 +53,7 @@ class BasicPOSnippetFactoryImpl implements BasicPOSnippetFactory {
         registerFactoryMethods();
     }
     
-    BasicPOSnippetFactoryImpl(LoopInvariant invariant,
+    BasicPOSnippetFactoryImpl(LoopSpecification invariant,
                               ProofObligationVars poVars,
                               ExecutionContext context,
                               Term guardTerm,

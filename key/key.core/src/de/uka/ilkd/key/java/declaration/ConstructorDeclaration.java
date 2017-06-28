@@ -20,7 +20,6 @@ import de.uka.ilkd.key.java.abstraction.Constructor;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.ProgramElementName;
 
-
 /**
  *  The getTypeReference method returns null - constructors do not have
  *  explicite return types.  A constructor declaration contains its own
@@ -47,10 +46,9 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
      */
     public ConstructorDeclaration(ExtList children,
 				  boolean parentIsInterfaceDeclaration) {
-	super(children, parentIsInterfaceDeclaration, null);	
+	super(children, parentIsInterfaceDeclaration, false, null);
     }
 
-    
     /**
      * Constructor declaration.
      * @param modifiers a modifier array.
@@ -68,16 +66,16 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
 				  Throws exceptions, 
 				  StatementBlock body, 
 				  boolean parentIsInterfaceDeclaration) { 
-	super(modifiers, 
+	super(modifiers,
 	      null, 
 	      name,
 	      parameters, 
 	      exceptions, 
 	      body, 
-	      parentIsInterfaceDeclaration);
+	      parentIsInterfaceDeclaration,
+	      false);
     }
 
-    
     /**
      * Constructors are never abstract.
      */
@@ -86,7 +84,6 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
         return false;
     }
 
-    
     /**
      * Constructors are never final.
      */
@@ -95,7 +92,6 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
         return false;
     }
 
-    
     /**
      * Constructors are never native.
      */
@@ -104,7 +100,6 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
         return false;
     }
 
-    
     /**
      * Constructors are never static.
      */
@@ -113,7 +108,6 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
         return false;
     }
 
-    
     /**
      * Constructors are never strictfp.
      */
@@ -122,7 +116,6 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
         return false;
     }
 
-    
     /**
      * Constructors are never synchronized.
      */
@@ -131,6 +124,11 @@ public class ConstructorDeclaration extends MethodDeclaration implements Constru
         return false;
     }
 
+    @Override
+    public boolean isRemote() {
+    	assert !super.isRemote() : "Constructors may not be part of a remote business interface.";
+    	return false;
+    }
 
     @Override    
     public void visit(Visitor v) {

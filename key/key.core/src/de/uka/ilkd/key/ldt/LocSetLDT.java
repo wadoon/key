@@ -188,7 +188,7 @@ public final class LocSetLDT extends LDT {
     
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op, 
+    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
 	    			   Services serv, 
 	    			   ExecutionContext ec) {
 	if(op instanceof Singleton) {

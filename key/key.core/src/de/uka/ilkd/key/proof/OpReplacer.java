@@ -135,7 +135,6 @@ public class OpReplacer {
         } else {
             result = term;
         }
-    
         return result;
     }      
     

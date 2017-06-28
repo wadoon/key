@@ -1,3 +1,4 @@
+
 // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
@@ -31,7 +32,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -97,7 +97,7 @@ public class TermBuilder {
        this.services = services;
        this.tf = tf;
        this.tt = tf.createTerm(Junctor.TRUE);
-       this.ff = tf.createTerm(Junctor.FALSE);             
+       this.ff = tf.createTerm(Junctor.FALSE);
     }
 
 
@@ -858,6 +858,7 @@ public class TermBuilder {
               TRUE());
     }
 
+    //------------------------------
     // Functions for wellfoundedness
     //------------------------------
 
@@ -1359,19 +1360,17 @@ public class TermBuilder {
     }
 
     public Term empty() {
-    return func(services.getTypeConverter().getLocSetLDT().getEmpty());
+    	return func(services.getTypeConverter().getLocSetLDT().getEmpty());
     }
 
 
     public Term allLocs() {
-    return func(services.getTypeConverter().getLocSetLDT().getAllLocs());
+    	return func(services.getTypeConverter().getLocSetLDT().getAllLocs());
     }
 
 
     public Term singleton(Term o, Term f) {
-    return func(services.getTypeConverter().getLocSetLDT().getSingleton(),
-            o,
-            f);
+    	return func(services.getTypeConverter().getLocSetLDT().getSingleton(), o, f);
     }
 
 
@@ -1529,7 +1528,7 @@ public class TermBuilder {
     }
 
 
-    public Term createdInHeap(Term s, Term h) {
+    public Term createdInHeap(Term s, Term h) { 
         final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
         if(s.op() == ldt.getEmpty()) {
             return tt();
@@ -1600,7 +1599,7 @@ public class TermBuilder {
     public Term wellFormed(Term heap) {
         return func(services.getTypeConverter().getHeapLDT().getWellFormed(), heap);
     }
-
+    
     public Term wellFormed(LocationVariable heap) {
         return wellFormed(var(heap));
     }
@@ -1614,10 +1613,11 @@ public class TermBuilder {
         return permissionsFor(var(permHeap),var(regularHeap));
     }
 
-    public Term inv(Term[] h, Term o) {
-        Term[] p = new Term[h.length + 1];
+    public Term inv(Term[] h, Term hist, Term o) {
+        Term[] p = new Term[h.length + 1+1];
         System.arraycopy(h, 0, p, 0, h.length);
-        p[h.length] = o;
+        p[h.length] = hist;
+        p[h.length+1] = o;
         return func(services.getJavaInfo().getInv(), p);
     }
 
@@ -1629,20 +1629,26 @@ public class TermBuilder {
         for(LocationVariable heap : heaps) {
             hs[i++] = var(heap);
         }
-        return inv(hs, o);
+        return inv(hs, var(services.getTypeConverter().getRemoteMethodEventLDT().getHist()) ,o);
     }
 
-    public Term staticInv(Term[] h, KeYJavaType t){
-        return func(services.getJavaInfo().getStaticInv(t), h);
+    public Term staticInv(Term[] h, Term hist , KeYJavaType t){
+        Term[] p = new Term[h.length+1];
+        for (int i = 0; i < h.length; i++) {
+            p[i] = h[i];
+        }
+        p[p.length-1] = hist;
+        return func(services.getJavaInfo().getStaticInv(t), p);
     }
 
     public Term staticInv(KeYJavaType t){
         List<LocationVariable> heaps = HeapContext.getModHeaps(services, false);
-        Term[] hs = new Term[heaps.size()];
+        Term[] hs = new Term[heaps.size()+1];
         int i=0;
         for(LocationVariable heap : heaps) {
             hs[i++] = var(heap);
         }
+        hs[i++] = var(services.getTypeConverter().getRemoteMethodEventLDT().getHist());
         return func(services.getJavaInfo().getStaticInv(t), hs);
     }
 
@@ -2034,6 +2040,67 @@ public class TermBuilder {
         return all(heapLV, t);
     }
 
+	//-------------------------------------------------------------------------
+	//event & history operators
+	//-------------------------------------------------------------------------
+
+    //getHistory
+    public Term getHist() {
+    	return var(services.getTypeConverter().getRemoteMethodEventLDT().getHist());
+    }
+
+    //event constructor
+	public Term evConst(Term type, Term caller, Term callee, Term method, Term args, Term heap) {
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().
+				eventConstructor(), type, caller, callee, method, args, heap);
+	}
+
+	//event destructor (/getters)
+	public Term evGetType(Term event) {
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().getTypeFromEvent(), event);
+	}
+	public Term evGetCaller(Term event) {
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().getCallerFromEvent(), event);
+	}
+	public Term evGetCallee(Term event) {
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().getCalleeFromEvent(), event);
+	}
+	public Term evGetMethod(Term event) {
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().getServiceFromEvent(), event);
+	}
+	public Term evGetArgs(Term event) {
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().getContentFromEvent(), event);
+	}
+	public Term evGetHeap(Term event) {
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().getHeapFromEvent(), event);
+	}
+
+	//event type constructors
+	public Term evCall() {
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().serviceCallConstant());
+	}
+	public Term evTerm() {
+		return func(services.getTypeConverter().getRemoteMethodEventLDT().serviceTerminationConstant());
+	}
+
+	//well formed
+    public Term wellFormedHist(Term hist) {
+        return func(services.getTypeConverter().getSeqLDT().getWellFormedHist(), hist);
+    }
+    public Term wellFormedHist (LocationVariable hist) {
+    	return wellFormedHist(var(hist));
+    }
+
+    // similar predicates
+    public Term similarHist(Term callee, Term hist1, Term hist2) {
+    	return func(services.getTypeConverter().getRemoteMethodEventLDT().similarHist(), callee, hist1, hist2);
+    }
+    public Term similarEvent(Term event1, Term event2) {
+    	return func(services.getTypeConverter().getRemoteMethodEventLDT().similarEvent(), event1, event2);
+    }
+    public Term similar(Term any1, Term any2, Term heap1, Term heap2) {
+    	return func(services.getTypeConverter().getRemoteMethodEventLDT().similar(), any1, any2, heap1, heap2);
+    }
 
     //-------------------------------------------------------------------------
     //reachability operators
@@ -2065,7 +2132,6 @@ public class TermBuilder {
                     idx);
     }
 
-
     public Term seqLen(Term s) {
         return func(services.getTypeConverter().getSeqLDT().getSeqLen(), s);
     }
@@ -2074,7 +2140,6 @@ public class TermBuilder {
     public Term indexOf(Term s, Term x){
         return func(services.getTypeConverter().getSeqLDT().getSeqIndexOf(),s,x);
     }
-
 
     public Term seqEmpty() {
         return func(services.getTypeConverter().getSeqLDT().getSeqEmpty());
@@ -2096,6 +2161,14 @@ public class TermBuilder {
         }
     }
 
+    public Term seqConcat(Term... terms) {
+    	Term result = seqEmpty();
+    	for (Term term : terms) {
+    		result = seqConcat(result, term);
+    	}
+    	return result;
+    }
+
     public Term seq(Term... terms) {
         Term result = seqEmpty();
         for (Term term : terms) {
@@ -2103,7 +2176,6 @@ public class TermBuilder {
         }
         return result;
     }
-
 
     public Term seq(ImmutableList<Term> terms) {
         Term result = seqEmpty();
@@ -2114,11 +2186,11 @@ public class TermBuilder {
     }
 
     public Term seqSub(Term s, Term from, Term to) {
-    return func(services.getTypeConverter().getSeqLDT().getSeqSub(), s, from, to);
+    	return func(services.getTypeConverter().getSeqLDT().getSeqSub(), s, from, to);
     }
 
     public Term seqReverse(Term s) {
-    return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
+    	return func(services.getTypeConverter().getSeqLDT().getSeqReverse(), s);
     }
 
     //-------------------------------------------------------------------------
@@ -2349,7 +2421,6 @@ public class TermBuilder {
                                 "__EQUALS__LOCS__POST__")), // TODO: define string constant elsewhere
                                 heap1_pre, heap1_post, locset1, heap2_pre, heap2_post, locset2);
     }
-    
     //TODO JK handle calls and terminations differently for consistency with depclusters
     //-------------------------------------------------------------------------
     // component based systems operators

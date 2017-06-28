@@ -360,7 +360,7 @@ public abstract class AbstractProofControl implements ProofControl {
               ns.ruleSets(),
               ns.choices(),
               progVars,
-              ns.methodIdentifiers()),
+              ns.methodIdentifier()),
               proof.abbreviations(),
        goal);
     }

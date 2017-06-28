@@ -129,6 +129,8 @@ public final class PartialInvAxiom extends ClassAxiom {
                                                        false,
                                                        false));
             }
+            final SchemaVariable histSV = SchemaVariableFactory.createTermSV(new Name("history"), 
+                            services.getTypeConverter().getSeqLDT().targetSort(), false, false);
             final SchemaVariable selfSV =
                     target.isStatic()
                     ? null
@@ -143,6 +145,7 @@ public final class PartialInvAxiom extends ClassAxiom {
             ImmutableSet<Taclet> taclets =
                     TG.generatePartialInvTaclet(name,
                                                 heapSVs,
+                                                histSV,
                                                 selfSV,
                                                 eqSV,
                                                 inv.getInv(selfSV, services),

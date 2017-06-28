@@ -19,6 +19,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
@@ -62,6 +63,7 @@ import de.uka.ilkd.key.java.declaration.modifier.Static;
 import de.uka.ilkd.key.java.declaration.modifier.StrictFp;
 import de.uka.ilkd.key.java.declaration.modifier.TwoState;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.expression.ElementValueArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
@@ -679,6 +681,11 @@ public class Recoder2KeYConverter {
         }
     }
 
+    public ElementValueArrayInitializer convert(recoder.java.expression.ElementValueArrayInitializer arg) {
+        return new ElementValueArrayInitializer(collectChildrenAndComments(arg), 
+                getKeYJavaType(getServiceConfiguration().getSourceInfo().getType(arg.getASTParent())));
+    }
+    
     /**
      * gets the KeY-Class related to the recoder one
      *
@@ -1097,6 +1104,7 @@ public class Recoder2KeYConverter {
 
         KeYJavaType kjt = getKeYJavaType(td);
         ExtList members = collectChildren(td);
+
         InterfaceDeclaration keYInterfaceDecl = new InterfaceDeclaration(
                 members, new ProgramElementName(td.getFullName()),
                 isParsingLibs());
@@ -1267,73 +1275,153 @@ public class Recoder2KeYConverter {
         return varSpec;
     }
 
-    /**
-     * convert a recoder MethodDeclaration to a KeY IProgramMethod (especially
-     * the declaration type of its parent is determined and handed over)
-     */
-    public IProgramMethod convert(recoder.java.declaration.MethodDeclaration md) {
-        IProgramMethod result = null;
+	/**
+	 * convert a recoder MethodDeclaration to a KeY IProgramMethod (especially
+	 * the declaration type of its parent is determined and handed over)
+	 */
+	public IProgramMethod convert(recoder.java.declaration.MethodDeclaration md) {
+		IProgramMethod result = null;
 
-        // methodsDeclaring contains the recoder method declarations as keys
-        // that have been started to convert but are not yet finished.
-        // The mapped value is the reference to the later completed
-        // IProgramMethod.
-        if (methodsDeclaring.containsKey(md)) {
-            // a recursive call from a method reference
-            return methodsDeclaring.get(md);
-            // reference that will later be set.
-        }
+		// methodsDeclaring contains the recoder method declarations as keys
+		// that have been started to convert but are not yet finished.
+		// The mapped value is the reference to the later completed
+		// IProgramMethod.
+		if (methodsDeclaring.containsKey(md)) {
+			// a recursive call from a method reference
+			return methodsDeclaring.get(md);
+			// reference that will later be set.
+		}
 
-        methodsDeclaring.put(md, result);
-        if (!getMapping().mapped(md)) {
+		methodsDeclaring.put(md, result);
+		if (!getMapping().mapped(md)) {
 
-            //If the method is 'void', the 'void' type reference
-            //gets lost in translation: the KeY AST uses "null" instead of
-            //it. However, the type reference may have attached JML comments
-            //(in particular, with the "helper" keyword) that we must keep.
-            Comment[] voidComments = null;
-            if(md.getTypeReference() != null
-               && md.getTypeReference().getName().equals("void")) {
-        	final ASTList<recoder.java.Comment> trComs
-        		= md.getTypeReference().getComments();
-        	if(trComs != null) {
-        	    voidComments = new Comment[trComs.size()];
-        	    for(int i = 0; i < voidComments.length; i++) {
-        		voidComments[i] = convert(trComs.get(i));
-        	    }
-        	}
-            }
+			//If the method is 'void', the 'void' type reference
+			//gets lost in translation: the KeY AST uses "null" instead of
+			//it. However, the type reference may have attached JML comments
+			//(in particular, with the "helper" keyword) that we must keep.
+			Comment[] voidComments = null;
+			if (md.getTypeReference() != null
+					&& md.getTypeReference().getName().equals("void")) {
+				final ASTList<recoder.java.Comment> trComs
+						= md.getTypeReference().getComments();
+				if (trComs != null) {
+					voidComments = new Comment[trComs.size()];
+					for(int i = 0; i < voidComments.length; i++) {
+						voidComments[i] = convert(trComs.get(i));
+					}
+				}
+			}
 
-            final MethodDeclaration methDecl
-            	= new MethodDeclaration(
-                    collectChildren(md),
-                    md.getASTParent() instanceof recoder.java.declaration.InterfaceDeclaration,
-                    voidComments);
-            recoder.abstraction.ClassType cont
-            	= getServiceConfiguration().getCrossReferenceSourceInfo()
-            	                           .getContainingClassType((recoder.abstraction.Member) md);
+			// check if method belongs to a Remote InterfaceNonTerminalProgramElement parent = md.getASTParent();
+			NonTerminalProgramElement parent = md.getASTParent();
+			boolean isRemote = false;
+			List<recoder.java.declaration.AnnotationUseSpecification> annotations = md.getAnnotations(); // just in case
+	        if (parent instanceof recoder.java.declaration.ClassDeclaration) {
+				recoder.java.declaration.ClassDeclaration parentClass = (recoder.java.declaration.ClassDeclaration) parent;
+				annotations.addAll(parentClass.getAnnotations());
+			}
+			if (parent instanceof recoder.java.declaration.InterfaceDeclaration) {
+				recoder.java.declaration.InterfaceDeclaration parentClass = (recoder.java.declaration.InterfaceDeclaration) parent;
+				annotations.addAll(parentClass.getAnnotations());
+			}
+			for (recoder.java.declaration.AnnotationUseSpecification a : annotations) {
+				recoder.java.reference.TypeReference tr = (recoder.java.reference.TypeReference) a.getChildAt(0);
+				if (tr.getName().equals("Remote")) {
+			    	isRemote = true;
+			    	break;
+				}
+			}
+/* TODO KD c implement
+			// TODO KD z mind public only
+			// TODO KD z if <>-Method don't do?
+			if (parent instanceof recoder.java.declaration.ClassDeclaration) {
+				recoder.java.declaration.ClassDeclaration parentClass = (recoder.java.declaration.ClassDeclaration) parent;
+				for (recoder.java.declaration.AnnotationUseSpecification annotation : parentClass.getAnnotations()) {
+					assert annotation.getChildAt(0) instanceof recoder.java.reference.TypeReference : "The 1st child of an annotation should be its type.";
+					if (((recoder.java.reference.TypeReference) annotation.getChildAt(0)).getName().equals("Remote")) {
+						if (annotation.getChildCount() > 1) {
+							assert annotation.getChildAt(1) instanceof recoder.java.declaration.AnnotationElementValuePair;
+							recoder.java.declaration.AnnotationElementValuePair pair = (recoder.java.declaration.AnnotationElementValuePair) annotation.getChildAt(1);
+							assert pair.getChildCount() > 0 && pair.getChildAt(0) instanceof recoder.java.reference.MetaClassReference;
+							recoder.java.reference.MetaClassReference classRef = (recoder.java.reference.MetaClassReference) pair.getChildAt(0);
+							assert classRef.getChildCount() > 0 && classRef.getChildAt(0) instanceof recoder.java.reference.TypeReference;
+							recoder.java.reference.TypeReference typeRef = (recoder.java.reference.TypeReference) classRef.getChildAt(0);
+							String interfaceName = typeRef.getName();
+							for (int i = 0; i < parentClass.getImplementedTypes().getChildCount(); i++) {
+								System.out.println(parentClass.getImplementedTypes().getChildAt(i));
+								recoder.java.reference.TypeReference tr = (recoder.java.reference.TypeReference) parentClass.getImplementedTypes().getChildAt(i);
+								System.out.println(tr.getParent());
+							}
+// 							for (Interface interface : information) {
+//								if (interface.contains(method)) {
+//									return true;
+//								}
+//							}
+//							return false;
+						} else { // no Interfaces are specified with the Remote annotation
+//							boolean interfaceHasRemoteAnnotation = false;
+//							boolean nonRemoteInterfaceContainsMethod = false;
+//							for (Interface interface : class.getInterfaces()) {
+//								if (interface.hasAnnotation("Remote")) {
+//									interfaceHasRemoteAnnotation = true;
+//									if (interface.contains(method)) {
+//										return true;
+//									}
+//								} else {
+//									nonRemoteInterfaceContainsMethod = nonRemoteInterfaceContainsMethod || interface.contains(method);
+//								}
+//							}
+//							return !interfaceHasRemoteAnnotation && nonRemoteInterfaceContainsMethod;
+						}
+						break;
+					}
+					break; // TODO KD z what happens with more then 1 Remote annotation?
+				}
+			} else if (parent instanceof recoder.java.declaration.InterfaceDeclaration) {
+				recoder.java.declaration.InterfaceDeclaration parentInterface = (recoder.java.declaration.InterfaceDeclaration) parent;
+				for (recoder.java.declaration.AnnotationUseSpecification annotation : parentInterface.getAnnotations()) {
+					assert annotation.getChildAt(0) instanceof recoder.java.reference.TypeReference : "The 1st child of an annotation should be its type.";
+					if (((recoder.java.reference.TypeReference) annotation.getChildAt(0)).getName().equals("Remote")) {
+						isRemote = true;
+						break;
+					}
+				}
+			} else { // parent of method is neither a class nor an interface
+				assert false : "Methods should belong to Classes or Inetrfaces.";
+			}
+*/
 
-            final HeapLDT heapLDT = rec2key.getTypeConverter().getTypeConverter().getHeapLDT();
-            Sort heapSort = heapLDT == null
-                            ? Sort.ANY
-                            : heapLDT.targetSort();
-            final KeYJavaType containerType = getKeYJavaType(cont);
-            assert containerType != null;
-            final Type returnType = md.getReturnType();
-            // may be null for a void method
-            final KeYJavaType returnKJT = returnType==null? KeYJavaType.VOID_TYPE : getKeYJavaType(returnType);
-            result = new ProgramMethod(methDecl,
-        	    		       containerType,
-                    		       returnKJT, positionInfo(md),
-                    		       heapSort,
-                    		       heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
+			final MethodDeclaration methDecl
+					= new MethodDeclaration(
+					collectChildren(md),
+					md.getASTParent() instanceof recoder.java.declaration.InterfaceDeclaration,
+					isRemote,
+					voidComments);
+			recoder.abstraction.ClassType cont
+					= getServiceConfiguration().getCrossReferenceSourceInfo()
+					.getContainingClassType((recoder.abstraction.Member) md);
 
-            insertToMap(md, result);
-        }
-        methodsDeclaring.remove(md);
-        result = (IProgramMethod) getMapping().toKeY(md);
-        return result;
-    }
+			final HeapLDT heapLDT = rec2key.getTypeConverter().getTypeConverter().getHeapLDT();
+			Sort heapSort = heapLDT == null
+					? Sort.ANY
+					: heapLDT.targetSort();
+			final KeYJavaType containerType = getKeYJavaType(cont);
+			assert containerType != null;
+			final Type returnType = md.getReturnType();
+			// may be null for a void method
+			final KeYJavaType returnKJT = returnType==null? KeYJavaType.VOID_TYPE : getKeYJavaType(returnType);
+			result = new ProgramMethod(methDecl,
+					containerType,
+					returnKJT, positionInfo(md),
+					heapSort,
+					heapLDT == null ? 1 : heapLDT.getAllHeaps().size() - 1);
+
+			insertToMap(md, result);
+		}
+		methodsDeclaring.remove(md);
+		result = (IProgramMethod) getMapping().toKeY(md);
+		return result;
+	}
 
     /**
      * convert a recoder FieldSpecification to a KeY FieldSpecification (checks

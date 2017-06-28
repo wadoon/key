@@ -30,6 +30,7 @@ public class TermProgramVariableCollector extends DefaultVisitor {
     
     public TermProgramVariableCollector(Services services) {
         this.services = services;
+        
     }
         
     
@@ -41,8 +42,9 @@ public class TermProgramVariableCollector extends DefaultVisitor {
     public void visit(Term t) {
 	if ( t.op() instanceof LocationVariable ) {
 	    result.add ( (LocationVariable) t.op() );
-	} 
-	
+	} /*else if (t.op().toString().equals("java.lang.Object::<inv>")) { // TODO KD c hacky and not working
+		collectHistVariable();
+	}*/
 	if ( !t.javaBlock ().isEmpty() ) {
 	    ProgramVariableCollector pvc
 		= new ProgramVariableCollector ( t.javaBlock ().program (), services );
@@ -51,6 +53,10 @@ public class TermProgramVariableCollector extends DefaultVisitor {
 	}
     }
 
+ /*   protected void collectHistVariable() {
+        result.add(services.getTypeConverter().getRemoteMethodEventLDT().getHist());
+    }*/
+    
     public HashSet<LocationVariable> result() { 
 	return result;
     }    

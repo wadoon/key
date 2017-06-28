@@ -59,8 +59,8 @@ import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InitiallyClause;
-import de.uka.ilkd.key.speclang.LoopInvariant;
 import de.uka.ilkd.key.speclang.ModelBasedSecSpec;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SpecExtractor;
 import de.uka.ilkd.key.speclang.SpecificationElement;
@@ -632,10 +632,10 @@ public final class JMLSpecExtractor implements SpecExtractor {
 
 
     @Override
-    public LoopInvariant extractLoopInvariant(IProgramMethod pm,
+    public LoopSpecification extractLoopInvariant(IProgramMethod pm,
                                               LoopStatement loop)
             throws SLTranslationException {
-        LoopInvariant result = null;
+        LoopSpecification result = null;
 
         //get type declaration, file name
         TypeDeclaration td

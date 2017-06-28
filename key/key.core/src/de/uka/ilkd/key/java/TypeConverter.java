@@ -76,6 +76,7 @@ import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.MapLDT;
 import de.uka.ilkd.key.ldt.PermissionLDT;
+import de.uka.ilkd.key.ldt.RemoteMethodEventLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.ldt.TempEventLDT;
 import de.uka.ilkd.key.logic.Name;
@@ -181,6 +182,10 @@ public final class TypeConverter {
 
     public CharListLDT getCharListLDT() {
 	return (CharListLDT) getLDT(CharListLDT.NAME);
+    }
+
+    public RemoteMethodEventLDT getRemoteMethodEventLDT() {
+    	return (RemoteMethodEventLDT) getLDT(RemoteMethodEventLDT.NAME);
     }
 
     private Term translateOperator(de.uka.ilkd.key.java.expression.Operator op, ExecutionContext ec) {

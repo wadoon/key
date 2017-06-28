@@ -123,7 +123,9 @@ public final class RepresentsAxiom extends ClassAxiom {
 	       && originalRep.sub(0).op() == target
 	       && (target.isStatic() 
 		   || originalRep.sub(0).sub(target.getStateCount()*target.getHeapCount(services))
-		           .op().equals(originalSelfVar));
+		           .op().equals(originalSelfVar)
+		   || (target.name().toString().contains("<inv>") && (originalRep.sub(0).sub(target.getStateCount()*target.getHeapCount(services)+1)
+                   .op().equals(originalSelfVar))));
     }
     
     public Term getAxiom(ParsableVariable heapVar,
@@ -173,23 +175,61 @@ public final class RepresentsAxiom extends ClassAxiom {
           heaps.add(h);
        }
        ProgramVariable self = (!target.isStatic() ? originalSelfVar : null);
+       LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
 
        Name tacletName = MiscTools.toValidTacletName(name);
        TacletGenerator TG = TacletGenerator.getInstance();
        if (isFunctional(services)) {
           ImmutableSet<Taclet> res = DefaultImmutableSet.<Taclet>nil();
-          res = res.union(TG.generateFunctionalRepresentsTaclets(
+          if (target.name().toString().contains("<inv>")) {
+              res = res.union(TG.generateFunctionalRepresentsTaclets(
+                      tacletName, originalPre, originalRep, kjt, target, heaps, hist, self,
+                      originalParamVars, atPreVars, toLimit, true, services));
+              res = res.union(TG.generateFunctionalRepresentsTaclets(
+                      tacletName, originalPre, originalRep, kjt, target, heaps, hist, self,
+                      originalParamVars, atPreVars, toLimit, false, services));   
+          } else {
+              res = res.union(TG.generateFunctionalRepresentsTaclets(
                 tacletName, originalPre, originalRep, kjt, target, heaps, self,
                 originalParamVars, atPreVars, toLimit, true, services));
-          res = res.union(TG.generateFunctionalRepresentsTaclets(
+              res = res.union(TG.generateFunctionalRepresentsTaclets(
                 tacletName, originalPre, originalRep, kjt, target, heaps, self,
                 originalParamVars, atPreVars, toLimit, false, services));
+          }
           return res;
        } else {
           if(originalPre != null) {
              assert false : "Only functional represents for model methods is currently supported, this should not have occured.";
           }
-          Taclet tacletWithShowSatisfiability =
+          Taclet tacletWithShowSatisfiability;
+          Taclet tacletWithTreatAsAxiom;
+          if (target.name().toString().contains("<inv>")) {            
+              tacletWithShowSatisfiability =
+                      TG.generateRelationalRepresentsTaclet(tacletName,
+                            originalRep,
+                            kjt,
+                            target,
+                            heaps,
+                            hist,
+                            self,
+                            originalParamVars,
+                            atPreVars,
+                            true,
+                            services);
+                tacletWithTreatAsAxiom =
+                      TG.generateRelationalRepresentsTaclet(tacletName,
+                            originalRep,
+                            kjt,
+                            target,
+                            heaps,
+                            hist,
+                            self,
+                            originalParamVars,
+                            atPreVars,
+                            false,
+                            services);
+          } else {
+          tacletWithShowSatisfiability =
                 TG.generateRelationalRepresentsTaclet(tacletName,
                       originalRep,
                       kjt,
@@ -200,7 +240,7 @@ public final class RepresentsAxiom extends ClassAxiom {
                       atPreVars,
                       true,
                       services);
-          Taclet tacletWithTreatAsAxiom =
+          tacletWithTreatAsAxiom =
                 TG.generateRelationalRepresentsTaclet(tacletName,
                       originalRep,
                       kjt,
@@ -211,6 +251,7 @@ public final class RepresentsAxiom extends ClassAxiom {
                       atPreVars,
                       false,
                       services);
+          }
           return DefaultImmutableSet.<Taclet>nil()
                 .add(tacletWithShowSatisfiability).add(tacletWithTreatAsAxiom);
        }

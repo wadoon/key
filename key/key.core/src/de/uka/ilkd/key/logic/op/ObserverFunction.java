@@ -68,6 +68,29 @@ public class ObserverFunction extends Function implements IObserverFunction {
 	this.stateCount = stateCount;
     }
     
+    public ObserverFunction(String baseName, 
+            Sort sort,
+            KeYJavaType type,                       
+            Sort heapSort,
+            Sort histSort,
+            KeYJavaType container,
+            boolean isStatic,                       
+            ImmutableArray<KeYJavaType> paramTypes,
+            int heapCount,
+            int stateCount) {
+        super(createName(baseName, container),
+                sort, 
+                getArgSortWithHist(heapSort, histSort, container, isStatic, paramTypes, heapCount, stateCount));
+        assert type == null || type.getSort() == sort;
+        assert container != null;   
+        this.type = type;
+        this.container = container;
+        this.isStatic = isStatic;
+        this.paramTypes = paramTypes;
+        this.heapCount = heapCount;
+        this.stateCount = stateCount;
+    }
+    
     public static ProgramElementName createName(String baseName, KeYJavaType container) {
        return new ProgramElementName(baseName, container.getSort().toString());
     }
@@ -106,6 +129,36 @@ public class ObserverFunction extends Function implements IObserverFunction {
        return result;	
     }
 
+    private static Sort[] getArgSortWithHist(Sort heapSort,
+            Sort histSort,
+            KeYJavaType container, 
+            boolean isStatic, 
+            ImmutableArray<KeYJavaType> paramTypes,
+            int heapCount,
+            int stateCount) {
+        final int arity = paramTypes.size() + stateCount*heapCount + (isStatic ? 0 : 1) + 1;
+
+        final Sort[] result = new Sort[arity];
+
+        int offset;
+
+        for(offset = 0; offset < stateCount * heapCount; offset++) {
+            result[offset] = heapSort;
+        }
+        result[offset] = histSort;
+        offset++;
+        if(!isStatic) {
+            result[offset] = container.getSort();
+            assert result[offset] != null : "Bad KJT: " + container;
+            offset++;
+        }
+
+        for(int i = 0, n = paramTypes.size(); i < n; i++) {
+            result[i + offset] = paramTypes.get(i).getSort();
+        }
+
+        return result;   
+    }
     
     
     //-------------------------------------------------------------------------
