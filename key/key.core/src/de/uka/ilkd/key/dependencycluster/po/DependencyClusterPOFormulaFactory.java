@@ -9,9 +9,12 @@ import de.uka.ilkd.key.informationflow.po.snippet.InfFlowInputOutputRelationSnip
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.TempEventLDT;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.RemoteMethodEventLDT;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.DependencyClusterContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -24,7 +27,7 @@ public class DependencyClusterPOFormulaFactory {
     private final IFProofObligationVars ifVars;
     private final Services services;
     private final TermBuilder tb;
-    private final TempEventLDT ldt;
+    private final RemoteMethodEventLDT ldt;
     private final ProofObligationVars symbExecVars;
     
     
@@ -33,7 +36,6 @@ public class DependencyClusterPOFormulaFactory {
     private final SymbExecWithHistFactory b;
     
     //TODO JK try better code reuse and remove these later
-    private final InfFlowPOSnippetFactory f;
     private final InformationFlowContract infFlowContract;
 
     
@@ -42,7 +44,7 @@ public class DependencyClusterPOFormulaFactory {
         this.ifVars = ifVars;
         this.services = services;
         this.tb = services.getTermBuilder();
-        this.ldt = services.getTypeConverter().getTempEventLDT();
+        this.ldt = services.getTypeConverter().getRemoteMethodEventLDT();
         this.symbExecVars = symbExecVars;
         
         ImmutableList<InfFlowSpec> infFlowSpecs = ImmutableSLList.<InfFlowSpec>nil();
@@ -72,11 +74,13 @@ public class DependencyClusterPOFormulaFactory {
                         infFlowSpecs,
                         true);
         
-        f = POSnippetFactory.getInfFlowFactory(infFlowContract, ifVars.c1, ifVars.c2, services);
-
+        //TODO JK check if that stuff works with Karsten's history
+        LocationVariable hist = ldt.getHist();
+        Term hist_A = tb.var(new LocationVariable(new ProgramElementName(tb.newName(hist + "_A")), new KeYJavaType(hist.sort())));  
+        Term hist_B = tb.var(new LocationVariable(new ProgramElementName(tb.newName(hist + "_B")), new KeYJavaType(hist.sort())));
         
-        a = new SymbExecWithHistFactory(contract, symbExecVars, ifVars.c1, services, tb.var(ldt.getHist_A()));
-        b = new SymbExecWithHistFactory(contract, symbExecVars, ifVars.c2, services, tb.var(ldt.getHist_B()));
+        a = new SymbExecWithHistFactory(contract, symbExecVars, ifVars.c1, services, hist_A);
+        b = new SymbExecWithHistFactory(contract, symbExecVars, ifVars.c2, services, hist_B);
     }
     
     public SymbExecWithHistFactory a() {
@@ -92,11 +96,11 @@ public class DependencyClusterPOFormulaFactory {
     }
     
     public Term callInvisible() {
-        return tb.func(ldt.invEvent(), a.callEventFromPostHist());
+        return tb.func(ldt.getInvEvent(), a.callEventFromPostHist());
     }
     
     public Term invisibleHistory() {
-        return tb.equals(tb.func(ldt.filterVisible(), a.postHistory()), tb.seqEmpty());
+        return tb.equals(tb.func(ldt.getFilterVisible(), a.postHistory()), tb.seqEmpty());
     }
     
     //No need to handle objects in a special way here, attacker can compare objects from pre and poststate and will know whether they've changed
@@ -149,7 +153,7 @@ public class DependencyClusterPOFormulaFactory {
     }
     
     public Term equivalentHistories() {
-        return tb.func(ldt.equivHistory(), a.postHistory(), b.postHistory());
+        return tb.func(ldt.getEquivHistory(), a.postHistory(), b.postHistory());
     }
     
    
@@ -159,11 +163,11 @@ public class DependencyClusterPOFormulaFactory {
     
     //services called with equivalent events are guaranteed to terminate with equivalent events
     public Term cooperationalEquivalence() {
-        return tb.func(ldt.coopListEquiv(), a.visibilityFilteredPostHistory(), b.visibilityFilteredPostHistory());      
+        return tb.func(ldt.getCoopListEquiv(), a.visibilityFilteredPostHistory(), b.visibilityFilteredPostHistory());      
     }
     
     public Term callEventEquivalence() {
-        return tb.func(ldt.equivEvent(), a.callEventFromPostHist(), b.callEventFromPostHist());
+        return tb.func(ldt.getEquivEvent(), a.callEventFromPostHist(), b.callEventFromPostHist());
     }
     
     

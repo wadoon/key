@@ -21,6 +21,8 @@ public class RemoteMethodEventLDT extends LDT {
 	public static final Name NAME = new Name("Event");
 	public static final Name HIST_NAME = new Name("hist");
 	public static final Name METHOD_SORT = new Name("MethodIdentifier");
+	public static final Name ENVCALLER_NAME = new Name("environmentCaller");
+	public static final Name CURRENT_PARAMS_NAME = new Name("currentParams");
 
 	private final Function event;
 	private final Function evType;
@@ -34,10 +36,21 @@ public class RemoteMethodEventLDT extends LDT {
 	private final Function similarHist;
 	private final Function similarEvent;
 	private final Function similar;
+	
+    private final Function wellformedList;
+    private final Function wellformedListCoop;
+    
+    private final Function coopListEquiv;
+    private final Function equivHistory;
+    private final Function equivEvent;
+    private final Function invEvent;
+    private final Function filterVisible;
+
 
 	//history (of Remote method events) ... copy of: key.core/resources/de/uka/ilkd/key/proof/rules/events.key -> Seq hist;
-	private LocationVariable hist;
-	private LocationVariable caller;
+	private final LocationVariable hist;
+	private final LocationVariable environmentCaller;
+	private final LocationVariable currentParams;
 
 	public RemoteMethodEventLDT (TermServices services) {
 		super(NAME, services);
@@ -53,8 +66,17 @@ public class RemoteMethodEventLDT extends LDT {
 		similarHist = addFunction(services, "similarHist");
 		similarEvent = addFunction(services, "similarEvent");
 		similar = addFunction(services, "similar");
+        wellformedList = addFunction(services, "wellformedList");
+        wellformedListCoop = addFunction(services, "wellformedListCoop");        
+        coopListEquiv = addFunction(services, "coopListEquiv");
+        equivHistory = addFunction(services, "equivHistory");
+        equivEvent = addFunction(services, "equivEvent");
+        filterVisible = addFunction(services, "filterVisible");
+        invEvent = addFunction(services, "invEvent");
+
 		hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
-		caller = (LocationVariable) services.getNamespaces().programVariables().lookup("caller");
+		environmentCaller = (LocationVariable) services.getNamespaces().programVariables().lookup(ENVCALLER_NAME);
+		currentParams = (LocationVariable) services.getNamespaces().programVariables().lookup(CURRENT_PARAMS_NAME);
 	}
 
 	public Function eventConstructor() {
@@ -105,16 +127,48 @@ public class RemoteMethodEventLDT extends LDT {
 		return similar;
 	}
 
-	/**
+	public Function getWellformedList() {
+        return wellformedList;
+    }
+
+    public Function getWellformedListCoop() {
+        return wellformedListCoop;
+    }
+
+    public Function getCoopListEquiv() {
+        return coopListEquiv;
+    }
+
+    public Function getEquivHistory() {
+        return equivHistory;
+    }
+
+    public Function getEquivEvent() {
+        return equivEvent;
+    }
+
+    public Function getInvEvent() {
+        return invEvent;
+    }
+
+    public Function getFilterVisible() {
+        return filterVisible;
+    }
+
+    /**
 	 * @return the history of Remote method events;
 	 */
 	public LocationVariable getHist() {
 		return hist;
 	}
 
-	public LocationVariable getCaller() {
-		return caller;
+	public LocationVariable getEnvironmentCaller() {
+		return environmentCaller;
 	}
+
+    public LocationVariable getCurrentParams() {
+        return currentParams;
+    }
 
 	// maybe put somewhere else?
 	public Function getMethodIdentifierByDeclaration(MethodDeclaration md, TermServices services) { // TODO KD z use more than just method name
@@ -134,6 +188,7 @@ public class RemoteMethodEventLDT extends LDT {
 	    }
 	    return f;
 	}
+
 
 	// TODO KD z add Operators / Literals / Types?
 

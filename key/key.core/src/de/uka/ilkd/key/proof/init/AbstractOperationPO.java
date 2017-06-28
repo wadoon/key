@@ -408,15 +408,15 @@ public abstract class AbstractOperationPO extends AbstractPO {
 					assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
 					// TODO KD z could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor() (caller cannot be selfVarTerm)
 					LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
-					LocationVariable caller = new LocationVariable(new ProgramElementName("Caller"), proofServices.getJavaInfo().objectSort());
+					Term caller = tb.getEnvironmentCaller();
 					Term method = tb.func(proofServices.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifierByDeclaration(pm.getMethodDeclaration(), proofServices));
 					Term resultTerm = (resultVar != null) ? tb.seqSingleton(tb.var(resultVar)) : tb.seqEmpty();
 					// throws Exception if pm.getMethodDeclaration().isStatic()
-					Term inCallEvent = tb.evConst(tb.evCall(), tb.var(caller), selfVarTerm, method, tb.seq(tb.var(paramVars)), tb.getBaseHeap());
+					Term inCallEvent = tb.evConst(tb.evCall(), caller, selfVarTerm, method, tb.seq(tb.var(paramVars)), tb.getBaseHeap());
 					Term newHistAtCall = tb.seqConcat(tb.getHist(), tb.seqSingleton(inCallEvent));
 					histAtCallUpdate = tb.elementary(hist, newHistAtCall);
 					// throws Exception if pm.getMethodDeclaration().isStatic()
-					Term outTermEvent = tb.evConst(tb.evTerm(), tb.var(caller), selfVarTerm, method, resultTerm, tb.getBaseHeap());
+					Term outTermEvent = tb.evConst(tb.evTerm(), caller, selfVarTerm, method, resultTerm, tb.getBaseHeap());
 					Term newHistAtTerm = tb.seqConcat(tb.getHist(), tb.seqSingleton(outTermEvent));
 					final Term histAtTermUpdate = tb.elementary(hist, newHistAtTerm);
 					post = tb.apply(histAtTermUpdate, post);

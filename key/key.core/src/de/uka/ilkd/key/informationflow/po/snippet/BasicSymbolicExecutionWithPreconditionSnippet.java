@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.informationflow.po.snippet.BasicSnippetData.Key;
-import de.uka.ilkd.key.ldt.TempEventLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 

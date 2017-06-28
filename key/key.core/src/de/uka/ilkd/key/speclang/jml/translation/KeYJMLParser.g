@@ -653,7 +653,7 @@ lowmessagespeclist[Lowlist.Direction dir] returns  [Lowlist result = null] throw
     SLExpression partner;
     Lowlist.MessageType mType;
     if (componentContext.getTerm().equals(tb.var(selfVar))) {
-        Term environmentCaller = tb.var(services.getTypeConverter().getTempEventLDT().getEnvironmentCaller());
+        Term environmentCaller = tb.getEnvironmentCaller();
         partner = new SLExpression(environmentCaller, new KeYJavaType(environmentCaller.sort()));
         if (dir == Lowlist.Direction.IN) {
             mType = Lowlist.MessageType.CALL;
@@ -733,7 +733,7 @@ visibilitylist returns  [ImmutableList<VisibilityCondition> result = ImmutableSL
     {
         SLExpression partner;
         if (componentContext.getTerm().equals(tb.var(selfVar))) {
-            Term environmentCaller = tb.var(services.getTypeConverter().getTempEventLDT().getEnvironmentCaller());
+            Term environmentCaller = tb.getEnvironmentCaller();
             partner = new SLExpression(environmentCaller, new KeYJavaType(environmentCaller.sort()));
         } else {
             partner = componentContext;
@@ -758,7 +758,7 @@ visibilitylist returns  [ImmutableList<VisibilityCondition> result = ImmutableSL
     {
         SLExpression partner;
         if (componentContext.getTerm().equals(tb.var(selfVar))) {
-            Term environmentCaller = tb.var(services.getTypeConverter().getTempEventLDT().getEnvironmentCaller());
+            Term environmentCaller = tb.getEnvironmentCaller();
             partner = new SLExpression(environmentCaller, new KeYJavaType(environmentCaller.sort()));
         } else {
             partner = componentContext;
@@ -1521,7 +1521,7 @@ primaryexpr returns [SLExpression ret=null] throws SLTranslationException
 
                     //result = tb.seqGet(parameterSort, );
 
-                    result = new SLExpression(tb.seqGet(parameterSort, tb.var(services.getTypeConverter().getTempEventLDT().getCurrentParams()), tb.zTerm(parameterIndex)), parameterKeYJavaType);
+                    result = new SLExpression(tb.seqGet(parameterSort, tb.var(services.getTypeConverter().getRemoteMethodEventLDT().getCurrentParams()), tb.zTerm(parameterIndex)), parameterKeYJavaType);
                 }
             } 
             
@@ -1761,7 +1761,7 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
 	  if (serviceContext != null) {
 	     KeYJavaType parameterType = serviceContext.getReturnType();
 	     Sort parameterSort = parameterType.getSort();
-	     Term resultTerm = tb.seqGet(parameterSort, tb.var(services.getTypeConverter().getTempEventLDT().getCurrentParams()), tb.zero());
+	     Term resultTerm = tb.seqGet(parameterSort, tb.var(services.getTypeConverter().getRemoteMethodEventLDT().getCurrentParams()), tb.zero());
 	     result = new SLExpression(resultTerm, parameterType);
 	  } else {
    	  if(resultVar==null) {

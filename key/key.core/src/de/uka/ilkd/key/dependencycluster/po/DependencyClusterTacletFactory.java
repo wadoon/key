@@ -7,7 +7,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.ldt.TempEventLDT;
+import de.uka.ilkd.key.ldt.RemoteMethodEventLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -27,17 +27,17 @@ public class DependencyClusterTacletFactory {
     private final DependencyClusterContract contract;
     private final InitConfig proofConfig;
     private final TermBuilder tb;
-    private final TempEventLDT ldt;
+    private final RemoteMethodEventLDT ldt;
     private final IFProofObligationVars poVars;
     
     Term calltype1;
     Term calltype2;
     
-    Term direction1;
-    Term direction2;
-    
-    Term component1;
-    Term component2;
+    Term caller1;
+    Term caller2;
+        
+    Term callee1;
+    Term callee2;
     
     Term service1;
     Term service2;
@@ -57,12 +57,11 @@ public class DependencyClusterTacletFactory {
     public DependencyClusterTacletFactory(DependencyClusterContract contract, InitConfig proofConfig, IFProofObligationVars poVars) {
         this.contract = contract;
         this.proofConfig = proofConfig;
-        ldt = proofConfig.getServices().getTypeConverter().getTempEventLDT();
+        ldt = proofConfig.getServices().getTypeConverter().getRemoteMethodEventLDT();
         
         tb = proofConfig.getServices().getTermBuilder();
         
         Sort calltypeSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("Calltype");
-        Sort dirSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("CallDirection");
         Sort objectSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("java.lang.Object");
         Sort methodSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("Method");
         Sort seqSort = proofConfig.getServices().getTypeConverter().getSeqLDT().targetSort();
@@ -70,12 +69,12 @@ public class DependencyClusterTacletFactory {
         
         calltype1 = tb.var(SchemaVariableFactory.createTermSV(new Name("calltype1"), calltypeSort, false, false));
         calltype2 = tb.var(SchemaVariableFactory.createTermSV(new Name("calltype2"), calltypeSort, false, false));
+                
+        caller1 = tb.var(SchemaVariableFactory.createTermSV(new Name("caller1"), objectSort, false, false));
+        caller2 = tb.var(SchemaVariableFactory.createTermSV(new Name("caller2"), objectSort, false, false));
         
-        direction1 = tb.var(SchemaVariableFactory.createTermSV(new Name("direction1"), dirSort, false, false));
-        direction2 = tb.var(SchemaVariableFactory.createTermSV(new Name("direction2"), dirSort, false, false));    
-        
-        component1 = tb.var(SchemaVariableFactory.createTermSV(new Name("component1"), objectSort, false, false));
-        component2 = tb.var(SchemaVariableFactory.createTermSV(new Name("component2"), objectSort, false, false));
+        callee1 = tb.var(SchemaVariableFactory.createTermSV(new Name("callee1"), objectSort, false, false));
+        callee2 = tb.var(SchemaVariableFactory.createTermSV(new Name("callee2"), objectSort, false, false));
         
         service1 = tb.var(SchemaVariableFactory.createTermSV(new Name("service1"), methodSort, false, false));
         service2 = tb.var(SchemaVariableFactory.createTermSV(new Name("service2"), methodSort, false, false));
@@ -84,10 +83,11 @@ public class DependencyClusterTacletFactory {
         params2 = tb.var(SchemaVariableFactory.createTermSV(new Name("params2"), seqSort, false, false));
         
         heap1 = tb.var(SchemaVariableFactory.createTermSV(new Name("heap1"), heapSort, false, false));
-        heap2 = tb.var(SchemaVariableFactory.createTermSV(new Name("heap2"), heapSort, false, false));
+        heap2 = tb.var(SchemaVariableFactory.createTermSV(new Name("heap2"), heapSort, false, false));        
         
-        event1 = tb.func(ldt.evConst(), calltype1, direction1, component1, service1, params1, heap1);
-        event2 = tb.func(ldt.evConst(), calltype2, direction2, component2, service2, params2, heap2);
+        //TODO MERGE types won't fit at first
+        event1 = tb.evConst(calltype1, caller1, callee1, service1, params1, heap1);
+        event2 = tb.evConst(calltype2, caller2, callee2, service2, params2, heap2);
         
         updatedParams1 = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1), tb.elementary(ldt.getCurrentParams(), params1));
         updatedParams2 = tb.parallel(tb.elementary(tb.getBaseHeap(), heap2), tb.elementary(ldt.getCurrentParams(), params2));
@@ -96,30 +96,30 @@ public class DependencyClusterTacletFactory {
     }
     
     public Term findTermEquivalence() {
-        Term find = tb.func(ldt.equivEvent(), event1, event2);
+        Term find = tb.func(ldt.getEquivEvent(), event1, event2);
         return find;
     }
     
     public Term bothEventsInvisible() {
-        Term event1Invis = tb.func(ldt.invEvent(), event1);
-        Term event2Invis = tb.func(ldt.invEvent(), event2);
+        Term event1Invis = tb.func(ldt.getInvEvent(), event1);
+        Term event2Invis = tb.func(ldt.getInvEvent(), event2);
         Term bothInvis = tb.and(event1Invis, event2Invis);
         return bothInvis;
     }
     
     public Term bothEventsVisible() {
-        Term event1Vis = tb.not(tb.func(ldt.invEvent(), event1));
-        Term event2Vis = tb.not(tb.func(ldt.invEvent(), event2));
+        Term event1Vis = tb.not(tb.func(ldt.getInvEvent(), event1));
+        Term event2Vis = tb.not(tb.func(ldt.getInvEvent(), event2));
         Term bothVis = tb.and(event1Vis, event2Vis);
         return bothVis;
     }
     
     public Term equalMetadata() {
         Term equalType = tb.equals(calltype1, calltype2);
-        Term equalDirection = tb.equals(direction1, direction2);
-        Term equalPartner = tb.equals(component1, component2);
+        Term equalCaller = tb.equals(caller1, caller2);
+        Term equalCallee = tb.equals(callee1, callee2);
         Term equalService = tb.equals(service1, service2);
-        Term equalMetadata = tb.and(equalType, equalDirection, equalPartner, equalService);
+        Term equalMetadata = tb.and(equalType, equalCaller, equalCallee, equalService);
         return equalMetadata;
     }
     
@@ -128,31 +128,31 @@ public class DependencyClusterTacletFactory {
         ImmutableList<Term> collectedTerms = ImmutableSLList.<Term>nil();
         for (Lowlist list:contract.getSpecs().getLowIn().append(contract.getSpecs().getLowOut())) {
             Term specifiedCalltype;
+            Term specifiedCaller;
+            Term specifiedCallee;
             if (list.getCallType() == Lowlist.MessageType.CALL) {
-                specifiedCalltype = tb.func(ldt.evCall());
+                specifiedCalltype = tb.evCall();
+                specifiedCaller = tb.getEnvironmentCaller();
+                specifiedCallee = poVars.c1.pre.self; //TODO JK is this a proper self var for this purpose?
             } else {
-                specifiedCalltype = tb.func(ldt.evTerm());
+                specifiedCalltype = tb.evTerm();
+                specifiedCaller = poVars.c1.pre.self;
+                specifiedCallee = list.getCommunicationPartner().getTerm();
             }
-            Term specifiedDirection;
-            if (list.getDirection() == Lowlist.Direction.IN) {
-                specifiedDirection = tb.func(ldt.evIncoming());
-            } else {
-                specifiedDirection = tb.func(ldt.evOutgoing());
-            }
-            Term specifiedComponent = list.getCommunicationPartner().getTerm();
+
             Term updateHeapAndSelf = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1), tb.elementary(contract.getSelfVar(), poVars.c1.pre.self));
-            Term updatedspecifiedComponent = tb.apply(updateHeapAndSelf, specifiedComponent);
-            
-            
-            Term specifiedService = tb.func(ldt.getMethodIdentifier(list.getService().getMethodDeclaration(), proofConfig.getServices()));
+            Term updatedSpecifiedCaller = tb.apply(updateHeapAndSelf, specifiedCaller);
+            Term updatedSpecifiedCallee = tb.apply(updateHeapAndSelf, specifiedCallee);
+                        
+            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(list.getService().getMethodDeclaration(), proofConfig.getServices()));
             
             
             
             Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
-            Term equalDirections1 = tb.equals(direction1, specifiedDirection);
-            Term equalComponents1 = tb.equals(component1, updatedspecifiedComponent);
+            Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);
+            Term equalCallees1 = tb.equals(callee1, updatedSpecifiedCallee);
             Term equalServices1 = tb.equals(service1, specifiedService);
-            Term message1fitsSpec = tb.and(equalCalltypes1, equalDirections1, equalComponents1, equalServices1);
+            Term message1fitsSpec = tb.and(equalCalltypes1, equalCallers1, equalCallees1, equalServices1);
             
             //We don't need that part since the messages have equal metadata here anyway
             /*
@@ -176,31 +176,39 @@ public class DependencyClusterTacletFactory {
         ImmutableList<Term> collectedTerms = ImmutableSLList.<Term>nil();
         for (VisibilityCondition condition:contract.getSpecs().getVisible()) {
             Term specifiedCalltype;
+            Term specifiedCaller;
+            Term specifiedCallee;
             if (condition.getMessageType() == VisibilityCondition.MessageType.CALL) {
-                specifiedCalltype = tb.func(ldt.evCall());
+                specifiedCalltype = tb.evCall();
+                if (condition.getDirection() == VisibilityCondition.Direction.IN) {
+                    specifiedCaller = tb.getEnvironmentCaller();
+                    specifiedCallee = poVars.c1.pre.self;
+                } else {
+                    specifiedCaller = poVars.c1.pre.self;
+                    specifiedCallee = condition.getCommunicationPartner().getTerm();
+                }
             } else {
-                specifiedCalltype = tb.func(ldt.evTerm());
+                specifiedCalltype = tb.evTerm();
+                if (condition.getDirection() == VisibilityCondition.Direction.OUT) {
+                    specifiedCaller = tb.getEnvironmentCaller();
+                    specifiedCallee = poVars.c1.pre.self;
+                } else {
+                    specifiedCaller = poVars.c1.pre.self;
+                    specifiedCallee = condition.getCommunicationPartner().getTerm();
+                }
             }
-            Term specifiedDirection;
-            if (condition.getDirection() == VisibilityCondition.Direction.IN) {
-                specifiedDirection = tb.func(ldt.evIncoming());
-            } else {
-                specifiedDirection = tb.func(ldt.evOutgoing());
-            }
-            Term specifiedComponent = condition.getCommunicationPartner().getTerm();
+            
             Term updateHeapAndSelf = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1), tb.elementary(contract.getSelfVar(), poVars.c1.pre.self));
-            Term updatedspecifiedComponent = tb.apply(updateHeapAndSelf, specifiedComponent);
-            
-            
-            Term specifiedService = tb.func(ldt.getMethodIdentifier(condition.getServiceContext().getMethodDeclaration(), proofConfig.getServices()));
-            
-            
-            
+            Term updatedSpecifiedCaller = tb.apply(updateHeapAndSelf, specifiedCaller);
+            Term updatedSpecifiedCallee = tb.apply(updateHeapAndSelf, specifiedCallee);
+                        
+            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(condition.getServiceContext().getMethodDeclaration(), proofConfig.getServices()));
+                      
             Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
-            Term equalDirections1 = tb.equals(direction1, specifiedDirection);
-            Term equalComponents1 = tb.equals(component1, updatedspecifiedComponent);
+            Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);
+            Term equalCallees1 = tb.equals(callee1, updatedSpecifiedCallee);
             Term equalServices1 = tb.equals(service1, specifiedService);
-            Term message1fitsSpec = tb.and(equalCalltypes1, equalDirections1, equalComponents1, equalServices1);
+            Term message1fitsSpec = tb.and(equalCalltypes1, equalCallers1, equalCallees1, equalServices1);
         
             Term messageInvisibilityNotRestrictedByThisCondition = tb.not(message1fitsSpec);
             collectedTerms = collectedTerms.append(messageInvisibilityNotRestrictedByThisCondition);
@@ -261,38 +269,46 @@ public class DependencyClusterTacletFactory {
         ImmutableList<Term> conditions = ImmutableSLList.<Term>nil();
         for (VisibilityCondition condition: contract.getSpecs().getVisible()) {
 
-            Term checkDirection;
-            if (condition.getDirection() == VisibilityCondition.Direction.IN){
-                checkDirection = tb.func(ldt.evIncoming());
-            } else {
-                checkDirection = tb.func(ldt.evOutgoing());
-            } 
-                        
-            Term checkCalltype;
+            Term specifiedCalltype;
+            Term specifiedCaller;
+            Term specifiedCallee;
             if (condition.getMessageType() == VisibilityCondition.MessageType.CALL) {
-                checkCalltype = tb.func(ldt.evCall());
+                specifiedCalltype = tb.evCall();
+                if (condition.getDirection() == VisibilityCondition.Direction.IN){
+                    specifiedCaller = tb.getEnvironmentCaller();
+                    specifiedCallee = poVars.c1.pre.self;
+                } else {
+                    specifiedCaller = poVars.c1.pre.self;
+                    specifiedCallee = condition.getCommunicationPartner().getTerm();
+                } 
             } else {
-                checkCalltype = tb.func(ldt.evTerm());
+                specifiedCalltype = tb.evTerm();
+                if (condition.getDirection() == VisibilityCondition.Direction.OUT){
+                    specifiedCaller = tb.getEnvironmentCaller();
+                    specifiedCallee = poVars.c1.pre.self;
+                } else {
+                    specifiedCaller = poVars.c1.pre.self;
+                    specifiedCallee = condition.getCommunicationPartner().getTerm();
+                } 
             }
-            Term checkComponent = condition.getCommunicationPartner().getTerm();
             Term updateHeapAndSelf = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1), tb.elementary(contract.getSelfVar(), poVars.c1.pre.self));
-            Term updatedCheckComponent = tb.apply(updateHeapAndSelf, checkComponent);
+            Term updatedSpecifiedCaller = tb.apply(updateHeapAndSelf, specifiedCaller);
+            Term updatedSpecifiedCallee = tb.apply(updateHeapAndSelf, specifiedCallee);
             
-            Term checkService = tb.func(ldt.getMethodIdentifier(condition.getServiceContext().getMethodDeclaration(), proofConfig.getServices()));
-            
-            Term dirEq = tb.equals(direction1, checkDirection);
-            Term typeEq = tb.equals(calltype1, checkCalltype);
-            Term compEq = tb.equals(component1, updatedCheckComponent);
-            Term servEq = tb.equals(service1, checkService);
-            Term metadataFits = tb.and(dirEq, typeEq, compEq, servEq);
+            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(condition.getServiceContext().getMethodDeclaration(), proofConfig.getServices()));
 
-            conditions = conditions.append(tb.and(metadataFits, tb.apply(updatedParams1, tb.convertToFormula(condition.getTerm()))));
+            Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
+            Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);
+            Term equalCallees1 = tb.equals(callee1, updatedSpecifiedCallee);
+            Term equalServices1 = tb.equals(service1, specifiedService);
+            Term message1fitsSpec = tb.and(equalCalltypes1, equalCallers1, equalCallees1, equalServices1);
+            conditions = conditions.append(tb.and(message1fitsSpec, tb.apply(updatedParams1, tb.convertToFormula(condition.getTerm()))));
         }
         return tb.or(conditions);
     }
 
     public Term findTermInvisibility() {
-        return tb.func(ldt.invEvent(), event1);
+        return tb.func(ldt.getInvEvent(), event1);
     }
 
     public ImmutableList<Term> collectedConditionsForEquivalenceOfVisibleEvents() {
@@ -307,34 +323,35 @@ public class DependencyClusterTacletFactory {
     private ImmutableList<Term> equivalenceConditionsForLowlist(ImmutableList<Lowlist> lowlists) {
         ImmutableList<Term> collectedConditionsForEquivalenceOfVisibleEvents = ImmutableSLList.<Term>nil();
         for (Lowlist list: lowlists) {
-            
-            Term checkDirection;
-            if (list.getDirection() == Lowlist.Direction.IN){
-                checkDirection = tb.func(ldt.evIncoming());
-            } else {
-                checkDirection = tb.func(ldt.evOutgoing());
-            } 
-                        
-            Term checkCalltype;
+            Term specifiedCalltype;
+            Term specifiedCaller;
+            Term specifiedCallee;
             if (list.getCallType() == Lowlist.MessageType.CALL) {
-                checkCalltype = tb.func(ldt.evCall());
+                specifiedCalltype = tb.evCall();
+                specifiedCaller = tb.getEnvironmentCaller();
+                specifiedCallee = poVars.c1.pre.self; //TODO JK is this a proper self var for this purpose?
             } else {
-                checkCalltype = tb.func(ldt.evTerm());
+                specifiedCalltype = tb.evTerm();
+                specifiedCaller = poVars.c1.pre.self;
+                specifiedCallee = list.getCommunicationPartner().getTerm();
             }
-            Term checkComponent = list.getCommunicationPartner().getTerm();
+
             Term updateHeapAndSelf = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1), tb.elementary(contract.getSelfVar(), poVars.c1.pre.self));
-            Term updatedCheckComponent = tb.apply(updateHeapAndSelf, checkComponent);
-            
-            Term checkService = tb.func(ldt.getMethodIdentifier(list.getService().getMethodDeclaration(), proofConfig.getServices()));
-            
-            Term dirEq = tb.equals(direction1, checkDirection);
-            Term typeEq = tb.equals(calltype1, checkCalltype);
-            Term compEq = tb.equals(component1, updatedCheckComponent);
-            Term servEq = tb.equals(service1, checkService);
-            Term metadataFits = tb.and(dirEq, typeEq, compEq, servEq);
+            Term updatedSpecifiedCaller = tb.apply(updateHeapAndSelf, specifiedCaller);
+            Term updatedSpecifiedCallee = tb.apply(updateHeapAndSelf, specifiedCallee);
+                        
+            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(list.getService().getMethodDeclaration(), proofConfig.getServices()));
+               
+            Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
+            Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);
+            Term equalCallees1 = tb.equals(callee1, updatedSpecifiedCallee);
+            Term equalServices1 = tb.equals(service1, specifiedService);
+            Term message1fitsSpec = tb.and(equalCalltypes1, equalCallers1, equalCallees1, equalServices1);
 
             ImmutableList<Term> expressionsEq = ImmutableSLList.<Term>nil();
             
+            
+            //TODO JK handle sequences with objects CURRENTLY UNSOUND bc isomorphy doesn't include them! check sequence stuff in general
             //Formulas
             for (Term term: getFormulas(list.getLowTerms())) {             
                 //TODO JK Parser returns some "boolean" expressions (for example with > operator) as Formulas, not as expressions, so we need special treatment for those (can't be in sequences, dont have a = relation...)
@@ -346,12 +363,12 @@ public class DependencyClusterTacletFactory {
             }
             
             //BuiltIn types
-            if (!getBuiltInTypeExpressions(list.getLowTerms()).isEmpty()) {
-                Term builtin = tb.seq(getBuiltInTypeExpressions(list.getLowTerms()));
-                Term t1 = tb.apply(updatedParams1, builtin);
-                Term t2 = tb.apply(updatedParams2, builtin);
+            for (Term term: getBuiltInTypeExpressions(list.getLowTerms())) {
+                Term t1 = tb.apply(updatedParams1, term);
+                Term t2 = tb.apply(updatedParams2, term);
+                Term expressionComparison = tb.equals(t1, t2);
                 
-                expressionsEq = expressionsEq.append(tb.equals(t1, t2));
+                expressionsEq = expressionsEq.append(expressionComparison);
             }
             
             //Objects
@@ -373,7 +390,8 @@ public class DependencyClusterTacletFactory {
 
             
             if (!expressionsEq.isEmpty()) {
-                collectedConditionsForEquivalenceOfVisibleEvents = collectedConditionsForEquivalenceOfVisibleEvents.append(tb.and(metadataFits, tb.and(expressionsEq)));
+                collectedConditionsForEquivalenceOfVisibleEvents = 
+                        collectedConditionsForEquivalenceOfVisibleEvents.append(tb.and(message1fitsSpec, tb.and(expressionsEq)));
             }
         }
         return collectedConditionsForEquivalenceOfVisibleEvents;

@@ -2048,6 +2048,11 @@ public class TermBuilder {
     	return var(services.getTypeConverter().getRemoteMethodEventLDT().getHist());
     }
 
+    //getEnvironmentCaller
+    public Term getEnvironmentCaller() {
+        return var(services.getTypeConverter().getRemoteMethodEventLDT().getEnvironmentCaller());
+    }
+
     //event constructor
 	public Term evConst(Term type, Term caller, Term callee, Term method, Term args, Term heap) {
 		return func(services.getTypeConverter().getRemoteMethodEventLDT().

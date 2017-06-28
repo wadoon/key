@@ -78,7 +78,6 @@ import de.uka.ilkd.key.ldt.MapLDT;
 import de.uka.ilkd.key.ldt.PermissionLDT;
 import de.uka.ilkd.key.ldt.RemoteMethodEventLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.ldt.TempEventLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
@@ -146,10 +145,6 @@ public final class TypeConverter {
         } else {
             return LDTs.get(ldtName);
         }
-    }
-    
-    public TempEventLDT getTempEventLDT() {
-        return (TempEventLDT) getLDT(TempEventLDT.NAME);
     }
     
     public IntegerLDT getIntegerLDT() {
