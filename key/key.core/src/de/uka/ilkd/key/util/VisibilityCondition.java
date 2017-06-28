@@ -2,7 +2,6 @@ package de.uka.ilkd.key.util;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.MessageTypeValue;
 import de.uka.ilkd.key.speclang.translation.SLExpression;
 
 public class VisibilityCondition {

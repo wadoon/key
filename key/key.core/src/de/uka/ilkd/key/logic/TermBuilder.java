@@ -48,7 +48,6 @@ import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.MessageTypeValue;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -2420,18 +2419,6 @@ public class TermBuilder {
                         : func((Function) services.getNamespaces().functions().lookup(new Name(
                                 "__EQUALS__LOCS__POST__")), // TODO: define string constant elsewhere
                                 heap1_pre, heap1_post, locset1, heap2_pre, heap2_post, locset2);
-    }
-    //TODO JK handle calls and terminations differently for consistency with depclusters
-    //-------------------------------------------------------------------------
-    // component based systems operators
-    //-------------------------------------------------------------------------
-    
-    public Term call() {
-        return tf.createTerm(MessageTypeValue.CALL);
-    }
-    
-    public Term termination() {
-        return tf.createTerm(MessageTypeValue.TERMINATION);
     }
     
 }

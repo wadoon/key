@@ -738,7 +738,7 @@ visibilitylist returns  [ImmutableList<VisibilityCondition> result = ImmutableSL
         } else {
             partner = componentContext;
         }
-        if (mtype == MessageTypeValue.CALL) {
+        if (mtype == tb.evCall()) {
             if (componentContext.getTerm().equals(tb.var(selfVar))) {
                 result = result.append(new VisibilityCondition(componentContext, serviceContext, partner, VisibilityCondition.MessageType.CALL, VisibilityCondition.Direction.IN, term)); 
             } else {
@@ -763,7 +763,7 @@ visibilitylist returns  [ImmutableList<VisibilityCondition> result = ImmutableSL
         } else {
             partner = componentContext;
         }
-        if (mtype == MessageTypeValue.CALL) {
+        if (mtype == tb.evCall()) {
             if (componentContext.getTerm().equals(tb.var(selfVar))) {
                 result = result.append(new VisibilityCondition(componentContext, serviceContext, partner, VisibilityCondition.MessageType.CALL, VisibilityCondition.Direction.IN, term)); 
             } else {
@@ -781,10 +781,10 @@ visibilitylist returns  [ImmutableList<VisibilityCondition> result = ImmutableSL
     })*
     ;
     
-messagetype returns [MessageTypeValue result = null]
+messagetype returns [Term result = null]
 :
-        CALL {result = MessageTypeValue.CALL;}
-    |   TERMINATION {result = MessageTypeValue.TERMINATION;}
+        CALL {result = tb.evCall();}
+    |   TERMINATION {result = tb.evTerm();}
     ;
     
     
@@ -2047,8 +2047,8 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
          => result = sequence    
     
     |   LPAREN result=expression RPAREN
-    | 	CALL {result = new SLExpression(tb.call(), new KeYJavaType(Sort.MESSAGETYPE));}
-    |	TERMINATION {result = new SLExpression(tb.termination(), new KeYJavaType(Sort.MESSAGETYPE));}
+    | 	CALL {result = new SLExpression(tb.evCall(), new KeYJavaType(tb.evCall().sort()));}
+    |	TERMINATION {result = new SLExpression(tb.evTerm(), new KeYJavaType(tb.evCall().sort()));}
     |   METHODID LPAREN classid = IDENT DOT methid = IDENT RPAREN { // TODO KD z hacky
       result = new SLExpression(tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifierByString(/*classid.getText() + "_" +*/ methid.getText(), services)/*, MRTHODTYPE*/));
     }
