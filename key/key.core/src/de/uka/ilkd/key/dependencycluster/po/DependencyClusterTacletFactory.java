@@ -61,9 +61,9 @@ public class DependencyClusterTacletFactory {
         
         tb = proofConfig.getServices().getTermBuilder();
         
-        Sort calltypeSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("Calltype");
+        Sort calltypeSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("EventType");
         Sort objectSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("java.lang.Object");
-        Sort methodSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("Method");
+        Sort methodSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("MethodIdentifier");
         Sort seqSort = proofConfig.getServices().getTypeConverter().getSeqLDT().targetSort();
         Sort heapSort = proofConfig.getServices().getTypeConverter().getHeapLDT().targetSort();
         
@@ -85,7 +85,6 @@ public class DependencyClusterTacletFactory {
         heap1 = tb.var(SchemaVariableFactory.createTermSV(new Name("heap1"), heapSort, false, false));
         heap2 = tb.var(SchemaVariableFactory.createTermSV(new Name("heap2"), heapSort, false, false));        
         
-        //TODO MERGE types won't fit at first
         event1 = tb.evConst(calltype1, caller1, callee1, service1, params1, heap1);
         event2 = tb.evConst(calltype2, caller2, callee2, service2, params2, heap2);
         

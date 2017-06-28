@@ -589,8 +589,6 @@ public class JMLSpecFactory {
                                                 excVar, null, DependencyClusterSpec.class, services);
             result = result.append(translated);
         }
-        //TODO JK remove debug output
-        System.out.println("HERE:" + result);
         return result;
     }
 }
