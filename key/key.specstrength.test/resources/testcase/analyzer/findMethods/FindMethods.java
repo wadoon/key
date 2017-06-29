@@ -212,8 +212,6 @@ public class FindMethods {
     //   Loop body fact: "result = i_0"
     //   Post condition fact: "result = result_1_0"
     //   Post condition fact: "result = -1"
-    // One uncovered fact:
-    //   Loop use case fact: "arr_0[result_1_0] = n"
     // Open exception: "arr_0 != null, but i Out of Bounds"
     /*@ public normal_behavior
       @ ensures \result == -1 || arr[\result] == n;

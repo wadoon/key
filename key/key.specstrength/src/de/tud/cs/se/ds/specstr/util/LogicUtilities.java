@@ -441,10 +441,14 @@ public final class LogicUtilities {
         // replaceKnownAuxiliaryConstant, since otherwise, there could be
         // invariant formulas contained.
 
-        // TODO: This can be refined, such as inserting all things that taclets
-        // can insert and using the remaining procedure below to get rid of
-        // invariant formulas.
+        // TODO: This could be refined, such as inserting all things that
+        // taclets can insert and using the remaining procedure below to get rid
+        // of invariant formulas.
 
+        // XXX: Something goes wrong here. During the analysis, there are
+        // obviously replaceKnownSelect taclets left that are applied; when
+        // reloading with KeY, those taclets are however removed correctly. What
+        // goes wrong here?
         analysisGoal.indexOfTaclets().removeTaclets(
             analysisGoal.indexOfTaclets().getPartialInstantiatedApps());
 
