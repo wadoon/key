@@ -672,6 +672,8 @@ public final class UseOperationContractRule implements BuiltInRule {
         	return t;
     	} else if (t.op() == Junctor.AND) {
     		return tb.and(getInv(t.sub(0), contractSelf, tb), getInv(t.sub(1), contractSelf, tb));
+    	} else if (t.op().toString().equals("update-application")) {
+    		return tb.apply(t.sub(0), getInv(t.sub(1), contractSelf, tb));
     	} else {
 			return tb.tt();
 		}
@@ -888,7 +890,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 					tb.wellFormedHist(otherHist),
 					tb.wellFormedHist(otherPreHist),
 					tb.similarHist(contractSelf, tb.getHist(), tb.var(otherHist)),
-					tb.similarHist(contractSelf, tb.var(beforeHist), tb.var(otherPreHist)));
+					tb.similarHist(contractSelf, tb.var(beforeHist), tb.var(otherPreHist)),
+					getInv(originalPre, contractSelf, tb));
 		}
 
 		final Term excNull = tb.equals(tb.var(excVar), tb.NULL());
@@ -962,11 +965,6 @@ public final class UseOperationContractRule implements BuiltInRule {
 				ruleApp.posInOccurrence());
 
 		preGoal.addFormula(new SequentFormula(tb.applySequential(new Term[]{inst.u, atPreUpdates},similarFormula)), true, false);
-		if (pm.getMethodDeclaration().isRemote()) {
-			// TODO KD a known <inv> and <inv> to prove dont match sometimes
-			// updateOther already applied to originalPre
-			preGoal.addFormula(new SequentFormula(getInv(originalPre, contractSelf, tb)), true, false);
-		}
 
 		TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this, preGoal, null, null);
 
