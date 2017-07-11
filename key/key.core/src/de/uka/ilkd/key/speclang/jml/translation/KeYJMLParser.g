@@ -622,7 +622,7 @@ dependencyclusterspec returns  [DependencyClusterSpec result = DependencyCluster
     	LOWOUT (NOTHING | tmpLowOut = depclusterspeclist[Lowlist.Direction.OUT] {lowOut = lowOut.append(tmpLowOut);}) 
     	LOWSTATE (NOTHING | tmpLowState = infflowspeclist {lowState = lowState.append(tmpLowState);}) 
     	VISIBLE (NOTHING | tmpVisible = visibilitylist {visible = visible.append(tmpVisible);})
-    	NEW_OBJECTS (NOTHING | tmpNew = infflowspeclist {newObs = newObs.append(tmpNew);})
+    	(NEW_OBJECTS (NOTHING | tmpNew = infflowspeclist {newObs = newObs.append(tmpNew);}))?
 
     {result = new DependencyClusterSpec(lowIn, lowOut, lowState, visible, newObs);}
     ;
