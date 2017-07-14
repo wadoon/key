@@ -57,7 +57,7 @@ public class ProjectedNode {
         return proofNode == null;
     }
 
-    Node getProofNode() {
+    public Node getProofNode() {
         return proofNode;
     }
 

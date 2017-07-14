@@ -13,7 +13,7 @@ public class SearchNode {
     SequentFormula[] pattern;
     int pos = 0;
     int succAntPos = 0;
-    MatchConditions mc;
+    public MatchConditions mc;
     ImmutableList<IfFormulaInstantiation> antec;
     ImmutableList<IfFormulaInstantiation> succ;
 
