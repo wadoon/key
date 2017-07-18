@@ -27,6 +27,12 @@ public class StaRVOOrSUtilTest extends AbstractStaRVOOrSTest {
       doTest("data/hashtable/test/HashTable.java",
              "data/hashtable/oracle/HashTable.xml");
    }
+
+   @Test
+   public void testStart_ConPurse() throws Exception {
+      doTestC("data/conpurse/test/ConPurse.java",
+             "data/conpurse/oracle/ConPurse.xml");
+   }
    
    protected void doTest(String javaPath, String oraclePath) throws Exception {
       HashMap<String, String> originalTacletOptions = null;
@@ -51,5 +57,30 @@ public class StaRVOOrSUtilTest extends AbstractStaRVOOrSTest {
          setOneStepSimplificationEnabled(null, originalOneStepSimplification);
          restoreTacletOptions(originalTacletOptions);
       }
+   }
+      
+      protected void doTestC(String javaPath, String oraclePath) throws Exception {
+          HashMap<String, String> originalTacletOptions = null;
+          boolean originalOneStepSimplification = isOneStepSimplificationEnabled(null);
+          try {
+             File javaFile = new File(PROJECT_ROOT_DIRECTORY, javaPath);
+             assertTrue("Java file '" + javaFile + "' does not exist.", javaFile.exists());
+             // Set expected options
+             originalTacletOptions = setDefaultTacletOptions(PROJECT_ROOT_DIRECTORY, "data/conpurse/test/ConPurse.java", "ConPurse", "startFrom");
+             setOneStepSimplificationEnabled(null, true);
+             // Analyze source code
+             StaRVOOrSResult result = StaRVOOrSUtil.start(javaFile, false, true, true);
+             // Create oracle file if required
+             createOracleFile(result, oraclePath);
+             // Compare result with oracle file
+             File oracleFile = new File(PROJECT_ROOT_DIRECTORY, oraclePath);
+             StaRVOOrSResult expectedResult = StaRVOOrSReader.load(oracleFile);
+             assertResult(expectedResult, result);
+          }
+          finally {
+             // Restore original options
+             setOneStepSimplificationEnabled(null, originalOneStepSimplification);
+             restoreTacletOptions(originalTacletOptions);
+          }
    }
 }

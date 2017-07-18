@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<result>
+   <proof contractId="ConPurse[ConPurse::startFrom(int)].JML normal_behavior operation contract.0" contractText="result = self.startFrom(m) catch(exc)
+pre: ConPurse.start_from_operation_log_full_ignored_at
+  = TRUE
+&amp; m = 1
+&amp; (self.status = ConPurse.Idle &amp; m = 2)
+&amp; self.&lt;inv&gt;
+post: result = ConPurse.SW_IGNORED &amp; self.&lt;inv&gt; &amp; exc = null
+mod: {}
+termination: box" type="ConPurse" target="startFrom(int)">
+      <executionPath pathCondition="true" verified="true" newPrecondition="ConPurse.start_from_operation_log_full_ignored_at
+  = TRUE
+&amp; m = 1
+&amp; (self.status = ConPurse.Idle &amp; m = 2)
+&amp; self.&lt;inv&gt;">
+      </executionPath>
+   </proof>
+</result>
