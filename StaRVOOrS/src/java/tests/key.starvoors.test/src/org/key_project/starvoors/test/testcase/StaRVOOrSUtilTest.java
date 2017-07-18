@@ -38,7 +38,7 @@ public class StaRVOOrSUtilTest extends AbstractStaRVOOrSTest {
          originalTacletOptions = setDefaultTacletOptions(PROJECT_ROOT_DIRECTORY, "data/hashtable/test/HashTable.java", "HashTable", "add");
          setOneStepSimplificationEnabled(null, true);
          // Analyze source code
-         StaRVOOrSResult result = StaRVOOrSUtil.start(javaFile, false, false, true);
+         StaRVOOrSResult result = StaRVOOrSUtil.start(javaFile, false, true, true);
          // Create oracle file if required
          createOracleFile(result, oraclePath);
          // Compare result with oracle file
