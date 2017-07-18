@@ -43,7 +43,9 @@ import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.IGuard;
 import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.NamespaceSet;
@@ -240,6 +242,13 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
                                 .getBody()));
     }
 
+    public LoopScopeBlock convert(
+            de.uka.ilkd.key.java.recoderext.LoopScopeBlock l) {
+        return new LoopScopeBlock(
+                (de.uka.ilkd.key.logic.op.IProgramVariable) callConvert(l.getIndexPV()),
+                (StatementBlock) callConvert(l.getBody()));
+    }
+
     /**
      * translate method body statements.
      */
@@ -298,6 +307,12 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     public SchemaVariable convert(
             de.uka.ilkd.key.java.recoderext.LabelSVWrapper svw) {
         return svw.getSV();
+    }
+    
+    public MergePointStatement convert(
+            de.uka.ilkd.key.java.recoderext.MergePointStatement l) {
+        return new MergePointStatement(
+                (IProgramVariable) callConvert(l.getChildAt(0)));
     }
     
     public SchemaVariable convert(

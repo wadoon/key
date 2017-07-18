@@ -26,8 +26,11 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.util.pp.TestLayouter.class,
         de.uka.ilkd.key.util.TestProofStarter.class,
         de.uka.ilkd.key.util.TestNodePreorderIterator.class,
-        de.uka.ilkd.key.util.TestProofUserManager.class
-    }; 
+        de.uka.ilkd.key.util.TestSearchNodePreorderIterator.class,
+        de.uka.ilkd.key.util.TestSearchNodeReversePreorderIterator.class,
+        de.uka.ilkd.key.util.TestProofUserManager.class,
+        de.uka.ilkd.key.rule.merge.PredicateAbstractionLatticeTests.class
+    };
 
 
     static Class<? extends TestCase>[] logicModelTests = new Class[] {
@@ -37,9 +40,10 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.logic.TestTerm.class,
         de.uka.ilkd.key.logic.TestNamespace.class,
         de.uka.ilkd.key.logic.TestSemisequent.class,
-        de.uka.ilkd.key.logic.TestPosInOcc.class,   	
-        de.uka.ilkd.key.logic.TestPosInTerm.class,       
+        de.uka.ilkd.key.logic.TestPosInOcc.class,
+        de.uka.ilkd.key.logic.TestPosInTerm.class,
         de.uka.ilkd.key.logic.TestClashFreeSubst.class,
+        de.uka.ilkd.key.logic.TestLocalSymbols.class,
         de.uka.ilkd.key.logic.TestSyntacticalReplaceVisitor.class,
         de.uka.ilkd.key.logic.TestVariableNamer.class,
         de.uka.ilkd.key.logic.LabeledTermImplTest.class
@@ -68,7 +72,7 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.rule.inst.TestGenericSortInstantiations.class,
         de.uka.ilkd.key.rule.metaconstruct.TestProgramMetaConstructs.class,
         de.uka.ilkd.key.rule.conditions.TestDropEffectlessElementary.class,
-        de.uka.ilkd.key.rule.join.JoinRuleTests.class
+        de.uka.ilkd.key.rule.merge.MergeRuleTests.class
     };
 
 
@@ -130,7 +134,7 @@ public class TestKey extends TestSuite {
 
         TestSuite suite = new TestSuite();
         suite.addTest(createSuite(utilityTests, "Testing KeY specific Utilities"));
-        suite.addTest(createSuite(logicModelTests, "Testing Logic Engine"));	
+        suite.addTest(createSuite(logicModelTests, "Testing Logic Engine"));
         suite.addTest(createSuite(parserTests, "Testing Parsers"));
         suite.addTest(createSuite(ruleTests, "Testing Rule Engine"));
         suite.addTest(createSuite(proofConstructionTests, "Testing Proof Construction"));
@@ -141,7 +145,7 @@ public class TestKey extends TestSuite {
 
         return suite;
     }
-    
+
 
     public TestKey(String name) {
         super(name);

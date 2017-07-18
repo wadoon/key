@@ -122,6 +122,10 @@ public class StrategySettingsDefinition {
                                         StrategyProperties.METHOD_CONTRACT);
 
                                 newProps.setProperty(
+                                        StrategyProperties.MPS_OPTIONS_KEY,
+                                        StrategyProperties.MPS_MERGE);
+
+                                newProps.setProperty(
                                         StrategyProperties.DEP_OPTIONS_KEY,
                                         StrategyProperties.DEP_ON);
 
@@ -132,6 +136,10 @@ public class StrategySettingsDefinition {
                                 newProps.setProperty(
                                         StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
                                         StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+
+                                newProps.setProperty(
+                                        StrategyProperties.OSS_OPTIONS_KEY,
+                                        StrategyProperties.OSS_ON);
 
                                 newProps.setProperty(
                                         StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
@@ -171,6 +179,10 @@ public class StrategySettingsDefinition {
                                 newProps.setProperty(
                                         StrategyProperties.METHOD_OPTIONS_KEY,
                                         StrategyProperties.METHOD_NONE);
+
+                                newProps.setProperty(
+                                        StrategyProperties.MPS_MERGE,
+                                        StrategyProperties.MPS_NONE);
 
                                 newProps.setProperty(
                                         StrategyProperties.DEP_OPTIONS_KEY,

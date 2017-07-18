@@ -473,6 +473,7 @@ TOKEN :
 | < LOCSET: "\\locset">
 | < LONG: "long" >
 | < MAP: "\\map" >
+| < MERGE_POINT: "merge_point" >
 | < METHODFRAME: "method-frame" >
 | < NATIVE: "native" >
 | < NEW: "new" >
@@ -3675,6 +3676,8 @@ Statement Statement() :
 | result = ReturnStatement()
 | result = ThrowStatement()
 | result = SynchronizedStatement()
+| result = MergePointStatement()
+| result = LoopScope()
 | result = TryStatement()
 | result = AssertStatement()
 | result = KeYCatchAllStatement()
@@ -4488,6 +4491,53 @@ SynchronizedBlock SynchronizedStatement() :
       checkConstruction(result);
       setPostfixInfo(result);
       return result;
+  }
+}
+
+LoopScopeBlock LoopScope() :
+{
+    LoopScopeBlock result;
+    Expression indexPV;
+    StatementBlock block;
+}
+{
+  "loop-scope"
+  {
+      result = factory.createLoopScopeBlock();
+      setPrefixInfo(result);
+  }
+  "(" indexPV = Expression() ")"
+  block = Block()
+  {
+      result.setIndexPV(indexPV);
+      result.setBody(block);
+      checkConstruction(result);
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+MergePointStatement MergePointStatement() :
+{
+    Expression expr = null;
+    MergePointStatement result;
+}
+{
+  "merge_point"
+  {
+      result = factory.createMergePointStatement();
+      setPrefixInfo(result);
+  }
+  "(" expr = Expression()
+    {
+        result.setIndexPV(expr);
+    }
+  ")"
+  ";"
+  {
+    checkConstruction(result);
+    setPostfixInfo(result);
+    return result;
   }
 }
 

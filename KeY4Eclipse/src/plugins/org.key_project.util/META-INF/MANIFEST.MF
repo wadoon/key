@@ -16,10 +16,11 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jface.text;bundle-version="3.9.2";resolution:=optional,
  org.eclipse.ui.editors;bundle-version="3.8.200";resolution:=optional
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.util,
  org.key_project.util.bean,
+ org.key_project.util.bitops,
  org.key_project.util.collection,
  org.key_project.util.eclipse,
  org.key_project.util.eclipse.job,

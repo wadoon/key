@@ -5,7 +5,6 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import java.util.Iterator;
-import java.util.List;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -20,9 +19,10 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 
 /**
@@ -42,8 +42,8 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
         final IProgramMethod pm = (IProgramMethod) targetMethod;
         StatementBlock targetBlock =
                 (StatementBlock) d.get(BasicSnippetData.Key.TARGET_BLOCK);
-        LoopInvariant loopInv =
-                (LoopInvariant) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
+        LoopSpecification loopInv =
+                (LoopSpecification) d.get(BasicSnippetData.Key.LOOP_INVARIANT);
         String nameString = generatePredicateName(pm, targetBlock, loopInv);
         final ImmutableList<Term> termList =
                 extractTermListForPredicate(pm, poVars, d.hasMby);
@@ -75,12 +75,19 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
                                                TermBuilder tb,
                                                Services services) {
         final Name name = new Name(nameString);
-        final Namespace functionNS = services.getNamespaces().functions();
+        Namespace<Function> functionNS = services.getNamespaces().functions();
+
+        /* This predicate needs to present on all branches and, therefore, must be added
+         * to the toplevel function namespace. Hence, we rewind to the parent namespace here.
+         */
+        while(functionNS.parent() != null)
+            functionNS = functionNS.parent();
+
         Function pred = (Function) functionNS.lookup(name);
 
         if (pred == null) {
             pred = new Function(name, Sort.FORMULA, argSorts);
-            services.getNamespaces().functions().addSafely(pred);
+            functionNS.addSafely(pred);
         }
         return pred;
     }
@@ -105,7 +112,7 @@ abstract class TwoStateMethodPredicateSnippet implements FactoryMethod {
 
     abstract String generatePredicateName(IProgramMethod pm,
                                           StatementBlock block,
-                                          LoopInvariant loopInv);
+                                          LoopSpecification loopInv);
 
 
     /**
