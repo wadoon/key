@@ -1,9 +1,16 @@
 package org.key_project.sed.algodebug.view;
 
+import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
 
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FormAttachment;
@@ -18,7 +25,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.wb.swt.SWTResourceManager;
@@ -28,9 +36,10 @@ import org.key_project.sed.algodebug.model.AlgorithmicDebug;
 import org.key_project.sed.algodebug.model.Call;
 import org.key_project.sed.core.model.ISEConstraint;
 import org.key_project.sed.core.model.ISENode;
-import org.key_project.sed.ui.visualization.view.ExecutionTreeView;
+import org.key_project.sed.key.core.util.KeySEDUtil;
+import org.key_project.util.eclipse.swt.SWTUtil;
 
-public class AlgorithmicDebugView extends ViewPart implements Observer {
+public class AlgorithmicDebugView extends ViewPart implements Observer, ISelectionProvider{
 
    public static final String VIEW_ID = "org.key_project.sed.ui.view.AlgorithmicDebugView";
    
@@ -38,6 +47,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer {
    private AlgorithmicDebug debug; 
    private Shell shell;
    private Call actualCall;
+   private ListenerList listeners = new ListenerList();
    
    public AlgorithmicDebugView(){
       debug = new AlgorithmicDebug();
@@ -64,30 +74,43 @@ public class AlgorithmicDebugView extends ViewPart implements Observer {
    }
 
    private ISENode getSelectedNode(){
-      IWorkbench workbench = PlatformUI.getWorkbench();
-      
-      ISENode selectedNode = null;
-      IViewPart part = workbench.getActiveWorkbenchWindow().getActivePage()
-            .findView(ExecutionTreeView.VIEW_ID);
-        if (part instanceof ExecutionTreeView) {
-            ExecutionTreeView view = (ExecutionTreeView) part;
-            selectedNode = view.getSelectedNode();
-            // now access whatever internals you can get to
-        }
-        return selectedNode;
+      return (KeySEDUtil.getSelectedDebugElement() instanceof ISENode ) ? (ISENode) KeySEDUtil.getSelectedDebugElement() : null;
+//      IWorkbench workbench = PlatformUI.getWorkbench();
+//      
+//      ISENode selectedNode = null;
+//      IViewPart part = workbench.getActiveWorkbenchWindow().getActivePage()
+//            .findView(ExecutionTreeView.VIEW_ID);
+//        if (part instanceof ExecutionTreeView) {
+//            ExecutionTreeView view = (ExecutionTreeView) part;
+//            selectedNode = view.getSelectedNode();
+//        }
+//        return selectedNode;
    }
    
    Label questionLabel;
    Label methodNameLabel;
    Label constraintsLabel;
    Label returnLabel;
+
+   private IViewPart view;
    
    @Override
    public void createPartControl(final Composite parent) {
    
     Display display = Display.getDefault();
     shell = display.getActiveShell();
-      
+    //getSite().setSelectionProvider(this);   
+    
+    try {
+       view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView("org.key_project.sed.ui.graphiti.view.ExecutionTreeView", null, IWorkbenchPage.VIEW_ACTIVATE);  
+      // view.getViewSite().setSelectionProvider(this);IDebugUIConstants.ID_VARIABLE_VIEW
+      // view.setFocus();
+    }
+    catch (PartInitException e1) {
+       // TODO Auto-generated catch block
+       e1.printStackTrace();
+    }
+    
    // create a FormLayout and set its margin
       FormLayout layout = new FormLayout();
       layout.marginHeight = 5;
@@ -128,13 +151,17 @@ public class AlgorithmicDebugView extends ViewPart implements Observer {
       constraintsLabel.setLayoutData(fd3);
       
       Button buttonCorrect = new Button(parent, SWT.BORDER);
-      fd3.bottom = new FormAttachment(buttonCorrect, -85);
+      buttonCorrect.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+         }
+      });
       buttonCorrect.setText("Correct");
       //Display display = parent.getDisplay();
       Color green = display.getSystemColor(SWT.COLOR_GREEN);
       buttonCorrect.setBackground(green);
       
-      //TODO: Correct Button
+      //Correct Button
       buttonCorrect.addListener(SWT.Selection, new Listener() {
          public void handleEvent(Event e) {
            switch (e.type) {
@@ -161,48 +188,16 @@ public class AlgorithmicDebugView extends ViewPart implements Observer {
            }}
          }
        });
-      
-      // create FormData and set each of its sides
-      FormData formData1 = new FormData(-1,-1);
-      formData1.top = new FormAttachment(0, 390);
-      formData1.left = new FormAttachment(0, 80);
     
       // set FormDate for button
-      buttonCorrect.setLayoutData(formData1);
+      FormData fd_buttonCorrect = new FormData(-1,-1);
+      fd_buttonCorrect.right = new FormAttachment(0, 207);
+      fd_buttonCorrect.left = new FormAttachment(0, 106);
+      buttonCorrect.setLayoutData(fd_buttonCorrect);
       
-      //TODO: More Info Button
-      // create a button or any other widget
-      Button buttonMoreInfo = new Button(parent, SWT.PUSH);
-      buttonMoreInfo.addSelectionListener(new SelectionAdapter() {
-         @Override
-         public void widgetSelected(SelectionEvent e) {
-         }
-      });
-      formData1.right = new FormAttachment(buttonMoreInfo, -68);
-      buttonMoreInfo.setText("More Info");
-      buttonMoreInfo.addListener(SWT.Selection, new Listener() {
-         public void handleEvent(Event e) {
-           switch (e.type) {
-           case SWT.Selection:
-                
-              break;
-           }
-         }
-       });
-      
-      // create FormData and set each of its sides
-      FormData formData = new FormData();
-      formData.left = new FormAttachment(0, 251);
-      formData.top = new FormAttachment(buttonCorrect, 0, SWT.TOP);
-      formData.bottom = new FormAttachment(100, -25);
-    
-      // set FormDate for button
-      buttonMoreInfo.setLayoutData(formData);
-      
-      //TODO: False Button
+      //False Button
       // create a button or any other widget
       Button buttonFalse = new Button(parent, SWT.BORDER);
-      formData.right = new FormAttachment(100, -269);
       buttonFalse.setText("False");
       Color red = display.getSystemColor(SWT.COLOR_RED);
       buttonFalse.setBackground(red);
@@ -211,7 +206,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer {
          public void handleEvent(Event e) {
            switch (e.type) {
            case SWT.Selection:
-              debug.annotateCall(actualCall, false);
+              debug.annotateCallFalse(actualCall);
              
               MessageBox mb = new MessageBox( parent.getShell());
               mb.setText("Hint!");
@@ -229,16 +224,14 @@ public class AlgorithmicDebugView extends ViewPart implements Observer {
          }
        });
     
-      // create FormData and set each of its sides
-      FormData formData2 = new FormData();
-      formData2.top = new FormAttachment(buttonCorrect, 0, SWT.TOP);
-      formData2.left = new FormAttachment(buttonMoreInfo, 69);
-      formData2.right = new FormAttachment(100, -92);
-    
       // set FormDate for button
-      buttonFalse.setLayoutData(formData2);
+      FormData fd_buttonFalse = new FormData();
+      fd_buttonFalse.top = new FormAttachment(buttonCorrect, 0, SWT.TOP);
+      fd_buttonFalse.right = new FormAttachment(100, -128);
+      fd_buttonFalse.left = new FormAttachment(100, -229);
+      buttonFalse.setLayoutData(fd_buttonFalse);
       
-      //TODO: Previous Button
+      //Previous Button
       Button btnNewButton = new Button(parent, SWT.NONE);
       btnNewButton.addSelectionListener(new SelectionAdapter() {
          @Override
@@ -270,8 +263,9 @@ public class AlgorithmicDebugView extends ViewPart implements Observer {
       btnNewButton.setLayoutData(fd_btn_Back);
       btnNewButton.setText("Back");
       
-      //TODO: Button Next
+      //Button Next
       Button btnNext = new Button(parent, SWT.NONE);
+
       btnNext.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
@@ -283,8 +277,15 @@ public class AlgorithmicDebugView extends ViewPart implements Observer {
 //               // TODO Auto-generated catch block
 //               e1.printStackTrace();
 //            }
-            if(actualCall != null)
+            if(actualCall != null){               
                showQuestionCall(actualCall);
+               System.out.println(view.getClass());
+             //TODO: Selection richtig an Variables View weitergeben
+               System.out.println(actualCall.getCall());
+               SWTUtil.select(((org.key_project.sed.ui.visualization.view.ExecutionTreeView)view).getDebugView().getViewer(),
+                     new StructuredSelection(actualCall.getCall()), true);
+         
+            }
             else{
                MessageBox mb = new MessageBox( parent.getShell());
                mb.setText("Last call reached!");
@@ -300,7 +301,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer {
       btnNext.setLayoutData(fd_btn_Next);
       btnNext.setText("Next");
       
-      //TODO: Start Debugging Button
+      // Start Debugging Button
       Button btnStartAlgorithmicDebugging = new Button(parent, SWT.NONE);
       fd_btn_Back.right = new FormAttachment(100, -465);
       fd.top = new FormAttachment(0, 47);
@@ -336,22 +337,42 @@ public class AlgorithmicDebugView extends ViewPart implements Observer {
       lblConstraintslabel.setText("while using these constraints:");
       
       Label lblReturnlabel = new Label(parent, SWT.NONE);
+      fd3.bottom = new FormAttachment(lblReturnlabel, -6);
       lblReturnlabel.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
       FormData fd_lblReturnlabel = new FormData();
-      fd_lblReturnlabel.top = new FormAttachment(constraintsLabel, 6);
+      fd_lblReturnlabel.top = new FormAttachment(0, 311);
       fd_lblReturnlabel.left = new FormAttachment(0, 233);
       lblReturnlabel.setLayoutData(fd_lblReturnlabel);
       lblReturnlabel.setText("and this return value:");
       
       returnLabel = new Label(parent, SWT.NONE);
+      fd_buttonCorrect.top = new FormAttachment(returnLabel, 6);
       FormData fd_lblReturnvaluelabel = new FormData();
-      fd_lblReturnvaluelabel.right = new FormAttachment(methodNameLabel, 0, SWT.RIGHT);
+      fd_lblReturnvaluelabel.bottom = new FormAttachment(100, -70);
       fd_lblReturnvaluelabel.top = new FormAttachment(lblReturnlabel, 16);
-      fd_lblReturnvaluelabel.bottom = new FormAttachment(buttonCorrect, -1);
+      fd_lblReturnvaluelabel.right = new FormAttachment(methodNameLabel, 0, SWT.RIGHT);
       fd_lblReturnvaluelabel.left = new FormAttachment(methodNameLabel, 5, SWT.LEFT);
       returnLabel.setLayoutData(fd_lblReturnvaluelabel);
    }
 
+   public ISENode[] getExecutionTreeAsArray(){
+      //TODO: Alle Knoten des Execution Tree als Array zurückgeben...
+      ISENode[] SETasList;
+      ISENode root = debug.getRoot(actualNode);
+      
+      return null;
+   }
+   
+//   private ArrayList<ISENode> asList(ISENode node){
+//      ArrayList<ISENode> list;
+////      if(node.hasChildren()){
+////         for(ISENode child : node.getChildren()){
+////            
+////         }
+////      }
+//      return list;
+//   }
+   
    @Override
    public void setFocus() {
       questionLabel.setFocus();
@@ -360,5 +381,38 @@ public class AlgorithmicDebugView extends ViewPart implements Observer {
    @Override
    public void update(Observable o, Object arg) {
      
+   }
+
+   @Override
+   public void addSelectionChangedListener(ISelectionChangedListener listener) {
+      System.out.println("Add Listener "+listener.toString());
+      listeners.add(listener);        
+   }
+
+   @Override
+   public ISelection getSelection() {
+      
+      if(actualCall != null && actualCall.getCall() != null) {
+         System.out.println("getSelection()");
+         ISENode node = actualCall.getCall();
+         ISelection selection = new StructuredSelection(node);
+         return selection;
+         } else {
+          return StructuredSelection.EMPTY;
+         }
+   }
+
+   @Override
+   public void removeSelectionChangedListener(ISelectionChangedListener listener) {
+      listeners.remove(listener);        
+   }
+
+   @Override
+   public void setSelection(ISelection selection) {
+      Object[] list = listeners.getListeners();
+      for (int i = 0; i < list.length; i++) {
+       ((ISelectionChangedListener) list[i])
+         .selectionChanged(new SelectionChangedEvent(this, selection));
+      }
    }
 }

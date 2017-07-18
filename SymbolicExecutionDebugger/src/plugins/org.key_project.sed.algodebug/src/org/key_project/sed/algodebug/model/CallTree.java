@@ -143,11 +143,11 @@ public class CallTree {
    public ArrayList<CallPath> generatePaths(ISENode node){
          try {
             //System.out.println("Generating Paths");
-            if(!node.hasChildren()) {
+            if(!node.hasChildren()) { //Bei einem Blatt angekommen
                addPath(node);
                }
             else{
-               for(ISENode child : node.getChildren()){
+               for(ISENode child : node.getChildren()){ //Es gibt Kind-Knoten: Für jeden neuen Pfad hinzufügen
                   generatePaths(child);
                   }
                }

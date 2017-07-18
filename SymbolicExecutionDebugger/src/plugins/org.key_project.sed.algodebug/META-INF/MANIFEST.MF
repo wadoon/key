@@ -14,9 +14,13 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.databinding.property,
  org.eclipse.jface.databinding,
  com.ibm.icu,
- org.key_project.sed.ui.visualization
+ org.key_project.sed.ui.visualization,
+ org.eclipse.ui.workbench.texteditor;bundle-version="3.9.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Import-Package: org.eclipse.debug.ui,
+Import-Package: org.eclipse.debug.internal.ui.views.variables,
+ org.eclipse.debug.ui,
  org.eclipse.ui.forms.widgets,
- org.key_project.sed.ui.property
+ org.key_project.sed.key.core.util,
+ org.key_project.sed.ui.property,
+ org.key_project.sed.ui.util

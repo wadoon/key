@@ -128,6 +128,38 @@ public class AlgorithmicDebug  {
       
    }
    
+   public void annotateCallFalse(Call call){
+
+      ISENode node = call.getRet();
+      Shell shell = Display.getCurrent().getActiveShell();
+      
+      while(  !(node instanceof ISEThread) ){
+//         try {
+//            System.out.println("annotiere: "+node.getName().toString() +" und hasUnAnnotatedChildren(node) ist: "+hasUnAnnotatedChildren(node));
+//         }
+//         catch (DebugException e1) {
+//            // TODO Auto-generated catch block
+//            e1.printStackTrace();
+//         }
+         if(node == call.getCall() ){
+            annotateNode(shell, node,false); //annotieren
+            break;
+            }
+         else{
+            if(node.getAnnotationLinks(SEAnnotationUtil.getAnnotationtype(AlgorithmicDebugCorrectAnnotationType.TYPE_ID)).length == 0 ) //wenn node keine korrekt Annotationen enthält wird er falsch markiert.
+               annotateNode(shell, node, false); //annotieren
+         }
+         try {
+            node = node.getParent();
+         }
+         catch (DebugException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+      }
+      
+   }
+   
    public void highlightCall(Call call){
 
       ISENode node = call.getRet();

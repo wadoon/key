@@ -365,8 +365,10 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
             SEDUIUtil.selectInDebugView(getEditorPart(), getDebugView(), businessObjects);
             //Set the selected node variable
             if(businessObjects.size() == 1){
-               if(businessObjects.get(0) instanceof ISENode)
+               if(businessObjects.get(0) instanceof ISENode){
                   selectedNode = (ISENode)businessObjects.get(0);
+                  System.out.println(businessObjects.get(0).getClass().toString());
+               }
             }
          }
       }

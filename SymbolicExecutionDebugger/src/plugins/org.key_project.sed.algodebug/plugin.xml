@@ -4,12 +4,26 @@
    <extension
          point="org.eclipse.ui.views">
       <view
+            class="org.key_project.sed.algodebug.view.VariablesSelectionView"
+            id="org.key_project.sed.ui.view.VariablesSelectionView"
+            name="VariablesSelectionView"
+            restorable="true">
+      </view>
+      <view
             category="org.key_project.sed.ui.category"
             class="org.key_project.sed.algodebug.view.AlgorithmicDebugView"
             id="org.key_project.sed.ui.view.AlgorithmicDebugView"
             name="Algorithmic Debug"
             restorable="true">
       </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="org.key_project.sed.algodebug.perspective.Perspective"
+            id="org.key_project.sed.algodebug.perspective"
+            name="Algorithmic Debugging Perspective">
+      </perspective>
    </extension>
 
 </plugin>
