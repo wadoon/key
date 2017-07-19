@@ -6,6 +6,8 @@ import java.util.Observer;
 
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.debug.core.DebugException;
+import org.eclipse.debug.internal.ui.views.variables.VariablesView;
+import org.eclipse.debug.ui.IDebugUIConstants;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
@@ -284,6 +286,20 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
                System.out.println(actualCall.getCall());
                SWTUtil.select(((org.key_project.sed.ui.visualization.view.ExecutionTreeView)view).getDebugView().getViewer(),
                      new StructuredSelection(actualCall.getCall()), true);
+               
+               
+               IViewPart Part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView("org.key_project.sed.ui.view.VariablesSelectionView");
+               VariablesSelectionView selectionview = null;
+               if (Part instanceof VariablesSelectionView) {
+                 selectionview = (VariablesSelectionView) Part;}
+               
+               IViewPart VariablesPart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(IDebugUIConstants.ID_VARIABLE_VIEW);
+               if (VariablesPart instanceof VariablesView) {
+                  VariablesView view = (VariablesView) VariablesPart;
+                  extracted(selectionview, view);}
+               
+//               SWTUtil.select(((org.key_project.sed.algodebug.view.VariablesSelectionView)view). getViewer(),
+//                     new StructuredSelection(actualCall.getCall()), true);
          
             }
             else{
@@ -292,6 +308,11 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
                mb.setMessage("There is no call after this one.");
                mb.open();
             }
+         }
+
+         private void extracted(VariablesSelectionView selectionview,
+               VariablesView view) {
+            view.setSelectionProvider(selectionview.getviewer());
          }
       });
       FormData fd_btn_Next = new FormData();
@@ -355,23 +376,51 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       returnLabel.setLayoutData(fd_lblReturnvaluelabel);
    }
 
-   public ISENode[] getExecutionTreeAsArray(){
-      //TODO: Alle Knoten des Execution Tree als Array zurückgeben...
-      ISENode[] SETasList;
-      ISENode root = debug.getRoot(actualNode);
+   /*
+    * Alle Knoten des Execution Tree in Preorder Reihenfolge in einem Array zurückgeben...
+    */
+   public Object[] getExecutionTreeAsArray(){
+
+      ISENode root = null;
+      if(actualNode != null)
+            root = debug.getRoot(actualNode);
+
+      Object[] array = null;
+      if(root != null)
+         array =  asList(root).toArray();
       
-      return null;
+//      for(Object element : array){
+//         try {
+//            System.out.println(((ISENode)element).getName().toString());
+//         }
+//         catch (DebugException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//         }
+//      }
+//      
+      return array;
    }
    
-//   private ArrayList<ISENode> asList(ISENode node){
-//      ArrayList<ISENode> list;
-////      if(node.hasChildren()){
-////         for(ISENode child : node.getChildren()){
-////            
-////         }
-////      }
-//      return list;
-//   }
+   /*
+    * 
+    */
+   private ArrayList<ISENode> asList(ISENode node){
+      ArrayList<ISENode> list = new ArrayList<ISENode>();
+      list.add(node);
+      try {
+         if(node.hasChildren()){
+            for(ISENode child : node.getChildren()){
+               list.addAll(asList(child));
+            }
+         }
+      }
+      catch (DebugException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
+      return list;
+   }
    
    @Override
    public void setFocus() {
