@@ -48,5 +48,14 @@ class=de.uka.ilkd.key.taclettranslation.lemma.TacletProofObligationInput
 ";
 
 \proofScript "
-
+rule equiv_right;
+cut '!\forall Ord v_i;!f_phi(v_i)';
+rule notLeft;
+rule oIndBasic
+ formula='\forall Ord v_i; !f_phi(v_i)';
+rule allRight;
+rule impRight;
+cut '\forall Ord nv2; (olt(nv2, nv1_0) -> !f_phi(nv2))';
+instantiate hide var=v_i with=nv1_0;
+tryclose;
 "
