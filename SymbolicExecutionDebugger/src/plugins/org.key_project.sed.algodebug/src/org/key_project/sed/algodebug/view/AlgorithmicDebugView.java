@@ -30,6 +30,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.wb.swt.SWTResourceManager;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -94,7 +95,8 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
    Label constraintsLabel;
    Label returnLabel;
 
-   private IViewPart view;
+   private IViewPart executiontreeView,variablesSelectionView,variablesView;
+   IWorkbenchPage workbenchpage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
    
    @Override
    public void createPartControl(final Composite parent) {
@@ -104,8 +106,10 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
     //getSite().setSelectionProvider(this);   
     
     try {
-       view = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().showView("org.key_project.sed.ui.graphiti.view.ExecutionTreeView", null, IWorkbenchPage.VIEW_ACTIVATE);  
-      // view.getViewSite().setSelectionProvider(this);IDebugUIConstants.ID_VARIABLE_VIEW
+       executiontreeView = workbenchpage.showView("org.key_project.sed.ui.graphiti.view.ExecutionTreeView", null, IWorkbenchPage.VIEW_ACTIVATE);  
+       variablesSelectionView = workbenchpage.findView("org.key_project.sed.ui.view.VariablesSelectionView");
+       variablesView = workbenchpage.findView(IDebugUIConstants.ID_VARIABLE_VIEW);
+       // view.getViewSite().setSelectionProvider(this);IDebugUIConstants.ID_VARIABLE_VIEW
       // view.setFocus();
     }
     catch (PartInitException e1) {
@@ -239,7 +243,8 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
          @Override
          public void widgetSelected(SelectionEvent e) {
             actualCall = debug.getPath(actualNode).getPreviousCall();
-            
+            SWTUtil.select(VariablesSelectionView.getviewerLeft(),
+                  new StructuredSelection(actualCall.getCall()), true);
 //            try {
 //               System.out.println("Showing previous call from "+actualCall.getCall().getName().toString()+"to" + actualCall.getRet().getName().toString());
 //            }
@@ -281,25 +286,30 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
 //            }
             if(actualCall != null){               
                showQuestionCall(actualCall);
-               System.out.println(view.getClass());
+              // System.out.println(view.getClass());
              //TODO: Selection richtig an Variables View weitergeben
-               System.out.println(actualCall.getCall());
-               SWTUtil.select(((org.key_project.sed.ui.visualization.view.ExecutionTreeView)view).getDebugView().getViewer(),
-                     new StructuredSelection(actualCall.getCall()), true);
+              // System.out.println(actualCall.getCall());
+               //SWTUtil.select(((org.key_project.sed.ui.visualization.view.ExecutionTreeView)view).getDebugView().getViewer(),new StructuredSelection(actualCall.getCall()), true);
+            
+                  //SWTUtil.select(((org.key_project.sed.algodebug.view.VariablesSelectionView) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView("org.key_project.sed.algodebug.view.VariablesSelectionView")).getviewer(),new StructuredSelection(actualCall.getCall()), true);
+               
+  
                
                
-               IViewPart Part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView("org.key_project.sed.ui.view.VariablesSelectionView");
-               VariablesSelectionView selectionview = null;
-               if (Part instanceof VariablesSelectionView) {
-                 selectionview = (VariablesSelectionView) Part;}
-               
-               IViewPart VariablesPart = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(IDebugUIConstants.ID_VARIABLE_VIEW);
+//               IViewPart Part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView("org.key_project.sed.ui.view.VariablesSelectionView");
+//               VariablesSelectionView selectionview = null;
+//               if (Part instanceof VariablesSelectionView) {
+//                 selectionview = (VariablesSelectionView) Part;}
+//               
+               IViewPart VariablesPart = variablesView;
                if (VariablesPart instanceof VariablesView) {
                   VariablesView view = (VariablesView) VariablesPart;
-                  extracted(selectionview, view);}
+                  view.setSelectionProvider( VariablesSelectionView.getviewerLeft());}
                
-//               SWTUtil.select(((org.key_project.sed.algodebug.view.VariablesSelectionView)view). getViewer(),
-//                     new StructuredSelection(actualCall.getCall()), true);
+               SWTUtil.select(VariablesSelectionView.getviewerLeft(),
+                     new StructuredSelection(actualCall.getCall()), true);
+               SWTUtil.select(VariablesSelectionView.getviewerRight(),
+                     new StructuredSelection(actualCall.getRet()), true);
          
             }
             else{
@@ -310,10 +320,6 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
             }
          }
 
-         private void extracted(VariablesSelectionView selectionview,
-               VariablesView view) {
-            view.setSelectionProvider(selectionview.getviewer());
-         }
       });
       FormData fd_btn_Next = new FormData();
       fd_btn_Next.bottom = new FormAttachment(methodNameLabel, -39);
@@ -335,6 +341,8 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
                   actualNode = debug.selectNode(getSelectedNode());
 
                   actualCall = debug.getPath(actualNode).getStartCall();
+                  SWTUtil.select(VariablesSelectionView.getviewerLeft(),
+                        new StructuredSelection(actualCall.getCall()), true);
                 if(actualCall != null)
                    showQuestionCall(actualCall);
                 }
