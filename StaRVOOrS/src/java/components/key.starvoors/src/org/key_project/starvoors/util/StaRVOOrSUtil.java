@@ -289,8 +289,11 @@ public final class StaRVOOrSUtil {
              null;
    }
 
+   //TODO: Add new component to the xml file indicating that the proof was closed due to a contradiction in the preconditions 
    protected static boolean isVerified(IExecutionNode<?> node) {
-      return node instanceof IExecutionTermination && ((IExecutionTermination) node).isBranchVerified();
+      return (node instanceof IExecutionStart && (node.getChildren() == null || node.getChildren().length == 0) 
+    		  && node.getProofNode().isClosed()) ||
+    		 node instanceof IExecutionTermination && ((IExecutionTermination) node).isBranchVerified();
    }
    
    protected static SpecificationUseInformation computeSpecificationUseInformation(IExecutionNode<?> node) {
