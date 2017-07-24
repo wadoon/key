@@ -45,6 +45,13 @@ public class RemoteMethodEventLDT extends LDT {
     private final Function equivEvent;
     private final Function invEvent;
     private final Function filterVisible;
+    
+    private final Function wellformedListInternal;
+    private final Function wellformedListCoopInternal;
+    
+    private final Function coopListEquivInternal;
+    private final Function equivHistoryInternal;
+    private final Function filterVisibleInternal;
 
 
 	//history (of Remote method events) ... copy of: key.core/resources/de/uka/ilkd/key/proof/rules/events.key -> Seq hist;
@@ -75,6 +82,12 @@ public class RemoteMethodEventLDT extends LDT {
         equivEvent = addFunction(services, "equivEvent");
         filterVisible = addFunction(services, "filterVisible");
         invEvent = addFunction(services, "invEvent");
+        
+        wellformedListInternal = addFunction(services, "wellformedListInternal");
+        wellformedListCoopInternal = addFunction(services, "wellformedListCoopInternal");        
+        coopListEquivInternal = addFunction(services, "coopListEquivInternal");
+        equivHistoryInternal = addFunction(services, "equivHistoryInternal");
+        filterVisibleInternal = addFunction(services, "filterVisibleInternal");
 
 		hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
 		environmentCaller = (LocationVariable) services.getNamespaces().programVariables().lookup(ENVCALLER_NAME);
@@ -178,7 +191,27 @@ public class RemoteMethodEventLDT extends LDT {
         return currentParams;
     }
 
-	// maybe put somewhere else?
+	public Function getWellformedListInternal() {
+        return wellformedListInternal;
+    }
+
+    public Function getWellformedListCoopInternal() {
+        return wellformedListCoopInternal;
+    }
+
+    public Function getCoopListEquivInternal() {
+        return coopListEquivInternal;
+    }
+
+    public Function getEquivHistoryInternal() {
+        return equivHistoryInternal;
+    }
+
+    public Function getFilterVisibleInternal() {
+        return filterVisibleInternal;
+    }
+
+    // maybe put somewhere else?
 	public Function getMethodIdentifierByDeclaration(MethodDeclaration md, TermServices services) { // TODO KD z use more than just method name
 	    String string = md.getFullName();
 		return getMethodIdentifierByString(string, services);

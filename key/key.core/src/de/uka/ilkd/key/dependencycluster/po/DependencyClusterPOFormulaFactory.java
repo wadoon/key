@@ -37,6 +37,9 @@ public class DependencyClusterPOFormulaFactory {
     
     //TODO JK try better code reuse and remove these later
     private final InformationFlowContract infFlowContract;
+    
+    Term internalHist_A;
+    Term internalHist_B;
 
     
     public DependencyClusterPOFormulaFactory(DependencyClusterContract contract, ProofObligationVars symbExecVars, IFProofObligationVars ifVars, Services services) {
@@ -78,6 +81,9 @@ public class DependencyClusterPOFormulaFactory {
         LocationVariable hist = ldt.getHist();
         Term hist_A = tb.var(new LocationVariable(new ProgramElementName(tb.newName(hist + "_A")), new KeYJavaType(hist.sort())));  
         Term hist_B = tb.var(new LocationVariable(new ProgramElementName(tb.newName(hist + "_B")), new KeYJavaType(hist.sort())));
+        
+        internalHist_A = tb.var(new LocationVariable(new ProgramElementName(tb.newName("internalHist_A")), new KeYJavaType(hist.sort())));  
+        internalHist_B = tb.var(new LocationVariable(new ProgramElementName(tb.newName("internalHist_B")), new KeYJavaType(hist.sort())));
         
         Term call_A = tb.var(new LocationVariable(new ProgramElementName(tb.newName("call_A")), new KeYJavaType(ldt.eventSort())));  
         Term call_B = tb.var(new LocationVariable(new ProgramElementName(tb.newName("call_B")), new KeYJavaType(ldt.eventSort())));
@@ -180,9 +186,15 @@ public class DependencyClusterPOFormulaFactory {
         return tb.func(ldt.getEquivEvent(), a.getCall(), b.getCall());
     }
     
+    public Term defineInternalHistories() {
+        return tb.and(
+                tb.equals(internalHist_A, tb.seqSub(a.postHistory(), tb.zTerm(1), tb.add(tb.seqLen(a.postHistory()), tb.zTerm(-1)))), 
+                tb.equals(internalHist_B, tb.seqSub(b.postHistory(), tb.zTerm(1), tb.add(tb.seqLen(b.postHistory()), tb.zTerm(-1)))));
+    }
+    
     
     public Term completeFormula() {
-        return tb.imp(bothExecutions(), tb.imp(assumptions(), consequence()));
+        return tb.imp(tb.and(bothExecutions(), defineInternalHistories()), tb.imp(assumptions(), consequence()));
     }
 
 }
