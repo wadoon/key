@@ -18,7 +18,6 @@ import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListene
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.control.ProofControl;
-import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -75,4 +74,28 @@ public interface IProofProvider {
     * @return The {@link IProject} if known or {@code null} if unknown.
     */
    public IProject getProject();
+
+   /**
+    * Checks if it is allowed to start the auto mode.
+    * @return {@code true} can start auto mode, {@code false} is not allowed to start auto mode.
+    */
+   public boolean isCanStartAutomode();
+   
+   /**
+    * Checks if it is allowed to apply rules.
+    * @return {@code true} can apply rules, {@code false} is not allowed to apply rules.
+    */
+   public boolean isCanApplyRules();
+
+   /**
+    * Checks if it is allowed to prune proof.
+    * @return {@code true} can prune proof, {@code false} is not allowed to prune proof.
+    */
+   public boolean isCanPruneProof();
+
+   /**
+    * Checks if it is allowed to start SMT solver.
+    * @return {@code true} can start SMT solver, {@code false} is not allowed to start SMT solver.
+    */
+   public boolean isCanStartSMTSolver();
 }

@@ -45,7 +45,7 @@ import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.joinrule.JoinRuleCompletion;
+import de.uka.ilkd.key.gui.mergerule.MergeRuleCompletion;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
@@ -98,7 +98,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         completions.add(new DependencyContractCompletion());
         completions.add(new LoopInvariantRuleCompletion());
         completions.add(new BlockContractCompletion(mainWindow));
-        completions.add(JoinRuleCompletion.INSTANCE);
+        completions.add(MergeRuleCompletion.INSTANCE);
     }
 
     @Override
@@ -534,7 +534,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       }
       AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, includes, null, forceNewProfileOfNewProofs);
       InitConfig initConfig = loader.getInitConfig();
-      return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig, loader.getProof(), loader.getResult());
+      return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig,
+          loader.getProof(), loader.getProofScript(), loader.getResult());
    }
 
    @Override

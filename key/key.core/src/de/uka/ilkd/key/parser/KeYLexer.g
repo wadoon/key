@@ -339,8 +339,6 @@ lexer grammar KeYLexer;
         IS_ABSTRACT_OR_INTERFACE : '\\isAbstractOrInterface';
         CONTAINERTYPE : '\\containerType';
 
-        LIMITED : '$lmtd';
-
         // types that need to be declared as keywords
         LOCSET : '\\locset';
         SEQ : '\\seq';
