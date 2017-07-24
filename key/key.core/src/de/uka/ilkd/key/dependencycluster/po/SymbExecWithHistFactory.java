@@ -22,8 +22,10 @@ public class SymbExecWithHistFactory {
     private final ProofObligationVars symbExecVars;
     private final BasicPOSnippetFactory f;
     private final Term postHistory;
+    private final Term call;
+    private final Term termination;
     
-    public SymbExecWithHistFactory(DependencyClusterContract contract, ProofObligationVars symbExecVars, ProofObligationVars ifVars, Services services, Term postHistory) {
+    public SymbExecWithHistFactory(DependencyClusterContract contract, ProofObligationVars symbExecVars, ProofObligationVars ifVars, Services services, Term postHistory, Term call, Term term) {
         this.contract = contract;
         this.ifVars = ifVars;
         this.services = services;
@@ -32,6 +34,9 @@ public class SymbExecWithHistFactory {
         this.symbExecVars = symbExecVars;
         //TODO JK check sort of postHistory
         this.postHistory = postHistory;
+        
+        this.call = call;
+        this.termination = term;
         
         //f = POSnippetFactory.getBasicFactory(contract, ifVars, services);
         //TODO JK Can I really pass "this" while I'm still in the constructor???
@@ -47,16 +52,20 @@ public class SymbExecWithHistFactory {
                 ifVars.pre.heap);
     }
     
+    public Term defineCallVar() {
+        return tb.equals(call, callEvent());
+    }
+    
+    public Term defineTermVar() {
+        return tb.equals(termination, terminationEvent());
+    }
+    
     public Term postHistory() {
         return this.postHistory;
     }
     
     public Term historyWithCallEvent() {
-        return tb.seqSingleton(callEvent());
-    }
-    
-    public Term updateHistoryWithCallEvent() {
-        return tb.elementary(realHistory(), historyWithCallEvent());
+        return tb.seqSingleton(call);
     }
     
     public Term initialHistoryEquality() {
@@ -73,7 +82,7 @@ public class SymbExecWithHistFactory {
     }
         
     public Term historyWithTermEvent() {
-        return tb.seqConcat(realHistory(), tb.seqSingleton(terminationEvent()));
+        return tb.seqConcat(realHistory(), tb.seqSingleton(termination));
     }
     
     public Term updateHistoryWithTermEvent() {
@@ -89,7 +98,7 @@ public class SymbExecWithHistFactory {
                 f.create(BasicPOSnippetFactory.Snippet.FREE_PRE);
         final Term contractPre =
                 f.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
-        return tb.and(freePre, initialHistoryEquality(), contractPre);
+        return tb.and(freePre, initialHistoryEquality(), defineCallVar(), contractPre);
     }
     
     public Term symbolicExecutionWithPost() {
@@ -130,5 +139,9 @@ public class SymbExecWithHistFactory {
 
     public Term wellformedHistory() {
         return tb.and(tb.func(ldt.getWellformedList(), postHistory()),tb.func(ldt.getWellformedListCoop(), postHistory()));
+    }
+
+    public Term getCall() {
+        return call;
     }
 }

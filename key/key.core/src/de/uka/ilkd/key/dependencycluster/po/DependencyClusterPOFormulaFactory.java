@@ -79,8 +79,14 @@ public class DependencyClusterPOFormulaFactory {
         Term hist_A = tb.var(new LocationVariable(new ProgramElementName(tb.newName(hist + "_A")), new KeYJavaType(hist.sort())));  
         Term hist_B = tb.var(new LocationVariable(new ProgramElementName(tb.newName(hist + "_B")), new KeYJavaType(hist.sort())));
         
-        a = new SymbExecWithHistFactory(contract, symbExecVars, ifVars.c1, services, hist_A);
-        b = new SymbExecWithHistFactory(contract, symbExecVars, ifVars.c2, services, hist_B);
+        Term call_A = tb.var(new LocationVariable(new ProgramElementName(tb.newName("call_A")), new KeYJavaType(ldt.eventSort())));  
+        Term call_B = tb.var(new LocationVariable(new ProgramElementName(tb.newName("call_B")), new KeYJavaType(ldt.eventSort())));
+        
+        Term term_A = tb.var(new LocationVariable(new ProgramElementName(tb.newName("term_A")), new KeYJavaType(ldt.eventSort())));  
+        Term term_B = tb.var(new LocationVariable(new ProgramElementName(tb.newName("term_B")), new KeYJavaType(ldt.eventSort())));
+        
+        a = new SymbExecWithHistFactory(contract, symbExecVars, ifVars.c1, services, hist_A, call_A, term_A);
+        b = new SymbExecWithHistFactory(contract, symbExecVars, ifVars.c2, services, hist_B, call_B, term_B);
     }
     
     public SymbExecWithHistFactory a() {
@@ -167,7 +173,7 @@ public class DependencyClusterPOFormulaFactory {
     }
     
     public Term callEventEquivalence() {
-        return tb.func(ldt.getEquivEvent(), a.callEventFromPostHist(), b.callEventFromPostHist());
+        return tb.func(ldt.getEquivEvent(), a.getCall(), b.getCall());
     }
     
     

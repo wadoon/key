@@ -51,6 +51,8 @@ public class RemoteMethodEventLDT extends LDT {
 	private final LocationVariable hist;
 	private final LocationVariable environmentCaller;
 	private final LocationVariable currentParams;
+	
+	private final Sort eventSort;
 
 	public RemoteMethodEventLDT (TermServices services) {
 		super(NAME, services);
@@ -77,6 +79,12 @@ public class RemoteMethodEventLDT extends LDT {
 		hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
 		environmentCaller = (LocationVariable) services.getNamespaces().programVariables().lookup(ENVCALLER_NAME);
 		currentParams = (LocationVariable) services.getNamespaces().programVariables().lookup(CURRENT_PARAMS_NAME);
+		
+		eventSort = (Sort) services.getNamespaces().sorts().lookup("Event");
+	}
+	
+	public Sort eventSort() {
+	    return eventSort;
 	}
 
 	public Function eventConstructor() {
