@@ -100,11 +100,7 @@ public class DependencyClusterPOFormulaFactory {
     public Term bothExecutions() {
         return tb.and(a.updatedExecutionWithPreAndPost(), b.updatedExecutionWithPreAndPost());
     }
-    
-    public Term callInvisible() {
-        return tb.func(ldt.getInvEvent(), a.callEventFromPostHist());
-    }
-    
+       
     public Term invisibleHistory() {
         return tb.equals(tb.func(ldt.getFilterVisible(), a.postHistory()), tb.seqEmpty());
     }
@@ -125,9 +121,17 @@ public class DependencyClusterPOFormulaFactory {
     //TODO JK make sure this is correct, but the assumption of an cooperative environment makes sure that its equivalent to the original vis preserving version to make the whole history invisible
     // This uses the variables from run A by convention
     public Term visibilityPreserving() {
-        return tb.imp(callInvisible(), tb.and(invisibleHistory(), lowPartsOfPreAndPostEqual()));
+        return tb.and(tb.imp(callAInvisible(), tb.and(invisibleHistory(), lowPartsOfPreAndPostEqual())), tb.equals(callAInvisible(), termAInvisible()));
     }
     
+    private Term termAInvisible() {
+        return tb.func(ldt.getInvEvent(), a.getTermination());
+    }
+
+    private Term callAInvisible() {
+        return tb.func(ldt.getInvEvent(), a.getCall());
+    }
+
     public Term consequence() {      
         //TODO JK next add visibility preserving
         return tb.and(postStateEquivalence(), visibilityPreserving(), equivalentHistories());

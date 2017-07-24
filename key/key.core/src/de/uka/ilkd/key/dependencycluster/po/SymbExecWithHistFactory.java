@@ -117,12 +117,7 @@ public class SymbExecWithHistFactory {
     public Term visibilityFilteredPostHistory() {
         return tb.func(ldt.getFilterVisible(), postHistory());
     }
-    
-    public Term callEventFromPostHist() {
-        //TODO JK how to get the event sort properly?
-        return tb.seqGet(callEvent().sort(), postHistory(), tb.zero());
-    }
-    
+  
     
     private Term realHistory() {
         /*
@@ -143,5 +138,9 @@ public class SymbExecWithHistFactory {
 
     public Term getCall() {
         return call;
+    }
+
+    public Term getTermination() {
+        return termination;
     }
 }
