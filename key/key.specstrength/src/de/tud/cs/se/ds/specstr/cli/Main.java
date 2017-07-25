@@ -155,7 +155,7 @@ public final class Main {
     private static void printHelp(Options options) {
         System.out.println(INFO_STRING);
         HelpFormatter helpFormatter = new HelpFormatter();
-        helpFormatter.printHelp("java -jar key.specstrength.jar"
+        helpFormatter.printHelp("java -cp KeY.jar de.tud.cs.se.ds.specstr.cli.Main"
                 + "\t[input Java file]" + "\t[fully qualified method name]",
             options);
     }

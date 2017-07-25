@@ -4,6 +4,8 @@
 	<property name="build.dir" value="${basedir}/bin" />
 	<property name="ext.dir" value="${basedir}/lib" />
 	<property name="destfile" value="key.specstrength.jar" />
+	<property name="dist.dir"  value="${basedir}/../deployment" />
+	<property name="lib.dir" value="${basedir}/../key.core/lib"/>
 
 	<path id="classpath">
 		<fileset dir="${ext.dir}" includes="commons-cli-1.3.1.jar" />
@@ -12,6 +14,8 @@
 		<pathelement path="${basedir}/../key.core/bin" />
 		<pathelement path="${basedir}/../key.util/bin" />
 		<pathelement path="${basedir}/../key.core.symbolic_execution/bin" />
+		<pathelement path="${lib.dir}/antlr.jar"/>
+		<pathelement path="${lib.dir}/recoderKey.jar"/>
 	</path>
 
 	<target name="clean" description="Deletes all generated files and folders.">
@@ -30,7 +34,7 @@
 		</copy>
 	</target>
 
-	<target name="build" depends="copy">
+	<target name="compile" depends="copy">
 		<mkdir dir="${build.dir}" />
 		<javac
 			srcdir="${src.dir}"
@@ -44,7 +48,19 @@
 			source="1.8" />
 	</target>
 
-	<target name="jar" depends="build">
+	<target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">
+		<mkdir dir="${dist.dir}"/>
+		<mkdir dir="${dist.dir}/components"/>
+		<mkdir dir="${dist.dir}/libs"/>
+		<copy todir="${dist.dir}/libs">
+			<fileset file="${ext.dir}/commons-cli-1.3.1.jar"/>
+			<fileset file="${ext.dir}/log4j-api-2.6.2.jar"/>
+			<fileset file="${ext.dir}/log4j-core-2.6.2.jar"/>
+		</copy>
+		<jar destfile="${dist.dir}/components/key.specstrength.jar" basedir="${build.dir}" manifest="${basedir}/META-INF/MANIFEST.MF" />
+	</target>
+
+	<target name="jar" depends="compile">
 		<jar destfile="${destfile}" basedir="${build.dir}" includes="**/*">
 			<zipgroupfileset dir="${ext.dir}" includes="*.jar" />
 			<!--<fileset dir="." includes="gpl.txt" />-->
@@ -63,5 +79,5 @@
 		</java>
 	</target>
 
-	<target name="all" depends="build,jar" />
+	<target name="all" depends="compile,jar" />
 </project>

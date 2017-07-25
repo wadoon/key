@@ -32,6 +32,7 @@
 		<ant antfile="${key.dir}/key.core.example/build.xml" target="compile" dir="${key.dir}/key.core.example" inheritall="false"/>
 		<ant antfile="${key.dir}/key.removegenerics/build.xml" target="compile" dir="${key.dir}/key.removegenerics" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="compile" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
+		<ant antfile="${key.dir}/key.specstrength/build.xml" target="compile" dir="${key.dir}/key.specstrength" inheritall="false"/>
 	</target>
 
 	<target name="deployAll" description="Prepare KeY for shipping. Find results in directory 'deployment'. (Calls 'ant deploy' on production subprojects.)">
@@ -55,6 +56,7 @@
 		<ant antfile="${key.dir}/key.core.example/build.xml" target="deploy" dir="${key.dir}/key.core.example" inheritall="false"/>
 		<ant antfile="${key.dir}/key.removegenerics/build.xml" target="deploy" dir="${key.dir}/key.removegenerics" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="deploy" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
+		<ant antfile="${key.dir}/key.specstrength/build.xml" target="deploy" dir="${key.dir}/key.specstrength" inheritall="false"/>
 		<!-- Deploy license -->
 		<copy todir="${key.dir}/deployment">
 			<fileset file="${key.dir}/LICENSE.TXT"/>
@@ -81,6 +83,7 @@
 		<ant antfile="${key.dir}/key.core.example/build.xml" target="clean" dir="${key.dir}/key.core.example" inheritall="false"/>
 		<ant antfile="${key.dir}/key.removegenerics/build.xml" target="clean" dir="${key.dir}/key.removegenerics" inheritall="false"/>
 		<ant antfile="${key.dir}/key.core.symbolic_execution.example/build.xml" target="clean" dir="${key.dir}/key.core.symbolic_execution.example" inheritall="false"/>
+		<ant antfile="${key.dir}/key.specstrength/build.xml" target="clean" dir="${key.dir}/key.specstrength" inheritall="false"/>
 		<!-- Delete deployed files -->
 		<delete file="${key.dir}/deployment/LICENSE.TXT" failonerror="false" />
 		<delete file="${key.dir}/deployment/KeY.jar" failonerror="false" />
