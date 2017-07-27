@@ -18,7 +18,8 @@ public class VariableAssignments {
         HEAP("\\term Heap"),
         FIELD("\\term Field"),
         LOCSET("\\term LocSet"),
-        FORMULA("\\formula");
+        FORMULA("\\formula"),
+        SEQ("\\term Seq");
 
         private final String declPrefix;
 
