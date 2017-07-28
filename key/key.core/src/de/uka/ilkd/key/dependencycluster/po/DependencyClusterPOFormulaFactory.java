@@ -107,8 +107,8 @@ public class DependencyClusterPOFormulaFactory {
         return tb.and(a.updatedExecutionWithPreAndPost(), b.updatedExecutionWithPreAndPost());
     }
        
-    public Term invisibleHistory() {
-        return tb.equals(tb.func(ldt.getFilterVisible(), a.postHistory()), tb.seqEmpty());
+    public Term invisibleHistoryInternal() {
+        return tb.equals(tb.func(ldt.getFilterVisible(), a.postHistoryInternal()), tb.seqEmpty());
     }
     
     //No need to handle objects in a special way here, attacker can compare objects from pre and poststate and will know whether they've changed
@@ -127,7 +127,7 @@ public class DependencyClusterPOFormulaFactory {
     //TODO JK make sure this is correct, but the assumption of an cooperative environment makes sure that its equivalent to the original vis preserving version to make the whole history invisible
     // This uses the variables from run A by convention
     public Term visibilityPreserving() {
-        return tb.and(tb.imp(callAInvisible(), tb.and(invisibleHistory(), lowPartsOfPreAndPostEqual())), tb.equals(callAInvisible(), termAInvisible()));
+        return tb.and(tb.imp(callAInvisible(), tb.and(invisibleHistoryInternal(), lowPartsOfPreAndPostEqual())), tb.equals(callAInvisible(), termAInvisible()));
     }
     
     private Term termAInvisible() {
@@ -138,9 +138,8 @@ public class DependencyClusterPOFormulaFactory {
         return tb.func(ldt.getInvEvent(), a.getCall());
     }
 
-    public Term consequence() {      
-        //TODO JK next add visibility preserving
-        return tb.and(postStateEquivalence(), visibilityPreserving(), equivalentHistories());
+    public Term consequence() {
+        return tb.and(postStateEquivalence(), visibilityPreserving(), equivalentInternalHistories(), equivalentTerminationEvents());
     }
     
     //self is implicitly considered to be low
@@ -168,8 +167,12 @@ public class DependencyClusterPOFormulaFactory {
         return snippet.produceOutputRelation(d, ifVars.c1, ifVars.c2);
     }
     
-    public Term equivalentHistories() {
-        return tb.func(ldt.getEquivHistoryInternal(), a.postHistory(), b.postHistory());
+    public Term equivalentInternalHistories() {
+        return tb.func(ldt.getEquivHistoryInternal(), a.postHistoryInternal(), b.postHistoryInternal());
+    }
+    
+    public Term equivalentTerminationEvents() {
+        return tb.func(ldt.getEquivEvent(), a.getTermination(), b.getTermination());
     }
     
    
@@ -179,7 +182,7 @@ public class DependencyClusterPOFormulaFactory {
     
     //services called with equivalent events are guaranteed to terminate with equivalent events
     public Term cooperationalEquivalence() {
-        return tb.func(ldt.getCoopListEquivInternal(), a.postHistory(), b.postHistory());      
+        return tb.func(ldt.getCoopListEquivInternal(), a.postHistoryInternal(), b.postHistoryInternal());      
     }
     
     public Term callEventEquivalence() {
