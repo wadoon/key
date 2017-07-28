@@ -89,6 +89,10 @@ public class SymbExecWithHistFactory {
         return tb.elementary(realHistory(), historyWithTermEvent());
     }
     
+    public Term updateHistoryWithCallEvent() {
+        return tb.elementary(realHistory(), historyWithCallEvent());
+    }
+    
     public Term postHistoryEquality() {
         return tb.equals(postHistory(), historyWithTermEvent());
     }
@@ -110,8 +114,8 @@ public class SymbExecWithHistFactory {
 
         final Term updateHeap = tb.elementary(tb.getBaseHeap(), ifVars.pre.heap);
         
-        //return tb.apply(updateHeap, tb.apply(updateHistoryWithCallEvent(), execWithPre));
-        return tb.apply(updateHeap, execWithPre);
+        return tb.apply(updateHeap, tb.apply(updateHistoryWithCallEvent(), execWithPre));
+        //return tb.apply(updateHeap, execWithPre);
     }
     
     public Term visibilityFilteredPostHistory() {
@@ -133,7 +137,7 @@ public class SymbExecWithHistFactory {
     
 
     public Term wellformedHistory() {
-        return tb.and(tb.func(ldt.getWellformedList(), postHistory()),tb.func(ldt.getWellformedListCoop(), postHistory()));
+        return tb.and(tb.func(ldt.getWellformedListInternal(), postHistory()),tb.func(ldt.getWellformedListCoopInternal(), postHistory()));
     }
 
     public Term getCall() {

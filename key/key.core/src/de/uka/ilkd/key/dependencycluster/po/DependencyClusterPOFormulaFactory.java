@@ -169,7 +169,7 @@ public class DependencyClusterPOFormulaFactory {
     }
     
     public Term equivalentHistories() {
-        return tb.func(ldt.getEquivHistory(), a.postHistory(), b.postHistory());
+        return tb.func(ldt.getEquivHistoryInternal(), a.postHistory(), b.postHistory());
     }
     
    
@@ -179,22 +179,23 @@ public class DependencyClusterPOFormulaFactory {
     
     //services called with equivalent events are guaranteed to terminate with equivalent events
     public Term cooperationalEquivalence() {
-        return tb.func(ldt.getCoopListEquiv(), a.visibilityFilteredPostHistory(), b.visibilityFilteredPostHistory());      
+        return tb.func(ldt.getCoopListEquivInternal(), a.postHistory(), b.postHistory());      
     }
     
     public Term callEventEquivalence() {
         return tb.func(ldt.getEquivEvent(), a.getCall(), b.getCall());
     }
     
+    /*
     public Term defineInternalHistories() {
         return tb.and(
                 tb.equals(internalHist_A, tb.seqSub(a.postHistory(), tb.zTerm(1), tb.add(tb.seqLen(a.postHistory()), tb.zTerm(-1)))), 
                 tb.equals(internalHist_B, tb.seqSub(b.postHistory(), tb.zTerm(1), tb.add(tb.seqLen(b.postHistory()), tb.zTerm(-1)))));
     }
-    
+    */
     
     public Term completeFormula() {
-        return tb.imp(tb.and(bothExecutions(), defineInternalHistories()), tb.imp(assumptions(), consequence()));
+        return tb.imp(bothExecutions(), tb.imp(assumptions(), consequence()));
     }
 
 }
