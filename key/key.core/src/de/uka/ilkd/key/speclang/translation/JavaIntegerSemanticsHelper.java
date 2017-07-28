@@ -25,7 +25,7 @@ import de.uka.ilkd.key.logic.op.Function;
 /**
  * Helper class for sl-parsers dealing with Java's type promotion for integers.
  */
-public class JavaIntegerSemanticsHelper {
+public class JavaIntegerSemanticsHelper extends SemanticsHelper {
 
     private final TermBuilder tb; 
 

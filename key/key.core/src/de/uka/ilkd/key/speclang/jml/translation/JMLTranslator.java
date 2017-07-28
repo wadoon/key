@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import de.uka.ilkd.key.speclang.translation.*;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
 import org.key_project.util.collection.ImmutableList;
@@ -52,7 +53,6 @@ import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -60,10 +60,6 @@ import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
-import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
-import de.uka.ilkd.key.speclang.translation.SLExpression;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.speclang.translation.SLTranslationExceptionManager;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.MiscTools;
@@ -1219,7 +1215,7 @@ public final class JMLTranslator {
         translationMethods.put(JMLKeyWord.SHIFT_RIGHT, new JMLArithmeticOperationTranslationMethod(){
 
             @Override
-            public SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression a, SLExpression e)
+            public SLExpression translate(SemanticsHelper intHelper, SLExpression a, SLExpression e)
             throws SLTranslationException {
                 checkNotBigint(a);
                 checkNotBigint(e);
@@ -1237,7 +1233,7 @@ public final class JMLTranslator {
         translationMethods.put(JMLKeyWord.SHIFT_LEFT, new JMLArithmeticOperationTranslationMethod(){
 
             @Override
-            public SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression result, SLExpression e)
+            public SLExpression translate(SemanticsHelper intHelper, SLExpression result, SLExpression e)
             throws SLTranslationException {
                 checkNotBigint(result);
                 checkNotBigint(e);
@@ -1255,7 +1251,7 @@ public final class JMLTranslator {
         translationMethods.put(JMLKeyWord.UNSIGNED_SHIFT_RIGHT, new JMLArithmeticOperationTranslationMethod(){
 
             @Override
-            public SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression result, SLExpression e)
+            public SLExpression translate(SemanticsHelper intHelper, SLExpression result, SLExpression e)
             throws SLTranslationException {
                 checkNotBigint(result);
                 checkNotBigint(e);
@@ -1277,7 +1273,7 @@ public final class JMLTranslator {
             }
 
             @Override
-            protected SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression left,
+            protected SLExpression translate(SemanticsHelper intHelper, SLExpression left,
                     SLExpression right) throws SLTranslationException {
                     return intHelper.buildAddExpression(left, right);
             }
@@ -1292,7 +1288,7 @@ public final class JMLTranslator {
             }
 
             @Override
-            protected SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression left,
+            protected SLExpression translate(SemanticsHelper intHelper, SLExpression left,
                     SLExpression right) throws SLTranslationException {
                 return intHelper.buildSubExpression(left, right);
             }
@@ -2011,13 +2007,6 @@ public final class JMLTranslator {
         /**
          * Add implicit "non-null" and "created" guards for reference types,
          * "in-bounds" guards for integer types. Then, translateToTerm the quantifier.
-         * @param quantName
-         * @param declVars
-         * @param expr
-         * @param preTerm
-         * @param bodyTerm
-         * @param nullable
-         * @param services
          * @return
          * @throws SLTranslationException
          */
@@ -2384,19 +2373,26 @@ public final class JMLTranslator {
         @Override
         public SLExpression translate (SLTranslationExceptionManager man, Object ... params ) throws SLTranslationException{
             checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
-            JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper((Services)params[0],man);
-            bigint = ((Services)params[0]).getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
             SLExpression e1 = (SLExpression) params[1];
             SLExpression e2 = (SLExpression) params[2];
-            checkNotType(e1,man);
-            checkNotType(e2,man);
-            SLExpression result = null;
-            result = translate(jish,e1,e2);
+            SLExpression result;
+            if (e1.getType().getJavaType() == PrimitiveType.JAVA_FLOAT && e2.getType().getJavaType() == PrimitiveType.JAVA_FLOAT) {
+                checkNotType(e1, man);
+                checkNotType(e2, man);
+                JavaFloatSemanticsHelper jfsh = new JavaFloatSemanticsHelper((Services) params[0], man);
+                result = translate(jfsh, e1, e2);
+            } else {
+                checkNotType(e1, man);
+                checkNotType(e2, man);
+                bigint = ((Services)params[0]).getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_BIGINT);
+                JavaIntegerSemanticsHelper jish = new JavaIntegerSemanticsHelper((Services)params[0],man);
+                result = translate(jish, e1, e2);
+            }
             return result;
         }
 
         protected abstract String opName();
-        protected abstract SLExpression translate(JavaIntegerSemanticsHelper intHelper, SLExpression left, SLExpression right) throws SLTranslationException;
+        protected abstract SLExpression translate(SemanticsHelper Helper, SLExpression left, SLExpression right) throws SLTranslationException;
     }
 
     /*
