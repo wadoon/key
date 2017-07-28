@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public class RemoteMethodEventLDT extends LDT {
 	public static final Name NAME = new Name("Event");
 	public static final Name HIST_NAME = new Name("hist");
+	public static final Name INTERNAL_HIST_NAME = new Name("internalHist");
 	public static final Name METHOD_SORT = new Name("MethodIdentifier");
 	public static final Name ENVCALLER_NAME = new Name("environmentCaller");
 	public static final Name CURRENT_PARAMS_NAME = new Name("currentParams");
@@ -56,6 +57,7 @@ public class RemoteMethodEventLDT extends LDT {
 
 	//history (of Remote method events) ... copy of: key.core/resources/de/uka/ilkd/key/proof/rules/events.key -> Seq hist;
 	private final LocationVariable hist;
+	private final LocationVariable internalHist;
 	private final LocationVariable environmentCaller;
 	private final LocationVariable currentParams;
 	
@@ -90,6 +92,7 @@ public class RemoteMethodEventLDT extends LDT {
         filterVisibleInternal = addFunction(services, "filterVisibleInternal");
 
 		hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
+		internalHist = (LocationVariable) services.getNamespaces().programVariables().lookup(INTERNAL_HIST_NAME);
 		environmentCaller = (LocationVariable) services.getNamespaces().programVariables().lookup(ENVCALLER_NAME);
 		currentParams = (LocationVariable) services.getNamespaces().programVariables().lookup(CURRENT_PARAMS_NAME);
 		
@@ -182,6 +185,11 @@ public class RemoteMethodEventLDT extends LDT {
 	public LocationVariable getHist() {
 		return hist;
 	}
+	
+
+    public LocationVariable getInternalHist() {
+        return internalHist;
+    }
 
 	public LocationVariable getEnvironmentCaller() {
 		return environmentCaller;
@@ -280,4 +288,5 @@ public class RemoteMethodEventLDT extends LDT {
 		assert false : "RemoteMethodEventLDT: No Types are associated with Events.";
 		return null; // add Types to java.abstraction.PrimitiveType?
 	}
+
 }

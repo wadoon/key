@@ -741,6 +741,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 				contractParams, services);
 
 		LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
+		LocationVariable internalHist = services.getTypeConverter().getRemoteMethodEventLDT().getInternalHist();
 		ProgramElementName otherHeapName = new ProgramElementName(tb.newName("otherHeap"));
 		LocationVariable otherHeap = new LocationVariable(otherHeapName, new KeYJavaType(baseHeap.sort()));
 		ProgramElementName otherPreHeapName = new ProgramElementName(tb.newName("otherHeapBefore_" + pm.getName()));
@@ -851,12 +852,18 @@ public final class UseOperationContractRule implements BuiltInRule {
 		// modify history
 		final ProgramVariable selfVar = (ProgramVariable)(services.getNamespaces().programVariables().lookup(tb.selfVar(pm, contract.getKJT(), false).name()));
 		final Term selfVarTerm = (selfVar != null) ? tb.var(selfVar) : null;
-		final Name afterHistName = new Name(tb.newName(hist + "After_" + pm.getName()));
+		final Name afterHistName = new Name(tb.newName(hist + "After_" + pm.getName()));		
+		final Name afterHistInternalName = new Name(tb.newName(hist + "After_" + pm.getName() + "_internal"));		
 		final Function afterHistFunc = new Function(afterHistName, hist.sort(), true);
+		final Function afterHistInternalFunc = new Function(afterHistInternalName, hist.sort(), true);		
 		services.getNamespaces().functions().addSafely(afterHistFunc);
+		services.getNamespaces().functions().addSafely(afterHistInternalFunc);		
 		final Term afterHist = tb.func(afterHistFunc);
+		final Term afterHistInternal = tb.func(afterHistInternalFunc);		
 		final Term anonHistUpdate = tb.elementary(hist, afterHist);
+		final Term anonHistInternalUpdate = tb.elementary(internalHist, afterHistInternal);		
 		Term newHist;
+		Term newHistInternal;
 		// if called method belongs to a business remote interface, add "outgoing call" and "incoming termination" events to history
 		if (pm.getMethodDeclaration().isRemote()) {
 			assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
@@ -867,7 +874,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 			Term outCallEvent = tb.evConst(tb.evCall(), selfVarTerm, contractSelf, method, tb.seq(contractParams), anonUpdateDatas.head().methodHeapAtPre);
 			// throws Exception if pm.getMethodDeclaration().isStatic()
 			Term inTermEvent  = tb.evConst(tb.evTerm(), selfVarTerm, contractSelf, method, resultTerm, anonUpdateDatas.reverse().head().methodHeap);
-			newHist = tb.seqConcat(tb.getHist(), tb.seq(outCallEvent, inTermEvent));
+			newHist = tb.seqConcat(tb.seqConcat(tb.getHist(), tb.seqSingleton(outCallEvent)), tb.seqSingleton(inTermEvent));
+			newHistInternal = tb.seqConcat(tb.seqConcat(tb.getInternalHist(), tb.seqSingleton(outCallEvent)), tb.seqSingleton(inTermEvent));
 		// if called method does not belong to a business remote interface add unknown changes to history
 		} else {
 			final Name anonHistName = new Name(tb.newName("anon_" + hist + "_" + pm.getName()));
@@ -875,10 +883,14 @@ public final class UseOperationContractRule implements BuiltInRule {
 			services.getNamespaces().functions().addSafely(anonHistFunc);
 			final Term anonHist = tb.label(tb.func(anonHistFunc), new ParameterlessTermLabel(new Name("anonHistFunction")));
 			newHist = tb.seqConcat(tb.getHist(), anonHist);
+			newHistInternal = tb.seqConcat(tb.getInternalHist(), anonHist);
 		}
-		final Term assumption = tb.equals(newHist, afterHist);
+		final Term assumptionGlobal = tb.equals(newHist, afterHist);
+		final Term assumptionInternal = tb.equals(newHistInternal, afterHistInternal);
+		final Term assumption = tb.and(assumptionGlobal, assumptionInternal);		
 		anonAssumption = tb.and(anonAssumption, assumption);
-		anonUpdate = tb.parallel(anonUpdate, anonHistUpdate);
+		anonUpdate = tb.parallel(anonUpdate, anonHistUpdate, anonHistInternalUpdate);
+
 		atPreUpdates = tb.parallel(atPreUpdates, tb.elementary(beforeHist, tb.getHist()));
 		reachableState = tb.and(reachableState, tb.wellFormedHist(hist));
 

@@ -91,8 +91,8 @@ public class DependencyClusterPOFormulaFactory {
         Term term_A = tb.var(new LocationVariable(new ProgramElementName(tb.newName("term_A")), new KeYJavaType(ldt.eventSort())));  
         Term term_B = tb.var(new LocationVariable(new ProgramElementName(tb.newName("term_B")), new KeYJavaType(ldt.eventSort())));
         
-        a = new SymbExecWithHistFactory(contract, symbExecVars, ifVars.c1, services, hist_A, call_A, term_A);
-        b = new SymbExecWithHistFactory(contract, symbExecVars, ifVars.c2, services, hist_B, call_B, term_B);
+        a = new SymbExecWithHistFactory(contract, symbExecVars, ifVars.c1, services, hist_A, internalHist_A, call_A, term_A);
+        b = new SymbExecWithHistFactory(contract, symbExecVars, ifVars.c2, services, hist_B, internalHist_B, call_B, term_B);
     }
     
     public SymbExecWithHistFactory a() {
