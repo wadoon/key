@@ -367,7 +367,7 @@ public class ExecutionTreeView extends AbstractDebugViewBasedEditorInViewView<Ex
             if(businessObjects.size() == 1){
                if(businessObjects.get(0) instanceof ISENode){
                   selectedNode = (ISENode)businessObjects.get(0);
-                  System.out.println(businessObjects.get(0).getClass().toString());
+                  //System.out.println(businessObjects.get(0).getClass().toString());
                }
             }
          }

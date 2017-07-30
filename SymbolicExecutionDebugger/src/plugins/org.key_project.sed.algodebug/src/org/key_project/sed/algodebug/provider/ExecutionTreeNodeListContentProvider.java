@@ -22,15 +22,6 @@ public class ExecutionTreeNodeListContentProvider implements IStructuredContentP
 
    @Override
    public Object[] getElements(Object inputElement) {
-      //TODO: Alle Nodes des Execution Tree als Liste zurückgeben...
-//      ISENode[] NodeArray = null;
-//      IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView("org.key_project.sed.ui.view.AlgorithmicDebugView");
-//      if (part instanceof AlgorithmicDebugView) {
-//         AlgorithmicDebugView view = (AlgorithmicDebugView) part;
-//         NodeArray =  view.getExecutionTreeAsArray();
-//     }
-//      
-//      return NodeArray != null ? NodeArray : null;
       return (Object[]) inputElement;
    }
 

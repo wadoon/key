@@ -1,14 +1,15 @@
 package org.key_project.sed.algodebug.view;
 
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
-import org.eclipse.swt.widgets.List;
-import org.eclipse.debug.internal.ui.views.variables.VariablesView;
-import org.eclipse.debug.ui.IDebugUIConstants;
+import org.eclipse.debug.ui.contexts.DebugContextEvent;
+import org.eclipse.debug.ui.contexts.IDebugContextListener;
+import org.eclipse.debug.ui.contexts.IDebugContextProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ListViewer;
@@ -16,85 +17,121 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.key_project.sed.algodebug.provider.ExecutionTreeNodeListContentProvider;
 import org.key_project.sed.algodebug.provider.ExecutionTreeNodeListLabelProvider;
-import org.key_project.sed.core.model.ISENode;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.custom.SashForm;
 
-public class VariablesSelectionView extends ViewPart implements ISelectionListener{
+@SuppressWarnings("restriction")
+public class VariablesSelectionView extends ViewPart {
    
    public static final String VIEW_ID = "org.key_project.sed.ui.view.VariablesSelectionView";
    
-   public VariablesSelectionView() {
-      // TODO Auto-generated constructor stub
+   public VariablesSelectionView(){
    }
-static ListViewer viewerLeft = null;
-static ListViewer viewerRight = null;
+   
+   static ListViewer viewerLeft = null;
 
-public static ListViewer getviewerLeft (){
-   return viewerLeft;
-}
+   static ListViewer viewerRight = null;
 
-public static ListViewer getviewerRight (){
-   return viewerRight;
-}
-
-private void getContent(){
-   Object[] NodeArray = null;
-   IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView("org.key_project.sed.ui.view.AlgorithmicDebugView");
-   if (part instanceof AlgorithmicDebugView) {
-      AlgorithmicDebugView view = (AlgorithmicDebugView) part;
-      NodeArray =  view.getExecutionTreeAsArray();
-  }
-   if(NodeArray == null){
-      viewerLeft.setInput(null);
-      viewerLeft.setInput(null);
+   public static ListViewer getviewerLeft (){
+      return viewerLeft;
    }
-   else{
-      viewerLeft.setInput(NodeArray);
-      viewerRight.setInput(NodeArray);
+
+   public static ListViewer getviewerRight (){
+      return viewerRight;
    }
-}
 
-@Override
-   public void createPartControl(Composite parent) {
-      
-      SashForm sashForm = new SashForm(parent, SWT.NONE);
-      
-      viewerLeft = new ListViewer(sashForm, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-      List listOfCallNodes = viewerLeft.getList();
-      viewerLeft.setContentProvider(new ExecutionTreeNodeListContentProvider());
-      viewerLeft.setLabelProvider(new ExecutionTreeNodeListLabelProvider());
+   private void getContent(){
+      Object[] NodeArray = null;
+      IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView("org.key_project.sed.ui.view.AlgorithmicDebugView");
+      if (part instanceof AlgorithmicDebugView) {
+         AlgorithmicDebugView view = (AlgorithmicDebugView) part;
+         NodeArray =  view.getExecutionTreeAsArray();
+     }
+      if(NodeArray == null){
+         viewerLeft.setInput(null);
+         viewerLeft.setInput(null);
+      }
+      else{
+         viewerLeft.setInput(NodeArray);
+         viewerRight.setInput(NodeArray);
+      }
+   }
 
-      getSite().setSelectionProvider(viewerLeft);
-      registerViwererAtVariablesView(viewerLeft);
+   private final IDebugContextProvider IDCProvider = new IDebugContextProvider() {
       
-      viewerRight = new ListViewer(sashForm, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-      List listOfReturnNodes = viewerRight.getList();
+      @Override
+      public void removeDebugContextListener(IDebugContextListener listener) {
+      }
       
-            viewerRight.setContentProvider(new ExecutionTreeNodeListContentProvider());
-            viewerRight.setLabelProvider(new ExecutionTreeNodeListLabelProvider());
-      sashForm.setWeights(new int[] {1, 1});
+      @Override
+      public IWorkbenchPart getPart() {
+         return null;
+      }
       
+      @Override
+      public ISelection getActiveContext() {
+         return null;
+      }
+      
+      @Override
+      public void addDebugContextListener(IDebugContextListener listener) {      
+      }
+   };
+
+   private IViewPart variablesViewLeft,variablesViewRight;
+   
+   private void createViews(){
+      IWorkbenchPage workbenchpage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+      try {
+         variablesViewLeft = workbenchpage.showView("org.key_project.sed.ui.view.myVariablesView", "VariablesViewLeft",IWorkbenchPage.VIEW_ACTIVATE);
+         variablesViewRight = workbenchpage.showView("org.key_project.sed.ui.view.myVariablesView", "VariablesViewRight",IWorkbenchPage.VIEW_ACTIVATE);
+      }
+      catch (PartInitException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
+      
+      IViewPart VPartLeft = variablesViewLeft;
+      final AlgoDebugVariablesView left = (AlgoDebugVariablesView) VPartLeft ;
+      viewerLeft.addSelectionChangedListener(new ISelectionChangedListener() {
+         @Override
+         public void selectionChanged(SelectionChangedEvent event) {
+            left.debugContextChanged(new DebugContextEvent( IDCProvider, event.getSelection(), 1)); //warum flags = 1 ?
+         }
+      });
+      
+      IViewPart VPartRight = variablesViewRight;
+      final AlgoDebugVariablesView right = (AlgoDebugVariablesView) VPartRight ;
+      viewerRight.addSelectionChangedListener(new ISelectionChangedListener() {
+   
+         @Override
+         public void selectionChanged(SelectionChangedEvent event) {
+            right.debugContextChanged(new DebugContextEvent( IDCProvider, event.getSelection(), 1)); //warum flags = 1 ?
+         }
+      });
+   }
+   
+   
+   @Override
+      public void createPartControl(Composite parent) {
+      
+         SashForm sashForm = new SashForm(parent, SWT.NONE);
+         
+         viewerLeft = new ListViewer(sashForm, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+         viewerLeft.setContentProvider(new ExecutionTreeNodeListContentProvider());
+         viewerLeft.setLabelProvider(new ExecutionTreeNodeListLabelProvider());
+         
+         viewerRight = new ListViewer(sashForm, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+         viewerRight.setContentProvider(new ExecutionTreeNodeListContentProvider());
+         viewerRight.setLabelProvider(new ExecutionTreeNodeListLabelProvider());
+         
+         sashForm.setWeights(new int[] {1, 1});
+         
+         createViews();
+         getContent();
+      }
+   
+   @Override
+   public void setFocus() {
       getContent();
-      getViewSite().getPage().addSelectionListener(this);
    }
-
-private void registerViwererAtVariablesView(ListViewer viewer){
-   IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView(IDebugUIConstants.ID_VARIABLE_VIEW);
-   if (part instanceof VariablesView) {
-      VariablesView view = (VariablesView) part;
-      view.setSelectionProvider(viewer);
-   }
-   }
-
-@Override
-public void selectionChanged(IWorkbenchPart part, ISelection selection) {
- System.out.println("Selection geändert: " +selection.toString());
-}
-
-@Override
-public void setFocus() {
-   // TODO Auto-generated method stub
-   getContent();
-}
 }

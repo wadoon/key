@@ -2,7 +2,8 @@
 <classpath>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins">
 		<accessrules>
-			<accessrule kind="accessible" pattern="org.eclipse.debug.internal.ui.views"/>
+			<accessrule kind="accessible" pattern="org.eclipse.debug.internal.ui.*"/>
+			<accessrule kind="accessible" pattern="org.eclipse.debug.*"/>
 		</accessrules>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>

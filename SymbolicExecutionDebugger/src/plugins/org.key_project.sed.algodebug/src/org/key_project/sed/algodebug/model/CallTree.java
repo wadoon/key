@@ -5,9 +5,6 @@ import java.util.Deque;
 import java.util.LinkedList;
 
 import org.eclipse.debug.core.DebugException;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Shell;
 import org.key_project.sed.core.model.ISEBaseMethodReturn;
 import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEMethodCall;

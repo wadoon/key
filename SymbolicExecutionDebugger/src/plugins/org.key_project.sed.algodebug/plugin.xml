@@ -16,6 +16,18 @@
             name="Algorithmic Debug"
             restorable="true">
       </view>
+      <view
+            class="org.key_project.sed.algodebug.view.SelectionTest"
+            id="org.key_project.sed.ui.view.SelectionTest"
+            name="SelectionTest"
+            restorable="true">
+      </view>
+      <view
+            class="org.key_project.sed.algodebug.view.AlgoDebugVariablesView"
+            id="org.key_project.sed.ui.view.myVariablesView"
+            name="myVariablesView"
+            restorable="true">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
