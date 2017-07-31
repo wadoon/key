@@ -174,6 +174,8 @@ public final class JMLTranslator {
         // arithmetic
         ADD ("+"),
         SUBTRACT ("-"),
+        MULT ("*"),
+        DIV ("/"),
         SHIFT_LEFT ("<<"),
         SHIFT_RIGHT (">>"),
         UNSIGNED_SHIFT_RIGHT (">>>"),
@@ -1273,9 +1275,9 @@ public final class JMLTranslator {
             }
 
             @Override
-            protected SLExpression translate(SemanticsHelper intHelper, SLExpression left,
+            protected SLExpression translate(SemanticsHelper helper, SLExpression left,
                     SLExpression right) throws SLTranslationException {
-                    return intHelper.buildAddExpression(left, right);
+                    return helper.buildAddExpression(left, right);
             }
 
         });
@@ -1288,9 +1290,39 @@ public final class JMLTranslator {
             }
 
             @Override
-            protected SLExpression translate(SemanticsHelper intHelper, SLExpression left,
+            protected SLExpression translate(SemanticsHelper helper, SLExpression left,
                     SLExpression right) throws SLTranslationException {
-                return intHelper.buildSubExpression(left, right);
+                return helper.buildSubExpression(left, right);
+            }
+
+        });
+
+        translationMethods.put(JMLKeyWord.MULT, new JMLArithmeticOperationTranslationMethod(){
+
+            @Override
+            protected String opName() {
+                return ("subtract");
+            }
+
+            @Override
+            protected SLExpression translate(SemanticsHelper helper, SLExpression left,
+                                             SLExpression right) throws SLTranslationException {
+                return helper.buildMultExpression(left, right);
+            }
+
+        });
+
+        translationMethods.put(JMLKeyWord.DIV, new JMLArithmeticOperationTranslationMethod(){
+
+            @Override
+            protected String opName() {
+                return ("subtract");
+            }
+
+            @Override
+            protected SLExpression translate(SemanticsHelper helper, SLExpression left,
+                                             SLExpression right) throws SLTranslationException {
+                return helper.buildDivExpression(left, right);
             }
 
         });
@@ -1718,17 +1750,10 @@ public final class JMLTranslator {
 				return new SLExpression(tb.values(),t);
 			}});
         
-        translationMethods.put(JMLKeyWord.INF_FLOW_SPEC_LIST, new JMLTranslationMethod() {
-
-            @Override
-            public ImmutableList<?> translate(
-                    SLTranslationExceptionManager excManager,
-                    Object... params)
-                    throws SLTranslationException {
-                checkParameters(params, ImmutableList.class, Services.class);
-                ImmutableList<?> infFlowSpecList = (ImmutableList<?>) params[0];
-                return infFlowSpecList;
-            }
+        translationMethods.put(JMLKeyWord.INF_FLOW_SPEC_LIST, (excManager1, params) -> {
+            checkParameters(params, ImmutableList.class, Services.class);
+            ImmutableList<?> infFlowSpecList = (ImmutableList<?>) params[0];
+            return infFlowSpecList;
         });
     }
 
@@ -2376,7 +2401,8 @@ public final class JMLTranslator {
             SLExpression e1 = (SLExpression) params[1];
             SLExpression e2 = (SLExpression) params[2];
             SLExpression result;
-            if (e1.getType().getJavaType() == PrimitiveType.JAVA_FLOAT && e2.getType().getJavaType() == PrimitiveType.JAVA_FLOAT) {
+            if ((e1.getType().getJavaType() == PrimitiveType.JAVA_FLOAT && e2.getType().getJavaType() == PrimitiveType.JAVA_FLOAT)
+                 || (e1.getType().getJavaType() == PrimitiveType.JAVA_DOUBLE && e2.getType().getJavaType() == PrimitiveType.JAVA_DOUBLE )  ) {
                 checkNotType(e1, man);
                 checkNotType(e2, man);
                 JavaFloatSemanticsHelper jfsh = new JavaFloatSemanticsHelper((Services) params[0], man);

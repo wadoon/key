@@ -67,6 +67,7 @@ options {
     // Helper objects
     private JMLResolverManager resolverManager;
     private JavaIntegerSemanticsHelper intHelper;
+    private JavaFloatSemanticsHelper floatHelper;
 
 
     private KeYJMLParser(KeYJMLLexer lexer,
@@ -103,6 +104,7 @@ options {
 	this.atPres         = atPres;
 
         intHelper = new JavaIntegerSemanticsHelper(services, excManager);
+        floatHelper = new JavaFloatSemanticsHelper(services, excManager);
 	// initialize helper objects
 	this.resolverManager = new JMLResolverManager(this.javaInfo,
 						      specInClass,
@@ -1179,7 +1181,7 @@ multexpr returns [SLExpression ret=null] throws SLTranslationException
 :
     result=unaryexpr
     (
-	MULT e=unaryexpr
+	mult=MULT e=unaryexpr
 	{
 	    if (result.isType()) {
 		raiseError("Cannot build multiplicative expression from type " +
@@ -1192,10 +1194,11 @@ multexpr returns [SLExpression ret=null] throws SLTranslationException
 	    assert result.isTerm();
 	    assert e.isTerm();
 
-	    result = intHelper.buildMulExpression(result, e);
+        result = translator.<SLExpression>translate(mult.getText(), SLExpression.class, services, result, e);
+//	    result = intHelper.buildMulExpression(result, e);
 	}
     |
-	DIV e=unaryexpr
+	div=DIV e=unaryexpr
 	{
 	    if (result.isType()) {
 		raiseError("Cannot build multiplicative expression from type " +
@@ -1208,7 +1211,8 @@ multexpr returns [SLExpression ret=null] throws SLTranslationException
 	    assert result.isTerm();
 	    assert e.isTerm();
 
-	    result = intHelper.buildDivExpression(result, e);
+        result = translator.<SLExpression>translate(div.getText(), SLExpression.class, services, result, e);
+//	    result = intHelper.buildDivExpression(result, e);
 	}
     |
 	MOD e=unaryexpr
@@ -1249,8 +1253,12 @@ unaryexpr returns [SLExpression ret=null] throws SLTranslationException
 		raiseError("Cannot build  -" + result.getType().getName() + ".");
 	    }
 	    assert result.isTerm();
-
-	    result = intHelper.buildUnaryMinusExpression(result);
+        if (result.getType().getJavaType() == PrimitiveType.JAVA_FLOAT
+            || result.getType().getJavaType() == PrimitiveType.JAVA_DOUBLE) {
+            result = floatHelper.buildUnaryMinusExpression(result);
+        } else {
+	        result = intHelper.buildUnaryMinusExpression(result);
+	    }
 	}
     |
 	(LPAREN typespec RPAREN ) => result = castexpr
