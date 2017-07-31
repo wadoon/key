@@ -91,6 +91,7 @@ options {
     // Helper objects
     private JMLResolverManager resolverManager;
     private JavaIntegerSemanticsHelper intHelper;
+    private JavaFloatSemanticsHelper floatHelper;
 
     private KeYJMLParser(KeYJMLLexer lexer,
                          String fileName,
@@ -127,6 +128,7 @@ options {
         this.atBefores      = atBefores;
 
         intHelper = new JavaIntegerSemanticsHelper(services, excManager);
+        floatHelper = new JavaFloatSemanticsHelper(services, excManager);
         // initialize helper objects
         this.resolverManager = new JMLResolverManager(this.javaInfo,
                                                       specInClass,
@@ -1195,7 +1197,7 @@ relationalexpr returns [SLExpression ret=null] throws SLTranslationException
 
 			    result = new SLExpression(
 				tb.func(f,result.getTerm(),right.getTerm()));
-			} 
+			}
 			if (right2 != null) { // range expressions like 0 <= x < 23
 			    if (right2.isType()) {
 			    raiseError("Cannot build relational expression from type " +
@@ -1260,37 +1262,39 @@ multexpr returns [SLExpression ret=null] throws SLTranslationException
 :
     result=unaryexpr
     (
-    MULT e=unaryexpr
-    {
-        if (result.isType()) {
-            raiseError("Cannot build multiplicative expression from type " +
-                       result.getType().getName() + ".");
-        }
-        if (e.isType()) {
-            raiseError("Cannot multiply by type " +
-                       e.getType().getName() + ".");
-        }
-        assert result.isTerm();
-        assert e.isTerm();
+	mult=MULT e=unaryexpr
+	{
+	    if (result.isType()) {
+		raiseError("Cannot build multiplicative expression from type " +
+		    result.getType().getName() + ".");
+	    }
+	    if (e.isType()) {
+		raiseError("Cannot multiply by type " +
+		    e.getType().getName() + ".");
+	    }
+	    assert result.isTerm();
+	    assert e.isTerm();
 
-        result = intHelper.buildMulExpression(result, e);
-    }
+        result = translator.<SLExpression>translate(mult.getText(), SLExpression.class, services, result, e);
+//	    result = intHelper.buildMulExpression(result, e);
+	}
     |
-    DIV e=unaryexpr
-    {
-        if (result.isType()) {
-            raiseError("Cannot build multiplicative expression from type " +
-                       result.getType().getName() + ".");
-        }
-        if (e.isType()) {
-            raiseError("Cannot divide by type " +
-                       e.getType().getName() + ".");
-        }
-        assert result.isTerm();
-        assert e.isTerm();
+	div=DIV e=unaryexpr
+	{
+	    if (result.isType()) {
+		raiseError("Cannot build multiplicative expression from type " +
+		    result.getType().getName() + ".");
+	    }
+	    if (e.isType()) {
+		raiseError("Cannot divide by type " +
+		    e.getType().getName() + ".");
+	    }
+	    assert result.isTerm();
+	    assert e.isTerm();
 
-        result = intHelper.buildDivExpression(result, e);
-    }
+        result = translator.<SLExpression>translate(div.getText(), SLExpression.class, services, result, e);
+//	    result = intHelper.buildDivExpression(result, e);
+	}
     |
     MOD e=unaryexpr
     {
@@ -1340,15 +1344,19 @@ unaryexpr returns [SLExpression ret=null] throws SLTranslationException
         }
     }
     |
-    minus=MINUS result=unaryexpr
-    {
-        if (result.isType()) {
-            raiseError("Cannot build  -" + result.getType().getName() + ".");
-        }
-        assert result.isTerm();
-
-        result = intHelper.buildUnaryMinusExpression(result);
-    }
+	MINUS result=unaryexpr
+	{
+	    if (result.isType()) {
+		raiseError("Cannot build  -" + result.getType().getName() + ".");
+	    }
+	    assert result.isTerm();
+        if (result.getType().getJavaType() == PrimitiveType.JAVA_FLOAT
+            || result.getType().getJavaType() == PrimitiveType.JAVA_DOUBLE) {
+            result = floatHelper.buildUnaryMinusExpression(result);
+        } else {
+	        result = intHelper.buildUnaryMinusExpression(result);
+	    }
+	}
     |
     (LPAREN typespec RPAREN ) => result = castexpr
     |

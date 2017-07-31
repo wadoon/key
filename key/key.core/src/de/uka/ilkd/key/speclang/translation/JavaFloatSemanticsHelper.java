@@ -145,7 +145,7 @@ public class JavaFloatSemanticsHelper extends SemanticsHelper {
         return null;
     }
 
-    public SLExpression buildMulExpression(SLExpression a, SLExpression b)
+    public SLExpression buildMultExpression(SLExpression a, SLExpression b)
             throws SLTranslationException {
         assert a != null;
         assert b != null;
