@@ -31,18 +31,18 @@ public class AlgorithmicDebug  {
    private Call lastHighlightedCall;
    
    public AlgorithmicDebug() {
-      path = null;
+      tree = null;
    }
    
-   private CallTree path;
+   private CallTree tree;
    
-   public CallTree getPath(ISENode node){
-      if(path == null){
-         path = new CallTree();
-         path.generatePaths(getRoot(node));
+   public CallTree getCallTree(ISENode node){
+      if(tree == null){
+         tree = new CallTree();
+         tree.generatePaths(getRoot(node));
          //path.printPathsToConsoleWithIterators();
          }
-      return path;
+      return tree;
    }
    
    /**

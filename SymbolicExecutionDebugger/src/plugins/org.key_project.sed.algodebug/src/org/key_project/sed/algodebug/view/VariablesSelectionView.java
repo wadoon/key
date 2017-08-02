@@ -56,6 +56,10 @@ public class VariablesSelectionView extends ViewPart {
       }
    }
 
+   /*
+    * IDCProvider: Dummy method, needed only as Parameter for variables view
+    */
+   
    private final IDebugContextProvider IDCProvider = new IDebugContextProvider() {
       
       @Override
@@ -91,7 +95,7 @@ public class VariablesSelectionView extends ViewPart {
       }
       
       IViewPart VPartLeft = variablesViewLeft;
-      final AlgoDebugVariablesView left = (AlgoDebugVariablesView) VPartLeft ;
+      final AlgorithmicDebugVariablesView left = (AlgorithmicDebugVariablesView) VPartLeft ;
       viewerLeft.addSelectionChangedListener(new ISelectionChangedListener() {
          @Override
          public void selectionChanged(SelectionChangedEvent event) {
@@ -100,7 +104,7 @@ public class VariablesSelectionView extends ViewPart {
       });
       
       IViewPart VPartRight = variablesViewRight;
-      final AlgoDebugVariablesView right = (AlgoDebugVariablesView) VPartRight ;
+      final AlgorithmicDebugVariablesView right = (AlgorithmicDebugVariablesView) VPartRight ;
       viewerRight.addSelectionChangedListener(new ISelectionChangedListener() {
    
          @Override

@@ -34,6 +34,7 @@ import org.key_project.sed.core.model.ISEConstraint;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
+import org.eclipse.swt.custom.ScrolledComposite;
 
 public class AlgorithmicDebugView extends ViewPart implements Observer, ISelectionProvider{
 
@@ -121,14 +122,6 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
 //      fd2.bottom = new FormAttachment(0, 10);
       methodNameLabel.setLayoutData(fd2);
       
-      constraintsLabel = new Label(parent, 0);
-//      constraintsLabel.setText("CONSTRAINTS");
-      FormData fd3 = new FormData();
-      fd3.right = new FormAttachment(methodNameLabel, 0, SWT.RIGHT);
-      fd3.left = new FormAttachment(0, 10);
-//      fd3.bottom = new FormAttachment(0, 100);
-      constraintsLabel.setLayoutData(fd3);
-      
       Button buttonCorrect = new Button(parent, SWT.BORDER);
       buttonCorrect.addSelectionListener(new SelectionAdapter() {
          @Override
@@ -154,7 +147,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
                 }
               else{
               debug.annotateCall(actualCall, true);
-              actualCall = debug.getPath(actualNode).getNextCall();
+              actualCall = debug.getCallTree(actualNode).getNextCall();
               if(actualCall != null){
                  showQuestionCall(actualCall);
                  setVariablesSelectionViewSelection();}
@@ -215,7 +208,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       btnNewButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
-            actualCall = debug.getPath(actualNode).getPreviousCall();
+            actualCall = debug.getCallTree(actualNode).getPreviousCall();
             if(actualCall != null){
                showQuestionCall(actualCall);
                setVariablesSelectionViewSelection();
@@ -243,7 +236,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
          
          @Override
          public void widgetSelected(SelectionEvent e) {
-            actualCall = debug.getPath(actualNode).getNextCall();
+            actualCall = debug.getCallTree(actualNode).getNextCall();
             if(actualCall != null){               
                showQuestionCall(actualCall);
               // SWTUtil.select(((org.key_project.sed.ui.visualization.view.ExecutionTreeView)executiontreeView).getDebugView().getViewer(),new StructuredSelection(actualCall.getCall()), true);
@@ -272,16 +265,15 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       btnStartAlgorithmicDebugging.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
-            if(getSelectedNode() != null){
+            actualNode = getSelectedNode();                   //actualNode = debug.selectNode(getSelectedNode()); geändert: warum wurde der erste nicht markierte Node gesucht ??
+            if(actualNode != null){
                //System.out.println("STARTKNOTEN: " +getSelectedNode().toString());
-                  actualNode = debug.selectNode(getSelectedNode());
-                  actualCall = debug.getPath(actualNode).getStartCall();
-                  
-                if(actualCall != null){
-                   showQuestionCall(actualCall);
-                   setVariablesSelectionViewSelection();
-                }
-                }
+                  actualCall = debug.getCallTree(actualNode).getStartCall();
+                  if(actualCall != null){
+                     showQuestionCall(actualCall);
+                     setVariablesSelectionViewSelection();
+                     }
+                   }
             }
          }
       );
@@ -293,7 +285,6 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       btnStartAlgorithmicDebugging.setText("Start Algorithmic Debugging");
       
       Label lblConstraintslabel = new Label(parent, SWT.NONE);
-      fd3.top = new FormAttachment(lblConstraintslabel, 6);
       lblConstraintslabel.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
       FormData fd_lblConstraintslabel = new FormData();
       fd_lblConstraintslabel.top = new FormAttachment(methodNameLabel, 6);
@@ -302,7 +293,6 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       lblConstraintslabel.setText("while using these constraints:");
       
       Label lblReturnlabel = new Label(parent, SWT.NONE);
-      fd3.bottom = new FormAttachment(lblReturnlabel, -6);
       lblReturnlabel.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
       FormData fd_lblReturnlabel = new FormData();
       fd_lblReturnlabel.top = new FormAttachment(0, 311);
@@ -311,13 +301,31 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       lblReturnlabel.setText("and this return value:");
       
       returnLabel = new Label(parent, SWT.NONE);
+      fd_lblReturnlabel.bottom = new FormAttachment(returnLabel, -14);
       fd_buttonCorrect.top = new FormAttachment(returnLabel, 6);
       FormData fd_lblReturnvaluelabel = new FormData();
+      fd_lblReturnvaluelabel.top = new FormAttachment(0, 342);
       fd_lblReturnvaluelabel.bottom = new FormAttachment(100, -70);
-      fd_lblReturnvaluelabel.top = new FormAttachment(lblReturnlabel, 16);
       fd_lblReturnvaluelabel.right = new FormAttachment(methodNameLabel, 0, SWT.RIGHT);
       fd_lblReturnvaluelabel.left = new FormAttachment(methodNameLabel, 5, SWT.LEFT);
       returnLabel.setLayoutData(fd_lblReturnvaluelabel);
+      
+      ScrolledComposite scrolledComposite = new ScrolledComposite(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+      FormData fd_scrolledComposite = new FormData();
+      fd_scrolledComposite.bottom = new FormAttachment(lblReturnlabel, -16);
+      fd_scrolledComposite.top = new FormAttachment(lblConstraintslabel, 8);
+      fd_scrolledComposite.right = new FormAttachment(methodNameLabel, 0, SWT.RIGHT);
+      fd_scrolledComposite.left = new FormAttachment(returnLabel, 0, SWT.LEFT);
+      scrolledComposite.setLayoutData(fd_scrolledComposite);
+      scrolledComposite.setExpandHorizontal(true);
+      scrolledComposite.setExpandVertical(true);
+      scrolledComposite.setMinSize( 50, 50 );
+
+      
+      constraintsLabel = new Label(scrolledComposite, SWT.NONE);
+      constraintsLabel.setLayoutData(new FormData());
+      scrolledComposite.setContent( constraintsLabel );
+
    }
 
    /*
@@ -402,5 +410,4 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
          .selectionChanged(new SelectionChangedEvent(this, selection));
       }
    }
-
 }

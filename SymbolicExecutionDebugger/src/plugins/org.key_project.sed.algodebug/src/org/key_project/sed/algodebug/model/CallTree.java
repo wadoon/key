@@ -75,6 +75,10 @@ public class CallTree {
       }
    }
 
+   /*
+    * Gibt den ersten Call der Pfadliste zurück.
+    * @author Peter Schauberger
+    */
    public Call getStartCall(){
       pathIterator = 0;
       callIterator = 0;
@@ -135,6 +139,7 @@ public class CallTree {
    
    /*
     * Generate the Paths for algorithmic debugging
+    * Sucht nach Blättern und ruft addpath auf wenn eines gefunden wurde
     * @author Peter Schauberger
     */
    public ArrayList<CallPath> generatePaths(ISENode node){
@@ -170,14 +175,14 @@ public class CallTree {
          while(!(node instanceof ISEThread)){
             if(node instanceof ISEBaseMethodReturn){
                deque.push(node);
-               //System.out.println("Pushing"+node.getName());
+               System.out.println("Pushing"+node.getName());
             }
             else if(node instanceof ISEMethodCall){
-               //System.out.println("Adding Call: From "+node.getName());//+"to"+deque.getFirst().getName());
-               if(!( deque.peekLast() instanceof ISEExceptionalMethodReturn))
+               System.out.println("Adding Call: From "+node.getName() + "to"+deque.peekFirst().getName());
+               if(!( deque.peekFirst() instanceof ISEExceptionalMethodReturn))
                   path.addCall(new Call(node, deque.pop()));
                else
-                  path.addCall(new Call(node, deque.peekLast()));
+                  path.addCall(new Call(node, deque.peekFirst()));
             }
                node = node.getParent();
             }

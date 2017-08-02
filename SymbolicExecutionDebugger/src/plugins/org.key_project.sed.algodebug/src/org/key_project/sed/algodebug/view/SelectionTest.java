@@ -16,6 +16,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.SWT;
 
+@SuppressWarnings("unused")
 public class SelectionTest extends ViewPart {
 
    public SelectionTest() {
@@ -38,25 +39,25 @@ public class SelectionTest extends ViewPart {
          e.printStackTrace();
       }
       
-//      IViewPart VPart = variablesView;
-//      final myVariablesView sw = (myVariablesView) VPart ;
-////      if (VPart instanceof myVariablesView) {
-////         sw = (myVariablesView) VPart;
-////      }
-//      
-//      ListViewer viewer = VariablesSelectionView.getviewerLeft();
-//      viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-//         
-//         @Override
-//         public void selectionChanged(SelectionChangedEvent event) {
-//            String selection = "";
-//            selection = event.getSelection().toString();
-//            lblLabel.setText(selection);
-//            
-//            //sw.getSelectionProviderWrapper().setSelection(new StructuredSelection(event.getSelection())); 
-//            //getSelectionProviderWrapper().setSelection(event.getSelection());
-//         }
-//      });
+      IViewPart VPart = variablesView;
+      final AlgorithmicDebugVariablesView sw = (AlgorithmicDebugVariablesView) VPart ;
+//      if (VPart instanceof myVariablesView) {
+//         sw = (myVariablesView) VPart;
+//      }
+      
+      ListViewer viewer = VariablesSelectionView.getviewerLeft();
+      viewer.addSelectionChangedListener(new ISelectionChangedListener() {
+         
+         @Override
+         public void selectionChanged(SelectionChangedEvent event) {
+            String selection = "";
+            selection = event.getSelection().toString();
+            lblLabel.setText(selection);
+            
+            //sw.getSelectionProviderWrapper().setSelection(new StructuredSelection(event.getSelection())); 
+            //getSelectionProviderWrapper().setSelection(event.getSelection());
+         }
+      });
 
    }
    

@@ -23,7 +23,7 @@
             restorable="true">
       </view>
       <view
-            class="org.key_project.sed.algodebug.view.AlgoDebugVariablesView"
+            class="org.key_project.sed.algodebug.view.AlgorithmicDebugVariablesView"
             id="org.key_project.sed.ui.view.myVariablesView"
             name="myVariablesView"
             restorable="true">
