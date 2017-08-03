@@ -30,6 +30,8 @@ public class SMTTermFloatOp extends SMTTerm{
 
 		public static final Op FPNEG		= new Op("fp.neg", SMTSort.FLOAT, SMTSort.FLOAT);
 		public static final Op FPABS		= new Op("fp.abs", SMTSort.FLOAT, SMTSort.FLOAT);
+		public static final Op FPMIN		= new Op("fp.min", SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.FLOAT);
+		public static final Op FPMAX		= new Op("fp.max", SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.FLOAT);
 		public static final Op FPISNAN	= new Op("fp.isNaN", SMTSort.FLOAT, SMTSort.BOOL);
 		public static final Op FPISZERO	= new Op("fp.isZero", SMTSort.FLOAT, SMTSort.BOOL);
 		public static final Op FPISNORMAL	= new Op("fp.isNormal", SMTSort.FLOAT, SMTSort.BOOL);
