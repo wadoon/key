@@ -1116,7 +1116,7 @@ relationalexpr returns [SLExpression ret=null] throws SLTranslationException
 
 			    result = new SLExpression(
 				tb.func(f,result.getTerm(),right.getTerm()));
-			} 
+			}
 			if (right2 != null) { // range expressions like 0 <= x < 23
 			    if (right2.isType()) {
 			    raiseError("Cannot build relational expression from type " +

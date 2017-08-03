@@ -166,6 +166,8 @@ public class SMTFloatTranslator implements SMTTranslator {
 
 		fopTable.put(floatLDT.getJavaUnaryMinus(), SMTTermFloatOp.Op.FPNEG);
 		fopTable.put(floatLDT.getAbs(), SMTTermFloatOp.Op.FPABS);
+		fopTable.put(floatLDT.getJavaMin(), SMTTermFloatOp.Op.FPMIN);
+		fopTable.put(floatLDT.getJavaMax(), SMTTermFloatOp.Op.FPMAX);
 		fopTable.put(floatLDT.getIsNaN(), SMTTermFloatOp.Op.FPISNAN);
 		fopTable.put(floatLDT.getIsZero(), SMTTermFloatOp.Op.FPISZERO);
 		fopTable.put(floatLDT.getIsNormal(), SMTTermFloatOp.Op.FPISNORMAL);
@@ -274,7 +276,7 @@ public class SMTFloatTranslator implements SMTTranslator {
 				buffer.append(";" + c2 + "\n");
 			}
 		}
-
+		System.out.println("buffer = " + buffer);
 		return buffer;
 	}
 
@@ -314,6 +316,7 @@ public class SMTFloatTranslator implements SMTTranslator {
 		}
 		// Add the proof obligation to file.
 		file.addFormula(po);
+		System.out.println("file = " + file.toString());
 		return file;
 	}
 
