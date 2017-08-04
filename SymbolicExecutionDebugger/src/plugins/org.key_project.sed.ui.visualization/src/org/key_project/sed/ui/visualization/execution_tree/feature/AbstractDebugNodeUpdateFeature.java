@@ -20,7 +20,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Exchanger;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
@@ -2205,7 +2204,6 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             ISEAnnotation[] annotations = node.computeUsedAnnotations();
             String newStyleId = ExecutionTreeStyleUtil.computeDebugNodeStyleId(annotations);
             if (!newStyleId.equals(rr.getStyle().getId())) {
-               //System.out.println(" if (!newStyleId.equals(rr.getStyle().getId())) {");
                // Replace and update style
                rr.setStyle(ExecutionTreeStyleUtil.getStyleForDebugNode(newStyleId, annotations, getDiagram()));
                rr.setLineWidth(ExecutionTreeStyleUtil.getLineWidthForDebugNode(annotations));
@@ -2213,7 +2211,6 @@ public abstract class AbstractDebugNodeUpdateFeature extends AbstractUpdateFeatu
             else {
                // Update style
                ExecutionTreeStyleUtil.getStyleForDebugNode(newStyleId, annotations, getDiagram());
-               rr.setLineWidth(ExecutionTreeStyleUtil.getLineWidthForDebugNode(annotations));
             }
          }
          else if (shape.getGraphicsAlgorithm() instanceof Text) {

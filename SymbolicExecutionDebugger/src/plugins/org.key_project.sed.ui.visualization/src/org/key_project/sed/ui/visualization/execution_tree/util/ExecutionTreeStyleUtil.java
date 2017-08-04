@@ -78,7 +78,13 @@ public final class ExecutionTreeStyleUtil {
       gaService.setRenderingStyle(style, areas);
       return style;
    }
-
+   
+   /**
+    * Returns the linewidth for the {@link ISEnodes}
+    * @param annotations The {@link ISEAnnotation}s to search in.
+    * @return The linewidth used for the {@link ISENode}. If a {@link HighlightAnnotation} was found a thick line is used, if not then a thin line.
+    * @author Peter Schauberger
+    */
    public static int getLineWidthForDebugNode(ISEAnnotation[] annotations){
       int width = 1;
       ISEAnnotation highlightAnnotation = searchHighlightAnnotation(annotations);
@@ -89,6 +95,9 @@ public final class ExecutionTreeStyleUtil {
    }
    
    /**
+    * Searches {@link ISEAnnotation}s of type HighlightAnnotation.
+    * @param annotations The {@link ISEAnnotation}s to search in.
+    * @return The found {@link ISEAnnotation} or {@code null} if not available.
     * @author Peter Schauberger
     */
    public static ISEAnnotation searchHighlightAnnotation(ISEAnnotation[] annotations) {

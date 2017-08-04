@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.core.model.ISEBaseMethodReturn;
 import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
+import org.key_project.sed.core.model.ISEExceptionalTermination;
 import org.key_project.sed.core.model.ISEMethodCall;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEThread;
@@ -171,18 +172,24 @@ public class CallTree {
       ISENode node = leaf;
       CallPath path = new CallPath();
       Deque<ISENode> deque = new LinkedList<ISENode>();
+      ISENode exception = null;
+      
+      if(leaf instanceof ISEExceptionalTermination)
+         exception = leaf;
       
          while(!(node instanceof ISEThread)){
             if(node instanceof ISEBaseMethodReturn){
                deque.push(node);
-               System.out.println("Pushing"+node.getName());
+               //System.out.println("Pushing"+node.getName());
             }
             else if(node instanceof ISEMethodCall){
-               System.out.println("Adding Call: From "+node.getName() + "to"+deque.peekFirst().getName());
-               if(!( deque.peekFirst() instanceof ISEExceptionalMethodReturn))
+               //System.out.println("Adding Call: From "+node.getName() + "to"+deque.peekFirst().getName());
+               if( deque.isEmpty() && exception != null )
+                  path.addCall(new Call(node, exception));
+               else if(!( deque.peekFirst() instanceof ISEExceptionalMethodReturn))
                   path.addCall(new Call(node, deque.pop()));
-               else
-                  path.addCall(new Call(node, deque.peekFirst()));
+                  else
+                     path.addCall(new Call(node, deque.peekFirst()));
             }
                node = node.getParent();
             }

@@ -166,13 +166,6 @@ public class AlgorithmicDebug  {
       Shell shell = Display.getCurrent().getActiveShell();
       
       while(  !(node instanceof ISEThread)){
-//         try {
-//            System.out.println("++++Highlighte Node: "+node.getName().toString());
-//         }
-//         catch (DebugException e1) {
-//            // TODO Auto-generated catch block
-//            e1.printStackTrace();
-//         }
             if(node == call.getCall()){
                highlightNode(shell, node); //annotieren
                break;
@@ -191,6 +184,30 @@ public class AlgorithmicDebug  {
       }
       lastHighlightedCall = call;
    }
+   
+   public void highlightNode(Shell shell, ISENode node) {  
+      
+      ISEAnnotationType annotationTypeHighlight = SEAnnotationUtil.getAnnotationtype(HighlightAnnotationType.TYPE_ID);   
+      ISEAnnotation[] registeredAnnotationsHighlight = node.getDebugTarget().getRegisteredAnnotations(annotationTypeHighlight);
+      
+      ISEAnnotation annotationHighlight = ArrayUtil.search(registeredAnnotationsHighlight, new IFilter<ISEAnnotation>() {
+         @Override
+         public boolean select(ISEAnnotation element) {
+            return element instanceof HighlightAnnotation; 
+         }
+      });
+        
+        if(annotationHighlight == null){
+           ISEDebugTarget target = node.getDebugTarget();
+           annotationHighlight = annotationTypeHighlight.createAnnotation();
+           target.registerAnnotation(annotationHighlight);
+        }
+
+        //If AnnotationLink was not found, we create a new one and attach it to the node
+          if(node.getAnnotationLinks(annotationTypeHighlight).length == 0){
+             node.addAnnotationLink(annotationTypeHighlight.createLink(annotationHighlight, node));
+          }     
+     }
    
    public void unhighlight(){
       
@@ -227,30 +244,6 @@ public class AlgorithmicDebug  {
             e.printStackTrace();
          }
          }
-   }
-   
- public void highlightNode(Shell shell, ISENode node) {  
-  
-    ISEAnnotationType annotationTypeHighlight = SEAnnotationUtil.getAnnotationtype(HighlightAnnotationType.TYPE_ID);   
-    ISEAnnotation[] registeredAnnotationsHighlight = node.getDebugTarget().getRegisteredAnnotations(annotationTypeHighlight);
-    
-    ISEAnnotation annotationHighlight = ArrayUtil.search(registeredAnnotationsHighlight, new IFilter<ISEAnnotation>() {
-       @Override
-       public boolean select(ISEAnnotation element) {
-          return element instanceof HighlightAnnotation; 
-       }
-    });
-      
-      if(annotationHighlight == null){
-         ISEDebugTarget target = node.getDebugTarget();
-         annotationHighlight = annotationTypeHighlight.createAnnotation();
-         target.registerAnnotation(annotationHighlight);
-      }
-
-      //If AnnotationLink was not found, we create a new one and attach it to the node
-        if(node.getAnnotationLinks(annotationTypeHighlight).length == 0){
-           node.addAnnotationLink(annotationTypeHighlight.createLink(annotationHighlight, node));
-        }     
    }
  
    /*
