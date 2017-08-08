@@ -5,6 +5,9 @@ import java.util.Deque;
 import java.util.LinkedList;
 
 import org.eclipse.debug.core.DebugException;
+import org.key_project.sed.algodebug.traversalstrategy.ITraversalStrategy;
+import org.key_project.sed.algodebug.traversalstrategy.TraversalStrategyBottomUp;
+import org.key_project.sed.algodebug.traversalstrategy.TraversalStrategyTopDown;
 import org.key_project.sed.core.model.ISEBaseMethodReturn;
 import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEExceptionalTermination;
@@ -18,14 +21,14 @@ public class CallTree {
     * the list of paths
     * @author Peter Schauberger
     */
-   public ArrayList<CallPath> Paths;
+   public ArrayList<CallPath> tree;
    
    /*
     * @return the paths
     * @author Peter Schauberger
     */
    public ArrayList<CallPath> getPaths() {
-      return Paths;
+      return tree;
    }
 
    /*
@@ -33,9 +36,11 @@ public class CallTree {
     * @author Peter Schauberger
     */
    public CallTree() {
-      this.Paths = new ArrayList<CallPath>();
+      this.tree = new ArrayList<CallPath>();
       
    }
+   
+   private ITraversalStrategy strategy = null; 
 
    /*
     * Iterator for lists of paths
@@ -53,24 +58,24 @@ public class CallTree {
     * @author Peter Schauberger
     */
    public Call getNextCall(){
-      if(pathIterator == Paths.size()-1){ //letzter Pfad erreicht
-         if(callIterator == Paths.get(pathIterator).getSize()-1){ //Letzter Call im letzten Pfad: Ende erreicht
+      if(pathIterator == tree.size()-1){ //letzter Pfad erreicht
+         if(callIterator == tree.get(pathIterator).getSize()-1){ //Letzter Call im letzten Pfad: Ende erreicht
             return null; 
          }
          else{ //mitten im letzten Pfad: nächsten Call zurück
             callIterator++;
-            return Paths.get(pathIterator).getCall(callIterator);
+            return tree.get(pathIterator).getCall(callIterator);
             }
       }
       else{ // nicht letzter Pfad
-         if(callIterator == Paths.get(pathIterator).getSize()-1){ //Letzter Call im Pfad: erster Call im nächsten Pfad zurück
+         if(callIterator == tree.get(pathIterator).getSize()-1){ //Letzter Call im Pfad: erster Call im nächsten Pfad zurück
             pathIterator++;
             callIterator = 0;
-            return Paths.get(pathIterator).getCall(callIterator); 
+            return tree.get(pathIterator).getCall(callIterator); 
          }
          else{
             callIterator++;
-            return Paths.get(pathIterator).getCall(callIterator); 
+            return tree.get(pathIterator).getCall(callIterator); 
          }
          
       }
@@ -83,7 +88,7 @@ public class CallTree {
    public Call getStartCall(){
       pathIterator = 0;
       callIterator = 0;
-      return Paths.get(pathIterator).getCall(callIterator);
+      return tree.get(pathIterator).getCall(callIterator);
    }
    
    
@@ -99,108 +104,33 @@ public class CallTree {
          }
          else{ //irgendein Call im ersten Pfad: voreriger zurück
             callIterator--;
-            return Paths.get(pathIterator).getCall(callIterator);
+            return tree.get(pathIterator).getCall(callIterator);
          }
       }
       else{
          if(callIterator == 0){ //erster Call in irgendeinem Pfad: einen Pfad zuvor letzten Call zurück
             pathIterator--;
-            callIterator = Paths.get(pathIterator).getSize()-1;
-            return Paths.get(pathIterator).getCall(callIterator);
+            callIterator = tree.get(pathIterator).getSize()-1;
+            return tree.get(pathIterator).getCall(callIterator);
          }
          else{ //irgendwo in einem Pfad: gib vorigen Call zurück
             callIterator--;
-            return Paths.get(pathIterator).getCall(callIterator);
+            return tree.get(pathIterator).getCall(callIterator);
          }
       }
       
    }
    
-   /*
-    * returns the root node of the symbolic tree
-    * @author Peter Schauberger
-    */
-   private ISENode getRoot(ISENode node){
-      System.out.println("getRoot");
-      try {
-         if(node.getParent() == null) //Dann haben wir bereits den Root-Knoten gefunden
-            return node;
-         else if( node.getParent() instanceof ISEThread)
-            return node.getParent();
-         else
-            return getRoot(node.getParent());
-      }
-      catch (DebugException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      }
-
-      return node;
+   public void setTraversalStrategy(ITraversalStrategy strategy){
+      this.strategy = strategy;
    }
    
-   /*
-    * Generate the Paths for algorithmic debugging
-    * Sucht nach Blättern und ruft addpath auf wenn eines gefunden wurde
-    * @author Peter Schauberger
-    */
-   public ArrayList<CallPath> generatePaths(ISENode node){
-         try {
-            //System.out.println("Generating Paths");
-            if(!node.hasChildren()) { //Bei einem Blatt angekommen
-               addPath(node);
-               }
-            else{
-               for(ISENode child : node.getChildren()){ //Es gibt Kind-Knoten: Für jeden neuen Pfad hinzufügen
-                  generatePaths(child);
-                  }
-               }
-            return Paths;
-            }
-       catch (DebugException e) {
-          // TODO Auto-generated catch block
-          e.printStackTrace();
-       }
-   return null;
-   }
-   
-   /*
-    * Erzeugt einen Path indem es von einem Blatt zur Wurzel läuft
-    * @author Peter Schauberger
-    */
-   private void addPath(ISENode leaf){
-      try {
-      ISENode node = leaf;
-      CallPath path = new CallPath();
-      Deque<ISENode> deque = new LinkedList<ISENode>();
-      ISENode exception = null;
-      
-      if(leaf instanceof ISEExceptionalTermination)
-         exception = leaf;
-      
-         while(!(node instanceof ISEThread)){
-            if(node instanceof ISEBaseMethodReturn){
-               deque.push(node);
-               //System.out.println("Pushing"+node.getName());
-            }
-            else if(node instanceof ISEMethodCall){
-               //System.out.println("Adding Call: From "+node.getName() + "to"+deque.peekFirst().getName());
-               if( deque.isEmpty() && exception != null )
-                  path.addCall(new Call(node, exception));
-               else if(!( deque.peekFirst() instanceof ISEExceptionalMethodReturn))
-                  path.addCall(new Call(node, deque.pop()));
-                  else
-                     path.addCall(new Call(node, deque.peekFirst()));
-            }
-               node = node.getParent();
-            }
-      
-         Paths.add(path);
-         
-         }
-         catch (DebugException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-         }
+   public void generateCallTree(ISENode root, String strategy){
+      if(strategy.equalsIgnoreCase("BottomUp"))
+         this.strategy = new TraversalStrategyBottomUp();
+      else if(strategy.equalsIgnoreCase("TopDown"))
+         this.strategy = new TraversalStrategyTopDown();
+      tree = this.strategy.generateCallTree(root);
    }
 
    /*
@@ -210,7 +140,7 @@ public class CallTree {
    public void printPathsToConsole(){
       System.out.println("Printing Paths to Console:");
       int counter = 0;
-      for(CallPath path : Paths){
+      for(CallPath path : tree){
          counter++;
          System.out.println("Path "+counter);
          for(int i = 0; i < path.getSize(); i++){

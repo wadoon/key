@@ -35,6 +35,7 @@ import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 import org.key_project.util.eclipse.swt.SWTUtil;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.widgets.Combo;
 
 public class AlgorithmicDebugView extends ViewPart implements Observer, ISelectionProvider{
 
@@ -68,21 +69,17 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       }
    }
 
+   /*
+    * getSelectedNode
+    * @returns the actual selected node at the {@link ExecutionTreeView}
+    */
+   
    private ISENode getSelectedNode(){
       return (KeySEDUtil.getSelectedDebugElement() instanceof ISENode ) ? (ISENode) KeySEDUtil.getSelectedDebugElement() : null;
-//      IWorkbench workbench = PlatformUI.getWorkbench();
-//      
-//      ISENode selectedNode = null;
-//      IViewPart part = workbench.getActiveWorkbenchWindow().getActivePage()
-//            .findView(ExecutionTreeView.VIEW_ID);
-//        if (part instanceof ExecutionTreeView) {
-//            ExecutionTreeView view = (ExecutionTreeView) part;
-//            selectedNode = view.getSelectedNode();
-//        }
-//        return selectedNode;
    }
    
    Label questionLabel, methodNameLabel, constraintsLabel, returnLabel;
+   Combo combo;
 
    IWorkbenchPage workbenchpage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
@@ -147,7 +144,9 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
                 }
               else{
               debug.annotateCall(actualCall, true);
-              actualCall = debug.getCallTree(actualNode).getNextCall();
+              
+//              while(actualCall.getCorrectness() == 'c')
+                 actualCall = debug.getCallTree().getNextCall();
               if(actualCall != null){
                  showQuestionCall(actualCall);
                  setVariablesSelectionViewSelection();}
@@ -208,7 +207,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       btnNewButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
-            actualCall = debug.getCallTree(actualNode).getPreviousCall();
+            actualCall = debug.getCallTree().getPreviousCall();
             if(actualCall != null){
                showQuestionCall(actualCall);
                setVariablesSelectionViewSelection();
@@ -224,7 +223,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       });
       FormData fd_btn_Back = new FormData();
       fd_btn_Back.bottom = new FormAttachment(methodNameLabel, -39);
-      fd_btn_Back.top = new FormAttachment(0, 20);
+      fd_btn_Back.top = new FormAttachment(0, 21);
       fd_btn_Back.left = new FormAttachment(0, 10);
       btnNewButton.setLayoutData(fd_btn_Back);
       btnNewButton.setText("Back");
@@ -236,8 +235,8 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
          
          @Override
          public void widgetSelected(SelectionEvent e) {
-            actualCall = debug.getCallTree(actualNode).getNextCall();
-            if(actualCall != null){               
+            actualCall = debug.getCallTree().getNextCall();
+            if(actualCall != null){
                showQuestionCall(actualCall);
               // SWTUtil.select(((org.key_project.sed.ui.visualization.view.ExecutionTreeView)executiontreeView).getDebugView().getViewer(),new StructuredSelection(actualCall.getCall()), true);
                setVariablesSelectionViewSelection();
@@ -251,24 +250,24 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
          }
       });
       FormData fd_btn_Next = new FormData();
-      fd_btn_Next.bottom = new FormAttachment(methodNameLabel, -39);
-      fd_btn_Next.top = new FormAttachment(0, 19);
+      fd_btn_Next.bottom = new FormAttachment(methodNameLabel, -37);
+      fd_btn_Next.top = new FormAttachment(0, 21);
       fd_btn_Next.right = new FormAttachment(100, -10);
       btnNext.setLayoutData(fd_btn_Next);
       btnNext.setText("Next");
       
       // Start Debugging Button
       Button btnStartAlgorithmicDebugging = new Button(parent, SWT.NONE);
-      fd_btn_Back.right = new FormAttachment(100, -465);
+      fd_btn_Back.right = new FormAttachment(100, -456);
       fd.top = new FormAttachment(0, 47);
-      fd_btn_Next.left = new FormAttachment(0, 481);
+      fd_btn_Next.left = new FormAttachment(0, 473);
       btnStartAlgorithmicDebugging.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
             actualNode = getSelectedNode();                   //actualNode = debug.selectNode(getSelectedNode()); geändert: warum wurde der erste nicht markierte Node gesucht ??
             if(actualNode != null){
                //System.out.println("STARTKNOTEN: " +getSelectedNode().toString());
-                  actualCall = debug.getCallTree(actualNode).getStartCall();
+                  actualCall = debug.getCallTree(actualNode, combo.getText()).getStartCall();
                   if(actualCall != null){
                      showQuestionCall(actualCall);
                      setVariablesSelectionViewSelection();
@@ -278,9 +277,9 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
          }
       );
       FormData fd_btnNewButton_1 = new FormData();
-      fd_btnNewButton_1.bottom = new FormAttachment(questionLabel, -6);
-      fd_btnNewButton_1.right = new FormAttachment(btnNext, -78);
-      fd_btnNewButton_1.left = new FormAttachment(btnNewButton, 76);
+      fd_btnNewButton_1.top = new FormAttachment(btnNewButton, -1, SWT.TOP);
+      fd_btnNewButton_1.right = new FormAttachment(btnNext, -129);
+      fd_btnNewButton_1.left = new FormAttachment(btnNewButton, 19);
       btnStartAlgorithmicDebugging.setLayoutData(fd_btnNewButton_1);
       btnStartAlgorithmicDebugging.setText("Start Algorithmic Debugging");
       
@@ -325,7 +324,16 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       constraintsLabel = new Label(scrolledComposite, SWT.NONE);
       constraintsLabel.setLayoutData(new FormData());
       scrolledComposite.setContent( constraintsLabel );
-
+      
+      combo = new Combo(parent, SWT.NONE);
+      FormData fd_combo = new FormData();
+      fd_combo.top = new FormAttachment(btnNewButton, 1, SWT.TOP);
+      fd_combo.left = new FormAttachment(btnStartAlgorithmicDebugging, 6);
+      combo.setLayoutData(fd_combo);
+      combo.setText("choose strategy");
+      String[] items = { "Bottom Up", "Top Down" };
+      combo.setItems(items);
+      combo.select(0);
    }
 
    /*
