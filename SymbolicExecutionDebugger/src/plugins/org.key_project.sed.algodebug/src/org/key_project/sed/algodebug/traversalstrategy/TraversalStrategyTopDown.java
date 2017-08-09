@@ -16,52 +16,45 @@ import org.key_project.sed.core.model.ISEThread;
 
 public class TraversalStrategyTopDown implements ITraversalStrategy {
 
-   public TraversalStrategyTopDown() {
-      this.tree = new ArrayList<CallPath>();
-   }
-
-   private ArrayList<CallPath> tree;
-   
    @Override
    public ArrayList<CallPath> generateCallTree(ISENode root) {
-      return generatePaths(root);
+      final ArrayList<CallPath> tree = new ArrayList<CallPath>();
+      generatePaths(root, tree);
+      return tree;
    }
-      
-      
-   public ArrayList<CallPath> generatePaths(ISENode node){
+
+   private void generatePaths(ISENode node, ArrayList<CallPath> tree){
       try {
          //System.out.println("Generating Paths");
          if(!node.hasChildren()) { //Bei einem Blatt angekommen
-            addPath(node);
-            }
+            tree.add(getPath(node));
+         }
          else{
             for(ISENode child : node.getChildren()){ //Es gibt Kind-Knoten: Für jeden neuen Pfad hinzufügen
-               generatePaths(child);
-               }
+               generatePaths(child, tree);
             }
-         return tree;
          }
+      }
       catch (DebugException e) {
          // TODO Auto-generated catch block
          e.printStackTrace();
       }
-      return null;
    }
 
    /*
     * Erzeugt einen Path indem es von einem Blatt zur Wurzel läuft
     * @author Peter Schauberger
     */
-   private void addPath(ISENode leaf){
+   private CallPath getPath(ISENode leaf){
       try {
-      ISENode node = leaf;
-      CallPath path = new CallPath();
-      Deque<ISENode> deque = new LinkedList<ISENode>();
-      ISENode exception = null;
-      
-      if(leaf instanceof ISEExceptionalTermination)
-         exception = leaf;
-      
+         ISENode node = leaf;
+         CallPath path = new CallPath();
+         Deque<ISENode> deque = new LinkedList<ISENode>();
+         ISENode exception = null;
+
+         if(leaf instanceof ISEExceptionalTermination)
+            exception = leaf;
+
          while(!(node instanceof ISEThread)){
             if(node instanceof ISEBaseMethodReturn){
                deque.push(node);
@@ -73,19 +66,19 @@ public class TraversalStrategyTopDown implements ITraversalStrategy {
                   path.addCall(new Call(node, exception));
                else if(!( deque.peekFirst() instanceof ISEExceptionalMethodReturn))
                   path.addCall(new Call(node, deque.pop()));
-                  else
-                     path.addCall(new Call(node, deque.peekFirst()));
+               else
+                  path.addCall(new Call(node, deque.peekFirst()));
             }
-               node = node.getParent();
-            }
+            node = node.getParent();
+         }
          path.reversePath();
-         tree.add(path);
-         
-         }
-         catch (DebugException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-         }
+         return path;
       }
+      catch (DebugException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
+      return null;
+   }
 
 }

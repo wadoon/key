@@ -25,46 +25,46 @@ public class SelectionTest extends ViewPart {
    private IViewPart variablesSelectionView,variablesView;
    @Override
    public void createPartControl(Composite parent) {
-      
+
 
       final Label lblLabel = new Label(parent, SWT.NONE);
       lblLabel.setText("label");
       IWorkbenchPage workbenchpage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
       try {
          variablesSelectionView = workbenchpage.showView("org.key_project.sed.ui.view.VariablesSelectionView", null, IWorkbenchPage.VIEW_ACTIVATE);
-        // variablesView = workbenchpage.showView("org.key_project.sed.ui.view.myVariablesView");
+         // variablesView = workbenchpage.showView("org.key_project.sed.ui.view.myVariablesView");
       }
       catch (PartInitException e) {
          // TODO Auto-generated catch block
          e.printStackTrace();
       }
-      
+
       IViewPart VPart = variablesView;
       final AlgorithmicDebugVariablesView sw = (AlgorithmicDebugVariablesView) VPart ;
-//      if (VPart instanceof myVariablesView) {
-//         sw = (myVariablesView) VPart;
-//      }
-      
+      //      if (VPart instanceof myVariablesView) {
+      //         sw = (myVariablesView) VPart;
+      //      }
+
       ListViewer viewer = VariablesSelectionView.getviewerLeft();
       viewer.addSelectionChangedListener(new ISelectionChangedListener() {
-         
+
          @Override
          public void selectionChanged(SelectionChangedEvent event) {
             String selection = "";
             selection = event.getSelection().toString();
             lblLabel.setText(selection);
-            
+
             //sw.getSelectionProviderWrapper().setSelection(new StructuredSelection(event.getSelection())); 
             //getSelectionProviderWrapper().setSelection(event.getSelection());
          }
       });
 
    }
-   
+
    @Override
    public void setFocus() {
       // TODO Auto-generated method stub
-      
+
    }
 
 }

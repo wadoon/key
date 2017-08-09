@@ -13,13 +13,13 @@ public class Call {
    private ISENode call;
 
    private ISENode ret;
-   
+
    /**
     * correctness
     * char value - can be 'c' if the ISENode was answered to be correct, or 'f' if it was answered to be false, or 'u' if it was never asked
     */
    private char correctness;
-   
+
    /**
     * @return the call
     */
@@ -56,5 +56,5 @@ public class Call {
    public void setCorrectness(char correctness) {
       this.correctness = correctness;
    }
-   
+
 }

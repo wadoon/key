@@ -16,13 +16,13 @@ import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEThread;
 
 public class CallTree {
-   
+
    /*
     * the list of paths
     * @author Peter Schauberger
     */
    public ArrayList<CallPath> tree;
-   
+
    /*
     * @return the paths
     * @author Peter Schauberger
@@ -37,9 +37,9 @@ public class CallTree {
     */
    public CallTree() {
       this.tree = new ArrayList<CallPath>();
-      
+
    }
-   
+
    private ITraversalStrategy strategy = null; 
 
    /*
@@ -47,12 +47,12 @@ public class CallTree {
     * @author Peter Schauberger
     */
    private int pathIterator;
-   
+
    /*
     * iterator for the list of calls of a specific path
     */
    private int callIterator;
-   
+
    /*
     * @returns The next call of the list of paths if we iterate it path by path and inside the paths call by call
     * @author Peter Schauberger
@@ -65,7 +65,7 @@ public class CallTree {
          else{ //mitten im letzten Pfad: nächsten Call zurück
             callIterator++;
             return tree.get(pathIterator).getCall(callIterator);
-            }
+         }
       }
       else{ // nicht letzter Pfad
          if(callIterator == tree.get(pathIterator).getSize()-1){ //Letzter Call im Pfad: erster Call im nächsten Pfad zurück
@@ -77,7 +77,7 @@ public class CallTree {
             callIterator++;
             return tree.get(pathIterator).getCall(callIterator); 
          }
-         
+
       }
    }
 
@@ -90,8 +90,8 @@ public class CallTree {
       callIterator = 0;
       return tree.get(pathIterator).getCall(callIterator);
    }
-   
-   
+
+
    /*
     * Gibt den vorigen Call der Pfadliste zurück wenn diese Call für Call rückwärts durchlaufen wird
     * @author Peter Schauberger
@@ -118,13 +118,13 @@ public class CallTree {
             return tree.get(pathIterator).getCall(callIterator);
          }
       }
-      
+
    }
-   
+
    public void setTraversalStrategy(ITraversalStrategy strategy){
       this.strategy = strategy;
    }
-   
+
    public void generateCallTree(ISENode root, String strategy){
       if(strategy.equalsIgnoreCase("BottomUp"))
          this.strategy = new TraversalStrategyBottomUp();
@@ -154,5 +154,5 @@ public class CallTree {
          }
       }
    }   
-   
+
 }

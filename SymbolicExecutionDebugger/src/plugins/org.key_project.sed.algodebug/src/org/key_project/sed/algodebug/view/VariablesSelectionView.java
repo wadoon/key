@@ -21,12 +21,12 @@ import org.eclipse.swt.custom.SashForm;
 
 @SuppressWarnings("restriction")
 public class VariablesSelectionView extends ViewPart {
-   
+
    public static final String VIEW_ID = "org.key_project.sed.ui.view.VariablesSelectionView";
-   
+
    public VariablesSelectionView(){
    }
-   
+
    static ListViewer viewerLeft = null;
 
    static ListViewer viewerRight = null;
@@ -45,7 +45,7 @@ public class VariablesSelectionView extends ViewPart {
       if (part instanceof AlgorithmicDebugView) {
          AlgorithmicDebugView view = (AlgorithmicDebugView) part;
          NodeArray =  view.getExecutionTreeAsArray();
-     }
+      }
       if(NodeArray == null){
          viewerLeft.setInput(null);
          viewerLeft.setInput(null);
@@ -59,30 +59,30 @@ public class VariablesSelectionView extends ViewPart {
    /*
     * IDCProvider: Dummy method, needed only as Parameter for variables view
     */
-   
+
    private final IDebugContextProvider IDCProvider = new IDebugContextProvider() {
-      
+
       @Override
       public void removeDebugContextListener(IDebugContextListener listener) {
       }
-      
+
       @Override
       public IWorkbenchPart getPart() {
          return null;
       }
-      
+
       @Override
       public ISelection getActiveContext() {
          return null;
       }
-      
+
       @Override
       public void addDebugContextListener(IDebugContextListener listener) {      
       }
    };
 
    private IViewPart variablesViewLeft,variablesViewRight;
-   
+
    private void createViews(){
       IWorkbenchPage workbenchpage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
       try {
@@ -93,7 +93,7 @@ public class VariablesSelectionView extends ViewPart {
          // TODO Auto-generated catch block
          e.printStackTrace();
       }
-      
+
       IViewPart VPartLeft = variablesViewLeft;
       final AlgorithmicDebugVariablesView left = (AlgorithmicDebugVariablesView) VPartLeft ;
       viewerLeft.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -102,38 +102,38 @@ public class VariablesSelectionView extends ViewPart {
             left.debugContextChanged(new DebugContextEvent( IDCProvider, event.getSelection(), 1)); //warum flags = 1 ?
          }
       });
-      
+
       IViewPart VPartRight = variablesViewRight;
       final AlgorithmicDebugVariablesView right = (AlgorithmicDebugVariablesView) VPartRight ;
       viewerRight.addSelectionChangedListener(new ISelectionChangedListener() {
-   
+
          @Override
          public void selectionChanged(SelectionChangedEvent event) {
             right.debugContextChanged(new DebugContextEvent( IDCProvider, event.getSelection(), 1)); //warum flags = 1 ?
          }
       });
    }
-   
-   
+
+
    @Override
-      public void createPartControl(Composite parent) {
-      
-         SashForm sashForm = new SashForm(parent, SWT.NONE);
-         
-         viewerLeft = new ListViewer(sashForm, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-         viewerLeft.setContentProvider(new ExecutionTreeNodeListContentProvider());
-         viewerLeft.setLabelProvider(new ExecutionTreeNodeListLabelProvider());
-         
-         viewerRight = new ListViewer(sashForm, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
-         viewerRight.setContentProvider(new ExecutionTreeNodeListContentProvider());
-         viewerRight.setLabelProvider(new ExecutionTreeNodeListLabelProvider());
-         
-         sashForm.setWeights(new int[] {1, 1});
-         
-         createViews();
-         getContent();
-      }
-   
+   public void createPartControl(Composite parent) {
+
+      SashForm sashForm = new SashForm(parent, SWT.NONE);
+
+      viewerLeft = new ListViewer(sashForm, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+      viewerLeft.setContentProvider(new ExecutionTreeNodeListContentProvider());
+      viewerLeft.setLabelProvider(new ExecutionTreeNodeListLabelProvider());
+
+      viewerRight = new ListViewer(sashForm, SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL);
+      viewerRight.setContentProvider(new ExecutionTreeNodeListContentProvider());
+      viewerRight.setLabelProvider(new ExecutionTreeNodeListLabelProvider());
+
+      sashForm.setWeights(new int[] {1, 1});
+
+      createViews();
+      getContent();
+   }
+
    @Override
    public void setFocus() {
       getContent();

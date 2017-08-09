@@ -15,7 +15,7 @@ public class ExecutionTreeNodeListLabelProvider implements ILabelProvider {
    @Override
    public void addListener(ILabelProviderListener listener) {
       // TODO Auto-generated method stub
-      
+
    }
 
    @Override
@@ -27,7 +27,7 @@ public class ExecutionTreeNodeListLabelProvider implements ILabelProvider {
    @Override
    public void removeListener(ILabelProviderListener listener) {
       // TODO Auto-generated method stub
-      
+
    }
 
    @Override
@@ -50,7 +50,7 @@ public class ExecutionTreeNodeListLabelProvider implements ILabelProvider {
 
    @Override
    public void dispose() {
-      
+
    }
-   
+
 }

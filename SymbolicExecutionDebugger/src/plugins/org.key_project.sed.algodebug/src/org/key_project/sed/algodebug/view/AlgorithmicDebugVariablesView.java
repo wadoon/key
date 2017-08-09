@@ -7,5 +7,5 @@ import org.eclipse.debug.internal.ui.views.variables.VariablesView;
  */
 @SuppressWarnings("restriction")
 public class AlgorithmicDebugVariablesView extends VariablesView {
-   
+
 }

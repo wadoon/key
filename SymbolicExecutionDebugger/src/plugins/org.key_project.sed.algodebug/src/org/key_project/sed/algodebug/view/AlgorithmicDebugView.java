@@ -40,16 +40,30 @@ import org.eclipse.swt.widgets.Combo;
 public class AlgorithmicDebugView extends ViewPart implements Observer, ISelectionProvider{
 
    public static final String VIEW_ID = "org.key_project.sed.ui.view.AlgorithmicDebugView";
-   
-   private ISENode actualNode; 
+
+   private ISENode actualNode, root; 
    private AlgorithmicDebug debug; 
    private Call actualCall;
    private ListenerList listeners = new ListenerList();
-   
+
    public AlgorithmicDebugView(){
       debug = new AlgorithmicDebug();
    }
-   
+
+   private void reset(){
+      debug.unhighlight();
+      debug.removeAllAlgoDebugAnnotations(root);
+      debug = new AlgorithmicDebug();
+      actualCall = null;
+   }
+
+   public void dispose(){
+      actualNode = null;
+      debug = null;
+      actualCall = null;
+      super.dispose();
+   }
+
    private void showQuestionCall(Call call){
       try {
          //System.out.println("Showing Return: " + call.getRet().getName().toString());
@@ -73,11 +87,11 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
     * getSelectedNode
     * @returns the actual selected node at the {@link ExecutionTreeView}
     */
-   
+
    private ISENode getSelectedNode(){
       return (KeySEDUtil.getSelectedDebugElement() instanceof ISENode ) ? (ISENode) KeySEDUtil.getSelectedDebugElement() : null;
    }
-   
+
    Label questionLabel, methodNameLabel, constraintsLabel, returnLabel;
    Combo combo;
 
@@ -85,40 +99,40 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
 
    @Override
    public void createPartControl(final Composite parent) {
-   
-    Display display = Display.getDefault();
-        
-   // create a FormLayout and set its margin
+
+      Display display = Display.getDefault();
+
+      // create a FormLayout and set its margin
       FormLayout layout = new FormLayout();
       layout.marginHeight = 5;
       layout.marginWidth = 5;
-    
+
       // set layout for parent
       parent.setLayout(layout);
-      
+
       questionLabel = new Label(parent, 0);
       questionLabel.setAlignment(SWT.CENTER);
       questionLabel.setFont(SWTResourceManager.getFont("Segoe UI", 10, SWT.BOLD));
       questionLabel.setText("Is this method doing the right thing?");
-      
+
       FormData fd = new FormData();
       fd.right = new FormAttachment(100, -176);
       fd.left = new FormAttachment(0, 178);
-//      fd.bottom = new FormAttachment(0, 20);
+      //      fd.bottom = new FormAttachment(0, 20);
       questionLabel.setLayoutData(fd);
-     
+
       methodNameLabel = new Label(parent, 0);
       methodNameLabel.setAlignment(SWT.CENTER);
       methodNameLabel.setFont(SWTResourceManager.getFont("Segoe UI", 12, SWT.BOLD));
-//      methodNameLabel.setText("NAME");
+      //      methodNameLabel.setText("NAME");
       FormData fd2 = new FormData(-1,-1);
       fd2.right = new FormAttachment(100, -18);
       fd2.left = new FormAttachment(0, 10);
       fd2.top = new FormAttachment(questionLabel, 19);
       fd2.bottom = new FormAttachment(100, -339);
-//      fd2.bottom = new FormAttachment(0, 10);
+      //      fd2.bottom = new FormAttachment(0, 10);
       methodNameLabel.setLayoutData(fd2);
-      
+
       Button buttonCorrect = new Button(parent, SWT.BORDER);
       buttonCorrect.addSelectionListener(new SelectionAdapter() {
          @Override
@@ -129,79 +143,79 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       //Display display = parent.getDisplay();
       Color green = display.getSystemColor(SWT.COLOR_GREEN);
       buttonCorrect.setBackground(green);
-      
+
       //Correct Button
       buttonCorrect.addListener(SWT.Selection, new Listener() {
          public void handleEvent(Event e) {
-           switch (e.type) {
-           case SWT.Selection:
-              if(actualCall == null){
-                 MessageBox mb = new MessageBox( parent.getShell());
-                 mb.setText("Last call reached!");
-                 mb.setMessage("There is no call after this one. No Bug found.");
-                 mb.open();
-                 break;
-                }
-              else{
-              debug.annotateCall(actualCall, true);
-              
-//              while(actualCall.getCorrectness() == 'c')
-                 actualCall = debug.getCallTree().getNextCall();
-              if(actualCall != null){
-                 showQuestionCall(actualCall);
-                 setVariablesSelectionViewSelection();}
-              else{
-                 MessageBox mb = new MessageBox( parent.getShell());
-                 mb.setText("Last call reached!");
-                 mb.setMessage("There is no call after this one. No Bug found.");
-                 mb.open();
-                }
-              break;
-           }}
+            switch (e.type) {
+            case SWT.Selection:
+               if(actualCall == null){
+                  MessageBox mb = new MessageBox( parent.getShell());
+                  mb.setText("Last call reached!");
+                  mb.setMessage("There is no call after this one. No Bug found.");
+                  mb.open();
+                  break;
+               }
+               else{
+                  debug.annotateCall(actualCall, true);
+
+                  //              while(actualCall.getCorrectness() == 'c')
+                  actualCall = debug.getCallTree().getNextCall();
+                  if(actualCall != null){
+                     showQuestionCall(actualCall);
+                     setVariablesSelectionViewSelection();}
+                  else{
+                     MessageBox mb = new MessageBox( parent.getShell());
+                     mb.setText("Last call reached!");
+                     mb.setMessage("There is no call after this one. No Bug found.");
+                     mb.open();
+                  }
+                  break;
+               }}
          }
-       });
-    
+      });
+
       // set FormDate for button
       FormData fd_buttonCorrect = new FormData(-1,-1);
       fd_buttonCorrect.right = new FormAttachment(0, 207);
       fd_buttonCorrect.left = new FormAttachment(0, 106);
       buttonCorrect.setLayoutData(fd_buttonCorrect);
-      
+
       //False Button
       // create a button or any other widget
       Button buttonFalse = new Button(parent, SWT.BORDER);
       buttonFalse.setText("False");
       Color red = display.getSystemColor(SWT.COLOR_RED);
       buttonFalse.setBackground(red);
-      
+
       buttonFalse.addListener(SWT.Selection, new Listener() {
          public void handleEvent(Event e) {
-           switch (e.type) {
-           case SWT.Selection:
-              debug.annotateCallFalse(actualCall);
-             
-              MessageBox mb = new MessageBox( parent.getShell());
-              mb.setText("Hint!");
-              try {
-               mb.setMessage("Found wrong Method: "+actualCall.getCall().getName().toString());
+            switch (e.type) {
+            case SWT.Selection:
+               debug.annotateCallFalse(actualCall);
+
+               MessageBox mb = new MessageBox( parent.getShell());
+               mb.setText("Hint!");
+               try {
+                  mb.setMessage("Found wrong Method: "+actualCall.getCall().getName().toString());
+               }
+               catch (DebugException e1) {
+                  // TODO Auto-generated catch block
+                  e1.printStackTrace();
+               }
+               mb.open();
+               break;
             }
-            catch (DebugException e1) {
-               // TODO Auto-generated catch block
-               e1.printStackTrace();
-            }
-              mb.open();
-              break;
-           }
          }
-       });
-    
+      });
+
       // set FormDate for button
       FormData fd_buttonFalse = new FormData();
       fd_buttonFalse.top = new FormAttachment(buttonCorrect, 0, SWT.TOP);
       fd_buttonFalse.right = new FormAttachment(100, -128);
       fd_buttonFalse.left = new FormAttachment(100, -229);
       buttonFalse.setLayoutData(fd_buttonFalse);
-      
+
       //Previous Button
       Button btnNewButton = new Button(parent, SWT.NONE);
       btnNewButton.addSelectionListener(new SelectionAdapter() {
@@ -211,34 +225,32 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
             if(actualCall != null){
                showQuestionCall(actualCall);
                setVariablesSelectionViewSelection();
-               }
-            else{
-             MessageBox mb = new MessageBox( parent.getShell());
-             mb.setText("First call reached!");
-             mb.setMessage("There is no call before this one.");
-             mb.open();
             }
-            
+            else{
+               MessageBox mb = new MessageBox( parent.getShell());
+               mb.setText("First call reached!");
+               mb.setMessage("There is no call before this one.");
+               mb.open();
+            }
+
          }
       });
       FormData fd_btn_Back = new FormData();
-      fd_btn_Back.bottom = new FormAttachment(methodNameLabel, -39);
-      fd_btn_Back.top = new FormAttachment(0, 21);
       fd_btn_Back.left = new FormAttachment(0, 10);
       btnNewButton.setLayoutData(fd_btn_Back);
       btnNewButton.setText("Back");
-      
+
       //Button Next
       Button btnNext = new Button(parent, SWT.NONE);
 
       btnNext.addSelectionListener(new SelectionAdapter() {
-         
+
          @Override
          public void widgetSelected(SelectionEvent e) {
             actualCall = debug.getCallTree().getNextCall();
             if(actualCall != null){
                showQuestionCall(actualCall);
-              // SWTUtil.select(((org.key_project.sed.ui.visualization.view.ExecutionTreeView)executiontreeView).getDebugView().getViewer(),new StructuredSelection(actualCall.getCall()), true);
+               // SWTUtil.select(((org.key_project.sed.ui.visualization.view.ExecutionTreeView)executiontreeView).getDebugView().getViewer(),new StructuredSelection(actualCall.getCall()), true);
                setVariablesSelectionViewSelection();
             }
             else{
@@ -250,39 +262,57 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
          }
       });
       FormData fd_btn_Next = new FormData();
-      fd_btn_Next.bottom = new FormAttachment(methodNameLabel, -37);
-      fd_btn_Next.top = new FormAttachment(0, 21);
+      fd_btn_Next.bottom = new FormAttachment(methodNameLabel, -42);
+      fd_btn_Next.top = new FormAttachment(btnNewButton, 0, SWT.TOP);
       fd_btn_Next.right = new FormAttachment(100, -10);
       btnNext.setLayoutData(fd_btn_Next);
       btnNext.setText("Next");
-      
+
       // Start Debugging Button
-      Button btnStartAlgorithmicDebugging = new Button(parent, SWT.NONE);
+      final Button btnStart = new Button(parent, SWT.NONE);
+      fd_btn_Back.top = new FormAttachment(btnStart, 0, SWT.TOP);
       fd_btn_Back.right = new FormAttachment(100, -456);
       fd.top = new FormAttachment(0, 47);
       fd_btn_Next.left = new FormAttachment(0, 473);
-      btnStartAlgorithmicDebugging.addSelectionListener(new SelectionAdapter() {
+      btnStart.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
-            actualNode = getSelectedNode();                   //actualNode = debug.selectNode(getSelectedNode()); geändert: warum wurde der erste nicht markierte Node gesucht ??
-            if(actualNode != null){
-               //System.out.println("STARTKNOTEN: " +getSelectedNode().toString());
+            if(btnStart.getText().equals("Start")){
+               btnStart.setText("Reset");
+               actualNode = getSelectedNode();                   //actualNode = debug.selectNode(getSelectedNode()); geändert: warum wurde der erste nicht markierte Node gesucht ??
+               root = debug.getRoot(actualNode);
+               if(actualNode != null){
+                  //System.out.println("STARTKNOTEN: " +getSelectedNode().toString());
                   actualCall = debug.getCallTree(actualNode, combo.getText()).getStartCall();
                   if(actualCall != null){
                      showQuestionCall(actualCall);
                      setVariablesSelectionViewSelection();
-                     }
-                   }
+                  }
+               }
+            }
+            else if(btnStart.getText().equals("Reset")){
+               debug.unhighlight();
+               reset();
+               actualNode = getSelectedNode();                   //actualNode = debug.selectNode(getSelectedNode()); geändert: warum wurde der erste nicht markierte Node gesucht ??
+               if(actualNode != null){
+                  //System.out.println("STARTKNOTEN: " +getSelectedNode().toString());
+                  actualCall = debug.getCallTree(actualNode, combo.getText()).getStartCall();
+                  if(actualCall != null){
+                     showQuestionCall(actualCall);
+                     setVariablesSelectionViewSelection();
+                  }
+               }
             }
          }
-      );
+
+      }
+            );
       FormData fd_btnNewButton_1 = new FormData();
-      fd_btnNewButton_1.top = new FormAttachment(btnNewButton, -1, SWT.TOP);
-      fd_btnNewButton_1.right = new FormAttachment(btnNext, -129);
-      fd_btnNewButton_1.left = new FormAttachment(btnNewButton, 19);
-      btnStartAlgorithmicDebugging.setLayoutData(fd_btnNewButton_1);
-      btnStartAlgorithmicDebugging.setText("Start Algorithmic Debugging");
-      
+      fd_btnNewButton_1.left = new FormAttachment(btnNewButton, 39);
+      fd_btnNewButton_1.bottom = new FormAttachment(questionLabel, -6);
+      btnStart.setLayoutData(fd_btnNewButton_1);
+      btnStart.setText("Start");
+
       Label lblConstraintslabel = new Label(parent, SWT.NONE);
       lblConstraintslabel.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
       FormData fd_lblConstraintslabel = new FormData();
@@ -290,7 +320,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       fd_lblConstraintslabel.left = new FormAttachment(0, 208);
       lblConstraintslabel.setLayoutData(fd_lblConstraintslabel);
       lblConstraintslabel.setText("while using these constraints:");
-      
+
       Label lblReturnlabel = new Label(parent, SWT.NONE);
       lblReturnlabel.setFont(SWTResourceManager.getFont("Segoe UI", 9, SWT.BOLD));
       FormData fd_lblReturnlabel = new FormData();
@@ -298,7 +328,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       fd_lblReturnlabel.left = new FormAttachment(0, 233);
       lblReturnlabel.setLayoutData(fd_lblReturnlabel);
       lblReturnlabel.setText("and this return value:");
-      
+
       returnLabel = new Label(parent, SWT.NONE);
       fd_lblReturnlabel.bottom = new FormAttachment(returnLabel, -14);
       fd_buttonCorrect.top = new FormAttachment(returnLabel, 6);
@@ -308,7 +338,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       fd_lblReturnvaluelabel.right = new FormAttachment(methodNameLabel, 0, SWT.RIGHT);
       fd_lblReturnvaluelabel.left = new FormAttachment(methodNameLabel, 5, SWT.LEFT);
       returnLabel.setLayoutData(fd_lblReturnvaluelabel);
-      
+
       ScrolledComposite scrolledComposite = new ScrolledComposite(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
       FormData fd_scrolledComposite = new FormData();
       fd_scrolledComposite.bottom = new FormAttachment(lblReturnlabel, -16);
@@ -320,15 +350,16 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       scrolledComposite.setExpandVertical(true);
       scrolledComposite.setMinSize( 50, 50 );
 
-      
+
       constraintsLabel = new Label(scrolledComposite, SWT.NONE);
       constraintsLabel.setLayoutData(new FormData());
       scrolledComposite.setContent( constraintsLabel );
-      
+
       combo = new Combo(parent, SWT.NONE);
+      fd_btnNewButton_1.right = new FormAttachment(100, -313);
       FormData fd_combo = new FormData();
-      fd_combo.top = new FormAttachment(btnNewButton, 1, SWT.TOP);
-      fd_combo.left = new FormAttachment(btnStartAlgorithmicDebugging, 6);
+      fd_combo.top = new FormAttachment(btnNewButton, 2, SWT.TOP);
+      fd_combo.right = new FormAttachment(questionLabel, 0, SWT.RIGHT);
       combo.setLayoutData(fd_combo);
       combo.setText("choose strategy");
       String[] items = { "Bottom Up", "Top Down" };
@@ -341,23 +372,24 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
     */
    public Object[] getExecutionTreeAsArray(){
       ISENode root = null;
-      if(actualNode != null)
-            root = debug.getRoot(actualNode);
+      if(actualNode != null){
+         root = debug.getRoot(actualNode);
+      }
       Object[] array = null;
       if(root != null)
          array =  asList(root).toArray();
       return array;
    }
-   
+
    private void setVariablesSelectionViewSelection() {
       SWTUtil.select(VariablesSelectionView.getviewerLeft(),
             new StructuredSelection(actualCall.getCall()), true);
       SWTUtil.select(VariablesSelectionView.getviewerRight(),
             new StructuredSelection(actualCall.getRet()), true);
    }
-   
+
    /*
-    * 
+    * asList - Gibt eine Liste mit allen Knoten des ExecutionTree zurück
     */
    private ArrayList<ISENode> asList(ISENode node){
       ArrayList<ISENode> list = new ArrayList<ISENode>();
@@ -375,15 +407,15 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       }
       return list;
    }
-   
+
    @Override
    public void setFocus() {
       questionLabel.setFocus();
    }
-  
+
    @Override
    public void update(Observable o, Object arg) {
-     
+
    }
 
    @Override
@@ -394,15 +426,15 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
 
    @Override
    public ISelection getSelection() {
-      
+
       if(actualCall != null && actualCall.getCall() != null) {
-        // System.out.println("getSelection()");
+         // System.out.println("getSelection()");
          ISENode node = actualCall.getCall();
          ISelection selection = new StructuredSelection(node);
          return selection;
-         } else {
-          return StructuredSelection.EMPTY;
-         }
+      } else {
+         return StructuredSelection.EMPTY;
+      }
    }
 
    @Override
@@ -414,7 +446,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
    public void setSelection(ISelection selection) {
       Object[] list = listeners.getListeners();
       for (int i = 0; i < list.length; i++) {
-       ((ISelectionChangedListener) list[i])
+         ((ISelectionChangedListener) list[i])
          .selectionChanged(new SelectionChangedEvent(this, selection));
       }
    }
