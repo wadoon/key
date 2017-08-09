@@ -58,6 +58,8 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
    }
 
    public void dispose(){
+      debug.unhighlight();
+      debug.removeAllAlgoDebugAnnotations(root);
       actualNode = null;
       debug = null;
       actualCall = null;
@@ -450,4 +452,5 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
          .selectionChanged(new SelectionChangedEvent(this, selection));
       }
    }
+
 }

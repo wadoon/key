@@ -136,6 +136,7 @@ public class VariablesSelectionView extends ViewPart {
 
    @Override
    public void setFocus() {
-      getContent();
+      getContent();;
    }
+   
 }
