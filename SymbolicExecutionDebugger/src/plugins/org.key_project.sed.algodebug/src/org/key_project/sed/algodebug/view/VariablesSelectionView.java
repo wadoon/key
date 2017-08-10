@@ -39,7 +39,7 @@ public class VariablesSelectionView extends ViewPart {
       return viewerRight;
    }
 
-   private void getContent(){
+   public void getContent(){
       Object[] NodeArray = null;
       IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView("org.key_project.sed.ui.view.AlgorithmicDebugView");
       if (part instanceof AlgorithmicDebugView) {
@@ -48,7 +48,7 @@ public class VariablesSelectionView extends ViewPart {
       }
       if(NodeArray == null){
          viewerLeft.setInput(null);
-         viewerLeft.setInput(null);
+         viewerRight.setInput(null);
       }
       else{
          viewerLeft.setInput(NodeArray);
@@ -56,8 +56,13 @@ public class VariablesSelectionView extends ViewPart {
       }
    }
 
+   public void clear(){
+      viewerLeft.setInput(null);
+      viewerRight.setInput(null);
+   }
+   
    /*
-    * IDCProvider: Dummy method, needed only as Parameter for variables view
+    * IDCProvider: Dummy Provider, needed only as Parameter for variables view
     */
 
    private final IDebugContextProvider IDCProvider = new IDebugContextProvider() {
@@ -136,7 +141,6 @@ public class VariablesSelectionView extends ViewPart {
 
    @Override
    public void setFocus() {
-      getContent();;
    }
    
 }

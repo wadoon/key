@@ -3,6 +3,7 @@ package org.key_project.sed.algodebug.view;
 import java.util.ArrayList;
 import java.util.Observable;
 import java.util.Observer;
+
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.jface.viewers.ISelection;
@@ -22,7 +23,9 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.wb.swt.SWTResourceManager;
@@ -45,9 +48,15 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
    private AlgorithmicDebug debug; 
    private Call actualCall;
    private ListenerList listeners = new ListenerList();
-
-   public AlgorithmicDebugView(){
+   private Label questionLabel, methodNameLabel, constraintsLabel, returnLabel;
+   private Combo combo;
+   private IWorkbenchPage workbenchpage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
+   private IViewPart variablesSelectionView;
+   private VariablesSelectionView view;
+   
+   public AlgorithmicDebugView() throws PartInitException{
       debug = new AlgorithmicDebug();
+      variablesSelectionView = workbenchpage.showView("org.key_project.sed.ui.view.VariablesSelectionView",null,IWorkbenchPage.VIEW_ACTIVATE);
    }
 
    private void reset(){
@@ -55,14 +64,33 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       debug.removeAllAlgoDebugAnnotations(root);
       debug = new AlgorithmicDebug();
       actualCall = null;
+      questionLabel.setText("");
+      constraintsLabel.setText("");
+      returnLabel.setText("");
+      IViewPart part = workbenchpage
+            .findView("org.key_project.sed.ui.view.VariablesSelectionView");
+        if (part instanceof VariablesSelectionView) {
+            VariablesSelectionView view = (VariablesSelectionView) part;
+            view.clear();
+            view.getContent();        }
+      
    }
 
    public void dispose(){
       debug.unhighlight();
       debug.removeAllAlgoDebugAnnotations(root);
+      questionLabel.setText("");
+      constraintsLabel.setText("");
+      returnLabel.setText("");
       actualNode = null;
       debug = null;
       actualCall = null;
+      IViewPart part = workbenchpage
+            .findView("org.key_project.sed.ui.view.VariablesSelectionView");
+        if (part instanceof VariablesSelectionView) {
+            VariablesSelectionView view = (VariablesSelectionView) part;
+            view.clear();
+          }
       super.dispose();
    }
 
@@ -94,11 +122,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       return (KeySEDUtil.getSelectedDebugElement() instanceof ISENode ) ? (ISENode) KeySEDUtil.getSelectedDebugElement() : null;
    }
 
-   Label questionLabel, methodNameLabel, constraintsLabel, returnLabel;
-   Combo combo;
-
-   IWorkbenchPage workbenchpage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
-
+   
    @Override
    public void createPartControl(final Composite parent) {
 
@@ -151,6 +175,17 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
          public void handleEvent(Event e) {
             switch (e.type) {
             case SWT.Selection:
+               MessageBox mbo = new MessageBox( parent.getShell());
+               mbo.setText("Stack");
+               try {
+                  mbo.setMessage(actualCall.getCall().getCallStack().toString());
+               }
+               catch (DebugException e1) {
+                  // TODO Auto-generated catch block
+                  e1.printStackTrace();
+               }
+               mbo.open();
+               
                if(actualCall == null){
                   MessageBox mb = new MessageBox( parent.getShell());
                   mb.setText("Last call reached!");
@@ -160,7 +195,6 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
                }
                else{
                   debug.annotateCall(actualCall, true);
-
                   //              while(actualCall.getCorrectness() == 'c')
                   actualCall = debug.getCallTree().getNextCall();
                   if(actualCall != null){
@@ -280,12 +314,19 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
          @Override
          public void widgetSelected(SelectionEvent e) {
             if(btnStart.getText().equals("Start")){
-               btnStart.setText("Reset");
-               actualNode = getSelectedNode();                   //actualNode = debug.selectNode(getSelectedNode()); geändert: warum wurde der erste nicht markierte Node gesucht ??
-               root = debug.getRoot(actualNode);
+               actualNode = getSelectedNode();
                if(actualNode != null){
                   //System.out.println("STARTKNOTEN: " +getSelectedNode().toString());
+                  btnStart.setText("Reset");
+                  root = debug.getRoot(actualNode);
                   actualCall = debug.getCallTree(actualNode, combo.getText()).getStartCall();
+                  IViewPart part = workbenchpage
+                        .findView("org.key_project.sed.ui.view.VariablesSelectionView");
+                    if (part instanceof VariablesSelectionView) {
+                        VariablesSelectionView view = (VariablesSelectionView) part;
+                        view.getContent();
+                    }
+
                   if(actualCall != null){
                      showQuestionCall(actualCall);
                      setVariablesSelectionViewSelection();
@@ -293,9 +334,15 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
                }
             }
             else if(btnStart.getText().equals("Reset")){
-               debug.unhighlight();
                reset();
                actualNode = getSelectedNode();                   //actualNode = debug.selectNode(getSelectedNode()); geändert: warum wurde der erste nicht markierte Node gesucht ??
+               IViewPart part = workbenchpage
+                     .findView("org.key_project.sed.ui.view.VariablesSelectionView");
+                 if (part instanceof VariablesSelectionView) {
+                     VariablesSelectionView view = (VariablesSelectionView) part;
+                     view.getContent();
+                 }
+
                if(actualNode != null){
                   //System.out.println("STARTKNOTEN: " +getSelectedNode().toString());
                   actualCall = debug.getCallTree(actualNode, combo.getText()).getStartCall();
@@ -304,6 +351,8 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
                      setVariablesSelectionViewSelection();
                   }
                }
+               else
+                  btnStart.setText("Start");
             }
          }
 

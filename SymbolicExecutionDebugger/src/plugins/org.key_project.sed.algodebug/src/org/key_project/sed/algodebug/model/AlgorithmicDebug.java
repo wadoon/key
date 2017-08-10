@@ -212,6 +212,7 @@ public class AlgorithmicDebug  {
    }
 
    public void removeAllAlgoDebugAnnotations(ISENode node){
+      if(node != null){
       removeAnnotations(node);
       try {
          if(node.hasChildren())
@@ -222,7 +223,7 @@ public class AlgorithmicDebug  {
       catch (DebugException e) {
          // TODO Auto-generated catch block
          e.printStackTrace();
-      }
+      }}
    }
 
    private void removeAnnotations(ISENode node){
