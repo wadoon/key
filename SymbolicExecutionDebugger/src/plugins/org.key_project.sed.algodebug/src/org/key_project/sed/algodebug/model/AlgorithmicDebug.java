@@ -46,6 +46,8 @@ public class AlgorithmicDebug  {
             tree.generateCallTree(getRoot(node), "BottomUp");
          else if(strategy.equals("Top Down"))
             tree.generateCallTree(getRoot(node), "TopDown");
+         else if(strategy.equals("Single Stepping"))
+            tree.generateCallTree(getRoot(node), "SingleStepping");
          //         path.printPathsToConsoleWithIterators();
       }
       return tree;

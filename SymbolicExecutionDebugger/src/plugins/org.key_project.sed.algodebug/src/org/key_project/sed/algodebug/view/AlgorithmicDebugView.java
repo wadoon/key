@@ -120,6 +120,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
          }
          textConstraints.setText(constraintText.toString());
          textReturn.setText(call.getRet().getName().toString());
+//         textReturn.setText(call.getRet().getCallStack());
       }
       catch (DebugException e) {
          // TODO Auto-generated catch block
@@ -222,7 +223,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
 
       combo = new Combo(parent, SWT.NONE);
       combo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-      String[] items = { "Bottom Up", "Top Down" };
+      String[] items = { "Bottom Up", "Top Down","Single Stepping" };
       combo.setItems(items);
       combo.select(0);
 

@@ -5,9 +5,10 @@ import java.util.Deque;
 import java.util.LinkedList;
 
 import org.eclipse.debug.core.DebugException;
-import org.key_project.sed.algodebug.traversalstrategy.ITraversalStrategy;
-import org.key_project.sed.algodebug.traversalstrategy.TraversalStrategyBottomUp;
-import org.key_project.sed.algodebug.traversalstrategy.TraversalStrategyTopDown;
+import org.key_project.sed.algodebug.searchstrategy.ISearchStrategy;
+import org.key_project.sed.algodebug.searchstrategy.BottomUp;
+import org.key_project.sed.algodebug.searchstrategy.SingleStepping;
+import org.key_project.sed.algodebug.searchstrategy.TopDown;
 import org.key_project.sed.core.model.ISEBaseMethodReturn;
 import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEExceptionalTermination;
@@ -40,7 +41,7 @@ public class CallTree {
 
    }
 
-   private ITraversalStrategy strategy = null; 
+   private ISearchStrategy strategy = null; 
 
    /*
     * Iterator for lists of paths
@@ -121,15 +122,17 @@ public class CallTree {
 
    }
 
-   public void setTraversalStrategy(ITraversalStrategy strategy){
+   public void setTraversalStrategy(ISearchStrategy strategy){
       this.strategy = strategy;
    }
 
    public void generateCallTree(ISENode root, String strategy){
       if(strategy.equalsIgnoreCase("BottomUp"))
-         this.strategy = new TraversalStrategyBottomUp();
+         this.strategy = new BottomUp();
       else if(strategy.equalsIgnoreCase("TopDown"))
-         this.strategy = new TraversalStrategyTopDown();
+         this.strategy = new TopDown();
+      else if(strategy.equalsIgnoreCase("SingleStepping"))
+         this.strategy = new SingleStepping();
       tree = this.strategy.generateCallTree(root);
    }
 

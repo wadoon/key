@@ -1,4 +1,4 @@
-package org.key_project.sed.algodebug.traversalstrategy;
+package org.key_project.sed.algodebug.searchstrategy;
 
 import java.util.ArrayList;
 import java.util.Deque;
@@ -14,7 +14,7 @@ import org.key_project.sed.core.model.ISEMethodCall;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEThread;
 
-public class TraversalStrategyTopDown implements ITraversalStrategy {
+public class TopDown implements ISearchStrategy {
 
    @Override
    public ArrayList<CallPath> generateCallTree(ISENode root) {
