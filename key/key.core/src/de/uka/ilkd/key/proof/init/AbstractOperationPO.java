@@ -228,9 +228,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				heapToBefore.put(tb.var(heap), tb.var(beforeVars.get(heap)));
 			}
 
+			Term defActiveComp = tb.tt();
+			if (pm.getMethodDeclaration().isRemote()) {
+				defActiveComp = tb.equals(tb.getActiveComponent(), tb.var(selfVar));
+			}
+
 			final Term pre =
 					tb.and(buildFreePre(selfVar, getCalleeKeYJavaType(), paramVars, heaps, proofServices),
-					permsFor, getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices));
+					permsFor, getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices), defActiveComp);
 			// build program term
 			Term postTerm = getPost(modHeaps, selfVar, paramVars, resultVar, null, atPreVars, proofServices);
 			// Add uninterpreted predicate
@@ -407,16 +412,17 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				if (pm.getMethodDeclaration().isRemote()) {
 					assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
 					// TODO KD z could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor() (caller cannot be selfVarTerm)
-					LocationVariable hist = proofServices.getTypeConverter().getRemoteMethodEventLDT().getHist();
+					LocationVariable hist = proofServices.getTypeConverter().getServiceEventLDT().getHist();
 					Term caller = tb.getEnvironmentCaller();
-					Term method = tb.func(proofServices.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifierByDeclaration(pm.getMethodDeclaration(), proofServices));
+					final Term comp = tb.getActiveComponent();
+					Term method = tb.func(proofServices.getTypeConverter().getServiceEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), proofServices));
 					Term resultTerm = (resultVar != null) ? tb.seqSingleton(tb.var(resultVar)) : tb.seqEmpty();
 					// throws Exception if pm.getMethodDeclaration().isStatic()
-					Term inCallEvent = tb.evConst(tb.evCall(), caller, selfVarTerm, method, tb.seq(tb.var(paramVars)), tb.getBaseHeap());
+					Term inCallEvent = tb.evConst(tb.evCall(), caller, comp, method, tb.seq(tb.var(paramVars)), tb.getBaseHeap());
 					Term newHistAtCall = tb.seqConcat(tb.getHist(), tb.seqSingleton(inCallEvent));
 					histAtCallUpdate = tb.elementary(hist, newHistAtCall);
 					// throws Exception if pm.getMethodDeclaration().isStatic()
-					Term outTermEvent = tb.evConst(tb.evTerm(), caller, selfVarTerm, method, resultTerm, tb.getBaseHeap());
+					Term outTermEvent = tb.evConst(tb.evTerm(), caller, comp, method, resultTerm, tb.getBaseHeap());
 					Term newHistAtTerm = tb.seqConcat(tb.getHist(), tb.seqSingleton(outTermEvent));
 					final Term histAtTermUpdate = tb.elementary(hist, newHistAtTerm);
 					post = tb.apply(histAtTermUpdate, post);
@@ -972,7 +978,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 		}
 
 		// histAtPre := hist
-		LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
+		LocationVariable hist = services.getTypeConverter().getServiceEventLDT().getHist();
 		LocationVariable histAtPre = new LocationVariable(new ProgramElementName(tb.newName(hist + "AtPre")), new KeYJavaType(hist.sort()));
 		Term histupdate = tb.elementary(histAtPre, tb.getHist());
 		update = tb.parallel(update, histupdate);

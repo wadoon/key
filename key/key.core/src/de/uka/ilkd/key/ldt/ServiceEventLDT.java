@@ -17,12 +17,13 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-public class RemoteMethodEventLDT extends LDT {
+public class ServiceEventLDT extends LDT {
 	public static final Name NAME = new Name("Event");
 	public static final Name HIST_NAME = new Name("hist");
 	public static final Name METHOD_SORT = new Name("MethodIdentifier");
 	public static final Name ENVCALLER_NAME = new Name("environmentCaller");
 	public static final Name CURRENT_PARAMS_NAME = new Name("currentParams");
+	public static final Name COMPONENT_NAME = new Name("activeComponent");
 
 	private final Function event;
 	private final Function evType;
@@ -51,8 +52,9 @@ public class RemoteMethodEventLDT extends LDT {
 	private final LocationVariable hist;
 	private final LocationVariable environmentCaller;
 	private final LocationVariable currentParams;
+	private final LocationVariable activeComponent;
 
-	public RemoteMethodEventLDT (TermServices services) {
+	public ServiceEventLDT (TermServices services) {
 		super(NAME, services);
 		event = addFunction(services, "event");
 		evType = addFunction(services, "evType");
@@ -77,6 +79,7 @@ public class RemoteMethodEventLDT extends LDT {
 		hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
 		environmentCaller = (LocationVariable) services.getNamespaces().programVariables().lookup(ENVCALLER_NAME);
 		currentParams = (LocationVariable) services.getNamespaces().programVariables().lookup(CURRENT_PARAMS_NAME);
+		activeComponent = (LocationVariable) services.getNamespaces().programVariables().lookup(COMPONENT_NAME);
 	}
 
 	public Function eventConstructor() {
@@ -170,25 +173,30 @@ public class RemoteMethodEventLDT extends LDT {
         return currentParams;
     }
 
-	// maybe put somewhere else?
-	public Function getMethodIdentifierByDeclaration(MethodDeclaration md, TermServices services) { // TODO KD z use more than just method name
-	    String string = md.getFullName();
-		return getMethodIdentifierByString(string, services);
-	}
-	public Function getMethodIdentifierByString(String string, TermServices services) {
-		Name name = new Name(string);
-		return getMethodIdentifierByName(name, services);
-	}
-	public Function getMethodIdentifierByName(Name name, TermServices services) {
-	    Function f = (Function) services.getNamespaces().methodIdentifier().lookup(name);
-	    if (f == null) {
-	        //add the function
-	        f = new Function(name, (Sort)services.getNamespaces().sorts().lookup(METHOD_SORT), new ImmutableArray<Sort>(), null, true);
-	        services.getNamespaces().methodIdentifier().addSafely(f);
-	    }
-	    return f;
-	}
+    public LocationVariable getActiveComponent() {
+        return activeComponent;
+    }
 
+	public Function getMethodIdentifier(MethodDeclaration md, TermServices services) {
+		// TODO KD b do i need the class and can i get it from md?
+		// TODO KD c test (same name, different signature)
+	    String functionString = md.getFullName() + "(";
+	    if (md.getParameterDeclarationCount() > 0) {
+	    	functionString += md.getParameterDeclarationAt(0).getTypeReference().getKeYJavaType().getFullName();
+		    for (int i = 1; i < md.getParameterDeclarationCount(); i++) {
+		    	functionString += ", " + md.getParameterDeclarationAt(i).getTypeReference().getKeYJavaType().getFullName();
+		    }
+	    }
+	    functionString += ")";
+		Name functionName = new Name(functionString);
+	    Function function = (Function) services.getNamespaces().methodIdentifier().lookup(functionName);
+	    if (function == null) {
+	        //add the function
+	        function = new Function(functionName, (Sort)services.getNamespaces().sorts().lookup(METHOD_SORT), new ImmutableArray<Sort>(), null, true);
+	        services.getNamespaces().methodIdentifier().addSafely(function);
+	    }
+	    return function;
+	}
 
 	// TODO KD z add Operators / Literals / Types?
 

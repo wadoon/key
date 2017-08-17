@@ -36,6 +36,7 @@ options {
 
     import java.math.BigInteger;
     import java.util.List;
+    import java.util.LinkedList;
     import java.util.Map;
     import java.util.LinkedHashMap;
     import java.util.ArrayList;
@@ -672,10 +673,50 @@ lowmessagespeclist[Lowlist.Direction dir] returns  [Lowlist result = null] throw
     
     ;
     
+methodidentifier returns [Function f = null] throws SLTranslationException
+@init {
+    String className = "";
+    String methodName = "";
+    ImmutableArray<KeYJavaType> argumentTypeList = null;
+}
+@after {
+    ImmutableList<IProgramMethod> methods = javaInfo.getAllProgramMethods(javaInfo.getTypeByName(className));
+    methodLoop: for (IProgramMethod method : methods) {
+        if (method.getName().equals(methodName)) {
+            if (argumentTypeList != null) {
+                if (argumentTypeList.size() != method.getParamTypes().size()) {
+                    continue methodLoop;
+                }
+                for (int i = 0; i < argumentTypeList.size(); i++) {
+                    if (!argumentTypeList.get(i).equals(method.getParamTypes().get(i))) {
+                        continue methodLoop;
+                    }
+                }
+            }
+                 
+            //TODO JK allow inheritance because it's no true ambiguity! Should not be too hard to deal with...
+            if (f != null) {
+                throw new SLTranslationException("Method " + className + "." + methodName + " ambiguous (please specify argument types in square brackets behind the method name; can't handle inheritance atm)!");
+            }
+            f = services.getTypeConverter().getServiceEventLDT().getMethodIdentifier(method.getMethodDeclaration(), services);
+        }
+    }
+    if (f == null) {
+        throw new SLTranslationException("Method " + className + "." + methodName + " not found!");
+    }
+}
+:  
+    classIdent = IDENT DOT methodIdent = IDENT (LBRACKET params = typelist RBRACKET)?
+    {className = classIdent.getText();
+    methodName = methodIdent.getText();
+    argumentTypeList = params;}
+    ;
+
 servicecontext throws SLTranslationException
 @init {
 String serviceName = "";
 String receiverName = "";
+ImmutableArray<KeYJavaType> argumentTypeList = null;
 }
 @after {
         if (componentContext != null)
@@ -701,11 +742,22 @@ String receiverName = "";
         receiverType = componentContext.getType();
         
         ImmutableList<IProgramMethod> methods = javaInfo.getAllProgramMethods(receiverType);
-          for (IProgramMethod method : methods) {
+          methodLoop: for (IProgramMethod method : methods) {
              if (method.getName().equals(serviceName)) {
+                if (argumentTypeList != null) {
+                    if (argumentTypeList.size() != method.getParamTypes().size()) {
+                        continue methodLoop;
+                    }
+                    for (int i = 0; i < argumentTypeList.size(); i++) {
+                        if (!argumentTypeList.get(i).equals(method.getParamTypes().get(i))) {
+                            continue methodLoop;
+                        }
+                    }
+                }
+                 
                  //TODO JK allow inheritance because it's no true ambiguity! Should not be too hard to deal with...
                  if (serviceContext != null) {
-                     throw new SLTranslationException("Method " + receiverType.getFullName() + "." + serviceName + " ambiguous (can't handle overloading and inheritance atm)!");
+                     throw new SLTranslationException("Method " + receiverType.getFullName() + "." + serviceName + " ambiguous (please specify argument types in square brackets behind the method name; can't handle inheritance atm)!");
                  }
                  serviceContext = method;                 
              }
@@ -715,9 +767,22 @@ String receiverName = "";
         }
 }
 :
-    component = (IDENT|THIS) DOT service = IDENT
+    component = (IDENT|THIS) DOT service = IDENT (LBRACKET params = typelist RBRACKET)?
     {receiverName = component.getText();
-    serviceName = service.getText();}
+    serviceName = service.getText();
+    argumentTypeList = params;}
+    ;
+
+typelist returns [ImmutableArray<KeYJavaType> result = null] throws SLTranslationException // KD
+@init {
+List<KeYJavaType> types = new LinkedList<>();
+}
+@after {
+    result = new ImmutableArray<>(types);
+}
+:
+    (typeLabel = typespec { types.add(typeLabel); }
+    (COMMA typeLabel = typespec { types.add(typeLabel); })*)?
     ;
     
 termlist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil()] throws SLTranslationException
@@ -1521,7 +1586,7 @@ primaryexpr returns [SLExpression ret=null] throws SLTranslationException
 
                     //result = tb.seqGet(parameterSort, );
 
-                    result = new SLExpression(tb.seqGet(parameterSort, tb.var(services.getTypeConverter().getRemoteMethodEventLDT().getCurrentParams()), tb.zTerm(parameterIndex)), parameterKeYJavaType);
+                    result = new SLExpression(tb.seqGet(parameterSort, tb.var(services.getTypeConverter().getServiceEventLDT().getCurrentParams()), tb.zTerm(parameterIndex)), parameterKeYJavaType);
                 }
             } 
             
@@ -1761,7 +1826,7 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
 	  if (serviceContext != null) {
 	     KeYJavaType parameterType = serviceContext.getReturnType();
 	     Sort parameterSort = parameterType.getSort();
-	     Term resultTerm = tb.seqGet(parameterSort, tb.var(services.getTypeConverter().getRemoteMethodEventLDT().getCurrentParams()), tb.zero());
+	     Term resultTerm = tb.seqGet(parameterSort, tb.var(services.getTypeConverter().getServiceEventLDT().getCurrentParams()), tb.zero());
 	     result = new SLExpression(resultTerm, parameterType);
 	  } else {
    	  if(resultVar==null) {
@@ -2049,9 +2114,7 @@ jmlprimary returns [SLExpression ret=null] throws SLTranslationException
     |   LPAREN result=expression RPAREN
     | 	CALL {result = new SLExpression(tb.evCall(), new KeYJavaType(tb.evCall().sort()));}
     |	TERMINATION {result = new SLExpression(tb.evTerm(), new KeYJavaType(tb.evCall().sort()));}
-    |   METHODID LPAREN classid = IDENT DOT methid = IDENT RPAREN { // TODO KD z hacky
-      result = new SLExpression(tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifierByString(/*classid.getText() + "_" +*/ methid.getText(), services)/*, MRTHODTYPE*/));
-    }
+    |   METHODID LPAREN methodid = methodidentifier RPAREN {result = new SLExpression(tb.func(methodid)/* TODO KD c type?*/);}
 ;
 
 
@@ -2359,7 +2422,7 @@ builtintype returns [KeYJavaType type = null] throws SLTranslationException
             {
                 type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_SEQ);
             }
-        |   EVENT // TODO KD z maybe hack
+        |   EVENT
             {
                 type = javaInfo.getKeYJavaType(PrimitiveType.JAVA_EVENT);
             }

@@ -175,7 +175,7 @@ public final class RepresentsAxiom extends ClassAxiom {
           heaps.add(h);
        }
        ProgramVariable self = (!target.isStatic() ? originalSelfVar : null);
-       LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
+       LocationVariable hist = services.getTypeConverter().getServiceEventLDT().getHist();
 
        Name tacletName = MiscTools.toValidTacletName(name);
        TacletGenerator TG = TacletGenerator.getInstance();

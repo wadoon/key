@@ -385,7 +385,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         } else if (resultTerm != null) {
             result = tb.and(tb.reachableValue(resultTerm, pm.getReturnType()),
                     // if pm is part of a remote interface ensure free "\fresh" (may still be null though)
-            		(pm.getMethodDeclaration().isRemote() && resultTerm.sort().extendsSorts().contains(services.getJavaInfo().objectSort())) ?
+            		(pm.getMethodDeclaration().isRemote() && resultTerm.sort().extendsSorts().contains(services.getJavaInfo().objectSort())) ? // TODO KD a
             		tb.not(tb.created(heapAtPres.get(services.getTypeConverter().getHeapLDT().getHeap()), resultTerm)) : 
             		tb.tt());
         } else {
@@ -679,6 +679,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 		}
     }
 
+    // TODO JK activeComponent_A / activeComponent_B stuff
+    // TODO KD a \old(hist) and \caller
+
     // TODO KD a- add wfHist(anonHist) for (non service) methods
     // TODO KD a- gather all changes and put them in one if statement
     // TODO KD b disable / implement service inlining
@@ -740,24 +743,34 @@ public final class UseOperationContractRule implements BuiltInRule {
 		final Term globalDefs = contract.getGlobalDefs(baseHeap, baseHeapTerm, contractSelf,
 				contractParams, services);
 
-		LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
-		ProgramElementName otherHeapName = new ProgramElementName(tb.newName("otherHeap"));
-		LocationVariable otherHeap = new LocationVariable(otherHeapName, new KeYJavaType(baseHeap.sort()));
-		ProgramElementName otherPreHeapName = new ProgramElementName(tb.newName("otherHeapBefore_" + pm.getName()));
-		LocationVariable otherPreHeap = new LocationVariable(otherPreHeapName, new KeYJavaType(baseHeap.sort()));
-		ProgramElementName otherHistName = new ProgramElementName(tb.newName("otherHist"));
-		LocationVariable otherHist = new LocationVariable(otherHistName, new KeYJavaType(hist.sort()));
-		ProgramElementName otherPreHistName = new ProgramElementName(tb.newName("otherHistBefore_" + pm.getName()));
-		LocationVariable otherPreHist = new LocationVariable(otherPreHistName, new KeYJavaType(hist.sort()));
+		// TODO KD a // start of history related changes
+		LocationVariable hist = services.getTypeConverter().getServiceEventLDT().getHist();
 		ProgramElementName beforeHistName = new ProgramElementName(tb.newName(hist + "Before_" + pm.getName()));
 		LocationVariable beforeHist = new LocationVariable(beforeHistName, new KeYJavaType(hist.sort()));
+		LocationVariable otherHeap = null, otherPreHeap = null, otherHist = null, otherPreHist = null;
 		Term updateOther = tb.skip();
+		final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
 		if (pm.getMethodDeclaration().isRemote()) {
+			// set needed variable values
+			otherHeap = new LocationVariable(new ProgramElementName(tb.newName("otherHeap")), new KeYJavaType(baseHeap.sort()));
+			otherPreHeap = new LocationVariable(new ProgramElementName(tb.newName("otherHeapBefore_" + pm.getName())), new KeYJavaType(baseHeap.sort()));
+			otherHist = new LocationVariable(new ProgramElementName(tb.newName("otherHist")), new KeYJavaType(hist.sort()));
+			otherPreHist = new LocationVariable(new ProgramElementName(tb.newName("otherHistBefore_" + pm.getName())), new KeYJavaType(hist.sort()));
+			// ensure the use of other heap in statements about another component
 			updateOther = tb.parallel(
 					tb.elementary(baseHeapTerm, tb.var(otherHeap)),
 					tb.elementary(atPreVars.get(baseHeap), tb.var(otherPreHeap)),
 					tb.elementary(tb.getHist(), tb.var(otherHist)),
 					tb.elementary(tb.var(beforeHist), tb.var(otherPreHist)));
+			// ensure free "pure"
+			for(LocationVariable heap : heapContext) {
+				mods.put(heap, tb.empty());
+			}
+		} else {
+			for(LocationVariable heap : heapContext) {
+				final Term m = contract.getMod(heap, tb.var(heap), contractSelf, contractParams, services);
+				mods.put(heap, m);
+			}
 		}
 
 		final Term originalPre = tb.apply(updateOther, contract.getPre(heapContext, heapTerms, contractSelf, contractParams, atPres, services));
@@ -780,14 +793,6 @@ public final class UseOperationContractRule implements BuiltInRule {
 				services);
 		final Term post = tb.apply(globalDefs != null ? globalDefs : tb.skip(), originalPost);
 		final Term freeSpecPost = tb.apply(globalDefs != null ? globalDefs : tb.skip(), originalFreePost);
-		final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
-
-		for(LocationVariable heap : heapContext) {
-			final Term m = pm.getMethodDeclaration().isRemote() ?
-					tb.empty() : // if pm belongs to remote method interface, add free @pure to ensure clause
-					contract.getMod(heap, tb.var(heap), contractSelf, contractParams, services);
-			mods.put(heap, m);
-		}
 
 		final Term mby = contract.hasMby()
 				? contract.getMby(heapTerms,
@@ -849,41 +854,25 @@ public final class UseOperationContractRule implements BuiltInRule {
 		}
 
 		// modify history
-		final ProgramVariable selfVar = (ProgramVariable)(services.getNamespaces().programVariables().lookup(tb.selfVar(pm, contract.getKJT(), false).name()));
-		final Term selfVarTerm = (selfVar != null) ? tb.var(selfVar) : null;
+		final Term comp = tb.getActiveComponent();
 		final Name afterHistName = new Name(tb.newName(hist + "After_" + pm.getName()));
 		final Function afterHistFunc = new Function(afterHistName, hist.sort(), true);
 		services.getNamespaces().functions().addSafely(afterHistFunc);
 		final Term afterHist = tb.func(afterHistFunc);
 		final Term anonHistUpdate = tb.elementary(hist, afterHist);
 		Term newHist;
+		Term similarFormula = tb.tt();
 		// if called method belongs to a business remote interface, add "outgoing call" and "incoming termination" events to history
-		if (pm.getMethodDeclaration().isRemote()) {
+		if (pm.getMethodDeclaration().isRemote()) { // TODO KD a
 			assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
 			// TODO KD z could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor() and selfVarTerm != contractSelf
-			Term method = tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifierByDeclaration(pm.getMethodDeclaration(), services));
+			Term method = tb.func(services.getTypeConverter().getServiceEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), services));
 			Term resultTerm = contractResult != null ? tb.seqSingleton(contractResult) : tb.seqEmpty();
 			// throws Exception if pm.getMethodDeclaration().isStatic()
-			Term outCallEvent = tb.evConst(tb.evCall(), selfVarTerm, contractSelf, method, tb.seq(contractParams), anonUpdateDatas.head().methodHeapAtPre);
+			Term outCallEvent = tb.evConst(tb.evCall(), comp, contractSelf, method, tb.seq(contractParams), anonUpdateDatas.head().methodHeapAtPre);
 			// throws Exception if pm.getMethodDeclaration().isStatic()
-			Term inTermEvent  = tb.evConst(tb.evTerm(), selfVarTerm, contractSelf, method, resultTerm, anonUpdateDatas.reverse().head().methodHeap);
+			Term inTermEvent  = tb.evConst(tb.evTerm(), comp, contractSelf, method, resultTerm, anonUpdateDatas.reverse().head().methodHeap);
 			newHist = tb.seqConcat(tb.getHist(), tb.seq(outCallEvent, inTermEvent));
-		// if called method does not belong to a business remote interface add unknown changes to history
-		} else {
-			final Name anonHistName = new Name(tb.newName("anon_" + hist + "_" + pm.getName()));
-			final Function anonHistFunc = new Function(anonHistName, hist.sort());
-			services.getNamespaces().functions().addSafely(anonHistFunc);
-			final Term anonHist = tb.label(tb.func(anonHistFunc), new ParameterlessTermLabel(new Name("anonHistFunction")));
-			newHist = tb.seqConcat(tb.getHist(), anonHist);
-		}
-		final Term assumption = tb.equals(newHist, afterHist);
-		anonAssumption = tb.and(anonAssumption, assumption);
-		anonUpdate = tb.parallel(anonUpdate, anonHistUpdate);
-		atPreUpdates = tb.parallel(atPreUpdates, tb.elementary(beforeHist, tb.getHist()));
-		reachableState = tb.and(reachableState, tb.wellFormedHist(hist));
-
-		Term similarFormula = tb.tt();
-		if (pm.getMethodDeclaration().isRemote()) {
 			similarFormula = tb.and(
 					tb.wellFormed(otherHeap),
 					tb.wellFormed(otherPreHeap),
@@ -892,7 +881,21 @@ public final class UseOperationContractRule implements BuiltInRule {
 					tb.similarHist(contractSelf, tb.getHist(), tb.var(otherHist)),
 					tb.similarHist(contractSelf, tb.var(beforeHist), tb.var(otherPreHist)),
 					getInv(originalPre, contractSelf, tb));
+		// if called method does not belong to a business remote interface add unknown changes to history
+		} else {
+			final Name anonHistName = new Name(tb.newName("anon_" + hist + "_" + pm.getName()));
+			final Function anonHistFunc = new Function(anonHistName, hist.sort());
+			services.getNamespaces().functions().addSafely(anonHistFunc);
+			final Term anonHist = tb.label(tb.func(anonHistFunc), new ParameterlessTermLabel(new Name("anonHistFunction")));
+			newHist = tb.seqConcat(tb.getHist(), anonHist);
 		}
+
+		final Term assumption = tb.equals(newHist, afterHist);
+		anonAssumption = tb.and(anonAssumption, assumption);
+		anonUpdate = tb.parallel(anonUpdate, anonHistUpdate);
+		atPreUpdates = tb.parallel(atPreUpdates, tb.elementary(beforeHist, tb.getHist()));
+		reachableState = tb.and(reachableState, tb.wellFormedHist(hist));
+
 
 		final Term excNull = tb.equals(tb.var(excVar), tb.NULL());
 		final Term excCreated = tb.created(tb.var(excVar));

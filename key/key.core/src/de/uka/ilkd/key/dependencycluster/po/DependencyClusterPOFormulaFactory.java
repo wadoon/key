@@ -10,7 +10,7 @@ import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.ldt.RemoteMethodEventLDT;
+import de.uka.ilkd.key.ldt.ServiceEventLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -27,7 +27,7 @@ public class DependencyClusterPOFormulaFactory {
     private final IFProofObligationVars ifVars;
     private final Services services;
     private final TermBuilder tb;
-    private final RemoteMethodEventLDT ldt;
+    private final ServiceEventLDT ldt;
     private final ProofObligationVars symbExecVars;
     
     
@@ -44,7 +44,7 @@ public class DependencyClusterPOFormulaFactory {
         this.ifVars = ifVars;
         this.services = services;
         this.tb = services.getTermBuilder();
-        this.ldt = services.getTypeConverter().getRemoteMethodEventLDT();
+        this.ldt = services.getTypeConverter().getServiceEventLDT();
         this.symbExecVars = symbExecVars;
         
         ImmutableList<InfFlowSpec> infFlowSpecs = ImmutableSLList.<InfFlowSpec>nil();

@@ -1079,7 +1079,7 @@ public class TacletGenerator {
                 replace.put(TB.var(heap), TB.var(heapSVs.get(i++)));
         }
         //replace the history variable with the schema variable
-        replace.put(TB.var(services.getTypeConverter().getRemoteMethodEventLDT().getHist()), TB.var(histSV));
+        replace.put(TB.var(services.getTypeConverter().getServiceEventLDT().getHist()), TB.var(histSV));
         final OpReplacer replacer = new OpReplacer(replace, services.getTermFactory());
         // TB.getBaseHeap(services),  TB.var(heapSV)
         //instantiate axiom with schema variables

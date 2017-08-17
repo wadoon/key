@@ -7,7 +7,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.ldt.RemoteMethodEventLDT;
+import de.uka.ilkd.key.ldt.ServiceEventLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -27,7 +27,7 @@ public class DependencyClusterTacletFactory {
     private final DependencyClusterContract contract;
     private final InitConfig proofConfig;
     private final TermBuilder tb;
-    private final RemoteMethodEventLDT ldt;
+    private final ServiceEventLDT ldt;
     private final IFProofObligationVars poVars;
     
     Term calltype1;
@@ -57,7 +57,7 @@ public class DependencyClusterTacletFactory {
     public DependencyClusterTacletFactory(DependencyClusterContract contract, InitConfig proofConfig, IFProofObligationVars poVars) {
         this.contract = contract;
         this.proofConfig = proofConfig;
-        ldt = proofConfig.getServices().getTypeConverter().getRemoteMethodEventLDT();
+        ldt = proofConfig.getServices().getTypeConverter().getServiceEventLDT();
         
         tb = proofConfig.getServices().getTermBuilder();
         
@@ -143,7 +143,7 @@ public class DependencyClusterTacletFactory {
             Term updatedSpecifiedCaller = tb.apply(updateHeapAndSelf, specifiedCaller);
             Term updatedSpecifiedCallee = tb.apply(updateHeapAndSelf, specifiedCallee);
                         
-            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(list.getService().getMethodDeclaration(), proofConfig.getServices()));
+            Term specifiedService = tb.func(ldt.getMethodIdentifier(list.getService().getMethodDeclaration(), proofConfig.getServices()));
             
             
             
@@ -201,7 +201,7 @@ public class DependencyClusterTacletFactory {
             Term updatedSpecifiedCaller = tb.apply(updateHeapAndSelf, specifiedCaller);
             Term updatedSpecifiedCallee = tb.apply(updateHeapAndSelf, specifiedCallee);
                         
-            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(condition.getServiceContext().getMethodDeclaration(), proofConfig.getServices()));
+            Term specifiedService = tb.func(ldt.getMethodIdentifier(condition.getServiceContext().getMethodDeclaration(), proofConfig.getServices()));
                       
             Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
             Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);
@@ -294,7 +294,7 @@ public class DependencyClusterTacletFactory {
             Term updatedSpecifiedCaller = tb.apply(updateHeapAndSelf, specifiedCaller);
             Term updatedSpecifiedCallee = tb.apply(updateHeapAndSelf, specifiedCallee);
             
-            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(condition.getServiceContext().getMethodDeclaration(), proofConfig.getServices()));
+            Term specifiedService = tb.func(ldt.getMethodIdentifier(condition.getServiceContext().getMethodDeclaration(), proofConfig.getServices()));
 
             Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
             Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);
@@ -339,7 +339,7 @@ public class DependencyClusterTacletFactory {
             Term updatedSpecifiedCaller = tb.apply(updateHeapAndSelf, specifiedCaller);
             Term updatedSpecifiedCallee = tb.apply(updateHeapAndSelf, specifiedCallee);
                         
-            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(list.getService().getMethodDeclaration(), proofConfig.getServices()));
+            Term specifiedService = tb.func(ldt.getMethodIdentifier(list.getService().getMethodDeclaration(), proofConfig.getServices()));
                
             Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
             Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);
