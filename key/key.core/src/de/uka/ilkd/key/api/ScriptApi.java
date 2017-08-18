@@ -83,6 +83,7 @@ public class ScriptApi {
     }
 
     /**
+     * Evaluate the arguments passed to a command
      * @param arguments
      * @param <T>
      * @return
@@ -94,13 +95,9 @@ public class ScriptApi {
                 command.evaluateArguments(state, arguments));
     }
 
-    //TODO
-    public void applyRule(String ruleName, String posInOcc) {
-        //TacletApp app = new PosTacletApp();
-        //TODO over RuleCommand
-    }
 
     /**
+     *
      * @param term
      * @param assignments
      * @return
@@ -139,29 +136,5 @@ public class ScriptApi {
         return pseudoRoot;
     }
 
-    //isclosable
-    //derivable : mache cut und dann auto, falls nicht schließt prune proof
-
-    //public ProofApi openSpeculatedProof(ProjectedNode){
-    //copy node + env
-    // }
-
-    /**
-     * Method tries to close proof by applying the script command. If it succeeds the method returns true otherwise false.
-     * In any case the proof is rolled back and the proof state is not changed visibly.
-     *
-     * @param com  Proof command that should close the goal
-     * @param node goal node to close
-     * @return true iff proof can be found using com, false otherwise
-     */
-    public boolean isClosable(ScriptCommand com, ProjectedNode node) {
-
-        return false;
-    }
-
-    public boolean isDerivable(String formula, ProjectedNode node) {
-        return false;
-    }
-    //new env, new PO, closable
 
 }

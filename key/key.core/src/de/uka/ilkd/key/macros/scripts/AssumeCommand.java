@@ -13,8 +13,11 @@ import de.uka.ilkd.key.rule.TacletApp;
 import java.util.Map;
 
 /**
- * The assume command takes one argument:
- * * a formula to which the command is applied
+ * The assume command is an unsound taclet rule and takes one argument:
+ *
+ * The command adds the formula passed as argument to the antecedent
+ * * a formula #2  to which the command is applied
+ *
  */
 public class AssumeCommand
         extends AbstractCommand<AssumeCommand.FormulaParameter> {

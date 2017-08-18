@@ -11,6 +11,14 @@ import de.uka.ilkd.key.smt.SMTSolverResult.ThreeValuedTruth;
 
 import java.util.*;
 
+/**
+ * The script command "smt" calls the SMT solver z3 and is used:
+ * "smt" \<STRING\>
+ * <ul>
+ *     <li>Z3: use z3 as SMT solver</li>
+ * </ul>
+ */
+
 public class SMTCommand
         extends AbstractCommand<SMTCommand.SMTCommandArguments> {
     static class SMTCommandArguments {

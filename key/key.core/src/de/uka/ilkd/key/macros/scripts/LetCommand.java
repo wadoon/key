@@ -7,6 +7,14 @@ import java.util.stream.StreamSupport;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.pp.AbbrevMap;
 
+
+/**
+ * The command object LetCommand represents a script command with name "let".
+ * Parameters are:
+ * <ul>
+ *     <li>#literal</li>
+ * </ul>
+ */
 public class LetCommand extends AbstractCommand<Map<String, String>> {
 
     public LetCommand() {

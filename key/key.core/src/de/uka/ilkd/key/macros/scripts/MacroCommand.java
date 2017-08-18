@@ -12,6 +12,13 @@ import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.TaskStartedInfo;
 
+/**
+ * The command object MacroCommand invokes KeY macros.
+ * It is called using the keyword "macros" and as parameters
+ * <ul>
+ *     <li>#2: STRING the macro name to be invoked</li>
+ * </ul>
+ */
 public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
 
     public MacroCommand() {

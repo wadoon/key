@@ -3,6 +3,12 @@ package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 
+
+/**
+ * The Exit Command exits the script
+ *
+ * * It has no parameters.
+ */
 public class ExitCommand extends NoArgumentCommand {
     @Override public void execute(AbstractUserInterfaceControl uiControl,
             Void args, EngineState stateMap)

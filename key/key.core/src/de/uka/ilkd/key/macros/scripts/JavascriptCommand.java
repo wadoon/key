@@ -13,7 +13,12 @@ import de.uka.ilkd.key.macros.scripts.meta.ValueInjector;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevException;
 import de.uka.ilkd.key.proof.Proof;
-
+/** The command object JavascriptCommand with name  "javascript" and parameters:
+ *
+ *  <ul>
+ *  <li>#2: STRING, which is teh ID of the java-script that should be called </li>
+ *  </ul>
+ */
 public class JavascriptCommand
         extends AbstractCommand<JavascriptCommand.Parameters> {
 
