@@ -56,7 +56,7 @@ public final class ArgumentsLifter {
         arg.setRequired(option.required());
         arg.setField(field);
         arg.setType(field.getType());
-        arg.setDocumentation(option.help());
+        arg.setDocumentation(DescriptionFacade.getDocumentation(arg));
         return arg;
     }
 

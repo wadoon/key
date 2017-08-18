@@ -71,7 +71,9 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
      * @throws ScriptException
      * @throws InterruptedException
      */
-    protected abstract void execute(T args) throws ScriptException, InterruptedException;
+    protected void execute(T args) throws ScriptException, InterruptedException {
+
+    }
 
     /**
      *

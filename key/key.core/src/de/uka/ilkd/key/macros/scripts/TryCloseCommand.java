@@ -10,7 +10,7 @@ import de.uka.ilkd.key.proof.Node;
  * The script command tryclose" has two optional arguments:
  * <ul>
  *     <li>steps: INTEGER number of steps to use</li>
- *     <li>#2: STRINg the branch whcih should be closed</li>
+ *     <li>#2: STRING the branch which should be closed</li>
  * </ul>
  *
  * TryClose tries to close the specified branch. If it is not successful within the specified number

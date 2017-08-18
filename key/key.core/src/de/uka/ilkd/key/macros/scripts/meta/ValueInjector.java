@@ -15,10 +15,10 @@ public class ValueInjector {
     private static ValueInjector INSTANCE;
     private Map<Class, StringConverter> converters = new HashMap<>();
 
-    public static <T> T injection(ProofScriptCommand command, T obj, Map<String, String> arguments)
+    public static <T> T injection(T obj, Map<String, String> arguments)
             throws ArgumentRequiredException, InjectionReflectionException, NoSpecifiedConverterException, ConversionException,
             IllegalAccessException {
-        return getInstance().inject(command, obj, arguments);
+        return getInstance().inject(obj, arguments);
     }
 
     public static ValueInjector getInstance() {
@@ -45,10 +45,10 @@ public class ValueInjector {
         return vi;
     }
 
-    public <T> T inject(ProofScriptCommand command, T obj, Map<String, String> arguments)
+    public <T> T inject(T obj, Map<String, String> arguments)
             throws IllegalAccessException, ConversionException, InjectionReflectionException, NoSpecifiedConverterException,
             ArgumentRequiredException {
-        List<ProofScriptArgument> meta = ArgumentsLifter.inferScriptArguments(obj.getClass(), command);
+        List<ProofScriptArgument> meta = ArgumentsLifter.inferScriptArguments(obj.getClass());
         List<ProofScriptArgument> varArgs = new ArrayList<>(meta.size());
 
         List<String> usedKeys = new ArrayList<>();

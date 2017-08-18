@@ -1,8 +1,13 @@
 <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
 <properties>
     <comment>This is a comment</comment>
-    <entry key="instantiate"><![CDATA[
+    <entry key="assume">
+        The assume command is an unsound taclet rule and takes one argument:
 
+        The command adds the formula passed as argument to the antecedent
+        a formula #2 to which the command is applied
+    </entry>
+    <entry key="instantiate"><![CDATA[
 
     ]]>
     </entry>
