@@ -105,7 +105,7 @@ public class Matcher {
             while (!queue.isEmpty()) {
                 SearchNode node = queue.remove();
                 boolean inAntecedent = node.isAntecedent();
-                System.out.println(inAntecedent ? "In Antec: " : "In Succ");
+                //System.out.println(inAntecedent ? "In Antec: " : "In Succ");
 
                 IfMatchResult ma = ltm.matchIf((inAntecedent ?
                         antecCand : succCand), node.getPatternTerm(), node.mc, copyServices);
@@ -126,12 +126,12 @@ public class Matcher {
 
 
                 } else {
-                    System.out.println("Pattern Empty");
+                    //System.out.println("Pattern Empty");
                 }
             }
-            for (SearchNode finalCandidate : finalCandidates) {
+            /*for (SearchNode finalCandidate : finalCandidates) {
                 System.out.println(finalCandidate.mc.getInstantiations());
-            }
+            }*/
         }
         List<VariableAssignments> matches = new ArrayList<>();
         if(!finalCandidates.isEmpty()) {
@@ -184,7 +184,7 @@ public class Matcher {
         typeMap.forEach((id, type) -> strn.add(toDecl(id,type)));
         schemaVars += strn.stream().collect(Collectors.joining("\n"));
         schemaVars +="}";
-        System.out.println(schemaVars);
+        //System.out.println(schemaVars);
         return schemaVars;
     }
 
