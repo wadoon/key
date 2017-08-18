@@ -3,6 +3,7 @@ package de.uka.ilkd.key.macros.scripts;
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.macros.scripts.meta.ArgumentsLifter;
+import de.uka.ilkd.key.macros.scripts.meta.DescriptionFacade;
 import de.uka.ilkd.key.macros.scripts.meta.ProofScriptArgument;
 import de.uka.ilkd.key.proof.Proof;
 
@@ -23,6 +24,7 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
     protected Services service;
     protected EngineState state;
     protected AbstractUserInterfaceControl uiControl;
+    protected String documentation = null;
 
     protected static Logger log = Logger.getLogger(ProofScriptCommand.class.getName());
 
@@ -37,7 +39,8 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
     }
 
 
-    @Override public T evaluateArguments(EngineState state, Map<String, String> arguments) throws Exception {
+    @Override
+    public T evaluateArguments(EngineState state, Map<String, String> arguments) throws Exception {
         if (parameterClazz != null) {
             T obj = parameterClazz.newInstance();
             return state.getValueInjector().inject(obj, arguments);
@@ -45,7 +48,8 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
         return null;
     }
 
-    @Override public void execute(AbstractUserInterfaceControl uiControl, T args, EngineState stateMap)
+    @Override
+    public void execute(AbstractUserInterfaceControl uiControl, T args, EngineState stateMap)
             throws ScriptException, InterruptedException {
         proof = stateMap.getProof();
         service = proof.getServices();
@@ -54,8 +58,7 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
 
         try {
             execute(args);
-        }
-        finally {
+        } finally {
             //preventing memory leak
             proof = null;
             service = null;
@@ -68,7 +71,16 @@ public abstract class AbstractCommand<T> implements ProofScriptCommand<T> {
      * @throws ScriptException
      * @throws InterruptedException
      */
-    protected void execute(T args) throws ScriptException, InterruptedException {
+    protected abstract void execute(T args) throws ScriptException, InterruptedException;
 
+    /**
+     *
+     */
+    @Override
+    public String getDocumentation() {
+        if (documentation == null) {
+            documentation = DescriptionFacade.getDocumentation(this);
+        }
+        return documentation;
     }
 }
