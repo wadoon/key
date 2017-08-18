@@ -8,6 +8,13 @@ import java.nio.file.NoSuchFileException;
 import java.util.Map;
 import java.util.logging.Logger;
 
+/**
+ * The command object ScriptCommand is called using "script"
+ * and the parameter:
+ * <ul>
+ *     <li>#2: STRING filename of the script that should be executed</li>
+ * </ul>
+ */
 public class ScriptCommand extends AbstractCommand<ScriptCommand.Parameters> {
     public ScriptCommand() {
         super(Parameters.class);

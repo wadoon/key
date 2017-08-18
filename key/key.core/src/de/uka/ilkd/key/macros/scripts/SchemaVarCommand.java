@@ -9,10 +9,14 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.pp.AbbrevMap;
-
 /**
- *
+ * The command object SchemaVarCommand is called using "schemaVar" and the parameters:
+ * <ul>
+ *     <li>#2: STRING the type of the schema variable</li>
+ *     <li>#3: STRINg the name of teh schema variable</li>
+ * </ul>
  */
+
 public class SchemaVarCommand
         extends AbstractCommand<SchemaVarCommand.Parameters> {
 

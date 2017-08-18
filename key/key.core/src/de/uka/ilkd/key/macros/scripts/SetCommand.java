@@ -4,7 +4,17 @@ import de.uka.ilkd.key.macros.scripts.meta.Option;
 
 import java.util.Map;
 import java.util.Properties;
-
+/**
+ * The SetCommand is called using "set" and the
+ * parameters:
+ *
+ * <ul>
+ *     <li>key:STRING</li>
+ *     <li>value: STRING</li>
+ * </ul>
+ *
+ * It sets properties.
+ */
 public class SetCommand extends AbstractCommand<SetCommand.Parameters> {
 
     static class Parameters {

@@ -12,7 +12,13 @@ import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-
+/**
+ * The command object SelectCommand is called using "select".
+ * and the parameter:
+ * <ul>
+ *     <li>formula: TERM the formula to be selected</li>
+ * </ul>
+ */
 public class SelectCommand extends AbstractCommand<SelectCommand.Parameters> {
     public class Parameters {
         @Option("formula") public Term formula;

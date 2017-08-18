@@ -28,7 +28,7 @@ public class ProofApi {
     private final Proof proof;
     private Object firstOpenGoal;
 
-    ProofApi(Proof proof, KeYEnvironment<?> currentEnv) {
+    public ProofApi(Proof proof, KeYEnvironment<?> currentEnv) {
         this.proof = proof;
         this.env = currentEnv;
     }

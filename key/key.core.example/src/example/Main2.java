@@ -31,7 +31,7 @@ public class Main2 {
                 VariableAssignments va = new VariableAssignments();
                 cArgs.put("#2", "impRight");
                 ProofScriptCommandCall impRight = scrapi.instantiateCommand(rc, cArgs);
-                scrapi.executeScriptCommand(impRight, openGoal, va);
+                //scrapi.executeScriptCommand(impRight, openGoal, va);
                 VariableAssignments va2 = new VariableAssignments(va);
                 va2.addType("X", VariableAssignments.VarType.FORMULA);
                 va2.addType("Y", VariableAssignments.VarType.FORMULA);

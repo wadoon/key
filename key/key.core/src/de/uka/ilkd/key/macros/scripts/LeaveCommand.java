@@ -7,6 +7,10 @@ import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 
+/**
+ * The command object LeaveCommand represents a script command with name "leave".
+ * It has no parameters.
+ */
 public class LeaveCommand extends NoArgumentCommand {
     private static Logger log = Logger.getLogger(ProofScriptCommand.class.getName());
 

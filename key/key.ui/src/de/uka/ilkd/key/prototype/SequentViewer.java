@@ -1,21 +1,29 @@
 package de.uka.ilkd.key.prototype;
 
+import de.uka.ilkd.key.api.SearchNode;
 import de.uka.ilkd.key.api.VariableAssignments;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.parser.DefaultTermParser;
-import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.parser.*;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.match.legacy.LegacyTacletMatcher;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import org.antlr.runtime.RecognitionException;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
 
 import java.io.File;
+import java.io.PrintWriter;
 import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -42,15 +50,34 @@ public class SequentViewer extends Application {
     private Sequent createTestSequent()
             throws ProblemLoaderException, ParserException {
         KeYEnvironment<?> env = KeYEnvironment.load(new File(
-                "key.ui/src/de/uka/ilkd/key/prototype/test.key"));
+                "key.ui/src/de/uka/ilkd/key/prototype/src.key"));
 
         DefaultTermParser dtp = new DefaultTermParser();
         StringReader r = new StringReader(// "a=5 ==> \\<{int i = 0;}\\>(a=5)");
                 //   "(5 = a) & (15 = add(b, -3)) ==> (mul(a, b) = 90)");
                 // " fi(c), fi(d) ==> fi(d), fi(c)");
-                " c = d , d= c, fi(d) ==> fi(c), fi(d)");
+               // " c = d , d= c, fi(d) ==> fi(c), fi(d)");
+        " wellFormed(heap),\n" +
+                " self.<created> = TRUE,\n" +
+                " Simple::exactInstance(self) = TRUE,\n" +
+                " a.<created> = TRUE,\n" +
+                " b.<created> = TRUE,\n" +
+                " measuredByEmpty,\n" +
+                " \\forall int i; (i <= -1 | i >= a.length | !b[i] = a[i]),\n" +
+                " self.log.length = 100,\n" +
+                " self.n >= 0\n" +
+                "==>\n" +
+                " self.log = null,\n" +
+                " self = null,\n" +
+                " a = null,\n" +
+                " b = null,\n" +
+                " {exc:=null || result:=a}\n" +
+                "   (\\forall int i; (i <= -1 | i >= a.length | !b[i] = a[i])\n" +
+                "    & result = a\n" +
+                "    &(self.<inv> & !result = null)\n" +
+                "    & exc = null)");
         nss = env.getServices().getNamespaces();
-
+        System.out.println(nss.lookup(new Name("a")));
         AbbrevMap abbrev = new AbbrevMap();
 
         Sequent seq = dtp.parseSeq(r, env.getServices(), nss, abbrev);
@@ -59,24 +86,45 @@ public class SequentViewer extends Application {
 
         VariableAssignments testAssign = new VariableAssignments(null);
         try {
-            testAssign.addType("x0", VariableAssignments.VarType.INT);
-            testAssign.addType("x1", VariableAssignments.VarType.INT);
-            testAssign.addType("x", VariableAssignments.VarType.INT);
+            testAssign.addType("i", VariableAssignments.VarType.INT);
+         //   testAssign.addType("x1", VariableAssignments.VarType.INT);
+         //   testAssign.addType("x", VariableAssignments.VarType.INT);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        String testPattern = "x0=x, x1=x==> fi(x0)";
-        //matchPattern(testPattern, seq, testAssign, services);
-
+        String testPattern = "a[i] >= 0 ==>";
+        matchPattern(testPattern, seq, testAssign, services);
 
         return seq;
     }
-/*
+
+
+   /* wellFormed(heap),
+    self.<created> = TRUE,
+    Simple::exactInstance(self) = TRUE,
+    a.<created> = TRUE,
+    b.<created> = TRUE,
+    measuredByEmpty,
+            ∀ int i; (i ≤ -1 ∨ i ≥ a.length ∨ ¬b[i] = a[i]),
+    self.log.length = 100,
+    self.n ≥ 0
+            ==>
+    self.log = null,
+    self = null,
+    a = null,
+    b = null,
+    {exc:=null || result:=a}
+   (  ∀ int i; (i ≤ -1 ∨ i ≥ a.length ∨ ¬b[i] = a[i])
+            ∧ result = a
+    ∧ (self.<inv> ∧ ¬result = null)
+            ∧ exc = null)
+    */
+
     /**
      * TODO: richtige Signatur noch zu tun, atm. erst einmal Testweise
      * Es muessten noch die Assignments mit gegebene werden mit Typeninfo
-
+    */
     public void matchPattern(String pattern, Sequent currentSeq, VariableAssignments assignments, Services services){
         //Aufbau der Deklarationen für den NameSpace
         buildNameSpace(services, assignments);
@@ -241,7 +289,7 @@ public class SequentViewer extends Application {
             e.printStackTrace(pw);
             throw e;
         }
-    }*/
+    }
     /*Term parseTerm(String s) throws RecognitionException {
         try {
             KeYParserF p = new KeYParserF(ParserMode.TERM, new KeYLexerF(s,

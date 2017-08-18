@@ -47,6 +47,8 @@ public class Matcher {
     //List of VarAssignment
     public List<VariableAssignments> matchPattern(String pattern, Sequent currentSeq, VariableAssignments assignments){
         //copy services in order to not accidently set assignments and namespace for environment
+        Services cp = api.getEnv().getServices().copy(false);
+
         Services copyServices = api.getEnv().getServices().copy(false);
         //services.copy(false);
         //Aufbau der Deklarationen für den NameSpace
@@ -103,7 +105,7 @@ public class Matcher {
             while (!queue.isEmpty()) {
                 SearchNode node = queue.remove();
                 boolean inAntecedent = node.isAntecedent();
-                System.out.println(inAntecedent ? "In Antec: " : "In Succ");
+                //System.out.println(inAntecedent ? "In Antec: " : "In Succ");
 
                 IfMatchResult ma = ltm.matchIf((inAntecedent ?
                         antecCand : succCand), node.getPatternTerm(), node.mc, copyServices);
@@ -124,12 +126,12 @@ public class Matcher {
 
 
                 } else {
-                    System.out.println("Pattern Empty");
+                    //System.out.println("Pattern Empty");
                 }
             }
-            for (SearchNode finalCandidate : finalCandidates) {
+            /*for (SearchNode finalCandidate : finalCandidates) {
                 System.out.println(finalCandidate.mc.getInstantiations());
-            }
+            }*/
         }
         List<VariableAssignments> matches = new ArrayList<>();
         if(!finalCandidates.isEmpty()) {
@@ -154,8 +156,6 @@ public class Matcher {
             SchemaVariable sv = insts.lookupVar(new Name(varName));
             Object value = insts.getInstantiation(sv);
             va.addAssignmentWithType(varName, value, (VariableAssignments.VarType) assignments.getTypeMap().get(varName));
-            //System.out.println("Looking up "+sv.toString()+" value "+value.toString());
-
         }
         return va;
 
@@ -184,34 +184,12 @@ public class Matcher {
         typeMap.forEach((id, type) -> strn.add(toDecl(id,type)));
         schemaVars += strn.stream().collect(Collectors.joining("\n"));
         schemaVars +="}";
-        System.out.println(schemaVars);
+        //System.out.println(schemaVars);
         return schemaVars;
     }
 
     private String toDecl(String id, VariableAssignments.VarType type){
-        String s ="";
-        switch (type) {
-            case ANY:
-                s += "\\term any "+id+";";
-                break;
-            case BOOL:
-                s += "\\term boolean "+id+";";
-                break;
-            case INT:
-                s+= "\\term int "+id+";";
-                break;
-            case FORMULA:
-                s+= "\\formula "+id+";";
-                break;
-            case INT_ARRAY:
-                s+= "\\term int[] "+id+";";
-                break;
-            default:
-                //TODO missing types
-                System.out.println("Sort "+type+" not supported yet");
-                break;
-        }
-        return s;
+        return type.getKeYDeclarationPrefix()+" "+id+";";
     }
 
 
@@ -245,7 +223,7 @@ public class Matcher {
                 services, services.getNamespaces());
     }
 
-    Taclet parseTaclet(String s, Services services) throws RecognitionException {
+    private Taclet parseTaclet(String s, Services services) throws RecognitionException {
         try {
             KeYParserF p = stringTacletParser(s, services);
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="JAVA_MODULE" version="4">
-  <component name="NewModuleRootManager">
+  <component name="NewModuleRootManager" inherit-compiler-output="false">
     <output url="file://$MODULE_DIR$/bin" />
     <output-test url="file://$MODULE_DIR$/bin" />
     <exclude-output />
@@ -15,7 +15,7 @@
     <orderEntry type="module" module-name="key.core" exported="" />
     <orderEntry type="module" module-name="key.util" exported="" />
     <orderEntry type="module" module-name="key.core.testgen" exported="" />
-    <orderEntry type="module" module-name="key.core.symbolic_execution" />
+    <orderEntry type="module" module-name="key.core.symbolic_execution" exported="" />
     <orderEntry type="module-library">
       <library>
         <CLASSES>
