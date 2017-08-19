@@ -16,19 +16,19 @@ import org.key_project.sed.core.model.ISEMethodCall;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEThread;
 
-public class CallTree {
+public class QuestionTree {
 
    /*
     * the list of paths
     * @author Peter Schauberger
     */
-   public ArrayList<CallPath> tree;
+   public ArrayList<QuestionPath> tree;
 
    /*
     * @return the paths
     * @author Peter Schauberger
     */
-   public ArrayList<CallPath> getPaths() {
+   public ArrayList<QuestionPath> getPaths() {
       return tree;
    }
 
@@ -36,8 +36,8 @@ public class CallTree {
     * Constructor
     * @author Peter Schauberger
     */
-   public CallTree() {
-      this.tree = new ArrayList<CallPath>();
+   public QuestionTree() {
+      this.tree = new ArrayList<QuestionPath>();
 
    }
 
@@ -58,7 +58,7 @@ public class CallTree {
     * @returns The next call of the list of paths if we iterate it path by path and inside the paths call by call
     * @author Peter Schauberger
     */
-   public Call getNextCall(){
+   public Question getNextCall(){
       if(pathIterator == tree.size()-1){ //letzter Pfad erreicht
          if(callIterator == tree.get(pathIterator).getSize()-1){ //Letzter Call im letzten Pfad: Ende erreicht
             return null; 
@@ -86,7 +86,7 @@ public class CallTree {
     * Gibt den ersten Call der Pfadliste zurück.
     * @author Peter Schauberger
     */
-   public Call getStartCall(){
+   public Question getStartCall(){
       pathIterator = 0;
       callIterator = 0;
       return tree.get(pathIterator).getCall(callIterator);
@@ -97,7 +97,7 @@ public class CallTree {
     * Gibt den vorigen Call der Pfadliste zurück wenn diese Call für Call rückwärts durchlaufen wird
     * @author Peter Schauberger
     */
-   public Call getPreviousCall(){
+   public Question getPreviousCall(){
 
       if(pathIterator == 0){
          if(callIterator == 0){ //erster Call im ersten Pfad: gibt keinen davor
@@ -143,7 +143,7 @@ public class CallTree {
    public void printPathsToConsole(){
       System.out.println("Printing Paths to Console:");
       int counter = 0;
-      for(CallPath path : tree){
+      for(QuestionPath path : tree){
          counter++;
          System.out.println("Path "+counter);
          for(int i = 0; i < path.getSize(); i++){

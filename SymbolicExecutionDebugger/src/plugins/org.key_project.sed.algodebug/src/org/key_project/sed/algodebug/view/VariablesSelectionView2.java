@@ -21,11 +21,11 @@ import org.key_project.sed.algodebug.provider.ExecutionTreeNodeListLabelProvider
 import org.eclipse.swt.custom.SashForm;
 
 @SuppressWarnings("restriction")
-public class VariablesSelectionView extends ViewPart {
+public class VariablesSelectionView2 extends ViewPart {
 
-   public static final String VIEW_ID = "org.key_project.sed.ui.view.VariablesSelectionView";
+   public static final String VIEW_ID = "org.key_project.sed.ui.view.VariablesSelectionView2";
 
-   public VariablesSelectionView(){
+   public VariablesSelectionView2(){
    }
 
    static ListViewer viewerLeft = null;
@@ -42,9 +42,9 @@ public class VariablesSelectionView extends ViewPart {
 
    public void getContent(){
       Object[] NodeArray = null;
-      IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView("org.key_project.sed.ui.view.AlgorithmicDebugView");
-      if (part instanceof AlgorithmicDebugView) {
-         AlgorithmicDebugView view = (AlgorithmicDebugView) part;
+      IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView("org.key_project.sed.ui.view.AlgorithmicDebugView2");
+      if (part instanceof AlgorithmicDebugView2) {
+         AlgorithmicDebugView2 view = (AlgorithmicDebugView2) part;
          NodeArray =  view.getExecutionTreeAsArray();
       }
       if(NodeArray == null){

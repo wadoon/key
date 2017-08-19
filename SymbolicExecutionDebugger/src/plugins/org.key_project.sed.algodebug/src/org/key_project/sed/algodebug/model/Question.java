@@ -2,9 +2,9 @@ package org.key_project.sed.algodebug.model;
 
 import org.key_project.sed.core.model.ISENode;
 
-public class Call {
+public class Question {
 
-   public Call(ISENode startNode, ISENode EndNode) {
+   public Question(ISENode startNode, ISENode EndNode) {
       call = startNode;
       ret = EndNode;
       correctness = 'u';

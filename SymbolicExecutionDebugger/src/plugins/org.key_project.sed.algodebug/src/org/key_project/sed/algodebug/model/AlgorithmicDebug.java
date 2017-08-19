@@ -3,6 +3,7 @@ package org.key_project.sed.algodebug.model;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.key_project.sed.algodebug.model2.ListOfMethodCallTrees;
 import org.key_project.sed.core.annotation.ISEAnnotation;
 import org.key_project.sed.core.annotation.ISEAnnotationType;
 import org.key_project.sed.core.annotation.impl.AlgorithmicDebugCorrectAnnotation;
@@ -26,37 +27,48 @@ import org.key_project.util.java.IFilter;
 public class AlgorithmicDebug  {
 
    //Letzten Call zwischenspeichern um Rückgängigmachen des Highlighting in unhighlight zu ermöglichen
-   private Call lastHighlightedCall;
+   private Question lastHighlightedCall;
 
    public AlgorithmicDebug() {
       tree = null;
    }
 
-   private CallTree tree;
+   private QuestionTree tree;
    private ISENode root;
    /*
     * getCallTree
     * Der Knoten welcher den Anfangspunkt darstellt wird immer übergeben
     */
 
-   public CallTree getCallTree(ISENode node, String strategy){
+   public QuestionTree getCallTree(ISENode node, String strategy){
       if(tree == null){
-         tree = new CallTree();
+         tree = new QuestionTree();
+         root = getRoot(node);
+         try {
+            System.out.println("Root:"+root.getName().toString());
+         }
+         catch (DebugException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+         ListOfMethodCallTrees testList = new ListOfMethodCallTrees();
+         testList.generateListOfCallTrees(root);
+         testList.printTree();
          if(strategy.equals("Bottom Up"))
-            tree.generateCallTree(getRoot(node), "BottomUp");
+            tree.generateCallTree(root, "BottomUp");
          else if(strategy.equals("Top Down"))
-            tree.generateCallTree(getRoot(node), "TopDown");
+            tree.generateCallTree(root, "TopDown");
          else if(strategy.equals("Single Stepping"))
-            tree.generateCallTree(getRoot(node), "SingleStepping");
+            tree.generateCallTree(root, "SingleStepping");
          //         path.printPathsToConsoleWithIterators();
       }
       return tree;
    }
 
-   public CallTree getCallTree(){
+   public QuestionTree getCallTree(){
       return tree;
    }
-   public void highlightCall(Call call){
+   public void highlightCall(Question call){
 
       ISENode node = call.getRet();
 
@@ -146,29 +158,49 @@ public class AlgorithmicDebug  {
     * @author Peter Schauberger
     */
    public ISENode getRoot(ISENode node){
+//      try {
+//         System.out.println(node.getName().toString());
+//      }
+//      catch (DebugException e1) {
+//         // TODO Auto-generated catch block
+//         e1.printStackTrace();
+//      }
       //      System.out.println("getRoot");
       try {
          if(node.getParent() == null){ //Dann haben wir bereits den Root-Knoten gefunden
-            root = node;
+//            try {
+//               System.out.println("getroot return: "+node.getName().toString());
+//            }
+//            catch (DebugException e1) {
+//               // TODO Auto-generated catch block
+//               e1.printStackTrace();
+//            }
             return node;
          }
-         else if( node.getParent() instanceof ISEThread)
-            return node.getParent();
-         else
-            return getRoot(node.getParent());
+         else if( node.getParent() instanceof ISEThread){
+//            try {
+//               System.out.println("getroot return: "+node.getName().toString());
+//            }
+//            catch (DebugException e1) {
+//               // TODO Auto-generated catch block
+//               e1.printStackTrace();
+//            }
+            return node.getParent();}
+         else{
+            
+            return getRoot(node.getParent());}
       }
       catch (DebugException e) {
          // TODO Auto-generated catch block
          e.printStackTrace();
       }
-
-      return node;
+      return null;
    }
 
    /*
     * Markiert einen Call, also die Knoten zwischen dem dort gespeicherten Start und Endknoten
     */
-   public void annotateCall(Call call, boolean bool){
+   public void annotateCall(Question call, boolean bool){
       call.setCorrectness('c');
       annotateNodes(call, bool);
    }
@@ -179,7 +211,7 @@ public class AlgorithmicDebug  {
     * @param bool - der Wert den die Knoten erhalten sollen
     */
 
-   private void annotateNodes(Call call, boolean bool){
+   private void annotateNodes(Question call, boolean bool){
 
       ISENode node = call.getRet();
       Shell shell = Display.getCurrent().getActiveShell();
@@ -385,7 +417,7 @@ public class AlgorithmicDebug  {
     * Annotiert die Nodes eines Call rückwärts vom Return Knoten aus als falsch
     */
 
-   public void annotateCallFalse(Call call){
+   public void annotateCallFalse(Question call){
 
       ISENode node = call.getRet();
 

@@ -3,14 +3,14 @@ package org.key_project.sed.algodebug.model;
 import java.util.ArrayList;
 import java.util.Collections;
 
-public class CallPath {
-   private ArrayList<Call> path;
+public class QuestionPath {
+   private ArrayList<Question> path;
 
-   public CallPath(){
-      path = new ArrayList<Call>();
+   public QuestionPath(){
+      path = new ArrayList<Question>();
    }
 
-   public Call getCall(int CallIndex){
+   public Question getCall(int CallIndex){
       if(CallIndex >= 0 && CallIndex < path.size())
          return path.get(CallIndex);
       else
@@ -21,7 +21,7 @@ public class CallPath {
       return path.size();
    }
 
-   public void addCall(Call call){
+   public void addCall(Question call){
       if(call != null)
          path.add(call);
    }
@@ -31,7 +31,7 @@ public class CallPath {
    }
 
    public void setCorrectness(char c){
-      for (Call call : path) {
+      for (Question call : path) {
          call.setCorrectness('c');
       }
    }

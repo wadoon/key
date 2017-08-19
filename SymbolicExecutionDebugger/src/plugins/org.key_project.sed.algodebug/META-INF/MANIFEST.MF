@@ -16,10 +16,13 @@ Require-Bundle: org.eclipse.ui,
  com.ibm.icu,
  org.key_project.sed.ui.visualization,
  org.eclipse.ui.workbench.texteditor;bundle-version="3.9.0",
- org.eclipse.jface
+ org.eclipse.jface,
+ org.key_project.sed.key.core,
+ org.key_project.core.symbolic_execution
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
-Import-Package: org.eclipse.debug.internal.ui,
+Import-Package: de.uka.ilkd.key.java.reference,
+ org.eclipse.debug.internal.ui,
  org.eclipse.debug.internal.ui.actions,
  org.eclipse.debug.internal.ui.actions.variables,
  org.eclipse.debug.internal.ui.preferences,

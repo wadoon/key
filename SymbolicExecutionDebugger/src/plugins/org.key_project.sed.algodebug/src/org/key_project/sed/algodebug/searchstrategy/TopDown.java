@@ -5,8 +5,8 @@ import java.util.Deque;
 import java.util.LinkedList;
 
 import org.eclipse.debug.core.DebugException;
-import org.key_project.sed.algodebug.model.Call;
-import org.key_project.sed.algodebug.model.CallPath;
+import org.key_project.sed.algodebug.model.Question;
+import org.key_project.sed.algodebug.model.QuestionPath;
 import org.key_project.sed.core.model.ISEBaseMethodReturn;
 import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEExceptionalTermination;
@@ -17,13 +17,13 @@ import org.key_project.sed.core.model.ISEThread;
 public class TopDown implements ISearchStrategy {
 
    @Override
-   public ArrayList<CallPath> generateCallTree(ISENode root) {
-      final ArrayList<CallPath> tree = new ArrayList<CallPath>();
+   public ArrayList<QuestionPath> generateCallTree(ISENode root) {
+      final ArrayList<QuestionPath> tree = new ArrayList<QuestionPath>();
       generatePaths(root, tree);
       return tree;
    }
 
-   private void generatePaths(ISENode node, ArrayList<CallPath> tree){
+   private void generatePaths(ISENode node, ArrayList<QuestionPath> tree){
       try {
          //System.out.println("Generating Paths");
          if(!node.hasChildren()) { //Bei einem Blatt angekommen
@@ -45,10 +45,10 @@ public class TopDown implements ISearchStrategy {
     * Erzeugt einen Path indem es von einem Blatt zur Wurzel läuft
     * @author Peter Schauberger
     */
-   private CallPath getPath(ISENode leaf){
+   private QuestionPath getPath(ISENode leaf){
       try {
          ISENode node = leaf;
-         CallPath path = new CallPath();
+         QuestionPath path = new QuestionPath();
          Deque<ISENode> deque = new LinkedList<ISENode>();
          ISENode exception = null;
 
@@ -63,11 +63,11 @@ public class TopDown implements ISearchStrategy {
             else if(node instanceof ISEMethodCall){
                //System.out.println("Adding Call: From "+node.getName() + "to"+deque.peekFirst().getName());
                if( deque.isEmpty() && exception != null )
-                  path.addCall(new Call(node, exception));
+                  path.addCall(new Question(node, exception));
                else if(!( deque.peekFirst() instanceof ISEExceptionalMethodReturn))
-                  path.addCall(new Call(node, deque.pop()));
+                  path.addCall(new Question(node, deque.pop()));
                else
-                  path.addCall(new Call(node, deque.peekFirst()));
+                  path.addCall(new Question(node, deque.peekFirst()));
             }
             node = node.getParent();
          }

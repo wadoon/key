@@ -5,8 +5,8 @@ import java.util.Deque;
 import java.util.LinkedList;
 
 import org.eclipse.debug.core.DebugException;
-import org.key_project.sed.algodebug.model.Call;
-import org.key_project.sed.algodebug.model.CallPath;
+import org.key_project.sed.algodebug.model.Question;
+import org.key_project.sed.algodebug.model.QuestionPath;
 import org.key_project.sed.core.annotation.impl.AlgorithmicDebugCorrectAnnotationType;
 import org.key_project.sed.core.model.ISEBaseMethodReturn;
 import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
@@ -16,21 +16,25 @@ import org.key_project.sed.core.model.ISEMethodReturn;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.util.SEAnnotationUtil;
+import org.key_project.sed.key.core.model.KeYMethodCall;
+import org.key_project.sed.key.core.model.KeYMethodReturn;
+
+//import de.uka.ilkd.key.proof.init.ProofInputException;
 
 public class SingleStepping implements ISearchStrategy {
 
    public SingleStepping(){
-      this.tree = new ArrayList<CallPath>();
+      this.tree = new ArrayList<QuestionPath>();
    }
 
-   private ArrayList<CallPath> tree;
+   private ArrayList<QuestionPath> tree;
 
    @Override
-   public ArrayList<CallPath> generateCallTree(ISENode root) {
+   public ArrayList<QuestionPath> generateCallTree(ISENode root) {
       return generatePaths(root);
    }
 
-   public ArrayList<CallPath> generatePaths(ISENode node){
+   public ArrayList<QuestionPath> generatePaths(ISENode node){
       try {
          //System.out.println("Generating Paths");
          if(!node.hasChildren()) { //Bei einem Blatt angekommen
@@ -51,7 +55,7 @@ public class SingleStepping implements ISearchStrategy {
    }
 
    private void addPath(ISENode leaf){
-      CallPath path = new CallPath();
+      QuestionPath path = new QuestionPath();
       ArrayList<ISENode> list = getListOfPathNodes(leaf);
       for(ISENode node : list){
          if(node instanceof ISEMethodReturn || node instanceof ISEExceptionalMethodReturn){
@@ -66,7 +70,7 @@ public class SingleStepping implements ISearchStrategy {
             }
             do{
                if((temp instanceof ISEMethodCall) && stack.isEmpty()){
-                  path.addCall(new Call(temp, node));
+                  path.addCall(new Question(temp, node));
                   break;}
                else if(temp instanceof ISEMethodReturn)
                   stack.push(temp);
