@@ -128,12 +128,12 @@ public class ListOfMethodCallTrees {
       int counter = 0;
       if(nodelist.size() > 1){
          for(ISENode node : nodelist){
-            nodecount++;
             if(node == start) 
                continue;
             if((node instanceof ISEMethodCall) && counter == 0){
                counter++;
-               calllist.add(generateMethodCallTree(node, (List<ISENode>)nodelist.subList(nodecount, nodelist.size())));
+               int ende = nodelist.size();
+               calllist.add(generateMethodCallTree(node, (List<ISENode>)nodelist.subList(nodecount, ende)));
             }
             else if(((node instanceof ISEMethodReturn) && counter == 0) ) {
                return new MethodCall(start, node, calllist);
@@ -142,11 +142,14 @@ public class ListOfMethodCallTrees {
                counter--;
             else if((node instanceof ISEMethodCall) && counter != 0) 
                counter++;
+            nodecount++;
          }
       }
       else{
-         return new MethodCall(start, start, calllist);}
-      return new MethodCall(start, nodelist.get(nodelist.size()-1), calllist);
+         return new MethodCall(start, start, calllist);
+         }
+      int zahl = nodelist.size()-1;
+      return new MethodCall(start, nodelist.get(zahl), calllist);
    }
 
    private List<ISENode> getListOfPathNodes(ISENode leaf){
