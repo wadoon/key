@@ -52,7 +52,7 @@ public class AlgorithmicDebug  {
             e.printStackTrace();
          }
          ListOfMethodCallTrees testList = new ListOfMethodCallTrees();
-         testList.generateListOfCallTrees(root);
+         testList.generateListOfMethodCallTrees(root);
          testList.printTree();
          if(strategy.equals("Bottom Up"))
             tree.generateCallTree(root, "BottomUp");

@@ -43,7 +43,7 @@ public class ListOfMethodCallTrees {
       this.listOfMethodCallTrees = new ArrayList<MethodCall>();
 
    }
-   
+
    private ISearchStrategy searchStrategy = null; 
 
    /*
@@ -67,37 +67,38 @@ public class ListOfMethodCallTrees {
          addParentsToSubTree(call);
       }
    }
-   
+
    private void addParentsToSubTree(MethodCall call){
       for(MethodCall subCall:call.getListOfCalledMethods()){
          subCall.setParent(call);
          addParentsToSubTree(subCall);
       }
    }
-   
-   public void generateListOfCallTrees(ISENode node){
+
+   public void generateListOfMethodCallTrees(ISENode node){
       try {
          //System.out.println("Generating Paths");
          if(!node.hasChildren()) { //Bei einem Blatt angekommen
             List<ISENode> list =  getListOfPathNodes(node);
-//            System.out.println("PrintList");
-//            for(ISENode printme :list){
-//               try {
-//                  System.out.println(printme.getName().toString());
-//               }
-//               catch (DebugException e) {
-//                  // TODO Auto-generated catch block
-//                  e.printStackTrace();
-//               }
-//            }
-            MethodCall tree = generateSubTree(list.get(0), list);
+//            printNodeList(list);
+            //            System.out.println("PrintList");
+            //            for(ISENode printme :list){
+            //               try {
+            //                  System.out.println(printme.getName().toString());
+            //               }
+            //               catch (DebugException e) {
+            //                  // TODO Auto-generated catch block
+            //                  e.printStackTrace();
+            //               }
+            //            }
+            MethodCall tree = generateMethodCallTree(list.get(0), list);
             tree.setMethodCallTreeCompletelySearched(false);
             tree.setRoot();
             listOfMethodCallTrees.add(tree);
          }
          else{
             for(ISENode child : node.getChildren()){ //Es gibt Kind-Knoten: Für jeden neuen Pfad hinzufügen
-               generateListOfCallTrees(child);
+               generateListOfMethodCallTrees(child);
             }
          }
       }
@@ -108,52 +109,44 @@ public class ListOfMethodCallTrees {
 
    }
 
-   private MethodCall generateSubTree(ISENode start, List<ISENode> nodelist){
+   private void printNodeList(List<ISENode> nodelist){
+      System.out.println("\n neue Knotenliste:");
+      for(ISENode node : nodelist){
+         try {
+            System.out.println(node.getName().toString());
+         }
+         catch (DebugException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+      }
+   }
+
+   private MethodCall generateMethodCallTree(ISENode start, List<ISENode> nodelist){
       ArrayList<MethodCall> calllist = new ArrayList<MethodCall>();
       int nodecount = 0;
       int counter = 0;
-      ISENode stop = null;
-      if(!nodelist.isEmpty()){
-         List<ISENode> nodelistIntern = nodelist.subList(1, nodelist.size()-1);
-         for(ISENode node : nodelistIntern){
+      if(nodelist.size() > 1){
+         for(ISENode node : nodelist){
             nodecount++;
+            if(node == start) 
+               continue;
             if((node instanceof ISEMethodCall) && counter == 0){
                counter++;
-               calllist.add(generateSubTree(node, (List<ISENode>)nodelist.subList(nodecount, nodelist.size()-1)));
-//               try {
-//                  System.out.println("Füge Subtree hinzu: Oberknoten" +start.getName().toString() +" Unternkoten "+node.getName().toString());
-//               }
-//               catch (DebugException e) {
-//                  // TODO Auto-generated catch block
-//                  e.printStackTrace();
-//               }
+               calllist.add(generateMethodCallTree(node, (List<ISENode>)nodelist.subList(nodecount, nodelist.size())));
             }
-            else if((node instanceof ISEMethodReturn) && counter == 0) {
-               counter--;
+            else if(((node instanceof ISEMethodReturn) && counter == 0) ) {
                return new MethodCall(start, node, calllist);
             }
             else if((node instanceof ISEMethodReturn) && counter != 0) 
                counter--;
             else if((node instanceof ISEMethodCall) && counter != 0) 
                counter++;
-            else if((node instanceof ISEExceptionalMethodReturn)){ 
-//               System.out.println("Exceptional Method Return");
-               stop = node;
-               break;
-            }
-
          }
       }
-      //      try {
-      //         System.out.println("Füge Call hinzu: " +start.getName().toString() +" Unternkoten "+stop.getName().toString());
-      //      }
-      //      catch (DebugException e) {
-      //         // TODO Auto-generated catch block
-      //         e.printStackTrace();
-      //      }
-      if(stop == null)
-         System.out.println("");
-      return new MethodCall(start, stop, calllist);
+      else{
+         return new MethodCall(start, start, calllist);}
+      return new MethodCall(start, nodelist.get(nodelist.size()-1), calllist);
    }
 
    private List<ISENode> getListOfPathNodes(ISENode leaf){
@@ -184,13 +177,13 @@ public class ListOfMethodCallTrees {
    private void  printListOfCallTrees(MethodCall oberknoten){
       if(!oberknoten.getListOfCalledMethods().isEmpty()){
 
-      try {
-         System.out.println("OberKnoten von: "+(oberknoten.getCall()).getName().toString() + " nach: " + (oberknoten.getMethodReturn()).getName().toString());
-      }
-      catch (DebugException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      }}
+         try {
+            System.out.println("OberKnoten von: "+(oberknoten.getCall()).getName().toString() + " nach: " + (oberknoten.getMethodReturn()).getName().toString());
+         }
+         catch (DebugException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }}
       for(MethodCall unterknoten : oberknoten.getListOfCalledMethods()){
          try {
             System.out.println("Unterknoten von: "+(unterknoten.getCall()).getName().toString()+" nach: "+(unterknoten.getMethodReturn()).getName().toString());
@@ -200,7 +193,7 @@ public class ListOfMethodCallTrees {
             // TODO Auto-generated catch block
             e.printStackTrace();
          }
- 
+
       }
       if(!oberknoten.getListOfCalledMethods().isEmpty()){
          for(MethodCall unterknoten2 : oberknoten.getListOfCalledMethods()){

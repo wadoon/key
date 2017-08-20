@@ -41,7 +41,7 @@ public class AlgorithmicDebug2  {
    private boolean searchCompletedButNoBugFound = false;
 
    public void generateTree(ISENode root){
-      listOfMethodCallTrees.generateListOfCallTrees(root);
+      listOfMethodCallTrees.generateListOfMethodCallTrees(root);
       listOfMethodCallTrees.addParentsToTree();
       //      listOfMethodCallTrees.printTree();
    }
