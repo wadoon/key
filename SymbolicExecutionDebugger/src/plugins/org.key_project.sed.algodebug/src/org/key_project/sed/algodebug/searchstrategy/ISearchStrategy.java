@@ -1,10 +1,14 @@
 package org.key_project.sed.algodebug.searchstrategy;
 
-import java.util.ArrayList;
-
-import org.key_project.sed.algodebug.model.QuestionPath;
-import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.algodebug.model.MethodCall;
 
 public interface ISearchStrategy {
-   public ArrayList<QuestionPath> generateCallTree(ISENode root);
+   public MethodCall getNext(MethodCall tree);
+   public void markBug(MethodCall methodCall, char correctness);
+   public void setMethodCallCorrectness(MethodCall methodCall, char correctness);
+   public boolean treeCompletelySearched();
+   public void reset();
+   public boolean bugFound();
+   public MethodCall getBug();
+   public boolean seachCompletedButNoBugFound();
 }

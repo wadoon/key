@@ -1,4 +1,4 @@
-package org.key_project.sed.algodebug.model2;
+package org.key_project.sed.algodebug.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,10 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.debug.core.DebugException;
-import org.key_project.sed.algodebug.searchstrategy.ISearchStrategy;
-import org.key_project.sed.algodebug.searchstrategy.BottomUp;
-import org.key_project.sed.algodebug.searchstrategy.SingleStepping;
-import org.key_project.sed.algodebug.searchstrategy.TopDown;
 import org.key_project.sed.core.model.ISEBaseMethodReturn;
 import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
 import org.key_project.sed.core.model.ISEExceptionalTermination;
@@ -44,23 +40,6 @@ public class ListOfMethodCallTrees {
 
    }
 
-   private ISearchStrategy searchStrategy = null; 
-
-   /*
-    * Iterator for lists of paths
-    * @author Peter Schauberger
-    */
-   private int methodCallTreeIterator;
-
-   /*
-    * iterator for the list of calls of a specific path
-    */
-   private int methodCallIterator;
-
-   public void setTraversalStrategy(ISearchStrategy strategy){
-      this.searchStrategy = strategy;
-   }
-
    public void addParentsToTree(){
       for(MethodCall call:listOfMethodCallTrees){
          call.setParent(null);
@@ -80,14 +59,13 @@ public class ListOfMethodCallTrees {
          //System.out.println("Generating Paths");
          if(!node.hasChildren()) { //Bei einem Blatt angekommen
             List<ISENode> list =  getListOfPathNodes(node);
-//            printNodeList(list);
+            //            printNodeList(list);
             //            System.out.println("PrintList");
             //            for(ISENode printme :list){
             //               try {
             //                  System.out.println(printme.getName().toString());
             //               }
             //               catch (DebugException e) {
-            //                  // TODO Auto-generated catch block
             //                  e.printStackTrace();
             //               }
             //            }
@@ -103,22 +81,7 @@ public class ListOfMethodCallTrees {
          }
       }
       catch (DebugException e) {
-         // TODO Auto-generated catch block
          e.printStackTrace();
-      }
-
-   }
-
-   private void printNodeList(List<ISENode> nodelist){
-      System.out.println("\n neue Knotenliste:");
-      for(ISENode node : nodelist){
-         try {
-            System.out.println(node.getName().toString());
-         }
-         catch (DebugException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-         }
       }
    }
 
@@ -147,27 +110,35 @@ public class ListOfMethodCallTrees {
       }
       else{
          return new MethodCall(start, start, calllist);
-         }
+      }
       int zahl = nodelist.size()-1;
       return new MethodCall(start, nodelist.get(zahl), calllist);
    }
 
+   private void printNodeList(List<ISENode> nodelist){
+      System.out.println("\n neue Knotenliste:");
+      for(ISENode node : nodelist){
+         try {
+            System.out.println(node.getName().toString());
+         }
+         catch (DebugException e) {
+            e.printStackTrace();
+         }
+      }
+   }
+   
    private List<ISENode> getListOfPathNodes(ISENode leaf){
       ISENode node = leaf;
       List<ISENode> list = new ArrayList<ISENode>();
-      //            System.out.println("Generiere Pfad-Liste:");
       while(!(node instanceof ISEThread)){
          list.add(0, node);
          try {
             node = node.getParent();
          }
          catch (DebugException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
          }
       }
-      //      Collections.reverse(list);
-
       return list;
    }
 
@@ -184,7 +155,6 @@ public class ListOfMethodCallTrees {
             System.out.println("OberKnoten von: "+(oberknoten.getCall()).getName().toString() + " nach: " + (oberknoten.getMethodReturn()).getName().toString());
          }
          catch (DebugException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
          }}
       for(MethodCall unterknoten : oberknoten.getListOfCalledMethods()){
@@ -193,7 +163,6 @@ public class ListOfMethodCallTrees {
             //            printListOfCallTrees(unterknoten);
          }
          catch (DebugException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
          }
 

@@ -1,4 +1,4 @@
-package org.key_project.sed.algodebug.model2;
+package org.key_project.sed.algodebug.model;
 
 import java.util.ArrayList;
 import java.util.Collections;

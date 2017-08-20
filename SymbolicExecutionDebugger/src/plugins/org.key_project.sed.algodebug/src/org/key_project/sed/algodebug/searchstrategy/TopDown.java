@@ -1,84 +1,101 @@
 package org.key_project.sed.algodebug.searchstrategy;
 
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.LinkedList;
-
 import org.eclipse.debug.core.DebugException;
-import org.key_project.sed.algodebug.model.Question;
-import org.key_project.sed.algodebug.model.QuestionPath;
-import org.key_project.sed.core.model.ISEBaseMethodReturn;
-import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
-import org.key_project.sed.core.model.ISEExceptionalTermination;
-import org.key_project.sed.core.model.ISEMethodCall;
-import org.key_project.sed.core.model.ISENode;
-import org.key_project.sed.core.model.ISEThread;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.ui.PlatformUI;
+import org.key_project.sed.algodebug.model.MethodCall;
+import org.key_project.sed.algodebug.util.MCTUtil;
+import org.key_project.sed.algodebug.util.SETUtil;
 
-public class TopDown implements ISearchStrategy {
+public class TopDown extends SearchStrategy implements ISearchStrategy {
+
+   private MethodCall lastAskedMethod;
+   private MethodCall root;
+   /*
+    * return null wenn kein nächster Method Call gefunden werden kann
+    * -----> weil der Baum komplett abgesucht wurde
+    * -----> weil ein Bug gefunden wurde
+    * return nächsten abzufragenden Method Call sonst
+    */
+   @Override
+   public MethodCall getNext(MethodCall tree) {
+      if(lastAskedMethod == null){
+         root = tree;
+         lastAskedMethod = tree;
+         return tree;
+      }
+      else if(lastAskedMethod.isRoot() && lastAskedMethod.getCorrectness() == 'c'){
+         searchCompletedButNoBugFound = true;
+         lastAskedMethod.setMethodCallTreeCompletelySearched(true);
+         return null;
+      }
+      else if(lastAskedMethod.getCorrectness() == 'f' ){
+         if(MCTUtil.isEveryChildMarkedAs(lastAskedMethod, 'c')){
+            bugFound = true;
+            bug = lastAskedMethod;
+            return null;
+         }
+         for(MethodCall child : lastAskedMethod.getListOfCalledMethods()){
+            if(child.getCorrectness() == 'u'){
+               lastAskedMethod = child;
+               return child;
+            }
+         }
+         //Methode inkorrekt und alle Aufrufe korrekt: Methode ist Bug
+         bugFound = true;
+         bug = lastAskedMethod;
+         return null;
+      }
+      else if(lastAskedMethod.getCorrectness() == 'c'){
+         //            SETUtil.annotateMethodCallCorrect(lastAskedMethod);
+         if(!lastAskedMethod.isRoot()){
+            if(MCTUtil.isEveryChildMarkedAs(lastAskedMethod.getParent(), 'c')){
+               bugFound = true;
+               bug = lastAskedMethod.getParent();
+               return null;
+            }
+         }
+         for(MethodCall sibling : lastAskedMethod.getParent().getListOfCalledMethods()){
+            if(sibling.getCorrectness() == 'u'){
+               lastAskedMethod = sibling;
+               return sibling;
+            }
+         }
+      }
+      //kein Bug gefunden
+      root.setMethodCallTreeCompletelySearched(true);
+      searchCompletedButNoBugFound = true;
+      return null;
+   }
+
+   public void reset(){
+      lastAskedMethod = null;
+      root = null;
+      searchCompletedButNoBugFound = false;
+   }
 
    @Override
-   public ArrayList<QuestionPath> generateCallTree(ISENode root) {
-      final ArrayList<QuestionPath> tree = new ArrayList<QuestionPath>();
-      generatePaths(root, tree);
-      return tree;
+   public void markBug(MethodCall methodCall, char correctness) {
+      // TODO Auto-generated method stub
    }
 
-   private void generatePaths(ISENode node, ArrayList<QuestionPath> tree){
-      try {
-         //System.out.println("Generating Paths");
-         if(!node.hasChildren()) { //Bei einem Blatt angekommen
-            tree.add(getPath(node));
-         }
-         else{
-            for(ISENode child : node.getChildren()){ //Es gibt Kind-Knoten: Für jeden neuen Pfad hinzufügen
-               generatePaths(child, tree);
-            }
-         }
-      }
-      catch (DebugException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      }
+   @Override
+   public void setMethodCallCorrectness(MethodCall methodCall, char correctness) {
+      methodCall.setMethodCallCorrectness(correctness);
    }
 
-   /*
-    * Erzeugt einen Path indem es von einem Blatt zur Wurzel läuft
-    * @author Peter Schauberger
-    */
-   private QuestionPath getPath(ISENode leaf){
-      try {
-         ISENode node = leaf;
-         QuestionPath path = new QuestionPath();
-         Deque<ISENode> deque = new LinkedList<ISENode>();
-         ISENode exception = null;
+   @Override
+   public boolean treeCompletelySearched() {
+      if(root.getCorrectness() == 'c')
+         return true;
+      else 
+         return false;
+   }
 
-         if(leaf instanceof ISEExceptionalTermination)
-            exception = leaf;
-
-         while(!(node instanceof ISEThread)){
-            if(node instanceof ISEBaseMethodReturn){
-               deque.push(node);
-               //System.out.println("Pushing"+node.getName());
-            }
-            else if(node instanceof ISEMethodCall){
-               //System.out.println("Adding Call: From "+node.getName() + "to"+deque.peekFirst().getName());
-               if( deque.isEmpty() && exception != null )
-                  path.addCall(new Question(node, exception));
-               else if(!( deque.peekFirst() instanceof ISEExceptionalMethodReturn))
-                  path.addCall(new Question(node, deque.pop()));
-               else
-                  path.addCall(new Question(node, deque.peekFirst()));
-            }
-            node = node.getParent();
-         }
-         path.reversePath();
-         return path;
-      }
-      catch (DebugException e) {
-         // TODO Auto-generated catch block
-         e.printStackTrace();
-      }
-      return null;
+   @Override
+   public MethodCall getBug() {
+      //      SETUtil.annotateNodesFalseWithoutCalledCalls(bug);
+      return bug;
    }
 
 }

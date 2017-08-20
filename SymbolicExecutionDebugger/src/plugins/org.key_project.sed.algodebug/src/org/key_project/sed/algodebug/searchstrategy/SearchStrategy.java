@@ -1,6 +1,6 @@
-package org.key_project.sed.algodebug.searchstrategy2;
+package org.key_project.sed.algodebug.searchstrategy;
 
-import org.key_project.sed.algodebug.model2.MethodCall;
+import org.key_project.sed.algodebug.model.MethodCall;
 
 public class SearchStrategy {
    protected boolean searchCompletedButNoBugFound = false;
@@ -8,15 +8,15 @@ public class SearchStrategy {
    protected MethodCall bug;
 
    public SearchStrategy(){
-      
+
    }
-   
+
    public boolean seachCompletedButNoBugFound() {
       return searchCompletedButNoBugFound;
    }
-   
+
    public boolean bugFound() {
       return bugFound;
    }
-   
+
 }

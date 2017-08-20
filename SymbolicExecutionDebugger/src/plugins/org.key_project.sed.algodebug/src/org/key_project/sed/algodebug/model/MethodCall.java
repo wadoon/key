@@ -1,4 +1,4 @@
-package org.key_project.sed.algodebug.model2;
+package org.key_project.sed.algodebug.model;
 
 import java.util.ArrayList;
 
@@ -13,33 +13,33 @@ public class MethodCall {
    }
 
    private boolean root;
-   
+
    private boolean methodCallTreeCompletelySearched;
-   
+
    public MethodCall(ISENode start, ISENode ret, ArrayList<MethodCall> listOfCalledMethods) {
       methodCall = start;
       this.methodReturn = ret;
       this.listOfCalledMethods = listOfCalledMethods;
       correctness = 'u';
    }
-   
+
    public void setRoot(){
       root = true;
    }
-   
+
    public boolean isRoot(){
       return root;
    }
-   
+
    public boolean completelySearched(){
       if(methodCallTreeCompletelySearched)
          return true;
       else
          return false;
    }
-   
+
    private MethodCall parent;
-   
+
    /**
     * @return the parent
     */
@@ -59,7 +59,7 @@ public class MethodCall {
    private ISENode methodReturn;
 
    private ArrayList<MethodCall> listOfCalledMethods;
-   
+
    /**
     * @return the listOfCalledCalls
     */
@@ -135,7 +135,7 @@ public class MethodCall {
    public void setMethodCallTreeCompletelySearched(boolean b) {
       methodCallTreeCompletelySearched = b ;
    }
-   
+
    public boolean getMethodCallTreeCompletelySearched(){
       return methodCallTreeCompletelySearched;
    }

@@ -1,7 +1,7 @@
 package org.key_project.sed.algodebug.util;
 
 import org.eclipse.debug.core.DebugException;
-import org.key_project.sed.algodebug.model2.MethodCall;
+import org.key_project.sed.algodebug.model.MethodCall;
 import org.key_project.sed.core.annotation.ISEAnnotation;
 import org.key_project.sed.core.annotation.ISEAnnotationType;
 import org.key_project.sed.core.annotation.impl.AlgorithmicDebugCorrectAnnotation;
@@ -24,7 +24,7 @@ import org.key_project.util.java.IFilter;
  * Die Klasse SETUtil enthält Hilfsklassen die auf dem SET arbeiten und der Übersichtlichkeit ausgelagert wurden.
  */
 public class SETUtil {
-   
+
    public static void annotateMethodCallCorrect(MethodCall methodCall){
       ISENode node = methodCall.getMethodReturn();
       try {
@@ -37,7 +37,7 @@ public class SETUtil {
          e.printStackTrace();
       }
    }
-   
+
    public static void highlightNode(ISENode node) {  
 
       ISEAnnotationType annotationTypeHighlight = SEAnnotationUtil.getAnnotationtype(HighlightAnnotationType.TYPE_ID);   
@@ -246,6 +246,31 @@ public class SETUtil {
 
    public static void annotateCallFalse(MethodCall call){
       call.setMethodCallCorrectness('f');
+      ISENode node = call.getMethodReturn();
+      try {
+         while(node != call.getCall().getParent()){
+            annotateSETNode(node, 'f');
+            node = node.getParent();
+         }
+      }
+      catch (DebugException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
+   }
+
+   public void annotateCallCorrect(MethodCall methodCall){
+      ISENode node = methodCall.getMethodReturn();
+      try {
+         while(node != methodCall.getCall().getParent() && !(node instanceof ISEBranchStatement && ! hasNotCorrectAnnotatedChildren(node)) ){
+            annotateSETNode(node, 'c');
+            node = node.getParent();
+         }
+      }
+      catch (DebugException e) {
+         // TODO Auto-generated catch block
+         e.printStackTrace();
+      }
    }
 
    /*

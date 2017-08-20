@@ -14,7 +14,6 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.key_project.sed.algodebug.provider.ExecutionTreeNodeListContentProvider;
 import org.key_project.sed.algodebug.provider.ExecutionTreeNodeListLabelProvider;
@@ -60,19 +59,8 @@ public class VariablesSelectionView extends ViewPart {
    public void clear(){
       viewerLeft.setInput(null);
       viewerRight.setInput(null);
-      
-//      IViewPart partLeft = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView("VariablesViewLeft");
-//      if (partLeft instanceof AlgorithmicDebugVariablesView) {
-//         AlgorithmicDebugVariablesView view = (AlgorithmicDebugVariablesView) partLeft;
-//         view.debugContextChanged(new DebugContextEvent( IDCProvider, org.eclipse.jface.viewers.StructuredSelection.EMPTY, 1));
-//      }
-//      IViewPart partRight = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView("VariablesViewRight");
-//      if (partRight instanceof AlgorithmicDebugVariablesView) {
-//         AlgorithmicDebugVariablesView view = (AlgorithmicDebugVariablesView) partRight;
-//         view.debugContextChanged(new DebugContextEvent( IDCProvider, org.eclipse.jface.viewers.StructuredSelection.EMPTY, 1));
-//      }
    }
-   
+
    /*
     * IDCProvider: Dummy Provider, needed only as Parameter for variables view
     */
@@ -130,7 +118,7 @@ public class VariablesSelectionView extends ViewPart {
          }
       });
    }
-   
+
    @Override
    public void createPartControl(Composite parent) {
 
@@ -153,5 +141,5 @@ public class VariablesSelectionView extends ViewPart {
    @Override
    public void setFocus() {
    }
-   
+
 }

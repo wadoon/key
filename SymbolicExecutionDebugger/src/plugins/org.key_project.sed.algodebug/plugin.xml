@@ -28,18 +28,6 @@
             name="myVariablesView"
             restorable="true">
       </view>
-      <view
-            class="org.key_project.sed.algodebug.view.AlgorithmicDebugView2"
-            id="org.key_project.sed.ui.view.AlgorithmicDebugView2"
-            name="Algorithmic Debug2"
-            restorable="true">
-      </view>
-      <view
-            class="org.key_project.sed.algodebug.view.VariablesSelectionView2"
-            id="org.key_project.sed.ui.view.VariablesSelectionView2"
-            name="VariablesSelectionView2"
-            restorable="true">
-      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">
