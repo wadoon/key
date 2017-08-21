@@ -43,10 +43,6 @@ public class AlgorithmicDebug  {
       //      listOfMethodCallTrees.printTree();
    }
 
-   public void markBuggyMethodCall(MethodCall methodCall){
-      searchStrategy.markBug(methodCall, 'f');
-   }
-
    public MethodCall getBug(){
       return bug;
    }
@@ -78,7 +74,7 @@ public class AlgorithmicDebug  {
                      bugFound = true;
                      return null;
                   }
-                  else if(searchStrategy.seachCompletedButNoBugFound()){
+                  else if(searchStrategy.searchCompletedButNoBugFound()){
                      continue;
                   }
             }
@@ -95,7 +91,7 @@ public class AlgorithmicDebug  {
                bugFound = true;
                return null;
             }
-            else if(searchStrategy.seachCompletedButNoBugFound()){
+            else if(searchStrategy.searchCompletedButNoBugFound()){
                return searchBugInListOfMethodCallTrees();
             }
       }
@@ -110,19 +106,6 @@ public class AlgorithmicDebug  {
     */
    private MethodCall searchBugInMethodCallTree(MethodCall methodCallTree){
       return searchStrategy.getNext(methodCallTree);
-   }
-
-   private boolean wasEveryCallOfExecutionTreeAsked(MethodCall tree){
-      boolean childrenCorrectness = true;
-      for(MethodCall child : tree.getListOfCalledMethods()){
-         childrenCorrectness = childrenCorrectness & wasEveryCallOfExecutionTreeAsked(child);
-         if(!childrenCorrectness)
-            return false;
-      }
-      if(tree.getCorrectness() == 'u')
-         return false;
-      else 
-         return true;
    }
 
    public MethodCall getNext(){
@@ -195,10 +178,6 @@ public class AlgorithmicDebug  {
     */
    public void markCall(MethodCall methodCall, char correctness){
       searchStrategy.setMethodCallCorrectness(methodCall, correctness);
-   }
-
-   public void markBug(MethodCall methodCall, char correctness){
-      searchStrategy.markBug(methodCall, correctness); 
    }
 
    public void setSearchStrategy(ISearchStrategy strategy) {

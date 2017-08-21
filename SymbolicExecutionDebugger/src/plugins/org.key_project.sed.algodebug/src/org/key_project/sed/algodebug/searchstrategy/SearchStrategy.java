@@ -11,12 +11,15 @@ public class SearchStrategy {
 
    }
 
-   public boolean seachCompletedButNoBugFound() {
+   public boolean searchCompletedButNoBugFound() {
       return searchCompletedButNoBugFound;
    }
 
    public boolean bugFound() {
       return bugFound;
    }
-
+   
+   public MethodCall getBug() {
+      return bug;
+   }
 }

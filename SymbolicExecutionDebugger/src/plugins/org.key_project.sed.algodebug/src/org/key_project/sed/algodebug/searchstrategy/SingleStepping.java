@@ -1,8 +1,6 @@
 package org.key_project.sed.algodebug.searchstrategy;
 
 import org.key_project.sed.algodebug.model.MethodCall;
-import org.key_project.sed.algodebug.util.MCTUtil;
-import org.key_project.sed.algodebug.util.SETUtil;
 
 public class SingleStepping extends SearchStrategy implements ISearchStrategy {
 
@@ -10,32 +8,42 @@ public class SingleStepping extends SearchStrategy implements ISearchStrategy {
 
    @Override
    public MethodCall getNext(MethodCall tree) {
-      MethodCall call = MCTUtil.getFirstUnMarkedChild(tree);
-      if(call == null){
+      if(root == null)
+         root = tree;
+      switch(tree.getCorrectness()){
+      case 'f':{
+         bugFound = true;
+         bug = tree;
+         return null;
+      }
+      case 'c':{
+         root.setMethodCallTreeCompletelySearched(true);
          searchCompletedButNoBugFound = true;
          return null;
       }
-      else{
-         //            for(MethodCall child : )
+      case 'u':{
+         for(MethodCall child : tree.getListOfCalledMethods()){
+            switch(child.getCorrectness()){
+            case 'f':         
+               bugFound = true;
+               bug = child;
+               return null;
+            case 'c':
+               continue;
+            case 'u':
+               return getNext(child);
+            }
+         }
+         return tree;
+      }
+      
       }
       return null;
    }
 
    @Override
-   public void markBug(MethodCall methodCall, char correctness) {
-      SETUtil.annotateNodesFalseWithoutCalledCalls(methodCall);
-   }
-
-   public boolean searchBug(MethodCall methodCall) {
-      if(methodCall.getCorrectness() == 'f' )
-         return true;
-      else
-         return false;
-   }
-
-   @Override
    public void setMethodCallCorrectness(MethodCall methodCall, char correctness) {
-      // TODO Auto-generated method stub
+      methodCall.setMethodCallCorrectness(correctness);
    }
 
    @Override
@@ -48,18 +56,7 @@ public class SingleStepping extends SearchStrategy implements ISearchStrategy {
 
    @Override
    public void reset() {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
-   public boolean bugFound() {
-      // TODO Auto-generated method stub
-      return false;
-   }
-
-   @Override
-   public MethodCall getBug() {
-      // TODO Auto-generated method stub
-      return null;
+      root = null;
+      searchCompletedButNoBugFound = false;
    }
 }

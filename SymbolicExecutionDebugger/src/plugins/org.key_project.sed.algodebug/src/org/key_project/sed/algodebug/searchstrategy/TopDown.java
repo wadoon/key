@@ -1,11 +1,7 @@
 package org.key_project.sed.algodebug.searchstrategy;
 
-import org.eclipse.debug.core.DebugException;
-import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.ui.PlatformUI;
 import org.key_project.sed.algodebug.model.MethodCall;
 import org.key_project.sed.algodebug.util.MCTUtil;
-import org.key_project.sed.algodebug.util.SETUtil;
 
 public class TopDown extends SearchStrategy implements ISearchStrategy {
 
@@ -75,11 +71,6 @@ public class TopDown extends SearchStrategy implements ISearchStrategy {
    }
 
    @Override
-   public void markBug(MethodCall methodCall, char correctness) {
-      // TODO Auto-generated method stub
-   }
-
-   @Override
    public void setMethodCallCorrectness(MethodCall methodCall, char correctness) {
       methodCall.setMethodCallCorrectness(correctness);
    }
@@ -91,11 +82,4 @@ public class TopDown extends SearchStrategy implements ISearchStrategy {
       else 
          return false;
    }
-
-   @Override
-   public MethodCall getBug() {
-      //      SETUtil.annotateNodesFalseWithoutCalledCalls(bug);
-      return bug;
-   }
-
 }

@@ -75,6 +75,20 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       variablesSelectionView = workbenchpage.showView("org.key_project.sed.ui.view.VariablesSelectionView",null,IWorkbenchPage.VIEW_ACTIVATE);
    }
 
+   String[] items = { "Single Stepping","Top Down" };
+
+   /*
+    * setsearchstrategy
+    * Create new Strategy Object for searching based on user decision at combo
+    * See Strategy Patten
+    */
+   private void setsearchstrategy(){
+      switch (combo.getText()){
+      case "Single Stepping": debug.setSearchStrategy(new SingleStepping()); break;
+      case "Top Down": debug.setSearchStrategy(new TopDown()); break;
+      }
+   }
+   
    /*
     * setzt den aktuell abgefragten Method Call auf korrekt und holt anschließend einen neuen
     * wenn der nächste abzufragende Method Call == null ist, frage im debug, über aufrufen von askDebugWhyThereIsNoNextMethodToAsk, was los ist
@@ -242,21 +256,6 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
          view.clear();
       }
    }
-
-   String[] items = { "Top Down", "Single Stepping", "Bottom Up" };
-
-   /*
-    * setsearchstrategy
-    * Create new Strategy Object for searching based on user decision at combo
-    * See Strategy Patten
-    */
-   private void setsearchstrategy(){
-      switch (combo.getText()){
-      case "Top Down": debug.setSearchStrategy(new TopDown()); break;
-      case "Single Stepping": debug.setSearchStrategy(new SingleStepping()); break;
-      }
-   }
-
 
    public void dispose(){
       //      clear();
