@@ -2047,6 +2047,10 @@ public class TermBuilder {
     public Term getHist() {
     	return var(services.getTypeConverter().getServiceEventLDT().getHist());
     }
+    
+    public Term getInternalHist() {
+        return var(services.getTypeConverter().getRemoteMethodEventLDT().getInternalHist());
+    }
 
     //getEnvironmentCaller
     public Term getEnvironmentCaller() {

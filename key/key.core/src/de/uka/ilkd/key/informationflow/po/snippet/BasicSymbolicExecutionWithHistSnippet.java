@@ -30,8 +30,9 @@ public class BasicSymbolicExecutionWithHistSnippet
         posts = posts.append(d.tb.equals(poVars.post.exception,
                 poVars.pre.exception));
         posts = posts.append(d.tb.equals(poVars.post.heap, d.tb.getBaseHeap()));
-        
-        posts = posts.append(helperFactory.postHistoryEquality());
+        posts = posts.append(helperFactory.defineTermVar());
+        //posts = posts.append(helperFactory.postHistoryEquality());
+        posts = posts.append(helperFactory.postInternalHistoryEquality());
         
         final Term prog = buildProgramTerm(d, poVars, d.tb.and(posts), d.tb);
         return prog;

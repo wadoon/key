@@ -745,7 +745,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
 		// TODO KD a // start of history related changes
 		LocationVariable hist = services.getTypeConverter().getServiceEventLDT().getHist();
-		ProgramElementName beforeHistName = new ProgramElementName(tb.newName(hist + "Before_" + pm.getName()));
+		ProgramElementName beforeHistName = new ProgramElementName(tb.newName(hist + "Before_" + pm.getName())); // TODO KD a fix merge
 		LocationVariable beforeHist = new LocationVariable(beforeHistName, new KeYJavaType(hist.sort()));
 		LocationVariable otherHeap = null, otherPreHeap = null, otherHist = null, otherPreHist = null;
 		Term updateOther = tb.skip();
@@ -856,12 +856,18 @@ public final class UseOperationContractRule implements BuiltInRule {
 		// modify history
 		final Term comp = tb.getActiveComponent();
 		final Name afterHistName = new Name(tb.newName(hist + "After_" + pm.getName()));
+		final Name afterHistInternalName = new Name(tb.newName(hist + "After_" + pm.getName() + "_internal")); // TODO KD a rework
 		final Function afterHistFunc = new Function(afterHistName, hist.sort(), true);
+		final Function afterHistInternalFunc = new Function(afterHistInternalName, hist.sort(), true);		
 		services.getNamespaces().functions().addSafely(afterHistFunc);
+		services.getNamespaces().functions().addSafely(afterHistInternalFunc);		
 		final Term afterHist = tb.func(afterHistFunc);
+		final Term afterHistInternal = tb.func(afterHistInternalFunc);		
 		final Term anonHistUpdate = tb.elementary(hist, afterHist);
+		final Term anonHistInternalUpdate = tb.elementary(internalHist, afterHistInternal);		
 		Term newHist;
 		Term similarFormula = tb.tt();
+		Term newHistInternal;
 		// if called method belongs to a business remote interface, add "outgoing call" and "incoming termination" events to history
 		if (pm.getMethodDeclaration().isRemote()) { // TODO KD a
 			assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
@@ -872,7 +878,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 			Term outCallEvent = tb.evConst(tb.evCall(), comp, contractSelf, method, tb.seq(contractParams), anonUpdateDatas.head().methodHeapAtPre);
 			// throws Exception if pm.getMethodDeclaration().isStatic()
 			Term inTermEvent  = tb.evConst(tb.evTerm(), comp, contractSelf, method, resultTerm, anonUpdateDatas.reverse().head().methodHeap);
-			newHist = tb.seqConcat(tb.getHist(), tb.seq(outCallEvent, inTermEvent));
+			newHist = tb.seqConcat(tb.seqConcat(tb.getHist(), tb.seqSingleton(outCallEvent)), tb.seqSingleton(inTermEvent));
+			newHistInternal = tb.seqConcat(tb.seqConcat(tb.getInternalHist(), tb.seqSingleton(outCallEvent)), tb.seqSingleton(inTermEvent));
 			similarFormula = tb.and(
 					tb.wellFormed(otherHeap),
 					tb.wellFormed(otherPreHeap),
@@ -888,11 +895,14 @@ public final class UseOperationContractRule implements BuiltInRule {
 			services.getNamespaces().functions().addSafely(anonHistFunc);
 			final Term anonHist = tb.label(tb.func(anonHistFunc), new ParameterlessTermLabel(new Name("anonHistFunction")));
 			newHist = tb.seqConcat(tb.getHist(), anonHist);
+			newHistInternal = tb.seqConcat(tb.getInternalHist(), anonHist);
 		}
-
-		final Term assumption = tb.equals(newHist, afterHist);
+		final Term assumptionGlobal = tb.equals(newHist, afterHist);
+		final Term assumptionInternal = tb.equals(newHistInternal, afterHistInternal);
+		final Term assumption = tb.and(assumptionGlobal, assumptionInternal);		
 		anonAssumption = tb.and(anonAssumption, assumption);
-		anonUpdate = tb.parallel(anonUpdate, anonHistUpdate);
+		anonUpdate = tb.parallel(anonUpdate, anonHistUpdate, anonHistInternalUpdate);
+
 		atPreUpdates = tb.parallel(atPreUpdates, tb.elementary(beforeHist, tb.getHist()));
 		reachableState = tb.and(reachableState, tb.wellFormedHist(hist));
 

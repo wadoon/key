@@ -37,6 +37,9 @@ public class DependencyClusterPOFormulaFactory {
     
     //TODO JK try better code reuse and remove these later
     private final InformationFlowContract infFlowContract;
+    
+    Term internalHist_A;
+    Term internalHist_B;
 
     
     public DependencyClusterPOFormulaFactory(DependencyClusterContract contract, ProofObligationVars symbExecVars, IFProofObligationVars ifVars, Services services) {
@@ -79,8 +82,17 @@ public class DependencyClusterPOFormulaFactory {
         Term hist_A = tb.var(new LocationVariable(new ProgramElementName(tb.newName(hist + "_A")), new KeYJavaType(hist.sort())));  
         Term hist_B = tb.var(new LocationVariable(new ProgramElementName(tb.newName(hist + "_B")), new KeYJavaType(hist.sort())));
         
-        a = new SymbExecWithHistFactory(contract, symbExecVars, ifVars.c1, services, hist_A);
-        b = new SymbExecWithHistFactory(contract, symbExecVars, ifVars.c2, services, hist_B);
+        internalHist_A = tb.var(new LocationVariable(new ProgramElementName(tb.newName("internalHist_A")), new KeYJavaType(hist.sort())));  
+        internalHist_B = tb.var(new LocationVariable(new ProgramElementName(tb.newName("internalHist_B")), new KeYJavaType(hist.sort())));
+        
+        Term call_A = tb.var(new LocationVariable(new ProgramElementName(tb.newName("call_A")), new KeYJavaType(ldt.eventSort())));  
+        Term call_B = tb.var(new LocationVariable(new ProgramElementName(tb.newName("call_B")), new KeYJavaType(ldt.eventSort())));
+        
+        Term term_A = tb.var(new LocationVariable(new ProgramElementName(tb.newName("term_A")), new KeYJavaType(ldt.eventSort())));  
+        Term term_B = tb.var(new LocationVariable(new ProgramElementName(tb.newName("term_B")), new KeYJavaType(ldt.eventSort())));
+        
+        a = new SymbExecWithHistFactory(contract, symbExecVars, ifVars.c1, services, hist_A, internalHist_A, call_A, term_A);
+        b = new SymbExecWithHistFactory(contract, symbExecVars, ifVars.c2, services, hist_B, internalHist_B, call_B, term_B);
     }
     
     public SymbExecWithHistFactory a() {
@@ -94,13 +106,9 @@ public class DependencyClusterPOFormulaFactory {
     public Term bothExecutions() {
         return tb.and(a.updatedExecutionWithPreAndPost(), b.updatedExecutionWithPreAndPost());
     }
-    
-    public Term callInvisible() {
-        return tb.func(ldt.getInvEvent(), a.callEventFromPostHist());
-    }
-    
-    public Term invisibleHistory() {
-        return tb.equals(tb.func(ldt.getFilterVisible(), a.postHistory()), tb.seqEmpty());
+       
+    public Term invisibleHistoryInternal() {
+        return tb.equals(tb.func(ldt.getFilterVisible(), a.postHistoryInternal()), tb.seqEmpty());
     }
     
     //No need to handle objects in a special way here, attacker can compare objects from pre and poststate and will know whether they've changed
@@ -119,12 +127,19 @@ public class DependencyClusterPOFormulaFactory {
     //TODO JK make sure this is correct, but the assumption of an cooperative environment makes sure that its equivalent to the original vis preserving version to make the whole history invisible
     // This uses the variables from run A by convention
     public Term visibilityPreserving() {
-        return tb.imp(callInvisible(), tb.and(invisibleHistory(), lowPartsOfPreAndPostEqual()));
+        return tb.and(tb.imp(callAInvisible(), tb.and(invisibleHistoryInternal(), lowPartsOfPreAndPostEqual())), tb.equals(callAInvisible(), termAInvisible()));
     }
     
-    public Term consequence() {      
-        //TODO JK next add visibility preserving
-        return tb.and(postStateEquivalence(), visibilityPreserving(), equivalentHistories());
+    private Term termAInvisible() {
+        return tb.func(ldt.getInvEvent(), a.getTermination());
+    }
+
+    private Term callAInvisible() {
+        return tb.func(ldt.getInvEvent(), a.getCall());
+    }
+
+    public Term consequence() {
+        return tb.and(postStateEquivalence(), visibilityPreserving(), equivalentInternalHistories(), equivalentTerminationEvents());
     }
     
     //self is implicitly considered to be low
@@ -152,8 +167,12 @@ public class DependencyClusterPOFormulaFactory {
         return snippet.produceOutputRelation(d, ifVars.c1, ifVars.c2);
     }
     
-    public Term equivalentHistories() {
-        return tb.func(ldt.getEquivHistory(), a.postHistory(), b.postHistory());
+    public Term equivalentInternalHistories() {
+        return tb.func(ldt.getEquivHistoryInternal(), a.postHistoryInternal(), b.postHistoryInternal());
+    }
+    
+    public Term equivalentTerminationEvents() {
+        return tb.func(ldt.getEquivEvent(), a.getTermination(), b.getTermination());
     }
     
    
@@ -163,13 +182,20 @@ public class DependencyClusterPOFormulaFactory {
     
     //services called with equivalent events are guaranteed to terminate with equivalent events
     public Term cooperationalEquivalence() {
-        return tb.func(ldt.getCoopListEquiv(), a.visibilityFilteredPostHistory(), b.visibilityFilteredPostHistory());      
+        return tb.func(ldt.getCoopListEquivInternal(), a.postHistoryInternal(), b.postHistoryInternal());      
     }
     
     public Term callEventEquivalence() {
-        return tb.func(ldt.getEquivEvent(), a.callEventFromPostHist(), b.callEventFromPostHist());
+        return tb.func(ldt.getEquivEvent(), a.getCall(), b.getCall());
     }
     
+    /*
+    public Term defineInternalHistories() {
+        return tb.and(
+                tb.equals(internalHist_A, tb.seqSub(a.postHistory(), tb.zTerm(1), tb.add(tb.seqLen(a.postHistory()), tb.zTerm(-1)))), 
+                tb.equals(internalHist_B, tb.seqSub(b.postHistory(), tb.zTerm(1), tb.add(tb.seqLen(b.postHistory()), tb.zTerm(-1)))));
+    }
+    */
     
     public Term completeFormula() {
         return tb.imp(bothExecutions(), tb.imp(assumptions(), consequence()));
