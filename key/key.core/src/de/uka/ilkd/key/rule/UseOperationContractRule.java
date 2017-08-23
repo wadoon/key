@@ -385,7 +385,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         } else if (resultTerm != null) {
             result = tb.and(tb.reachableValue(resultTerm, pm.getReturnType()),
                     // if pm is part of a remote interface ensure free "\fresh" (may still be null though)
-            		(pm.getMethodDeclaration().isRemote() && resultTerm.sort().extendsSorts().contains(services.getJavaInfo().objectSort())) ? // TODO KD a
+            		(pm.getMethodDeclaration().isRemote() && resultTerm.sort().extendsSorts().contains(services.getJavaInfo().objectSort())) ?
             		tb.not(tb.created(heapAtPres.get(services.getTypeConverter().getHeapLDT().getHeap()), resultTerm)) : 
             		tb.tt());
         } else {
@@ -743,11 +743,10 @@ public final class UseOperationContractRule implements BuiltInRule {
 		final Term globalDefs = contract.getGlobalDefs(baseHeap, baseHeapTerm, contractSelf,
 				contractParams, services);
 
-		// TODO KD a // start of history related changes
+		// start of history related changes
 		LocationVariable hist = services.getTypeConverter().getServiceEventLDT().getHist();
-		ProgramElementName beforeHistName = new ProgramElementName(tb.newName(hist + "Before_" + pm.getName())); // TODO KD a fix merge
-		LocationVariable beforeHist = new LocationVariable(beforeHistName, new KeYJavaType(hist.sort()));
-		LocationVariable otherHeap = null, otherPreHeap = null, otherHist = null, otherPreHist = null;
+		LocationVariable internalHist = services.getTypeConverter().getServiceEventLDT().getInternalHist();
+		LocationVariable otherHeap = null, otherPreHeap = null, otherHist = null, otherPreHist = null, beforeHist = null;
 		Term updateOther = tb.skip();
 		final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
 		if (pm.getMethodDeclaration().isRemote()) {
@@ -756,6 +755,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 			otherPreHeap = new LocationVariable(new ProgramElementName(tb.newName("otherHeapBefore_" + pm.getName())), new KeYJavaType(baseHeap.sort()));
 			otherHist = new LocationVariable(new ProgramElementName(tb.newName("otherHist")), new KeYJavaType(hist.sort()));
 			otherPreHist = new LocationVariable(new ProgramElementName(tb.newName("otherHistBefore_" + pm.getName())), new KeYJavaType(hist.sort()));
+			beforeHist = new LocationVariable(new ProgramElementName(tb.newName(hist + "Before_" + pm.getName())), new KeYJavaType(hist.sort()));
 			// ensure the use of other heap in statements about another component
 			updateOther = tb.parallel(
 					tb.elementary(baseHeapTerm, tb.var(otherHeap)),
@@ -855,10 +855,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 
 		// modify history
 		final Term comp = tb.getActiveComponent();
-		final Name afterHistName = new Name(tb.newName(hist + "After_" + pm.getName()));
-		final Name afterHistInternalName = new Name(tb.newName(hist + "After_" + pm.getName() + "_internal")); // TODO KD a rework
-		final Function afterHistFunc = new Function(afterHistName, hist.sort(), true);
-		final Function afterHistInternalFunc = new Function(afterHistInternalName, hist.sort(), true);		
+		final Function afterHistFunc = new Function(new Name(tb.newName(hist + "After_" + pm.getName())), hist.sort(), true);
+		final Function afterHistInternalFunc = new Function(new Name(tb.newName(hist + "After_" + pm.getName() + "_internal")), hist.sort(), true);		
 		services.getNamespaces().functions().addSafely(afterHistFunc);
 		services.getNamespaces().functions().addSafely(afterHistInternalFunc);		
 		final Term afterHist = tb.func(afterHistFunc);
@@ -869,7 +867,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 		Term similarFormula = tb.tt();
 		Term newHistInternal;
 		// if called method belongs to a business remote interface, add "outgoing call" and "incoming termination" events to history
-		if (pm.getMethodDeclaration().isRemote()) { // TODO KD a
+		if (pm.getMethodDeclaration().isRemote()) {
 			assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
 			// TODO KD z could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor() and selfVarTerm != contractSelf
 			Term method = tb.func(services.getTypeConverter().getServiceEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), services));

@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public class ServiceEventLDT extends LDT {
 	public static final Name NAME = new Name("Event");
 	public static final Name HIST_NAME = new Name("hist");
+	public static final Name INTERNAL_HIST_NAME = new Name("internalHist");
 	public static final Name METHOD_SORT = new Name("MethodIdentifier");
 	public static final Name ENVCALLER_NAME = new Name("environmentCaller");
 	public static final Name CURRENT_PARAMS_NAME = new Name("currentParams");
@@ -37,22 +38,31 @@ public class ServiceEventLDT extends LDT {
 	private final Function similarHist;
 	private final Function similarEvent;
 	private final Function similar;
-	
-    private final Function wellformedList;
-    private final Function wellformedListCoop;
-    
-    private final Function coopListEquiv;
-    private final Function equivHistory;
-    private final Function equivEvent;
-    private final Function invEvent;
-    private final Function filterVisible;
 
+	private final Function wellformedList;
+	private final Function wellformedListCoop;
+
+	private final Function coopListEquiv;
+	private final Function equivHistory;
+	private final Function equivEvent;
+	private final Function invEvent;
+	private final Function filterVisible;
+
+	private final Function wellformedListInternal;
+	private final Function wellformedListCoopInternal;
+
+	private final Function coopListEquivInternal;
+	private final Function equivHistoryInternal;
+	private final Function filterVisibleInternal;
 
 	//history (of Remote method events) ... copy of: key.core/resources/de/uka/ilkd/key/proof/rules/events.key -> Seq hist;
 	private final LocationVariable hist;
+	private final LocationVariable internalHist;
 	private final LocationVariable environmentCaller;
 	private final LocationVariable currentParams;
 	private final LocationVariable activeComponent;
+
+	private final Sort eventSort;
 
 	public ServiceEventLDT (TermServices services) {
 		super(NAME, services);
@@ -68,18 +78,31 @@ public class ServiceEventLDT extends LDT {
 		similarHist = addFunction(services, "similarHist");
 		similarEvent = addFunction(services, "similarEvent");
 		similar = addFunction(services, "similar");
-        wellformedList = addFunction(services, "wellformedList");
-        wellformedListCoop = addFunction(services, "wellformedListCoop");        
-        coopListEquiv = addFunction(services, "coopListEquiv");
-        equivHistory = addFunction(services, "equivHistory");
-        equivEvent = addFunction(services, "equivEvent");
-        filterVisible = addFunction(services, "filterVisible");
-        invEvent = addFunction(services, "invEvent");
+		wellformedList = addFunction(services, "wellformedList");
+		wellformedListCoop = addFunction(services, "wellformedListCoop");
+		coopListEquiv = addFunction(services, "coopListEquiv");
+		equivHistory = addFunction(services, "equivHistory");
+		equivEvent = addFunction(services, "equivEvent");
+		filterVisible = addFunction(services, "filterVisible");
+		invEvent = addFunction(services, "invEvent");
+
+		wellformedListInternal = addFunction(services, "wellformedListInternal");
+		wellformedListCoopInternal = addFunction(services, "wellformedListCoopInternal");
+		coopListEquivInternal = addFunction(services, "coopListEquivInternal");
+		equivHistoryInternal = addFunction(services, "equivHistoryInternal");
+		filterVisibleInternal = addFunction(services, "filterVisibleInternal");
 
 		hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
+		internalHist = (LocationVariable) services.getNamespaces().programVariables().lookup(INTERNAL_HIST_NAME);
 		environmentCaller = (LocationVariable) services.getNamespaces().programVariables().lookup(ENVCALLER_NAME);
 		currentParams = (LocationVariable) services.getNamespaces().programVariables().lookup(CURRENT_PARAMS_NAME);
 		activeComponent = (LocationVariable) services.getNamespaces().programVariables().lookup(COMPONENT_NAME);
+
+		eventSort = (Sort) services.getNamespaces().sorts().lookup("Event");
+	}
+
+	public Sort eventSort() {
+		return eventSort;
 	}
 
 	public Function eventConstructor() {
@@ -131,71 +154,95 @@ public class ServiceEventLDT extends LDT {
 	}
 
 	public Function getWellformedList() {
-        return wellformedList;
-    }
+		return wellformedList;
+	}
 
-    public Function getWellformedListCoop() {
-        return wellformedListCoop;
-    }
+	public Function getWellformedListCoop() {
+		return wellformedListCoop;
+	}
 
-    public Function getCoopListEquiv() {
-        return coopListEquiv;
-    }
+	public Function getCoopListEquiv() {
+		return coopListEquiv;
+	}
 
-    public Function getEquivHistory() {
-        return equivHistory;
-    }
+	public Function getEquivHistory() {
+		return equivHistory;
+	}
 
-    public Function getEquivEvent() {
-        return equivEvent;
-    }
+	public Function getEquivEvent() {
+		return equivEvent;
+	}
 
-    public Function getInvEvent() {
-        return invEvent;
-    }
+	public Function getInvEvent() {
+		return invEvent;
+	}
 
-    public Function getFilterVisible() {
-        return filterVisible;
-    }
+	public Function getFilterVisible() {
+		return filterVisible;
+	}
 
-    /**
+	/**
 	 * @return the history of Remote method events;
 	 */
 	public LocationVariable getHist() {
 		return hist;
 	}
 
+	public LocationVariable getInternalHist() {
+		return internalHist;
+	}
+
 	public LocationVariable getEnvironmentCaller() {
 		return environmentCaller;
 	}
 
-    public LocationVariable getCurrentParams() {
-        return currentParams;
-    }
+	public LocationVariable getCurrentParams() {
+		return currentParams;
+	}
 
-    public LocationVariable getActiveComponent() {
-        return activeComponent;
-    }
+	public LocationVariable getActiveComponent() {
+		return activeComponent;
+	}
+
+	public Function getWellformedListInternal() {
+		return wellformedListInternal;
+	}
+
+	public Function getWellformedListCoopInternal() {
+		return wellformedListCoopInternal;
+	}
+
+	public Function getCoopListEquivInternal() {
+		return coopListEquivInternal;
+	}
+
+	public Function getEquivHistoryInternal() {
+		return equivHistoryInternal;
+	}
+
+	public Function getFilterVisibleInternal() {
+		return filterVisibleInternal;
+	}
 
 	public Function getMethodIdentifier(MethodDeclaration md, TermServices services) {
 		// TODO KD b do i need the class and can i get it from md?
 		// TODO KD c test (same name, different signature)
-	    String functionString = md.getFullName() + "(";
-	    if (md.getParameterDeclarationCount() > 0) {
-	    	functionString += md.getParameterDeclarationAt(0).getTypeReference().getKeYJavaType().getFullName();
-		    for (int i = 1; i < md.getParameterDeclarationCount(); i++) {
-		    	functionString += ", " + md.getParameterDeclarationAt(i).getTypeReference().getKeYJavaType().getFullName();
-		    }
-	    }
-	    functionString += ")";
+		String functionString = md.getFullName() + "(";
+		if (md.getParameterDeclarationCount() > 0) {
+			functionString += md.getParameterDeclarationAt(0).getTypeReference().getKeYJavaType().getFullName();
+			for (int i = 1; i < md.getParameterDeclarationCount(); i++) {
+				functionString += ", " + md.getParameterDeclarationAt(i).getTypeReference().getKeYJavaType().getFullName();
+			}
+		}
+		functionString += ")";
 		Name functionName = new Name(functionString);
-	    Function function = (Function) services.getNamespaces().methodIdentifier().lookup(functionName);
-	    if (function == null) {
-	        //add the function
-	        function = new Function(functionName, (Sort)services.getNamespaces().sorts().lookup(METHOD_SORT), new ImmutableArray<Sort>(), null, true);
-	        services.getNamespaces().methodIdentifier().addSafely(function);
-	    }
-	    return function;
+		Function function = (Function) services.getNamespaces().methodIdentifier().lookup(functionName);
+		if (function == null) {
+			//add the function
+			function = new Function(functionName, (Sort)services.getNamespaces().sorts().lookup(METHOD_SORT), new ImmutableArray<Sort>(), null, true);
+			services.getNamespaces().methodIdentifier().addSafely(function);
+		}
+		return function;
 	}
 
 	// TODO KD z add Operators / Literals / Types?

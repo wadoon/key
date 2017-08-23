@@ -2049,7 +2049,7 @@ public class TermBuilder {
     }
     
     public Term getInternalHist() {
-        return var(services.getTypeConverter().getRemoteMethodEventLDT().getInternalHist());
+        return var(services.getTypeConverter().getServiceEventLDT().getInternalHist());
     }
 
     //getEnvironmentCaller
