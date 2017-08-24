@@ -16,21 +16,17 @@ package de.tud.cs.se.ds.specstr.rule;
 import static de.tud.cs.se.ds.specstr.util.LogicUtilities.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.tud.cs.se.ds.specstr.util.LogicUtilities;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
@@ -40,7 +36,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
@@ -98,11 +93,10 @@ public final class AnalyzeInvImpliesLoopEffectsRule
         final LocationVariable heapVar = services.getTypeConverter()
                 .getHeapLDT().getHeap();
 
-        final Term updateWithoutLocalOuts = updateContent.keySet().stream()
-                .filter(lhs -> !localOuts.contains(lhs))
-                .filter(lhs -> !lhs.equals(heapVar))
-                .map(lhs -> tb.elementary(lhs, updateContent.get(lhs)))
-                .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
+        final Map<LocationVariable, Term> updateLocalOuts = updateContent
+                .keySet().stream()
+                .filter(lhs -> localOuts.contains(lhs))
+                .collect(Collectors.toMap(x -> x, x -> updateContent.get(x)));
 
         // Retrieve store equalities
         final Term origHeapTerm = MergeRuleUtils
@@ -112,132 +106,69 @@ public final class AnalyzeInvImpliesLoopEffectsRule
                 extractStoreEqsAndInnerHeapTerm(services, origHeapTerm);
 
         final List<Term> storeEqualities = storeEqsAndInnerHeapTerm.isPresent()
-                ? storeEqsAndInnerHeapTerm.get().second : new ArrayList<>();
-
-        final Map<LocationVariable, List<Term>> newGoalInformation = constructNewGoalInformation(
-            tb, invTerm, localOuts, updateContent, heapVar,
-            updateWithoutLocalOuts, origHeapTerm);
+                ? storeEqsAndInnerHeapTerm.get().second
+                : new ArrayList<>();
 
         final ImmutableList<Goal> goals = goal
-                .split(newGoalInformation.size() + storeEqualities.size() + 1);
+                .split(updateLocalOuts.size() + storeEqualities.size() + 1);
         final Goal[] goalArray = goals.toArray(Goal.class);
         final TermLabelState termLabelState = new TermLabelState();
 
+        final Term updWithoutHeap = updateContent.keySet().stream()
+                .filter(lv -> !lv.equals(heapVar))
+                .map(lv -> tb.elementary(lv, updateContent.get(lv)))
+                .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
+
         int i = 0;
-        for (LocationVariable currLocalOut : newGoalInformation.keySet()) {
+        for (LocationVariable currLocalOut : updateLocalOuts.keySet()) {
             final Goal analysisGoal = goalArray[i++];
 
+            final Term updWithoutHeapAndCurrLocal = updateContent.keySet()
+                    .stream()
+                    .filter(lv -> !lv.equals(heapVar))
+                    .filter(lv -> !lv.equals(currLocalOut))
+                    .map(lv -> tb.elementary(lv, updateContent.get(lv)))
+                    .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
+
             final Term currAnalysisTerm = tb.equals(tb.var(currLocalOut),
-                updateContent.get(currLocalOut));
+                    updateLocalOuts.get(currLocalOut));
 
             prepareGoal(pio, analysisGoal, currAnalysisTerm, termLabelState,
-                this);
+                    this);
             removeLoopInvFormulasFromAntec(analysisGoal, loopInvNode);
             addFactPreconditions(analysisGoal,
-                newGoalInformation.get(currLocalOut), //
-                1, termLabelState, this);
+                    ImmutableSLList.<Term> nil()
+                            .prepend(storeEqualities)
+                            .prepend(tb.apply(updWithoutHeapAndCurrLocal,
+                                    invTerm)), //
+                    1, termLabelState, this);
         }
 
-        if (storeEqsAndInnerHeapTerm.isPresent()) {
-            for (Term heapEquality : storeEqualities) {
-                final Goal analysisGoal = goalArray[i++];
+        for (Term heapEquality : storeEqualities) {
+            final Goal analysisGoal = goalArray[i++];
 
-                prepareGoal(pio, analysisGoal, heapEquality, termLabelState,
+            prepareGoal(pio, analysisGoal, heapEquality, termLabelState,
                     this);
-                removeLoopInvFormulasFromAntec(analysisGoal, loopInvNode);
+            removeLoopInvFormulasFromAntec(analysisGoal, loopInvNode);
 
-                final Term update = updateWithoutLocalOuts;
+            final ImmutableList<Term> invNewState = ImmutableSLList.<Term> nil()
+                    .prepend(tb.apply(updWithoutHeap, invTerm));
 
-                final List<Term> newPres = Arrays.asList(new Term[] { //
-                    tb.apply(update, invTerm),
-                    tb.and(updateContent.keySet().stream()
-                            .filter(lhs -> !lhs.equals(heapVar))
-                            .map(lhs -> tb.equals(tb.var(lhs),
-                                updateContent.get(lhs)))
-                            .collect(Collectors.toList())),
-                    tb.and(storeEqualities.stream()
-                            .filter(se -> se != heapEquality)
-                            .collect(Collectors.toList())) });
+            final ImmutableList<Term> preconds = ImmutableSLList.<Term> nil()
+                    .prepend(storeEqualities.stream()
+                            .filter(eq -> !eq.equals(heapEquality))
+                            .collect(Collectors.toList()))
+                    .prepend(invNewState);
 
-                addFactPreconditions(analysisGoal, newPres, 1, termLabelState,
+            addFactPreconditions(analysisGoal, preconds, 1, termLabelState,
                     this);
-            }
         }
 
         addSETPredicateToAntec(goalArray[goalArray.length - 1]);
         goalArray[goalArray.length - 1].setBranchLabel(
-            AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL);
+                AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL);
 
         return goals;
-    }
-
-    /**
-     * The "new goal information" is a map from a "local out" to a list of two
-     * elements: the loop invariant in the original heap state and the local
-     * state without all "localOuts", and a conjunction of all facts without the
-     * current "local out".
-     *
-     * @param tb
-     *            The {@link TermBuilder} object.
-     * @param invTerm
-     *            The loop invariant {@link Term} (without update).
-     * @param localOuts
-     *            The "local outs", i.e. variables that are available also
-     *            outside the loop.
-     * @param updateContent
-     *            The disassembled update.
-     * @param heapVar
-     *            The heap {@link LocationVariable}.
-     * @param updateWithoutLocalOuts
-     *            The update without all local outs.
-     * @param origHeapTerm
-     *            The original heap term.
-     * @return A map from a "local out" to a list of two elements: the loop
-     *         invariant in the original heap state and the local state without
-     *         all "localOuts", and a conjunction of all facts without the
-     *         current "local out".
-     */
-    private Map<LocationVariable, List<Term>> constructNewGoalInformation(
-            final TermBuilder tb, final Term invTerm,
-            final List<LocationVariable> localOuts,
-            final Map<LocationVariable, Term> updateContent,
-            final LocationVariable heapVar, final Term updateWithoutLocalOuts,
-            final Term origHeapTerm) {
-        final Map<LocationVariable, List<Term>> newGoalInformation = new LinkedHashMap<>();
-
-        for (int i = 0; i < localOuts.size(); i++) {
-            final LocationVariable currLocalOut = localOuts.get(i);
-
-            if (updateContent.get(currLocalOut) == null) {
-                continue;
-            }
-
-            // TODO Excluding the heap here is a hack made because KeY otherwise
-            // gets stuck in an endless cascade of equation shuffling
-
-            // TODO: Filter out the facts that share no Skolem symbols with the
-            // fact to prove (and are not heap / exc equations?)
-            Term equationsOfUpd = tb.and(updateContent.keySet().stream()
-                    .filter(lhs -> lhs != currLocalOut)
-                    .filter(lhs -> !lhs.equals(heapVar))
-                    .map(lhs -> tb.equals(tb.var(lhs),
-                            updateContent.get(lhs)))
-                    .collect(Collectors.toList()));
-            
-            newGoalInformation
-                    .put(currLocalOut,
-                        Arrays.asList(new Term[] {
-                            // The loop invariant in the original heap state and
-                            // the local state without the "localOuts"
-                            tb.apply(
-                                tb.parallel(tb.elementary(tb.var(heapVar),
-                                    origHeapTerm), updateWithoutLocalOuts),
-                                invTerm),
-                            // The collected equations
-                            equationsOfUpd }));
-        }
-
-        return newGoalInformation;
     }
 
     @Override
