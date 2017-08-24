@@ -104,11 +104,11 @@ public class SymbExInterface {
         // @formatter:off
         env = KeYEnvironment.load(
                 StrengthAnalysisSEProfile.INSTANCE,
-                file,     // location
-                null,     // class path
-                null,     // boot class path
-                null,     // includes
-                true);    // forceNewProfileOfNewProofs
+                file, // location
+                null, // class path
+                null, // boot class path
+                null, // includes
+                true); // forceNewProfileOfNewProofs
         // @formatter:on
         LOGGER.trace("Built up environment.");
     }
@@ -119,6 +119,13 @@ public class SymbExInterface {
      */
     public List<KeYJavaType> getDeclaredTypes() {
         return JavaTypeInterface.getDeclaredTypes(env);
+    }
+
+    /**
+     * @return The {@link KeYEnvironment} object.
+     */
+    public KeYEnvironment<DefaultUserInterfaceControl> keyEnvironment() {
+        return env;
     }
 
     /**
@@ -148,8 +155,9 @@ public class SymbExInterface {
 
         if (contracts == null || contracts.size() != 1) {
             final String msg = GeneralUtilities.format(
-                "Expected 1 contract for method %s, found %s", pm.getFullName(),
-                contracts == null ? 0 : contracts.size());
+                    "Expected 1 contract for method %s, found %s",
+                    pm.getFullName(),
+                    contracts == null ? 0 : contracts.size());
 
             LOGGER.error(msg);
             throw new RuntimeException(msg);
@@ -161,17 +169,18 @@ public class SymbExInterface {
         try {
             final FunctionalOperationContractPO po = //
                     new FunctionalOperationContractPO(//
-                        env.getInitConfig(), //
-                        (FunctionalOperationContract) contract, //
-                        true, // add uninterpreted predicate
-                        true); // add symbolic execution label
+                            env.getInitConfig(), //
+                            (FunctionalOperationContract) contract, //
+                            true, // add uninterpreted predicate
+                            true); // add symbolic execution label
 
             proof = env.createProof(po);
             setupStrategy(proof);
-        } catch (ProofInputException e) {
+        }
+        catch (ProofInputException e) {
             GeneralUtilities.logErrorAndThrowRTE(LOGGER,
-                "Exception at '%s' of %s:\n%s", contract.getDisplayName(),
-                contract.getTarget(), e.getMessage());
+                    "Exception at '%s' of %s:\n%s", contract.getDisplayName(),
+                    contract.getTarget(), e.getMessage());
         }
     }
 
@@ -258,9 +267,10 @@ public class SymbExInterface {
     public void applyMacro(ProofMacro macro, Node node) {
         try {
             macro.applyTo(env.getUi(), node, null, env.getUi());
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             GeneralUtilities.logErrorAndThrowRTE(LOGGER,
-                "Problem in applying macro, message: %s", e.getMessage());
+                    "Problem in applying macro, message: %s", e.getMessage());
         }
     }
 
@@ -281,8 +291,8 @@ public class SymbExInterface {
         for (Goal g : proof.getSubtreeGoals(node)) {
             for (SequentFormula sf : g.node().sequent().succedent()) {
                 result.addAll(LogicUtilities.retrieveLoopScopeIndices(
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
-                    proof.getServices()));
+                        new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
+                        proof.getServices()));
             }
         }
 
@@ -308,7 +318,7 @@ public class SymbExInterface {
                 .setActiveStrategyProperties(sp);
         proof.getSettings().getStrategySettings().setMaxSteps(maxSteps);
         proof.setActiveStrategy(
-            new StrengthAnalysisStrategy.Factory().create(proof, sp));
+                new StrengthAnalysisStrategy.Factory().create(proof, sp));
     }
 
     /**
@@ -324,9 +334,12 @@ public class SymbExInterface {
                 .getActiveStrategyProperties();
 
         // @formatter:off
-        sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_CONTRACT);
-        sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY, StrategyProperties.DEP_ON);
-        sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY, StrategyProperties.QUERY_ON);
+        sp.setProperty(StrategyProperties.METHOD_OPTIONS_KEY,
+                StrategyProperties.METHOD_CONTRACT);
+        sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
+                StrategyProperties.DEP_ON);
+        sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
+                StrategyProperties.QUERY_ON);
         sp.setProperty(
                 StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
                 StrategyProperties.NON_LIN_ARITH_DEF_OPS);
@@ -336,7 +349,8 @@ public class SymbExInterface {
         sp.setProperty(
                 StrategyProperties.LOOP_OPTIONS_KEY,
                 StrategyProperties.LOOP_SCOPE_INVARIANT);
-        sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY, StrategyProperties.OSS_ON);
+        sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY,
+                StrategyProperties.OSS_ON);
         // @formatter:on
 
         proof.getSettings().getStrategySettings()
