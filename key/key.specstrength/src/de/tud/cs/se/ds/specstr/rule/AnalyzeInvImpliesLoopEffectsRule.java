@@ -214,6 +214,16 @@ public final class AnalyzeInvImpliesLoopEffectsRule
 
             // TODO Excluding the heap here is a hack made because KeY otherwise
             // gets stuck in an endless cascade of equation shuffling
+
+            // TODO: Filter out the facts that share no Skolem symbols with the
+            // fact to prove (and are not heap / exc equations?)
+            Term equationsOfUpd = tb.and(updateContent.keySet().stream()
+                    .filter(lhs -> lhs != currLocalOut)
+                    .filter(lhs -> !lhs.equals(heapVar))
+                    .map(lhs -> tb.equals(tb.var(lhs),
+                            updateContent.get(lhs)))
+                    .collect(Collectors.toList()));
+            
             newGoalInformation
                     .put(currLocalOut,
                         Arrays.asList(new Term[] {
@@ -224,12 +234,7 @@ public final class AnalyzeInvImpliesLoopEffectsRule
                                     origHeapTerm), updateWithoutLocalOuts),
                                 invTerm),
                             // The collected equations
-                            tb.and(updateContent.keySet().stream()
-                                    .filter(lhs -> lhs != currLocalOut)
-                                    .filter(lhs -> !lhs.equals(heapVar))
-                                    .map(lhs -> tb.equals(tb.var(lhs),
-                                        updateContent.get(lhs)))
-                                    .collect(Collectors.toList())) }));
+                            equationsOfUpd }));
         }
 
         return newGoalInformation;
@@ -294,7 +299,7 @@ public final class AnalyzeInvImpliesLoopEffectsRule
     public IBuiltInRuleApp createApp(PosInOccurrence pos,
             TermServices services) {
         return new AnalyzeInvImpliesLoopEffectsRuleApp(this, pos, null, null,
-            null);
+                null);
     }
 
     @Override
