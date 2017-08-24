@@ -32,7 +32,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.key_project.sed.algodebug.model.AlgorithmicDebug;
-import org.key_project.sed.algodebug.model.MethodCall;
+import org.key_project.sed.algodebug.model.Execution;
 import org.key_project.sed.algodebug.searchstrategy.SingleStepping;
 import org.key_project.sed.algodebug.searchstrategy.TopDown;
 import org.key_project.sed.algodebug.util.MCTUtil;
@@ -57,7 +57,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
 
    private ISENode actualNode, root; 
    private AlgorithmicDebug debug; 
-   private MethodCall actualCall;
+   private Execution actualCall;
    private ListenerList listeners = new ListenerList();
    private IWorkbenchPage workbenchpage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
    private IViewPart variablesSelectionView;
@@ -65,9 +65,9 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
    private Label lblMethodName;
    private Combo combo ;
    private Text textParameters, textReturn, textConstraints;
-   private ArrayList<MethodCall> questionList;
+   private ArrayList<Execution> questionList;
    private Button btnStart, btnCorrect, btnFalse;
-   private List<MethodCall> chronik = new ArrayList<MethodCall>();
+   private List<Execution> chronik = new ArrayList<Execution>();
    private Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
    private int chronikCounter = 0;
 
@@ -97,8 +97,8 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       debug.unhighlight();
       debug.markCall(actualCall, 'c');
       //      SETUtil.annotateMethodCallCorrect(actualCall);
-      MCTUtil.annotateMethodCallPartialCorrect(actualCall, 'c');
-      MethodCall next =  debug.getNext();
+      MCTUtil.annotateExecutionPartialCorrect(actualCall, 'c');
+      Execution next =  debug.getNext();
       if(next != null){
          chronik.add(next);
          chronikCounter = chronik.size()-1;
@@ -108,7 +108,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
          setVariablesSelectionViewSelection(actualCall);
       }
       else{
-         askDebugWhyThereIsNoNextMethodToAsk();
+         askDebugWhyThereIsNoNextExecutionToAsk();
       }
    }
 
@@ -120,7 +120,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       debug.unhighlight();
       debug.markCall(actualCall, 'f');
 
-      MethodCall next =  debug.getNext();
+      Execution next =  debug.getNext();
       if(next != null){
          chronik.add(next);
          chronikCounter = chronik.size()-1;
@@ -130,7 +130,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
          setVariablesSelectionViewSelection(actualCall);
       }
       else{
-         askDebugWhyThereIsNoNextMethodToAsk();
+         askDebugWhyThereIsNoNextExecutionToAsk();
       }
    }
 
@@ -138,12 +138,12 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
     * -----> wurden alle Bäume komplett durchsucht und kein Bug gefunden, informiere den Benutzer darüber
     * -----> wurde ein Bug gefunden, informiere den Benutzer darüber
     */
-   private void askDebugWhyThereIsNoNextMethodToAsk(){
+   private void askDebugWhyThereIsNoNextExecutionToAsk(){
       if(debug.bugFound()){
-         MethodCall bug = debug.getBug();
+         Execution bug = debug.getBug();
          btnCorrect.setEnabled(false);
          btnFalse.setEnabled(false);
-         MCTUtil.annotateSETNodesOfABuggyMethodCall(bug);
+         MCTUtil.annotateSETNodesOfABuggyExecution(bug);
          notifyBugFound(bug);
       }
       else if(debug.searchCompletedButNoBugFound()){
@@ -188,12 +188,18 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
             setVariablesSelectionViewSelection(actualCall);
          }
       }
+      else{
+         MessageBox mb = new MessageBox(shell);
+         mb.setText("No node selected !");
+         mb.setMessage("Please select a node in the Symbolic Execution Tree View bevor you start Algorithmic Debugging.");
+         mb.open();
+      }
    }
 
    protected void nextButtonPressed() {
       if(debug != null && chronikCounter < chronik.size()-1){
          chronikCounter++;
-         MethodCall call = chronik.get(chronikCounter);
+         Execution call = chronik.get(chronikCounter);
          showQuestion(call);
          setVariablesSelectionViewSelection(call);
       }
@@ -208,7 +214,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
    protected void backButtonPressed() {
       if(debug != null && chronikCounter >= 1){
          chronikCounter--;
-         MethodCall call = chronik.get(chronikCounter);
+         Execution call = chronik.get(chronikCounter);
          showQuestion(call);
          setVariablesSelectionViewSelection(call);
       }
@@ -265,17 +271,17 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
    /*
     * Unhighlight last call, highlight actual call and fill all necessary UI textfields
     */
-   public void showQuestion(MethodCall call){
+   public void showQuestion(Execution call){
       try {
          debug.unhighlight();
          debug.highlightCall(call);
          lblMethodName.setText(call.getCall().getName().toString());
          StringBuffer constraintText = new StringBuffer();
-         for( ISEConstraint c : call.getMethodReturn().getConstraints()){
+         for( ISEConstraint c : call.getExecutionReturn().getConstraints()){
             constraintText.append("\n"+c.getName());
          }
          textConstraints.setText(constraintText.toString());
-         textReturn.setText(call.getMethodReturn().getName().toString());
+         textReturn.setText(call.getExecutionReturn().getName().toString());
          //         textReturn.setText(call.getRet().getCallStack());
          /*
          if(!(call.getMethodReturn() instanceof ISEExceptionalMethodReturn)){
@@ -461,11 +467,11 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       return array;
    }
 
-   private void setVariablesSelectionViewSelection(MethodCall methodCall) {
+   private void setVariablesSelectionViewSelection(Execution execution) {
       SWTUtil.select(VariablesSelectionView.getviewerLeft(),
-            new StructuredSelection(methodCall.getCall()), true);
+            new StructuredSelection(execution.getCall()), true);
       SWTUtil.select(VariablesSelectionView.getviewerRight(),
-            new StructuredSelection(methodCall.getMethodReturn()), true);
+            new StructuredSelection(execution.getExecutionReturn()), true);
    }
 
    /*
@@ -532,7 +538,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       }
    }
 
-   public void notifyBugFound(MethodCall call) {
+   public void notifyBugFound(Execution call) {
       MessageBox mb = new MessageBox(shell);
       mb.setText("Incorrect Method identified");
       try {

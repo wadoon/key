@@ -1,11 +1,11 @@
 package org.key_project.sed.algodebug.searchstrategy;
 
-import org.key_project.sed.algodebug.model.MethodCall;
+import org.key_project.sed.algodebug.model.Execution;
 
 public class SearchStrategy {
    protected boolean searchCompletedButNoBugFound = false;
    protected boolean bugFound = false;
-   protected MethodCall bug;
+   protected Execution bug;
 
    public SearchStrategy(){
 
@@ -19,7 +19,7 @@ public class SearchStrategy {
       return bugFound;
    }
    
-   public MethodCall getBug() {
+   public Execution getBug() {
       return bug;
    }
 }

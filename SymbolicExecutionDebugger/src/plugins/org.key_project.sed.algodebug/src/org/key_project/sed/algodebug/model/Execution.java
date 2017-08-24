@@ -4,21 +4,21 @@ import java.util.ArrayList;
 
 import org.key_project.sed.core.model.ISENode;
 
-public class MethodCall {
+public class Execution {
 
-   public MethodCall(ISENode startNode, ISENode EndNode) {
-      methodCall = startNode;
-      methodReturn = EndNode;
+   public Execution(ISENode startNode, ISENode EndNode) {
+      executionCall = startNode;
+      executionReturn = EndNode;
       correctness = 'u';
    }
 
    private boolean root;
 
-   private boolean methodCallTreeCompletelySearched;
+   private boolean executionTreeCompletelySearched;
 
-   public MethodCall(ISENode start, ISENode ret, ArrayList<MethodCall> listOfCalledMethods) {
-      methodCall = start;
-      this.methodReturn = ret;
+   public Execution(ISENode start, ISENode ret, ArrayList<Execution> listOfCalledMethods) {
+      executionCall = start;
+      this.executionReturn = ret;
       this.listOfCalledMethods = listOfCalledMethods;
       correctness = 'u';
    }
@@ -32,45 +32,45 @@ public class MethodCall {
    }
 
    public boolean completelySearched(){
-      if(methodCallTreeCompletelySearched)
+      if(executionTreeCompletelySearched)
          return true;
       else
          return false;
    }
 
-   private MethodCall parent;
+   private Execution parent;
 
    /**
     * @return the parent
     */
-   public MethodCall getParent() {
+   public Execution getParent() {
       return parent;
    }
 
    /**
     * @param parent the parent to set
     */
-   public void setParent(MethodCall parent) {
+   public void setParent(Execution parent) {
       this.parent = parent;
    }
 
-   private ISENode methodCall;
+   private ISENode executionCall;
 
-   private ISENode methodReturn;
+   private ISENode executionReturn;
 
-   private ArrayList<MethodCall> listOfCalledMethods;
+   private ArrayList<Execution> listOfCalledMethods;
 
    /**
     * @return the listOfCalledCalls
     */
-   public ArrayList<MethodCall> getListOfCalledMethods() {
+   public ArrayList<Execution> getListOfCalledMethods() {
       return listOfCalledMethods;
    }
 
    /**
     * @param listOfCalledMethods the listOfCalledCalls to set
     */
-   public void setListOfCalledMethods(ArrayList<MethodCall> listOfCalledMethods) {
+   public void setListOfCalledMethods(ArrayList<Execution> listOfCalledMethods) {
       this.listOfCalledMethods = listOfCalledMethods;
    }
 
@@ -84,25 +84,25 @@ public class MethodCall {
     * @return the call
     */
    public ISENode getCall() {
-      return methodCall;
+      return executionCall;
    } 
    /**
     * @param call the call to set
     */
    public void setCall(ISENode call) {
-      this.methodCall = call;
+      this.executionCall = call;
    }
    /**
     * @return the ret
     */
-   public ISENode getMethodReturn() {
-      return methodReturn;
+   public ISENode getExecutionReturn() {
+      return executionReturn;
    }
    /**
     * @param ret the ret to set
     */
    public void setMethodReturn(ISENode ret) {
-      this.methodReturn = ret;
+      this.executionReturn = ret;
    }
    /**
     * @return the correctness
@@ -113,17 +113,17 @@ public class MethodCall {
    /**
     * @param correctness the correctness to set
     */
-   public void setMethodCallCorrectness(char correctness) {
+   public void setExecutionCorrectness(char correctness) {
       this.correctness = correctness;
    }
 
    /**
     * @param correctness the correctness to set
     */
-   public void setMethodCallCorrectnessIncludingSubMethods(char correctness) {
+   public void setExecutionCorrectnessIncludingSubMethods(char correctness) {
       this.correctness = correctness;
-      for(MethodCall call : listOfCalledMethods){
-         call.setMethodCallCorrectnessIncludingSubMethods(correctness);
+      for(Execution call : listOfCalledMethods){
+         call.setExecutionCorrectnessIncludingSubMethods(correctness);
       }
    }
    /**
@@ -132,11 +132,11 @@ public class MethodCall {
    public void setMethodCallCorrectnessExcludingSubMethods(char correctness) {
       this.correctness = correctness;}
 
-   public void setMethodCallTreeCompletelySearched(boolean b) {
-      methodCallTreeCompletelySearched = b ;
+   public void setExecutionTreeCompletelySearched(boolean b) {
+      executionTreeCompletelySearched = b ;
    }
 
-   public boolean getMethodCallTreeCompletelySearched(){
-      return methodCallTreeCompletelySearched;
+   public boolean getExecutionTreeCompletelySearched(){
+      return executionTreeCompletelySearched;
    }
 }

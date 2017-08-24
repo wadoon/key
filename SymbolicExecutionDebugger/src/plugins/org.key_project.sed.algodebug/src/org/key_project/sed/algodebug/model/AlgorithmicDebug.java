@@ -19,52 +19,53 @@ import org.key_project.util.java.IFilter;
 public class AlgorithmicDebug  {
 
    //Letzten Call zwischenspeichern um Rückgängigmachen des Highlighting in unhighlight zu ermöglichen
-   private MethodCall lastHighlightedCall;
-   public MethodCall getLastHighlightedCall(){
+   private Execution lastHighlightedCall;
+   public Execution getLastHighlightedCall(){
       return lastHighlightedCall;
    }
 
    private ISearchStrategy searchStrategy;
 
    public AlgorithmicDebug() {
-      listOfMethodCallTrees = new ListOfMethodCallTrees();
+      listOfExecutionTrees = new ListOfExecutionTrees();
    }
-   private ListOfMethodCallTrees listOfMethodCallTrees;
+   private ListOfExecutionTrees listOfExecutionTrees;
 
    private boolean bugFound = false;
 
-   private MethodCall bug;
+   private Execution bug;
 
    private boolean searchCompletedButNoBugFound = false;
 
    public void generateTree(ISENode root){
-      listOfMethodCallTrees.generateListOfMethodCallTrees(root);
-      listOfMethodCallTrees.addParentsToTree();
-      //      listOfMethodCallTrees.printTree();
+      listOfExecutionTrees.generateListOfExecutionTrees(root);
+      listOfExecutionTrees.addParentsToTree();
+//      listOfExecutionTrees.printTree();
+      listOfExecutionTrees.printTreeAsGraphviz();
    }
 
-   public MethodCall getBug(){
+   public Execution getBug(){
       return bug;
    }
 
-   private MethodCall actualMethodCallTree;
+   private Execution actualExecutionTree;
 
    /*
     * return Method Call wenn ein nächster Knoten zum abfragen gefunden werden konnte.
     * return null wenn ein Bug gefunden wurde oder alle Bäume komplett abgesucht wurden
     * -----> frage bei return null in der Such-Methode nach was los ist und setze bugFound oder searchCompletedButNoBugFound
     */
-   public MethodCall searchBugInListOfMethodCallTrees(){
-      if(actualMethodCallTree == null)
-         actualMethodCallTree = listOfMethodCallTrees.getListOfMethodCallTrees().get(0);
-      if(actualMethodCallTree.completelySearched()){
-         for(MethodCall methodCallTree :listOfMethodCallTrees.listOfMethodCallTrees){
-            if(methodCallTree.getMethodCallTreeCompletelySearched())
+   public Execution searchBugInListOfExecutionTrees(){
+      if(actualExecutionTree == null)
+         actualExecutionTree = listOfExecutionTrees.getListOfExecutionTrees().get(0);
+      if(actualExecutionTree.completelySearched()){
+         for(Execution executionTree :listOfExecutionTrees.listOfExecutionTrees){
+            if(executionTree.getExecutionTreeCompletelySearched())
                continue;
             else{
-               actualMethodCallTree = methodCallTree;
+               actualExecutionTree = executionTree;
                searchStrategy.reset();
-               MethodCall maybeABuggyCall = searchBugInMethodCallTree(methodCallTree);
+               Execution maybeABuggyCall = searchBugInExecutionTree(executionTree);
                if(maybeABuggyCall != null){
                   return maybeABuggyCall;
                }
@@ -81,7 +82,7 @@ public class AlgorithmicDebug  {
          }
       }
       else{
-         MethodCall maybeABuggyCall = searchBugInMethodCallTree(actualMethodCallTree);
+         Execution maybeABuggyCall = searchBugInExecutionTree(actualExecutionTree);
          if(maybeABuggyCall != null){
             return maybeABuggyCall;
          }
@@ -92,7 +93,7 @@ public class AlgorithmicDebug  {
                return null;
             }
             else if(searchStrategy.searchCompletedButNoBugFound()){
-               return searchBugInListOfMethodCallTrees();
+               return searchBugInListOfExecutionTrees();
             }
       }
       //Hier kommen wir hin wenn alle Trees durchlaufen wurden und kein Bug gefunden wurde
@@ -104,17 +105,17 @@ public class AlgorithmicDebug  {
     * return null wenn ein Bug gefunden wurde oder der ganze Baum durchsucht wurde
     * return Method Call wenn ein nächster Method Call gefunden wurde der abgefragt werden soll
     */
-   private MethodCall searchBugInMethodCallTree(MethodCall methodCallTree){
-      return searchStrategy.getNext(methodCallTree);
+   private Execution searchBugInExecutionTree(Execution executionTree){
+      return searchStrategy.getNext(executionTree);
    }
 
-   public MethodCall getNext(){
-      return searchBugInListOfMethodCallTrees();
+   public Execution getNext(){
+      return searchBugInListOfExecutionTrees();
    }
 
-   public void highlightCall(MethodCall call){
+   public void highlightCall(Execution call){
 
-      ISENode node = call.getMethodReturn();
+      ISENode node = call.getExecutionReturn();
 
       while(  !(node instanceof ISEThread)){
          if(node == call.getCall()){
@@ -139,7 +140,7 @@ public class AlgorithmicDebug  {
    public void unhighlight(){
 
       if(lastHighlightedCall != null){
-         ISENode node = lastHighlightedCall.getMethodReturn();
+         ISENode node = lastHighlightedCall.getExecutionReturn();
          ISEAnnotationType annotationTypeHighlight = SEAnnotationUtil.getAnnotationtype(HighlightAnnotationType.TYPE_ID);
          ISEAnnotation[]  registeredAnnotationsHighlight = node.getDebugTarget().getRegisteredAnnotations(annotationTypeHighlight);
 
@@ -176,8 +177,8 @@ public class AlgorithmicDebug  {
    /*
     * Markiert einen Call, also die Knoten zwischen dem dort gespeicherten Start und Endknoten
     */
-   public void markCall(MethodCall methodCall, char correctness){
-      searchStrategy.setMethodCallCorrectness(methodCall, correctness);
+   public void markCall(Execution execution, char correctness){
+      searchStrategy.setExecutionCorrectness(execution, correctness);
    }
 
    public void setSearchStrategy(ISearchStrategy strategy) {

@@ -1,13 +1,13 @@
 package org.key_project.sed.algodebug.searchstrategy;
 
-import org.key_project.sed.algodebug.model.MethodCall;
+import org.key_project.sed.algodebug.model.Execution;
 
 public class SingleStepping extends SearchStrategy implements ISearchStrategy {
 
-   private MethodCall root;
+   private Execution root;
 
    @Override
-   public MethodCall getNext(MethodCall tree) {
+   public Execution getNext(Execution tree) {
       if(root == null)
          root = tree;
       switch(tree.getCorrectness()){
@@ -17,12 +17,12 @@ public class SingleStepping extends SearchStrategy implements ISearchStrategy {
          return null;
       }
       case 'c':{
-         root.setMethodCallTreeCompletelySearched(true);
+         root.setExecutionTreeCompletelySearched(true);
          searchCompletedButNoBugFound = true;
          return null;
       }
       case 'u':{
-         for(MethodCall child : tree.getListOfCalledMethods()){
+         for(Execution child : tree.getListOfCalledMethods()){
             switch(child.getCorrectness()){
             case 'f':         
                bugFound = true;
@@ -36,14 +36,13 @@ public class SingleStepping extends SearchStrategy implements ISearchStrategy {
          }
          return tree;
       }
-      
       }
       return null;
    }
 
    @Override
-   public void setMethodCallCorrectness(MethodCall methodCall, char correctness) {
-      methodCall.setMethodCallCorrectness(correctness);
+   public void setExecutionCorrectness(Execution execution, char correctness) {
+      execution.setExecutionCorrectness(correctness);
    }
 
    @Override

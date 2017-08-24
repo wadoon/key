@@ -91,8 +91,8 @@ public class VariablesSelectionView extends ViewPart {
    private void createViews(){
       IWorkbenchPage workbenchpage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
       try {
-         variablesViewLeft = workbenchpage.showView("org.key_project.sed.ui.view.myVariablesView", "VariablesViewLeft",IWorkbenchPage.VIEW_ACTIVATE);
-         variablesViewRight = workbenchpage.showView("org.key_project.sed.ui.view.myVariablesView", "VariablesViewRight",IWorkbenchPage.VIEW_ACTIVATE);
+         variablesViewLeft = workbenchpage.showView("org.key_project.sed.ui.view.AlgorithmicDebugVariablesView", "VariablesViewLeft",IWorkbenchPage.VIEW_ACTIVATE);
+         variablesViewRight = workbenchpage.showView("org.key_project.sed.ui.view.AlgorithmicDebugVariablesView", "VariablesViewRight",IWorkbenchPage.VIEW_ACTIVATE);
       }
       catch (PartInitException e) {
          // TODO Auto-generated catch block
