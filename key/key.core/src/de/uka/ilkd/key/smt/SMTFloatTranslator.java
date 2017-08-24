@@ -276,7 +276,6 @@ public class SMTFloatTranslator implements SMTTranslator {
 				buffer.append(";" + c2 + "\n");
 			}
 		}
-		System.out.println("buffer = " + buffer);
 		return buffer;
 	}
 
@@ -316,7 +315,7 @@ public class SMTFloatTranslator implements SMTTranslator {
 		}
 		// Add the proof obligation to file.
 		file.addFormula(po);
-		System.out.println("file = " + file.toString());
+		//System.out.println("file = " + file.toString());
 		return file;
 	}
 
