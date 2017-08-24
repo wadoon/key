@@ -36,7 +36,7 @@ public class AnalyzerGUIDialog extends Application {
                 (AnalyzerGUIController) loader.getController();
 
         stage.setTitle("Strength Analysis");
-        stage.setScene(new Scene(root, 800, 500));
+        stage.setScene(new Scene(root, 900, 500));
         stage.show();
         
         controller.setMainWindow(stage);

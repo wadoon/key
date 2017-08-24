@@ -13,14 +13,7 @@
 
 package de.tud.cs.se.ds.specstr.util;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -32,19 +25,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.DefaultVisitor;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.label.FormulaTermLabel;
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.label.TermLabelManager;
-import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.label.*;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -698,7 +680,7 @@ public final class LogicUtilities {
                         formulaTermLabelIDsDeep(oSf.formula());
 
                 allLabelsInNode.addAll(labelsInSeqFor);
-                if (labelsInSeqFor.contains(label)) {
+                if (labelsInSeqFor.contains(label.toString())) {
                     originForm = oSf;
                     break;
                 }
