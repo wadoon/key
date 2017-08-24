@@ -3160,7 +3160,7 @@ public class PrettyPrinter {
     }
 
     public void printComment(Comment x) throws java.io.IOException {
-	write("/*" + x.getText() + "*/");
+	write(x.getText() + "\n");
     }
 
     public void printParenthesizedExpression(ParenthesizedExpression x) 
