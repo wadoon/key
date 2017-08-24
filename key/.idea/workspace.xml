@@ -4,8 +4,7 @@
     <list default="true" id="fa0320c5-b200-471f-9ed6-a7f797d0a8b1" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SMTFloatTranslator.java" afterPath="$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SMTFloatTranslator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/lang/SMTTermFloatOp.java" afterPath="$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/lang/SMTTermFloatOp.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/speclang/jml/translation/KeYJMLParser.g" afterPath="$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/speclang/jml/translation/KeYJMLParser.g" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SMTSolverImplementation.java" afterPath="$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SMTSolverImplementation.java" />
     </list>
     <ignored path="$PROJECT_DIR$/key.core/bin/" />
     <ignored path="$PROJECT_DIR$/key.core.example/bin/" />
@@ -38,45 +37,84 @@
       <file leaf-file-name="SMTFloatTranslator.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SMTFloatTranslator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="239">
-              <caret line="169" column="67" lean-forward="false" selection-start-line="169" selection-start-column="67" selection-end-line="169" selection-end-column="67" />
+            <state relative-caret-position="68">
+              <caret line="317" column="10" lean-forward="false" selection-start-line="317" selection-start-column="10" selection-end-line="317" selection-end-column="10" />
               <folding>
-                <element signature="e#8578#8587#0" expanded="true" />
-                <element signature="e#8975#8984#0" expanded="true" />
-                <element signature="e#13928#13937#0" expanded="true" />
-                <element signature="e#14144#14153#0" expanded="true" />
-                <element signature="e#17985#17994#0" expanded="true" />
-                <element signature="e#20423#20432#0" expanded="true" />
+                <marker date="1503577492871" expanded="false" signature="17943:17952" ph="&lt;~&gt;" />
+                <marker date="1503577492871" expanded="false" signature="20381:20390" ph="&lt;~&gt;" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SMTTermFloatOp.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/lang/SMTTermFloatOp.java">
+      <file leaf-file-name="SMTSolverImplementation.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SMTSolverImplementation.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
-              <caret line="31" column="33" lean-forward="true" selection-start-line="31" selection-start-column="33" selection-end-line="31" selection-end-column="33" />
+            <state relative-caret-position="366">
+              <caret line="336" column="29" lean-forward="false" selection-start-line="336" selection-start-column="29" selection-end-line="336" selection-end-column="29" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="NumberTranslation.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/NumberTranslation.java">
+      <file leaf-file-name="SMTFile.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/lang/SMTFile.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="322">
-              <caret line="89" column="41" lean-forward="true" selection-start-line="89" selection-start-column="41" selection-end-line="89" selection-end-column="41" />
+            <state relative-caret-position="129">
+              <caret line="152" column="35" lean-forward="false" selection-start-line="152" selection-start-column="35" selection-end-line="152" selection-end-column="35" />
+              <folding>
+                <element signature="e#1696#1697#0" expanded="true" />
+                <element signature="e#1726#1727#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Unsafe.class" pinned="false" current-in-tab="false">
+        <entry file="jar:///usr/java/jdk1.8.0_112/jre/lib/rt.jar!/sun/misc/Unsafe.class">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="363">
+              <caret line="362" column="0" lean-forward="false" selection-start-line="362" selection-start-column="0" selection-end-line="362" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SMTTranslator.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SMTTranslator.java">
+      <file leaf-file-name="SMTFunction.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/lang/SMTFunction.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="204">
-              <caret line="26" column="25" lean-forward="false" selection-start-line="26" selection-start-column="25" selection-end-line="26" selection-end-column="25" />
+            <state relative-caret-position="296">
+              <caret line="199" column="0" lean-forward="false" selection-start-line="199" selection-start-column="0" selection-end-line="199" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="floatRules.key" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/key.core/resources/de/uka/ilkd/key/proof/rules/floatRules.key">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="floatRulesAssumeStrictfp.key" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/key.core/resources/de/uka/ilkd/key/proof/rules/floatRulesAssumeStrictfp.key">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="112">
+              <caret line="25" column="20" lean-forward="false" selection-start-line="25" selection-start-column="20" selection-end-line="25" selection-end-column="20" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="JMLTranslator.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/speclang/jml/translation/JMLTranslator.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="145">
+              <caret line="2298" column="0" lean-forward="false" selection-start-line="2298" selection-start-column="0" selection-end-line="2298" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -85,96 +123,19 @@
       <file leaf-file-name="AbstractSMTTranslator.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/AbstractSMTTranslator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="404">
-              <caret line="2276" column="78" lean-forward="true" selection-start-line="2276" selection-start-column="78" selection-end-line="2276" selection-end-column="78" />
+            <state relative-caret-position="34578">
+              <caret line="2109" column="25" lean-forward="false" selection-start-line="2109" selection-start-column="25" selection-end-line="2109" selection-end-column="25" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SmtLibTranslator.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SmtLibTranslator.java">
+      <file leaf-file-name="ArrayIndexLoop.java" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/PDF-floats/productPrograms/ant/src/examples/ArrayIndexLoop.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-561">
-              <caret line="22" column="13" lean-forward="false" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="13" />
+            <state relative-caret-position="527">
+              <caret line="31" column="10" lean-forward="false" selection-start-line="31" selection-start-column="10" selection-end-line="31" selection-end-column="10" />
               <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SmtLib2Translator.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SmtLib2Translator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="226">
-              <caret line="395" column="36" lean-forward="true" selection-start-line="395" selection-start-column="36" selection-end-line="395" selection-end-column="36" />
-              <folding>
-                <element signature="e#11732#11733#0" expanded="true" />
-                <element signature="e#11757#11758#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SMTCommand.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/macros/scripts/SMTCommand.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="680">
-              <caret line="53" column="20" lean-forward="false" selection-start-line="53" selection-start-column="20" selection-end-line="53" selection-end-column="20" />
-              <folding>
-                <element signature="imports" expanded="false" />
-                <element signature="e#643#644#0" expanded="false" />
-                <element signature="e#691#692#0" expanded="false" />
-                <element signature="e#1277#1278#0" expanded="false" />
-                <element signature="e#1305#1306#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SolverLauncher.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SolverLauncher.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2278">
-              <caret line="159" column="24" lean-forward="false" selection-start-line="159" selection-start-column="24" selection-end-line="159" selection-end-column="24" />
-              <folding>
-                <element signature="e#0#17666#0" expanded="false" />
-                <element signature="imports" expanded="false" />
-                <element signature="e#4143#4144#0" expanded="false" />
-                <element signature="e#4175#4176#0" expanded="false" />
-                <element signature="e#4242#4243#0" expanded="false" />
-                <element signature="e#4277#4278#0" expanded="false" />
-                <element signature="e#10460#10461#0" expanded="false" />
-                <element signature="e#10513#10514#0" expanded="false" />
-                <element signature="e#14042#14043#0" expanded="false" />
-                <element signature="e#14080#14081#0" expanded="false" />
-                <element signature="e#14606#14607#0" expanded="false" />
-                <element signature="e#14646#14647#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="SMTProblem.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SMTProblem.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="221">
-              <caret line="37" column="13" lean-forward="false" selection-start-line="37" selection-start-column="13" selection-end-line="37" selection-end-column="13" />
-              <folding>
-                <element signature="e#0#6752#0" expanded="false" />
-                <element signature="imports" expanded="false" />
-                <element signature="e#2396#2397#0" expanded="false" />
-                <element signature="e#2435#2436#0" expanded="false" />
-                <element signature="e#2555#2556#0" expanded="false" />
-                <element signature="e#2597#2598#0" expanded="false" />
-                <element signature="e#3171#3172#0" expanded="false" />
-                <element signature="e#3210#3211#0" expanded="false" />
-                <element signature="e#3249#3250#0" expanded="false" />
-                <element signature="e#3291#3292#0" expanded="false" />
-                <element signature="e#4960#4961#0" expanded="false" />
-                <element signature="e#4999#5000#0" expanded="false" />
-                <element signature="e#5206#5207#0" expanded="false" />
-                <element signature="e#5253#5254#0" expanded="false" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -203,6 +164,9 @@
       <find>f</find>
       <find>file</find>
       <find>functions</find>
+      <find>FPEQ</find>
+      <find>all</find>
+      <find>all</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -226,7 +190,12 @@
         <option value="$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/speclang/jml/translation/JMLTranslator.java" />
         <option value="$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/speclang/jml/translation/KeYJMLParser.g" />
         <option value="$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/lang/SMTTermFloatOp.java" />
+        <option value="$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/AbstractSMTTranslator.java" />
+        <option value="$PROJECT_DIR$/key.core/resources/de/uka/ilkd/key/proof/rules/floatRulesAssumeStrictfp.key" />
+        <option value="$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/lang/SMTFunction.java" />
+        <option value="$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/lang/SMTFile.java" />
         <option value="$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SMTFloatTranslator.java" />
+        <option value="$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SMTSolverImplementation.java" />
       </list>
     </option>
   </component>
@@ -236,7 +205,7 @@
     <option name="height" value="1173" />
   </component>
   <component name="ProjectView">
-    <navigator proportions="" version="1">
+    <navigator currentView="ProjectPane" proportions="" version="1">
       <flattenPackages />
       <showMembers />
       <showModules />
@@ -249,13 +218,86 @@
       <manualOrder />
       <foldersAlwaysOnTop value="true" />
     </navigator>
-    <panes />
+    <panes>
+      <pane id="Scratches" />
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="key" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="key.core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="key" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="key.core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="resources" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="key" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="key.core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="resources" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="key" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="key" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="key.core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="resources" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="key" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="rules" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+    </panes>
   </component>
   <component name="PropertiesComponent">
     <property name="project.structure.last.edited" value="Modules" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="SearchEverywhereHistoryKey" value="&#9;FILE&#9;file:///home/i57/cnodes/jschiffl/keyfp/key/key/key.core/src/de/uka/ilkd/key/smt/SMTFloatTranslator.java&#10;smt&#9;FILE&#9;file:///home/i57/cnodes/jschiffl/keyfp/key/key/key.core/src/de/uka/ilkd/key/smt/SMTTranslator.java&#10;sle&#9;FILE&#9;file:///home/i57/cnodes/jschiffl/keyfp/key/key/key.core/src/de/uka/ilkd/key/speclang/translation/SLExpression.java&#10;keyjml&#9;FILE&#9;file:///home/i57/cnodes/jschiffl/keyfp/key/key/key.core/src/de/uka/ilkd/key/speclang/jml/translation/KeYJMLLexer.g&#10;keyjmlpr&#9;FILE&#9;file:///home/i57/cnodes/jschiffl/keyfp/key/key/key.core/src/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.g&#10;*lexer&#9;PSI&#9;JAVA://de.uka.ilkd.key.speclang.jml.translation.KeYJMLLexer&#10;jmltr&#9;PSI&#9;JAVA://de.uka.ilkd.key.speclang.jml.translation.JMLTranslator&#10;double&#9;PSI&#9;JAVA://de.uka.ilkd.key.ldt.DoubleLDT&#10;javaadd&#9;PSI&#9;JAVA://de.uka.ilkd.key.ldt.FloatLDT#javaAddFloat&#10;integer&#9;PSI&#9;JAVA://de.uka.ilkd.key.ldt.IntegerLDT" />
+    <property name="SearchEverywhereHistoryKey" value="inte&#9;FILE&#9;file:///home/i57/cnodes/jschiffl/keyfp/key/key/key.core/src/de/uka/ilkd/key/speclang/translation/JavaIntegerSemanticsHelper.java&#10;jml&#9;FILE&#9;file:///home/i57/cnodes/jschiffl/keyfp/key/key/key.core/src/de/uka/ilkd/key/speclang/jml/translation/JMLTranslator.java&#10;int&#9;FILE&#9;file:///home/i57/cnodes/jschiffl/keyfp/key/key/key.core/src/de/uka/ilkd/key/speclang/translation/JavaIntegerSemanticsHelper.java&#10;smt&#9;FILE&#9;file:///home/i57/cnodes/jschiffl/keyfp/key/key/key.core/src/de/uka/ilkd/key/smt/SMTTranslator.java&#10;sle&#9;FILE&#9;file:///home/i57/cnodes/jschiffl/keyfp/key/key/key.core/src/de/uka/ilkd/key/speclang/translation/SLExpression.java&#10;keyjml&#9;FILE&#9;file:///home/i57/cnodes/jschiffl/keyfp/key/key/key.core/src/de/uka/ilkd/key/speclang/jml/translation/KeYJMLLexer.g&#10;keyjmlpr&#9;FILE&#9;file:///home/i57/cnodes/jschiffl/keyfp/key/key/key.core/src/de/uka/ilkd/key/speclang/jml/pretranslation/KeYJMLPreLexer.g&#10;*lexer&#9;PSI&#9;JAVA://de.uka.ilkd.key.speclang.jml.translation.KeYJMLLexer&#10;jmltr&#9;PSI&#9;JAVA://de.uka.ilkd.key.speclang.jml.translation.JMLTranslator&#10;double&#9;PSI&#9;JAVA://de.uka.ilkd.key.ldt.DoubleLDT&#10;javaadd&#9;PSI&#9;JAVA://de.uka.ilkd.key.ldt.FloatLDT#javaAddFloat&#10;integer&#9;PSI&#9;JAVA://de.uka.ilkd.key.ldt.IntegerLDT" />
+    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
   <component name="RecentsManager">
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
@@ -476,23 +518,23 @@
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32947975" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Tool Output" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32947975" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Tool Output" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32851636" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32851636" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2938343" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.2716763" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="CheckStyle" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32947975" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32851636" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.122068234" sideWeight="0.4949785" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2228145" sideWeight="0.4949785" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32851636" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="ANTLR Preview" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2185501" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18923241" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.5549133" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.36705202" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.117803834" sideWeight="0.5050215" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -509,7 +551,7 @@
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="4" />
+      <option name="time" value="10" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -518,132 +560,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/ldt/IntegerLDT.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="60" column="19" lean-forward="false" selection-start-line="60" selection-start-column="19" selection-end-line="60" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/ldt/FloatLDT.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="54" column="22" lean-forward="false" selection-start-line="54" selection-start-column="22" selection-end-line="54" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/ldt/DoubleLDT.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="32" column="19" lean-forward="false" selection-start-line="32" selection-start-column="19" selection-end-line="32" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/logic/op/Function.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="27" column="13" lean-forward="false" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/logic/TermImpl.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1717">
-          <caret line="120" column="0" lean-forward="false" selection-start-line="120" selection-start-column="0" selection-end-line="120" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/speclang/jml/translation/KeYJMLParser.g">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="16541">
-          <caret line="973" column="23" lean-forward="false" selection-start-line="973" selection-start-column="23" selection-end-line="973" selection-end-column="23" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/speclang/jml/translation/JMLTranslator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3757">
-          <caret line="221" column="17" lean-forward="false" selection-start-line="221" selection-start-column="17" selection-end-line="221" selection-end-column="17" />
-          <folding>
-            <element signature="e#0#113688#0" expanded="false" />
-            <element signature="imports" expanded="false" />
-            <element signature="e#6582#6583#0" expanded="false" />
-            <element signature="e#6620#6621#0" expanded="false" />
-            <element signature="e#6656#6657#0" expanded="false" />
-            <element signature="e#6694#6695#0" expanded="false" />
-            <element signature="e#6747#6748#0" expanded="false" />
-            <element signature="e#6785#6786#0" expanded="false" />
-            <element signature="e#19789#19790#0" expanded="false" />
-            <element signature="e#19833#19834#0" expanded="false" />
-            <element signature="e#20527#20528#0" expanded="false" />
-            <element signature="e#20571#20572#0" expanded="false" />
-            <element signature="e#56134#56135#0" expanded="false" />
-            <element signature="e#56186#56187#0" expanded="false" />
-            <element signature="e#56694#56695#0" expanded="false" />
-            <element signature="e#56745#56746#0" expanded="false" />
-            <element signature="e#57272#57273#0" expanded="false" />
-            <element signature="e#57333#57334#0" expanded="false" />
-            <element signature="e#57500#57501#0" expanded="false" />
-            <element signature="e#57544#57545#0" expanded="false" />
-            <element signature="e#57984#57985#0" expanded="false" />
-            <element signature="e#58035#58036#0" expanded="false" />
-            <element signature="e#58467#58468#0" expanded="false" />
-            <element signature="e#58518#58519#0" expanded="false" />
-            <element signature="e#58975#58976#0" expanded="false" />
-            <element signature="e#59026#59027#0" expanded="false" />
-            <element signature="e#85748#85749#0" expanded="false" />
-            <element signature="e#85812#85813#0" expanded="false" />
-            <element signature="e#89913#89914#0" expanded="false" />
-            <element signature="e#89970#89971#0" expanded="false" />
-            <element signature="e#100738#100739#0" expanded="false" />
-            <element signature="e#100773#100774#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/key.core/genSrc/de/uka/ilkd/key/speclang/jml/translation/KeYJMLParser.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="74494">
-          <caret line="4382" column="37" lean-forward="false" selection-start-line="4382" selection-start-column="37" selection-end-line="4382" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/speclang/translation/JavaIntegerSemanticsHelper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3179">
-          <caret line="208" column="24" lean-forward="false" selection-start-line="208" selection-start-column="24" selection-end-line="208" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/ldt/IntegerLDT.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="238">
-          <caret line="60" column="19" lean-forward="false" selection-start-line="60" selection-start-column="19" selection-end-line="60" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/ldt/FloatLDT.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="340">
-          <caret line="54" column="22" lean-forward="false" selection-start-line="54" selection-start-column="22" selection-end-line="54" selection-end-column="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/ldt/DoubleLDT.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="32" column="19" lean-forward="false" selection-start-line="32" selection-start-column="19" selection-end-line="32" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/logic/op/Function.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="27" column="13" lean-forward="false" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/logic/TermImpl.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2040">
@@ -655,7 +571,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -712,20 +627,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
           <caret line="60" column="19" lean-forward="false" selection-start-line="60" selection-start-column="19" selection-end-line="60" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/logic/op/Function.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="204">
-          <caret line="27" column="13" lean-forward="false" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/ldt/DoubleLDT.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="102">
-          <caret line="32" column="19" lean-forward="false" selection-start-line="32" selection-start-column="19" selection-end-line="32" selection-end-column="19" />
         </state>
       </provider>
     </entry>
@@ -792,13 +693,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/speclang/translation/JavaIntegerSemanticsHelper.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5797">
-          <caret line="362" column="24" lean-forward="false" selection-start-line="362" selection-start-column="24" selection-end-line="362" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/speclang/jml/translation/JMLTranslationMethod.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="221">
@@ -817,20 +711,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2652">
           <caret line="184" column="34" lean-forward="false" selection-start-line="184" selection-start-column="34" selection-end-line="184" selection-end-column="34" />
-          <folding>
-            <element signature="e#0#8210#0" expanded="false" />
-            <element signature="imports" expanded="false" />
-            <element signature="e#2919#2920#0" expanded="false" />
-            <element signature="e#2994#2995#0" expanded="false" />
-            <element signature="e#3050#3051#0" expanded="false" />
-            <element signature="e#3126#3127#0" expanded="false" />
-            <element signature="e#4875#4876#0" expanded="false" />
-            <element signature="e#4902#4903#0" expanded="false" />
-            <element signature="e#5001#5002#0" expanded="false" />
-            <element signature="e#5028#5029#0" expanded="false" />
-            <element signature="e#5131#5132#0" expanded="false" />
-            <element signature="e#5158#5159#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -841,52 +721,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/speclang/jml/translation/JMLTranslator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="39678">
-          <caret line="2426" column="19" lean-forward="false" selection-start-line="2426" selection-start-column="19" selection-end-line="2426" selection-end-column="19" />
-          <folding>
-            <element signature="e#0#113688#0" expanded="false" />
-            <element signature="imports" expanded="false" />
-            <element signature="e#6582#6583#0" expanded="false" />
-            <element signature="e#6620#6621#0" expanded="false" />
-            <element signature="e#6656#6657#0" expanded="false" />
-            <element signature="e#6694#6695#0" expanded="false" />
-            <element signature="e#6747#6748#0" expanded="false" />
-            <element signature="e#6785#6786#0" expanded="false" />
-            <element signature="e#19789#19790#0" expanded="false" />
-            <element signature="e#19833#19834#0" expanded="false" />
-            <element signature="e#20527#20528#0" expanded="false" />
-            <element signature="e#20571#20572#0" expanded="false" />
-            <element signature="e#56134#56135#0" expanded="false" />
-            <element signature="e#56186#56187#0" expanded="false" />
-            <element signature="e#56694#56695#0" expanded="false" />
-            <element signature="e#56745#56746#0" expanded="false" />
-            <element signature="e#57272#57273#0" expanded="false" />
-            <element signature="e#57333#57334#0" expanded="false" />
-            <element signature="e#57500#57501#0" expanded="false" />
-            <element signature="e#57544#57545#0" expanded="false" />
-            <element signature="e#57984#57985#0" expanded="false" />
-            <element signature="e#58035#58036#0" expanded="false" />
-            <element signature="e#58467#58468#0" expanded="false" />
-            <element signature="e#58518#58519#0" expanded="false" />
-            <element signature="e#58975#58976#0" expanded="false" />
-            <element signature="e#59026#59027#0" expanded="false" />
-            <element signature="e#85748#85749#0" expanded="false" />
-            <element signature="e#85812#85813#0" expanded="false" />
-            <element signature="e#89913#89914#0" expanded="false" />
-            <element signature="e#89970#89971#0" expanded="false" />
-            <element signature="e#100738#100739#0" expanded="false" />
-            <element signature="e#100773#100774#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/speclang/jml/translation/KeYJMLParser.g">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17493">
           <caret line="1029" column="52" lean-forward="false" selection-start-line="1029" selection-start-column="52" selection-end-line="1029" selection-end-column="52" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -894,13 +732,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="680">
           <caret line="53" column="20" lean-forward="false" selection-start-line="53" selection-start-column="20" selection-end-line="53" selection-end-column="20" />
-          <folding>
-            <element signature="imports" expanded="false" />
-            <element signature="e#643#644#0" expanded="false" />
-            <element signature="e#691#692#0" expanded="false" />
-            <element signature="e#1277#1278#0" expanded="false" />
-            <element signature="e#1305#1306#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -908,20 +739,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2278">
           <caret line="159" column="24" lean-forward="false" selection-start-line="159" selection-start-column="24" selection-end-line="159" selection-end-column="24" />
-          <folding>
-            <element signature="e#0#17666#0" expanded="false" />
-            <element signature="imports" expanded="false" />
-            <element signature="e#4143#4144#0" expanded="false" />
-            <element signature="e#4175#4176#0" expanded="false" />
-            <element signature="e#4242#4243#0" expanded="false" />
-            <element signature="e#4277#4278#0" expanded="false" />
-            <element signature="e#10460#10461#0" expanded="false" />
-            <element signature="e#10513#10514#0" expanded="false" />
-            <element signature="e#14042#14043#0" expanded="false" />
-            <element signature="e#14080#14081#0" expanded="false" />
-            <element signature="e#14606#14607#0" expanded="false" />
-            <element signature="e#14646#14647#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -929,87 +746,194 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="221">
           <caret line="37" column="13" lean-forward="false" selection-start-line="37" selection-start-column="13" selection-end-line="37" selection-end-column="13" />
-          <folding>
-            <element signature="e#0#6752#0" expanded="false" />
-            <element signature="imports" expanded="false" />
-            <element signature="e#2396#2397#0" expanded="false" />
-            <element signature="e#2435#2436#0" expanded="false" />
-            <element signature="e#2555#2556#0" expanded="false" />
-            <element signature="e#2597#2598#0" expanded="false" />
-            <element signature="e#3171#3172#0" expanded="false" />
-            <element signature="e#3210#3211#0" expanded="false" />
-            <element signature="e#3249#3250#0" expanded="false" />
-            <element signature="e#3291#3292#0" expanded="false" />
-            <element signature="e#4960#4961#0" expanded="false" />
-            <element signature="e#4999#5000#0" expanded="false" />
-            <element signature="e#5206#5207#0" expanded="false" />
-            <element signature="e#5253#5254#0" expanded="false" />
-          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SmtLibTranslator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="102">
+          <caret line="22" column="13" lean-forward="false" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="13" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/NumberTranslation.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="322">
-          <caret line="89" column="41" lean-forward="true" selection-start-line="89" selection-start-column="41" selection-end-line="89" selection-end-column="41" />
+          <caret line="89" column="41" lean-forward="false" selection-start-line="89" selection-start-column="41" selection-end-line="89" selection-end-column="41" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/lang/SMTSort.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="187">
+          <caret line="26" column="13" lean-forward="false" selection-start-line="26" selection-start-column="13" selection-end-line="26" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/ldt/DoubleLDT.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3944">
+          <caret line="271" column="11" lean-forward="false" selection-start-line="271" selection-start-column="11" selection-end-line="271" selection-end-column="11" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/lang/SMTTermFloatOp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="459">
+          <caret line="45" column="51" lean-forward="false" selection-start-line="45" selection-start-column="51" selection-end-line="45" selection-end-column="51" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/lang/SMTTermMultOp.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="248">
+          <caret line="44" column="23" lean-forward="false" selection-start-line="44" selection-start-column="23" selection-end-line="44" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/speclang/translation/JavaIntegerSemanticsHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="234">
+          <caret line="186" column="24" lean-forward="false" selection-start-line="186" selection-start-column="24" selection-end-line="186" selection-end-column="24" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SMTTranslator.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="204">
-          <caret line="26" column="25" lean-forward="false" selection-start-line="26" selection-start-column="25" selection-end-line="26" selection-end-column="25" />
-          <folding />
+          <caret line="26" column="23" lean-forward="false" selection-start-line="26" selection-start-column="23" selection-end-line="26" selection-end-column="23" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SmtLibTranslator.java">
+    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/logic/op/Function.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-561">
-          <caret line="22" column="13" lean-forward="false" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="13" />
-          <folding />
+        <state relative-caret-position="-1753">
+          <caret line="27" column="13" lean-forward="false" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SmtLib2Translator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="226">
-          <caret line="395" column="36" lean-forward="true" selection-start-line="395" selection-start-column="36" selection-end-line="395" selection-end-column="36" />
-          <folding>
-            <element signature="e#11732#11733#0" expanded="true" />
-            <element signature="e#11757#11758#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="6188">
+          <caret line="395" column="37" lean-forward="false" selection-start-line="395" selection-start-column="37" selection-end-line="395" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/logic/op/AbstractSortedOperator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2108">
+          <caret line="149" column="19" lean-forward="false" selection-start-line="149" selection-start-column="19" selection-end-line="149" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/logic/sort/Sort.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="24" column="17" lean-forward="false" selection-start-line="24" selection-start-column="17" selection-end-line="24" selection-end-column="17" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/AbstractSMTTranslator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="404">
-          <caret line="2276" column="78" lean-forward="true" selection-start-line="2276" selection-start-column="78" selection-end-line="2276" selection-end-column="78" />
+        <state relative-caret-position="34578">
+          <caret line="2109" column="25" lean-forward="false" selection-start-line="2109" selection-start-column="25" selection-end-line="2109" selection-end-column="25" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/lang/SMTTermFloatOp.java">
+    <entry file="file://$PROJECT_DIR$/key.core/resources/de/uka/ilkd/key/proof/rules/floatRules.key">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="31" column="33" lean-forward="true" selection-start-line="31" selection-start-column="33" selection-end-line="31" selection-end-column="33" />
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/key.core/resources/de/uka/ilkd/key/proof/rules/floatRulesAssumeStrictfp.key">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="112">
+          <caret line="25" column="20" lean-forward="false" selection-start-line="25" selection-start-column="20" selection-end-line="25" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/AbstractSolverSocket.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="243">
+          <caret line="94" column="0" lean-forward="false" selection-start-line="94" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/PDF-floats/productPrograms/ant/src/examples/ArrayIndexLoop.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="31" column="10" lean-forward="false" selection-start-line="31" selection-start-column="10" selection-end-line="31" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/speclang/jml/translation/JMLTranslator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="145">
+          <caret line="2298" column="0" lean-forward="false" selection-start-line="2298" selection-start-column="0" selection-end-line="2298" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/lang/SMTFunction.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="296">
+          <caret line="199" column="0" lean-forward="false" selection-start-line="199" selection-start-column="0" selection-end-line="199" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///usr/java/jdk1.8.0_112/src.zip!/java/util/Map.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="211" column="6" lean-forward="false" selection-start-line="211" selection-start-column="6" selection-end-line="211" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar:///usr/java/jdk1.8.0_112/jre/lib/rt.jar!/sun/misc/Unsafe.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="363">
+          <caret line="362" column="0" lean-forward="false" selection-start-line="362" selection-start-column="0" selection-end-line="362" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/lang/SMTFile.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="129">
+          <caret line="152" column="35" lean-forward="false" selection-start-line="152" selection-start-column="35" selection-end-line="152" selection-end-column="35" />
+          <folding>
+            <element signature="e#1696#1697#0" expanded="true" />
+            <element signature="e#1726#1727#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SMTSolverImplementation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="366">
+          <caret line="336" column="29" lean-forward="false" selection-start-line="336" selection-start-column="29" selection-end-line="336" selection-end-column="29" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/key.core/src/de/uka/ilkd/key/smt/SMTFloatTranslator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="239">
-          <caret line="169" column="67" lean-forward="false" selection-start-line="169" selection-start-column="67" selection-end-line="169" selection-end-column="67" />
+        <state relative-caret-position="68">
+          <caret line="317" column="10" lean-forward="false" selection-start-line="317" selection-start-column="10" selection-end-line="317" selection-end-column="10" />
           <folding>
-            <element signature="e#8578#8587#0" expanded="true" />
-            <element signature="e#8975#8984#0" expanded="true" />
-            <element signature="e#13928#13937#0" expanded="true" />
-            <element signature="e#14144#14153#0" expanded="true" />
-            <element signature="e#17985#17994#0" expanded="true" />
-            <element signature="e#20423#20432#0" expanded="true" />
+            <marker date="1503577492871" expanded="false" signature="17943:17952" ph="&lt;~&gt;" />
+            <marker date="1503577492871" expanded="false" signature="20381:20390" ph="&lt;~&gt;" />
           </folding>
         </state>
       </provider>

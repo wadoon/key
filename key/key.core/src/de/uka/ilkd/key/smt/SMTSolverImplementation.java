@@ -313,38 +313,41 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         }
 
 
-        
         private static String indent(String string) {
 
             StringBuilder sb = new StringBuilder();
             int indention = 0;
-	    boolean isComment = false;
+            boolean isComment = false;
+            boolean inPipe = false;
 
             for (int i = 0; i < string.length(); i++) {
                 char c = string.charAt(i);
                 switch (c) {
-                case '(':
-		    if (!isComment) {
-			sb.append("\n");
-			for (int j = 0; j < indention; j++)
-			    sb.append(" ");
-			indention++;
-		    }
-                    break;
-		case '\n':
-		    isComment = false;
-		    break;
-		case ';':
-		    isComment = true;
-		    break;
-                case ')':
-                    indention--;
-                    // fall through
-                default:
+                    case '(':
+                        if (!isComment && !inPipe) {
+                            sb.append("\n");
+                            for (int j = 0; j < indention; j++)
+                                sb.append(" ");
+                            indention++;
+                        }
+                        break;
+                    case '\n':
+                        isComment = false;
+                        break;
+                    case ';':
+                        isComment = true;
+                        break;
+                    case '|':
+                        inPipe = !inPipe;
+                        break;
+                    case ')':
+                        indention--;
+                        // fall through
+                    default:
                 }
                 sb.append(c);
             }
-
+            System.out.println("sb = " + sb);
             return sb.toString();
         }
 
