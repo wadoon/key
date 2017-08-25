@@ -92,6 +92,25 @@ public class SymbExInterface {
     }
 
     /**
+     * Constructor.
+     *
+     * @param file
+     *            The {@link File} containing the method to analyze.
+     * @param env
+     *            The {@link KeYEnvironment} for the problem to analyse (based
+     *            on the {@link StrengthAnalysisSEProfile}).
+     * @throws ProblemLoaderException
+     *             If the {@link File} could not be loaded, e.g. due to syntax
+     *             errors.
+     */
+    public SymbExInterface(File file,
+            KeYEnvironment<DefaultUserInterfaceControl> env)
+            throws ProblemLoaderException {
+        this.file = file;
+        this.env = env;
+    }
+
+    /**
      * Builds the {@link KeYEnvironment} for the problem to analyse (based on
      * the {@link StrengthAnalysisSEProfile}).
      *

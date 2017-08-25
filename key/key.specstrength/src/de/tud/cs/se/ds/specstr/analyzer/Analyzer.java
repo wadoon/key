@@ -29,10 +29,13 @@ import org.apache.logging.log4j.Logger;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
+import de.tud.cs.se.ds.specstr.profile.StrengthAnalysisSEProfile;
 import de.tud.cs.se.ds.specstr.rule.*;
 import de.tud.cs.se.ds.specstr.util.GeneralUtilities;
 import de.tud.cs.se.ds.specstr.util.JavaTypeInterface;
 import de.tud.cs.se.ds.specstr.util.LogicUtilities;
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
@@ -128,6 +131,41 @@ public class Analyzer {
      *             If the method could not be loaded.
      */
     public Analyzer(File file, String method, Optional<File> outProofFile) {
+        this(file, method, outProofFile, null);
+    }
+
+    /**
+     * Constructor.
+     *
+     * @param file
+     *            The file containing the method.
+     * @param method
+     *            The method identifier; should respect the format<br>
+     *            <br>
+     *
+     *            <code>&lt;fully qualified type name&gt;::&lt;method
+     *            name&gt;(&lt;arg decl&gt;)&lt;return type decl&gt;</code>,<br>
+     *            <br>
+     *
+     *            where where <code>&lt;arg decl&gt;</code> is according to the
+     *            field descriptors in the JVM specification, for instance
+     *            <code>[ILjava.lang.Object;D</code> for an integer array, an
+     *            Object and a double (not that we would support
+     *            doubles...).<br>
+     *            <code>&lt;return type decl&gt;</code> is constructed
+     *            similarly, only for a single type.
+     * @param outProofFile
+     *            An {@link Optional} {@link File} for writing the analyzer
+     *            results to, when running the {@link Analyzer} from the command
+     *            line and not programmatically.
+     * @param env
+     *            The {@link KeYEnvironment} for the problem to analyse (based
+     *            on the {@link StrengthAnalysisSEProfile}).
+     * @throws RuntimeException
+     *             If the method could not be loaded.
+     */
+    public Analyzer(File file, String method, Optional<File> outProofFile,
+            KeYEnvironment<DefaultUserInterfaceControl> env) {
         this.file = file;
         if (!parseMethodString(method)) {
             final String errorMsg = GeneralUtilities
@@ -137,7 +175,12 @@ public class Analyzer {
         }
 
         try {
-            this.seIf = new SymbExInterface(file);
+            if (env == null) {
+                this.seIf = new SymbExInterface(file);
+            }
+            else {
+                this.seIf = new SymbExInterface(file, env);
+            }
         }
         catch (ProblemLoaderException e) {
             GeneralUtilities.logErrorAndThrowRTE(LOGGER,
@@ -846,8 +889,8 @@ public class Analyzer {
             // @formatter:off
             ps.println(String.format(
                     "==========================================\n"
-                            + "Open \"invariant preserved\" branches: *%s*:\n"
-                            + "==========================================\n",
+                  + "Open \"invariant preserved\" branches: *%s*:\n"
+                  + "==========================================\n",
                     result.unclosedLoopInvPreservedGoals()));
             // @formatter:on
 
@@ -875,8 +918,8 @@ public class Analyzer {
         if (result.numUncoveredFacts() > 0) {
             // @formatter:off
             ps.println("================\n"
-                    + "Uncovered Facts:\n"
-                    + "================\n");
+                     + "Uncovered Facts:\n"
+                     + "================\n");
             // @formatter:on
 
             final PrintStream fPs = ps;
@@ -889,8 +932,8 @@ public class Analyzer {
         if (result.numAbstractlyCoveredFacts() > 0) {
             // @formatter:off
             ps.println("=========================\n"
-                    + "Abstractly Covered Facts:\n"
-                    + "=========================\n");
+                     + "Abstractly Covered Facts:\n"
+                     + "=========================\n");
             // @formatter:on
 
             final PrintStream fPs = ps;
@@ -899,6 +942,12 @@ public class Analyzer {
                 fPs.println();
             });
         }
+        
+        // @formatter:off
+        ps.println("========\n"
+                 + "Summary:\n"
+                 + "========\n");
+        // @formatter:on
 
         ps.printf(
                 "Covered %s (%s concretely, %s abstractly) out of %s facts\n"

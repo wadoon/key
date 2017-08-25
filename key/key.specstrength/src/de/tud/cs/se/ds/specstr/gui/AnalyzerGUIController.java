@@ -105,6 +105,7 @@ public class AnalyzerGUIController {
 
     private static final File TMP_DIR = new File(
             System.getProperty("java.io.tmpdir") + "/analyzerOutput/");
+    
     ////// Private properties
 
     private ObjectProperty<Window> mainWindowProperty =
@@ -118,6 +119,10 @@ public class AnalyzerGUIController {
 
     private ObjectProperty<File> proofFileProperty =
             new SimpleObjectProperty<>();
+    
+    ////// Private fields
+
+    private SymbExInterface seIf;
 
     ////// Initializer and public interface
 
@@ -221,9 +226,6 @@ public class AnalyzerGUIController {
                         .getSelectedItem());
         final File outProofFile = new File(TMP_DIR,
                 methodDescriptor + ".proof");
-        final Analyzer analyzer = new Analyzer(javaFileProperty.get(),
-                methodDescriptor,
-                Optional.of(outProofFile));
 
         proofFileProperty.set(outProofFile);
 
@@ -231,6 +233,11 @@ public class AnalyzerGUIController {
             @Override
             protected AnalyzerResult call() throws Exception {
                 return doWithDisabledWindow(() -> {
+                    final Analyzer analyzer =
+                            new Analyzer(javaFileProperty.get(),
+                                    methodDescriptor,
+                                    Optional.of(outProofFile),
+                                    seIf.keyEnvironment());
                     AnalyzerResult result = null;
                     Logger logger =
                             LogManager.getLogger(AnalyzerGUIController.class);
@@ -324,8 +331,7 @@ public class AnalyzerGUIController {
 
     private void loadContractTargets(final File selectedFile) {
         try {
-            final SymbExInterface seIf =
-                    new SymbExInterface(selectedFile);
+            seIf = new SymbExInterface(selectedFile);
             final List<KeYJavaType> types = seIf.getDeclaredTypes();
             final List<IObserverFunction> contractTargets = types
                     .stream()
@@ -396,7 +402,8 @@ public class AnalyzerGUIController {
                 .loadContent(new StringBuilder().append("<html>")
                         .append("<head>")
                         .append("<style type=\"text/css\">")
-                        .append(XhtmlRendererFactory.getRenderer("java").getCssClassDefinitions())
+                        .append(XhtmlRendererFactory.getRenderer("java")
+                                .getCssClassDefinitions())
                         .append("</style>")
                         .append("</head>")
                         .append("<body>")
@@ -427,7 +434,9 @@ public class AnalyzerGUIController {
         }
         else {
             text = text.replaceAll("\n", "<br/>")
-                    .replaceAll(" ", "&nbsp;");
+                    .replaceAll(" ", "&nbsp;").replaceAll(
+                            "=+<br/>([^=]*?):<br/>=+",
+                            "<strong>$1</strong>");
         }
 
         return text;
