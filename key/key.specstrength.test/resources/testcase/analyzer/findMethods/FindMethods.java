@@ -75,7 +75,9 @@ public class FindMethods {
   
 
     // Missing facts:
-    // 2x loop body fact "i = 1 + i0", that is exact change of i.
+    //   2x loop body fact "i = 1 + i0", that is exact change of i.
+    // One fact "abstractly covered":
+    //   Post condition fact: "result = i_0 - 1"
     /*@ public normal_behavior
       @ ensures
       @      ((\exists int i; i >= 0 && i < arr.length; arr[i] == n) ==> arr[\result] == n)
@@ -106,7 +108,7 @@ public class FindMethods {
     }
   
     // Two "abstractly covered" facts:
-    //   Post condition fact: "result = result_1_0"
+    //   Post condition fact: "result = i_0 - 1"
     //   Post condition fact: "result = -1"
     // Two uncovered facts:
     //   2x loop body fact "i = 1 + i0"
@@ -176,6 +178,9 @@ public class FindMethods {
     //   Post condition fact: "result = -1"
     //   Post condition fact: "result = result_1_0"
     //   Loop body fact "i = 1 + i0"
+    //     (from that, we can derive "i=0" together with one part of
+    //     the inv (result != -1) and result == i_0 from the path condition,
+    //     which can be used to make true the second part of the inv (\forall...))
     //   Loop body fact: "result = i_0"
     // Two uncovered facts:
     //   Loop body fact "i = 1 + i0"
@@ -206,8 +211,9 @@ public class FindMethods {
         return result;
     }
   
-    // Six "abstractly covered" facts:
+    // Two uncovered facts:
     //   2x loop body fact "i = 1 + i0", that is exact change of i.
+    // Four "abstractly covered" facts:
     //   Loop body fact: "result = -1"
     //   Loop body fact: "result = i_0"
     //   Post condition fact: "result = result_1_0"
@@ -237,10 +243,10 @@ public class FindMethods {
         return result;
     }
   
-    // Three "abstractly covered" facts:
+    // One "abstractly covered" fact:
+    //   Post condition fact: "result = -1"
+    // Four uncovered facts:
     //   2x loop body fact "i = 1 + i0", that is exact change of i.
-    //   Post condition fact: "result = result_1_0"
-    // Two uncovered facts:
     //   Post condition fact "result = result_1_0"
     //   Loop use case fact: "arr_0[result_1_0] = n"
     // Open exception: "arr_0 != null, but i Out of Bounds"
@@ -268,7 +274,7 @@ public class FindMethods {
         return result;
     }
   
-    // All available facts are "abstractly covered":
+    // All available facts are uncovered:
     //   2x loop body fact "i = 1 + i0", that is exact change of i.
     //   Post condition fact: "result = -1"
     //   Post condition fact: "result = result_1_0"
