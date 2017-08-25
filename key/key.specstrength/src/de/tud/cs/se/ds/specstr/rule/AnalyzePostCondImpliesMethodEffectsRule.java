@@ -19,6 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.tud.cs.se.ds.specstr.util.LogicUtilities;
 import de.uka.ilkd.key.java.Services;
@@ -81,21 +82,23 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
         final Term contract = TermBuilder.goBelowUpdates(goal.proof().root()
                 .sequent().succedent().getFirst().formula().sub(1)).sub(0);
 
-        final IProgramMethod pm = fContract.getTarget();
-        boolean isVoid = pm.isVoid();
+        final boolean isVoid = fContract.getTarget().isVoid();
+
+        final LinkedHashMap<LocationVariable, Term> updateContent =
+                LogicUtilities
+                        .updateToMap(updateTerm);
 
         // The variables that we're interested in are the heap (for non-static,
         // non-pure methods) and the result variable (for non-void methods),
         // because changes to them describe the method's behavior
         final Term origHeapTerm = MergeRuleUtils
                 .getUpdateRightSideFor(updateTerm, heapVar);
-        final boolean hasHeap = origHeapTerm != null;
 
         final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
                 extractStoreEqsAndInnerHeapTerm(//
                         services, origHeapTerm);
 
-        final List<Term> storeEqualities = hasHeap
+        final List<Term> storeEqualities = storeEqsAndInnerHeapTerm.isPresent()
                 ? storeEqsAndInnerHeapTerm.get().second
                 : new ArrayList<>();
 
@@ -105,20 +108,13 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
                 : (LocationVariable) goal.getLocalNamespaces()
                         .programVariables()
                         .lookup(fContract.getResult().op().name());
-        final LocationVariable excVar = (LocationVariable) goal
-                .getLocalNamespaces().programVariables()
-                .lookup(fContract.getExc().op().name());
 
-        final LinkedHashMap<LocationVariable, Term> updateContent =
-                LogicUtilities
-                        .updateToMap(updateTerm);
-
-        final Term updateWithoutVarsOfInterest = updateContent.keySet().stream()
-                .filter(lhs -> isVoid || !lhs.equals(resultVar))
-                .filter(lhs -> !lhs.equals(heapVar))
-                .filter(lhs -> !lhs.equals(excVar))
-                .map(lhs -> tb.elementary(lhs, updateContent.get(lhs)))
-                .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
+        // @formatter:off
+        // Maybe we need that later on? Don't know why it was here.
+//        final LocationVariable excVar = (LocationVariable) goal
+//                .getLocalNamespaces().programVariables()
+//                .lookup(fContract.getExc().op().name());
+        // @formatter:on
 
         final boolean hasResultVar = resultVar != null
                 && updateContent.get(resultVar) != null;
@@ -132,6 +128,12 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
         if (hasResultVar) {
             final Goal analysisGoal = goalArray[0];
 
+            final Term updWithoutResVar = updateContent.keySet()
+                    .stream()
+                    .filter(lv -> !lv.equals(resultVar))
+                    .map(lv -> tb.elementary(lv, updateContent.get(lv)))
+                    .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
+
             final Term currAnalysisTerm = tb.equals(tb.var(resultVar),
                     MergeRuleUtils.getUpdateRightSideFor(updateTerm,
                             resultVar));
@@ -139,55 +141,42 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
             prepareGoal(pio, analysisGoal, currAnalysisTerm, termLabelState,
                     this);
 
-            final List<Term> newPres = Arrays
-                    .asList(new Term[] {
-                            tb.apply(hasHeap
-                                    ? tb.parallel(
-                                            tb.elementary(tb.var(heapVar),
-                                                    origHeapTerm),
-                                            updateWithoutVarsOfInterest)
-                                    : updateWithoutVarsOfInterest,
-                                    contract),
-                            tb.and(updateContent.keySet().stream()
-                                    .filter(lhs -> lhs != resultVar)
-                                    .filter(lhs -> !lhs.equals(heapVar))
-                                    .map(lhs -> tb.equals(tb.var(lhs),
-                                            updateContent.get(lhs)))
-                                    .collect(Collectors.toList())) });
-
-            addFactPreconditions(analysisGoal, newPres, 1, termLabelState,
-                    this);
+            addFactPreconditions(analysisGoal, ImmutableSLList.<Term> nil()
+                    .prepend(storeEqualities)
+                    .prepend(tb.apply(updWithoutResVar,
+                            contract)), //
+                    1, termLabelState, this);
         }
 
         int i = hasResultVar ? 1 : 0;
 
         // Add goals for store equalities
-        if (hasHeap) {
-            final Term innerHeapTerm = storeEqsAndInnerHeapTerm.get().first;
 
-            for (Term storeEquality : storeEqualities) {
-                final Goal analysisGoal = goalArray[i];
+        final Term updWithoutHeap = updateContent.keySet().stream()
+                .filter(lv -> !lv.equals(heapVar))
+                .map(lv -> tb.elementary(lv, updateContent.get(lv)))
+                .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
 
-                prepareGoal(pio, analysisGoal, storeEquality, termLabelState,
-                        this);
+        for (Term heapEquality : storeEqualities) {
+            final Goal analysisGoal = goalArray[i];
 
-                final Term update = tb.parallel(//
-                        tb.elementary(tb.var(heapVar), innerHeapTerm), //
-                        updateWithoutVarsOfInterest);
+            prepareGoal(pio, analysisGoal, heapEquality, termLabelState,
+                    this);
 
-                final List<Term> newPres = Arrays
-                        .asList(new Term[] { tb.apply(update, contract),
-                                tb.and(updateContent.keySet().stream()
-                                        .filter(lhs -> !lhs.equals(heapVar))
-                                        .map(lhs -> tb.equals(tb.var(lhs),
-                                                updateContent.get(lhs)))
-                                        .collect(Collectors.toList())) });
+            final ImmutableList<Term> contractNewState =
+                    ImmutableSLList.<Term> nil()
+                            .prepend(tb.apply(updWithoutHeap, contract));
 
-                addFactPreconditions(analysisGoal, newPres, 1, termLabelState,
-                        this);
+            final ImmutableList<Term> preconds = ImmutableSLList.<Term> nil()
+                    .prepend(storeEqualities.stream()
+                            .filter(eq -> !eq.equals(heapEquality))
+                            .collect(Collectors.toList()))
+                    .prepend(contractNewState);
 
-                i++;
-            }
+            addFactPreconditions(analysisGoal, preconds, 1, termLabelState,
+                    this);
+
+            i++;
         }
 
         // Remove SETAccumulate predicate for post condition

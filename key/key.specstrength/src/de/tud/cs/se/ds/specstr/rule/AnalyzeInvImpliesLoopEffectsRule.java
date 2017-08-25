@@ -117,11 +117,6 @@ public final class AnalyzeInvImpliesLoopEffectsRule
         final Goal[] goalArray = goals.toArray(Goal.class);
         final TermLabelState termLabelState = new TermLabelState();
 
-        final Term updWithoutHeap = updateContent.keySet().stream()
-                .filter(lv -> !lv.equals(heapVar))
-                .map(lv -> tb.elementary(lv, updateContent.get(lv)))
-                .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
-
         int i = 0;
         for (LocationVariable currLocalOut : updateLocalOuts.keySet()) {
             final Goal analysisGoal = goalArray[i++];
@@ -146,6 +141,11 @@ public final class AnalyzeInvImpliesLoopEffectsRule
                                     invTerm)), //
                     1, termLabelState, this);
         }
+
+        final Term updWithoutHeap = updateContent.keySet().stream()
+                .filter(lv -> !lv.equals(heapVar))
+                .map(lv -> tb.elementary(lv, updateContent.get(lv)))
+                .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
 
         for (Term heapEquality : storeEqualities) {
             final Goal analysisGoal = goalArray[i++];
