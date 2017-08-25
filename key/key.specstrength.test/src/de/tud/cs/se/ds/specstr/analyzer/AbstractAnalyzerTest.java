@@ -32,6 +32,8 @@ import org.key_project.util.java.IOUtil;
 
 import de.tud.cs.se.ds.specstr.analyzer.Analyzer.AnalyzerResult;
 import de.tud.cs.se.ds.specstr.util.GeneralUtilities;
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 
 /**
@@ -44,6 +46,10 @@ public abstract class AbstractAnalyzerTest {
     private static final String FUNCTIONAL_TESTS_RELATIVE_DIR = "/resources/testcase/analyzer/";
     private static final File TMP_DIR = new File(
             System.getProperty("java.io.tmpdir") + "/analyzerTests/");
+    
+    // We assume that in each test case, only one Java file is under test, and
+    // therefore we have a stable environment
+    private KeYEnvironment<DefaultUserInterfaceControl> keyEnv = null;
     
     @Rule
     public final ErrorCollector collector = new ErrorCollector();
@@ -98,10 +104,22 @@ public abstract class AbstractAnalyzerTest {
 
         logger.info("Output file for proof: %s",
                 outProofFile.getAbsolutePath());
+        
+        final File file = new File(functionalTestsDir, relPathToJavaFile);
 
+        if (keyEnv == null) {
+            try {
+                keyEnv = new SymbExInterface(file).keyEnvironment();
+            }
+            catch (ProblemLoaderException e) {
+                logger.error("Problem: %s", e.getMessage());
+            }
+        }
+        
         final Analyzer analyzer = new Analyzer(
-                new File(functionalTestsDir, relPathToJavaFile),
-                fullyQualifiedMethodDescriptor, Optional.of(outProofFile));
+                file,
+                fullyQualifiedMethodDescriptor, Optional.of(outProofFile),
+                keyEnv);
         final AnalyzerResult result = analyzer.analyze();
 
         try {
