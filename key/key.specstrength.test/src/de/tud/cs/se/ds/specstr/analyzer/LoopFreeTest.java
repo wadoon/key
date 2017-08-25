@@ -13,8 +13,7 @@
 
 package de.tud.cs.se.ds.specstr.analyzer;
 
-import static de.tud.cs.se.ds.specstr.analyzer.Analyzer.FactType.*;
-import static org.junit.Assert.assertEquals;
+import static de.tud.cs.se.ds.specstr.analyzer.Analyzer.FactType.POST_COND_FACT;
 
 import org.junit.Test;
 

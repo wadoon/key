@@ -259,7 +259,7 @@ public class AnalyzerGUIController {
         }
 
         StringWriter sw = new StringWriter();
-        PrettyPrinter pw = new PrettyPrinter(sw, false);
+        PrettyPrinter pw = new PrettyPrinter(sw, false, true);
         try {
             ((ProgramMethod) selected).prettyPrint(pw);
             loadTextToWebView(sw.getBuffer().toString(), true);
