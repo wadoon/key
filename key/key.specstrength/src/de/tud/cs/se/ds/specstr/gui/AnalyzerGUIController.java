@@ -16,14 +16,11 @@ package de.tud.cs.se.ds.specstr.gui;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import javax.swing.SwingUtilities;
@@ -108,63 +105,6 @@ public class AnalyzerGUIController {
 
     private static final File TMP_DIR = new File(
             System.getProperty("java.io.tmpdir") + "/analyzerOutput/");
-
-    private final static String[] JAVA_KEYWORDS = { "if", "else", "for", "do",
-            "while", "return", "break", "switch", "case", "continue", "try",
-            "catch", "finally", "assert", "null", "throw", "this", "true",
-            "false", "int", "char", "long", "short", "boolean", "public",
-            "static" };
-
-    public final static String JAVA_KEYWORDS_REGEX = concat("|",
-            Arrays.asList(JAVA_KEYWORDS));
-
-    // NOTE: \Q(...)\E escapes the String in (...)
-    private final static String DELIMITERS_REGEX = concat(
-            "([\\Q{}[]=*/.!,:<>\\E]|",
-            "\\Q&#040;\\E|", // (
-            "\\Q&#041;\\E|", // )
-            "\\Q&#059;\\E|", // ;
-            "\\Q&#043;\\E|", // +
-            "\\Q&#045;\\E|", // -
-            "\\Q&nbsp;\\E|", // " "
-            "\\Q<br>\\E|", // \n
-            "\\Q<br/>\\E|", // \n
-            "\\Q&lt;\\E|", // <
-            "\\Q&gt;\\E)"); // >
-
-    private final static Pattern JAVA_KEYWORDS_PATTERN = Pattern.compile(concat(
-            DELIMITERS_REGEX, "(", JAVA_KEYWORDS_REGEX, ")", DELIMITERS_REGEX));
-
-    private static final String JAVA_KEYWORDS_REPLACEMENT =
-            "$1<span class=\"java_highlight\">$2</span>$3";
-
-    private static final Pattern JML_SL_COMMENT_PATTERN = Pattern
-            .compile("//@.*?(?:<br/>|\\n)");
-    private static final String JML_SL_COMMENT_REPLACEMENT =
-            "<span class=\"jml_highlight\">$0</span>";
-
-    private static final Pattern JML_ML_COMMENT_PATTERN = Pattern
-            .compile("/\\*@(?:[^\\*]|[^\\*][^/])+\\*/");
-    private static final String JML_ML_COMMENT_REPLACEMENT =
-            "<span class=\"jml_highlight\">$0</span>";
-
-    private static final Pattern SINGLE_LINE_COMMENT_PATTERN =
-            Pattern.compile("//[^@].*?(?:<br/>|\\n)");
-    private static final String SINGLE_LINE_COMMENT_REPLACEMENT =
-            "<span class=\"comment_highlight\">$0</span>";
-
-    private static final Pattern ML_COMMENT_PATTERN = Pattern
-            .compile("/\\*[^@](?:[^\\*]|[^\\*][^/])+\\*/");
-    private static final String ML_COMMENT_REPLACEMENT =
-            "<span class=\"comment_highlight\">$0</span>";
-
-    private static final String HIGLIGHTING_STYLES = new StringBuilder()
-            .append("<style type=\"text/css\">")
-            .append(".java_highlight { color: #7F0055; font-weight: bold; }")
-            .append(".jml_highlight { color: #7F9FBF !important; font-weight: normal !important; }")
-            .append(".comment_highlight { color: #3F7F5F !important; font-weight: normal !important; }")
-            .append("</style>").toString();
-
     ////// Private properties
 
     private ObjectProperty<Window> mainWindowProperty =
@@ -525,66 +465,6 @@ public class AnalyzerGUIController {
         alert.getDialogPane().setExpandableContent(expContent);
 
         alert.showAndWait();
-    }
-
-    ////// Static private methods
-
-    /**
-     * Concatenates the given Strings using a {@link StringBuilder}.
-     *
-     * @param strings
-     *            Strings to concatenate.
-     * @return The concatenated Strings.
-     */
-    private static String concat(String... strings) {
-        final StringBuilder result = new StringBuilder();
-        for (String str : strings) {
-            result.append(str);
-        }
-        return result.toString();
-    }
-
-    /**
-     * Concatenates the given String array where the elements are separated by
-     * the given delimiter in the result String.
-     *
-     * @param delim
-     *            Delimiter for the elements in the array.
-     * @param strings
-     *            Strings to concatenate.
-     * @return The concatenated array, elements separated by the given
-     *         delimiter.
-     */
-    private static String concat(String delim,
-            Iterable<? extends Object> strings) {
-        return concat(delim, strings, obj -> obj.toString());
-    }
-
-    /**
-     * Concatenates the given String array where the elements are separated by
-     * the given delimiter in the result String.
-     *
-     * @param delim
-     *            Delimiter for the elements in the array.
-     * @param strings
-     *            Strings to concatenate.
-     * @param strTransformer
-     *            Transformation applied to the input Strings before the
-     *            concatenation is performed.
-     * @return The concatenated array, elements separated by the given
-     *         delimiter.
-     */
-    private static String concat(String delim,
-            Iterable<? extends Object> strings,
-            Function<Object, String> strTransformer) {
-        StringBuilder sb = new StringBuilder();
-        boolean loopEntered = false;
-        for (Object str : strings) {
-            sb.append(strTransformer.apply(str));
-            sb.append(delim);
-            loopEntered = true;
-        }
-        return loopEntered ? sb.substring(0, sb.length() - delim.length()) : "";
     }
 
     ////// Inner classes
