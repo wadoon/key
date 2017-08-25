@@ -295,7 +295,7 @@ public class AnalyzerGUIController {
                             new WebViewOutputStream()) {
                         appendWebViewLogger(webViewOutputStream);
                         result = analyzer.analyze();
-
+                        System.out.println("DONE ANALYSIS");
                     }
 
                     // Funny hack for "null-terminating" the log stream --

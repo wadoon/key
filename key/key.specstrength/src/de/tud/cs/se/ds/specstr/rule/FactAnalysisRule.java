@@ -59,7 +59,14 @@ public final class FactAnalysisRule implements BuiltInRule {
     /**
      * The branch label for the "abstractly covered" case.
      */
-    public static final String FACT_ABSTRACTLY_COVERED_BRANCH_LABEL = "Fact abstractly covered";
+    public static final String FACT_ABSTRACTLY_COVERED_BRANCH_LABEL =
+            "Fact abstractly covered (main)";
+
+    /**
+     * The branch label for the "abstractly covered check" case.
+     */
+    public static final String FACT_ABSTRACTLY_COVERED_VERIF_BRANCH_LABEL =
+            "Fact abstractly covered (check)";
 
     /**
      * The branch label for the "trivially covered" case.
@@ -97,20 +104,20 @@ public final class FactAnalysisRule implements BuiltInRule {
                 .addAbstractlyCoveredGoal();
 
         final Optional<SequentFormula> maybeFactSF = toStream(
-            node.sequent().succedent())
-                    .filter(sf -> sf.formula().containsLabel(
-                        StrengthAnalysisParameterlessTL.FACT_LABEL))
-                    .findAny();
+                node.sequent().succedent())
+                        .filter(sf -> sf.formula().containsLabel(
+                                StrengthAnalysisParameterlessTL.FACT_LABEL))
+                        .findAny();
 
         assert maybeFactSF.isPresent();
 
         final SequentFormula factSF = maybeFactSF.get();
 
         final List<SequentFormula> premiseSFs = toStream(
-            node.sequent().antecedent())
-                    .filter(sf -> sf.formula().containsLabel(
-                        StrengthAnalysisParameterlessTL.FACT_PREMISE_LABEL))
-                    .collect(Collectors.toList());
+                node.sequent().antecedent())
+                        .filter(sf -> sf.formula().containsLabel(
+                                StrengthAnalysisParameterlessTL.FACT_PREMISE_LABEL))
+                        .collect(Collectors.toList());
 
         final Term allPremiseSFs = tb.and(premiseSFs.stream()
                 .map(sf -> sf.formula()).collect(Collectors.toList()));
@@ -119,15 +126,17 @@ public final class FactAnalysisRule implements BuiltInRule {
                 .getConjunctiveElementsFor(cnfC.convertToCNF(allPremiseSFs));
 
         final ImmutableList<Goal> goals = goal
-                .split(1 + (addAbstractlyCoveredGoal ? 1 : 0)
+                .split(1 + (addAbstractlyCoveredGoal ? 2 : 0)
                         + (addCoveredWithoutLoopInvGoal ? 1 : 0));
         final Goal[] goalArray = goals.toArray(new Goal[] {});
 
         final Goal coveredGoal = goalArray[goalArray.length - 1];
         final Goal coveredByTrueGoal = addCoveredWithoutLoopInvGoal
-                ? (addAbstractlyCoveredGoal ? goalArray[1] : goalArray[0])
+                ? (addAbstractlyCoveredGoal ? goalArray[2] : goalArray[0])
                 : null;
         final Goal abstractlyCoveredGoal = //
+                addAbstractlyCoveredGoal ? goalArray[1] : null;
+        final Goal abstractlyCoveredVerifGoal = //
                 addAbstractlyCoveredGoal ? goalArray[0] : null;
 
         // The "fully covered" goal
@@ -138,18 +147,19 @@ public final class FactAnalysisRule implements BuiltInRule {
         // the removal of loop invariant formulas
         Node loopInvNode = null;
         if (analysisRuleApp instanceof AnalyzeInvImpliesLoopEffectsRuleApp) {
-            loopInvNode = ((AnalyzeInvImpliesLoopEffectsRuleApp) analysisRuleApp)
-                    .getLoopInvNode();
+            loopInvNode =
+                    ((AnalyzeInvImpliesLoopEffectsRuleApp) analysisRuleApp)
+                            .getLoopInvNode();
         }
 
         // Fact already covered without specification -- "covered by true"
 
         if (addCoveredWithoutLoopInvGoal) {
             coveredByTrueGoal.setBranchLabel(
-                FACT_COVERED_WITHOUT_SPECIFICATION_BRANCH_LABEL);
+                    FACT_COVERED_WITHOUT_SPECIFICATION_BRANCH_LABEL);
 
             premiseSFs.forEach(sf -> coveredByTrueGoal.removeFormula(
-                new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)));
+                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)));
 
             removeLoopInvFormulasFromAntec(coveredByTrueGoal, loopInvNode);
         }
@@ -161,25 +171,34 @@ public final class FactAnalysisRule implements BuiltInRule {
         if (addAbstractlyCoveredGoal) {
             abstractlyCoveredGoal
                     .setBranchLabel(FACT_ABSTRACTLY_COVERED_BRANCH_LABEL);
+            abstractlyCoveredVerifGoal
+                    .setBranchLabel(FACT_ABSTRACTLY_COVERED_VERIF_BRANCH_LABEL);
 
-            if (addCoveredWithoutLoopInvGoal) {
-                // For these rules, we also have to remove the loop invariant
-                // formulas here
-                removeLoopInvFormulasFromAntec(coveredByTrueGoal, loopInvNode);
+            for (final Goal abstrGoal : new Goal[] { abstractlyCoveredGoal,
+                    abstractlyCoveredVerifGoal }) {
+                if (addCoveredWithoutLoopInvGoal) {
+                    // For these rules, we also have to remove the loop
+                    // invariant formulas here
+                    removeLoopInvFormulasFromAntec(abstrGoal, loopInvNode);
+                }
+
+                LogicUtilities.addSETPredicateToAntec(abstrGoal);
+
+                premiseSFs.forEach(sf -> abstrGoal.removeFormula(
+                        new PosInOccurrence(sf, PosInTerm.getTopLevel(),
+                                true)));
+                abstrGoal.removeFormula(
+                        new PosInOccurrence(factSF, PosInTerm.getTopLevel(),
+                                false));
+
+                // Add disjunction of premise formula parts to succedent
+                abstrGoal.addFormula(
+                        new SequentFormula(tb.or(premiseConjElems)), false,
+                        true);
             }
 
-            LogicUtilities.addSETPredicateToAntec(abstractlyCoveredGoal);
-            premiseSFs.forEach(sf -> abstractlyCoveredGoal.removeFormula(
-                new PosInOccurrence(sf, PosInTerm.getTopLevel(), true)));
-            abstractlyCoveredGoal.removeFormula(
-                new PosInOccurrence(factSF, PosInTerm.getTopLevel(), false));
-
-            // Add fact to antecedent
+            // Add fact to antecedent, not for test goal
             abstractlyCoveredGoal.addFormula(factSF, true, false);
-
-            // Add disjunction of premise formula parts to succedent
-            abstractlyCoveredGoal.addFormula(
-                new SequentFormula(tb.or(premiseConjElems)), false, true);
         }
 
         return goals;
@@ -207,9 +226,9 @@ public final class FactAnalysisRule implements BuiltInRule {
                 (node.parent().getAppliedRuleApp()
                         .rule() instanceof AbstractAnalysisRule)
                 && !node.getNodeInfo().getBranchLabel().equals(
-                    AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL)
+                        AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL)
                 && !node.getNodeInfo().getBranchLabel().equals(
-                    AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL);
+                        AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL);
     }
 
     @Override
@@ -232,13 +251,23 @@ public final class FactAnalysisRule implements BuiltInRule {
      */
     public static Node getFactAbstractlyCoveredNode(
             Iterable<Node> analysisNodes) {
-        assert GeneralUtilities.toStream(analysisNodes).findAny().get().parent()
-                .getAppliedRuleApp().rule() == INSTANCE;
+        return getCaseNode(
+                FactAnalysisRule.FACT_ABSTRACTLY_COVERED_BRANCH_LABEL,
+                analysisNodes);
+    }
 
-        return GeneralUtilities.toStream(analysisNodes)
-                .filter(node -> node.getNodeInfo().getBranchLabel().equals(
-                    FactAnalysisRule.FACT_ABSTRACTLY_COVERED_BRANCH_LABEL))
-                .findAny().get();
+    /**
+     * @param analysisNodes
+     *            The {@link Node}s after an application of
+     *            {@link FactAnalysisRule}.
+     * @return The "abstactly covered test" case {@link Node} of the nodes after
+     *         a {@link FactAnalysisRule} application.
+     */
+    public static Node getFactAbstractlyCoveredVerifNode(
+            Iterable<Node> analysisNodes) {
+        return getCaseNode(
+                FactAnalysisRule.FACT_ABSTRACTLY_COVERED_VERIF_BRANCH_LABEL,
+                analysisNodes);
     }
 
     /**
@@ -249,13 +278,9 @@ public final class FactAnalysisRule implements BuiltInRule {
      *         {@link FactAnalysisRule} application.
      */
     public static Node getFactCoveredNode(Iterable<Node> analysisNodes) {
-        assert GeneralUtilities.toStream(analysisNodes).findAny().get().parent()
-                .getAppliedRuleApp().rule() == INSTANCE;
-
-        return GeneralUtilities.toStream(analysisNodes)
-                .filter(node -> node.getNodeInfo().getBranchLabel()
-                        .equals(FactAnalysisRule.FACT_COVERED_BRANCH_LABEL))
-                .findAny().get();
+        return getCaseNode(
+                FactAnalysisRule.FACT_COVERED_BRANCH_LABEL,
+                analysisNodes);
     }
 
     /**
@@ -266,12 +291,26 @@ public final class FactAnalysisRule implements BuiltInRule {
      *         {@link FactAnalysisRule} application.
      */
     public static Node getCoveredByTrueNode(Iterable<Node> analysisNodes) {
+        return getCaseNode(
+                FactAnalysisRule.FACT_COVERED_WITHOUT_SPECIFICATION_BRANCH_LABEL,
+                analysisNodes);
+    }
+
+    /**
+     * @param analysisNodes
+     *            The {@link Node}s after an application of
+     *            {@link FactAnalysisRule}.
+     * @return The case {@link Node} (with the given label) of the nodes after a
+     *         {@link FactAnalysisRule} application.
+     */
+    private static Node getCaseNode(String label,
+            Iterable<Node> analysisNodes) {
         assert GeneralUtilities.toStream(analysisNodes).findAny().get().parent()
                 .getAppliedRuleApp().rule() == INSTANCE;
 
         return GeneralUtilities.toStream(analysisNodes)
                 .filter(node -> node.getNodeInfo().getBranchLabel().equals(
-                    FactAnalysisRule.FACT_COVERED_WITHOUT_SPECIFICATION_BRANCH_LABEL))
+                        label))
                 .findAny().get();
     }
 

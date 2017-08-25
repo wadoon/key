@@ -443,6 +443,13 @@ public final class LogicUtilities {
                                     .contains(sf.formula());
 
             if (!remove && sf.formula().hasLabels()) {
+                if (termLabelsOfType(sf.formula(), FormulaTermLabel.class).isEmpty()) {
+                    // This is probably a formula which only has been added
+                    // during the application of the analysis goal, we definitly
+                    // cannot trace it back. Ignore.
+                    continue;
+                }
+                
                 // Find origin of this label
                 final OriginOfFormula origin = //
                         findOriginOfFormula(analysisGoal, sf.formula());
