@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -50,6 +49,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofVisitor;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
@@ -618,22 +618,10 @@ public class Analyzer {
                 .getTermBuilder().tt();
 
         try {
-            final ExecutorService service = Executors.newSingleThreadExecutor();
-            final Future<Term> pathCondTermFut = service.submit(() -> {
-                return SymbolicExecutionUtil
-                        .computePathCondition(analysisNode, true, true);
-            });
-
-            if (service.awaitTermination(750, TimeUnit.MILLISECONDS)) {
-                pathCondTerm = pathCondTermFut.get();
-            }
-            else {
-                LOGGER.debug(
-                        "Could not compute nice path condition within time limit",
-                        pathCondTerm);
-            }
+            pathCondTerm = SymbolicExecutionUtil
+                    .computePathCondition(analysisNode, true, true);
         }
-        catch (InterruptedException | ExecutionException e1) {
+        catch (ProofInputException e) {
             problem = true;
         }
 

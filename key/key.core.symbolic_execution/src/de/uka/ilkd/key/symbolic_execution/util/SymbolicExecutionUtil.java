@@ -1796,9 +1796,7 @@ public final class SymbolicExecutionUtil {
          return computeBlockContractBuiltInRuleAppBranchCondition(parent, node, simplify, improveReadability);
       }
       else if (parent.getAppliedRuleApp().rule().name().toString().equals("AnalyzePostCondImpliesMethodEffects") ||
-              parent.getAppliedRuleApp().rule().name().toString().equals("AnalyzeInvImpliesLoopEffects") ||
-              parent.getAppliedRuleApp().rule().name().toString().equals("FactAnalysis") ||
-              parent.getAppliedRuleApp().rule().name().toString().equals("AnalyzeUseCase")) {
+              parent.getAppliedRuleApp().rule().name().toString().equals("AnalyzeInvImpliesLoopEffects")) {
           return node.proof().getServices().getTermBuilder().tt();
       }
       else {

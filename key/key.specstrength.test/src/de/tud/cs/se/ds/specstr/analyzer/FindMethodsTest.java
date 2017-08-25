@@ -221,9 +221,9 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
             "findMethods/FindMethods.java",
             "FindMethods::find_stronger_inv([II)I");
 
-        assertEquals(57.14d, result.strength(), .01d);
+        assertEquals(42.86d, result.strength(), .01d);
         assertEquals(0d, result.programEffectsStrength(), 0d);
-        assertEquals(50d, result.programEffectsAbstractStrength(), 0d);
+        assertEquals(33.33d, result.programEffectsAbstractStrength(), .01d);
         
         assertEquals(0, result.unclosedLoopInvPreservedGoals());
 
@@ -235,18 +235,25 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
 
         final List<Fact> abstrLoopBodyFacts = result
                 .getAbstractlyCoveredFactsOfType(LOOP_BODY_FACT);
+        final List<Fact> uncLoopBodyFacts = result
+                .getUncoveredFactsOfType(LOOP_BODY_FACT);
         final List<Fact> abstrPostCondFacts = result
                 .getAbstractlyCoveredFactsOfType(POST_COND_FACT);
         final List<Fact> uncPostCondFacts = result
                 .getUncoveredFactsOfType(POST_COND_FACT);
 
-        assertEquals(4, abstrLoopBodyFacts.size());
+        assertEquals(2, abstrLoopBodyFacts.size());
+        assertEquals(2, uncLoopBodyFacts.size());
         assertEquals(2, abstrPostCondFacts.size());
 
         assertEquals(0, uncPostCondFacts.size());
 
-        assertEquals(0, result.numUncoveredFacts());
-        assertEquals(6, result.numAbstractlyCoveredFacts());
+        assertEquals(2, result.numUncoveredFacts());
+        assertEquals(4, result.numAbstractlyCoveredFacts());
+
+        uncLoopBodyFacts.forEach(f -> {
+            assertEquals("i = 1 + i_0", f.getDescr());
+        });
     }
 
     @Test
@@ -255,9 +262,9 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
             "findMethods/FindMethods.java",
             "FindMethods::find_sensible_post([II)I");
 
-        assertEquals(30d, result.strength(), 0d);
+        assertEquals(10d, result.strength(), 0d);
         assertEquals(0d, result.programEffectsStrength(), 0d);
-        assertEquals(37.5d, result.programEffectsAbstractStrength(), 0d);
+        assertEquals(12.5d, result.programEffectsAbstractStrength(), 0d);
         
         assertEquals(0, result.unclosedLoopInvPreservedGoals());
 
@@ -267,23 +274,23 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
         assertContains("arr_0.length > i_0 & (arr_0.length <= i_0 | i_0 < 0)",
             result.problematicExceptions().get(0).getPathCondition());
 
-        final List<Fact> abstrLoopBodyFacts = result
-                .getAbstractlyCoveredFactsOfType(LOOP_BODY_FACT);
         final List<Fact> abstrPostCondFacts = result
                 .getAbstractlyCoveredFactsOfType(POST_COND_FACT);
         final List<Fact> uncUseCaseFacts = result
                 .getUncoveredFactsOfType(LOOP_USE_CASE_FACT);
+        final List<Fact> uncLoopBodyFacts = result
+                .getUncoveredFactsOfType(LOOP_BODY_FACT);
         final List<Fact> uncPostCondFacts = result
                 .getUncoveredFactsOfType(POST_COND_FACT);
 
-        assertEquals(2, abstrLoopBodyFacts.size());
         assertEquals(1, abstrPostCondFacts.size());
 
         assertEquals(1, uncUseCaseFacts.size());
         assertEquals(1, uncPostCondFacts.size());
+        assertEquals(2, uncLoopBodyFacts.size());
 
-        assertEquals(2, result.numUncoveredFacts());
-        assertEquals(3, result.numAbstractlyCoveredFacts());
+        assertEquals(4, result.numUncoveredFacts());
+        assertEquals(1, result.numAbstractlyCoveredFacts());
 
         assertEquals("arr_0[result_1_0]@heap[anon({}, anon_heap_LOOP)] = n",
             uncUseCaseFacts.get(0).getDescr());
@@ -296,14 +303,14 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
         assertContains("result_1_0 = -1",
             abstrPostCondFacts.get(0).getPathCond());
 
-        abstrLoopBodyFacts.forEach(f -> {
+        uncLoopBodyFacts.forEach(f -> {
             assertEquals("i = 1 + i_0", f.getDescr());
         });
 
         assertContains("& !arr_0[i_0] = n",
-            abstrLoopBodyFacts.get(0).getPathCond());
+            uncLoopBodyFacts.get(0).getPathCond());
         assertContains("& arr_0[i_0] = n",
-            abstrLoopBodyFacts.get(1).getPathCond());
+            uncLoopBodyFacts.get(1).getPathCond());
     }
 
     @Test
@@ -311,9 +318,9 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
         final AnalyzerResult result = analyzeMethod(
             "findMethods/FindMethods.java", "FindMethods::find_weakest([II)I");
 
-        assertEquals(50d, result.strength(), 0d);
+        assertEquals(0d, result.strength(), 0d);
         assertEquals(0d, result.programEffectsStrength(), 0d);
-        assertEquals(50d, result.programEffectsAbstractStrength(), 0d);
+        assertEquals(0d, result.programEffectsAbstractStrength(), 0d);
         
         assertEquals(0, result.unclosedLoopInvPreservedGoals());
 
@@ -324,15 +331,14 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
             result.problematicExceptions().get(0).getPathCondition());
 
         final List<Fact> loopBodyFacts = result
-                .getAbstractlyCoveredFactsOfType(LOOP_BODY_FACT);
+                .getUncoveredFactsOfType(LOOP_BODY_FACT);
         final List<Fact> postCondFacts = result
-                .getAbstractlyCoveredFactsOfType(POST_COND_FACT);
+                .getUncoveredFactsOfType(POST_COND_FACT);
 
         assertEquals(2, loopBodyFacts.size());
         assertEquals(2, postCondFacts.size());
 
-        assertEquals(0, result.numUncoveredFacts());
-        assertEquals(4, result.numAbstractlyCoveredFacts());
+        assertEquals(4, result.numUncoveredFacts());
 
         assertEquals("result = result_1_0", postCondFacts.get(0).getDescr());
         assertEquals("result = -1", postCondFacts.get(1).getDescr());
