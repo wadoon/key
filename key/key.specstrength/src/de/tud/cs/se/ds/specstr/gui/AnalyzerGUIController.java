@@ -16,6 +16,7 @@ package de.tud.cs.se.ds.specstr.gui;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Callable;
@@ -345,6 +346,13 @@ public class AnalyzerGUIController {
                             .collect(Collectors.toList()))
                     .flatMap(List::stream)
                     .collect(Collectors.toList());
+            
+            // We reverse the list because in the default ImmutableSet
+            // implementation, new elements are added by prepend() and
+            // therefore, the methods occur in the reverse order than
+            // implemented in the class.
+            Collections.reverse(contractTargets);
+            
             Platform.runLater(() -> {
                 cmbMethodChooser.setItems(FXCollections
                         .observableArrayList(contractTargets));
