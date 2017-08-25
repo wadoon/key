@@ -595,9 +595,9 @@ public final class LogicUtilities {
      *            The {@link Term} to transform.
      * @return A {@link Map} from update left-hand-sides to right-hand-sides.
      */
-    public static Map<LocationVariable, Term> updateToMap(
+    public static LinkedHashMap<LocationVariable, Term> updateToMap(
             final Term updateTerm) {
-        final Map<LocationVariable, Term> updateContent = StreamSupport.stream(//
+        final LinkedHashMap<LocationVariable, Term> updateContent = StreamSupport.stream(//
             MergeRuleUtils.getUpdateLeftSideLocations(updateTerm).spliterator(),
             true).collect(Collectors.toMap(lhs -> lhs,
                 lhs -> MergeRuleUtils.getUpdateRightSideFor(updateTerm, lhs),

@@ -15,10 +15,7 @@ package de.tud.cs.se.ds.specstr.rule;
 
 import static de.tud.cs.se.ds.specstr.util.LogicUtilities.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
@@ -36,6 +33,7 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
@@ -87,16 +85,21 @@ public final class AnalyzeInvImpliesLoopEffectsRule
 
         assert updateTerm.op() instanceof UpdateJunctor;
 
-        final Map<LocationVariable, Term> updateContent = LogicUtilities
-                .updateToMap(updateTerm);
+        final LinkedHashMap<LocationVariable, Term> updateContent =
+                LogicUtilities
+                        .updateToMap(updateTerm);
 
         final LocationVariable heapVar = services.getTypeConverter()
                 .getHeapLDT().getHeap();
 
-        final Map<LocationVariable, Term> updateLocalOuts = updateContent
+        final LinkedHashMap<LocationVariable, Term> updateLocalOuts = updateContent
                 .keySet().stream()
                 .filter(lhs -> localOuts.contains(lhs))
-                .collect(Collectors.toMap(x -> x, x -> updateContent.get(x)));
+                .collect(Collectors.toMap(x -> x, x -> updateContent.get(x),
+                        (u, v) -> {
+                            throw new IllegalStateException(
+                                    String.format("Duplicate key %s", u));
+                        }, LinkedHashMap::new));
 
         // Retrieve store equalities
         final Term origHeapTerm = MergeRuleUtils

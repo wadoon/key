@@ -480,15 +480,16 @@ public class IntermediateProofReplayer {
         Services services = proof.getServices();
 
         if (currFormula != 0) { // otherwise we have no pos
-            try {
-                pos = PosInOccurrence.findInSequent(currGoal.sequent(),
-                        currFormula, currPosInTerm);
-                ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
-                ourApp = ourApp.setPosInOccurrence(pos, services);
-            } catch (Exception e) {
+            pos = PosInOccurrence.findInSequent(currGoal.sequent(),
+                    currFormula, currPosInTerm);
+            ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
+            
+            if (ourApp == null) {
                 throw new TacletConstructionException(
                         "Wrong position information.");
             }
+            
+            ourApp = ourApp.setPosInOccurrence(pos, services);
         }
 
         ourApp = constructInsts(ourApp, currGoal, currInterm.getInsts(),
