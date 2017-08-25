@@ -21,7 +21,7 @@ public class MCTUtil {
       return true;
    }
 
-   public static void annotateExecutionPartialCorrect(Execution execution, char correctness) {
+   public static void annotateExecutionPartialCorrect(Execution execution) {
       ISENode node = execution.getExecutionReturn();
       try {
          while(!node.equals(execution.getCall().getParent()) &&  !(node instanceof ISEBranchStatement && SETUtil.hasNotCorrectAnnotatedChildren(node)) &&!(node instanceof ISEBranchCondition && SETUtil.hasNotCorrectAnnotatedChildren(node)) ){
@@ -54,22 +54,62 @@ public class MCTUtil {
       List<ISENode> list = getListOfExecutionNodes(bug);
       int counter = 0;
       int nodeCounter = 1;
-      SETUtil.annotateFalse(list.get(0));
+      SETUtil.annotateBuggy(list.get(0));
       if(list.size() > 1){
-      ISENode node = list.get(1);
+         ISENode node = list.get(1);
 
-      while(!node.equals(bug.getExecutionReturn())){
-         if(node instanceof ISEMethodCall)
-            counter++;
-         else if(node instanceof ISEMethodReturn)
-            counter--;
-         else
-            if(counter == 0)
-               SETUtil.annotateFalse(node);
-         nodeCounter++;
-         node = list.get(nodeCounter);
+         while(!node.equals(bug.getExecutionReturn())){
+            if(node instanceof ISEMethodCall)
+               counter++;
+            else if(node instanceof ISEMethodReturn)
+               counter--;
+            else
+               if(counter == 0)
+                  SETUtil.annotateBuggy(node);
+            nodeCounter++;
+            node = list.get(nodeCounter);
+         }
+         SETUtil.annotateBuggy(list.get(list.size()-1));
       }
-      SETUtil.annotateFalse(list.get(list.size()-1));}
-      
+
+   }
+
+   public static void annotateSETNodesOfExecutionExcludingSubExecutions(Execution execution, char correctness) {
+      List<ISENode> list = getListOfExecutionNodes(execution);
+      int counter = 0;
+      int nodeCounter = 1;
+      switch(correctness){
+      case 'c':      SETUtil.annotateCorrect(list.get(0));break;
+      case 'f':      SETUtil.annotateFalse(list.get(0));break;
+      }
+      if(list.size() > 1){
+         ISENode node = list.get(1);
+
+         while(!node.equals(execution.getExecutionReturn())){
+            if(node instanceof ISEMethodCall)
+               counter++;
+            else if(node instanceof ISEMethodReturn)
+               counter--;
+            else
+               if(counter == 0)
+                  switch(correctness){
+                  case 'c':      SETUtil.annotateCorrect(node);break;
+                  case 'f':      SETUtil.annotateFalse(node);break;
+                  }
+            nodeCounter++;
+            node = list.get(nodeCounter);
+         }
+         switch(correctness){
+         case 'c':      SETUtil.annotateCorrect(list.get(list.size()-1));break;
+         case 'f':      SETUtil.annotateFalse(list.get(list.size()-1));break;
+         }
+      }
+   }
+
+   public static void annotateExecutionRecursively(Execution execution, char correctness) {
+      annotateSETNodesOfExecutionExcludingSubExecutions(execution,correctness);
+      for(Execution child : execution.getListOfCalledMethods()){
+         annotateExecutionRecursively(child, correctness);
+      }
    }
 }

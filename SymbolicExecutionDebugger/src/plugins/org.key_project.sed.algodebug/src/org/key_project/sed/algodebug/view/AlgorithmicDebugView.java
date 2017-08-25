@@ -88,7 +88,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       case "Top Down": debug.setSearchStrategy(new TopDown()); break;
       }
    }
-   
+
    /*
     * setzt den aktuell abgefragten Method Call auf korrekt und holt anschließend einen neuen
     * wenn der nächste abzufragende Method Call == null ist, frage im debug, über aufrufen von askDebugWhyThereIsNoNextMethodToAsk, was los ist
@@ -97,7 +97,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       debug.unhighlight();
       debug.markCall(actualCall, 'c');
       //      SETUtil.annotateMethodCallCorrect(actualCall);
-      MCTUtil.annotateExecutionPartialCorrect(actualCall, 'c');
+      // MCTUtil.annotateExecutionPartialCorrect(actualCall, 'c');
       Execution next =  debug.getNext();
       if(next != null){
          chronik.add(next);
@@ -173,6 +173,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
          btnStart.setText("Reset");
          root = SETUtil.getRoot(actualNode);
          debug.generateTree(root);
+         SETUtil.init(root);
          actualCall = debug.getNext();
          IViewPart part = workbenchpage
                .findView("org.key_project.sed.ui.view.VariablesSelectionView");
@@ -284,8 +285,8 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
          textReturn.setText(call.getExecutionReturn().getName().toString());
          //         textReturn.setText(call.getRet().getCallStack());
          /*
-         if(!(call.getMethodReturn() instanceof ISEExceptionalMethodReturn)){
-            KeYMethodReturn ret = (KeYMethodReturn) call.getMethodReturn();
+         if(!(call.getExecutionReturn() instanceof ISEExceptionalMethodReturn)){
+            KeYMethodReturn ret = (KeYMethodReturn) call.getExecutionReturn();
             try {
                ret.getExecutionNode().getReturnValues();
                textReturn.setText(ret.toString());

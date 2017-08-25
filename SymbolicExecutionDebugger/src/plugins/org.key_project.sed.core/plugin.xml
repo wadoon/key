@@ -55,5 +55,8 @@
          <annotationType
                class="org.key_project.sed.core.annotation.impl.HighlightAnnotationType">
          </annotationType>
+         <annotationType
+               class="org.key_project.sed.core.annotation.impl.AlgorithmicDebugBugAnnotationType">
+         </annotationType>
       </extension>
 </plugin>
