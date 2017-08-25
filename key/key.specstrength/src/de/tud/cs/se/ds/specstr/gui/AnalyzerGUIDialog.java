@@ -13,6 +13,8 @@
 
 package de.tud.cs.se.ds.specstr.gui;
 
+import java.net.URL;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -20,25 +22,30 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 
 /**
- * TODO: Document.
+ * The standalone GUI {@link Application} for strength analysis.
  *
  * @author Dominic Scheurer
- *
  */
 public class AnalyzerGUIDialog extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        final FXMLLoader loader =
-                new FXMLLoader(getClass().getResource("AnalyzerGUI.fxml"));
+        final FXMLLoader loader = new FXMLLoader();
+        final URL resource = AnalyzerGUIDialog.class
+                .getResource("AnalyzerGUI.fxml");
+
+        assert resource != null : "Could not find FXML file for abstraction predicates choice dialog";
+
+        loader.setLocation(resource);
+        
         final AnchorPane root = (AnchorPane) loader.load();
         final AnalyzerGUIController controller =
                 (AnalyzerGUIController) loader.getController();
 
-        stage.setTitle("Strength Analysis");
+        stage.setTitle("Coverage of Specifications Analysis");
         stage.setScene(new Scene(root, 900, 500));
         stage.show();
-        
+
         controller.setMainWindow(stage);
     }
 

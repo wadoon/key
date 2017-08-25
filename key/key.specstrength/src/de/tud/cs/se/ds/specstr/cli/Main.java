@@ -13,10 +13,7 @@
 
 package de.tud.cs.se.ds.specstr.cli;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.Optional;
 
 import org.apache.commons.cli.CommandLine;
@@ -30,6 +27,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import de.tud.cs.se.ds.specstr.analyzer.Analyzer;
+import de.tud.cs.se.ds.specstr.gui.AnalyzerGUIDialog;
+import javafx.application.Application;
 
 /**
  * Main class for CLI access.
@@ -72,6 +71,10 @@ public final class Main {
     public static void main(String[] args) {
         Options options = new Options();
 
+        Option guiOpt = Option.builder("g").longOpt("gui")
+                .desc("Open the Graphical User Interface").required(false)
+                .build();
+
         Option outFileOpt = Option.builder("o").longOpt("out-file")
                 .desc("Save output to this file").hasArg().required(false)
                 .build();
@@ -84,6 +87,7 @@ public final class Main {
                 .desc("Display help (this text) and terminate").required(false)
                 .build();
 
+        options.addOption(guiOpt);
         options.addOption(outFileOpt);
         options.addOption(outFileProofOpt);
         options.addOption(helpOpt);
@@ -93,9 +97,14 @@ public final class Main {
             // parse the command line arguments
             CommandLine line = parser.parse(options, args);
 
-            if (line.getArgList().size() < 2 || line.hasOption("h")) {
+            if ((line.getArgList().size() < 2 && !line.hasOption("g")) || line.hasOption("h")) {
                 printHelp(options);
                 System.exit(0);
+            }
+            
+            if (line.hasOption("g")) {
+                Application.launch(AnalyzerGUIDialog.class, args);
+                return;
             }
 
             String inputFileName = line.getArgList().get(0);
@@ -139,8 +148,11 @@ public final class Main {
             printHelp(options);
             System.exit(0);
         } catch (RuntimeException e) {
-            LOGGER.error("Problem occurred during the analysis:\n%s",
-                e.getMessage());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            e.printStackTrace(new PrintStream(baos));
+            LOGGER.error(
+                    "Problem occurred during the analysis:\n%s\n\nStack Trace:\n%s",
+                    e.getMessage(), baos.toString());
         }
 
         System.exit(1);
