@@ -15,11 +15,7 @@ package de.tud.cs.se.ds.specstr.rule;
 
 import static de.tud.cs.se.ds.specstr.util.LogicUtilities.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
@@ -27,17 +23,9 @@ import org.key_project.util.collection.ImmutableList;
 import de.tud.cs.se.ds.specstr.util.LogicUtilities;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
@@ -61,7 +49,7 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
      * The {@link Name} of this {@link AbstractAnalysisRule}.
      */
     public static final Name NAME = new Name(
-        "AnalyzePostCondImpliesMethodEffects");
+            "AnalyzePostCondImpliesMethodEffects");
 
     /**
      * Singleton instance of the
@@ -105,10 +93,11 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
 
         final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
                 extractStoreEqsAndInnerHeapTerm(//
-                    services, origHeapTerm);
+                        services, origHeapTerm);
 
         final List<Term> storeEqualities = hasHeap
-                ? storeEqsAndInnerHeapTerm.get().second : new ArrayList<>();
+                ? storeEqsAndInnerHeapTerm.get().second
+                : new ArrayList<>();
 
         // We have to look the variable up from the current namespaces, since
         // otherwise we will obtain a different object...
@@ -120,8 +109,9 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
                 .getLocalNamespaces().programVariables()
                 .lookup(fContract.getExc().op().name());
 
-        final Map<LocationVariable, Term> updateContent = LogicUtilities
-                .updateToMap(updateTerm);
+        final LinkedHashMap<LocationVariable, Term> updateContent =
+                LogicUtilities
+                        .updateToMap(updateTerm);
 
         final Term updateWithoutVarsOfInterest = updateContent.keySet().stream()
                 .filter(lhs -> isVoid || !lhs.equals(resultVar))
@@ -143,29 +133,30 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
             final Goal analysisGoal = goalArray[0];
 
             final Term currAnalysisTerm = tb.equals(tb.var(resultVar),
-                MergeRuleUtils.getUpdateRightSideFor(updateTerm, resultVar));
+                    MergeRuleUtils.getUpdateRightSideFor(updateTerm,
+                            resultVar));
 
             prepareGoal(pio, analysisGoal, currAnalysisTerm, termLabelState,
-                this);
+                    this);
 
             final List<Term> newPres = Arrays
                     .asList(new Term[] {
-                        tb.apply(hasHeap
-                                ? tb.parallel(
-                                    tb.elementary(tb.var(heapVar),
-                                        origHeapTerm),
-                                    updateWithoutVarsOfInterest)
-                                : updateWithoutVarsOfInterest,
-                            contract),
-                        tb.and(updateContent.keySet().stream()
-                                .filter(lhs -> lhs != resultVar)
-                                .filter(lhs -> !lhs.equals(heapVar))
-                                .map(lhs -> tb.equals(tb.var(lhs),
-                                    updateContent.get(lhs)))
-                                .collect(Collectors.toList())) });
+                            tb.apply(hasHeap
+                                    ? tb.parallel(
+                                            tb.elementary(tb.var(heapVar),
+                                                    origHeapTerm),
+                                            updateWithoutVarsOfInterest)
+                                    : updateWithoutVarsOfInterest,
+                                    contract),
+                            tb.and(updateContent.keySet().stream()
+                                    .filter(lhs -> lhs != resultVar)
+                                    .filter(lhs -> !lhs.equals(heapVar))
+                                    .map(lhs -> tb.equals(tb.var(lhs),
+                                            updateContent.get(lhs)))
+                                    .collect(Collectors.toList())) });
 
             addFactPreconditions(analysisGoal, newPres, 1, termLabelState,
-                this);
+                    this);
         }
 
         int i = hasResultVar ? 1 : 0;
@@ -178,22 +169,22 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
                 final Goal analysisGoal = goalArray[i];
 
                 prepareGoal(pio, analysisGoal, storeEquality, termLabelState,
-                    this);
+                        this);
 
                 final Term update = tb.parallel(//
-                    tb.elementary(tb.var(heapVar), innerHeapTerm), //
-                    updateWithoutVarsOfInterest);
+                        tb.elementary(tb.var(heapVar), innerHeapTerm), //
+                        updateWithoutVarsOfInterest);
 
                 final List<Term> newPres = Arrays
                         .asList(new Term[] { tb.apply(update, contract),
-                            tb.and(updateContent.keySet().stream()
-                                    .filter(lhs -> !lhs.equals(heapVar))
-                                    .map(lhs -> tb.equals(tb.var(lhs),
-                                        updateContent.get(lhs)))
-                                    .collect(Collectors.toList())) });
+                                tb.and(updateContent.keySet().stream()
+                                        .filter(lhs -> !lhs.equals(heapVar))
+                                        .map(lhs -> tb.equals(tb.var(lhs),
+                                                updateContent.get(lhs)))
+                                        .collect(Collectors.toList())) });
 
                 addFactPreconditions(analysisGoal, newPres, 1, termLabelState,
-                    this);
+                        this);
 
                 i++;
             }
@@ -204,7 +195,7 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
         addSETPredicateToAntec(postCondGoal);
 
         postCondGoal.setBranchLabel(
-            AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL);
+                AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL);
 
         return goals;
     }
@@ -236,7 +227,8 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
                 && f.op() instanceof UpdateApplication
                 && !(f.sub(1).op() instanceof Modality)
                 && !TermBuilder.goBelowUpdates(f).op().equals(Junctor.FALSE)
-                && !AnalyzeInvImpliesLoopEffectsRule.INSTANCE.isApplicable(goal, pio)
+                && !AnalyzeInvImpliesLoopEffectsRule.INSTANCE.isApplicable(goal,
+                        pio)
                 && (goal.node().getNodeInfo().getBranchLabel() == null
                         || !goal.node().getNodeInfo().getBranchLabel()
                                 .equals(LoopScopeInvariantRule. //
