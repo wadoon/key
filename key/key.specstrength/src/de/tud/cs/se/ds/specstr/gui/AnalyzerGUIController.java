@@ -14,6 +14,7 @@
 package de.tud.cs.se.ds.specstr.gui;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +38,8 @@ import org.apache.logging.log4j.core.appender.OutputStreamAppender;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.layout.PatternLayout;
+
+import com.uwyn.jhighlight.renderer.XhtmlRendererFactory;
 
 import de.tud.cs.se.ds.specstr.analyzer.Analyzer;
 import de.tud.cs.se.ds.specstr.analyzer.Analyzer.AnalyzerResult;
@@ -452,7 +455,9 @@ public class AnalyzerGUIController {
         wvInfo.getEngine()
                 .loadContent(new StringBuilder().append("<html>")
                         .append("<head>")
-                        .append(HIGLIGHTING_STYLES)
+                        .append("<style type=\"text/css\">")
+                        .append(XhtmlRendererFactory.getRenderer("java").getCssClassDefinitions())
+                        .append("</style>")
                         .append("</head>")
                         .append("<body>")
                         .append(text2HTML(text, javaHighlight))
@@ -461,20 +466,28 @@ public class AnalyzerGUIController {
     }
 
     private String text2HTML(String text, boolean javaHighlight) {
-        text = text.replaceAll("\n", "<br/>")
-                .replaceAll(" ", "&nbsp;");
-
         if (javaHighlight) {
-            text = SINGLE_LINE_COMMENT_PATTERN.matcher(text)
-                    .replaceAll(SINGLE_LINE_COMMENT_REPLACEMENT);
-            text = ML_COMMENT_PATTERN.matcher(text)
-                    .replaceAll(ML_COMMENT_REPLACEMENT);
-            text = JML_ML_COMMENT_PATTERN.matcher(text)
-                    .replaceAll(JML_ML_COMMENT_REPLACEMENT);
-            text = JML_SL_COMMENT_PATTERN.matcher(text)
-                    .replaceAll(JML_SL_COMMENT_REPLACEMENT);
-            text = JAVA_KEYWORDS_PATTERN.matcher(text)
-                    .replaceAll(JAVA_KEYWORDS_REPLACEMENT);
+            InputStream in = new ByteArrayInputStream(
+                    text.getBytes(StandardCharsets.UTF_8));
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            try {
+                XhtmlRendererFactory.getRenderer("java") //
+                        .highlight("", //
+                                in, //
+                                out, //
+                                "utf-8", //
+                                true);
+                text = out.toString("utf-8");
+                in.close();
+                out.close();
+            }
+            catch (IOException e) {
+                handleException(e);
+            }
+        }
+        else {
+            text = text.replaceAll("\n", "<br/>")
+                    .replaceAll(" ", "&nbsp;");
         }
 
         return text;
