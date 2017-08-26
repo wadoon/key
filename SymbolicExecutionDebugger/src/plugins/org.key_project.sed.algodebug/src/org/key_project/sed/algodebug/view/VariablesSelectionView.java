@@ -24,21 +24,41 @@ public class VariablesSelectionView extends ViewPart {
 
    public static final String VIEW_ID = "org.key_project.sed.ui.view.VariablesSelectionView";
 
+   /*
+    * constructor
+    */
    public VariablesSelectionView(){
    }
 
+   /*
+    * the viewer used to display the list of ISENodes of the SET
+    * At this viewer the method call of the actual asked execution is selected
+    */
    static ListViewer viewerLeft = null;
 
+   /*
+    * the viewer used to display the list of ISENodes of the SET
+    * At this viewer the method return of the actual asked execution is selected
+    */
    static ListViewer viewerRight = null;
 
+   /*
+    * returns the viewer used to display the method call stack
+    */
    public static ListViewer getviewerLeft (){
       return viewerLeft;
    }
 
+   /*
+    * returns the viewer used to display the method return stack
+    */
    public static ListViewer getviewerRight (){
       return viewerRight;
    }
 
+   /*
+    * set the content of the viewers
+    */
    public void getContent(){
       Object[] NodeArray = null;
       IViewPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().findView("org.key_project.sed.ui.view.AlgorithmicDebugView");
@@ -56,6 +76,9 @@ public class VariablesSelectionView extends ViewPart {
       }
    }
 
+   /*
+    * set the input of the viewers to null
+    */
    public void clear(){
       viewerLeft.setInput(null);
       viewerRight.setInput(null);
@@ -64,7 +87,6 @@ public class VariablesSelectionView extends ViewPart {
    /*
     * IDCProvider: Dummy Provider, needed only as Parameter for variables view
     */
-
    private final IDebugContextProvider IDCProvider = new IDebugContextProvider() {
 
       @Override
@@ -86,8 +108,14 @@ public class VariablesSelectionView extends ViewPart {
       }
    };
 
+   /*
+    * the variables views that show the stack
+    */
    private IViewPart variablesViewLeft,variablesViewRight;
 
+   /*
+    * creates the user interface of the variables selection view
+    */
    private void createViews(){
       IWorkbenchPage workbenchpage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
       try {
@@ -119,6 +147,10 @@ public class VariablesSelectionView extends ViewPart {
       });
    }
 
+/*
+ * (non-Javadoc)
+ * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+ */
    @Override
    public void createPartControl(Composite parent) {
 
@@ -138,6 +170,10 @@ public class VariablesSelectionView extends ViewPart {
       getContent();
    }
 
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+    */
    @Override
    public void setFocus() {
    }

@@ -54,7 +54,6 @@ import org.eclipse.swt.widgets.Text;
 public class AlgorithmicDebugView extends ViewPart implements Observer, ISelectionProvider{
 
    public static final String VIEW_ID = "org.key_project.sed.ui.view.AlgorithmicDebugView";
-
    private ISENode actualNode, root; 
    private AlgorithmicDebug debug; 
    private Execution actualCall;
@@ -71,10 +70,16 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
    private Shell shell = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell();
    private int chronikCounter = 0;
 
+   /*
+    * constructor
+    */
    public AlgorithmicDebugView() throws PartInitException{
       variablesSelectionView = workbenchpage.showView("org.key_project.sed.ui.view.VariablesSelectionView",null,IWorkbenchPage.VIEW_ACTIVATE);
    }
 
+   /*
+    * List of text strings used for the combo field used to select the search strategy by the user
+    */
    String[] items = { "Single Stepping","Top Down" };
 
    /*
@@ -90,14 +95,12 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
    }
 
    /*
-    * setzt den aktuell abgefragten Method Call auf korrekt und holt anschließend einen neuen
-    * wenn der nächste abzufragende Method Call == null ist, frage im debug, über aufrufen von askDebugWhyThereIsNoNextMethodToAsk, was los ist
+    * set the actual exection to be correct and get the next execution selected by the search strategy
+    * if the next execution to be asked is null, ask the algorithmicdebug object why null is returned 
     */
    private void correctButtonPressed(){
       debug.unhighlight();
       debug.markCall(actualCall, 'c');
-      //      SETUtil.annotateMethodCallCorrect(actualCall);
-      // MCTUtil.annotateExecutionPartialCorrect(actualCall, 'c');
       Execution next =  debug.getNext();
       if(next != null){
          chronik.add(next);
@@ -113,8 +116,8 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
    }
 
    /*
-    * setzt den aktuell abgefragten Method Call auf falsch und holt anschließend einen neuen
-    * wenn der nächste abzufragende Method Call == null ist, frage im debug, über aufrufen von askDebugWhyThereIsNoNextMethodToAsk, was los ist
+    * set the actual exection to be false and get the next execution selected by the search strategy
+    * if the next execution to be asked is null, ask the algorithmicdebug object why null is returned 
     */
    private void falseButtonPressed(){
       debug.unhighlight();
@@ -135,8 +138,8 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
    }
 
    /*
-    * -----> wurden alle Bäume komplett durchsucht und kein Bug gefunden, informiere den Benutzer darüber
-    * -----> wurde ein Bug gefunden, informiere den Benutzer darüber
+    * if every exeution tree was searched completey and no bug was found, let the user know about
+    * if a bug was found let the user know about
     */
    private void askDebugWhyThereIsNoNextExecutionToAsk(){
       if(debug.bugFound()){
@@ -153,6 +156,9 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       }
    }
 
+   /*
+    * no bug was found, let the user know about 
+    */
    private void notifyNoBugFound() {
       MessageBox mb = new MessageBox(shell);
       mb.setText("Couldn't find a Bug in the method");
@@ -161,7 +167,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
    }
 
    /*
-    * startet den Suchvorgang indem alle Sourcen angelegt werden und der erste abzufragende Knoten bereitgestellt wird
+    * starts the algorithmic debug process by creating all needed sources and getting the first execution that has to be asked
     */
    private void startButtonPressed() {
       btnCorrect.setEnabled(true);
@@ -197,6 +203,9 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       }
    }
 
+   /*
+    * show and highlight the next execution of the asked execution history
+    */
    protected void nextButtonPressed() {
       if(debug != null && chronikCounter < chronik.size()-1){
          chronikCounter++;
@@ -212,6 +221,9 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       }
    }
 
+   /*
+    * show and highlight the previous execution of the asked execution history
+    */
    protected void backButtonPressed() {
       if(debug != null && chronikCounter >= 1){
          chronikCounter--;
@@ -228,7 +240,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
    }
 
    /*
-    * reset()
+    * clears the ressouorces needed for the algorithmic debugging process and sets them new
     */
    private void reset(){
       clear();
@@ -243,7 +255,6 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
    }
 
    /*
-    * clear()
     * Unhighlight last call, remove all annotations, set all textfields to "",delete debug and actual call elements and reset other views.
     */
    private void clear(){
@@ -264,6 +275,10 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       }
    }
 
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+    */
    public void dispose(){
       //      clear();
       super.dispose();
@@ -312,11 +327,14 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
     * getSelectedNode
     * @returns the actual selected node at the {@link ExecutionTreeView}
     */
-
    private ISENode getSelectedNode(){
       return (KeySEDUtil.getSelectedDebugElement() instanceof ISENode ) ? (ISENode) KeySEDUtil.getSelectedDebugElement() : null;
    }
 
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
+    */
    @Override
    public void createPartControl(final Composite parent) {
       Display display = Display.getDefault();
@@ -455,6 +473,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
    }
 
    /*
+    * return all nodes of the symbolic execution tree as an array of ISENodes
     * Alle Knoten des Execution Tree in Preorder Reihenfolge in einem Array zurückgeben...
     */
    public Object[] getExecutionTreeAsArray(){
@@ -468,6 +487,10 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       return array;
    }
 
+   /*
+    * set the input of the variables selection view to the given execution
+    * @param execution the exeution the stack should be shown of
+    */
    private void setVariablesSelectionViewSelection(Execution execution) {
       SWTUtil.select(VariablesSelectionView.getviewerLeft(),
             new StructuredSelection(execution.getCall()), true);
@@ -476,7 +499,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
    }
 
    /*
-    * asList - Gibt eine Liste mit allen Knoten des ExecutionTree zurück
+    * returns a list containing all the ISENodes of the actual execution tree
     */
    private ArrayList<ISENode> asList(ISENode node){
       ArrayList<ISENode> list = new ArrayList<ISENode>();
@@ -494,6 +517,10 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       return list;
    }
 
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.ui.part.WorkbenchPart#setFocus()
+    */
    @Override
    public void setFocus() {
       lblMethodName.setFocus();
@@ -502,16 +529,27 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       }
    }
 
+   /*
+    * (non-Javadoc)
+    * @see java.util.Observer#update(java.util.Observable, java.lang.Object)
+    */
    @Override
    public void update(Observable o, Object arg) {
-
    }
 
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.jface.viewers.ISelectionProvider#addSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+    */
    @Override
    public void addSelectionChangedListener(ISelectionChangedListener listener) {
       listeners.add(listener);        
    }
 
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.jface.viewers.ISelectionProvider#getSelection()
+    */
    @Override
    public ISelection getSelection() {
 
@@ -525,11 +563,19 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       }
    }
 
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.jface.viewers.ISelectionProvider#removeSelectionChangedListener(org.eclipse.jface.viewers.ISelectionChangedListener)
+    */
    @Override
    public void removeSelectionChangedListener(ISelectionChangedListener listener) {
       listeners.remove(listener);        
    }
 
+   /*
+    * (non-Javadoc)
+    * @see org.eclipse.jface.viewers.ISelectionProvider#setSelection(org.eclipse.jface.viewers.ISelection)
+    */
    @Override
    public void setSelection(ISelection selection) {
       Object[] list = listeners.getListeners();
@@ -539,11 +585,15 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       }
    }
 
-   public void notifyBugFound(Execution call) {
+   /*
+    * notify the user that a buggy execution was found
+    * @param execution the buggy execution
+    */
+   public void notifyBugFound(Execution execution) {
       MessageBox mb = new MessageBox(shell);
       mb.setText("Incorrect Method identified");
       try {
-         mb.setMessage("It seems Method " +call.getCall().getName().toString()+" contains a bug.");
+         mb.setMessage("It seems Method " +execution.getCall().getName().toString()+" contains a bug.");
       }
       catch (DebugException e) {
          e.printStackTrace();

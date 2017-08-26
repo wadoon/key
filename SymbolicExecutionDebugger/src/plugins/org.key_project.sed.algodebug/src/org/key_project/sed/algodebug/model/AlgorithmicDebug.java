@@ -3,57 +3,83 @@ package org.key_project.sed.algodebug.model;
 import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.algodebug.searchstrategy.ISearchStrategy;
 import org.key_project.sed.algodebug.util.SETUtil;
-import org.key_project.sed.core.annotation.ISEAnnotation;
-import org.key_project.sed.core.annotation.ISEAnnotationType;
-import org.key_project.sed.core.annotation.impl.HighlightAnnotation;
-import org.key_project.sed.core.annotation.impl.HighlightAnnotationType;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEThread;
-import org.key_project.sed.core.util.SEAnnotationUtil;
-import org.key_project.util.java.ArrayUtil;
-import org.key_project.util.java.IFilter;
 
 /**
  * @author Peter Schauberger
  */
 public class AlgorithmicDebug  {
 
-   //Letzten Call zwischenspeichern um Rückgängigmachen des Highlighting in unhighlight zu ermöglichen
+   /*
+    * The last execution that has been highlighted
+    */
    private Execution lastHighlightedCall;
-   public Execution getLastHighlightedCall(){
+   
+   /*
+    * @return The last highlighted execution
+    */
+   public Execution getLastHighlightedExecution(){
       return lastHighlightedCall;
    }
 
+   /*
+    * The search-strategy used for algorithmic debugging
+    */
    private ISearchStrategy searchStrategy;
 
+   /*
+    * Constructor
+    */
    public AlgorithmicDebug() {
       listOfExecutionTrees = new ListOfExecutionTrees();
    }
+   
+   /*
+    * 
+    */
    private ListOfExecutionTrees listOfExecutionTrees;
 
+   /*
+    * Flag to indicate if a bug was found by the algorithmic debugging process
+    */
    private boolean bugFound = false;
 
+   /*
+    * The bug that was found.
+    */
    private Execution bug;
 
+   /*
+    * Flag to indicate if all execution trees have been searched but no bug was found
+    */
    private boolean searchCompletedButNoBugFound = false;
 
+   /*
+    * 
+    */
    public void generateTree(ISENode root){
       listOfExecutionTrees.generateListOfExecutionTrees(root);
       listOfExecutionTrees.addParentsToTree();
 //      listOfExecutionTrees.printTree();
-      listOfExecutionTrees.printTreeAsGraphviz();
+//      listOfExecutionTrees.printTreeAsGraphviz();
    }
 
+   /*
+    * returns the execution that has been identified as bug
+    */
    public Execution getBug(){
       return bug;
    }
 
+   /*
+    * the execution tree that is searched at the moment
+    */
    private Execution actualExecutionTree;
 
    /*
-    * return Method Call wenn ein nächster Knoten zum abfragen gefunden werden konnte.
-    * return null wenn ein Bug gefunden wurde oder alle Bäume komplett abgesucht wurden
-    * -----> frage bei return null in der Such-Methode nach was los ist und setze bugFound oder searchCompletedButNoBugFound
+    * @return execution if next execution was found that has to be asked
+    * @return null if either a bug was found or all execution trees were searched withouot finding a bug 
     */
    public Execution searchBugInListOfExecutionTrees(){
       if(actualExecutionTree == null)
@@ -69,7 +95,7 @@ public class AlgorithmicDebug  {
                if(maybeABuggyCall != null){
                   return maybeABuggyCall;
                }
-               else // 
+               else
                   if(searchStrategy.bugFound()){
                      bug = searchStrategy.getBug();
                      bugFound = true;
@@ -86,7 +112,7 @@ public class AlgorithmicDebug  {
          if(maybeABuggyCall != null){
             return maybeABuggyCall;
          }
-         else // 
+         else 
             if(searchStrategy.bugFound()){
                bug = searchStrategy.getBug();
                bugFound = true;
@@ -102,17 +128,23 @@ public class AlgorithmicDebug  {
    }
 
    /*
-    * return null wenn ein Bug gefunden wurde oder der ganze Baum durchsucht wurde
-    * return Method Call wenn ein nächster Method Call gefunden wurde der abgefragt werden soll
+    * @returns null is a bug was found or the whole execution tree was searched without finding a bug or 
+    * @returns the next execution that has to be asked
     */
    private Execution searchBugInExecutionTree(Execution executionTree){
       return searchStrategy.getNext(executionTree);
    }
 
+   /*
+    * uses the search-strategy to get the next execution that should be asked to the user from the actual execution tree 
+    */
    public Execution getNext(){
       return searchBugInListOfExecutionTrees();
    }
 
+   /*
+    * adds the highlight annotations toall SET nodes that belong to the next execution that is asked to the user
+    */
    public void highlightCall(Execution call){
 
       ISENode node = call.getExecutionReturn();
@@ -130,48 +162,17 @@ public class AlgorithmicDebug  {
             node = node.getParent();
          }
          catch (DebugException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
          }
       }
       lastHighlightedCall = call;
    }
 
+   /*
+    * removes the highlight annotations from all SET nodes that belong to the last highlited execution
+    */
    public void unhighlight(){
-
-      if(lastHighlightedCall != null){
-         ISENode node = lastHighlightedCall.getExecutionReturn();
-         ISEAnnotationType annotationTypeHighlight = SEAnnotationUtil.getAnnotationtype(HighlightAnnotationType.TYPE_ID);
-         ISEAnnotation[]  registeredAnnotationsHighlight = node.getDebugTarget().getRegisteredAnnotations(annotationTypeHighlight);
-
-         try {
-            while(  !(node == lastHighlightedCall.getCall().getParent())){ //!(node instanceof ISEThread) ){ //
-               //System.out.println("----UNhighlighte Node: "+node.getName().toString()+ " vom Typ: "+node.getNodeType());
-
-               ISEAnnotation annotationHighlight = ArrayUtil.search(registeredAnnotationsHighlight, new IFilter<ISEAnnotation>() {
-                  @Override
-                  public boolean select(ISEAnnotation element) {
-                     return element instanceof HighlightAnnotation; 
-                  }
-               });
-               if(annotationHighlight != null){
-                  node.removeAnnotationLink(annotationTypeHighlight.createLink(annotationHighlight, node));
-               }
-
-               try {
-                  node = node.getParent();
-               }
-               catch (DebugException e) {
-                  // TODO Auto-generated catch block
-                  e.printStackTrace();
-               }
-            }
-         }
-         catch (DebugException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-         }
-      }
+      SETUtil.unhighlight(lastHighlightedCall);
    }
 
    /*
@@ -181,14 +182,25 @@ public class AlgorithmicDebug  {
       searchStrategy.setExecutionCorrectness(execution, correctness);
    }
 
+   /*
+    * sets the search strategy für algorithmic debugging
+    * @param the search-strategy that shound be used
+    */
    public void setSearchStrategy(ISearchStrategy strategy) {
-      searchStrategy = strategy;      
+      searchStrategy = strategy;
    }
 
+   /*
+    * returns true if a bug was found
+    */
    public boolean bugFound() {
       return bugFound;
    }
 
+   /*
+    * returns true if search was completed but no bug was found.
+    * None of the execution trees has a bug.
+    */
    public boolean searchCompletedButNoBugFound() {
       return searchCompletedButNoBugFound;
    }

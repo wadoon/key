@@ -2,17 +2,24 @@ package org.key_project.sed.algodebug.searchstrategy;
 
 import org.key_project.sed.algodebug.model.Execution;
 import org.key_project.sed.algodebug.util.MCTUtil;
-import org.key_project.sed.algodebug.util.SETUtil;
 
 public class TopDown extends SearchStrategy implements ISearchStrategy {
 
-   private Execution lastAskedExecution;
-   private Execution root;
    /*
-    * return null wenn kein nächster Method Call gefunden werden kann
-    * -----> weil der Baum komplett abgesucht wurde
-    * -----> weil ein Bug gefunden wurde
-    * return nächsten abzufragenden Method Call sonst
+    * the last execution that was returned
+    * used as a starting point for the next search
+    */
+   private Execution lastAskedExecution;
+   
+   /*
+    * the execution that is the root node of the execution tree
+    */
+   private Execution root;
+   
+   /*
+    * return null if the execution tree was searched completely or
+    * return null if a buggy execution was found
+    * return next execution to be asked to the user otherwise
     */
    @Override
    public Execution getNext(Execution tree) {
@@ -65,12 +72,20 @@ public class TopDown extends SearchStrategy implements ISearchStrategy {
       return null;
    }
 
+   /*
+    * (non-Javadoc)
+    * @see org.key_project.sed.algodebug.searchstrategy.ISearchStrategy#reset()
+    */
    public void reset(){
       lastAskedExecution = null;
       root = null;
       searchCompletedButNoBugFound = false;
    }
 
+   /*
+    * (non-Javadoc)
+    * @see org.key_project.sed.algodebug.searchstrategy.ISearchStrategy#setExecutionCorrectness(org.key_project.sed.algodebug.model.Execution, char)
+    */
    @Override
    public void setExecutionCorrectness(Execution execution, char correctness) {
       if(correctness == 'c'){
@@ -83,6 +98,10 @@ public class TopDown extends SearchStrategy implements ISearchStrategy {
       }
    }
 
+   /*
+    * (non-Javadoc)
+    * @see org.key_project.sed.algodebug.searchstrategy.ISearchStrategy#treeCompletelySearched()
+    */
    @Override
    public boolean treeCompletelySearched() {
       if(root.getCorrectness() == 'c')

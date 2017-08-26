@@ -33,6 +33,9 @@ public class ListOfExecutionTrees {
       this.listOfExecutionTrees = new ArrayList<Execution>();
    }
 
+   /*
+    * adds the parent to every execution of the execution tree
+    */
    public void addParentsToTree(){
       for(Execution call:listOfExecutionTrees){
          call.setParent(null);
@@ -40,6 +43,9 @@ public class ListOfExecutionTrees {
       }
    }
 
+   /*
+    * adds the parent to every execution of the sub execution tree
+    */
    private void addParentsToSubTree(Execution call){
       for(Execution subCall:call.getListOfCalledMethods()){
          subCall.setParent(call);
@@ -47,6 +53,10 @@ public class ListOfExecutionTrees {
       }
    }
 
+   /*
+    * generates the list of execution trees 
+    * @param the root node of a symbolic exeution tree
+    */
    public void generateListOfExecutionTrees(ISENode node){
       try {
          //System.out.println("Generating Paths");
@@ -68,6 +78,11 @@ public class ListOfExecutionTrees {
       }
    }
 
+   /*
+    * generates an exeution tree 
+    * @param start the first node of the path ob which the execution tree is based
+    * @param nodelist the list of nodes the path consists of
+    */
    private Execution generateExecutionTree(ISENode start, List<ISENode> nodelist){
       ArrayList<Execution> calllist = new ArrayList<Execution>();
       int nodecount = 0;
@@ -98,6 +113,10 @@ public class ListOfExecutionTrees {
       return new Execution(start, nodelist.get(zahl), calllist);
    }
 
+   /*
+    * prints the list of ISENodes to the console the given list consists of
+    * @param nodelist a list of ISENodes
+    */
    private void printNodeList(List<ISENode> nodelist){
       System.out.println("\n neue Knotenliste:");
       for(ISENode node : nodelist){
@@ -158,6 +177,10 @@ public class ListOfExecutionTrees {
       }
    }
 
+   /*
+    * prints the list of execution trees one after another to the console as sequence of strings
+    * each tree can be plottet using graphviz
+    */
    public void printTreeAsGraphviz() {
       for(Execution path : listOfExecutionTrees){
          System.out.println("digraph G {");

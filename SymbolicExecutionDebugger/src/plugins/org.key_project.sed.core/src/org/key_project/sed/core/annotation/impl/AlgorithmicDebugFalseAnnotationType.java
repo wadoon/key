@@ -37,7 +37,7 @@ public class AlgorithmicDebugFalseAnnotationType extends AbstractSEAnnotationTyp
 
    @Override
    public RGB getDefaultBackgroundColor() {
-      return new RGB(255,0,0); //red
+      return new RGB(255, 255, 0); //yellow
    }
 
    @Override
@@ -48,7 +48,7 @@ public class AlgorithmicDebugFalseAnnotationType extends AbstractSEAnnotationTyp
 
    @Override
    public RGB getDefaultForegroundColor() {
-      return new RGB(255, 255, 0); // green
+      return new RGB(255, 255, 0); 
    }
 
    @Override

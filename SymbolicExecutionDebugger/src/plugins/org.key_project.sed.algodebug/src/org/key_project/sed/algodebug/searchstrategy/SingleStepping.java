@@ -2,12 +2,18 @@ package org.key_project.sed.algodebug.searchstrategy;
 
 import org.key_project.sed.algodebug.model.Execution;
 import org.key_project.sed.algodebug.util.MCTUtil;
-import org.key_project.sed.algodebug.util.SETUtil;
 
 public class SingleStepping extends SearchStrategy implements ISearchStrategy {
 
+   /*
+    * the execution that is the root of the execution tree
+    */
    private Execution root;
 
+   /*
+    * (non-Javadoc)
+    * @see org.key_project.sed.algodebug.searchstrategy.ISearchStrategy#getNext(org.key_project.sed.algodebug.model.Execution)
+    */
    @Override
    public Execution getNext(Execution tree) {
       if(root == null)
@@ -42,6 +48,10 @@ public class SingleStepping extends SearchStrategy implements ISearchStrategy {
       return null;
    }
 
+   /*
+    * (non-Javadoc)
+    * @see org.key_project.sed.algodebug.searchstrategy.ISearchStrategy#setExecutionCorrectness(org.key_project.sed.algodebug.model.Execution, char)
+    */
    @Override
    public void setExecutionCorrectness(Execution execution, char correctness) {
       execution.setExecutionCorrectness(correctness);
@@ -51,6 +61,10 @@ public class SingleStepping extends SearchStrategy implements ISearchStrategy {
          MCTUtil.annotateExecutionPartialCorrect(execution);
    }
 
+   /*
+    * (non-Javadoc)
+    * @see org.key_project.sed.algodebug.searchstrategy.ISearchStrategy#treeCompletelySearched()
+    */
    @Override
    public boolean treeCompletelySearched() {
       if(root.getCorrectness() == 'c')
@@ -59,6 +73,10 @@ public class SingleStepping extends SearchStrategy implements ISearchStrategy {
          return false;
    }
 
+   /*
+    * (non-Javadoc)
+    * @see org.key_project.sed.algodebug.searchstrategy.ISearchStrategy#reset()
+    */
    @Override
    public void reset() {
       root = null;

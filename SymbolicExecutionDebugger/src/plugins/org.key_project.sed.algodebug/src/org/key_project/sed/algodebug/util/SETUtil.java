@@ -1,6 +1,7 @@
 package org.key_project.sed.algodebug.util;
 
 import org.eclipse.debug.core.DebugException;
+import org.key_project.sed.algodebug.model.Execution;
 import org.key_project.sed.core.annotation.ISEAnnotation;
 import org.key_project.sed.core.annotation.ISEAnnotationType;
 import org.key_project.sed.core.annotation.impl.AlgorithmicDebugBugAnnotation;
@@ -33,64 +34,103 @@ public class SETUtil {
    private static ISEAnnotation[] registeredAnnotationsBug;
    private static ISEAnnotation[] registeredAnnotationsHighlight;
 
-   private static ISEAnnotation myannotationCorrect = annotationTypeCorrect.createAnnotation();
-   private static ISEAnnotation myannotationFalse = annotationTypeFalse.createAnnotation();
-   private static ISEAnnotation myannotationBug = annotationTypeBug.createAnnotation();
-   private static ISEAnnotation myannotationHighlight = annotationTypeHighlight.createAnnotation();
+   private static ISEAnnotation annotationCorrect = annotationTypeCorrect.createAnnotation();
+   private static ISEAnnotation annotationFalse = annotationTypeFalse.createAnnotation();
+   private static ISEAnnotation annotationBug = annotationTypeBug.createAnnotation();
+   private static ISEAnnotation annotationHighlight = annotationTypeHighlight.createAnnotation();
 
+   /*
+    * initialize the annotations that are used to create the annotation links
+    * @param node a node of the SET used to get the debug target hat is needed to create the annotations
+    */
    public static void init(ISENode node){
       ISEDebugTarget target = node.getDebugTarget();
 
-      myannotationCorrect = ArrayUtil.search(registeredAnnotationsCorrect, new IFilter<ISEAnnotation>() {
+      annotationCorrect = ArrayUtil.search(registeredAnnotationsCorrect, new IFilter<ISEAnnotation>() {
          @Override
          public boolean select(ISEAnnotation element) {
             return element instanceof AlgorithmicDebugCorrectAnnotation; 
          }
       });
-      if (myannotationCorrect == null){
-         myannotationCorrect = annotationTypeCorrect.createAnnotation();
-         target.registerAnnotation(myannotationCorrect);
+      if (annotationCorrect == null){
+         annotationCorrect = annotationTypeCorrect.createAnnotation();
+         target.registerAnnotation(annotationCorrect);
       }
 
-      myannotationFalse = ArrayUtil.search(registeredAnnotationsFalse, new IFilter<ISEAnnotation>() {
+      annotationFalse = ArrayUtil.search(registeredAnnotationsFalse, new IFilter<ISEAnnotation>() {
          @Override
          public boolean select(ISEAnnotation element) {
             return element instanceof AlgorithmicDebugFalseAnnotation; 
          }
       });
-      if (myannotationFalse == null){
-         myannotationFalse = annotationTypeFalse.createAnnotation();
-         target.registerAnnotation(myannotationFalse);
+      if (annotationFalse == null){
+         annotationFalse = annotationTypeFalse.createAnnotation();
+         target.registerAnnotation(annotationFalse);
       }
 
-      myannotationBug = ArrayUtil.search(registeredAnnotationsBug, new IFilter<ISEAnnotation>() {
+      annotationBug = ArrayUtil.search(registeredAnnotationsBug, new IFilter<ISEAnnotation>() {
          @Override
          public boolean select(ISEAnnotation element) {
             return element instanceof AlgorithmicDebugBugAnnotation; 
          }
       });
-      if (myannotationBug == null){
-         myannotationBug = annotationTypeBug.createAnnotation();
-         target.registerAnnotation(myannotationBug);
+      if (annotationBug == null){
+         annotationBug = annotationTypeBug.createAnnotation();
+         target.registerAnnotation(annotationBug);
       }
 
-      myannotationHighlight = ArrayUtil.search(registeredAnnotationsHighlight, new IFilter<ISEAnnotation>() {
+      annotationHighlight = ArrayUtil.search(registeredAnnotationsHighlight, new IFilter<ISEAnnotation>() {
          @Override
          public boolean select(ISEAnnotation element) {
             return element instanceof HighlightAnnotation; 
          }
       });
-      if (myannotationHighlight == null){
-         myannotationHighlight = annotationTypeHighlight.createAnnotation();
-         target.registerAnnotation(myannotationHighlight);
+      if (annotationHighlight == null){
+         annotationHighlight = annotationTypeHighlight.createAnnotation();
+         target.registerAnnotation(annotationHighlight);
       }
    }
 
+   /*
+    * removes the highlight annotation of the ISENodes of the give execution
+    */
+   public static void unhighlight(Execution lastHighlightedCall){
+
+      if(lastHighlightedCall != null){
+         ISENode node = lastHighlightedCall.getExecutionReturn();
+
+         try {
+            while(  !(node == lastHighlightedCall.getCall().getParent())){ //!(node instanceof ISEThread) ){ //
+               //System.out.println("----UNhighlighte Node: "+node.getName().toString()+ " vom Typ: "+node.getNodeType());
+
+               if(annotationHighlight != null){
+                  node.removeAnnotationLink(annotationTypeHighlight.createLink(annotationHighlight, node));
+               }
+
+               try {
+                  node = node.getParent();
+               }
+               catch (DebugException e) {
+                  // TODO Auto-generated catch block
+                  e.printStackTrace();
+               }
+            }
+         }
+         catch (DebugException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+         }
+      }
+   }
+   
+   /*
+    * adds the highlight annotation to the given ISENode
+    */
    public static void highlightNode(ISENode node) {  
 
       //If AnnotationLink was not found, we create a new one and attach it to the node
       if(node.getAnnotationLinks(annotationTypeHighlight).length == 0){
-         node.addAnnotationLink(annotationTypeHighlight.createLink(myannotationHighlight, node));
+         node.addAnnotationLink(annotationTypeHighlight.createLink(annotationHighlight, node));
       }     
    }
 
@@ -116,6 +156,10 @@ public class SETUtil {
       return null;
    }
 
+   /*
+    * removes all used annotations from all ISENodes of the SET
+    * @param node the root of the SET
+    */
    public static void removeAllAlgoDebugAnnotations(ISENode node){
       if(node != null){
          removeAnnotations(node);
@@ -130,13 +174,19 @@ public class SETUtil {
          }}
    }
 
+   /*
+    * removes the annotationTypeCorrect annotation, the annotationTypeFalse annotation and annotationTypeHighlight annotation of the given ISENode
+    * @param node the ISENode from which the annotations should be removed
+    */
    public static void removeAnnotations(ISENode node){
       if(node.getAnnotationLinks(annotationTypeCorrect).length != 0)
-         node.removeAnnotationLink(annotationTypeCorrect.createLink(myannotationCorrect, node));
+         node.removeAnnotationLink(annotationTypeCorrect.createLink(annotationCorrect, node));
       if(node.getAnnotationLinks(annotationTypeFalse).length != 0)
-         node.removeAnnotationLink(annotationTypeFalse.createLink(myannotationFalse, node));
+         node.removeAnnotationLink(annotationTypeFalse.createLink(annotationFalse, node));
       if(node.getAnnotationLinks(annotationTypeBug).length != 0)
-         node.removeAnnotationLink(annotationTypeBug.createLink(myannotationBug, node));
+         node.removeAnnotationLink(annotationTypeBug.createLink(annotationBug, node));
+      if(node.getAnnotationLinks(annotationTypeHighlight).length != 0)
+         node.removeAnnotationLink(annotationTypeHighlight.createLink(annotationHighlight, node));
    }
 
    /**
@@ -152,44 +202,46 @@ public class SETUtil {
    }
 
    /**
+    * annotates the given ISENode with the annotationTypeCorrect annotation
     * @author Peter Schauberger
     */
    public static void annotateCorrect(ISENode node) {
       if(node.getAnnotationLinks(annotationTypeCorrect).length == 0){
          if(node.getAnnotationLinks(annotationTypeFalse).length == 0){
-            node.addAnnotationLink(annotationTypeCorrect.createLink(myannotationCorrect, node));
+            node.addAnnotationLink(annotationTypeCorrect.createLink(annotationCorrect, node));
          }
          else{
-            node.removeAnnotationLink(annotationTypeFalse.createLink(myannotationFalse, node));
-            node.addAnnotationLink(annotationTypeCorrect.createLink(myannotationCorrect, node));
+            node.removeAnnotationLink(annotationTypeFalse.createLink(annotationFalse, node));
+            node.addAnnotationLink(annotationTypeCorrect.createLink(annotationCorrect, node));
          }
       }
    }
 
+   /**
+    * annotates the given ISENode with the annotationTypeFalse annotation
+    * @author Peter Schauberger
+    */
    public static void annotateFalse(ISENode node) {
       if(node.getAnnotationLinks(annotationTypeFalse).length == 0){
-         if(myannotationCorrect == null || node.getAnnotationLinks(annotationTypeCorrect).length == 0){
-            node.addAnnotationLink(annotationTypeFalse.createLink(myannotationFalse, node));
+         if(annotationCorrect == null || node.getAnnotationLinks(annotationTypeCorrect).length == 0){
+            node.addAnnotationLink(annotationTypeFalse.createLink(annotationFalse, node));
          }
          else{ 
-            node.removeAnnotationLink(annotationTypeCorrect.createLink(myannotationCorrect, node));
-            node.addAnnotationLink(annotationTypeFalse.createLink(myannotationFalse, node));
+            node.removeAnnotationLink(annotationTypeCorrect.createLink(annotationCorrect, node));
+            node.addAnnotationLink(annotationTypeFalse.createLink(annotationFalse, node));
          }
       }
    }
 
    /*
-    * Gibt wahr zurück wenn es Kinder gibt die nicht korrekt annotiert wurden
+    * returns true if the given ISENode has children that are not annotated with the AlgorithmicDebugCorrectAnnotationType
+    * @param node the node that should be checked
     */
    public static boolean hasNotCorrectAnnotatedChildren(ISENode node){
       try {
-         //System.out.println("HasUnannotatedChildren:");
          for(ISENode child : node.getChildren()){
-            //System.out.println("Checke: "+child.getName().toString());
             int len = child.getAnnotationLinks(SEAnnotationUtil.getAnnotationtype(AlgorithmicDebugCorrectAnnotationType.TYPE_ID)).length;
-            //System.out.println("Anzahl Correkt Markierungen:" +len);
-            if(len == 0){ //Knoten noch nicht korrekt markiert
-               //System.out.println("Noch nicht markiertes Child gefunden: " + child.getName().toString());
+            if(len == 0){
                return true;
             }
          }
@@ -200,18 +252,25 @@ public class SETUtil {
       return false;
    }
 
+   /*
+    * annotate the given ISENode with the annotationTypeBug
+    * @param node the node that should be annotated
+    */
    public static void annotateBug(ISENode node) {
 
       if(node.getAnnotationLinks(annotationTypeBug).length == 0){
-         node.addAnnotationLink(annotationTypeBug.createLink(myannotationBug, node));
+         node.addAnnotationLink(annotationTypeBug.createLink(annotationBug, node));
       }
    }
 
+   /*
+    * removes from the given ISENode the annotationTypeCorrect annotation and the annotationTypeFalse annotation. Then annotates the given ISENode with the annotationTypeBug annotation
+    */
    public static void annotateBuggy(ISENode node) {
       if(node.getAnnotationLinks(annotationTypeCorrect).length != 0)
-         node.removeAnnotationLink(annotationTypeCorrect.createLink(myannotationCorrect, node));
+         node.removeAnnotationLink(annotationTypeCorrect.createLink(annotationCorrect, node));
       if(node.getAnnotationLinks(annotationTypeFalse).length != 0)
-         node.removeAnnotationLink(annotationTypeFalse.createLink(myannotationFalse, node));
-      node.addAnnotationLink(annotationTypeBug.createLink(myannotationBug, node));
+         node.removeAnnotationLink(annotationTypeFalse.createLink(annotationFalse, node));
+      node.addAnnotationLink(annotationTypeBug.createLink(annotationBug, node));
    }
 }

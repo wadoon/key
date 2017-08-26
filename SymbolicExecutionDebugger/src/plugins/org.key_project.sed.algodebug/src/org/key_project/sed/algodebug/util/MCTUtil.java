@@ -13,6 +13,9 @@ import org.key_project.sed.core.model.ISENode;
 
 public class MCTUtil {
 
+   /*
+    * returns true if every child of the given execution is annotated with the given correctness
+    */
    public static boolean isEveryChildMarkedAs(Execution execution, char correctness){
       for(Execution child : execution.getListOfCalledMethods()){
          if(child.getCorrectness() != correctness)
@@ -21,6 +24,9 @@ public class MCTUtil {
       return true;
    }
 
+   /*
+    * annotates the ISENodes of the given execution correct backwards until a branch is reached that has a child that is not annotated to be correct
+    */
    public static void annotateExecutionPartialCorrect(Execution execution) {
       ISENode node = execution.getExecutionReturn();
       try {
@@ -35,6 +41,10 @@ public class MCTUtil {
       }
    }
 
+   /*
+    * returns a list of all ISENodes of the given execution
+    * @return the list
+    */
    public static List<ISENode> getListOfExecutionNodes(Execution execution){
       ISENode node = execution.getExecutionReturn();
       List<ISENode> list = new ArrayList<ISENode>();
@@ -50,6 +60,10 @@ public class MCTUtil {
       return list;
    }
 
+   /*
+    * annotates the ISENodes of a buggy execution with the abbotationBug annotation
+    * @param bug the execution that has to be annotated
+    */
    public static void annotateSETNodesOfABuggyExecution(Execution bug) {
       List<ISENode> list = getListOfExecutionNodes(bug);
       int counter = 0;
@@ -74,6 +88,11 @@ public class MCTUtil {
 
    }
 
+   /*
+    * annotates the ISENodes of the given execution but does not annotate the called executions
+    * @param execution the execution that is the root for this annotation process
+    * @param correctness the correctness used to annotate the ISENodes
+    */
    public static void annotateSETNodesOfExecutionExcludingSubExecutions(Execution execution, char correctness) {
       List<ISENode> list = getListOfExecutionNodes(execution);
       int counter = 0;
@@ -106,6 +125,11 @@ public class MCTUtil {
       }
    }
 
+   /*
+    * annotates the execution itself and every child exeution down to the leafs with the correctness given as parameter
+    * @param execution the execution that is the root for this annotation process
+    * @param correctness the correctness used to annotate the ISENodes
+    */
    public static void annotateExecutionRecursively(Execution execution, char correctness) {
       annotateSETNodesOfExecutionExcludingSubExecutions(execution,correctness);
       for(Execution child : execution.getListOfCalledMethods()){

@@ -6,16 +6,28 @@ import org.key_project.sed.core.model.ISENode;
 
 public class Execution {
 
+   /*
+    * constructor
+    */
    public Execution(ISENode startNode, ISENode EndNode) {
       executionCall = startNode;
       executionReturn = EndNode;
       correctness = 'u';
    }
 
+   /*
+    * flag indicating if the exeution is the root element of an execution tree
+    */
    private boolean root;
 
+   /*
+    * flag indicating if the execution tree was completely searched
+    */
    private boolean executionTreeCompletelySearched;
 
+   /*
+    * constructor
+    */
    public Execution(ISENode start, ISENode ret, ArrayList<Execution> listOfCalledMethods) {
       executionCall = start;
       this.executionReturn = ret;
@@ -23,14 +35,23 @@ public class Execution {
       correctness = 'u';
    }
 
+   /*
+    * set the execution to be the root of an execution tree
+    */
    public void setRoot(){
       root = true;
    }
 
+   /*
+    * returns true if the execution is the root element of an execution tree
+    */
    public boolean isRoot(){
       return root;
    }
 
+   /*
+    * returns true if the execution tree is completely searched and no bug was found
+    */
    public boolean completelySearched(){
       if(executionTreeCompletelySearched)
          return true;
@@ -38,6 +59,9 @@ public class Execution {
          return false;
    }
 
+   /*
+    * points to the parent of the execution
+    */
    private Execution parent;
 
    /**
@@ -54,10 +78,19 @@ public class Execution {
       this.parent = parent;
    }
 
+   /*
+    * the method call node of the execution
+    */
    private ISENode executionCall;
 
+   /*
+    * the method return node of the execution
+    */
    private ISENode executionReturn;
 
+   /*
+    * list of executions that are called from this execution
+    */
    private ArrayList<Execution> listOfCalledMethods;
 
    /**
@@ -132,10 +165,16 @@ public class Execution {
    public void setMethodCallCorrectnessExcludingSubMethods(char correctness) {
       this.correctness = correctness;}
 
+   /*
+    * set the execution tree to be completely searched
+    */
    public void setExecutionTreeCompletelySearched(boolean b) {
       executionTreeCompletelySearched = b ;
    }
 
+   /*
+    * returns true if the execution tree was completely searched
+    */
    public boolean getExecutionTreeCompletelySearched(){
       return executionTreeCompletelySearched;
    }
