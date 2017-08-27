@@ -93,28 +93,36 @@ public abstract class AbstractEffectsAnalysisRule extends AbstractAnalysisRule {
 
         final Term specTerm = specTerm(goal, services, ruleApp);
 
-        final Function<LocationVariable, Term> updWithoutHeapAndCurrLocal =
-                currVarOfInterest -> updateContent.keySet()
+        // Mapping from an equation "x = t" to an update which equals the
+        // original update, but without the heap and without any elementary
+        // update which has the LHS of the equation as update LHS.
+        // The equation may be null, then it's ignored.
+        final Function<Term, Term> updWithoutHeapAndCurrLocal =
+                eq -> updateContent.keySet()
                         .stream()
                         .filter(lv -> !removeHeapVarInAnalysisOfLocVarEffects()
                                 || !lv.equals(heapVar))
-                        .filter(lv -> !lv.equals(currVarOfInterest))
+                        .filter(lv -> eq == null || !lv.equals(eq.sub(0).op()))
                         .map(lv -> tb.elementary(lv, updateContent.get(lv)))
                         .reduce(tb.skip(),
                                 (acc, elem) -> tb.parallel(acc, elem));
 
-        final Map<LocationVariable, Term> locVarAnalysisTerms =
-                updVarOfInterestMap.keySet().stream().collect(
-                        Collectors.toMap(lv -> lv, lv -> tb.equals(tb.var(lv),
-                                updVarOfInterestMap.get(lv))));
+        final List<Term> locVarAnalysisTerms =
+                updVarOfInterestMap.keySet().stream()
+                        .map(lv -> tb.equals(tb.var(lv),
+                                updVarOfInterestMap.get(lv)))
+                        .collect(Collectors.toList());
+        
+        final List<Term> analysisTerms = new ArrayList<>();
+        analysisTerms.addAll(locVarAnalysisTerms);
+        analysisTerms.addAll(storeEqualities);
 
         int i = 0;
-        for (LocationVariable currVarOfInterest : updVarOfInterestMap
-                .keySet()) {
+        for (Term currAnalysisTerm : analysisTerms) {
             final Goal analysisGoal = goalArray[i++];
 
             prepareGoal(pio, analysisGoal,
-                    locVarAnalysisTerms.get(currVarOfInterest), termLabelState,
+                    currAnalysisTerm, termLabelState,
                     this);
 
             performAdditionalAnalysisGoalOps(analysisGoal, goal, services,
@@ -122,40 +130,14 @@ public abstract class AbstractEffectsAnalysisRule extends AbstractAnalysisRule {
 
             {
                 final Term specNewState = tb.apply(
-                        updWithoutHeapAndCurrLocal.apply(currVarOfInterest),
+                        updWithoutHeapAndCurrLocal.apply(currAnalysisTerm),
                         specTerm);
 
                 final ImmutableList<Term> preconds =
                         ImmutableSLList.<Term> nil()
-                                .prepend(storeEqualities)
-                                .prepend(specNewState);
-
-                addFactPreconditions(analysisGoal, preconds, 1, termLabelState,
-                        this);
-            }
-        }
-
-        final Term updWithoutHeap = updateContent.keySet().stream()
-                .filter(lv -> !lv.equals(heapVar))
-                .map(lv -> tb.elementary(lv, updateContent.get(lv)))
-                .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
-
-        for (Term heapEquality : storeEqualities) {
-            final Goal analysisGoal = goalArray[i++];
-
-            prepareGoal(pio, analysisGoal, heapEquality, termLabelState,
-                    this);
-
-            performAdditionalAnalysisGoalOps(analysisGoal, goal, services,
-                    ruleApp);
-
-            {
-                final Term specNewState = tb.apply(updWithoutHeap, specTerm);
-
-                final ImmutableList<Term> preconds =
-                        ImmutableSLList.<Term> nil()
                                 .prepend(storeEqualities.stream()
-                                        .filter(eq -> !eq.equals(heapEquality))
+                                        .filter(eq -> !eq
+                                                .equals(currAnalysisTerm))
                                         .collect(Collectors.toList()))
                                 .prepend(specNewState);
 
