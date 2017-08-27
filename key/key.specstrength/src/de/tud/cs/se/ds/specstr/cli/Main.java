@@ -33,7 +33,7 @@ import javafx.application.Application;
 /**
  * Main class for CLI access.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public final class Main {
 

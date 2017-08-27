@@ -39,7 +39,7 @@ import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 /**
  * TODO
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public abstract class AbstractAnalyzerTest {
     private static final Logger logger = LogManager.getFormatterLogger();

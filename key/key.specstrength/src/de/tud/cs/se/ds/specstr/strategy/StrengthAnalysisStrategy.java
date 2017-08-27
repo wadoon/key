@@ -31,7 +31,7 @@ import de.uka.ilkd.key.symbolic_execution.strategy.SymbolicExecutionStrategy;
 /**
  * A {@link SymbolicExecutionStrategy} with the {@link AbstractAnalysisRule}s.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class StrengthAnalysisStrategy extends SymbolicExecutionStrategy {
     /**
@@ -55,7 +55,7 @@ public class StrengthAnalysisStrategy extends SymbolicExecutionStrategy {
      * The {@link StrategyFactory} to create strategies of type
      * {@link StrengthAnalysisStrategy}.
      *
-     * @author Dominic Steinhöfel
+     * @author Dominic Steinhoefel
      */
     public static class Factory extends SymbolicExecutionStrategy.Factory {
         @Override

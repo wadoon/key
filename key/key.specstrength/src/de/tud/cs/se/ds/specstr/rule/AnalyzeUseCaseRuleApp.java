@@ -25,7 +25,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 /**
  * The {@link RuleApp} for the {@link AnalyzeUseCaseRule}.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class AnalyzeUseCaseRuleApp extends AbstractBuiltInRuleApp {
 

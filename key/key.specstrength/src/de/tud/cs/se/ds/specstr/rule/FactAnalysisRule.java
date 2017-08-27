@@ -47,7 +47,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * whether a fact is covered, abstractly covered or trivially covered. Not all
  * of these cases apply to all rules, which is why we do a case distinction.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public final class FactAnalysisRule implements BuiltInRule {
 

@@ -41,7 +41,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * Strength analysis rule for assessing the strength of a loop invariant with
  * respect to the post condition of the method.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public final class AnalyzeUseCaseRule extends AbstractAnalysisRule {
 

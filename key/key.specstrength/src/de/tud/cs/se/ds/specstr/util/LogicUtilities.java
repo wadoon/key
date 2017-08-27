@@ -52,7 +52,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 /**
  * TODO
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public final class LogicUtilities {
 
@@ -742,7 +742,7 @@ public final class LogicUtilities {
      * Determines the origin of a {@link SequentFormula} in terms of a
      * {@link Node} and the original {@link SequentFormula}.
      *
-     * @author Dominic Steinhöfel
+     * @author Dominic Steinhoefel
      */
     public static class OriginOfFormula {
         /**

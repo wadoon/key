@@ -21,7 +21,7 @@ import de.tud.cs.se.ds.specstr.analyzer.Analyzer.FactType;
 /**
  * TODO
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class AddTest extends AbstractAnalyzerTest {
     

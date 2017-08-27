@@ -35,7 +35,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
  * {@link #convertToCNF(Term)}. The returned formulas are logically equivalent,
  * so no Skolemization takes place! Quantifiers will still be included.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class CNFConverter {
     /**

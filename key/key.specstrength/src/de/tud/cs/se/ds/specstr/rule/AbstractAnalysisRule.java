@@ -23,7 +23,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 /**
  * An abstract {@link BuiltInRule} for strength analysis.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public abstract class AbstractAnalysisRule implements BuiltInRule {
 

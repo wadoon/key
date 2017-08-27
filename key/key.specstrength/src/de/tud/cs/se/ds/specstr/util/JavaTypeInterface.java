@@ -29,7 +29,7 @@ import de.uka.ilkd.key.logic.op.ProgramMethod;
 /**
  * An interface to the String designators for Java types.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public final class JavaTypeInterface {
 

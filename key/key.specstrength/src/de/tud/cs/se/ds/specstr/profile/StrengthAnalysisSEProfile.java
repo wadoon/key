@@ -29,7 +29,7 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 /**
  * The {@link Profile} for strength analysis.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public final class StrengthAnalysisSEProfile extends SymbolicExecutionJavaProfile {
     /**

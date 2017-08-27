@@ -30,7 +30,7 @@ import de.tud.cs.se.ds.specstr.util.CNFConverterTest;
 /**
  * TODO
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class TestSpecStrength {
 

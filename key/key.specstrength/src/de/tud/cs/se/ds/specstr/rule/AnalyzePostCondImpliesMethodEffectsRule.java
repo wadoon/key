@@ -35,7 +35,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
  * respect to the actual effects of the method (modulo abstractions by loop
  * invariants or method calls by contract).
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public final class AnalyzePostCondImpliesMethodEffectsRule
         extends AbstractEffectsAnalysisRule {

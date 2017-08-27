@@ -22,7 +22,7 @@ import de.tud.cs.se.ds.specstr.analyzer.Analyzer.AnalyzerResult;
 /**
  * TODO
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class LoopFreeTest extends AbstractAnalyzerTest {
 

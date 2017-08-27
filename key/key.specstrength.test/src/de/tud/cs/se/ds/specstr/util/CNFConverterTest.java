@@ -31,7 +31,7 @@ import de.uka.ilkd.key.proof.init.AbstractProfile;
 /**
  * TODO
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class CNFConverterTest {
     private CNFConverter conv;

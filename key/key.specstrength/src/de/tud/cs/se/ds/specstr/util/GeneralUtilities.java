@@ -27,7 +27,7 @@ import org.apache.logging.log4j.Logger;
 /**
  * Miscellaneous utilities container class.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public final class GeneralUtilities {
 

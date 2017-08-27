@@ -23,7 +23,7 @@ import de.tud.cs.se.ds.specstr.analyzer.Analyzer.FactType;
  * A method that returns, for a given array, an array where at each position
  * there is the sum up to that index in the input array.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class ArrSumTest extends AbstractAnalyzerTest {
 

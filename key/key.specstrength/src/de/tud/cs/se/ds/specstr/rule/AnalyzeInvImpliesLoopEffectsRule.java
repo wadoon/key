@@ -39,7 +39,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * loop. We have to make sure that we use AnalyzeInvImplies... here and not
  * AnalyzeUseCase.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public final class AnalyzeInvImpliesLoopEffectsRule
         extends AbstractEffectsAnalysisRule {

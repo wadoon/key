@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 /**
  * Static {@link TermLabel}s for strength analysis.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public final class StrengthAnalysisParameterlessTL implements TermLabel {
 

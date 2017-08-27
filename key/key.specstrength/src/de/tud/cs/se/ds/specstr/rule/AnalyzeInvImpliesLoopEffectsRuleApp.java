@@ -40,7 +40,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 /**
  * The {@link RuleApp} for the {@link AnalyzeInvImpliesLoopEffectsRule}.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class AnalyzeInvImpliesLoopEffectsRuleApp
         extends AbstractBuiltInRuleApp {

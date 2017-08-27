@@ -65,7 +65,7 @@ import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
  * {@link AnalyzerResult} can be printed out using
  * {@link #printResults(AnalyzerResult, PrintStream)}.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class Analyzer {
     /**
@@ -965,7 +965,7 @@ public class Analyzer {
      * A visitor for checking whether a given {@link RuleApp} type is present in
      * a {@link Proof} tree.
      *
-     * @author Dominic Steinhöfel
+     * @author Dominic Steinhoefel
      */
     private static class RuleAppVisitor implements ProofVisitor {
         /**
@@ -1005,7 +1005,7 @@ public class Analyzer {
     /**
      * Types of extracted {@link Fact}s.
      *
-     * @author Dominic Steinhöfel
+     * @author Dominic Steinhoefel
      */
     public static enum FactType {
         /** Loop body fact, i.e. an equation of the preserved part. */
@@ -1028,7 +1028,7 @@ public class Analyzer {
      * covered"; for each of those cases, it contains a {@link Node} that should
      * be used for checking which is the case.
      *
-     * @author Dominic Steinhöfel
+     * @author Dominic Steinhoefel
      */
     public static class Fact {
         /**
@@ -1201,7 +1201,7 @@ public class Analyzer {
     /**
      * Represents an exception branch that could not be closed.
      *
-     * @author Dominic Steinhöfel
+     * @author Dominic Steinhoefel
      */
     public static class ExceptionResult {
         /**
@@ -1247,7 +1247,7 @@ public class Analyzer {
     /**
      * Result of a strength analysis as returned by {@link Analyzer#analyze()}.
      *
-     * @author Dominic Steinhöfel
+     * @author Dominic Steinhoefel
      */
     public static class AnalyzerResult {
         /**

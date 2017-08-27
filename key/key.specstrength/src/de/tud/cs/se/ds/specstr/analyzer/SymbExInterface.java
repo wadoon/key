@@ -54,7 +54,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 /**
  * Bridge to KeY's symbolic execution engine.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class SymbExInterface {
     /**

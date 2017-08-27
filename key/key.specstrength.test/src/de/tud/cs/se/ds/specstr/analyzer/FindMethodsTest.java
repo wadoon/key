@@ -26,7 +26,7 @@ import de.tud.cs.se.ds.specstr.analyzer.Analyzer.Fact;
  * A test suite based on multiple specifications for a simple "find-in-array"
  * method with one loop.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class FindMethodsTest extends AbstractAnalyzerTest {
 
