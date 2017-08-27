@@ -13,38 +13,36 @@
 
 package de.tud.cs.se.ds.specstr.rule;
 
-import static de.tud.cs.se.ds.specstr.util.LogicUtilities.*;
+import static de.tud.cs.se.ds.specstr.util.LogicUtilities.removeLoopInvFormulasFromAntec;
+import static de.tud.cs.se.ds.specstr.util.LogicUtilities.retrieveLoopScopeIndices;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import de.tud.cs.se.ds.specstr.util.LogicUtilities;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
-import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * Strength analysis rule for assessing the strength of a loop invariant with
  * respect to the actual effects of a loop body.
+ * 
+ * TODO: A use case for an inner loop will be a preserves case for an outer
+ * loop. We have to make sure that we use AnalyzeInvImplies... here and not
+ * AnalyzeUseCase.
  *
  * @author Dominic Steinhöfel
  */
 public final class AnalyzeInvImpliesLoopEffectsRule
-        extends AbstractAnalysisRule {
+        extends AbstractEffectsAnalysisRule {
 
     /**
      * The {@link Name} of this {@link AbstractAnalysisRule}.
@@ -62,116 +60,6 @@ public final class AnalyzeInvImpliesLoopEffectsRule
      */
     private AnalyzeInvImpliesLoopEffectsRule() {
         // Singleton Constructor
-    }
-
-    @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services,
-            RuleApp ruleApp) throws RuleAbortException {
-        assert ruleApp instanceof AnalyzeInvImpliesLoopEffectsRuleApp;
-
-        // TODO: A use case for an inner loop will be a preserves case for an
-        // outer loop. We have to make sure that we use AnalyzeInvImplies...
-        // here and not AnalyzeUseCase.
-
-        final TermBuilder tb = services.getTermBuilder();
-
-        final AnalyzeInvImpliesLoopEffectsRuleApp aiileApp = //
-                (AnalyzeInvImpliesLoopEffectsRuleApp) ruleApp;
-        final Term invTerm = aiileApp.getInvTerm();
-        final List<LocationVariable> localOuts = aiileApp.getLocalOuts();
-        final PosInOccurrence pio = ruleApp.posInOccurrence();
-        final Term updateTerm = pio.subTerm().sub(0);
-        final Node loopInvNode = aiileApp.getLoopInvNode();
-
-        assert updateTerm.op() instanceof UpdateJunctor;
-
-        final LinkedHashMap<LocationVariable, Term> updateContent =
-                LogicUtilities
-                        .updateToMap(updateTerm);
-
-        final LocationVariable heapVar = services.getTypeConverter()
-                .getHeapLDT().getHeap();
-
-        final LinkedHashMap<LocationVariable, Term> updateLocalOuts = updateContent
-                .keySet().stream()
-                .filter(lhs -> localOuts.contains(lhs))
-                .collect(Collectors.toMap(x -> x, x -> updateContent.get(x),
-                        (u, v) -> {
-                            throw new IllegalStateException(
-                                    String.format("Duplicate key %s", u));
-                        }, LinkedHashMap::new));
-
-        // Retrieve store equalities
-        final Term origHeapTerm = MergeRuleUtils
-                .getUpdateRightSideFor(updateTerm, heapVar);
-
-        final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
-                extractStoreEqsAndInnerHeapTerm(services, origHeapTerm);
-
-        final List<Term> storeEqualities = storeEqsAndInnerHeapTerm.isPresent()
-                ? storeEqsAndInnerHeapTerm.get().second
-                : new ArrayList<>();
-
-        final ImmutableList<Goal> goals = goal
-                .split(updateLocalOuts.size() + storeEqualities.size() + 1);
-        final Goal[] goalArray = goals.toArray(Goal.class);
-        final TermLabelState termLabelState = new TermLabelState();
-
-        int i = 0;
-        for (LocationVariable currLocalOut : updateLocalOuts.keySet()) {
-            final Goal analysisGoal = goalArray[i++];
-
-            final Term updWithoutHeapAndCurrLocal = updateContent.keySet()
-                    .stream()
-                    .filter(lv -> !lv.equals(heapVar))
-                    .filter(lv -> !lv.equals(currLocalOut))
-                    .map(lv -> tb.elementary(lv, updateContent.get(lv)))
-                    .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
-
-            final Term currAnalysisTerm = tb.equals(tb.var(currLocalOut),
-                    updateLocalOuts.get(currLocalOut));
-
-            prepareGoal(pio, analysisGoal, currAnalysisTerm, termLabelState,
-                    this);
-            removeLoopInvFormulasFromAntec(analysisGoal, loopInvNode);
-            addFactPreconditions(analysisGoal,
-                    ImmutableSLList.<Term> nil()
-                            .prepend(storeEqualities)
-                            .prepend(tb.apply(updWithoutHeapAndCurrLocal,
-                                    invTerm)), //
-                    1, termLabelState, this);
-        }
-
-        final Term updWithoutHeap = updateContent.keySet().stream()
-                .filter(lv -> !lv.equals(heapVar))
-                .map(lv -> tb.elementary(lv, updateContent.get(lv)))
-                .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
-
-        for (Term heapEquality : storeEqualities) {
-            final Goal analysisGoal = goalArray[i++];
-
-            prepareGoal(pio, analysisGoal, heapEquality, termLabelState,
-                    this);
-            removeLoopInvFormulasFromAntec(analysisGoal, loopInvNode);
-
-            final ImmutableList<Term> invNewState = ImmutableSLList.<Term> nil()
-                    .prepend(tb.apply(updWithoutHeap, invTerm));
-
-            final ImmutableList<Term> preconds = ImmutableSLList.<Term> nil()
-                    .prepend(storeEqualities.stream()
-                            .filter(eq -> !eq.equals(heapEquality))
-                            .collect(Collectors.toList()))
-                    .prepend(invNewState);
-
-            addFactPreconditions(analysisGoal, preconds, 1, termLabelState,
-                    this);
-        }
-
-        addSETPredicateToAntec(goalArray[goalArray.length - 1]);
-        goalArray[goalArray.length - 1].setBranchLabel(
-                AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL);
-
-        return goals;
     }
 
     @Override
@@ -212,16 +100,11 @@ public final class AnalyzeInvImpliesLoopEffectsRule
             return false;
         }
 
-        for (LocationVariable lsi : indices) {
-            final Term rhs = MergeRuleUtils
-                    .getUpdateRightSideFor(pio.subTerm().sub(0), lsi);
-
-            if (rhs != null && rhs.equals(services.getTermBuilder().FALSE())) {
-                return true;
-            }
-        }
-
-        return false;
+        return indices.parallelStream().map(lsi -> MergeRuleUtils
+                .getUpdateRightSideFor(pio.subTerm().sub(0), lsi))
+                .map(rhs -> rhs != null
+                        && rhs.equals(services.getTermBuilder().FALSE()))
+                .reduce(false, (acc, elem) -> acc || elem);
     }
 
     @Override
@@ -244,6 +127,41 @@ public final class AnalyzeInvImpliesLoopEffectsRule
     @Override
     public boolean addAbstractlyCoveredGoal() {
         return true;
+    }
+
+    @Override
+    protected List<LocationVariable> varsOfInterest(Goal goal,
+            Services services, RuleApp ruleApp) {
+        final AnalyzeInvImpliesLoopEffectsRuleApp aiileApp = //
+                (AnalyzeInvImpliesLoopEffectsRuleApp) ruleApp;
+
+        return aiileApp.getLocalOuts();
+    }
+
+    @Override
+    protected Term specTerm(Goal goal, Services services, RuleApp ruleApp) {
+        final AnalyzeInvImpliesLoopEffectsRuleApp aiileApp = //
+                (AnalyzeInvImpliesLoopEffectsRuleApp) ruleApp;
+        return aiileApp.getInvTerm();
+    }
+
+    @Override
+    protected void performAdditionalAnalysisGoalOps(Goal analysisGoal,
+            Goal origGoal, Services services, RuleApp ruleApp) {
+        final AnalyzeInvImpliesLoopEffectsRuleApp aiileApp = //
+                (AnalyzeInvImpliesLoopEffectsRuleApp) ruleApp;
+        final Node loopInvNode = aiileApp.getLoopInvNode();
+        removeLoopInvFormulasFromAntec(analysisGoal, loopInvNode);
+    }
+
+    @Override
+    protected boolean removeHeapVarInAnalysisOfLocVarEffects() {
+        return true;
+    }
+
+    @Override
+    protected String specSatisfiedBranchLabel() {
+        return AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL;
     }
 
 }

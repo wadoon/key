@@ -13,9 +13,12 @@
 
 package de.tud.cs.se.ds.specstr.util;
 
-import java.util.Formatter;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -81,7 +84,8 @@ public final class GeneralUtilities {
         try {
             int result = Integer.parseInt(s);
             return Optional.of(result);
-        } catch (NumberFormatException e) {
+        }
+        catch (NumberFormatException e) {
             return Optional.empty();
         }
     }
@@ -119,6 +123,51 @@ public final class GeneralUtilities {
      */
     public static <T> Stream<T> toStream(Iterable<T> it) {
         return StreamSupport.stream(it.spliterator(), false);
+    }
+
+    /**
+     * Returns a merge function, suitable for use in
+     * {@link Map#merge(Object, Object, BiFunction) Map.merge()} or
+     * {@link #toMap(Function, Function, BinaryOperator) toMap()}, which always
+     * throws {@code IllegalStateException}. This can be used to enforce the
+     * assumption that the elements being collected are distinct.
+     *
+     * @param <T>
+     *            the type of input arguments to the merge function
+     * @return a merge function which always throw {@code IllegalStateException}
+     * @see Collectors
+     */
+    private static <T> BinaryOperator<T> throwingMerger() {
+        return (u, v) -> {
+            throw new IllegalStateException(
+                    String.format("Duplicate key %s", u));
+        };
+    }
+
+    /**
+     * Returns a {@link LinkedHashMap} as opposed to
+     * {@link Collectors#toMap(Function, Function)} which will return a
+     * {@link HashMap} with unpredictable iteration order.
+     *
+     * @param <T>
+     *            the type of the input elements
+     * @param <K>
+     *            the output type of the key mapping function
+     * @param <U>
+     *            the output type of the value mapping function
+     * @param keyMapper
+     *            a mapping function to produce keys
+     * @param valueMapper
+     *            a mapping function to produce values
+     * @return a {@code Collector} which collects elements into a
+     *         {@code LinkedHashMap} whose keys and values are the result of
+     *         applying mapping functions to the input elements
+     */
+    public static <T, K, U> Collector<T, ?, LinkedHashMap<K, U>> toLinkedHashMap(
+            Function<? super T, ? extends K> keyMapper,
+            Function<? super T, ? extends U> valueMapper) {
+        return Collectors.toMap(keyMapper, valueMapper, throwingMerger(),
+                LinkedHashMap::new);
     }
 
 }

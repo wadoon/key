@@ -13,28 +13,22 @@
 
 package de.tud.cs.se.ds.specstr.rule;
 
-import static de.tud.cs.se.ds.specstr.util.LogicUtilities.*;
+import static de.tud.cs.se.ds.specstr.util.LogicUtilities.getFOContract;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import de.tud.cs.se.ds.specstr.util.LogicUtilities;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
-import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * Strength analysis rule for assessing the strength of a post condition with
@@ -44,7 +38,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * @author Dominic Steinhöfel
  */
 public final class AnalyzePostCondImpliesMethodEffectsRule
-        extends AbstractAnalysisRule {
+        extends AbstractEffectsAnalysisRule {
 
     /**
      * The {@link Name} of this {@link AbstractAnalysisRule}.
@@ -61,132 +55,6 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
 
     private AnalyzePostCondImpliesMethodEffectsRule() {
         // Singleton Constructor
-    }
-
-    @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services,
-            RuleApp ruleApp) throws RuleAbortException {
-        final TermBuilder tb = services.getTermBuilder();
-
-        final PosInOccurrence pio = ruleApp.posInOccurrence();
-        final Term updateTerm = pio.subTerm().sub(0);
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final LocationVariable heapVar = heapLDT.getHeap();
-
-        final FunctionalOperationContract fContract = //
-                getFOContract(services);
-
-        // Note: That's a very hackish way of retrieving the post condition, but
-        // I did not find a clean one to get it with the correct variable
-        // instantiations
-        final Term contract = TermBuilder.goBelowUpdates(goal.proof().root()
-                .sequent().succedent().getFirst().formula().sub(1)).sub(0);
-
-        final boolean isVoid = fContract.getTarget().isVoid();
-
-        final LinkedHashMap<LocationVariable, Term> updateContent =
-                LogicUtilities
-                        .updateToMap(updateTerm);
-
-        // The variables that we're interested in are the heap (for non-static,
-        // non-pure methods) and the result variable (for non-void methods),
-        // because changes to them describe the method's behavior
-        final Term origHeapTerm = MergeRuleUtils
-                .getUpdateRightSideFor(updateTerm, heapVar);
-
-        final Optional<Pair<Term, List<Term>>> storeEqsAndInnerHeapTerm = //
-                extractStoreEqsAndInnerHeapTerm(//
-                        services, origHeapTerm);
-
-        final List<Term> storeEqualities = storeEqsAndInnerHeapTerm.isPresent()
-                ? storeEqsAndInnerHeapTerm.get().second
-                : new ArrayList<>();
-
-        // We have to look the variable up from the current namespaces, since
-        // otherwise we will obtain a different object...
-        final LocationVariable resultVar = isVoid ? null
-                : (LocationVariable) goal.getLocalNamespaces()
-                        .programVariables()
-                        .lookup(fContract.getResult().op().name());
-
-        // @formatter:off
-        // Maybe we need that later on? Don't know why it was here.
-//        final LocationVariable excVar = (LocationVariable) goal
-//                .getLocalNamespaces().programVariables()
-//                .lookup(fContract.getExc().op().name());
-        // @formatter:on
-
-        final boolean hasResultVar = resultVar != null
-                && updateContent.get(resultVar) != null;
-
-        final ImmutableList<Goal> goals = goal
-                .split((hasResultVar ? 1 : 0) + storeEqualities.size() + 1);
-        final Goal[] goalArray = goals.toArray(Goal.class);
-        final TermLabelState termLabelState = new TermLabelState();
-
-        // Add result var goal
-        if (hasResultVar) {
-            final Goal analysisGoal = goalArray[0];
-
-            final Term updWithoutResVar = updateContent.keySet()
-                    .stream()
-                    .filter(lv -> !lv.equals(resultVar))
-                    .map(lv -> tb.elementary(lv, updateContent.get(lv)))
-                    .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
-
-            final Term currAnalysisTerm = tb.equals(tb.var(resultVar),
-                    MergeRuleUtils.getUpdateRightSideFor(updateTerm,
-                            resultVar));
-
-            prepareGoal(pio, analysisGoal, currAnalysisTerm, termLabelState,
-                    this);
-
-            addFactPreconditions(analysisGoal, ImmutableSLList.<Term> nil()
-                    .prepend(storeEqualities)
-                    .prepend(tb.apply(updWithoutResVar,
-                            contract)), //
-                    1, termLabelState, this);
-        }
-
-        int i = hasResultVar ? 1 : 0;
-
-        // Add goals for store equalities
-
-        final Term updWithoutHeap = updateContent.keySet().stream()
-                .filter(lv -> !lv.equals(heapVar))
-                .map(lv -> tb.elementary(lv, updateContent.get(lv)))
-                .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
-
-        for (Term heapEquality : storeEqualities) {
-            final Goal analysisGoal = goalArray[i];
-
-            prepareGoal(pio, analysisGoal, heapEquality, termLabelState,
-                    this);
-
-            final ImmutableList<Term> contractNewState =
-                    ImmutableSLList.<Term> nil()
-                            .prepend(tb.apply(updWithoutHeap, contract));
-
-            final ImmutableList<Term> preconds = ImmutableSLList.<Term> nil()
-                    .prepend(storeEqualities.stream()
-                            .filter(eq -> !eq.equals(heapEquality))
-                            .collect(Collectors.toList()))
-                    .prepend(contractNewState);
-
-            addFactPreconditions(analysisGoal, preconds, 1, termLabelState,
-                    this);
-
-            i++;
-        }
-
-        // Remove SETAccumulate predicate for post condition
-        final Goal postCondGoal = goalArray[goalArray.length - 1];
-        addSETPredicateToAntec(postCondGoal);
-
-        postCondGoal.setBranchLabel(
-                AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL);
-
-        return goals;
     }
 
     @Override
@@ -247,4 +115,47 @@ public final class AnalyzePostCondImpliesMethodEffectsRule
         return true;
     }
 
+    @Override
+    protected List<LocationVariable> varsOfInterest(Goal goal,
+            Services services, RuleApp ruleApp) {
+        final List<LocationVariable> result = new ArrayList<>();
+
+        final FunctionalOperationContract fContract = //
+                getFOContract(services);
+
+        if (!fContract.getTarget().isVoid()) {
+            // We have to look the variable up from the current namespaces,
+            // since otherwise we will obtain a different object...
+            result.add((LocationVariable) goal.getLocalNamespaces()
+                    .programVariables()
+                    .lookup(fContract.getResult().op().name()));
+        }
+
+        return result;
+    }
+
+    @Override
+    protected Term specTerm(Goal goal, Services services, RuleApp ruleApp) {
+        // Note: That's a very hackish way of retrieving the post condition, but
+        // I did not find a clean one to get it with the correct variable
+        // instantiations
+        return TermBuilder.goBelowUpdates(goal.proof().root()
+                .sequent().succedent().getFirst().formula().sub(1)).sub(0);
+    }
+
+    @Override
+    protected void performAdditionalAnalysisGoalOps(Goal analysisGoal,
+            Goal origGoal, Services services, RuleApp ruleApp) {
+        // We don't do anything
+    }
+
+    @Override
+    protected boolean removeHeapVarInAnalysisOfLocVarEffects() {
+        return false;
+    }
+
+    @Override
+    protected String specSatisfiedBranchLabel() {
+        return AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL;
+    }
 }
