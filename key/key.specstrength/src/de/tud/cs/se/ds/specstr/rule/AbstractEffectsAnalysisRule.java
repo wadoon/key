@@ -150,9 +150,7 @@ public abstract class AbstractEffectsAnalysisRule extends AbstractAnalysisRule {
                     ruleApp);
 
             {
-                final ImmutableList<Term> specNewState =
-                        ImmutableSLList.<Term> nil()
-                                .prepend(tb.apply(updWithoutHeap, specTerm));
+                final Term specNewState = tb.apply(updWithoutHeap, specTerm);
 
                 final ImmutableList<Term> preconds =
                         ImmutableSLList.<Term> nil()
