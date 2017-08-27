@@ -18,10 +18,8 @@ import static de.tud.cs.se.ds.specstr.util.LogicUtilities.addSETPredicateToAntec
 import static de.tud.cs.se.ds.specstr.util.LogicUtilities.extractStoreEqsAndInnerHeapTerm;
 import static de.tud.cs.se.ds.specstr.util.LogicUtilities.prepareGoal;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableList;
@@ -95,32 +93,46 @@ public abstract class AbstractEffectsAnalysisRule extends AbstractAnalysisRule {
 
         final Term specTerm = specTerm(goal, services, ruleApp);
 
+        final Function<LocationVariable, Term> updWithoutHeapAndCurrLocal =
+                currVarOfInterest -> updateContent.keySet()
+                        .stream()
+                        .filter(lv -> !removeHeapVarInAnalysisOfLocVarEffects()
+                                || !lv.equals(heapVar))
+                        .filter(lv -> !lv.equals(currVarOfInterest))
+                        .map(lv -> tb.elementary(lv, updateContent.get(lv)))
+                        .reduce(tb.skip(),
+                                (acc, elem) -> tb.parallel(acc, elem));
+
+        final Map<LocationVariable, Term> locVarAnalysisTerms =
+                updVarOfInterestMap.keySet().stream().collect(
+                        Collectors.toMap(lv -> lv, lv -> tb.equals(tb.var(lv),
+                                updVarOfInterestMap.get(lv))));
+
         int i = 0;
         for (LocationVariable currVarOfInterest : updVarOfInterestMap
                 .keySet()) {
             final Goal analysisGoal = goalArray[i++];
 
-            final Term updWithoutHeapAndCurrLocal = updateContent.keySet()
-                    .stream()
-                    .filter(lv -> !removeHeapVarInAnalysisOfLocVarEffects()
-                            || !lv.equals(heapVar))
-                    .filter(lv -> !lv.equals(currVarOfInterest))
-                    .map(lv -> tb.elementary(lv, updateContent.get(lv)))
-                    .reduce(tb.skip(), (acc, elem) -> tb.parallel(acc, elem));
-
-            final Term currAnalysisTerm = tb.equals(tb.var(currVarOfInterest),
-                    updVarOfInterestMap.get(currVarOfInterest));
-
-            prepareGoal(pio, analysisGoal, currAnalysisTerm, termLabelState,
+            prepareGoal(pio, analysisGoal,
+                    locVarAnalysisTerms.get(currVarOfInterest), termLabelState,
                     this);
+
             performAdditionalAnalysisGoalOps(analysisGoal, goal, services,
                     ruleApp);
-            addFactPreconditions(analysisGoal,
-                    ImmutableSLList.<Term> nil()
-                            .prepend(storeEqualities)
-                            .prepend(tb.apply(updWithoutHeapAndCurrLocal,
-                                    specTerm)), //
-                    1, termLabelState, this);
+
+            {
+                final Term specNewState = tb.apply(
+                        updWithoutHeapAndCurrLocal.apply(currVarOfInterest),
+                        specTerm);
+
+                final ImmutableList<Term> preconds =
+                        ImmutableSLList.<Term> nil()
+                                .prepend(storeEqualities)
+                                .prepend(specNewState);
+
+                addFactPreconditions(analysisGoal, preconds, 1, termLabelState,
+                        this);
+            }
         }
 
         final Term updWithoutHeap = updateContent.keySet().stream()
@@ -133,21 +145,25 @@ public abstract class AbstractEffectsAnalysisRule extends AbstractAnalysisRule {
 
             prepareGoal(pio, analysisGoal, heapEquality, termLabelState,
                     this);
+
             performAdditionalAnalysisGoalOps(analysisGoal, goal, services,
                     ruleApp);
 
-            final ImmutableList<Term> specNewState =
-                    ImmutableSLList.<Term> nil()
-                            .prepend(tb.apply(updWithoutHeap, specTerm));
+            {
+                final ImmutableList<Term> specNewState =
+                        ImmutableSLList.<Term> nil()
+                                .prepend(tb.apply(updWithoutHeap, specTerm));
 
-            final ImmutableList<Term> preconds = ImmutableSLList.<Term> nil()
-                    .prepend(storeEqualities.stream()
-                            .filter(eq -> !eq.equals(heapEquality))
-                            .collect(Collectors.toList()))
-                    .prepend(specNewState);
+                final ImmutableList<Term> preconds =
+                        ImmutableSLList.<Term> nil()
+                                .prepend(storeEqualities.stream()
+                                        .filter(eq -> !eq.equals(heapEquality))
+                                        .collect(Collectors.toList()))
+                                .prepend(specNewState);
 
-            addFactPreconditions(analysisGoal, preconds, 1, termLabelState,
-                    this);
+                addFactPreconditions(analysisGoal, preconds, 1, termLabelState,
+                        this);
+            }
         }
 
         addSETPredicateToAntec(goalArray[goalArray.length - 1]);
