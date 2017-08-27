@@ -91,8 +91,6 @@ public abstract class AbstractEffectsAnalysisRule extends AbstractAnalysisRule {
         final Goal[] goalArray = goals.toArray(Goal.class);
         final TermLabelState termLabelState = new TermLabelState();
 
-        final Term specTerm = specTerm(goal, services, ruleApp);
-
         // Mapping from an equation "x = t" to an update which equals the
         // original update, but without the heap and without any elementary
         // update which has the LHS of the equation as update LHS.
@@ -131,7 +129,7 @@ public abstract class AbstractEffectsAnalysisRule extends AbstractAnalysisRule {
             {
                 final Term specNewState = tb.apply(
                         updWithoutHeapAndCurrLocal.apply(currAnalysisTerm),
-                        specTerm);
+                        specTerm(goal, services, ruleApp));
 
                 final ImmutableList<Term> preconds =
                         ImmutableSLList.<Term> nil()
