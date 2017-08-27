@@ -519,7 +519,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
         return result;
     }
-    
+
     /**
      * Returns the self {@link Term} for a {@link JavaBlock}.
      *

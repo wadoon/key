@@ -483,12 +483,12 @@ public class IntermediateProofReplayer {
             pos = PosInOccurrence.findInSequent(currGoal.sequent(),
                     currFormula, currPosInTerm);
             ourApp = ((NoPosTacletApp) ourApp).matchFind(pos, services);
-            
+
             if (ourApp == null) {
                 throw new TacletConstructionException(
                         "Wrong position information.");
             }
-            
+
             ourApp = ourApp.setPosInOccurrence(pos, services);
         }
 

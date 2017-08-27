@@ -90,9 +90,9 @@ public class PrettyPrinter {
 
     /** creates a new PrettyPrinter */
     public PrettyPrinter(Writer o) {
-    	setWriter(o);
-    	outBuf = new StringBuffer();
-    	printComments = false;
+        setWriter(o);
+        outBuf = new StringBuffer();
+        printComments = false;
     }
 
     public PrettyPrinter(Writer o, SVInstantiations svi) {
@@ -105,6 +105,13 @@ public class PrettyPrinter {
         this.noLinefeed = noLinefeed;
     }
 
+    /**
+     * Constructor.
+     *
+     * @param o The {@link Writer} to write to.
+     * @param noLinefeed Flag for adding / not adding line feed.
+     * @param printComments Flag for printing all existing comments before statements.
+     */
     public PrettyPrinter(Writer o, boolean noLinefeed, boolean printComments) {
         this(o, noLinefeed);
         this.printComments = printComments;
@@ -806,12 +813,12 @@ public class PrettyPrinter {
             }
         }
         indentMap.put(first, indent);
-        
+
         if (printComments) {
             Comment[] c = x.getComments();
-                for (Comment aC : c) {
-                    printComment(aC);
-                }
+            for (Comment aC : c) {
+                printComment(aC);
+            }
         }
     }
 
@@ -1611,16 +1618,16 @@ public class PrettyPrinter {
     public void printMethodDeclaration(MethodDeclaration x)
 	    throws java.io.IOException {
 	printHeader(x);
-    Comment[] c = x.getComments();
-    int m = c.length;
-	if (!printComments) {
-	    // If printComments is set, comments are already being written
+        Comment[] c = x.getComments();
+        int m = c.length;
+        if (!printComments) {
+        // If printComments is set, comments are already being written
         for (Comment aC : c) {
             printComment(aC);
         }
-	} else {
-	    write("\n");
-	}
+        } else {
+            write("\n");
+        }
 	if (x.getModifiers() != null) {
 	    ImmutableArray<Modifier> mods = x.getModifiers();
 	    m += mods.size();
