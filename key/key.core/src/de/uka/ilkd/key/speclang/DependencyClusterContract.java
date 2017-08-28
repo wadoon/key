@@ -36,4 +36,6 @@ public interface DependencyClusterContract extends Contract {
     public DependencyClusterSpec getSpecs();
 
     public Term getSelf();
+    
+    public String getLabel();
 }

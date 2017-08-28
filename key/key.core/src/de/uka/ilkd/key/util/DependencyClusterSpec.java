@@ -15,16 +15,16 @@ public class DependencyClusterSpec {
     
     private final ImmutableList<VisibilityCondition> visible;
     
-    private final String identifier;
+    private final String label;
 
 
-    public DependencyClusterSpec(ImmutableList<Lowlist> lowIn, ImmutableList<Lowlist> lowOut, ImmutableList<Term> lowState, ImmutableList<VisibilityCondition> visible, ImmutableList<Term> newObjects, String identifier) {
+    public DependencyClusterSpec(ImmutableList<Lowlist> lowIn, ImmutableList<Lowlist> lowOut, ImmutableList<Term> lowState, ImmutableList<VisibilityCondition> visible, ImmutableList<Term> newObjects, String label) {
         this.lowIn = lowIn;
         this.lowOut = lowOut;
         this.lowState = lowState;
         this.visible = visible;
         this.newObjects = newObjects;
-        this.identifier = identifier;
+        this.label = label;
     }
 
 
@@ -48,8 +48,8 @@ public class DependencyClusterSpec {
         return visible;
     }
     
-    public String getIdentifier() {
-        return identifier;
+    public String getLabel() {
+        return label;
     }
     
     

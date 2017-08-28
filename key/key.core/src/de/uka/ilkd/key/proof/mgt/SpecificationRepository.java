@@ -67,6 +67,7 @@ import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractAxiom;
 import de.uka.ilkd.key.speclang.ContractFactory;
+import de.uka.ilkd.key.speclang.DependencyClusterContract;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -107,6 +108,9 @@ public final class SpecificationRepository {
                               ImmutableSet<WellDefinednessCheck>>();
     private final Map<String, Contract> contractsByName =
             new LinkedHashMap<String, Contract>();
+    private final Map<String, DependencyClusterContract> ServiceDependencyClustersByName =
+            new LinkedHashMap<String, DependencyClusterContract>();
+    
     private final Map<KeYJavaType, ImmutableSet<IObserverFunction>> contractTargets =
             new LinkedHashMap<KeYJavaType, ImmutableSet<IObserverFunction>>();
     private final Map<KeYJavaType, ImmutableSet<ClassInvariant>> invs =
@@ -1514,7 +1518,13 @@ public final class SpecificationRepository {
     public void addSpecs(ImmutableSet<SpecificationElement> specs) {
         for (SpecificationElement spec : specs) {
             if (spec instanceof Contract) {
+                if (spec instanceof DependencyClusterContract) {
+                    assert (! ServiceDependencyClustersByName.containsKey(((DependencyClusterContract)spec).getLabel())) : 
+                        "Dependency Cluster label " + ((DependencyClusterContract)spec).getLabel() + " is ambiguos";                       
+                    ServiceDependencyClustersByName.put(((DependencyClusterContract)spec).getLabel(), (DependencyClusterContract)spec);
+                }
                 addContract((Contract) spec);
+                System.out.println(ServiceDependencyClustersByName.keySet());
             } else if (spec instanceof ClassInvariant) {
                 addClassInvariant((ClassInvariant) spec);
             } else if (spec instanceof InitiallyClause) {
