@@ -607,7 +607,7 @@ infflowspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil
         { result = translator.translate("infflowspeclist", ImmutableList.class, result, services); }
     ;
     
-dependencyclusterspec returns  [DependencyClusterSpec result = DependencyClusterSpec.EMPTY_DEP_CLUSTER_SPEC] throws SLTranslationException
+dependencyclusterspec returns  [DependencyClusterSpec result = null] throws SLTranslationException
 @init {
     ImmutableList<Lowlist> lowIn = ImmutableSLList.<Lowlist>nil();
     ImmutableList<Lowlist> lowOut = ImmutableSLList.<Lowlist>nil();
@@ -617,14 +617,14 @@ dependencyclusterspec returns  [DependencyClusterSpec result = DependencyCluster
 }
 ://TODO JK check which parts can be made optional, work on nice syntax
 //TODO JK make sure there aren't multiple lists for the same kind of event (ie same partner, direction and service)
-    CLUSTER 
+    CLUSTER (id = IDENT)
     	LOWIN (NOTHING | tmpLowIn = depclusterspeclist[Lowlist.Direction.IN] {lowIn = lowIn.append(tmpLowIn);}) 
     	LOWOUT (NOTHING | tmpLowOut = depclusterspeclist[Lowlist.Direction.OUT] {lowOut = lowOut.append(tmpLowOut);}) 
     	LOWSTATE (NOTHING | tmpLowState = infflowspeclist {lowState = lowState.append(tmpLowState);}) 
     	VISIBLE (NOTHING | tmpVisible = visibilitylist {visible = visible.append(tmpVisible);})
     	(NEW_OBJECTS (NOTHING | tmpNew = infflowspeclist {newObs = newObs.append(tmpNew);}))?
 
-    {result = new DependencyClusterSpec(lowIn, lowOut, lowState, visible, newObs);}
+    {result = new DependencyClusterSpec(lowIn, lowOut, lowState, visible, newObs, id.getText());}
     ;
     
       

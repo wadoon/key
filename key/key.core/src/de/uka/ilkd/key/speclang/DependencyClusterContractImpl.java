@@ -237,6 +237,7 @@ public class DependencyClusterContractImpl
     public String getHTMLText(Services services) {
         // TODO implement
         return "<html>" +
+        "<b>ID </b>" + origDependencyClusterSpec.getIdentifier() +"<br>" +
         "<b>LowIn </b>" + origDependencyClusterSpec.getLowIn() +"<br>" +
         "<b>LowOut </b>" + origDependencyClusterSpec.getLowOut() +"<br>" +
         "<b>LowState </b>" + origDependencyClusterSpec.getLowState() +"<br>" +
