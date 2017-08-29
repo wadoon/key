@@ -55,7 +55,8 @@ public class DependencyClusterSpec {
     
     @Override
     public String toString() {
-        return "LowIn: " + lowIn + "\n" +
+        return  "Label: " + label+ "\n" +
+                "LowIn: " + lowIn + "\n" +
                 "LowOut: " + lowOut + "\n" +
                 "lowState: " + lowState + "\n" +
                 "Visible: " + visible + "\n" +

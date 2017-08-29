@@ -3,11 +3,11 @@ package de.uka.ilkd.key.speclang;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 
-public class ModelBasedSecSpecImpl implements ModelBasedSecSpec {
+public class ComponentClusterImpl implements ComponentCluster {
     protected KeYJavaType forClass;
 
     
-    public ModelBasedSecSpecImpl(KeYJavaType forClass) {
+    public ComponentClusterImpl(KeYJavaType forClass) {
             this.forClass = forClass;
     }
 

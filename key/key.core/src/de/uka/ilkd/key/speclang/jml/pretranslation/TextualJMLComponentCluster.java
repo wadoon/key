@@ -7,11 +7,11 @@ import de.uka.ilkd.key.speclang.PositionedString;
 /**
  * A JML model-based security (information flow) specification in textual form.
  */
-public class TextualJMLModelBasedSecSpec extends TextualJMLConstruct {
+public class TextualJMLComponentCluster extends TextualJMLConstruct {
     
     private final PositionedString spec;
 
-    public TextualJMLModelBasedSecSpec(ImmutableList<String> mods, PositionedString spec) {
+    public TextualJMLComponentCluster(ImmutableList<String> mods, PositionedString spec) {
         super(mods);
         assert spec != null;
         this.spec = spec;
@@ -29,10 +29,10 @@ public class TextualJMLModelBasedSecSpec extends TextualJMLConstruct {
     
     @Override
     public boolean equals(Object o) {
-        if(!(o instanceof TextualJMLModelBasedSecSpec)) {
+        if(!(o instanceof TextualJMLComponentCluster)) {
             return false;
         }
-        TextualJMLModelBasedSecSpec other = (TextualJMLModelBasedSecSpec) o;
+        TextualJMLComponentCluster other = (TextualJMLComponentCluster) o;
         return mods.equals(other.mods) && spec.equals(other.spec);
     }
     

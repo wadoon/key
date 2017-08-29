@@ -47,7 +47,7 @@ options {
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
-    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLModelBasedSecSpec;
+    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLComponentCluster;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 }
 
@@ -229,7 +229,7 @@ classlevel_element[ImmutableList<String> mods]
 :
         result=class_invariant[mods]
     |   (accessible_keyword expression) => result=depends_clause[mods]
-    |	(determines_keyword expression_with_preserving) => result=determines_clause_mbs[mods] //TODO: Adjust Name of Rule? This is for model based NI specification
+    |   result=component_cluster[mods]
     |   result=method_specification[mods]
     |   result=field_or_method_declaration[mods]
     |   result=represents_clause[mods]
@@ -391,18 +391,18 @@ initially_clause[ImmutableList<String> mods]
 ;
 
 //-----------------------------------------------------------------------------
-//class level NI
+//component level NI
 //-----------------------------------------------------------------------------
 //TODO: do mods make sense here?
-determines_clause_mbs[ImmutableList<String> mods]
+component_cluster[ImmutableList<String> mods]
         returns [ImmutableList<TextualJMLConstruct> result = null]
         throws SLTranslationException
 :
-    determines_keyword ps=expression  //BY expression PRESERVING expression TODO: expressions have to end with semicolons, thats why we can't have the more detailed syntax in the PreParser
+    keyword=COMPCLUSTER ps=expression  //TODO: expressions have to end with semicolons, thats why we can't have the more detailed syntax in the PreParser
     {
-    	    ps = ps.prepend("determines ");
-	    TextualJMLModelBasedSecSpec mbs = new TextualJMLModelBasedSecSpec(mods, ps);
-	    result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(mbs);
+    	    ps = ps.prepend(keyword.getText() + " ");
+	    TextualJMLComponentCluster cc = new TextualJMLComponentCluster(mods, ps);
+	    result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(cc);
 	    //TODO: Throw exception if stupid mods found
     }
 ;

@@ -56,10 +56,10 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.ComponentCluster;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InitiallyClause;
-import de.uka.ilkd.key.speclang.ModelBasedSecSpec;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SpecExtractor;
@@ -68,12 +68,12 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassAxiom;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLComponentCluster;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLDepends;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLInitially;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLModelBasedSecSpec;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
@@ -364,9 +364,9 @@ public final class JMLSpecExtractor implements SpecExtractor {
         	    } else if (c instanceof TextualJMLClassAxiom){
         		ClassAxiom ax = jsf.createJMLClassAxiom(kjt, (TextualJMLClassAxiom)c);
         		result = result.add(ax);
-        	    } else if (c instanceof TextualJMLModelBasedSecSpec){
-                TextualJMLModelBasedSecSpec textspec = (TextualJMLModelBasedSecSpec)c;
-                ModelBasedSecSpec spec = jsf.createJMLModelBasedSecSpec(kjt, textspec.getSpec());
+        	    } else if (c instanceof TextualJMLComponentCluster){
+        	    TextualJMLComponentCluster textspec = (TextualJMLComponentCluster)c;
+        	    ComponentCluster spec = jsf.createJMLComponentCluster(kjt, textspec.getSpec());
                 result = result.add(spec);
                 } else {
     	        // DO NOTHING

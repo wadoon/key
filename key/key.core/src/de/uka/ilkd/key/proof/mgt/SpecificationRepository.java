@@ -64,6 +64,7 @@ import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
 import de.uka.ilkd.key.speclang.ClassWellDefinedness;
+import de.uka.ilkd.key.speclang.ComponentCluster;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractAxiom;
 import de.uka.ilkd.key.speclang.ContractFactory;
@@ -74,7 +75,6 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
-import de.uka.ilkd.key.speclang.ModelBasedSecSpec;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.speclang.QueryAxiom;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
@@ -1535,8 +1535,8 @@ public final class SpecificationRepository {
                 addLoopInvariant((LoopSpecification) spec);
             } else if (spec instanceof BlockContract) {
                 addBlockContract((BlockContract) spec);
-            } else if (spec instanceof ModelBasedSecSpec) {
-                assert false : "model based NI specification not implemented yet"; //TODO: handle model based NI specs
+            } else if (spec instanceof ComponentCluster) {
+                assert false : "Do something with component clusters here"; //TODO JK add clusters to a map
             } else {
                 assert false : "unexpected spec: " + spec + "\n("
                         + spec.getClass() + ")";

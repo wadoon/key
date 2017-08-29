@@ -57,6 +57,7 @@ import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassAxiomImpl;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
+import de.uka.ilkd.key.speclang.ComponentCluster;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
@@ -64,8 +65,6 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InitiallyClause;
 import de.uka.ilkd.key.speclang.InitiallyClauseImpl;
-import de.uka.ilkd.key.speclang.ModelBasedSecSpec;
-import de.uka.ilkd.key.speclang.ModelBasedSecSpecImpl;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.LoopSpecImpl;
 import de.uka.ilkd.key.speclang.PositionedString;
@@ -1340,21 +1339,20 @@ public class JMLSpecFactory {
         return createJMLDependencyContract(kjt, targetHeap, dep);
     }
     
-    //TODO: Is Dummy atm, implement after semantics of ModelBasedSecSpec are defined
-    public ModelBasedSecSpec createJMLModelBasedSecSpec(KeYJavaType kjt,
+    //TODO JK Here the comp cluster translation is started
+    public ComponentCluster createJMLComponentCluster(KeYJavaType kjt,
             PositionedString spec)
         throws SLTranslationException {
         assert kjt != null;
         assert spec != null;
         
-        //TODO: we probably need a selfvar here... how can we get one? this way? what is meant by "registering" it? Could there also be a static context?
+        //TODO JK what  is this selfvar for?
         ProgramVariable selfVar = TB.selfVar(kjt, false);
-        //TODO: model based spec parsing here!!!! currently parser tries to build a infflowspec (obviously failing) instead of a ModelBasedSecSpec. 
-        //Obviously MessageTypes can't be properly handled by the parser atm 
-        InfFlowSpec parseTest = JMLTranslator.translate(spec, kjt, selfVar, null, null,
-                                     null, null, InfFlowSpec.class, services);
 
-        return new ModelBasedSecSpecImpl(kjt);
+        ComponentCluster cc = JMLTranslator.translate(spec, kjt, selfVar, null, null,
+                                     null, null, ComponentCluster.class, services);
+
+        return cc;
     }
 
 
