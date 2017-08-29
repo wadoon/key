@@ -61,19 +61,19 @@ public class ComponentClusterImpl implements ComponentCluster {
 
     @Override
     public String getName() {
-        // TODO stub
+        // TODO JK stub
         return "NAME_dummy";
     }
 
     @Override
     public String getDisplayName() {
-        // TODO stub
+        // TODO JK stub
         return "DISPLAYNAME_dummy";
     }
 
     @Override
     public VisibilityModifier getVisibility() {
-     // TODO stub
+     // TODO JK stub
         System.out.println("asked for visibility");
         return null;
     }
