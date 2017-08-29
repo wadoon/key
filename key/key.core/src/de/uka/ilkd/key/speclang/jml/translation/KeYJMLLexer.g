@@ -196,6 +196,7 @@ XOR : '^';
 
 //TODO JK einsortieren, Zeug für Komponenten NI
 CLUSTER	:	'cluster';
+COMPCLUSTER:    'componentCluster';
 LOWIN	:	'\\lowIn';
 LOWOUT	:	'\\lowOut';
 LOWSTATE:	'\\lowState';

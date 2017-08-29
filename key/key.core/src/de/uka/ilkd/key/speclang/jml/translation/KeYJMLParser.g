@@ -31,6 +31,8 @@ options {
     import de.uka.ilkd.key.util.InfFlowSpec;
     import de.uka.ilkd.key.util.Lowlist;
     import de.uka.ilkd.key.util.DependencyClusterSpec;
+    import de.uka.ilkd.key.speclang.ComponentCluster;
+    import de.uka.ilkd.key.speclang.ComponentClusterImpl;
     import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
     import de.uka.ilkd.key.util.VisibilityCondition;
 
@@ -406,7 +408,6 @@ top returns [Object ret = null] throws SLTranslationException
     |   joinprocclause { ret = $joinprocclause.ret; }
     |   requiresfreeclause { ret = $requiresfreeclause.ret; }
     |   decreasesclause { ret = $decreasesclause.ret; }
-    | 	(DETERMINES expression_with_preserving) => mbsecspecclause {  ret = $mbsecspecclause.result; }
     |   separatesclause { ret = $separatesclause.result; } // old information flow syntax
     |   determinesclause { ret = $determinesclause.result; } // new information flow syntax
     |   loopseparatesclause { ret = $loopseparatesclause.result; } // old information flow syntax
@@ -416,6 +417,7 @@ top returns [Object ret = null] throws SLTranslationException
     |   signalsonlyclause { ret = $signalsonlyclause.result; }
     |   termexpression { ret = $termexpression.result; }
     |	dependencyclusterspec { ret = $dependencyclusterspec.result; }
+    |	componentdependencyclusterspec { ret = $componentdependencyclusterspec.result; }
     )
     (SEMI)? EOF
     ;
@@ -607,12 +609,29 @@ infflowspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil
         { result = translator.translate("infflowspeclist", ImmutableList.class, result, services); }
     ;
     
+componentdependencyclusterspec returns  [ComponentCluster result = null] throws SLTranslationException
+@init {
+    ImmutableList<Lowlist> lowIn = ImmutableSLList.<Lowlist>nil();
+    ImmutableList<Lowlist> lowOut = ImmutableSLList.<Lowlist>nil();
+    ImmutableList<Term> lowState = ImmutableSLList.<Term>nil();
+    ImmutableList<VisibilityCondition> visible = ImmutableSLList.<VisibilityCondition>nil();
+}
+:
+    COMPCLUSTER (id = IDENT)
+    	LOWIN (NOTHING | tmpLowIn = depclusterspeclist[Lowlist.Direction.IN] {lowIn = lowIn.append(tmpLowIn);}) 
+    	LOWOUT (NOTHING | tmpLowOut = depclusterspeclist[Lowlist.Direction.OUT] {lowOut = lowOut.append(tmpLowOut);}) 
+    	LOWSTATE (NOTHING | tmpLowState = infflowspeclist {lowState = lowState.append(tmpLowState);}) 
+    	VISIBLE (NOTHING | tmpVisible = visibilitylist {visible = visible.append(tmpVisible);})
+
+    {result = new ComponentClusterImpl(containerType, lowIn, lowOut, lowState, visible, id.getText());}
+    ;
+
 dependencyclusterspec returns  [DependencyClusterSpec result = null] throws SLTranslationException
 @init {
     ImmutableList<Lowlist> lowIn = ImmutableSLList.<Lowlist>nil();
     ImmutableList<Lowlist> lowOut = ImmutableSLList.<Lowlist>nil();
     ImmutableList<Term> lowState = ImmutableSLList.<Term>nil();
-    ImmutableList<VisibilityCondition> visible = ImmutableSLList.<VisibilityCondition>nil(); //TODO JK A List of simple terms wont do it I think, create visibleList class
+    ImmutableList<VisibilityCondition> visible = ImmutableSLList.<VisibilityCondition>nil();
     ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
 }
 ://TODO JK check which parts can be made optional, work on nice syntax
@@ -786,39 +805,6 @@ messagetype returns [Term result = null]
         CALL {result = tb.evCall();}
     |   TERMINATION {result = tb.evTerm();}
     ;
-    
-    
-mbsecspecclause returns  [InfFlowSpec result = InfFlowSpec.EMPTY_INF_FLOW_SPEC] throws SLTranslationException
-@init {
-    ImmutableList<Term> decl = ImmutableSLList.<Term>nil();
-    ImmutableList<Term> erases = ImmutableSLList.<Term>nil();
-    ImmutableList<Term> newObs = ImmutableSLList.<Term>nil();
-}
-:
-    DETERMINES (NOTHING {det=ImmutableSLList.<Term>nil();} | det = infflowspeclist)
-    BY (NOTHING {by = ImmutableSLList.<Term>nil();} | (ITSELF {by = det;}) | by = infflowspeclist)
-    PRESERVING (NOTHING {det=ImmutableSLList.<Term>nil();} | newobs = infflowspeclist)
-    {det = det.append(erases);
-     by = by.append(decl);
-     result = new InfFlowSpec(by, det, newObs);}
-    ;
-    
-    
-//to check whether the preserving keyword appears (not inside a parantheses expression) before the expression is terminated by a semicolon. To prevent ambiguity of determines and determines mbs
-//TODO JK more elegant solution? Left factoring would be complicated. parentheses counting doesn't even work with syntactic predicates, so something needs to be done here anyway
-expression_with_preserving
-@init {
-    int parenthesesCounter = 0;
-}
-:
-    (
-        LPAREN { parenthesesCounter++; }
-    |   RPAREN { parenthesesCounter--; }
-    |   { parenthesesCounter > 0 }? SEMI
-    |   ~(LPAREN | RPAREN | SEMI | PRESERVING)
-    )*
-    { parenthesesCounter == 0 }? PRESERVING
-;
 
 
 signalsclause returns [Term ret=null] throws SLTranslationException

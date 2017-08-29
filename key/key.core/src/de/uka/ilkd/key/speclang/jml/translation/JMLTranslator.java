@@ -1770,6 +1770,7 @@ public final class JMLTranslator {
                 return castToReturnType(t, resultClass);
             }
         }
+        
         return castToReturnType(result, resultClass);
     }
     
