@@ -330,6 +330,10 @@ public abstract class LemmaGenerationAction extends MainWindowAction {
                                     .getTaclets();
                             base = base.prependReverse(taclets);
                             proof.getInitConfig().setTaclets(base);
+
+                            // add an include-statement to the proof for the lemma file
+                            proof.prefixHeader("\\include \"" + fileForLemmata + "\";\n\n");
+
                             for (Taclet taclet : taclets) {
                                 for (Goal goal : proof.openGoals()) {
                                     goal

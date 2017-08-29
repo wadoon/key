@@ -1316,4 +1316,12 @@ public class Proof implements Named {
                     getServices().getProfile().getDefaultStrategyFactory();
 
     }
+
+    /**
+     * Prepends the given String to the header.
+     * @param str the String to add to the header
+     */
+    public void prefixHeader(String str) {
+        problemHeader = str + problemHeader;
+    }
 }

@@ -266,8 +266,8 @@ public class OutputStreamProofSaver {
      * replace them by paths relative to the proof file to be saved.
      */
     private String makePathsRelative(String header) {
-        final String[] search = new String[] { "\\javaSource",
-            "\\bootclasspath", "\\classpath", "\\include" };
+        final String[] search =
+                new String[] { "\\javaSource", "\\bootclasspath", "\\classpath", "\\include" };
         final String basePath;
         String tmp = header;
         try {
@@ -276,44 +276,47 @@ public class OutputStreamProofSaver {
             // locate filenames in header
             for (final String s : search) {
                 int i = tmp.indexOf(s);
-                if (i == -1) {
-                    continue; // entry not in file
-                }
+                int i2 = i;                     // indicates start of current occurrence of keyword
 
-                // put in everything before the keyword
-                // bugfix #1138: changed i-1 to i
-                String tmp2 = tmp.substring(0, i);
-                String relPathString = "";
-                i += s.length();
-                final int l = tmp.indexOf(";", i);
+                while (i != -1) {               // multiple occurrences of a keyword may exist
+                    //if (i == -1)
+                    //    continue; // entry not in file
 
-                // there may be more than one path
-                while (0 <= tmp.indexOf("\"", i) && tmp.indexOf("\"", i) < l) {
-                    if (!relPathString.isEmpty()) {
-                        relPathString += ", ";
+                    // put in everything before the keyword
+                    // bugfix #1138: changed i-1 to i
+                    String tmp2 = tmp.substring(0, i);
+                    String relPathString = "";
+                    i += s.length();
+                    final int l = tmp.indexOf(";", i);
+
+                    // there may be more than one path
+                    while (0 <= tmp.indexOf("\"", i) && tmp.indexOf("\"", i) < l) {
+                        if (!relPathString.isEmpty()) {
+                            relPathString += ", ";
+                        }
+
+                        // path is always put in quotation marks
+                        final int k = tmp.indexOf("\"", i) + 1;
+                        final int j = tmp.indexOf("\"", k);
+
+                        // add new relative path
+                        final String absPath = tmp.substring(k, j);
+                        final String relPath =
+                                tryToMakeFilenameRelative(absPath, basePath);
+                        relPathString = relPathString + " \""
+                                + escapeCharacters(relPath) + "\"";
+                        i = j + 1;
                     }
+                    tmp2 = tmp2 + s + relPathString + ";";
 
-                    // path is always put in quotation marks
-                    final int k = tmp.indexOf("\"", i) + 1;
-                    final int j = tmp.indexOf("\"", k);
+                    // put back in the rest
+                    tmp = tmp2 + (i < tmp.length() ? tmp.substring(l + 1, tmp.length()) : "");
 
-                    // add new relative path
-                    final String absPath = tmp.substring(k, j);
-                    final String relPath = tryToMakeFilenameRelative(absPath,
-                        basePath);
-                    final String correctedRelPath = relPath.equals("") ? "." : relPath;
-                    relPathString = relPathString + " \""
-                            + escapeCharacters(correctedRelPath) + "\"";
-                    i = j + 1;
+                    i = tmp.indexOf(s, i2 + s.length());
+                    i2 = i;
                 }
-                tmp2 = tmp2 + s + relPathString + ";";
-
-                // put back in the rest
-                tmp = tmp2
-                        + (i < tmp.length() ? tmp.substring(l + 1, tmp.length())
-                                : "");
             }
-        } catch (final IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return tmp;
