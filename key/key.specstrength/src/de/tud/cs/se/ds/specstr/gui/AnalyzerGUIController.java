@@ -90,6 +90,9 @@ public class AnalyzerGUIController {
     private Button btnFileChooser;
 
     @FXML
+    private Button btnRecent;
+
+    @FXML
     private Button btnOpenKeY;
 
     @FXML
@@ -303,6 +306,11 @@ public class AnalyzerGUIController {
         }
 
         proofFileProperty.set(null);
+    }
+    
+    @FXML
+    public void handleLoadRecentPressed() {
+        //TODO
     }
 
     /////// Private helpers

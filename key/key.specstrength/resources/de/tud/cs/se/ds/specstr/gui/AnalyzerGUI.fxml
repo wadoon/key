@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
 <?import javafx.scene.web.*?>
 <?import javafx.scene.text.*?>
 <?import javafx.geometry.*?>
@@ -15,56 +16,87 @@
                <items>
                   <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="501.0" prefWidth="295.0">
                      <children>
-                        <FlowPane orientation="VERTICAL" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-120.0" AnchorPane.topAnchor="0.0">
+                        <VBox prefHeight="220.0" prefWidth="274.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                            <children>
-                              <Label text="Select Java File">
-                                 <opaqueInsets>
-                                    <Insets />
-                                 </opaqueInsets>
-                                 <FlowPane.margin>
-                                    <Insets bottom="10.0" />
-                                 </FlowPane.margin>
-                                 <font>
-                                    <Font name="System Bold" size="14.0" />
-                                 </font>
-                              </Label>
-                              <FlowPane hgap="10.0" prefHeight="38.0" prefWidth="264.0">
-                                 <children>
-                                    <TextField id="txtJavaFile" fx:id="txtJavaFile" editable="false" />
-                                    <Button id="btnFileChooser" fx:id="btnFileChooser" mnemonicParsing="false" onAction="#handleChooseFilePressed" text="Choose">
-                                       <FlowPane.margin>
+                              <BorderPane prefWidth="200.0">
+                                 <center>
+                                    <TextField id="txtJavaFile" fx:id="txtJavaFile" editable="false" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER" />
+                                 </center>
+                                 <right>
+                                    <FlowPane prefHeight="26.0" prefWidth="104.0" BorderPane.alignment="CENTER">
+                                       <BorderPane.margin>
+                                          <Insets left="10.0" />
+                                       </BorderPane.margin>
+                                       <children>
+                                          <Button id="btnFileChooser" fx:id="btnFileChooser" mnemonicParsing="false" onAction="#handleChooseFilePressed" text="Choose" />
+                                          <Button fx:id="btnRecent" mnemonicParsing="false" onAction="#handleLoadRecentPressed">
+                                             <FlowPane.margin>
+                                                <Insets left="5.0" />
+                                             </FlowPane.margin>
+                                             <graphic>
+                                                <ImageView fitHeight="15.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true">
+                                                   <image>
+                                                      <Image url="@../../../../../../../../resources/de/tud/cs/se/ds/specstr/gui/openMostRecent.png" />
+                                                   </image>
+                                                </ImageView>
+                                             </graphic>
+                                          </Button>
+                                       </children>
+                                    </FlowPane>
+                                 </right>
+                                 <top>
+                                    <Label text="Select Java File" BorderPane.alignment="TOP_LEFT">
+                                       <opaqueInsets>
                                           <Insets />
-                                       </FlowPane.margin>
-                                    </Button>
-                                 </children>
-                              </FlowPane>
-                              <Label layoutX="10.0" layoutY="10.0" text="Select Method">
-                                 <opaqueInsets>
-                                    <Insets />
-                                 </opaqueInsets>
-                                 <font>
-                                    <Font name="System Bold" size="14.0" />
-                                 </font>
-                                 <FlowPane.margin>
-                                    <Insets bottom="10.0" />
-                                 </FlowPane.margin>
-                              </Label>
-                              <ComboBox fx:id="cmbMethodChooser" onAction="#handleMethodSelected" prefHeight="26.0" prefWidth="245.0" />
+                                       </opaqueInsets>
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                       <BorderPane.margin>
+                                          <Insets bottom="10.0" />
+                                       </BorderPane.margin>
+                                    </Label>
+                                 </top>
+                                 <VBox.margin>
+                                    <Insets bottom="20.0" />
+                                 </VBox.margin>
+                              </BorderPane>
+                              <BorderPane prefWidth="200.0">
+                                 <center>
+                                    <ComboBox fx:id="cmbMethodChooser" maxWidth="1.7976931348623157E308" onAction="#handleMethodSelected" BorderPane.alignment="CENTER" />
+                                 </center>
+                                 <top>
+                                    <Label text="Select Method" BorderPane.alignment="TOP_LEFT">
+                                       <opaqueInsets>
+                                          <Insets />
+                                       </opaqueInsets>
+                                       <font>
+                                          <Font name="System Bold" size="14.0" />
+                                       </font>
+                                       <BorderPane.margin>
+                                          <Insets bottom="10.0" />
+                                       </BorderPane.margin>
+                                    </Label>
+                                 </top>
+                                 <VBox.margin>
+                                    <Insets bottom="20.0" />
+                                 </VBox.margin>
+                              </BorderPane>
                               <FlowPane hgap="10.0" prefWidth="239.0">
-                                 <FlowPane.margin>
-                                    <Insets top="30.0" />
-                                 </FlowPane.margin>
                                  <children>
                                     <Button fx:id="btnStartAnalysis" mnemonicParsing="false" onAction="#handleAnalyzeButtonPressed" text="Analyze" />
                                     <Button fx:id="btnOpenKeY" mnemonicParsing="false" onAction="#handleOpenKeYButtonPressed" text="Open KeY" />
                                  </children>
+                                 <VBox.margin>
+                                    <Insets top="10.0" />
+                                 </VBox.margin>
                               </FlowPane>
                            </children>
-                           <padding>
-                              <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                           </padding>
-                        </FlowPane>
+                        </VBox>
                      </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
                   </AnchorPane>
                   <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0">
                      <children>
