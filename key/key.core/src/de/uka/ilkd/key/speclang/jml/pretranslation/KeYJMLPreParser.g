@@ -786,7 +786,8 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=returns_clause        { sc.addReturns(ps); }
         |   ps=separates_clause      { sc.addInfFlowSpecs(ps); }
         |   ps=determines_clause      { sc.addInfFlowSpecs(ps); }
-        |   ps=dependency_cluster_spec	{sc.addDepClusterSpecs(ps);}
+        |   (CLUSTER IDENT LOWIN) => ps=dependency_cluster_spec	{sc.addDepClusterSpecs(ps);}
+        |   (CLUSTER IDENT SATISFIED_BY) => ps=cluster_satisfaction_spec	{sc.addClusterSatisfactionSpecs(ps);}
     )
     {
 	if(b == Behavior.EXCEPTIONAL_BEHAVIOR
@@ -857,7 +858,16 @@ dependency_cluster_spec
 @init { result = r; }
 @after { r = result; }
 :
-    CLUSTER result=expression { result = result.prepend("cluster ");}
+    keyword = CLUSTER result=expression { result = result.prepend(keyword.getText() + " ");}
+;
+
+cluster_satisfaction_spec
+        returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    keyword = CLUSTER result=expression { result = result.prepend(keyword.getText() + " ");}
 ;
 
 

@@ -86,6 +86,7 @@ lexer grammar KeYJMLPreLexer;
     LOOP_INVARIANT  		: 'loop_invariant';
     LOOP_INVARIANT_RED  	: 'loop_invariant_redundantly';
     LOOP_INVARIANT_FREE	: 'loop_invariant_free';
+    LOWIN                       : '\\lowIn';
     MAINTAINING  		: 'maintaining';
     MAINTAINING_REDUNDANTLY	: 'maintaining_redundantly';
     MAPS			: 'maps';
@@ -129,6 +130,7 @@ lexer grammar KeYJMLPreLexer;
 	RETURN_BEHAVIOR 	: 'return_behavior';
     RETURN_BEHAVIOUR 	: 'return_behaviour';
     RESPECTS                    : 'respects';
+    SATISFIED_BY                : '\\satisfied_by';
     SEPARATES                   : 'separates';
     SET 			: 'set';
     SIGNALS 			: 'signals';
@@ -155,6 +157,7 @@ lexer grammar KeYJMLPreLexer;
     WORKING_SPACE 		: 'working_space';
     WORKING_SPACE_RED 		: 'working_space_redundantly';
     WRITABLE			: 'writable';
+    
 
 fragment SL_COMMENT
 :

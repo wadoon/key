@@ -83,6 +83,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
+import de.uka.ilkd.key.util.ClusterSatisfactionSpec;
 import de.uka.ilkd.key.util.DependencyClusterSpec;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
@@ -245,6 +246,7 @@ public class JMLSpecFactory {
         public Map<LocationVariable,Boolean> hasMod  = new LinkedHashMap<LocationVariable,Boolean>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
         public ImmutableList<DependencyClusterSpec> dependencyClusterSpecs;
+        public ImmutableList<ClusterSatisfactionSpec> clusterSatisfactionSpecs;
         public JoinProcedure joinProcedure;
     }
 
@@ -509,6 +511,10 @@ public class JMLSpecFactory {
                 translateDependencyClusterSpecs(pm, progVars.selfVar,
                                             progVars.paramVars, progVars.resultVar, progVars.excVar, 
                                             textualSpecCase.getDependencyClusters());
+        clauses.clusterSatisfactionSpecs =
+                translateClusterSatisfactionSpecs(pm, progVars.selfVar,
+                                            progVars.paramVars, progVars.resultVar, progVars.excVar, 
+                                            textualSpecCase.getClusterSatisfactionSpecs());
         clauses.joinProcedure = translateJoinProcedure(textualSpecCase.getJoinProcs());
         return clauses;
     }
@@ -590,6 +596,31 @@ public class JMLSpecFactory {
         }
         return result;
     }
+    }
+    
+    private ImmutableList<ClusterSatisfactionSpec> translateClusterSatisfactionSpecs(IProgramMethod pm,
+                                ProgramVariable selfVar,
+                                ImmutableList<ProgramVariable> paramVars,
+                                ProgramVariable resultVar,
+                                ProgramVariable excVar,
+                                ImmutableList<PositionedString> originalClauses)
+        throws SLTranslationException {
+    if (originalClauses.isEmpty()) {
+        return ImmutableSLList.<ClusterSatisfactionSpec>nil();
+    } else {
+        ImmutableList<ClusterSatisfactionSpec> result =
+                                 ImmutableSLList.<ClusterSatisfactionSpec>nil();
+        for (PositionedString expr : originalClauses) {
+
+            ClusterSatisfactionSpec translated =
+                        JMLTranslator.translate(expr, pm.getContainerType(),
+                                                selfVar, paramVars, resultVar,
+                                                excVar, null, ClusterSatisfactionSpec.class, services);
+            result = result.append(translated);
+        }
+        return result;
+    }
+
 }
     
     private JoinProcedure translateJoinProcedure(ImmutableList<PositionedString> originalClauses) throws SLTranslationException {
@@ -1339,7 +1370,6 @@ public class JMLSpecFactory {
         return createJMLDependencyContract(kjt, targetHeap, dep);
     }
     
-    //TODO JK Here the comp cluster translation is started
     public ComponentCluster createJMLComponentCluster(KeYJavaType kjt,
             PositionedString spec)
         throws SLTranslationException {
@@ -1391,6 +1421,7 @@ public class JMLSpecFactory {
                                                                 clauses));
         result = result.union(createDependencyClusterContracts(clauses, pm,
                                                                progVars));
+        //TODO JK continue here to create and add clusterSatisfaction contracts
 
         return result;
     }

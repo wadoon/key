@@ -201,6 +201,7 @@ LOWIN	:	'\\lowIn';
 LOWOUT	:	'\\lowOut';
 LOWSTATE:	'\\lowState';
 VISIBLE	:	'\\visible';
+SATISFIED_BY:   '\\satisfied_by';
 
 
 

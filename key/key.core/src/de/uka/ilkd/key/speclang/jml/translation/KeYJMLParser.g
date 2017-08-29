@@ -31,6 +31,7 @@ options {
     import de.uka.ilkd.key.util.InfFlowSpec;
     import de.uka.ilkd.key.util.Lowlist;
     import de.uka.ilkd.key.util.DependencyClusterSpec;
+    import de.uka.ilkd.key.util.ClusterSatisfactionSpec;
     import de.uka.ilkd.key.speclang.ComponentCluster;
     import de.uka.ilkd.key.speclang.ComponentClusterImpl;
     import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -416,8 +417,9 @@ top returns [Object ret = null] throws SLTranslationException
     |   signalsclause { ret = $signalsclause.ret; }
     |   signalsonlyclause { ret = $signalsonlyclause.result; }
     |   termexpression { ret = $termexpression.result; }
-    |	dependencyclusterspec { ret = $dependencyclusterspec.result; }
+    |	(CLUSTER IDENT LOWIN) => dependencyclusterspec { ret = $dependencyclusterspec.result; }
     |	componentdependencyclusterspec { ret = $componentdependencyclusterspec.result; }
+    |	(CLUSTER IDENT SATISFIED_BY) => clustersatisfactionspec { ret = $clustersatisfactionspec.result; }
     )
     (SEMI)? EOF
     ;
@@ -607,6 +609,13 @@ infflowspeclist returns  [ImmutableList<Term> result = ImmutableSLList.<Term>nil
     term = termexpression { result = result.append(term); }
     (COMMA term = termexpression { result = result.append(term); })*
         { result = translator.translate("infflowspeclist", ImmutableList.class, result, services); }
+    ;
+    
+clustersatisfactionspec returns  [ClusterSatisfactionSpec result = null] throws SLTranslationException
+:
+    CLUSTER global = IDENT SATISFIED_BY local = IDENT
+
+    {result = new ClusterSatisfactionSpec(global.getText(), local.getText());}
     ;
     
 componentdependencyclusterspec returns  [ComponentCluster result = null] throws SLTranslationException

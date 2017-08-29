@@ -61,6 +61,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private ImmutableList<PositionedString> dependencyClusters =
             ImmutableSLList.<PositionedString>nil();
     
+    private ImmutableList<PositionedString> clusterSatisfactionSpecs =
+            ImmutableSLList.<PositionedString>nil();
+    
     private Map<String, ImmutableList<PositionedString>>
       accessibles = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
@@ -361,6 +364,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public void addDepClusterSpecs(ImmutableList<PositionedString> l) {
         dependencyClusters = dependencyClusters.append(l);
     }
+    
+    public void addClusterSatisfactionSpecs(PositionedString ps) {
+        clusterSatisfactionSpecs = clusterSatisfactionSpecs.append(ps);
+    }
+
+
+    public void addClusterSatisfactionSpecs(ImmutableList<PositionedString> l) {
+        clusterSatisfactionSpecs = clusterSatisfactionSpecs.append(l);
+    }
 
 
     public Behavior getBehavior() {
@@ -488,6 +500,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     
     public ImmutableList<PositionedString> getDependencyClusters() {
         return dependencyClusters;
+    }
+    
+    public ImmutableList<PositionedString> getClusterSatisfactionSpecs() {
+        return clusterSatisfactionSpecs;
     }
 
 
