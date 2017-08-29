@@ -67,7 +67,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.web.WebView;
@@ -142,17 +141,6 @@ public class AnalyzerGUIController {
 
         txtJavaFile.textProperty().addListener((obs, oldV, newV) -> {
             txtJavaFile.selectPositionCaret(newV.length() - 1);
-        });
-
-        mainWindowProperty.addListener(w -> {
-            @SuppressWarnings("unchecked")
-            final AnchorPane root =
-                    (AnchorPane) ((ObjectProperty<Window>) w).get().getScene()
-                            .getRoot();
-
-            wvInfo.prefWidthProperty().bind(root.widthProperty().subtract(290));
-            wvInfo.prefHeightProperty()
-                    .bind(root.heightProperty().subtract(20));
         });
 
         javaFileProperty.addListener(l -> {
