@@ -56,13 +56,13 @@ public class SelfcompositionStateExpansionMacro extends AbstractPropositionalExp
     private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
 
     @Override
-    protected Set<String> getAdmittedRuleNames() {
+    protected Set<String> getAdmittedRuleNames(Proof proof) {
         return ADMITTED_RULES_SET;
     }
 
     @Override
     protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
-        return new SelfCompExpansionStrategy(getAdmittedRuleNames());
+        return new SelfCompExpansionStrategy(getAdmittedRuleNames(proof));
     }
 
     @Override
