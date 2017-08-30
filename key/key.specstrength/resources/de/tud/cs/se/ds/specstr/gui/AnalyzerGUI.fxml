@@ -23,23 +23,16 @@
                                     <TextField id="txtJavaFile" fx:id="txtJavaFile" editable="false" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER" />
                                  </center>
                                  <right>
-                                    <FlowPane prefHeight="26.0" prefWidth="104.0" BorderPane.alignment="CENTER">
+                                    <FlowPane prefHeight="26.0" prefWrapLength="90" BorderPane.alignment="CENTER">
                                        <BorderPane.margin>
                                           <Insets left="10.0" />
                                        </BorderPane.margin>
                                        <children>
-                                          <Button id="btnFileChooser" fx:id="btnFileChooser" mnemonicParsing="false" onAction="#handleChooseFilePressed" text="Choose" />
-                                          <Button fx:id="btnRecent" mnemonicParsing="false" onAction="#handleLoadRecentPressed">
+                                          <Button id="btnFileChooser" fx:id="btnFileChooser" mnemonicParsing="false" onAction="#handleChooseFilePressed" text="Load" />
+                                          <Button fx:id="btnRecent" mnemonicParsing="false" onAction="#handleLoadRecentPressed" style="-fx-graphic: url('/de/tud/cs/se/ds/specstr/gui/refresh.png')">
                                              <FlowPane.margin>
                                                 <Insets left="5.0" />
                                              </FlowPane.margin>
-                                             <graphic>
-                                                <ImageView fitHeight="15.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true">
-                                                   <image>
-                                                      <Image url="@../../../../../../../../resources/de/tud/cs/se/ds/specstr/gui/openMostRecent.png" />
-                                                   </image>
-                                                </ImageView>
-                                             </graphic>
                                           </Button>
                                        </children>
                                     </FlowPane>
