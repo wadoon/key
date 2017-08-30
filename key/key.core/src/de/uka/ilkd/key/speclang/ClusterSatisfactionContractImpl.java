@@ -5,6 +5,8 @@ import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
 
+import de.uka.ilkd.key.dependencycluster.po.ClusterSatisfactionPO;
+import de.uka.ilkd.key.dependencycluster.po.DependencyClusterContractPO;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -110,8 +112,7 @@ public class ClusterSatisfactionContractImpl
     }
 
     @Override
-    public IObserverFunction getTarget() {
-        
+    public IProgramMethod getTarget() {        
         return pm;
     }
 
@@ -262,21 +263,18 @@ public class ClusterSatisfactionContractImpl
 
     @Override
     public ContractPO createProofObl(InitConfig initConfig) {
-        // TODO JK continue here for PO creation
-        return null;
+        return new ClusterSatisfactionPO(initConfig, this);
     }
 
     @Override
     public ProofOblInput getProofObl(Services services) {
-        // TODO JK continue here for PO creation
-        return null;
+        return services.getSpecificationRepository().getPO(this);
     }
 
     @Override
     public ProofOblInput createProofObl(InitConfig initConfig,
             Contract contract) {
-        // TODO JK continue here for PO creation
-        return null;
+        return new ClusterSatisfactionPO(initConfig, (ClusterSatisfactionContract) contract);
     }
 
     @Override
