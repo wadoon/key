@@ -221,6 +221,35 @@ public class JMLSpecFactory {
         }
         return contracts;
     }
+    
+    private ImmutableSet<Contract>
+    createClusterSatisfactionContracts(ContractClauses clauses,
+                                   IProgramMethod pm,
+                                   ProgramVariableCollection progVars) {
+        LocationVariable heap =
+                services.getTypeConverter().getHeapLDT().getHeap();
+        
+        ImmutableSet<Contract> contracts =
+                DefaultImmutableSet.<Contract>nil();
+        
+        if (clauses.clusterSatisfactionSpecs != null && !clauses.clusterSatisfactionSpecs.isEmpty()) {
+            for (ClusterSatisfactionSpec spec: clauses.clusterSatisfactionSpecs) {
+                contracts = contracts.add(cf.createClusterSatisfactionContract(pm.getContainerType(), pm, 
+                        pm.getContainerType(), 
+                        Modality.BOX,
+                        clauses.requires.get(heap),
+                        clauses.measuredBy,
+                        clauses.assignables.get(heap),
+                        !clauses.hasMod.get(heap),
+                        progVars,
+                        clauses.accessibles.get(heap),
+                        spec,
+                        false));
+            }
+
+        }
+        return contracts;
+    }
 
 
     //-------------------------------------------------------------------------
@@ -1421,7 +1450,8 @@ public class JMLSpecFactory {
                                                                 clauses));
         result = result.union(createDependencyClusterContracts(clauses, pm,
                                                                progVars));
-        //TODO JK continue here to create and add clusterSatisfaction contracts
+        result = result.union(createClusterSatisfactionContracts(clauses, pm,
+                progVars));
 
         return result;
     }

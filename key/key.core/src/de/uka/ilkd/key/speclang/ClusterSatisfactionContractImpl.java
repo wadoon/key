@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
 
-import de.uka.ilkd.key.dependencycluster.po.DependencyClusterContractPO;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
@@ -18,15 +17,11 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.ContractFactory;
-import de.uka.ilkd.key.speclang.DependencyClusterContract;
+import de.uka.ilkd.key.util.ClusterSatisfactionSpec;
 import de.uka.ilkd.key.util.DependencyClusterSpec;
 
-public class DependencyClusterContractImpl
-        implements DependencyClusterContract {
-
-    //public static final Contract DUMMY_DEP_CLUSTER_CONTRACT = new DependencyClusterContractImpl();
+public class ClusterSatisfactionContractImpl
+        implements ClusterSatisfactionContract {
     
     private final int id;
     private final KeYJavaType forClass;
@@ -45,11 +40,11 @@ public class DependencyClusterContractImpl
     private final Term origAtPre;
     private final boolean toBeSaved;
     private final Term origDep;
-    private final DependencyClusterSpec origDependencyClusterSpec;
+    private final ClusterSatisfactionSpec clusterSatisfactionSpec;
     
     final boolean hasRealModifiesClause;
 
-    public DependencyClusterContractImpl(String baseName,
+    public ClusterSatisfactionContractImpl(String baseName,
             KeYJavaType forClass,
             IProgramMethod pm,
             KeYJavaType specifiedIn,
@@ -64,12 +59,12 @@ public class DependencyClusterContractImpl
             Term exc,
             Term heapAtPre,
             Term dep,
-            DependencyClusterSpec dependencyClusterSpec,
+            ClusterSatisfactionSpec clusterSatisfactionSpec,
             boolean toBeSaved) {
-        this(baseName, forClass, pm, specifiedIn, modality, pre, mby, mod, hasRealMod, self, params, result, exc, heapAtPre, dep, dependencyClusterSpec, toBeSaved, INVALID_ID);
+        this(baseName, forClass, pm, specifiedIn, modality, pre, mby, mod, hasRealMod, self, params, result, exc, heapAtPre, dep, clusterSatisfactionSpec, toBeSaved, INVALID_ID);
     }
     
-    protected DependencyClusterContractImpl(String baseName,
+    protected ClusterSatisfactionContractImpl(String baseName,
                                         KeYJavaType forClass,
                                         IProgramMethod pm,
                                         KeYJavaType specifiedIn,
@@ -84,7 +79,7 @@ public class DependencyClusterContractImpl
                                         Term exc,
                                         Term heapAtPre,
                                         Term dep,
-                                        DependencyClusterSpec dependencyClusterSpec,
+                                        ClusterSatisfactionSpec clusterSatisfactionSpec,
                                         boolean toBeSaved,
                                         int id) {
         this.id = id;
@@ -105,7 +100,7 @@ public class DependencyClusterContractImpl
         this.hasRealModifiesClause  = hasRealMod;
         this.toBeSaved = toBeSaved;
         this.origDep = dep;
-        this.origDependencyClusterSpec = dependencyClusterSpec;
+        this.clusterSatisfactionSpec = clusterSatisfactionSpec;
 
     }
 
@@ -115,7 +110,8 @@ public class DependencyClusterContractImpl
     }
 
     @Override
-    public IProgramMethod getTarget() {
+    public IObserverFunction getTarget() {
+        
         return pm;
     }
 
@@ -236,20 +232,15 @@ public class DependencyClusterContractImpl
     @Override
     public String getHTMLText(Services services) {
         return "<html>" +
-        "<b>ID </b>" + origDependencyClusterSpec.getLabel() +"<br>" +
-        "<b>LowIn </b>" + origDependencyClusterSpec.getLowIn() +"<br>" +
-        "<b>LowOut </b>" + origDependencyClusterSpec.getLowOut() +"<br>" +
-        "<b>LowState </b>" + origDependencyClusterSpec.getLowState() +"<br>" +
-        "<b>Visible </b>" + origDependencyClusterSpec.getVisible() +"<br>" +
-        "<b>New Objects </b>" + origDependencyClusterSpec.getNewObjects() +"<br>" +
-        "</html>";
+                "<b>cluster </b>" + clusterSatisfactionSpec.getComponentClusterLabel() +"<br>" +
+                "<b>satisfied by </b>" + clusterSatisfactionSpec.getServiceClusterLabel() +
+                "</html>";
     }
 
     @Override
     public String getPlainText(Services services) {
-        // TODO implement
-        return "plain text for: "
-                + origDependencyClusterSpec;
+        // TODO JK where is this used?
+        return clusterSatisfactionSpec.toString();
     }
 
     @Override
@@ -271,39 +262,42 @@ public class DependencyClusterContractImpl
 
     @Override
     public ContractPO createProofObl(InitConfig initConfig) {
-        return new DependencyClusterContractPO(initConfig, this);
+        // TODO JK continue here for PO creation
+        return null;
     }
 
     @Override
     public ProofOblInput getProofObl(Services services) {
-        return services.getSpecificationRepository().getPO(this);
+        // TODO JK continue here for PO creation
+        return null;
     }
 
     @Override
     public ProofOblInput createProofObl(InitConfig initConfig,
             Contract contract) {
-        return new DependencyClusterContractPO(initConfig, (DependencyClusterContract) contract);
+        // TODO JK continue here for PO creation
+        return null;
     }
 
     @Override
     public ProofOblInput createProofObl(InitConfig initConfig,
             Contract contract, boolean supportSymbolicExecutionAPI) {
-        //TODO JK what does this do?
+      //TODO JK what does this do?
         throw new IllegalStateException("TODO JK why am I here?");
         //return createProofObl(initConfig, contract);
-
     }
 
     @Override
     public Contract setID(int newId) {
-        return new DependencyClusterContractImpl(baseName, forClass, pm, specifiedIn, modality, origPre, origMby, origMod, hasRealModifiesClause, origSelf, origParams, 
-                origResult, origExc, origAtPre, origDep, origDependencyClusterSpec, toBeSaved, newId);
+        return new ClusterSatisfactionContractImpl(baseName, forClass, pm, specifiedIn, modality, origPre, origMby, origMod, hasRealModifiesClause, origSelf, origParams, 
+                origResult, origExc, origAtPre, origDep, clusterSatisfactionSpec, toBeSaved, newId);
+    
     }
 
     @Override
     public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
-        return new DependencyClusterContractImpl(baseName, newKJT, (IProgramMethod)newPM, specifiedIn, modality, origPre, origMby, origMod, hasRealModifiesClause, origSelf, origParams, 
-                origResult, origExc, origAtPre, origDep, origDependencyClusterSpec, toBeSaved, id);
+        return new ClusterSatisfactionContractImpl(baseName, newKJT, pm, specifiedIn, modality, origPre, origMby, origMod, hasRealModifiesClause, origSelf, origParams, 
+                origResult, origExc, origAtPre, origDep, clusterSatisfactionSpec, toBeSaved, id);
     }
 
     @Override
@@ -340,82 +334,9 @@ public class DependencyClusterContractImpl
     }
 
     @Override
-    public Modality getModality() {
-        return modality;
+    public ClusterSatisfactionSpec getSpecs() {
+      
+        return clusterSatisfactionSpec;
     }
 
-    @Override
-    public KeYJavaType getSpecifiedIn() {
-        return specifiedIn;
-    }
-
-    @Override
-    public Term getPre() {
-        return origPre;
-    }
-
-    @Override
-    public Term getMod() {
-        return origMod;
-    }
-
-    @Override
-    public boolean hasModifiesClause() {
-        return hasRealModifiesClause;
-    }
-
-    @Override
-    public Term getSelfVar() {
-       
-        return origSelf;
-    }
-
-    @Override
-    public ImmutableList<Term> getParams() {
-        
-        return origParams;
-    }
-
-    @Override
-    public Term getResult() {
-
-        return origResult;
-    }
-
-    @Override
-    public Term getExc() {
-        
-        return origExc;
-    }
-
-    @Override
-    public Term getDep() {
-        
-        return origDep;
-    }
-
-    @Override
-    public Term getHeapAtPre() {
-       
-        return origAtPre;
-    }
-
-    @Override
-    public DependencyClusterSpec getSpecs() {
-        return origDependencyClusterSpec;
-    }
-
-    @Override
-    public Term getSelf() {
-        if (origSelf == null){
-            assert pm.isStatic() : "missing self variable in non-static method contract";
-            return null;
-        }
-        return origSelf;
-    }
-
-    @Override
-    public String getLabel() {
-        return getSpecs().getLabel();
-    }
 }
