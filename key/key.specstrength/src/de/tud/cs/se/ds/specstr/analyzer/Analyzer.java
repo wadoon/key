@@ -1239,7 +1239,7 @@ public class Analyzer {
         @Override
         public String toString() {
             return String.format(
-                    "Unclosed exception node \"%s\", path condition: \"%s\"",
+                    "Unclosed exception node \"%s\"\nPath condition: \"%s\"",
                     excLabel, pathCondition);
         }
     }

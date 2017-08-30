@@ -108,7 +108,7 @@ public class AnalyzerGUIController {
 
     private static final File TMP_DIR = new File(
             System.getProperty("java.io.tmpdir") + "/analyzerOutput/");
-    
+
     ////// Private properties
 
     private ObjectProperty<Window> mainWindowProperty =
@@ -122,7 +122,7 @@ public class AnalyzerGUIController {
 
     private ObjectProperty<File> proofFileProperty =
             new SimpleObjectProperty<>();
-    
+
     ////// Private fields
 
     private SymbExInterface seIf;
@@ -185,6 +185,8 @@ public class AnalyzerGUIController {
                 .bind(cmbMethodChooser.selectionModelProperty().getValue()
                         .selectedItemProperty().isNull()
                         .or(interfaceDisabledProperty));
+
+        btnRecent.disableProperty().bind(javaFileProperty.isNull());
     }
 
     ////// FXML event handlers
@@ -289,31 +291,34 @@ public class AnalyzerGUIController {
                 fileChooser.showOpenDialog(mainWindowProperty.get());
         if (selectedFile != null) {
             javaFileProperty.set(selectedFile);
-
-            Task<Void> task = new Task<Void>() {
-                @Override
-                protected Void call() throws Exception {
-                    return doWithDisabledWindow(() -> {
-                        loadContractTargets(selectedFile);
-                        return null;
-                    });
-                }
-            };
-
-            Thread th = new Thread(task);
-            th.setDaemon(true);
-            th.start();
+            loadFile();
         }
 
         proofFileProperty.set(null);
     }
-    
+
     @FXML
     public void handleLoadRecentPressed() {
-        //TODO
+        loadFile();
     }
 
     /////// Private helpers
+
+    private void loadFile() {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                return doWithDisabledWindow(() -> {
+                    loadContractTargets(javaFileProperty.get());
+                    return null;
+                });
+            }
+        };
+
+        Thread th = new Thread(task);
+        th.setDaemon(true);
+        th.start();
+    }
 
     private void recursivelyDoForChildren(Parent node, Consumer<Node> job) {
         for (final Node child : node
@@ -342,13 +347,13 @@ public class AnalyzerGUIController {
                             .collect(Collectors.toList()))
                     .flatMap(List::stream)
                     .collect(Collectors.toList());
-            
+
             // We reverse the list because in the default ImmutableSet
             // implementation, new elements are added by prepend() and
             // therefore, the methods occur in the reverse order than
             // implemented in the class.
             Collections.reverse(contractTargets);
-            
+
             Platform.runLater(() -> {
                 cmbMethodChooser.setItems(FXCollections
                         .observableArrayList(contractTargets));
@@ -418,6 +423,7 @@ public class AnalyzerGUIController {
 
     private String text2HTML(String text, boolean javaHighlight) {
         if (javaHighlight) {
+            text = text.trim();
             InputStream in = new ByteArrayInputStream(
                     text.getBytes(StandardCharsets.UTF_8));
             ByteArrayOutputStream out = new ByteArrayOutputStream();
