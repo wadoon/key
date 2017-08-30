@@ -106,8 +106,7 @@ public class AnalyzerGUIController {
 
     ////// Private constants
 
-    private static final File TMP_DIR = new File(
-            System.getProperty("java.io.tmpdir") + "/analyzerOutput/");
+    private final File TMP_DIR;
 
     ////// Private properties
 
@@ -128,6 +127,19 @@ public class AnalyzerGUIController {
     private SymbExInterface seIf;
 
     ////// Initializer and public interface
+    
+    public AnalyzerGUIController() {
+        File tmpDir;
+        try {
+            tmpDir = Files.createTempDirectory("analyzerOutput").toFile();
+        }
+        catch (IOException e) {
+            tmpDir = null;
+            handleException(e);
+        }
+        
+        TMP_DIR = tmpDir;
+    }
 
     public void initialize() {
         if (!TMP_DIR.exists()) {

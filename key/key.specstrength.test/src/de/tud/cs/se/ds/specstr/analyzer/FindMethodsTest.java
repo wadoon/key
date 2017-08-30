@@ -190,7 +190,7 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
         assertEquals(1, result.problematicExceptions().size());
         assertContains("arr_0 != null, but i Out of Bounds",
             result.problematicExceptions().get(0).getExcLabel());
-        assertContains("arr_0.length > i_0 & (arr_0.length <= i_0 | i_0 < 0)",
+        assertContains("arr_0.length > i_0 & i_0 < 0",
             result.problematicExceptions().get(0).getPathCondition());
 
         final List<Fact> abstrLoopBodyFacts = result
@@ -230,7 +230,7 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
         assertEquals(1, result.problematicExceptions().size());
         assertContains("arr_0 != null, but i Out of Bounds",
             result.problematicExceptions().get(0).getExcLabel());
-        assertContains("arr_0.length > i_0 & (arr_0.length <= i_0 | i_0 < 0)",
+        assertContains("arr_0.length > i_0 & i_0 < 0",
             result.problematicExceptions().get(0).getPathCondition());
 
         final List<Fact> abstrLoopBodyFacts = result
@@ -271,7 +271,7 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
         assertEquals(1, result.problematicExceptions().size());
         assertContains("arr_0 != null, but i Out of Bounds",
             result.problematicExceptions().get(0).getExcLabel());
-        assertContains("arr_0.length > i_0 & (arr_0.length <= i_0 | i_0 < 0)",
+        assertContains("arr_0.length > i_0 & i_0 < 0",
             result.problematicExceptions().get(0).getPathCondition());
 
         final List<Fact> abstrPostCondFacts = result
@@ -292,7 +292,7 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
         assertEquals(4, result.numUncoveredFacts());
         assertEquals(1, result.numAbstractlyCoveredFacts());
 
-        assertEquals("arr_0[result_1_0]@heap[anon({}, anon_heap_LOOP)] = n",
+        assertContains("arr_0[result_1_0]@heap[anon({}, anon_heap_LOOP)] = n",
             uncUseCaseFacts.get(0).getDescr());
         assertEquals("result = result_1_0", uncPostCondFacts.get(0).getDescr());
 
@@ -327,7 +327,7 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
         assertEquals(1, result.problematicExceptions().size());
         assertContains("arr_0 != null, but i Out of Bounds",
             result.problematicExceptions().get(0).getExcLabel());
-        assertContains("arr_0.length > i_0 & (arr_0.length <= i_0 | i_0 < 0)",
+        assertContains("arr_0.length > i_0 & i_0 < 0",
             result.problematicExceptions().get(0).getPathCondition());
 
         final List<Fact> loopBodyFacts = result

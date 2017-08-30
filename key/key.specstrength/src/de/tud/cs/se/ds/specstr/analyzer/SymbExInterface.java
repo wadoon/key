@@ -369,7 +369,7 @@ public class SymbExInterface {
                 StrategyProperties.LOOP_OPTIONS_KEY,
                 StrategyProperties.LOOP_SCOPE_INVARIANT);
         sp.setProperty(StrategyProperties.OSS_OPTIONS_KEY,
-                StrategyProperties.OSS_ON);
+                StrategyProperties.OSS_OFF);
         // @formatter:on
 
         proof.getSettings().getStrategySettings()

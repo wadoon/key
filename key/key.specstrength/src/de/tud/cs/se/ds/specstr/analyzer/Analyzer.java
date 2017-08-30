@@ -33,7 +33,6 @@ import de.tud.cs.se.ds.specstr.profile.StrengthAnalysisSEProfile;
 import de.tud.cs.se.ds.specstr.rule.*;
 import de.tud.cs.se.ds.specstr.util.GeneralUtilities;
 import de.tud.cs.se.ds.specstr.util.JavaTypeInterface;
-import de.tud.cs.se.ds.specstr.util.LogicUtilities;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.Services;
@@ -46,6 +45,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.macros.GeneralSimplificationMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
@@ -427,7 +427,8 @@ public class Analyzer {
             final String readablePathCond = extractReadablePathCondition(
                     n.parent());
 
-            final Node newNode = LogicUtilities.quickSimplifyUpdates(n);
+            seIf.applyMacro(new GeneralSimplificationMacro(), n);
+            final Node newNode = n.leavesIterator().next();
 
             final Optional<PosInOccurrence> maybePioOfApplySeqFor = //
                     getPioOfFormulaWhichHadSELabel(newNode);

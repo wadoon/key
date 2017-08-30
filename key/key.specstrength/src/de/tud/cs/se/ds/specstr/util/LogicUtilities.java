@@ -41,11 +41,9 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.util.LinkedHashMap;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
@@ -59,7 +57,8 @@ public final class LogicUtilities {
     /**
      * A cache for formulas that are known to originate from a loop invariant.
      */
-    private static final Map<Node, Set<Term>> LOOP_INV_FORMULAS_CACHE = new LinkedHashMap<>();
+    private static final Map<Node, Set<Term>> LOOP_INV_FORMULAS_CACHE =
+            new LinkedHashMap<>();
 
     private LogicUtilities() {
         // Hidden constructor -- it's a utility class.
@@ -108,7 +107,8 @@ public final class LogicUtilities {
             final Sort sort = getHeapStoreTargetSort(services, currHeapTerm);
 
             storeEqualities.add(tb.equals(
-                tb.select(sort, tb.getBaseHeap(), targetObj, field), value));
+                    tb.select(sort, tb.getBaseHeap(), targetObj, field),
+                    value));
 
             currHeapTerm = currHeapTerm.sub(0);
         }
@@ -140,19 +140,23 @@ public final class LogicUtilities {
         Sort sort = null;
         if (!(value.sort() instanceof NullSort)) {
             sort = value.sort();
-        } else if (((ProgramVariable) targetObj.op()).getKeYJavaType()
+        }
+        else if (((ProgramVariable) targetObj.op()).getKeYJavaType()
                 .getJavaType() instanceof ArrayDeclaration) {
             sort = services.getNamespaces().sorts().lookup(
-                ((ArrayDeclaration) ((ProgramVariable) targetObj.op())
-                        .getKeYJavaType().getJavaType()).getBaseType()
-                                .getName());
-        } else {
+                    ((ArrayDeclaration) ((ProgramVariable) targetObj.op())
+                            .getKeYJavaType().getJavaType()).getBaseType()
+                                    .getName());
+        }
+        else {
             sort = services.getJavaInfo().getAttribute(
-                // Format is "path.to.type::$field"; we have to remove the "$"
-                // to find the field in the JavaInfo.
-                field.toString().replaceAll("\\$", ""),
-                services.getJavaInfo()
-                        .getTypeByClassName(field.toString().split("::")[0]))
+                    // Format is "path.to.type::$field"; we have to remove the
+                    // "$"
+                    // to find the field in the JavaInfo.
+                    field.toString().replaceAll("\\$", ""),
+                    services.getJavaInfo()
+                            .getTypeByClassName(
+                                    field.toString().split("::")[0]))
                     .sort();
         }
         return sort;
@@ -220,8 +224,8 @@ public final class LogicUtilities {
             final Goal analysisGoal, final Term fact,
             TermLabelState termLabelState, Rule rule) {
         prepareGoal(pio, analysisGoal, fact,
-            AbstractAnalysisRule.COVERS_FACT_BRANCH_LABEL_PREFIX,
-            termLabelState, rule);
+                AbstractAnalysisRule.COVERS_FACT_BRANCH_LABEL_PREFIX,
+                termLabelState, rule);
     }
 
     /**
@@ -257,18 +261,19 @@ public final class LogicUtilities {
         final Services services = analysisGoal.proof().getServices();
 
         analysisGoal.setBranchLabel(String.format("%s \"%s\"", descr,
-            LogicPrinter
-                    .quickPrintTerm(TermBuilder.goBelowUpdates(fact), services)
-                    .replaceAll("(\\r|\\n|\\r\\n)+", "")
-                    .replaceAll("<<[^>]+>>", "").trim()));
+                LogicPrinter
+                        .quickPrintTerm(TermBuilder.goBelowUpdates(fact),
+                                services)
+                        .replaceAll("(\\r|\\n|\\r\\n)+", "")
+                        .replaceAll("<<[^>]+>>", "").trim()));
 
         analysisGoal.removeFormula(pio);
 
         Term newFormula = services.getTermBuilder().label(fact,
-            StrengthAnalysisParameterlessTL.FACT_LABEL);
+                StrengthAnalysisParameterlessTL.FACT_LABEL);
         newFormula = TermLabelManager.refactorTerm(termLabelState, services,
-            null, newFormula, rule, analysisGoal,
-            AbstractAnalysisRule.FACT_HINT, null);
+                null, newFormula, rule, analysisGoal,
+                AbstractAnalysisRule.FACT_HINT, null);
 
         analysisGoal.addFormula(new SequentFormula(newFormula), false, true);
     }
@@ -295,11 +300,11 @@ public final class LogicUtilities {
             Rule rule) {
         Term newFormula = addFactPremiseLabel
                 ? analysisGoal.proof().getServices().getTermBuilder().label(t,
-                    StrengthAnalysisParameterlessTL.FACT_PREMISE_LABEL)
+                        StrengthAnalysisParameterlessTL.FACT_PREMISE_LABEL)
                 : t;
         newFormula = TermLabelManager.refactorTerm(termLabelState,
-            analysisGoal.proof().getServices(), null, newFormula, rule,
-            analysisGoal, AbstractAnalysisRule.FACT_PREMISE_HINT, null);
+                analysisGoal.proof().getServices(), null, newFormula, rule,
+                analysisGoal, AbstractAnalysisRule.FACT_PREMISE_HINT, null);
 
         analysisGoal.addFormula(new SequentFormula(newFormula), true, false);
     }
@@ -333,7 +338,7 @@ public final class LogicUtilities {
         int i = 0;
         for (Term term : terms) {
             addFactPrecondition(analysisGoal, term,
-                i < numFactsWithPremiseLabels, termLabelState, rule);
+                    i < numFactsWithPremiseLabels, termLabelState, rule);
             i++;
         }
     }
@@ -375,7 +380,8 @@ public final class LogicUtilities {
             final int posResult = Integer.parseInt(smallest.split("\\.")[0]);
             if (idsInFirst.contains(smallest)) {
                 return -posResult;
-            } else {
+            }
+            else {
                 return posResult;
             }
         });
@@ -398,7 +404,7 @@ public final class LogicUtilities {
                 .map(g -> g.node())
                 .filter(n -> GeneralUtilities.toStream(n.sequent().succedent())
                         .anyMatch(
-                            f -> f.formula().containsJavaBlockRecursive()))
+                                f -> f.formula().containsJavaBlockRecursive()))
                 .collect(Collectors.toList());
     }
 
@@ -432,7 +438,7 @@ public final class LogicUtilities {
         // reloading with KeY, those taclets are however removed correctly. What
         // goes wrong here?
         analysisGoal.indexOfTaclets().removeTaclets(
-            analysisGoal.indexOfTaclets().getPartialInstantiatedApps());
+                analysisGoal.indexOfTaclets().getPartialInstantiatedApps());
 
         for (SequentFormula sf : analysisGoal.sequent().antecedent()) {
             boolean remove = loopInvNode == null
@@ -443,13 +449,21 @@ public final class LogicUtilities {
                                     .contains(sf.formula());
 
             if (!remove && sf.formula().hasLabels()) {
-                if (termLabelsOfType(sf.formula(), FormulaTermLabel.class).isEmpty()) {
-                    // This is probably a formula which only has been added
-                    // during the application of the analysis goal, we definitly
-                    // cannot trace it back. Ignore.
+                final Term sePred = findSETPred(sf.formula());
+                if (sePred != null && sf.formula().equals(sePred)) {
+                    // We don't remove the SE predicate formula
                     continue;
                 }
                 
+                if (termLabelsOfType(sf.formula(), FormulaTermLabel.class)
+                        .isEmpty()) {
+                    // This is probably a formula which only has been added
+                    // during the application of the analysis goal, we
+                    // definitely
+                    // cannot trace it back. Ignore.
+                    continue;
+                }
+
                 // Find origin of this label
                 final OriginOfFormula origin = //
                         findOriginOfFormula(analysisGoal, sf.formula());
@@ -462,13 +476,13 @@ public final class LogicUtilities {
 
                     // Add value to the cache
                     updateCache(sf.formula(), loopInvNode,
-                        analysisGoal.proof().root());
+                            analysisGoal.proof().root());
                 }
             }
 
             if (remove) {
                 analysisGoal.removeFormula(
-                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true));
+                        new PosInOccurrence(sf, PosInTerm.getTopLevel(), true));
             }
         }
     }
@@ -512,13 +526,11 @@ public final class LogicUtilities {
     public static void addSETPredicateToAntec(final Goal goal) {
         final Optional<Pair<SequentFormula, Term>> maybeSETPredicate = //
                 Stream.concat(
-                    GeneralUtilities.toStream(goal.sequent().succedent()),
-                    GeneralUtilities.toStream(goal.sequent().antecedent()))
+                        GeneralUtilities.toStream(goal.sequent().succedent()),
+                        GeneralUtilities.toStream(goal.sequent().antecedent()))
                         .map(sf -> {
-                            SETPredVisitor v = new SETPredVisitor();
-                            sf.formula().execPostOrder(v);
                             return new Pair<SequentFormula, Term>(sf,
-                                v.getSetPredTerm());
+                                    findSETPred(sf.formula()));
                         }).filter(p -> p.second != null).findAny();
 
         if (!maybeSETPredicate.isPresent()) {
@@ -561,33 +573,6 @@ public final class LogicUtilities {
     }
 
     /**
-     * Performs update simplification via {@link OneStepSimplifier} on the given
-     * {@link Node}.
-     *
-     * @param n
-     *            The {@link Node} to simplify updates in.
-     * @return The resulting node.
-     */
-    public static Node quickSimplifyUpdates(final Node n) {
-        final Proof proof = n.proof();
-        final Services services = proof.getServices();
-
-        List<SequentFormula> seqForsWithUpdate = GeneralUtilities
-                .toStream(n.sequent())
-                .filter(f -> f.formula().op() instanceof UpdateApplication)
-                .collect(Collectors.toList());
-
-        for (SequentFormula sf : seqForsWithUpdate) {
-            proof.getSubtreeGoals(n).head().apply(
-                MiscTools.findOneStepSimplifier(proof)
-                        .createApp(findInSequent(sf, n.sequent()), services));
-        }
-
-        final Node newNode = proof.getSubtreeGoals(n).head().node();
-        return newNode;
-    }
-
-    /**
      * Transforms an update to a {@link Map} from left-hand-sides to
      * right-hand-sides.
      *
@@ -597,32 +582,22 @@ public final class LogicUtilities {
      */
     public static LinkedHashMap<LocationVariable, Term> updateToMap(
             final Term updateTerm) {
-        final LinkedHashMap<LocationVariable, Term> updateContent = StreamSupport.stream(//
-            MergeRuleUtils.getUpdateLeftSideLocations(updateTerm).spliterator(),
-            true).collect(Collectors.toMap(lhs -> lhs,
-                lhs -> MergeRuleUtils.getUpdateRightSideFor(updateTerm, lhs),
-                (u, v) -> {
-                    throw new IllegalStateException(
-                        String.format("Duplicate key %s", u));
-                }, LinkedHashMap::new));
+        final LinkedHashMap<LocationVariable, Term> updateContent =
+                StreamSupport.stream(//
+                        MergeRuleUtils.getUpdateLeftSideLocations(updateTerm)
+                                .spliterator(),
+                        true).collect(
+                                Collectors.toMap(lhs -> lhs,
+                                        lhs -> MergeRuleUtils
+                                                .getUpdateRightSideFor(
+                                                        updateTerm, lhs),
+                                        (u, v) -> {
+                                            throw new IllegalStateException(
+                                                    String.format(
+                                                            "Duplicate key %s",
+                                                            u));
+                                        }, LinkedHashMap::new));
         return updateContent;
-    }
-
-    private static PosInOccurrence findInSequent(SequentFormula sf,
-            Sequent seq) {
-        for (SequentFormula otherSf : seq.antecedent()) {
-            if (otherSf.formula().equals(sf.formula())) {
-                return new PosInOccurrence(sf, PosInTerm.getTopLevel(), true);
-            }
-        }
-
-        for (SequentFormula otherSf : seq.succedent()) {
-            if (otherSf.formula().equals(sf.formula())) {
-                return new PosInOccurrence(sf, PosInTerm.getTopLevel(), false);
-            }
-        }
-
-        return null;
     }
 
     private static <L extends TermLabel> List<L> termLabelsOfType(
@@ -706,7 +681,8 @@ public final class LogicUtilities {
 
             if (numMatches == 0) {
                 break;
-            } else {
+            }
+            else {
                 currNode = parent;
             }
         }
@@ -733,9 +709,21 @@ public final class LogicUtilities {
 
         result.add(l.getId());
         result.addAll(
-            Arrays.stream(l.getBeforeIds()).collect(Collectors.toList()));
+                Arrays.stream(l.getBeforeIds()).collect(Collectors.toList()));
 
         return result;
+    }
+
+    /**
+     * @param formula
+     *            The formula to obtain the symbolic execution predicate from.
+     * @return An SE predicate {@link Term} or null, if the given formula does
+     *         not contain one.
+     */
+    private static Term findSETPred(Term formula) {
+        SETPredVisitor v = new SETPredVisitor();
+        formula.execPostOrder(v);
+        return v.getSetPredTerm();
     }
 
     /**
@@ -806,7 +794,7 @@ public final class LogicUtilities {
         public void visit(Term visited) {
             if (visited.op() instanceof LocationVariable && visited.hasLabels()
                     && visited.containsLabel(
-                        ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)) {
+                            ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL)) {
                 final LocationVariable lsi = (LocationVariable) visited.op();
                 if (!indices.contains(lsi)) {
                     indices.add(lsi);
@@ -838,8 +826,8 @@ public final class LogicUtilities {
 
         for (SequentFormula sf : node.sequent().succedent()) {
             List<LocationVariable> maybeIdxVar = retrieveLoopScopeIndices(
-                new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
-                services);
+                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
+                    services);
 
             if (!maybeIdxVar.isEmpty()) {
                 final List<LocationVariable> falseLSI = maybeIdxVar.stream()
