@@ -9,7 +9,7 @@ import org.key_project.sed.core.model.ISEThread;
 /**
  * @author Peter Schauberger
  */
-public class AlgorithmicDebug  {
+public class AlgorithmicDebugger  {
 
    /*
     * The last execution that has been highlighted
@@ -31,12 +31,12 @@ public class AlgorithmicDebug  {
    /*
     * Constructor
     */
-   public AlgorithmicDebug() {
+   public AlgorithmicDebugger() {
       listOfExecutionTrees = new ListOfExecutionTrees();
    }
    
    /*
-    * 
+    * the list of execution trees
     */
    private ListOfExecutionTrees listOfExecutionTrees;
 
@@ -56,7 +56,7 @@ public class AlgorithmicDebug  {
    private boolean searchCompletedButNoBugFound = false;
 
    /*
-    * 
+    * generates the list of execution trees
     */
    public void generateTree(ISENode root){
       listOfExecutionTrees.generateListOfExecutionTrees(root);

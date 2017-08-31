@@ -1,7 +1,7 @@
 package org.key_project.sed.algodebug.searchstrategy;
 
 import org.key_project.sed.algodebug.model.Execution;
-import org.key_project.sed.algodebug.util.MCTUtil;
+import org.key_project.sed.algodebug.util.ExecutionTreeUtil;
 
 public class TopDown extends SearchStrategy implements ISearchStrategy {
 
@@ -34,7 +34,7 @@ public class TopDown extends SearchStrategy implements ISearchStrategy {
          return null;
       }
       else if(lastAskedExecution.getCorrectness() == 'f' ){
-         if(MCTUtil.isEveryChildMarkedAs(lastAskedExecution, 'c')){
+         if(ExecutionTreeUtil.isEveryChildMarkedAs(lastAskedExecution, 'c')){
             bugFound = true;
             bug = lastAskedExecution;
             return null;
@@ -53,7 +53,7 @@ public class TopDown extends SearchStrategy implements ISearchStrategy {
       else if(lastAskedExecution.getCorrectness() == 'c'){
          //            SETUtil.annotateMethodCallCorrect(lastAskedMethod);
          if(!lastAskedExecution.isRoot()){
-            if(MCTUtil.isEveryChildMarkedAs(lastAskedExecution.getParent(), 'c')){
+            if(ExecutionTreeUtil.isEveryChildMarkedAs(lastAskedExecution.getParent(), 'c')){
                bugFound = true;
                bug = lastAskedExecution.getParent();
                return null;
@@ -90,11 +90,12 @@ public class TopDown extends SearchStrategy implements ISearchStrategy {
    public void setExecutionCorrectness(Execution execution, char correctness) {
       if(correctness == 'c'){
          execution.setExecutionCorrectnessIncludingSubMethods(correctness);
-         MCTUtil.annotateExecutionRecursively(execution,correctness);
+         ExecutionTreeUtil.annotateExecutionPartialCorrect(execution);
+//         MCTUtil.annotateExecutionRecursively(execution,correctness);
       }
       if(correctness == 'f'){
          execution.setExecutionCorrectness(correctness);
-         MCTUtil.annotateSETNodesOfExecutionExcludingSubExecutions(execution, 'f');
+         ExecutionTreeUtil.annotateSETNodesOfExecutionExcludingSubExecutions(execution, 'f');
       }
    }
 

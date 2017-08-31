@@ -9,6 +9,7 @@ import org.key_project.sed.core.model.ISEMethodReturn;
 import org.key_project.sed.core.model.ISENode;
 import org.key_project.sed.core.model.ISEThread;
 
+@SuppressWarnings("unused")
 public class ListOfExecutionTrees {
 
    /*

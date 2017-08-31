@@ -7,11 +7,13 @@ import org.eclipse.debug.core.DebugException;
 import org.key_project.sed.algodebug.model.Execution;
 import org.key_project.sed.core.model.ISEBranchCondition;
 import org.key_project.sed.core.model.ISEBranchStatement;
+import org.key_project.sed.core.model.ISELoopCondition;
 import org.key_project.sed.core.model.ISEMethodCall;
 import org.key_project.sed.core.model.ISEMethodReturn;
 import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEStatement;
 
-public class MCTUtil {
+public class ExecutionTreeUtil {
 
    /*
     * returns true if every child of the given execution is annotated with the given correctness
@@ -30,7 +32,7 @@ public class MCTUtil {
    public static void annotateExecutionPartialCorrect(Execution execution) {
       ISENode node = execution.getExecutionReturn();
       try {
-         while(!node.equals(execution.getCall().getParent()) &&  !(node instanceof ISEBranchStatement && SETUtil.hasNotCorrectAnnotatedChildren(node)) &&!(node instanceof ISEBranchCondition && SETUtil.hasNotCorrectAnnotatedChildren(node)) ){
+         while(!node.equals((execution.getCall()).getParent()) && !(node instanceof ISEBranchStatement && !SETUtil.allChildrenAreAnnotatedCorrect(node))&& !(node instanceof ISELoopCondition && !SETUtil.allChildrenAreAnnotatedCorrect(node))  && !(node instanceof ISEBranchCondition && !SETUtil.allChildrenAreAnnotatedCorrect(node)) && !(node instanceof ISEStatement && !SETUtil.allChildrenAreAnnotatedCorrect(node))){
             SETUtil.annotateCorrect(node);
             node = node.getParent();
          }

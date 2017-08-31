@@ -1,7 +1,7 @@
 package org.key_project.sed.algodebug.searchstrategy;
 
 import org.key_project.sed.algodebug.model.Execution;
-import org.key_project.sed.algodebug.util.MCTUtil;
+import org.key_project.sed.algodebug.util.ExecutionTreeUtil;
 
 public class SingleStepping extends SearchStrategy implements ISearchStrategy {
 
@@ -56,9 +56,9 @@ public class SingleStepping extends SearchStrategy implements ISearchStrategy {
    public void setExecutionCorrectness(Execution execution, char correctness) {
       execution.setExecutionCorrectness(correctness);
       if(correctness == 'f')
-         MCTUtil.annotateSETNodesOfABuggyExecution(execution);
+         ExecutionTreeUtil.annotateSETNodesOfABuggyExecution(execution);
       if(correctness == 'c')
-         MCTUtil.annotateExecutionPartialCorrect(execution);
+         ExecutionTreeUtil.annotateExecutionPartialCorrect(execution);
    }
 
    /*

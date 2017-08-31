@@ -31,11 +31,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.key_project.sed.algodebug.model.AlgorithmicDebug;
+import org.key_project.sed.algodebug.model.AlgorithmicDebugger;
 import org.key_project.sed.algodebug.model.Execution;
 import org.key_project.sed.algodebug.searchstrategy.SingleStepping;
 import org.key_project.sed.algodebug.searchstrategy.TopDown;
-import org.key_project.sed.algodebug.util.MCTUtil;
+import org.key_project.sed.algodebug.util.ExecutionTreeUtil;
 import org.key_project.sed.algodebug.util.SETUtil;
 import org.key_project.sed.core.model.ISEConstraint;
 import org.key_project.sed.core.model.ISEExceptionalMethodReturn;
@@ -55,7 +55,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
 
    public static final String VIEW_ID = "org.key_project.sed.ui.view.AlgorithmicDebugView";
    private ISENode actualNode, root; 
-   private AlgorithmicDebug debug; 
+   private AlgorithmicDebugger debug; 
    private Execution actualCall;
    private ListenerList listeners = new ListenerList();
    private IWorkbenchPage workbenchpage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
@@ -146,7 +146,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
          Execution bug = debug.getBug();
          btnCorrect.setEnabled(false);
          btnFalse.setEnabled(false);
-         MCTUtil.annotateSETNodesOfABuggyExecution(bug);
+         ExecutionTreeUtil.annotateSETNodesOfABuggyExecution(bug);
          notifyBugFound(bug);
       }
       else if(debug.searchCompletedButNoBugFound()){
@@ -172,7 +172,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
    private void startButtonPressed() {
       btnCorrect.setEnabled(true);
       btnFalse.setEnabled(true);
-      debug = new AlgorithmicDebug();
+      debug = new AlgorithmicDebugger();
       setsearchstrategy();
       actualNode = getSelectedNode();
       if(actualNode != null){
@@ -267,6 +267,7 @@ public class AlgorithmicDebugView extends ViewPart implements Observer, ISelecti
       actualNode = null;
       debug = null;
       actualCall = null;
+      chronikCounter = 0;
       IViewPart part = workbenchpage
             .findView("org.key_project.sed.ui.view.VariablesSelectionView");
       if (part instanceof VariablesSelectionView) {

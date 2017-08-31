@@ -253,6 +253,26 @@ public class SETUtil {
    }
 
    /*
+    * returns true if all children of the given ISENode node are annotated with the AlgorithmicDebugCorrectAnnotationType
+    * @param node the node that should be checked
+    */
+   public static boolean allChildrenAreAnnotatedCorrect(ISENode node){
+      boolean ret = true;
+      try {
+         for(ISENode child : node.getChildren()){
+            int len = child.getAnnotationLinks(SEAnnotationUtil.getAnnotationtype(AlgorithmicDebugCorrectAnnotationType.TYPE_ID)).length;
+            if(len == 0){
+               ret= false;
+            }
+         }
+      }
+      catch (DebugException e) {
+         e.printStackTrace();
+      }
+      return ret;
+   }
+   
+   /*
     * annotate the given ISENode with the annotationTypeBug
     * @param node the node that should be annotated
     */
