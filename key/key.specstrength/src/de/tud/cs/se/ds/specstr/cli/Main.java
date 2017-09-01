@@ -46,7 +46,7 @@ public final class Main {
      * The information {@link String} for the help output to the command line.
      */
     private static final String INFO_STRING =
-            // @formatter:off
+    // @formatter:off
               "===========================================\n"
             + "            This is  SpecStr v0.1          \n"
             + "a tool for assessing the strength of formal\n"
@@ -97,11 +97,12 @@ public final class Main {
             // parse the command line arguments
             CommandLine line = parser.parse(options, args);
 
-            if ((line.getArgList().size() < 2 && !line.hasOption("g")) || line.hasOption("h")) {
+            if ((line.getArgList().size() < 2 && !line.hasOption("g"))
+                    || line.hasOption("h")) {
                 printHelp(options);
                 System.exit(0);
             }
-            
+
             if (line.hasOption("g")) {
                 Application.launch(AnalyzerGUIDialog.class, args);
                 return;
@@ -114,14 +115,16 @@ public final class Main {
             if (!inputFileName.endsWith(".java") || !inputFile.exists()
                     || !inputFile.isFile()) {
                 System.out.println(
-                    "Invalid file name or not existing file: " + inputFileName);
+                        "Invalid file name or not existing file: "
+                                + inputFileName);
                 System.out.println("Please supply an existing Java file.\n");
                 printHelp(options);
             }
 
             Optional<File> outProof = line.hasOption(outFileProofOpt.getOpt())
                     ? Optional.of(
-                        new File(line.getOptionValue(outFileProofOpt.getOpt())))
+                            new File(line
+                                    .getOptionValue(outFileProofOpt.getOpt())))
                     : Optional.empty();
 
             Analyzer analyzer = new Analyzer(inputFile, theMethod, outProof);
@@ -132,7 +135,8 @@ public final class Main {
                 File file = new File(line.getOptionValue(outFileOpt.getOpt()));
                 try {
                     ps = new PrintStream(new FileOutputStream(file));
-                } catch (FileNotFoundException e) {
+                }
+                catch (FileNotFoundException e) {
                     LOGGER.error("Could not open file %s", file.getName());
                 }
             }
@@ -144,10 +148,12 @@ public final class Main {
             Analyzer.printResults(result, ps);
 
             System.exit(0);
-        } catch (ParseException exp) {
+        }
+        catch (ParseException exp) {
             printHelp(options);
             System.exit(0);
-        } catch (RuntimeException e) {
+        }
+        catch (RuntimeException e) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             e.printStackTrace(new PrintStream(baos));
             LOGGER.error(
@@ -167,9 +173,14 @@ public final class Main {
     private static void printHelp(Options options) {
         System.out.println(INFO_STRING);
         HelpFormatter helpFormatter = new HelpFormatter();
-        helpFormatter.printHelp("java -cp KeY.jar de.tud.cs.se.ds.specstr.cli.Main"
-                + "\t[input Java file]" + "\t[fully qualified method name]",
-            options);
+        helpFormatter.printHelp(String.format(
+                "java -cp KeY.jar de.tud.cs.se.ds.specstr.cli.Main\t%s\t%s\n\t%s",
+                "[input Java file]", "[fully qualified method name (FQMN)]",
+                        "where FQMN ==>\n\t<fully qualified type name>::<method name>(<arg decl>)<return type decl>, "
+                        + "\n\t<arg decl> is according to the field descriptors "
+                        + "in the JVM specification, for instance [ILjava.lang.Object;B "
+                        + "for an integer array, an Object and a boolean"),
+                options);
     }
 
 }
