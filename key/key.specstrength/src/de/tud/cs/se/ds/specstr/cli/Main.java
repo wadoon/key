@@ -171,16 +171,17 @@ public final class Main {
      *            Command line options supplied.
      */
     private static void printHelp(Options options) {
-        System.out.println(INFO_STRING);
+         System.out.println(INFO_STRING);
         HelpFormatter helpFormatter = new HelpFormatter();
+
         helpFormatter.printHelp(String.format(
-                "java -cp KeY.jar de.tud.cs.se.ds.specstr.cli.Main\t%s\t%s\n\t%s",
-                "[input Java file]", "[fully qualified method name (FQMN)]",
-                        "where FQMN ==>\n\t<fully qualified type name>::<method name>(<arg decl>)<return type decl>, "
+                "java -cp KeY.jar de.tud.cs.se.ds.specstr.cli.Main\t%s\t%s",
+                "[input Java file]", "[fully qualified method name]"),
+                "", options, "\nFully qualified method names:\n\t"
+                        + "<fully qualified type name>::<method name>(<arg decl>)<return type decl>"
                         + "\n\t<arg decl> is according to the field descriptors "
-                        + "in the JVM specification, for instance [ILjava.lang.Object;B "
-                        + "for an integer array, an Object and a boolean"),
-                options);
+                        + "in the JVM specification, for instance \"[ILjava.lang.Object;B\" "
+                        + "for an integer array, an Object and a boolean");
     }
 
 }
