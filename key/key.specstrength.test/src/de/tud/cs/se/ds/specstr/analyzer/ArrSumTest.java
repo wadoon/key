@@ -33,9 +33,8 @@ public class ArrSumTest extends AbstractAnalyzerTest {
             "arrSum/ArrSum.java", //
             "ArrSum::arrSumStd([I)[I");
 
-        assertEquals(37.5, result.strength(), 0.0d);
-        assertEquals(0d, result.programEffectsStrength(), 0.0d);
-        assertEquals(16.66, result.programEffectsAbstractStrength(), 0.01d);
+        assertEquals(0d, result.coveredStrength(), 0.0d);
+        assertEquals(16.66, result.strength(), 0.01d);
 
         assertEquals(4, result.numFacts());
         assertEquals(2, result.numUncoveredFacts());
@@ -47,8 +46,6 @@ public class ArrSumTest extends AbstractAnalyzerTest {
         assertEquals(1,
             result.getAbstractlyCoveredFactsOfType(FactType.POST_COND_FACT)
                     .size());
-        assertEquals(1,
-            result.getCoveredFactsOfType(FactType.LOOP_USE_CASE_FACT).size());
 
         final Fact absCoveredPostCondFact = result
                 .getAbstractlyCoveredFactsOfType(FactType.POST_COND_FACT)

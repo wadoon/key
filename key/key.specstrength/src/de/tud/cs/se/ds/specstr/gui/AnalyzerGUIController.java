@@ -458,7 +458,8 @@ public class AnalyzerGUIController {
             text = text.replaceAll("\n", "<br/>")
                     .replaceAll(" ", "&nbsp;").replaceAll(
                             "=+<br/>([^=]*?):<br/>=+",
-                            "<strong>$1</strong>");
+                            "<strong>$1</strong>")
+                    .replaceAll("\\*([^\\*]*?)\\*", "<em>$1</em>");
         }
 
         return text;

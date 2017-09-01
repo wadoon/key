@@ -18,7 +18,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.tud.cs.se.ds.specstr.rule.AnalyzeInvImpliesLoopEffectsRule;
 import de.tud.cs.se.ds.specstr.rule.AnalyzePostCondImpliesMethodEffectsRule;
-import de.tud.cs.se.ds.specstr.rule.AnalyzeUseCaseRule;
 import de.tud.cs.se.ds.specstr.rule.FactAnalysisRule;
 import de.tud.cs.se.ds.specstr.strategy.StrengthAnalysisStrategy;
 import de.uka.ilkd.key.proof.init.Profile;
@@ -54,8 +53,7 @@ public final class StrengthAnalysisSEProfile extends SymbolicExecutionJavaProfil
         return super.initBuiltInRules()
                 .append(AnalyzeInvImpliesLoopEffectsRule.INSTANCE)
                 .append(AnalyzePostCondImpliesMethodEffectsRule.INSTANCE)
-                .append(FactAnalysisRule.INSTANCE)
-                .append(AnalyzeUseCaseRule.INSTANCE);
+                .append(FactAnalysisRule.INSTANCE);
     }
 
     @Override

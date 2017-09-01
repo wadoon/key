@@ -30,7 +30,10 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import de.tud.cs.se.ds.specstr.profile.StrengthAnalysisSEProfile;
-import de.tud.cs.se.ds.specstr.rule.*;
+import de.tud.cs.se.ds.specstr.rule.AbstractAnalysisRule;
+import de.tud.cs.se.ds.specstr.rule.AnalyzeInvImpliesLoopEffectsRule;
+import de.tud.cs.se.ds.specstr.rule.AnalyzePostCondImpliesMethodEffectsRule;
+import de.tud.cs.se.ds.specstr.rule.FactAnalysisRule;
 import de.tud.cs.se.ds.specstr.util.GeneralUtilities;
 import de.tud.cs.se.ds.specstr.util.JavaTypeInterface;
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -45,7 +48,6 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.macros.GeneralSimplificationMacro;
 import de.uka.ilkd.key.macros.TryCloseMacro;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Goal;
@@ -56,6 +58,7 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
+import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
@@ -199,6 +202,21 @@ public class Analyzer {
      *             {@link IOException}.
      */
     public AnalyzerResult analyze() {
+        return analyze(Optional.empty());
+    }
+
+    /**
+     * Performs the actual analysis.
+     *
+     * @param existingProof
+     *            An existing {@link Optional} {@link Proof} object to
+     *            re-analyze, in particular after interaction.
+     * @return An {@link AnalyzerResult} object.
+     * @throws RuntimeException
+     *             If the results file could not be saved due to an
+     *             {@link IOException}.
+     */
+    public AnalyzerResult analyze(Optional<Proof> existingProof) {
         LOGGER.info("Analyzing Java file %s", file);
 
         final ProgramMethod method = findMethod();
@@ -206,44 +224,30 @@ public class Analyzer {
         LOGGER.info("Analyzing method %s::%s%s", className, methodName,
                 methodTypeStr);
 
-        LOGGER.trace("Building proof tree");
-        // Finish symbolic execution
-        seIf.finishSEForMethod(method);
-        final Proof proof = seIf.proof();
-
-        LOGGER.trace("Collecting facts");
-
         // TODO: Finishing SE with the macro has the side effect that some goals
         // that would be trivially closable, like exception branches, are closed
         // late since the macro is focusing on SE.
 
-        final List<Node> postConditionNodes = new ArrayList<>();
-        final List<Fact> facts = new ArrayList<>();
+        LOGGER.trace("Building proof tree");
+        // Finish symbolic execution
+        seIf.finishSEForMethod(method);
+        final Proof proof = existingProof.orElse(seIf.proof());
 
-        int unclosedLoopInvPreservedGoals = 0;
-        if (proofHasLoopInvApp(proof)) {
-            // Post condition facts. Those have to be extracted *before* the use
-            // case facts, since the goals might change that are analyzed for
-            // the use case
-            extractPostCondFacts(proof, facts);
-
-            // Find "preserves" and "use case" branches
-            final List<Node> preservedNodes = new ArrayList<>();
-
-            extractPreservedAndUseCaseNodes(proof, preservedNodes,
-                    postConditionNodes);
-
-            // Loop facts
-            unclosedLoopInvPreservedGoals = //
-                    extractLoopBodyFactsAndShowValidity(//
-                            proof, preservedNodes, facts);
-            extractUseCaseFacts(//
-                    proof, postConditionNodes, facts);
+        FactExtractionResult fer;
+        if (existingProof.isPresent()) {
+            LOGGER.trace("Collecting facts");
+            fer = extractFactsFromProofTree(proof);
         }
         else {
-            // Post condition facts
-            extractPostCondFacts(proof, facts);
+            LOGGER.trace("Applying analysis rules and collecting facts");
+            fer = applyAnalysisRules(proof);
         }
+
+        final List<Fact> facts = fer.getFacts();
+        final int unclosedLoopInvPreservedGoals =
+                fer.getUnclosedLoopInvPreservedGoals();
+        final int unclosedPostCondSatisfiedGoals =
+                fer.getUnclosedPostCondSatisfiedGoals();
 
         LOGGER.info("Collected %s facts", facts.size());
 
@@ -282,7 +286,159 @@ public class Analyzer {
 
         return new AnalyzerResult(coveredFacts, abstractlyCoveredFacts,
                 unCoveredFacts, problematicExceptions,
-                unclosedLoopInvPreservedGoals);
+                unclosedLoopInvPreservedGoals, unclosedPostCondSatisfiedGoals);
+    }
+
+    /**
+     * Extracts facts from a {@link Proof} tree after exhaustive symbolic
+     * execution.
+     *
+     * @param proof
+     *            The {@link Proof} tree to extract facts from.
+     * @return A {@link FactExtractionResult}.
+     */
+    private FactExtractionResult extractFactsFromProofTree(Proof proof) {
+        final RuleProofVisitor analysisRuleVisitor =
+                new RuleProofVisitor(AbstractAnalysisRule.class);
+        proof.breadthFirstSearch(proof.root(), analysisRuleVisitor);
+
+        final List<Fact> facts = new ArrayList<>();
+        int unclosedLoopInvPreservedGoals = 0;
+        int unclosedPostCondSatisfiedGoals = 0;
+
+        for (final Node analysisRuleNode : analysisRuleVisitor.result()) {
+            final String readablePathCond =
+                    extractReadablePathCondition(
+                            analysisRuleNode.parent());
+
+            final Rule analysisRule =
+                    analysisRuleNode.getAppliedRuleApp().rule();
+
+            assert analysisRule instanceof AbstractAnalysisRule;
+
+            final FactType factType;
+            if (analysisRule instanceof AnalyzeInvImpliesLoopEffectsRule) {
+                factType = FactType.LOOP_BODY_FACT;
+            }
+            else if (analysisRule instanceof AnalyzePostCondImpliesMethodEffectsRule) {
+                factType = FactType.POST_COND_FACT;
+            }
+            else {
+                factType = null;
+                GeneralUtilities.logErrorAndThrowRTE(LOGGER,
+                        "Unknown %s: %s",
+                        AbstractAnalysisRule.class.getName(),
+                        analysisRule.getClass().getName());
+            }
+
+            final Iterable<Node> factNodes = GeneralUtilities
+                    .toStream((() -> analysisRuleNode.childrenIterator()))
+                    .collect(Collectors.toList());
+
+            for (final Node factNode : factNodes) {
+                final String branchLabel =
+                        factNode.getNodeInfo().getBranchLabel();
+
+                if (factNode.getAppliedRuleApp() == null
+                        || !factNode.getAppliedRuleApp().rule()
+                                .equals(FactAnalysisRule.INSTANCE)) {
+                    // This is a "post condition satisfied" / "loop invariant
+                    // preserved" node and no FactAnalysisRule node -- has to be
+                    // treated specially.
+
+                    seIf.applyMacro(new TryCloseMacro(10000), factNode);
+
+                    if (!factNode.isClosed()) {
+                        if (branchLabel.equals(
+                                AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL)) {
+                            unclosedLoopInvPreservedGoals++;
+                        }
+                        else if (branchLabel.equals(
+                                AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL)) {
+                            unclosedPostCondSatisfiedGoals++;
+                        }
+                        else {
+                            GeneralUtilities.logErrorAndThrowRTE(LOGGER,
+                                    "Unknown / unexpected branch label \"%s\" where %s or %s was expected.",
+                                    branchLabel,
+                                    AbstractAnalysisRule.INVARIANT_PRESERVED_BRANCH_LABEL,
+                                    AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL);
+                        }
+                    }
+
+                    continue;
+                }
+
+                final String factTitle = branchLabel.split("\"")[1];
+
+                final Iterable<Node> factAnalysisCaseNodes =
+                        GeneralUtilities
+                                .toStream((() -> factNode
+                                        .childrenIterator()))
+                                .collect(Collectors.toList());
+
+                if (factType != FactType.POST_COND_FACT &&
+                        factCanBeDiscarded(factAnalysisCaseNodes)) {
+                    // Discard the fact -- too easy ;)
+                    continue;
+                }
+
+                facts.add(new Fact(factTitle,
+                        readablePathCond, factType,
+                        FactAnalysisRule
+                                .getFactCoveredNode(factAnalysisCaseNodes),
+                        FactAnalysisRule
+                                .getFactAbstractlyCoveredNode(
+                                        factAnalysisCaseNodes),
+                        FactAnalysisRule
+                                .getFactAbstractlyCoveredVerifNode(
+                                        factAnalysisCaseNodes)));
+            }
+        }
+
+        return new FactExtractionResult(facts, unclosedLoopInvPreservedGoals,
+                unclosedPostCondSatisfiedGoals);
+    }
+
+    /**
+     * Applies analysis rules and extracts facts from a {@link Proof} tree after
+     * exhaustive symbolic execution.
+     *
+     * @param proof
+     *            The {@link Proof} tree to extract facts from.
+     * @return A {@link FactExtractionResult}.
+     */
+    private FactExtractionResult applyAnalysisRules(Proof proof) {
+        final List<Node> postConditionNodes = new ArrayList<>();
+        final List<Fact> facts = new ArrayList<>();
+
+        int unclosedLoopInvPreservedGoals = 0;
+        int unclosedPostCondGoals = 0;
+
+        if (proofHasLoopInvApp(proof)) {
+            // Post condition facts. Those have to be extracted *before* the use
+            // case facts, since the goals might change that are analyzed for
+            // the use case
+            unclosedPostCondGoals = extractPostCondFacts(proof, facts);
+
+            // Find "preserves" and "use case" branches
+            final List<Node> preservedNodes = new ArrayList<>();
+
+            extractPreservedAndUseCaseNodes(proof, preservedNodes,
+                    postConditionNodes);
+
+            // Loop facts
+            unclosedLoopInvPreservedGoals = //
+                    extractLoopBodyFactsAndShowValidity(//
+                            proof, preservedNodes, facts);
+        }
+        else {
+            // Post condition facts
+            extractPostCondFacts(proof, facts);
+        }
+
+        return new FactExtractionResult(facts, unclosedLoopInvPreservedGoals,
+                unclosedPostCondGoals);
     }
 
     /**
@@ -403,69 +559,6 @@ public class Analyzer {
     }
 
     /**
-     * Extracts "use case facts", that is those of the branches where the method
-     * post condition should be shown. The presence of uncovered use case facts
-     * indicates that either the post condition is wrong, or (which we usually
-     * assume) the invariant is too weak for the post condition.
-     *
-     * @param proof
-     *            The {@link Proof} object.
-     * @param useCaseNodes
-     *            The {@link List} of use case nodes.
-     * @param facts
-     *            A {@link List} of {@link Fact}s; the method will write
-     *            {@link Fact}s into this list.
-     */
-    private void extractUseCaseFacts(final Proof proof,
-            final List<Node> useCaseNodes, final List<Fact> facts) {
-        final Services services = proof.getServices();
-
-        useCaseNodes.removeIf(n -> !n.getNodeInfo().getBranchLabel().equals(
-                AbstractAnalysisRule.POSTCONDITION_SATISFIED_BRANCH_LABEL));
-
-        for (final Node n : useCaseNodes) {
-            final String readablePathCond = extractReadablePathCondition(
-                    n.parent());
-
-            seIf.applyMacro(new GeneralSimplificationMacro(), n);
-            final Node newNode = n.leavesIterator().next();
-
-            final Optional<PosInOccurrence> maybePioOfApplySeqFor = //
-                    getPioOfFormulaWhichHadSELabel(newNode);
-            assert maybePioOfApplySeqFor.isPresent();
-
-            final Goal newGoal = proof.getGoal(newNode);
-            final List<Node> factNodes = GeneralUtilities
-                    .toStream(newGoal.apply(AnalyzeUseCaseRule.INSTANCE
-                            .createApp(maybePioOfApplySeqFor.get(), services)
-                            .forceInstantiate(newGoal)))
-                    .map(g -> g.node()).collect(Collectors.toList());
-
-            for (final Node factNode : factNodes) {
-                final Iterable<Node> factAnalysisNodes = //
-                        GeneralUtilities.toStream(proof.getGoal(factNode)
-                                .apply(FactAnalysisRule.INSTANCE.createApp(null,
-                                        proof.getServices())))
-                                .map(g -> g.node())
-                                .collect(Collectors.toList());
-
-                if (factCanBeDiscarded(factAnalysisNodes)) {
-                    // Discard the fact -- too easy ;)
-                    continue;
-                }
-
-                final String branchLabel = factNode.getNodeInfo()
-                        .getBranchLabel();
-
-                facts.add(new Fact(branchLabel.split("\"")[1], readablePathCond,
-                        FactType.LOOP_USE_CASE_FACT,
-                        FactAnalysisRule.getFactCoveredNode(factAnalysisNodes),
-                        null, null));
-            }
-        }
-    }
-
-    /**
      * Extracts post condition {@link Fact}s, that is equations about the final
      * state after the method execution (or the use case in the presence of a
      * loop).
@@ -475,8 +568,11 @@ public class Analyzer {
      * @param facts
      *            A {@link List} of {@link Fact}s; the method will write
      *            {@link Fact}s into this list.
+     * @return The number of unclosed "post condition satisfied" goals.
      */
-    private void extractPostCondFacts(Proof proof, List<Fact> facts) {
+    private int extractPostCondFacts(Proof proof, List<Fact> facts) {
+        int numPostCondGoalsNotClosed = 0;
+
         for (Goal g : proof.openGoals()) {
             final Node postCondNode = g.node();
             final Optional<PosInOccurrence> maybePio = //
@@ -528,8 +624,26 @@ public class Analyzer {
                             FactAnalysisRule.getFactAbstractlyCoveredVerifNode(
                                     factAnalysisNodes)));
                 }
+                else {
+                    // That's a post condition branch -- try to close it
+                    seIf.applyMacro(new TryCloseMacro(10000),
+                            analysisNode);
+                    if (!analysisNode.isClosed()) {
+                        numPostCondGoalsNotClosed++;
+                    }
+                }
             }
         }
+
+        if (numPostCondGoalsNotClosed > 0) {
+            LOGGER.warn(
+                    "Specification (method precondition / loop invariant) could "
+                            + "be too weak, or post condition / program wrong: "
+                            + "%s open preserves goals",
+                    numPostCondGoalsNotClosed);
+        }
+
+        return numPostCondGoalsNotClosed;
     }
 
     /**
@@ -894,12 +1008,16 @@ public class Analyzer {
                   + "==========================================\n",
                     result.unclosedLoopInvPreservedGoals()));
             // @formatter:on
+        }
 
-            final PrintStream fPs = ps;
-            result.problematicExceptions().forEach(e -> {
-                fPs.println(e);
-                fPs.println();
-            });
+        if (result.unclosedPostCondSatisfiedGoals() > 0) {
+            // @formatter:off
+            ps.println(String.format(
+                    "=================================================\n"
+                  + "Open \"post condition satisfied\" branches: *%s*:\n"
+                  + "=================================================\n",
+                    result.unclosedPostCondSatisfiedGoals()));
+            // @formatter:on
         }
 
         if (result.problematicExceptions().size() > 0) {
@@ -943,7 +1061,7 @@ public class Analyzer {
                 fPs.println();
             });
         }
-        
+
         // @formatter:off
         ps.println("========\n"
                  + "Summary:\n"
@@ -952,14 +1070,71 @@ public class Analyzer {
 
         ps.printf(
                 "Covered %s (%s concretely, %s abstractly) out of %s facts\n"
-                        + "Overall Strength:          %.2f%%\n"
-                        + "Concrete Effects Strength: %.2f%%\n"
-                        + "Abstract Effects Strength: %.2f%%\n",
+                        + "Strength:          %.2f%%\n"
+                        + "Concrete Strength: %.2f%%\n",
                 result.numCoveredFacts() + result.numAbstractlyCoveredFacts(),
                 result.numCoveredFacts(), result.numAbstractlyCoveredFacts(),
                 result.numFacts(), result.strength(),
-                result.programEffectsStrength(),
-                result.programEffectsAbstractStrength());
+                result.coveredStrength());
+    }
+
+    /**
+     * Result of extracting {@link Fact}s from a {@link Proof} tree.
+     *
+     * @author Dominic Steinhoefel
+     */
+    private static class FactExtractionResult {
+        /**
+         * @see #getFacts()
+         */
+        private final List<Fact> facts;
+
+        /**
+         * @see #getUnclosedLoopInvPreservedGoals()
+         */
+        private final int unclosedLoopInvPreservedGoals;
+
+        /**
+         * @see #getUnclosedPostCondSatisfiedGoals()
+         */
+        private final int unclosedPostCondSatisfiedGoals;
+
+        /**
+         * Constructor.
+         *
+         * @param facts
+         * @param unclosedExceptionGoals
+         */
+        public FactExtractionResult(List<Fact> facts,
+                int unclosedExceptionGoals,
+                int unclosedPostCondSatisfiedGoals) {
+            this.facts = facts;
+            this.unclosedLoopInvPreservedGoals = unclosedExceptionGoals;
+            this.unclosedPostCondSatisfiedGoals =
+                    unclosedPostCondSatisfiedGoals;
+        }
+
+        /**
+         * @return the facts
+         */
+        public List<Fact> getFacts() {
+            return facts;
+        }
+
+        /**
+         * @return the number of unclosed "loop inv preserved" goals
+         */
+        public int getUnclosedLoopInvPreservedGoals() {
+            return unclosedLoopInvPreservedGoals;
+        }
+
+        /**
+         * @return the number of unclosed "post condition satisfied" goals
+         */
+        public int getUnclosedPostCondSatisfiedGoals() {
+            return unclosedPostCondSatisfiedGoals;
+        }
+
     }
 
     /**
@@ -1011,11 +1186,7 @@ public class Analyzer {
     public static enum FactType {
         /** Loop body fact, i.e. an equation of the preserved part. */
         LOOP_BODY_FACT,
-        /**
-         * Loop use case fact, i.e. a part of the post condition that is to be
-         * proven using the invariant and remaining state changes.
-         */
-        LOOP_USE_CASE_FACT,
+
         /**
          * Post condition fact, i.e. a part of the final state after method
          * execution that should be shown using the post condition.
@@ -1187,8 +1358,6 @@ public class Analyzer {
             switch (ft) {
             case LOOP_BODY_FACT:
                 return "Loop body fact";
-            case LOOP_USE_CASE_FACT:
-                return "Loop use case fact";
             case POST_COND_FACT:
                 return "Post condition implies final state fact";
             default:
@@ -1278,6 +1447,12 @@ public class Analyzer {
         private final int unclosedLoopInvPreservedGoals;
 
         /**
+         * The number of "post condition satisfied" goals that couldn't be
+         * closed.
+         */
+        private final int unclosedPostCondSatisfiedGoals;
+
+        /**
          * A {@link List} of {@link ExceptionResult}s for exception branches
          * that couldn't be closed.
          */
@@ -1296,16 +1471,21 @@ public class Analyzer {
          *            See {@link #problematicExceptions}
          * @param unclosedLoopInvPreservedGoals
          *            See {@link #unclosedLoopInvPreservedGoals}
+         * @param unclosedPostCondSatisfiedGoals
+         *            See {@link #unclosedPostCondSatisfiedGoals}
          */
         public AnalyzerResult(List<Fact> coveredFacts,
                 List<Fact> abstractlyCoveredFacts, List<Fact> unCoveredFacts,
                 List<ExceptionResult> problematicExceptions,
-                int unclosedLoopInvPreservedGoals) {
+                int unclosedLoopInvPreservedGoals,
+                int unclosedPostCondSatisfiedGoals) {
             this.coveredFacts = coveredFacts;
             this.abstractlyCoveredFacts = abstractlyCoveredFacts;
             this.uncoveredFacts = unCoveredFacts;
             this.unclosedLoopInvPreservedGoals = unclosedLoopInvPreservedGoals;
             this.problematicExceptions = problematicExceptions;
+            this.unclosedPostCondSatisfiedGoals =
+                    unclosedPostCondSatisfiedGoals;
         }
 
         public List<Fact> getCoveredFacts() {
@@ -1405,6 +1585,14 @@ public class Analyzer {
         }
 
         /**
+         * @return The number of "post condition satisfied" goals that couldn't
+         *         be closed.
+         */
+        public int unclosedPostCondSatisfiedGoals() {
+            return unclosedPostCondSatisfiedGoals;
+        }
+
+        /**
          * @return The strength of this {@link AnalyzerResult} as a percentage
          *         value. Includes abstractly covered facts that are weighted by
          *         {@link #ABSTRACTLY_COVERED_WEIGHT}.
@@ -1423,62 +1611,6 @@ public class Analyzer {
          */
         public double coveredStrength() {
             return 100d * ((double) numCoveredFacts()) / ((double) numFacts());
-        }
-
-        /**
-         * @return A strength value considering only loop body and post cond
-         *         facts (ignoring use case facts); only concretely covered
-         *         facts are counted as covered (abstractly ignored).
-         */
-        public double programEffectsStrength() {
-            final double numCovLoopBodyFacts = getCoveredFactsOfType(
-                    FactType.LOOP_BODY_FACT).size();
-            final double numCovPostCondFacts = getCoveredFactsOfType(
-                    FactType.POST_COND_FACT).size();
-            final double numAbsCovLoopBodyFacts =
-                    getAbstractlyCoveredFactsOfType(
-                            FactType.LOOP_BODY_FACT).size();
-            final double numAbsCovPostCondFacts =
-                    getAbstractlyCoveredFactsOfType(
-                            FactType.POST_COND_FACT).size();
-            final double numUncovLoopBodyFacts = getUncoveredFactsOfType(
-                    FactType.LOOP_BODY_FACT).size();
-            final double numUncovPostCondFacts = getUncoveredFactsOfType(
-                    FactType.POST_COND_FACT).size();
-
-            return 100d * (numCovLoopBodyFacts + numCovPostCondFacts)
-                    / (numCovLoopBodyFacts + numCovPostCondFacts
-                            + numAbsCovLoopBodyFacts + numAbsCovPostCondFacts
-                            + numUncovLoopBodyFacts + numUncovPostCondFacts);
-        }
-
-        /**
-         * @return A strength value considering only loop body and post cond
-         *         facts (ignoring use case facts); abstractly covered facts are
-         *         included (weighted by {@link #ABSTRACTLY_COVERED_WEIGHT}).
-         */
-        public double programEffectsAbstractStrength() {
-            final double numCovLoopBodyFacts = getCoveredFactsOfType(
-                    FactType.LOOP_BODY_FACT).size();
-            final double numCovPostCondFacts = getCoveredFactsOfType(
-                    FactType.POST_COND_FACT).size();
-            final double numAbsCovLoopBodyFacts =
-                    getAbstractlyCoveredFactsOfType(
-                            FactType.LOOP_BODY_FACT).size();
-            final double numAbsCovPostCondFacts =
-                    getAbstractlyCoveredFactsOfType(
-                            FactType.POST_COND_FACT).size();
-            final double numUncovLoopBodyFacts = getUncoveredFactsOfType(
-                    FactType.LOOP_BODY_FACT).size();
-            final double numUncovPostCondFacts = getUncoveredFactsOfType(
-                    FactType.POST_COND_FACT).size();
-
-            return 100d * (numCovLoopBodyFacts + numCovPostCondFacts
-                    + (ABSTRACTLY_COVERED_WEIGHT * (numAbsCovLoopBodyFacts
-                            + numAbsCovPostCondFacts)))
-                    / (numCovLoopBodyFacts + numCovPostCondFacts
-                            + numAbsCovLoopBodyFacts + numAbsCovPostCondFacts
-                            + numUncovLoopBodyFacts + numUncovPostCondFacts);
         }
     }
 
