@@ -52,7 +52,6 @@ public class DependencyClusterPOFormulaFactory {
         
         ImmutableList<InfFlowSpec> infFlowSpecs = ImmutableSLList.<InfFlowSpec>nil();
         
-        //TODO JK think about how to handle multiple clusters! Check whether all cluster specs make it to this point!
         DependencyClusterSpec spec = contract.getSpecs();
         InfFlowSpec infFlowSpec = new InfFlowSpec(spec.getLowState(), spec.getLowState(), spec.getNewObjects());
         infFlowSpecs = infFlowSpecs.append(infFlowSpec);

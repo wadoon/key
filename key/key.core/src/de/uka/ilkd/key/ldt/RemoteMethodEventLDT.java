@@ -62,6 +62,8 @@ public class RemoteMethodEventLDT extends LDT {
 	private final LocationVariable currentParams;
 	
 	private final Sort eventSort;
+    private final Sort calltypeSort;
+    private final Sort methodSort;
 
 	public RemoteMethodEventLDT (TermServices services) {
 		super(NAME, services);
@@ -97,6 +99,8 @@ public class RemoteMethodEventLDT extends LDT {
 		currentParams = (LocationVariable) services.getNamespaces().programVariables().lookup(CURRENT_PARAMS_NAME);
 		
 		eventSort = (Sort) services.getNamespaces().sorts().lookup("Event");
+		calltypeSort = (Sort) services.getNamespaces().sorts().lookup("EventType");
+		methodSort = (Sort) services.getNamespaces().sorts().lookup(METHOD_SORT);
 	}
 	
 	public Sort eventSort() {
@@ -288,5 +292,13 @@ public class RemoteMethodEventLDT extends LDT {
 		assert false : "RemoteMethodEventLDT: No Types are associated with Events.";
 		return null; // add Types to java.abstraction.PrimitiveType?
 	}
+
+    public Sort getCalltypeSort() {
+        return calltypeSort;
+    }
+
+    public Sort getMethodSort() {
+        return methodSort;
+    }
 
 }

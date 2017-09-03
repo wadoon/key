@@ -45,10 +45,10 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
         assert proofConfig == null;
 
         final Services proofServices = postInit(); 
-        final TermBuilder tb = proofServices.getTermBuilder();
         
-        //TODO JK build PO here!
-        assignPOTerms(tb.equals(tb.var(proofServices.getTypeConverter().getRemoteMethodEventLDT().getCurrentParams()),tb.var(proofServices.getTypeConverter().getRemoteMethodEventLDT().getCurrentParams())));        
+        final ClusterSatisfactionPOFormulaFactory factory = new ClusterSatisfactionPOFormulaFactory(contract, proofServices);
+        
+        assignPOTerms(factory.completeFormula());        
     }
 
     @Override
