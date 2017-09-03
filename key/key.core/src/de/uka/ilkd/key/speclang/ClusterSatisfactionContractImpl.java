@@ -337,4 +337,9 @@ public class ClusterSatisfactionContractImpl
         return clusterSatisfactionSpec;
     }
 
+    @Override
+    public Term getMod() {
+        return origMod;
+    }
+
 }

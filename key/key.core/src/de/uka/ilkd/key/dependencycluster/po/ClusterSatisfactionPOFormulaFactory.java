@@ -13,6 +13,7 @@ import de.uka.ilkd.key.speclang.ClusterSatisfactionContract;
 
 public class ClusterSatisfactionPOFormulaFactory {
 
+    private final ClusterSatisfactionContract contract;
     private final Services proofServices;
     private final TermBuilder tb;
     private final RemoteMethodEventLDT eventLDT;
@@ -26,15 +27,16 @@ public class ClusterSatisfactionPOFormulaFactory {
             ClusterSatisfactionContract contract, Services proofServices) {
         this.proofServices = proofServices;
         this.tb = proofServices.getTermBuilder();
+        this.contract = contract;
         eventLDT = proofServices.getTypeConverter().getRemoteMethodEventLDT();
         heapLDT = proofServices.getTypeConverter().getHeapLDT();
         seqLDT = proofServices.getTypeConverter().getSeqLDT();
         a = new Event("_A");
         b = new Event("_B");
     }
-    
+
     public Term premise() {
-        return tb.and(wellformed());
+        return tb.and(wellformed(), anon());
     }
     
     public Term consequence() {
@@ -43,6 +45,10 @@ public class ClusterSatisfactionPOFormulaFactory {
     
     public Term wellformed() {
         return tb.and(a.wellformed(), b.wellformed());
+    }
+    
+    public Term anon() {
+        return tb.and(a.anon(), b.anon());
     }
     
     public Term completeFormula() {
@@ -96,6 +102,14 @@ public class ClusterSatisfactionPOFormulaFactory {
 
         public Term wellformedCaller() {
             return tb.not(tb.equals(caller, tb.NULL()));
+        }
+        
+        public Term anon() {
+            //TODO get assignable set from somewhere...
+            Term mod = contract.getMod();
+            //TODO JK debug output
+            System.out.println(mod);
+            return tb.equals(heapPost, tb.anon(heap2, mod, heap));
         }
     }
 
