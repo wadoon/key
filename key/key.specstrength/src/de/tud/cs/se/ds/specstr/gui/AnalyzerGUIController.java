@@ -204,11 +204,8 @@ public class AnalyzerGUIController {
         btnFileEdit.disableProperty()
                 .bind(javaFileProperty.isNull().or(interfaceDisabledProperty));
 
-        btnOpenKeY.disableProperty()
-                .bind(proofProperty.isNull().or(interfaceDisabledProperty));
-
-        btnReloadProof.disableProperty()
-                .bind(proofFileProperty.isNull().or(interfaceDisabledProperty));
+        btnRecent.disableProperty().bind(
+                javaFileProperty.isNull());
 
         cmbMethodChooser.disableProperty()
                 .bind(javaFileProperty.isNull().or(interfaceDisabledProperty));
@@ -218,7 +215,15 @@ public class AnalyzerGUIController {
                         .selectedItemProperty().isNull()
                         .or(interfaceDisabledProperty));
 
-        btnRecent.disableProperty().bind(javaFileProperty.isNull());
+        btnOpenKeY.disableProperty()
+                .bind(proofProperty.isNull()
+                        .or(btnStartAnalysis.disabledProperty())
+                        .or(interfaceDisabledProperty));
+
+        btnReloadProof.disableProperty()
+                .bind(proofFileProperty.isNull()
+                        .or(btnOpenKeY.disableProperty())
+                        .or(interfaceDisabledProperty));
     }
 
     ////// FXML event handlers
