@@ -62,7 +62,7 @@ public class UpdateSimplificationMacro extends
 	}
 
 	@Override
-	protected Set<String> getAdmittedRuleNames(Proof proof) {
+    protected Set<String> getAdmittedRuleNames(Proof proof) {
 		return ADMITTED_RULE_NAMES_AS_SET;
 	}
 

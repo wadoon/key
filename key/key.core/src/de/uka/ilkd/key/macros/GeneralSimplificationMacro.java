@@ -19,9 +19,16 @@ import de.uka.ilkd.key.rule.*;
 public class GeneralSimplificationMacro extends
         AbstractPropositionalExpansionMacro {
 
+    /**
+     * Name for this {@link ProofMacro}.
+     */
     public static final String SIMPLIFICATION_ONLY =
             "Simplification Only";
 
+    /**
+     * The sets of {@link Rule}s that should be activated by this
+     * {@link ProofMacro}.
+     */
     private static final ImmutableList<String> RULE_SETS =
             ImmutableSLList.<String> nil() //
                     .append("concrete")
@@ -31,6 +38,9 @@ public class GeneralSimplificationMacro extends
                     .append("update_join")
                     .append("elimQuantifier");
 
+    /**
+     * {@link Rule} sets that should explicitely be excluded.
+     */
     private static final ImmutableList<String> EXCLUDED_RULE_SETS =
             ImmutableSLList.<String> nil();
 
@@ -91,8 +101,7 @@ public class GeneralSimplificationMacro extends
                 for (RuleSet rs : app.taclet().getRuleSets()) {
                     if (rs.name().toString().equals(ruleSetName)) {
                         accept = true;
-                    }
-                    else if (EXCLUDED_RULE_SETS
+                    } else if (EXCLUDED_RULE_SETS
                             .contains(rs.name().toString())) {
                         accept = false;
                         break;
