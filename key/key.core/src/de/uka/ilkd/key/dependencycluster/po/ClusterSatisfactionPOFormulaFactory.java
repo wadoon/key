@@ -9,6 +9,7 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.ClusterSatisfactionContract;
 
 public class ClusterSatisfactionPOFormulaFactory {
@@ -21,6 +22,9 @@ public class ClusterSatisfactionPOFormulaFactory {
     private final SeqLDT seqLDT;
     private final Event a;
     private final Event b;
+    
+    private final Term callingComp;
+    private final Term self;
 
 
     public ClusterSatisfactionPOFormulaFactory(
@@ -33,10 +37,26 @@ public class ClusterSatisfactionPOFormulaFactory {
         seqLDT = proofServices.getTypeConverter().getSeqLDT();
         a = new Event("_A");
         b = new Event("_B");
+        
+        callingComp = tb.var(new LocationVariable(new ProgramElementName(tb.newName("callingComp")), new KeYJavaType(proofServices.getJavaInfo().objectSort())));
+    
+        //TODO JK is this the proper way to get a self var here? Seems like overkill, take another look
+        ProofObligationVars symbExecVars =
+                new ProofObligationVars(contract.getTarget(), contract.getKJT(), proofServices);
+        
+        self = symbExecVars.pre.self;
+    }
+    
+    public Term selfNotNull() {
+        return tb.not(tb.equals(self, tb.NULL()));
+    }
+    
+    public Term callingCompNotNull() {
+        return tb.not(tb.equals(callingComp, tb.NULL()));
     }
 
     public Term premise() {
-        return tb.and(wellformed(), anon());
+        return tb.and(selfNotNull(), callingCompNotNull(), wellformed(), anon());
     }
     
     public Term consequence() {
@@ -107,8 +127,6 @@ public class ClusterSatisfactionPOFormulaFactory {
         public Term anon() {
             //TODO get assignable set from somewhere...
             Term mod = contract.getMod();
-            //TODO JK debug output
-            System.out.println(mod);
             return tb.equals(heapPost, tb.anon(heap2, mod, heap));
         }
     }
