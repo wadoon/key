@@ -107,6 +107,20 @@ public class Analyzer {
     private Optional<File> outProofFile;
 
     /**
+     * An {@link Optional} {@link AnalyzerResult} with the result of the most
+     * resent {@link Analyzer} run; only is non-empty after {@link #analyze()} /
+     * {@link #analyze(Optional)} has been called.
+     */
+    private Optional<AnalyzerResult> analyzerResult = Optional.empty();
+
+    /**
+     * An {@link Optional} with a {@link Proof} of the most resent
+     * {@link Analyzer} run; only is non-empty after {@link #analyze()} /
+     * {@link #analyze(Optional)} has been called.
+     */
+    private Optional<Proof> analyzerProofResult = Optional.empty();
+
+    /**
      * Constructor.
      *
      * @param file
@@ -194,7 +208,32 @@ public class Analyzer {
     }
 
     /**
-     * Performs the actual analysis.
+     * An {@link Optional} {@link AnalyzerResult} with the result of the most
+     * resent {@link Analyzer} run; only is non-empty after {@link #analyze()} /
+     * {@link #analyze(Optional)} has been called.
+     *
+     * @return The most recent {@link AnalyzerResult} or an empty
+     *         {@link Optional}.
+     */
+    public Optional<AnalyzerResult> result() {
+        return analyzerResult;
+    }
+
+    /**
+     * An {@link Optional} with a {@link Proof} of the most resent
+     * {@link Analyzer} run; only is non-empty after {@link #analyze()} /
+     * {@link #analyze(Optional)} has been called.
+     *
+     * @return The most recent {@link Proof} or an empty {@link Optional}.
+     */
+    public Optional<Proof> proof() {
+        return analyzerProofResult;
+    }
+
+    /**
+     * Performs the actual analysis, and sets the internal
+     * {@link AnalyzerResult}, which is also returned to the result. This result
+     * can afterward be obtained by calling {@link #result()}.
      *
      * @return An {@link AnalyzerResult} object.
      * @throws RuntimeException
@@ -206,7 +245,35 @@ public class Analyzer {
     }
 
     /**
-     * Performs the actual analysis.
+     * Performs the actual analysis, and sets the internal
+     * {@link AnalyzerResult}, which is also returned to the result. This result
+     * can afterward be obtained by calling {@link #result()}.
+     *
+     * @return An {@link AnalyzerResult} object.
+     * @throws RuntimeException
+     *             If the results file could not be saved due to an
+     *             {@link IOException}.
+     */
+    public AnalyzerResult analyze(File proofFile) {
+        assert proofFile != null;
+        try {
+            seIf = new SymbExInterface(file, KeYEnvironment.load(proofFile));
+            return analyze(Optional.of(seIf.keyEnvironment().getLoadedProof()));
+        }
+        catch (ProblemLoaderException e) {
+            GeneralUtilities.logErrorAndThrowRTE(LOGGER,
+                    "%s while loading proof file %s:\n%s",
+                    e.getClass().getSimpleName(), proofFile.getName(),
+                    e.getMessage());
+        }
+
+        return analyze(Optional.empty());
+    }
+
+    /**
+     * Performs the actual analysis, and sets the internal
+     * {@link AnalyzerResult}, which is also returned to the result. This result
+     * can afterward be obtained by calling {@link #result()}.
      *
      * @param existingProof
      *            An existing {@link Optional} {@link Proof} object to
@@ -284,9 +351,15 @@ public class Analyzer {
 
         LOGGER.trace("Finished analysis of Java file %s", file);
 
-        return new AnalyzerResult(coveredFacts, abstractlyCoveredFacts,
+        final AnalyzerResult result = new AnalyzerResult(coveredFacts,
+                abstractlyCoveredFacts,
                 unCoveredFacts, problematicExceptions,
                 unclosedLoopInvPreservedGoals, unclosedPostCondSatisfiedGoals);
+
+        this.analyzerResult = Optional.of(result);
+        this.analyzerProofResult = Optional.of(proof);
+
+        return result;
     }
 
     /**

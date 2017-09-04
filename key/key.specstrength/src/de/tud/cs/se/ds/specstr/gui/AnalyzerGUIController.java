@@ -50,6 +50,7 @@ import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
@@ -102,6 +103,9 @@ public class AnalyzerGUIController {
     private Button btnStartAnalysis;
 
     @FXML
+    private Button btnReloadProof;
+
+    @FXML
     private WebView wvInfo;
 
     ////// Private constants
@@ -120,6 +124,12 @@ public class AnalyzerGUIController {
             new SimpleBooleanProperty(false);
 
     private ObjectProperty<File> proofFileProperty =
+            new SimpleObjectProperty<>();
+
+    private ObjectProperty<Analyzer> analyzerProperty =
+            new SimpleObjectProperty<>();
+
+    private ObjectProperty<Proof> proofProperty =
             new SimpleObjectProperty<>();
 
     ////// Private fields
@@ -188,6 +198,9 @@ public class AnalyzerGUIController {
                 });
 
         btnOpenKeY.disableProperty()
+                .bind(proofProperty.isNull().or(interfaceDisabledProperty));
+
+        btnReloadProof.disableProperty()
                 .bind(proofFileProperty.isNull().or(interfaceDisabledProperty));
 
         cmbMethodChooser.disableProperty()
@@ -235,29 +248,28 @@ public class AnalyzerGUIController {
 
         proofFileProperty.set(outProofFile);
 
-        Task<AnalyzerResult> task = new Task<AnalyzerResult>() {
+        Task<Analyzer> task = new Task<Analyzer>() {
             @Override
-            protected AnalyzerResult call() throws Exception {
+            protected Analyzer call() throws Exception {
                 return doWithDisabledWindow(() -> {
                     final Analyzer analyzer =
                             new Analyzer(javaFileProperty.get(),
                                     methodDescriptor,
                                     Optional.of(outProofFile),
                                     seIf.keyEnvironment());
-                    AnalyzerResult result = null;
                     Logger logger =
                             LogManager.getLogger(AnalyzerGUIController.class);
                     try (WebViewOutputStream webViewOutputStream =
                             new WebViewOutputStream()) {
                         appendWebViewLogger(webViewOutputStream);
-                        result = analyzer.analyze();
+                        analyzer.analyze();
                     }
 
                     // Funny hack for "null-terminating" the log stream --
                     // without that, somehow the log buffer is not reset.
                     logger.info("\0");
 
-                    return result;
+                    return analyzer;
                 });
             }
         };
@@ -269,10 +281,58 @@ public class AnalyzerGUIController {
         task.setOnSucceeded(ev -> {
             AnalyzerResult result;
             try {
-                result = task.get();
+                final Analyzer analyzer = task.get();
+                analyzerProperty.set(analyzer);
+                proofProperty.set(analyzer.proof().orElse(null));
+                result = analyzer.result().get();
 
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
                 Analyzer.printResults(result, new PrintStream(os));
+                String resultStr = new String(os.toByteArray(), "UTF-8");
+
+                loadTextToWebView(resultStr, false);
+            }
+            catch (InterruptedException | ExecutionException
+                    | IOException ex) {
+                handleException(ex);
+            }
+        });
+    }
+
+    @FXML
+    public void handleReloadProofButtonPressed() {
+        Task<Void> task = new Task<Void>() {
+            @Override
+            protected Void call() throws Exception {
+                return doWithDisabledWindow(() -> {
+                    Logger logger =
+                            LogManager.getLogger(AnalyzerGUIController.class);
+                    try (WebViewOutputStream webViewOutputStream =
+                            new WebViewOutputStream()) {
+                        appendWebViewLogger(webViewOutputStream);
+                        analyzerProperty.get()
+                                .analyze(proofFileProperty.get());
+                    }
+
+                    // Funny hack for "null-terminating" the log stream --
+                    // without that, somehow the log buffer is not reset.
+                    logger.info("\0");
+                    return null;
+                });
+            }
+        };
+
+        Thread th = new Thread(task);
+        th.setDaemon(true);
+        th.start();
+
+        task.setOnSucceeded(ev -> {
+            try {
+                task.get();
+
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                Analyzer.printResults(analyzerProperty.get().result().get(),
+                        new PrintStream(os));
                 String resultStr = new String(os.toByteArray(), "UTF-8");
 
                 loadTextToWebView(resultStr, false);
