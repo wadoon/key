@@ -59,7 +59,7 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
 
     /**
      * Gets the set of admitted rule names.
-     * 
+     *
      * @param proof
      *            The {@link Proof} object, can be used for obtaining rules from
      *            {@link RuleSet} names.

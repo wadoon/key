@@ -13,7 +13,7 @@ import de.uka.ilkd.key.rule.*;
 /**
  * This macro applies only simplification rules. The idea is to use it instead
  * of the {@link OneStepSimplifier}.
- * 
+ *
  * @author Dominic Steinhoefel
  */
 public class GeneralSimplificationMacro extends
