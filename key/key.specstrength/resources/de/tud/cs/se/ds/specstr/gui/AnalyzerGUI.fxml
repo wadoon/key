@@ -13,7 +13,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
 
-<AnchorPane prefHeight="582.0" prefWidth="926.0" xmlns="http://javafx.com/javafx/8.0.92" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.tud.cs.se.ds.specstr.gui.AnalyzerGUIController">
+<AnchorPane prefHeight="582.0" prefWidth="926.0" xmlns="http://javafx.com/javafx/8.0.131" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.tud.cs.se.ds.specstr.gui.AnalyzerGUIController">
    <children>
       <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <center>
@@ -27,21 +27,6 @@
                                  <center>
                                     <TextField id="txtJavaFile" fx:id="txtJavaFile" editable="false" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER" />
                                  </center>
-                                 <right>
-                                    <FlowPane prefHeight="26.0" prefWrapLength="90" BorderPane.alignment="CENTER">
-                                       <BorderPane.margin>
-                                          <Insets left="10.0" />
-                                       </BorderPane.margin>
-                                       <children>
-                                          <Button id="btnFileChooser" fx:id="btnFileChooser" mnemonicParsing="false" onAction="#handleChooseFilePressed" text="Load" />
-                                          <Button fx:id="btnRecent" mnemonicParsing="false" onAction="#handleLoadRecentPressed" style="-fx-graphic: url('/de/tud/cs/se/ds/specstr/gui/refresh.png')">
-                                             <FlowPane.margin>
-                                                <Insets left="5.0" />
-                                             </FlowPane.margin>
-                                          </Button>
-                                       </children>
-                                    </FlowPane>
-                                 </right>
                                  <top>
                                     <Label text="Select Java File" BorderPane.alignment="TOP_LEFT">
                                        <opaqueInsets>
@@ -58,6 +43,22 @@
                                  <VBox.margin>
                                     <Insets bottom="20.0" />
                                  </VBox.margin>
+                                 <bottom>
+                                    <FlowPane hgap="10.0" prefHeight="26.0" prefWrapLength="90" BorderPane.alignment="CENTER">
+                                       <BorderPane.margin>
+                                          <Insets top="10.0" />
+                                       </BorderPane.margin>
+                                       <children>
+                                          <Button id="btnFileChooser" fx:id="btnFileChooser" mnemonicParsing="false" onAction="#handleChooseFilePressed" text="Load" />
+                                          <Button fx:id="btnFileEdit" mnemonicParsing="false" onAction="#handleEditFilePressed" text="Edit" />
+                                          <Button fx:id="btnRecent" mnemonicParsing="false" onAction="#handleLoadRecentPressed" style="-fx-graphic: url('/de/tud/cs/se/ds/specstr/gui/refresh.png')">
+                                             <FlowPane.margin>
+                                                <Insets />
+                                             </FlowPane.margin>
+                                          </Button>
+                                       </children>
+                                    </FlowPane>
+                                 </bottom>
                               </BorderPane>
                               <BorderPane prefWidth="200.0">
                                  <center>
@@ -79,17 +80,19 @@
                                  <VBox.margin>
                                     <Insets bottom="20.0" />
                                  </VBox.margin>
+                                 <bottom>
+                                    <FlowPane hgap="10.0" prefWidth="239.0" BorderPane.alignment="CENTER">
+                                       <children>
+                                          <Button fx:id="btnStartAnalysis" mnemonicParsing="false" onAction="#handleAnalyzeButtonPressed" text="Analyze" />
+                                          <Button fx:id="btnOpenKeY" mnemonicParsing="false" onAction="#handleOpenKeYButtonPressed" text="Open KeY" />
+                                          <Button fx:id="btnReloadProof" mnemonicParsing="false" onAction="#handleReloadProofButtonPressed" style="-fx-graphic: url('/de/tud/cs/se/ds/specstr/gui/refresh.png')" />
+                                       </children>
+                                       <BorderPane.margin>
+                                          <Insets top="10.0" />
+                                       </BorderPane.margin>
+                                    </FlowPane>
+                                 </bottom>
                               </BorderPane>
-                              <FlowPane hgap="10.0" prefWidth="239.0">
-                                 <children>
-                                    <Button fx:id="btnStartAnalysis" mnemonicParsing="false" onAction="#handleAnalyzeButtonPressed" text="Analyze" />
-                                    <Button fx:id="btnOpenKeY" mnemonicParsing="false" onAction="#handleOpenKeYButtonPressed" text="Open KeY" />
-                                    <Button fx:id="btnReloadProof" mnemonicParsing="false" onAction="#handleReloadProofButtonPressed" style="-fx-graphic: url('/de/tud/cs/se/ds/specstr/gui/refresh.png')" />
-                                 </children>
-                                 <VBox.margin>
-                                    <Insets top="10.0" />
-                                 </VBox.margin>
-                              </FlowPane>
                            </children>
                         </VBox>
                      </children>

@@ -13,6 +13,7 @@
 
 package de.tud.cs.se.ds.specstr.gui;
 
+import java.awt.Desktop;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -89,6 +90,9 @@ public class AnalyzerGUIController {
 
     @FXML
     private Button btnFileChooser;
+
+    @FXML
+    private Button btnFileEdit;
 
     @FXML
     private Button btnRecent;
@@ -196,6 +200,9 @@ public class AnalyzerGUIController {
                                 .bind(interfaceDisabledProperty);
                     }
                 });
+
+        btnFileEdit.disableProperty()
+                .bind(javaFileProperty.isNull().or(interfaceDisabledProperty));
 
         btnOpenKeY.disableProperty()
                 .bind(proofProperty.isNull().or(interfaceDisabledProperty));
@@ -367,6 +374,20 @@ public class AnalyzerGUIController {
         }
 
         proofFileProperty.set(null);
+    }
+
+    @FXML
+    public void handleEditFilePressed() {
+        if (Desktop.isDesktopSupported()) {
+            new Thread(() -> {
+                try {
+                    Desktop.getDesktop().open(javaFileProperty.get());
+                }
+                catch (IOException e) {
+                    handleException(e);
+                }
+            }).start();
+        }
     }
 
     @FXML
