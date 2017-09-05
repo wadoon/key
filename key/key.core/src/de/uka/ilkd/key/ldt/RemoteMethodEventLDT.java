@@ -53,6 +53,15 @@ public class RemoteMethodEventLDT extends LDT {
     private final Function coopListEquivInternal;
     private final Function equivHistoryInternal;
     private final Function filterVisibleInternal;
+    
+    private final Function equivEventLocal;
+    private final Function equivEventGlobal;
+    private final Function invEventLocal;
+    private final Function invEventGlobal;
+    private final Function isCallable;
+
+    private final Function agreeLocal;
+    private final Function agreeGlobal;
 
 
 	//history (of Remote method events) ... copy of: key.core/resources/de/uka/ilkd/key/proof/rules/events.key -> Seq hist;
@@ -64,6 +73,7 @@ public class RemoteMethodEventLDT extends LDT {
 	private final Sort eventSort;
     private final Sort calltypeSort;
     private final Sort methodSort;
+
 
 	public RemoteMethodEventLDT (TermServices services) {
 		super(NAME, services);
@@ -84,8 +94,17 @@ public class RemoteMethodEventLDT extends LDT {
         coopListEquiv = addFunction(services, "coopListEquiv");
         equivHistory = addFunction(services, "equivHistory");
         equivEvent = addFunction(services, "equivEvent");
+        equivEventLocal = addFunction(services, "equivEventLocal");
+        equivEventGlobal = addFunction(services, "equivEventGlobal");
         filterVisible = addFunction(services, "filterVisible");
         invEvent = addFunction(services, "invEvent");
+        invEventLocal = addFunction(services, "invEventLocal");
+        invEventGlobal = addFunction(services, "invEventGlobal");
+        
+        agreeLocal = addFunction(services, "agreeLocal");
+        agreeGlobal = addFunction(services, "agreeGlobal");
+        
+        isCallable = addFunction(services, "isCallable");
         
         wellformedListInternal = addFunction(services, "wellformedListInternal");
         wellformedListCoopInternal = addFunction(services, "wellformedListCoopInternal");        
@@ -299,6 +318,34 @@ public class RemoteMethodEventLDT extends LDT {
 
     public Sort getMethodSort() {
         return methodSort;
+    }
+
+    public Function getEquivEventLocal() {
+        return equivEventLocal;
+    }
+
+    public Function getEquivEventGlobal() {
+        return equivEventGlobal;
+    }
+
+    public Function getInvEventLocal() {
+        return invEventLocal;
+    }
+
+    public Function getInvEventGlobal() {
+        return invEventGlobal;
+    }
+
+    public Function getIsCallable() {
+        return isCallable;
+    }
+
+    public Function getAgreeLocal() {
+        return agreeLocal;
+    }
+
+    public Function getAgreeGlobal() {
+        return agreeGlobal;
     }
 
 }

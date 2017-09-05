@@ -59,8 +59,27 @@ public class ClusterSatisfactionPOFormulaFactory {
         return tb.and(selfNotNull(), callingCompNotNull(), wellformed(), anon());
     }
     
+    public Term globalImplLocalEvent() {
+        return tb.imp(tb.func(eventLDT.getEquivEventGlobal(), a.event(), b.event()), tb.func(eventLDT.getEquivEventLocal(), a.event(), b.event()));
+    }
+    
+    public Term globalImplLocalState() {
+        return tb.imp(tb.func(eventLDT.getAgreeGlobal(), a.heap, b.heap), tb.func(eventLDT.getAgreeLocal(), a.heap, b.heap));
+    }
+    
+    public Term localImplGlobalEvent() {
+        return tb.imp(tb.and(tb.func(eventLDT.getEquivEventLocal(), a.event(), b.event()), 
+                        a.callable(), b.callable()), 
+                tb.func(eventLDT.getEquivEventGlobal(), a.event(), b.event()));
+    }
+    
+    public Term localImplGlobalState() {
+        return tb.imp(tb.and(tb.func(eventLDT.getAgreeGlobal(), a.heap, b.heap), tb.func(eventLDT.getAgreeLocal(), a.heap2, b.heap2)), 
+                tb.func(eventLDT.getAgreeGlobal(), a.heapPost, b.heapPost));
+    }
+    
     public Term consequence() {
-        return tb.equals(a.event(), b.event());
+        return tb.and(globalImplLocalEvent(), globalImplLocalState(), localImplGlobalEvent(), localImplGlobalState());
     }
     
     public Term wellformed() {
@@ -128,6 +147,10 @@ public class ClusterSatisfactionPOFormulaFactory {
             //TODO get assignable set from somewhere...
             Term mod = contract.getMod();
             return tb.equals(heapPost, tb.anon(heap2, mod, heap));
+        }
+        
+        public Term callable() {
+            return tb.func(eventLDT.getIsCallable(), event());
         }
     }
 
