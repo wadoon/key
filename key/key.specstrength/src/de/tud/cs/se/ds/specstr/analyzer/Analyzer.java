@@ -1350,7 +1350,7 @@ public class Analyzer {
                 Node factCoveredNode, Node factAbstractlyCoveredNode,
                 Node factAbstractlyCoveredTestNode) {
             this.descr = descr.trim();
-            this.pathCond = pathCond.trim();
+            this.pathCond = pathCond.trim().replaceAll("<<[^>]*?>>", "");
             this.factType = factType;
             this.factCoveredNode = factCoveredNode;
             this.factAbstractlyCoveredNode = factAbstractlyCoveredNode;
@@ -1424,7 +1424,7 @@ public class Analyzer {
         @Override
         public String toString() {
             return String.format("%s, Path condition \"%s\"\n%s",
-                    factTypeToString(factType), pathCond.trim(), descr);
+                    factTypeToString(factType), pathCond, descr);
         }
 
         private static String factTypeToString(FactType ft) {
