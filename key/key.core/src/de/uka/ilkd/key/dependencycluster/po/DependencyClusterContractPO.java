@@ -100,7 +100,7 @@ public class DependencyClusterContractPO extends AbstractOperationPO
         
         collectClassAxioms(contract.getKJT(), proofConfig);
 
-        DependencyClusterTacletFactory tacletFactory = new DependencyClusterTacletFactory(contract, proofConfig, ifVars);
+        EventEquivalenceWithIsoFactory tacletFactory = new EventEquivalenceWithIsoFactory(contract, proofConfig, ifVars);
         RewriteTaclet equivEventTaclet = tacletFactory.getEventEquivalenceTaclet();               
         register(equivEventTaclet, proofConfig);
         //TODO JK is another justification better? Reference the contract for example?

@@ -48,7 +48,9 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
         
         final ClusterSatisfactionPOFormulaFactory factory = new ClusterSatisfactionPOFormulaFactory(contract, proofServices);
         
-        assignPOTerms(factory.completeFormula());        
+        assignPOTerms(factory.completeFormula());     
+        
+        collectClassAxioms(contract.getKJT(), proofConfig);
     }
 
     @Override
