@@ -1790,7 +1790,7 @@ public final class SymbolicExecutionUtil {
          return computeLoopInvariantBuiltInRuleAppBranchCondition(parent, node, simplify, improveReadability);
       }
       else if (parent.getAppliedRuleApp().rule() == LoopScopeInvariantRule.INSTANCE) {
-          return node.proof().getServices().getTermBuilder().tt();
+          return computeLoopScopeInvariantBuiltInRuleBranchCondition(parent, node, simplify, improveReadability);
        }
       else if (parent.getAppliedRuleApp() instanceof BlockContractBuiltInRuleApp) {
          return computeBlockContractBuiltInRuleAppBranchCondition(parent, node, simplify, improveReadability);
@@ -2180,6 +2180,90 @@ public final class SymbolicExecutionUtil {
          return exceptionEquality;
       }
    }
+   
+    /**
+     * <p>
+     * Computes the branch condition of the given {@link Node} which was
+     * constructed by a {@link LoopScopeInvariantRule} app.
+     * </p>
+     * <p>
+     * The branch conditions are:
+     * <ul>
+     * <li>Preserves / Use Case Branch: Invariant</li>
+     * </ul>
+     * </p>
+     * 
+     * @param parent
+     *            The parent {@link Node} of the given one.
+     * @param node
+     *            The {@link Node} to compute its branch condition.
+     * @param simplify
+     *            {@code true} simplify condition in a side proof, {@code false}
+     *            do not simplify condition.
+     * @param improveReadability
+     *            {@code true} improve readability, {@code false} do not improve
+     *            readability.
+     * @return The computed branch condition.
+     * @throws ProofInputException
+     *             Occurred Exception.
+     */
+    private static Term computeLoopScopeInvariantBuiltInRuleBranchCondition(
+            Node parent,
+            Node node,
+            boolean simplify,
+            boolean improveReadability) throws ProofInputException {
+        // Make sure that a computation is possible
+        if (!(parent.getAppliedRuleApp()
+                .rule() instanceof LoopScopeInvariantRule)) {
+            throw new ProofInputException(
+                    "Only LoopScopeInvariantRule is allowed in branch computation but rule \""
+                            + parent.getAppliedRuleApp().rule()
+                            + "\" was found.");
+        }
+
+        // Make sure that branch is supported
+        final int childIndex =
+                CollectionUtil.indexOf(parent.childrenIterator(), node);
+
+        if (childIndex != 1) {
+            throw new ProofInputException(
+                    "Branch condition of initially valid check is not supported.");
+        }
+
+        // Compute invariant (last antecedent formula of the preserved / use
+        // case branch)
+        final Semisequent antecedent = parent.child(1).sequent().antecedent();
+        Term invTerm = antecedent.get(antecedent.size() - 1).formula();
+
+        // Create formula which contains the value interested in.
+        Term condition;
+        if (simplify) {
+            final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
+                    .cloneProofEnvironmentWithOwnOneStepSimplifier(
+                            parent.proof(), true);
+            Sequent newSequent = createSequentToProveWithNewSuccedent(parent,
+                    (Term) null, invTerm, null, true);
+            condition = evaluateInSideProof(parent.proof().getServices(),
+                    parent.proof(),
+                    sideProofEnv,
+                    newSequent,
+                    RESULT_LABEL,
+                    "Loop invariant branch condition computation on node "
+                            + parent.serialNr() + " for branch "
+                            + node.serialNr() + ".",
+                    StrategyProperties.SPLITTING_OFF);
+        }
+        else {
+            condition = TermBuilder.goBelowUpdates(invTerm);
+        }
+
+        if (improveReadability) {
+            condition =
+                    improveReadability(condition, parent.proof().getServices());
+        }
+
+        return condition;
+    }
    
    /**
     * <p>
@@ -3391,9 +3475,13 @@ public final class SymbolicExecutionUtil {
                                            boolean simplify,
                                            boolean improveReadability) throws ProofInputException {
       if (childNode != null) {
-         final Services services = childNode.proof().getServices();
+        final Node origNode = childNode;
+        final Proof proof = childNode.proof();
+        final Services services = proof.getServices();
+        
          Term pathCondition = services.getTermBuilder().tt();
          while (childNode != null && childNode != parentNode) {
+             
             Node parent = childNode.parent();
             if (parent != null && parent.childrenCount() >= 2) {
                Term branchCondition = computeBranchCondition(childNode, simplify, improveReadability);
@@ -3401,15 +3489,82 @@ public final class SymbolicExecutionUtil {
             }
             childNode = parent;
          }
+         
          if (services.getTermBuilder().ff().equals(pathCondition)) {
             throw new ProofInputException("Path condition computation failed because the result is false.");
          }
+         
+         pathCondition = simplifyAndImproveReadability(simplify,
+                improveReadability, origNode, pathCondition);
+         
          return pathCondition;
       }
       else {
          return null;
       }
    }
+
+    /**
+     * Simplifies and / or improves the readability of the {@link Term}
+     * termToSimplify in the given {@link Node}.<br>
+     * TODO: This should make the other simplification steps superfluous, i.e.
+     * those dedicated to special {@link RuleApp}s. Check whether they can be
+     * removed.
+     *
+     * @param simplify
+     *            true iff side-proof based simplification should be applied.
+     * @param improveReadability
+     *            true iff readabiltiy should be improved (syntactical
+     *            transformations).
+     * @param node
+     *            The {@link Node} to start with.
+     * @param termToSimplify
+     *            The {@link Term} to simplify.
+     * @return A simplified version of termToSimplify.
+     * @throws ProofInputException
+     *             Hopefully not.
+     */
+    public static Term simplifyAndImproveReadability(boolean simplify,
+            boolean improveReadability, final Node node,
+            final Term termToSimplify)
+            throws ProofInputException {
+        assert node != null && termToSimplify != null;
+
+        Term result = termToSimplify;
+
+        final Proof proof = node.proof();
+        final Services services = proof.getServices();
+
+        if (simplify) {
+            final ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil
+                    .cloneProofEnvironmentWithOwnOneStepSimplifier(
+                            proof, true);
+
+            TermFactory factory = services.getTermFactory();
+            result = addLabelRecursiveToNonSkolem(factory, termToSimplify,
+                    RESULT_LABEL);
+
+            Sequent newSequent = Sequent.createSuccSequent(
+                    new Semisequent(new SequentFormula(termToSimplify)));
+            result = evaluateInSideProof(proof.getServices(),
+                    proof,
+                    sideProofEnv,
+                    newSequent,
+                    RESULT_LABEL,
+                    "Branch condition simplification.",
+                    StrategyProperties.SPLITTING_OFF);
+        }
+        else {
+            result = TermBuilder.goBelowUpdates(termToSimplify);
+        }
+
+        if (improveReadability) {
+            result =
+                    improveReadability(termToSimplify, services);
+        }
+        
+        return result;
+    }
 
    /**
     * Checks if the {@link Sort} of the given {@link Term} is a reference type.
