@@ -146,8 +146,8 @@ public abstract class EventEquivalenceTacletFactory {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
         
         //TODO JK remove preceding As
-        tacletBuilder.setDisplayName("AAAEquivEventDef");
-        tacletBuilder.setName(new Name("AAAEquivEventDef"));
+        tacletBuilder.setDisplayName("EquivEventDef");
+        tacletBuilder.setName(new Name("EquivEventDef"));
         
         tacletBuilder.setFind(findTermEquivalence());
         
@@ -164,8 +164,8 @@ public abstract class EventEquivalenceTacletFactory {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
         
         //TODO JK remove preceding As
-        tacletBuilder.setDisplayName("AAAEventInvisibilityDef");
-        tacletBuilder.setName(new Name("AAAEventInvisibilityDef"));
+        tacletBuilder.setDisplayName("EventInvisibilityDef");
+        tacletBuilder.setName(new Name("EventInvisibilityDef"));
 
         tacletBuilder.setFind(findTermInvisibility());
         tacletBuilder.addGoalTerm(replaceTermInvisibility());
@@ -197,6 +197,8 @@ public abstract class EventEquivalenceTacletFactory {
     }
     
     public abstract ImmutableList<Term> equivalenceConditionsForLowlist(ImmutableList<Lowlist> lowlists);
+    
+    
     
     protected ImmutableList<Term> getFormulas(ImmutableList<Term> list) {
         ImmutableList<Term> formulas = ImmutableSLList.<Term>nil();

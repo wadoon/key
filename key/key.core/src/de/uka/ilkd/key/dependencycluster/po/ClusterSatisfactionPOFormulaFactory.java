@@ -28,7 +28,7 @@ public class ClusterSatisfactionPOFormulaFactory {
 
 
     public ClusterSatisfactionPOFormulaFactory(
-            ClusterSatisfactionContract contract, Services proofServices) {
+            ClusterSatisfactionContract contract, Services proofServices, Term self) {
         this.proofServices = proofServices;
         this.tb = proofServices.getTermBuilder();
         this.contract = contract;
@@ -40,11 +40,7 @@ public class ClusterSatisfactionPOFormulaFactory {
         
         callingComp = tb.var(new LocationVariable(new ProgramElementName(tb.newName("callingComp")), new KeYJavaType(proofServices.getJavaInfo().objectSort())));
     
-        //TODO JK is this the proper way to get a self var here? Seems like overkill, take another look
-        ProofObligationVars symbExecVars =
-                new ProofObligationVars(contract.getTarget(), contract.getKJT(), proofServices);
-        
-        self = symbExecVars.pre.self;
+        this.self = self;
     }
     
     public Term selfNotNull() {

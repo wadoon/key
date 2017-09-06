@@ -19,11 +19,14 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.speclang.ClusterSatisfactionContract;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyClusterContract;
+import de.uka.ilkd.key.util.DependencyClusterSpec;
+import de.uka.ilkd.key.util.Lowlist;
 
 public class ClusterSatisfactionPO extends AbstractOperationPO
         implements ContractPO {
@@ -46,11 +49,23 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
 
         final Services proofServices = postInit(); 
         
-        final ClusterSatisfactionPOFormulaFactory factory = new ClusterSatisfactionPOFormulaFactory(contract, proofServices);
+        //TODO JK is this the proper way to get a self var here? Seems like overkill, take another look
+        final ProofObligationVars symbExecVars =
+                new ProofObligationVars(contract.getTarget(), contract.getKJT(), proofServices);
+        
+        final Term self = symbExecVars.pre.self;
+        
+        final ClusterSatisfactionPOFormulaFactory factory = new ClusterSatisfactionPOFormulaFactory(contract, proofServices, self);
+        
+        final DependencyClusterSpec localSpec = proofServices.getSpecificationRepository().getServiceDependencyClusterByLabel(contract.getSpecs().getServiceClusterLabel());
+        
+        final EventEquivalenceWithEqFactory equivEventLocalFactory = new EventEquivalenceWithEqFactory(localSpec, self, proofConfig);
         
         assignPOTerms(factory.completeFormula());     
         
         collectClassAxioms(contract.getKJT(), proofConfig);
+        
+        
     }
 
     @Override

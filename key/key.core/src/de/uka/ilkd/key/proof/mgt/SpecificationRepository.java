@@ -83,6 +83,7 @@ import de.uka.ilkd.key.speclang.StatementWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.util.DependencyClusterSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
@@ -108,8 +109,8 @@ public final class SpecificationRepository {
                               ImmutableSet<WellDefinednessCheck>>();
     private final Map<String, Contract> contractsByName =
             new LinkedHashMap<String, Contract>();
-    private final Map<String, DependencyClusterContract> serviceDependencyClustersByLabel =
-            new LinkedHashMap<String, DependencyClusterContract>();
+    private final Map<String, DependencyClusterSpec> serviceDependencyClustersByLabel =
+            new LinkedHashMap<String, DependencyClusterSpec>();
     private final Map<String, ComponentCluster> componentDependencyClustersByLabel =
             new LinkedHashMap<String, ComponentCluster>();
     
@@ -820,6 +821,12 @@ public final class SpecificationRepository {
         }
 
         return combineOperationContracts(baseContracts);
+    }
+    
+    public DependencyClusterSpec getServiceDependencyClusterByLabel(String label) {
+        DependencyClusterSpec spec = serviceDependencyClustersByLabel.get(label);
+        assert spec != null: "There is no service dependency cluster with label \"" + label + "\"."; 
+        return spec;
     }
 
     /**
@@ -1532,7 +1539,7 @@ public final class SpecificationRepository {
                 if (spec instanceof DependencyClusterContract) {
                     assert (! serviceDependencyClustersByLabel.containsKey(((DependencyClusterContract)spec).getLabel())) : 
                         "Dependency Cluster label " + ((DependencyClusterContract)spec).getLabel() + " is ambiguos";                       
-                    serviceDependencyClustersByLabel.put(((DependencyClusterContract)spec).getLabel(), (DependencyClusterContract)spec);
+                    serviceDependencyClustersByLabel.put(((DependencyClusterContract)spec).getLabel(), ((DependencyClusterContract)spec).getSpecs());
                 }
                 addContract((Contract) spec);
             } else if (spec instanceof ClassInvariant) {
