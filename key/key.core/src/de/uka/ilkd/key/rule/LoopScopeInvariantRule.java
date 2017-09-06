@@ -283,9 +283,9 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                 termLabelState, services, null, uAnonInv, this, presrvAndUCGoal,
                 ANON_INVARIANT_TERM_HINT, null);
 
-        presrvAndUCGoal.addFormula(new SequentFormula(labeledUAnonInv), true, false);
         presrvAndUCGoal.addFormula(new SequentFormula(wellFormedAnon), true,
                 false);
+        presrvAndUCGoal.addFormula(new SequentFormula(labeledUAnonInv), true, false);
         presrvAndUCGoal.changeFormula(new SequentFormula(newFormula),
                 ruleApp.posInOccurrence());
     }
