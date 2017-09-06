@@ -66,7 +66,7 @@ public class FindMethodsTest extends AbstractAnalyzerTest {
 
         assertEquals("result = iLastRun_0",
             abstrPostCondFacts.get(0).getDescr());
-        assertEquals("!result_1_0 = -1",
+        assertContains("!result_1_0 = -1",
             abstrPostCondFacts.get(0).getPathCond());
     }
 
