@@ -8,6 +8,7 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.ldt.RemoteMethodEventLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -57,9 +58,11 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
         
         final ClusterSatisfactionPOFormulaFactory factory = new ClusterSatisfactionPOFormulaFactory(contract, proofServices, self);
         
-        final DependencyClusterSpec localSpec = proofServices.getSpecificationRepository().getServiceDependencyClusterByLabel(contract.getSpecs().getServiceClusterLabel());
+        final RemoteMethodEventLDT ldt = proofServices.getTypeConverter().getRemoteMethodEventLDT();
         
-        final EventEquivalenceWithEqFactory equivEventLocalFactory = new EventEquivalenceWithEqFactory(localSpec, self, proofConfig);
+        final DependencyClusterSpec localSpec = proofServices.getSpecificationRepository().getServiceDependencyClusterByLabel(contract.getSpecs().getServiceClusterLabel());
+                
+        final EventEquivalenceWithEqFactory equivEventLocalFactory = new EventEquivalenceWithEqFactory(localSpec, self, proofConfig, ldt.getEquivEventLocal(), ldt.getInvEventLocal(), "Local");
         
         assignPOTerms(factory.completeFormula());     
         

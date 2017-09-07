@@ -57,7 +57,13 @@ public abstract class EventEquivalenceTacletFactory {
     protected final ImmutableList<Lowlist> lowOut;
     protected final ImmutableList<VisibilityCondition> visible;
     
-    public EventEquivalenceTacletFactory(InitConfig proofConfig, ImmutableList<Lowlist> lowIn, ImmutableList<Lowlist> lowOut, ImmutableList<VisibilityCondition> visible) {
+    private final Function equivEventFunction;
+    private final Function invEventFunction;
+    
+    private final String ruleNameSuffix;
+    
+    public EventEquivalenceTacletFactory(InitConfig proofConfig, ImmutableList<Lowlist> lowIn, ImmutableList<Lowlist> lowOut, 
+            ImmutableList<VisibilityCondition> visible, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
 
         this.proofConfig = proofConfig;
         ldt = proofConfig.getServices().getTypeConverter().getRemoteMethodEventLDT();
@@ -98,23 +104,26 @@ public abstract class EventEquivalenceTacletFactory {
         updatedParams1 = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1), tb.elementary(ldt.getCurrentParams(), params1));
         updatedParams2 = tb.parallel(tb.elementary(tb.getBaseHeap(), heap2), tb.elementary(ldt.getCurrentParams(), params2));
         
+        this.equivEventFunction = equivEventFunction;
+        this.invEventFunction = invEventFunction;
+        this.ruleNameSuffix = ruleNameSuffix;
     }
     
     public Term findTermEquivalence() {
-        Term find = tb.func(ldt.getEquivEvent(), event1, event2);
+        Term find = tb.func(equivEventFunction, event1, event2);
         return find;
     }
     
     public Term bothEventsInvisible() {
-        Term event1Invis = tb.func(ldt.getInvEvent(), event1);
-        Term event2Invis = tb.func(ldt.getInvEvent(), event2);
+        Term event1Invis = tb.func(invEventFunction, event1);
+        Term event2Invis = tb.func(invEventFunction, event2);
         Term bothInvis = tb.and(event1Invis, event2Invis);
         return bothInvis;
     }
     
     public Term bothEventsVisible() {
-        Term event1Vis = tb.not(tb.func(ldt.getInvEvent(), event1));
-        Term event2Vis = tb.not(tb.func(ldt.getInvEvent(), event2));
+        Term event1Vis = tb.not(tb.func(invEventFunction, event1));
+        Term event2Vis = tb.not(tb.func(invEventFunction, event2));
         Term bothVis = tb.and(event1Vis, event2Vis);
         return bothVis;
     }
@@ -145,9 +154,9 @@ public abstract class EventEquivalenceTacletFactory {
     public RewriteTaclet getEventEquivalenceTaclet() {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
         
-        //TODO JK remove preceding As
-        tacletBuilder.setDisplayName("EquivEventDef");
-        tacletBuilder.setName(new Name("EquivEventDef"));
+        final String name = "EquivEventDef" + ruleNameSuffix;
+        tacletBuilder.setDisplayName(name);
+        tacletBuilder.setName(new Name(name));
         
         tacletBuilder.setFind(findTermEquivalence());
         
@@ -163,9 +172,9 @@ public abstract class EventEquivalenceTacletFactory {
     public RewriteTaclet getInvisibilityTaclet() {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
         
-        //TODO JK remove preceding As
-        tacletBuilder.setDisplayName("EventInvisibilityDef");
-        tacletBuilder.setName(new Name("EventInvisibilityDef"));
+        final String name = "EventInvisibilityDef" + ruleNameSuffix;
+        tacletBuilder.setDisplayName(name);
+        tacletBuilder.setName(new Name(name));
 
         tacletBuilder.setFind(findTermInvisibility());
         tacletBuilder.addGoalTerm(replaceTermInvisibility());
@@ -184,7 +193,7 @@ public abstract class EventEquivalenceTacletFactory {
     public abstract Term eventVisibleDueToExplicitSpec();
     
     public Term findTermInvisibility() {
-        return tb.func(ldt.getInvEvent(), event1);
+        return tb.func(invEventFunction, event1);
     }
 
     public ImmutableList<Term> collectedConditionsForEquivalenceOfVisibleEvents() {

@@ -5,6 +5,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.ClusterSatisfactionContract;
 import de.uka.ilkd.key.util.DependencyClusterSpec;
@@ -18,8 +19,8 @@ public class EventEquivalenceWithEqFactory
 
 
     public EventEquivalenceWithEqFactory(DependencyClusterSpec localSpec, Term self,
-            InitConfig config) {
-        super(config, localSpec.getLowIn(), localSpec.getLowOut(), localSpec.getVisible());
+            InitConfig config, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
+        super(config, localSpec.getLowIn(), localSpec.getLowOut(), localSpec.getVisible(), equivEventFunction, invEventFunction, ruleNameSuffix);
         
         this.self = self;
     }

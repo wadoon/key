@@ -18,8 +18,8 @@ public class EventEquivalenceWithIsoFactory
     private final IFProofObligationVars poVars;
 
     public EventEquivalenceWithIsoFactory(DependencyClusterContract contract,
-            InitConfig proofConfig, IFProofObligationVars poVars) {
-        super(proofConfig, contract.getSpecs().getLowIn(), contract.getSpecs().getLowOut(), contract.getSpecs().getVisible());
+            InitConfig proofConfig, IFProofObligationVars poVars, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
+        super(proofConfig, contract.getSpecs().getLowIn(), contract.getSpecs().getLowOut(), contract.getSpecs().getVisible(), equivEventFunction, invEventFunction, ruleNameSuffix);
         
         this.contract = contract;
 
