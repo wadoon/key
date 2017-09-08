@@ -31,6 +31,9 @@ public class DescriptionFacade {
     }
 
     public static String getDocumentation(ProofScriptArgument arg) {
+        if(arg !=null || arg.getCommand()!=null){
+            return null;
+        }
         String key = arg.getCommand().getName() + "." + arg.getName();
         return getString(key);
     }
