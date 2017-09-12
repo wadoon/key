@@ -16,24 +16,33 @@ public final class ArgumentsLifter {
     private ArgumentsLifter() {
     }
 
-    public static List<ProofScriptArgument> inferScriptArguments(Class clazz, ProofScriptCommand command) {
-        List<ProofScriptArgument> args = new ArrayList<>();
+    public static <T> List<ProofScriptArgument<T>> inferScriptArguments(Class clazz, ProofScriptCommand<T> command) {
+        List<ProofScriptArgument<T>> args = new ArrayList<>();
         for (Field field : clazz.getDeclaredFields()) {
+            ProofScriptArgument<T> argument = new ProofScriptArgument<T>();
+            argument.setCommand(command);
+            boolean add = false;
+
             Option option = field.getDeclaredAnnotation(Option.class);
             if (option != null) {
-                args.add(lift(option, field));
+                lift(argument, option, field);
+                add = true;
             }
-            else {
-                Flag flag = field.getDeclaredAnnotation(Flag.class);
-                if (flag != null) {
-                    args.add(lift(flag, field));
-                }
-                else {
-                    Varargs vargs = field.getDeclaredAnnotation(Varargs.class);
-                    if (vargs!=null) {
-                        args.add(lift(vargs, field));
-                    }
-                }
+
+            Flag flag = field.getDeclaredAnnotation(Flag.class);
+            if (flag != null) {
+                lift(argument, flag, field);
+                add = true;
+            }
+
+            Varargs vargs = field.getDeclaredAnnotation(Varargs.class);
+            if (vargs != null) {
+                lift(argument, vargs, field);
+                add=true;
+            }
+
+            if (add) {
+                args.add(argument);
             }
         }
         //
@@ -41,18 +50,17 @@ public final class ArgumentsLifter {
         return args;
     }
 
-    private static ProofScriptArgument lift(Varargs vargs, Field field) {
-        ProofScriptArgument arg = new ProofScriptArgument();
+    private static ProofScriptArgument lift(ProofScriptArgument arg, Varargs vargs, Field field) {
         arg.setName(vargs.prefix());
         arg.setRequired(false);
         arg.setField(field);
         arg.setType(vargs.as());
         arg.setVariableArguments(true);
+        arg.setDocumentation(DescriptionFacade.getDocumentation(arg));
         return arg;
     }
 
-    private static ProofScriptArgument lift(Option option, Field field) {
-        ProofScriptArgument arg = new ProofScriptArgument();
+    private static ProofScriptArgument lift(ProofScriptArgument arg, Option option, Field field) {
         arg.setName(option.value());
         arg.setRequired(option.required());
         arg.setField(field);
@@ -61,7 +69,7 @@ public final class ArgumentsLifter {
         return arg;
     }
 
-    private static ProofScriptArgument lift(Flag flag, Field field) {
+    private static ProofScriptArgument lift(ProofScriptArgument argument, Flag flag, Field field) {
         throw new IllegalStateException("not implemented");
     }
 }
