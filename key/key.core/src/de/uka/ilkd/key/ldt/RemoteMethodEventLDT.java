@@ -60,8 +60,9 @@ public class RemoteMethodEventLDT extends LDT {
     private final Function invEventGlobal;
     private final Function isCallable;
 
-    private final Function agreeLocal;
-    private final Function agreeGlobal;
+    private final Function agreePreLocal;
+    private final Function agreePreGlobal;
+    private final Function agreePost;
 
 
 	//history (of Remote method events) ... copy of: key.core/resources/de/uka/ilkd/key/proof/rules/events.key -> Seq hist;
@@ -101,8 +102,9 @@ public class RemoteMethodEventLDT extends LDT {
         invEventLocal = addFunction(services, "invEventLocal");
         invEventGlobal = addFunction(services, "invEventGlobal");
         
-        agreeLocal = addFunction(services, "agreeLocal");
-        agreeGlobal = addFunction(services, "agreeGlobal");
+        agreePreLocal = addFunction(services, "agreePreLocal");
+        agreePreGlobal = addFunction(services, "agreePreGlobal");
+        agreePost = addFunction(services, "agreePost");
         
         isCallable = addFunction(services, "isCallable");
         
@@ -340,12 +342,16 @@ public class RemoteMethodEventLDT extends LDT {
         return isCallable;
     }
 
-    public Function getAgreeLocal() {
-        return agreeLocal;
+    public Function getAgreePreLocal() {
+        return agreePreLocal;
     }
 
-    public Function getAgreeGlobal() {
-        return agreeGlobal;
+    public Function getAgreePreGlobal() {
+        return agreePreGlobal;
+    }
+
+    public Function getAgreePost() {
+        return agreePost;
     }
 
 }

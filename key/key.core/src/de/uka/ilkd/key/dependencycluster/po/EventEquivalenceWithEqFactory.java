@@ -51,6 +51,7 @@ public class EventEquivalenceWithEqFactory
                 specifiedCallee = list.getCommunicationPartner().getTerm();
             }
 
+            //TODO JK maybe we have to update heap here as well... I really need to wrap my head around which self vars are used where...
             Term updateHeap = tb.elementary(tb.getBaseHeap(), heap1);
             Term updatedSpecifiedCaller = tb.apply(updateHeap, specifiedCaller);
             Term updatedSpecifiedCallee = tb.apply(updateHeap, specifiedCallee);

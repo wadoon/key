@@ -60,7 +60,7 @@ public class ClusterSatisfactionPOFormulaFactory {
     }
     
     public Term globalImplLocalState() {
-        return tb.imp(tb.func(eventLDT.getAgreeGlobal(), a.heap, b.heap), tb.func(eventLDT.getAgreeLocal(), a.heap, b.heap));
+        return tb.imp(tb.func(eventLDT.getAgreePreGlobal(), a.heap, b.heap), tb.func(eventLDT.getAgreePreLocal(), a.heap, b.heap));
     }
     
     public Term localImplGlobalEvent() {
@@ -70,8 +70,8 @@ public class ClusterSatisfactionPOFormulaFactory {
     }
     
     public Term localImplGlobalState() {
-        return tb.imp(tb.and(tb.func(eventLDT.getAgreeGlobal(), a.heap, b.heap), tb.func(eventLDT.getAgreeLocal(), a.heap2, b.heap2)), 
-                tb.func(eventLDT.getAgreeGlobal(), a.heapPost, b.heapPost));
+        return tb.imp(tb.and(tb.func(eventLDT.getAgreePreGlobal(), a.heap, b.heap), tb.func(eventLDT.getAgreePreLocal(), a.heap2, b.heap2)), 
+                tb.func(eventLDT.getAgreePreGlobal(), a.heapPost, b.heapPost));
     }
     
     public Term consequence() {
