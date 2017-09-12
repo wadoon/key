@@ -8,6 +8,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.ClusterSatisfactionContract;
+import de.uka.ilkd.key.speclang.ComponentCluster;
 import de.uka.ilkd.key.util.DependencyClusterSpec;
 import de.uka.ilkd.key.util.Lowlist;
 import de.uka.ilkd.key.util.VisibilityCondition;
@@ -22,6 +23,12 @@ public class EventEquivalenceWithEqFactory
             InitConfig config, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
         super(config, localSpec.getLowIn(), localSpec.getLowOut(), localSpec.getVisible(), equivEventFunction, invEventFunction, ruleNameSuffix);
         
+        this.self = self;
+    }
+
+    public EventEquivalenceWithEqFactory(ComponentCluster globalSpec, Term self,
+            InitConfig config, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
+        super(config, globalSpec.getLowIn(), globalSpec.getLowOut(), globalSpec.getVisible(), equivEventFunction, invEventFunction, ruleNameSuffix);
         this.self = self;
     }
 

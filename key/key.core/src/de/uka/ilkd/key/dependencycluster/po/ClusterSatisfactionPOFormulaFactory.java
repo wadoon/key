@@ -140,7 +140,6 @@ public class ClusterSatisfactionPOFormulaFactory {
         }
         
         public Term anon() {
-            //TODO get assignable set from somewhere...
             Term mod = contract.getMod();
             return tb.equals(heapPost, tb.anon(heap2, mod, heap));
         }

@@ -24,6 +24,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.speclang.ClusterSatisfactionContract;
+import de.uka.ilkd.key.speclang.ComponentCluster;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyClusterContract;
 import de.uka.ilkd.key.util.DependencyClusterSpec;
@@ -61,6 +62,7 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
         final RemoteMethodEventLDT ldt = proofServices.getTypeConverter().getRemoteMethodEventLDT();
         
         final DependencyClusterSpec localSpec = proofServices.getSpecificationRepository().getServiceDependencyClusterByLabel(contract.getSpecs().getServiceClusterLabel());
+        //TODO JK make sure the specified local cluster is actually a cluster of this method?
         final EventEquivalenceWithEqFactory equivEventLocalFactory = new EventEquivalenceWithEqFactory(localSpec, self, proofConfig, ldt.getEquivEventLocal(), ldt.getInvEventLocal(), "Local");
         RewriteTaclet equivEventLocalTaclet = equivEventLocalFactory.getEventEquivalenceTaclet();    
         RewriteTaclet invEventLocalTaclet = equivEventLocalFactory.getInvisibilityTaclet();  
@@ -69,6 +71,16 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
         //TODO JK is another justification better? Reference the contract for example?
         proofConfig.registerRule(equivEventLocalTaclet, AxiomJustification.INSTANCE);
         proofConfig.registerRule(invEventLocalTaclet, AxiomJustification.INSTANCE);
+        
+        final ComponentCluster globalSpec = proofServices.getSpecificationRepository().getComponentDependencyClusterByLabel(contract.getSpecs().getComponentClusterLabel());
+        final EventEquivalenceWithEqFactory equivEventGlobalFactory = new EventEquivalenceWithEqFactory(globalSpec, self, proofConfig, ldt.getEquivEventGlobal(), ldt.getInvEventGlobal(), "Global");
+        RewriteTaclet equivEventGlobalTaclet = equivEventGlobalFactory.getEventEquivalenceTaclet();    
+        RewriteTaclet invEventGlobalTaclet = equivEventGlobalFactory.getInvisibilityTaclet();  
+        register(equivEventGlobalTaclet, proofConfig);
+        register(invEventGlobalTaclet, proofConfig);
+        //TODO JK is another justification better? Reference the contract for example?
+        proofConfig.registerRule(equivEventGlobalTaclet, AxiomJustification.INSTANCE);
+        proofConfig.registerRule(invEventGlobalTaclet, AxiomJustification.INSTANCE);
         
         
         assignPOTerms(factory.completeFormula());     

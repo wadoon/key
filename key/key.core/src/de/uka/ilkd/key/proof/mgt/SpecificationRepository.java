@@ -823,6 +823,12 @@ public final class SpecificationRepository {
         return combineOperationContracts(baseContracts);
     }
     
+    public ComponentCluster getComponentDependencyClusterByLabel(String label) {
+        ComponentCluster spec = componentDependencyClustersByLabel.get(label);
+        assert spec != null: "There is no component dependency cluster with label \"" + label + "\"."; 
+        return spec;
+    }
+    
     public DependencyClusterSpec getServiceDependencyClusterByLabel(String label) {
         DependencyClusterSpec spec = serviceDependencyClustersByLabel.get(label);
         assert spec != null: "There is no service dependency cluster with label \"" + label + "\"."; 
