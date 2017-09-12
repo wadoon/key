@@ -235,7 +235,7 @@ public class EventEquivalenceWithIsoFactory
             
             if (!expressionsEq.isEmpty()) {
                 collectedConditionsForEquivalenceOfVisibleEvents = 
-                        collectedConditionsForEquivalenceOfVisibleEvents.append(tb.and(message1fitsSpec, tb.and(expressionsEq)));
+                        collectedConditionsForEquivalenceOfVisibleEvents.append(tb.imp(message1fitsSpec, tb.and(expressionsEq)));
             }
         }
         return collectedConditionsForEquivalenceOfVisibleEvents;

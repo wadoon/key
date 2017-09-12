@@ -61,8 +61,15 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
         final RemoteMethodEventLDT ldt = proofServices.getTypeConverter().getRemoteMethodEventLDT();
         
         final DependencyClusterSpec localSpec = proofServices.getSpecificationRepository().getServiceDependencyClusterByLabel(contract.getSpecs().getServiceClusterLabel());
-                
         final EventEquivalenceWithEqFactory equivEventLocalFactory = new EventEquivalenceWithEqFactory(localSpec, self, proofConfig, ldt.getEquivEventLocal(), ldt.getInvEventLocal(), "Local");
+        RewriteTaclet equivEventLocalTaclet = equivEventLocalFactory.getEventEquivalenceTaclet();    
+        RewriteTaclet invEventLocalTaclet = equivEventLocalFactory.getInvisibilityTaclet();  
+        register(equivEventLocalTaclet, proofConfig);
+        register(invEventLocalTaclet, proofConfig);
+        //TODO JK is another justification better? Reference the contract for example?
+        proofConfig.registerRule(equivEventLocalTaclet, AxiomJustification.INSTANCE);
+        proofConfig.registerRule(invEventLocalTaclet, AxiomJustification.INSTANCE);
+        
         
         assignPOTerms(factory.completeFormula());     
         

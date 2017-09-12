@@ -142,7 +142,7 @@ public abstract class EventEquivalenceTacletFactory {
     public abstract Term invisibilityForMessagesWithoutSpec();
     
     public Term equivalenceInVisibleCase() {
-        Term visibleEquivalence = tb.and(bothEventsVisible(), equalMetadata(), tb.or(collectedConditionsForEquivalenceOfVisibleEvents()));
+        Term visibleEquivalence = tb.and(bothEventsVisible(), equalMetadata(), tb.and(collectedConditionsForEquivalenceOfVisibleEvents()));
         return visibleEquivalence;
     }
     
@@ -154,7 +154,7 @@ public abstract class EventEquivalenceTacletFactory {
     public RewriteTaclet getEventEquivalenceTaclet() {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
         
-        final String name = "EquivEventDef" + ruleNameSuffix;
+        final String name = "AAAEquivEventDef" + ruleNameSuffix;
         tacletBuilder.setDisplayName(name);
         tacletBuilder.setName(new Name(name));
         
@@ -172,7 +172,7 @@ public abstract class EventEquivalenceTacletFactory {
     public RewriteTaclet getInvisibilityTaclet() {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
         
-        final String name = "EventInvisibilityDef" + ruleNameSuffix;
+        final String name = "AAAEventInvisibilityDef" + ruleNameSuffix;
         tacletBuilder.setDisplayName(name);
         tacletBuilder.setName(new Name(name));
 
@@ -200,8 +200,9 @@ public abstract class EventEquivalenceTacletFactory {
         ImmutableList<Term> collectedConditionsForEquivalenceOfVisibleEvents = equivalenceConditionsForLowlist(lowIn);
         collectedConditionsForEquivalenceOfVisibleEvents = collectedConditionsForEquivalenceOfVisibleEvents.append(equivalenceConditionsForLowlist(lowOut));
         
-        Term equivalenceForMessagesWithoutLowPart = equivalenceForMessagesWithoutLowPart();
-        collectedConditionsForEquivalenceOfVisibleEvents = collectedConditionsForEquivalenceOfVisibleEvents.append(equivalenceForMessagesWithoutLowPart);
+        //TODO JK I think I don't need this at all, since equivalenceConditionsForLowlist returns implications there are only equivalence restrictions for messages with low parts
+        //Term equivalenceForMessagesWithoutLowPart = equivalenceForMessagesWithoutLowPart();
+        //collectedConditionsForEquivalenceOfVisibleEvents = collectedConditionsForEquivalenceOfVisibleEvents.append(equivalenceForMessagesWithoutLowPart);
         return collectedConditionsForEquivalenceOfVisibleEvents;
     }
     

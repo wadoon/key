@@ -25,6 +25,7 @@ public class EventEquivalenceWithEqFactory
         this.self = self;
     }
 
+    //TODO JK terms for equivalenceForMessagesWithoutLowPart and invisibilityForMessagesWithoutSpec and eventVisibleDueToExplicitSpec probably don't need to be overriden if done properly
     @Override
     public Term equivalenceForMessagesWithoutLowPart() {
         //TODO JK Do I still need this??? When are messages equivalent if they have no specified low parts in their content?
@@ -65,21 +66,139 @@ public class EventEquivalenceWithEqFactory
     
     @Override
     public Term invisibilityForMessagesWithoutSpec() {
-        // TODO Auto-generated method stub
-        return null;
+        ImmutableList<Term> collectedTerms = ImmutableSLList.<Term>nil();
+        for (VisibilityCondition condition:visible) {
+            Term specifiedCalltype;
+            Term specifiedCaller;
+            Term specifiedCallee;
+            if (condition.getMessageType() == VisibilityCondition.MessageType.CALL) {
+                specifiedCalltype = tb.evCall();
+                if (condition.getDirection() == VisibilityCondition.Direction.IN) {
+                    specifiedCaller = tb.getEnvironmentCaller();
+                    specifiedCallee = self;
+                } else {
+                    specifiedCaller = self;
+                    specifiedCallee = condition.getCommunicationPartner().getTerm();
+                }
+            } else {
+                specifiedCalltype = tb.evTerm();
+                if (condition.getDirection() == VisibilityCondition.Direction.OUT) {
+                    specifiedCaller = tb.getEnvironmentCaller();
+                    specifiedCallee = self;
+                } else {
+                    specifiedCaller = self;
+                    specifiedCallee = condition.getCommunicationPartner().getTerm();
+                }
+            }
+            
+            Term updateHeap = tb.elementary(tb.getBaseHeap(), heap1);
+            Term updatedSpecifiedCaller = tb.apply(updateHeap, specifiedCaller);
+            Term updatedSpecifiedCallee = tb.apply(updateHeap, specifiedCallee);
+                        
+            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(condition.getServiceContext().getMethodDeclaration(), proofConfig.getServices()));
+                      
+            Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
+            Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);
+            Term equalCallees1 = tb.equals(callee1, updatedSpecifiedCallee);
+            Term equalServices1 = tb.equals(service1, specifiedService);
+            Term message1fitsSpec = tb.and(equalCalltypes1, equalCallers1, equalCallees1, equalServices1);
+        
+            Term messageInvisibilityNotRestrictedByThisCondition = tb.not(message1fitsSpec);
+            collectedTerms = collectedTerms.append(messageInvisibilityNotRestrictedByThisCondition);
+        }
+        return tb.and(collectedTerms);
     }
 
     @Override
     public Term eventVisibleDueToExplicitSpec() {
-        // TODO Auto-generated method stub
-        return null;
+        ImmutableList<Term> conditions = ImmutableSLList.<Term>nil();
+        for (VisibilityCondition condition: visible) {
+
+            Term specifiedCalltype;
+            Term specifiedCaller;
+            Term specifiedCallee;
+            if (condition.getMessageType() == VisibilityCondition.MessageType.CALL) {
+                specifiedCalltype = tb.evCall();
+                if (condition.getDirection() == VisibilityCondition.Direction.IN){
+                    specifiedCaller = tb.getEnvironmentCaller();
+                    specifiedCallee = self;
+                } else {
+                    specifiedCaller = self;
+                    specifiedCallee = condition.getCommunicationPartner().getTerm();
+                } 
+            } else {
+                specifiedCalltype = tb.evTerm();
+                if (condition.getDirection() == VisibilityCondition.Direction.OUT){
+                    specifiedCaller = tb.getEnvironmentCaller();
+                    specifiedCallee = self;
+                } else {
+                    specifiedCaller = self;
+                    specifiedCallee = condition.getCommunicationPartner().getTerm();
+                } 
+            }
+            Term updateHeap = tb.elementary(tb.getBaseHeap(), heap1);
+            Term updatedSpecifiedCaller = tb.apply(updateHeap, specifiedCaller);
+            Term updatedSpecifiedCallee = tb.apply(updateHeap, specifiedCallee);
+            
+            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(condition.getServiceContext().getMethodDeclaration(), proofConfig.getServices()));
+
+            Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
+            Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);
+            Term equalCallees1 = tb.equals(callee1, updatedSpecifiedCallee);
+            Term equalServices1 = tb.equals(service1, specifiedService);
+            Term message1fitsSpec = tb.and(equalCalltypes1, equalCallers1, equalCallees1, equalServices1);
+            conditions = conditions.append(tb.and(message1fitsSpec, tb.apply(updatedParams1, tb.convertToFormula(condition.getTerm()))));
+        }
+        return tb.or(conditions);
     }
 
     @Override
     public ImmutableList<Term> equivalenceConditionsForLowlist(
             ImmutableList<Lowlist> lowlists) {
-        // TODO Auto-generated method stub
-        return null;
+        ImmutableList<Term> collectedConditionsForEquivalenceOfVisibleEvents = ImmutableSLList.<Term>nil();
+        for (Lowlist list: lowlists) {
+            Term specifiedCalltype;
+            Term specifiedCaller;
+            Term specifiedCallee;
+            if (list.getCallType() == Lowlist.MessageType.CALL) {
+                specifiedCalltype = tb.evCall();
+                specifiedCaller = tb.getEnvironmentCaller();
+                specifiedCallee = self; //TODO JK is this a proper self var for this purpose?
+            } else {
+                specifiedCalltype = tb.evTerm();
+                specifiedCaller = self;
+                specifiedCallee = list.getCommunicationPartner().getTerm();
+            }
+
+            Term updateHeap = tb.elementary(tb.getBaseHeap(), heap1);
+            Term updatedSpecifiedCaller = tb.apply(updateHeap, specifiedCaller);
+            Term updatedSpecifiedCallee = tb.apply(updateHeap, specifiedCallee);
+                        
+            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(list.getService().getMethodDeclaration(), proofConfig.getServices()));
+               
+            Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
+            Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);
+            Term equalCallees1 = tb.equals(callee1, updatedSpecifiedCallee);
+            Term equalServices1 = tb.equals(service1, specifiedService);
+            Term message1fitsSpec = tb.and(equalCalltypes1, equalCallers1, equalCallees1, equalServices1);
+
+            ImmutableList<Term> expressionsEq = ImmutableSLList.<Term>nil();
+            
+            //TODO JK here is the only real difference to the version with isomorphisms, try better code reuse
+            for (Term term: list.getLowTerms()) {             
+                Term t1 = tb.apply(updatedParams1, term);
+                Term t2 = tb.apply(updatedParams2, term);
+                Term expressionComparison = tb.equals(t1, t2);
+                
+                expressionsEq = expressionsEq.append(expressionComparison);
+            }
+            
+            if (!expressionsEq.isEmpty()) {
+                collectedConditionsForEquivalenceOfVisibleEvents = 
+                        collectedConditionsForEquivalenceOfVisibleEvents.append(tb.imp(message1fitsSpec, tb.and(expressionsEq)));
+            }
+        }
+        return collectedConditionsForEquivalenceOfVisibleEvents;
     }
 
 }
