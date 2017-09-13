@@ -26,7 +26,7 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
         super(Parameters.class);
     }
 
-    static class Parameters {
+    public static class Parameters {
         @Option("#2") public Term formula;
     }
 

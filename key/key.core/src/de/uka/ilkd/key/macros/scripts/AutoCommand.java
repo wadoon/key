@@ -93,7 +93,7 @@ public class AutoCommand extends AbstractCommand<AutoCommand.Parameters> {
         }
     }
 
-    static class Parameters {
+    public static class Parameters {
         @Option(value = "all", required = false) public boolean onAllOpenGoals = false;
 
         @Option(value = "steps", required = false) public int maxSteps = -1;
