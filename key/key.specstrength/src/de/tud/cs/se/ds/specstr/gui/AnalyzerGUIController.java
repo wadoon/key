@@ -171,21 +171,6 @@ public class AnalyzerGUIController {
         txtJavaFile.textProperty().addListener((obs, oldV, newV) -> {
             txtJavaFile.selectPositionCaret(newV.length() - 1);
         });
-
-        javaFileProperty.addListener(l -> {
-            try {
-                @SuppressWarnings("unchecked")
-                final ObjectProperty<File> objectProperty =
-                        (ObjectProperty<File>) l;
-                final String file = new String(Files.readAllBytes(
-                        objectProperty.get().toPath()));
-                loadTextToWebView(file, true);
-            }
-            catch (IOException e) {
-                handleException(e);
-            }
-        });
-
     }
 
     public void setMainWindow(Window mainWindow) {
@@ -408,7 +393,19 @@ public class AnalyzerGUIController {
             @Override
             protected Void call() throws Exception {
                 return doWithDisabledWindow(() -> {
+                    Platform.runLater(() -> {
+                        try {
+                            String file = new String(Files.readAllBytes(
+                                    javaFileProperty.get().toPath()));
+                            loadTextToWebView(file, true);
+                        }
+                        catch (IOException e) {
+                            handleException(e);
+                        }
+                    });
+                    
                     loadContractTargets(javaFileProperty.get());
+                    
                     return null;
                 });
             }
