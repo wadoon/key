@@ -449,8 +449,9 @@ public final class LogicUtilities {
                                     .contains(sf.formula());
 
             if (!remove && sf.formula().hasLabels()) {
-                final Term sePred = findSETPred(sf.formula());
-                if (sePred != null && sf.formula().equals(sePred)) {
+                final LinkedHashSet<Term> sePreds = findSETPreds(sf.formula());
+                if (!sePreds.isEmpty() && !sePreds.stream()
+                        .noneMatch(pred -> sf.formula().equals(pred))) {
                     // We don't remove the SE predicate formula
                     continue;
                 }
@@ -523,25 +524,30 @@ public final class LogicUtilities {
      * @param goal
      *            The {@link Goal} to add the SE predicate to.
      */
-    public static void addSETPredicateToAntec(final Goal goal) {
-        final Optional<Pair<SequentFormula, Term>> maybeSETPredicate = //
+    public static void addSETPredicateToAntec(final Goal goal) {        
+        final Optional<Pair<SequentFormula, LinkedHashSet<Term>>> maybeSETPredicates = //
                 Stream.concat(
                         GeneralUtilities.toStream(goal.sequent().succedent()),
                         GeneralUtilities.toStream(goal.sequent().antecedent()))
                         .map(sf -> {
-                            return new Pair<SequentFormula, Term>(sf,
-                                    findSETPred(sf.formula()));
-                        }).filter(p -> p.second != null).findAny();
+                            return new Pair<SequentFormula, LinkedHashSet<Term>>(sf,
+                                    findSETPreds(sf.formula()));
+                        }).filter(p -> !p.second.isEmpty()).findAny();
 
-        if (!maybeSETPredicate.isPresent()) {
+        if (!maybeSETPredicates.isPresent()) {
             // There are easy goals where the post condition is just "false", so
             // that should be OK
             return;
         }
 
-        Term newFormula = maybeSETPredicate.get().second;
-        final Term seqFor = maybeSETPredicate.get().first.formula();
+        final Term seqFor = maybeSETPredicates.get().first.formula();
         final List<Term> updates = getUpdates(seqFor);
+        
+        final TermBuilder tb = goal.proof().getServices().getTermBuilder();
+
+        Term newFormula = maybeSETPredicates.get().second.stream()
+                .reduce(tb.tt(), (acc, elem) -> tb.and(acc, elem));
+        
         for (int i = updates.size() - 1; i >= 0; i--) {
             newFormula = goal.proof().getServices().getTermBuilder()
                     .apply(updates.get(i), newFormula);
@@ -717,13 +723,12 @@ public final class LogicUtilities {
     /**
      * @param formula
      *            The formula to obtain the symbolic execution predicate from.
-     * @return An SE predicate {@link Term} or null, if the given formula does
-     *         not contain one.
+     * @return The set of SE predicate {@link Term}s.
      */
-    private static Term findSETPred(Term formula) {
+    private static LinkedHashSet<Term> findSETPreds(Term formula) {
         SETPredVisitor v = new SETPredVisitor();
         formula.execPostOrder(v);
-        return v.getSetPredTerm();
+        return v.getSetPredTerms();
     }
 
     /**
@@ -769,18 +774,18 @@ public final class LogicUtilities {
         /**
          * The result of the {@link Visitor} execution.
          */
-        private Term setPredTerm = null;
+        private LinkedHashSet<Term> setPredTerms = new LinkedHashSet<>();
 
         @Override
         public void visit(Term visited) {
             if (visited.op().name().toString()
-                    .equals(AbstractOperationPO.UNINTERPRETED_PREDICATE_NAME)) {
-                setPredTerm = visited;
+                    .startsWith(AbstractOperationPO.UNINTERPRETED_PREDICATE_NAME)) {
+                setPredTerms.add(visited);
             }
         }
 
-        public Term getSetPredTerm() {
-            return setPredTerm;
+        public LinkedHashSet<Term> getSetPredTerms() {
+            return setPredTerms;
         }
     }
 
