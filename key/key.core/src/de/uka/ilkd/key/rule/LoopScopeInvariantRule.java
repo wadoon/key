@@ -344,8 +344,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         if (loop.getBody() instanceof StatementBlock) {
             ((StatementBlock) loop.getBody()).getBody()
                     .forEach(elem -> stmnt.add(elem));
-        }
-        else {
+        } else {
             stmnt.add(loop.getBody());
         }
 
