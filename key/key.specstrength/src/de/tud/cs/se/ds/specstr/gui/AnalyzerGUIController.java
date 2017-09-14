@@ -194,7 +194,8 @@ public class AnalyzerGUIController {
         recursivelyDoForChildren(mainWindow.sceneProperty().get().getRoot(),
                 n -> {
                     if (n instanceof Control
-                            && !(n instanceof ScrollBar)) {
+                            && !(n instanceof ScrollBar)
+                            && !(n instanceof SplitPane)) {
                         final Control ctrl = (Control) n;
                         ctrl.disableProperty()
                                 .bind(interfaceDisabledProperty);
@@ -205,7 +206,7 @@ public class AnalyzerGUIController {
                 .bind(javaFileProperty.isNull().or(interfaceDisabledProperty));
 
         btnRecent.disableProperty().bind(
-                javaFileProperty.isNull());
+                javaFileProperty.isNull().or(interfaceDisabledProperty));
 
         cmbMethodChooser.disableProperty()
                 .bind(javaFileProperty.isNull().or(interfaceDisabledProperty));
@@ -545,7 +546,7 @@ public class AnalyzerGUIController {
                     .replaceAll(" ", "&nbsp;").replaceAll(
                             "=+<br/>([^=]*?):<br/>=+",
                             "<strong>$1</strong>")
-                    .replaceAll("\\*([^\\*]*?)\\*", "<em>$1</em>");
+                    .replaceAll("\\*\\*([^\\*]+?)\\*\\*", "<em>$1</em>");
         }
 
         return text;

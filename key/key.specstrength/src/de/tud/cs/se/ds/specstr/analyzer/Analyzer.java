@@ -1076,9 +1076,9 @@ public class Analyzer {
         if (result.unclosedLoopInvPreservedGoals() > 0) {
             // @formatter:off
             ps.println(String.format(
-                    "==========================================\n"
-                  + "Open \"invariant preserved\" branches: *%s*:\n"
-                  + "==========================================\n",
+                    "============================================\n"
+                  + "Open \"invariant preserved\" branches: **%s**:\n"
+                  + "============================================\n",
                     result.unclosedLoopInvPreservedGoals()));
             // @formatter:on
         }
@@ -1086,9 +1086,9 @@ public class Analyzer {
         if (result.unclosedPostCondSatisfiedGoals() > 0) {
             // @formatter:off
             ps.println(String.format(
-                    "=================================================\n"
-                  + "Open \"post condition satisfied\" branches: *%s*:\n"
-                  + "=================================================\n",
+                    "===================================================\n"
+                  + "Open \"post condition satisfied\" branches: **%s**:\n"
+                  + "===================================================\n",
                     result.unclosedPostCondSatisfiedGoals()));
             // @formatter:on
         }
