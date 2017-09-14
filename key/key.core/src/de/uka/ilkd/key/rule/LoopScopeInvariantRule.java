@@ -463,7 +463,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final Term progPost = splitUpdates(inst.progPost, services).second;
 
         Term fullInvariant = tb.and(invTerm, frameCondition, variantPO);
-        
+
         // Add uninterpreted SE predicate if required; this will, not as in the
         // standard, also contain local out variables of the loop.
         fullInvariant = addUninterpretedPredicateWithLocalOuts(services,
@@ -525,7 +525,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             final ImmutableList<Term> localOuts,
             Term fullInvariant) {
         final TermBuilder tb = services.getTermBuilder();
-        
+
         // Protected variables: Heap and localOuts
         ImmutableList<LocationVariable> variablesToProtect =
                 ImmutableSLList.<LocationVariable> nil();
