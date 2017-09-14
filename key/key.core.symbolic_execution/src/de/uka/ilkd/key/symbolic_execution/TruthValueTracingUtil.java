@@ -287,7 +287,7 @@ public final class TruthValueTracingUtil {
       // If goal reached, update final result
       int childCount = child.childrenCount();
       if (childCount == 0) {
-         Term condition = SymbolicExecutionUtil.computePathCondition(evaluationNode, child, false, true);
+         Term condition = SymbolicExecutionUtil.computePathCondition(evaluationNode, child, false, true, true);
          String conditionString = SymbolicExecutionUtil.formatTerm(condition, services, useUnicode, usePrettyPrinting);
          result.addBranchResult(new BranchResult(child, nodeResult, condition, conditionString, termLabelName));
       }

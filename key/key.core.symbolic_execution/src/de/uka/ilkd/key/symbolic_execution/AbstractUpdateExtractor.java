@@ -1461,7 +1461,7 @@ public abstract class AbstractUpdateExtractor {
                                          boolean simplifyConditions) throws ProofInputException {
       Term result = branchConditionCache.get(node);
       if (result == null) {
-         result = SymbolicExecutionUtil.computeBranchCondition(node, simplifyConditions, true);
+         result = SymbolicExecutionUtil.computeBranchCondition(node, simplifyConditions, true, true);
          branchConditionCache.put(node, result);
       }
       return result;

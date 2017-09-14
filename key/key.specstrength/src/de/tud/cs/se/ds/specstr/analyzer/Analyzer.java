@@ -850,7 +850,7 @@ public class Analyzer {
 
         try {
             pathCondTerm = SymbolicExecutionUtil
-                    .computePathCondition(analysisNode, true, true);
+                    .computePathCondition(analysisNode, true, true, false);
         }
         catch (ProofInputException e) {
             problem = true;

@@ -153,7 +153,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
             }
          }
          else {
-            branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), getSettings().isSimplifyConditions(), true);
+            branchCondition = SymbolicExecutionUtil.computeBranchCondition(getProofNode(), getSettings().isSimplifyConditions(), true, true);
          }
          // Format branch condition
          formatedBranchCondition = formatTerm(branchCondition, services);
@@ -264,7 +264,7 @@ public class ExecutionBranchCondition extends AbstractExecutionNode<SourceElemen
          Term[] result = new Term[mergedProofNodes.size()];
          Iterator<Node> iter = mergedProofNodes.iterator();
          for (int i = 0; i < result.length; i++) {
-            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), getSettings().isSimplifyConditions(), true);
+            result[i] = SymbolicExecutionUtil.computeBranchCondition(iter.next(), getSettings().isSimplifyConditions(), true, true);
          }
          return result;
       }

@@ -342,7 +342,7 @@ public class ExecutionVariable extends AbstractExecutionVariable {
          List<Term> pathConditions = new LinkedList<Term>();
          Proof proof = null;
          for (Goal valueGoal : valueGoals) {
-            pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(), getSettings().isSimplifyConditions(), false));
+            pathConditions.add(SymbolicExecutionUtil.computePathCondition(valueGoal.node(), getSettings().isSimplifyConditions(), false, true));
             proof = valueGoal.node().proof();
          }
          Term comboundPathCondition = tb.or(pathConditions);
