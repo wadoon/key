@@ -5,33 +5,27 @@ import java.util.Optional;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
-import de.uka.ilkd.key.java.KeYJavaASTFactory;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.java.visitor.ProgramElementReplacer;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.proof.init.ContractPO;
+import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
 
@@ -80,12 +74,14 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     /**
      * The Singleton instance of {@link LoopScopeInvariantRule}.
      */
-    public static final LoopScopeInvariantRule INSTANCE = new LoopScopeInvariantRule();
+    public static final LoopScopeInvariantRule INSTANCE =
+            new LoopScopeInvariantRule();
 
     /**
      * The hint used to refactor the initial invariant.
      */
-    public static final String INITIAL_INVARIANT_ONLY_HINT = "onlyInitialInvariant";
+    public static final String INITIAL_INVARIANT_ONLY_HINT =
+            "onlyInitialInvariant";
 
     /**
      * The hint used to refactor the full invariant.
@@ -100,7 +96,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     /**
      * The branch label for the initially valid branch.
      */
-    public static final String INVARIANT_INITIALLY_VALID_BRANCH_LABEL = "Invariant Initially Valid";
+    public static final String INVARIANT_INITIALLY_VALID_BRANCH_LABEL =
+            "Invariant Initially Valid";
 
     private static final Name NAME = new Name("Loop (Scope) Invariant");
 
@@ -139,9 +136,11 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final Modality modality = (Modality) progPost.op();
 
         return !InfFlowCheckInfo.isInfFlow(goal)
-                && !WellDefinednessCheck.isOn() // TODO: Remove when wd goal is integrated,
-                                                //  otherwise loop invariant rule would be unsound
-                                                //  w.r.t. well-definedness
+                && !WellDefinednessCheck.isOn() // TODO: Remove when wd goal is
+                                                // integrated,
+                                                // otherwise loop invariant rule
+                                                // would be unsound
+                                                // w.r.t. well-definedness
                 && !(modality == Modality.BOX_TRANSACTION
                         || modality == Modality.DIA_TRANSACTION);
     }
@@ -152,8 +151,9 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         // Initial assertions
         assert ruleApp instanceof LoopInvariantBuiltInRuleApp;
 
-        LoopInvariantInformation loopInvInfo = doPreparationsAndSplit(goal, services,
-                ruleApp);
+        LoopInvariantInformation loopInvInfo =
+                doPreparationsAndSplit(goal, services,
+                        ruleApp);
 
         ImmutableList<Goal> goals = loopInvInfo.goals;
         Goal initiallyGoal = goals.tail().head();
@@ -285,7 +285,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
 
         presrvAndUCGoal.addFormula(new SequentFormula(wellFormedAnon), true,
                 false);
-        presrvAndUCGoal.addFormula(new SequentFormula(labeledUAnonInv), true, false);
+        presrvAndUCGoal.addFormula(new SequentFormula(labeledUAnonInv), true,
+                false);
         presrvAndUCGoal.changeFormula(new SequentFormula(newFormula),
                 ruleApp.posInOccurrence());
     }
@@ -343,13 +344,14 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         if (loop.getBody() instanceof StatementBlock) {
             ((StatementBlock) loop.getBody()).getBody()
                     .forEach(elem -> stmnt.add(elem));
-        } else {
+        }
+        else {
             stmnt.add(loop.getBody());
         }
-        
+
         // If this assignment of "false" to the loop scope index is reached, we
         // are in the standard "preserved" case and have to show the invariant.
-        
+
         stmnt.add(KeYJavaASTFactory.assign(loopScopeIdxVar,
                 KeYJavaASTFactory.falseLiteral()));
 
@@ -375,7 +377,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         // differs from Nathan Wasser's thesis and the paper on loop scope
         // invariants, where we instead use an artificial "continue" statement.
         // We wanted to get rid of this.
-        
+
         final StatementBlock newBlock = KeYJavaASTFactory
                 .block(KeYJavaASTFactory.declare(loopScopeIdxVar,
                         KeYJavaASTFactory.trueLiteral()), loopScope);
@@ -462,8 +464,11 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final Term progPost = splitUpdates(inst.progPost, services).second;
 
         Term fullInvariant = tb.and(invTerm, frameCondition, variantPO);
-        fullInvariant = AbstractOperationPO
-                .addUninterpretedPredicateIfRequired(services, fullInvariant);
+        
+        // Add uninterpreted SE predicate if required; this will, not as in the
+        // standard, also contain local out variables of the loop.
+        fullInvariant = addUninterpretedPredicateWithLocalOuts(services,
+                inst.inv.getLocalOuts(), fullInvariant);
         fullInvariant = TermLabelManager.refactorTerm(termLabelState, services,
                 null, fullInvariant, this, presrvAndUCGoal,
                 FULL_INVARIANT_TERM_HINT, null);
@@ -473,7 +478,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final JavaBlock origJavaBlock = progPost.javaBlock();
 
         final ProgramVariable loopScopeIdxVar = loopScopeIdxVar(services);
-        presrvAndUCGoal.getLocalNamespaces().programVariables().add(loopScopeIdxVar);
+        presrvAndUCGoal.getLocalNamespaces().programVariables()
+                .add(loopScopeIdxVar);
 
         final ProgramElement newProg = newProgram(services, loop, loopLabel,
                 stmtToReplace, origJavaBlock, loopScopeIdxVar);
@@ -497,6 +503,69 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
     }
 
     /**
+     * Adds the "SETAccumulate(...)" uninterpreted predicate. The predicate will
+     * also contain the "localOuts", that is, the assignable fields / variables
+     * of the loop body. That way, a also the final values for these variables
+     * can in any case be analyzed, independently of whether they're used in the
+     * post condition / after the loop, or not.
+     * <p>
+     * NOTE: If the current {@link ContractPO} is not a
+     * {@link FunctionalOperationContractPO}, we will leave out the local outs.
+     *
+     * @param services
+     *            The {@link Services} object.
+     * @param localOuts
+     *            The location variables the loop body may write to.
+     * @param fullInvariant
+     *            The invariant {@link Term} to which to append the
+     *            SETAccumulate predicate.
+     * @return The fullInvariant term with an additional conjunct containing the
+     *         SETAccumulate predicate.
+     */
+    private Term addUninterpretedPredicateWithLocalOuts(Services services,
+            final ImmutableList<Term> localOuts,
+            Term fullInvariant) {
+        final TermBuilder tb = services.getTermBuilder();
+        
+        // Protected variables: Heap and localOuts
+        ImmutableList<LocationVariable> variablesToProtect =
+                ImmutableSLList.<LocationVariable> nil();
+
+        for (final Term localOut : localOuts) {
+            variablesToProtect =
+                    variablesToProtect.append((LocationVariable) localOut.op());
+        }
+
+        // Result variable
+        final ContractPO contractPO = services.getSpecificationRepository()
+                .getContractPOForProof(services.getProof());
+
+        if (contractPO == null
+                || !(contractPO instanceof FunctionalOperationContractPO)) {
+            // Unexpected PO type, fallback to standard predicate.
+            return AbstractOperationPO.addUninterpretedPredicateIfRequired(
+                    services, fullInvariant);
+        }
+
+        final FunctionalOperationContract fContract = //
+                ((FunctionalOperationContractPO) contractPO).getContract();
+
+        final LocationVariable resultVar =
+                (LocationVariable) services.getNamespaces()
+                        .programVariables()
+                        .lookup(fContract.getResult().op().name());
+
+        // Exception variable
+        final Term exceptionVar = fContract.getExc();
+
+        return AbstractOperationPO
+                .addAdditionalUninterpretedPredicateIfRequired(services,
+                        fullInvariant, variablesToProtect,
+                        resultVar == null ? null : tb.var(resultVar),
+                        exceptionVar);
+    }
+
+    /**
      * If the {@link While} loop has a loop label, returns this and the labeled
      * statement. Otherwise, returns an empty {@link Optional} and the given
      * loop statement.
@@ -512,16 +581,19 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         Optional<Label> loopLabel = Optional.empty();
         Statement stmtToRepl = whileLoop;
 
-        ImmutableArray<ProgramPrefix> prefixElems = ((StatementBlock) TermBuilder
-                .goBelowUpdates(ruleApp.posInOccurrence().subTerm()).javaBlock()
-                .program()).getPrefixElements();
+        ImmutableArray<ProgramPrefix> prefixElems =
+                ((StatementBlock) TermBuilder
+                        .goBelowUpdates(ruleApp.posInOccurrence().subTerm())
+                        .javaBlock()
+                        .program()).getPrefixElements();
 
         if (prefixElems.size() > 0
                 && (prefixElems.last() instanceof LabeledStatement)
                 && ((LabeledStatement) prefixElems.last()).getBody()
                         .equals(whileLoop)) {
-            final LabeledStatement lastLabeledStmt = (LabeledStatement) prefixElems
-                    .last();
+            final LabeledStatement lastLabeledStmt =
+                    (LabeledStatement) prefixElems
+                            .last();
             loopLabel = Optional.of(lastLabeledStmt.getLabel());
             stmtToRepl = lastLabeledStmt.getBody();
         }
