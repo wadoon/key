@@ -679,11 +679,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 		}
     }
 
-    // TODO JK activeComponent_A / activeComponent_B stuff
     // TODO KD a \old(hist) and \caller
-
     // TODO KD a- add wfHist(anonHist) for (non service) methods
-    // TODO KD a- gather all changes and put them in one if statement
     // TODO KD b disable / implement service inlining
 	@Override
 	public ImmutableList<Goal> apply(Goal goal, 
@@ -806,29 +803,37 @@ public final class UseOperationContractRule implements BuiltInRule {
 		final ImmutableList<Goal> result;
 		final Goal preGoal, postGoal, excPostGoal, nullGoal;
 		final ReferencePrefix rp = inst.mr.getReferencePrefix();
-		if(rp != null
-				&& !(rp instanceof ThisReference)
-				&& !(rp instanceof SuperReference)
-				&& !(rp instanceof TypeReference)
-				&& !(inst.pm.isStatic())) {
-			result = goal.split(4);
-			postGoal = result.tail().tail().tail().head();
-			excPostGoal = result.tail().tail().head();
-			preGoal = result.tail().head();
-			nullGoal = result.head();
-			nullGoal.setBranchLabel("Null reference ("
-					+ inst.actualSelf
-					+ " = null)");
-		} else {
-			result = goal.split(3);
-			postGoal = result.tail().tail().head();
-			excPostGoal = result.tail().head();
+		if (pm.getMethodDeclaration().isRemote()) { // TODO KD s exceptional post excluded in simons theory
+			result = goal.split(2);
+			postGoal = result.tail().head();
+			excPostGoal = null;
 			preGoal = result.head();
 			nullGoal = null;
+		} else {
+			if(rp != null
+					&& !(rp instanceof ThisReference)
+					&& !(rp instanceof SuperReference)
+					&& !(rp instanceof TypeReference)
+					&& !(inst.pm.isStatic())) {
+				result = goal.split(4);
+				postGoal = result.tail().tail().tail().head();
+				excPostGoal = result.tail().tail().head();
+				preGoal = result.tail().head();
+				nullGoal = result.head();
+				nullGoal.setBranchLabel("Null reference ("
+						+ inst.actualSelf
+						+ " = null)");
+			} else {
+				result = goal.split(3);
+				postGoal = result.tail().tail().head();
+				excPostGoal = result.tail().head();
+				preGoal = result.head();
+				nullGoal = null;
+			}
+			excPostGoal.setBranchLabel("Exceptional Post"+ " ("+pm.getName()+")");
 		}
 		preGoal.setBranchLabel("Pre"+ " ("+pm.getName()+")");
 		postGoal.setBranchLabel("Post"+ " ("+pm.getName()+")");
-		excPostGoal.setBranchLabel("Exceptional Post"+ " ("+pm.getName()+")");
 
 		//prepare common stuff for the three branches
 		Term anonAssumption = tb.tt();
@@ -864,8 +869,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 		final Term anonHistUpdate = tb.elementary(hist, afterHist);
 		final Term anonHistInternalUpdate = tb.elementary(internalHist, afterHistInternal);		
 		Term newHist;
-		Term similarFormula = tb.tt();
 		Term newHistInternal;
+		Term similarFormula = tb.tt();
 		// if called method belongs to a business remote interface, add "outgoing call" and "incoming termination" events to history
 		if (pm.getMethodDeclaration().isRemote()) {
 			assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
@@ -886,6 +891,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 					tb.similarHist(contractSelf, tb.getHist(), tb.var(otherHist)),
 					tb.similarHist(contractSelf, tb.var(beforeHist), tb.var(otherPreHist)),
 					getInv(originalPre, contractSelf, tb));
+			atPreUpdates = tb.parallel(atPreUpdates, tb.elementary(beforeHist, tb.getHist()));
 		// if called method does not belong to a business remote interface add unknown changes to history
 		} else {
 			final Name anonHistName = new Name(tb.newName("anon_" + hist + "_" + pm.getName()));
@@ -901,7 +907,6 @@ public final class UseOperationContractRule implements BuiltInRule {
 		anonAssumption = tb.and(anonAssumption, assumption);
 		anonUpdate = tb.parallel(anonUpdate, anonHistUpdate, anonHistInternalUpdate);
 
-		atPreUpdates = tb.parallel(atPreUpdates, tb.elementary(beforeHist, tb.getHist()));
 		reachableState = tb.and(reachableState, tb.wellFormedHist(hist));
 
 
@@ -1014,27 +1019,29 @@ public final class UseOperationContractRule implements BuiltInRule {
 				tb.var(excVar), mby, atPreUpdates,finalPreTerm, anonUpdateDatas, services);
 
 		//create "Exceptional Post" branch
-		final StatementBlock excPostSB
-				= replaceStatement(jb, new StatementBlock(new Throw(excVar)));
-		JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
-		final Term originalExcPost = tb.apply(anonUpdate,
-				tb.prog(inst.mod, excJavaBlock, inst.progPost.sub(0),
-				TermLabelManager.instantiateLabels(termLabelState, services, 
-				ruleApp.posInOccurrence(), this, ruleApp,
-				excPostGoal, "ExceptionalPostModality",
-				null, inst.mod,
-				new ImmutableArray<Term>(
-						inst.progPost.sub(0)),
-				null, excJavaBlock, inst.progPost.getLabels())), null);
-		final Term excPost = globalDefs==null? originalExcPost: tb.apply(globalDefs, originalExcPost);
-		excPostGoal.addFormula(new SequentFormula(wellFormedAnon),
-				true,
-				false);
-		excPostGoal.changeFormula(new SequentFormula(tb.apply(inst.u, excPost, null)),
-				ruleApp.posInOccurrence());
-		excPostGoal.addFormula(new SequentFormula(excPostAssumption),
-				true,
-				false);
+		if (excPostGoal != null) {
+			final StatementBlock excPostSB
+					= replaceStatement(jb, new StatementBlock(new Throw(excVar)));
+			JavaBlock excJavaBlock = JavaBlock.createJavaBlock(excPostSB);
+			final Term originalExcPost = tb.apply(anonUpdate,
+					tb.prog(inst.mod, excJavaBlock, inst.progPost.sub(0),
+					TermLabelManager.instantiateLabels(termLabelState, services, 
+					ruleApp.posInOccurrence(), this, ruleApp,
+					excPostGoal, "ExceptionalPostModality",
+					null, inst.mod,
+					new ImmutableArray<Term>(
+					inst.progPost.sub(0)),
+					null, excJavaBlock, inst.progPost.getLabels())), null);
+			final Term excPost = globalDefs==null? originalExcPost: tb.apply(globalDefs, originalExcPost);
+			excPostGoal.addFormula(new SequentFormula(wellFormedAnon),
+					true,
+					false);
+			excPostGoal.changeFormula(new SequentFormula(tb.apply(inst.u, excPost, null)),
+					ruleApp.posInOccurrence());
+			excPostGoal.addFormula(new SequentFormula(excPostAssumption),
+					true,
+					false);
+		}
 
 		//create "Null Reference" branch
 		if (nullGoal != null) {
