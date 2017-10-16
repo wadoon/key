@@ -55,6 +55,11 @@ public class ServiceEventLDT extends LDT {
 	private final Function equivHistoryInternal;
 	private final Function filterVisibleInternal;
 
+	private final Function heapjoin;
+	private final Function isIso;
+	private final Function isoObject;
+	private final Function transfresh;
+
 	//history (of Remote method events) ... copy of: key.core/resources/de/uka/ilkd/key/proof/rules/events.key -> Seq hist;
 	private final LocationVariable hist;
 	private final LocationVariable internalHist;
@@ -91,6 +96,11 @@ public class ServiceEventLDT extends LDT {
 		coopListEquivInternal = addFunction(services, "coopListEquivInternal");
 		equivHistoryInternal = addFunction(services, "equivHistoryInternal");
 		filterVisibleInternal = addFunction(services, "filterVisibleInternal");
+
+		heapjoin = addFunction(services, "heapjoin");
+		isIso = addFunction(services, "isIso");
+		isoObject = addFunction(services, "isoObject");
+		transfresh = addFunction(services, "transfresh");
 
 		hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
 		internalHist = (LocationVariable) services.getNamespaces().programVariables().lookup(INTERNAL_HIST_NAME);
@@ -181,6 +191,22 @@ public class ServiceEventLDT extends LDT {
 		return filterVisible;
 	}
 
+	public Function heapjoin() {
+		return heapjoin;
+	}
+
+	public Function isIso() {
+		return isIso;
+	}
+
+	public Function isoObject() {
+		return isoObject;
+	}
+
+	public Function transfresh() {
+		return transfresh;
+	}
+
 	/**
 	 * @return the history of Remote method events;
 	 */
@@ -225,8 +251,7 @@ public class ServiceEventLDT extends LDT {
 	}
 
 	public Function getMethodIdentifier(MethodDeclaration md, TermServices services) {
-		// TODO KD b do i need the class and can i get it from md?
-		// TODO KD c test (same name, different signature)
+		// TODO KD b extend methodIdentifier with class
 		String functionString = md.getFullName() + "(";
 		if (md.getParameterDeclarationCount() > 0) {
 			functionString += md.getParameterDeclarationAt(0).getTypeReference().getKeYJavaType().getFullName();
@@ -279,7 +304,7 @@ public class ServiceEventLDT extends LDT {
 
 	@Override
 	public boolean hasLiteralFunction(Function f) {
-		assert false; // TODO KD z just to be sure
+		assert false;
 		return containsFunction(f) && f.arity() == 0; // should return false I think
 	}
 

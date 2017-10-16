@@ -663,7 +663,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
     // TODO KD z hacky
     private Term getInv(Term t, Term contractSelf, TermBuilder tb) {
-    	// TODO KD c inv hack made t.sub(1) hist, careful, when changing again
+    	// TODO KD c inv hack made t.sub(1) hist, careful, when changing again (+ Display BUG)
     	if (t.op().toString().contains("<inv>") && t.sub(2) == contractSelf) {
         	return t;
     	} else if (t.op() == Junctor.AND) {
@@ -688,8 +688,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 		}
     }
 
-    // TODO KD a- \old(hist) and \caller
-    // TODO KD c- add wfHist(anonHist) for (non service) methods
+    // TODO KD b \old(hist) and \caller
     // TODO KD b disable / implement service inlining
     // TODO KS s
     // self = contractSelf?
@@ -789,7 +788,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 		final ImmutableList<Goal> result;
 		final Goal preGoal, postGoal, excPostGoal, nullGoal;
 		final ReferencePrefix rp = inst.mr.getReferencePrefix();
-		if (pm.getMethodDeclaration().isRemote()) { // TODO KD s exceptional post excluded in simons theory
+		if (pm.getMethodDeclaration().isRemote()) {
 			result = goal.split(2);
 			postGoal = result.tail().head();
 			excPostGoal = null;
@@ -883,9 +882,9 @@ public final class UseOperationContractRule implements BuiltInRule {
 			services.getNamespaces().functions().addSafely(hist_post);
 			Function hist_opre = new Function(new Name(tb.newName("otherHistBefore_" + pm.getName())), hist.sort(), true);
 			services.getNamespaces().functions().addSafely(hist_opre);
-			Function hist_pre = new Function(new Name(tb.newName("histBefore_" + pm.getName())), hist.sort(), true); // TODO KD a,s not a function symbol?
+			Function hist_pre = new Function(new Name(tb.newName("histBefore_" + pm.getName())), hist.sort(), true); // TODO KD b,s not a function symbol?
 			services.getNamespaces().functions().addSafely(hist_pre);
-			Function hist_pre_local = new Function(new Name(tb.newName("histLocalBefore_" + pm.getName())), hist.sort(), true); // TODO KD a,s not a function symbol?
+			Function hist_pre_local = new Function(new Name(tb.newName("histLocalBefore_" + pm.getName())), hist.sort(), true); // TODO KD b,s not a function symbol?
 			services.getNamespaces().functions().addSafely(hist_pre_local);
 			Function callevent = new Function(new Name(tb.newName("callEvent")), services.getTypeConverter().getServiceEventLDT().eventSort(), true);
 			services.getNamespaces().functions().addSafely(callevent);
@@ -896,7 +895,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 			Function termevent_o = new Function(new Name(tb.newName("otherTermEvent")), services.getTypeConverter().getServiceEventLDT().eventSort(), true);
 			services.getNamespaces().functions().addSafely(termevent_o);
 			Term w = tb.parallel(
-//					tb.elementary(self, contractSelf), TODO KD a;s what is self?; self ->? this?
+//					tb.elementary(self, contractSelf), TODO KD a;s what is self?; self ->? this
 					tb.elementary(bean, contractSelf),
 					tb.elementary(callingComp, bean));
 			Term u_o = tb.parallel(
@@ -908,6 +907,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 					tb.elementary(tb.getHist(), tb.seqConcat(tb.func(hist_o), tb.func(callevent_o))),
 					tb.elementary(tb.var(hist_local), tb.seqEmpty()));
 			Term pre_noinv = noInv(originalPre, contractSelf, tb);
+			Term u_post = tb.parallel(
+					tb.elementary(baseHeapTerm, tb.func(heap_post)),
+					tb.elementary(tb.var(hist_local), tb.seqConcat(tb.var(hist_local), tb.func(callevent), tb.func(termevent))),
+					tb.elementary(tb.getHist(), tb.seqConcat(tb.getHist(), tb.func(callevent), tb.func(termevent)))//,
+//					tb.elementary(res, r) // TODO KD a,s what is res, r (nooooo, they are different)
+			);
 			Term reachableOut = excNull;
 			Term resultSeq;
 			Term resultSeq_o;
@@ -916,8 +921,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 				r_o = new Function(new Name(tb.newName("r_o")), contractResult.sort(), true);
 				services.getNamespaces().functions().addSafely(r_o);
 				reachableOut = tb.and(reachableOut, tb.imp(tb.instance(services.getJavaInfo().objectSort(), contractResult), tb.or(tb.equals(contractResult, tb.NULL()), tb.created(contractResult))));
-				// TODO KD a,s again: ist es möglich impl rauszuziehen
-//				u_post = tb.parallel(u_post, tb.elementary(contractResult, gamma(r_o))); // TODO KD  gamma missing
+				// TODO KD c,s again: possible to leave impl out
+				u_post = tb.parallel(u_post, tb.elementary(contractResult, tb.isoObject(tb.func(r_o))));
 				resultSeq = tb.seqSingleton(contractResult); // TODO KD s contractResult right?
 				resultSeq_o = tb.seqSingleton(tb.func(r_o));
 			} else {
@@ -932,13 +937,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 					tb.elementary(atPreVars.get(baseHeap), tb.func(heap_opre)),
 					tb.elementary(tb.func(hist_pre_local), tb.seqEmpty()),
 					tb.elementary(tb.func(hist_pre), tb.func(hist_opre)),
-					tb.elementary(contractResult, tb.func(r_o))); // TODO KD s res =? r (both = contractResult?)
-			Term u_post = tb.parallel(
-					tb.elementary(baseHeapTerm, tb.func(heap_post)),
-					tb.elementary(tb.var(hist_local), tb.seqConcat(tb.var(hist_local), tb.func(callevent), tb.func(termevent))),
-					tb.elementary(tb.getHist(), tb.seqConcat(tb.getHist(), tb.func(callevent), tb.func(termevent)))//,
-//					tb.elementary(res, r) // TODO KD s what is res, r (nooooo, they are different)
-					);
+					tb.elementary(contractResult, tb.func(r_o))); // TODO KD a,s res =? r (both = contractResult?)
 			Term reachableIn = tb.tt();
 			Term[] a = new Term[contractParams.size()];
 			for (int i = 0; i < a.length; i++) {
@@ -948,27 +947,23 @@ public final class UseOperationContractRule implements BuiltInRule {
 				w = tb.parallel(w, tb.elementary(a[i], contractParams.take(i).head()));
 				reachableIn = tb.and(reachableIn,
 						tb.imp(tb.instance(services.getJavaInfo().objectSort(), a[i]), tb.or(tb.equals(a[i], tb.NULL()), tb.created(a[i])))//,
-//						tb.imp(isLocSet(a[i]), tb.disjoint(a[i], unusedLocs[heap])) // TODO KD a;s how to isLocSet, unusedLocs
-						// TODO KD a,s possible to leave (both) impl out of formula?
+//						tb.imp(isLocSet(a[i]), tb.disjoint(a[i], unusedLocs[heap])) // TODO KD a;s how to isLocSet, unusedLocs; how can it be a locSet?
+						// TODO KD c,s possible to leave (both) impl out of formula?
 						);
 			}
 			Term m_id = tb.func(services.getTypeConverter().getServiceEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), services));
-			Term preFormula = tb.and(
-					tb.wellFormed(tb.func(heap_o)),
+			Term preFormula = tb.apply(w,
+					tb.and(tb.wellFormed(tb.func(heap_o)),
 					tb.wellFormed(tb.func(heap_opre)),
 					tb.wellFormedHist(tb.func(hist_o)),
-//					tb.equals(heap_opre, tb.heapjoin(heap, heap_o, tb.seq(a))), TODO KD  heapjoin missing
-					tb.equals(tb.func(callevent_o), tb.evConst(tb.evCall(), callingComp, contractSelf, m_id, tb.seq(a), tb.func(heap_opre)))//,
-/*					tb.apply(u_o, tb.imp(self.<inv>, tb.apply(u_opre, tb.and( // TODO KD a,s self.<inv> missing
+					tb.equals(tb.func(heap_opre), tb.heapjoin(baseHeapTerm, tb.func(heap_o), tb.seq(a))),
+					tb.equals(tb.func(callevent_o), tb.evConst(tb.evCall(), callingComp, contractSelf, m_id, tb.seq(a), tb.func(heap_opre))),
+					tb.transfresh(a, tb.func(heap_opre), tb.func(heap_o)),
+					tb.apply(u_o, tb.imp(/*self.<inv>*/tb.tt(), tb.apply(u_opre, tb.and( // TODO KD a,s self.<inv> missing
 							pre_noinv,
 							reachableIn,
-							tb.not(tb.equals(contractSelf, tb.NULL()))
-							tb.created(contractSelf))))))*/
-					); // TODO KD a- GAMMA => {u} AND DELTA not included
-			for (Term t : a) {
-//				preFormula = tb.and(preFormula, transfresh(t, heap_opre, heap_o)); TODO KD  transfresh missing
-			}
-			preFormula = tb.apply(w, preFormula);
+							tb.not(tb.equals(contractSelf, tb.NULL())),
+							tb.created(contractSelf))))))); // TODO KD a GAMMA => {u} AND DELTA not included
 			Term postFormula = tb.imp(
 					tb.and(
 							tb.wellFormed(tb.func(heap_opre)),
@@ -976,27 +971,22 @@ public final class UseOperationContractRule implements BuiltInRule {
 							tb.wellFormed(tb.func(h_1)),
 							tb.wellFormed(tb.func(h_2)),
 							tb.wellFormedHist(tb.func(hist_o)),
-//							tb.wellformed(tb.func(hist_o)), TODO KD s what should that mean?
-//							tb.equals(heap_opre, tb.heapjoin(heap, heap_o, tb.seq(a))), TODO KD  heapjoin missing
-//							tb.equals(heap_opost, tb.anon(heap_opre, mod, h1)), TODO KD s mod missing
+							tb.equals(tb.func(heap_opre), tb.heapjoin(baseHeapTerm, tb.func(heap_o), tb.seq(a))),
+//							tb.equals(heap_opost, tb.anon(tb.func(heap_opre), mods, tb.func(h_1))), // TODO KD a,s how to get mods Term
 							tb.equals(tb.func(hist_opost), tb.seqConcat(tb.func(hist_o), tb.seqSingleton(tb.func(callevent_o)), tb.func(hist_olocal), tb.seqSingleton(tb.func(termevent_o)))),
 							tb.equals(tb.func(heap_post), tb.anon(baseHeapTerm, tb.seqEmpty(), tb.func(h_2))),
 							// TODO KD s tb.seq(contractParams) =? {a_1..a_m} OR {a_1_..a_m_}
-							tb.equals(tb.func(callevent), tb.evConst(tb.evCall(), bean, contractSelf, m_id, tb.seq(contractParams), baseHeapTerm/*anonUpdateDatas.head().methodHeapAtPre*/)),
-							tb.equals(tb.func(termevent), tb.evConst(tb.evTerm(), bean, contractSelf, m_id, resultSeq, tb.func(heap_post)/*anonUpdateDatas.reverse().head().methodHeap*/)),
+							tb.equals(tb.func(callevent), tb.evConst(tb.evCall(), bean, contractSelf, m_id, tb.seq(contractParams), baseHeapTerm)),
+							tb.equals(tb.func(termevent), tb.evConst(tb.evTerm(), bean, contractSelf, m_id, resultSeq, tb.func(heap_post))),
 							tb.equals(tb.func(callevent_o), tb.evConst(tb.evCall(), bean, contractSelf, m_id, tb.seq(contractParams), tb.func(heap_opre))), // TODO KD s contractParams_?
 							tb.equals(tb.func(termevent_o), tb.evConst(tb.evTerm(), bean, contractSelf, m_id, resultSeq_o, tb.func(heap_opost))),
-//							tb.transfresh(contractResult, heap_post, baseHeapTerm), TODO KD  transfresh missing
-//							TODO KD a- forall Any y, z; y = z EQUIV isoObject(y) = isoObject(z) missing
-//							TODO KD  isoObject(null) = null missing
-//							TODO KD  isIso(r, isoObject(r_o)) missing
+							tb.transfresh(contractResult, tb.func(heap_post), baseHeapTerm),
+//							TODO KD a forall Any y, z; y = z EQUIV isoObject(y) = isoObject(z) missing
+							tb.equals(tb.isoObject(tb.NULL()), tb.NULL()),
+							tb.isIso(contractResult, tb.isoObject(tb.func(r_o))),
 							tb.apply(u_opost, post)),
-					tb.apply(u_post, tb.imp(reachableOut, tb.ff()/*TODO KD a- PI OMEGA PHY missing*/))); // TODO KD a- GAMMA => {u} AND DELTA not included
+					tb.apply(u_post, tb.imp(reachableOut, tb.ff()/*TODO KD a PI OMEGA PHY missing*/))); // TODO KD a GAMMA => {u} AND DELTA not included
 
-			//;
-			//;
-			//;
-			//; 
 /*			newHist = tb.seqConcat(tb.seqConcat(tb.getHist(), tb.seqSingleton(tb.func(callevent))), tb.seqSingleton(tb.func(termevent)));
 			newHistInternal = tb.seqConcat(tb.seqConcat(tb.getInternalHist(), tb.seqSingleton(tb.func(callevent))), tb.seqSingleton(tb.func(termevent)));*/
 /*			similarFormula = tb.and(

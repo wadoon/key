@@ -404,7 +404,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
 				final LocationVariable baseHeap = proofServices.getTypeConverter().getHeapLDT().getHeap();
 				final Term selfVarTerm = (selfVar != null) ? tb.var(selfVar) : null;
-				final Term globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm, // TODO KD z always null?
+				final Term globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm, // TODO KD z,s always null?
 						tb.var(paramVars), proofServices);
 
 				// if method to prove is remote add "outgoing termination" events to history

@@ -150,7 +150,7 @@ public abstract class AbstractBlastingMacro extends StrategyProofMacro {
                             heaps[0] = tb.var(h);
                             Term histTerm = tb.var(hist);
 
-                            Term inv = tb.inv(heaps, histTerm, tb.var(o));
+                            Term inv = tb.inv(heaps, tb.var(o), histTerm);
 
                             if(left.op().name().equals(inv.op().name())){
 
