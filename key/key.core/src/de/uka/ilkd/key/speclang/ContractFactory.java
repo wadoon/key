@@ -38,7 +38,6 @@ import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory;
 import de.uka.ilkd.key.speclang.jml.translation.ProgramVariableCollection;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.ClusterSatisfactionSpec;
-import de.uka.ilkd.key.util.DependencyClusterSpec;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
@@ -302,7 +301,7 @@ public class ContractFactory {
             boolean hasMod,
             ProgramVariableCollection progVars,
             Term accessible,
-            DependencyClusterSpec dependencyClusterSpec,
+            ServiceDependencyClusterSpec dependencyClusterSpec,
             boolean toBeSaved) {
         final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
         final Term atPre = tb.var(progVars.atPreVars.get(baseHeap));

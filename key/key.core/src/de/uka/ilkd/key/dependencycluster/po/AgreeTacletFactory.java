@@ -68,6 +68,7 @@ public class AgreeTacletFactory {
         return tb.and(collectedTerms);
     }
 
+    //TODO JK AgreePost is object sensitive - if we use it this has to be implemented properly
     public RewriteTaclet getAgreePostTaclet() {
         return null;
     }

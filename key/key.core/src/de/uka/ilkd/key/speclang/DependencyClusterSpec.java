@@ -1,0 +1,19 @@
+package de.uka.ilkd.key.speclang;
+
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+
+public interface DependencyClusterSpec {
+
+    public Function getEquivEventPredicate();
+    
+    public Function getAgreePrePredicate();
+    
+    public Function getVisibilityPredicate();
+    
+    public RewriteTaclet getEquivEventDefinition();
+    
+    public RewriteTaclet getAgreePreDefinition();
+    
+    public RewriteTaclet getVisibilityDefinition();
+}

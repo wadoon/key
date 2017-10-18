@@ -27,7 +27,7 @@ import de.uka.ilkd.key.speclang.ClusterSatisfactionContract;
 import de.uka.ilkd.key.speclang.ComponentCluster;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyClusterContract;
-import de.uka.ilkd.key.util.DependencyClusterSpec;
+import de.uka.ilkd.key.speclang.ServiceDependencyClusterSpec;
 import de.uka.ilkd.key.util.Lowlist;
 
 public class ClusterSatisfactionPO extends AbstractOperationPO
@@ -61,7 +61,7 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
         
         final RemoteMethodEventLDT ldt = proofServices.getTypeConverter().getRemoteMethodEventLDT();
         
-        final DependencyClusterSpec localSpec = proofServices.getSpecificationRepository().getServiceDependencyClusterByLabel(contract.getSpecs().getServiceClusterLabel());
+        final ServiceDependencyClusterSpec localSpec = proofServices.getSpecificationRepository().getServiceDependencyClusterByLabel(contract.getSpecs().getServiceClusterLabel());
         //TODO JK make sure the specified local cluster is actually a cluster of this method?
         final EventEquivalenceWithEqFactory equivEventLocalFactory = new EventEquivalenceWithEqFactory(localSpec, self, proofConfig, ldt.getEquivEventLocal(), ldt.getInvEventLocal(), "Local");
         final AgreeTacletFactory agreeLocalTacletFactory = new AgreeTacletFactory(localSpec.getLowState(), proofConfig, "Local", ldt.getAgreePreLocal(), ldt.getAgreePost());

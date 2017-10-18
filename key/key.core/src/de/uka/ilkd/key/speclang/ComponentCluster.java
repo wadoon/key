@@ -6,7 +6,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.util.Lowlist;
 import de.uka.ilkd.key.util.VisibilityCondition;
 
-public interface ComponentCluster extends SpecificationElement {
+public interface ComponentCluster extends SpecificationElement, DependencyClusterSpec  {
     public ImmutableList<Lowlist> getLowOut();
 
     public ImmutableList<Lowlist> getLowIn();

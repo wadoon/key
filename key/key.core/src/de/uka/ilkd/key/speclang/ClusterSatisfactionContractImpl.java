@@ -20,7 +20,6 @@ import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.util.ClusterSatisfactionSpec;
-import de.uka.ilkd.key.util.DependencyClusterSpec;
 
 public class ClusterSatisfactionContractImpl
         implements ClusterSatisfactionContract {

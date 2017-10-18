@@ -19,7 +19,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.DependencyClusterContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.InformationFlowContractImpl;
-import de.uka.ilkd.key.util.DependencyClusterSpec;
+import de.uka.ilkd.key.speclang.ServiceDependencyClusterSpec;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 public class DependencyClusterPOFormulaFactory {
@@ -52,7 +52,7 @@ public class DependencyClusterPOFormulaFactory {
         
         ImmutableList<InfFlowSpec> infFlowSpecs = ImmutableSLList.<InfFlowSpec>nil();
         
-        DependencyClusterSpec spec = contract.getSpecs();
+        ServiceDependencyClusterSpec spec = contract.getSpecs();
         InfFlowSpec infFlowSpec = new InfFlowSpec(spec.getLowState(), spec.getLowState(), spec.getNewObjects());
         infFlowSpecs = infFlowSpecs.append(infFlowSpec);
         

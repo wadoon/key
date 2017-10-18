@@ -195,7 +195,7 @@ public class EventEquivalenceWithIsoFactory
             ImmutableList<Term> expressionsEq = ImmutableSLList.<Term>nil();
             
             
-            //TODO JK handle sequences with objects CURRENTLY UNSOUND bc isomorphy doesn't include them! check sequence stuff in general
+            //TODO JK UNSOUND! handle sequences with objects CURRENTLY UNSOUND bc isomorphy doesn't include them! check sequence stuff in general
             //Formulas
             for (Term term: getFormulas(list.getLowTerms())) {             
                 //TODO JK Parser returns some "boolean" expressions (for example with > operator) as Formulas, not as expressions, so we need special treatment for those (can't be in sequences, dont have a = relation...)

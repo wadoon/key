@@ -78,12 +78,12 @@ import de.uka.ilkd.key.speclang.MethodWellDefinedness;
 import de.uka.ilkd.key.speclang.PartialInvAxiom;
 import de.uka.ilkd.key.speclang.QueryAxiom;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
+import de.uka.ilkd.key.speclang.ServiceDependencyClusterSpec;
 import de.uka.ilkd.key.speclang.SpecificationElement;
 import de.uka.ilkd.key.speclang.StatementWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.util.DependencyClusterSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
@@ -109,8 +109,8 @@ public final class SpecificationRepository {
                               ImmutableSet<WellDefinednessCheck>>();
     private final Map<String, Contract> contractsByName =
             new LinkedHashMap<String, Contract>();
-    private final Map<String, DependencyClusterSpec> serviceDependencyClustersByLabel =
-            new LinkedHashMap<String, DependencyClusterSpec>();
+    private final Map<String, ServiceDependencyClusterSpec> serviceDependencyClustersByLabel =
+            new LinkedHashMap<String, ServiceDependencyClusterSpec>();
     private final Map<String, ComponentCluster> componentDependencyClustersByLabel =
             new LinkedHashMap<String, ComponentCluster>();
     
@@ -829,8 +829,8 @@ public final class SpecificationRepository {
         return spec;
     }
     
-    public DependencyClusterSpec getServiceDependencyClusterByLabel(String label) {
-        DependencyClusterSpec spec = serviceDependencyClustersByLabel.get(label);
+    public ServiceDependencyClusterSpec getServiceDependencyClusterByLabel(String label) {
+        ServiceDependencyClusterSpec spec = serviceDependencyClustersByLabel.get(label);
         assert spec != null: "There is no service dependency cluster with label \"" + label + "\"."; 
         return spec;
     }

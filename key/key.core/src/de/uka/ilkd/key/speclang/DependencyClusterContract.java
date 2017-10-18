@@ -6,7 +6,6 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.util.DependencyClusterSpec;
 
 public interface DependencyClusterContract extends Contract {
     public IProgramMethod getTarget();
@@ -33,7 +32,7 @@ public interface DependencyClusterContract extends Contract {
 
     public Term getHeapAtPre();
 
-    public DependencyClusterSpec getSpecs();
+    public ServiceDependencyClusterSpec getSpecs();
 
     public Term getSelf();
     

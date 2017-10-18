@@ -1,11 +1,15 @@
-package de.uka.ilkd.key.util;
+package de.uka.ilkd.key.speclang;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.util.Lowlist;
+import de.uka.ilkd.key.util.VisibilityCondition;
 
-public class DependencyClusterSpec {
+public class ServiceDependencyClusterSpec implements DependencyClusterSpec {
     
 
     private final ImmutableList<Lowlist> lowIn;
@@ -18,7 +22,7 @@ public class DependencyClusterSpec {
     private final String label;
 
 
-    public DependencyClusterSpec(ImmutableList<Lowlist> lowIn, ImmutableList<Lowlist> lowOut, ImmutableList<Term> lowState, ImmutableList<VisibilityCondition> visible, ImmutableList<Term> newObjects, String label) {
+    public ServiceDependencyClusterSpec(ImmutableList<Lowlist> lowIn, ImmutableList<Lowlist> lowOut, ImmutableList<Term> lowState, ImmutableList<VisibilityCondition> visible, ImmutableList<Term> newObjects, String label) {
         this.lowIn = lowIn;
         this.lowOut = lowOut;
         this.lowState = lowState;
@@ -61,5 +65,47 @@ public class DependencyClusterSpec {
                 "lowState: " + lowState + "\n" +
                 "Visible: " + visible + "\n" +
                 "New Objects: " + newObjects;
+    }
+
+
+    @Override
+    public Function getEquivEventPredicate() {
+        // TODO Auto-generated method stub
+
+    }
+
+
+    @Override
+    public Function getAgreePrePredicate() {
+        // TODO Auto-generated method stub
+
+    }
+
+
+    @Override
+    public Function getVisibilityPredicate() {
+        // TODO Auto-generated method stub
+
+    }
+
+
+    @Override
+    public RewriteTaclet getEquivEventDefinition() {
+        // TODO Auto-generated method stub
+
+    }
+
+
+    @Override
+    public RewriteTaclet getAgreePreDefinition() {
+        // TODO Auto-generated method stub
+
+    }
+
+
+    @Override
+    public RewriteTaclet getVisibilityDefinition() {
+        // TODO Auto-generated method stub
+
     }
 }

@@ -21,7 +21,6 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.DependencyClusterContract;
-import de.uka.ilkd.key.util.DependencyClusterSpec;
 
 public class DependencyClusterContractImpl
         implements DependencyClusterContract {
@@ -45,7 +44,7 @@ public class DependencyClusterContractImpl
     private final Term origAtPre;
     private final boolean toBeSaved;
     private final Term origDep;
-    private final DependencyClusterSpec origDependencyClusterSpec;
+    private final ServiceDependencyClusterSpec origDependencyClusterSpec;
     
     final boolean hasRealModifiesClause;
 
@@ -64,7 +63,7 @@ public class DependencyClusterContractImpl
             Term exc,
             Term heapAtPre,
             Term dep,
-            DependencyClusterSpec dependencyClusterSpec,
+            ServiceDependencyClusterSpec dependencyClusterSpec,
             boolean toBeSaved) {
         this(baseName, forClass, pm, specifiedIn, modality, pre, mby, mod, hasRealMod, self, params, result, exc, heapAtPre, dep, dependencyClusterSpec, toBeSaved, INVALID_ID);
     }
@@ -84,7 +83,7 @@ public class DependencyClusterContractImpl
                                         Term exc,
                                         Term heapAtPre,
                                         Term dep,
-                                        DependencyClusterSpec dependencyClusterSpec,
+                                        ServiceDependencyClusterSpec dependencyClusterSpec,
                                         boolean toBeSaved,
                                         int id) {
         this.id = id;
@@ -401,7 +400,7 @@ public class DependencyClusterContractImpl
     }
 
     @Override
-    public DependencyClusterSpec getSpecs() {
+    public ServiceDependencyClusterSpec getSpecs() {
         return origDependencyClusterSpec;
     }
 

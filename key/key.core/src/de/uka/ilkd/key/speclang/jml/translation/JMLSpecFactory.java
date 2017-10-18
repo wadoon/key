@@ -69,6 +69,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.LoopSpecImpl;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.RepresentsAxiom;
+import de.uka.ilkd.key.speclang.ServiceDependencyClusterSpec;
 import de.uka.ilkd.key.speclang.SimpleBlockContract;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
@@ -84,7 +85,6 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
 import de.uka.ilkd.key.util.ClusterSatisfactionSpec;
-import de.uka.ilkd.key.util.DependencyClusterSpec;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -204,7 +204,7 @@ public class JMLSpecFactory {
                 DefaultImmutableSet.<Contract>nil();
         
         if (clauses.dependencyClusterSpecs != null && !clauses.dependencyClusterSpecs.isEmpty()) {
-            for (DependencyClusterSpec spec: clauses.dependencyClusterSpecs) {
+            for (ServiceDependencyClusterSpec spec: clauses.dependencyClusterSpecs) {
                 contracts = contracts.add(cf.createDependencyClusterContract(pm.getContainerType(), pm, 
                         pm.getContainerType(), 
                         Modality.BOX,
@@ -274,7 +274,7 @@ public class JMLSpecFactory {
         public Term returns;
         public Map<LocationVariable,Boolean> hasMod  = new LinkedHashMap<LocationVariable,Boolean>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
-        public ImmutableList<DependencyClusterSpec> dependencyClusterSpecs;
+        public ImmutableList<ServiceDependencyClusterSpec> dependencyClusterSpecs;
         public ImmutableList<ClusterSatisfactionSpec> clusterSatisfactionSpecs;
         public JoinProcedure joinProcedure;
     }
@@ -602,7 +602,7 @@ public class JMLSpecFactory {
         }
     }
     
-    private ImmutableList<DependencyClusterSpec>
+    private ImmutableList<ServiceDependencyClusterSpec>
     translateDependencyClusterSpecs(IProgramMethod pm,
                                 ProgramVariable selfVar,
                                 ImmutableList<ProgramVariable> paramVars,
@@ -611,16 +611,16 @@ public class JMLSpecFactory {
                                 ImmutableList<PositionedString> originalClauses)
         throws SLTranslationException {
     if (originalClauses.isEmpty()) {
-        return ImmutableSLList.<DependencyClusterSpec>nil();
+        return ImmutableSLList.<ServiceDependencyClusterSpec>nil();
     } else {
-        ImmutableList<DependencyClusterSpec> result =
-                                 ImmutableSLList.<DependencyClusterSpec>nil();
+        ImmutableList<ServiceDependencyClusterSpec> result =
+                                 ImmutableSLList.<ServiceDependencyClusterSpec>nil();
         for (PositionedString expr : originalClauses) {
 
-            DependencyClusterSpec translated =
+            ServiceDependencyClusterSpec translated =
                         JMLTranslator.translate(expr, pm.getContainerType(),
                                                 selfVar, paramVars, resultVar,
-                                                excVar, null, DependencyClusterSpec.class, services);
+                                                excVar, null, ServiceDependencyClusterSpec.class, services);
             result = result.append(translated);
         }
         return result;

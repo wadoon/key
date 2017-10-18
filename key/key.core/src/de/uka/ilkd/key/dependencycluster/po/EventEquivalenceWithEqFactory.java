@@ -9,7 +9,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.ClusterSatisfactionContract;
 import de.uka.ilkd.key.speclang.ComponentCluster;
-import de.uka.ilkd.key.util.DependencyClusterSpec;
+import de.uka.ilkd.key.speclang.ServiceDependencyClusterSpec;
 import de.uka.ilkd.key.util.Lowlist;
 import de.uka.ilkd.key.util.VisibilityCondition;
 
@@ -19,7 +19,7 @@ public class EventEquivalenceWithEqFactory
     private final Term self;
 
 
-    public EventEquivalenceWithEqFactory(DependencyClusterSpec localSpec, Term self,
+    public EventEquivalenceWithEqFactory(ServiceDependencyClusterSpec localSpec, Term self,
             InitConfig config, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
         super(config, localSpec.getLowIn(), localSpec.getLowOut(), localSpec.getVisible(), equivEventFunction, invEventFunction, ruleNameSuffix);
         
