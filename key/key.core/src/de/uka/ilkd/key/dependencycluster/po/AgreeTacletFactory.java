@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.dependencycluster.po;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -57,10 +58,14 @@ public class AgreeTacletFactory {
     }
     
     private Term agreePre() {
+        ImmutableList<Term> collectedTerms = ImmutableSLList.<Term>nil();
         for (Term t: lowState) {
-            //System.out.println(t);
+            System.out.println(t);
+            Term t1 = tb.apply(tb.elementary(tb.getBaseHeap(), heap2), t);
+            Term t2 = tb.apply(tb.elementary(tb.getBaseHeap(), heap1), t);
+            collectedTerms = collectedTerms.append(tb.equals(t1, t2));
         }
-        return tb.tt();
+        return tb.and(collectedTerms);
     }
 
     public RewriteTaclet getAgreePostTaclet() {

@@ -79,7 +79,7 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
 
         final ComponentCluster globalSpec = proofServices.getSpecificationRepository().getComponentDependencyClusterByLabel(contract.getSpecs().getComponentClusterLabel());
         final EventEquivalenceWithEqFactory equivEventGlobalFactory = new EventEquivalenceWithEqFactory(globalSpec, self, proofConfig, ldt.getEquivEventGlobal(), ldt.getInvEventGlobal(), "Global");
-        final AgreeTacletFactory agreeGlobalTacletFactory = new AgreeTacletFactory(localSpec.getLowState(), proofConfig, "Global", ldt.getAgreePreLocal(), ldt.getAgreePost());
+        final AgreeTacletFactory agreeGlobalTacletFactory = new AgreeTacletFactory(localSpec.getLowState(), proofConfig, "Global", ldt.getAgreePreGlobal(), ldt.getAgreePost());
         RewriteTaclet agreeGlobalTaclet = agreeGlobalTacletFactory.getAgreePreTaclet();
         RewriteTaclet equivEventGlobalTaclet = equivEventGlobalFactory.getEventEquivalenceTaclet();    
         RewriteTaclet invEventGlobalTaclet = equivEventGlobalFactory.getInvisibilityTaclet();  
