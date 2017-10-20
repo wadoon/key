@@ -834,6 +834,12 @@ public final class SpecificationRepository {
         assert spec != null: "There is no service dependency cluster with label \"" + label + "\"."; 
         return spec;
     }
+    
+    public ComponentCluster getComponentDependencyClusterByLabel(String label) {
+        ComponentCluster spec = componentDependencyClustersByLabel.get(label);
+        assert spec != null: "There is no service dependency cluster with label \"" + label + "\"."; 
+        return spec;
+    }
 
     /**
      * Returns a set encompassing the passed contract and all its versions
