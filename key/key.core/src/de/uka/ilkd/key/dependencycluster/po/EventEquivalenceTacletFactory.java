@@ -220,6 +220,16 @@ public abstract class EventEquivalenceTacletFactory {
         return formulas;
     }
     
+    protected ImmutableList<Term> withoutFormulas(ImmutableList<Term> list) {
+        ImmutableList<Term> seq = ImmutableSLList.<Term>nil();
+        for (Term term: list) {
+            if (!term.sort().equals(tb.tt().sort())) {
+                seq = seq.append(term);
+            }
+        }
+        return seq;
+    }
+    
     protected ImmutableList<Term> getObjects(ImmutableList<Term> list) {
         Sort objectSort = proofConfig.getServices().getJavaInfo().objectSort();
         ImmutableList<Term> formulas = ImmutableSLList.<Term>nil();

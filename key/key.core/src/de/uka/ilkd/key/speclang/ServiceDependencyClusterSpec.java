@@ -70,6 +70,7 @@ public class ServiceDependencyClusterSpec implements DependencyClusterSpec {
 
     @Override
     public Function getEquivEventPredicate() {
+        return null;
         // TODO Auto-generated method stub
 
     }
@@ -77,6 +78,7 @@ public class ServiceDependencyClusterSpec implements DependencyClusterSpec {
 
     @Override
     public Function getAgreePrePredicate() {
+        return null;
         // TODO Auto-generated method stub
 
     }
@@ -84,6 +86,7 @@ public class ServiceDependencyClusterSpec implements DependencyClusterSpec {
 
     @Override
     public Function getVisibilityPredicate() {
+        return null;
         // TODO Auto-generated method stub
 
     }
@@ -91,6 +94,7 @@ public class ServiceDependencyClusterSpec implements DependencyClusterSpec {
 
     @Override
     public RewriteTaclet getEquivEventDefinition() {
+        return null;
         // TODO Auto-generated method stub
 
     }
@@ -98,6 +102,7 @@ public class ServiceDependencyClusterSpec implements DependencyClusterSpec {
 
     @Override
     public RewriteTaclet getAgreePreDefinition() {
+        return null;
         // TODO Auto-generated method stub
 
     }
@@ -105,6 +110,7 @@ public class ServiceDependencyClusterSpec implements DependencyClusterSpec {
 
     @Override
     public RewriteTaclet getVisibilityDefinition() {
+        return null;
         // TODO Auto-generated method stub
 
     }

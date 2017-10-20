@@ -30,7 +30,8 @@ options {
     import de.uka.ilkd.key.util.Triple;
     import de.uka.ilkd.key.util.InfFlowSpec;
     import de.uka.ilkd.key.util.Lowlist;
-    import de.uka.ilkd.key.util.DependencyClusterSpec;
+    import de.uka.ilkd.key.speclang.DependencyClusterSpec;
+    import de.uka.ilkd.key.speclang.ServiceDependencyClusterSpec;
     import de.uka.ilkd.key.util.ClusterSatisfactionSpec;
     import de.uka.ilkd.key.speclang.ComponentCluster;
     import de.uka.ilkd.key.speclang.ComponentClusterImpl;
@@ -652,7 +653,7 @@ dependencyclusterspec returns  [DependencyClusterSpec result = null] throws SLTr
     	VISIBLE (NOTHING | tmpVisible = visibilitylist {visible = visible.append(tmpVisible);})
     	(NEW_OBJECTS (NOTHING | tmpNew = infflowspeclist {newObs = newObs.append(tmpNew);}))?
 
-    {result = new DependencyClusterSpec(lowIn, lowOut, lowState, visible, newObs, id.getText());}
+    {result = new ServiceDependencyClusterSpec(lowIn, lowOut, lowState, visible, newObs, id.getText());}
     ;
     
       

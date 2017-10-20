@@ -195,42 +195,37 @@ public class EventEquivalenceWithIsoFactory
             ImmutableList<Term> expressionsEq = ImmutableSLList.<Term>nil();
             
             
+            
+            
             //TODO JK UNSOUND! handle sequences with objects CURRENTLY UNSOUND bc isomorphy doesn't include them! check sequence stuff in general
+            
+            
+            Function objectsIsoFunction =
+                    (Function)proofConfig.getServices().getNamespaces().functions().lookup("objectsIsomorphic");
+            Function sameTypesFunction =
+                    (Function)proofConfig.getServices().getNamespaces().functions().lookup("sameTypes");
+            
+            
+            Term t1 = tb.apply(updatedParams1, tb.seq(withoutFormulas(list.getLowTerms())));
+            Term t2 = tb.apply(updatedParams2, tb.seq(withoutFormulas(list.getLowTerms())));
+            Term objectsIso = tb.func(objectsIsoFunction, t1, t1, t2, t2);
+            Term sameTypes = tb.func(sameTypesFunction, t1, t2);
+            
+            expressionsEq = expressionsEq.append(objectsIso);
+            expressionsEq = expressionsEq.append(sameTypes);
+            
             //Formulas
             for (Term term: getFormulas(list.getLowTerms())) {             
                 //TODO JK Parser returns some "boolean" expressions (for example with > operator) as Formulas, not as expressions, so we need special treatment for those (can't be in sequences, dont have a = relation...)
-                Term t1 = tb.apply(updatedParams1, term);
-                Term t2 = tb.apply(updatedParams2, term);
-                Term expressionComparison = tb.equals(t1, t2);
+                Term a = tb.apply(updatedParams1, term);
+                Term b = tb.apply(updatedParams2, term);
+                Term expressionComparison = tb.equals(a, b);
 
                 expressionsEq = expressionsEq.append(expressionComparison);
             }
             
-            //BuiltIn types
-            for (Term term: getBuiltInTypeExpressions(list.getLowTerms())) {
-                Term t1 = tb.apply(updatedParams1, term);
-                Term t2 = tb.apply(updatedParams2, term);
-                Term expressionComparison = tb.equals(t1, t2);
-                
-                expressionsEq = expressionsEq.append(expressionComparison);
-            }
+            //TODO JK recursive equality of non-object stuff
             
-            //Objects
-            if (!getObjects(list.getLowTerms()).isEmpty()) {
-                Term objects = tb.seq(getObjects(list.getLowTerms()));
-                Term t1 = tb.apply(updatedParams1, objects);
-                Term t2 = tb.apply(updatedParams2, objects);
-                
-                Function objectsIsoFunction =
-                        (Function)proofConfig.getServices().getNamespaces().functions().lookup("objectsIsomorphic");
-                Function sameTypesFunction =
-                        (Function)proofConfig.getServices().getNamespaces().functions().lookup("sameTypes");
-                
-                Term objectsIso = tb.func(objectsIsoFunction, t1, t1, t2, t2);
-                Term sameTypes = tb.func(sameTypesFunction, t1, t2);
-                
-                expressionsEq = expressionsEq.append(tb.and(sameTypes, objectsIso));
-            }
 
             
             if (!expressionsEq.isEmpty()) {

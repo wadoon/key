@@ -5,6 +5,8 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.util.Lowlist;
 import de.uka.ilkd.key.util.VisibilityCondition;
 
@@ -81,6 +83,42 @@ public class ComponentClusterImpl implements ComponentCluster {
     @Override
     public KeYJavaType getKJT() {
      return forClass;
+    }
+
+    @Override
+    public Function getEquivEventPredicate() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Function getAgreePrePredicate() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Function getVisibilityPredicate() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public RewriteTaclet getEquivEventDefinition() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public RewriteTaclet getAgreePreDefinition() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public RewriteTaclet getVisibilityDefinition() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
