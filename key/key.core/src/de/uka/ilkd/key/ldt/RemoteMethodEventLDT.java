@@ -63,6 +63,8 @@ public class RemoteMethodEventLDT extends LDT {
     private final Function agreePreLocal;
     private final Function agreePreGlobal;
     private final Function agreePost;
+    
+    private final Function agreeBasic;
 
 
 	//history (of Remote method events) ... copy of: key.core/resources/de/uka/ilkd/key/proof/rules/events.key -> Seq hist;
@@ -113,6 +115,7 @@ public class RemoteMethodEventLDT extends LDT {
         coopListEquivInternal = addFunction(services, "coopListEquivInternal");
         equivHistoryInternal = addFunction(services, "equivHistoryInternal");
         filterVisibleInternal = addFunction(services, "filterVisibleInternal");
+        agreeBasic = addFunction(services, "agreeBasic");
 
 		hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
 		internalHist = (LocationVariable) services.getNamespaces().programVariables().lookup(INTERNAL_HIST_NAME);
@@ -352,6 +355,10 @@ public class RemoteMethodEventLDT extends LDT {
 
     public Function getAgreePost() {
         return agreePost;
+    }
+
+    public Function getAgreeBasic() {
+        return agreeBasic;
     }
 
 }

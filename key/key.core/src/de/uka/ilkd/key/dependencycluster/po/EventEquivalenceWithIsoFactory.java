@@ -204,15 +204,18 @@ public class EventEquivalenceWithIsoFactory
                     (Function)proofConfig.getServices().getNamespaces().functions().lookup("objectsIsomorphic");
             Function sameTypesFunction =
                     (Function)proofConfig.getServices().getNamespaces().functions().lookup("sameTypes");
+            Function agreeBasicFunction = ldt.getAgreeBasic();
             
             
             Term t1 = tb.apply(updatedParams1, tb.seq(withoutFormulas(list.getLowTerms())));
             Term t2 = tb.apply(updatedParams2, tb.seq(withoutFormulas(list.getLowTerms())));
             Term objectsIso = tb.func(objectsIsoFunction, t1, t1, t2, t2);
             Term sameTypes = tb.func(sameTypesFunction, t1, t2);
+            Term agreeBasic = tb.func(agreeBasicFunction, t1, t2);
             
             expressionsEq = expressionsEq.append(objectsIso);
             expressionsEq = expressionsEq.append(sameTypes);
+            expressionsEq = expressionsEq.append(agreeBasic);
             
             //Formulas
             for (Term term: getFormulas(list.getLowTerms())) {             
@@ -223,8 +226,7 @@ public class EventEquivalenceWithIsoFactory
 
                 expressionsEq = expressionsEq.append(expressionComparison);
             }
-            
-            //TODO JK recursive equality of non-object stuff
+
             
 
             
