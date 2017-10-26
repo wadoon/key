@@ -5,15 +5,12 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 
 public interface DependencyClusterSpec {
 
-    public Function getEquivEventPredicate();
+    public Function getEquivEventEqPredicate();
+    
+    public Function getEquivEventIsoPredicate();
     
     public Function getAgreePrePredicate();
     
     public Function getVisibilityPredicate();
-    
-    public RewriteTaclet getEquivEventDefinition();
-    
-    public RewriteTaclet getAgreePreDefinition();
-    
-    public RewriteTaclet getVisibilityDefinition();
+
 }

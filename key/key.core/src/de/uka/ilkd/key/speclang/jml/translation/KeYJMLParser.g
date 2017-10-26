@@ -633,7 +633,7 @@ componentdependencyclusterspec returns  [ComponentCluster result = null] throws 
     	LOWSTATE (NOTHING | tmpLowState = infflowspeclist {lowState = lowState.append(tmpLowState);}) 
     	VISIBLE (NOTHING | tmpVisible = visibilitylist {visible = visible.append(tmpVisible);})
 
-    {result = new ComponentClusterImpl(containerType, lowIn, lowOut, lowState, visible, id.getText());}
+    {result = new ComponentClusterImpl(containerType, lowIn, lowOut, lowState, visible, id.getText(), services);}
     ;
 
 dependencyclusterspec returns  [DependencyClusterSpec result = null] throws SLTranslationException
@@ -653,7 +653,7 @@ dependencyclusterspec returns  [DependencyClusterSpec result = null] throws SLTr
     	VISIBLE (NOTHING | tmpVisible = visibilitylist {visible = visible.append(tmpVisible);})
     	(NEW_OBJECTS (NOTHING | tmpNew = infflowspeclist {newObs = newObs.append(tmpNew);}))?
 
-    {result = new ServiceDependencyClusterSpec(lowIn, lowOut, lowState, visible, newObs, id.getText());}
+    {result = new ServiceDependencyClusterSpec(lowIn, lowOut, lowState, visible, newObs, id.getText(), services);}
     ;
     
       

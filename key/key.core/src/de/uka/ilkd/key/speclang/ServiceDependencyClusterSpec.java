@@ -3,13 +3,15 @@ package de.uka.ilkd.key.speclang;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.util.Lowlist;
 import de.uka.ilkd.key.util.VisibilityCondition;
 
-public class ServiceDependencyClusterSpec implements DependencyClusterSpec {
+public class ServiceDependencyClusterSpec extends AbstractDependencyClusterSpec {
     
 
     private final ImmutableList<Lowlist> lowIn;
@@ -18,17 +20,18 @@ public class ServiceDependencyClusterSpec implements DependencyClusterSpec {
     private final ImmutableList<Term> newObjects;
     
     private final ImmutableList<VisibilityCondition> visible;
-    
-    private final String label;
 
 
-    public ServiceDependencyClusterSpec(ImmutableList<Lowlist> lowIn, ImmutableList<Lowlist> lowOut, ImmutableList<Term> lowState, ImmutableList<VisibilityCondition> visible, ImmutableList<Term> newObjects, String label) {
+
+
+    public ServiceDependencyClusterSpec(ImmutableList<Lowlist> lowIn, ImmutableList<Lowlist> lowOut, ImmutableList<Term> lowState, 
+            ImmutableList<VisibilityCondition> visible, ImmutableList<Term> newObjects, String label, Services services) {
+        super(label, services);
         this.lowIn = lowIn;
         this.lowOut = lowOut;
         this.lowState = lowState;
         this.visible = visible;
         this.newObjects = newObjects;
-        this.label = label;
     }
 
 
@@ -67,51 +70,4 @@ public class ServiceDependencyClusterSpec implements DependencyClusterSpec {
                 "New Objects: " + newObjects;
     }
 
-
-    @Override
-    public Function getEquivEventPredicate() {
-        return null;
-        // TODO Auto-generated method stub
-
-    }
-
-
-    @Override
-    public Function getAgreePrePredicate() {
-        return null;
-        // TODO Auto-generated method stub
-
-    }
-
-
-    @Override
-    public Function getVisibilityPredicate() {
-        return null;
-        // TODO Auto-generated method stub
-
-    }
-
-
-    @Override
-    public RewriteTaclet getEquivEventDefinition() {
-        return null;
-        // TODO Auto-generated method stub
-
-    }
-
-
-    @Override
-    public RewriteTaclet getAgreePreDefinition() {
-        return null;
-        // TODO Auto-generated method stub
-
-    }
-
-
-    @Override
-    public RewriteTaclet getVisibilityDefinition() {
-        return null;
-        // TODO Auto-generated method stub
-
-    }
 }
