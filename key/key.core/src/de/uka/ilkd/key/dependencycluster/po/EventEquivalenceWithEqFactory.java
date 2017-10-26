@@ -20,15 +20,15 @@ public class EventEquivalenceWithEqFactory
 
 
     public EventEquivalenceWithEqFactory(ServiceDependencyClusterSpec localSpec, Term self,
-            InitConfig config, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
-        super(config, localSpec.getLowIn(), localSpec.getLowOut(), localSpec.getVisible(), equivEventFunction, invEventFunction, ruleNameSuffix);
+            Services services, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
+        super(services, localSpec.getLowIn(), localSpec.getLowOut(), localSpec.getVisible(), equivEventFunction, invEventFunction, ruleNameSuffix);
         
         this.self = self;
     }
 
     public EventEquivalenceWithEqFactory(ComponentCluster globalSpec, Term self,
-            InitConfig config, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
-        super(config, globalSpec.getLowIn(), globalSpec.getLowOut(), globalSpec.getVisible(), equivEventFunction, invEventFunction, ruleNameSuffix);
+            Services services, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
+        super(services, globalSpec.getLowIn(), globalSpec.getLowOut(), globalSpec.getVisible(), equivEventFunction, invEventFunction, ruleNameSuffix);
         this.self = self;
     }
 
@@ -56,7 +56,7 @@ public class EventEquivalenceWithEqFactory
             Term updatedSpecifiedCaller = tb.apply(updateHeap, specifiedCaller);
             Term updatedSpecifiedCallee = tb.apply(updateHeap, specifiedCallee);
                         
-            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(list.getService().getMethodDeclaration(), proofConfig.getServices()));
+            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(list.getService().getMethodDeclaration(), services));
             
             
             
@@ -103,7 +103,7 @@ public class EventEquivalenceWithEqFactory
             Term updatedSpecifiedCaller = tb.apply(updateHeap, specifiedCaller);
             Term updatedSpecifiedCallee = tb.apply(updateHeap, specifiedCallee);
                         
-            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(condition.getServiceContext().getMethodDeclaration(), proofConfig.getServices()));
+            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(condition.getServiceContext().getMethodDeclaration(), services));
                       
             Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
             Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);
@@ -148,7 +148,7 @@ public class EventEquivalenceWithEqFactory
             Term updatedSpecifiedCaller = tb.apply(updateHeap, specifiedCaller);
             Term updatedSpecifiedCallee = tb.apply(updateHeap, specifiedCallee);
             
-            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(condition.getServiceContext().getMethodDeclaration(), proofConfig.getServices()));
+            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(condition.getServiceContext().getMethodDeclaration(), services));
 
             Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
             Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);
@@ -182,7 +182,7 @@ public class EventEquivalenceWithEqFactory
             Term updatedSpecifiedCaller = tb.apply(updateHeap, specifiedCaller);
             Term updatedSpecifiedCallee = tb.apply(updateHeap, specifiedCallee);
                         
-            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(list.getService().getMethodDeclaration(), proofConfig.getServices()));
+            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(list.getService().getMethodDeclaration(), services));
                
             Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
             Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);

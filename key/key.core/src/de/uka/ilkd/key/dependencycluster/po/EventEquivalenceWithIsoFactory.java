@@ -4,6 +4,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -18,8 +19,8 @@ public class EventEquivalenceWithIsoFactory
     private final IFProofObligationVars poVars;
 
     public EventEquivalenceWithIsoFactory(DependencyClusterContract contract,
-            InitConfig proofConfig, IFProofObligationVars poVars, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
-        super(proofConfig, contract.getSpecs().getLowIn(), contract.getSpecs().getLowOut(), contract.getSpecs().getVisible(), equivEventFunction, invEventFunction, ruleNameSuffix);
+            Services services, IFProofObligationVars poVars, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
+        super(services, contract.getSpecs().getLowIn(), contract.getSpecs().getLowOut(), contract.getSpecs().getVisible(), equivEventFunction, invEventFunction, ruleNameSuffix);
         
         this.contract = contract;
 
@@ -48,7 +49,7 @@ public class EventEquivalenceWithIsoFactory
             Term updatedSpecifiedCaller = tb.apply(updateHeapAndSelf, specifiedCaller);
             Term updatedSpecifiedCallee = tb.apply(updateHeapAndSelf, specifiedCallee);
                         
-            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(list.getService().getMethodDeclaration(), proofConfig.getServices()));
+            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(list.getService().getMethodDeclaration(), services));
             
             
             
@@ -107,7 +108,7 @@ public class EventEquivalenceWithIsoFactory
             Term updatedSpecifiedCaller = tb.apply(updateHeapAndSelf, specifiedCaller);
             Term updatedSpecifiedCallee = tb.apply(updateHeapAndSelf, specifiedCallee);
                         
-            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(condition.getServiceContext().getMethodDeclaration(), proofConfig.getServices()));
+            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(condition.getServiceContext().getMethodDeclaration(), services));
                       
             Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
             Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);
@@ -152,7 +153,7 @@ public class EventEquivalenceWithIsoFactory
             Term updatedSpecifiedCaller = tb.apply(updateHeapAndSelf, specifiedCaller);
             Term updatedSpecifiedCallee = tb.apply(updateHeapAndSelf, specifiedCallee);
             
-            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(condition.getServiceContext().getMethodDeclaration(), proofConfig.getServices()));
+            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(condition.getServiceContext().getMethodDeclaration(), services));
 
             Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
             Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);
@@ -184,7 +185,7 @@ public class EventEquivalenceWithIsoFactory
             Term updatedSpecifiedCaller = tb.apply(updateHeapAndSelf, specifiedCaller);
             Term updatedSpecifiedCallee = tb.apply(updateHeapAndSelf, specifiedCallee);
                         
-            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(list.getService().getMethodDeclaration(), proofConfig.getServices()));
+            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(list.getService().getMethodDeclaration(), services));
                
             Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
             Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);
@@ -195,15 +196,10 @@ public class EventEquivalenceWithIsoFactory
             ImmutableList<Term> expressionsEq = ImmutableSLList.<Term>nil();
             
             
-            
-            
-            //TODO JK UNSOUND! handle sequences with objects CURRENTLY UNSOUND bc isomorphy doesn't include them! check sequence stuff in general
-            
-            
             Function objectsIsoFunction =
-                    (Function)proofConfig.getServices().getNamespaces().functions().lookup("objectsIsomorphic");
+                    (Function)services.getNamespaces().functions().lookup("objectsIsomorphic");
             Function sameTypesFunction =
-                    (Function)proofConfig.getServices().getNamespaces().functions().lookup("sameTypes");
+                    (Function)services.getNamespaces().functions().lookup("sameTypes");
             Function agreeBasicFunction = ldt.getAgreeBasic();
             
             

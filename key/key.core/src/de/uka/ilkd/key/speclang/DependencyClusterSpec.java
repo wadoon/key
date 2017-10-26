@@ -12,5 +12,7 @@ public interface DependencyClusterSpec {
     public Function getAgreePrePredicate();
     
     public Function getVisibilityPredicate();
+    
+    public void registerPredicatesAndTaclets();
 
 }

@@ -22,17 +22,15 @@ public class AgreeTacletFactory {
     private final InitConfig proofConfig;
     private final TermBuilder tb;
     private final Function agreePreFunction;
-    private final Function agreePostFunction;
     private final Term heap1;
     private final Term heap2;
 
-    public AgreeTacletFactory(ImmutableList<Term> lowState, InitConfig proofConfig, String ruleNameSuffix, Function agreePreFunction, Function agreePostFunction) {
+    public AgreeTacletFactory(ImmutableList<Term> lowState, InitConfig proofConfig, String ruleNameSuffix, Function agreePreFunction) {
         this.ruleNameSuffix = ruleNameSuffix;
         this.lowState = lowState;
         this.proofConfig = proofConfig;
         tb = proofConfig.getServices().getTermBuilder();
         this.agreePreFunction = agreePreFunction;
-        this.agreePostFunction = agreePostFunction;
         
         Sort heapSort = proofConfig.getServices().getTypeConverter().getHeapLDT().targetSort();
         heap1 = tb.var(SchemaVariableFactory.createTermSV(new Name("heap1"), heapSort, false, false));
@@ -68,8 +66,4 @@ public class AgreeTacletFactory {
         return tb.and(collectedTerms);
     }
 
-    //TODO JK AgreePost is object sensitive - if we use it this has to be implemented properly
-    public RewriteTaclet getAgreePostTaclet() {
-        return null;
-    }
 }

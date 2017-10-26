@@ -5,6 +5,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.ldt.RemoteMethodEventLDT;
@@ -25,7 +26,7 @@ import de.uka.ilkd.key.util.VisibilityCondition;
 
 public abstract class EventEquivalenceTacletFactory {
 
-    protected final InitConfig proofConfig;
+    protected final Services services;
     protected final TermBuilder tb;
     protected final RemoteMethodEventLDT ldt;
     
@@ -62,23 +63,23 @@ public abstract class EventEquivalenceTacletFactory {
     
     private final String ruleNameSuffix;
     
-    public EventEquivalenceTacletFactory(InitConfig proofConfig, ImmutableList<Lowlist> lowIn, ImmutableList<Lowlist> lowOut, 
+    public EventEquivalenceTacletFactory(Services services, ImmutableList<Lowlist> lowIn, ImmutableList<Lowlist> lowOut, 
             ImmutableList<VisibilityCondition> visible, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
 
-        this.proofConfig = proofConfig;
-        ldt = proofConfig.getServices().getTypeConverter().getRemoteMethodEventLDT();
+        this.services = services;
+        ldt = services.getTypeConverter().getRemoteMethodEventLDT();
         
         this.lowIn = lowIn;
         this.lowOut = lowOut;
         this.visible = visible;
         
-        tb = proofConfig.getServices().getTermBuilder();
+        tb = services.getTermBuilder();
         
-        Sort calltypeSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("EventType");
-        Sort objectSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("java.lang.Object");
-        Sort methodSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("MethodIdentifier");
-        Sort seqSort = proofConfig.getServices().getTypeConverter().getSeqLDT().targetSort();
-        Sort heapSort = proofConfig.getServices().getTypeConverter().getHeapLDT().targetSort();
+        Sort calltypeSort = (Sort) services.getNamespaces().sorts().lookup("EventType");
+        Sort objectSort = (Sort) services.getNamespaces().sorts().lookup("java.lang.Object");
+        Sort methodSort = (Sort) services.getNamespaces().sorts().lookup("MethodIdentifier");
+        Sort seqSort = services.getTypeConverter().getSeqLDT().targetSort();
+        Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
         
         calltype1 = tb.var(SchemaVariableFactory.createTermSV(new Name("calltype1"), calltypeSort, false, false));
         calltype2 = tb.var(SchemaVariableFactory.createTermSV(new Name("calltype2"), calltypeSort, false, false));
@@ -163,7 +164,8 @@ public abstract class EventEquivalenceTacletFactory {
         tacletBuilder.addGoalTerm(replaceTermEquivalence());
         
         //TODO JK which ruleset is correct?
-        tacletBuilder.addRuleSet((RuleSet)proofConfig.ruleSetNS().lookup(new Name("simplify_enlarging")));  
+        tacletBuilder.addRuleSet((RuleSet)services.getNamespaces().ruleSets().lookup(new Name("simplify_enlarging")));  
+        
         
         RewriteTaclet taclet = tacletBuilder.getRewriteTaclet();
         return taclet;
@@ -180,7 +182,7 @@ public abstract class EventEquivalenceTacletFactory {
         tacletBuilder.addGoalTerm(replaceTermInvisibility());
         
         //TODO JK which ruleset is correct?
-        tacletBuilder.addRuleSet((RuleSet)proofConfig.ruleSetNS().lookup(new Name("simplify_enlarging")));  
+        tacletBuilder.addRuleSet((RuleSet)services.getNamespaces().ruleSets().lookup(new Name("simplify_enlarging")));  
         
         RewriteTaclet taclet = tacletBuilder.getRewriteTaclet();
         return taclet;
@@ -231,7 +233,7 @@ public abstract class EventEquivalenceTacletFactory {
     }
     
     protected ImmutableList<Term> getObjects(ImmutableList<Term> list) {
-        Sort objectSort = proofConfig.getServices().getJavaInfo().objectSort();
+        Sort objectSort = services.getJavaInfo().objectSort();
         ImmutableList<Term> formulas = ImmutableSLList.<Term>nil();
         for (Term term: list) {
             if (term.sort().extendsTrans(objectSort)) {
@@ -242,7 +244,7 @@ public abstract class EventEquivalenceTacletFactory {
     }
     
     protected ImmutableList<Term> getBuiltInTypeExpressions(ImmutableList<Term> list) {
-        Sort objectSort = (Sort) proofConfig.getServices().getNamespaces().sorts().lookup("java.lang.Object");
+        Sort objectSort = (Sort) services.getNamespaces().sorts().lookup("java.lang.Object");
         ImmutableList<Term> formulas = ImmutableSLList.<Term>nil();
         for (Term term: list) {
             if (!(term.sort().extendsTrans(objectSort) || term.sort().equals(tb.tt().sort()))) {

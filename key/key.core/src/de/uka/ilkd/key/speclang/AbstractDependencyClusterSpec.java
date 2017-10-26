@@ -59,6 +59,15 @@ public abstract class AbstractDependencyClusterSpec
         return equivEventIsoPredicate;
     }
 
+
+
+    protected void registerPredicates() {
+        services.getNamespaces().functions().addSafely(agreePrePredicate);
+        services.getNamespaces().functions().addSafely(equivEventEqPredicate);
+        services.getNamespaces().functions().addSafely(equivEventIsoPredicate);
+        services.getNamespaces().functions().addSafely(invisPredicate);
+    }
+
     
     
 }
