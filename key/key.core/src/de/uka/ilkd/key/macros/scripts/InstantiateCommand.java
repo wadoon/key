@@ -45,13 +45,13 @@ public class InstantiateCommand
         @Option(value = "formula", required = false) public Term formula;
         @Option(value = "var", required = false) public String var;
         @Option(value = "occ", required = false) public int occ = 1;
-        @Flag(arg = "#2", value = "hide") public boolean hide;
+        @Flag("#2") public boolean hide;
         @Option("with") public Term with;
     }
 
     @Override public Parameters evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
-        return state.getValueInjector().inject(new Parameters(), arguments);
+        return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     @Override public void execute(AbstractUserInterfaceControl uiControl,

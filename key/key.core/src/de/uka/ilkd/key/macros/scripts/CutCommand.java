@@ -36,7 +36,7 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
 
     @Override public Parameters evaluateArguments(EngineState state,
             Map<String, String> arguments) throws Exception {
-        return state.getValueInjector().inject(new Parameters(), arguments);
+        return state.getValueInjector().inject(this, new Parameters(), arguments);
     }
 
     /**
