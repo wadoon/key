@@ -42,9 +42,9 @@ public class InstantiateCommand
     }
 
     public static class Parameters {
-        @Option("formula") public Term formula;
-        @Option("var") public String var;
-        @Option("occ") public int occ = 1;
+        @Option(value = "formula", required = false) public Term formula;
+        @Option(value = "var", required = false) public String var;
+        @Option(value = "occ", required = false) public int occ = 1;
         @Flag(arg = "#2", value = "hide") public boolean hide;
         @Option("with") public Term with;
     }
