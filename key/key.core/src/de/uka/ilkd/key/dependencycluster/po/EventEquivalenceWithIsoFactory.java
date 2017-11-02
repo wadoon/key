@@ -16,14 +16,14 @@ import de.uka.ilkd.key.util.VisibilityCondition;
 public class EventEquivalenceWithIsoFactory
         extends EventEquivalenceTacletFactory {
     
-    private final IFProofObligationVars poVars;
+    private final Term selfVar;
 
     public EventEquivalenceWithIsoFactory(ServiceDependencyClusterSpec spec,
-            Services services, IFProofObligationVars poVars, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
+            Services services, Term selfVar, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
         super(services, spec.getLowIn(), spec.getLowOut(), spec.getVisible(), equivEventFunction, invEventFunction, ruleNameSuffix);
         
 
-        this.poVars = poVars;
+        this.selfVar = selfVar;
     }
     
     @Override
@@ -37,10 +37,10 @@ public class EventEquivalenceWithIsoFactory
             if (list.getCallType() == Lowlist.MessageType.CALL) {
                 specifiedCalltype = tb.evCall();
                 specifiedCaller = tb.getEnvironmentCaller();
-                specifiedCallee = poVars.c1.pre.self; //TODO JK is this a proper self var for this purpose?
+                specifiedCallee = selfVar; //TODO JK is this a proper self var for this purpose?
             } else {
                 specifiedCalltype = tb.evTerm();
-                specifiedCaller = poVars.c1.pre.self;
+                specifiedCaller = selfVar;
                 specifiedCallee = list.getCommunicationPartner().getTerm();
             }
 
@@ -87,18 +87,18 @@ public class EventEquivalenceWithIsoFactory
                 specifiedCalltype = tb.evCall();
                 if (condition.getDirection() == VisibilityCondition.Direction.IN) {
                     specifiedCaller = tb.getEnvironmentCaller();
-                    specifiedCallee = poVars.c1.pre.self;
+                    specifiedCallee = selfVar;
                 } else {
-                    specifiedCaller = poVars.c1.pre.self;
+                    specifiedCaller = selfVar;
                     specifiedCallee = condition.getCommunicationPartner().getTerm();
                 }
             } else {
                 specifiedCalltype = tb.evTerm();
                 if (condition.getDirection() == VisibilityCondition.Direction.OUT) {
                     specifiedCaller = tb.getEnvironmentCaller();
-                    specifiedCallee = poVars.c1.pre.self;
+                    specifiedCallee = selfVar;
                 } else {
-                    specifiedCaller = poVars.c1.pre.self;
+                    specifiedCaller = selfVar;
                     specifiedCallee = condition.getCommunicationPartner().getTerm();
                 }
             }
@@ -133,18 +133,18 @@ public class EventEquivalenceWithIsoFactory
                 specifiedCalltype = tb.evCall();
                 if (condition.getDirection() == VisibilityCondition.Direction.IN){
                     specifiedCaller = tb.getEnvironmentCaller();
-                    specifiedCallee = poVars.c1.pre.self;
+                    specifiedCallee = selfVar;
                 } else {
-                    specifiedCaller = poVars.c1.pre.self;
+                    specifiedCaller = selfVar;
                     specifiedCallee = condition.getCommunicationPartner().getTerm();
                 } 
             } else {
                 specifiedCalltype = tb.evTerm();
                 if (condition.getDirection() == VisibilityCondition.Direction.OUT){
                     specifiedCaller = tb.getEnvironmentCaller();
-                    specifiedCallee = poVars.c1.pre.self;
+                    specifiedCallee = selfVar;
                 } else {
-                    specifiedCaller = poVars.c1.pre.self;
+                    specifiedCaller = selfVar;
                     specifiedCallee = condition.getCommunicationPartner().getTerm();
                 } 
             }
@@ -173,10 +173,10 @@ public class EventEquivalenceWithIsoFactory
             if (list.getCallType() == Lowlist.MessageType.CALL) {
                 specifiedCalltype = tb.evCall();
                 specifiedCaller = tb.getEnvironmentCaller();
-                specifiedCallee = poVars.c1.pre.self; //TODO JK is this a proper self var for this purpose?
+                specifiedCallee = selfVar; //TODO JK is this a proper self var for this purpose?
             } else {
                 specifiedCalltype = tb.evTerm();
-                specifiedCaller = poVars.c1.pre.self;
+                specifiedCaller = selfVar;
                 specifiedCallee = list.getCommunicationPartner().getTerm();
             }
 
