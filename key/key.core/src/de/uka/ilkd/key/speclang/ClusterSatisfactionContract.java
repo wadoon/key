@@ -9,5 +9,7 @@ public interface ClusterSatisfactionContract extends Contract {
    
     public IProgramMethod getTarget();
     
-    public Term getMod();
+    public Term getMod();   
+
+    public Term getSelf();
 }

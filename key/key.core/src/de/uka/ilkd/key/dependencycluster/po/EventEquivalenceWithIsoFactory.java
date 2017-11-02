@@ -9,20 +9,19 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.speclang.DependencyClusterContract;
+import de.uka.ilkd.key.speclang.ServiceDependencyClusterSpec;
 import de.uka.ilkd.key.util.Lowlist;
 import de.uka.ilkd.key.util.VisibilityCondition;
 
 public class EventEquivalenceWithIsoFactory
         extends EventEquivalenceTacletFactory {
     
-    private final DependencyClusterContract contract;
     private final IFProofObligationVars poVars;
 
-    public EventEquivalenceWithIsoFactory(DependencyClusterContract contract,
+    public EventEquivalenceWithIsoFactory(ServiceDependencyClusterSpec spec,
             Services services, IFProofObligationVars poVars, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
-        super(services, contract.getSpecs().getLowIn(), contract.getSpecs().getLowOut(), contract.getSpecs().getVisible(), equivEventFunction, invEventFunction, ruleNameSuffix);
+        super(services, spec.getLowIn(), spec.getLowOut(), spec.getVisible(), equivEventFunction, invEventFunction, ruleNameSuffix);
         
-        this.contract = contract;
 
         this.poVars = poVars;
     }
@@ -45,9 +44,9 @@ public class EventEquivalenceWithIsoFactory
                 specifiedCallee = list.getCommunicationPartner().getTerm();
             }
 
-            Term updateHeapAndSelf = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1), tb.elementary(contract.getSelfVar(), poVars.c1.pre.self));
-            Term updatedSpecifiedCaller = tb.apply(updateHeapAndSelf, specifiedCaller);
-            Term updatedSpecifiedCallee = tb.apply(updateHeapAndSelf, specifiedCallee);
+            Term updateHeap = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1));
+            Term updatedSpecifiedCaller = tb.apply(updateHeap, specifiedCaller);
+            Term updatedSpecifiedCallee = tb.apply(updateHeap, specifiedCallee);
                         
             Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(list.getService().getMethodDeclaration(), services));
             
@@ -104,9 +103,9 @@ public class EventEquivalenceWithIsoFactory
                 }
             }
             
-            Term updateHeapAndSelf = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1), tb.elementary(contract.getSelfVar(), poVars.c1.pre.self));
-            Term updatedSpecifiedCaller = tb.apply(updateHeapAndSelf, specifiedCaller);
-            Term updatedSpecifiedCallee = tb.apply(updateHeapAndSelf, specifiedCallee);
+            Term updateHeap = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1));
+            Term updatedSpecifiedCaller = tb.apply(updateHeap, specifiedCaller);
+            Term updatedSpecifiedCallee = tb.apply(updateHeap, specifiedCallee);
                         
             Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(condition.getServiceContext().getMethodDeclaration(), services));
                       
@@ -149,9 +148,9 @@ public class EventEquivalenceWithIsoFactory
                     specifiedCallee = condition.getCommunicationPartner().getTerm();
                 } 
             }
-            Term updateHeapAndSelf = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1), tb.elementary(contract.getSelfVar(), poVars.c1.pre.self));
-            Term updatedSpecifiedCaller = tb.apply(updateHeapAndSelf, specifiedCaller);
-            Term updatedSpecifiedCallee = tb.apply(updateHeapAndSelf, specifiedCallee);
+            Term updateHeap = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1));
+            Term updatedSpecifiedCaller = tb.apply(updateHeap, specifiedCaller);
+            Term updatedSpecifiedCallee = tb.apply(updateHeap, specifiedCallee);
             
             Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(condition.getServiceContext().getMethodDeclaration(), services));
 
@@ -181,9 +180,9 @@ public class EventEquivalenceWithIsoFactory
                 specifiedCallee = list.getCommunicationPartner().getTerm();
             }
 
-            Term updateHeapAndSelf = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1), tb.elementary(contract.getSelfVar(), poVars.c1.pre.self));
-            Term updatedSpecifiedCaller = tb.apply(updateHeapAndSelf, specifiedCaller);
-            Term updatedSpecifiedCallee = tb.apply(updateHeapAndSelf, specifiedCallee);
+            Term updateHeap = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1));
+            Term updatedSpecifiedCaller = tb.apply(updateHeap, specifiedCaller);
+            Term updatedSpecifiedCallee = tb.apply(updateHeap, specifiedCallee);
                         
             Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(list.getService().getMethodDeclaration(), services));
                

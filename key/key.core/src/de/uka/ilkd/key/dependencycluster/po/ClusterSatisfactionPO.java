@@ -51,11 +51,8 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
 
         final Services proofServices = postInit(); 
         
-        //TODO JK is this the proper way to get a self var here? Seems like overkill, take another look
-        final ProofObligationVars symbExecVars =
-                new ProofObligationVars(contract.getTarget(), contract.getKJT(), proofServices);
-        
-        final Term self = symbExecVars.pre.self;
+        //TODO JK is this the proper way to get a self var here?        
+        final Term self = contract.getSelf();
         
         final ClusterSatisfactionPOFormulaFactory factory = new ClusterSatisfactionPOFormulaFactory(contract, proofServices, self);
         

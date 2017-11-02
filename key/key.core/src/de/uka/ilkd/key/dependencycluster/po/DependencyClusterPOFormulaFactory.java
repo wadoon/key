@@ -143,7 +143,7 @@ public class DependencyClusterPOFormulaFactory {
     
     //self is implicitly considered to be low
     public Term selfAtPreEquality() {
-        return tb.equals(ifVars.c1.pre.self, ifVars.c2.pre.self);
+        return tb.and(tb.equals(ifVars.c1.pre.self, contract.getSelf()), tb.equals(ifVars.c1.pre.self, ifVars.c2.pre.self));
     }
     
     public Term assumptions() {

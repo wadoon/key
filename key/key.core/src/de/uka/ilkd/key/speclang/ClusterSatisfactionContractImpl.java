@@ -341,4 +341,9 @@ public class ClusterSatisfactionContractImpl
         return origMod;
     }
 
+    @Override
+    public Term getSelf() {
+        return origSelf;
+    }
+
 }
