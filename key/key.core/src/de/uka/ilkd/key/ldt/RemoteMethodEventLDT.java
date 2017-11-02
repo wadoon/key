@@ -324,23 +324,7 @@ public class RemoteMethodEventLDT extends LDT {
     public Sort getMethodSort() {
         return methodSort;
     }
-
-    public Function getEquivEventLocal() {
-        return equivEventLocal;
-    }
-
-    public Function getEquivEventGlobal() {
-        return equivEventGlobal;
-    }
-
-    public Function getInvEventLocal() {
-        return invEventLocal;
-    }
-
-    public Function getInvEventGlobal() {
-        return invEventGlobal;
-    }
-
+    
     public Function getIsCallable() {
         return isCallable;
     }

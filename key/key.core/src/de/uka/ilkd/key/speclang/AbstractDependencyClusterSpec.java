@@ -29,8 +29,6 @@ public abstract class AbstractDependencyClusterSpec
         agreePrePredicate = new Function(new Name("AgreePre_" + label), formulaSort, heapSort, heapSort);
         invisPredicate = new Function(new Name("InvisEvent_" + label), formulaSort, eventSort);
     }
-    
-
 
 
     @Override
@@ -58,16 +56,14 @@ public abstract class AbstractDependencyClusterSpec
     public Function getEquivEventIsoPredicate() {
         return equivEventIsoPredicate;
     }
-
-
-
-    protected void registerPredicates() {
+    
+    //TODO JK apparently registering isn't necessary... maybe you only need if you wan't to do lookups later... Still, better double check what difference this would make
+    @Override
+    public void registerPredicates() {
         services.getNamespaces().functions().addSafely(agreePrePredicate);
         services.getNamespaces().functions().addSafely(equivEventEqPredicate);
         services.getNamespaces().functions().addSafely(equivEventIsoPredicate);
         services.getNamespaces().functions().addSafely(invisPredicate);
     }
-
-    
     
 }

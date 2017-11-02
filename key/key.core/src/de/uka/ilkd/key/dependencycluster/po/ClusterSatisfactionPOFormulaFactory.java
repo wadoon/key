@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.ClusterSatisfactionContract;
+import de.uka.ilkd.key.speclang.DependencyClusterSpec;
 
 public class ClusterSatisfactionPOFormulaFactory {
 
@@ -22,6 +23,8 @@ public class ClusterSatisfactionPOFormulaFactory {
     private final SeqLDT seqLDT;
     private final Event a;
     private final Event b;
+    private final DependencyClusterSpec globalSpec;
+    private final DependencyClusterSpec localSpec;
     
     private final Term callingComp;
     private final Term self;
@@ -41,6 +44,9 @@ public class ClusterSatisfactionPOFormulaFactory {
         callingComp = tb.var(new LocationVariable(new ProgramElementName(tb.newName("callingComp")), new KeYJavaType(proofServices.getJavaInfo().objectSort())));
     
         this.self = self;
+        
+        globalSpec = proofServices.getSpecificationRepository().getComponentDependencyClusterByLabel(contract.getSpecs().getComponentClusterLabel());
+        localSpec = proofServices.getSpecificationRepository().getServiceDependencyClusterByLabel(contract.getSpecs().getServiceClusterLabel());
     }
     
     public Term selfNotNull() {
@@ -56,7 +62,7 @@ public class ClusterSatisfactionPOFormulaFactory {
     }
     
     public Term globalImplLocalEvent() {
-        return tb.imp(tb.func(eventLDT.getEquivEventGlobal(), a.event(), b.event()), tb.func(eventLDT.getEquivEventLocal(), a.event(), b.event()));
+        return tb.imp(tb.func(globalSpec.getEquivEventEqPredicate(), a.event(), b.event()), tb.func(localSpec.getEquivEventEqPredicate(), a.event(), b.event()));
     }
     
     public Term globalImplLocalState() {
@@ -64,9 +70,10 @@ public class ClusterSatisfactionPOFormulaFactory {
     }
     
     public Term localImplGlobalEvent() {
-        return tb.imp(tb.and(tb.func(eventLDT.getEquivEventLocal(), a.event(), b.event()), 
+        return tb.imp(tb.and(tb.func(localSpec.getEquivEventEqPredicate()
+                , a.event(), b.event()), 
                         a.callable(), b.callable()), 
-                tb.func(eventLDT.getEquivEventGlobal(), a.event(), b.event()));
+                tb.func(globalSpec.getEquivEventEqPredicate(), a.event(), b.event()));
     }
     
     public Term localImplGlobalState() {

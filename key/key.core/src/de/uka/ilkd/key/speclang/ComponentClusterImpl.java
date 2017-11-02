@@ -87,11 +87,4 @@ public class ComponentClusterImpl extends AbstractDependencyClusterSpec implemen
      return forClass;
     }
 
-    @Override
-    public void registerPredicatesAndTaclets() {
-        // TODO Auto-generated method stub
-        
-    }
-
-
 }

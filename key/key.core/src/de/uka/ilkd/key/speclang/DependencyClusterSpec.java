@@ -13,6 +13,6 @@ public interface DependencyClusterSpec {
     
     public Function getVisibilityPredicate();
     
-    public void registerPredicatesAndTaclets();
+    public void registerPredicates();
 
 }

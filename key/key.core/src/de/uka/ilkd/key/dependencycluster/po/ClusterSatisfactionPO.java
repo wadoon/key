@@ -60,7 +60,7 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
         
         final ServiceDependencyClusterSpec localSpec = proofServices.getSpecificationRepository().getServiceDependencyClusterByLabel(contract.getSpecs().getServiceClusterLabel());
         //TODO JK make sure the specified local cluster is actually a cluster of this method?
-        final EventEquivalenceWithEqFactory equivEventLocalFactory = new EventEquivalenceWithEqFactory(localSpec, self, proofConfig.getServices(), ldt.getEquivEventLocal(), ldt.getInvEventLocal(), "Local");
+        final EventEquivalenceWithEqFactory equivEventLocalFactory = new EventEquivalenceWithEqFactory(localSpec, self, proofConfig.getServices(), localSpec.getEquivEventEqPredicate(), localSpec.getVisibilityPredicate(), localSpec.getLabel());
         final AgreeTacletFactory agreeLocalTacletFactory = new AgreeTacletFactory(localSpec.getLowState(), proofConfig, "Local", ldt.getAgreePreLocal());
         RewriteTaclet equivEventLocalTaclet = equivEventLocalFactory.getEventEquivalenceTaclet();    
         RewriteTaclet invEventLocalTaclet = equivEventLocalFactory.getInvisibilityTaclet();
@@ -75,7 +75,7 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
         
 
         final ComponentCluster globalSpec = proofServices.getSpecificationRepository().getComponentDependencyClusterByLabel(contract.getSpecs().getComponentClusterLabel());
-        final EventEquivalenceWithEqFactory equivEventGlobalFactory = new EventEquivalenceWithEqFactory(globalSpec, self, proofConfig.getServices(), ldt.getEquivEventGlobal(), ldt.getInvEventGlobal(), "Global");
+        final EventEquivalenceWithEqFactory equivEventGlobalFactory = new EventEquivalenceWithEqFactory(globalSpec, self, proofConfig.getServices(), globalSpec.getEquivEventEqPredicate(), globalSpec.getVisibilityPredicate(), globalSpec.getLabel());
         final AgreeTacletFactory agreeGlobalTacletFactory = new AgreeTacletFactory(localSpec.getLowState(), proofConfig, "Global", ldt.getAgreePreGlobal());
         RewriteTaclet agreeGlobalTaclet = agreeGlobalTacletFactory.getAgreePreTaclet();
         RewriteTaclet equivEventGlobalTaclet = equivEventGlobalFactory.getEventEquivalenceTaclet();    

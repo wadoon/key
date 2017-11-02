@@ -70,13 +70,4 @@ public class ServiceDependencyClusterSpec extends AbstractDependencyClusterSpec 
                 "New Objects: " + newObjects;
     }
 
-
-    @Override
-    public void registerPredicatesAndTaclets() {
-        registerPredicates();
-        
-        
-        
-    }
-
 }

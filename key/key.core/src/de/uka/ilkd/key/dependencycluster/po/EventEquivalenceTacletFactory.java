@@ -25,6 +25,9 @@ import de.uka.ilkd.key.util.Lowlist;
 import de.uka.ilkd.key.util.VisibilityCondition;
 
 public abstract class EventEquivalenceTacletFactory {
+    
+    public static final String EQUIV_RULE_BASENAME = "AAADefOfEquivEvent";
+    public static final String INV_RULE_BASENAME = "AAADefOfInvisEvent";
 
     protected final Services services;
     protected final TermBuilder tb;
@@ -155,7 +158,7 @@ public abstract class EventEquivalenceTacletFactory {
     public RewriteTaclet getEventEquivalenceTaclet() {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
         
-        final String name = "AAAEquivEventDef" + ruleNameSuffix;
+        final String name = EQUIV_RULE_BASENAME + ruleNameSuffix;
         tacletBuilder.setDisplayName(name);
         tacletBuilder.setName(new Name(name));
         
@@ -174,7 +177,7 @@ public abstract class EventEquivalenceTacletFactory {
     public RewriteTaclet getInvisibilityTaclet() {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
         
-        final String name = "AAAEventInvisibilityDef" + ruleNameSuffix;
+        final String name = INV_RULE_BASENAME + ruleNameSuffix;
         tacletBuilder.setDisplayName(name);
         tacletBuilder.setName(new Name(name));
 
