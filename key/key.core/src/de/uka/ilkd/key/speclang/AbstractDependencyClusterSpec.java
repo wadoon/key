@@ -34,7 +34,6 @@ public abstract class AbstractDependencyClusterSpec
     @Override
     public Function getAgreePrePredicate() {
         return agreePrePredicate;
-
     }
 
 

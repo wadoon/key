@@ -393,17 +393,17 @@ initially_clause[ImmutableList<String> mods]
 //-----------------------------------------------------------------------------
 //component level NI
 //-----------------------------------------------------------------------------
-//TODO: do mods make sense here?
+//TODO JK: do mods make sense here?
 component_cluster[ImmutableList<String> mods]
         returns [ImmutableList<TextualJMLConstruct> result = null]
         throws SLTranslationException
 :
-    keyword=COMPCLUSTER ps=expression  //TODO: expressions have to end with semicolons, thats why we can't have the more detailed syntax in the PreParser
+    keyword=COMPCLUSTER ps=expression  //TODO JK: expressions have to end with semicolons, thats why we can't have the more detailed syntax in the PreParser
     {
     	    ps = ps.prepend(keyword.getText() + " ");
 	    TextualJMLComponentCluster cc = new TextualJMLComponentCluster(mods, ps);
 	    result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(cc);
-	    //TODO: Throw exception if stupid mods found
+	    //TODO JK: Throw exception if stupid mods found
     }
 ;
 
@@ -787,6 +787,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
         |   ps=separates_clause      { sc.addInfFlowSpecs(ps); }
         |   ps=determines_clause      { sc.addInfFlowSpecs(ps); }
         |   (CLUSTER IDENT LOWIN) => ps=dependency_cluster_spec	{sc.addDepClusterSpecs(ps);}
+        |   (CLUSTER IDENT COMBINES) => ps=dependency_cluster_spec	{sc.addCombinedClusterSpecs(ps);}
         |   (CLUSTER IDENT SATISFIED_BY) => ps=cluster_satisfaction_spec	{sc.addClusterSatisfactionSpecs(ps);}
     )
     {

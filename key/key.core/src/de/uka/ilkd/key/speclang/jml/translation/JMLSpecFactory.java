@@ -544,6 +544,8 @@ public class JMLSpecFactory {
                 translateClusterSatisfactionSpecs(pm, progVars.selfVar,
                                             progVars.paramVars, progVars.resultVar, progVars.excVar, 
                                             textualSpecCase.getClusterSatisfactionSpecs());
+        //TODO JK continue here, add combined cluster stuff
+        
         clauses.joinProcedure = translateJoinProcedure(textualSpecCase.getJoinProcs());
         return clauses;
     }

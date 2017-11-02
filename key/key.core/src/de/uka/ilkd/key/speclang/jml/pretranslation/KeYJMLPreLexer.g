@@ -43,6 +43,7 @@ lexer grammar KeYJMLPreLexer;
     CAPTURES_RED 		: 'captures_redundantly';
     CLUSTER			: 'cluster';
     COMPCLUSTER                 : 'componentCluster';
+    COMBINES                    : '\\combines';
     CODE 			: 'code';
     CODE_BIGINT_MATH 		: 'code_bigint_math';
     CODE_JAVA_MATH 		: 'code_java_math';

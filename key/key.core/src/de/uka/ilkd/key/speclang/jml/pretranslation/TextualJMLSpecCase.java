@@ -61,6 +61,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private ImmutableList<PositionedString> dependencyClusters =
             ImmutableSLList.<PositionedString>nil();
     
+    private ImmutableList<PositionedString> combinedClusterSpecs =
+            ImmutableSLList.<PositionedString>nil();
+    
     private ImmutableList<PositionedString> clusterSatisfactionSpecs =
             ImmutableSLList.<PositionedString>nil();
     
@@ -360,7 +363,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         dependencyClusters = dependencyClusters.append(ps);
     }
 
-
     public void addDepClusterSpecs(ImmutableList<PositionedString> l) {
         dependencyClusters = dependencyClusters.append(l);
     }
@@ -372,6 +374,15 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addClusterSatisfactionSpecs(ImmutableList<PositionedString> l) {
         clusterSatisfactionSpecs = clusterSatisfactionSpecs.append(l);
+    }
+    
+    
+    public void addCombinedClusterSpecs(PositionedString ps) {
+        combinedClusterSpecs = combinedClusterSpecs.append(ps);
+    }
+    
+    public void addCombinedClusterSpecs(ImmutableList<PositionedString> l) {
+        combinedClusterSpecs = combinedClusterSpecs.append(l);
     }
 
 
@@ -502,6 +513,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return dependencyClusters;
     }
     
+    public ImmutableList<PositionedString> getCombinedClusterSpecs() {
+        return combinedClusterSpecs;
+    }
+    
     public ImmutableList<PositionedString> getClusterSatisfactionSpecs() {
         return clusterSatisfactionSpecs;
     }
@@ -606,6 +621,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("cluster: ").append(it.next()).append("\n");
         }
+        it = combinedClusterSpecs.iterator();
+        while (it.hasNext()) {
+            sb.append("combinedCluster: ").append(it.next()).append("\n");
+        }
+        it = clusterSatisfactionSpecs.iterator();
+        while (it.hasNext()) {
+            sb.append("clusterSatisfaction: ").append(it.next()).append("\n");
+        }
         it = joinProcs.iterator();
         while (it.hasNext()) {
             sb.append("join procedure: ").append(it.next()).append("\n");
@@ -639,7 +662,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && returns.equals(sc.returns)
                && joinProcs.equals(sc.joinProcs)
                && infFlowSpecs.equals(sc.infFlowSpecs)
-               && dependencyClusters.equals(sc.dependencyClusters);
+               && dependencyClusters.equals(sc.dependencyClusters)
+               && combinedClusterSpecs.equals(sc.combinedClusterSpecs)
+               && clusterSatisfactionSpecs.equals(sc.clusterSatisfactionSpecs);
     }
 
 
@@ -664,6 +689,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + returns.hashCode()
                + joinProcs.hashCode()
                + infFlowSpecs.hashCode()
-               + dependencyClusters.hashCode();
+               + dependencyClusters.hashCode()
+               + clusterSatisfactionSpecs.hashCode()
+               + combinedClusterSpecs.hashCode();
     }
 }
