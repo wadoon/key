@@ -2140,6 +2140,14 @@ public class TermBuilder {
     	return result;
     }
 
+    public Term transfresh(ImmutableList<Term> anys, Term heap1, Term heap2) {
+    	Term result = tt();
+    	for (Term any : anys) {
+    		result = and(result, func(services.getTypeConverter().getServiceEventLDT().transfresh(), any, heap1, heap2));
+    	}
+    	return result;
+    }
+
     //-------------------------------------------------------------------------
     //reachability operators
     //-------------------------------------------------------------------------
