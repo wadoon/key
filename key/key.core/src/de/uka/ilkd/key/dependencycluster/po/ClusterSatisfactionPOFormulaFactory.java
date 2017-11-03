@@ -66,7 +66,7 @@ public class ClusterSatisfactionPOFormulaFactory {
     }
     
     public Term globalImplLocalState() {
-        return tb.imp(tb.func(eventLDT.getAgreePreGlobal(), a.heap, b.heap), tb.func(eventLDT.getAgreePreLocal(), a.heap, b.heap));
+        return tb.imp(tb.func(globalSpec.getAgreePrePredicate(), a.heap, b.heap), tb.func(localSpec.getAgreePrePredicate(), a.heap, b.heap));
     }
     
     public Term localImplGlobalEvent() {
@@ -77,8 +77,8 @@ public class ClusterSatisfactionPOFormulaFactory {
     }
     
     public Term localImplGlobalState() {
-        return tb.imp(tb.and(tb.func(eventLDT.getAgreePreGlobal(), a.heap, b.heap), tb.func(eventLDT.getAgreePreLocal(), a.heap2, b.heap2)), 
-                tb.func(eventLDT.getAgreePreGlobal(), a.heapPost, b.heapPost));
+        return tb.imp(tb.and(tb.func(globalSpec.getAgreePrePredicate(), a.heap, b.heap), tb.func(localSpec.getAgreePrePredicate(), a.heap2, b.heap2)), 
+                tb.func(globalSpec.getAgreePrePredicate(), a.heapPost, b.heapPost));
     }
     
     public Term consequence() {

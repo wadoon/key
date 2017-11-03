@@ -16,6 +16,7 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 
 //TODO JK make this unugly
 public class AgreeTacletFactory {
+    public static final String AGREE_PRE_RULE_BASENAME = "AAADefOfAgreePre";
     
     private final String ruleNameSuffix;
     private final ImmutableList<Term> lowState;
@@ -40,7 +41,7 @@ public class AgreeTacletFactory {
     public RewriteTaclet getAgreePreTaclet() {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
         
-        final String name = "AAAAgreePre" + ruleNameSuffix;
+        final String name = AGREE_PRE_RULE_BASENAME + ruleNameSuffix;
         tacletBuilder.setDisplayName(name);
         tacletBuilder.setName(new Name(name));
         

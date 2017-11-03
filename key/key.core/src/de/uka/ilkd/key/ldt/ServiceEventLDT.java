@@ -69,8 +69,6 @@ public class ServiceEventLDT extends LDT {
 	
     private final Function isCallable;
 
-    private final Function agreePreLocal;
-    private final Function agreePreGlobal;
     private final Function agreePost;
     
     private final Function agreeBasic;
@@ -100,8 +98,6 @@ public class ServiceEventLDT extends LDT {
 		equivEvent = addFunction(services, "equivEvent");
 		filterVisible = addFunction(services, "filterVisible");
 		invEvent = addFunction(services, "invEvent");
-        agreePreLocal = addFunction(services, "agreePreLocal");
-        agreePreGlobal = addFunction(services, "agreePreGlobal");
         agreePost = addFunction(services, "agreePost");
         agreeBasic = addFunction(services, "agreeBasic");
         isCallable = addFunction(services, "isCallable");
@@ -300,14 +296,6 @@ public class ServiceEventLDT extends LDT {
     
     public Function getIsCallable() {
         return isCallable;
-    }
-
-    public Function getAgreePreLocal() {
-        return agreePreLocal;
-    }
-
-    public Function getAgreePreGlobal() {
-        return agreePreGlobal;
     }
 
     public Function getAgreePost() {
