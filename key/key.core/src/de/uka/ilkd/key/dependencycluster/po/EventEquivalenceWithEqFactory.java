@@ -56,7 +56,7 @@ public class EventEquivalenceWithEqFactory
             Term updatedSpecifiedCaller = tb.apply(updateHeap, specifiedCaller);
             Term updatedSpecifiedCallee = tb.apply(updateHeap, specifiedCallee);
                         
-            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(list.getService().getMethodDeclaration(), services));
+            Term specifiedService = tb.func(ldt.getMethodIdentifier(list.getService().getMethodDeclaration(), services));
             
             
             
@@ -103,7 +103,7 @@ public class EventEquivalenceWithEqFactory
             Term updatedSpecifiedCaller = tb.apply(updateHeap, specifiedCaller);
             Term updatedSpecifiedCallee = tb.apply(updateHeap, specifiedCallee);
                         
-            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(condition.getServiceContext().getMethodDeclaration(), services));
+            Term specifiedService = tb.func(ldt.getMethodIdentifier(condition.getServiceContext().getMethodDeclaration(), services));
                       
             Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
             Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);
@@ -148,7 +148,7 @@ public class EventEquivalenceWithEqFactory
             Term updatedSpecifiedCaller = tb.apply(updateHeap, specifiedCaller);
             Term updatedSpecifiedCallee = tb.apply(updateHeap, specifiedCallee);
             
-            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(condition.getServiceContext().getMethodDeclaration(), services));
+            Term specifiedService = tb.func(ldt.getMethodIdentifier(condition.getServiceContext().getMethodDeclaration(), services));
 
             Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
             Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);
@@ -182,7 +182,7 @@ public class EventEquivalenceWithEqFactory
             Term updatedSpecifiedCaller = tb.apply(updateHeap, specifiedCaller);
             Term updatedSpecifiedCallee = tb.apply(updateHeap, specifiedCallee);
                         
-            Term specifiedService = tb.func(ldt.getMethodIdentifierByDeclaration(list.getService().getMethodDeclaration(), services));
+            Term specifiedService = tb.func(ldt.getMethodIdentifier(list.getService().getMethodDeclaration(), services));
                
             Term equalCalltypes1 = tb.equals(calltype1, specifiedCalltype);
             Term equalCallers1 = tb.equals(caller1, updatedSpecifiedCaller);

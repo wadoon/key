@@ -813,13 +813,13 @@ public class TacletGenerator {
         for(SchemaVariable heapSV : heapSVs) {
              vars = vars.append(TB.var(heapSV));
         }
-        vars = vars.append(TB.var(histSV));
         if(!target.isStatic()) {
              vars = vars.append(TB.var(selfSV));
         }
         for(SchemaVariable sv : paramSVs) {
              vars = vars.append(TB.var(sv));
         }
+        vars = vars.append(TB.var(histSV));
         final Term targetTerm = TB.func(target, vars.toArray(new Term[0]));
 
         final Term axiomSatisfiable;
@@ -1108,10 +1108,9 @@ public class TacletGenerator {
         final AntecTacletBuilder tacletBuilder = new AntecTacletBuilder();
         final Term invTerm = isStatic? 
                 TB.staticInv(hs,TB.var(histSV), kjt) :
-                    TB.inv(hs,TB.var(histSV),
-                            eqVersion
-                            ? TB.var(eqSV)
-                            : TB.var(selfSV));        
+                    TB.inv(hs,
+                            eqVersion ? TB.var(eqSV) : TB.var(selfSV),
+                            TB.var(histSV));        
         tacletBuilder.setFind(invTerm);
         tacletBuilder.addTacletGoalTemplate(
                 new TacletGoalTemplate(addedSeq,

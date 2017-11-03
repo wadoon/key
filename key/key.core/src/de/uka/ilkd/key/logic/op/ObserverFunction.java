@@ -72,15 +72,15 @@ public class ObserverFunction extends Function implements IObserverFunction {
             Sort sort,
             KeYJavaType type,                       
             Sort heapSort,
-            Sort histSort,
             KeYJavaType container,
+            Sort histSort,
             boolean isStatic,                       
             ImmutableArray<KeYJavaType> paramTypes,
             int heapCount,
             int stateCount) {
         super(createName(baseName, container),
                 sort, 
-                getArgSortWithHist(heapSort, histSort, container, isStatic, paramTypes, heapCount, stateCount));
+                getArgSortWithHist(heapSort, container, histSort, isStatic, paramTypes, heapCount, stateCount));
         assert type == null || type.getSort() == sort;
         assert container != null;   
         this.type = type;
@@ -130,8 +130,8 @@ public class ObserverFunction extends Function implements IObserverFunction {
     }
 
     private static Sort[] getArgSortWithHist(Sort heapSort,
-            Sort histSort,
             KeYJavaType container, 
+            Sort histSort,
             boolean isStatic, 
             ImmutableArray<KeYJavaType> paramTypes,
             int heapCount,
@@ -145,8 +145,6 @@ public class ObserverFunction extends Function implements IObserverFunction {
         for(offset = 0; offset < stateCount * heapCount; offset++) {
             result[offset] = heapSort;
         }
-        result[offset] = histSort;
-        offset++;
         if(!isStatic) {
             result[offset] = container.getSort();
             assert result[offset] != null : "Bad KJT: " + container;
@@ -156,6 +154,9 @@ public class ObserverFunction extends Function implements IObserverFunction {
         for(int i = 0, n = paramTypes.size(); i < n; i++) {
             result[i + offset] = paramTypes.get(i).getSort();
         }
+
+        result[offset] = histSort;
+        offset++;
 
         return result;   
     }

@@ -9,7 +9,6 @@ import de.uka.ilkd.key.ldt.ServiceEventLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.DependencyClusterContract;
 
@@ -49,7 +48,7 @@ public class SymbExecWithHistFactory {
         return tb.evConst(tb.evCall(), 
                 tb.getEnvironmentCaller(), 
                 ifVars.pre.self, 
-                tb.func(ldt.getMethodIdentifierByDeclaration(contract.getTarget().getMethodDeclaration(), services)), 
+                tb.func(ldt.getMethodIdentifier(contract.getTarget().getMethodDeclaration(), services)), 
                 tb.seq(ifVars.pre.localVars), //TODO JK are these the right variables?
                 ifVars.pre.heap);
     }
@@ -86,7 +85,7 @@ public class SymbExecWithHistFactory {
        return tb.evConst(tb.evTerm(), 
                tb.getEnvironmentCaller(), 
                ifVars.pre.self, 
-               tb.func(ldt.getMethodIdentifierByDeclaration(contract.getTarget().getMethodDeclaration(), services)), 
+               tb.func(ldt.getMethodIdentifier(contract.getTarget().getMethodDeclaration(), services)), 
                tb.seq(ifVars.post.result), //TODO JK are these the right variables?
                ifVars.post.heap);
     }

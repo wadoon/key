@@ -262,9 +262,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             }
             LocationVariable hist = services.getTypeConverter().getServiceEventLDT().getHist();
             ProgramVariable atPreVar = atPreVars.get(hist);
-            ProgramVariable originalAtPreVar = originalAtPreVars.get(hist); // always null?!
+            ProgramVariable originalAtPreVar = originalAtPreVars.get(hist);
             if (atPreVar != null && originalAtPreVar != null) {
-            	result.put(atPreVar, originalAtPreVar); // TODO KD zf what does this do?
+            	result.put(atPreVar, originalAtPreVar);
             }
         }
 
@@ -338,13 +338,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             assertEqualSort(originalExcVar, excTerm);
             result.put(tb.var(originalExcVar), excTerm);
         }
-/*
-        //hist
-        if (histTerm != null) {
-        	assertEqualSort(originalHistVar, histTerm);
-        	result.put(tb.var(originalHistVar), histTerm);
-        } // TODO KD za put hist? (big change!)
-*/
+
         if (atPres != null) {
             final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
             for(LocationVariable h : heapLDT.getAllHeaps()) {
@@ -1162,15 +1156,10 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                         Term excTerm,
                         Map<LocationVariable, Term> atPres,
                         Services services) {
-        Term result = null;
+        Term result = tb.tt();
         for(LocationVariable heap : heapContext) {
             final Term p = getPost(heap, heapTerms.get(heap), selfTerm, paramTerms, resultTerm, excTerm, atPres, services);
-            if(p == null) {
-                continue;
-            }
-            if(result == null) {
-                result = p;
-            }else{
+            if(p != null) {
                 result = tb.and(result, p);
             }
         }

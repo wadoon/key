@@ -58,7 +58,6 @@ public class AgreeTacletFactory {
     private Term agreePre() {
         ImmutableList<Term> collectedTerms = ImmutableSLList.<Term>nil();
         for (Term t: lowState) {
-            System.out.println(t);
             Term t1 = tb.apply(tb.elementary(tb.getBaseHeap(), heap2), t);
             Term t2 = tb.apply(tb.elementary(tb.getBaseHeap(), heap1), t);
             collectedTerms = collectedTerms.append(tb.equals(t1, t2));

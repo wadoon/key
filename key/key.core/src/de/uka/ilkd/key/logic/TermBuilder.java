@@ -1612,11 +1612,11 @@ public class TermBuilder {
         return permissionsFor(var(permHeap),var(regularHeap));
     }
 
-    public Term inv(Term[] h, Term hist, Term o) {
+    public Term inv(Term[] h, Term o, Term hist) {
         Term[] p = new Term[h.length + 1+1];
         System.arraycopy(h, 0, p, 0, h.length);
-        p[h.length] = hist;
-        p[h.length+1] = o;
+        p[h.length] = o;
+        p[h.length+1] = hist;
         return func(services.getJavaInfo().getInv(), p);
     }
 
@@ -1628,7 +1628,7 @@ public class TermBuilder {
         for(LocationVariable heap : heaps) {
             hs[i++] = var(heap);
         }
-        return inv(hs, var(services.getTypeConverter().getServiceEventLDT().getHist()) ,o);
+        return inv(hs, o, var(services.getTypeConverter().getServiceEventLDT().getHist()));
     }
 
     public Term staticInv(Term[] h, Term hist , KeYJavaType t){
@@ -2057,6 +2057,11 @@ public class TermBuilder {
         return var(services.getTypeConverter().getServiceEventLDT().getEnvironmentCaller());
     }
 
+    //getActiveComponent
+    public Term getActiveComponent() {
+    	return var(services.getTypeConverter().getServiceEventLDT().getActiveComponent());
+    }
+
     //event constructor
 	public Term evConst(Term type, Term caller, Term callee, Term method, Term args, Term heap) {
 		return func(services.getTypeConverter().getServiceEventLDT().
@@ -2108,6 +2113,39 @@ public class TermBuilder {
     }
     public Term similar(Term any1, Term any2, Term heap1, Term heap2) {
     	return func(services.getTypeConverter().getServiceEventLDT().similar(), any1, any2, heap1, heap2);
+    }
+
+    //other stuff
+    public Term heapjoin(Term heap1, Term heap2, Term fields) {
+    	return func(services.getTypeConverter().getServiceEventLDT().heapjoin(), heap1, heap2, fields);
+    }
+
+    public Term isIso(Term any1, Term any2) {
+    	return func(services.getTypeConverter().getServiceEventLDT().isIso(), any1, any2);
+    }
+
+    public Term isoObject(Term any) {
+    	return func(services.getTypeConverter().getServiceEventLDT().isoObject(), any);
+    }
+
+    public Term transfresh(Term any, Term heap1, Term heap2) {
+    	return func(services.getTypeConverter().getServiceEventLDT().transfresh(), any, heap1, heap2);
+    }
+
+    public Term transfresh(Term[] anys, Term heap1, Term heap2) {
+    	Term result = tt();
+    	for (Term any : anys) {
+    		result = and(result, func(services.getTypeConverter().getServiceEventLDT().transfresh(), any, heap1, heap2));
+    	}
+    	return result;
+    }
+
+    public Term transfresh(ImmutableList<Term> anys, Term heap1, Term heap2) {
+    	Term result = tt();
+    	for (Term any : anys) {
+    		result = and(result, func(services.getTypeConverter().getServiceEventLDT().transfresh(), any, heap1, heap2));
+    	}
+    	return result;
     }
 
     //-------------------------------------------------------------------------

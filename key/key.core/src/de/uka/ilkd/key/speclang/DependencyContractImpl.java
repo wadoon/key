@@ -190,9 +190,9 @@ public final class DependencyContractImpl implements DependencyContract {
             }
             LocationVariable hist = services.getTypeConverter().getServiceEventLDT().getHist();
             ProgramVariable atPreVar = atPreVars.get(hist);
-            ProgramVariable originalAtPreVar = originalAtPreVars.get(hist); // always null?!
+            ProgramVariable originalAtPreVar = originalAtPreVars.get(hist);
             if (atPreVar != null && originalAtPreVar != null) {
-            	map.put(atPreVar, originalAtPreVar); // TODO KD zf what does this do?
+            	map.put(atPreVar, originalAtPreVar);
             }
         }
 
@@ -260,7 +260,7 @@ public final class DependencyContractImpl implements DependencyContract {
             Map<LocationVariable,Term> atPres,
             Services services) {
         Term result = null;
-        for(LocationVariable heap : heapContext) { // TODO KD z maybe need to change something for <inv>
+        for(LocationVariable heap : heapContext) {
             final Term p = getPre(heap, heapTerms.get(heap), selfTerm, paramTerms, atPres, services);
             if(result == null) {
                 result = p;

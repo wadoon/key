@@ -156,8 +156,8 @@ lexer grammar KeYJMLLexer;
     // ONLY_ASSIGNED     : '\\only_assigned';
     // ONLY_CALLED       : '\\only_called';
     // ONLY_CAPTURED     : '\\only_captured';
-    
-    METHODID             : '\\methodID'; // TODO KD z hacky
+
+    METHODID             : '\\methodID';
 
 AND : '&';
 BITWISENOT : '~';
