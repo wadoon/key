@@ -5,7 +5,7 @@ import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory.Snippet;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.RemoteMethodEventLDT;
+import de.uka.ilkd.key.ldt.ServiceEventLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -18,7 +18,7 @@ public class SymbExecWithHistFactory {
     private final ProofObligationVars ifVars;
     private final Services services;
     private final TermBuilder tb;
-    private final RemoteMethodEventLDT ldt;
+    private final ServiceEventLDT ldt;
     private final ProofObligationVars symbExecVars;
     private final BasicPOSnippetFactory f;
     private final Term postHistory;
@@ -31,7 +31,7 @@ public class SymbExecWithHistFactory {
         this.ifVars = ifVars;
         this.services = services;
         this.tb = services.getTermBuilder();
-        this.ldt = services.getTypeConverter().getRemoteMethodEventLDT();
+        this.ldt = services.getTypeConverter().getServiceEventLDT();
         this.symbExecVars = symbExecVars;
         //TODO JK check sort of postHistory
         this.postHistory = postHistory;

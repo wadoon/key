@@ -37,7 +37,7 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.MapLDT;
 import de.uka.ilkd.key.ldt.RealLDT;
-import de.uka.ilkd.key.ldt.RemoteMethodEventLDT;
+import de.uka.ilkd.key.ldt.ServiceEventLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -86,7 +86,7 @@ public final class PrimitiveType implements Type {
             new PrimitiveType("\\map", EmptyMapLiteral.INSTANCE, MapLDT.NAME);
 
     // TODO KD z hacky (see de.uka.ilkd.key.speclang.jml.translation: g-Files)
-    public static final PrimitiveType JAVA_EVENT = new PrimitiveType("\\event", null, RemoteMethodEventLDT.NAME);
+    public static final PrimitiveType JAVA_EVENT = new PrimitiveType("\\event", null, ServiceEventLDT.NAME);
 
     public static final PrimitiveType PROGRAM_SV = new PrimitiveType("SV", null, null);
 

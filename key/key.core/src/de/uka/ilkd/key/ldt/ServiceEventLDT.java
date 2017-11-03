@@ -17,7 +17,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-public class RemoteMethodEventLDT extends LDT {
+public class ServiceEventLDT extends LDT {
 	public static final Name NAME = new Name("Event");
 	public static final Name HIST_NAME = new Name("hist");
 	public static final Name INTERNAL_HIST_NAME = new Name("internalHist");
@@ -78,7 +78,7 @@ public class RemoteMethodEventLDT extends LDT {
     private final Sort methodSort;
 
 
-	public RemoteMethodEventLDT (TermServices services) {
+	public ServiceEventLDT (TermServices services) {
 		super(NAME, services);
 		event = addFunction(services, "event");
 		evType = addFunction(services, "evType");

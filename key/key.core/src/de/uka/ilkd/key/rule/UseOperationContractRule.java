@@ -740,8 +740,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 		final Term globalDefs = contract.getGlobalDefs(baseHeap, baseHeapTerm, contractSelf,
 				contractParams, services);
 
-		LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
-		LocationVariable internalHist = services.getTypeConverter().getRemoteMethodEventLDT().getInternalHist();
+		LocationVariable hist = services.getTypeConverter().getServiceEventLDT().getHist();
+		LocationVariable internalHist = services.getTypeConverter().getServiceEventLDT().getInternalHist();
 		ProgramElementName otherHeapName = new ProgramElementName(tb.newName("otherHeap"));
 		LocationVariable otherHeap = new LocationVariable(otherHeapName, new KeYJavaType(baseHeap.sort()));
 		ProgramElementName otherPreHeapName = new ProgramElementName(tb.newName("otherHeapBefore_" + pm.getName()));
@@ -868,7 +868,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 		if (pm.getMethodDeclaration().isRemote()) {
 			assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
 			// TODO KD z could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor() and selfVarTerm != contractSelf
-			Term method = tb.func(services.getTypeConverter().getRemoteMethodEventLDT().getMethodIdentifierByDeclaration(pm.getMethodDeclaration(), services));
+			Term method = tb.func(services.getTypeConverter().getServiceEventLDT().getMethodIdentifierByDeclaration(pm.getMethodDeclaration(), services));
 			Term resultTerm = contractResult != null ? tb.seqSingleton(contractResult) : tb.seqEmpty();
 			// throws Exception if pm.getMethodDeclaration().isStatic()
 			Term outCallEvent = tb.evConst(tb.evCall(), selfVarTerm, contractSelf, method, tb.seq(contractParams), anonUpdateDatas.head().methodHeapAtPre);

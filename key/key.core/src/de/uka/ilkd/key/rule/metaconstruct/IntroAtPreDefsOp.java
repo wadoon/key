@@ -134,7 +134,7 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
 		}
 
 		// create Before hist
-		LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
+		LocationVariable hist = services.getTypeConverter().getServiceEventLDT().getHist();
 		LocationVariable h = new LocationVariable(new ProgramElementName(tb.newName(hist + "Before_" + methodName)), new KeYJavaType(hist.sort()));
 		services.getNamespaces().programVariables().addSafely(h);
 		Term histVar = tb.var(hist);

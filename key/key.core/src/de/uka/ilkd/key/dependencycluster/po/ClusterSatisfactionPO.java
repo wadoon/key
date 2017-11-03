@@ -8,7 +8,7 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.ldt.RemoteMethodEventLDT;
+import de.uka.ilkd.key.ldt.ServiceEventLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -56,7 +56,7 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
         
         final ClusterSatisfactionPOFormulaFactory factory = new ClusterSatisfactionPOFormulaFactory(contract, proofServices, self);
         
-        final RemoteMethodEventLDT ldt = proofServices.getTypeConverter().getRemoteMethodEventLDT();
+        final ServiceEventLDT ldt = proofServices.getTypeConverter().getServiceEventLDT();
         
         final ServiceDependencyClusterSpec localSpec = proofServices.getSpecificationRepository().getServiceDependencyClusterByLabel(contract.getSpecs().getServiceClusterLabel());
         //TODO JK make sure the specified local cluster is actually a cluster of this method?

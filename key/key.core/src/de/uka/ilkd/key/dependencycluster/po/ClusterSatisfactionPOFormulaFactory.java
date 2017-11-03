@@ -3,7 +3,7 @@ package de.uka.ilkd.key.dependencycluster.po;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.RemoteMethodEventLDT;
+import de.uka.ilkd.key.ldt.ServiceEventLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -18,7 +18,7 @@ public class ClusterSatisfactionPOFormulaFactory {
     private final ClusterSatisfactionContract contract;
     private final Services proofServices;
     private final TermBuilder tb;
-    private final RemoteMethodEventLDT eventLDT;
+    private final ServiceEventLDT eventLDT;
     private final HeapLDT heapLDT;
     private final SeqLDT seqLDT;
     private final Event a;
@@ -35,7 +35,7 @@ public class ClusterSatisfactionPOFormulaFactory {
         this.proofServices = proofServices;
         this.tb = proofServices.getTermBuilder();
         this.contract = contract;
-        eventLDT = proofServices.getTypeConverter().getRemoteMethodEventLDT();
+        eventLDT = proofServices.getTypeConverter().getServiceEventLDT();
         heapLDT = proofServices.getTypeConverter().getHeapLDT();
         seqLDT = proofServices.getTypeConverter().getSeqLDT();
         a = new Event("_A");

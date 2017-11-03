@@ -21,7 +21,7 @@ public abstract class AbstractDependencyClusterSpec
         this.label = label;
         this.services = services;
         
-        Sort eventSort = services.getTypeConverter().getRemoteMethodEventLDT().eventSort();
+        Sort eventSort = services.getTypeConverter().getServiceEventLDT().eventSort();
         Sort formulaSort = services.getTermBuilder().tt().sort();
         Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
         equivEventEqPredicate = new Function(new Name("EquivEventEq_" + label), formulaSort, eventSort, eventSort);

@@ -17,7 +17,7 @@ import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.ldt.RemoteMethodEventLDT;
+import de.uka.ilkd.key.ldt.ServiceEventLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -100,7 +100,7 @@ public class DependencyClusterContractPO extends AbstractOperationPO
         
         collectClassAxioms(contract.getKJT(), proofConfig);
         
-        RemoteMethodEventLDT ldt = proofServices.getTypeConverter().getRemoteMethodEventLDT();
+        ServiceEventLDT ldt = proofServices.getTypeConverter().getServiceEventLDT();
 
         EventEquivalenceWithIsoFactory tacletFactory = new EventEquivalenceWithIsoFactory(contract.getSpecs(), proofConfig.getServices(), contract.getSelf(), ldt.getEquivEvent(), ldt.getInvEvent(), "");
         RewriteTaclet equivEventTaclet = tacletFactory.getEventEquivalenceTaclet();               

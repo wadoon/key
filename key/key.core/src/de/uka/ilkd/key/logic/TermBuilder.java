@@ -1628,7 +1628,7 @@ public class TermBuilder {
         for(LocationVariable heap : heaps) {
             hs[i++] = var(heap);
         }
-        return inv(hs, var(services.getTypeConverter().getRemoteMethodEventLDT().getHist()) ,o);
+        return inv(hs, var(services.getTypeConverter().getServiceEventLDT().getHist()) ,o);
     }
 
     public Term staticInv(Term[] h, Term hist , KeYJavaType t){
@@ -1647,7 +1647,7 @@ public class TermBuilder {
         for(LocationVariable heap : heaps) {
             hs[i++] = var(heap);
         }
-        hs[i++] = var(services.getTypeConverter().getRemoteMethodEventLDT().getHist());
+        hs[i++] = var(services.getTypeConverter().getServiceEventLDT().getHist());
         return func(services.getJavaInfo().getStaticInv(t), hs);
     }
 
@@ -2045,50 +2045,50 @@ public class TermBuilder {
 
     //getHistory
     public Term getHist() {
-    	return var(services.getTypeConverter().getRemoteMethodEventLDT().getHist());
+    	return var(services.getTypeConverter().getServiceEventLDT().getHist());
     }
     
     public Term getInternalHist() {
-        return var(services.getTypeConverter().getRemoteMethodEventLDT().getInternalHist());
+        return var(services.getTypeConverter().getServiceEventLDT().getInternalHist());
     }
 
     //getEnvironmentCaller
     public Term getEnvironmentCaller() {
-        return var(services.getTypeConverter().getRemoteMethodEventLDT().getEnvironmentCaller());
+        return var(services.getTypeConverter().getServiceEventLDT().getEnvironmentCaller());
     }
 
     //event constructor
 	public Term evConst(Term type, Term caller, Term callee, Term method, Term args, Term heap) {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().
+		return func(services.getTypeConverter().getServiceEventLDT().
 				eventConstructor(), type, caller, callee, method, args, heap);
 	}
 
 	//event destructor (/getters)
 	public Term evGetType(Term event) {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().getTypeFromEvent(), event);
+		return func(services.getTypeConverter().getServiceEventLDT().getTypeFromEvent(), event);
 	}
 	public Term evGetCaller(Term event) {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().getCallerFromEvent(), event);
+		return func(services.getTypeConverter().getServiceEventLDT().getCallerFromEvent(), event);
 	}
 	public Term evGetCallee(Term event) {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().getCalleeFromEvent(), event);
+		return func(services.getTypeConverter().getServiceEventLDT().getCalleeFromEvent(), event);
 	}
 	public Term evGetMethod(Term event) {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().getServiceFromEvent(), event);
+		return func(services.getTypeConverter().getServiceEventLDT().getServiceFromEvent(), event);
 	}
 	public Term evGetArgs(Term event) {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().getContentFromEvent(), event);
+		return func(services.getTypeConverter().getServiceEventLDT().getContentFromEvent(), event);
 	}
 	public Term evGetHeap(Term event) {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().getHeapFromEvent(), event);
+		return func(services.getTypeConverter().getServiceEventLDT().getHeapFromEvent(), event);
 	}
 
 	//event type constructors
 	public Term evCall() {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().serviceCallConstant());
+		return func(services.getTypeConverter().getServiceEventLDT().serviceCallConstant());
 	}
 	public Term evTerm() {
-		return func(services.getTypeConverter().getRemoteMethodEventLDT().serviceTerminationConstant());
+		return func(services.getTypeConverter().getServiceEventLDT().serviceTerminationConstant());
 	}
 
 	//well formed
@@ -2101,13 +2101,13 @@ public class TermBuilder {
 
     // similar predicates
     public Term similarHist(Term callee, Term hist1, Term hist2) {
-    	return func(services.getTypeConverter().getRemoteMethodEventLDT().similarHist(), callee, hist1, hist2);
+    	return func(services.getTypeConverter().getServiceEventLDT().similarHist(), callee, hist1, hist2);
     }
     public Term similarEvent(Term event1, Term event2) {
-    	return func(services.getTypeConverter().getRemoteMethodEventLDT().similarEvent(), event1, event2);
+    	return func(services.getTypeConverter().getServiceEventLDT().similarEvent(), event1, event2);
     }
     public Term similar(Term any1, Term any2, Term heap1, Term heap2) {
-    	return func(services.getTypeConverter().getRemoteMethodEventLDT().similar(), any1, any2, heap1, heap2);
+    	return func(services.getTypeConverter().getServiceEventLDT().similar(), any1, any2, heap1, heap2);
     }
 
     //-------------------------------------------------------------------------

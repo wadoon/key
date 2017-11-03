@@ -61,7 +61,7 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     }
     
     protected void collectHistVariable() {
-        result.add(services.getTypeConverter().getRemoteMethodEventLDT().getHist());
+        result.add(services.getTypeConverter().getServiceEventLDT().getHist());
     }
 
 

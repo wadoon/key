@@ -8,7 +8,7 @@ import de.uka.ilkd.key.informationflow.po.IFProofObligationVars;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.ldt.RemoteMethodEventLDT;
+import de.uka.ilkd.key.ldt.ServiceEventLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -31,7 +31,7 @@ public abstract class EventEquivalenceTacletFactory {
 
     protected final Services services;
     protected final TermBuilder tb;
-    protected final RemoteMethodEventLDT ldt;
+    protected final ServiceEventLDT ldt;
     
     protected final Term calltype1;
     protected final Term calltype2;
@@ -70,7 +70,7 @@ public abstract class EventEquivalenceTacletFactory {
             ImmutableList<VisibilityCondition> visible, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
 
         this.services = services;
-        ldt = services.getTypeConverter().getRemoteMethodEventLDT();
+        ldt = services.getTypeConverter().getServiceEventLDT();
         
         this.lowIn = lowIn;
         this.lowOut = lowOut;

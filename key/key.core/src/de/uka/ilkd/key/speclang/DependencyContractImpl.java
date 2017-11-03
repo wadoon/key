@@ -188,7 +188,7 @@ public final class DependencyContractImpl implements DependencyContract {
                     map.put(tb.var(originalAtPreVar), tb.var(atPreVar));
                 }
             }
-            LocationVariable hist = services.getTypeConverter().getRemoteMethodEventLDT().getHist();
+            LocationVariable hist = services.getTypeConverter().getServiceEventLDT().getHist();
             ProgramVariable atPreVar = atPreVars.get(hist);
             ProgramVariable originalAtPreVar = originalAtPreVars.get(hist); // always null?!
             if (atPreVar != null && originalAtPreVar != null) {
