@@ -32,6 +32,7 @@ options {
     import de.uka.ilkd.key.util.Lowlist;
     import de.uka.ilkd.key.speclang.DependencyClusterSpec;
     import de.uka.ilkd.key.speclang.ServiceDependencyClusterSpec;
+    import de.uka.ilkd.key.speclang.CombinedClusterSpec;
     import de.uka.ilkd.key.util.ClusterSatisfactionSpec;
     import de.uka.ilkd.key.speclang.ComponentCluster;
     import de.uka.ilkd.key.speclang.ComponentClusterImpl;
@@ -422,6 +423,7 @@ top returns [Object ret = null] throws SLTranslationException
     |	(CLUSTER IDENT LOWIN) => dependencyclusterspec { ret = $dependencyclusterspec.result; }
     |	componentdependencyclusterspec { ret = $componentdependencyclusterspec.result; }
     |	(CLUSTER IDENT SATISFIED_BY) => clustersatisfactionspec { ret = $clustersatisfactionspec.result; }
+    |	(CLUSTER IDENT COMBINES) => combinedclusterspec { ret = $combinedclusterspec.result; }
     )
     (SEMI)? EOF
     ;
@@ -618,6 +620,20 @@ clustersatisfactionspec returns  [ClusterSatisfactionSpec result = null] throws 
     CLUSTER global = IDENT SATISFIED_BY local = IDENT
 
     {result = new ClusterSatisfactionSpec(global.getText(), local.getText());}
+    ;
+    
+
+combinedclusterspec returns  [CombinedClusterSpec result = null] throws SLTranslationException
+:
+    CLUSTER label = IDENT COMBINES clusters = stringlist
+
+    {result = new CombinedClusterSpec(label.getText(), services, clusters);}
+    ;
+
+stringlist returns  [ImmutableList<String> result = ImmutableSLList.<String>nil();] throws SLTranslationException
+:
+    string = IDENT { result = result.append(string.getText()); }
+	(COMMA string = IDENT { result = result.append(string.getText()); })*
     ;
     
 componentdependencyclusterspec returns  [ComponentCluster result = null] throws SLTranslationException
