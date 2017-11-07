@@ -546,8 +546,6 @@ public class JMLSpecFactory {
                 translateClusterSatisfactionSpecs(pm, progVars.selfVar,
                                             progVars.paramVars, progVars.resultVar, progVars.excVar, 
                                             textualSpecCase.getClusterSatisfactionSpecs());
-        //TODO JK continue here, add combined cluster stuff - DONE
-        //TODO JK support combined cluster specs in main parser
         //TODO JK find out where to add these specs to the specification repo
         clauses.combinedClusterSpecs =
                 translateCombinedClusterSpecs(pm, progVars.selfVar,

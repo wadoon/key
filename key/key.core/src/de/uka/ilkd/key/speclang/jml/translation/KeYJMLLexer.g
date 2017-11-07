@@ -142,7 +142,7 @@ lexer grammar KeYJMLLexer;
     SUBSET               : '\\subset';
     SUCH_THAT            : '\\such_that';
     SUM                  : '\\sum';
-    TERMINATION          : '\\termination'; //KeY extension, not official JML
+    TERMINATION          : '\\termination' | '\\term'; //KeY extension, not official JML
     TRANSACTIONUPDATED   : '\\transactionUpdated';  //KeY extension, not official JML
     TRANSIENT            : '\\transient';  //KeY extension, not official JML
     TYPE                 : '\\TYPE';
