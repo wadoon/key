@@ -1319,7 +1319,7 @@ public class Recoder2KeYConverter {
 	        if (parent instanceof recoder.java.declaration.ClassDeclaration) {
 				recoder.java.declaration.ClassDeclaration parentClass = (recoder.java.declaration.ClassDeclaration) parent;
 				annotations.addAll(parentClass.getAnnotations());
-			}
+			} // TODO -BUG?- doesnt find Remote interfaces?
 			if (parent instanceof recoder.java.declaration.InterfaceDeclaration) {
 				recoder.java.declaration.InterfaceDeclaration parentClass = (recoder.java.declaration.InterfaceDeclaration) parent;
 				annotations.addAll(parentClass.getAnnotations());
@@ -1331,9 +1331,9 @@ public class Recoder2KeYConverter {
 			    	break;
 				}
 			}
-/* TODO KD b implement
-			// TODO KD z mind public only
-			// TODO KD z if <>-Method don't do?
+/* TODO KD -implement- correct remote check
+			// TODO KD -tipp- mind public only
+			// TODO KD -tipp- if <>-Method don't do?
 			if (parent instanceof recoder.java.declaration.ClassDeclaration) {
 				recoder.java.declaration.ClassDeclaration parentClass = (recoder.java.declaration.ClassDeclaration) parent;
 				for (recoder.java.declaration.AnnotationUseSpecification annotation : parentClass.getAnnotations()) {
@@ -1375,7 +1375,7 @@ public class Recoder2KeYConverter {
 						}
 						break;
 					}
-					break; // TODO KD z what happens with more then 1 Remote annotation?
+					break; // TODO KD -bug?- what happens with more then 1 Remote annotation?
 				}
 			} else if (parent instanceof recoder.java.declaration.InterfaceDeclaration) {
 				recoder.java.declaration.InterfaceDeclaration parentInterface = (recoder.java.declaration.InterfaceDeclaration) parent;

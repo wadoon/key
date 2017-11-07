@@ -264,7 +264,7 @@ public class ServiceEventLDT extends LDT {
 	}
 
 	public Function getMethodIdentifier(MethodDeclaration md, TermServices services) {
-		// TODO KD b extend methodIdentifier with class
+		// TODO KD -implement- extend methodIdentifier with class
 		String functionString = md.getFullName() + "(";
 		if (md.getParameterDeclarationCount() > 0) {
 			functionString += md.getParameterDeclarationAt(0).getTypeReference().getKeYJavaType().getFullName();
@@ -282,9 +282,6 @@ public class ServiceEventLDT extends LDT {
 		}
 		return function;
 	}
-
-	// TODO KD z add Operators / Literals / Types?
-	
 
     public Sort getCalltypeSort() {
         return calltypeSort;

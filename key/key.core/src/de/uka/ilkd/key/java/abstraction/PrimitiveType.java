@@ -85,7 +85,7 @@ public final class PrimitiveType implements Type {
     public static final PrimitiveType JAVA_MAP =
             new PrimitiveType("\\map", EmptyMapLiteral.INSTANCE, MapLDT.NAME);
 
-    // TODO KD z hacky (see de.uka.ilkd.key.speclang.jml.translation: g-Files)
+    // TODO KD -hacky- (see de.uka.ilkd.key.speclang.jml.translation: g-Files)
     public static final PrimitiveType JAVA_EVENT = new PrimitiveType("\\event", null, ServiceEventLDT.NAME);
 
     public static final PrimitiveType PROGRAM_SV = new PrimitiveType("SV", null, null);

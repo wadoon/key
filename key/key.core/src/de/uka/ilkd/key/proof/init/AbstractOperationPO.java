@@ -404,14 +404,14 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
 				final LocationVariable baseHeap = proofServices.getTypeConverter().getHeapLDT().getHeap();
 				final Term selfVarTerm = (selfVar != null) ? tb.var(selfVar) : null;
-				final Term globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm, // TODO KD z,s always null?
+				final Term globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm, // TODO KD -bug?- always null?
 						tb.var(paramVars), proofServices);
 
 				// if method to prove is remote add "outgoing termination" events to history
 				Term histAtCallUpdate = tb.skip();
 				if (pm.getMethodDeclaration().isRemote()) {
 					assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
-					// TODO KD z could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor() (caller cannot be selfVarTerm)
+					// TODO KD -tipp- could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor() (caller cannot be selfVarTerm)
 					LocationVariable hist = proofServices.getTypeConverter().getServiceEventLDT().getHist();
 					Term caller = tb.getEnvironmentCaller();
 					final Term comp = tb.getActiveComponent();
