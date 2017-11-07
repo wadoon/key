@@ -787,46 +787,47 @@ public final class UseOperationContractRule implements BuiltInRule {
 		final ImmutableList<Goal> result;
 		final Goal preGoal, postGoal, excPostGoal, nullGoal;
 		final ReferencePrefix rp = inst.mr.getReferencePrefix();
-		if (pm.getMethodDeclaration().isRemote()) {
-			if (rp != null
-					&& !(rp instanceof ThisReference)
-					&& !(rp instanceof SuperReference)
-					&& !(rp instanceof TypeReference)
-					&& !(inst.pm.isStatic())) {
-				// TODO KD 00 oh god why?
-				// throw new IllegalStateException("Found a remote method with nullgoal (-whatever that is-). Do not know how to progress!");
-				System.out.println("Found a remote method with nullgoal (-whatever that is-). Ignoring it and progressing!");
+		if (rp != null
+				&& !(rp instanceof ThisReference)
+				&& !(rp instanceof SuperReference)
+				&& !(rp instanceof TypeReference)
+				&& !(inst.pm.isStatic())) {
+			if (pm.getMethodDeclaration().isRemote()) {
+				result = goal.split(3);
+				postGoal = result.tail().tail().head();
+				excPostGoal = null;
+				preGoal = result.tail().head();
+				nullGoal = result.head();
+			} else {
+				result = goal.split(4);
+				postGoal = result.tail().tail().tail().head();
+				excPostGoal = result.tail().tail().head();
+				preGoal = result.tail().head();
+				nullGoal = result.head();
 			}
+		} else if (pm.getMethodDeclaration().isRemote()) {
 			result = goal.split(2);
 			postGoal = result.tail().head();
 			excPostGoal = null;
 			preGoal = result.head();
 			nullGoal = null;
 		} else {
-			if (rp != null
-					&& !(rp instanceof ThisReference)
-					&& !(rp instanceof SuperReference)
-					&& !(rp instanceof TypeReference)
-					&& !(inst.pm.isStatic())) {
-				result = goal.split(4);
-				postGoal = result.tail().tail().tail().head();
-				excPostGoal = result.tail().tail().head();
-				preGoal = result.tail().head();
-				nullGoal = result.head();
-				nullGoal.setBranchLabel("Null reference ("
-						+ inst.actualSelf
-						+ " = null)");
-			} else {
-				result = goal.split(3);
-				postGoal = result.tail().tail().head();
-				excPostGoal = result.tail().head();
-				preGoal = result.head();
-				nullGoal = null;
-			}
+			result = goal.split(3);
+			postGoal = result.tail().tail().head();
+			excPostGoal = result.tail().head();
+			preGoal = result.head();
+			nullGoal = null;
+		}
+		postGoal.setBranchLabel("Post"+ " ("+pm.getName()+")");
+		if (excPostGoal != null) {
 			excPostGoal.setBranchLabel("Exceptional Post"+ " ("+pm.getName()+")");
 		}
 		preGoal.setBranchLabel("Pre"+ " ("+pm.getName()+")");
-		postGoal.setBranchLabel("Post"+ " ("+pm.getName()+")");
+		if (nullGoal != null) {
+			nullGoal.setBranchLabel("Null reference ("
+					+ inst.actualSelf
+					+ " = null)");
+		}
 
 		//prepare common stuff for the three branches
 		Term anonAssumption = tb.tt();
@@ -862,6 +863,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 //		Term similarFormula = tb.tt();
 		// if called method belongs to a business remote interface, add "outgoing call" and "incoming termination" events to history
 		Term preFormula = null;
+		Term postFormula = null;
 		if (pm.getMethodDeclaration().isRemote()) {
 			assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
 			// TODO KD z could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor()
@@ -931,8 +933,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 			if (contractResult != null) {
 				r_o = new Function(new Name(tb.newName("r_o")), contractResult.sort(), true);
 				services.getNamespaces().functions().addSafely(r_o);
-				reachableOut = tb.and(reachableOut, tb.imp(tb.instance(services.getJavaInfo().objectSort(), contractResult), tb.or(tb.equals(contractResult, tb.NULL()), tb.created(contractResult))));
-				// TODO KD 05 again: possible to leave impl out
+				//reachableOut = tb.and(reachableOut, tb.imp(tb.instance(services.getJavaInfo().objectSort(), contractResult), tb.or(tb.equals(contractResult, tb.NULL()), tb.created(contractResult))));
+				// TODO KD 01 problem with primitives - talk to simon (maybe possible to leave out iff tb.instance(services.getJavaInfo().objectSort(), contractResult)
 //				u_post = tb.parallel(u_post, tb.elementary(contractResult, tb.isoObject(tb.func(r_o)))); // TODO KD type stuff
 				resultSeq = tb.seqSingleton(contractResult);
 				resultSeq_o = tb.seqSingleton(tb.func(r_o));
@@ -964,18 +966,16 @@ public final class UseOperationContractRule implements BuiltInRule {
 //						);
 			}
 			Term m_id = tb.func(services.getTypeConverter().getServiceEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), services));
-			preFormula = tb.applySequential(new Term[]{inst.u, w},
-					tb.and(tb.wellFormed(tb.func(heap_o)),
+			Term preKnowledge = tb.and(tb.wellFormed(tb.func(heap_o)),
 					tb.wellFormed(tb.func(heap_opre)),
 					tb.wellFormedHist(tb.func(hist_o)),
 					tb.equals(tb.func(heap_opre), tb.heapjoin(baseHeapTerm, tb.func(heap_o), tb.seq(contractParams))),
 					tb.equals(tb.func(callevent_o), tb.evConst(tb.evCall(), callingComp, contractSelf, m_id, tb.seq(contractParams), tb.func(heap_opre))),
-					tb.transfresh(contractParams, tb.func(heap_opre), tb.func(heap_o)),
-					tb.apply(u_o, tb.imp(/*self.<inv>*/tb.tt(), tb.apply(u_opre, tb.and( // TODO KD 02 self.<inv> missing
-							pre_noinv,
-							reachableIn,
-							tb.not(tb.equals(contractSelf, tb.NULL())),
-							tb.created(contractSelf)))))));
+					tb.transfresh(contractParams, tb.func(heap_opre), tb.func(heap_o))//,
+//					tb.apply(u_o, self.<inv>) // TODO KD 02 self.<inv> missing
+					);
+			preFormula = tb.applySequential(new Term[]{inst.u, w}, tb.imp(preKnowledge,
+					tb.applySequential(new Term[]{u_o, u_opre}, tb.and(pre_noinv, reachableIn, tb.not(tb.equals(contractSelf, tb.NULL())), tb.created(contractSelf)))));
 			LogicVariable y = new LogicVariable(new Name("y"), (Sort) services.getNamespaces().sorts().lookup("any")); // TODO KD 05 hacky
 			LogicVariable z = new LogicVariable(new Name("z"), (Sort) services.getNamespaces().sorts().lookup("any"));
 			Term postKnowledge = tb.and(
@@ -1001,7 +1001,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 						tb.transfresh(contractResult, tb.func(heap_post), baseHeapTerm),
 						tb.isIso(contractResult, tb.isoObject(tb.func(r_o))));
 			}
-			Term postFormula = tb.applySequential(new Term[]{inst.u, v},
+			postFormula = tb.applySequential(new Term[]{inst.u, v},
 					tb.imp(postKnowledge, tb.apply(u_post, tb.imp(reachableOut, tb.ff()/*TODO KD 03 PI OMEGA PHY missing*/))));
 
 /*			newHist = tb.seqConcat(tb.seqConcat(tb.getHist(), tb.seqSingleton(tb.func(callevent))), tb.seqSingleton(tb.func(termevent)));
@@ -1098,6 +1098,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 		}
 
 		if (pm.getMethodDeclaration().isRemote()) { // TODO KD 05 hacky
+			assert preFormula != null;
 			finalPreTerm = preFormula;
 		}
 
@@ -1121,7 +1122,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 		final StatementBlock postSB
 				= replaceStatement(jb, resultAssign);
 		JavaBlock postJavaBlock = JavaBlock.createJavaBlock(postSB);
-		final Term normalPost = tb.apply(anonUpdate,
+		/*final*/ Term normalPost = tb.apply(anonUpdate,
 				tb.prog(inst.mod,
 				postJavaBlock,
 				inst.progPost.sub(0),
@@ -1131,7 +1132,10 @@ public final class UseOperationContractRule implements BuiltInRule {
 				new ImmutableArray<Term>(inst.progPost.sub(0)),
 				null, postJavaBlock, inst.progPost.getLabels())),
 				null);
-		// TODO KD 00 mby change normalPost?
+		if (pm.getMethodDeclaration().isRemote()) {
+			assert postFormula != null;
+			normalPost = postFormula; // TODO KD 00 just a try
+		}
 		postGoal.addFormula(new SequentFormula(wellFormedAnon),
 				true,
 				false);
