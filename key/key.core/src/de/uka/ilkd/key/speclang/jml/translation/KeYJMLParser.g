@@ -693,7 +693,7 @@ lowmessagespeclist[Lowlist.Direction dir] returns  [Lowlist result = null] throw
 }
 :
 //TODO JK add flexibility to choosing component, for example allow accessing components in arrays
-	servicecontext LPAREN list = termlist RPAREN
+	servicecontext (loc = DOT parsedMessageTypeTerm = messagetype)? LPAREN list = termlist RPAREN
 	
 	{
 	SLExpression partner;
@@ -714,6 +714,19 @@ lowmessagespeclist[Lowlist.Direction dir] returns  [Lowlist result = null] throw
 			mType = Lowlist.MessageType.TERMINATION;
 		}
 	}
+        
+        if (parsedMessageTypeTerm != null) {
+            Lowlist.MessageType parsedMessageType;
+            if (tb.evTerm().equals(parsedMessageTypeTerm)) {
+                parsedMessageType = Lowlist.MessageType.TERMINATION;
+            } else {
+                parsedMessageType = Lowlist.MessageType.CALL;
+            }
+            
+            if (parsedMessageType != mType) {
+                  raiseError("Expected a " + mType + " or nothing, found a " + parsedMessageType, loc);
+            }
+        }
 	result = new Lowlist(componentContext, serviceContext, partner, dir, mType, list);}
 	
 	;
@@ -728,7 +741,7 @@ methodidentifier returns [Function f = null] throws SLTranslationException
 	// TODO KD c packages are ignored ... fix!
 	SLExpression classExpression = resolverManager.resolve(null, className, null);
 	if (classExpression == null) {
-		throw new SLTranslationException("Class " + className + " not found!");
+		raiseError("Class " + className + " not found!");
 	}
 	ImmutableList<IProgramMethod> methods = javaInfo.getAllProgramMethods(classExpression.getType());
 	methodLoop: for (IProgramMethod method : methods) {
@@ -752,7 +765,7 @@ methodidentifier returns [Function f = null] throws SLTranslationException
 		}
 	}
 	if (f == null) {
-		throw new SLTranslationException("Method " + className + "." + methodName + " not found!");
+		raiseError("Method " + className + "." + methodName + " not found!");
 	}
 }
 :  
@@ -771,12 +784,12 @@ ImmutableArray<KeYJavaType> argumentTypeList = null;
 @after {
 		if (componentContext != null)
 		{
-			throw new SLTranslationException("componentContext already set!");
+			raiseError("componentContext already set!");
 		}
 		
 		if (serviceContext != null)
 		{
-			throw new SLTranslationException("serviceContext already set!");
+			raiseError("serviceContext already set!");
 		}
 			  
 		KeYJavaType receiverType = null;
@@ -807,13 +820,13 @@ ImmutableArray<KeYJavaType> argumentTypeList = null;
 				 
 				 //TODO JK allow inheritance because it's no true ambiguity! Should not be too hard to deal with...
 				 if (serviceContext != null) {
-					 throw new SLTranslationException("Method " + receiverType.getFullName() + "." + serviceName + " ambiguous (please specify argument types in square brackets behind the method name; can't handle inheritance atm)!");
+					 raiseError("Method " + receiverType.getFullName() + "." + serviceName + " ambiguous (please specify argument types in square brackets behind the method name; can't handle inheritance atm)!");
 				 }
 				 serviceContext = method;				 
 			 }
 		  }
 		if (serviceContext == null) {
-			throw new SLTranslationException("Method " + receiverType.getFullName() + "." + serviceName + " not found!");
+			raiseError("Method " + receiverType.getFullName() + "." + serviceName + " not found!");
 		}
 }
 :
@@ -853,7 +866,7 @@ visibilitylist returns  [ImmutableList<VisibilityCondition> result = ImmutableSL
 		} else {
 			partner = componentContext;
 		}
-		if (mtype == tb.evCall()) {
+		if (mtype.equals(tb.evCall())) {
 			if (componentContext.getTerm().equals(tb.var(selfVar))) {
 				result = result.append(new VisibilityCondition(componentContext, serviceContext, partner, VisibilityCondition.MessageType.CALL, VisibilityCondition.Direction.IN, term)); 
 			} else {

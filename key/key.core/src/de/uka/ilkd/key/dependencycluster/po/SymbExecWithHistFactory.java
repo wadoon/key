@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.dependencycluster.po;
 //TODO JK move this to de.uka.ilkd.key.dependencycluster.po as soon as I find a way to reuse christophs code without code duplication and ugly hacks like this
 
+import org.omg.CORBA.Environment;
+
 import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.BasicPOSnippetFactory.Snippet;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
@@ -119,9 +121,14 @@ public class SymbExecWithHistFactory {
                 f.create(BasicPOSnippetFactory.Snippet.FREE_PRE);
         final Term contractPre =
                 f.create(BasicPOSnippetFactory.Snippet.CONTRACT_PRE);
-        return tb.and(freePre, initialHistoryEquality(), initialInternalHistoryEquality(), defineCallVar(), contractPre);
+        return tb.and(freePre, initialHistoryEquality(), initialInternalHistoryEquality(), defineCallVar(), noSelfCall(), contractPre);
     }
     
+    public Term noSelfCall() {
+        
+        return tb.not(tb.equals(tb.getEnvironmentCaller(), ifVars.pre.self));
+    }
+
     public Term symbolicExecutionWithPost() {
         return f.create(Snippet.SYMBOLIC_EXEC);
     }
