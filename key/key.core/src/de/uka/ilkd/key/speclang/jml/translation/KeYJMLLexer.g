@@ -67,6 +67,7 @@ lexer grammar KeYJMLLexer;
     BSUM                 : '\\bsum';  //KeY extension, not official JML
     BY                   : '\\by'|'by';  //KeY extension, not official JML
     CALL		 : '\\call'; //KeY extension, not official JML
+    COMBINES             : '\\combines'; //KeY extension, not official JML
     DECLASSIFIES         : '\\declassifies';  //KeY extension, not official JML
     DISJOINT             : '\\disjoint';  //KeY extension, not official JML
     DOMAIN_IMPLIES_CREATED : '\\domain_implies_created';  //KeY extension, not official JML
@@ -141,7 +142,7 @@ lexer grammar KeYJMLLexer;
     SUBSET               : '\\subset';
     SUCH_THAT            : '\\such_that';
     SUM                  : '\\sum';
-    TERMINATION          : '\\termination'; //KeY extension, not official JML
+    TERMINATION          : '\\termination' | '\\term'; //KeY extension, not official JML
     TRANSACTIONUPDATED   : '\\transactionUpdated';  //KeY extension, not official JML
     TRANSIENT            : '\\transient';  //KeY extension, not official JML
     TYPE                 : '\\TYPE';

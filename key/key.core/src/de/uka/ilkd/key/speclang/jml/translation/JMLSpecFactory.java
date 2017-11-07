@@ -57,6 +57,7 @@ import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassAxiomImpl;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
+import de.uka.ilkd.key.speclang.CombinedClusterSpec;
 import de.uka.ilkd.key.speclang.ComponentCluster;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
@@ -277,6 +278,7 @@ public class JMLSpecFactory {
         public ImmutableList<ServiceDependencyClusterSpec> dependencyClusterSpecs;
         public ImmutableList<ClusterSatisfactionSpec> clusterSatisfactionSpecs;
         public JoinProcedure joinProcedure;
+        public ImmutableList<CombinedClusterSpec> combinedClusterSpecs;
     }
 
     //-------------------------------------------------------------------------
@@ -544,13 +546,17 @@ public class JMLSpecFactory {
                 translateClusterSatisfactionSpecs(pm, progVars.selfVar,
                                             progVars.paramVars, progVars.resultVar, progVars.excVar, 
                                             textualSpecCase.getClusterSatisfactionSpecs());
-        //TODO JK continue here, add combined cluster stuff
-        
+        //TODO JK find out where to add these specs to the specification repo
+        clauses.combinedClusterSpecs =
+                translateCombinedClusterSpecs(pm, progVars.selfVar,
+                                            progVars.paramVars, progVars.resultVar, progVars.excVar, 
+                                            textualSpecCase.getCombinedClusterSpecs());
+
         clauses.joinProcedure = translateJoinProcedure(textualSpecCase.getJoinProcs());
         return clauses;
     }
 
-    
+
     /** register abbreviations in contracts (aka. old clauses).
      * creates update terms.
      * @throws SLTranslationException */
@@ -627,6 +633,33 @@ public class JMLSpecFactory {
         }
         return result;
     }
+    }
+    
+
+    
+    private ImmutableList<CombinedClusterSpec> 
+    translateCombinedClusterSpecs(IProgramMethod pm,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable resultVar,
+            ProgramVariable excVar,
+            ImmutableList<PositionedString> originalClauses)
+                    throws SLTranslationException {
+        if (originalClauses.isEmpty()) {
+            return ImmutableSLList.<CombinedClusterSpec>nil();
+        } else {
+            ImmutableList<CombinedClusterSpec> result =
+                                     ImmutableSLList.<CombinedClusterSpec>nil();
+            for (PositionedString expr : originalClauses) {
+
+                CombinedClusterSpec translated =
+                            JMLTranslator.translate(expr, pm.getContainerType(),
+                                                    selfVar, paramVars, resultVar,
+                                                    excVar, null, CombinedClusterSpec.class, services);
+                result = result.append(translated);
+            }
+            return result;
+        }
     }
     
     private ImmutableList<ClusterSatisfactionSpec> translateClusterSatisfactionSpecs(IProgramMethod pm,
