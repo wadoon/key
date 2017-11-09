@@ -56,11 +56,11 @@ public class SymbExecWithHistFactory {
     }
     
     public Term defineCallVar() {
-        return tb.equals(call, callEvent());
+        return tb.equals(callEvent(), call);
     }
     
     public Term defineTermVar() {
-        return tb.equals(termination, terminationEvent());
+        return tb.equals(terminationEvent(), termination);
     }
     
     public Term postHistory() {
@@ -76,11 +76,11 @@ public class SymbExecWithHistFactory {
     }
     
     public Term initialHistoryEquality() {
-        return tb.equals(realHistory(), historyWithCallEvent());
+        return tb.equals(historyWithCallEvent(), realHistory());
     }
     
     public Term initialInternalHistoryEquality() {
-        return tb.equals(realHistoryInternal(), tb.seqEmpty());
+        return tb.equals(tb.seqEmpty(), realHistoryInternal());
     }
     
     public Term terminationEvent() {
@@ -109,11 +109,11 @@ public class SymbExecWithHistFactory {
     }
     
     public Term postHistoryEquality() {
-        return tb.equals(postHistory(), historyWithTermEvent());
+        return tb.equals(historyWithTermEvent(), postHistory());
     }
     
     public Term postInternalHistoryEquality() {
-        return tb.equals(postHistoryInternal(), realHistoryInternal());
+        return tb.equals(realHistoryInternal(), postHistoryInternal());
     }
     
     public Term pre() {

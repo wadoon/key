@@ -10,6 +10,7 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.ldt.ServiceEventLDT;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -28,6 +29,8 @@ public abstract class EventEquivalenceTacletFactory {
     
     public static final String EQUIV_RULE_BASENAME = "AAADefOfEquivEvent";
     public static final String INV_RULE_BASENAME = "AAADefOfInvisEvent";
+    public static final String EQUIV_RULE_HEURISTICS = "simplify";
+    public static final String INV_RULE_HEURISTICS = "simplify";
 
     protected final Services services;
     protected final TermBuilder tb;
@@ -167,7 +170,7 @@ public abstract class EventEquivalenceTacletFactory {
         tacletBuilder.addGoalTerm(replaceTermEquivalence());
         
         //TODO JK which ruleset is correct?
-        tacletBuilder.addRuleSet((RuleSet)services.getNamespaces().ruleSets().lookup(new Name("simplify_enlarging")));  
+        tacletBuilder.addRuleSet((RuleSet)services.getNamespaces().ruleSets().lookup(new Name(EQUIV_RULE_HEURISTICS)));  
         
         
         RewriteTaclet taclet = tacletBuilder.getRewriteTaclet();
@@ -185,7 +188,7 @@ public abstract class EventEquivalenceTacletFactory {
         tacletBuilder.addGoalTerm(replaceTermInvisibility());
         
         //TODO JK which ruleset is correct?
-        tacletBuilder.addRuleSet((RuleSet)services.getNamespaces().ruleSets().lookup(new Name("simplify_enlarging")));  
+        tacletBuilder.addRuleSet((RuleSet)services.getNamespaces().ruleSets().lookup(new Name(INV_RULE_HEURISTICS)));  
         
         RewriteTaclet taclet = tacletBuilder.getRewriteTaclet();
         return taclet;
