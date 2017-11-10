@@ -5,6 +5,7 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.rule.RewriteTaclet;
 
 public class CombinedClusterSpec extends AbstractDependencyClusterSpec {
     
@@ -25,8 +26,10 @@ public class CombinedClusterSpec extends AbstractDependencyClusterSpec {
     }
 
     @Override
-    public void registerTaclets(Term self, InitConfig config) {
-        // TODO JK stub
-        
+    public ImmutableList<RewriteTaclet> getTaclets(Term self,
+            InitConfig config) {
+        // TODO Auto-generated method stub
+        return null;
     }
+
 }
