@@ -163,6 +163,14 @@ public abstract class AbstractPO implements IPersistablePO {
         taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(t));
         proofConfig.registerRule(t, AxiomJustification.INSTANCE);
     }
+    //TODO JK I made this, should this exist?
+    public void registerIfNew(Taclet t, InitConfig proofConfig) {
+        assert t != null;
+        boolean isNew = proofConfig.registerRuleIfNew(t, AxiomJustification.INSTANCE);
+        if (isNew) {
+            taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(t));
+        }
+    }
 
 
     protected final void register(ProgramVariable pv, Services services) {

@@ -64,13 +64,13 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
         
         //TODO JK handle double registrations!
         for (RewriteTaclet taclet: localSpec.getTaclets(self, proofConfig)) {
-            register(taclet, proofConfig);
-            proofConfig.registerRule(taclet, AxiomJustification.INSTANCE);
+            registerIfNew(taclet, proofConfig);
+            proofConfig.registerRuleIfNew(taclet, AxiomJustification.INSTANCE);
         }
         
         for (RewriteTaclet taclet: globalSpec.getTaclets(self, proofConfig)) {
-            register(taclet, proofConfig);
-            proofConfig.registerRule(taclet, AxiomJustification.INSTANCE);
+            registerIfNew(taclet, proofConfig);
+            proofConfig.registerRuleIfNew(taclet, AxiomJustification.INSTANCE);
         }
         /*
         //TODO JK make sure the specified local cluster is actually a cluster of this method?

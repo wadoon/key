@@ -44,6 +44,10 @@ public class RuleJustificationInfo {
             rule2justif.put(ruleKey, j);
         }
     }
+    
+    public boolean hasRule(Rule r) {
+        return rule2justif.containsKey(new RuleKey(r));
+    }
 
     public RuleJustification getJustification(Rule r) {
         return rule2justif.get(new RuleKey(r));
