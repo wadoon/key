@@ -421,7 +421,8 @@ top returns [Object ret = null] throws SLTranslationException
     |   signalsonlyclause { ret = $signalsonlyclause.result; }
     |   termexpression { ret = $termexpression.result; }
     |	(CLUSTER IDENT LOWIN) => dependencyclusterspec { ret = $dependencyclusterspec.result; }
-    |	componentdependencyclusterspec { ret = $componentdependencyclusterspec.result; }
+    |	(COMPCLUSTER IDENT LOWIN) => componentdependencyclusterspec { ret = $componentdependencyclusterspec.result; }
+    |   (COMPCLUSTER IDENT COMBINES) => combinedcomponentclusterspec { ret = $combinedcomponentclusterspec.result; }
     |	(CLUSTER IDENT SATISFIED_BY) => clustersatisfactionspec { ret = $clustersatisfactionspec.result; }
     |	(CLUSTER IDENT COMBINES) => combinedclusterspec { ret = $combinedclusterspec.result; }
     )
@@ -627,7 +628,7 @@ combinedclusterspec returns  [CombinedClusterSpec result = null] throws SLTransl
 :
     CLUSTER label = IDENT COMBINES clusters = stringlist
 
-    {result = new CombinedClusterSpec(label.getText(), services, clusters);}
+    {result = new CombinedClusterSpec(containerType, label.getText(), services, clusters);}
     ;
 
 stringlist returns  [ImmutableList<String> result = ImmutableSLList.<String>nil();] throws SLTranslationException
@@ -652,6 +653,13 @@ componentdependencyclusterspec returns  [ComponentCluster result = null] throws 
 
     {result = new ComponentClusterImpl(containerType, lowIn, lowOut, lowState, visible, id.getText(), services);}
     ;
+    
+combinedcomponentclusterspec returns  [CombinedClusterSpec result = null] throws SLTranslationException
+:
+    COMPCLUSTER label = IDENT COMBINES clusters = stringlist
+
+    {result = new CombinedClusterSpec(containerType, label.getText(), services, clusters);}
+    ;
 
 dependencyclusterspec returns  [DependencyClusterSpec result = null] throws SLTranslationException
 @init {
@@ -670,7 +678,7 @@ dependencyclusterspec returns  [DependencyClusterSpec result = null] throws SLTr
     	VISIBLE (NOTHING | tmpVisible = visibilitylist {visible = visible.append(tmpVisible);})
     	(NEW_OBJECTS (NOTHING | tmpNew = infflowspeclist {newObs = newObs.append(tmpNew);}))?
 
-    {result = new ServiceDependencyClusterSpec(lowIn, lowOut, lowState, visible, newObs, id.getText(), services);}
+    {result = new ServiceDependencyClusterSpec(containerType, lowIn, lowOut, lowState, visible, newObs, id.getText(), services);}
     ;
     
       

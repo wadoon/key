@@ -1454,6 +1454,21 @@ public class JMLSpecFactory {
 
         return cc;
     }
+    
+    public CombinedClusterSpec createJMLCombinedComponentCluster(KeYJavaType kjt,
+            PositionedString spec)
+        throws SLTranslationException {
+        assert kjt != null;
+        assert spec != null;
+        
+        //TODO JK what  is this selfvar for?
+        ProgramVariable selfVar = TB.selfVar(kjt, false);
+
+        CombinedClusterSpec cc = JMLTranslator.translate(spec, kjt, selfVar, null, null,
+                                     null, null, CombinedClusterSpec.class, services);
+
+        return cc;
+    }
 
 
     /**

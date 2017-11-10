@@ -4,6 +4,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -15,12 +17,15 @@ import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 
 public class CombinedClusterSpec extends AbstractDependencyClusterSpec {
-    
+    protected final KeYJavaType forClass;
     private final ImmutableList<String> specLabels;
 
-    public CombinedClusterSpec(String label, Services services, ImmutableList<String> specLabels) {
+    public CombinedClusterSpec(KeYJavaType forClass, String label, Services services, ImmutableList<String> specLabels) {
         super(label, services);
         this.specLabels = specLabels;
+        this.forClass = forClass;
+        
+        System.out.println(this);
     }
 
     public ImmutableList<String> getSpecLabels() {
@@ -29,7 +34,7 @@ public class CombinedClusterSpec extends AbstractDependencyClusterSpec {
     
     @Override
     public String toString() {
-        return "cluster " + label + " combines " + specLabels;
+        return label + " combines " + specLabels;
     }
 
     @Override
@@ -195,6 +200,28 @@ public class CombinedClusterSpec extends AbstractDependencyClusterSpec {
         
         RewriteTaclet taclet = tacletBuilder.getRewriteTaclet();
         return taclet;
+    }
+
+    @Override
+    public String getName() {
+        return label;
+    }
+
+    @Override
+    public String getDisplayName() {
+        return label;
+    }
+
+    @Override
+    public VisibilityModifier getVisibility() {
+        // TODO JK stub
+        System.out.println("asked for visibility");
+        return null;
+    }
+
+    @Override
+    public KeYJavaType getKJT() {
+        return forClass;
     }
 
 }

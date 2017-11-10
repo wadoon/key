@@ -56,6 +56,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
+import de.uka.ilkd.key.speclang.CombinedClusterSpec;
 import de.uka.ilkd.key.speclang.ComponentCluster;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -68,6 +69,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.speclang.jml.pretranslation.KeYJMLPreParser;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassAxiom;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
+import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLCombinedComponentCluster;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLComponentCluster;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
 import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLDepends;
@@ -368,7 +370,11 @@ public final class JMLSpecExtractor implements SpecExtractor {
         	    TextualJMLComponentCluster textspec = (TextualJMLComponentCluster)c;
         	    ComponentCluster spec = jsf.createJMLComponentCluster(kjt, textspec.getSpec());
                 result = result.add(spec);
-                } else {
+                } else if (c instanceof TextualJMLCombinedComponentCluster){
+                    TextualJMLCombinedComponentCluster textspec = (TextualJMLCombinedComponentCluster)c;
+                    CombinedClusterSpec spec = jsf.createJMLCombinedComponentCluster(kjt, textspec.getSpec());
+                    result = result.add(spec);
+                    }else {
     	        // DO NOTHING
                     // There may be other kinds of JML constructs which are not specifications.
         	    }

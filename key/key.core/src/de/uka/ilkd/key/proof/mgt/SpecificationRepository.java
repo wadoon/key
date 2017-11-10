@@ -1563,7 +1563,9 @@ public final class SpecificationRepository {
                 addBlockContract((BlockContract) spec);
             } else if (spec instanceof ComponentCluster) {
                 addDependencyClusterSpec((ComponentCluster) spec);
-            } else {
+            } else if (spec instanceof CombinedClusterSpec) {
+                addDependencyClusterSpec((CombinedClusterSpec) spec);
+            }else {
                 assert false : "unexpected spec: " + spec + "\n("
                         + spec.getClass() + ")";
             }

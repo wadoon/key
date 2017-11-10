@@ -7,6 +7,8 @@ import de.uka.ilkd.key.dependencycluster.po.AgreeTacletFactory;
 import de.uka.ilkd.key.dependencycluster.po.EventEquivalenceWithEqFactory;
 import de.uka.ilkd.key.dependencycluster.po.EventEquivalenceWithIsoFactory;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
@@ -17,7 +19,7 @@ import de.uka.ilkd.key.util.Lowlist;
 import de.uka.ilkd.key.util.VisibilityCondition;
 
 public class ServiceDependencyClusterSpec extends AbstractDependencyClusterSpec {
-    
+    protected KeYJavaType forClass;
 
     private final ImmutableList<Lowlist> lowIn;
     private final ImmutableList<Lowlist> lowOut;
@@ -29,7 +31,7 @@ public class ServiceDependencyClusterSpec extends AbstractDependencyClusterSpec 
 
 
 
-    public ServiceDependencyClusterSpec(ImmutableList<Lowlist> lowIn, ImmutableList<Lowlist> lowOut, ImmutableList<Term> lowState, 
+    public ServiceDependencyClusterSpec(KeYJavaType forClass, ImmutableList<Lowlist> lowIn, ImmutableList<Lowlist> lowOut, ImmutableList<Term> lowState, 
             ImmutableList<VisibilityCondition> visible, ImmutableList<Term> newObjects, String label, Services services) {
         super(label, services);
         this.lowIn = lowIn;
@@ -37,6 +39,8 @@ public class ServiceDependencyClusterSpec extends AbstractDependencyClusterSpec 
         this.lowState = lowState;
         this.visible = visible;
         this.newObjects = newObjects;
+        
+        this.forClass = forClass;
     }
 
 
@@ -90,6 +94,32 @@ public class ServiceDependencyClusterSpec extends AbstractDependencyClusterSpec 
         taclets = taclets.prepend(agreeFactory.getAgreePostTaclet());
         
         return taclets;
+    }
+
+
+    @Override
+    public String getName() {
+        return label;
+    }
+
+
+    @Override
+    public String getDisplayName() {
+        return label;
+    }
+
+
+    @Override
+    public VisibilityModifier getVisibility() {
+        // TODO JK stub
+        System.out.println("asked for visibility");
+        return null;
+    }
+
+
+    @Override
+    public KeYJavaType getKJT() {
+        return forClass;
     }
 
 }
