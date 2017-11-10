@@ -56,11 +56,11 @@ public class SymbExecWithHistFactory {
     }
     
     public Term defineCallVar() {
-        return tb.equals(callEvent(), call);
+        return tb.equals(call, callEvent());
     }
     
     public Term defineTermVar() {
-        return tb.equals(terminationEvent(), termination);
+        return tb.equals(termination, terminationEvent());
     }
     
     public Term postHistory() {
