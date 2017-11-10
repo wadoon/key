@@ -67,6 +67,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     private ImmutableList<PositionedString> clusterSatisfactionSpecs =
             ImmutableSLList.<PositionedString>nil();
     
+    private ImmutableList<PositionedString> callables =
+            ImmutableSLList.<PositionedString>nil();
+    
     private Map<String, ImmutableList<PositionedString>>
       accessibles = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
@@ -370,6 +373,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public void addClusterSatisfactionSpecs(PositionedString ps) {
         clusterSatisfactionSpecs = clusterSatisfactionSpecs.append(ps);
     }
+    
+    public void addCallable(PositionedString ps) {
+        callables = callables.append(ps);
+    }
+    
+    public void addCallable(ImmutableList<PositionedString> l) {
+        callables = callables.append(l);
+    }
 
 
     public void addClusterSatisfactionSpecs(ImmutableList<PositionedString> l) {
@@ -520,6 +531,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public ImmutableList<PositionedString> getClusterSatisfactionSpecs() {
         return clusterSatisfactionSpecs;
     }
+    
+    public ImmutableList<PositionedString> getCallable() {
+        return callables;
+    }
 
 
     @Override
@@ -629,6 +644,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         while (it.hasNext()) {
             sb.append("clusterSatisfaction: ").append(it.next()).append("\n");
         }
+        it = callables.iterator();
+        while (it.hasNext()) {
+            sb.append("callable: ").append(it.next()).append("\n");
+        }
         it = joinProcs.iterator();
         while (it.hasNext()) {
             sb.append("join procedure: ").append(it.next()).append("\n");
@@ -664,7 +683,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && infFlowSpecs.equals(sc.infFlowSpecs)
                && dependencyClusters.equals(sc.dependencyClusters)
                && combinedClusterSpecs.equals(sc.combinedClusterSpecs)
-               && clusterSatisfactionSpecs.equals(sc.clusterSatisfactionSpecs);
+               && clusterSatisfactionSpecs.equals(sc.clusterSatisfactionSpecs)
+               && callables.equals(sc.callables);
     }
 
 
@@ -691,6 +711,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + infFlowSpecs.hashCode()
                + dependencyClusters.hashCode()
                + clusterSatisfactionSpecs.hashCode()
-               + combinedClusterSpecs.hashCode();
+               + combinedClusterSpecs.hashCode()
+               + callables.hashCode();
     }
 }

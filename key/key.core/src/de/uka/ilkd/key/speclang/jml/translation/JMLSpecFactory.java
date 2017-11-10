@@ -557,6 +557,7 @@ public class JMLSpecFactory {
 
             services.getSpecificationRepository().addDependencyClusterSpec(spec);
         }
+        
 
         clauses.joinProcedure = translateJoinProcedure(textualSpecCase.getJoinProcs());
         return clauses;

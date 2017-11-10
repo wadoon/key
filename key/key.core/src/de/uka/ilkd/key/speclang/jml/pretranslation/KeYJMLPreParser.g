@@ -803,6 +803,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
         |   (CLUSTER IDENT LOWIN) => ps=dependency_cluster_spec	{sc.addDepClusterSpecs(ps);}
         |   (CLUSTER IDENT COMBINES) => ps=dependency_cluster_spec	{sc.addCombinedClusterSpecs(ps);}
         |   (CLUSTER IDENT SATISFIED_BY) => ps=cluster_satisfaction_spec	{sc.addClusterSatisfactionSpecs(ps);}
+        |   ps=callable_clause     { sc.addCallable(ps); }
     )
     {
 	if(b == Behavior.EXCEPTIONAL_BEHAVIOR
@@ -893,6 +894,15 @@ assignable_clause
 @after { r = result; }
 :
     assignable_keyword result=expression { result = flipHeaps("assignable", result); }
+;
+
+callable_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    keyword=CALLABLE result=expression { result = result.prepend(keyword.getText() + " "); }
 ;
 
 
