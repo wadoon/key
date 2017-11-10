@@ -1,12 +1,18 @@
 package de.uka.ilkd.key.speclang;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.dependencycluster.po.AgreeTacletFactory;
+import de.uka.ilkd.key.dependencycluster.po.EventEquivalenceWithEqFactory;
+import de.uka.ilkd.key.dependencycluster.po.EventEquivalenceWithIsoFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.util.Lowlist;
 import de.uka.ilkd.key.util.VisibilityCondition;
@@ -49,10 +55,6 @@ public class ComponentClusterImpl extends AbstractDependencyClusterSpec implemen
         return visible;
     }
     
-    public String getLabel() {
-        return label;
-    }
-    
     
     @Override
     public String toString() {
@@ -85,6 +87,26 @@ public class ComponentClusterImpl extends AbstractDependencyClusterSpec implemen
     @Override
     public KeYJavaType getKJT() {
      return forClass;
+    }
+
+    @Override
+    public ImmutableList<RewriteTaclet> getTaclets(Term self, InitConfig config) {
+        Services services = config.getServices();
+        EventEquivalenceWithEqFactory eqFactory = new EventEquivalenceWithEqFactory(this, self, services, getEquivEventEqPredicate(), getVisibilityPredicate(), label);
+        EventEquivalenceWithIsoFactory isoFactory = new EventEquivalenceWithIsoFactory(this, services, self, getEquivEventIsoPredicate(), getVisibilityPredicate(), label);
+        AgreeTacletFactory agreeFactory = new AgreeTacletFactory(getLowState(), services, label, getAgreePrePredicate(), getAgreePostPredicate());
+        
+        ImmutableList<RewriteTaclet> taclets = ImmutableSLList.<RewriteTaclet>nil();
+        
+        
+        taclets = taclets.prepend(eqFactory.getInvisibilityTaclet());
+        taclets = taclets.prepend(eqFactory.getEventEquivalenceTaclet());
+        taclets = taclets.prepend(isoFactory.getEventEquivalenceTaclet());
+        taclets = taclets.prepend(agreeFactory.getAgreePreTaclet());
+        taclets = taclets.prepend(agreeFactory.getAgreePostTaclet());
+        
+        return taclets;
+        
     }
 
 }

@@ -15,20 +15,21 @@ import de.uka.ilkd.key.util.VisibilityCondition;
 
 public class EventEquivalenceWithEqFactory
         extends EventEquivalenceTacletFactory {
+    public static final String EQUIV_TYPE_LABEL = "Eq";
 
     private final Term self;
 
 
     public EventEquivalenceWithEqFactory(ServiceDependencyClusterSpec localSpec, Term self,
             Services services, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
-        super(services, localSpec.getLowIn(), localSpec.getLowOut(), localSpec.getVisible(), equivEventFunction, invEventFunction, ruleNameSuffix);
+        super(services, localSpec.getLowIn(), localSpec.getLowOut(), localSpec.getVisible(), equivEventFunction, invEventFunction, EQUIV_TYPE_LABEL + ruleNameSuffix, ruleNameSuffix);
         
         this.self = self;
     }
 
     public EventEquivalenceWithEqFactory(ComponentCluster globalSpec, Term self,
             Services services, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
-        super(services, globalSpec.getLowIn(), globalSpec.getLowOut(), globalSpec.getVisible(), equivEventFunction, invEventFunction, ruleNameSuffix);
+        super(services, globalSpec.getLowIn(), globalSpec.getLowOut(), globalSpec.getVisible(), equivEventFunction, invEventFunction, EQUIV_TYPE_LABEL + ruleNameSuffix, ruleNameSuffix);
         this.self = self;
     }
 
