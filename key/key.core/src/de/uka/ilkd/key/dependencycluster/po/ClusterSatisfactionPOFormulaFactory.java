@@ -45,8 +45,8 @@ public class ClusterSatisfactionPOFormulaFactory {
     
         this.self = self;
         
-        globalSpec = proofServices.getSpecificationRepository().getComponentDependencyClusterByLabel(contract.getSpecs().getComponentClusterLabel());
-        localSpec = proofServices.getSpecificationRepository().getServiceDependencyClusterByLabel(contract.getSpecs().getServiceClusterLabel());
+        globalSpec = proofServices.getSpecificationRepository().getDependencyClusterSpecByLabel(contract.getSpecs().getComponentClusterLabel());
+        localSpec = proofServices.getSpecificationRepository().getDependencyClusterSpecByLabel(contract.getSpecs().getServiceClusterLabel());
     }
     
     public Term selfNotNull() {

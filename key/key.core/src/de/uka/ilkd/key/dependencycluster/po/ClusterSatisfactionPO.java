@@ -27,6 +27,7 @@ import de.uka.ilkd.key.speclang.ClusterSatisfactionContract;
 import de.uka.ilkd.key.speclang.ComponentCluster;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.DependencyClusterContract;
+import de.uka.ilkd.key.speclang.DependencyClusterSpec;
 import de.uka.ilkd.key.speclang.ServiceDependencyClusterSpec;
 import de.uka.ilkd.key.util.Lowlist;
 
@@ -58,7 +59,19 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
         
         final ServiceEventLDT ldt = proofServices.getTypeConverter().getServiceEventLDT();
         
-        final ServiceDependencyClusterSpec localSpec = proofServices.getSpecificationRepository().getServiceDependencyClusterByLabel(contract.getSpecs().getServiceClusterLabel());
+        final DependencyClusterSpec localSpec = proofServices.getSpecificationRepository().getDependencyClusterSpecByLabel(contract.getSpecs().getServiceClusterLabel());
+        final DependencyClusterSpec globalSpec = proofServices.getSpecificationRepository().getDependencyClusterSpecByLabel(contract.getSpecs().getComponentClusterLabel());
+        
+        for (RewriteTaclet taclet: localSpec.getTaclets(self, proofConfig)) {
+            register(taclet, proofConfig);
+            proofConfig.registerRule(taclet, AxiomJustification.INSTANCE);
+        }
+        
+        for (RewriteTaclet taclet: globalSpec.getTaclets(self, proofConfig)) {
+            register(taclet, proofConfig);
+            proofConfig.registerRule(taclet, AxiomJustification.INSTANCE);
+        }
+        /*
         //TODO JK make sure the specified local cluster is actually a cluster of this method?
         final EventEquivalenceWithEqFactory equivEventLocalFactory = new EventEquivalenceWithEqFactory(localSpec, self, proofConfig.getServices(), localSpec.getEquivEventEqPredicate(), localSpec.getVisibilityPredicate(), localSpec.getLabel());
         final AgreeTacletFactory agreeLocalTacletFactory = new AgreeTacletFactory(localSpec.getLowState(), proofConfig, localSpec.getLabel(), localSpec.getAgreePrePredicate());
@@ -74,9 +87,9 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
         proofConfig.registerRule(invEventLocalTaclet, AxiomJustification.INSTANCE);
         
 
-        final ComponentCluster globalSpec = proofServices.getSpecificationRepository().getComponentDependencyClusterByLabel(contract.getSpecs().getComponentClusterLabel());
+        
         final EventEquivalenceWithEqFactory equivEventGlobalFactory = new EventEquivalenceWithEqFactory(globalSpec, self, proofConfig.getServices(), globalSpec.getEquivEventEqPredicate(), globalSpec.getVisibilityPredicate(), globalSpec.getLabel());
-        final AgreeTacletFactory agreeGlobalTacletFactory = new AgreeTacletFactory(localSpec.getLowState(), proofConfig, globalSpec.getLabel(), globalSpec.getAgreePrePredicate());
+        final AgreeTacletFactory agreeGlobalTacletFactory = new AgreeTacletFactory(localSpec.getLowState(), proofConfig.getServices(), globalSpec.getLabel(), globalSpec.getAgreePrePredicate());
         RewriteTaclet agreeGlobalTaclet = agreeGlobalTacletFactory.getAgreePreTaclet();
         RewriteTaclet equivEventGlobalTaclet = equivEventGlobalFactory.getEventEquivalenceTaclet();    
         RewriteTaclet invEventGlobalTaclet = equivEventGlobalFactory.getInvisibilityTaclet();  
@@ -87,7 +100,7 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
         proofConfig.registerRule(equivEventGlobalTaclet, AxiomJustification.INSTANCE);
         proofConfig.registerRule(invEventGlobalTaclet, AxiomJustification.INSTANCE);
         proofConfig.registerRule(agreeGlobalTaclet, AxiomJustification.INSTANCE);
-        
+        */
         
         
         

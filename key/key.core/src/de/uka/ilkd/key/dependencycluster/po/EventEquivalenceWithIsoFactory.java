@@ -8,6 +8,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.speclang.ComponentClusterImpl;
 import de.uka.ilkd.key.speclang.DependencyClusterContract;
 import de.uka.ilkd.key.speclang.ServiceDependencyClusterSpec;
 import de.uka.ilkd.key.util.Lowlist;
@@ -15,17 +16,26 @@ import de.uka.ilkd.key.util.VisibilityCondition;
 
 public class EventEquivalenceWithIsoFactory
         extends EventEquivalenceTacletFactory {
+    public static final String EQUIV_TYPE_LABEL = "Iso";
     
     private final Term selfVar;
 
     public EventEquivalenceWithIsoFactory(ServiceDependencyClusterSpec spec,
             Services services, Term selfVar, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
-        super(services, spec.getLowIn(), spec.getLowOut(), spec.getVisible(), equivEventFunction, invEventFunction, ruleNameSuffix);
+        super(services, spec.getLowIn(), spec.getLowOut(), spec.getVisible(), equivEventFunction, invEventFunction, EQUIV_TYPE_LABEL + ruleNameSuffix, ruleNameSuffix);
         
 
         this.selfVar = selfVar;
     }
     
+    public EventEquivalenceWithIsoFactory(
+            ComponentClusterImpl spec, Services services,
+            Term self, Function equivEventFunction,
+            Function invEventFunction, String ruleNameSuffix) {
+        super(services, spec.getLowIn(), spec.getLowOut(), spec.getVisible(), equivEventFunction, invEventFunction, EQUIV_TYPE_LABEL +ruleNameSuffix, ruleNameSuffix);
+        this.selfVar = self;
+    }
+
     @Override
     public Term equivalenceForMessagesWithoutLowPart() {
         //TODO JK Do I still need this??? When are messages equivalent if they have no specified low parts in their content?

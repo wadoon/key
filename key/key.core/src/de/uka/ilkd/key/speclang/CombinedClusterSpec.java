@@ -3,6 +3,8 @@ package de.uka.ilkd.key.speclang;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.init.InitConfig;
 
 public class CombinedClusterSpec extends AbstractDependencyClusterSpec {
     
@@ -20,5 +22,11 @@ public class CombinedClusterSpec extends AbstractDependencyClusterSpec {
     @Override
     public String toString() {
         return "cluster " + label + " combines " + specLabels;
+    }
+
+    @Override
+    public void registerTaclets(Term self, InitConfig config) {
+        // TODO JK stub
+        
     }
 }
