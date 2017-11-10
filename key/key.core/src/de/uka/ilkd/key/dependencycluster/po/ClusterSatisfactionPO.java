@@ -62,6 +62,7 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
         final DependencyClusterSpec localSpec = proofServices.getSpecificationRepository().getDependencyClusterSpecByLabel(contract.getSpecs().getServiceClusterLabel());
         final DependencyClusterSpec globalSpec = proofServices.getSpecificationRepository().getDependencyClusterSpecByLabel(contract.getSpecs().getComponentClusterLabel());
         
+        //TODO JK handle double registrations!
         for (RewriteTaclet taclet: localSpec.getTaclets(self, proofConfig)) {
             register(taclet, proofConfig);
             proofConfig.registerRule(taclet, AxiomJustification.INSTANCE);

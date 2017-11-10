@@ -18,21 +18,24 @@ import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 //TODO JK make this unugly
 public class AgreeTacletFactory {
     public static final String AGREE_PRE_RULE_BASENAME = "AAADefOfAgreePre";
+    public static final String AGREE_POST_RULE_BASENAME = "AAADefOfAgreePost";
     
     private final String ruleNameSuffix;
     private final ImmutableList<Term> lowState;
     private final Services services;
     private final TermBuilder tb;
     private final Function agreePreFunction;
+    private final Function agreePostFunction;
     private final Term heap1;
     private final Term heap2;
 
-    public AgreeTacletFactory(ImmutableList<Term> lowState, Services services, String ruleNameSuffix, Function agreePreFunction) {
+    public AgreeTacletFactory(ImmutableList<Term> lowState, Services services, String ruleNameSuffix, Function agreePreFunction, Function agreePostFunction) {
         this.ruleNameSuffix = ruleNameSuffix;
         this.lowState = lowState;
         this.services = services;
         tb = services.getTermBuilder();
         this.agreePreFunction = agreePreFunction;
+        this.agreePostFunction = agreePostFunction;
         
         Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
         heap1 = tb.var(SchemaVariableFactory.createTermSV(new Name("heap1"), heapSort, false, false));
@@ -65,6 +68,29 @@ public class AgreeTacletFactory {
             collectedTerms = collectedTerms.append(tb.equals(t1, t2));
         }
         return tb.and(collectedTerms);
+    }
+    
+    public RewriteTaclet getAgreePostTaclet() {
+        RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
+        
+        final String name = AGREE_POST_RULE_BASENAME + ruleNameSuffix;
+        tacletBuilder.setDisplayName(name);
+        tacletBuilder.setName(new Name(name));
+        
+        tacletBuilder.setFind(tb.func(agreePostFunction, heap1, heap2));
+        
+        tacletBuilder.addGoalTerm(agreePost());
+        
+        //TODO JK which ruleset is correct?
+        tacletBuilder.addRuleSet((RuleSet)services.getNamespaces().ruleSets().lookup(new Name("simplify_enlarging")));  
+        
+        RewriteTaclet taclet = tacletBuilder.getRewriteTaclet();
+        return taclet;
+    }
+
+    private Term agreePost() {
+        //TODO JK proper definition of agreePost
+        return tb.tt();
     }
 
 }

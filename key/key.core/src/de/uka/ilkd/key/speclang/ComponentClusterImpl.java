@@ -94,7 +94,7 @@ public class ComponentClusterImpl extends AbstractDependencyClusterSpec implemen
         Services services = config.getServices();
         EventEquivalenceWithEqFactory eqFactory = new EventEquivalenceWithEqFactory(this, self, services, getEquivEventEqPredicate(), getVisibilityPredicate(), label);
         EventEquivalenceWithIsoFactory isoFactory = new EventEquivalenceWithIsoFactory(this, services, self, getEquivEventIsoPredicate(), getVisibilityPredicate(), label);
-        AgreeTacletFactory agreeFactory = new AgreeTacletFactory(getLowState(), services, label, getAgreePrePredicate());
+        AgreeTacletFactory agreeFactory = new AgreeTacletFactory(getLowState(), services, label, getAgreePrePredicate(), getAgreePostPredicate());
         
         ImmutableList<RewriteTaclet> taclets = ImmutableSLList.<RewriteTaclet>nil();
         
@@ -103,7 +103,7 @@ public class ComponentClusterImpl extends AbstractDependencyClusterSpec implemen
         taclets = taclets.prepend(eqFactory.getEventEquivalenceTaclet());
         taclets = taclets.prepend(isoFactory.getEventEquivalenceTaclet());
         taclets = taclets.prepend(agreeFactory.getAgreePreTaclet());
-        //TODO JK add agreePost
+        taclets = taclets.prepend(agreeFactory.getAgreePostTaclet());
         
         return taclets;
         
