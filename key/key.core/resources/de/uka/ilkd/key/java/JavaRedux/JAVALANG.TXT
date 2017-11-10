@@ -49,3 +49,7 @@ java.util.Map
 java.util.Set
 javax.ejb.Local
 javax.ejb.Remote
+javax.ejb.EJB
+javax.ejb.Stateful
+javax.ejb.Stateless
+javax.ejb.Singleton

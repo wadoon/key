@@ -64,11 +64,13 @@ import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.ClassInvariantImpl;
 import de.uka.ilkd.key.speclang.ClassWellDefinedness;
+import de.uka.ilkd.key.speclang.CombinedClusterSpec;
 import de.uka.ilkd.key.speclang.ComponentCluster;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractAxiom;
 import de.uka.ilkd.key.speclang.ContractFactory;
 import de.uka.ilkd.key.speclang.DependencyClusterContract;
+import de.uka.ilkd.key.speclang.DependencyClusterSpec;
 import de.uka.ilkd.key.speclang.DependencyContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -109,10 +111,9 @@ public final class SpecificationRepository {
                               ImmutableSet<WellDefinednessCheck>>();
     private final Map<String, Contract> contractsByName =
             new LinkedHashMap<String, Contract>();
-    private final Map<String, ServiceDependencyClusterSpec> serviceDependencyClustersByLabel =
-            new LinkedHashMap<String, ServiceDependencyClusterSpec>();
-    private final Map<String, ComponentCluster> componentDependencyClustersByLabel =
-            new LinkedHashMap<String, ComponentCluster>();
+    
+    private final Map<String, DependencyClusterSpec> dependencyClustersByLabel =
+            new LinkedHashMap<String, DependencyClusterSpec>();
     
     private final Map<KeYJavaType, ImmutableSet<IObserverFunction>> contractTargets =
             new LinkedHashMap<KeYJavaType, ImmutableSet<IObserverFunction>>();
@@ -823,17 +824,12 @@ public final class SpecificationRepository {
         return combineOperationContracts(baseContracts);
     }
     
-    public ComponentCluster getComponentDependencyClusterByLabel(String label) {
-        ComponentCluster spec = componentDependencyClustersByLabel.get(label);
-        assert spec != null: "There is no component dependency cluster with label \"" + label + "\"."; 
+    public DependencyClusterSpec getDependencyClusterSpecByLabel(String label) {
+        DependencyClusterSpec spec = dependencyClustersByLabel.get(label);
+        assert spec != null: "There is no dependency cluster with label \"" + label + "\"."; 
         return spec;
     }
-    
-    public ServiceDependencyClusterSpec getServiceDependencyClusterByLabel(String label) {
-        ServiceDependencyClusterSpec spec = serviceDependencyClustersByLabel.get(label);
-        assert spec != null: "There is no service dependency cluster with label \"" + label + "\"."; 
-        return spec;
-    }
+
 
     /**
      * Returns a set encompassing the passed contract and all its versions
@@ -1531,21 +1527,28 @@ public final class SpecificationRepository {
     }
     
 
-    private void addComponentCluster(ComponentCluster spec) {
-        assert (! componentDependencyClustersByLabel.containsKey(spec.getLabel())) : 
-            "Component Dependency Cluster label " + spec.getLabel() + " is ambiguos";       
+    public void addDependencyClusterSpec(DependencyClusterSpec spec) {
+        assert (! dependencyClustersByLabel.containsKey(spec.getLabel())) : 
+            "Dependency Cluster label " + spec.getLabel() + " is ambiguos";       
         
-        componentDependencyClustersByLabel.put(spec.getLabel(), spec);
+        dependencyClustersByLabel.put(spec.getLabel(), spec);
 
     }
+    
+    public void addDependencyClusterSpecs(ImmutableList<DependencyClusterSpec> specs) {
+        for (DependencyClusterSpec spec : specs) {
+            addDependencyClusterSpec(spec);
+        }
+    }
+    
 
     public void addSpecs(ImmutableSet<SpecificationElement> specs) {
         for (SpecificationElement spec : specs) {
             if (spec instanceof Contract) {
                 if (spec instanceof DependencyClusterContract) {
-                    assert (! serviceDependencyClustersByLabel.containsKey(((DependencyClusterContract)spec).getLabel())) : 
+                    assert (! dependencyClustersByLabel.containsKey(((DependencyClusterContract)spec).getLabel())) : 
                         "Dependency Cluster label " + ((DependencyClusterContract)spec).getLabel() + " is ambiguos";                       
-                    serviceDependencyClustersByLabel.put(((DependencyClusterContract)spec).getLabel(), ((DependencyClusterContract)spec).getSpecs());
+                    dependencyClustersByLabel.put(((DependencyClusterContract)spec).getLabel(), ((DependencyClusterContract)spec).getSpecs());
                 }
                 addContract((Contract) spec);
             } else if (spec instanceof ClassInvariant) {
@@ -1559,7 +1562,7 @@ public final class SpecificationRepository {
             } else if (spec instanceof BlockContract) {
                 addBlockContract((BlockContract) spec);
             } else if (spec instanceof ComponentCluster) {
-                addComponentCluster((ComponentCluster) spec);
+                addDependencyClusterSpec((ComponentCluster) spec);
             } else {
                 assert false : "unexpected spec: " + spec + "\n("
                         + spec.getClass() + ")";
@@ -1675,4 +1678,5 @@ public final class SpecificationRepository {
         }
         return result;
     }
+
 }

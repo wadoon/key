@@ -67,10 +67,11 @@ public abstract class EventEquivalenceTacletFactory {
     private final Function equivEventFunction;
     private final Function invEventFunction;
     
-    private final String ruleNameSuffix;
+    private final String equivRuleNameSuffix;
+    private final String invRuleNameSuffix;
     
     public EventEquivalenceTacletFactory(Services services, ImmutableList<Lowlist> lowIn, ImmutableList<Lowlist> lowOut, 
-            ImmutableList<VisibilityCondition> visible, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
+            ImmutableList<VisibilityCondition> visible, Function equivEventFunction, Function invEventFunction, String equivRuleNameSuffix, String invRuleNameSuffix) {
 
         this.services = services;
         ldt = services.getTypeConverter().getServiceEventLDT();
@@ -113,7 +114,8 @@ public abstract class EventEquivalenceTacletFactory {
         
         this.equivEventFunction = equivEventFunction;
         this.invEventFunction = invEventFunction;
-        this.ruleNameSuffix = ruleNameSuffix;
+        this.equivRuleNameSuffix = equivRuleNameSuffix;
+        this.invRuleNameSuffix = invRuleNameSuffix;
     }
     
     public Term findTermEquivalence() {
@@ -161,7 +163,7 @@ public abstract class EventEquivalenceTacletFactory {
     public RewriteTaclet getEventEquivalenceTaclet() {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
         
-        final String name = EQUIV_RULE_BASENAME + ruleNameSuffix;
+        final String name = EQUIV_RULE_BASENAME + equivRuleNameSuffix;
         tacletBuilder.setDisplayName(name);
         tacletBuilder.setName(new Name(name));
         
@@ -180,7 +182,7 @@ public abstract class EventEquivalenceTacletFactory {
     public RewriteTaclet getInvisibilityTaclet() {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
         
-        final String name = INV_RULE_BASENAME + ruleNameSuffix;
+        final String name = INV_RULE_BASENAME + invRuleNameSuffix;
         tacletBuilder.setDisplayName(name);
         tacletBuilder.setName(new Name(name));
 

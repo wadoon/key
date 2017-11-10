@@ -38,6 +38,7 @@ import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.RuleKey;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletBuilder;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -287,6 +288,20 @@ public class InitConfig {
     public void registerRule(Rule r, RuleJustification j) {
    justifInfo.addJustification(r, j);
     }
+    
+   //TODO JK should this exist? What kind of name should it have?
+    /** registers a rule with the given justification at the
+     * justification managing {@link RuleJustification} object of this
+     * environment if a rule of that name isn't already registered. 
+     * @return true if r was new and registered
+     */
+   public boolean registerRuleIfNew(Rule r, RuleJustification j) {
+       if (!justifInfo.hasRule(r)) {
+           justifInfo.addJustification(r, j);
+           return true;
+       }
+       return false;
+   }
 
     public void registerRuleIntroducedAtNode(RuleApp r, 
                                              Node node, 

@@ -546,11 +546,17 @@ public class JMLSpecFactory {
                 translateClusterSatisfactionSpecs(pm, progVars.selfVar,
                                             progVars.paramVars, progVars.resultVar, progVars.excVar, 
                                             textualSpecCase.getClusterSatisfactionSpecs());
-        //TODO JK find out where to add these specs to the specification repo
+        
         clauses.combinedClusterSpecs =
                 translateCombinedClusterSpecs(pm, progVars.selfVar,
                                             progVars.paramVars, progVars.resultVar, progVars.excVar, 
                                             textualSpecCase.getCombinedClusterSpecs());
+        
+      //TODO JK find out where to add these specs to the specification repo properly, this can only be a temporary solution I think
+        for (CombinedClusterSpec spec: clauses.combinedClusterSpecs) {
+
+            services.getSpecificationRepository().addDependencyClusterSpec(spec);
+        }
 
         clauses.joinProcedure = translateJoinProcedure(textualSpecCase.getJoinProcs());
         return clauses;
@@ -1487,6 +1493,7 @@ public class JMLSpecFactory {
                                                                progVars));
         result = result.union(createClusterSatisfactionContracts(clauses, pm,
                 progVars));
+        
 
         return result;
     }
