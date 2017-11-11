@@ -252,6 +252,7 @@ lexer grammar KeYLexer;
 	ISTHISREFERENCE:'\\isThisReference';
 	DIFFERENTFIELDS:'\\differentFields';
 	ISSELFEXPR:'\\selfExpression';
+	ISPARAMEXPR:'\\paramExpression';
 	ISREFERENCE:'\\isReference';
 	ISREFERENCEARRAY:'\\isReferenceArray';
 	ISSTATICFIELD : '\\isStaticField';

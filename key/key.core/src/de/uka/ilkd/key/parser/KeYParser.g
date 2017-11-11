@@ -3797,6 +3797,7 @@ varexp[TacletBuilder b]
     | varcond_simplifyIfThenElseUpdate[b]
     | varcond_differentFields[b]  
     | varcond_selfExpression[b]
+    | varcond_paramExpression[b]
   ) 
   | 
   ( (NOT_ {negated = true;} )? 
@@ -3874,6 +3875,17 @@ varcond_selfExpression [TacletBuilder b]
   RPAREN
   {
           b.addVariableCondition(new IsSelfExpression((SchemaVariable)x, (SchemaVariable)y));
+  }
+;
+
+varcond_paramExpression [TacletBuilder b]
+:
+  ISPARAMEXPR
+  LPAREN
+    x = varId COMMA y = varId
+  RPAREN
+  {
+          b.addVariableCondition(new IsPExpression((SchemaVariable)x, (SchemaVariable)y));
   }
 ;
 
