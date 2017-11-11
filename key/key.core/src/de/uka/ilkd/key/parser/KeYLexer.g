@@ -251,6 +251,7 @@ lexer grammar KeYLexer;
 	METADISJOINT : '\\metaDisjoint';
 	ISTHISREFERENCE:'\\isThisReference';
 	DIFFERENTFIELDS:'\\differentFields';
+	ISSELFEXPR:'\\selfExpression';
 	ISREFERENCE:'\\isReference';
 	ISREFERENCEARRAY:'\\isReferenceArray';
 	ISSTATICFIELD : '\\isStaticField';
