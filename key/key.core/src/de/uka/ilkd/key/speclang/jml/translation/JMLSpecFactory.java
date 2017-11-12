@@ -53,6 +53,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.CallableServSpec;
 import de.uka.ilkd.key.speclang.CallableSpec;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassAxiomImpl;
@@ -241,6 +242,7 @@ public class JMLSpecFactory {
                         Modality.BOX,
                         clauses.requires.get(heap),
                         clauses.measuredBy,
+                        clauses.callableSpec,
                         clauses.assignables.get(heap),
                         !clauses.hasMod.get(heap),
                         progVars,
@@ -280,7 +282,7 @@ public class JMLSpecFactory {
         public ImmutableList<ClusterSatisfactionSpec> clusterSatisfactionSpecs;
         public JoinProcedure joinProcedure;
         public ImmutableList<CombinedClusterSpec> combinedClusterSpecs;
-        public ImmutableList<CallableSpec> callableSpecs;
+        public CallableSpec callableSpec;
     }
 
     //-------------------------------------------------------------------------
@@ -560,8 +562,16 @@ public class JMLSpecFactory {
             services.getSpecificationRepository().addDependencyClusterSpec(spec);
         }        
 
-        clauses.callableSpecs = translateCallableSpecs(pm, progVars.selfVar,
+        ImmutableList<CallableSpec> callable = translateCallableSpecs(pm, progVars.selfVar,
                 progVars.paramVars, progVars.resultVar, progVars.excVar, textualSpecCase.getCallable());
+        if (callable.size() > 1) {
+            throw new SLTranslationException("Multiple callable clauses found for " + pm);
+        }
+        if (callable.size() == 0) {
+            clauses.callableSpec = new CallableSpec();
+        } else {
+            clauses.callableSpec = callable.head();
+        }
 
         clauses.joinProcedure = translateJoinProcedure(textualSpecCase.getJoinProcs());
         return clauses;

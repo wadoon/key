@@ -11,4 +11,18 @@ public class CallableServSpec {
         this.serv = serv;
         this.client = client;
     }
+    
+    public IProgramMethod getService() {
+        return serv;
+    }
+    
+    public Term getClient() {
+        return client;
+    }
+    
+    @Override
+    public String toString() {
+        return "Callable Service: " + client + " . " + serv;
+    }
+    
 }
