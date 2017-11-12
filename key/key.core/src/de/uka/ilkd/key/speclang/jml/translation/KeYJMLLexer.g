@@ -38,6 +38,7 @@ lexer grammar KeYJMLLexer;
     ACCESSIBLE      : 'accessible';
     ASSIGNABLE      : 'assignable';
     BREAKS          : 'breaks';
+    CALLABLE        : 'callable'; //TODO JK this isn't a real JML callable clause I think because it's only supposed to refer to services, right? How should we handle that?
     CONTINUES       : 'continues';
     DECREASES       : 'decreases'; // internal translation for 'measured_by'
     DEPENDS         : 'depends';  // internal translation for 'accessible' on model fields

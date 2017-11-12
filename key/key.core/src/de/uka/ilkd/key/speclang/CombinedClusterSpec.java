@@ -25,7 +25,6 @@ public class CombinedClusterSpec extends AbstractDependencyClusterSpec {
         this.specLabels = specLabels;
         this.forClass = forClass;
         
-        System.out.println(this);
     }
 
     public ImmutableList<String> getSpecLabels() {

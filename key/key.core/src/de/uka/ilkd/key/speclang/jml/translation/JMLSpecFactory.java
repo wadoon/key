@@ -53,6 +53,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.CallableSpec;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassAxiomImpl;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -279,6 +280,7 @@ public class JMLSpecFactory {
         public ImmutableList<ClusterSatisfactionSpec> clusterSatisfactionSpecs;
         public JoinProcedure joinProcedure;
         public ImmutableList<CombinedClusterSpec> combinedClusterSpecs;
+        public ImmutableList<CallableSpec> callableSpecs;
     }
 
     //-------------------------------------------------------------------------
@@ -556,8 +558,10 @@ public class JMLSpecFactory {
         for (CombinedClusterSpec spec: clauses.combinedClusterSpecs) {
 
             services.getSpecificationRepository().addDependencyClusterSpec(spec);
-        }
-        
+        }        
+
+        clauses.callableSpecs = translateCallableSpecs(pm, progVars.selfVar,
+                progVars.paramVars, progVars.resultVar, progVars.excVar, textualSpecCase.getCallable());
 
         clauses.joinProcedure = translateJoinProcedure(textualSpecCase.getJoinProcs());
         return clauses;
@@ -663,6 +667,31 @@ public class JMLSpecFactory {
                             JMLTranslator.translate(expr, pm.getContainerType(),
                                                     selfVar, paramVars, resultVar,
                                                     excVar, null, CombinedClusterSpec.class, services);
+                result = result.append(translated);
+            }
+            return result;
+        }
+    }
+    
+    private ImmutableList<CallableSpec> 
+    translateCallableSpecs(IProgramMethod pm,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable resultVar,
+            ProgramVariable excVar,
+            ImmutableList<PositionedString> originalClauses)
+                    throws SLTranslationException {
+        if (originalClauses.isEmpty()) {
+            return ImmutableSLList.<CallableSpec>nil();
+        } else {
+            ImmutableList<CallableSpec> result =
+                                     ImmutableSLList.<CallableSpec>nil();
+            for (PositionedString expr : originalClauses) {
+
+                CallableSpec translated =
+                            JMLTranslator.translate(expr, pm.getContainerType(),
+                                                    selfVar, paramVars, resultVar,
+                                                    excVar, null, CallableSpec.class, services);
                 result = result.append(translated);
             }
             return result;
