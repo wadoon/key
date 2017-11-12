@@ -12,4 +12,6 @@ public interface ClusterSatisfactionContract extends Contract {
     public Term getMod();   
 
     public Term getSelf();
+    
+    public CallableSpec getCallable();
 }

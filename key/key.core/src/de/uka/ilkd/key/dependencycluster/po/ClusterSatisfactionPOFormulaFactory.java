@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.dependencycluster.po;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -10,6 +13,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.speclang.CallableServSpec;
 import de.uka.ilkd.key.speclang.ClusterSatisfactionContract;
 import de.uka.ilkd.key.speclang.DependencyClusterSpec;
 
@@ -152,7 +156,24 @@ public class ClusterSatisfactionPOFormulaFactory {
         }
         
         public Term callable() {
-            return tb.func(eventLDT.getIsCallable(), event());
+            if (contract.getCallable().restrictsCalls()) {
+                ImmutableList<Term> callableConditions = ImmutableSLList.<Term>nil();
+                for (CallableServSpec callableServ: contract.getCallable().getCallableServices()) {
+                    Term callerFits = tb.equals(caller, self);
+                    Term calleeFits = tb.equals(callee, callableServ.getClient());
+                    Term serviceFits = tb.equals(service, tb.func(eventLDT.getMethodIdentifier(callableServ.getService().getMethodDeclaration(), proofServices)));
+                    callableConditions = callableConditions.prepend(tb.and(callerFits, calleeFits, serviceFits));
+                }
+                
+                Term callerFits = tb.equals(caller, tb.var(eventLDT.getEnvironmentCaller()));
+                Term calleeFits = tb.equals(callee, self);
+                Term serviceFits = tb.equals(service, tb.func(eventLDT.getMethodIdentifier(contract.getTarget().getMethodDeclaration(), proofServices)));
+                callableConditions = callableConditions.prepend(tb.and(callerFits, calleeFits, serviceFits));
+                
+                return tb.or(callableConditions);
+            } else {
+                return tb.tt();
+            }
         }
     }
 

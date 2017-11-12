@@ -110,6 +110,7 @@ public class ClusterSatisfactionContractImpl
 
     }
     
+    @Override
     public CallableSpec getCallable() {
         return callable;
     }
