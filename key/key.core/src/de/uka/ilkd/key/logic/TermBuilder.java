@@ -2124,10 +2124,6 @@ public class TermBuilder {
     	return func(services.getTypeConverter().getServiceEventLDT().isIso(), any1, heap1, any2, heap2);
     }
 
-    public Term isoObject(Term any) {
-    	return func(services.getTypeConverter().getServiceEventLDT().isoObject(), any);
-    }
-
     public Term transfresh(Term any, Term heap1, Term heap2) {
     	return func(services.getTypeConverter().getServiceEventLDT().transfresh(), any, heap1, heap2);
     }
