@@ -57,12 +57,16 @@ public class ClusterSatisfactionPOFormulaFactory {
         return tb.not(tb.equals(self, tb.NULL()));
     }
     
+    public Term selfCreated() {
+        return tb.and(a.selfCreated(), b.selfCreated());
+    }
+    
     public Term callingCompNotNull() {
         return tb.not(tb.equals(callingComp, tb.NULL()));
     }
 
     public Term premise() {
-        return tb.and(selfType(), selfNotNull(), callingCompNotNull(), wellformed(), anon(), invs());
+        return tb.and(selfType(), selfNotNull(), selfCreated(), callingCompNotNull(), wellformed(), anon(), invs());
     }
     
     public Term selfType() {
@@ -138,6 +142,10 @@ public class ClusterSatisfactionPOFormulaFactory {
             heapPost = tb.var(new LocationVariable(new ProgramElementName(tb.newName("heapPost" + varsuffix)), new KeYJavaType(heapLDT.targetSort())));
         
             hist = tb.var(new LocationVariable(new ProgramElementName(tb.newName("hist" + varsuffix)), seqLDT.targetSort()));
+        }
+
+        public Term selfCreated() {
+            return tb.created(heap, self);
         }
 
         public Term inv() {

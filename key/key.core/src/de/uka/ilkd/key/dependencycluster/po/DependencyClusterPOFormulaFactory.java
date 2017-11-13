@@ -174,7 +174,8 @@ public class DependencyClusterPOFormulaFactory {
             for (IProgramMethod method: methods) {
                 if (method.getMethodDeclaration().isRemote()) {
                     if (!(field.getProgramVariable() instanceof LocationVariable)) {
-                        System.out.println("MIST!");
+                        //TODO JK what do we do if that doesn't work?
+                        System.out.println("crap.");
                     }
                     LocationVariable fieldVar = (LocationVariable)field.getProgramVariable();
                     
