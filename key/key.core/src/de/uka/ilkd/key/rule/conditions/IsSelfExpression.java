@@ -33,9 +33,10 @@ public class IsSelfExpression extends VariableConditionAdapter {
             //Called with another schema var than the ones needed. Therefore, check if the others are instantiated.
             checkInst = instMap.getInstantiation(this.checkExpr);
             selfInst = instMap.getInstantiation(this.selfExpr);
-            assert(checkInst != null && selfInst != null);
         } 
-            
+        if(checkInst == null || selfInst == null) {
+            return false;
+        }
         return checkHelper(checkInst, selfInst, services);
     }
    
