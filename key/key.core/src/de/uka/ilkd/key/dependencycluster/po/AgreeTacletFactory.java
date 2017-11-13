@@ -28,14 +28,16 @@ public class AgreeTacletFactory {
     private final Function agreePostFunction;
     private final Term heap1;
     private final Term heap2;
+    private final Term self;
 
-    public AgreeTacletFactory(ImmutableList<Term> lowState, Services services, String ruleNameSuffix, Function agreePreFunction, Function agreePostFunction) {
+    public AgreeTacletFactory(ImmutableList<Term> lowState, Term self, Services services, String ruleNameSuffix, Function agreePreFunction, Function agreePostFunction) {
         this.ruleNameSuffix = ruleNameSuffix;
         this.lowState = lowState;
         this.services = services;
         tb = services.getTermBuilder();
         this.agreePreFunction = agreePreFunction;
         this.agreePostFunction = agreePostFunction;
+        this.self = self;
         
         Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
         heap1 = tb.var(SchemaVariableFactory.createTermSV(new Name("heap1"), heapSort, false, false));
