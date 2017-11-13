@@ -9,7 +9,9 @@ import de.uka.ilkd.key.informationflow.po.snippet.InfFlowInputOutputRelationSnip
 import de.uka.ilkd.key.informationflow.po.snippet.InfFlowPOSnippetFactory;
 import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.ldt.ServiceEventLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -27,9 +29,7 @@ public class DependencyClusterPOFormulaFactory {
     private final IFProofObligationVars ifVars;
     private final Services services;
     private final TermBuilder tb;
-    private final ServiceEventLDT ldt;
-    private final ProofObligationVars symbExecVars;
-    
+    private final ServiceEventLDT ldt;  
     
     
     private final SymbExecWithHistFactory a;
@@ -48,7 +48,6 @@ public class DependencyClusterPOFormulaFactory {
         this.services = services;
         this.tb = services.getTermBuilder();
         this.ldt = services.getTypeConverter().getServiceEventLDT();
-        this.symbExecVars = symbExecVars;
         
         ImmutableList<InfFlowSpec> infFlowSpecs = ImmutableSLList.<InfFlowSpec>nil();
         
@@ -151,7 +150,17 @@ public class DependencyClusterPOFormulaFactory {
     }
     
     public Term assumptions() {
-        return tb.and(wellformedHistories(), cooperationalEquivalence(), selfAtPreEquality(), selfIsActiveComp(), callEventEquivalence(), preStateEquivalence());
+        return tb.and(wellformedHistories(), cooperationalEquivalence(), selfAtPreEquality(), remoteBeanEquality(), selfIsActiveComp(), callEventEquivalence(), preStateEquivalence());
+    }
+    
+    public Term remoteBeanEquality() {
+        //TODO JK do proper cast precautions
+        ClassDeclaration classDecl = (ClassDeclaration)services.getJavaInfo().getTypeDeclaration(contract.getKJT().getFullName());
+        ImmutableList<Field> fields = services.getJavaInfo().getAllFields(classDecl);  
+        for (Field field: fields) {
+            //System.out.println(field);
+        }
+        return tb.tt();
     }
     
     public Term preStateEquivalence() {
