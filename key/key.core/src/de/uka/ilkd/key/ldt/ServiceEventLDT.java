@@ -57,7 +57,6 @@ public class ServiceEventLDT extends LDT {
 
 	private final Function heapjoin;
 	private final Function isIso;
-	private final Function isoObject;
 	private final Function transfresh;
 
 	//history (of Remote method events) ... copy of: key.core/resources/de/uka/ilkd/key/proof/rules/events.key -> Seq hist;
@@ -110,7 +109,6 @@ public class ServiceEventLDT extends LDT {
 
 		heapjoin = addFunction(services, "heapjoin");
 		isIso = addFunction(services, "isIso");
-		isoObject = addFunction(services, "isoObject");
 		transfresh = addFunction(services, "transfresh");
 
 		hist = (LocationVariable) services.getNamespaces().programVariables().lookup(HIST_NAME);
@@ -210,10 +208,6 @@ public class ServiceEventLDT extends LDT {
 
 	public Function isIso() {
 		return isIso;
-	}
-
-	public Function isoObject() {
-		return isoObject;
 	}
 
 	public Function transfresh() {
