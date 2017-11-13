@@ -70,6 +70,7 @@ public class AgreeTacletFactory {
         return tb.and(collectedTerms);
     }
     
+    //TODO JK this isn't quite agreePost as in theory but a special version for cluster satisfaction contracts - make this obvious!
     public RewriteTaclet getAgreePostTaclet() {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<RewriteTaclet>();
         
@@ -88,9 +89,24 @@ public class AgreeTacletFactory {
         return taclet;
     }
 
+
+    //TODO JK If I understood correctly, Simon says (heh...) we can ignore any new objects business here. Maybe think about this another time - after all, for objects existing in the prestate not any isomorphism is good enough in the poststate, and there are a few other issues. But, of course, we don't really deal with pre- and poststates here, we're only really thinking in Terms of information subsets...
     private Term agreePost() {
-        //TODO JK proper definition of agreePost
-        return tb.tt();
+        Function objectsIsoFunction =
+                (Function)services.getNamespaces().functions().lookup("objectsIsomorphic");
+        Function sameTypesFunction =
+                (Function)services.getNamespaces().functions().lookup("sameTypes");
+        Function agreeBasicFunction = services.getTypeConverter().getServiceEventLDT().getAgreeBasic();
+        
+        Term lowSeq = tb.seq(lowState);
+        Term t1 = tb.apply(tb.elementary(tb.getBaseHeap(), heap1), lowSeq);
+        Term t2 = tb.apply(tb.elementary(tb.getBaseHeap(), heap2), lowSeq);
+        
+        Term sameTypes = tb.func(sameTypesFunction, t1, t2);
+        Term agreeBasic = tb.func(agreeBasicFunction, t1, t2);
+        Term objectsIso = tb.func(objectsIsoFunction, t1, t1, t2, t2);
+        
+        return tb.and(sameTypes, agreeBasic, objectsIso);
     }
 
 }
