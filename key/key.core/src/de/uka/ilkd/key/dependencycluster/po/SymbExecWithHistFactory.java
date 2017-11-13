@@ -142,6 +142,14 @@ public class SymbExecWithHistFactory {
         //return tb.apply(updateHeap, execWithPre);
     }
     
+    public Term heapAtPre() {
+        return ifVars.pre.heap;
+    }
+    
+    public Term selfAtPre() {
+        return ifVars.pre.self;
+    }
+    
     public Term visibilityFilteredPostHistory() {
         return tb.func(ldt.getFilterVisible(), postHistory());
     }
