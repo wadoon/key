@@ -323,6 +323,7 @@ public class ContractFactory {
             Modality modality,
             Term requires,
             Term measuredBy,
+            CallableSpec callable,
             Term modifies,
             boolean hasMod,
             ProgramVariableCollection progVars,
@@ -338,7 +339,7 @@ public class ContractFactory {
         final Term exc = progVars.excVar != null ? tb.var(progVars.excVar) : null;
         return new ClusterSatisfactionContractImpl(
                 CLUSTER_SATISFACTION_CONTRACT_BASENAME, forClass, pm, specifiedIn,
-                modality, requires, measuredBy, modifies, hasMod, self, params,
+                modality, requires, measuredBy, callable, modifies, hasMod, self, params,
                 result, exc, atPre, accessible, clusterSatisfactionSpec, toBeSaved);
     }
 

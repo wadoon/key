@@ -7,11 +7,11 @@ import de.uka.ilkd.key.speclang.PositionedString;
 /**
  * A JML component based systems information flow specification in textual form.
  */
-public class TextualJMLComponentCluster extends TextualJMLConstruct {
+public class TextualJMLCombinedComponentCluster extends TextualJMLConstruct {
     
     private final PositionedString spec;
 
-    public TextualJMLComponentCluster(ImmutableList<String> mods, PositionedString spec) {
+    public TextualJMLCombinedComponentCluster(ImmutableList<String> mods, PositionedString spec) {
         super(mods);
         assert spec != null;
         this.spec = spec;
@@ -29,10 +29,10 @@ public class TextualJMLComponentCluster extends TextualJMLConstruct {
     
     @Override
     public boolean equals(Object o) {
-        if(!(o instanceof TextualJMLComponentCluster)) {
+        if(!(o instanceof TextualJMLCombinedComponentCluster)) {
             return false;
         }
-        TextualJMLComponentCluster other = (TextualJMLComponentCluster) o;
+        TextualJMLCombinedComponentCluster other = (TextualJMLCombinedComponentCluster) o;
         return mods.equals(other.mods) && spec.equals(other.spec);
     }
     

@@ -53,6 +53,8 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.join.JoinProcedure;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.CallableServSpec;
+import de.uka.ilkd.key.speclang.CallableSpec;
 import de.uka.ilkd.key.speclang.ClassAxiom;
 import de.uka.ilkd.key.speclang.ClassAxiomImpl;
 import de.uka.ilkd.key.speclang.ClassInvariant;
@@ -240,6 +242,7 @@ public class JMLSpecFactory {
                         Modality.BOX,
                         clauses.requires.get(heap),
                         clauses.measuredBy,
+                        clauses.callableSpec,
                         clauses.assignables.get(heap),
                         !clauses.hasMod.get(heap),
                         progVars,
@@ -279,6 +282,7 @@ public class JMLSpecFactory {
         public ImmutableList<ClusterSatisfactionSpec> clusterSatisfactionSpecs;
         public JoinProcedure joinProcedure;
         public ImmutableList<CombinedClusterSpec> combinedClusterSpecs;
+        public CallableSpec callableSpec;
     }
 
     //-------------------------------------------------------------------------
@@ -556,6 +560,17 @@ public class JMLSpecFactory {
         for (CombinedClusterSpec spec: clauses.combinedClusterSpecs) {
 
             services.getSpecificationRepository().addDependencyClusterSpec(spec);
+        }        
+
+        ImmutableList<CallableSpec> callable = translateCallableSpecs(pm, progVars.selfVar,
+                progVars.paramVars, progVars.resultVar, progVars.excVar, textualSpecCase.getCallable());
+        if (callable.size() > 1) {
+            throw new SLTranslationException("Multiple callable clauses found for " + pm);
+        }
+        if (callable.size() == 0) {
+            clauses.callableSpec = new CallableSpec();
+        } else {
+            clauses.callableSpec = callable.head();
         }
 
         clauses.joinProcedure = translateJoinProcedure(textualSpecCase.getJoinProcs());
@@ -662,6 +677,31 @@ public class JMLSpecFactory {
                             JMLTranslator.translate(expr, pm.getContainerType(),
                                                     selfVar, paramVars, resultVar,
                                                     excVar, null, CombinedClusterSpec.class, services);
+                result = result.append(translated);
+            }
+            return result;
+        }
+    }
+    
+    private ImmutableList<CallableSpec> 
+    translateCallableSpecs(IProgramMethod pm,
+            ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars,
+            ProgramVariable resultVar,
+            ProgramVariable excVar,
+            ImmutableList<PositionedString> originalClauses)
+                    throws SLTranslationException {
+        if (originalClauses.isEmpty()) {
+            return ImmutableSLList.<CallableSpec>nil();
+        } else {
+            ImmutableList<CallableSpec> result =
+                                     ImmutableSLList.<CallableSpec>nil();
+            for (PositionedString expr : originalClauses) {
+
+                CallableSpec translated =
+                            JMLTranslator.translate(expr, pm.getContainerType(),
+                                                    selfVar, paramVars, resultVar,
+                                                    excVar, null, CallableSpec.class, services);
                 result = result.append(translated);
             }
             return result;
@@ -1451,6 +1491,21 @@ public class JMLSpecFactory {
 
         ComponentCluster cc = JMLTranslator.translate(spec, kjt, selfVar, null, null,
                                      null, null, ComponentCluster.class, services);
+
+        return cc;
+    }
+    
+    public CombinedClusterSpec createJMLCombinedComponentCluster(KeYJavaType kjt,
+            PositionedString spec)
+        throws SLTranslationException {
+        assert kjt != null;
+        assert spec != null;
+        
+        //TODO JK what  is this selfvar for?
+        ProgramVariable selfVar = TB.selfVar(kjt, false);
+
+        CombinedClusterSpec cc = JMLTranslator.translate(spec, kjt, selfVar, null, null,
+                                     null, null, CombinedClusterSpec.class, services);
 
         return cc;
     }

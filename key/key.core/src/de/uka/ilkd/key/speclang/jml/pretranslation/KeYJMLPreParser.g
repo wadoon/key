@@ -229,7 +229,8 @@ classlevel_element[ImmutableList<String> mods]
 :
         result=class_invariant[mods]
     |   (accessible_keyword expression) => result=depends_clause[mods]
-    |   result=component_cluster[mods]
+    |   (COMPCLUSTER IDENT LOWIN) => result=component_cluster[mods]
+    |   (COMPCLUSTER IDENT COMBINES) => result=combined_component_cluster[mods]
     |   result=method_specification[mods]
     |   result=field_or_method_declaration[mods]
     |   result=represents_clause[mods]
@@ -402,6 +403,19 @@ component_cluster[ImmutableList<String> mods]
     {
     	    ps = ps.prepend(keyword.getText() + " ");
 	    TextualJMLComponentCluster cc = new TextualJMLComponentCluster(mods, ps);
+	    result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(cc);
+	    //TODO JK: Throw exception if stupid mods found
+    }
+;
+
+combined_component_cluster[ImmutableList<String> mods]
+        returns [ImmutableList<TextualJMLConstruct> result = null]
+        throws SLTranslationException
+:
+    keyword=COMPCLUSTER ps=expression  //TODO JK: expressions have to end with semicolons, thats why we can't have the more detailed syntax in the PreParser
+    {
+    	    ps = ps.prepend(keyword.getText() + " ");
+	    TextualJMLCombinedComponentCluster cc = new TextualJMLCombinedComponentCluster(mods, ps);
 	    result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(cc);
 	    //TODO JK: Throw exception if stupid mods found
     }
@@ -789,6 +803,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
         |   (CLUSTER IDENT LOWIN) => ps=dependency_cluster_spec	{sc.addDepClusterSpecs(ps);}
         |   (CLUSTER IDENT COMBINES) => ps=dependency_cluster_spec	{sc.addCombinedClusterSpecs(ps);}
         |   (CLUSTER IDENT SATISFIED_BY) => ps=cluster_satisfaction_spec	{sc.addClusterSatisfactionSpecs(ps);}
+        |   ps=callable_clause     { sc.addCallable(ps); }
     )
     {
 	if(b == Behavior.EXCEPTIONAL_BEHAVIOR
@@ -879,6 +894,15 @@ assignable_clause
 @after { r = result; }
 :
     assignable_keyword result=expression { result = flipHeaps("assignable", result); }
+;
+
+callable_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    keyword=CALLABLE result=expression { result = result.prepend(keyword.getText() + " "); }
 ;
 
 

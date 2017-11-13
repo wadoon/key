@@ -8,7 +8,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 
-public interface DependencyClusterSpec {
+public interface DependencyClusterSpec extends SpecificationElement{
     
     public String getLabel();
 

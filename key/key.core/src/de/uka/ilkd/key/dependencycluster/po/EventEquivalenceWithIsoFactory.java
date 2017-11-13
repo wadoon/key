@@ -221,6 +221,8 @@ public class EventEquivalenceWithIsoFactory
             expressionsEq = expressionsEq.append(sameTypes);
             expressionsEq = expressionsEq.append(agreeBasic);
             
+            
+            //TODO JK check whether we still need this
             //Formulas
             for (Term term: getFormulas(list.getLowTerms())) {             
                 //TODO JK Parser returns some "boolean" expressions (for example with > operator) as Formulas, not as expressions, so we need special treatment for those (can't be in sequences, dont have a = relation...)

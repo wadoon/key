@@ -35,6 +35,8 @@ options {
     import de.uka.ilkd.key.speclang.CombinedClusterSpec;
     import de.uka.ilkd.key.util.ClusterSatisfactionSpec;
     import de.uka.ilkd.key.speclang.ComponentCluster;
+    import de.uka.ilkd.key.speclang.CallableSpec;
+    import de.uka.ilkd.key.speclang.CallableServSpec;
     import de.uka.ilkd.key.speclang.ComponentClusterImpl;
     import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
     import de.uka.ilkd.key.util.VisibilityCondition;
@@ -421,9 +423,11 @@ top returns [Object ret = null] throws SLTranslationException
     |   signalsonlyclause { ret = $signalsonlyclause.result; }
     |   termexpression { ret = $termexpression.result; }
     |	(CLUSTER IDENT LOWIN) => dependencyclusterspec { ret = $dependencyclusterspec.result; }
-    |	componentdependencyclusterspec { ret = $componentdependencyclusterspec.result; }
+    |	(COMPCLUSTER IDENT LOWIN) => componentdependencyclusterspec { ret = $componentdependencyclusterspec.result; }
+    |   (COMPCLUSTER IDENT COMBINES) => combinedcomponentclusterspec { ret = $combinedcomponentclusterspec.result; }
     |	(CLUSTER IDENT SATISFIED_BY) => clustersatisfactionspec { ret = $clustersatisfactionspec.result; }
     |	(CLUSTER IDENT COMBINES) => combinedclusterspec { ret = $combinedclusterspec.result; }
+    |	callableclause { ret = $callableclause.result; }
     )
     (SEMI)? EOF
     ;
@@ -627,7 +631,7 @@ combinedclusterspec returns  [CombinedClusterSpec result = null] throws SLTransl
 :
     CLUSTER label = IDENT COMBINES clusters = stringlist
 
-    {result = new CombinedClusterSpec(label.getText(), services, clusters);}
+    {result = new CombinedClusterSpec(containerType, label.getText(), services, clusters);}
     ;
 
 stringlist returns  [ImmutableList<String> result = ImmutableSLList.<String>nil();] throws SLTranslationException
@@ -652,6 +656,13 @@ componentdependencyclusterspec returns  [ComponentCluster result = null] throws 
 
     {result = new ComponentClusterImpl(containerType, lowIn, lowOut, lowState, visible, id.getText(), services);}
     ;
+    
+combinedcomponentclusterspec returns  [CombinedClusterSpec result = null] throws SLTranslationException
+:
+    COMPCLUSTER label = IDENT COMBINES clusters = stringlist
+
+    {result = new CombinedClusterSpec(containerType, label.getText(), services, clusters);}
+    ;
 
 dependencyclusterspec returns  [DependencyClusterSpec result = null] throws SLTranslationException
 @init {
@@ -670,7 +681,7 @@ dependencyclusterspec returns  [DependencyClusterSpec result = null] throws SLTr
     	VISIBLE (NOTHING | tmpVisible = visibilitylist {visible = visible.append(tmpVisible);})
     	(NEW_OBJECTS (NOTHING | tmpNew = infflowspeclist {newObs = newObs.append(tmpNew);}))?
 
-    {result = new ServiceDependencyClusterSpec(lowIn, lowOut, lowState, visible, newObs, id.getText(), services);}
+    {result = new ServiceDependencyClusterSpec(containerType, lowIn, lowOut, lowState, visible, newObs, id.getText(), services);}
     ;
     
       
@@ -914,6 +925,53 @@ messagetype returns [Term result = null]
         CALL {result = tb.evCall();}
     |   TERMINATION {result = tb.evTerm();}
     ;
+    
+callableclause returns [CallableSpec result = null] throws SLTranslationException
+@init {
+    ImmutableList<CallableServSpec> servs = ImmutableSLList.<CallableServSpec>nil();
+}
+:
+	CALLABLE ((serv = callableserv {servs = servs.append(serv);} (COMMA serv = callableserv {servs = servs.append(serv);})*) | NOTHING)
+		{ result = new CallableSpec(servs); }
+	;
+ 
+//TODO JK check whether the stuff copied from Karsten works properly     
+callableserv returns [CallableServSpec result = null] throws SLTranslationException
+:
+        beanTok = IDENT DOT servTok = IDENT (LBRACKET params = typelist RBRACKET)?
+        {
+            SLExpression bean = resolverManager.resolve(null, beanTok.getText(), null);
+            
+            KeYJavaType beanType = bean.getType();
+            IProgramMethod serv = null;
+
+            ImmutableList<IProgramMethod> methods = javaInfo.getAllProgramMethods(beanType);
+              methodLoop: for (IProgramMethod method : methods) {
+                     if (method.getName().equals(servTok.getText())) {
+                            if (params != null) {
+                                    if (params.size() != method.getParamTypes().size()) {
+                                            continue methodLoop;
+                                    }
+                                    for (int i = 0; i < params.size(); i++) {
+                                            if (!params.get(i).equals(method.getParamTypes().get(i))) {
+                                                    continue methodLoop;
+                                            }
+                                    }
+                            }
+
+                             //TODO JK allow inheritance because it's no true ambiguity! Should not be too hard to deal with...
+                             if (serv != null) {
+                                     raiseError("Method " + beanType.getFullName() + "." + servTok.getText() + " ambiguous (please specify argument types in square brackets behind the method name; can't handle inheritance atm)!");
+                             }
+                             serv = method;				 
+                     }
+              }
+            if (serv == null) {
+                    raiseError("Method " + beanType.getFullName() + "." + servTok.getText() + " not found!");
+            }
+            result = new CallableServSpec(serv, bean.getTerm());
+        }
+        ;
 
 
 signalsclause returns [Term ret=null] throws SLTranslationException

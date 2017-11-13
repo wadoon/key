@@ -39,6 +39,7 @@ lexer grammar KeYJMLPreLexer;
 	BREAK_BEHAVIOR 	    : 'break_behavior';
     BREAK_BEHAVIOUR 	: 'break_behaviour';
     BY				: 'by';
+    CALLABLE                    : 'callable';
     CAPTURES 			: 'captures';
     CAPTURES_RED 		: 'captures_redundantly';
     CLUSTER			: 'cluster';

@@ -1,5 +1,8 @@
 package de.uka.ilkd.key.dependencycluster.po;
 
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -10,6 +13,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
+import de.uka.ilkd.key.speclang.CallableServSpec;
 import de.uka.ilkd.key.speclang.ClusterSatisfactionContract;
 import de.uka.ilkd.key.speclang.DependencyClusterSpec;
 
@@ -21,8 +25,8 @@ public class ClusterSatisfactionPOFormulaFactory {
     private final ServiceEventLDT eventLDT;
     private final HeapLDT heapLDT;
     private final SeqLDT seqLDT;
-    private final Event a;
-    private final Event b;
+    private final EventAndState a;
+    private final EventAndState b;
     private final DependencyClusterSpec globalSpec;
     private final DependencyClusterSpec localSpec;
     
@@ -38,8 +42,8 @@ public class ClusterSatisfactionPOFormulaFactory {
         eventLDT = proofServices.getTypeConverter().getServiceEventLDT();
         heapLDT = proofServices.getTypeConverter().getHeapLDT();
         seqLDT = proofServices.getTypeConverter().getSeqLDT();
-        a = new Event("_A");
-        b = new Event("_B");
+        a = new EventAndState("_A");
+        b = new EventAndState("_B");
         
         callingComp = tb.var(new LocationVariable(new ProgramElementName(tb.newName("callingComp")), new KeYJavaType(proofServices.getJavaInfo().objectSort())));
     
@@ -58,27 +62,35 @@ public class ClusterSatisfactionPOFormulaFactory {
     }
 
     public Term premise() {
-        return tb.and(selfNotNull(), callingCompNotNull(), wellformed(), anon());
+        return tb.and(selfType(), selfNotNull(), callingCompNotNull(), wellformed(), anon(), invs());
+    }
+    
+    public Term selfType() {
+        return tb.exactInstance(contract.getKJT().getSort(), self);
+    }
+    
+    public Term invs() {
+        return tb.and(a.inv(), b.inv());
     }
     
     public Term globalImplLocalEvent() {
-        return tb.imp(tb.func(globalSpec.getEquivEventEqPredicate(), a.event(), b.event()), tb.func(localSpec.getEquivEventEqPredicate(), a.event(), b.event()));
+        return tb.imp(tb.func(globalSpec.getEquivEventIsoPredicate(), a.event(), b.event()), tb.func(localSpec.getEquivEventIsoPredicate(), a.event(), b.event()));
     }
     
     public Term globalImplLocalState() {
-        return tb.imp(tb.func(globalSpec.getAgreePrePredicate(), a.heap, b.heap), tb.func(localSpec.getAgreePrePredicate(), a.heap, b.heap));
+        return tb.imp(tb.func(globalSpec.getAgreePostPredicate(), a.heap, b.heap), tb.func(localSpec.getAgreePostPredicate(), a.heap, b.heap));
     }
     
     public Term localImplGlobalEvent() {
-        return tb.imp(tb.and(tb.func(localSpec.getEquivEventEqPredicate()
+        return tb.imp(tb.and(tb.func(localSpec.getEquivEventIsoPredicate()
                 , a.event(), b.event()), 
                         a.callable(), b.callable()), 
-                tb.func(globalSpec.getEquivEventEqPredicate(), a.event(), b.event()));
+                tb.func(globalSpec.getEquivEventIsoPredicate(), a.event(), b.event()));
     }
     
     public Term localImplGlobalState() {
-        return tb.imp(tb.and(tb.func(globalSpec.getAgreePrePredicate(), a.heap, b.heap), tb.func(localSpec.getAgreePrePredicate(), a.heap2, b.heap2)), 
-                tb.func(globalSpec.getAgreePrePredicate(), a.heapPost, b.heapPost));
+        return tb.imp(tb.and(tb.func(globalSpec.getAgreePostPredicate(), a.heap, b.heap), tb.func(localSpec.getAgreePostPredicate(), a.heap2, b.heap2)), 
+                tb.func(globalSpec.getAgreePostPredicate(), a.heapPost, b.heapPost));
     }
     
     public Term consequence() {
@@ -97,17 +109,19 @@ public class ClusterSatisfactionPOFormulaFactory {
         return tb.imp(premise(), consequence());
     }
     
-    private class Event {
+    private class EventAndState {
         public final Term caller;
         public final Term callee;
         public final Term service;
         public final Term type;
         public final Term params;
+        public final Term eventHeap;
         public final Term heap;
         public final Term heap2;
         public final Term heapPost;
+        public final Term hist;
         
-        public Event(String varsuffix) {
+        public EventAndState(String varsuffix) {
             
             caller = tb.var(new LocationVariable(new ProgramElementName(tb.newName("caller" + varsuffix)), new KeYJavaType(proofServices.getJavaInfo().objectSort())));
             callee = tb.var(new LocationVariable(new ProgramElementName(tb.newName("callee" + varsuffix)), new KeYJavaType(proofServices.getJavaInfo().objectSort())));
@@ -117,14 +131,21 @@ public class ClusterSatisfactionPOFormulaFactory {
             type = tb.var(new LocationVariable(new ProgramElementName(tb.newName("type" + varsuffix)), new KeYJavaType(eventLDT.getCalltypeSort())));
             
             params = tb.var(new LocationVariable(new ProgramElementName(tb.newName("params" + varsuffix)), new KeYJavaType(seqLDT.targetSort())));
-
+            
+            eventHeap = tb.var(new LocationVariable(new ProgramElementName(tb.newName("eventHeap" + varsuffix)), new KeYJavaType(heapLDT.targetSort())));
             heap = tb.var(new LocationVariable(new ProgramElementName(tb.newName("heap" + varsuffix)), new KeYJavaType(heapLDT.targetSort())));
             heap2 = tb.var(new LocationVariable(new ProgramElementName(tb.newName("heap2" + varsuffix)), new KeYJavaType(heapLDT.targetSort())));
             heapPost = tb.var(new LocationVariable(new ProgramElementName(tb.newName("heapPost" + varsuffix)), new KeYJavaType(heapLDT.targetSort())));
-        }
         
+            hist = tb.var(new LocationVariable(new ProgramElementName(tb.newName("hist" + varsuffix)), seqLDT.targetSort()));
+        }
+
+        public Term inv() {
+            return tb.apply(tb.elementary(tb.getBaseHeap(), heap),  tb.apply(tb.elementary(tb.getHist(), hist), tb.inv(self)));
+        }
+
         public Term event() {
-            return tb.func(eventLDT.eventConstructor(), type, caller, callee, service, params, heap);
+            return tb.func(eventLDT.eventConstructor(), type, caller, callee, service, params, eventHeap);
         }
         
         public Term wellformed() {
@@ -134,8 +155,9 @@ public class ClusterSatisfactionPOFormulaFactory {
         private Term wellformedHeaps() {
             Term h = tb.wellFormed(heap);
             Term h2 = tb.wellFormed(heap2);
+            Term eh = tb.wellFormed(eventHeap);
             Term hp = tb.wellFormed(heapPost);
-            return tb.and(h, h2, hp);
+            return tb.and(h, h2, hp, eh);
         }
 
         public Term wellformedCallee() {
@@ -148,11 +170,28 @@ public class ClusterSatisfactionPOFormulaFactory {
         
         public Term anon() {
             Term mod = contract.getMod();
-            return tb.equals(heapPost, tb.anon(heap2, mod, heap));
+            return tb.equals(heapPost, tb.anon(heap, mod, heap2));
         }
         
         public Term callable() {
-            return tb.func(eventLDT.getIsCallable(), event());
+            if (contract.getCallable().restrictsCalls()) {
+                ImmutableList<Term> callableConditions = ImmutableSLList.<Term>nil();
+                for (CallableServSpec callableServ: contract.getCallable().getCallableServices()) {
+                    Term callerFits = tb.equals(caller, self);
+                    Term calleeFits = tb.equals(callee, callableServ.getClient());
+                    Term serviceFits = tb.equals(service, tb.func(eventLDT.getMethodIdentifier(callableServ.getService().getMethodDeclaration(), proofServices)));
+                    callableConditions = callableConditions.prepend(tb.and(callerFits, calleeFits, serviceFits));
+                }
+                
+                Term callerFits = tb.equals(caller, tb.var(eventLDT.getEnvironmentCaller()));
+                Term calleeFits = tb.equals(callee, self);
+                Term serviceFits = tb.equals(service, tb.func(eventLDT.getMethodIdentifier(contract.getTarget().getMethodDeclaration(), proofServices)));
+                callableConditions = callableConditions.prepend(tb.and(callerFits, calleeFits, serviceFits));
+                
+                return tb.or(callableConditions);
+            } else {
+                return tb.tt();
+            }
         }
     }
 

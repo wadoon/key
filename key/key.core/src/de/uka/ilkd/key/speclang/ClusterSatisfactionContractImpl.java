@@ -32,6 +32,7 @@ public class ClusterSatisfactionContractImpl
     private final String name;
     private final Term origPre;
     private final Term origMby;
+    private final CallableSpec callable;
     private final Term origMod;
     private final Modality modality;
     private final Term origSelf;
@@ -52,6 +53,7 @@ public class ClusterSatisfactionContractImpl
             Modality modality,
             Term pre,
             Term mby,
+            CallableSpec callable,
             Term mod,
             boolean hasRealMod,
             Term self,
@@ -62,7 +64,7 @@ public class ClusterSatisfactionContractImpl
             Term dep,
             ClusterSatisfactionSpec clusterSatisfactionSpec,
             boolean toBeSaved) {
-        this(baseName, forClass, pm, specifiedIn, modality, pre, mby, mod, hasRealMod, self, params, result, exc, heapAtPre, dep, clusterSatisfactionSpec, toBeSaved, INVALID_ID);
+        this(baseName, forClass, pm, specifiedIn, modality, pre, mby, callable, mod, hasRealMod, self, params, result, exc, heapAtPre, dep, clusterSatisfactionSpec, toBeSaved, INVALID_ID);
     }
     
     protected ClusterSatisfactionContractImpl(String baseName,
@@ -72,6 +74,7 @@ public class ClusterSatisfactionContractImpl
                                         Modality modality,
                                         Term pre,
                                         Term mby,
+                                        CallableSpec callable,
                                         Term mod,
                                         boolean hasRealMod,
                                         Term self,
@@ -83,6 +86,7 @@ public class ClusterSatisfactionContractImpl
                                         ClusterSatisfactionSpec clusterSatisfactionSpec,
                                         boolean toBeSaved,
                                         int id) {
+
         this.id = id;
         this.baseName = baseName;
         this.name = ContractFactory.generateContractName(baseName, forClass, pm, specifiedIn, id);
@@ -91,6 +95,7 @@ public class ClusterSatisfactionContractImpl
         this.specifiedIn = specifiedIn;
         this.origPre = pre;
         this.origMby = mby;
+        this.callable = callable;
         this.origMod = mod;
         this.origSelf = self;
         this.origParams = params;
@@ -103,6 +108,11 @@ public class ClusterSatisfactionContractImpl
         this.origDep = dep;
         this.clusterSatisfactionSpec = clusterSatisfactionSpec;
 
+    }
+    
+    @Override
+    public CallableSpec getCallable() {
+        return callable;
     }
 
     @Override
@@ -286,14 +296,14 @@ public class ClusterSatisfactionContractImpl
 
     @Override
     public Contract setID(int newId) {
-        return new ClusterSatisfactionContractImpl(baseName, forClass, pm, specifiedIn, modality, origPre, origMby, origMod, hasRealModifiesClause, origSelf, origParams, 
+        return new ClusterSatisfactionContractImpl(baseName, forClass, pm, specifiedIn, modality, origPre, origMby, callable, origMod, hasRealModifiesClause, origSelf, origParams, 
                 origResult, origExc, origAtPre, origDep, clusterSatisfactionSpec, toBeSaved, newId);
     
     }
 
     @Override
     public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
-        return new ClusterSatisfactionContractImpl(baseName, newKJT, pm, specifiedIn, modality, origPre, origMby, origMod, hasRealModifiesClause, origSelf, origParams, 
+        return new ClusterSatisfactionContractImpl(baseName, newKJT, pm, specifiedIn, modality, origPre, origMby, callable, origMod, hasRealModifiesClause, origSelf, origParams, 
                 origResult, origExc, origAtPre, origDep, clusterSatisfactionSpec, toBeSaved, id);
     }
 
