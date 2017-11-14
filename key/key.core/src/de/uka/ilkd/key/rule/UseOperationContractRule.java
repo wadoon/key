@@ -978,7 +978,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 					tb.wellFormed(tb.func(h_2)),
 					tb.wellFormedHist(tb.func(hist_o)),
 					tb.equals(tb.func(heap_opre), tb.heapjoin(baseHeapTerm, tb.func(heap_o), tb.seq(contractParams), contractSelf)),
-					tb.equals(tb.func(heap_opost), tb.anon(tb.func(heap_opre), mods.get(baseHeap), tb.func(h_1))),
+					//Do not use this anonymization. It confuses the prover. Plus: there is no need for it.
+					//tb.equals(tb.func(heap_opost), tb.anon(tb.func(heap_opre), mods.get(baseHeap), tb.func(h_1))),
 					tb.equals(tb.func(hist_opost), tb.seqConcat(tb.func(hist_o), tb.seqSingleton(tb.func(callevent_o)), tb.func(hist_olocal), tb.seqSingleton(tb.func(termevent_o)))),
 					tb.equals(tb.func(heap_post), tb.anon(baseHeapTerm, tb.empty(), tb.func(h_2))),
 					tb.equals(tb.func(callevent), tb.evConst(tb.evCall(), bean, contractSelf, m_id, tb.seq(contractParams), baseHeapTerm)),
@@ -1012,12 +1013,16 @@ public final class UseOperationContractRule implements BuiltInRule {
 		final Term freeExcPost = inst.pm.isConstructor()
 				? freePost
 				: tb.tt();
-		final Term postAssumption
-				= tb.applySequential(new Term[]{inst.u, atPreUpdates},
-				tb.and(anonAssumption,
-				tb.apply(anonUpdate,
-				tb.and(excNull, freePost, post),
-				null)));
+
+        final Term postAssumption
+              = tb.applySequential(new Term[]{inst.u, atPreUpdates},
+              tb.and(anonAssumption,
+              tb.apply(anonUpdate,
+              tb.and(excNull, freePost, post),
+                  null)));
+
+
+				
 		final Term excPostAssumption
 				= tb.applySequential(new Term[]{inst.u, atPreUpdates},
 				tb.and(anonAssumption,
@@ -1113,9 +1118,13 @@ public final class UseOperationContractRule implements BuiltInRule {
 				false);
 		postGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost, null)),
 				ruleApp.posInOccurrence());
-		postGoal.addFormula(new SequentFormula(postAssumption),
+		//The method call case adds this formula encoding the postcondition.
+		//In the remote method call case, the postcondition is encoded in the formula above as an implication,
+		// and it differs fundamentally.
+		//We therefore do not need this formula.
+		/*postGoal.addFormula(new SequentFormula(postAssumption),
 				true,
-				false);
+				false);*/
 
 		applyInfFlow(postGoal, contract, inst, contractSelf, contractParams, contractResult,
 				tb.var(excVar), mby, atPreUpdates,finalPreTerm, anonUpdateDatas, services);
