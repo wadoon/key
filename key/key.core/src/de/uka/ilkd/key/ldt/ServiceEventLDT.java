@@ -25,6 +25,10 @@ public class ServiceEventLDT extends LDT {
 	public static final Name ENVCALLER_NAME = new Name("environmentCaller");
 	public static final Name CURRENT_PARAMS_NAME = new Name("currentParams");
 	public static final Name COMPONENT_NAME = new Name("activeComponent");
+	//Stuff for deserialization effects
+	public static final Name DESERIALMAP_NAME = new Name("DeserialMap");
+	public static final Name DESERIALFUNC_NAME = new Name("deserial");
+	public static final Name DESERIALEQUIV_NAME = new Name("deserialEquiv");
 
 	private final Function event;
 	private final Function evType;
@@ -71,10 +75,14 @@ public class ServiceEventLDT extends LDT {
     private final Function agreePost;
     
     private final Function agreeBasic;
+    
+    private final Function deserialfunc;
+    private final Function deserialequiv;
 
 	private final Sort eventSort;
     private final Sort calltypeSort;
     private final Sort methodSort;
+    private final Sort deserialMapSort;
 
 	public ServiceEventLDT (TermServices services) {
 		super(NAME, services);
@@ -100,6 +108,9 @@ public class ServiceEventLDT extends LDT {
         agreePost = addFunction(services, "agreePost");
         agreeBasic = addFunction(services, "agreeBasic");
         isCallable = addFunction(services, "isCallable");
+        
+        deserialfunc = addFunction(services, DESERIALFUNC_NAME.toString());
+        deserialequiv = addFunction(services, DESERIALEQUIV_NAME.toString());
 
 		wellformedListInternal = addFunction(services, "wellformedListInternal");
 		wellformedListCoopInternal = addFunction(services, "wellformedListCoopInternal");
@@ -120,10 +131,23 @@ public class ServiceEventLDT extends LDT {
 		eventSort = (Sort) services.getNamespaces().sorts().lookup("Event");
         calltypeSort = (Sort) services.getNamespaces().sorts().lookup("EventType");
         methodSort = (Sort) services.getNamespaces().sorts().lookup(METHOD_SORT);
+        deserialMapSort = (Sort) services.getNamespaces().sorts().lookup(DESERIALMAP_NAME.toString());
 	}
 
 	public Sort eventSort() {
 		return eventSort;
+	}
+	
+	public Sort deserialmapSort() {
+	    return deserialMapSort;
+	}
+	
+	public Function deserialfunction() {
+	    return deserialfunc; 
+	}
+	
+	public Function deserialeqiv() {
+	    return deserialequiv;
 	}
 
 	public Function eventConstructor() {

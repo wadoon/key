@@ -55,6 +55,8 @@ public class ClusterSatisfactionPO extends AbstractOperationPO
         //TODO JK is this the proper way to get a self var here?        
         final Term self = contract.getSelf();
         
+ 
+        
         final ClusterSatisfactionPOFormulaFactory factory = new ClusterSatisfactionPOFormulaFactory(contract, proofServices, self);
         
         final ServiceEventLDT ldt = proofServices.getTypeConverter().getServiceEventLDT();
