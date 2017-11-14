@@ -28,17 +28,24 @@ public class AgreeTacletFactory {
     private final Function agreePostFunction;
     private final Term heap1;
     private final Term heap2;
-    private final Term self;
+    private final Term contractSelf;
+    private final Term specSelf;
 
-    public AgreeTacletFactory(ImmutableList<Term> lowState, Term self, Services services, String ruleNameSuffix, Function agreePreFunction, Function agreePostFunction) {
+    /*
+     * separate self variables are needed if the self in the lowState specification (specSelf) 
+     * isn't the same as the self used in the proof obligation these taclets are used in (contractSelf).
+     * We set {specSelf:=contractSelf}.
+     */
+    public AgreeTacletFactory(ImmutableList<Term> lowState, Term contractSelf, Term specSelf, Services services, String ruleNameSuffix, Function agreePreFunction, Function agreePostFunction) {
         this.ruleNameSuffix = ruleNameSuffix;
         this.lowState = lowState;
         this.services = services;
         tb = services.getTermBuilder();
         this.agreePreFunction = agreePreFunction;
         this.agreePostFunction = agreePostFunction;
-        this.self = self;
-        
+        this.contractSelf = contractSelf;
+        this.specSelf = specSelf;
+                        
         Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
         heap1 = tb.var(SchemaVariableFactory.createTermSV(new Name("heap1"), heapSort, false, false));
         heap2 = tb.var(SchemaVariableFactory.createTermSV(new Name("heap2"), heapSort, false, false));
@@ -65,9 +72,17 @@ public class AgreeTacletFactory {
     private Term agreePre() {
         ImmutableList<Term> collectedTerms = ImmutableSLList.<Term>nil();
         for (Term t: lowState) {
+            //TODO JK less ugly
             Term t1 = tb.apply(tb.elementary(tb.getBaseHeap(), heap2), t);
             Term t2 = tb.apply(tb.elementary(tb.getBaseHeap(), heap1), t);
-            collectedTerms = collectedTerms.append(tb.equals(t1, t2));
+            
+            if (contractSelf.equals(specSelf)) {
+                collectedTerms = collectedTerms.append(tb.equals(t1, t2));
+            } else {
+                Term tt1 = tb.apply(tb.elementary(specSelf, contractSelf), t1);
+                Term tt2 = tb.apply(tb.elementary(specSelf, contractSelf), t2);
+                collectedTerms = collectedTerms.append(tb.equals(tt1, tt2));
+            }
         }
         return tb.and(collectedTerms);
     }
@@ -101,8 +116,15 @@ public class AgreeTacletFactory {
         Function agreeBasicFunction = services.getTypeConverter().getServiceEventLDT().getAgreeBasic();
         
         Term lowSeq = tb.seq(lowState);
-        Term t1 = tb.apply(tb.elementary(tb.getBaseHeap(), heap1), lowSeq);
-        Term t2 = tb.apply(tb.elementary(tb.getBaseHeap(), heap2), lowSeq);
+        Term t1;
+        Term t2;
+        if (contractSelf.equals(specSelf)) {
+            t1 = tb.apply(tb.elementary(tb.getBaseHeap(), heap1), lowSeq);
+            t2 = tb.apply(tb.elementary(tb.getBaseHeap(), heap2), lowSeq);
+        } else {
+            t1 = tb.apply(tb.elementary(specSelf, contractSelf), tb.apply(tb.elementary(tb.getBaseHeap(), heap1), lowSeq));
+            t2 = tb.apply(tb.elementary(specSelf, contractSelf), tb.apply(tb.elementary(tb.getBaseHeap(), heap2), lowSeq));
+        }
         
         Term sameTypes = tb.func(sameTypesFunction, t1, t2);
         Term agreeBasic = tb.func(agreeBasicFunction, t1, t2);
