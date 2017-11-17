@@ -19,7 +19,7 @@ public class IsSelfExpression extends VariableConditionAdapter {
     
     @Override
     public boolean check(SchemaVariable var, SVSubstitute instCandidate,
-            SVInstantiations instMap, Services services) {    
+            SVInstantiations instMap, Services services) {   
         Object selfInst;
         Object checkInst;
         
@@ -34,8 +34,9 @@ public class IsSelfExpression extends VariableConditionAdapter {
             checkInst = instMap.getInstantiation(this.checkExpr);
             selfInst = instMap.getInstantiation(this.selfExpr);
         } 
+        
         if(checkInst == null || selfInst == null) {
-            return false;
+            return true;
         }
         return checkHelper(checkInst, selfInst, services);
     }

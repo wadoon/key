@@ -1121,10 +1121,12 @@ public final class UseOperationContractRule implements BuiltInRule {
 		//The method call case adds this formula encoding the postcondition.
 		//In the remote method call case, the postcondition is encoded in the formula above as an implication,
 		// and it differs fundamentally.
-		//We therefore do not need this formula.
-		/*postGoal.addFormula(new SequentFormula(postAssumption),
-				true,
-				false);*/
+		//We therefore do not need this formula, if the called method is a remote method.
+		if (!pm.getMethodDeclaration().isRemote()) {  
+		    postGoal.addFormula(new SequentFormula(postAssumption),
+			  	  true,
+				  false);
+		}
 
 		applyInfFlow(postGoal, contract, inst, contractSelf, contractParams, contractResult,
 				tb.var(excVar), mby, atPreUpdates,finalPreTerm, anonUpdateDatas, services);

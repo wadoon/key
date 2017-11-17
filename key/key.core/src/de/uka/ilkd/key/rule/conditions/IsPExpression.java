@@ -36,7 +36,7 @@ public class IsPExpression extends VariableConditionAdapter {
         } 
         
         if (selfInst == null || checkInst == null) {
-            return false;
+            return true;
         }
         
         return checkHelper(checkInst, selfInst, services);
