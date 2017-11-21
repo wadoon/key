@@ -22,6 +22,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -144,7 +145,12 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
             if(!hasModality(goal.node())) {
                 return false;
             }
+
             if(isNonHumanInteractionTagged(app.rule())) {
+                return false;
+            }
+
+            if(!NodeInfo.isSymbolicExecutionRuleApplied(app)) {
                 return false;
             }
 
