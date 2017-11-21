@@ -24,6 +24,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -148,6 +149,10 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
             if(isNonHumanInteractionTagged(app.rule())) {
                 return false;
+            }
+
+            if(app.rule() instanceof OneStepSimplifier) {
+                return true;
             }
 
             if(!NodeInfo.isSymbolicExecutionRuleApplied(app)) {
