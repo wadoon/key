@@ -54,6 +54,7 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -400,36 +401,94 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				Term frameTerm = buildFrameClause(modHeaps, heapToAtPre, selfVar, paramVars, proofServices);
 
 				Term post = tb.and(postTerm, frameTerm);
-				post = modifyPostTerm(proofServices, post);
+				post = modifyPostTerm(proofServices, post); // TODO KD -bug?- do i need to do this to my post term?
+				
 
 				final LocationVariable baseHeap = proofServices.getTypeConverter().getHeapLDT().getHeap();
 				final Term selfVarTerm = (selfVar != null) ? tb.var(selfVar) : null;
 				final Term globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm,
 						tb.var(paramVars), proofServices);
 
-				// if method to prove is remote add "outgoing termination" events to history
-				Term histAtCallUpdate = tb.skip();
+				Term progUpdate = buildUpdate(paramVars, formalParamVars, atPreVars, proofServices);
+
+				LocationVariable hist = proofServices.getTypeConverter().getServiceEventLDT().getHist();
+				Term callingComp = tb.var(proofServices.getTypeConverter().getServiceEventLDT().getEnvironmentCaller());
+				Term hist_local = tb.var(proofServices.getTypeConverter().getServiceEventLDT().getInternalHist());
 				if (pm.getMethodDeclaration().isRemote()) {
 					assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
 					// TODO KD -tipp- could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor() (caller cannot be selfVarTerm)
-					LocationVariable hist = proofServices.getTypeConverter().getServiceEventLDT().getHist();
-					Term caller = tb.getEnvironmentCaller();
-					final Term comp = tb.getActiveComponent();
-					Term method = tb.func(proofServices.getTypeConverter().getServiceEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), proofServices));
-					Term resultTerm = (resultVar != null) ? tb.seqSingleton(tb.var(resultVar)) : tb.seqEmpty();
-					// throws Exception if pm.getMethodDeclaration().isStatic()
-					Term inCallEvent = tb.evConst(tb.evCall(), caller, comp, method, tb.seq(tb.var(paramVars)), tb.getBaseHeap());
-					Term newHistAtCall = tb.seqConcat(tb.getHist(), tb.seqSingleton(inCallEvent));
-					histAtCallUpdate = tb.elementary(hist, newHistAtCall);
-					// throws Exception if pm.getMethodDeclaration().isStatic()
-					Term outTermEvent = tb.evConst(tb.evTerm(), caller, comp, method, resultTerm, tb.getBaseHeap());
-					Term newHistAtTerm = tb.seqConcat(tb.getHist(), tb.seqSingleton(outTermEvent));
-					final Term histAtTermUpdate = tb.elementary(hist, newHistAtTerm);
-					post = tb.apply(histAtTermUpdate, post);
-				}
 
-				final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar,
-						exceptionVar, atPreVars, histAtCallUpdate, post, sb, proofServices);
+					Term calls = tb.tt();
+/*					for (Event e : hist_local) {
+						calls = tb.and(calls, inCallable(e));
+					}
+*/ // TODO KD  -implement- callable
+					Term m_id = tb.func(proofServices.getTypeConverter().getServiceEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), proofServices));
+					Term[] a = new Term[paramVars.size()];
+					int i = 0;
+					for (ProgramVariable pv : paramVars) {
+						a[i++] = tb.var(pv);
+					}
+					Function heap_pserial = new Function(new Name(tb.newName("heap_pserial")), baseHeap.sort(), true); // TODO KD -ask simon- new function? what else?
+					proofServices.getNamespaces().functions().addSafely(heap_pserial);
+					Term resultTerm = (resultVar != null) ? tb.seqSingleton(tb.var(resultVar)) : tb.seqEmpty();
+					// TODO KD -ask simon- self -> activeComponent
+					Term callevent = tb.evConst(tb.evCall(), callingComp, selfVarTerm, m_id, tb.seq(a), tb.func(heap_pserial));
+					Term termevent = tb.evConst(tb.evTerm(), callingComp, selfVarTerm, m_id, resultTerm, tb.getBaseHeap());
+					Function h2 = new Function(new Name(tb.newName("h2")), baseHeap.sort(), true); // TODO KD -ask simon- new function? what else?
+					proofServices.getNamespaces().functions().addSafely(h2);
+					Function h = new Function(new Name(tb.newName("h")), baseHeap.sort(), true); // TODO KD -ask simon- new function? what else?
+					proofServices.getNamespaces().functions().addSafely(h);
+					Function bean = new Function(new Name(tb.newName("bean")), selfVar.sort(), true); // TODO KD -ask simon- new function? what else?
+					proofServices.getNamespaces().functions().addSafely(bean);
+
+					LocationVariable hist_pre = new LocationVariable(new ProgramElementName (tb.newName("histBefore_" + pm.getName())), hist.sort()); // TODO KD -later- replace with /old values
+					proofServices.getNamespaces().programVariables().addSafely(hist_pre);
+					LocationVariable hist_pre_local = new LocationVariable(new ProgramElementName(tb.newName("histLocalBefore_" + pm.getName())), hist.sort());
+					proofServices.getNamespaces().programVariables().addSafely(hist_pre_local);
+
+					// actual changes
+					pre = tb.and( // TODO KD -hacky- oh god why
+							tb.wellFormed(tb.getBaseHeap()),
+							tb.wellFormed(tb.func(heap_pserial)),
+							tb.wellFormed(tb.func(h2)),
+							tb.wellFormedHist(hist),
+							tb.equals(tb.getInternalHist(), tb.seqEmpty()),
+							tb.not(tb.equals(selfVarTerm, tb.NULL())),
+							tb.not(tb.equals(tb.func(bean), selfVarTerm)),
+							generateSelfExactType(getProgramMethod(), selfVar, getCalleeKeYJavaType()),
+							tb.created(selfVarTerm),
+							tb.inv(selfVarTerm), // TODO KD -bug?- correct invariant?
+							tb.wellFormed(tb.func(h)),
+							tb.equals(tb.func(heap_pserial), tb.anon(tb.var(baseHeap), tb.empty(), tb.func(h))), // TOD KD -bug?- empty = locsert?
+							tb.not(tb.equals(callingComp, tb.NULL())),
+							tb.not(tb.equals(callingComp, selfVarTerm)),
+							tb.created(callingComp),
+							tb.transfresh(a, tb.var(baseHeap), tb.func(heap_pserial)),
+							tb.apply(tb.elementary(tb.getBaseHeap(), tb.func(heap_pserial)),
+									tb.and(noInv(getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices), selfVarTerm), // TODO KD -bug?- correct noInv? / noInv not needed?
+											generateParamsOK(paramVars)//,
+//											tb.disjoint(a, unusedLocs(tb.getBaseHeap())) // TODO KD -ask simon- unusedLocs? needed?
+												)));
+
+					Map<LocationVariable,Term> atPres = HeapContext.getAtPres(atPreVars, proofServices);
+					Term heap_pre = atPres.get(baseHeap);
+					progUpdate = tb.parallel( // TODO KD -hacky- this is not getting better
+							tb.elementary(tb.getBaseHeap(), tb.func(heap_pserial)),
+							tb.elementary(heap_pre, tb.func(heap_pserial)),
+							tb.elementary(hist, tb.seqConcat(tb.var(hist), tb.seqSingleton(callevent))),
+							tb.elementary(tb.var(hist_pre), tb.var(hist)),
+							tb.elementary(hist_local, tb.seqEmpty()));
+
+					post = tb.apply(tb.elementary(tb.var(hist), tb.seqConcat(tb.var(hist), tb.seqSingleton(termevent))),
+							tb.and(post, // includes frame
+									calls,
+									tb.wellFormedHist(hist)));
+									// TODO KD -bug?- "exc == NULL" should be included in post
+				}
+				final Term progPost = tb.apply(
+						progUpdate,
+						buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar, exceptionVar, atPreVars, post, sb, proofServices));
 				final Term preImpliesProgPost = tb.imp(pre, progPost);
 				final Term applyGlobalUpdate = globalUpdate == null ?
 						preImpliesProgPost : tb.apply(globalUpdate, preImpliesProgPost);
@@ -448,6 +507,19 @@ public abstract class AbstractOperationPO extends AbstractPO {
 		// for JML annotation statements
 		generateWdTaclets(proofConfig);
 	}
+
+    // TODO KD -hacky- works only for special cases
+    private Term noInv(Term t, Term contractSelf) {
+    	if (t.op().toString().contains("<inv>") && t.sub(1) == contractSelf) {
+        	return tb.tt();
+    	} else if (t.op() == Junctor.AND) {
+    		return tb.and(noInv(t.sub(0), contractSelf), noInv(t.sub(1), contractSelf));
+    	} else if (t.op().toString().equals("update-application")) {
+    		return tb.apply(t.sub(0), noInv(t.sub(1), contractSelf));
+    	} else {
+			return t;
+		}
+    }
 
    protected Services postInit() {
       proofConfig = environmentConfig.deepCopy();
@@ -548,11 +620,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
 			final Term wf = tb.wellFormed(tb.var(heap));
 			wellFormed = tb.and(wellFormed, wf);
 		}
-
-		//for Remote Methods
-		final Term wfHist = tb.wellFormedHist(tb.getHist());
-		wellFormed = tb.and(wellFormed, wfHist);
-
 		return tb.and((wellFormed != null ? wellFormed : tb.tt()), selfNotNull,
 				selfCreated, selfExactType, paramsOK, mbyAtPreDef);
 	}
@@ -834,7 +901,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                    ProgramVariable resultVar,
                                    ProgramVariable exceptionVar,
                                    Map<LocationVariable, LocationVariable> atPreVars,
-                                   Term histAtCallUpdate,
                                    Term postTerm,
                                    ImmutableList<StatementBlock> sb,
                                    Services services) {
@@ -852,10 +918,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
          programTerm = tb.label(programTerm, new SymbolicExecutionTermLabel(labelID));
       }
 
-      // create update
-      Term update = buildUpdate(paramVars, formalParamVars, histAtCallUpdate, atPreVars, services);
-
-      return tb.apply(update, programTerm, null);
+      return programTerm;
    }
 
    /**
@@ -966,7 +1029,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
 	 */
 	protected Term buildUpdate(ImmutableList<ProgramVariable> paramVars,
 			ImmutableList<LocationVariable> formalParamVars,
-			Term histAtCallUpdate,
 			Map<LocationVariable, LocationVariable> atPreVars,
 			Services services) {
 		Term update = tb.skip();
@@ -977,11 +1039,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
 			update = tb.parallel(update, u);
 		}
 
-		// histAtPre := hist
-		LocationVariable hist = services.getTypeConverter().getServiceEventLDT().getHist();
-		LocationVariable histAtPre = new LocationVariable(new ProgramElementName(tb.newName(hist + "AtPre")), new KeYJavaType(hist.sort()));
-		Term histupdate = tb.elementary(histAtPre, tb.getHist());
-		update = tb.parallel(update, histupdate);
 		if (isCopyOfMethodArgumentsUsed()) {
 			Iterator<LocationVariable> formalParamIt = formalParamVars.iterator();
 			Iterator<ProgramVariable> paramIt = paramVars.iterator();
@@ -990,10 +1047,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				update = tb.parallel(update, paramUpdate);
 			}
 		}
-
-		// hist := histAtCall
-		update = tb.sequential(update, histAtCallUpdate);
-
 		return update;
 	}
 

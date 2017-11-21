@@ -913,7 +913,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 			services.getNamespaces().functions().addSafely(termevent_o);
 			Function isoObject = new Function(new Name(tb.newName("isoObject_" + pm.getName())), 
 					(Sort) services.getNamespaces().sorts().lookup("any"),
-					(Sort) services.getNamespaces().sorts().lookup("any")); // TODO KD -test- works?
+					(Sort) services.getNamespaces().sorts().lookup("any")); // TODO KD -hacky- works?
 			w = tb.parallel(
 					tb.elementary(bean, contractSelf),
 					tb.elementary(callingComp, bean));

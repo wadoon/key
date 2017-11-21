@@ -1526,6 +1526,13 @@ public class TermBuilder {
         }
     }
 
+    public Term disjoint(Term[] s1s, Term s2) {
+    	Term result = tt();
+    	for (Term s1 : s1s) {
+    		result = and(result, disjoint(s1, s2));
+    	}
+    	return result;
+    }
 
     public Term createdInHeap(Term s, Term h) { 
         final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
@@ -2102,7 +2109,7 @@ public class TermBuilder {
     }
     public Term wellFormedHist (LocationVariable hist) {
     	return wellFormedHist(var(hist));
-    }
+    } // TODO KD -refactor- delete
 
     // similar predicates
     public Term similarHist(Term callee, Term hist1, Term hist2) {
