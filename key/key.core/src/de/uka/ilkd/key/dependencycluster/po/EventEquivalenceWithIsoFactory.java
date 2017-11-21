@@ -46,12 +46,22 @@ public class EventEquivalenceWithIsoFactory
             Term specifiedCallee;
             if (list.getCallType() == Lowlist.MessageType.CALL) {
                 specifiedCalltype = tb.evCall();
-                specifiedCaller = tb.getEnvironmentCaller();
-                specifiedCallee = selfVar; //TODO JK is this a proper self var for this purpose?
+                if (list.getDirection() == Lowlist.Direction.IN){
+                    specifiedCaller = tb.getEnvironmentCaller();
+                    specifiedCallee = selfVar;
+                } else {
+                    specifiedCaller = selfVar;
+                    specifiedCallee = list.getCommunicationPartner().getTerm();
+                } 
             } else {
                 specifiedCalltype = tb.evTerm();
-                specifiedCaller = selfVar;
-                specifiedCallee = list.getCommunicationPartner().getTerm();
+                if (list.getDirection() == Lowlist.Direction.OUT){
+                    specifiedCaller = tb.getEnvironmentCaller();
+                    specifiedCallee = selfVar;
+                } else {
+                    specifiedCaller = selfVar;
+                    specifiedCallee = list.getCommunicationPartner().getTerm();
+                } 
             }
 
             Term updateHeap = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1));
@@ -181,12 +191,22 @@ public class EventEquivalenceWithIsoFactory
             Term specifiedCallee;
             if (list.getCallType() == Lowlist.MessageType.CALL) {
                 specifiedCalltype = tb.evCall();
-                specifiedCaller = tb.getEnvironmentCaller();
-                specifiedCallee = selfVar; //TODO JK is this a proper self var for this purpose?
+                if (list.getDirection() == Lowlist.Direction.IN){
+                    specifiedCaller = tb.getEnvironmentCaller();
+                    specifiedCallee = selfVar;
+                } else {
+                    specifiedCaller = selfVar;
+                    specifiedCallee = list.getCommunicationPartner().getTerm();
+                } 
             } else {
                 specifiedCalltype = tb.evTerm();
-                specifiedCaller = selfVar;
-                specifiedCallee = list.getCommunicationPartner().getTerm();
+                if (list.getDirection() == Lowlist.Direction.OUT){
+                    specifiedCaller = tb.getEnvironmentCaller();
+                    specifiedCallee = selfVar;
+                } else {
+                    specifiedCaller = selfVar;
+                    specifiedCallee = list.getCommunicationPartner().getTerm();
+                } 
             }
 
             Term updateHeap = tb.parallel(tb.elementary(tb.getBaseHeap(), heap1));

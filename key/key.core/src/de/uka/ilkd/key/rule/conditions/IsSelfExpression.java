@@ -19,7 +19,7 @@ public class IsSelfExpression extends VariableConditionAdapter {
     
     @Override
     public boolean check(SchemaVariable var, SVSubstitute instCandidate,
-            SVInstantiations instMap, Services services) {    
+            SVInstantiations instMap, Services services) {   
         Object selfInst;
         Object checkInst;
         
@@ -33,9 +33,11 @@ public class IsSelfExpression extends VariableConditionAdapter {
             //Called with another schema var than the ones needed. Therefore, check if the others are instantiated.
             checkInst = instMap.getInstantiation(this.checkExpr);
             selfInst = instMap.getInstantiation(this.selfExpr);
-            assert(checkInst != null && selfInst != null);
         } 
-            
+        
+        if(checkInst == null || selfInst == null) {
+            return true;
+        }
         return checkHelper(checkInst, selfInst, services);
     }
    

@@ -911,9 +911,14 @@ public final class UseOperationContractRule implements BuiltInRule {
 			services.getNamespaces().functions().addSafely(callevent_o);
 			Function termevent_o = new Function(new Name(tb.newName("otherTermEvent")), services.getTypeConverter().getServiceEventLDT().eventSort(), true);
 			services.getNamespaces().functions().addSafely(termevent_o);
-			Function isoObject = new Function(new Name(tb.newName("isoObject_" + pm.getName())), 
-					(Sort) services.getNamespaces().sorts().lookup("any"),
-					(Sort) services.getNamespaces().sorts().lookup("any")); // TODO KD -hacky- works?
+
+			Term isoMap = tb.createDeserialMap(pm.getName());
+
+			//TODO: SG: remove
+			//Function isoObject = new Function(new Name(tb.newName("isoObject_" + pm.getName())), 
+			//		(Sort) services.getNamespaces().sorts().lookup("any"),
+			//		(Sort) services.getNamespaces().sorts().lookup("any")); // TODO KD -hacky- works?
+
 			w = tb.parallel(
 					tb.elementary(bean, contractSelf),
 					tb.elementary(callingComp, bean));
@@ -936,7 +941,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 			if (contractResult != null) {
 				r_o = new Function(new Name(tb.newName("r_o")), contractResult.sort(), true);
 				services.getNamespaces().functions().addSafely(r_o);
-				u_post = tb.parallel(u_post, tb.elementary(contractResult, tb.cast(contractResult.sort(), tb.func(isoObject,tb.func(r_o)))));
+				//u_post = tb.parallel(u_post, tb.elementary(contractResult, tb.cast(contractResult.sort(), tb.func(isoObject,tb.func(r_o)))));
+				u_post = tb.parallel(u_post, tb.elementary(contractResult, tb.cast(contractResult.sort(), tb.deserialMap(isoMap, tb.func(r_o)))));
 				resultSeq = tb.seqSingleton(contractResult);
 				resultSeq_o = tb.seqSingleton(tb.func(r_o));
 			} else {
@@ -964,8 +970,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 					tb.equals(tb.func(callevent_o), tb.evConst(tb.evCall(), callingComp, contractSelf, m_id, tb.seq(contractParams), tb.func(heap_opre))),
 					tb.transfresh(contractParams, tb.func(heap_opre), tb.func(heap_o)),
 					tb.apply(u_o, tb.inv(contractSelf)));
-			LogicVariable y = new LogicVariable(new Name("y"), (Sort) services.getNamespaces().sorts().lookup("any")); // TODO KD -hacky- lookup of sort
-			LogicVariable z = new LogicVariable(new Name("z"), (Sort) services.getNamespaces().sorts().lookup("any"));
+			//LogicVariable y = new LogicVariable(new Name("y"), (Sort) services.getNamespaces().sorts().lookup("any")); // TODO KD -hacky- lookup of sort
+			//LogicVariable z = new LogicVariable(new Name("z"), (Sort) services.getNamespaces().sorts().lookup("any"));
 			postKnowledge = tb.and(
 					tb.wellFormed(tb.func(heap_opre)),
 					tb.wellFormed(tb.func(heap_opost)),
@@ -973,20 +979,23 @@ public final class UseOperationContractRule implements BuiltInRule {
 					tb.wellFormed(tb.func(h_2)),
 					tb.wellFormedHist(tb.func(hist_o)),
 					tb.equals(tb.func(heap_opre), tb.heapjoin(baseHeapTerm, tb.func(heap_o), tb.seq(contractParams), contractSelf)),
-					tb.equals(tb.func(heap_opost), tb.anon(tb.func(heap_opre), mods.get(baseHeap), tb.func(h_1))),
+					//Do not use this anonymization. It confuses the prover. Plus: there is no need for it.
+					//tb.equals(tb.func(heap_opost), tb.anon(tb.func(heap_opre), mods.get(baseHeap), tb.func(h_1))),
 					tb.equals(tb.func(hist_opost), tb.seqConcat(tb.func(hist_o), tb.seqSingleton(tb.func(callevent_o)), tb.func(hist_olocal), tb.seqSingleton(tb.func(termevent_o)))),
 					tb.equals(tb.func(heap_post), tb.anon(baseHeapTerm, tb.empty(), tb.func(h_2))),
 					tb.equals(tb.func(callevent), tb.evConst(tb.evCall(), bean, contractSelf, m_id, tb.seq(contractParams), baseHeapTerm)),
 					tb.equals(tb.func(termevent), tb.evConst(tb.evTerm(), bean, contractSelf, m_id, resultSeq, tb.func(heap_post))),
 					tb.equals(tb.func(callevent_o), tb.evConst(tb.evCall(), bean, contractSelf, m_id, tb.seq(contractParams), tb.func(heap_opre))),
 					tb.equals(tb.func(termevent_o), tb.evConst(tb.evTerm(), bean, contractSelf, m_id, resultSeq_o, tb.func(heap_opost))),
-					tb.all(y, tb.all(z, tb./*equiv*/equals(tb.equals(tb.var(y), tb.var(z)), tb.equals(tb.func(isoObject,tb.var(y)), tb.func(isoObject,tb.var(z)))))),
-					tb.equals(tb.func(isoObject,tb.NULL()), tb.NULL()),
+					//tb.all(y, tb.all(z, tb./*equiv*/equals(tb.equals(tb.var(y), tb.var(z)), tb.equals(tb.func(isoObject,tb.var(y)), tb.func(isoObject,tb.var(z)))))),
+					//tb.equals(tb.func(isoObject,tb.NULL()), tb.NULL()),
 					tb.apply(u_opost, post));
 			if (contractResult != null) {
 				postKnowledge = tb.and(postKnowledge,
 						tb.transfresh(contractResult, tb.func(heap_post), baseHeapTerm),
-						tb.isIso(contractResult, tb.func(heap_post), tb.func(isoObject, tb.func(r_o)), tb.func(heap_opost)));
+						tb.deserialEquiv(isoMap, tb.cast(Sort.ANY, contractResult), tb.func(heap_post), tb.cast(Sort.ANY, tb.func(r_o)), tb.func(heap_opost)),
+						tb.equals(contractResult, tb.deserialMap(isoMap, tb.func(r_o))));
+						//tb.isIso(contractResult, tb.func(heap_post), tb.func(isoObject, tb.func(r_o)), tb.func(heap_opost)));
 			}
 		// if called method does not belong to a business remote interface add unknown changes to history
 		} else {
@@ -1005,12 +1014,16 @@ public final class UseOperationContractRule implements BuiltInRule {
 		final Term freeExcPost = inst.pm.isConstructor()
 				? freePost
 				: tb.tt();
-		final Term postAssumption
-				= tb.applySequential(new Term[]{inst.u, atPreUpdates},
-				tb.and(anonAssumption,
-				tb.apply(anonUpdate,
-				tb.and(excNull, freePost, post),
-				null)));
+
+        final Term postAssumption
+              = tb.applySequential(new Term[]{inst.u, atPreUpdates},
+              tb.and(anonAssumption,
+              tb.apply(anonUpdate,
+              tb.and(excNull, freePost, post),
+                  null)));
+
+
+				
 		final Term excPostAssumption
 				= tb.applySequential(new Term[]{inst.u, atPreUpdates},
 				tb.and(anonAssumption,
@@ -1106,9 +1119,15 @@ public final class UseOperationContractRule implements BuiltInRule {
 				false);
 		postGoal.changeFormula(new SequentFormula(tb.apply(inst.u, normalPost, null)),
 				ruleApp.posInOccurrence());
-		postGoal.addFormula(new SequentFormula(postAssumption),
-				true,
-				false);
+		//The method call case adds this formula encoding the postcondition.
+		//In the remote method call case, the postcondition is encoded in the formula above as an implication,
+		// and it differs fundamentally.
+		//We therefore do not need this formula, if the called method is a remote method.
+		if (!pm.getMethodDeclaration().isRemote()) {  
+		    postGoal.addFormula(new SequentFormula(postAssumption),
+			  	  true,
+				  false);
+		}
 
 		applyInfFlow(postGoal, contract, inst, contractSelf, contractParams, contractResult,
 				tb.var(excVar), mby, atPreUpdates,finalPreTerm, anonUpdateDatas, services);

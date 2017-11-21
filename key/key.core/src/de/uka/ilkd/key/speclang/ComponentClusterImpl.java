@@ -25,10 +25,11 @@ public class ComponentClusterImpl extends AbstractDependencyClusterSpec implemen
     private final ImmutableList<Lowlist> lowOut;
     private final ImmutableList<Term> lowState;   
     private final ImmutableList<VisibilityCondition> visible;
+    private final Term specSelf;
 
-    
+    //specSelf refers to the self used in lowIn and is needed because this specification might be used in contexts with a different default self variable
     public ComponentClusterImpl(KeYJavaType forClass, ImmutableList<Lowlist> lowIn, ImmutableList<Lowlist> lowOut, 
-            ImmutableList<Term> lowState, ImmutableList<VisibilityCondition> visible, String label, Services services) {
+            ImmutableList<Term> lowState, ImmutableList<VisibilityCondition> visible, Term specSelf, String label, Services services) {
         super(label, services);
             this.forClass = forClass;
             
@@ -36,6 +37,7 @@ public class ComponentClusterImpl extends AbstractDependencyClusterSpec implemen
             this.lowOut = lowOut;
             this.lowState = lowState;
             this.visible = visible;
+            this.specSelf = specSelf;
             this.label = label;
     }
     
@@ -90,11 +92,11 @@ public class ComponentClusterImpl extends AbstractDependencyClusterSpec implemen
     }
 
     @Override
-    public ImmutableList<RewriteTaclet> getTaclets(Term self, InitConfig config) {
+    public ImmutableList<RewriteTaclet> getTaclets(Term contractSelf, InitConfig config) {
         Services services = config.getServices();
-        EventEquivalenceWithEqFactory eqFactory = new EventEquivalenceWithEqFactory(this, self, services, getEquivEventEqPredicate(), getVisibilityPredicate(), label);
-        EventEquivalenceWithIsoFactory isoFactory = new EventEquivalenceWithIsoFactory(this, services, self, getEquivEventIsoPredicate(), getVisibilityPredicate(), label);
-        AgreeTacletFactory agreeFactory = new AgreeTacletFactory(getLowState(), services, label, getAgreePrePredicate(), getAgreePostPredicate());
+        EventEquivalenceWithEqFactory eqFactory = new EventEquivalenceWithEqFactory(this, contractSelf, services, getEquivEventEqPredicate(), getVisibilityPredicate(), label);
+        EventEquivalenceWithIsoFactory isoFactory = new EventEquivalenceWithIsoFactory(this, services, contractSelf, getEquivEventIsoPredicate(), getVisibilityPredicate(), label);
+        AgreeTacletFactory agreeFactory = new AgreeTacletFactory(getLowState(), contractSelf, specSelf, services, label, getAgreePrePredicate(), getAgreePostPredicate());
         
         ImmutableList<RewriteTaclet> taclets = ImmutableSLList.<RewriteTaclet>nil();
         

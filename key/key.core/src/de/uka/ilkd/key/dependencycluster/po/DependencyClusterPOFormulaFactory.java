@@ -11,12 +11,15 @@ import de.uka.ilkd.key.informationflow.po.snippet.POSnippetFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.Method;
 import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.ldt.ServiceEventLDT;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.DependencyClusterContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -156,11 +159,42 @@ public class DependencyClusterPOFormulaFactory {
     public Term remoteBeanEquality() {
         //TODO JK do proper cast precautions
         ClassDeclaration classDecl = (ClassDeclaration)services.getJavaInfo().getTypeDeclaration(contract.getKJT().getFullName());
-        ImmutableList<Field> fields = services.getJavaInfo().getAllFields(classDecl);  
+        ImmutableList<Field> fields = services.getJavaInfo().getAllFields(classDecl); 
+        ImmutableList<Term> fieldEqs = ImmutableSLList.<Term>nil();
+
         for (Field field: fields) {
-            //System.out.println(field);
+            if (!(field.getType() instanceof KeYJavaType)) {
+                continue;
+            }
+            KeYJavaType fieldKeYJavaType = (KeYJavaType)field.getType();
+
+
+            ImmutableList<IProgramMethod> methods = services.getJavaInfo().getAllProgramMethods(fieldKeYJavaType);
+            
+            for (IProgramMethod method: methods) {
+                if (method.getMethodDeclaration().isRemote()) {
+                    if (!(field.getProgramVariable() instanceof LocationVariable)) {
+                        //TODO JK what do we do if that doesn't work?
+                        System.out.println("crap.");
+                    }
+                    LocationVariable fieldVar = (LocationVariable)field.getProgramVariable();
+                    
+                    //Term fieldTerm = tb.var(fieldVar);
+
+                    Term fieldA = tb.select(fieldKeYJavaType.getSort(), a.heapAtPre(), a.selfAtPre(), fieldVar);
+                    Term fieldB = tb.select(fieldKeYJavaType.getSort(), b.heapAtPre(), b.selfAtPre(), fieldVar);
+                    
+                    fieldEqs = fieldEqs.prepend(tb.equals(fieldA, fieldB));
+                    break;
+                }
+            }
+            //TODO JK the nice  way would be this:
+            //services.getJavaInfo().getTypeDeclaration(field.getType().getFullName()).getAnnotations usw.
+            //but we apparently can't get the annotations from Class or Interface declarations (until Karsten does something about that)           
         }
-        return tb.tt();
+        
+
+        return tb.and(fieldEqs);
     }
     
     public Term preStateEquivalence() {

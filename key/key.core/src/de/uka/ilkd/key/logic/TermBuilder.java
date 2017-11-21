@@ -2471,4 +2471,27 @@ public class TermBuilder {
                                 heap1_pre, heap1_post, locset1, heap2_pre, heap2_post, locset2);
     }
     
+    //---------------------------------------------------------------------------------
+    // deserialization expressions
+    //---------------------------------------------------------------------------------
+    
+    /**
+     * Get the Term which encodes the mapping of the deserialization map
+     * @param deserialmap: the deserialization map
+     * @param value: the value in the sending heap
+     * @return the function expressing the value in the receiving heap. 
+     */
+    public Term deserialMap(Term deserialmap, Term value) {
+        return tf.createTerm(services.getTypeConverter().getServiceEventLDT().deserialfunction(), deserialmap, value);
+    }
+    
+    public Term deserialEquiv(Term deserialmap, Term receivingVal, Term receivingHeap, Term sendingVal, Term sendingHeap){
+        return tf.createTerm(services.getTypeConverter().getServiceEventLDT().deserialeqiv(), deserialmap, receivingVal, receivingHeap, sendingVal, sendingHeap);
+    }
+    
+    public Term createDeserialMap(String id) {
+        return func(new Function(new Name(newName("deserialMap_" + id)), services.getTypeConverter().getServiceEventLDT().deserialmapSort()));
+    }
+    
+    
 }
