@@ -229,7 +229,7 @@ public class ProofRunnable implements Runnable {
         else {
            strategyProperties = proof.getSettings().getStrategySettings().getActiveStrategyProperties(); 
         }
-        strategyProperties.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_NONCLOSE);
+        strategyProperties.setProperty(StrategyProperties.STOPMODE_OPTIONS_KEY, StrategyProperties.STOPMODE_DEFAULT);
         proof.getSettings().getStrategySettings().setActiveStrategyProperties(strategyProperties);
         // Run auto mode
         ProofStarter ps = new ProofStarter(false);
