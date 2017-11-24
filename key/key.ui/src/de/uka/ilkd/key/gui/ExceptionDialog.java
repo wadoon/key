@@ -72,6 +72,7 @@ public class ExceptionDialog extends JDialog {
         }
 
     private ExceptionDialog(Window parent, Throwable exception) {
+        // TODO Really "PARSER" Messages?
         super(parent, "Parser Messages", Dialog.ModalityType.DOCUMENT_MODAL);
         this.exception = exception;
         this.location = ExceptionTools.getLocation(exception);

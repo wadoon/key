@@ -1,7 +1,7 @@
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Desktop;
 import java.awt.Dialog;
 import java.awt.FlowLayout;
 import java.awt.Window;
@@ -10,12 +10,16 @@ import java.awt.event.ActionListener;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.URI;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,6 +27,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.swing.AbstractAction;
+import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -59,6 +64,14 @@ public class SendFeedbackAction extends AbstractAction {
      * This is the email address to which feedback will be sent.
      */
     private static final String FEEDBACK_RECIPIENT = "feedback@key-project.org";
+
+    private static final String SERVER = "www.key-project.org";
+    private static final String REPORT_URL = "http://" + SERVER + "/feedback";
+
+    private static final String INITIAL_TEXT =
+            "Please describe the error you experienced here.\n" +
+            "If you want, add your NAME AND E-MAIL to allow us to come back to you.\n" +
+            "You can also contact us via e-Mail under " + FEEDBACK_RECIPIENT + ".";
 
     private static String serializeStackTrace(Throwable t) {
         StringWriter sw = new StringWriter();
@@ -327,10 +340,6 @@ public class SendFeedbackAction extends AbstractAction {
     }
 
     private class SendAction implements ActionListener {
-        private static final String MAIL_BODY =
-                "Please attach the file %s with the chosen metadata to this mail and send it.%%0a%%0a" +
-                "Thanks for your feedack, %%0athe KeY team";
-
         JDialog dialog;
         JTextArea message;
 
@@ -342,38 +351,51 @@ public class SendFeedbackAction extends AbstractAction {
         @Override
         public void actionPerformed(ActionEvent arg0) {
 
+            File reportFile = null;
+            HttpURLConnection connection = null;
             try {
-                File reportFile = File.createTempFile("key-bugreport", ".zip");
+                reportFile = File.createTempFile("key-bugreport", ".zip");
+                saveMetaDataToFile(reportFile, message.getText());
 
                 int confirmed = JOptionPane.showConfirmDialog(
                         parent,
-                        "A zip archive containing the selected data will be created.\n"
-                                + "A new e-mail client window will open.\n"
-                                + "Please attach the file " + reportFile +
-                                " to the mail and send it.", "Send Bug Report",
-                                JOptionPane.OK_CANCEL_OPTION);
+                          "A zip archive containing the data you selected has been created as "
+                        + reportFile.getAbsolutePath() + ".\n\n"
+                        + "This file will now be reported to our server " + SERVER + ".",
+                        "Send Bug Report",
+                        JOptionPane.OK_CANCEL_OPTION);
 
                 if (confirmed == JOptionPane.OK_OPTION) {
-                    saveMetaDataToFile(reportFile, message.getText());
-                    if (Desktop.isDesktopSupported()) {
-                        Desktop desktop = Desktop.getDesktop();
-                        URI uriMailTo = new URI("mailto:" + FEEDBACK_RECIPIENT + "?" +
-                                "subject=KeY%20feedback&body=" +
-                                String.format(MAIL_BODY, reportFile).replace(" ", "%20"));
-                        desktop.mail(uriMailTo);
-                    } else {
-                        JOptionPane.showMessageDialog(parent,
-                                "A mail window cannot be automatically opened on your system.\n"+
-                                "Please send the file " + reportFile + " to address " +
-                                FEEDBACK_RECIPIENT);
-                    }
+                    URL url = new URL(REPORT_URL);
+                    url = new URL("https://formal.iti.kit.edu/ulbrich/key-feedback.php"); // FIXME
+                    connection = (HttpURLConnection) url.openConnection();
+                    connection.setDoOutput(true);
+                    connection.setRequestMethod("POST");
+                    connection.connect();
+                    // TODO these streams might not be closed.
+                    OutputStream outputStream = connection.getOutputStream();
+                    drain(new FileInputStream(reportFile), outputStream);
+                    outputStream.close();
+
+                    System.out.println(connection.getResponseCode());
+                    System.out.println(connection.getResponseMessage());
+                    drain(connection.getInputStream(), System.out);
+
+                    JOptionPane.showMessageDialog(parent,
+                            "Thanks for your feedback. If you have provided an email address,\n"
+                            + "we will soon get in contact with you.");
                 }
             } catch (Exception e) {
                 ExceptionDialog.showDialog(parent, e);
+            } finally {
+                if (reportFile != null) {
+                    reportFile.delete();
+                }
             }
 
             dialog.dispose();
         }
+
     }
 
     private void saveMetaDataToFile(File zipFile, String message) throws IOException {
@@ -433,6 +455,7 @@ public class SendFeedbackAction extends AbstractAction {
         dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
 
         JPanel right = new JPanel();
+        right.setBorder(BorderFactory.createTitledBorder("Report items:"));
         right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
         for (SendFeedbackItem item : items) {
             JCheckBox box = new JCheckBox(item.displayName);
@@ -447,16 +470,17 @@ public class SendFeedbackAction extends AbstractAction {
         }
 
         final JTextArea bugDescription = new JTextArea(20, 50);
+        bugDescription.setText(INITIAL_TEXT);
         bugDescription.setLineWrap(true);
         bugDescription.setBorder(new TitledBorder("Message to Developers"));
         JScrollPane left = new JScrollPane(bugDescription);
         left.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         left.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-        JPanel topPanel = new JPanel();
-        topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.X_AXIS));
-        topPanel.add(left);
-        topPanel.add(right);
+        Container topPanel = dialog.getContentPane();
+        topPanel.setLayout(new BorderLayout());
+        topPanel.add(left, BorderLayout.CENTER);
+        topPanel.add(right, BorderLayout.EAST);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
@@ -475,10 +499,7 @@ public class SendFeedbackAction extends AbstractAction {
         buttonPanel.add(sendFeedbackReportButton);
         buttonPanel.add(cancelButton);
 
-        Container container = dialog.getContentPane();
-        container.setLayout(new BoxLayout(container, BoxLayout.Y_AXIS));
-        container.add(topPanel);
-        container.add(buttonPanel);
+        topPanel.add(buttonPanel, BorderLayout.SOUTH);
 
         dialog.pack();
 
@@ -490,5 +511,14 @@ public class SendFeedbackAction extends AbstractAction {
         JDialog dialog = makeDialog();
         dialog.setLocationRelativeTo(parent);
         dialog.setVisible(true);
+    }
+
+    private static void drain(InputStream in, OutputStream out) throws IOException {
+        // TODO should be centralised somewhere
+        byte[] data = new byte[65536];
+        int read;
+        while((read = in.read(data)) >= 0) {
+            out.write(data, 0, read);
+        }
     }
 }
