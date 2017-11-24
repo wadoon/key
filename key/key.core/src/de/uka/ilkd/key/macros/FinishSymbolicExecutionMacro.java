@@ -61,7 +61,7 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
     @Override
     public String getDescription() {
-        return "Continue automatic strategy application until no more modality is on the sequent.";
+        return "Continue automatic strategy application until there is no modality on the sequent.";
     }
 
     /*

@@ -29,13 +29,13 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
@@ -43,16 +43,8 @@ import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
-    private static final String[] ADMITTED_RULES = {
-        "orRight", "impRight", "close", "andRight"
-    };
-
-    private static final Set<String> ADMITTED_RULES_SET = asSet(ADMITTED_RULES);
-
-    private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("notHumanReadable");
-
     public AutoPilotPrepareProofMacro() { super(); }
-    
+
     @Override
     public String getName() {
         return "Auto pilot (preparation only)";
@@ -113,24 +105,17 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         return false;
     }
 
-    /*
-     * Checks if a rule is marked as not suited for interaction.
-     */
-    private static boolean isNonHumanInteractionTagged(Rule rule) {
-        return isInRuleSet(rule, NON_HUMAN_INTERACTION_RULESET);
-    }
-
     private static boolean isInRuleSet(Rule rule, Name ruleSetName) {
         if (rule instanceof Taclet) {
             Taclet taclet = (Taclet) rule;
             for (RuleSet rs : taclet.getRuleSets()) {
-                if (ruleSetName.equals(rs.name())) 
+                if (ruleSetName.equals(rs.name()))
                     return true;
             }
         }
         return false;
     }
-    
+
     private static class AutoPilotStrategy implements Strategy {
 
         private static final Name NAME = new Name("Autopilot filter strategy");
@@ -165,26 +150,22 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
 
             Rule rule = app.rule();
-            if(isNonHumanInteractionTagged(rule)) {
-                return TopRuleAppCost.INSTANCE;
-            }
 
-            if(hasModality(goal.node())) {
+            if(NodeInfo.isSymbolicExecutionRuleApplied(app)
+                    || isInRuleSet(rule, new Name("alpha"))) {
                 return delegate.computeCost(app, pio, goal);
             }
 
-            String name = rule.name().toString();
-            if(ADMITTED_RULES_SET.contains(name)) {
-                return NumberRuleAppCost.getZeroCost();
-            }
-            
             // apply OSS to <inv>() calls.
             if(rule instanceof OneStepSimplifier) {
                 Term target = pio.subTerm();
+                if(hasModality(target)) {
+                    return delegate.computeCost(app, pio, goal);
+                }
                 if(target.op() instanceof UpdateApplication) {
                     Operator updatedOp = target.sub(1).op();
                     if(updatedOp instanceof ObserverFunction) {
-                        return NumberRuleAppCost.getZeroCost();
+                        return delegate.computeCost(app, pio, goal);
                     }
                 }
             }
