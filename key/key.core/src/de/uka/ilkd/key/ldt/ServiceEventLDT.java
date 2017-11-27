@@ -29,6 +29,10 @@ public class ServiceEventLDT extends LDT {
 	public static final Name DESERIALMAP_NAME = new Name("DeserialMap");
 	public static final Name DESERIALFUNC_NAME = new Name("deserial");
 	public static final Name DESERIALEQUIV_NAME = new Name("deserialEquiv");
+	
+	public static final Name HISTCALLABLE_NAME = new Name("histCallable");
+	public static final Name EVISCALLABLE_NAME = new Name("evIsCallable");
+	public static final Name CALLELEMENT_NAME = new Name("callElement"); 
 
 	private final Function event;
 	private final Function evType;
@@ -42,6 +46,10 @@ public class ServiceEventLDT extends LDT {
 	private final Function similarHist;
 	private final Function similarEvent;
 	private final Function similar;
+	
+	private final Function histcallable;
+	private final Function eviscallable;
+	private final Function callelement;
 
 	private final Function wellformedList;
 	private final Function wellformedListCoop;
@@ -109,6 +117,10 @@ public class ServiceEventLDT extends LDT {
         agreeBasic = addFunction(services, "agreeBasic");
         isCallable = addFunction(services, "isCallable");
         
+        histcallable = addFunction(services, HISTCALLABLE_NAME.toString());
+        eviscallable = addFunction(services, EVISCALLABLE_NAME.toString());
+        callelement = addFunction(services, CALLELEMENT_NAME.toString());
+        
         deserialfunc = addFunction(services, DESERIALFUNC_NAME.toString());
         deserialequiv = addFunction(services, DESERIALEQUIV_NAME.toString());
 
@@ -140,6 +152,18 @@ public class ServiceEventLDT extends LDT {
 	
 	public Sort deserialmapSort() {
 	    return deserialMapSort;
+	}
+	
+	public Function evCallable() {
+	    return this.eviscallable ;
+	}
+	
+	public Function histCallable() {
+	    return this.histcallable;
+	}
+	
+	public Function callebleElement() {
+	    return this.callelement;
 	}
 	
 	public Function deserialfunction() {

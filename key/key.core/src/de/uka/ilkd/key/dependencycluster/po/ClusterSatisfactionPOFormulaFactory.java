@@ -93,8 +93,10 @@ public class ClusterSatisfactionPOFormulaFactory {
     }
     
     public Term localImplGlobalState() {
-        return tb.imp(tb.and(tb.func(globalSpec.getAgreePostPredicate(), a.heap, b.heap), tb.func(localSpec.getAgreePostPredicate(), a.heap2, b.heap2)), 
-                tb.func(globalSpec.getAgreePostPredicate(), a.heapPost, b.heapPost));
+        //return tb.imp(tb.and(tb.func(globalSpec.getAgreePostPredicate(), a.heap, b.heap), tb.func(localSpec.getAgreePostPredicate(), a.heap2, b.heap2)), 
+        //        tb.func(globalSpec.getAgreePostPredicate(), a.heapPost, b.heapPost));
+        return tb.imp(tb.and(tb.func(globalSpec.getAgreePrePredicate(), a.heap, b.heap), tb.func(localSpec.getAgreePrePredicate(), a.heapPost, b.heapPost)), 
+                tb.func(globalSpec.getAgreePrePredicate(), a.heapPost, b.heapPost));
     }
     
     public Term consequence() {

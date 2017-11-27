@@ -307,7 +307,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				boolean makeNamesUnique = isMakeNamesUnique();
 				final ImmutableList<ProgramVariable> paramVars =
 						tb.paramVars(pm, makeNamesUnique);
-				final ProgramVariable selfVar =
+				final ProgramVariable selfVar = 
 						tb.selfVar(pm, getCalleeKeYJavaType(), makeNamesUnique);
 				final ProgramVariable resultVar =
 						tb.resultVar(pm, makeNamesUnique);
@@ -473,7 +473,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
 					post = tb.apply(tb.elementary(tb.var(hist), tb.seqConcat(tb.var(hist), tb.seqSingleton(termevent))),
 							tb.and(post, // includes frame
-									calls(hist_local, atPres.get(baseHeap), proofServices),
+									calls(hist_local, atPres.get(baseHeap), selfVarTerm, proofServices),
 									tb.wellFormedHist(hist)));
 									// TODO KD -bug?- "exc == NULL" should be included in post
 				}
@@ -500,7 +500,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 	}
 
 	// TODO KD -hacky- should be abstract (not worse then the others though)
-	protected /*abstract*/ Term calls(Term hist_local, Term heap_pre, Services services) {
+	protected /*abstract*/ Term calls(Term hist_local, Term heap_pre, Term selfVar, Services services) {
 		assert false;
 		throw new UnsupportedOperationException("Only FunctionalOperationContracts should have a calls set");
 	}

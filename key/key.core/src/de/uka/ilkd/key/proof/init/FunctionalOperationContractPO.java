@@ -397,23 +397,48 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     }
 
 	@Override
-	protected Term calls(Term hist_local, Term heap_pre, Services services) { // TODO KD -ask simon- fehlt nicht calls zeug bei der contract anwendung?
+	protected Term calls(Term hist_local, Term heap_pre, Term selfVar, Services services) { // TODO KD -ask simon- fehlt nicht calls zeug bei der contract anwendung?
 		CallableSpec callable = contract.getCallable();
 		if (!callable.restrictsCalls()) {
 			return tb.tt();
 		}
 		ImmutableList<CallableServSpec> callableServs = callable.getCallableServices();
 		Sort eventSort = services.getTypeConverter().getServiceEventLDT().eventSort();
-		LogicVariable i = new LogicVariable(new Name("i"), services.getTypeConverter().getIntegerLDT().targetSort());
+		//Build a sequence out of the callables in the contract
+		Term callableSeq = null;
+		if (callableServs.isEmpty()) {
+		    callableSeq = tb.seqEmpty();
+		} else {
+		    for (CallableServSpec cs : callableServs) {
+		        Term meth = tb.func(services.getTypeConverter().getServiceEventLDT().getMethodIdentifier(cs.getService().getMethodDeclaration(), services));
+		        Term selfupd = tb.parallel(tb.elementary(tb.getBaseHeap(), heap_pre), tb.elementary(contract.getSelf(), selfVar));
+		        Term ce = tb.seqSingleton(tb.callElement(tb.apply(selfupd, cs.getClient()), meth));
+		        if (callableSeq == null) {
+		            callableSeq = ce;
+		        } else {
+		            callableSeq = tb.seqConcat(ce, callableSeq);
+		        }
+		    }
+		    //add the updates for the sequence necessary due to different selfs
+		    Term update = tb.elementary(tb.getBaseHeap(), heap_pre);
+		    callableSeq = tb.apply(update, callableSeq);
+		}
+		callableSeq = tb.histCallable(hist_local, callableSeq);
+		
+		return callableSeq;
+		//Old version using forall. Keep it for the moment.
+		/*LogicVariable i = new LogicVariable(new Name("i"), services.getTypeConverter().getIntegerLDT().targetSort());
 		Term update = tb.elementary(tb.getBaseHeap(), heap_pre);
 		Term isCallable = tb.ff();
 		for (CallableServSpec serv : callableServs) {
 			Function m_id = services.getTypeConverter().getServiceEventLDT().getMethodIdentifier(serv.getService().getMethodDeclaration(), services);
+			Term contractself = contract.getSelf();
 			isCallable = tb.or(isCallable, tb.and(
 					tb.equals(tb.evGetMethod(tb.seqGet(eventSort, hist_local, tb.var(i))), tb.func(m_id)),
-					tb.apply(update, tb.equals(tb.evGetCallee(tb.seqGet(eventSort, hist_local, tb.var(i))), serv.getClient()))));
+					tb.apply(update, tb.equals(tb.evGetCallee(tb.seqGet(eventSort, hist_local, tb.var(i))), 
+					        tb.apply(tb.elementary(contractself, selfVar), serv.getClient())))));
 		} // TODO -ask simon- formula in theorie correct?
 		Term iInRange = tb.and(tb.leq(tb.zero(), tb.var(i)), tb.lt(tb.var(i), tb.seqLen(hist_local)));
-		return tb.all(i, tb.imp(iInRange, isCallable));
+		return tb.all(i, tb.imp(iInRange, isCallable));*/
 	}
 }

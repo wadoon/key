@@ -20,26 +20,26 @@ public class IsPExpression extends VariableConditionAdapter {
     @Override
     public boolean check(SchemaVariable var, SVSubstitute instCandidate,
             SVInstantiations instMap, Services services) {    
-        Object selfInst;
+        Object seqInst;
         Object checkInst;
         
         if (var == this.checkExpr) {            
             checkInst = instCandidate;
-            selfInst = instMap.getInstantiation(this.pseqExpr);
+            seqInst = instMap.getInstantiation(this.pseqExpr);
         } else if (var == this.pseqExpr){            
             checkInst = instMap.getInstantiation(this.checkExpr);
-            selfInst = instCandidate;
+            seqInst = instCandidate;
         } else {
             //Called with another schema var than the ones needed. Therefore, check if the others are instantiated.
             checkInst = instMap.getInstantiation(this.checkExpr);
-            selfInst = instMap.getInstantiation(this.pseqExpr);
+            seqInst = instMap.getInstantiation(this.pseqExpr);
         } 
         
-        if (selfInst == null || checkInst == null) {
+        if (seqInst == null || checkInst == null) {
             return true;
         }
         
-        return checkHelper(checkInst, selfInst, services);
+        return checkHelper(checkInst, seqInst, services);
     }
     
     
@@ -47,7 +47,8 @@ public class IsPExpression extends VariableConditionAdapter {
         if (pseq instanceof Term && check instanceof Term) {
             Term pseqterm = (Term) pseq; 
             if (pseqterm.sort().equals(services.getTypeConverter().getSeqLDT().targetSort())) {
-               return checkHelperSeq((Term)check, pseqterm, services);
+                boolean res = checkHelperSeq((Term)check, pseqterm, services);            
+               return res;               
             } else {
                 return false;
             }
@@ -56,7 +57,7 @@ public class IsPExpression extends VariableConditionAdapter {
         }
     }
    
-    private boolean checkHelperSeq(Term check, Term paramseq, Services services) {
+    private boolean checkHelperSeq(Term check, Term paramseq, Services services) {       
         if (paramseq.op().equals(services.getTypeConverter().getSeqLDT().getSeqConcat())) {
             //parameters are a concatenation. check for all subterms recursively
             return checkHelperSeq(check, paramseq.sub(0), services) || checkHelperSeq(check, paramseq.sub(1), services);
@@ -67,7 +68,7 @@ public class IsPExpression extends VariableConditionAdapter {
         }
     }
     
-    private boolean checkHelperTerm(Term check, Term param, Services services) {
+    private boolean checkHelperTerm(Term check, Term param, Services services) {      
         if (check.equals(param)) {
             //found it
             return true;

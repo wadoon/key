@@ -2493,5 +2493,16 @@ public class TermBuilder {
         return func(new Function(new Name(newName("deserialMap_" + id)), services.getTypeConverter().getServiceEventLDT().deserialmapSort()));
     }
     
+    public Term callElement(Term o, Term m) {
+        return tf.createTerm(services.getTypeConverter().getServiceEventLDT().callebleElement() , o, m);
+    }
+    
+    public Term evIsCallable(Term ev, Term callseq) {
+        return tf.createTerm(services.getTypeConverter().getServiceEventLDT().evCallable(), ev, callseq);
+    }
+    
+    public Term histCallable(Term hist, Term callseq) {
+        return tf.createTerm(services.getTypeConverter().getServiceEventLDT().histCallable(), hist, callseq);
+    }
     
 }
