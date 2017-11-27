@@ -95,6 +95,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     final int id;
     final boolean transaction;
     final boolean toBeSaved;
+    final CallableSpec callable;
 
     /**
      * If a method is strictly pure, it has no modifies clause which could
@@ -151,7 +152,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                     Term globalDefs,
                                     int id,
                                     boolean toBeSaved,
-                                    boolean transaction, TermServices services) {
+                                    boolean transaction, TermServices services,
+                                    CallableSpec callable) {
         assert !(name == null && baseName == null);
         assert kjt != null;
         assert pm != null;
@@ -201,6 +203,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         this.id                     = id;
         this.transaction            = transaction;
         this.toBeSaved	            = toBeSaved;
+        this.callable				= callable;
     }
 
 
@@ -978,6 +981,9 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return toBeSaved;
     }
 
+    public CallableSpec getCallable() {
+    	return callable;
+    }
 
     @Override
     public String proofToString(Services services) {
@@ -1552,7 +1558,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                    newId,
                                                    toBeSaved,
                                                    transaction, 
-                                                   services);
+                                                   services,
+                                                   callable);
     }
 
 
@@ -1583,7 +1590,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                                                    globalDefs,
                                                    id,
                                                    toBeSaved && newKJT.equals(kjt),
-                                                   transaction, services);
+                                                   transaction, services,
+                                                   callable);
     }
 
 

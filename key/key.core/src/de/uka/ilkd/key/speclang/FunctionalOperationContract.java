@@ -139,5 +139,7 @@ public interface FunctionalOperationContract extends OperationContract {
     public Term getExc();
     public KeYJavaType getSpecifiedIn();
 
+    public CallableSpec getCallable();
+
     public boolean hasResultVar();
 }

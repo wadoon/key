@@ -69,7 +69,7 @@ public class ServiceEventLDT extends LDT {
 	private final LocationVariable environmentCaller;
 	private final LocationVariable currentParams;
 	private final LocationVariable activeComponent;
-	
+
     private final Function isCallable;
 
     private final Function agreePost;

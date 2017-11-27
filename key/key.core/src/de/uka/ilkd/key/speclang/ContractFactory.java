@@ -122,7 +122,8 @@ public class ContractFactory {
             foci.globalDefs,
             foci.id,
             foci.toBeSaved,
-            foci.transaction, services);
+            foci.transaction, services,
+            foci.callable);
     }
 
     /** Add the specification contained in InitiallyClause as a postcondition. */
@@ -183,7 +184,8 @@ public class ContractFactory {
                                                    foci.originalMods
                                                    .get(services.getTypeConverter()
                                                            .getHeapLDT().getSavedHeap()) != null,
-                                                   services);
+                                                   services,
+                                                   foci.callable);
     }
 
     /**
@@ -204,7 +206,8 @@ public class ContractFactory {
                                                    foci.originalSelfVar, foci.originalParamVars,
                                                    foci.originalResultVar, foci.originalExcVar,
                                                    foci.originalAtPreVars, globalDefs, foci.id,
-                                                   foci.toBeSaved,foci.transaction, services);
+                                                   foci.toBeSaved,foci.transaction, services,
+                                                   foci.callable);
     }
 
     public DependencyContract dep(KeYJavaType containerType,
@@ -374,14 +377,16 @@ public class ContractFactory {
                                              ProgramVariable resultVar,
                                              ProgramVariable excVar,
                                              Map<LocationVariable,LocationVariable> atPreVars,
-                                             boolean toBeSaved) {
+                                             boolean toBeSaved,
+                                             CallableSpec callable) {
         return new FunctionalOperationContractImpl(baseName, null, kjt, pm, pm.getContainerType(),
                                                    modality, pres, freePres, mby, posts, freePosts,
                                                    axioms, mods, accs, hasMod, selfVar, paramVars,
                                                    resultVar, excVar, atPreVars, null,
                                                    Contract.INVALID_ID, toBeSaved,
                                                    mods.get(services.getTypeConverter().getHeapLDT()
-                                                           .getSavedHeap()) != null, services);
+                                                           .getSavedHeap()) != null, services,
+                                                           callable);
     }
 
     public FunctionalOperationContract func (String baseName,
@@ -396,11 +401,13 @@ public class ContractFactory {
                                              Map<LocationVariable, Term> mods,
                                              Map<ProgramVariable, Term> accessibles,
                                              Map<LocationVariable, Boolean> hasMod,
-                                             ProgramVariableCollection pv) {
+                                             ProgramVariableCollection pv,
+                                             CallableSpec callable) {
         return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres,
                     freePres, mby, posts, freePosts, axioms,
                     mods, accessibles, hasMod, pv, false, mods.get(
-                            services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
+                            services.getTypeConverter().getHeapLDT().getSavedHeap()) != null,
+                            callable);
     }
 
 
@@ -417,7 +424,8 @@ public class ContractFactory {
                                              Map<ProgramVariable, Term> accessibles,
                                              Map<LocationVariable, Boolean> hasMod,
                                              ProgramVariableCollection progVars,
-                                             boolean toBeSaved, boolean transaction) {
+                                             boolean toBeSaved, boolean transaction,
+                                             CallableSpec callable) {
         return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm,
                                                    pm.getContainerType(), modality, pres, freePres,
                                                    mby, posts, freePosts,
@@ -425,7 +433,8 @@ public class ContractFactory {
                                                    progVars.selfVar, progVars.paramVars,
                                                    progVars.resultVar, progVars.excVar,
                                                    progVars.atPreVars, null,
-                                                   Contract.INVALID_ID, toBeSaved, transaction, services);
+                                                   Contract.INVALID_ID, toBeSaved, transaction, services,
+                                                   callable);
     }
 
     /**
@@ -663,7 +672,8 @@ public class ContractFactory {
                                                    t.globalDefs,
                                                    Contract.INVALID_ID,
                                                    t.toBeSaved,
-                                                   t.transaction, services);
+                                                   t.transaction, services,
+                                                   null); // TODO KD -not supported- callable intersection here
     }
 
 

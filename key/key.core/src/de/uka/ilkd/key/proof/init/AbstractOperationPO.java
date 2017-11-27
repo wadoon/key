@@ -294,7 +294,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 				progPost = tb.apply(saveBeforeHeaps, tb.apply(tb.elementary(tb.var(resultVar), body.sub(1)), post));
 			}
 			termPOs.add(tb.imp(pre, progPost));
-		} else {
+		} else { // -> !pm.isModel()
 			if (isTransactionApplicable()) {
 				transactionFlags = new boolean[] { false, true };
 				poNames = new String[2];
@@ -418,29 +418,21 @@ public abstract class AbstractOperationPO extends AbstractPO {
 					assert !pm.getMethodDeclaration().isStatic() : "Remote methods can per definition not be static.";
 					// TODO KD -tipp- could also check for !pm.getMethodDeclaration().isFinal() and !pm.isConstructor() (caller cannot be selfVarTerm)
 
-					Term calls = tb.tt();
-/*					for (Event e : hist_local) {
-						calls = tb.and(calls, inCallable(e));
-					}
-*/ // TODO KD  -implement- callable
 					Term m_id = tb.func(proofServices.getTypeConverter().getServiceEventLDT().getMethodIdentifier(pm.getMethodDeclaration(), proofServices));
 					Term[] a = new Term[paramVars.size()];
 					int i = 0;
 					for (ProgramVariable pv : paramVars) {
 						a[i++] = tb.var(pv);
 					}
-					Function heap_pserial = new Function(new Name(tb.newName("heap_pserial")), baseHeap.sort(), true); // TODO KD -ask simon- new function? what else?
+					Function heap_pserial = new Function(new Name(tb.newName("heap_pserial")), baseHeap.sort(), true);
 					proofServices.getNamespaces().functions().addSafely(heap_pserial);
 					Term resultTerm = (resultVar != null) ? tb.seqSingleton(tb.var(resultVar)) : tb.seqEmpty();
-					// TODO KD -ask simon- self -> activeComponent
 					Term callevent = tb.evConst(tb.evCall(), callingComp, selfVarTerm, m_id, tb.seq(a), tb.func(heap_pserial));
 					Term termevent = tb.evConst(tb.evTerm(), callingComp, selfVarTerm, m_id, resultTerm, tb.getBaseHeap());
-					Function h2 = new Function(new Name(tb.newName("h2")), baseHeap.sort(), true); // TODO KD -ask simon- new function? what else?
+					Function h2 = new Function(new Name(tb.newName("h2")), baseHeap.sort(), true);
 					proofServices.getNamespaces().functions().addSafely(h2);
-					Function h = new Function(new Name(tb.newName("h")), baseHeap.sort(), true); // TODO KD -ask simon- new function? what else?
+					Function h = new Function(new Name(tb.newName("h")), baseHeap.sort(), true);
 					proofServices.getNamespaces().functions().addSafely(h);
-					Function bean = new Function(new Name(tb.newName("bean")), selfVar.sort(), true); // TODO KD -ask simon- new function? what else?
-					proofServices.getNamespaces().functions().addSafely(bean);
 
 					LocationVariable hist_pre = new LocationVariable(new ProgramElementName (tb.newName("histBefore_" + pm.getName())), hist.sort()); // TODO KD -later- replace with /old values
 					proofServices.getNamespaces().programVariables().addSafely(hist_pre);
@@ -455,7 +447,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 							tb.wellFormedHist(hist),
 							tb.equals(tb.getInternalHist(), tb.seqEmpty()),
 							tb.not(tb.equals(selfVarTerm, tb.NULL())),
-							tb.not(tb.equals(tb.func(bean), selfVarTerm)),
+							tb.not(tb.equals(tb.getActiveComponent(), selfVarTerm)),
 							generateSelfExactType(getProgramMethod(), selfVar, getCalleeKeYJavaType()),
 							tb.created(selfVarTerm),
 							tb.inv(selfVarTerm), // TODO KD -bug?- correct invariant?
@@ -468,21 +460,20 @@ public abstract class AbstractOperationPO extends AbstractPO {
 							tb.apply(tb.elementary(tb.getBaseHeap(), tb.func(heap_pserial)),
 									tb.and(noInv(getPre(modHeaps, selfVar, paramVars, atPreVars, proofServices), selfVarTerm), // TODO KD -bug?- correct noInv? / noInv not needed?
 											generateParamsOK(paramVars)//,
-//											tb.disjoint(a, unusedLocs(tb.getBaseHeap())) // TODO KD -ask simon- unusedLocs? needed?
+//											tb.disjoint(a, unusedLocs(tb.getBaseHeap())) // TODO KD -bug?- unusedLocs? probably not needed anyways?
 												)));
 
 					Map<LocationVariable,Term> atPres = HeapContext.getAtPres(atPreVars, proofServices);
-					Term heap_pre = atPres.get(baseHeap);
 					progUpdate = tb.parallel( // TODO KD -hacky- this is not getting better
 							tb.elementary(tb.getBaseHeap(), tb.func(heap_pserial)),
-							tb.elementary(heap_pre, tb.func(heap_pserial)),
+							tb.elementary(atPres.get(baseHeap), tb.func(heap_pserial)),
 							tb.elementary(hist, tb.seqConcat(tb.var(hist), tb.seqSingleton(callevent))),
 							tb.elementary(tb.var(hist_pre), tb.var(hist)),
 							tb.elementary(hist_local, tb.seqEmpty()));
 
 					post = tb.apply(tb.elementary(tb.var(hist), tb.seqConcat(tb.var(hist), tb.seqSingleton(termevent))),
 							tb.and(post, // includes frame
-									calls,
+									calls(hist_local, atPres.get(baseHeap), proofServices),
 									tb.wellFormedHist(hist)));
 									// TODO KD -bug?- "exc == NULL" should be included in post
 				}
@@ -506,6 +497,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
 		// for JML annotation statements
 		generateWdTaclets(proofConfig);
+	}
+
+	// TODO KD -hacky- should be abstract (not worse then the others though)
+	protected /*abstract*/ Term calls(Term hist_local, Term heap_pre, Services services) {
+		assert false;
+		throw new UnsupportedOperationException("Only FunctionalOperationContracts should have a calls set");
 	}
 
     // TODO KD -hacky- works only for special cases

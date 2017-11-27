@@ -346,6 +346,7 @@ public final class DLSpecFactory {
 	               resultVar,
 	               excVar,
 	               atPreVars,
-	               !isLibraryClass);
+	               !isLibraryClass,
+	               null); // TODO KD -bug?- callableSpec
     }
 }

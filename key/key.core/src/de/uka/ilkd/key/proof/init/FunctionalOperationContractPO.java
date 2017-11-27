@@ -16,11 +16,9 @@ package de.uka.ilkd.key.proof.init;
 import static de.uka.ilkd.key.java.KeYJavaASTFactory.declare;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Properties;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -35,17 +33,23 @@ import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
 import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
 import de.uka.ilkd.key.rule.metaconstruct.PostWork;
+import de.uka.ilkd.key.speclang.CallableServSpec;
+import de.uka.ilkd.key.speclang.CallableSpec;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
@@ -391,4 +395,25 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     public KeYJavaType getContainerType() {
        return getContract().getKJT();
     }
+
+	@Override
+	protected Term calls(Term hist_local, Term heap_pre, Services services) { // TODO KD -ask simon- fehlt nicht calls zeug bei der contract anwendung?
+		CallableSpec callable = contract.getCallable();
+		if (!callable.restrictsCalls()) {
+			return tb.tt();
+		}
+		ImmutableList<CallableServSpec> callableServs = callable.getCallableServices();
+		Sort eventSort = services.getTypeConverter().getServiceEventLDT().eventSort();
+		LogicVariable i = new LogicVariable(new Name("i"), services.getTypeConverter().getIntegerLDT().targetSort());
+		Term update = tb.elementary(tb.getBaseHeap(), heap_pre);
+		Term isCallable = tb.ff();
+		for (CallableServSpec serv : callableServs) {
+			Function m_id = services.getTypeConverter().getServiceEventLDT().getMethodIdentifier(serv.getService().getMethodDeclaration(), services);
+			isCallable = tb.or(isCallable, tb.and(
+					tb.equals(tb.evGetMethod(tb.seqGet(eventSort, hist_local, tb.var(i))), tb.func(m_id)),
+					tb.apply(update, tb.equals(tb.evGetCallee(tb.seqGet(eventSort, hist_local, tb.var(i))), serv.getClient()))));
+		} // TODO -ask simon- formula in theorie correct?
+		Term iInRange = tb.and(tb.leq(tb.zero(), tb.var(i)), tb.lt(tb.var(i), tb.seqLen(hist_local)));
+		return tb.all(i, tb.imp(iInRange, isCallable));
+	}
 }
