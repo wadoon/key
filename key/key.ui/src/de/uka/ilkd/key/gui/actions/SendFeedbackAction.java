@@ -32,11 +32,13 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
 import de.uka.ilkd.key.core.KeYMediator;
@@ -69,9 +71,9 @@ public class SendFeedbackAction extends AbstractAction {
     private static final String REPORT_URL = "http://" + SERVER + "/feedback";
 
     private static final String INITIAL_TEXT =
-            "Please describe the error you experienced here.\n" +
-            "If you want, add your NAME AND E-MAIL to allow us to come back to you.\n" +
-            "You can also contact us via e-Mail under " + FEEDBACK_RECIPIENT + ".";
+            "<html>Please describe the error you experienced in the textfield below.<br>" +
+            "Mention your NAME AND E-MAIL ADDRESS to allow us to come back to you.<br>" +
+            "You can also contact us via e-mail directly under " + FEEDBACK_RECIPIENT + ".";
 
     private static String serializeStackTrace(Throwable t) {
         StringWriter sw = new StringWriter();
@@ -470,17 +472,20 @@ public class SendFeedbackAction extends AbstractAction {
         }
 
         final JTextArea bugDescription = new JTextArea(20, 50);
-        bugDescription.setText(INITIAL_TEXT);
         bugDescription.setLineWrap(true);
         bugDescription.setBorder(new TitledBorder("Message to Developers"));
         JScrollPane left = new JScrollPane(bugDescription);
         left.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         left.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
+        JLabel invitation = new JLabel(INITIAL_TEXT);
+        invitation.setBorder(new EmptyBorder(5, 5, 5, 5));
+
         Container topPanel = dialog.getContentPane();
         topPanel.setLayout(new BorderLayout());
         topPanel.add(left, BorderLayout.CENTER);
         topPanel.add(right, BorderLayout.EAST);
+        topPanel.add(invitation, BorderLayout.NORTH);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new FlowLayout());
