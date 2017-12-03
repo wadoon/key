@@ -24,11 +24,11 @@ import java.util.Map;
  * All parameters are passed as strings and converted by the command.
  * The parameters are:
  * <ol>
- *     <li>#2 = <String>rule name</String></li>
- *     <li>on= key.core.logic.Term on which the rule should be applied to as String (find part of the rule) </li>
- *     <li>formula= toplevel formula in which term appears in</li>
- *     <li>occ = occurrence number</li>
- *     <li>inst_= instantiation</li>
+ * <li>#2 = <String>rule name</String></li>
+ * <li>on= key.core.logic.Term on which the rule should be applied to as String (find part of the rule) </li>
+ * <li>formula= toplevel formula in which term appears in</li>
+ * <li>occ = occurrence number</li>
+ * <li>inst_= instantiation</li>
  * </ol>
  */
 public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
@@ -37,12 +37,14 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         super(Parameters.class);
     }
 
-    @Override public String getName() {
+    @Override
+    public String getName() {
         return "rule";
     }
 
-    @Override public Parameters evaluateArguments(EngineState state,
-            Map<String, String> arguments) throws Exception {
+    @Override
+    public Parameters evaluateArguments(EngineState state,
+                                        Map<String, String> arguments) throws Exception {
         Parameters p = state.getValueInjector()
                 .inject(this, new Parameters(), arguments);
 
@@ -64,8 +66,9 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         return p;
     }
 
-    @Override public void execute(AbstractUserInterfaceControl uiControl,
-            Parameters args, EngineState state)
+    @Override
+    public void execute(AbstractUserInterfaceControl uiControl,
+                        Parameters args, EngineState state)
             throws ScriptException, InterruptedException {
         Proof proof = state.getProof();
         TacletApp theApp = makeTacletApp(args, state);
@@ -113,14 +116,14 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         Taclet taclet = proof.getEnv().getInitConfigForEnvironment().
                 lookupActiveTaclet(new Name(p.rulename));
 
+        /*weigl: does nor work dynamical taclets
         if (taclet == null) {
             throw new ScriptException("Taclet '" + p.rulename + "' not known.");
-        }
+        }*/
 
-        if (taclet instanceof NoFindTaclet) {
+        if (taclet != null && taclet instanceof NoFindTaclet) {
             return makeNoFindTacletApp(taclet);
-        }
-        else {
+        } else {
             return findTacletApp(p, state);
         }
 
@@ -148,8 +151,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                         "More than one applicable occurrence");
             }
             return matchingApps.get(0);
-        }
-        else {
+        } else {
             if (p.occ >= matchingApps.size()) {
                 throw new ScriptException("Occurence " + p.occ
                         + " has been specified, but there are only "
@@ -160,7 +162,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
     }
 
     private ImmutableList<TacletApp> findAllTacletApps(Parameters p,
-            EngineState state) throws ScriptException {
+                                                       EngineState state) throws ScriptException {
         Services services = state.getProof().getServices();
         TacletFilter filter = new TacletNameFilter(p.rulename);
         Goal g = state.getFirstOpenGoal();
@@ -195,7 +197,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
      * Filter those apps from a list that are according to the parameters.
      */
     private List<TacletApp> filterList(Parameters p,
-            ImmutableList<TacletApp> list) {
+                                       ImmutableList<TacletApp> list) {
         List<TacletApp> matchingApps = new ArrayList<TacletApp>();
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp) {
