@@ -102,7 +102,7 @@ public class DependencyClusterContractPO extends AbstractOperationPO
         
         ServiceEventLDT ldt = proofServices.getTypeConverter().getServiceEventLDT();
 
-        EventEquivalenceWithIsoFactory tacletFactory = new EventEquivalenceWithIsoFactory(contract.getSpecs(), proofConfig.getServices(), contract.getSelf(), ldt.getEquivEvent(), ldt.getInvEvent(), "");
+        EventEquivalenceTacletFactory tacletFactory = new EventEquivalenceWithEqFactory(contract.getSpecs(), proofConfig.getServices(), contract.getSelf(), ldt.getEquivEvent(), ldt.getInvEvent(), "");
         RewriteTaclet equivEventTaclet = tacletFactory.getEventEquivalenceTaclet();               
         register(equivEventTaclet, proofConfig);
         //TODO JK is another justification better? Reference the contract for example?

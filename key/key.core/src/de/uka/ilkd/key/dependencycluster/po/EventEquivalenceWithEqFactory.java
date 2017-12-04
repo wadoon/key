@@ -20,8 +20,8 @@ public class EventEquivalenceWithEqFactory
     private final Term self;
 
 
-    public EventEquivalenceWithEqFactory(ServiceDependencyClusterSpec localSpec, Term self,
-            Services services, Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
+    public EventEquivalenceWithEqFactory(ServiceDependencyClusterSpec localSpec, Services services, Term self,
+             Function equivEventFunction, Function invEventFunction, String ruleNameSuffix) {
         super(services, localSpec.getLowIn(), localSpec.getLowOut(), localSpec.getVisible(), equivEventFunction, invEventFunction, EQUIV_TYPE_LABEL + ruleNameSuffix, ruleNameSuffix);
         
         this.self = self;
