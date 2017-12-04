@@ -20,6 +20,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,9 +38,10 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.text.JTextComponent;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ExceptionDialog;
@@ -342,11 +344,13 @@ public class SendFeedbackAction extends AbstractAction {
     }
 
     private class SendAction implements ActionListener {
-        JDialog dialog;
-        JTextArea message;
+        private JDialog dialog;
+        private JTextArea message;
+        private JTextComponent emailAddress;
 
-        public SendAction(JDialog dialog, JTextArea bugDescription) {
+        public SendAction(JDialog dialog, JTextComponent emailAddress, JTextArea bugDescription) {
             this.dialog = dialog;
+            this.emailAddress = emailAddress;
             this.message = bugDescription;
         }
 
@@ -368,8 +372,9 @@ public class SendFeedbackAction extends AbstractAction {
                         JOptionPane.OK_CANCEL_OPTION);
 
                 if (confirmed == JOptionPane.OK_OPTION) {
+                    String mail = URLEncoder.encode(emailAddress.getText(), "UTF-8");
                     URL url = new URL(REPORT_URL);
-                    url = new URL("https://formal.iti.kit.edu/ulbrich/key-feedback.php"); // FIXME
+                    url = new URL("https://formal.iti.kit.edu/ulbrich/key-feedback.php?m=" + mail); // FIXME
                     connection = (HttpURLConnection) url.openConnection();
                     connection.setDoOutput(true);
                     connection.setRequestMethod("POST");
@@ -473,17 +478,21 @@ public class SendFeedbackAction extends AbstractAction {
 
         final JTextArea bugDescription = new JTextArea(20, 50);
         bugDescription.setLineWrap(true);
-        bugDescription.setBorder(new TitledBorder("Message to Developers"));
-        JScrollPane left = new JScrollPane(bugDescription);
-        left.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        left.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        bugDescription.setBorder(new TitledBorder("Message to developers"));
 
         JLabel invitation = new JLabel(INITIAL_TEXT);
         invitation.setBorder(new EmptyBorder(5, 5, 5, 5));
 
+        JTextField email = new JTextField();
+        email.setBorder(new TitledBorder("Your e-mail address"));
+
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        leftPanel.add(email, BorderLayout.NORTH);
+        leftPanel.add(bugDescription, BorderLayout.CENTER);
+
         Container topPanel = dialog.getContentPane();
         topPanel.setLayout(new BorderLayout());
-        topPanel.add(left, BorderLayout.CENTER);
+        topPanel.add(new JScrollPane(leftPanel), BorderLayout.CENTER);
         topPanel.add(right, BorderLayout.EAST);
         topPanel.add(invitation, BorderLayout.NORTH);
 
@@ -491,7 +500,7 @@ public class SendFeedbackAction extends AbstractAction {
         buttonPanel.setLayout(new FlowLayout());
 
         JButton sendFeedbackReportButton = new JButton("Send Feedback");
-        sendFeedbackReportButton.addActionListener(new SendAction(dialog, bugDescription));
+        sendFeedbackReportButton.addActionListener(new SendAction(dialog, email, bugDescription));
 
         JButton cancelButton = new JButton("Cancel");
         cancelButton.addActionListener(new ActionListener() {
