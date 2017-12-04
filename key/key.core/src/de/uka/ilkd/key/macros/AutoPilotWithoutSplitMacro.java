@@ -22,7 +22,6 @@ package de.uka.ilkd.key.macros;
  * It performs the following steps:
  * <ol>
  * <li>Finish symbolic execution
- * <li>Try to close all proof obligations
  * <li>Separate proof obligations
  * <li>Expand invariant definitions
  * <li>Try to close all proof obligations
@@ -30,7 +29,7 @@ package de.uka.ilkd.key.macros;
  *
  * @author mattias ulbrich
  */
-public class FullAutoPilotProofMacro extends SequentialProofMacro {
+public class AutoPilotWithoutSplitMacro extends SequentialProofMacro {
 
     /**
      * The number of proof steps that should be run by the {@link TryCloseMacro}
@@ -66,9 +65,7 @@ public class FullAutoPilotProofMacro extends SequentialProofMacro {
     @Override
     protected ProofMacro[] createProofMacroArray() {
         return new ProofMacro[] {
-                new FinishSymbolicExecutionMacro(),
-                new ExpandInvariantDefinitionMacro(),
-                new ExpandAndRightMacro(),
+                new AutoPilotPrepareProofMacro(),
                 new TryCloseMacro(NUMBER_OF_TRY_STEPS)
         };
     }

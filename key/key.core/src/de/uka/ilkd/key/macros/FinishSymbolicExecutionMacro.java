@@ -42,7 +42,7 @@ import de.uka.ilkd.key.strategy.Strategy;
  */
 public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
-    private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("notHumanReadable");
+    private static final Name NON_HUMAN_INTERACTION_RULESET = new Name("alpha");
 
     @Override
     public String getName() {
@@ -143,23 +143,19 @@ public class FinishSymbolicExecutionMacro extends StrategyProofMacro {
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            if(!hasModality(goal.node())) {
-                return false;
+            if (isNonHumanInteractionTagged(app.rule())) {
+                return super.isApprovedApp(app, pio, goal);
             }
 
-            if(isNonHumanInteractionTagged(app.rule())) {
-                return false;
+            if (app.rule() instanceof OneStepSimplifier && hasModality(pio.subTerm())) {
+                return super.isApprovedApp(app, pio, goal);
             }
 
-            if(app.rule() instanceof OneStepSimplifier) {
-                return true;
+            if (NodeInfo.isSymbolicExecutionRuleApplied(app)) {
+                return super.isApprovedApp(app, pio, goal);
             }
 
-            if(!NodeInfo.isSymbolicExecutionRuleApplied(app)) {
-                return false;
-            }
-
-            return super.isApprovedApp(app, pio, goal);
+            return false;
         }
 
       @Override

@@ -156,17 +156,10 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
                 return delegate.computeCost(app, pio, goal);
             }
 
-            // apply OSS to <inv>() calls.
             if(rule instanceof OneStepSimplifier) {
                 Term target = pio.subTerm();
                 if(hasModality(target)) {
                     return delegate.computeCost(app, pio, goal);
-                }
-                if(target.op() instanceof UpdateApplication) {
-                    Operator updatedOp = target.sub(1).op();
-                    if(updatedOp instanceof ObserverFunction) {
-                        return delegate.computeCost(app, pio, goal);
-                    }
                 }
             }
 

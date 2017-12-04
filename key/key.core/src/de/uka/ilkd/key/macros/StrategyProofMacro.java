@@ -43,6 +43,18 @@ import de.uka.ilkd.key.strategy.Strategy;
  */
 public abstract class StrategyProofMacro extends AbstractProofMacro {
 
+    /**
+     * Create the strategy which is used proving.
+     *
+     * Any implementation must return a working proof strategy which is to be
+     * applied to the pos in occurrence.
+     *
+     * @param proof
+     *            the proof for which the strategy will be used.
+     * @param posInOcc
+     *            the position onto which it will be applied.
+     * @return a non-<code>null</code> strategy
+     */
     protected abstract Strategy createStrategy(Proof proof, PosInOccurrence posInOcc);
 
     /**

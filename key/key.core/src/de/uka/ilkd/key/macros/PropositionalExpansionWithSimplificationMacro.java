@@ -7,6 +7,10 @@ package de.uka.ilkd.key.macros;
 import java.util.Set;
 
 /**
+ * This macro allows the application of propositional rules and the one step
+ * simplifier.
+ *
+ * TODO Check if this class is not redundant if {@link #allowOSS()} returns true. (MU)
  *
  * @author christoph
  */

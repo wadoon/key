@@ -30,7 +30,7 @@ package de.uka.ilkd.key.macros;
  *
  * @author mattias ulbrich
  */
-public class FullAutoPilotProofMacro extends SequentialProofMacro {
+public class RefiningAutoPilotProofMacro extends SequentialProofMacro {
 
     /**
      * The number of proof steps that should be run by the {@link TryCloseMacro}
@@ -41,7 +41,7 @@ public class FullAutoPilotProofMacro extends SequentialProofMacro {
 
     @Override
     public String getName() {
-        return "Full Auto Pilot";
+        return "Refining Auto Pilot";
     }
 
     @Override
@@ -51,13 +51,14 @@ public class FullAutoPilotProofMacro extends SequentialProofMacro {
 
     @Override
     public String getScriptCommandName() {
-        return "autopilot";
+        return "ref-autopilot";
     }
 
 
     @Override
     public String getDescription() {
         return "<html><ol><li>Finish symbolic execution" +
+                "<li>Try to close all proof obligations" +
                 "<li>Separate proof obligations" +
                 "<li>Expand invariant definitions" +
                 "<li>Try to close all proof obligations</ol>";
@@ -67,6 +68,7 @@ public class FullAutoPilotProofMacro extends SequentialProofMacro {
     protected ProofMacro[] createProofMacroArray() {
         return new ProofMacro[] {
                 new FinishSymbolicExecutionMacro(),
+                new TryCloseMacro(NUMBER_OF_TRY_STEPS),
                 new ExpandInvariantDefinitionMacro(),
                 new ExpandAndRightMacro(),
                 new TryCloseMacro(NUMBER_OF_TRY_STEPS)
