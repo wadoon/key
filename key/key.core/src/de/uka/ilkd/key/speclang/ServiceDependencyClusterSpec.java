@@ -81,7 +81,7 @@ public class ServiceDependencyClusterSpec extends AbstractDependencyClusterSpec 
     @Override
     public ImmutableList<RewriteTaclet> getTaclets(Term contractSelf, InitConfig config) {
         Services services = config.getServices();
-        EventEquivalenceWithEqFactory eqFactory = new EventEquivalenceWithEqFactory(this, contractSelf, services, getEquivEventEqPredicate(), getVisibilityPredicate(), label);
+        EventEquivalenceWithEqFactory eqFactory = new EventEquivalenceWithEqFactory(this, services, contractSelf, getEquivEventEqPredicate(), getVisibilityPredicate(), label);
         EventEquivalenceWithIsoFactory isoFactory = new EventEquivalenceWithIsoFactory(this, services, contractSelf, getEquivEventIsoPredicate(), getVisibilityPredicate(), label);
         AgreeTacletFactory agreeFactory = new AgreeTacletFactory(getLowState(), contractSelf, specSelf, services, label, getAgreePrePredicate(), getAgreePostPredicate());
         
