@@ -243,7 +243,7 @@ public class DependencyClusterPOFormulaFactory {
     
     //services called with equivalent events are guaranteed to terminate with equivalent events
     public Term cooperationalEquivalence() {
-        return tb.func(ldt.getCoopListEquivInternal(), a.postHistoryInternal(), b.postHistoryInternal());      
+        return tb.imp(newObjectsEqualInPost(), tb.func(ldt.getCoopListEquivInternal(), a.postHistoryInternal(), b.postHistoryInternal()));      
     }
     
     public Term callEventEquivalence() {
