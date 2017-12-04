@@ -107,6 +107,17 @@ public class DependencyClusterPOFormulaFactory {
     public Term bothExecutions() {
         return tb.and(a.updatedExecutionWithPreAndPost(), b.updatedExecutionWithPreAndPost());
     }
+    
+    public Term newObjectsEqualInPost() {
+        ImmutableList<Term> listOfNewObjectEqualities = ImmutableSLList.nil();
+        for (Term o: contract.getSpecs().getNewObjects()) {
+            Term atHeapA = tb.elementary(tb.getBaseHeap(), ifVars.c1.post.heap);
+            Term atHeapB = tb.elementary(tb.getBaseHeap(), ifVars.c2.post.heap);
+            Term equal = tb.equals(tb.apply(atHeapA, o), tb.apply(atHeapB, o));
+            listOfNewObjectEqualities = listOfNewObjectEqualities.append(equal);
+        }
+        return tb.and(listOfNewObjectEqualities);
+    }
        
     public Term invisibleHistoryInternal() {
         return tb.equals(tb.func(ldt.getFilterVisible(), a.postHistoryInternal()), tb.seqEmpty());
@@ -140,7 +151,11 @@ public class DependencyClusterPOFormulaFactory {
     }
 
     public Term consequence() {
-        return tb.and(postStateEquivalence(), visibilityPreserving(), equivalentInternalHistories(), equivalentTerminationEvents());
+        return tb.and(postStateEquivalence(), visibilityPreserving(), equivalentHistories());
+    }
+    
+    public Term equivalentHistories() {
+        return tb.imp(newObjectsEqualInPost(), tb.and(equivalentInternalHistories(), equivalentTerminationEvents()));
     }
     
     //self is implicitly considered to be low
