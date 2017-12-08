@@ -46,7 +46,7 @@ public class SymbExecWithHistFactory {
         f = POSnippetFactory.getBasicFactoryWithHist(contract, services, ifVars, this);
     }
     
-    public Term callEvent() {
+    public Term callEvent() {       
         return tb.evConst(tb.evCall(), 
                 tb.getEnvironmentCaller(), 
                 ifVars.pre.self, 
@@ -84,11 +84,17 @@ public class SymbExecWithHistFactory {
     }
     
     public Term terminationEvent() {
+       Term resvar;
+       if (ifVars.post.result == null) {
+           resvar = tb.seqEmpty();
+       } else {
+           resvar = tb.seq(ifVars.post.result);
+       }
        return tb.evConst(tb.evTerm(), 
                tb.getEnvironmentCaller(), 
                ifVars.pre.self, 
                tb.func(ldt.getMethodIdentifier(contract.getTarget().getMethodDeclaration(), services)), 
-               tb.seq(ifVars.post.result), //TODO JK are these the right variables?
+               resvar, //TODO JK are these the right variables?
                ifVars.post.heap);
     }
         
