@@ -1,8 +1,6 @@
 package de.uka.ilkd.key.macros;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.logic.Name;
@@ -37,8 +35,6 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 		private static final int UNWIND_COST = 1000;
 		private int limitPerLoop;
 		
-		
-		static int loops = 0;
 		
 		static {
 			unwindRules = new HashSet<String>();
@@ -116,6 +112,11 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 			//return totalUnwinds;
 //		}
 		
+		/**
+		 * this method count the number of unwind rules for the current loop. 
+		 * @param goal the current goal
+		 * @return the number of unwind rules used for the current loop
+		 */
 		private int computeUnwindRules(Goal goal) {
 			int unwindings = 0;
 			Node prevNode = goal.node();
@@ -124,7 +125,7 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 				final RuleApp app = currentNode.getAppliedRuleApp();
 				if (app != null) {
 					if (isUnwindRule(app.rule())) {
-						//addiere die unwindings
+						//count unwindings used for this loop
 						++unwindings;
 					}
 				}
@@ -135,9 +136,9 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 						//TODO überprüfe, ob ifSplit wirklich zu unwinding gehört
 						
 						//System.out.println(currentNode.getAppliedRuleApp().rule().name().toString() + " " + currentNode.serialNr());
-						// falls linker Kindknoten höre hier auf zu zählen
+						
+						// if left child node, stop count (unwinding rules above are part of other loops)
 						if(currentNode.child(1).equals(prevNode)) {
-							
 							break;
 						}
 					}
@@ -156,6 +157,7 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 			if (TestGenInfoFlowStrategy.isUnwindRule(app.rule())) {
 				
 				int unwindings = computeUnwindRules(goal);
+				//check the number of unwindings for the current loop
 				if (unwindings >= limitPerLoop) {
 					return false;
 				} else {
