@@ -70,47 +70,7 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 		}
 		
 		
-//		private int computeUnwindRules(Goal goal) {
-//			
-//				System.out.println("____");
-//				for (RuleApp r : goal.appliedRuleApps()) {//appliedRuleApps liefert eine liste von Rules, die auf diesem Branch verwendet wurden!. Damit können wir für die verschieden Branches eine bestimmte anzahl loopunwinds zulassen! das könnte die lösung sein!
-//					//System.out.println("name der regel:" +r.rule().name());
-//					
-//					
-//					
-//					if(isUnwindRule(r.rule())) {
-//						limitPerLoop = limitPerLoop - 1;
-//						//System.out.println("in diesem Branch wurden bereits unwind Rules verwendet");
-//						//loopRulesCounter = loopRulesCounter+1;
-//						//System.out.println("anzahl loopRules: "+ loopRulesCounter);
-//					}
-//				}
-//				System.out.println("____");
-//			return limitPerLoop;
 
-//			int loopRulesCounter = 0;
-//			Node node = goal.node();
-//			while (!node.root()) {
-//				final RuleApp app = node.getAppliedRuleApp();
-//				if (app != null) {
-//					final Rule rule = app.rule();
-//					if (TestGenInfoFlowStrategy.isUnwindRule(rule)) {
-//						for (RuleApp r : goal.appliedRuleApps()) {
-//							if(isUnwindRule(r.rule())) {
-//								++loopRulesCounter;
-//							}
-//						}
-//					}
-//				}
-//				node = node.parent();
-//			}
-//			//test
-//			return loopRulesCounter;
-			
-			
-			
-			//return totalUnwinds;
-//		}
 		
 		/**
 		 * this method count the number of unwind rules for the current loop. 
@@ -133,7 +93,7 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 				currentNode = currentNode.parent();
 				if (!currentNode.root()) {
 					if (currentNode.getAppliedRuleApp().rule().name().toString().equals("ifSplit")) {
-						//TODO überprüfe, ob ifSplit wirklich zu unwinding gehört
+						//TODO test ifsplit belongs to unwind rule 
 						
 						//System.out.println(currentNode.getAppliedRuleApp().rule().name().toString() + " " + currentNode.serialNr());
 						
@@ -170,58 +130,7 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 		}
 		
 
-//		@Override
-//		public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-//			
-//			
-//			
-//			if (!TestGenInfoFlowMacro.hasModality(goal.node())) {
-//				return false;
-//			}
-//			
-//			
-//			if (TestGenInfoFlowStrategy.isUnwindRule(app.rule())) {
-//				//System.out.println("FOLGENDER NODE WURDE BEARBEITET ::::: " + goal.node().serialNr());
-//				boolean contains = false;
-//				for (int i = 0; i < enoughUnwindGoals.size(); i++) {
-//					if (enoughUnwindGoals.contains(goal.node().serialNr())) {
-//						System.out.println("dieser Goal" + enoughUnwindGoals.get(i) +"ist bereits in der Liste!!!!");
-//						contains = true;
-//					}
-//				}
-//				if(enoughUnwindGoals.isEmpty() || !contains){
-//					
-//					//System.out.println("Found unwind rule!!"); //TODO remove
-//					//int unwindRules = computeUnwindRules(goal);
-//					//System.out.println(unwindRules); //TODO remove
-//					//System.out.println("The limit is "+limitPerLoop);//TODO REMOVE
-//
-//					
-//					if (loops == 0) {
-//						if(loopCounter >= 0) {
-//							loops = limitPerLoop;//edit for multiple loops, at the moment it works for two loops.
-//							loopCounter = loopCounter - 1;
-//						}
-//						enoughUnwindGoals.add(goal.node().serialNr());
-//						return false;
-//					} else {
-//						loops = loops - 1;
-//						GesamtLoopUNwindings = GesamtLoopUNwindings + 1;
-//						return true;
-//					}
-//				}
-//				else {
-//					System.out.println("FALSE");
-//					return false;
-//				}
-//			}
-//			else {
-//				return super.isApprovedApp(app, pio, goal);
-//				
-//			}
-//			
-//			
-//		}
+
 
 		@Override
 		public Name name() {
