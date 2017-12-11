@@ -22,7 +22,7 @@ import de.uka.ilkd.key.strategy.Strategy;
 /**
  * Macro for test generation which perform double symbolic execution 
  * (include loop unwinding for multiple loops).
- * @author Müssig
+ * @author Muessig
  *
  */
 public class TestGenInfoFlowMacro extends StrategyProofMacro {
