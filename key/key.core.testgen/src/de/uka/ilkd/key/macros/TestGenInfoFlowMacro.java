@@ -33,7 +33,9 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 		        TestGenInfoFlowStrategy.class.getSimpleName());
 		private static final Set<String> unwindRules;
 		private static final int UNWIND_COST = 1000;
-		private int limitPerLoop;
+		private static final String IFSPLIT= "ifSplit";
+		private final int limitPerLoop;
+		private static boolean belongsToUnwind = false;
 		
 		
 		static {
@@ -69,8 +71,17 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 			return super.computeCost(app, pio, goal);
 		}
 		
-		
-
+		/**
+		 * check if the applied rule of the node is a "ifsplit" rule
+		 * @param node the node you want to check
+		 * @return true if the applied rule is "ifSplit"
+		 */
+		private boolean isIfSplitRule(Node node) {
+			if (node.getAppliedRuleApp().rule().name().toString().equals(IFSPLIT)) {
+				return true;
+			}
+			return false;
+		}
 		
 		/**
 		 * this method count the number of unwind rules for the current loop. 
@@ -85,22 +96,45 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 				final RuleApp app = currentNode.getAppliedRuleApp();
 				if (app != null) {
 					if (isUnwindRule(app.rule())) {
+						//TODO Save loop signature and count for each loop
+						
 						//count unwindings used for this loop
 						++unwindings;
+						
 					}
 				}
 				prevNode = currentNode;
 				currentNode = currentNode.parent();
+				
 				if (!currentNode.root()) {
-					if (currentNode.getAppliedRuleApp().rule().name().toString().equals("ifSplit")) {
-						//TODO test ifsplit belongs to unwind rule 
+					//check if the applied rule is if split and belongs to an unwind rule
+					if (isIfSplitRule(currentNode)) {
 						
-						//System.out.println(currentNode.getAppliedRuleApp().rule().name().toString() + " " + currentNode.serialNr());
+						belongsToUnwind = false;
 						
-						// if left child node, stop count (unwinding rules above are part of other loops)
-						if(currentNode.child(1).equals(prevNode)) {
-							break;
+						//check if the current ifSplit rule belongs to an unwinding rule 
+						Node checkNode = currentNode.parent();
+						while(!checkNode.root()) {
+							RuleApp appIfSplit = checkNode.getAppliedRuleApp();
+							if(isIfSplitRule(checkNode)) {
+								break;
+								//last if split does not belong to unwind rule
+							}
+							if(isUnwindRule(appIfSplit.rule())) {
+								//the current ifSplitNode belongs to the unwinding rule
+								belongsToUnwind = true;
+								break;
+							}
+							checkNode = checkNode.parent();
 						}
+						
+						if(belongsToUnwind) {
+							// if left child node, stop count (unwinding rules above are part of other loops)
+							if(currentNode.child(1).equals(prevNode)) {
+								break;
+							}
+						}
+						
 					}
 				}
 			}
