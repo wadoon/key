@@ -1,8 +1,13 @@
 package de.uka.ilkd.key.macros;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -36,7 +41,11 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 		private static final String IFSPLIT= "ifSplit";
 		private final int limitPerLoop;
 		private static boolean belongsToUnwind = false;
+		private static HashMap<Integer, JavaBlock> nodeJavaBlockMap;
 		
+		static {
+			nodeJavaBlockMap = new HashMap<Integer, JavaBlock>();
+		}
 		
 		static {
 			unwindRules = new HashSet<String>();
@@ -60,6 +69,7 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 			super(delegate);
 			limitPerLoop = ProofIndependentSettings.DEFAULT_INSTANCE
 			        .getTestGenerationSettings().getMaximalUnwinds();
+			
 		}
 
 		@Override
@@ -71,75 +81,169 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 			return super.computeCost(app, pio, goal);
 		}
 		
-		/**
-		 * check if the applied rule of the node is a "ifsplit" rule
-		 * @param node the node you want to check
-		 * @return true if the applied rule is "ifSplit"
-		 */
-		private boolean isIfSplitRule(Node node) {
-			if (node.getAppliedRuleApp().rule().name().toString().equals(IFSPLIT)) {
-				return true;
-			}
-			return false;
-		}
+//		/**
+//		 * check if the applied rule of the node is a "ifsplit" rule
+//		 * @param node the node you want to check
+//		 * @return true if the applied rule is "ifSplit"
+//		 */
+//		private boolean isIfSplitRule(Node node) {
+//			if (node.getAppliedRuleApp().rule().name().toString().equals(IFSPLIT)) {
+//				return true;
+//			}
+//			return false;
+//		}
 		
-		/**
-		 * this method count the number of unwind rules for the current loop. 
-		 * @param goal the current goal
-		 * @return the number of unwind rules used for the current loop
-		 */
-		private int computeUnwindRules(Goal goal) {
-			int unwindings = 0;
-			Node prevNode = goal.node();
+		private int computeUnwindRules(Goal goal, PosInOccurrence pio) {
+			JavaBlock currentBlock = pio.subTerm().javaBlock();
 			Node currentNode = goal.node();
+			int unwindings = 0;
+			//remember every javaBlock with unwind rule node
+			
+			nodeJavaBlockMap.put(currentNode.serialNr(), currentBlock);
+			
+			//now count number of unwind rules with same java block 
+			//(use the hasmap to get the corresponding javablock)
 			while(!currentNode.root()) {
-				final RuleApp app = currentNode.getAppliedRuleApp();
+				RuleApp app = currentNode.getAppliedRuleApp();
 				if (app != null) {
-					if (isUnwindRule(app.rule())) {
-						//TODO Save loop signature and count for each loop
-						
-						//count unwindings used for this loop
-						++unwindings;
+					if(isUnwindRule(app.rule())) {
+						JavaBlock javaBlockCurrentNode = nodeJavaBlockMap.get(currentNode.serialNr());
+						if(currentBlock.equals(javaBlockCurrentNode)) {
+							++unwindings;
+						}
 						
 					}
 				}
-				prevNode = currentNode;
 				currentNode = currentNode.parent();
-				
-				if (!currentNode.root()) {
-					//check if the applied rule is if split and belongs to an unwind rule
-					if (isIfSplitRule(currentNode)) {
-						
-						belongsToUnwind = false;
-						
-						//check if the current ifSplit rule belongs to an unwinding rule 
-						Node checkNode = currentNode.parent();
-						while(!checkNode.root()) {
-							RuleApp appIfSplit = checkNode.getAppliedRuleApp();
-							if(isIfSplitRule(checkNode)) {
-								break;
-								//last if split does not belong to unwind rule
-							}
-							if(isUnwindRule(appIfSplit.rule())) {
-								//the current ifSplitNode belongs to the unwinding rule
-								belongsToUnwind = true;
-								break;
-							}
-							checkNode = checkNode.parent();
-						}
-						
-						if(belongsToUnwind) {
-							// if left child node, stop count (unwinding rules above are part of other loops)
-							if(currentNode.child(1).equals(prevNode)) {
-								break;
-							}
-						}
-						
-					}
-				}
 			}
 			return unwindings;
+			
 		}
+		
+		
+//		private int computeUnwindRulesJavaBlockSignature(Goal goal, PosInOccurrence pio) {
+//			int unwinds = 0;
+//			JavaBlock currentBlock = pio.subTerm().javaBlock();
+//			boolean found = false;
+//			System.out.println("current javablock programm ::: " + currentBlock.toString());
+//			System.out.println("TEST ..... ::: "+ currentBlock.program().getFirstElementIncludingBlocks());
+//			
+//			
+//			for (int i = 0; i < loopJavaBlocks.size(); i++){
+//				if (loopJavaBlocks.get(i).first.equals(currentBlock)) {
+//					System.out.println("verglichen mit Block :: " + loopJavaBlocks.get(i).toString());
+//					System.out.println("Ja");
+//					System.out.println("anzahl unwinds:: " + loopJavaBlocks.get(i).second);
+//					Pair<JavaBlock, Integer> currentPair = loopJavaBlocks.get(i);
+//					unwinds = loopJavaBlocks.get(i).second + 1;
+//					currentPair = new Pair<JavaBlock, Integer>(currentBlock, unwinds);
+//					loopJavaBlocks.set(i, currentPair);
+//					found = true;
+//				}
+//			}
+//			if (!found) {
+//				loopJavaBlocks.add(new Pair<JavaBlock, Integer>(currentBlock, 0));
+//				unwinds = 0;
+//				System.out.println("hinzufügen");
+//			}
+//			
+//			return unwinds;
+			
+//			Node currentNode = goal.node();
+//			int totalUnwinds = 0;
+//			while (!currentNode.root()) {
+//				final RuleApp app = currentNode.getAppliedRuleApp();
+//				if (app != null) {
+//					final Rule rule = app.rule();
+//					if (TestGenInfoFlowStrategy.isUnwindRule(rule)) {
+//						
+//						++totalUnwinds;
+//					}
+//				}
+//				currentNode = currentNode.parent();
+//			}
+//			
+//			
+//			
+//			//return totalUnwinds;
+//			
+//			//TODO Save loop signature and count for each loop and traverse the tree like TestGenMacro
+//			//String[] loopSignatur = currentNode.name().split("\\{");
+//			
+//			//System.out.println("node name :: "+loopSignatur[0]);
+//			for (int i = 0; i < loopSignatures.size(); i++) {
+//				//loop already in list
+//				if (loopSignatures.get(i).first.equals(currentNode.name())) {
+//					int unwinds = loopSignatures.get(i).second;
+//					Pair<String, Integer> currentPair = loopSignatures.get(i);
+//					currentPair = new Pair<String, Integer>(currentNode.name(), unwinds+1);
+//					loopSignatures.set(i, currentPair);
+//					unwinds = unwinds +1;
+//					return unwinds;
+//				}
+//			}
+//			
+//			//new Loop
+//			loopSignatures.add(new Pair<String, Integer>(currentNode.name(), 1));
+//			return 1;
+			
+//		}
+		
+//		/**
+//		 * this method count the number of unwind rules for the current loop. 
+//		 * @param goal the current goal
+//		 * @return the number of unwind rules used for the current loop
+//		 */
+//		private int computeUnwindRules(Goal goal) {
+//			int unwindings = 0;
+//			Node prevNode = goal.node();
+//			Node currentNode = goal.node();
+//			while(!currentNode.root()) {
+//				final RuleApp app = currentNode.getAppliedRuleApp();
+//				if (app != null) {
+//					if (isUnwindRule(app.rule())) {
+//						//count unwindings used for this loop
+//						++unwindings;
+//					}
+//				}
+//				prevNode = currentNode;
+//				currentNode = currentNode.parent();
+//				
+//				if (!currentNode.root()) {
+//					//check if the applied rule is if split and belongs to an unwind rule
+//					if (isIfSplitRule(currentNode)) {
+//						
+//						belongsToUnwind = false;
+//						
+//						//check if the current ifSplit rule belongs to an unwinding rule 
+//						Node checkNode = currentNode.parent();
+//						while(!checkNode.root()) {
+//							RuleApp appIfSplit = checkNode.getAppliedRuleApp();
+//							if(isIfSplitRule(checkNode)) {
+//								break;
+//								//last if split does not belong to unwind rule
+//							}
+//							if(isUnwindRule(appIfSplit.rule())) {
+//								//the current ifSplitNode belongs to the unwinding rule
+//								belongsToUnwind = true;
+//								break;
+//							}
+//							checkNode = checkNode.parent();
+//						}
+//						
+//						if(belongsToUnwind) {
+//							// if left child node, stop count (unwinding rules above are part of other loops)
+//							if(currentNode.child(1).equals(prevNode)) {
+//								break;
+//							}
+//						}
+//						
+//					}
+//				}
+//			}
+//			return unwindings;
+//			
+//		}
 		
 		@Override
 		public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
@@ -149,8 +253,12 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 			}
 			
 			if (TestGenInfoFlowStrategy.isUnwindRule(app.rule())) {
+//				System.out.println(pio.subTerm().javaBlock().toString());
 				
-				int unwindings = computeUnwindRules(goal);
+//				System.out.println(pio.down(0).subTerm().javaBlock().toString());
+				
+				
+				int unwindings = computeUnwindRules(goal, pio);
 				//check the number of unwindings for the current loop
 				if (unwindings >= limitPerLoop) {
 					return false;
