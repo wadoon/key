@@ -4,7 +4,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-
+import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -37,10 +38,10 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 		private static final Set<String> unwindRules;
 		private static final int UNWIND_COST = 1000;
 		private final int limitPerLoop;
-		private static HashMap<Integer, JavaBlock> nodeJavaBlockMap;
+		private static HashMap<Integer, SourceElement> nodeJavaBlockMap;
 		
 		static {
-			nodeJavaBlockMap = new HashMap<Integer, JavaBlock>();
+			nodeJavaBlockMap = new HashMap<Integer, SourceElement>();
 		}
 		
 		static {
@@ -65,7 +66,6 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 			super(delegate);
 			limitPerLoop = ProofIndependentSettings.DEFAULT_INSTANCE
 			        .getTestGenerationSettings().getMaximalUnwinds();
-			
 		}
 
 		@Override
@@ -78,13 +78,26 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 		}
 		
 		
-		private int computeUnwindRules(Goal goal, PosInOccurrence pio) {
+		private int computeUnwindRules(Goal goal, PosInOccurrence pio, RuleApp appGoal) {
+			
 			JavaBlock currentBlock = pio.subTerm().javaBlock();
 			Node currentNode = goal.node();
 			int unwindings = 0;
-			//remember every javaBlock with unwind rule node
+			SourceElement element = currentBlock.program().getFirstElementIncludingBlocks();
+			if (appGoal.rule().name().toString().equals("loopUnwind") || appGoal.rule().name().toString().equals("doWhileUnwind")) {
+				String whileString = element.toString();
+				//filter the javaBlock (get the loop)
+				while (!whileString.startsWith("while")) {
+					element = element.getFirstElementIncludingBlocks();
+					whileString = element.toString();
+				}
+			}
 			
-			nodeJavaBlockMap.put(currentNode.serialNr(), currentBlock);
+			//TODO maybe add the same thing for doWhileLoops ? 
+			
+			
+			//remember every javaBlock with unwind rule node
+			nodeJavaBlockMap.put(currentNode.serialNr(), element);
 			
 			//now count number of unwind rules with same java block 
 			//(use the hasmap to get the corresponding javablock)
@@ -92,8 +105,8 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 				RuleApp app = currentNode.getAppliedRuleApp();
 				if (app != null) {
 					if(isUnwindRule(app.rule())) {
-						JavaBlock javaBlockCurrentNode = nodeJavaBlockMap.get(currentNode.serialNr());
-						if(currentBlock.equals(javaBlockCurrentNode)) {
+						SourceElement currentElement = nodeJavaBlockMap.get(currentNode.serialNr());
+						if(element.equals(currentElement)) {
 							++unwindings;
 						}
 					}
@@ -112,12 +125,11 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 			}
 			
 			if (TestGenInfoFlowStrategy.isUnwindRule(app.rule())) {
-//				System.out.println(pio.subTerm().javaBlock().toString());
+				if (limitPerLoop == 0) {
+					return false;
+				}
 				
-//				System.out.println(pio.down(0).subTerm().javaBlock().toString());
-				
-				
-				int unwindings = computeUnwindRules(goal, pio);
+				int unwindings = computeUnwindRules(goal, pio, app);
 				//check the number of unwindings for the current loop
 				if (unwindings >= limitPerLoop) {
 					return false;
