@@ -36,7 +36,7 @@ public class FullAutoPilotProofMacro extends SequentialProofMacro {
      * before retracting. This overrides the strategy setting.
      */
     private static final int NUMBER_OF_TRY_STEPS =
-            Integer.getInteger("key.autopilot.closesteps", 1000);
+            Integer.getInteger("key.autopilot.closesteps", 10000);
 
     @Override
     public String getName() {
