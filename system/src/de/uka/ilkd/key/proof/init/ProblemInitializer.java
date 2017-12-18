@@ -538,8 +538,10 @@ public final class ProblemInitializer {
 	}
         try {
             //determine environment
-            initConfig = determineEnvironment(po, initConfig);
-           
+        	long start = System.nanoTime();
+        	System.out.println("Proof Init: start");
+        	initConfig = determineEnvironment(po, initConfig);
+            
             //read problem
     	    reportStatus("Loading problem \"" + po.name() + "\"");
     	    po.readProblem();
@@ -547,6 +549,9 @@ public final class ProblemInitializer {
     	    //final work
     	    setUpProofHelper(po, pa, initConfig);
 
+    	    long end = System.nanoTime();
+            System.out.println("Problem specific init Time):" + (end - start)/1000000 + "ms");
+            
 	    //done
     	    if(listener != null){
                 listener.proofCreated(this, pa);
