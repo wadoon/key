@@ -1246,7 +1246,9 @@ public abstract class ProgramSVSort extends AbstractSort {
 
 	
 	public boolean canStandFor(Term t) {	   
-	    return t.op () instanceof ProgramConstant && 
+	    return t.op () instanceof ProgramConstant &&
+		!((ProgramConstant)t.op()).getContainerType().getSort().name().toString().equals("FM.FeatureModel")
+		&&
 	    	isString == t.sort().name().equals(type);
 	}
 

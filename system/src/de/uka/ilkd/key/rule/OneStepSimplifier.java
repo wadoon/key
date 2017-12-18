@@ -501,9 +501,10 @@ public final class OneStepSimplifier implements BuiltInRule,
     //-------------------------------------------------------------------------
 
     public void refresh(Proof proof) {
-    active = ProofIndependentSettings.DEFAULT_INSTANCE
-    		.getGeneralSettings()
-    		.oneStepSimplification();
+    	active = false;
+    //active = ProofIndependentSettings.DEFAULT_INSTANCE
+    //		.getGeneralSettings()
+    //		.oneStepSimplification();
 //	active = ProofSettings.DEFAULT_SETTINGS
 //		              .getGeneralSettings()
 //		              .oneStepSimplification();

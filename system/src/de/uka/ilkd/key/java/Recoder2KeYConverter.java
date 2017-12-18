@@ -1395,7 +1395,7 @@ public class Recoder2KeYConverter {
                     }
                 }
 
-                if (compileTimeConstant == null) {
+                if (compileTimeConstant == null && !recContainingClassType.getFullName().equals("FM.FeatureModel")) {
                     pv = new LocationVariable(pen, getKeYJavaType(recoderType),
                             getKeYJavaType(recContainingClassType),
                             recoderVarSpec.isStatic(),

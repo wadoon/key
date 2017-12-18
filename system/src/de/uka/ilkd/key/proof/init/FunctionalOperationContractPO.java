@@ -24,6 +24,8 @@ import java.util.Properties;
 import de.uka.ilkd.key.collection.ImmutableArray;
 import de.uka.ilkd.key.collection.ImmutableList;
 import de.uka.ilkd.key.collection.ImmutableSLList;
+import de.uka.ilkd.key.collection.ImmutableSet;
+
 import static de.uka.ilkd.key.java.KeYJavaASTFactory.*;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -44,6 +46,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ConstructorCall;
 import de.uka.ilkd.key.rule.metaconstruct.CreateObject;
 import de.uka.ilkd.key.rule.metaconstruct.PostWork;
+import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
@@ -207,7 +210,12 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                           ImmutableList<ProgramVariable> paramVars,
                           Map<LocationVariable, LocationVariable> atPreVars,
                           Services services) {
-       return contract.getPre(modHeaps, selfVar, paramVars, atPreVars, services);
+    	   ImmutableSet<ClassInvariant> invs = services.getSpecificationRepository().getClassInvariants(services.getJavaInfo().getKeYJavaType("FM.FeatureModel"));
+       Term pre = contract.getPre(modHeaps, selfVar, paramVars, atPreVars, services);
+    	   for (ClassInvariant ci : invs) {
+    		   pre = services.getTermBuilder().and(ci.getInv(null, services), pre);
+       }
+    	   return pre;
     }
 
     /**
