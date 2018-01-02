@@ -407,6 +407,11 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
         return new LoopScopeBlock();
     }
     
+    public AssignableScopeBlock createAssignableScopeBlock() {
+        return new AssignableScopeBlock();
+    }
+
+
     public MergePointStatement createMergePointStatement() {
         return new MergePointStatement();
     }

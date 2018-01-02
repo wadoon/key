@@ -49,10 +49,10 @@ import de.uka.ilkd.key.logic.ProgramElementName;
 public final class PrimitiveType implements Type {
 
     // must be first in file.
-    private static final Map<String,PrimitiveType> typeMap = 
+    private static final Map<String,PrimitiveType> typeMap =
             new LinkedHashMap<String, PrimitiveType>();
     // must be first in file.
-    private static final Map<Name,PrimitiveType> ldtMap = 
+    private static final Map<Name,PrimitiveType> ldtMap =
             new LinkedHashMap<Name, PrimitiveType>();
 
     public static final PrimitiveType JAVA_BYTE  =
@@ -87,6 +87,13 @@ public final class PrimitiveType implements Type {
     public static final PrimitiveType PROGRAM_SV = new PrimitiveType("SV", null, null);
 
     private ProgramElementName arrayElementName = null;
+
+    static {
+        // MU: Fix. Some types have different names in JavaDL and should
+        // be visible under that name also as primitive types.
+        typeMap.put("LocSet", JAVA_LOCSET);
+        typeMap.put("Seq", JAVA_SEQ);
+    }
 
 
     public static PrimitiveType getPrimitiveType(String name) {

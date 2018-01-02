@@ -220,7 +220,7 @@ public class PosInProgram {
 		list +=", "; 
 	    }
 	}
-	return "PosInProgram: "+list;
+	return "PosInProgram: "+list+"]";
     }
     
 

@@ -3839,6 +3839,7 @@ varexp[TacletBuilder b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
     | varcond_differentFields[b]
+    | varcond_capture_assignable_scope[b]
   ) 
   | 
   ( (NOT_ {negated = true;} )? 
@@ -3973,6 +3974,16 @@ varcond_newlabel [TacletBuilder b]
      b.addVariableCondition(new NewJumpLabelCondition((SchemaVariable)x));
   }
 ;
+
+varcond_capture_assignable_scope [TacletBuilder b]
+:
+  CAPTURE_ASSIGNABLE LPAREN on=varId COMMA sv=varId RPAREN {
+     // TODO Type checking
+     b.addVariableCondition(new CaptureAssignableCondition((ProgramSV)on, (TermSV)sv));
+  }
+;
+
+
 varcond_typecheck [TacletBuilder b, boolean negated]
 @init{
   TypeComparisonCondition.Mode mode = null;

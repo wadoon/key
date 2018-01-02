@@ -102,6 +102,9 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
         return new LoopScopeBlock();
     }
 
+    public AssignableScopeBlock createAssignableScopeBlock() {
+        return new AssignableScopeBlock();
+    }
     
     public RMethodBodyStatement createRMethodBodyStatement
             (TypeReference typeRef,

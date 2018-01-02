@@ -3595,6 +3595,7 @@ Statement Statement() :
      | result = WhileStatement()
      | result = MergePointStatement()
      | result = LoopScopeStatement()
+     | result = AssignableScope()
      | result = KeYMetaConstructStatement()
      | result = DoStatement()
      | result = ForStatement()
@@ -4462,6 +4463,28 @@ LoopScopeBlock LoopScopeStatement() :
 	checkConstruction(result);
 	return result;
     }
+}
+
+AssignableScopeBlock AssignableScope() :
+{
+    AssignableScopeBlock result;
+    Expression assignable;
+    StatementBlock block;
+}
+{
+  "assignable-scope"
+  {
+      result = factory.createAssignableScopeBlock();
+      setPrefixInfo(result);
+  }
+  "(" assignable = Expression() ")"
+  block = Block()
+  {
+      result.setAssignable(assignable);
+      result.setBody(block);
+      checkConstruction(result);
+      return result;
+  }
 }
 
 MergePointStatement MergePointStatement() :

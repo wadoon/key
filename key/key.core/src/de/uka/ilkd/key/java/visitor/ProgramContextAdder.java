@@ -22,6 +22,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.statement.AssignableScopeBlock;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -96,12 +97,15 @@ public class ProgramContextAdder {
             } else if (context instanceof LoopScopeBlock) {
                 return createLoopScopeBlockWrapper((LoopScopeBlock) context,
                         (StatementBlock) body);
+            } else if (context instanceof AssignableScopeBlock) {
+                return createAssignableScopeBlockWrapper((AssignableScopeBlock) context,
+                        (StatementBlock) body);
             } else if (context instanceof SynchronizedBlock) {
                 return createSynchronizedBlockWrapper(
                         (SynchronizedBlock) context, (StatementBlock) body);
             } else {
-                throw new RuntimeException(new UnexpectedException(
-                        "Unexpected block type: " + context.getClass()));
+                throw new RuntimeException(
+                        "Unexpected block type: " + context.getClass());
             }
         }
     }
@@ -222,6 +226,12 @@ public class ProgramContextAdder {
             LoopScopeBlock old, StatementBlock body) {
         return new LoopScopeBlock(old.getIndexPV(), body);
     }
+
+    protected AssignableScopeBlock createAssignableScopeBlockWrapper(
+            AssignableScopeBlock old, StatementBlock body) {
+        return new AssignableScopeBlock(old.getAssignablePV(), body);
+    }
+
 
     protected SynchronizedBlock createSynchronizedBlockWrapper(
             SynchronizedBlock old, StatementBlock body) {

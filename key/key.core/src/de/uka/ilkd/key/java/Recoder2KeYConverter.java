@@ -143,6 +143,7 @@ import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Assert;
+import de.uka.ilkd.key.java.statement.AssignableScopeBlock;
 import de.uka.ilkd.key.java.statement.Break;
 import de.uka.ilkd.key.java.statement.Case;
 import de.uka.ilkd.key.java.statement.Catch;
@@ -2266,6 +2267,12 @@ public class Recoder2KeYConverter {
     // package reference
     public PackageReference convert(recoder.java.reference.PackageReference m) {
         return new PackageReference(collectChildrenAndComments(m));
+    }
+
+    public AssignableScopeBlock convert(de.uka.ilkd.key.java.recoderext.AssignableScopeBlock l) {
+        return new AssignableScopeBlock(
+                (de.uka.ilkd.key.logic.op.IProgramVariable) callConvert(l.getAssignable()),
+                (StatementBlock) callConvert(l.getBody()));
     }
 
 }

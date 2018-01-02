@@ -123,6 +123,7 @@ import de.uka.ilkd.key.java.reference.ThisConstructorReference;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Assert;
+import de.uka.ilkd.key.java.statement.AssignableScopeBlock;
 import de.uka.ilkd.key.java.statement.Break;
 import de.uka.ilkd.key.java.statement.Case;
 import de.uka.ilkd.key.java.statement.Catch;
@@ -2355,6 +2356,24 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
+
+    public void printAssignableScopeBlock(AssignableScopeBlock x) throws IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        write("assignable-scope(");
+        if (x.getAssignablePV() != null) {
+            writeElement(x.getAssignablePV());
+        }
+        write(")");
+        if (x.getBody() != null) {
+            writeElement(1, x.getBody());
+        } else {
+            write("{}");
+        }
+        printFooter(x);
+    }
+
+
     public void printImport(Import x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
@@ -3209,6 +3228,4 @@ public class PrettyPrinter {
         write("\\map_empty");
         printFooter(x);
     }
-
-    
 }

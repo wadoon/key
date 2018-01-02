@@ -30,6 +30,7 @@ import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.statement.AssignableScopeBlock;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -620,24 +621,25 @@ public abstract class TacletIndex  {
 	    Try.class,	    
 	    MethodFrame.class,
 	    SynchronizedBlock.class,
-	    LoopScopeBlock.class
+	    LoopScopeBlock.class,
+	    AssignableScopeBlock.class,
 	    };
-
-	/**
-	 * number of prefix types
-	 */
-	static final int PREFIXTYPES=prefixClasses.length;
 
 	/**
 	 * field that marks iff the prefix elements have already occurred
 	 */
-	private final boolean[] occurred = new boolean[PREFIXTYPES];
+	private final boolean[] occurred = new boolean[prefixClasses.length];
 	
 	/**
 	 * fields to indicate the position of the next relevant child (the next
 	 * possible prefix element or real statement
 	 */
-	static final int[] nextChild = new int[]{0,1,0,1,1,1};
+	static final int[] nextChild = new int[]{0,1,0,1,1,1,1};
+
+	static {
+	    assert nextChild.length == prefixClasses.length :
+	        "A nextChild must be defined for every prefix class";
+	}
 
 	PrefixOccurrences() {
 	    reset();
@@ -647,8 +649,8 @@ public abstract class TacletIndex  {
 	 * resets the occurred field to 'nothing has occurred'
 	 */
 	public void reset() {
-	    for (int i=0; i<PREFIXTYPES; i++) {
-		occurred[i]=false;
+	    for (int i = 0; i < prefixClasses.length; i++) {
+		occurred[i] = false;
 	    }
 	}
 
@@ -659,7 +661,7 @@ public abstract class TacletIndex  {
 	 * @return the number of the next possible prefix element
 	 */
     public int occurred(ProgramElement pe) {
-        for (int i = 0; i < PREFIXTYPES; i++) {
+        for (int i = 0; i < prefixClasses.length; i++) {
             if (prefixClasses[i].isInstance(pe)) {
                 occurred[i] = true;
                 if (pe instanceof MethodFrame) {
@@ -670,7 +672,8 @@ public abstract class TacletIndex  {
                 }
             }
         }
-        return -1;
+        throw new Error("This should never be reached");
+        // return -1;
     }
 
 	/**
@@ -681,7 +684,7 @@ public abstract class TacletIndex  {
 	public ImmutableList<NoPosTacletApp> getList
 	    (HashMap<Object, ImmutableList<NoPosTacletApp>> map) {
 	    ImmutableList<NoPosTacletApp> result=ImmutableSLList.<NoPosTacletApp>nil();
-	    for (int i=0; i<PREFIXTYPES; i++) {
+	    for (int i=0; i<prefixClasses.length; i++) {
 		if (occurred[i]) {
 		    ImmutableList<NoPosTacletApp> inMap=map.get(prefixClasses[i]);
 		    if (inMap!=null) {

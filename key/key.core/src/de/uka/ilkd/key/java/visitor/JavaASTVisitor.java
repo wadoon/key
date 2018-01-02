@@ -770,6 +770,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
     @Override
+    public void performActionOnAssignableScopeBlock(AssignableScopeBlock x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnThen(Then x) {
 	doDefaultAction(x);
     }

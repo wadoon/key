@@ -3678,6 +3678,7 @@ Statement Statement() :
 | result = SynchronizedStatement()
 | result = MergePointStatement()
 | result = LoopScope()
+| result = AssignableScope()
 | result = TryStatement()
 | result = AssertStatement()
 | result = KeYCatchAllStatement()
@@ -4510,6 +4511,29 @@ LoopScopeBlock LoopScope() :
   block = Block()
   {
       result.setIndexPV(indexPV);
+      result.setBody(block);
+      checkConstruction(result);
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+AssignableScopeBlock AssignableScope() :
+{
+    AssignableScopeBlock result;
+    Expression assignable;
+    StatementBlock block;
+}
+{
+  "assignable-scope"
+  {
+      result = factory.createAssignableScopeBlock();
+      setPrefixInfo(result);
+  }
+  "(" assignable = Expression() ")"
+  block = Block()
+  {
+      result.setAssignable(assignable);
       result.setBody(block);
       checkConstruction(result);
       setPostfixInfo(result);

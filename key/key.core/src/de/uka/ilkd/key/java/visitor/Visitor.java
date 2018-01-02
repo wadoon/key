@@ -115,6 +115,7 @@ import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.java.statement.Assert;
+import de.uka.ilkd.key.java.statement.AssignableScopeBlock;
 import de.uka.ilkd.key.java.statement.Break;
 import de.uka.ilkd.key.java.statement.Case;
 import de.uka.ilkd.key.java.statement.Catch;
@@ -302,6 +303,8 @@ public interface Visitor {
     void performActionOnSynchronizedBlock(SynchronizedBlock x); 
 
     void performActionOnLoopScopeBlock(LoopScopeBlock x); 
+
+    void performActionOnAssignableScopeBlock(AssignableScopeBlock assignableScopeBlock);
 
     void performActionOnImport(Import x);
 
