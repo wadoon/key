@@ -96,7 +96,8 @@ public class EditSourceFileAction extends AbstractAction {
          parserMessage.setEditable(false);
          parserMessage.setColumns(columnNumber);
          // approximate # rows
-         parserMessage.setRows(message.length() / (columnNumber-10));
+         int messageLength = message == null ? 0 : message.length();
+         parserMessage.setRows(messageLength / (columnNumber-10));
          parserMessage.setLineWrap(true);
          parserMessage.setWrapStyleWord(true);
          parserMessage.setBorder(new TitledBorder("Parser Message"));
