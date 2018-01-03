@@ -87,6 +87,7 @@ public class PosInProgram {
     }   
 
     private PosInProgram(int[] pos, int depth) {
+        assert depth >= 0 : "Position in program must have non-negative depth";
         this.pos = pos;
         this.depth = depth; 
     }
@@ -110,7 +111,7 @@ public class PosInProgram {
      */
     public PosInProgram up() {
         final PosInProgram up;
-        if (this != TOP) {
+        if (depth > 0) {
             up = new PosInProgram(this.pos, depth - 1); 
         } else {
             up = TOP;
