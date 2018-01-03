@@ -196,11 +196,11 @@ public class TestCaseGenerator {
 		executeWithOpenJML = createExecuteWithOpenJML(settings.getOpenjmlPath(),settings.getObjenesisPath());
 		compileWithOpenJML = createCompileWithOpenJML(settings.getOpenjmlPath(), settings.getObjenesisPath());
 		oracleGenerator  =new OracleGenerator(services,rflCreator, useRFL);
-		if(junitFormat){
-			//System.out.println("Translating oracle");
-			oracleMethods = new LinkedList<OracleMethod>();
-			oracleMethodCall = getOracleAssertion(oracleMethods);
-		}
+//		if(junitFormat){//TODO muessig restore
+//			//System.out.println("Translating oracle");
+//			oracleMethods = new LinkedList<OracleMethod>();
+//			oracleMethodCall = getOracleAssertion(oracleMethods);
+//		}
 	}
 
 	/**
@@ -509,42 +509,43 @@ public class TestCaseGenerator {
 			return true;
 		}
 	}
+	
 
-	public String generateJUnitTestCase(Model m, Node n) throws IOException { // TODO: Method is never used, remove
-		fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
-		String mut = getMUTCall();
-		if (mut == null) {
-			mut = "<method under test> //Manually write a call to the method under test, because KeY could not determine it automatically.";
-		} else {
-			fileName += "_" + MUTName;
-		}
-		final StringBuffer testCase = new StringBuffer();
-		testCase.append(getFilePrefix(fileName, null) + NEW_LINE);
-		testCase.append(getMainMethod(fileName, 1) + NEW_LINE + NEW_LINE);
-		testCase.append(getTestMethodSignature(0) + "{" + NEW_LINE);
-		Map<String, Sort> typeInfMap = null;
-		if(n!=null){
-		    typeInfMap = generateTypeInferenceMap(n);
-		}
-		testCase.append("   //Test preamble: creating objects and intializing test data"
-				+ generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
-		testCase.append("   //Calling the method under test   " + NEW_LINE + mut
-				+ NEW_LINE);
-		testCase.append("}" + NEW_LINE + "}");
-		logger.writeln("Writing test file to:" + directory + modDir
-				+ File.separator + fileName);
-		writeToFile(fileName + JAVA_FILE_EXTENSION_WITH_DOT, testCase);
-		exportCodeUnderTest();
-		createDummyClasses();
-		try{
-			if(useRFL)writeRFLFile();
-		}catch(Exception ex){
-			logger.writeln("Error: The file RFL" + JAVA_FILE_EXTENSION_WITH_DOT + " is either not generated or it has an error.");
-		}
-		createOpenJMLShellScript();
-		TestCaseGenerator.fileCounter++;
-		return testCase.toString();
-	}
+//	public String generateJUnitTestCase(Model m, Node n) throws IOException { // TODO: Method is never used, remove
+//		fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
+//		String mut = getMUTCall();
+//		if (mut == null) {
+//			mut = "<method under test> //Manually write a call to the method under test, because KeY could not determine it automatically.";
+//		} else {
+//			fileName += "_" + MUTName;
+//		}
+//		final StringBuffer testCase = new StringBuffer();
+//		testCase.append(getFilePrefix(fileName, null) + NEW_LINE);
+//		testCase.append(getMainMethod(fileName, 1) + NEW_LINE + NEW_LINE);
+//		testCase.append(getTestMethodSignature(0) + "{" + NEW_LINE);
+//		Map<String, Sort> typeInfMap = null;
+//		if(n!=null){
+//		    typeInfMap = generateTypeInferenceMap(n);
+//		}
+//		testCase.append("   //Test preamble: creating objects and intializing test data"
+//				+ generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
+//		testCase.append("   //Calling the method under test   " + NEW_LINE + mut
+//				+ NEW_LINE);
+//		testCase.append("}" + NEW_LINE + "}");
+//		logger.writeln("Writing test file to:" + directory + modDir
+//				+ File.separator + fileName);
+//		writeToFile(fileName + JAVA_FILE_EXTENSION_WITH_DOT, testCase);
+//		exportCodeUnderTest();
+//		createDummyClasses();
+//		try{
+//			if(useRFL)writeRFLFile();
+//		}catch(Exception ex){
+//			logger.writeln("Error: The file RFL" + JAVA_FILE_EXTENSION_WITH_DOT + " is either not generated or it has an error.");
+//		}
+//		createOpenJMLShellScript();
+//		TestCaseGenerator.fileCounter++;
+//		return testCase.toString();
+//	}
 
 
 
@@ -569,6 +570,8 @@ public class TestCaseGenerator {
 	private Term getPostCondition() {
 		return info.getPostCondition();
 	}
+	
+	
 	public String generateJUnitTestSuite(Collection<SMTSolver> problemSolvers) throws IOException {
 		initFileName();
 		StringBuffer testSuite = createTestCaseCotent(problemSolvers);
@@ -616,9 +619,11 @@ public class TestCaseGenerator {
 						
 						testMethod.append("  //" + originalNodeName + NEW_LINE);
 						testMethod.append(getTestMethodSignature(i) + "{" + NEW_LINE);
-						testMethod
-						.append("   //Test preamble: creating objects and intializing test data"
-								+ generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
+						testMethod.append("    //Test preamble: creating objects and initializing test data"
+								+ generateTestCaseInfoFlow(m, typeInfMap) + NEW_LINE + NEW_LINE); //TODO muessig remove
+//						testMethod
+//						.append("   //Test preamble: creating objects and intializing test data"
+//								+ generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
 
 						Set<Term> vars = new HashSet<Term>();
 						info.getProgramVariables(info.getPO(), vars);         	  
@@ -626,11 +631,14 @@ public class TestCaseGenerator {
 						testMethod
 						.append("   //Calling the method under test   " + NEW_LINE
 								+ info.getCode() + NEW_LINE);
+						
+						testMethod.append(info.getCode() + NEW_LINE); //TODO muessig get the second code block!
+						
 
-
-						if(junitFormat){
-							testMethod.append("   //calling the test oracle" + NEW_LINE+TAB+oracleMethodCall + NEW_LINE);
-						}
+						
+//						if(junitFormat){//TODO muessig restore
+//							testMethod.append("   //calling the test oracle" + NEW_LINE+TAB+oracleMethodCall + NEW_LINE);
+//						}
 
 						testMethod.append(" }" + NEW_LINE + NEW_LINE);
 						i++;
@@ -657,12 +665,12 @@ public class TestCaseGenerator {
 		testSuite.append(getMainMethod(fileName, i) + NEW_LINE + NEW_LINE);
 		testSuite.append(testMethods);
 
-		if(junitFormat){
-			for(OracleMethod m : oracleMethods){
-				testSuite.append(NEW_LINE + NEW_LINE);
-				testSuite.append(m);
-			}
-		}
+//		if(junitFormat){ //TODO muessig restore
+//			for(OracleMethod m : oracleMethods){
+//				testSuite.append(NEW_LINE + NEW_LINE);
+//				testSuite.append(m);
+//			}
+//		}
 
 		if (rflAsInternalClass) {
 			testSuite.append(createRFLFileContent());
@@ -693,6 +701,7 @@ public class TestCaseGenerator {
 
     private void generateTypeInferenceMapHelper(Term t, Map<String, Sort> map){
         Operator op = t.op();
+
         if(op instanceof ProgramVariable){
             ProgramVariable pv = (ProgramVariable)t.op();
             final String name = pv.name().toString();
@@ -828,6 +837,211 @@ public class TestCaseGenerator {
 
 		return res.toString();
 	}
+	
+	public String generateTestCaseInfoFlow(Model m, Map<String, Sort> typeInfMap) {
+		m.removeUnnecessaryObjects();
+
+		Set<String> objects = new HashSet<String>();
+		
+		
+		
+		final List<Assignment> assignments = new LinkedList<Assignment>();
+//		Heap heap = null;
+		List<Heap> heaps = m.getHeaps();
+//		for (final Heap h : m.getHeaps()) {
+//			
+//			if (h.getName().equals(HeapLDT.BASE_HEAP_NAME.toString())) {
+//				heap = h;
+//				break;
+//			}
+//		}
+
+		//Set<ObjectVal> prestate = getPrestateObjects(m);
+		Set<ObjectVal> prestate = new HashSet<ObjectVal>();
+		if (!heaps.isEmpty()) {
+
+			//create Objects for all Heaps (PreA/B, PostA/B)
+			for (Heap heap : heaps) {
+				for (final ObjectVal o : heap.getObjects()) {
+					if (o.getName().equals("#o0")) {
+						continue;
+					}
+					final String type = getSafeType(o.getSort());
+					String right;
+					if (type.endsWith("[]")) {
+						right = "new " + type.substring(0, type.length() - 2) + "["
+								+ o.getLength() + "]";
+					}else if(o.getSort() == null || o.getSort().toString().equals("Null")){
+						right = "null";
+					}else {
+						if(useRFL){
+							right = "RFL.new"+ReflectionClassCreator.cleanTypeName(type)+"()";
+							rflCreator.addSort(type);
+							//rflCreator.addSort(oSort!=null?oSort.name().toString():"Object");
+							//System.out.println("Adding sort (create Object):"+ (oSort!=null?oSort.name().toString():"Object"));
+						}else
+							right = "new " + type + "()";
+					}
+					
+					String currentHeapSplit[] = heap.getName().split("At");
+					String currentHeap;
+					if (currentHeapSplit.length > 1) {
+						currentHeap = currentHeapSplit[1];
+					}
+					else {
+						currentHeap = "";
+					}
+					String objName = currentHeap+createObjectName(o);
+					objects.add(objName);
+					assignments.add(new Assignment(type, objName, right));
+//					if(junitFormat && isInPrestate(prestate, o)){
+//						assignments.add(new Assignment(type, getPreName(objName), right));
+//					}
+				}
+			}
+		}
+		// init constants
+		for (final String c : m.getConstants().keySet()) {
+			String val = m.getConstants().get(c);
+			if (filterVal(val) && !c.equals("null")) {
+			    boolean isObject = false;
+				String type = "int";
+				String declType = "int";
+				if (val.equals("true") || val.equals("false")) {
+					type = "boolean";
+				} else if (val.startsWith("#o")) {
+				    isObject = true;
+				    type = this.inferSort(typeInfMap, c);
+				    /*
+					final ObjectVal o = getObject(heap, val);
+					if (o != null) {
+						if (val.equals("#o0")
+								&& m.getTypes().getOriginalConstantType(c) != null) {
+							type = m.getTypes().getOriginalConstantType(c)
+									.name().toString();
+						} else {
+							type = getSafeType(o.getSort()); //o.getSort().name().toString();
+						}
+					} else {
+						type = "Object";
+					}
+					*/
+                    
+				}
+				if(isObject){
+                    declType = NULLABLE +" "+type;
+				}
+				else{
+                    declType = type;				    
+				}
+
+				val = translateValueExpression(val);
+//				for (Heap heap : heaps) {
+					if(isObject&&!val.equals("null")) {
+						val = "Post_A"+val;//TODO muessig continue here, this is not complete	
+					}
+					assignments.add(new Assignment(declType, c, "("+type+")"+val));
+//					if(junitFormat && isObject && isInPrestate(prestate, val)){
+//						assignments.add(new Assignment(declType, getPreName(c), "("+type+")"+getPreName(val)));
+//					}
+//				}
+			}
+		}
+		// init fields
+		if (!heaps.isEmpty()) {
+			for(Heap heap : heaps) {
+				for (final ObjectVal o : heap.getObjects()) {
+					if (o.getName().equals("#o0") || o.getSort().name().toString().endsWith("Exception")) {
+						continue;
+					}
+					String currentHeapSplit[] = heap.getName().split("At");
+					String currentHeap;
+					if (currentHeapSplit.length > 1) {
+						currentHeap = currentHeapSplit[1];
+					}
+					else {
+						currentHeap = "";
+					}
+					final String receiverObject = currentHeap+createObjectName(o);
+					for (final String f : o.getFieldvalues().keySet()) {
+						if (f.contains("<") || f.contains(">")) {
+							continue;
+						}
+						String fieldName = f.substring(f.lastIndexOf(":") + 1);
+						fieldName = fieldName.replace("|", "");
+						String val = o.getFieldvalues().get(f);
+						//final String vType = getTypeOfValue(heap, m, val);
+	                    String fieldName2 = f.replace("|","");
+						final String vType = this.inferSort(typeInfMap, fieldName2); //getTypeOfValue(heap, m, val);
+						rflCreator.addSort(vType); //possible bug if vType represents an abstract type or an interface. See: getSafeType.
+						//System.out.println("Added sort (init fields):"+vType);
+						val = translateValueExpression(val);
+						final String rcObjType = getSafeType(o.getSort());
+						assignments
+						.add(new Assignment(new RefEx(rcObjType,receiverObject,vType,fieldName), "("+vType+")"+val));
+	
+//						if(junitFormat && isInPrestate(prestate, o)){//TODO muessig check if needed
+//							//if value that is pointed to is object and in prestate then use prestate object
+//							if(!vType.equals("int") && !vType.equals("boolean") && isInPrestate(prestate, val) && !val.equals("null")){
+//								val = getPreName(val);
+//							}
+//							
+//							
+//							
+//							assignments
+//							.add(new Assignment(new RefEx(rcObjType,getPreName(receiverObject),vType,fieldName),"("+vType+")"+ val));
+//						}
+	
+					}
+					if (o.getSort() != null
+							&& o.getSort().name().toString().endsWith("[]")) {
+	
+						String safeType = getSafeType(o.getSort());
+						String elementType = safeType.substring(0, safeType.length()-2);
+						rflCreator.addSort(safeType);
+						//System.out.println("Added sort (init array fields):"+safeType);					
+	
+						for (int i = 0; i < o.getLength(); i++) {
+							final String fieldName = "[" + i + "]";
+							String val = o.getArrayValue(i);
+							val = translateValueExpression(val);
+							assignments.add(new Assignment(receiverObject + fieldName, val));
+							//assignments.add(new Assignment("",new RefArrayEx("","",name,""+i), val));
+	
+							if(junitFormat && isInPrestate(prestate, o)){
+								
+	
+								if(!elementType.equals("int") && !elementType.equals("boolean") && isInPrestate(prestate, val) && !val.equals("null")){
+									val = getPreName(val);
+								}
+								
+								assignments.add(new Assignment(getPreName(receiverObject) + fieldName, val));
+							}
+	
+	
+						}
+					}
+				}
+			}
+		}
+
+		final StringBuffer result = new StringBuffer();
+		for (final Assignment a : assignments) {
+			result.append(NEW_LINE + "   ");
+			result.append(a.toString(useRFL));
+		}
+		
+//		if(junitFormat){//TODO muessig check if needed
+//			result.append(NEW_LINE);
+//			result.append(createOldMap(objects) + NEW_LINE);
+//			result.append(createBoolSet() + NEW_LINE);
+//			result.append(createIntSet() + NEW_LINE);
+//			result.append(createObjSetInfoFlow(heaps) + NEW_LINE);			
+//		}
+
+
+		return result.toString();
+	}
 
 	public String generateTestCase(Model m, Map<String, Sort> typeInfMap) {
 		/*		if(useRFL){
@@ -840,7 +1054,9 @@ public class TestCaseGenerator {
 		m.removeUnnecessaryObjects();
 
 		Set<String> objects = new HashSet<String>();
-
+		
+		
+		System.out.println("generate Test Case"); //TODO muessig remove
 		final List<Assignment> assignments = new LinkedList<Assignment>();
 		Heap heap = null;
 		for (final Heap h : m.getHeaps()) {
@@ -1155,7 +1371,7 @@ public class TestCaseGenerator {
 		StringBuffer res  = new StringBuffer();		
 
 		res.append(TAB+"Set<Object> "+ALL_OBJECTS +"= new HashSet<Object>();" + NEW_LINE);
-
+		
 		for(ObjectVal o : h.getObjects()){
 			String name = o.getName();
 			if(name.equals("#o0")){
@@ -1167,6 +1383,27 @@ public class TestCaseGenerator {
 		}			
 
 		return res.toString();		
+	}
+	
+	//TODO muessig test this method
+	private String createObjSetInfoFlow(List<Heap> heaps) {
+		StringBuffer res = new StringBuffer();
+		
+		res.append(TAB+"Set<Object> "+ALL_OBJECTS +"= new HashSet<Object>();" + NEW_LINE);
+		
+		//create objects for HeapAtPre_A, HeapAtPre_B, HeapAtPost_A and HeapAtPost_B
+		for (Heap h : heaps) {
+			for(ObjectVal o : h.getObjects()){
+				String name = "_"+h.getName()+o.getName();
+				if(name.equals("#o0")){
+					continue;
+				}
+				name = name.replace("#", "_");
+				res.append(TAB+ALL_OBJECTS+".add("+name+");" + NEW_LINE);
+
+			}		
+		}
+		return res.toString();	
 	}
 
 
