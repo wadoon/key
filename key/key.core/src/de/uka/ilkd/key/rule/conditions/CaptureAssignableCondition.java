@@ -57,7 +57,7 @@ public final class CaptureAssignableCondition implements VariableCondition {
         ProgramElement program = contextInst.contextProgram();
         PosInProgram pos = contextInst.prefix();
 
-        while(pos != PosInProgram.TOP) {
+        while(pos.depth() > 0) {
             ProgramElement current = pos.getProgram(program);
             if(current instanceof AssignableScopeBlock) {
                 AssignableScopeBlock ass = (AssignableScopeBlock) current;
