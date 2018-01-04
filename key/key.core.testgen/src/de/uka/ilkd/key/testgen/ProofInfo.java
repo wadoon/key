@@ -2,6 +2,8 @@ package de.uka.ilkd.key.testgen;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.PrettyPrinter;
@@ -121,7 +123,7 @@ public class ProofInfo {
 
 		Term f = getPO();
 		JavaBlock block = getJavaBlock(f);
-
+		
 		//	getUpdate(f);
 		StringWriter sw = new StringWriter();
 		sw.write("   "+getUpdate(f)+"\n");
@@ -135,6 +137,40 @@ public class ProofInfo {
 		}
 
 		return null;	
+
+	}
+	
+	/**
+	 * This method returns you the two java blocks for 
+	 * information flow tests (two java blocks for two MUT-executions)
+	 * @return String array with two java blocks
+	 * @author Muessig
+	 */
+	public String[] getCodeInfoFlow() {
+
+		Term f = getPO();
+		String[] result = new String[2];
+		List<JavaBlock> blocks = getJavaBlocks(f);
+		
+		if(blocks.size() > 2) {
+			System.out.println("Warning: The Proof owns more than 2 JavaBlocks, "
+					+ "check if the MUT calls are correct");
+		}
+		
+		for (int i = 0; i < result.length; i++) {
+			try {
+				StringWriter sw = new StringWriter();
+				sw.write("   "+getUpdate(f)+"\n");
+				PrettyPrinter pw = new CustomPrettyPrinter(sw,false);
+				
+				blocks.get(i).program().prettyPrint(pw);
+				result[i] = sw.getBuffer().toString();
+				
+			} catch (IOException e) {	       
+				e.printStackTrace();
+			}
+		}
+		return result;
 
 	}
 
@@ -246,9 +282,27 @@ public class ProofInfo {
 		}		
 		return null;		
 	}
+	
 
+	private List<JavaBlock> getJavaBlocks(Term f) { //TODO muessig check if needed
+		List<JavaBlock> blocks = new ArrayList<JavaBlock>();
+		getJavaBlocksHelp(f, blocks);
+		return blocks;
+	}
+	
 
-
-
+	private void getJavaBlocksHelp(Term f, List<JavaBlock> blocks) {
+		if(f.containsJavaBlockRecursive()) {
+			
+			for (Term s : f.subs()) {
+				if (s.containsJavaBlockRecursive()) {
+					if (!s.javaBlock().isEmpty()) {
+						blocks.add(s.javaBlock());
+					}	
+					getJavaBlocksHelp(s, blocks);
+				}
+			}
+		}
+	}
 
 }
