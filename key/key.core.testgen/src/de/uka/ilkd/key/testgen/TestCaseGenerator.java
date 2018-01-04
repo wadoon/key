@@ -605,6 +605,10 @@ public class TestCaseGenerator {
 		testSuite.append(getFilePrefix(fileName, packageName) + NEW_LINE);
 		final StringBuffer testMethods = new StringBuffer();
 		int i = 0;
+		boolean infoFlow = false;
+		if(info.getContract().getDisplayName().startsWith("Non-interference")) { //check if non-interference contract
+			infoFlow = true;
+		}
 		for (final SMTSolver solver : problemSolvers) {
 			try {
 				final StringBuffer testMethod = new StringBuffer();
@@ -619,23 +623,34 @@ public class TestCaseGenerator {
 						
 						testMethod.append("  //" + originalNodeName + NEW_LINE);
 						testMethod.append(getTestMethodSignature(i) + "{" + NEW_LINE);
-						testMethod.append("    //Test preamble: creating objects and initializing test data"
-								+ generateTestCaseInfoFlow(m, typeInfMap) + NEW_LINE + NEW_LINE); //TODO muessig remove
-//						testMethod
-//						.append("   //Test preamble: creating objects and intializing test data"
-//								+ generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
+						if(infoFlow) {
+							testMethod
+							.append("    //Test preamble: creating objects and initializing test data"
+									+ generateTestCaseInfoFlow(m, typeInfMap) + NEW_LINE + NEW_LINE); 
+						}
+						else {
+							testMethod
+							.append("   //Test preamble: creating objects and intializing test data"
+									+ generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
+						}
 
 						Set<Term> vars = new HashSet<Term>();
 						info.getProgramVariables(info.getPO(), vars);         	  
 						testMethod.append(TAB+"//Other variables" + NEW_LINE + getRemainingConstants(m.getConstants().keySet(), vars) + NEW_LINE);
-						testMethod
-						.append("   //Calling the method under test   " + NEW_LINE
-								+ info.getCode() + NEW_LINE);
+						if (infoFlow) {
+							String[] codes = info.getCodeInfoFlow(); //TODO muessig for information flow
+							for (String code : codes) {
+								testMethod.append(code + NEW_LINE);
+							}
+						}
+						else {
+							testMethod
+							.append("   //Calling the method under test   " + NEW_LINE
+									+ info.getCode() + NEW_LINE);
+						}
 						
-						testMethod.append(info.getCode() + NEW_LINE); //TODO muessig get the second code block!
 						
-
-						
+//						
 //						if(junitFormat){//TODO muessig restore
 //							testMethod.append("   //calling the test oracle" + NEW_LINE+TAB+oracleMethodCall + NEW_LINE);
 //						}
@@ -1056,7 +1071,6 @@ public class TestCaseGenerator {
 		Set<String> objects = new HashSet<String>();
 		
 		
-		System.out.println("generate Test Case"); //TODO muessig remove
 		final List<Assignment> assignments = new LinkedList<Assignment>();
 		Heap heap = null;
 		for (final Heap h : m.getHeaps()) {
