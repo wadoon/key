@@ -109,6 +109,7 @@ import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeRef;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.Assert;
+import de.uka.ilkd.key.java.statement.AssignableScopeBlock;
 import de.uka.ilkd.key.java.statement.Break;
 import de.uka.ilkd.key.java.statement.Case;
 import de.uka.ilkd.key.java.statement.Catch;
@@ -627,6 +628,16 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         DefaultAction def = new DefaultAction(x) {
             ProgramElement createNewElement(ExtList changeList) {
                 return new LoopScopeBlock(changeList);
+            }
+        };
+        def.doAction(x);
+    }
+
+    @Override
+    public void performActionOnAssignableScopeBlock(AssignableScopeBlock x) {
+        DefaultAction def = new DefaultAction(x) {
+            ProgramElement createNewElement(ExtList changeList) {
+                return new AssignableScopeBlock(changeList);
             }
         };
         def.doAction(x);

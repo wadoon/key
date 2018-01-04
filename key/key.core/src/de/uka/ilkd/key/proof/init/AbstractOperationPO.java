@@ -97,7 +97,7 @@ import de.uka.ilkd.key.speclang.HeapContext;
 public abstract class AbstractOperationPO extends AbstractPO {
    private static final String JAVA_LANG_THROWABLE = "java.lang.Throwable";
 
-/**
+    /**
     * If this is {@code true} an uninterpreted predicate is added to the
     * postconditions which contains the heap and all parameters as arguments.
     * @see #buildUninterpretedPredicate(ImmutableList, String)
@@ -126,6 +126,8 @@ public abstract class AbstractOperationPO extends AbstractPO {
    protected InitConfig proofConfig;
    protected TermBuilder tb;
 
+    protected final boolean localAssignableChecks;
+
    /**
     * Constructor.
     * @param initConfig The {@link InitConfig} to use.
@@ -149,6 +151,10 @@ public abstract class AbstractOperationPO extends AbstractPO {
       super(initConfig, name);
       this.addUninterpretedPredicate = addUninterpretedPredicate;
       this.addSymbolicExecutionLabel = addSymbolicExecutionLabel;
+
+        this.localAssignableChecks = "assignableChecks:local".equals(
+                initConfig.getSettings().getChoiceSettings().
+                getDefaultChoices().get("assignableChecks"));
    }
 
    @Override
@@ -240,7 +246,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
           }
 
           Term frameTerm = buildFrameClause(heaps, heapToBefore, selfVar, paramVars, proofServices);
-          Term post = tb.and(postTerm, frameTerm);
+            Term post;
+            if(localAssignableChecks) {
+                post = postTerm;
+            } else {
+                post = tb.and(postTerm, frameTerm);
+            }
           ImmutableList<FunctionalOperationContract> lookupContracts = ImmutableSLList.<FunctionalOperationContract>nil();
           ImmutableSet<FunctionalOperationContract> cs = proofServices.getSpecificationRepository().getOperationContracts(getCalleeKeYJavaType(), pm);
           for(KeYJavaType superType : proofServices.getJavaInfo().getAllSupertypes(getCalleeKeYJavaType())) {
@@ -310,13 +321,20 @@ public abstract class AbstractOperationPO extends AbstractPO {
          final ProgramVariable exceptionVar =
                  tb.excVar(pm, makeNamesUnique);
 
+                ProgramVariable modVar = null;
+                if(localAssignableChecks) {
+                    String modName = tb.newName("mod");
+                    modVar = new LocationVariable(new ProgramElementName(modName),
+                            proofServices.getJavaInfo().getPrimitiveKeYJavaType("LocSet"));
+                }
+
          final List<LocationVariable> modHeaps =
                  HeapContext.getModHeaps(proofServices, transactionFlag);
          final Map<LocationVariable, LocationVariable> atPreVars =
                  HeapContext.getBeforeAtPreVars(modHeaps, proofServices, "AtPre");
 
-//         final Map<LocationVariable, Map<Term, Term>> heapToAtPre =
-//                 new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+                //         final Map<LocationVariable, Map<Term, Term>> heapToAtPre =
+                //                 new LinkedHashMap<LocationVariable, Map<Term, Term>>();
          final Map<Term, Term> heapToAtPre = new LinkedHashMap<Term, Term>();
 
          for (LocationVariable heap : modHeaps) {
@@ -324,12 +342,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
          }
 
          // FIXME Wojtek: This is a fiddly bit that needs to be rechecked eventually
-/*
+                /*
          if (modHeaps.contains(getSavedHeap())) {
             heapToAtPre.get(getSavedHeap())
                 .put(tb.getBaseHeap(), tb.var(atPreVars.get(getSavedHeap())));
          }
-*/
+                 */
 
          // register the variables so they are declared in proof header if the proof is saved to a file
          register(paramVars, proofServices);
@@ -356,7 +374,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
          // build program block to execute in try clause (must be done before pre condition is created.
          final ImmutableList<StatementBlock> sb =
-                 buildOperationBlocks(formalParamVars, selfVar, resultVar, proofServices);
+                        buildOperationBlocks(formalParamVars, selfVar, resultVar, modVar, proofServices);
 
          Term permsFor = tb.tt();
          if(pm.getHeapCount(proofServices) == 2 && proofServices.getTypeConverter().getHeapLDT().getPermissionHeap() != null) {
@@ -386,18 +404,20 @@ public abstract class AbstractOperationPO extends AbstractPO {
              }
          }
          // build program term
-         Term postTerm =
+                Term post =
                  getPost(modHeaps, selfVar, paramVars, resultVar, exceptionVar, atPreVars, proofServices);
          // Add uninterpreted predicate
          if (isAddUninterpretedPredicate()) {
-            postTerm = tb.and(postTerm,
+                    post = tb.and(post,
                               ensureUninterpretedPredicateExists(paramVars, formalParamVars, exceptionVar,
                                                           getUninterpretedPredicateName(), proofServices));
          }
 
+                if(!localAssignableChecks) {
          Term frameTerm = buildFrameClause(modHeaps, heapToAtPre, selfVar, paramVars, proofServices);
+                    post = tb.and(post, frameTerm);
+                }
 
-         Term post = tb.and(postTerm, frameTerm);
          post = modifyPostTerm(proofServices, post);
          
          final LocationVariable baseHeap = proofServices.getTypeConverter().getHeapLDT().getHeap();
@@ -405,11 +425,18 @@ public abstract class AbstractOperationPO extends AbstractPO {
          final Term globalUpdate = getGlobalDefs(baseHeap, tb.getBaseHeap(), selfVarTerm,
                                                  tb.var(paramVars), proofServices);
 
-         final Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar,
+                Term progPost = buildProgramTerm(paramVars, formalParamVars, selfVar, resultVar,
                                                 exceptionVar, atPreVars, post, sb, proofServices);
+                if(localAssignableChecks) {
+                    progPost = tb.apply(tb.elementary(tb.var(modVar),
+                                                      buildFrameLocSet(modVar, baseHeap, selfVar, paramVars, proofServices)),
+                                        progPost);
+                }
+
          final Term preImpliesProgPost = tb.imp(pre, progPost);
          final Term applyGlobalUpdate = globalUpdate == null ?
                  preImpliesProgPost : tb.apply(globalUpdate, preImpliesProgPost);
+
          termPOs.add(applyGlobalUpdate);
          if (poNames != null) {
             poNames[nameIndex++] = buildPOName(transactionFlag);
@@ -484,11 +511,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @param formalParVars Arguments from formal parameters for method call.
     * @param selfVar The self variable.
     * @param resultVar The result variable.
+     * @param modVar
     * @param services TODO
     */
    protected abstract ImmutableList<StatementBlock> buildOperationBlocks(ImmutableList<LocationVariable> formalParVars,
                                                          ProgramVariable selfVar,
-                                                         ProgramVariable resultVar, Services services);
+            ProgramVariable resultVar, ProgramVariable modVar, Services services);
 
 
    /**
@@ -800,12 +828,13 @@ public abstract class AbstractOperationPO extends AbstractPO {
     * @param selfVar The self variable.
     * @param resultVar The result variable.
     * @param exceptionVar The {@link ProgramVariable} used to store caught exceptions.
+     * @param modVar
     * @param atPreVars Mapping of {@link LocationVariable} to the {@link LocationVariable} which contains the initial value.
     * @param postTerm The post condition.
     * @param sb The {@link StatementBlock} to execute in try block.
     * @return The created {@link Term}.
     */
-   protected Term buildProgramTerm(ImmutableList<ProgramVariable> paramVars,
+    private Term buildProgramTerm(ImmutableList<ProgramVariable> paramVars,
                                    ImmutableList<LocationVariable> formalParamVars,
                                    ProgramVariable selfVar,
                                    ProgramVariable resultVar,
@@ -849,6 +878,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
    protected LocationVariable getSavedHeap(Services services) {
       return services.getTypeConverter().getHeapLDT().getSavedHeap();
    }
+
+
+    protected Term buildFrameLocSet(ProgramVariable modVar, LocationVariable heap,
+            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, Services services) {
+        throw new UnsupportedOperationException("This instance does not support this method.");
+    }
 
    /**
     * Creates the try catch block to execute.

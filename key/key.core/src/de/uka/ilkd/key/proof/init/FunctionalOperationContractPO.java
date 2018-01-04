@@ -34,6 +34,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.statement.AssignableScopeBlock;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
@@ -138,7 +139,9 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
     @Override
     protected ImmutableList<StatementBlock> buildOperationBlocks(ImmutableList<LocationVariable> formalParVars,
                                                  ProgramVariable selfVar,
-                                                 ProgramVariable resultVar, Services services) {
+                                                 ProgramVariable resultVar,
+                                                 ProgramVariable modVar,
+                                                 Services services) {
         final StatementBlock[] result = new StatementBlock[4];
         final ImmutableArray<Expression> formalArray = new ImmutableArray<Expression>(formalParVars.toArray(
              new ProgramVariable[formalParVars.size()]));
@@ -169,6 +172,10 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
                                             resultVar,
                                             formalArray);
             result[1] = new StatementBlock(call);
+            if(localAssignableChecks) {
+                AssignableScopeBlock ass = new AssignableScopeBlock(modVar, result[1]);
+                result[1] = new StatementBlock(ass);
+            }
         }
        assert result[1] != null : "null body in method";
        return ImmutableSLList.<StatementBlock>nil().prepend(result);
@@ -258,6 +265,18 @@ public class FunctionalOperationContractPO extends AbstractOperationPO implement
           }
        }
        return frameTerm;
+    }
+
+    @Override
+    protected Term buildFrameLocSet(ProgramVariable modVar, LocationVariable heap,
+            ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars, Services services) {
+        if (getContract().hasModifiesClause(heap)) {
+            return tb.union(getContract().getMod(heap, selfVar, paramVars, services),
+                            tb.freshLocs(tb.var(heap)));
+        } else {
+            // strictly pure have a different contract.
+            return tb.empty();
+        }
     }
 
     /**

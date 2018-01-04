@@ -70,6 +70,7 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.ProofStatus;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.Pair;
@@ -105,6 +106,11 @@ public final class ProofManagementDialog extends JDialog {
         this.mediator = mainWindow.getMediator();
         this.initConfig = initConfig;
         
+        // sanitize initConfig
+        if(initConfig.getSettings() == null) {
+            initConfig.setSettings(new ProofSettings(ProofSettings.DEFAULT_SETTINGS));
+        }
+
         //create class tree
         targetIcons = new LinkedHashMap<Pair<KeYJavaType, IObserverFunction>, Icon>();
         classTree = new ClassTree(true, true, initConfig.getServices(), targetIcons);

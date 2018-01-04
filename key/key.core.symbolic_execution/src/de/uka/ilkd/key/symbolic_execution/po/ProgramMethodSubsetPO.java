@@ -158,7 +158,9 @@ public class ProgramMethodSubsetPO extends ProgramMethodPO {
    @Override
    protected ImmutableList<StatementBlock> buildOperationBlocks(ImmutableList<LocationVariable> formalParVars,
                                                 ProgramVariable selfVar,
-                                                ProgramVariable resultVar, Services services) {
+                                                ProgramVariable resultVar,
+                                                ProgramVariable modVar,
+                                                Services services) {
       // Get program method to execute
       KeYJavaType type = getCalleeKeYJavaType();
       IProgramMethod pm = getProgramMethod();

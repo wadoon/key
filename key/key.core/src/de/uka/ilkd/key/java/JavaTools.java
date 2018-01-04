@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.statement.AssignableScopeBlock;
 import de.uka.ilkd.key.java.statement.CatchAllStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -23,6 +24,7 @@ import de.uka.ilkd.key.java.visitor.CreatingASTVisitor;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 
 /** Miscellaneous static methods related to Java blocks or statements in KeY.
  * Mostly moved from key.util.MiscTools here.
@@ -117,6 +119,64 @@ public final class JavaTools {
         return result;
     }
     
+    /**
+     * returns the innermost assignable scope of a java block.
+     *
+     * This is intended to be the most local scope for the active statement.
+     *
+     * (Essentially a clone of {@link #getInnermostMethodFrame(JavaBlock, Services)})
+     *
+     * @see #getInnermostMethodFrame(JavaBlock, Services)
+     * @param jb
+     *            the non-null java block
+     * @param services
+     *            non-null services for lookup
+     * @return either the program variable of the innermost scope, or
+     *         <code>null</code> if no such block exists in jb.
+     *
+     * @author mattias ulbrich
+     */
+    public static IProgramVariable getInnermostAssignableScope(JavaBlock jb, Services services) {
+        return getInnermostAssignableScope(jb.program(), services);
+    }
+
+    /**
+     * returns the innermost assignable scope of a java block.
+     *
+     * This is intended to be the most local scope for the active statement.
+     *
+     * (Essentially a clone of {@link #getInnermostMethodFrame(JavaBlock, Services)})
+     *
+     * @see #getInnermostMethodFrame(JavaBlock, Services)
+     * @param jb
+     *            the non-null element representing a java block
+     * @param services
+     *            non-null services for lookup
+     * @return either the program variable of the innermost scope, or
+     *         <code>null</code> if no such block exists in jb.
+     *
+     * @author mattias ulbrich
+     */
+    public static IProgramVariable getInnermostAssignableScope(ProgramElement pe, Services services) {
+        IProgramVariable result = new JavaASTVisitor(pe , services) {
+            private IProgramVariable res;
+            protected void doAction(ProgramElement node) {
+                node.visit(this);
+            }
+            protected void doDefaultAction(SourceElement node) {
+                if(node instanceof AssignableScopeBlock && res == null) {
+                    AssignableScopeBlock assBlock = (AssignableScopeBlock) node;
+                    res = assBlock.getAssignablePV();
+                }
+            }
+            public IProgramVariable run() {
+                walk(pe);
+                return res;
+            }
+        }.run();
+
+        return result;
+    }
 
     public static ExecutionContext getInnermostExecutionContext(
         						JavaBlock jb, 

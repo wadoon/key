@@ -266,6 +266,7 @@ public class SymbolicExecutionPO extends AbstractInfFlowPO
             ImmutableList<LocationVariable> formalParVars,
             ProgramVariable selfVar,
             ProgramVariable resultVar,
+            ProgramVariable modVar,
             Services services) {
         throw new UnsupportedOperationException("Not supported any more. " +
                 "Please use the POSnippetFactory instead.");

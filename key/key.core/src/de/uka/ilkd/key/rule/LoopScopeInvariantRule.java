@@ -7,6 +7,7 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowCheckInfo;
+import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -14,6 +15,8 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.statement.AssignableScopeBlock;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.While;
@@ -28,6 +31,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -153,7 +158,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         // Create the "Initially" goal
         constructInitiallyGoal(loopInvInfo.services, loopInvInfo.ruleApp,
                 loopInvInfo.termLabelState, initiallyGoal, loopInvInfo.inst,
-                loopInvInfo.invTerm, loopInvInfo.reachableState);
+                loopInvInfo.invTerm, loopInvInfo.reachableState,
+                loopInvInfo.localAssignablePV != null);
 
         // Create the "Invariant Preserved and Use Case" goal
         constructPresrvAndUCGoal(loopInvInfo.services, loopInvInfo.ruleApp,
@@ -162,7 +168,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
                 loopInvInfo.wellFormedAnon, loopInvInfo.uAnonInv,
                 loopInvInfo.frameCondition, loopInvInfo.variantPO,
                 loopInvInfo.termLabelState, loopInvInfo.invTerm,
-                loopInvInfo.uBeforeLoopDefAnonVariant);
+                loopInvInfo.uBeforeLoopDefAnonVariant,
+                loopInvInfo.localAssignablePV);
 
         return goals;
     }
@@ -200,15 +207,17 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      *            The loop invariant formula.
      * @param reachableState
      *            The reachable state formula.
+     * @param localAssignableChecks
      */
     private void constructInitiallyGoal(Services services, RuleApp ruleApp,
             final TermLabelState termLabelState, Goal initiallyGoal,
-            final Instantiation inst, final Term invTerm, Term reachableState) {
+            final Instantiation inst, final Term invTerm, Term reachableState,
+            boolean localAssignableChecks) {
         initiallyGoal.setBranchLabel("Invariant Initially Valid");
         initiallyGoal
                 .changeFormula(
                         initFormula(termLabelState, inst, invTerm,
-                                reachableState, services, initiallyGoal),
+                                reachableState, services, initiallyGoal, localAssignableChecks),
                         ruleApp.posInOccurrence());
     }
 
@@ -257,13 +266,13 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             Optional<Label> loopLabel, Statement stmtToReplace, Term anonUpdate,
             Term wellFormedAnon, final Term uAnonInv, Term frameCondition,
             Term variantPO, TermLabelState termLabelState, Term invTerm,
-            Term[] uBeforeLoopDefAnonVariant) {
+            Term[] uBeforeLoopDefAnonVariant, LocationVariable assignablePV) {
         final While loop = inst.loop;
 
         final Term newFormula = formulaWithLoopScope(services, inst, anonUpdate,
                 loop, loopLabel, stmtToReplace, frameCondition, variantPO,
                 termLabelState, presrvAndUCGoal, uBeforeLoopDefAnonVariant,
-                invTerm);
+                invTerm, assignablePV);
 
         presrvAndUCGoal.setBranchLabel("Invariant Preserved and Used");
         presrvAndUCGoal.addFormula(new SequentFormula(uAnonInv), true, false);
@@ -320,7 +329,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      */
     private ProgramElement newProgram(Services services, final While loop,
             Optional<Label> loopLabel, Statement stmtToReplace,
-            final JavaBlock origProg, final ProgramVariable loopScopeIdxVar) {
+            final JavaBlock origProg, final ProgramVariable loopScopeIdxVar,
+            LocationVariable assignablePV) {
         final ArrayList<ProgramElement> stmnt = new ArrayList<ProgramElement>();
 
         if (loop.getBody() instanceof StatementBlock) {
@@ -348,8 +358,13 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final Statement newIf = KeYJavaASTFactory
                 .ifThen(loop.getGuardExpression(), ifBody);
 
-        final LoopScopeBlock loopScope = new LoopScopeBlock(loopScopeIdxVar,
+        JavaStatement loopScope = new LoopScopeBlock(loopScopeIdxVar,
                 KeYJavaASTFactory.block(newIf));
+
+        if(assignablePV != null) {
+            // wrap it into a "assignable-scope" if assignables are to be checked locally
+            loopScope = new AssignableScopeBlock(assignablePV, new StatementBlock(loopScope));
+        }
 
         // NOTE (important): The assignment of the initial value "true" for the
         // loop scope index variable is crucial here; otherwise, the handling of
@@ -388,10 +403,25 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
      */
     private SequentFormula initFormula(TermLabelState termLabelState,
             Instantiation inst, final Term invTerm, Term reachableState,
-            Services services, Goal initGoal) {
+            Services services, Goal initGoal, boolean localAssignableChecks) {
         final TermBuilder tb = services.getTermBuilder();
 
-        Term sfTerm = tb.apply(inst.u, tb.and(invTerm, reachableState), null);
+        Term cond = tb.and(invTerm, reachableState);
+        if(localAssignableChecks) {
+            IProgramVariable pv = JavaTools.getInnermostAssignableScope(inst.progPost.javaBlock(), services);
+            if(pv != null) {
+                Term assignable = inst.inv.getModifies();
+                if(assignable.equals(tb.ff())) {
+                    assignable = tb.empty();
+                } else {
+                    // TODO assignable = union(assignable, fresh)
+                }
+                cond = tb.and(cond, tb.subset(assignable, services.getTermFactory().createTerm(pv)));
+            }
+        }
+
+        Term sfTerm = tb.apply(inst.u, cond, null);
+
         sfTerm = TermLabelManager.refactorTerm(termLabelState, services, null,
                 sfTerm, this, initGoal, INITIAL_INVARIANT_ONLY_HINT, null);
 
@@ -440,11 +470,14 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             Optional<Label> loopLabel, Statement stmtToReplace,
             Term frameCondition, Term variantPO, TermLabelState termLabelState,
             Goal presrvAndUCGoal, final Term[] uBeforeLoopDefAnonVariant,
-            Term invTerm) {
+            Term invTerm, LocationVariable assignablePV) {
         final TermBuilder tb = services.getTermBuilder();
         final Term progPost = splitUpdates(inst.progPost, services).second;
 
-        Term fullInvariant = tb.and(invTerm, frameCondition, variantPO);
+        Term fullInvariant = tb.and(invTerm, variantPO);
+        if(assignablePV == null) {
+            fullInvariant = tb.and(fullInvariant, frameCondition);
+        }
         fullInvariant = TermLabelManager.refactorTerm(termLabelState, services,
                 null, fullInvariant, this, presrvAndUCGoal,
                 FULL_INVARIANT_TERM_HINT, null);
@@ -456,7 +489,7 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final ProgramVariable loopScopeIdxVar = loopScopeIdxVar(services);
 
         final ProgramElement newProg = newProgram(services, loop, loopLabel,
-                stmtToReplace, origJavaBlock, loopScopeIdxVar);
+                stmtToReplace, origJavaBlock, loopScopeIdxVar, assignablePV);
 
         final Term labeledIdxVar = tb.label(tb.var(loopScopeIdxVar),
                 ParameterlessTermLabel.LOOP_SCOPE_INDEX_LABEL);

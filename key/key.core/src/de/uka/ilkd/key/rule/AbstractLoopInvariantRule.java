@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -32,6 +33,7 @@ import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.settings.ChoiceSettings;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
@@ -83,6 +85,9 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      */
     public LoopInvariantInformation doPreparations(Goal goal, Services services,
             RuleApp ruleApp) throws RuleAbortException {
+
+
+
         // Basic objects needed for rule application
         final TermBuilder tb = services.getTermBuilder();
         final TermLabelState termLabelState = new TermLabelState();
@@ -110,9 +115,18 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop = //
                 new LinkedHashMap<LocationVariable, Map<Term, Term>>();
 
+        // Make a new location variable for assignables if local
+        LocationVariable assignablePV = null;
+        if(checkLocalAssignables(goal)) {
+            assignablePV = new LocationVariable(new ProgramElementName(tb.newName("mod")),
+                    services.getJavaInfo().getPrimitiveKeYJavaType("LocSet"));
+            services.getNamespaces().programVariables().addSafely(assignablePV);
+        }
+
         // Create update for values before loop
+        Term modifies = inst.inv.getModifies(inst.selfTerm, atPres, services);
         Term beforeLoopUpdate = createBeforeLoopUpdate(services, heapContext,
-                localOuts, heapToBeforeLoop);
+                localOuts, assignablePV, modifies, heapToBeforeLoop);
 
         // prepare anon update, frame condition, etc.
         AdditionalHeapTerms additionalHeapTerms = createAdditionalHeapTerms(
@@ -149,7 +163,14 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
                 additionalHeapTerms.anonUpdate,
                 additionalHeapTerms.wellFormedAnon, uAnonInv,
                 additionalHeapTerms.frameCondition, uBeforeLoopDefAnonVariant,
-                additionalHeapTerms.anonUpdateData);
+                additionalHeapTerms.anonUpdateData,
+                assignablePV);
+    }
+
+    private boolean checkLocalAssignables(Goal goal) {
+        ChoiceSettings choiceSettings = goal.proof().getSettings().getChoiceSettings();
+        String prop = choiceSettings.getDefaultChoices().get("assignableChecks");
+        return "assignableChecks:local".equals(prop);
     }
 
     @Override
@@ -197,6 +218,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      *            TODO
      * @param localOuts
      *            TODO
+     * @param assignable
      * @param heapToBeforeLoop
      *            TODO
      * @return The "...Before_LOOP" update needed for the variant.
@@ -204,9 +226,11 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
     protected static Term createBeforeLoopUpdate(Services services,
             final List<LocationVariable> heapContext,
             final ImmutableSet<ProgramVariable> localOuts,
+            final LocationVariable assignable,
+            Term modifies,
             final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop) {
         final TermBuilder tb = services.getTermBuilder();
-        final Namespace progVarNS = services.getNamespaces().programVariables();
+        final Namespace<IProgramVariable> progVarNS = services.getNamespaces().programVariables();
 
         Term beforeLoopUpdate = null;
         for (LocationVariable heap : heapContext) {
@@ -237,6 +261,16 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             heapToBeforeLoop
                     .get(services.getTypeConverter().getHeapLDT().getHeap())
                     .put(tb.var(pv), tb.var(pvBeforeLoop));
+        }
+
+        if(assignable != null) {
+            Term lhs = tb.var(assignable);
+            if(modifies.equals(tb.ff())) {
+                modifies = tb.empty();
+            } else {
+                //modifies = tb.union(modifies, tb.freshLocs(services.getTypeConverter().getHeapLDT().getHeap()))
+            }
+            beforeLoopUpdate = tb.parallel(beforeLoopUpdate, tb.elementary(lhs, modifies));
         }
 
         return beforeLoopUpdate;
@@ -756,6 +790,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
          */
         public final ImmutableList<AnonUpdateData> anonUpdateData;
 
+        public final LocationVariable localAssignablePV;
+
         /**
          * Creates a new {@link LoopInvariantInformation} object.
          * 
@@ -803,7 +839,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
                 Term invTerm, Term variantPO, Term reachableState,
                 Term anonUpdate, Term wellFormedAnon, Term uAnonInv,
                 Term frameCondition, Term[] uBeforeLoopDefAnonVariant,
-                ImmutableList<AnonUpdateData> anonUpdateData) {
+                ImmutableList<AnonUpdateData> anonUpdateData,
+                LocationVariable assignablePV) {
             super();
             this.goal = goal;
             this.services = services;
@@ -820,6 +857,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             this.frameCondition = frameCondition;
             this.uBeforeLoopDefAnonVariant = uBeforeLoopDefAnonVariant;
             this.anonUpdateData = anonUpdateData;
+            this.localAssignablePV = assignablePV;
         }
     }
 

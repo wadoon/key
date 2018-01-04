@@ -58,7 +58,7 @@ public abstract class AbstractPO implements IPersistablePO {
     protected final JavaInfo javaInfo;
     protected final HeapLDT heapLDT;
     protected final SpecificationRepository specRepos;
-    protected final String name;
+    protected String name;
     protected ImmutableSet<NoPosTacletApp> taclets;
     private String header;
     private ProofAggregate proofAggregate;

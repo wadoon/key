@@ -13,11 +13,13 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
+import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.AssignableScopeBlock;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -47,7 +49,7 @@ public final class CaptureAssignableCondition implements VariableCondition {
             SVSubstitute instCandidate, MatchConditions matchCond,
             Services services) {
 
-        System.out.println(var + "->" + instCandidate);
+        // System.out.println(var + "->" + instCandidate);
 
         Object instantiation = matchCond.getInstantiations().getInstantiation(assignableSV);
         if(instantiation != null)
@@ -55,20 +57,13 @@ public final class CaptureAssignableCondition implements VariableCondition {
 
         ContextInstantiationEntry contextInst = matchCond.getInstantiations().getContextInstantiation();
         ProgramElement program = contextInst.contextProgram();
-        PosInProgram pos = contextInst.prefix();
 
-        while(pos.depth() > 0) {
-            ProgramElement current = pos.getProgram(program);
-            if(current instanceof AssignableScopeBlock) {
-                AssignableScopeBlock ass = (AssignableScopeBlock) current;
-                Term t = services.getTermFactory().createTerm(ass.getAssignablePV());
-                return updateInst(matchCond, t, services);
+        IProgramVariable pv = JavaTools.getInnermostAssignableScope(program, services);
+        if(pv == null) {
+            return updateInst(matchCond, services.getTermBuilder().allLocs(), services);
+        } else {
+            return updateInst(matchCond, services.getTermFactory().createTerm(pv), services);
             }
-            pos = pos.up();
-        }
-
-        Term t = services.getTermBuilder().allLocs();
-        return updateInst(matchCond, t, services);
     }
 
     private MatchConditions updateInst(MatchConditions matchCond, Term t,
