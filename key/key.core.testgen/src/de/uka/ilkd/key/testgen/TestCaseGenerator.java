@@ -1068,8 +1068,11 @@ public class TestCaseGenerator {
 				if (c.contains("Post")) {
 					return "_post_A";
 				}
-				else {
+				else if (c.contains("Pre")){
 					return "_pre_A";
+				}
+				else {
+					return "_A";
 				}
 			}
 					
@@ -1077,8 +1080,11 @@ public class TestCaseGenerator {
 				if(c.contains("Post")) {	
 					return "_post_B";
 				}
-				else {
+				else if (c.contains("Pre")){
 					return "_pre_B";
+				}
+				else {
+					return "_B";
 				}
 				
 			}
@@ -1429,25 +1435,25 @@ public class TestCaseGenerator {
 	}
 	
 	//TODO muessig check if needed
-	private String createObjSetInfoFlow(List<Heap> heaps) {
-		StringBuffer res = new StringBuffer();
-		
-		res.append(TAB+"Set<Object> "+ALL_OBJECTS +"= new HashSet<Object>();" + NEW_LINE);
-		
-		//create objects for HeapAtPre_A, HeapAtPre_B, HeapAtPost_A and HeapAtPost_B
-		for (Heap h : heaps) {
-			for(ObjectVal o : h.getObjects()){
-				String name = "_"+h.getName()+o.getName();
-				if(name.equals("#o0")){
-					continue;
-				}
-				name = name.replace("#", "_");
-				res.append(TAB+ALL_OBJECTS+".add("+name+");" + NEW_LINE);
-
-			}		
-		}
-		return res.toString();	
-	}
+//	private String createObjSetInfoFlow(List<Heap> heaps) {
+//		StringBuffer res = new StringBuffer();
+//		
+//		res.append(TAB+"Set<Object> "+ALL_OBJECTS +"= new HashSet<Object>();" + NEW_LINE);
+//		
+//		//create objects for HeapAtPre_A, HeapAtPre_B, HeapAtPost_A and HeapAtPost_B
+//		for (Heap h : heaps) {
+//			for(ObjectVal o : h.getObjects()){
+//				String name = "_"+h.getName()+o.getName();
+//				if(name.equals("#o0")){
+//					continue;
+//				}
+//				name = name.replace("#", "_");
+//				res.append(TAB+ALL_OBJECTS+".add("+name+");" + NEW_LINE);
+//
+//			}		
+//		}
+//		return res.toString();	
+//	}
 
 
 

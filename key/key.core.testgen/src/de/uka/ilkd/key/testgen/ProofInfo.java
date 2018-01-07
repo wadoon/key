@@ -153,15 +153,17 @@ public class ProofInfo {
 		List<JavaBlock> blocks = getJavaBlocks(f);
 		
 		if(blocks.size() > 2) {
-			System.out.println("Warning: The Proof owns more than 2 JavaBlocks, "
+			System.out.println("Warning: more than 2 JavaBlocks, "
 					+ "check if the MUT calls are correct");
 		}
+		
 		for (int i = 0; i < result.length; i++) {
 			try {
 				StringWriter sw = new StringWriter();
-				sw.write("   "+getUpdateInfoFlow(f)+"\n");
 				PrettyPrinter pw = new CustomPrettyPrinter(sw,false);
-				
+				if (i == 0) {
+					sw.write("   "+getUpdateInfoFlow(f)+"\n");
+				}
 				blocks.get(i).program().prettyPrint(pw);
 				result[i] = sw.getBuffer().toString();
 				
@@ -246,27 +248,16 @@ public class ProofInfo {
 		}
 
 	}
-	
-	private String getUpdateInfoFlowHelp(Term s, Term prev) {
-		String result = "";
-		if (!s.javaBlock().isEmpty()) {			
-			return getUpdate(prev);
-		}
-		else {
-			result = result + getUpdateInfoFlow(s);
-		}
-//		result = result + getUpdateInfoFlow(s);
-		return result;
-	}
 
 	private String getUpdateInfoFlow(Term t) { // maybe without recursion 
 		String result = "";
-		if (t.containsJavaBlockRecursive()) {
+		if(t.containsJavaBlockRecursive()) {
 			for (Term s : t.subs()) {
-				//find the first JavaBlock and get the update
 				if (s.containsJavaBlockRecursive()) {
-					result = getUpdateInfoFlowHelp(s, t);
-					continue;
+					if (!s.javaBlock().isEmpty()) {
+						result = result + getUpdate(t);
+					}	
+					result = result + getUpdateInfoFlow(s);
 				}
 			}
 		}
