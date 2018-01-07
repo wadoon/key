@@ -898,18 +898,10 @@ public class TestCaseGenerator {
 							right = "new " + type + "()";
 					}
 					
-					String currentHeapSplit[] = heap.getName().split("At");
-					String currentHeap;
-					if (currentHeapSplit.length > 1) {
-						currentHeap = currentHeapSplit[1];
-					}
-					else {
-						currentHeap = "";
-					}
-					String objName = currentHeap+createObjectName(o);
+					String objName = getInfoFlowHeapName(heap)+createObjectName(o);
 					objects.add(objName);
 					assignments.add(new Assignment(type, objName, right));
-//					if(junitFormat && isInPrestate(prestate, o)){
+//					if(junitFormat && isInPrestate(prestate, o)){ //TODO muessig check if needed because of preHeap
 //						assignments.add(new Assignment(type, getPreName(objName), right));
 //					}
 				}
@@ -917,7 +909,11 @@ public class TestCaseGenerator {
 		}
 		// init constants
 		for (final String c : m.getConstants().keySet()) {
+			if (c.equals("self")) { // TODO muessig check if we need self. 
+				break;
+			}
 			String val = m.getConstants().get(c);
+
 			if (filterVal(val) && !c.equals("null")) {
 			    boolean isObject = false;
 				String type = "int";
@@ -949,17 +945,20 @@ public class TestCaseGenerator {
 				else{
                     declType = type;				    
 				}
-
+				
 				val = translateValueExpression(val);
-//				for (Heap heap : heaps) {
-					if(isObject&&!val.equals("null")) {
-						val = "Post_A"+val;//TODO muessig continue here, this is not complete	
-					}
-					assignments.add(new Assignment(declType, c, "("+type+")"+val));
-//					if(junitFormat && isObject && isInPrestate(prestate, val)){
-//						assignments.add(new Assignment(declType, getPreName(c), "("+type+")"+getPreName(val)));
-//					}
+				
+				if(isObject&&!val.equals("null")) {
+					val = getValPrefixForConfstants(c)+val;
+				}
+				
+				
+				
+				assignments.add(new Assignment(declType, c, "("+type+")"+val));
+//				if(junitFormat && isObject && isInPrestate(prestate, val)){
+//					assignments.add(new Assignment(declType, getPreName(c), "("+type+")"+getPreName(val)));
 //				}
+				
 			}
 		}
 		// init fields
@@ -969,15 +968,8 @@ public class TestCaseGenerator {
 					if (o.getName().equals("#o0") || o.getSort().name().toString().endsWith("Exception")) {
 						continue;
 					}
-					String currentHeapSplit[] = heap.getName().split("At");
-					String currentHeap;
-					if (currentHeapSplit.length > 1) {
-						currentHeap = currentHeapSplit[1];
-					}
-					else {
-						currentHeap = "";
-					}
-					final String receiverObject = currentHeap+createObjectName(o);
+					
+					final String receiverObject = getInfoFlowHeapName(heap)+createObjectName(o);
 					for (final String f : o.getFieldvalues().keySet()) {
 						if (f.contains("<") || f.contains(">")) {
 							continue;
@@ -1056,6 +1048,43 @@ public class TestCaseGenerator {
 
 
 		return result.toString();
+	}
+	
+	private String getInfoFlowHeapName(Heap heap) {
+		String currentHeapSplit[] = heap.getName().split("At");
+		String currentHeap;
+		if (currentHeapSplit.length > 1) {
+			currentHeap = currentHeapSplit[1];
+		}
+		else {
+			currentHeap = "";
+		}
+		currentHeap = currentHeap.substring(0, 1).toLowerCase() + currentHeap.substring(1); // first letter to lower case
+		return "_"+currentHeap;
+	}
+	
+	private String getValPrefixForConfstants (String c) {		
+			if (c.contains("A")) {
+				if (c.contains("Post")) {
+					return "_post_A";
+				}
+				else {
+					return "_pre_A";
+				}
+			}
+					
+			if (c.contains("B")) {
+				if(c.contains("Post")) {	
+					return "_post_B";
+				}
+				else {
+					return "_pre_B";
+				}
+				
+			}
+			return "";
+			
+		
 	}
 
 	public String generateTestCase(Model m, Map<String, Sort> typeInfMap) {
@@ -1399,7 +1428,7 @@ public class TestCaseGenerator {
 		return res.toString();		
 	}
 	
-	//TODO muessig test this method
+	//TODO muessig check if needed
 	private String createObjSetInfoFlow(List<Heap> heaps) {
 		StringBuffer res = new StringBuffer();
 		
