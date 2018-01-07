@@ -156,11 +156,10 @@ public class ProofInfo {
 			System.out.println("Warning: The Proof owns more than 2 JavaBlocks, "
 					+ "check if the MUT calls are correct");
 		}
-		
 		for (int i = 0; i < result.length; i++) {
 			try {
 				StringWriter sw = new StringWriter();
-				sw.write("   "+getUpdate(f)+"\n");
+				sw.write("   "+getUpdateInfoFlow(f)+"\n");
 				PrettyPrinter pw = new CustomPrettyPrinter(sw,false);
 				
 				blocks.get(i).program().prettyPrint(pw);
@@ -228,9 +227,8 @@ public class ProofInfo {
 	public Term getPO() {
 		return proof.root().sequent().succedent().get(0).formula();
 	}
-
-
-
+	
+	
 
 
 
@@ -248,8 +246,34 @@ public class ProofInfo {
 		}
 
 	}
+	
+	private String getUpdateInfoFlowHelp(Term s, Term prev) {
+		String result = "";
+		if (!s.javaBlock().isEmpty()) {			
+			return getUpdate(prev);
+		}
+		else {
+			result = result + getUpdateInfoFlow(s);
+		}
+//		result = result + getUpdateInfoFlow(s);
+		return result;
+	}
 
-
+	private String getUpdateInfoFlow(Term t) { // maybe without recursion 
+		String result = "";
+		if (t.containsJavaBlockRecursive()) {
+			for (Term s : t.subs()) {
+				//find the first JavaBlock and get the update
+				if (s.containsJavaBlockRecursive()) {
+					result = getUpdateInfoFlowHelp(s, t);
+					continue;
+				}
+			}
+		}
+		
+		return result;
+		
+	}
 
 
 	private String processUpdate(Term update) {
@@ -292,8 +316,8 @@ public class ProofInfo {
 	
 
 	private void getJavaBlocksHelp(Term f, List<JavaBlock> blocks) {
+		
 		if(f.containsJavaBlockRecursive()) {
-			
 			for (Term s : f.subs()) {
 				if (s.containsJavaBlockRecursive()) {
 					if (!s.javaBlock().isEmpty()) {
