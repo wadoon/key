@@ -97,7 +97,7 @@ public class StrategyCostChanger implements Strategy {
             return this;
         }
 
-        public Builder changeCost(double factor, String tacletNames)
+        public Builder changeCost(double factor, String tacletNames) {return this;}
 
         /**
          * Removes '@'
