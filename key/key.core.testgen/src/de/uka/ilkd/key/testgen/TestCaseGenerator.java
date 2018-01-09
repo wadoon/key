@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -72,6 +73,8 @@ public class TestCaseGenerator {
 	public static final String ALL_FIELDS = "allFields";
 	public static final String ALL_SEQ = "allSeq";
 	public static final String ALL_LOCSETS = "allLocSets";
+	public static final String A_EXECUTION = "_A";
+	public static final String B_EXECUTION = "_B";
 
 	public static final String OBJENESIS_NAME = "objenesis-2.2.jar";
 
@@ -635,10 +638,16 @@ public class TestCaseGenerator {
 						}
 
 						Set<Term> vars = new HashSet<Term>();
-						info.getProgramVariables(info.getPO(), vars);         	  
-						testMethod.append(TAB+"//Other variables" + NEW_LINE + getRemainingConstants(m.getConstants().keySet(), vars) + NEW_LINE);
+						info.getProgramVariables(info.getPO(), vars);   
 						if (infoFlow) {
-							String[] codes = info.getCodeInfoFlow(); //TODO muessig for information flow
+							//could cause problems with variable names (name includes post)
+							testMethod.append(TAB+"//Other variables" + NEW_LINE + getRemainingConstantsInformationFlow(m.getConstants().keySet(), vars) + NEW_LINE);
+						} else {
+							testMethod.append(TAB+"//Other variables" + NEW_LINE + getRemainingConstants(m.getConstants().keySet(), vars) + NEW_LINE);
+						}
+						
+						if (infoFlow) {
+							String[] codes = info.getCodeInfoFlow(); //for information flow
 							for (String code : codes) {
 								testMethod.append(code + NEW_LINE);
 							}
@@ -650,10 +659,10 @@ public class TestCaseGenerator {
 						}
 						
 						
-//						
-//						if(junitFormat){//TODO muessig restore
-//							testMethod.append("   //calling the test oracle" + NEW_LINE+TAB+oracleMethodCall + NEW_LINE);
-//						}
+						
+						if(junitFormat){
+							testMethod.append("   //calling the test oracle" + NEW_LINE+TAB+oracleMethodCall + NEW_LINE);
+						}
 
 						testMethod.append(" }" + NEW_LINE + NEW_LINE);
 						i++;
@@ -680,7 +689,7 @@ public class TestCaseGenerator {
 		testSuite.append(getMainMethod(fileName, i) + NEW_LINE + NEW_LINE);
 		testSuite.append(testMethods);
 
-//		if(junitFormat){ //TODO muessig restore
+//		if(junitFormat){  //TODO muessig restore
 //			for(OracleMethod m : oracleMethods){
 //				testSuite.append(NEW_LINE + NEW_LINE);
 //				testSuite.append(m);
@@ -793,6 +802,33 @@ public class TestCaseGenerator {
         }
         return result;
     }
+    
+    //think about solution without code duplication
+    private String getRemainingConstantsInformationFlow(Collection<String> existingConstants, Collection<Term> newConstants) {
+    	String result = "";
+    	
+    	for(Term c : newConstants) {
+    		if (isPostName(c.toString())) {
+    			continue;
+    		}
+    		if(!existingConstants.contains(c.toString())){
+
+				String init = "null";
+				if(c.sort().equals(services.getTypeConverter().getIntegerLDT().targetSort())){
+					init = "0";
+				}
+				else if(c.sort().equals(services.getTypeConverter().getBooleanLDT().targetSort())){
+					init = "false";
+				}
+
+				result += NEW_LINE +TAB+ NULLABLE+ " "+ getSafeType(c.sort()) + " " + c + " = " + init + ";";
+				
+				result += NEW_LINE+TAB+ NULLABLE+ " "+ getSafeType(c.sort()) + " " + getPreName(c.toString()) + " = " + init + ";";
+				
+			}
+    	}
+    	return result;
+    }
 
     private String getRemainingConstants(Collection<String> existingConstants, Collection<Term> newConstants){
 		String result = "";
@@ -858,24 +894,53 @@ public class TestCaseGenerator {
 
 		Set<String> objects = new HashSet<String>();
 		
-		
-		
 		final List<Assignment> assignments = new LinkedList<Assignment>();
-//		Heap heap = null;
-		List<Heap> heaps = m.getHeaps();
-//		for (final Heap h : m.getHeaps()) {
-//			
-//			if (h.getName().equals(HeapLDT.BASE_HEAP_NAME.toString())) {
-//				heap = h;
-//				break;
-//			}
-//		}
+//		
+		List<Heap> heaps = new ArrayList<Heap>();
+		for (final Heap h : m.getHeaps()) {
+			
+			if (!isPostName(h.getName())) {
+				heaps.add(h);
+			}
+		}
 
-		//Set<ObjectVal> prestate = getPrestateObjects(m);
 		Set<ObjectVal> prestate = new HashSet<ObjectVal>();
 		if (!heaps.isEmpty()) {
+			
+			//TODO muessig check after oracle creation if this solution is correct
+			//maybe generate objects for the object constants we cant refer to execution A or B
+			for (final ObjectVal o : heaps.get(0).getObjects()) {
+				if (o.getName().equals("#o0")) {
+					continue;
+				}
+				final String type = getSafeType(o.getSort());
+				String right;
+				if (type.endsWith("[]")) {
+					right = "new " + type.substring(0, type.length() - 2) + "["
+							+ o.getLength() + "]";
+				}else if(o.getSort() == null || o.getSort().toString().equals("Null")){
+					right = "null";
+				}else {
+					if(useRFL){
+						right = "RFL.new"+ReflectionClassCreator.cleanTypeName(type)+"()";
+						rflCreator.addSort(type);
+						//rflCreator.addSort(oSort!=null?oSort.name().toString():"Object");
+						//System.out.println("Adding sort (create Object):"+ (oSort!=null?oSort.name().toString():"Object"));
+					}else
+						right = "new " + type + "()";
+				}
+				
+				String objName = createObjectName(o);
+//				String objName = getInfoFlowHeapName(heap)+createObjectName(o); //remove unused
+				objects.add(objName); // maybe remove
+				assignments.add(new Assignment(type, objName, right));
 
-			//create Objects for all Heaps (PreA/B, PostA/B)
+				assignments.add(new Assignment(type, getPreName(objName), right));
+			}
+			//
+			
+
+			//create Objects for all pre-Heaps (PreA/B)
 			for (Heap heap : heaps) {
 				for (final ObjectVal o : heap.getObjects()) {
 					if (o.getName().equals("#o0")) {
@@ -898,22 +963,25 @@ public class TestCaseGenerator {
 							right = "new " + type + "()";
 					}
 					
-					String objName = getInfoFlowHeapName(heap)+createObjectName(o);
+					String objName = getExecutionName(heap.getName())+createObjectName(o);
+//					String objName = getInfoFlowHeapName(heap)+createObjectName(o); //remove unused
 					objects.add(objName);
 					assignments.add(new Assignment(type, objName, right));
-//					if(junitFormat && isInPrestate(prestate, o)){ //TODO muessig check if needed because of preHeap
-//						assignments.add(new Assignment(type, getPreName(objName), right));
-//					}
+					
+					assignments.add(new Assignment(type, getPreName(objName), right));
+					
 				}
 			}
 		}
 		// init constants
+		
 		for (final String c : m.getConstants().keySet()) {
-			if (c.equals("self")) { // TODO muessig check if we need self. 
-				break;
+			if (c.equals("self") || isPostName(c)) { //self and post constants not needed
+				continue;
 			}
+			
 			String val = m.getConstants().get(c);
-
+			
 			if (filterVal(val) && !c.equals("null")) {
 			    boolean isObject = false;
 				String type = "int";
@@ -923,20 +991,6 @@ public class TestCaseGenerator {
 				} else if (val.startsWith("#o")) {
 				    isObject = true;
 				    type = this.inferSort(typeInfMap, c);
-				    /*
-					final ObjectVal o = getObject(heap, val);
-					if (o != null) {
-						if (val.equals("#o0")
-								&& m.getTypes().getOriginalConstantType(c) != null) {
-							type = m.getTypes().getOriginalConstantType(c)
-									.name().toString();
-						} else {
-							type = getSafeType(o.getSort()); //o.getSort().name().toString();
-						}
-					} else {
-						type = "Object";
-					}
-					*/
                     
 				}
 				if(isObject){
@@ -947,18 +1001,19 @@ public class TestCaseGenerator {
 				}
 				
 				val = translateValueExpression(val);
-				
-				if(isObject&&!val.equals("null")) {
-					val = getValPrefixForConfstants(c)+val;
+				if (isObject && !val.equals("null")) { 
+					System.out.println(c + " " + val);
+					val = getExecutionName(c)+val;
+					assignments.add(new Assignment(declType, c, "("+type+")"+val));
+					//prestate
+					assignments.add(new Assignment(declType, getPreName(c), "("+type+")"+getPreName(val)));
 				}
-				
-				
-				
-				assignments.add(new Assignment(declType, c, "("+type+")"+val));
-//				if(junitFormat && isObject && isInPrestate(prestate, val)){
-//					assignments.add(new Assignment(declType, getPreName(c), "("+type+")"+getPreName(val)));
-//				}
-				
+				else {
+					val = translateValueExpression(val);
+					assignments.add(new Assignment(declType, c, "("+type+")"+val));
+					//prestate
+					assignments.add(new Assignment(declType, getPreName(c), "("+type+")"+val));
+				}
 			}
 		}
 		// init fields
@@ -969,7 +1024,7 @@ public class TestCaseGenerator {
 						continue;
 					}
 					
-					final String receiverObject = getInfoFlowHeapName(heap)+createObjectName(o);
+					final String receiverObject = getExecutionName(heap.getName())+createObjectName(o);
 					for (final String f : o.getFieldvalues().keySet()) {
 						if (f.contains("<") || f.contains(">")) {
 							continue;
@@ -989,14 +1044,14 @@ public class TestCaseGenerator {
 	
 //						if(junitFormat && isInPrestate(prestate, o)){//TODO muessig check if needed
 //							//if value that is pointed to is object and in prestate then use prestate object
-//							if(!vType.equals("int") && !vType.equals("boolean") && isInPrestate(prestate, val) && !val.equals("null")){
-//								val = getPreName(val);
-//							}
+							if(!vType.equals("int") && !vType.equals("boolean") && isInPrestate(prestate, val) && !val.equals("null")){
+								val = getPreName(val);
+							}
 //							
 //							
 //							
-//							assignments
-//							.add(new Assignment(new RefEx(rcObjType,getPreName(receiverObject),vType,fieldName),"("+vType+")"+ val));
+							assignments
+							.add(new Assignment(new RefEx(rcObjType,getPreName(receiverObject),vType,fieldName),"("+vType+")"+ val));
 //						}
 	
 					}
@@ -1015,7 +1070,7 @@ public class TestCaseGenerator {
 							assignments.add(new Assignment(receiverObject + fieldName, val));
 							//assignments.add(new Assignment("",new RefArrayEx("","",name,""+i), val));
 	
-							if(junitFormat && isInPrestate(prestate, o)){
+//							if(junitFormat && isInPrestate(prestate, o)){
 								
 	
 								if(!elementType.equals("int") && !elementType.equals("boolean") && isInPrestate(prestate, val) && !val.equals("null")){
@@ -1023,7 +1078,7 @@ public class TestCaseGenerator {
 								}
 								
 								assignments.add(new Assignment(getPreName(receiverObject) + fieldName, val));
-							}
+//							}
 	
 	
 						}
@@ -1050,47 +1105,37 @@ public class TestCaseGenerator {
 		return result.toString();
 	}
 	
-	private String getInfoFlowHeapName(Heap heap) {
-		String currentHeapSplit[] = heap.getName().split("At");
-		String currentHeap;
-		if (currentHeapSplit.length > 1) {
-			currentHeap = currentHeapSplit[1];
+	/**
+	 * check if variable is post variable (for information flow test)
+	 * @param c
+	 * @return
+	 * @author Muessig
+	 */
+	private boolean isPostName(String c) { //TODO muessig looking for solution without using the name
+		if(c.contains("AtPost")) {
+			return true;
 		}
 		else {
-			currentHeap = "";
+			return false;
 		}
-		currentHeap = currentHeap.substring(0, 1).toLowerCase() + currentHeap.substring(1); // first letter to lower case
-		return "_"+currentHeap;
 	}
 	
-	private String getValPrefixForConfstants (String c) {		
-			if (c.contains("A")) {
-				if (c.contains("Post")) {
-					return "_post_A";
-				}
-				else if (c.contains("Pre")){
-					return "_pre_A";
-				}
-				else {
-					return "_A";
-				}
-			}
-					
-			if (c.contains("B")) {
-				if(c.contains("Post")) {	
-					return "_post_B";
-				}
-				else if (c.contains("Pre")){
-					return "_pre_B";
-				}
-				else {
-					return "_B";
-				}
-				
-			}
-			return "";
-			
+	/**
+	 * returns the name Prefix (execution A or B) for a heap
+	 * @param heap
+	 * @return String constant _A or _B
+	 * @author Muessig
+	 */
+	private String getExecutionName(String s) {
 		
+		if (s.contains(A_EXECUTION)) {
+			return A_EXECUTION;
+		}
+		if (s.contains(B_EXECUTION)) {
+			return B_EXECUTION;
+		}
+		System.out.println("Warning : the constant " + s + " could not refer to Execution A or B");
+		return "";
 	}
 
 	public String generateTestCase(Model m, Map<String, Sort> typeInfMap) {
