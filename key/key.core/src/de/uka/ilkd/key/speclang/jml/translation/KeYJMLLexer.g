@@ -269,14 +269,14 @@ BACKSLASH_PREFIXED:
  | JML_IDENT
  ;
 
-HEXNUMERAL
+HEXLITERAL
     :
-        '0' ('x'|'X') (HEXDIGIT)+
+        '0' ('x'|'X') (HEXDIGIT)+ ( 'l'|'L' )?
 ;
 
-DIGITS
+DECOCTLITERAL
     :
-        (DIGIT)+
+        (DIGIT)+ ( 'l'|'L' )?
 ;
 
 CHAR_LITERAL:
