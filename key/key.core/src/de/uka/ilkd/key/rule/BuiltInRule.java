@@ -33,6 +33,12 @@ public interface BuiltInRule extends Rule {
      */
     boolean isApplicable(Goal goal, PosInOccurrence pio);
     
+    /**
+     * returns true if the rule can in principle applicable to terms which are
+     * not toplevel in the sequent.
+     *
+     * @return <code>true</code> iff applicable not only to toplevel formulas.
+     */
     boolean isApplicableOnSubTerms();
 
     IBuiltInRuleApp createApp(PosInOccurrence pos, TermServices services);

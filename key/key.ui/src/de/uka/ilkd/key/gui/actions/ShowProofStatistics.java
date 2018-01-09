@@ -68,11 +68,6 @@ public class ShowProofStatistics extends MainWindowAction {
             contentPane.setBorder(BorderFactory.createEmptyBorder());
             contentPane.setCaretPosition(0);
             contentPane.setBackground(MainWindow.getInstance().getBackground());
-            contentPane.setSize(new Dimension(10, 360));
-            contentPane.setPreferredSize(new Dimension(contentPane.getPreferredSize().width + 15, 360));
-            
-            JScrollPane scrollPane = new JScrollPane(contentPane);
-            scrollPane.setBorder(BorderFactory.createEmptyBorder());
             
             Font myFont = UIManager.getFont(Config.KEY_FONT_PROOF_TREE);
             if (myFont != null) {
@@ -81,6 +76,12 @@ public class ShowProofStatistics extends MainWindowAction {
             } else {
                 Debug.out("KEY_FONT_PROOF_TREE not available. Use standard font.");
             }
+            
+            contentPane.setSize(new Dimension(10, 500));	// original: 360
+            contentPane.setPreferredSize(new Dimension(contentPane.getPreferredSize().width + 50, 500));
+            
+            JScrollPane scrollPane = new JScrollPane(contentPane);
+            scrollPane.setBorder(BorderFactory.createEmptyBorder());
             
             JOptionPane.showMessageDialog(mainWindow, scrollPane,
                     "Proof Statistics", JOptionPane.INFORMATION_MESSAGE);
