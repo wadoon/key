@@ -59,7 +59,7 @@ public class StrategyCostChanger implements Strategy {
         return cost;
     }
 
-    public static class Builder {
+    public class Builder {
         private StrategyCostChanger instance = new StrategyCostChanger(other);
 
         /**
@@ -76,7 +76,7 @@ public class StrategyCostChanger implements Strategy {
         }
 
         public Builder forbidTaclet(String name) {
-            instance.forbiddenTaclets.add(name);
+            //instance.forbiddenTaclets.add(name);
             return this;
         }
 
@@ -106,7 +106,7 @@ public class StrategyCostChanger implements Strategy {
          * @return
          */
         public Builder forbidRuleset(String set) {
-            instance.forbiddenRuleSets.add(set.replace("@", ""));
+            //instance.forbiddenRuleSets.add(set.replace("@", ""));
             return this;
         }
 
