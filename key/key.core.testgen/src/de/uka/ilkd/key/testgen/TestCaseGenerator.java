@@ -199,11 +199,11 @@ public class TestCaseGenerator {
 		executeWithOpenJML = createExecuteWithOpenJML(settings.getOpenjmlPath(),settings.getObjenesisPath());
 		compileWithOpenJML = createCompileWithOpenJML(settings.getOpenjmlPath(), settings.getObjenesisPath());
 		oracleGenerator  =new OracleGenerator(services,rflCreator, useRFL);
-//		if(junitFormat){//TODO muessig restore
-//			//System.out.println("Translating oracle");
-//			oracleMethods = new LinkedList<OracleMethod>();
-//			oracleMethodCall = getOracleAssertion(oracleMethods);
-//		}
+		if(junitFormat){
+			//System.out.println("Translating oracle");
+			oracleMethods = new LinkedList<OracleMethod>();
+			oracleMethodCall = getOracleAssertion(oracleMethods);
+		}
 	}
 
 	/**
@@ -689,12 +689,12 @@ public class TestCaseGenerator {
 		testSuite.append(getMainMethod(fileName, i) + NEW_LINE + NEW_LINE);
 		testSuite.append(testMethods);
 
-//		if(junitFormat){  //TODO muessig restore
-//			for(OracleMethod m : oracleMethods){
-//				testSuite.append(NEW_LINE + NEW_LINE);
-//				testSuite.append(m);
-//			}
-//		}
+		if(junitFormat){
+			for(OracleMethod m : oracleMethods){
+				testSuite.append(NEW_LINE + NEW_LINE);
+				testSuite.append(m);
+			}
+		}
 
 		if (rflAsInternalClass) {
 			testSuite.append(createRFLFileContent());
@@ -909,34 +909,34 @@ public class TestCaseGenerator {
 			
 			//TODO muessig check after oracle creation if this solution is correct
 			//maybe generate objects for the object constants we cant refer to execution A or B
-			for (final ObjectVal o : heaps.get(0).getObjects()) {
-				if (o.getName().equals("#o0")) {
-					continue;
-				}
-				final String type = getSafeType(o.getSort());
-				String right;
-				if (type.endsWith("[]")) {
-					right = "new " + type.substring(0, type.length() - 2) + "["
-							+ o.getLength() + "]";
-				}else if(o.getSort() == null || o.getSort().toString().equals("Null")){
-					right = "null";
-				}else {
-					if(useRFL){
-						right = "RFL.new"+ReflectionClassCreator.cleanTypeName(type)+"()";
-						rflCreator.addSort(type);
-						//rflCreator.addSort(oSort!=null?oSort.name().toString():"Object");
-						//System.out.println("Adding sort (create Object):"+ (oSort!=null?oSort.name().toString():"Object"));
-					}else
-						right = "new " + type + "()";
-				}
-				
-				String objName = createObjectName(o);
-//				String objName = getInfoFlowHeapName(heap)+createObjectName(o); //remove unused
-				objects.add(objName); // maybe remove
-				assignments.add(new Assignment(type, objName, right));
-
-				assignments.add(new Assignment(type, getPreName(objName), right));
-			}
+//			for (final ObjectVal o : heaps.get(0).getObjects()) {
+//				if (o.getName().equals("#o0")) {
+//					continue;
+//				}
+//				final String type = getSafeType(o.getSort());
+//				String right;
+//				if (type.endsWith("[]")) {
+//					right = "new " + type.substring(0, type.length() - 2) + "["
+//							+ o.getLength() + "]";
+//				}else if(o.getSort() == null || o.getSort().toString().equals("Null")){
+//					right = "null";
+//				}else {
+//					if(useRFL){
+//						right = "RFL.new"+ReflectionClassCreator.cleanTypeName(type)+"()";
+//						rflCreator.addSort(type);
+//						//rflCreator.addSort(oSort!=null?oSort.name().toString():"Object");
+//						//System.out.println("Adding sort (create Object):"+ (oSort!=null?oSort.name().toString():"Object"));
+//					}else
+//						right = "new " + type + "()";
+//				}
+//				
+//				String objName = createObjectName(o);
+////				String objName = getInfoFlowHeapName(heap)+createObjectName(o); //remove unused
+//				objects.add(objName); // maybe remove
+//				assignments.add(new Assignment(type, objName, right));
+//
+//				assignments.add(new Assignment(type, getPreName(objName), right));
+//			}
 			//
 			
 
@@ -963,7 +963,7 @@ public class TestCaseGenerator {
 							right = "new " + type + "()";
 					}
 					
-					String objName = getExecutionName(heap.getName())+createObjectName(o);
+					String objName = createObjectName(o)+getExecutionName(heap.getName());
 //					String objName = getInfoFlowHeapName(heap)+createObjectName(o); //remove unused
 					objects.add(objName);
 					assignments.add(new Assignment(type, objName, right));
@@ -1002,11 +1002,26 @@ public class TestCaseGenerator {
 				
 				val = translateValueExpression(val);
 				if (isObject && !val.equals("null")) { 
-					System.out.println(c + " " + val);
-					val = getExecutionName(c)+val;
-					assignments.add(new Assignment(declType, c, "("+type+")"+val));
-					//prestate
-					assignments.add(new Assignment(declType, getPreName(c), "("+type+")"+getPreName(val)));
+					String exName = getExecutionName(c);
+					
+					//TODO muessig check if this is needed. 
+					//if the constant name doesnt include the Execution A or B
+					// create the constant for both.
+					if (exName.equals("")) {
+						assignments.add(new Assignment(declType, c+A_EXECUTION, "("+type+")"+val+A_EXECUTION));
+						//prestate
+						assignments.add(new Assignment(declType, getPreName(c+A_EXECUTION), "("+type+")"+getPreName(val+A_EXECUTION)));
+						
+						assignments.add(new Assignment(declType, c+B_EXECUTION, "("+type+")"+val+B_EXECUTION));
+						//prestate
+						assignments.add(new Assignment(declType, getPreName(c+B_EXECUTION), "("+type+")"+getPreName(val+B_EXECUTION)));
+						
+					} else {
+						val = exName+val;
+						assignments.add(new Assignment(declType, c, "("+type+")"+val));
+						//prestate
+						assignments.add(new Assignment(declType, getPreName(c), "("+type+")"+getPreName(val)));
+					}
 				}
 				else {
 					val = translateValueExpression(val);
@@ -1093,7 +1108,7 @@ public class TestCaseGenerator {
 			result.append(a.toString(useRFL));
 		}
 		
-//		if(junitFormat){//TODO muessig check if needed
+//		if(junitFormat){//TODO muessig check if needed this is for quantified post conditions ?
 //			result.append(NEW_LINE);
 //			result.append(createOldMap(objects) + NEW_LINE);
 //			result.append(createBoolSet() + NEW_LINE);
@@ -1134,7 +1149,8 @@ public class TestCaseGenerator {
 		if (s.contains(B_EXECUTION)) {
 			return B_EXECUTION;
 		}
-		System.out.println("Warning : the constant " + s + " could not refer to Execution A or B");
+		System.out.println("Warning : the constant " + s + " could not refer to Execution A or B."
+				+ " Create constant for both");
 		return "";
 	}
 
