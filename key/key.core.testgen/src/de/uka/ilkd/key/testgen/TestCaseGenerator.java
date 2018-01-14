@@ -202,7 +202,11 @@ public class TestCaseGenerator {
 		if(junitFormat){
 			//System.out.println("Translating oracle");
 			oracleMethods = new LinkedList<OracleMethod>();
-			oracleMethodCall = getOracleAssertion(oracleMethods);
+			if(info.isNoninterferenceProof()) {//check if noninterference
+				oracleMethodCall = getOracleAssertionInfoFlow(oracleMethods);
+			} else {
+				oracleMethodCall = getOracleAssertion(oracleMethods);
+			}
 		}
 	}
 
@@ -550,11 +554,26 @@ public class TestCaseGenerator {
 //		return testCase.toString();
 //	}
 
+	private String getOracleAssertionInfoFlow(List<OracleMethod> oracleMethods) {
+		
+		Term postcondition = info.getNonInterferencePostCondition();
+		System.out.println("generiere oracle method for noninterference");//TODO muessig remove
+		OracleMethod oracle = oracleGenerator.generateOracleMethodNoninterference(postcondition);
 
+		OracleMethodCall oracleCall = new OracleMethodCall(oracle, oracle.getArgs());
 
-	protected String getOracleAssertion(List<OracleMethod> oracleMethods){		
+		oracleMethods.add(oracle);
+		oracleMethods.addAll(oracleGenerator.getOracleMethods());
+
+		//System.out.println("Modifier Set: "+oracleGenerator.getOracleLocationSet(info.getAssignable()));
+
+		return "assertTrue("+oracleCall.toString().replaceAll("AtPost", "")+");";
+	}
+
+	//TODO muessig check if complete 
+	protected String getOracleAssertion(List<OracleMethod> oracleMethods){	
 		Term postcondition = getPostCondition();
-
+		
 		OracleMethod oracle = oracleGenerator.generateOracleMethod(postcondition);
 
 
@@ -566,7 +585,7 @@ public class TestCaseGenerator {
 
 		//System.out.println("Modifier Set: "+oracleGenerator.getOracleLocationSet(info.getAssignable()));
 
-
+		
 		return "assertTrue("+oracleCall.toString()+");";
 	}
 
@@ -609,7 +628,7 @@ public class TestCaseGenerator {
 		final StringBuffer testMethods = new StringBuffer();
 		int i = 0;
 		boolean infoFlow = false;
-		if(info.getContract().getDisplayName().startsWith("Non-interference")) { //check if non-interference contract
+		if(info.isNoninterferenceProof()) { //check if non-interference contract
 			infoFlow = true;
 		}
 		for (final SMTSolver solver : problemSolvers) {
@@ -803,11 +822,12 @@ public class TestCaseGenerator {
         return result;
     }
     
-    //think about solution without code duplication
+    //TODO muessig think about solution without code duplication
     private String getRemainingConstantsInformationFlow(Collection<String> existingConstants, Collection<Term> newConstants) {
     	String result = "";
     	
     	for(Term c : newConstants) {
+    		//filter post variables
     		if (isPostName(c.toString())) {
     			continue;
     		}
@@ -888,6 +908,7 @@ public class TestCaseGenerator {
 
 		return res.toString();
 	}
+	
 	
 	public String generateTestCaseInfoFlow(Model m, Map<String, Sort> typeInfMap) {
 		m.removeUnnecessaryObjects();
