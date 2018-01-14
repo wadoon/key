@@ -129,6 +129,13 @@ public class OracleGenerator {
 		return new OracleMethod("testOracle", methodArgs, "return "+body.toString()+";");
 	}
 	
+	public OracleMethod generateOracleMethodNoninterference(Term term) {
+		constants = getConstants(term);
+		methodArgs = getMethodArgsForNoninterference();
+		OracleTerm body = generateOracle(term, false);
+		return new OracleMethod("testOracle", methodArgs, "return "+body.toString()+";");
+	}
+	
 	public OracleLocationSet getOracleLocationSet(Term modifierset){
 		
 		ModifiesSetTranslator mst = new ModifiesSetTranslator(services, this);
@@ -191,6 +198,17 @@ public class OracleGenerator {
 	public Set<Term> getConstants() {
 		return constants;
 	}
+	
+	private List<OracleVariable> getMethodArgsForNoninterference(){
+List<OracleVariable> result = new LinkedList<OracleVariable>();
+		
+		
+		for(Term c : constants){
+			result.add(new OracleVariable(c.toString(), c.sort()));
+			result.add(new OracleVariable(PRE_STRING+c.toString(), c.sort()));
+		}
+		return result;
+	}
 
     /* TODO: The argument t is never used?*/
 	private List<OracleVariable> getMethodArgs(Term t){
@@ -241,7 +259,6 @@ public class OracleGenerator {
 		String name = "Set<"+inner+">";
 		return new SortImpl(new Name(name));
 	}
-
 
 	public OracleTerm generateOracle(Term term, boolean initialSelect){
 		
