@@ -95,11 +95,31 @@ public class ProofInfo {
 		}
 
 		return post;
+	}
+	
+	/**
+	 * returns the Post condition for a noninterference contract
+	 * @return the postcondition term
+	 */
+	public Term getNonInterferencePostCondition() {
+		Term t = getPO();
+		Term post = services.getTermBuilder().tt();
+		try{
+			post = t.sub(1);
+		}catch(Exception e){
+			System.err.println("Could not get PostCondition");
+		}
 
-
+		return post;
 	}
 
-
+	/**
+	 * is this a noninterference proof
+	 * @return true if noninterference proof
+	 */
+	public boolean isNoninterferenceProof() {
+		return getContract().getDisplayName().startsWith("Non-interference");
+	}
 
 
 	public Term getPreConTerm(){
