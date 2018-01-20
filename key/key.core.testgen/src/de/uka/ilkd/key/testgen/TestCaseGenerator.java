@@ -1037,7 +1037,7 @@ public class TestCaseGenerator {
 						assignments.add(new Assignment(declType, getPreName(c+B_EXECUTION), "("+type+")"+getPreName(val+B_EXECUTION)));
 						
 					} else {
-						val = exName+val;
+						val = val+exName;
 						assignments.add(new Assignment(declType, c, "("+type+")"+val));
 						//prestate
 						assignments.add(new Assignment(declType, getPreName(c), "("+type+")"+getPreName(val)));
@@ -1059,7 +1059,7 @@ public class TestCaseGenerator {
 						continue;
 					}
 					
-					final String receiverObject = getExecutionName(heap.getName())+createObjectName(o);
+					final String receiverObject = createObjectName(o)+getExecutionName(heap.getName());
 					for (final String f : o.getFieldvalues().keySet()) {
 						if (f.contains("<") || f.contains(">")) {
 							continue;
