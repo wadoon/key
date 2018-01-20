@@ -557,7 +557,6 @@ public class TestCaseGenerator {
 	private String getOracleAssertionInfoFlow(List<OracleMethod> oracleMethods) {
 		
 		Term postcondition = info.getNonInterferencePostCondition();
-		System.out.println("generiere oracle method for noninterference");//TODO muessig remove
 		OracleMethod oracle = oracleGenerator.generateOracleMethodNoninterference(postcondition);
 
 		OracleMethodCall oracleCall = new OracleMethodCall(oracle, oracle.getArgs());

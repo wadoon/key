@@ -69,6 +69,8 @@ public class OracleGenerator {
 	
 	public static final String PRE_STRING = "_pre";
 	
+	public static final String AT_POST = "AtPost";
+	
 	public OracleGenerator(Services services, ReflectionClassCreator rflCreator, boolean useRFL) {
 		this.services = services;
 		initOps();		
@@ -132,7 +134,7 @@ public class OracleGenerator {
 	public OracleMethod generateOracleMethodNoninterference(Term term) {
 		constants = getConstants(term);
 		methodArgs = getMethodArgsForNoninterference();
-		OracleTerm body = generateOracle(term, false);
+		OracleTerm body = generateNoninterferenceOracle(term, false, true, false);
 		return new OracleMethod("testOracle", methodArgs, "return "+body.toString()+";");
 	}
 	
@@ -200,12 +202,11 @@ public class OracleGenerator {
 	}
 	
 	private List<OracleVariable> getMethodArgsForNoninterference(){
-List<OracleVariable> result = new LinkedList<OracleVariable>();
-		
+		List<OracleVariable> result = new LinkedList<OracleVariable>();
 		
 		for(Term c : constants){
-			result.add(new OracleVariable(c.toString(), c.sort()));
-			result.add(new OracleVariable(PRE_STRING+c.toString(), c.sort()));
+			result.add(new OracleVariable(c.toString().replaceAll(AT_POST, ""), c.sort()));
+			result.add(new OracleVariable(PRE_STRING+c.toString().replaceAll(AT_POST, ""), c.sort()));		
 		}
 		return result;
 	}
@@ -258,6 +259,124 @@ List<OracleVariable> result = new LinkedList<OracleVariable>();
 	private Sort createSetSort(String inner){
 		String name = "Set<"+inner+">";
 		return new SortImpl(new Name(name));
+	}
+	
+	
+	public OracleTerm generateNoninterferenceOracle(Term term, boolean initialSelect, boolean firstCall, boolean needPreState) {
+Operator op = term.op();
+		
+		//binary terms
+		if(ops.containsKey(op)){			
+			OracleTerm left = generateNoninterferenceOracle(term.sub(0), initialSelect, false, needPreState);
+			OracleTerm right = generateNoninterferenceOracle(term.sub(1), initialSelect, false, needPreState);	
+			String javaOp = ops.get(op);
+			
+			if(javaOp.equals(EQUALS)){
+				return eq(left, right);
+			}
+			else if(javaOp.equals(AND)){
+				return and(left,right);
+			}
+			else if(javaOp.equals(OR)){
+				return or(left,right);
+			}			
+			
+			return new OracleBinTerm(javaOp,left,right);			
+		}//negation
+		else if(op == Junctor.NOT){
+			OracleTerm sub = generateNoninterferenceOracle(term.sub(0), initialSelect, false, needPreState);
+			if(sub instanceof OracleUnaryTerm){
+				OracleUnaryTerm neg = (OracleUnaryTerm) sub;
+				return neg.getSub();
+			}
+			return new OracleUnaryTerm(sub, Op.Neg);
+		}
+		//true
+		else if (op == Junctor.TRUE) {
+			return OracleConstant.TRUE;
+		}
+		//false
+		else if (op == Junctor.FALSE) {
+			return OracleConstant.FALSE;
+		}
+		//imp - if imp is outer operation, then left term is in pre state
+		else if (op == Junctor.IMP){
+			OracleTerm left;
+			OracleTerm right;
+			if (firstCall) {
+				//left term from imp need pre state !!!
+				left = generateNoninterferenceOracle(term.sub(0), initialSelect, false, true);
+				right = generateNoninterferenceOracle(term.sub(1), initialSelect, false, needPreState);
+			} else {
+				left = generateNoninterferenceOracle(term.sub(0), initialSelect, false, needPreState);
+				right = generateNoninterferenceOracle(term.sub(1), initialSelect, false, needPreState);			
+			}
+			OracleTerm notLeft = neg(left);
+			return new OracleBinTerm(OR, notLeft, right);
+		}
+		
+		
+//		//quantifiable variable //TODO muessig check if needed
+//		else if (op instanceof QuantifiableVariable) {			
+//			QuantifiableVariable qop = (QuantifiableVariable) op;
+//			if(needPreState) {
+//				return new OracleVariable(PRE_STRING+qop.name().toString().replaceAll(AT_POST, ""), qop.sort());
+//			} else {
+//				return new OracleVariable(qop.name().toString().replaceAll(AT_POST, ""), qop.sort());	
+//			}
+//		}
+//		//integers
+//		else if (op == services.getTypeConverter().getIntegerLDT()
+//		        .getNumberSymbol()) {			
+//			long num = NumberTranslation.translate(term.sub(0)).longValue();			
+//			return new OracleConstant(Long.toString(num),term.sort());
+//		}
+		//forall
+//		else if (op == Quantifier.ALL || op == Quantifier.EX) {
+//			Sort field = services.getTypeConverter().getHeapLDT().getFieldSort();
+//			Sort heap = services.getTypeConverter().getHeapLDT().targetSort();
+//			Sort varSort = term.boundVars().get(0).sort();
+//			if(varSort.equals(field) || varSort.equals(heap)){
+//				return OracleConstant.TRUE;
+//			}
+//			
+//			OracleMethod method = createQuantifierMethod(term, initialSelect);
+//			oracleMethods.add(method);
+//			List<OracleTerm> args = new LinkedList<OracleTerm>();
+//			args.addAll(quantifiedVariables);
+//			args.addAll(methodArgs);
+//			return new OracleMethodCall(method, args);
+//		}		
+//		//if-then-else
+//		else if(op == IfThenElse.IF_THEN_ELSE){
+//			OracleMethod method = createIfThenElseMethod(term, initialSelect);
+//			oracleMethods.add(method);
+//			List<OracleTerm> args = new LinkedList<OracleTerm>();
+//			args.addAll(quantifiedVariables);
+//			args.addAll(methodArgs);
+//			return new OracleMethodCall(method, args);
+//		}
+//		//functions
+//		else if (op instanceof Function) {
+//			return translateFunction(term, initialSelect);
+//		}
+		//program variables
+		else if (op instanceof ProgramVariable){
+			ProgramVariable var = (ProgramVariable) op;
+			LocationVariable loc = (LocationVariable) var;
+			if(needPreState) {
+				// generate name with pre state !
+				return new OracleConstant(PRE_STRING+loc.name().toString().replaceAll(AT_POST, ""), loc.sort());
+			} else {
+				return new OracleConstant(loc.name().toString().replaceAll(AT_POST, ""), loc.sort()); //TODO muessig check if correct and remove if not
+			}
+		}
+				
+		else{
+			//System.out.println("Could not translate: "+term);
+			throw new RuntimeException("Could not translate oracle for: "+term+" of type "+term.op());
+		}
+			
 	}
 
 	public OracleTerm generateOracle(Term term, boolean initialSelect){
