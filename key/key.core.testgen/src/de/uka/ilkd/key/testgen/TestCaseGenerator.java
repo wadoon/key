@@ -996,10 +996,10 @@ public class TestCaseGenerator {
 		// init constants
 		
 		for (final String c : m.getConstants().keySet()) {
+			System.out.println("Konstante ::::::::::::::" + c);
 			if (c.equals("self") || isPostName(c)) { //self and post constants not needed
 				continue;
 			}
-			
 			String val = m.getConstants().get(c);
 			
 			if (filterVal(val) && !c.equals("null")) {
@@ -1129,16 +1129,18 @@ public class TestCaseGenerator {
 		}
 		
 //		if(junitFormat){//TODO muessig check if needed this is for quantified post conditions ?
-//			result.append(NEW_LINE);
-//			result.append(createOldMap(objects) + NEW_LINE);
-//			result.append(createBoolSet() + NEW_LINE);
-//			result.append(createIntSet() + NEW_LINE);
-//			result.append(createObjSetInfoFlow(heaps) + NEW_LINE);			
+			result.append(NEW_LINE);
+			result.append(createOldMap(objects) + NEW_LINE);
+			result.append(createBoolSet() + NEW_LINE);
+			result.append(createIntSet() + NEW_LINE);
+			result.append(createObjSetInfoFlow(heaps) + NEW_LINE);			
 //		}
 
 
 		return result.toString();
 	}
+	
+	
 	
 	/**
 	 * check if variable is post variable (for information flow test)
@@ -1516,25 +1518,27 @@ public class TestCaseGenerator {
 	}
 	
 	//TODO muessig check if needed
-//	private String createObjSetInfoFlow(List<Heap> heaps) {
-//		StringBuffer res = new StringBuffer();
-//		
-//		res.append(TAB+"Set<Object> "+ALL_OBJECTS +"= new HashSet<Object>();" + NEW_LINE);
-//		
-//		//create objects for HeapAtPre_A, HeapAtPre_B, HeapAtPost_A and HeapAtPost_B
-//		for (Heap h : heaps) {
-//			for(ObjectVal o : h.getObjects()){
-//				String name = "_"+h.getName()+o.getName();
-//				if(name.equals("#o0")){
-//					continue;
-//				}
-//				name = name.replace("#", "_");
-//				res.append(TAB+ALL_OBJECTS+".add("+name+");" + NEW_LINE);
-//
-//			}		
-//		}
-//		return res.toString();	
-//	}
+	private String createObjSetInfoFlow(List<Heap> heaps) {
+		StringBuffer res = new StringBuffer();
+		
+		res.append(TAB+"Set<Object> "+ALL_OBJECTS +"= new HashSet<Object>();" + NEW_LINE);
+		
+		//create objects for HeapAtPre_A, HeapAtPre_B, HeapAtPost_A and HeapAtPost_B
+		for (Heap h : heaps) {
+			for(ObjectVal o : h.getObjects()){
+				String name = o.getName();
+				if(name.equals("#o0")){
+					continue;
+				}
+				name = name+getExecutionName(h.getName());
+				name = name.replace("#", "_");
+				res.append(TAB+ALL_OBJECTS+".add("+name+");" + NEW_LINE);
+//				res.append(TAB+ALL_OBJECTS+".add("+getPreName(name)+");" + NEW_LINE);
+
+			}		
+		}
+		return res.toString();	
+	}
 
 
 
