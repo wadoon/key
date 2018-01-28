@@ -292,6 +292,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final RuleSetDispatchFeature d = new RuleSetDispatchFeature();
         
         bindRuleSet(d, "semantics_blasting", inftyConst());
+        bindRuleSet(d, "test_gen_postcondition_hide", inftyConst());
         bindRuleSet(d, "simplify_heap_high_costs", inftyConst());
 
         bindRuleSet(d, "closure", -15000);
