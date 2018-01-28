@@ -18,7 +18,9 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.macros.RemovePostConditionMacro;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
+import de.uka.ilkd.key.macros.TestGenInfoFlowMacro;
 import de.uka.ilkd.key.macros.TestGenMacro;
 import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -27,6 +29,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.TaskFinishedInfo;
 import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
+import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
@@ -94,10 +97,30 @@ public abstract class AbstractTestGenerator {
     	return;
     }
     
+    
+    //macro removing post condition //TODO edit code below for noninterference and normal testgen
+    if(!settings.includePostCondition()) {
+		log.writeln("Applying remove postcondition Macro (remove postcondition from proof)...");
+    	if (originalProof.openEnabledGoals().size() > 1) {
+    		log.writeln("did not remove postcondition, because already removed and symbolic execution is already done");
+    		log.writeln("please reload proof if you want to change the include postcondition option");
+    	} else {
+        	RemovePostConditionMacro macro = new RemovePostConditionMacro();
+        	try {
+    			macro.applyTo(ui, originalProof, originalProof.openEnabledGoals(), null, null);
+    			log.writeln("removed post condition");
+    		} catch (Throwable ex) {
+    			log.writeException(ex);
+    		}
+    	}
+    }
+    
     if(settings.getApplySymbolicExecution()){
         log.writeln("Applying TestGen Macro (bounded symbolic execution)...");
         try {
-            TestGenMacro macro = new TestGenMacro();        
+        	
+//        	TestGenMacro macro = new TestGenMacro();
+            TestGenInfoFlowMacro macro = new TestGenInfoFlowMacro();
             //Strategy backupStrategy = originalProof.getActiveStrategy();
             //ProofSettings backupSettings = originalProof.getSettings();
             
@@ -114,7 +137,9 @@ public abstract class AbstractTestGenerator {
     }
     
     log.writeln("Extracting test data constraints (path conditions).");
-    proofs = createProofsForTesting(settings.removeDuplicates(), ! settings.includePostCondition());
+//    proofs = createProofsForTesting(settings.removeDuplicates(), ! settings.includePostCondition()); //TODO muessig remove for normal testgeneration
+    // noninterference has own macro for removing post condition
+    proofs = createProofsForTesting(settings.removeDuplicates(), false); //TODO muessig this is for noninterference proofs -> create if else non interference
     if (stopRequest != null && stopRequest.shouldStop()) {
        return;
     }
