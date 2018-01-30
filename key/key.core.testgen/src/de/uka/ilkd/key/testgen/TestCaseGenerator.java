@@ -999,14 +999,14 @@ public class TestCaseGenerator {
 					//TODO muessig check if this is needed. 
 					//if the constant name doesnt include the Execution A or B
 					// create the constant for both.
-					if (exName.equals("")) {
-						assignments.add(new Assignment(declType, c+A_EXECUTION, "("+type+")"+val+A_EXECUTION));
-						//prestate
-						assignments.add(new Assignment(declType, getPreName(c+A_EXECUTION), "("+type+")"+getPreName(val+A_EXECUTION)));
-						
-						assignments.add(new Assignment(declType, c+B_EXECUTION, "("+type+")"+val+B_EXECUTION));
-						//prestate
-						assignments.add(new Assignment(declType, getPreName(c+B_EXECUTION), "("+type+")"+getPreName(val+B_EXECUTION)));
+					if (exName.equals("")) {//TODO remove this part if we need this constants. But i think they are just for the proof
+//						assignments.add(new Assignment(declType, c+A_EXECUTION, "("+type+")"+val+A_EXECUTION));
+//						//prestate
+//						assignments.add(new Assignment(declType, getPreName(c+A_EXECUTION), "("+type+")"+getPreName(val+A_EXECUTION)));
+//						
+//						assignments.add(new Assignment(declType, c+B_EXECUTION, "("+type+")"+val+B_EXECUTION));
+//						//prestate
+//						assignments.add(new Assignment(declType, getPreName(c+B_EXECUTION), "("+type+")"+getPreName(val+B_EXECUTION)));
 						
 					} else {
 						val = val+exName;

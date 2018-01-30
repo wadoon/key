@@ -6,6 +6,7 @@ import java.util.List;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.expression.operator.adt.AllObjects;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
@@ -43,7 +44,6 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 	
 	@Override
 	protected List<OracleVariable> getMethodArgs(Term t){
-		System.out.println("right get Method args"); //TODO muessig remove
 		
 		List<OracleVariable> result = new LinkedList<OracleVariable>();
 
@@ -57,10 +57,23 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 		OracleVariable allBools = new OracleVariable(TestCaseGenerator.ALL_BOOLS, allBoolSort);
 		OracleVariable allObj = new OracleVariable(TestCaseGenerator.ALL_OBJECTS, allObjSort);
 		OracleVariable oldMap = new OracleVariable(TestCaseGenerator.OLDMap, oldMapSort);
-		
+		boolean add = true;
 		for(Term c : constants){
-			result.add(new OracleVariable(c.toString().replaceAll(AT_POST, ""), c.sort()));
-			result.add(new OracleVariable(PRE_STRING+c.toString().replaceAll(AT_POST, ""), c.sort()));		
+			OracleVariable constant = new OracleVariable(c.toString().replaceAll(AT_POST, ""), c.sort());
+			OracleVariable preConstant = new OracleVariable(PRE_STRING+c.toString().replaceAll(AT_POST, ""), c.sort());
+			
+			//add constants just once
+			for (OracleVariable o : result) {
+				if (o.getName().toString().equals(constant.getName().toString())|| o.getName().toString().equals(constant.getName().toString())) {
+					add = false;
+				}
+			}
+			
+			if (add) {
+				result.add(constant);
+				result.add(preConstant);
+			}
+					
 		}
 
 		result.add(allBools);
@@ -90,7 +103,6 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 	}	
 	
 	public OracleTerm generateNoninterferenceOracle(Term term, boolean initialSelect, boolean firstCall, boolean needPrestate) {
-		if (firstCall) System.out.println("right oracle generation "); //TODO remove
 		
 		Operator op = term.op();
 
@@ -345,7 +357,7 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 	    
 	    
 	    else if (name.equals("newObjectsIsomorphic")) {
-	    	OracleMethod method = createIsomorphicOracleMethod(term, initialSelect);
+	    	OracleMethod method = createIsomorphicOracleMethod(term, initialSelect/*not needed*/);
 			oracleMethods.add(method);
 			List<OracleTerm> args = new LinkedList<OracleTerm>();
 			args.addAll(quantifiedVariables);
@@ -412,7 +424,6 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 		return new OracleConstant(value, term.sort());
 	}
 	
-	//TODO muessig move to new class -> remove
 	private String[] getObjNamesFromList(Term t, int size) {
 		int i = 0;
 		String[] names = new String[size];
@@ -423,7 +434,7 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 		return names;
 	}
 	
-	//TODO muessig move to new class -> remove
+	//TODO remove if not needed
 	private String checkPreString(String[] names) {
 		String checkPreOne = "";
 		for (int i = 0; i < names.length-1; i++) {
@@ -432,7 +443,7 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 		return checkPreOne+PRE_STRING+names[names.length-1]+EQUALS+" null";
 	}
 		
-	//TODO muessig move to new class -> remove
+	//TODO remove if not needed
 	private String checkTypeString(String[] namesA, String[] namesB) {
 		String result = "";
 		for(int i = 0; i < namesA.length-1; i++) {
@@ -470,37 +481,76 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 		}
 		objectsA = objectsA + objANames[listSize-1]+"}";
 		objectsB = objectsB + objBNames[listSize-1]+"}";
-			
-		String objectArrays = "\n"+tab+tab+"Object[] objectsA = "+objectsA+";"
-								+"\n"+tab+tab+"Objects objectsB = "+objectsB+";";
+		
+		String objectArrays = "\n"+tab+tab+"Object[] l1 = "+objectsA+";"
+								+"\n"+tab+tab+"Object[] l2 = "+objectsB+";";
 		
 		result = result + objectArrays;
+		//until here create the two lists -> now call next submethod
 		
-		//list of objects
-		//check if exists in prestate
-		String checkPreOne = checkPreString(objANames);
-		String checkPreSec = checkPreString(objBNames);
-		String checkIfNew =
-				"\n"+tab+tab+"//check if objects new "
-				+"\n"+tab+tab+"if(!("+checkPreOne + "&&" + checkPreSec+")) {"
-						+"\n"+tab+tab+tab+"return false;"
-						+"\n"+tab+tab+"}";
-		
-		result = result + checkIfNew;
-		
-		
-		//check the type of obj in list with .class
-		String compareTypes = checkTypeString(objANames, objBNames);		
-		String checkType =
-				"\n"+tab+tab+"//check object types"
-				+"\n"+tab+tab+"if(!("+compareTypes+")) {"
-					+"\n"+tab+tab+tab+"return false;"
-					+"\n"+tab+tab+"}";
-			
-		
-		result = result + checkType;
-		    
+		//submethod checks if objects are new
+		OracleMethod checkIsomorphism = areObjectsNew();
+		oracleMethods.add(checkIsomorphism);
 		List<OracleVariable> args = new LinkedList<OracleVariable>();
+		String name = "Object[]";
+		Sort array = new SortImpl(new Name(name));
+		args.add(new OracleVariable("l1", array));
+		args.add(new OracleVariable("allObjects", createSetSort("Object")));
+		//call for A
+		OracleMethodCall callNewA = new OracleMethodCall(checkIsomorphism, args);
+		
+		args = new LinkedList<OracleVariable>();
+		args.add(new OracleVariable("l2", array));
+		args.add(new OracleVariable("allObjects", createSetSort("Object")));
+		//call for B
+		OracleMethodCall callNewB = new OracleMethodCall(checkIsomorphism, args);
+		
+		result = result
+				+"\n"+tab+tab+"return "+callNewA +" && "+ callNewB;
+		
+		//add same type oracle method
+		args = new LinkedList<OracleVariable>();
+		args.add(new OracleVariable("l1", array));
+		args.add(new OracleVariable("l2", array));
+		OracleMethod checkSameType = sameTypeMethod(args);
+		oracleMethods.add(checkSameType);
+		
+		OracleMethodCall callTypeCheck = new OracleMethodCall(checkSameType, args);
+		
+		result = result + " && "+ callTypeCheck;
+		
+		//check object isomorphic
+		OracleMethod isomorphicMethod = checkIsomorphicMethod(args);
+		oracleMethods.add(isomorphicMethod);
+		OracleMethodCall callIsomorphicMethod = new OracleMethodCall(isomorphicMethod, args);
+		
+		result = result + " && "+ callIsomorphicMethod+";";
+		
+//		//list of objects
+//		//check if exists in prestate
+//		String checkPreOne = checkPreString(objANames);
+//		String checkPreSec = checkPreString(objBNames);
+//		String checkIfNew =
+//				"\n"+tab+tab+"//check if objects new "
+//				+"\n"+tab+tab+"if(!("+checkPreOne + "&&" + checkPreSec+")) {"
+//						+"\n"+tab+tab+tab+"return false;"
+//						+"\n"+tab+tab+"}";
+//		
+//		result = result + checkIfNew;
+//		
+//		
+//		//check the type of obj in list with .class
+//		String compareTypes = checkTypeString(objANames, objBNames);		
+//		String checkType =
+//				"\n"+tab+tab+"//check object types"
+//				+"\n"+tab+tab+"if(!("+compareTypes+")) {"
+//					+"\n"+tab+tab+tab+"return false;"
+//					+"\n"+tab+tab+"}";
+//			
+//		
+//		result = result + checkType;
+//		    
+		args = new LinkedList<OracleVariable>();
 		args.addAll(quantifiedVariables);
 		args.addAll(methodArgs);
 		
@@ -508,9 +558,86 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 		return new OracleMethod(methodName, args, result);
 	}
 	
+	private OracleMethod checkIsomorphicMethod(List<OracleVariable> args) {
+		String methodName = "objectsAreIsomoprhic";
+		String tab = TestCaseGenerator.TAB;
+		
+		List<OracleVariable> argsHelp = new LinkedList<OracleVariable>();
+		String objectArray = "Object[]";
+		String object = "Object";
+		Sort array = new SortImpl(new Name(objectArray));
+		Sort objectSort = new SortImpl(new Name(object));
+		argsHelp.add(new OracleVariable("l1", array));
+		argsHelp.add(new OracleVariable("l2", array));
+		argsHelp.add(new OracleVariable("o1", objectSort));
+		argsHelp.add(new OracleVariable("o2", objectSort));
+		OracleMethod helpIsomorphicCheck = isomorphicHelpMethod(argsHelp);
+		oracleMethods.add(helpIsomorphicCheck);
+		
+		OracleMethodCall helperCall = new OracleMethodCall(helpIsomorphicCheck, argsHelp);
+		
+		String body = 
+				"\n"+tab+tab+"for (int i = 0; i < l1.length; i++) {"
+				+"\n"+tab+tab+tab+"Object o1 = l1[i];"
+				+"\n"+tab+tab+tab+"Object o2 = l2[i];"
+				+"\n"+tab+tab+tab+"if (!"+ helperCall +") return false;"
+				+"\n"+tab+tab+"}"
+				+"\n"+tab+tab+"return true;";
+		
+		return new OracleMethod(methodName, args, body);
+		
+	}
+	
+	private OracleMethod isomorphicHelpMethod(List<OracleVariable> args) {
+		String methodName = "objectsIsIsomorphic";
+		String tab = TestCaseGenerator.TAB;
+		
+		String body = 
+				"\n"+tab+tab+"for (int i = 0; i < l1.length; i++) {"
+				+"\n"+tab+tab+tab+"if ( (l1[i] == o1) != (l2[i] == o2)) return false;"
+				+"\n"+tab+tab+"}"
+				+"\n"+tab+tab+"return true;";
+		
+		
+		return new OracleMethod(methodName, args, body);
+	}
+	
+	private OracleMethod sameTypeMethod(List<OracleVariable> args) {
+		String methodName = "sameTypes";
+		String tab = TestCaseGenerator.TAB;
+		String body = 
+				"\n"+tab+tab+"for (int i = 0; i < l1.length; i++) {"
+				+"\n"+tab+tab+tab+"if (!l1[i].getClass().equals(l2[i].getClass())) return false;"
+				+"\n"+tab+tab+"}"
+				+"\n"+tab+tab+"return true;";
+		
+		return new OracleMethod(methodName ,args, body);
+	}
+	
+	
+	private OracleMethod areObjectsNew() {
+		
+		String methodName = "newObjects";
+		
+		String tab = TestCaseGenerator.TAB;
+		String body = 
+				"\n"+tab+tab+"for (Object o1 : l) {"
+				+"\n"+tab+tab+tab+"for (Object o2 : allObjects) {"
+				+"\n"+tab+tab+tab+tab+"if (o1 == o2) return false;"
+				+"\n"+tab+tab+tab+"}"
+				+"\n"+tab+tab+"}"
+				+"\n"+tab+tab+"return true;";
+		
+		
+		List<OracleVariable> args = new LinkedList<OracleVariable>();
+		String name = "Object[]";
+		Sort array = new SortImpl(new Name(name));
+		args.add(new OracleVariable("l", array));
+		args.add(new OracleVariable("allObjects", createSetSort("Object")));
+		return new OracleMethod(methodName ,args, body);
+	}
+	
 	private OracleMethod allFieldsArrayEqualsToMethod(Term leftTerm, Term rightTerm, boolean initialSelect) {
-		
-		
 		String methodName = generateMethodName();
 			
 		String tab = TestCaseGenerator.TAB;
