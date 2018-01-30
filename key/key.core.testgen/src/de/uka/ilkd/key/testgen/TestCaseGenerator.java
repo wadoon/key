@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -44,6 +45,7 @@ import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
 import de.uka.ilkd.key.smt.testgen.TestGenerationLog;
 import de.uka.ilkd.key.testgen.oracle.OracleGenerator;
+import de.uka.ilkd.key.testgen.oracle.OracleGeneratorNoninterference;
 import de.uka.ilkd.key.testgen.oracle.OracleMethod;
 import de.uka.ilkd.key.testgen.oracle.OracleMethodCall;
 import de.uka.ilkd.key.util.KeYConstants;
@@ -198,14 +200,17 @@ public class TestCaseGenerator {
 		rflCreator = new ReflectionClassCreator();
 		executeWithOpenJML = createExecuteWithOpenJML(settings.getOpenjmlPath(),settings.getObjenesisPath());
 		compileWithOpenJML = createCompileWithOpenJML(settings.getOpenjmlPath(), settings.getObjenesisPath());
-		oracleGenerator  =new OracleGenerator(services,rflCreator, useRFL);
+		
 		if(junitFormat){
 			//System.out.println("Translating oracle");
 			oracleMethods = new LinkedList<OracleMethod>();
 			if(info.isNoninterferenceProof()) {//check if noninterference
+				oracleGenerator  =new OracleGeneratorNoninterference(services,rflCreator, useRFL);
 				oracleMethodCall = getOracleAssertionInfoFlow(oracleMethods);
 			} else {
+				oracleGenerator  =new OracleGenerator(services,rflCreator, useRFL);
 				oracleMethodCall = getOracleAssertion(oracleMethods);
+				
 			}
 		}
 	}
@@ -554,10 +559,10 @@ public class TestCaseGenerator {
 //		return testCase.toString();
 //	}
 
-	private String getOracleAssertionInfoFlow(List<OracleMethod> oracleMethods) {
+	private String getOracleAssertionInfoFlow(List<OracleMethod> oracleMethods) { //TODO muessig remove because of dynamic binding. do the replacing (at post) after calling this method
 		
 		Term postcondition = info.getNonInterferencePostCondition();
-		OracleMethod oracle = oracleGenerator.generateOracleMethodNoninterference(postcondition);
+		OracleMethod oracle = oracleGenerator.generateOracleMethod(postcondition);
 
 		OracleMethodCall oracleCall = new OracleMethodCall(oracle, oracle.getArgs());
 
@@ -909,6 +914,7 @@ public class TestCaseGenerator {
 	}
 	
 	
+	//TODO muessig create new class extending from this
 	public String generateTestCaseInfoFlow(Model m, Map<String, Sort> typeInfMap) {
 		m.removeUnnecessaryObjects();
 
@@ -922,43 +928,10 @@ public class TestCaseGenerator {
 			if (!isPostName(h.getName())) {
 				heaps.add(h);
 			}
-		}
+		}		
 
 		Set<ObjectVal> prestate = new HashSet<ObjectVal>();
 		if (!heaps.isEmpty()) {
-			
-			//TODO muessig check after oracle creation if this solution is correct
-			//maybe generate objects for the object constants we cant refer to execution A or B
-//			for (final ObjectVal o : heaps.get(0).getObjects()) {
-//				if (o.getName().equals("#o0")) {
-//					continue;
-//				}
-//				final String type = getSafeType(o.getSort());
-//				String right;
-//				if (type.endsWith("[]")) {
-//					right = "new " + type.substring(0, type.length() - 2) + "["
-//							+ o.getLength() + "]";
-//				}else if(o.getSort() == null || o.getSort().toString().equals("Null")){
-//					right = "null";
-//				}else {
-//					if(useRFL){
-//						right = "RFL.new"+ReflectionClassCreator.cleanTypeName(type)+"()";
-//						rflCreator.addSort(type);
-//						//rflCreator.addSort(oSort!=null?oSort.name().toString():"Object");
-//						//System.out.println("Adding sort (create Object):"+ (oSort!=null?oSort.name().toString():"Object"));
-//					}else
-//						right = "new " + type + "()";
-//				}
-//				
-//				String objName = createObjectName(o);
-////				String objName = getInfoFlowHeapName(heap)+createObjectName(o); //remove unused
-//				objects.add(objName); // maybe remove
-//				assignments.add(new Assignment(type, objName, right));
-//
-//				assignments.add(new Assignment(type, getPreName(objName), right));
-//			}
-			//
-			
 
 			//create Objects for all pre-Heaps (PreA/B)
 			for (Heap heap : heaps) {
@@ -996,7 +969,6 @@ public class TestCaseGenerator {
 		// init constants
 		
 		for (final String c : m.getConstants().keySet()) {
-			System.out.println("Konstante ::::::::::::::" + c);
 			if (c.equals("self") || isPostName(c)) { //self and post constants not needed
 				continue;
 			}
@@ -1274,6 +1246,8 @@ public class TestCaseGenerator {
 				}
 			}
 		}
+
+		
 		// init fields
 		if (heap != null) {
 			for (final ObjectVal o : heap.getObjects()) {
