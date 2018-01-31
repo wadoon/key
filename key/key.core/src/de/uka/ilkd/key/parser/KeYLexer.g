@@ -660,6 +660,11 @@ IDENT
     )
 ;
 
+STARDONTCARE: '...' | '…';
+SCHEMAIDENT
+: ('?'IDENT | '_' |STARDONTCARE IDENT STARDONTCARE )
+;
+
 fragment
 NUM_LITERAL
 :
