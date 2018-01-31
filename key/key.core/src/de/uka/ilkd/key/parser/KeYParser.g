@@ -1,4 +1,3 @@
-
 // This file is part of KeY - Integrated Deductive Software Design
 // Copyright (C) 2001-2011 Universitaet Karlsruhe, Germany
 //                         Universitaet Koblenz-Landau, Germany
@@ -105,6 +104,16 @@ options {
 @annotateclass{ @SuppressWarnings("all") } 
 
 @members{
+
+    /**
+     * This Boolean flag determines whether we allow the lexing of schema variables,
+     * i.e. variables with a '?'-prefix like ?A or ?B.
+     */
+     private boolean enableSchemaVariables;
+     public boolean isEnableSchemaVariables() { return enableSchemaVariables;}
+     public void setEnableSchemaVariables(boolean flag) {
+        enableSchemaVariables=flag;
+     }
 
     private static final Sort[] AN_ARRAY_OF_SORTS = new Sort[0];
     private static final Term[] AN_ARRAY_OF_TERMS = new Term[0];
@@ -1880,8 +1889,12 @@ string_literal returns [String lit = null]
 
 simple_ident returns [String ident = null]
    :
-     id=IDENT { ident = id.getText(); }
+       id=IDENT { ident = id.getText(); }
+     | {enableSchemaVariables}? => id=SCHEMAIDENT {ident=id.getText();
+            //TODO extend namespace
+     }
    ;
+
 
 simple_ident_comma_list returns [ImmutableList<String> ids = ImmutableSLList.<String>nil()]
    :
@@ -3114,6 +3127,18 @@ atom returns [Term _atom = null]
 (        {isTermTransformer()}? a = specialTerm
     |   a = funcpredvarterm
     |   LPAREN a = term RPAREN
+    |   STARTDONTCARE a=term STARTDONTCARE
+    {
+        //TODO
+        //Operator of STARTDONTCARE
+        //create term
+    }
+    |  a=term '\as' SCHEMAIDENT
+    {
+           //TODO
+           //Operator of STARTDONTCARE
+           //create term
+    }
     |   TRUE  { a = getTermFactory().createTerm(Junctor.TRUE); }
     |   FALSE { a = getTermFactory().createTerm(Junctor.FALSE); }
     |   a = ifThenElseTerm

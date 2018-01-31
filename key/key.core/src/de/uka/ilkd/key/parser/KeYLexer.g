@@ -41,6 +41,16 @@ lexer grammar KeYLexer;
 @annotateclass{ @SuppressWarnings("all") } 
 
 @members{
+    /**
+     * This Boolean flag determines whether we allow the lexing of schema variables,
+     * i.e. variables with a '?'-prefix like ?A or ?B.
+     */
+    private boolean enableSchemaVariables;
+    public boolean isEnableSchemaVariables() { return enableSchemaVariables;}
+    public void setEnableSchemaVariables(boolean flag) {
+        enableSchemaVariables=flag;
+    }
+
     class SaveStruct {
         SaveStruct (CharStream input) {
             this.input = input;
@@ -660,9 +670,9 @@ IDENT
     )
 ;
 
-STARDONTCARE: '...' | '…';
+STARDONTCARE: '...' | '?';
 SCHEMAIDENT
-: ('?'IDENT | '_' |STARDONTCARE IDENT STARDONTCARE )
+:   {enableSchemaVariables}? => '?' IDENT?
 ;
 
 fragment
