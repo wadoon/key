@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.testgen.oracle;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -31,9 +32,13 @@ import de.uka.ilkd.key.testgen.oracle.OracleUnaryTerm.Op;
 public class OracleGeneratorNoninterference extends OracleGenerator {
 	
 	private Set<String> primitiveTypes;
+	
+	private Set<String> newObjectsList;
 
 	public OracleGeneratorNoninterference(Services services, ReflectionClassCreator rflCreator, boolean useRFL) {
 		super(services, rflCreator, useRFL);
+		newObjectsList = new HashSet<String>();
+		primitiveTypes = new HashSet<String>();
 		addPrimitiveTypes();
 	}
 	
@@ -54,6 +59,12 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 		constants = getConstants(term);
 		methodArgs = getMethodArgs(term);
 		OracleTerm body = generateNoninterferenceOracle(term, false, true, false);
+		if (body == null) {
+			//empty Oracle
+			System.out.println("Warning: the testOracle is empty");
+			List<OracleVariable> emptyArgs = new LinkedList<OracleVariable>();
+			return new OracleMethod("testOracle", emptyArgs, "return true");
+		}
 		return new OracleMethod("testOracle", methodArgs, "return "+body.toString()+";");
 	}
 	
@@ -117,7 +128,6 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 	}	
 	
 	public OracleTerm generateNoninterferenceOracle(Term term, boolean initialSelect, boolean firstCall, boolean needPrestate) {
-		
 		Operator op = term.op();
 
 		//binary terms
@@ -161,13 +171,31 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 				left = generateNoninterferenceOracle(term.sub(0), initialSelect, false, needPrestate);
 				right = generateNoninterferenceOracle(term.sub(1), initialSelect, false, needPrestate);
 			}
+			
+			//empty right or empty left
+			if (right == null) {
+				return left;
+			}
+			
+			
+			if (left == null) {
+				return right;
+			}
+			
+			
 			String javaOp = ops.get(op);
 
 			if(javaOp.equals(EQUALS)){
-				
-				return eq(left, right);
+				//equals check with objects already checked with newObjectsIsomorphic -> dont check them with equal
+				if(newObjectsList.contains(left.toString()) && newObjectsList.contains(right.toString())) {
+					return null;
+				} else {
+
+					return eq(left, right);
+				}
 			}
 			else if(javaOp.equals(AND)){
+				
 				return and(left,right);
 			}
 			else if(javaOp.equals(OR)){
@@ -178,6 +206,10 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 		}//negation
 		else if(op == Junctor.NOT){
 			OracleTerm sub = generateNoninterferenceOracle(term.sub(0), initialSelect, false, needPrestate);
+			
+			//empty sub
+			if (sub == null) return null;
+			
 			if(sub instanceof OracleUnaryTerm){
 				OracleUnaryTerm neg = (OracleUnaryTerm) sub;
 				return neg.getSub();
@@ -204,6 +236,11 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 				left = generateNoninterferenceOracle(term.sub(0), initialSelect, false, needPrestate);
 				right = generateNoninterferenceOracle(term.sub(1), initialSelect, false, needPrestate);			
 			}
+			if (left == null) {
+				return right;
+			} else if (right == null){
+				return neg(left);
+			} 
 			OracleTerm notLeft = neg(left);
 			return new OracleBinTerm(OR, notLeft, right);
 		}
@@ -261,7 +298,7 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 				// generate name with pre state !
 				return new OracleConstant(PRE_STRING+loc.name().toString().replaceAll(AT_POST, ""), loc.sort());
 			} else {
-				return new OracleConstant(loc.name().toString().replaceAll(AT_POST, ""), loc.sort()); //TODO muessig check if correct and remove if not
+				return new OracleConstant(loc.name().toString().replaceAll(AT_POST, ""), loc.sort());
 			}
 		}
 				
@@ -379,6 +416,9 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 	    
 	    else if (name.equals("newObjectsIsomorphic")) {
 	    	OracleMethod method = createIsomorphicOracleMethod(term, initialSelect/*not needed*/);
+	    	if (method == null) {
+	    		return null;
+	    	}
 			oracleMethods.add(method);
 			List<OracleTerm> args = new LinkedList<OracleTerm>();
 			args.addAll(quantifiedVariables);
@@ -449,10 +489,30 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 		int i = 0;
 		String[] names = new String[size];
 		for (Term a : t.subs()) {
-			if (!primitiveTypes.contains(a.sort().name().toString())) {
-				names[i] = a.toString().replaceAll("AtPost", "");
+			if (a.op().name().toString().equals("seqSingleton")) {//TODO muessig check if lists contains of singletons
+				a = a.sub(0);
+			}
+			String name;
+			//check if function (select)
+			if (a.op() instanceof Function) {
+				OracleTerm subFunct = translateFunction(a, false, false, false);
+				
+				name = subFunct.toString();
+			} else {
+				name = a.toString();
+			}
+				
+			if (!primitiveTypes.contains(a.sort().name().toString())) { 
+				name = name.replaceAll(AT_POST, "");
+				names[i] = name;
+				newObjectsList.add(name);
 			}
 			i++;
+		}
+		
+		//empty ?
+		if (names[0] == null) {
+			return null;
 		}
 		return names;
 	}
@@ -462,7 +522,6 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 		//TODO muessig implement with needPrestate !!!!!
 	private OracleMethod createIsomorphicOracleMethod(Term term, boolean initialSelect) {
 		
-		//TODO remember the objects and dont use them in determine clause
 		String result = "";
 		String methodName = generateMethodName();
 		String tab = TestCaseGenerator.TAB;
@@ -478,6 +537,11 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 		//all objects in the list as String
 		String[] objANames = getObjNamesFromList(objectListA, listSize);
 		String[] objBNames = getObjNamesFromList(objectListB, listSize);
+		//no objects to check -> just primitive types
+		if (objANames == null || objBNames == null) {
+			System.out.println("Warning: no objects to check for isomorphic");
+			return null;
+		}
 		
 		String objectsA = "{";
 		String objectsB = "{";
