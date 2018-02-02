@@ -815,7 +815,7 @@ public class SMTObjTranslator implements SMTTranslator {
 				        selectArr);
 				Sort singleSort = services.getJavaInfo().getKeYJavaType(single)
 				        .getSort();
-				addTypePredicate(singleSort);
+				addTypeConstarints(singleSort);
 				SMTFunction tps = getTypePredicate(singleSort.name().toString());
 				SMTTerm selectObjArr = castTermIfNecessary(selectArr,
 				        sorts.get(OBJECT_SORT));
@@ -1661,9 +1661,9 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * @param s
 	 */
 	private void addTypePredicate(Sort s) {
-		if (!appearsInPO(s)) {
-			return;
-		}
+//		if (!appearsInPO(s)) {
+//			return;
+//		}
 		forceAddTypePredicate(s);
 	}
 	
