@@ -786,7 +786,8 @@ public class SMTObjTranslator implements SMTTranslator {
 		SMTTerm assertion4 = new SMTTerm.True();
 		for (Sort s : thierarchy.getArraySortList()) {
 			String name = s.name().toString();
-			addTypePredicate(s);
+			addTypeConstarints(s);
+			//addTypePredicate(s);
 			String single = name.substring(0, name.length() - 2);
 			SMTFunction tp = getTypePredicate(name);
 			if (tp == null) {
@@ -1434,8 +1435,8 @@ public class SMTObjTranslator implements SMTTranslator {
 			}
 			// System.out.println("Found sort in PO: "+s);
 			javaSorts.add(s);
-			addTypePredicate(s);
-			// addTypeConstarints(s);
+			//addTypePredicate(s);
+		    //addTypeConstarints(s);
 			return sorts.get(OBJECT_SORT);
 		}
 	}
@@ -1482,9 +1483,9 @@ public class SMTObjTranslator implements SMTTranslator {
 		}
 		// Do not specify constraint for these sorts:
 		if (s == Sort.ANY || s.equals(objectSort)
-		        || s.name().toString().equalsIgnoreCase("Null")) {
+		        || isNullSort(s)) {
 			return;
-		}
+		}		
 		/*
 		 * First we need to say that if an object is of type s, then it is of
 		 * the type of its parents as well.
@@ -1581,6 +1582,10 @@ public class SMTObjTranslator implements SMTTranslator {
 		SMTTerm forall = SMTTerm.forall(var, left.implies(right), null);
 		forall.setComment("Assertions for type " + s.name());
 		typeAssertions.put(s.name().toString(), forall);
+	}
+
+	private boolean isNullSort(Sort s) {
+		return s.name().toString().equalsIgnoreCase("Null");
 	}
 
 	private boolean isFinal(Sort s) {
@@ -1770,7 +1775,8 @@ public class SMTObjTranslator implements SMTTranslator {
 			SortDependingFunction sdf = (SortDependingFunction) fun;
 			Sort depSort = sdf.getSortDependingOn();
 			//javaSorts.add(depSort);
-			addTypePredicate(depSort);
+			addTypeConstarints(depSort);
+			//addTypePredicate(depSort);
 			function = getTypePredicate(sdf.getSortDependingOn().name()
 			        .toString());
 		} else if (name.endsWith("::cast")) {
@@ -1865,7 +1871,13 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * @param castTarget
 	 */
 	private void addCastFunctionAssertions(Sort castTarget) {
-		addTypePredicate(castTarget);
+		
+		try {
+			addTypeConstarints(castTarget);
+		} catch (IllegalFormulaException e) {
+			System.err.println("Error adding cast sort constraint.");
+			e.printStackTrace();
+		}
 		SMTFunction f = functions.get(getCastFunctionName(castTarget));
 		SMTFunction t = getTypePredicate(castTarget.name().toString());
 		if (t == null) {

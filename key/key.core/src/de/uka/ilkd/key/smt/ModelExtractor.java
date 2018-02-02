@@ -808,7 +808,7 @@ public class ModelExtractor implements PipeListener<SolverCommunication>{
 				
 				
 				
-				Query q = new ObjectTypeQuery(objectID, s);
+				Query q = new ObjectTypeQuery(objectID, s);				
 				queries.add(q);
 				
 				
@@ -1449,8 +1449,9 @@ public class ModelExtractor implements PipeListener<SolverCommunication>{
 				String objectID = oq.getObjectId();
 				Sort s = oq.getSort();
 				String result = oq.getResult();
-				
+				//System.out.println("Query: "+q.getQuery());
 				if(result.equals("true")){
+					//System.out.println(" is true");
 					Sort t = objectSorts.get(objectID);
 					
 					if(t == null || s.extendsTrans(t)){
