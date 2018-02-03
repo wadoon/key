@@ -14,6 +14,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -101,15 +102,17 @@ public class ProofInfo {
 	 * returns the Post condition for a noninterference contract
 	 * @return the postcondition term
 	 */
-	public Term getNonInterferencePostCondition() {
+	public Term getNonInterferencePostCondition() {//TODO maybe new class with dynamic binding 
 		Term t = getPO();
 		Term post = services.getTermBuilder().tt();
 		try{
 			post = t.sub(1);
+			if(post.op() == Junctor.IMP) {
+				post = post.sub(1);
+			}
 		}catch(Exception e){
 			System.err.println("Could not get PostCondition");
 		}
-
 		return post;
 	}
 

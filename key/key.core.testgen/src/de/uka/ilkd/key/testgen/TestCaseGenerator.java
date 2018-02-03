@@ -826,10 +826,11 @@ public class TestCaseGenerator {
         return result;
     }
     
-    //TODO muessig think about solution without code duplication
+    //TODO muessig think about solution without code duplication. new subclass
     private String getRemainingConstantsInformationFlow(Collection<String> existingConstants, Collection<Term> newConstants) {
     	String result = "";
-    	
+    	//TODO muessig !! if other variables same value -> count + 1
+    	// because some test cases pass because of exception -> no result is set -> resultA = resultB -> test pass.
     	for(Term c : newConstants) {
     		//filter post variables
     		if (isPostName(c.toString())) {
@@ -847,7 +848,7 @@ public class TestCaseGenerator {
 
 				result += NEW_LINE +TAB+ NULLABLE+ " "+ getSafeType(c.sort()) + " " + c + " = " + init + ";";
 				
-				result += NEW_LINE+TAB+ NULLABLE+ " "+ getSafeType(c.sort()) + " " + getPreName(c.toString()) + " = " + init + ";";
+//				result += NEW_LINE+TAB+ NULLABLE+ " "+ getSafeType(c.sort()) + " " + getPreName(c.toString()) + " = " + init + ";"; //TODO remove
 				
 			}
     	}
@@ -961,7 +962,7 @@ public class TestCaseGenerator {
 					objects.add(objName);
 					assignments.add(new Assignment(type, objName, right));
 					
-					assignments.add(new Assignment(type, getPreName(objName), right));
+//					assignments.add(new Assignment(type, getPreName(objName), right)); //TODO muessig remove
 					
 				}
 			}
@@ -996,7 +997,7 @@ public class TestCaseGenerator {
 				if (isObject && !val.equals("null")) { 
 					String exName = getExecutionName(c);
 					
-					//TODO muessig check if this is needed. 
+					//TODO muessig check if this is needed.  and remove if not
 					//if the constant name doesnt include the Execution A or B
 					// create the constant for both.
 					if (exName.equals("")) {//TODO remove this part if we need this constants. But i think they are just for the proof
@@ -1012,14 +1013,14 @@ public class TestCaseGenerator {
 						val = val+exName;
 						assignments.add(new Assignment(declType, c, "("+type+")"+val));
 						//prestate
-						assignments.add(new Assignment(declType, getPreName(c), "("+type+")"+getPreName(val)));
+//						assignments.add(new Assignment(declType, getPreName(c), "("+type+")"+getPreName(val)));  //TODO muessig remove
 					}
 				}
 				else {
 					val = translateValueExpression(val);
 					assignments.add(new Assignment(declType, c, "("+type+")"+val));
 					//prestate
-					assignments.add(new Assignment(declType, getPreName(c), "("+type+")"+val));
+//					assignments.add(new Assignment(declType, getPreName(c), "("+type+")"+val));//TODO muessig remove
 				}
 			}
 		}
@@ -1057,8 +1058,8 @@ public class TestCaseGenerator {
 //							
 //							
 //							
-							assignments
-							.add(new Assignment(new RefEx(rcObjType,getPreName(receiverObject),vType,fieldName),"("+vType+")"+ val));
+//							assignments
+//							.add(new Assignment(new RefEx(rcObjType,getPreName(receiverObject),vType,fieldName),"("+vType+")"+ val));//TODO muessig remove
 //						}
 	
 					}
@@ -1084,7 +1085,7 @@ public class TestCaseGenerator {
 									val = getPreName(val);
 								}
 								
-								assignments.add(new Assignment(getPreName(receiverObject) + fieldName, val));
+//								assignments.add(new Assignment(getPreName(receiverObject) + fieldName, val));//TODO muessig remove
 //							}
 	
 	
@@ -1102,7 +1103,7 @@ public class TestCaseGenerator {
 		
 //		if(junitFormat){//TODO muessig check if needed this is for quantified post conditions ?
 			result.append(NEW_LINE);
-			result.append(createOldMap(objects) + NEW_LINE);
+//			result.append(createOldMap(objects) + NEW_LINE); //TODO muessig remove
 			result.append(createBoolSet() + NEW_LINE);
 			result.append(createIntSet() + NEW_LINE);
 			result.append(createObjSetInfoFlow(heaps) + NEW_LINE);			
