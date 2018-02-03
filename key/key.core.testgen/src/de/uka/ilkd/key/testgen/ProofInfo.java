@@ -102,7 +102,7 @@ public class ProofInfo {
 	 * returns the Post condition for a noninterference contract
 	 * @return the postcondition term
 	 */
-	public Term getNonInterferencePostCondition() {
+	public Term getNonInterferencePostCondition() {//TODO maybe new class with dynamic binding 
 		Term t = getPO();
 		Term post = services.getTermBuilder().tt();
 		try{
@@ -111,8 +111,8 @@ public class ProofInfo {
 				post = post.sub(1);
 			}
 		}catch(Exception e){
+			System.err.println("Could not get PostCondition");
 		}
-		System.out.println(post);
 		return post;
 	}
 
