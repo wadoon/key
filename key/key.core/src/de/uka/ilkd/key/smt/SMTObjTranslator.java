@@ -1468,6 +1468,10 @@ public class SMTObjTranslator implements SMTTranslator {
 			getExactInstanceFunction(s);
 		}
 		extendedJavaSorts = tempSortList;
+		
+		for (Sort s : tempSortList) {
+			addTypeConstarints(s);
+		}
 	}
 
 	/**
@@ -1949,13 +1953,15 @@ public class SMTObjTranslator implements SMTTranslator {
 	 * 
 	 * @param sort
 	 * @return
+	 * @throws IllegalFormulaException 
 	 */
-	private SMTFunction createExactInstanceDefinition(Sort sort) {
+	private SMTFunction createExactInstanceDefinition(Sort sort) throws IllegalFormulaException {
 		// System.out.println("EI: "+sort);
 		String id = getExactInstanceName(sort.name().toString());
 		SMTSort image = SMTSort.BOOL;
 		SMTTermVariable o = new SMTTermVariable("o", sorts.get(OBJECT_SORT));
 		addTypePredicate(sort);
+		//addTypeConstarints(sort);
 		SMTFunction typeofFun = getTypePredicate(sort.name().toString());
 		SMTTerm typeof;
 		if (typeofFun != null) {
