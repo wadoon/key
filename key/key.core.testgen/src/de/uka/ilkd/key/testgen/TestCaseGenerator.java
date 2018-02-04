@@ -202,14 +202,12 @@ public class TestCaseGenerator {
 		if(junitFormat){
 			//System.out.println("Translating oracle");
 			oracleMethods = new LinkedList<OracleMethod>();
-//			if(info.isNoninterferenceProof()) {//TODO muessig remove if class finished
-//				oracleGenerator  =new OracleGeneratorNoninterference(services,rflCreator, useRFL);
-//				oracleMethodCall = getOracleAssertionInfoFlow(oracleMethods);//TODO remove uplication -> dynamic binding (subclass constructor set this)
-//			} else {
-//				oracleGenerator  =new OracleGenerator(services,rflCreator, useRFL);
-//				oracleMethodCall = getOracleAssertion(oracleMethods);
-//			}
-			oracleGenerator = new OracleGenerator(services, rflCreator, useRFL);
+			if(info.isNoninterferenceProof()) {
+				info = new NoninterferenceProofInfo(proof);
+				oracleGenerator  =new OracleGeneratorNoninterference(services,rflCreator, useRFL);
+			} else {
+				oracleGenerator  =new OracleGenerator(services,rflCreator, useRFL);
+			}
 			oracleMethodCall = getOracleAssertion(oracleMethods);
 		}
 	}
@@ -594,7 +592,12 @@ public class TestCaseGenerator {
 	}
 
 	private Term getPostCondition() {
+		if (info instanceof NoninterferenceProofInfo) System.out.println("komisch");
 		return info.getPostCondition();
+	}
+	
+	protected void setProofInfo(ProofInfo newInfo) {
+		info = newInfo;
 	}
 	
 	
@@ -660,6 +663,7 @@ public class TestCaseGenerator {
 //							.append("   //Test preamble: creating objects and intializing test data"
 //									+ generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
 //						}
+
 						testMethod
 						.append("   //Test preamble: creating objects and intializing test data"
 								+ generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
@@ -673,7 +677,7 @@ public class TestCaseGenerator {
 //							testMethod.append(TAB+"//Other variables" + NEW_LINE + getRemainingConstants(m.getConstants().keySet(), vars) + NEW_LINE);
 //						}
 						testMethod.append(TAB+"//Other variables" + NEW_LINE + getRemainingConstants(m.getConstants().keySet(), vars) + NEW_LINE);
-						
+
 //						if (infoFlow) {//TODO muessig remove if finished
 //							String[] codes = info.getCodeInfoFlow(); //for information flow
 //							for (String code : codes) {
@@ -685,8 +689,8 @@ public class TestCaseGenerator {
 //							.append("   //Calling the method under test   " + NEW_LINE
 //									+ info.getCode() + NEW_LINE);
 //						}
-						testMethod.append("   //Calling the method under test   " + NEW_LINE + callingMUTString() + NEW_LINE);
 						
+						testMethod.append("   //Calling the method under test   " + NEW_LINE + info.getCode() + NEW_LINE);
 						
 						
 						if(junitFormat){
@@ -731,14 +735,6 @@ public class TestCaseGenerator {
 
 		testSuite.append(NEW_LINE + "}");
 		return testSuite;
-	}
-	
-	/**
-	 * get the java code from the proof
-	 * @return the java code as String
-	 */
-	protected String callingMUTString() {
-		return info.getCode() + NEW_LINE;
 	}
 	
 	protected String inferSort(Map<String, Sort> typeInfMap, String progVar){

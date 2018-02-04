@@ -26,11 +26,12 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 
+//TODO muessig sub class !
 public class ProofInfo {
 
 	private Proof proof;	
 
-	private Services services;
+	protected Services services;
 
 	public ProofInfo(Proof proof) {
 		this.proof = proof;
@@ -98,23 +99,23 @@ public class ProofInfo {
 		return post;
 	}
 	
-	/**
-	 * returns the Post condition for a noninterference contract
-	 * @return the postcondition term
-	 */
-	public Term getNonInterferencePostCondition() {//TODO maybe new class with dynamic binding 
-		Term t = getPO();
-		Term post = services.getTermBuilder().tt();
-		try{
-			post = t.sub(1);
-			if(post.op() == Junctor.IMP) {
-				post = post.sub(1);
-			}
-		}catch(Exception e){
-			System.err.println("Could not get PostCondition");
-		}
-		return post;
-	}
+//	/**
+//	 * returns the Post condition for a noninterference contract
+//	 * @return the postcondition term
+//	 */
+//	public Term getNonInterferencePostCondition() {//TODO remove if finished
+//		Term t = getPO();
+//		Term post = services.getTermBuilder().tt();
+//		try{
+//			post = t.sub(1);
+//			if(post.op() == Junctor.IMP) {
+//				post = post.sub(1);
+//			}
+//		}catch(Exception e){
+//			System.err.println("Could not get PostCondition");
+//		}
+//		return post;
+//	}
 
 	/**
 	 * is this a noninterference proof
@@ -163,40 +164,40 @@ public class ProofInfo {
 
 	}
 	
-	/**
-	 * This method returns you the two java blocks for 
-	 * information flow tests (two java blocks for two MUT-executions)
-	 * @return String array with two java blocks
-	 * @author Muessig
-	 */
-	public String[] getCodeInfoFlow() {
-
-		Term f = getPO();
-		String[] result = new String[2];
-		List<JavaBlock> blocks = getJavaBlocks(f);
-		
-		if(blocks.size() > 2) {
-			System.out.println("Warning: more than 2 JavaBlocks, "
-					+ "check if the MUT calls are correct");
-		}
-		
-		for (int i = 0; i < result.length; i++) {
-			try {
-				StringWriter sw = new StringWriter();
-				PrettyPrinter pw = new CustomPrettyPrinter(sw,false);
-				if (i == 0) {
-					sw.write("   "+getUpdateInfoFlow(f)+"\n");
-				}
-				blocks.get(i).program().prettyPrint(pw);
-				result[i] = sw.getBuffer().toString();
-				
-			} catch (IOException e) {	       
-				e.printStackTrace();
-			}
-		}
-		return result;
-
-	}
+//	/**
+//	 * This method returns you the two java blocks for 
+//	 * information flow tests (two java blocks for two MUT-executions)
+//	 * @return String array with two java blocks
+//	 * @author Muessig
+//	 */
+//	public String[] getCodeInfoFlow() {//TODO remove if finished
+//
+//		Term f = getPO();
+//		String[] result = new String[2];
+//		List<JavaBlock> blocks = getJavaBlocks(f);
+//		
+//		if(blocks.size() > 2) {
+//			System.out.println("Warning: more than 2 JavaBlocks, "
+//					+ "check if the MUT calls are correct");
+//		}
+//		
+//		for (int i = 0; i < result.length; i++) {
+//			try {
+//				StringWriter sw = new StringWriter();
+//				PrettyPrinter pw = new CustomPrettyPrinter(sw,false);
+//				if (i == 0) {
+//					sw.write("   "+getUpdateInfoFlow(f)+"\n");
+//				}
+//				blocks.get(i).program().prettyPrint(pw);
+//				result[i] = sw.getBuffer().toString();
+//				
+//			} catch (IOException e) {	       
+//				e.printStackTrace();
+//			}
+//		}
+//		return result;
+//
+//	}
 
 	public void getProgramVariables(Term t, Set<Term> vars){
 
@@ -272,22 +273,22 @@ public class ProofInfo {
 
 	}
 
-	private String getUpdateInfoFlow(Term t) { // maybe without recursion 
-		String result = "";
-		if(t.containsJavaBlockRecursive()) {
-			for (Term s : t.subs()) {
-				if (s.containsJavaBlockRecursive()) {
-					if (!s.javaBlock().isEmpty()) {
-						result = result + getUpdate(t);
-					}	
-					result = result + getUpdateInfoFlow(s);
-				}
-			}
-		}
-		
-		return result;
-		
-	}
+//	private String getUpdateInfoFlow(Term t) { // maybe without recursion //TODO remove if finished
+//		String result = "";
+//		if(t.containsJavaBlockRecursive()) {
+//			for (Term s : t.subs()) {
+//				if (s.containsJavaBlockRecursive()) {
+//					if (!s.javaBlock().isEmpty()) {
+//						result = result + getUpdate(t);
+//					}	
+//					result = result + getUpdateInfoFlow(s);
+//				}
+//			}
+//		}
+//		
+//		return result;
+//		
+//	}
 
 
 	private String processUpdate(Term update) {
@@ -322,25 +323,25 @@ public class ProofInfo {
 	}
 	
 
-	private List<JavaBlock> getJavaBlocks(Term f) { //TODO muessig check if needed
-		List<JavaBlock> blocks = new ArrayList<JavaBlock>();
-		getJavaBlocksHelp(f, blocks);
-		return blocks;
-	}
-	
-
-	private void getJavaBlocksHelp(Term f, List<JavaBlock> blocks) {
-		
-		if(f.containsJavaBlockRecursive()) {
-			for (Term s : f.subs()) {
-				if (s.containsJavaBlockRecursive()) {
-					if (!s.javaBlock().isEmpty()) {
-						blocks.add(s.javaBlock());
-					}	
-					getJavaBlocksHelp(s, blocks);
-				}
-			}
-		}
-	}
+//	private List<JavaBlock> getJavaBlocks(Term f) { //TODO remove if finished
+//		List<JavaBlock> blocks = new ArrayList<JavaBlock>();
+//		getJavaBlocksHelp(f, blocks);
+//		return blocks;
+//	}
+//	
+//
+//	private void getJavaBlocksHelp(Term f, List<JavaBlock> blocks) {//TODO remove if finished
+//		
+//		if(f.containsJavaBlockRecursive()) {
+//			for (Term s : f.subs()) {
+//				if (s.containsJavaBlockRecursive()) {
+//					if (!s.javaBlock().isEmpty()) {
+//						blocks.add(s.javaBlock());
+//					}	
+//					getJavaBlocksHelp(s, blocks);
+//				}
+//			}
+//		}
+//	}
 
 }

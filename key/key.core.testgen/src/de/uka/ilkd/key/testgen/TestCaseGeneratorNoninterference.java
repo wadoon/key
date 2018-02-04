@@ -25,20 +25,17 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
 
 	public TestCaseGeneratorNoninterference(Proof proof) {
 		super(proof);
-//		info = new noninterferenceProofInfo();
-		oracleGenerator  =new OracleGeneratorNoninterference(services,rflCreator, useRFL);
 	}
 	
 	@Override
 	protected String getOracleAssertion(List<OracleMethod> oracleMethods) {
-		Term postcondition = info.getNonInterferencePostCondition();
+		Term postcondition = info.getPostCondition();
 		OracleMethod oracle = oracleGenerator.generateOracleMethod(postcondition);
 
 		OracleMethodCall oracleCall = new OracleMethodCall(oracle, oracle.getArgs());
 
 		oracleMethods.add(oracle);
 		oracleMethods.addAll(oracleGenerator.getOracleMethods());
-
 		return "assertTrue("+oracleCall.toString().replaceAll("AtPost", "")+");";
 	}
 	
@@ -96,17 +93,6 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
 			}		
 		}
 		return res.toString();	
-	}
-	
-	@Override
-	protected String callingMUTString() {
-		String result = "";
-		String[] codes = info.getCodeInfoFlow();
-		for (String code : codes) {
-			System.out.println(code);
-			result = result + TAB + code + NEW_LINE;
-		}
-		return result;
 	}
 	
 	@Override
