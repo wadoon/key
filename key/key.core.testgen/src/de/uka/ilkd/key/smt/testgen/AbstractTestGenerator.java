@@ -47,6 +47,7 @@ import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
+import de.uka.ilkd.key.testgen.TestCaseGeneratorNoninterference;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
@@ -62,6 +63,8 @@ public abstract class AbstractTestGenerator {
    private final Proof originalProof;
    private SolverLauncher launcher;
    private List<Proof> proofs;
+   boolean isNoninterferenceProof;
+   
    
    /**
     * Constructor.
@@ -71,6 +74,8 @@ public abstract class AbstractTestGenerator {
    public AbstractTestGenerator(UserInterfaceControl ui, Proof originalProof) {
       this.ui = ui;
       this.originalProof = originalProof;
+      ContractPO po = originalProof.getServices().getSpecificationRepository().getPOForProof(originalProof);
+      isNoninterferenceProof = po.getContract().getDisplayName().startsWith("Non-interference"); //needed for contract checking
    }
 
    public void generateTestCases(final StopRequest stopRequest,
@@ -79,8 +84,12 @@ public abstract class AbstractTestGenerator {
 	         
       TestGenerationSettings settings =
             ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings();
-
-
+      
+      
+      
+      
+      boolean includePostcondition = settings.includePostCondition();
+      
     if (!SolverType.Z3_CE_SOLVER.isInstalled(true)) {
        log
        .writeln("Could not find the z3 SMT solver. Aborting.");
@@ -99,7 +108,8 @@ public abstract class AbstractTestGenerator {
     
     
     //macro removing post condition //TODO edit code below for noninterference and normal testgen
-    if(!settings.includePostCondition()) {
+    //TODO muessig just use this for noninterferenceProofs
+    if(!includePostcondition && isNoninterferenceProof) {
 		log.writeln("Applying remove postcondition Macro (remove postcondition from proof)...");
     	if (originalProof.openEnabledGoals().size() > 1) {
     		log.writeln("did not remove postcondition, because already removed and symbolic execution is already done");
@@ -109,6 +119,7 @@ public abstract class AbstractTestGenerator {
         	try {
     			macro.applyTo(ui, originalProof, originalProof.openEnabledGoals(), null, null);
     			log.writeln("removed post condition");
+    			includePostcondition = true; //already removed 
     		} catch (Throwable ex) {
     			log.writeException(ex);
     		}
@@ -118,8 +129,10 @@ public abstract class AbstractTestGenerator {
     if(settings.getApplySymbolicExecution()){
         log.writeln("Applying TestGen Macro (bounded symbolic execution)...");
         try {
-        	
+        	//old macro 
 //        	TestGenMacro macro = new TestGenMacro();
+        	
+        	//new macro for multiple loops
             TestGenInfoFlowMacro macro = new TestGenInfoFlowMacro();
             //Strategy backupStrategy = originalProof.getActiveStrategy();
             //ProofSettings backupSettings = originalProof.getSettings();
@@ -137,9 +150,9 @@ public abstract class AbstractTestGenerator {
     }
     
     log.writeln("Extracting test data constraints (path conditions).");
-//    proofs = createProofsForTesting(settings.removeDuplicates(), ! settings.includePostCondition()); //TODO muessig remove for normal testgeneration
+    proofs = createProofsForTesting(settings.removeDuplicates(), ! includePostcondition); //TODO muessig remove for normal testgeneration
     // noninterference has own macro for removing post condition
-    proofs = createProofsForTesting(settings.removeDuplicates(), false); //TODO muessig this is for noninterference proofs -> create if else non interference
+//    proofs = createProofsForTesting(settings.removeDuplicates(), false); //TODO muessig this is for noninterference proofs -> create if else non interference
     if (stopRequest != null && stopRequest.shouldStop()) {
        return;
     }
@@ -409,7 +422,13 @@ public abstract class AbstractTestGenerator {
    }
 
    protected void generateFiles(SolverLauncher launcher, Collection<SMTSolver> problemSolvers, TestGenerationLog log, Proof originalProof) throws Exception {
-      final TestCaseGenerator tg = new TestCaseGenerator(originalProof);
+	   final TestCaseGenerator tg;
+	   if (isNoninterferenceProof) {
+		   tg = new TestCaseGeneratorNoninterference(originalProof);
+	   } else {
+		   tg = new TestCaseGenerator(originalProof); 
+	   }
+//	   final TestCaseGenerator tg = new TestCaseGenerator(originalProof);//TODO remove
       tg.setLogger(log);
             
       tg.generateJUnitTestSuite(problemSolvers);
