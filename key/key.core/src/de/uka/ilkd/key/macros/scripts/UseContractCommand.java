@@ -136,8 +136,18 @@ public class UseContractCommand extends AbstractCommand<UseContractCommand.Param
                 return null;
             }
         } else {
-
-            PosInOccurrence pio =
+            if(steps.size() > 0){
+                for (int i = 0; i < steps.size(); i++) {
+                    PosInOccurrence posInOccurrence =  steps.get(i);
+                    if(posInOccurrence.subTerm().equalsModRenaming(p.heap)){
+                        return cApp.setStep(steps.get(i));
+                    }
+                }
+                throw new ScriptException("Cannot find heapconfig "+p.heap+" in SequentFormula "+cApp.posInOccurrence());
+            } else {
+                throw new ScriptException("There is no heapconfig "+p.heap+" in SequentFormula "+cApp.posInOccurrence());
+            }
+            /*PosInOccurrence pio =
                     findTermInSeqFormula(cApp.posInOccurrence().sequentFormula(), p.heap, cApp.posInOccurrence().isInAntec());
             if(pio == null || !steps.contains(pio)){
                 throw new ScriptException("Cannot find heapconfig "+p.heap+" in SequentFormula "+cApp.posInOccurrence());
@@ -148,9 +158,9 @@ public class UseContractCommand extends AbstractCommand<UseContractCommand.Param
                         return cApp.setStep(steps.get(i));
                     }
                 }
-            }
+            }*/
         }
-        return null;
+      //  return null;
     }
 
 
@@ -221,6 +231,7 @@ public class UseContractCommand extends AbstractCommand<UseContractCommand.Param
             pio = new PosInOccurrence(seq, PosInTerm.getTopLevel(), inAntec);
             //return topLevel
         } else {
+
             PosInTerm pit = helper(toFind, seq.formula(), PosInTerm.getTopLevel());
             if (pit != null) {
                 pio = new PosInOccurrence(seq, pit, inAntec);
@@ -265,6 +276,27 @@ public class UseContractCommand extends AbstractCommand<UseContractCommand.Param
 
     }
 
+    private List<PosInTerm> getAllMatchingPios(Term toFind, Term findIn, PosInTerm currentPos){
+        List<PosInTerm> retList = new ArrayList<PosInTerm>();
+
+        if (toFind.equalsModRenaming(findIn)) {
+           retList.add(currentPos);
+           return retList;
+        }
+        if (findIn.subs().isEmpty() && !toFind.equalsModRenaming(findIn)) {
+            return retList;
+        }
+        
+        ImmutableArray<Term> subs = findIn.subs();
+
+        for (int i = 0; i < subs.size(); i++) {
+            List<PosInTerm> currentRound = getAllMatchingPios(toFind, subs.get(i), currentPos.down(i));
+            retList.addAll(currentRound);
+
+        }
+        return retList;
+
+    }
 
 
 
