@@ -119,7 +119,7 @@ public class InstantiateCommand
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if (p.formula != null && !sf.formula().equals(p.formula)) {
+            if (p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
@@ -128,7 +128,7 @@ public class InstantiateCommand
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if (p.formula != null && !sf.formula().equals(p.formula)) {
+            if (p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
@@ -146,7 +146,7 @@ public class InstantiateCommand
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp) {
                 PosTacletApp pta = (PosTacletApp) tacletApp;
-                if (pta.posInOccurrence().subTerm().equals(p.formula)) {
+                if (pta.posInOccurrence().subTerm().equalsModRenaming(p.formula)) {
                     return pta;
                 }
             }
