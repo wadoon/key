@@ -11,6 +11,7 @@ import java.util.Set;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.metaconstruct.IsStatic;
 import de.uka.ilkd.key.smt.model.Heap;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.model.ObjectVal;
@@ -47,6 +48,15 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
 	 */
 	private boolean isPostName(String c) {
 		if(c.contains("AtPost")) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	private boolean isPreName(String c) {
+		if(c.contains("AtPre")) {
 			return true;
 		}
 		else {
@@ -98,6 +108,7 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
 	@Override
     protected String getRemainingConstants(Collection<String> existingConstants, Collection<Term> newConstants) {
     	String result = "";
+    	List<String> constantAlreadyInit= new ArrayList<String>();
     	//TODO muessig !! if other variables same value -> count + 1
     	// because some test cases pass because of exception -> no result is set -> resultA = resultB -> test pass.
     	for(Term c : newConstants) {
@@ -106,7 +117,6 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
     			continue;
     		}
     		if(!existingConstants.contains(c.toString())){
-
 				String init = "null";
 				if(c.sort().equals(services.getTypeConverter().getIntegerLDT().targetSort())){
 					init = "0";
@@ -135,20 +145,22 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
 		List<Heap> heaps = new ArrayList<Heap>();
 		for (final Heap h : m.getHeaps()) {
 			
-			if (!isPostName(h.getName())) {
+//			if (!isPostName(h.getName())) {
+//				heaps.add(h);
+//			}
+			if (isPreName(h.getName())) {
 				heaps.add(h);
 			}
 		}		
 
-		Set<ObjectVal> prestate = new HashSet<ObjectVal>();
 		if (!heaps.isEmpty()) {
-
 			//create Objects for all pre-Heaps (PreA/B)
 			for (Heap heap : heaps) {
 				for (final ObjectVal o : heap.getObjects()) {
 					if (o.getName().equals("#o0")) {
 						continue;
 					}
+					
 					final String type = getSafeType(o.getSort());
 					String right;
 					if (type.endsWith("[]")) {
@@ -165,7 +177,6 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
 						}else
 							right = "new " + type + "()";
 					}
-					
 					String objName = createObjectName(o)+getExecutionName(heap.getName());
 //					String objName = getInfoFlowHeapName(heap)+createObjectName(o); //remove unused
 					objects.add(objName);
@@ -206,7 +217,7 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
 				if (isObject && !val.equals("null")) { 
 					String exName = getExecutionName(c);
 					
-					//TODO muessig check if this is needed.  and remove if not
+					//TODO check if else structure. 
 					//if the constant name doesnt include the Execution A or B
 					// create the constant for both.
 					if (exName.equals("")) {//TODO remove this part if we need this constants. But i think they are just for the proof
@@ -240,12 +251,12 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
 					if (o.getName().equals("#o0") || o.getSort().name().toString().endsWith("Exception")) {
 						continue;
 					}
-					
 					final String receiverObject = createObjectName(o)+getExecutionName(heap.getName());
 					for (final String f : o.getFieldvalues().keySet()) {
 						if (f.contains("<") || f.contains(">")) {
 							continue;
 						}
+						
 						String fieldName = f.substring(f.lastIndexOf(":") + 1);
 						fieldName = fieldName.replace("|", "");
 						String val = o.getFieldvalues().get(f);
@@ -254,11 +265,20 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
 						final String vType = this.inferSort(typeInfMap, fieldName2); //getTypeOfValue(heap, m, val);
 						rflCreator.addSort(vType); //possible bug if vType represents an abstract type or an interface. See: getSafeType.
 						//System.out.println("Added sort (init fields):"+vType);
+						boolean fieldisObject = false;
+						if (val.startsWith("#o")) {
+							fieldisObject = true;
+						}
 						val = translateValueExpression(val);
 						final String rcObjType = getSafeType(o.getSort());
-						assignments
-						.add(new Assignment(new RefEx(rcObjType,receiverObject,vType,fieldName), "("+vType+")"+val));
-	
+						
+						if (fieldisObject && !val.equals("null")) {
+							assignments
+							.add(new Assignment(new RefEx(rcObjType,receiverObject,vType,fieldName), "("+vType+")"+val+getExecutionName(heap.getName())));
+						} else {
+							assignments
+							.add(new Assignment(new RefEx(rcObjType,receiverObject,vType,fieldName), "("+vType+")"+val));
+						}
 //						if(junitFormat && isInPrestate(prestate, o)){//TODO muessig check if needed
 //							//if value that is pointed to is object and in prestate then use prestate object
 //							if(!vType.equals("int") && !vType.equals("boolean") && isInPrestate(prestate, val) && !val.equals("null")){
@@ -284,7 +304,7 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
 							final String fieldName = "[" + i + "]";
 							String val = o.getArrayValue(i);
 							val = translateValueExpression(val);
-							assignments.add(new Assignment(receiverObject + fieldName, val));
+							assignments.add(new Assignment(receiverObject + fieldName, "("+elementType+")"+val));
 							//assignments.add(new Assignment("",new RefArrayEx("","",name,""+i), val));
 	
 //							if(junitFormat && isInPrestate(prestate, o)){
