@@ -293,10 +293,10 @@ public class ProofInfo {
 
 	private String processUpdate(Term update) {
 		if(update.op() instanceof ElementaryUpdate){			
-			ElementaryUpdate up = (ElementaryUpdate) update.op();			
+			ElementaryUpdate up = (ElementaryUpdate) update.op();	
 			if(up.lhs().sort().extendsTrans(services.getTypeConverter().getHeapLDT().targetSort())){
 				return "";
-			}			
+			}
 			return "   \n"+up.lhs().sort()+" "+up.lhs().toString()+" = "+update.sub(0)+";";
 		}
 		String result = "";

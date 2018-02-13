@@ -652,50 +652,24 @@ public class TestCaseGenerator {
 						
 						testMethod.append("  //" + originalNodeName + NEW_LINE);
 						testMethod.append(getTestMethodSignature(i) + "{" + NEW_LINE);
-//						if(infoFlow) { //muessig remove if finished
-//							//TODO muessig remove duplication -> dynamic binding with new class
-//							testMethod
-//							.append("    //Test preamble: creating objects and initializing test data"
-//									+ generateTestCaseInfoFlow(m, typeInfMap) + NEW_LINE + NEW_LINE); 
-//						}
-//						else {
-//							testMethod
-//							.append("   //Test preamble: creating objects and intializing test data"
-//									+ generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
-//						}
 
-						testMethod
-						.append("   //Test preamble: creating objects and intializing test data"
-								+ generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
-
-						Set<Term> vars = new HashSet<Term>();
-						info.getProgramVariables(info.getPO(), vars);   
-//						if (infoFlow) {//TODO muessig remove if finished
-//							//TODO muessig remove duplication -> dynamic binding with new class
-//							testMethod.append(TAB+"//Other variables" + NEW_LINE + getRemainingConstantsInformationFlow(m.getConstants().keySet(), vars) + NEW_LINE);
-//						} else {
-//							testMethod.append(TAB+"//Other variables" + NEW_LINE + getRemainingConstants(m.getConstants().keySet(), vars) + NEW_LINE);
-//						}
-						testMethod.append(TAB+"//Other variables" + NEW_LINE + getRemainingConstants(m.getConstants().keySet(), vars) + NEW_LINE);
-
-//						if (infoFlow) {//TODO muessig remove if finished
-//							String[] codes = info.getCodeInfoFlow(); //for information flow
-//							for (String code : codes) {
-//								testMethod.append(code + NEW_LINE);
-//							}
-//						}
-//						else {
-//							testMethod
-//							.append("   //Calling the method under test   " + NEW_LINE
-//									+ info.getCode() + NEW_LINE);
-//						}
+						createTestCaseBody(testMethod, m, typeInfMap, oracleMethodCall);
 						
-						testMethod.append("   //Calling the method under test   " + NEW_LINE + info.getCode() + NEW_LINE);
-						
-						
-						if(junitFormat){
-							testMethod.append("   //calling the test oracle" + NEW_LINE+TAB+oracleMethodCall + NEW_LINE);
-						}
+//						testMethod//TODO muessig remove
+//						.append("   //Test preamble: creating objects and intializing test data"
+//								+ generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
+//
+//						Set<Term> vars = new HashSet<Term>();
+//						info.getProgramVariables(info.getPO(), vars);   
+//						testMethod.append(TAB+"//Other variables" + NEW_LINE + getRemainingConstants(m.getConstants().keySet(), vars) + NEW_LINE);
+//
+//						
+//						testMethod.append("   //Calling the method under test   " + NEW_LINE + info.getCode() + NEW_LINE);
+//						
+//						
+//						if(junitFormat){
+//							testMethod.append("   //calling the test oracle" + NEW_LINE+TAB+oracleMethodCall + NEW_LINE);
+//						}
 
 						testMethod.append(" }" + NEW_LINE + NEW_LINE);
 						i++;
@@ -735,6 +709,24 @@ public class TestCaseGenerator {
 
 		testSuite.append(NEW_LINE + "}");
 		return testSuite;
+	}
+	
+	protected void createTestCaseBody(StringBuffer testMethod, Model m ,Map<String, Sort> typeInfMap, String oracleMethodCall) {
+		testMethod
+		.append("   //Test preamble: creating objects and intializing test data"
+				+ generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
+
+		Set<Term> vars = new HashSet<Term>();
+		info.getProgramVariables(info.getPO(), vars);   
+		testMethod.append(TAB+"//Other variables" + NEW_LINE + getRemainingConstants(m.getConstants().keySet(), vars) + NEW_LINE);
+
+		
+		testMethod.append("   //Calling the method under test   " + NEW_LINE + info.getCode() + NEW_LINE);
+		
+		
+		if(junitFormat){
+			testMethod.append("   //calling the test oracle" + NEW_LINE+TAB+oracleMethodCall + NEW_LINE);
+		}
 	}
 	
 	protected String inferSort(Map<String, Sort> typeInfMap, String progVar){

@@ -9,6 +9,7 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Proof;
 
 public class NoninterferenceProofInfo extends ProofInfo {
@@ -39,17 +40,40 @@ public class NoninterferenceProofInfo extends ProofInfo {
 		return post;
 	}
 	
+	@Override
+	public String getCode() {
+		String[] result = getCodeNoninterference();
+		String r = "";
+		for (String code : result) {
+			r = r + code + TestCaseGenerator.NEW_LINE;
+		}
+		return r;
+	}
+	
+	
+	
 	/**
 	 * This method returns you the two java blocks for 
 	 * information flow tests (two java blocks for two MUT-executions)
 	 * @return String array with two java blocks
 	 * @author Muessig
 	 */
-	@Override
-	public String getCode() {//TODO return value String 
+	public String[] getCodeNoninterference() {//TODO return value String 
 		Term f = getPO();
 		String[] result = new String[2];
 		List<JavaBlock> blocks = getJavaBlocks(f);
+		
+		List<Term> terme1 = new ArrayList<>();
+		List<Term> terme2 = new ArrayList<>();
+		for (Term s : f.subs()) {
+			if (s.containsJavaBlockRecursive()) terme1.add(s);
+		}
+		
+		for (Term s : terme1) {
+			for (Term a : s.subs()) {
+				if (a.containsJavaBlockRecursive()) terme2.add(a);
+			}
+		}
 		
 		if(blocks.size() > 2) {
 			System.out.println("Warning: more than 2 JavaBlocks, "
@@ -63,10 +87,11 @@ public class NoninterferenceProofInfo extends ProofInfo {
 
 				PrettyPrinter pw = new CustomPrettyPrinter(sw,false);
 
-				if (i == 0) {
-					sw.write("   "+getUpdate(f)+"\n");
-				}
-
+//				if (i == 0) {
+//					sw.write("   "+getUpdate(f)+"\n");
+//				}
+				sw.write("    "+getUpdate(terme2.get(i))+"\n");
+				
 				blocks.get(i).program().prettyPrint(pw);
 				result[i] = sw.getBuffer().toString();
 
@@ -74,11 +99,11 @@ public class NoninterferenceProofInfo extends ProofInfo {
 				e.printStackTrace();
 			}
 		}
-		String r = "";
-		for (String code : result) {
-			r = r + code + TestCaseGenerator.NEW_LINE;
-		}
-		return r;
+//		String r = "";
+//		for (String code : result) {
+//			r = r + code + TestCaseGenerator.NEW_LINE;
+//		}
+		return result;
 
 	}
 	
@@ -101,6 +126,8 @@ public class NoninterferenceProofInfo extends ProofInfo {
 			}
 		}
 	}
+	
+
 	
 	@Override
 	public String getUpdate(Term t) { // maybe without recursion 
