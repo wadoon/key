@@ -77,35 +77,32 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 		Sort allIntSort = createSetSort("Integer");
 		Sort allBoolSort = createSetSort("Boolean");
 		Sort allObjSort = createSetSort("java.lang.Object");
-		Sort oldMapSort = new SortImpl(new Name("Map<Object,Object>"));
 		
 		OracleVariable allInts = new OracleVariable(TestCaseGenerator.ALL_INTS, allIntSort);
 		OracleVariable allBools = new OracleVariable(TestCaseGenerator.ALL_BOOLS, allBoolSort);
 		OracleVariable allObj = new OracleVariable(TestCaseGenerator.ALL_OBJECTS, allObjSort);
-		OracleVariable oldMap = new OracleVariable(TestCaseGenerator.OLDMap, oldMapSort);
 		boolean add = true;
 		for(Term c : constants){
 			OracleVariable constant = new OracleVariable(c.toString().replaceAll(AT_POST, ""), c.sort());
-			OracleVariable preConstant = new OracleVariable(PRE_STRING+c.toString().replaceAll(AT_POST, ""), c.sort());
 			
 			//add constants just once
 			for (OracleVariable o : result) {
-				if (o.getName().toString().equals(constant.getName().toString())|| o.getName().toString().equals(constant.getName().toString())) {
+				if (o.getName().toString().equals(constant.getName().toString())) {
 					add = false;
+					
 				}
 			}
 			
 			if (add) {
 				result.add(constant);
-				result.add(preConstant);
+//				result.add(preConstant);
 			}
 					
 		}
 
 		result.add(allBools);
 		result.add(allInts);
-		result.add(allObj);		
-		result.add(oldMap);
+		result.add(allObj);	
 		return result;
 	}
 	
@@ -118,36 +115,70 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 			if (left.op() instanceof Function && right.op() instanceof Function) {
 				Function leftFun = (Function) left.op();
 				Function rightFun = (Function) right.op();
+				System.out.println(leftFun + " : " + rightFun);
 				if(leftFun.name().toString().equals("allFields") && rightFun.name().toString().equals("allFields")) {
 					return true;
-				}
-				
+				}	
 			}
 		}
 		return false;
 	}	
 	
+	private boolean equalLength(Term term) {
+		Operator op = term.op();
+		String javaOp = ops.get(op);
+		if (javaOp.equals(EQUALS)) {
+			Term left = term.sub(0);
+			Term right = term.sub(1);
+			if (left.op() instanceof Function && right.op() instanceof Function) {
+				Function leftFun = (Function) left.op();
+				Function rightFun = (Function) right.op();
+				if(leftFun.name().toString().equals("length") && rightFun.name().toString().equals("length")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	//TODO remove firstCall and needPrestate.. not needed anymore
 	public OracleTerm generateNoninterferenceOracle(Term term, boolean initialSelect, boolean firstCall, boolean needPrestate) {
 		Operator op = term.op();
 
 		//binary terms
 		if(ops.containsKey(op)){
 			
-			//Equals with allFields (AllFields(a) == AllFields(b))
-			if(isAllFieldsEquals(term)) {
-				Term left = term.sub(0).sub(0);
-				Term right = term.sub(1).sub(0);
+			if (equalLength(term)) {
+				//compare length
+				Term leftTerm = term.sub(0).sub(0);
+				Term rightTerm = term.sub(1).sub(0);
 				
-				String rightSort = left.sort().name().toString();
-				String leftSort = right.sort().name().toString();
+				OracleMethod compareLengthMethod = oracleMethodCompareLength(leftTerm, rightTerm);
+				List<OracleTerm> args;
+				oracleMethods.add(compareLengthMethod);
+				args = new LinkedList<OracleTerm>();
+				args.addAll(quantifiedVariables);
+				args.addAll(methodArgs);
+				
+				return new OracleMethodCall(compareLengthMethod, args);
+			}
+			
+			else if (isAllFieldsEquals(term)){
+				//compare all fields
+				//Equals with allFields (AllFields(a) == AllFields(b))
+				Term leftTerm = term.sub(0).sub(0);
+				Term rightTerm = term.sub(1).sub(0);
+					
+				String rightSort = leftTerm.sort().name().toString();
+				String leftSort = rightTerm.sort().name().toString();
 				OracleMethod method;
 				List<OracleTerm> args;
-				
-				
+					
+					
 				//AllFields for Array with same Type? (a[*] == b[*]) // TODO muessig check if allFields without Arrays are necessary
 				if(leftSort.endsWith("[]") && leftSort.endsWith("[]") && rightSort.equals(leftSort)) {
-				
-					method = allFieldsArrayEqualsToMethod(left, right, initialSelect);
+					
+					method = allFieldsArrayEqualsToMethod(leftTerm, rightTerm, initialSelect);
 					
 					oracleMethods.add(method);
 					args = new LinkedList<OracleTerm>();
@@ -156,12 +187,13 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 				} else {
 					throw new RuntimeException("Could not translate oracle for: "+term+" of type "+term.op());
 				}
-				
+					
 				return new OracleMethodCall(method, args);
 			}
 			
 
 			//check subterm isomorphic -> remember objects and don't use them for determin oracle
+			//generate the isomorphic method first and remember the objects
 			OracleTerm right;
 			OracleTerm left;
 			if (term.sub(1).op() instanceof Function && term.sub(1).op().name().toString().equals("newObjectsIsomorphic")) {
@@ -190,7 +222,6 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 				if(newObjectsList.contains(left.toString()) && newObjectsList.contains(right.toString())) {
 					return null;
 				} else {
-
 					return eq(left, right);
 				}
 			}
@@ -709,14 +740,35 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 		return new OracleMethod(methodName ,args, body);
 	}
 	
+	private OracleMethod oracleMethodCompareLength(Term leftTerm, Term rightTerm) {
+		String methodName = generateMethodName();
+		String left = leftTerm.toString().replaceAll("AtPost", "");
+		String right = rightTerm.toString().replaceAll("AtPost", "");
+		
+		String tab = TestCaseGenerator.TAB;
+		String body = 
+				"\n" + tab +tab + "if("+left+" "+EQUALS+" null "+ AND +" "+right+" "+EQUALS+" null "+" ) return true;"
+				+"\n" + tab +tab + "if("+left+" "+EQUALS+" null "+ OR +" "+right+" "+EQUALS+" null "+" ) return false;"
+				+"\n" + tab +tab + "return ("+left+".length"+" "+EQUALS+" "+right+".length"+" );";
+		    
+		List<OracleVariable> args = new LinkedList<OracleVariable>();
+		args.addAll(quantifiedVariables);
+		args.addAll(methodArgs);
+
+		return new OracleMethod(methodName, args, body);
+	}
+	
 	private OracleMethod allFieldsArrayEqualsToMethod(Term leftTerm, Term rightTerm, boolean initialSelect) {
 		String methodName = generateMethodName();
+	
+		String left = leftTerm.toString().replaceAll("AtPost", "");
+		String right = rightTerm.toString().replaceAll("AtPost", "");
 			
 		String tab = TestCaseGenerator.TAB;
 		String body = 
-				"\n" + tab + "if("+leftTerm+".length"+EQUALS+rightTerm+".length"+" ) {"
+				"\n" + tab + "if("+left+".length"+EQUALS+right+".length"+" ) {"
 				+ "\n"+tab+tab+"for("+"int"+" "+"i"+" : "+TestCaseGenerator.ALL_INTS+"){"
-				+ "\n"+tab+tab+tab+"if("+"0 <= i"+ " && " + "i < "+ leftTerm+ ".length"+ " && " +"!("+leftTerm+"[i]"+EQUALS+rightTerm+"[i]"+")){"
+				+ "\n"+tab+tab+tab+"if("+"0 <= i"+ " && " + "i < "+ left+ ".length"+ " && " +"!("+left+"[i]"+EQUALS+right+"[i]"+")){"
 				+ "\n"+tab+tab+tab+tab+"return false;"
 				+ "\n"+tab+tab+tab+"}"
 				+ "\n"+tab+tab+"}"
@@ -728,7 +780,6 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 		List<OracleVariable> args = new LinkedList<OracleVariable>();
 		args.addAll(quantifiedVariables);
 		args.addAll(methodArgs);
-
 		return new OracleMethod(methodName, args, body);
 		
 	}
