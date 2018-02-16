@@ -80,7 +80,7 @@ public class ProofApi {
             if (just == null) {
                 continue; // do not break system because of this
             }
-            s.add(app.taclet().displayName());
+            s.add(app.taclet().name().toString());
         }
 
         return s;

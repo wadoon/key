@@ -115,7 +115,24 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         Proof proof = state.getProof();
         Taclet taclet = proof.getEnv().getInitConfigForEnvironment().
                 lookupActiveTaclet(new Name(p.rulename));
-
+        List<Taclet> foundApps = new ArrayList<>();
+        if(taclet == null){
+            //lookup with displayname
+            Iterable<Taclet> taclets = proof.getEnv().getInitConfigForEnvironment().activatedTaclets();
+            taclets.forEach(taclet1 -> {
+                if(taclet1.displayName().equals(p.rulename)){
+                    foundApps.add(taclet1);
+                }
+            });
+            if(foundApps.size() > 1){
+                StringBuilder sb = new StringBuilder("More than one possible taclet found for"+p.rulename+".\n Found:");
+                foundApps.forEach(taclet1 -> sb.append(taclet1.displayName()));
+                throw new ScriptException(sb.toString());
+            }
+            if(foundApps.size() == 1){
+                taclet = foundApps.get(0);
+            }
+        }
         /*weigl: does nor work dynamical taclets
         if (taclet == null) {
             throw new ScriptException("Taclet '" + p.rulename + "' not known.");
