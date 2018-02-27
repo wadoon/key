@@ -668,12 +668,12 @@ IDENT
 :  ( (LETTER | '_' | '#' | '$') (IDCHAR)*
     )
 ;
-STARDONTCARE
+ELLIPSIS
 :
     '...'
 ;
 
-SCHEMAIDENT
+MATCH_ID
 :
     {isEnabledSchemaMatching()}? => ('?' (IDENT)?)
 ;

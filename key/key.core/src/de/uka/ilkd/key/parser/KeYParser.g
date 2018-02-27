@@ -3150,17 +3150,17 @@ atom returns [Term _atom = null]
     :
 (        {isTermTransformer()}? a = specialTerm
     |   a = funcpredvarterm
-    |   LPAREN a = term RPAREN ( {isEnabledSchemaMatching()}? => COLON si=schema_ident )?
-          { if(si != null) { a = tb.createMatchBinder(a, si); } }
+    |   LPAREN a = term RPAREN ( {isEnabledSchemaMatching()}? => COLON si=match_ident )?
+          { if(si != null) { a = getServices().getTermBuilder().createMatchBinder(a, si); } }
     |   TRUE  { a = getTermFactory().createTerm(Junctor.TRUE); }
     |   FALSE { a = getTermFactory().createTerm(Junctor.FALSE); }
-    |   {isEnabledSchemaMatching()}? => STARDONTCARE a = term  STARDONTCARE {
+    |   {isEnabledSchemaMatching()}? => ELLIPSIS a = term  ELLIPSIS {
             //TODO Term createn?
-            //a = tb.stardontcarterm(a)
+            a = getServices().getTermBuilder().createEllipsisTerm(a)
         }
-    |   {isEnabledSchemaMatching()}? => a=schema_ident {
+    |   {isEnabledSchemaMatching()}? => a=match_ident {
 
-        }
+       }
 
     |   a = ifThenElseTerm
     |   a = ifExThenElseTerm
@@ -3175,10 +3175,15 @@ atom returns [Term _atom = null]
               raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
-schema_ident returns [Term a = null]
+match_ident returns [Term a = null]
 :
-id=SCHEMAIDENT ((COLON IDENT) => COLON sort=sortId_check[true])?
+id=MATCH_ID ((COLON IDENT) => COLON sort=sortId_check[true])?
 {
+    if(MATCH_ID.equals("?")){
+        a = getServices().getTermBuilder().createMatchIdentifier(sort);
+    } else {
+        a = getServices().getTermBuilder().createMatchIdentifier(id.text, sort);
+    }
 //TODO Spezialfall ? als _ hier abfangen?
 //TODO a = tb.matchIdentifier(id.text, nullable sort);
 }
@@ -3458,7 +3463,7 @@ one_logic_bound_variable returns[QuantifiableVariable v=null]
   s=sortId id=simple_ident {
     v = bindVar(id, s);
   }
-  | {isEnabledSchemaMatching()}? mv=schema_ident {
+  | {isEnabledSchemaMatching()}? mv=match_ident {
          v = (QuantifiableVariable)mv.op();
    }
 ;

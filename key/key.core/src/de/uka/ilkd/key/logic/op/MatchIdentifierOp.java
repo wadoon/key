@@ -7,14 +7,18 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * Operator representing a MatchIdentifier '?' respectively '?X'
  */
 public class MatchIdentifierOp extends AbstractSV implements QuantifiableVariable {
+    Name name;
+    Sort sort;
 
 
     protected MatchIdentifierOp(Name name, Sort sort, boolean isRigid, boolean isStrict) {
         super(name, sort, isRigid, isStrict);
+        this.name = name;
+        this.sort = sort;
     }
 
     @Override
     public String proofToString() {
-        return null;
+        return name.toString() + ":"+sort.toString();
     }
 }

@@ -7,9 +7,10 @@ import org.key_project.util.collection.ImmutableArray;
 /**
  * BinaryOperator Term : ?rt
  */
-public class MatchBinderOp extends AbstractSortedOperator{
+public class MatchBinderOp extends Function implements SortedOperator{
 
-    protected MatchBinderOp(Name name, ImmutableArray<Sort> argSorts, Sort sort, boolean isRigid) {
-        super(name, argSorts, sort, isRigid);
+    public MatchBinderOp(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
+        super(name, sort, argSorts);
+        assert argSorts.size() == 2;
     }
 }
