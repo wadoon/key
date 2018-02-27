@@ -11,8 +11,8 @@ public class MatchIdentifierOp extends AbstractSV implements QuantifiableVariabl
     Sort sort;
 
 
-    protected MatchIdentifierOp(Name name, Sort sort, boolean isRigid, boolean isStrict) {
-        super(name, sort, isRigid, isStrict);
+    public MatchIdentifierOp(Name name, Sort sort) {
+        super(name, sort, false, false);
         this.name = name;
         this.sort = sort;
     }

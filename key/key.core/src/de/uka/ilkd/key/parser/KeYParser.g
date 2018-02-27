@@ -3156,7 +3156,7 @@ atom returns [Term _atom = null]
     |   FALSE { a = getTermFactory().createTerm(Junctor.FALSE); }
     |   {isEnabledSchemaMatching()}? => ELLIPSIS a = term  ELLIPSIS {
             //TODO Term createn?
-            a = getServices().getTermBuilder().createEllipsisTerm(a)
+            a = getServices().getTermBuilder().createEllipsisTerm(a);
         }
     |   {isEnabledSchemaMatching()}? => a=match_ident {
 
@@ -3179,10 +3179,10 @@ match_ident returns [Term a = null]
 :
 id=MATCH_ID ((COLON IDENT) => COLON sort=sortId_check[true])?
 {
-    if(MATCH_ID.equals("?")){
+    if(id.getText().equals("?")){
         a = getServices().getTermBuilder().createMatchIdentifier(sort);
     } else {
-        a = getServices().getTermBuilder().createMatchIdentifier(id.text, sort);
+        a = getServices().getTermBuilder().createMatchIdentifier(id.getText(), sort);
     }
 //TODO Spezialfall ? als _ hier abfangen?
 //TODO a = tb.matchIdentifier(id.text, nullable sort);

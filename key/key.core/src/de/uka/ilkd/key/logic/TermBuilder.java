@@ -20,6 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.logic.op.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -36,28 +37,6 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IfExThenElse;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SubstOp;
-import de.uka.ilkd.key.logic.op.Transformer;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
-import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -2238,5 +2217,41 @@ public class TermBuilder {
                                                                      // elsewhere
                         heap1_pre, heap1_post, locset1, heap2_pre, heap2_post,
                         locset2);
+    }
+
+    // -------------------------------------------------------------------------
+    // Matching operators
+    // -------------------------------------------------------------------------
+
+    /**
+     * Cretae named MatchIdentifier
+     * @param idText
+     * @param sort
+     * @return
+     */
+    public Term createMatchIdentifier(String idText, Sort sort){
+        Term t =  tf.createTerm(new MatchIdentifierOp(new Name(idText), sort));
+        return t;
+    }
+
+    /**
+     * Create Anonymous Identifer
+     * @param sort
+     * @return
+     */
+    public Term createMatchIdentifier(Sort sort){
+        Term t =  tf.createTerm(new MatchIdentifierOp(new Name("?"), sort));
+        return t;
+    }
+    public Term createEllipsisTerm(Term a){
+        //TODO
+        //Term t = tf.createTerm(new EllipsisOp(), a);
+        return null;
+    }
+
+    public Term createMatchBinder(Term inner, Term matchBinder){
+        MatchBinderOp mbo = new MatchBinderOp(matchBinder.op().name(), matchBinder.sort(), new ImmutableArray<>(inner.sort()));
+        //TODO
+        return null;
     }
 }
