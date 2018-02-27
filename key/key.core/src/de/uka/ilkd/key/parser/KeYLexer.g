@@ -41,6 +41,17 @@ lexer grammar KeYLexer;
 @annotateclass{ @SuppressWarnings("all") } 
 
 @members{
+    /**
+    *   To enable parsing of schematerms from the proof script debugger
+    */
+    private boolean enabledSchemaMatching;
+    public boolean isEnabledSchemaMatching(){
+        return enabledSchemaMatching;
+    }
+    public void setEnabledSchemaMatching(boolean flag){
+        enabledSchemaMatching = flag;
+    }
+
     class SaveStruct {
         SaveStruct (CharStream input) {
             this.input = input;
@@ -657,6 +668,16 @@ IDENT
 :  ( (LETTER | '_' | '#' | '$') (IDCHAR)*
     )
 ;
+STARDONTCARE
+:
+    '...'
+;
+
+SCHEMAIDENT
+:
+    {isEnabledSchemaMatching()}? => ('?' (IDENT)?)
+;
+
 
 fragment
 NUM_LITERAL

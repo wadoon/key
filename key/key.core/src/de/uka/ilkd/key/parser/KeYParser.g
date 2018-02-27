@@ -106,6 +106,21 @@ options {
 
 @members{
 
+  /**
+   *   To enable parsing of schematerms from the proof script debugger
+   */
+   private boolean enabledSchemaMatching = false;
+
+   public boolean isEnabledSchemaMatching(){
+        return enabledSchemaMatching;
+   }
+
+   public void setEnabledSchemaMatching(boolean flag){
+        enabledSchemaMatching = flag;
+   }
+
+
+
     private static final Sort[] AN_ARRAY_OF_SORTS = new Sort[0];
     private static final Term[] AN_ARRAY_OF_TERMS = new Term[0];
 
@@ -3138,6 +3153,14 @@ atom returns [Term _atom = null]
     |   LPAREN a = term RPAREN
     |   TRUE  { a = getTermFactory().createTerm(Junctor.TRUE); }
     |   FALSE { a = getTermFactory().createTerm(Junctor.FALSE); }
+    |   {isEnabledSchemaMatching()}? => STARDONTCARE a = term  STARDONTCARE {
+            //TODO Term createn?
+            //a = tb.stardontcarterm(a)
+        }
+    |   {isEnabledSchemaMatching()}? => a=schema_ident {
+
+        }
+
     |   a = ifThenElseTerm
     |   a = ifExThenElseTerm
     |   literal=STRING_LITERAL
@@ -3151,6 +3174,13 @@ atom returns [Term _atom = null]
               raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
+schema_ident returns [Term a = null]
+:
+id=SCHEMAIDENT //((COLON IDENT) => COLON sort=sortId_check[true])?
+{
+//TODO a = tb.matchIdentifier(id.text, nullable sort);
+}
+;
 
 label returns [ImmutableArray<TermLabel> labels = new ImmutableArray<TermLabel>()]
 @init {
@@ -3426,6 +3456,10 @@ one_logic_bound_variable returns[QuantifiableVariable v=null]
   s=sortId id=simple_ident {
     v = bindVar(id, s);
   }
+  | {isEnabledSchemaMatching()}? s=schema_ident {
+            v = bindVar(id, s);
+         //v = s.op();
+   }
 ;
 
 one_logic_bound_variable_nosort returns[QuantifiableVariable v=null]
