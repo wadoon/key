@@ -3150,7 +3150,8 @@ atom returns [Term _atom = null]
     :
 (        {isTermTransformer()}? a = specialTerm
     |   a = funcpredvarterm
-    |   LPAREN a = term RPAREN
+    |   LPAREN a = term RPAREN ( {isEnabledSchemaMatching()}? => COLON si=schema_ident )?
+          { if(si != null) { a = tb.createMatchBinder(a, si); } }
     |   TRUE  { a = getTermFactory().createTerm(Junctor.TRUE); }
     |   FALSE { a = getTermFactory().createTerm(Junctor.FALSE); }
     |   {isEnabledSchemaMatching()}? => STARDONTCARE a = term  STARDONTCARE {
@@ -3176,8 +3177,9 @@ atom returns [Term _atom = null]
         }
 schema_ident returns [Term a = null]
 :
-id=SCHEMAIDENT //((COLON IDENT) => COLON sort=sortId_check[true])?
+id=SCHEMAIDENT ((COLON IDENT) => COLON sort=sortId_check[true])?
 {
+//TODO Spezialfall ? als _ hier abfangen?
 //TODO a = tb.matchIdentifier(id.text, nullable sort);
 }
 ;
@@ -3456,9 +3458,8 @@ one_logic_bound_variable returns[QuantifiableVariable v=null]
   s=sortId id=simple_ident {
     v = bindVar(id, s);
   }
-  | {isEnabledSchemaMatching()}? s=schema_ident {
-            v = bindVar(id, s);
-         //v = s.op();
+  | {isEnabledSchemaMatching()}? mv=schema_ident {
+         v = (QuantifiableVariable)mv.op();
    }
 ;
 
