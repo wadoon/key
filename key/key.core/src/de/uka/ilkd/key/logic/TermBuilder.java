@@ -2250,15 +2250,30 @@ public class TermBuilder {
         Term t =  tf.createTerm(new MatchIdentifierOp(new Name("?"),sort));
         return t;
     }
-    public Term createEllipsisTerm(Term a){
-        //TODO
+
+    /**
+     * Cretae Ellipsis Term '..'Term'..'
+     * @param a
+     * @return
+     */
+    public Term createEllipsisTerm(Term a) {
         Term t = tf.createTerm(new EllipsisOp(a.sort()), a);
         return t;
     }
 
+    /**
+     * Create matchbinder Term (Term ):(?Variable :int)
+     * @param inner
+     * @param matchBinder
+     * @return
+     * TODO rethink the decision to double matchbinder infos
+     */
     public Term createMatchBinder(Term inner, Term matchBinder){
-        MatchBinderOp mbo = new MatchBinderOp(matchBinder.op().name(), matchBinder.sort(), new ImmutableArray<>(inner.sort()));
-        //TODO
-        return null;
+        MatchBinderOp mbo = new MatchBinderOp(matchBinder.op().name(), new ImmutableArray<>(inner.sort()));
+        Term[] subTerms = new Term[2];
+        subTerms[0] = matchBinder;
+        subTerms[1] = inner;
+        return tf.createTerm(mbo, subTerms);
+
     }
 }

@@ -105,6 +105,14 @@ public class AbstractTestTermParser extends TestCase {
         return new KeYParserF(ParserMode.TERM, getLexer(s), services, nss);
     }
 
+    protected KeYParserF getMatchParser(String s){
+        KeYLexerF kl = new KeYLexerF(s,
+                "No file. Call of parser from parser/" + getClass().getSimpleName());
+        kl.setEnabledSchemaMatching(true);
+        KeYParserF kp = new KeYParserF(ParserMode.TERM, kl, services, nss);
+        kp.setEnabledSchemaMatching(true);
+        return kp;
+    }
     public Term parseTerm(String s) throws Exception {
         return getParser(s).term();
     }
