@@ -72,11 +72,11 @@ public final class DefaultTermParser {
      * @return The parsed term of the specified sort.
      * @throws ParserException The method throws a ParserException, if
      * the input could not be parsed correctly or the term has an
-     * invalid sort. */    
-    public Term parse(Reader in, 
-	    	      Sort sort, 
+     * invalid sort. */
+    public Term parse(Reader in,
+	    	      Sort sort,
 	    	      Services services,
-                      NamespaceSet nss, 
+                      NamespaceSet nss,
                       AbbrevMap scm)
         throws ParserException
     {
@@ -85,8 +85,8 @@ public final class DefaultTermParser {
             parser
                 = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""),
 				new Recoder2KeY (services, nss),
-                                services, 
-                                nss, 
+                                services,
+                                nss,
                                 scm);
 
             final Term result = parser.termEOF();
@@ -125,5 +125,36 @@ public final class DefaultTermParser {
         }
     }
 
+    //TODO is this right?
+    public Term parseMatchTerm(Reader in,
+                      Sort sort,
+                      Services services,
+                      NamespaceSet nss,
+                      AbbrevMap scm)
+            throws ParserException
+    {
+        KeYParserF parser = null;
+        try{
+            KeYLexerF keYLexerF = new KeYLexerF(in, "");
+            keYLexerF.setEnabledSchemaMatching(true);
+            parser
+                    = new KeYParserF(ParserMode.TERM, keYLexerF,
+                    new Recoder2KeY (services, nss),
+                    services,
+                    nss,
+                    scm);
+
+            parser.setEnabledSchemaMatching(true);
+            final Term result = parser.termEOF();
+
+            return result;
+        } catch (RecognitionException re) {
+            // problemParser cannot be null since exception is thrown during parsing.
+            String message = parser.getErrorMessage(re);
+            throw new ParserException(message, new Location(re));
+        } catch (IOException tse) {
+            throw new ParserException(tse.getMessage(), null);
+        }
+    }
     
 }

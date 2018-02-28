@@ -18,13 +18,10 @@ public class BottomSort implements Sort  {
 
     public static final Name NAME = new Name("Bottom");
 
-    private final Sort objectSort;
 
 
+    public BottomSort() {
 
-    public BottomSort(Sort objectSort) {
-        assert objectSort != null;
-        this.objectSort = objectSort;
     }
 
 
@@ -37,14 +34,13 @@ public class BottomSort implements Sort  {
     @Override
     public ImmutableSet<Sort> extendsSorts() {
         throw new UnsupportedOperationException(
-                "NullSort.extendsSorts() cannot be supported");
+                "BottomSort.extendsSorts() cannot be supported");
     }
 
 
     @Override
     public ImmutableSet<Sort> extendsSorts(Services services) {
         assert services != null;
-        assert objectSort == services.getJavaInfo().objectSort();
 
         ImmutableSet<Sort> returnValue = DefaultImmutableSet.nil();
         services.getNamespaces().sorts().allElements().forEach(sort -> returnValue.add(sort));
@@ -57,7 +53,7 @@ public class BottomSort implements Sort  {
     public boolean extendsTrans(Sort sort) {
         return sort == this
                 || sort == Sort.ANY
-                || sort.extendsTrans(objectSort);
+                ;
     }
 
 

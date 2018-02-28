@@ -2245,8 +2245,8 @@ public class TermBuilder {
     }
     public Term createEllipsisTerm(Term a){
         //TODO
-        //Term t = tf.createTerm(new EllipsisOp(), a);
-        return null;
+        Term t = tf.createTerm(new EllipsisOp(a.sort()), a);
+        return t;
     }
 
     public Term createMatchBinder(Term inner, Term matchBinder){
