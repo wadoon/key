@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.BottomSort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -2230,6 +2231,9 @@ public class TermBuilder {
      * @return
      */
     public Term createMatchIdentifier(String idText, Sort sort){
+        if(sort == null){
+            sort = new BottomSort();
+        }
         Term t =  tf.createTerm(new MatchIdentifierOp(new Name(idText), sort));
         return t;
     }
@@ -2240,7 +2244,10 @@ public class TermBuilder {
      * @return
      */
     public Term createMatchIdentifier(Sort sort){
-        Term t =  tf.createTerm(new MatchIdentifierOp(new Name("?"), sort));
+        if(sort == null){
+            sort = new BottomSort();
+        }
+        Term t =  tf.createTerm(new MatchIdentifierOp(new Name("?"),sort));
         return t;
     }
     public Term createEllipsisTerm(Term a){
