@@ -10,12 +10,16 @@ import org.key_project.util.collection.ImmutableArray;
  */
 public class MatchBinderOp extends Function implements SortedOperator{
 
-    public MatchBinderOp(Name name, ImmutableArray<Sort> argSorts) {
-        super(name, argSorts.get(0), argSorts);
-        assert argSorts.size() == 1;
-    }
 
+    /**
+     * A match binder operator is for bding an matched inner term to a schmeavariable for termmatching in PSDBG
+     * @param name
+     * @param binderSort
+     * @param argSorts
+     */
     public MatchBinderOp(Name name, Sort binderSort, ImmutableArray<Sort> argSorts ){
         super(name, binderSort, argSorts);
+        assert argSorts.size() == 2;
+        assert binderSort.equals( argSorts.get(0));
     }
 }

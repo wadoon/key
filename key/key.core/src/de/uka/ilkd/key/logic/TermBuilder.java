@@ -2269,17 +2269,17 @@ public class TermBuilder {
      * TODO rethink the decision to double matchbinder infos
      */
     public Term createMatchBinder(Term inner, Term matchBinder){
-        MatchBinderOp mbo;
-        if(matchBinder.sort() instanceof BottomSort){
+        MatchBinderOp mbo = new MatchBinderOp(matchBinder.op().name(), matchBinder.sort(), new ImmutableArray<>(matchBinder.sort(), inner.sort()));
+       /* if(matchBinder.sort() instanceof BottomSort){
             mbo = new MatchBinderOp(matchBinder.op().name(), new ImmutableArray<>(inner.sort()));
 
         } else {
             mbo = new MatchBinderOp(matchBinder.op().name(), matchBinder.sort(), new ImmutableArray<>(inner.sort()));
 
-        }
-        Term[] subTerms = new Term[1];
-       // subTerms[0] = matchBinder;
-        subTerms[0] = inner;
+        }*/
+        Term[] subTerms = new Term[2];
+        subTerms[0] = matchBinder;
+        subTerms[1] = inner;
         return tf.createTerm(mbo, subTerms);
 
     }

@@ -534,10 +534,8 @@ public class TestTermParser extends AbstractTestTermParser {
 
 	}
 	public void testMatchBinder() throws RecognitionException {
-		KeYParserF matchParser = getMatchParser("(x=y):?RT");
+		KeYParserF matchParser = getMatchParser("(x=y):?RT:Formula");
 		Term t = matchParser.termEOF();
-		t.op();
-		//what about sorts?
 
 	}
 
