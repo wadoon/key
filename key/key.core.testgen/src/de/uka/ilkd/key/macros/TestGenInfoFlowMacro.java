@@ -79,8 +79,26 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 		
 		
 		private int computeUnwindRules(Goal goal, PosInOccurrence pio, RuleApp appGoal) {
+			JavaBlock currentBlock = null;
 			
-			JavaBlock currentBlock = pio.subTerm().javaBlock();
+			//search for the programm element
+			if (pio.subTerm().javaBlock().isEmpty()) {
+				for (Term t : pio.subTerm().subs()) {
+					if (!t.javaBlock().isEmpty()) {
+						currentBlock = t.javaBlock();
+//						System.out.println("nicht leer :" +t.javaBlock().program().getFirstElementIncludingBlocks().toString());
+						break;
+					}
+				}
+			} else {
+				currentBlock = pio.subTerm().javaBlock();
+			}
+			if(currentBlock == null) {
+				System.out.println("Warning: java block not found");
+				currentBlock = pio.subTerm().javaBlock();
+			}
+			
+//			JavaBlock currentBlock = pio.subTerm().javaBlock();
 			Node currentNode = goal.node();
 			int unwindings = 0;
 			SourceElement element = currentBlock.program().getFirstElementIncludingBlocks();
@@ -93,12 +111,16 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 				}
 			}
 			
-			//TODO maybe add the same thing for doWhileLoops ? 
+			if(appGoal.rule().name().toString().equals("methodCall") || appGoal.rule().name().toString().equals("methodCallWithAssignment")) {
+				System.out.println(appGoal.rule().name().toString() + " in Knoten " + goal.node().serialNr());
+//				System.out.println(currentBlock);
+			} //TODO muessig remove
 			
-			
-			//remember every javaBlock with unwind rule node
-			nodeJavaBlockMap.put(currentNode.serialNr(), element);
-			
+			//TODO maybe add the same thing for doWhileLoops ?
+                
+            //remember every javaBlock with unwind rule node
+            nodeJavaBlockMap.put(currentNode.serialNr(), element);
+            
 			//now count number of unwind rules with same java block 
 			//(use the hasmap to get the corresponding javablock)
 			while(!currentNode.root()) {
@@ -123,12 +145,11 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 			if (!TestGenInfoFlowMacro.hasModality(goal.node())) {
 				return false;
 			}
-			
+
 			if (TestGenInfoFlowStrategy.isUnwindRule(app.rule())) {
 				if (limitPerLoop == 0) {
 					return false;
 				}
-				
 				int unwindings = computeUnwindRules(goal, pio, app);
 				//check the number of unwindings for the current loop
 				if (unwindings >= limitPerLoop) {

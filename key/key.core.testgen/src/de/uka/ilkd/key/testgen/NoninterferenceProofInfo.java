@@ -63,12 +63,13 @@ public class NoninterferenceProofInfo extends ProofInfo {
 		String[] result = new String[2];
 		List<JavaBlock> blocks = getJavaBlocks(f);
 		
+		
 		List<Term> terme1 = new ArrayList<>();
 		List<Term> terme2 = new ArrayList<>();
 		for (Term s : f.subs()) {
 			if (s.containsJavaBlockRecursive()) terme1.add(s);
 		}
-		
+		//collect the two terms which contains a java block for updates
 		for (Term s : terme1) {
 			for (Term a : s.subs()) {
 				if (a.containsJavaBlockRecursive()) terme2.add(a);

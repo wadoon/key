@@ -139,6 +139,7 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
 		
 		m.removeUnnecessaryObjects();
 		
+		//collect Pre Heaps for execution A/B
 		List<Heap> heaps = new ArrayList<Heap>();
 		for (final Heap h : m.getHeaps()) {
 			if (isPreName(h.getName())) {
@@ -150,14 +151,13 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
 		
 		Set<Term> vars = new HashSet<Term>();
 		info.getProgramVariables(info.getPO(), vars);   
-		testMethod.append(TAB+"//Other variables" + NEW_LINE + getRemainingConstants(m.getConstants().keySet(), vars) + NEW_LINE+ NEW_LINE);
+		testMethod.append(TAB+"//Other variables" + getRemainingConstants(m.getConstants().keySet(), vars) + NEW_LINE+ NEW_LINE);
 		
-		
-		
+		//create preamble and method execution for execution A
 		for (Heap heap : heaps) {
 			if (getExecutionName(heap.getName()).equals(A_EXECUTION)){
 				testMethod
-				.append("   //Test preamble for execution "+ "B" + ": creating objects and intializing test data"
+				.append("   //Test preamble for execution "+ "A" + ": creating objects and intializing test data"
 						+ generateTestCaseNoninterference(m, heap, typeInfMap) + NEW_LINE + NEW_LINE);
 				
 				testMethod.append("   //Calling the method under test   " + NEW_LINE + codes[0] + NEW_LINE);
@@ -165,10 +165,11 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
 			}
 		}
 		
+		//create preamble and method execution for execution B
 		for (Heap heap : heaps) {
 			if (getExecutionName(heap.getName()).equals(B_EXECUTION)){
 				testMethod
-				.append("   //Test preamble for execution "+ "A" + ": creating objects and intializing test data"
+				.append("   //Test preamble for execution "+ "B" + ": creating objects and intializing test data"
 						+ generateTestCaseNoninterference(m, heap, typeInfMap) + NEW_LINE + NEW_LINE);
 				
 				testMethod.append("   //Calling the method under test   " + NEW_LINE + codes[1] + NEW_LINE);
@@ -192,7 +193,6 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
 	
 	private String generateTestCaseNoninterference(Model m, Heap heap, Map<String, Sort> typeInfMap) {
 //		m.removeUnnecessaryObjects();
-
 //		Set<String> objects = new HashSet<String>();
 		
 		final List<Assignment> assignments = new LinkedList<Assignment>();
