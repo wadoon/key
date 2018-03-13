@@ -11,7 +11,11 @@ import org.key_project.util.collection.ImmutableArray;
 public class MatchBinderOp extends Function implements SortedOperator{
 
     public MatchBinderOp(Name name, ImmutableArray<Sort> argSorts) {
-        super(name, new BottomSort(), argSorts);
-//        assert argSorts.size() == 2;
+        super(name, argSorts.get(0), argSorts);
+        assert argSorts.size() == 1;
+    }
+
+    public MatchBinderOp(Name name, Sort binderSort, ImmutableArray<Sort> argSorts ){
+        super(name, binderSort, argSorts);
     }
 }
