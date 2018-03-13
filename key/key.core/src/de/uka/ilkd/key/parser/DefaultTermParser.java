@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.sort.BottomSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -133,10 +134,13 @@ public final class DefaultTermParser {
                       AbbrevMap scm)
             throws ParserException
     {
+
         KeYParserF parser = null;
         try{
             KeYLexerF keYLexerF = new KeYLexerF(in, "");
             keYLexerF.setEnabledSchemaMatching(true);
+            nss.sorts().add(new BottomSort());
+            nss.sorts().add(Sort.FORMULA);
             parser
                     = new KeYParserF(ParserMode.TERM, keYLexerF,
                     new Recoder2KeY (services, nss),
