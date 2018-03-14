@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.parser;
 
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.BottomSort;
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -533,9 +534,29 @@ public class TestTermParser extends AbstractTestTermParser {
 		Term t1 = matchParser.termEOF();
 
 	}
+	public void testMatchUnderOp() throws RecognitionException {
+		KeYParserF matchParser = getMatchParser("!(?X)");
+		Term t = matchParser.termEOF();
+		KeYParserF matchParser1 = getMatchParser("head(?X:list)");
+		Term t1 = matchParser1.termEOF();
+		KeYParserF matchParser2 = getMatchParser("head(?X)");
+		Term t2 = matchParser2.termEOF();
+
+	}
+
+	public void testMatchInFormula() throws RecognitionException {
+		KeYParserF matchParser = getMatchParser("!(x = ?X)");
+		Term t = matchParser.termEOF();
+
+	}
 	public void testMatchBinder() throws RecognitionException {
 		KeYParserF matchParser = getMatchParser("(x=y):?RT:Formula");
 		Term t = matchParser.termEOF();
+		assertEquals(t.sub(0).sort(), Sort.FORMULA);
+		KeYParserF matchParser1 = getMatchParser("(x=y):?RT");
+		Term t1 = matchParser1.termEOF();
+		assertEquals(t1.sub(0).sort().getClass(), BottomSort.class);
+
 
 	}
 

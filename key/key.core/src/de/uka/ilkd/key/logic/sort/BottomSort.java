@@ -14,7 +14,7 @@ import org.key_project.util.collection.ImmutableSet;
  * for terms represented by a specific schemavariable
  * see {@NullSort}
  */
-public class BottomSort implements Sort  {
+public final class BottomSort implements Sort  {
 
     public static final Name NAME = new Name("Bottom");
 
@@ -51,9 +51,7 @@ public class BottomSort implements Sort  {
 
     @Override
     public boolean extendsTrans(Sort sort) {
-        return sort == this
-                || sort == Sort.ANY
-                ;
+        return true;
     }
 
 
