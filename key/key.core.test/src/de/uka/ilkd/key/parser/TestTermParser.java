@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.BottomSort;
 import org.antlr.runtime.RecognitionException;
@@ -556,6 +557,16 @@ public class TestTermParser extends AbstractTestTermParser {
 		KeYParserF matchParser1 = getMatchParser("(x=y):?RT");
 		Term t1 = matchParser1.termEOF();
 		assertEquals(t1.sub(0).sort().getClass(), BottomSort.class);
+
+
+	}
+
+	public void testSequentMatchParsing() throws RecognitionException {
+		KeYParserF matchParser = getMatchParser("==> true & false");
+		Sequent s = matchParser.seqEOF();
+
+		KeYParserF matchParser1 = getMatchParser("==> ?X");
+		Sequent s1 = matchParser1.seqEOF();
 
 
 	}

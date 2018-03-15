@@ -89,9 +89,9 @@ public final class DefaultTermParser {
         try {
             KeYLexerF lexer = new KeYLexerF(in, "");
             lexer.setEnabledSchemaMatching(enableMatching);
-            if (enableMatching)
+            if (enableMatching) {
                 nss.sorts().add(new BottomSort());
-
+            }
             parser = new KeYParserF(ParserMode.TERM, lexer, new Recoder2KeY(services, nss), services, nss, scm);
             parser.setEnabledSchemaMatching(enableMatching);
             final Term result = parser.termEOF();
@@ -129,6 +129,8 @@ public final class DefaultTermParser {
             p.setEnabledSchemaMatching(enableMatching);
             if (enableMatching) {
                 nss.sorts().add(new BottomSort());
+                nss.sorts().add(Sort.FORMULA);
+
             }
             final Sequent seq = p.seqEOF();
             return seq;
