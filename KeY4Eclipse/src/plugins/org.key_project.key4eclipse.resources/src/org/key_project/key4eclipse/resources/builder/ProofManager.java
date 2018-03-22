@@ -381,14 +381,22 @@ public class ProofManager {
     * @param positionInfo The {@link PositionInfo} to search file for.
     * @return The found {@link IFile} or {@code null} if not available.
     */
-   protected IFile searchFile(PositionInfo positionInfo) {
-      if (positionInfo != null && !PositionInfo.UNDEFINED.equals(positionInfo)) {
-         String fileName = MiscTools.getSourcePath(positionInfo);
-         IPath location = new Path(fileName);
-         return ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(location);
-      }
-      return null;
-   }
+    protected IFile searchFile(PositionInfo positionInfo) {
+        IFile file = null;
+        if (positionInfo != null && !PositionInfo.UNDEFINED.equals(positionInfo)) {
+            String fileName = MiscTools.getSourcePath(positionInfo);
+            IPath location = new Path(fileName);
+            file = ResourcesPlugin.getWorkspace().getRoot().getFileForLocation(location);
+            if (file == null) {
+                //maybe a linked resource
+                IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(location.toFile().toURI());
+                if (files.length > 0) {
+                    file = files[0];
+                }
+            }
+        }
+        return file;
+    }
 
    /**
     * Removes all {@link PackageInfo} between the given indices.
