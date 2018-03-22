@@ -41,5 +41,8 @@ Export-Package: org.key_project.sed.key.core.test.suite,
  org.key_project.sed.key.core.test.testcase,
  org.key_project.sed.key.core.test.testcase.swtbot,
  org.key_project.sed.key.core.test.util
+<<<<<<< HEAD
+=======
 Import-Package: org.key_project.sed.ui.visualization.view
 Automatic-Module-Name: org.key_project.sed.key.core.test
+>>>>>>> 5ec27931f7... [Fix] Make Manifest files Java 9 compatible

@@ -25,3 +25,4 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
 Bundle-Vendor: KeY Project
 Export-Package: org.key_project.jmlediting.ui.test.suite
+Automatic-Module-Name: org.key_project.jmlediting.ui.test

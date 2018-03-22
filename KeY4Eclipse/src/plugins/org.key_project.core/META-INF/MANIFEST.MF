@@ -168,3 +168,4 @@ Export-Package: .,
 Bundle-Vendor: KeY Project
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.key_project.core.Activator
+Automatic-Module-Name: org.key_project.core
