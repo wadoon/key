@@ -135,14 +135,7 @@ public class OracleGenerator {
 		return new OracleMethod("testOracle", methodArgs, "return "+body.toString()+";");
 	}
 	
-	//TODO muessig move to new class
-//	public OracleMethod generateOracleMethodNoninterference(Term term) {
-//		constants = getConstants(term);
-//		methodArgs = getMethodArgsForNoninterference();
-//		OracleTerm body = generateNoninterferenceOracle(term, false, true, false);
-////		OracleTerm body = generateOracle(term, false);
-//		return new OracleMethod("testOracle", methodArgs, "return "+body.toString()+";");
-//	}
+
 	
 	public OracleLocationSet getOracleLocationSet(Term modifierset){
 		
@@ -207,33 +200,6 @@ public class OracleGenerator {
 		return constants;
 	}
 	
-//	//TODO muessig remove code duplication . look at getMethodArgs
-//	// override in new class --> delete if everthing works with new class
-//	private List<OracleVariable> getMethodArgsForNoninterference(){
-//		List<OracleVariable> result = new LinkedList<OracleVariable>();
-//
-//
-//		Sort allIntSort = createSetSort("Integer");
-//		Sort allBoolSort = createSetSort("Boolean");
-//		Sort allObjSort = createSetSort("java.lang.Object");
-//		Sort oldMapSort = new SortImpl(new Name("Map<Object,Object>"));
-//		
-//		OracleVariable allInts = new OracleVariable(TestCaseGenerator.ALL_INTS, allIntSort);
-//		OracleVariable allBools = new OracleVariable(TestCaseGenerator.ALL_BOOLS, allBoolSort);
-//		OracleVariable allObj = new OracleVariable(TestCaseGenerator.ALL_OBJECTS, allObjSort);
-//		OracleVariable oldMap = new OracleVariable(TestCaseGenerator.OLDMap, oldMapSort);
-//		
-//		for(Term c : constants){
-//			result.add(new OracleVariable(c.toString().replaceAll(AT_POST, ""), c.sort()));
-//			result.add(new OracleVariable(PRE_STRING+c.toString().replaceAll(AT_POST, ""), c.sort()));		
-//		}
-//
-//		result.add(allBools);
-//		result.add(allInts);
-//		result.add(allObj);		
-//		result.add(oldMap);
-//		return result;
-//	}
 
     /* TODO: The argument t is never used?*/
 	protected List<OracleVariable> getMethodArgs(Term t){
@@ -266,7 +232,6 @@ public class OracleGenerator {
 	
 	
 	private void findConstants(Set<Term> constants, Term term){	
-		//System.out.println("FindConstants: "+term+ " cls "+term.getClass().getName());
 		if(term.op() instanceof Function && term.arity() == 0){
 			constants.add(term);
 		}
@@ -285,179 +250,6 @@ public class OracleGenerator {
 		return new SortImpl(new Name(name));
 	}
 	
-	//TODO muessig move to new class
-	private boolean isAllFieldsEquals(Term term) {
-		Operator op = term.op();
-		String javaOp = ops.get(op);
-		if (javaOp.equals(EQUALS)) {
-			Term left = term.sub(0);
-			Term right = term.sub(1);
-			if (left.op() instanceof Function && right.op() instanceof Function) {
-				Function leftFun = (Function) left.op();
-				Function rightFun = (Function) right.op();
-				if(leftFun.name().toString().equals("allFields") && rightFun.name().toString().equals("allFields")) {
-					return true;
-				}
-				
-			}
-		}
-		return false;
-	}
-	
-//	//TODO muessig move to new class -> delete
-//	public OracleTerm generateNoninterferenceOracle(Term term, boolean initialSelect, boolean firstCall, boolean needPreState) {
-//		
-//		System.out.println("Term :::: " + term.op().name().toString());
-//		
-//		Operator op = term.op();
-//
-//		//binary terms
-//		if(ops.containsKey(op)){
-//			
-//			//Equals with allFields (AllFields(a) == AllFields(b))
-//			if(isAllFieldsEquals(term)) {
-//				Term left = term.sub(0).sub(0);
-//				Term right = term.sub(1).sub(0);
-//				
-//				String rightSort = left.sort().name().toString();
-//				String leftSort = right.sort().name().toString();
-//				OracleMethod method;
-//				List<OracleTerm> args;
-//				
-//				
-//				//AllFields for Array with same Type? (a[*] == b[*]) // TODO muessig check if allFields without Arrays are necessary
-//				if(leftSort.endsWith("[]") && leftSort.endsWith("[]") && rightSort.equals(leftSort)) {
-//					if(needPreState) {
-//						method = allFieldsArrayEqualsToMethod(PRE_STRING+left.toString(), PRE_STRING+right.toString(), initialSelect);
-//					} else {
-//						method = allFieldsArrayEqualsToMethod(left.toString(), right.toString(), initialSelect);
-//					}
-//						
-//					
-//					oracleMethods.add(method);
-//					args = new LinkedList<OracleTerm>();
-//					args.addAll(quantifiedVariables);
-//					args.addAll(methodArgs);
-//				} else {
-//					throw new RuntimeException("Could not translate oracle for: "+term+" of type "+term.op());
-//				}
-//				
-//				return new OracleMethodCall(method, args);
-//			}
-//			
-//			
-//			OracleTerm left = generateNoninterferenceOracle(term.sub(0), initialSelect, false, needPreState);
-//			OracleTerm right = generateNoninterferenceOracle(term.sub(1), initialSelect, false, needPreState);	
-//			String javaOp = ops.get(op);
-//
-//			if(javaOp.equals(EQUALS)){
-//				
-//				return eq(left, right);
-//			}
-//			else if(javaOp.equals(AND)){
-//				return and(left,right);
-//			}
-//			else if(javaOp.equals(OR)){
-//				return or(left,right);
-//			}			
-//			
-//			return new OracleBinTerm(javaOp,left,right);			
-//		}//negation
-//		else if(op == Junctor.NOT){
-//			OracleTerm sub = generateNoninterferenceOracle(term.sub(0), initialSelect, false, needPreState);
-//			if(sub instanceof OracleUnaryTerm){
-//				OracleUnaryTerm neg = (OracleUnaryTerm) sub;
-//				return neg.getSub();
-//			}
-//			return new OracleUnaryTerm(sub, Op.Neg);
-//		}
-//		//true
-//		else if (op == Junctor.TRUE) {
-//			return OracleConstant.TRUE;
-//		}
-//		//false
-//		else if (op == Junctor.FALSE) {
-//			return OracleConstant.FALSE;
-//		}
-//		//imp - if imp is outer operation, then left term is in pre state
-//		else if (op == Junctor.IMP){
-//			OracleTerm left;
-//			OracleTerm right;
-//			if (firstCall) {
-//				//left term from imp need pre state !!!
-//				left = generateNoninterferenceOracle(term.sub(0), initialSelect, false, true);
-//				right = generateNoninterferenceOracle(term.sub(1), initialSelect, false, needPreState);
-//			} else {
-//				left = generateNoninterferenceOracle(term.sub(0), initialSelect, false, needPreState);
-//				right = generateNoninterferenceOracle(term.sub(1), initialSelect, false, needPreState);			
-//			}
-//			OracleTerm notLeft = neg(left);
-//			return new OracleBinTerm(OR, notLeft, right);
-//		}
-//		
-//		
-//		//quantifiable variable //TODO muessig check if needed
-//		else if (op instanceof QuantifiableVariable) {			
-//			QuantifiableVariable qop = (QuantifiableVariable) op;
-//			if(needPreState) {
-//				return new OracleVariable(PRE_STRING+qop.name().toString().replaceAll(AT_POST, ""), qop.sort());
-//			} else {
-//				return new OracleVariable(qop.name().toString().replaceAll(AT_POST, ""), qop.sort());	
-//			}
-//		}
-//		//integers
-//		else if (op == services.getTypeConverter().getIntegerLDT()
-//		        .getNumberSymbol()) {			
-//			long num = NumberTranslation.translate(term.sub(0)).longValue();			
-//			return new OracleConstant(Long.toString(num),term.sort());
-//		}
-//		//forall
-//		else if (op == Quantifier.ALL || op == Quantifier.EX) {
-//			Sort field = services.getTypeConverter().getHeapLDT().getFieldSort();
-//			Sort heap = services.getTypeConverter().getHeapLDT().targetSort();
-//			Sort varSort = term.boundVars().get(0).sort();
-//			if(varSort.equals(field) || varSort.equals(heap)){
-//				return OracleConstant.TRUE;
-//			}
-//			
-//			OracleMethod method = createQuantifierMethod(term, initialSelect);
-//			oracleMethods.add(method);
-//			List<OracleTerm> args = new LinkedList<OracleTerm>();
-//			args.addAll(quantifiedVariables);
-//			args.addAll(methodArgs);
-//			return new OracleMethodCall(method, args);
-//		}		
-//		//if-then-else
-//		else if(op == IfThenElse.IF_THEN_ELSE){
-//			OracleMethod method = createIfThenElseMethod(term, initialSelect);
-//			oracleMethods.add(method);
-//			List<OracleTerm> args = new LinkedList<OracleTerm>();
-//			args.addAll(quantifiedVariables);
-//			args.addAll(methodArgs);
-//			return new OracleMethodCall(method, args);
-//		}
-//		//functions
-//		else if (op instanceof Function) {
-//			return translateFunction(term, initialSelect);
-//		}
-//		//program variables
-//		else if (op instanceof ProgramVariable){
-//			ProgramVariable var = (ProgramVariable) op;
-//			LocationVariable loc = (LocationVariable) var;
-//			if(needPreState) {
-//				// generate name with pre state !
-//				return new OracleConstant(PRE_STRING+loc.name().toString().replaceAll(AT_POST, ""), loc.sort());
-//			} else {
-//				return new OracleConstant(loc.name().toString().replaceAll(AT_POST, ""), loc.sort()); //TODO muessig check if correct and remove if not
-//			}
-//		}
-//				
-//		else{
-//			//System.out.println("Could not translate: "+term);
-//			throw new RuntimeException("Could not translate oracle for: "+term+" of type "+term.op());
-//		}
-//			
-//	}
 
 	public OracleTerm generateOracle(Term term, boolean initialSelect){
 		
@@ -465,7 +257,6 @@ public class OracleGenerator {
 		
 		Operator op = term.op();
 		
-		//System.out.println("Translate: "+term+" init: "+initialSelect);
 		
 		//binary terms
 		if(ops.containsKey(op)){			
@@ -558,7 +349,6 @@ public class OracleGenerator {
 			//System.out.println(services.getVariableNamer().getRenamingMap());
 			
 			LocationVariable loc = (LocationVariable) var;
-			//System.out.println("Term: "+loc.sort()+" "+loc.name());
 			return new OracleConstant(loc.name().toString(), loc.sort());
 		}
 		
@@ -673,120 +463,12 @@ public class OracleGenerator {
 	    	OracleTerm sub = generateOracle(term.sub(0), initialSelect);
 	    	return new OracleUnaryTerm(sub, Op.Minus);
 	    }
-	    
-//	    //TODO remove -> just need in new class
-//	    else if (name.equals("newObjectsIsomorphic")) {
-//	    	OracleMethod method = createIsomorphicOracleMethod(term, initialSelect);
-//			oracleMethods.add(method);
-//			List<OracleTerm> args = new LinkedList<OracleTerm>();
-//			
-//			
-//			args.addAll(quantifiedVariables);
-//			args.addAll(methodArgs);
-//			return new OracleMethodCall(method, args);
-//	    }
+
 	    
 	    
 	    throw new RuntimeException("Unsupported function found: "+name+ " of type "+fun.getClass().getName());
     }
 	
-	
-//	//TODO muessig move to new class -> remove
-//	private String[] getObjNamesFromList(Term t, int size) {
-//		int i = 0;
-//		String[] names = new String[size];
-//		for (Term a : t.subs()) {
-//			names[i] = a.toString().replaceAll("AtPost", "");
-//			i++;
-//		}
-//		return names;
-//	}
-	
-//	//TODO muessig move to new class -> remove
-//	private String checkPreString(String[] names) {
-//		String checkPreOne = "";
-//		for (int i = 0; i < names.length-1; i++) {
-//			checkPreOne = checkPreOne + PRE_STRING+names[i]+EQUALS+" null "+ AND;
-//		}
-//		return checkPreOne+PRE_STRING+names[names.length-1]+EQUALS+" null";
-//	}
-	
-//	//TODO muessig move to new class -> remove
-//	private String checkTypeString(String[] namesA, String[] namesB) {
-//		String result = "";
-//		for(int i = 0; i < namesA.length-1; i++) {
-//			result = result + namesA[i]+".class " + EQUALS + " " +namesB[i]+".class &&";
-//		}
-//		return result + namesA[namesA.length-1]+".class " + EQUALS + " " +namesB[namesB.length-1]+".class";
-//	}
-	
-	
-//	//compare the objects. Same Type, Same fileds with same values
-//	//TODO muessig implement with needPrestate !!!!!
-//	//TODO muessig move to new class -> remove
-//	private OracleMethod createIsomorphicOracleMethod(Term term, boolean initialSelect) {
-//		
-//		String result = "";
-//		String methodName = generateMethodName();
-//		String tab = TestCaseGenerator.TAB;
-//		Term objectListA = term.sub(0);
-//		Term objectListB = term.sub(2);
-//		
-//		
-//		int listSize = objectListA.subs().size();
-//		if (listSize != objectListB.subs().size()) {
-//			throw new RuntimeException("Could not translate oracle for: "+term+" of type "+term.op());
-//		}
-//		
-//		//all objects in the list as String
-//		String[] objANames = getObjNamesFromList(objectListA, listSize);
-//		String[] objBNames = getObjNamesFromList(objectListB, listSize);
-//		
-//		String objectsA = "{";
-//		String objectsB = "{";
-//		for (int i = 0; i < listSize-1; i++) {
-//			objectsA = objectsA + objANames[i] + ",";
-//			objectsB = objectsB + objBNames[i] + ",";
-//		}
-//		objectsA = objectsA + objANames[listSize-1]+"}";
-//		objectsB = objectsB + objBNames[listSize-1]+"}";
-//			
-//		String objectArrays = "\n"+tab+tab+"Object[] objectsA = "+objectsA+";"
-//								+"\n"+tab+tab+"Objects objectsB = "+objectsB+";";
-//		
-//		result = result + objectArrays;
-//		
-//		//list of objects
-//		//check if exists in prestate
-//		String checkPreOne = checkPreString(objANames);
-//		String checkPreSec = checkPreString(objBNames);
-//		String checkIfNew =
-//				"\n"+tab+tab+"//check if objects new "
-//				+"\n"+tab+tab+"if(!("+checkPreOne + "&&" + checkPreSec+")) {"
-//						+"\n"+tab+tab+tab+"return false;"
-//						+"\n"+tab+tab+"}";
-//		
-//		result = result + checkIfNew;
-//		
-//		
-//		//check the type of obj in list with .class
-//		String compareTypes = checkTypeString(objANames, objBNames);		
-//		String checkType =
-//				"\n"+tab+tab+"//check object types"
-//				+"\n"+tab+tab+"if(!("+compareTypes+")) {"
-//					+"\n"+tab+tab+tab+"return false;"
-//					+"\n"+tab+tab+"}";
-//			
-//		
-//		result = result + checkType;
-//		    
-//		List<OracleVariable> args = new LinkedList<OracleVariable>();
-//		args.addAll(quantifiedVariables);
-//		args.addAll(methodArgs);
-//		
-//		
-//		return new OracleMethod(methodName, args, result);
-//	}
 
 	private OracleTerm translateQuery(Term term, boolean initialSelect,
 			Operator op) {
@@ -1041,34 +723,6 @@ public class OracleGenerator {
 		return TestCaseGenerator.ALL_OBJECTS;
 	}
 	
-//	//TODO muessig move to new class -> remove
-//	private OracleMethod allFieldsArrayEqualsToMethod(String leftTerm, String rightTerm, boolean initialSelect) {
-//		
-//		
-//		String methodName = generateMethodName();
-//			
-//		String tab = TestCaseGenerator.TAB;
-//		String body = 
-//				"\n" + tab + "if("+leftTerm+".length"+EQUALS+rightTerm+".length"+" ) {"
-//				+ "\n"+tab+tab+"for("+"int"+" "+"i"+" : "+TestCaseGenerator.ALL_INTS+"){"
-//				+ "\n"+tab+tab+tab+"if("+"0 <= i"+ " && " + "i < "+ leftTerm+ ".length"+ " && " +"!("+leftTerm+"[i]"+EQUALS+rightTerm+"[i]"+")){"
-//				+ "\n"+tab+tab+tab+tab+"return false;"
-//				+ "\n"+tab+tab+tab+"}"
-//				+ "\n"+tab+tab+"}"
-//				+ "\n"+tab+"} else {"
-//				+ "\n"+tab+tab+"return false;"
-//				+ "\n"+tab+"}"
-//				+ "\n"+tab+"return true;";
-//		    
-//		List<OracleVariable> args = new LinkedList<OracleVariable>();
-//		args.addAll(quantifiedVariables);
-//		args.addAll(methodArgs);
-//		
-//		
-//		
-//		return new OracleMethod(methodName, args, body);
-//		
-//	}
 	
 	private OracleMethod createQuantifierMethod(Term term, boolean initialSelect){		
 		String methodName = generateMethodName();

@@ -65,9 +65,6 @@ public final class RemovePostConditionMacro extends StrategyProofMacro {
 			}
 			
 		}
-		
-
-
 
 		@Override
 		public Name name() {

@@ -25,7 +25,7 @@ public class NoninterferenceProofInfo extends ProofInfo {
 	 * @return the postcondition term
 	 */
 	@Override
-	public Term getPostCondition() {//TODO maybe new class with dynamic binding 
+	public Term getPostCondition() {
 		
 		Term t = getPO();
 		Term post = services.getTermBuilder().tt();
@@ -58,7 +58,7 @@ public class NoninterferenceProofInfo extends ProofInfo {
 	 * @return String array with two java blocks
 	 * @author Muessig
 	 */
-	public String[] getCodeNoninterference() {//TODO return value String 
+	public String[] getCodeNoninterference() { 
 		Term f = getPO();
 		String[] result = new String[2];
 		List<JavaBlock> blocks = getJavaBlocks(f);
@@ -88,9 +88,7 @@ public class NoninterferenceProofInfo extends ProofInfo {
 
 				PrettyPrinter pw = new CustomPrettyPrinter(sw,false);
 
-//				if (i == 0) {
-//					sw.write("   "+getUpdate(f)+"\n");
-//				}
+
 				sw.write("    "+getUpdate(terme2.get(i))+"\n");
 				
 				blocks.get(i).program().prettyPrint(pw);
@@ -100,15 +98,12 @@ public class NoninterferenceProofInfo extends ProofInfo {
 				e.printStackTrace();
 			}
 		}
-//		String r = "";
-//		for (String code : result) {
-//			r = r + code + TestCaseGenerator.NEW_LINE;
-//		}
+
 		return result;
 
 	}
 	
-	public List<JavaBlock> getJavaBlocks(Term f) { //TODO muessig check if needed
+	public List<JavaBlock> getJavaBlocks(Term f) { 
 		List<JavaBlock> blocks = new ArrayList<JavaBlock>();
 		getJavaBlocksHelp(f, blocks);
 		return blocks;

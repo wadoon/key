@@ -107,8 +107,7 @@ public abstract class AbstractTestGenerator {
     }
     
     
-    //macro removing post condition //TODO edit code below for noninterference and normal testgen
-    //TODO muessig just use this for noninterferenceProofs
+    //macro removing post condition for informationflow tests 
     if(!includePostcondition && isNoninterferenceProof) {
 		log.writeln("Applying remove postcondition Macro (remove postcondition from proof)...");
     	if (originalProof.openEnabledGoals().size() > 1) {
@@ -150,9 +149,7 @@ public abstract class AbstractTestGenerator {
     }
     
     log.writeln("Extracting test data constraints (path conditions).");
-    proofs = createProofsForTesting(settings.removeDuplicates(), ! includePostcondition); //TODO muessig remove for normal testgeneration
-    // noninterference has own macro for removing post condition
-//    proofs = createProofsForTesting(settings.removeDuplicates(), false); //TODO muessig this is for noninterference proofs -> create if else non interference
+    proofs = createProofsForTesting(settings.removeDuplicates(), ! includePostcondition); 
     if (stopRequest != null && stopRequest.shouldStop()) {
        return;
     }
@@ -428,7 +425,6 @@ public abstract class AbstractTestGenerator {
 	   } else {
 		   tg = new TestCaseGenerator(originalProof); 
 	   }
-//	   final TestCaseGenerator tg = new TestCaseGenerator(originalProof);//TODO remove
       tg.setLogger(log);
             
       tg.generateJUnitTestSuite(problemSolvers);

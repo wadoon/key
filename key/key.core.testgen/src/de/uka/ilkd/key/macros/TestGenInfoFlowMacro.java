@@ -86,7 +86,6 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 				for (Term t : pio.subTerm().subs()) {
 					if (!t.javaBlock().isEmpty()) {
 						currentBlock = t.javaBlock();
-//						System.out.println("nicht leer :" +t.javaBlock().program().getFirstElementIncludingBlocks().toString());
 						break;
 					}
 				}
@@ -98,7 +97,6 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 				currentBlock = pio.subTerm().javaBlock();
 			}
 			
-//			JavaBlock currentBlock = pio.subTerm().javaBlock();
 			Node currentNode = goal.node();
 			int unwindings = 0;
 			SourceElement element = currentBlock.program().getFirstElementIncludingBlocks();
@@ -111,18 +109,12 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 				}
 			}
 			
-			if(appGoal.rule().name().toString().equals("methodCall") || appGoal.rule().name().toString().equals("methodCallWithAssignment")) {
-				System.out.println(appGoal.rule().name().toString() + " in Knoten " + goal.node().serialNr());
-//				System.out.println(currentBlock);
-			} //TODO muessig remove
-			
 			//TODO maybe add the same thing for doWhileLoops ?
                 
             //remember every javaBlock with unwind rule node
             nodeJavaBlockMap.put(currentNode.serialNr(), element);
             
 			//now count number of unwind rules with same java block 
-			//(use the hasmap to get the corresponding javablock)
 			while(!currentNode.root()) {
 				RuleApp app = currentNode.getAppliedRuleApp();
 				if (app != null) {

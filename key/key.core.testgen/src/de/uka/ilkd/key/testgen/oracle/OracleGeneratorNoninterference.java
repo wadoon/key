@@ -115,7 +115,6 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 			if (left.op() instanceof Function && right.op() instanceof Function) {
 				Function leftFun = (Function) left.op();
 				Function rightFun = (Function) right.op();
-				System.out.println(leftFun + " : " + rightFun);
 				if(leftFun.name().toString().equals("allFields") && rightFun.name().toString().equals("allFields")) {
 					return true;
 				}	
@@ -141,7 +140,7 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 		return false;
 	}
 	
-	//TODO remove firstCall and needPrestate.. not needed anymore
+	//TODO remove parameters firstCall and needPrestate.. not needed anymore
 	public OracleTerm generateNoninterferenceOracle(Term term, boolean initialSelect, boolean firstCall, boolean needPrestate) {
 		Operator op = term.op();
 
@@ -175,7 +174,7 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 				List<OracleTerm> args;
 					
 					
-				//AllFields for Array with same Type? (a[*] == b[*]) // TODO muessig check if allFields without Arrays are necessary
+				//AllFields for Array with same Type? (a[*] == b[*]) 
 				if(leftSort.endsWith("[]") && leftSort.endsWith("[]") && rightSort.equals(leftSort)) {
 					
 					method = allFieldsArrayEqualsToMethod(leftTerm, rightTerm, initialSelect);
@@ -277,7 +276,7 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 		}
 		
 		
-		//quantifiable variable //TODO muessig check if needed
+		//quantifiable variable 
 		else if (op instanceof QuantifiableVariable) {			
 			QuantifiableVariable qop = (QuantifiableVariable) op;
 			if(needPrestate) {
@@ -367,7 +366,7 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 	    	
 	    	return translateSelect(term, initialSelect, firstCall,needPrestate);	    	
 	    }
-	    else if(name.equals("arr")){ //TODO muessig check prestate
+	    else if(name.equals("arr")){ 
 	    	OracleTerm index = generateNoninterferenceOracle(term.sub(0), initialSelect, firstCall, needPrestate);	    	
 	    	return new OracleConstant("["+index+"]", term.sort());	    	
 	    }
@@ -520,7 +519,7 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 		int i = 0;
 		String[] names = new String[size];
 		for (Term a : t.subs()) {
-			if (a.op().name().toString().equals("seqSingleton")) {//TODO muessig check if lists contains of singletons
+			if (a.op().name().toString().equals("seqSingleton")) {
 				a = a.sub(0);
 			}
 			String name;
@@ -550,7 +549,6 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 		
 		
 	//compare the objects. Same Type, Same fileds with same values
-		//TODO muessig implement with needPrestate !!!!!
 	private OracleMethod createIsomorphicOracleMethod(Term term, boolean initialSelect) {
 		
 		String result = "";
