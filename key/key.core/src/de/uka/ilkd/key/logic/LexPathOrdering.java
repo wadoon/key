@@ -98,13 +98,15 @@ public class LexPathOrdering implements TermOrdering {
     private final HashMap<CacheKey, CompRes> cache = 
         new LinkedHashMap<CacheKey, CompRes> ();
     
-    
+    private final int maxCacheSize = 1000011; 
     private CompRes compareHelp (Term p_a, Term p_b) {
         final CacheKey key = new CacheKey ( p_a, p_b );
         CompRes res = cache.get ( key );
         if ( res == null ) {
             res = compareHelp2 ( p_a, p_b );
-            if ( cache.size () > 100000 ) cache.clear ();
+            if ( cache.size () >  maxCacheSize) {
+                cache.clear ();
+            }
             cache.put ( key, res );
         }
         return res;

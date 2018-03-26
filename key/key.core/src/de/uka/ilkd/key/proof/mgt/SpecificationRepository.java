@@ -1527,7 +1527,7 @@ public final class SpecificationRepository {
     }
     
 
-    public void addDependencyClusterSpec(DependencyClusterSpec spec) {
+    public void addDependencyClusterSpec(DependencyClusterSpec spec) {        
         assert (! dependencyClustersByLabel.containsKey(spec.getLabel())) : 
             "Dependency Cluster label " + spec.getLabel() + " is ambiguos";       
         
@@ -1535,7 +1535,7 @@ public final class SpecificationRepository {
 
     }
     
-    public void addDependencyClusterSpecs(ImmutableList<DependencyClusterSpec> specs) {
+    public void addDependencyClusterSpecs(ImmutableList<DependencyClusterSpec> specs) {        
         for (DependencyClusterSpec spec : specs) {
             addDependencyClusterSpec(spec);
         }

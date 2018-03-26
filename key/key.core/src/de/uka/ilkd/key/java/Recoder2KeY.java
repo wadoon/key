@@ -352,7 +352,7 @@ public class Recoder2KeY implements JavaReader {
     public de.uka.ilkd.key.java.CompilationUnit[] readCompilationUnitsAsFiles(String[] cUnitStrings) {
         List<recoder.java.CompilationUnit> cUnits = recoderCompilationUnitsAsFiles(cUnitStrings);
         de.uka.ilkd.key.java.CompilationUnit[] result = new de.uka.ilkd.key.java.CompilationUnit[cUnits.size()];
-        for (int i = 0, sz = cUnits.size(); i < sz; i++) {
+        for (int i = 0, sz = cUnits.size(); i < sz; i++) {           
             Debug.out("converting now " + cUnitStrings[i]);
             result[i] = getConverter().processCompilationUnit(cUnits.get(i), cUnitStrings[i]);
         }
@@ -374,7 +374,7 @@ public class Recoder2KeY implements JavaReader {
         List<recoder.java.CompilationUnit> cUnits = new ArrayList<recoder.java.CompilationUnit>();
         parseSpecialClasses();
         try {
-            for (String filename : cUnitStrings) {
+            for (String filename : cUnitStrings) {              
                 final CompilationUnit cu;
                 Reader fr = null;
                 try {

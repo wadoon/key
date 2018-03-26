@@ -63,6 +63,7 @@ import de.uka.ilkd.key.speclang.CombinedClusterSpec;
 import de.uka.ilkd.key.speclang.ComponentCluster;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.ContractFactory;
+import de.uka.ilkd.key.speclang.DependencyClusterSpec;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
@@ -556,7 +557,7 @@ public class JMLSpecFactory {
                                             progVars.paramVars, progVars.resultVar, progVars.excVar, 
                                             textualSpecCase.getCombinedClusterSpecs());
         
-      //TODO JK find out where to add these specs to the specification repo properly, this can only be a temporary solution I think
+      //TODO JK find out where to add these specs to the specification repo properly, this can only be a temporary solution I think          
         for (CombinedClusterSpec spec: clauses.combinedClusterSpecs) {
 
             services.getSpecificationRepository().addDependencyClusterSpec(spec);
