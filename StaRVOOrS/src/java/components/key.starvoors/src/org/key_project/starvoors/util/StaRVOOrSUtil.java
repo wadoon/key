@@ -38,9 +38,11 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
+import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
+import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
@@ -65,11 +67,27 @@ import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTree
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 import de.uka.ilkd.key.util.KeYTypeUtil;
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
+import de.uka.ilkd.key.proof.init.JavaProfile;
 
 // TODO: Map renamings of program variables with help of Node#getRenamingTable() back to the original name. Do this when loop invariants are supported.
 public final class StaRVOOrSUtil {
-   private StaRVOOrSUtil() {
-   }
+	
+   private StaRVOOrSUtil() {}
+   
+   public static void setDefaultTacletOptions(File location) throws ProblemLoaderException {
+	      // Ensure that Taclets are parsed
+	      if (!ProofSettings.isChoiceSettingInitialised()) {
+	         KeYEnvironment<?> env = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), location, null, null, null, true);
+	         env.dispose();
+	      }
+	      // Set Taclet options
+	      ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
+	      HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
+	      HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
+	      newSettings.putAll(SymbolicExecutionUtil.getDefaultTacletOptions());
+	      choiceSettings.setDefaultChoices(newSettings);
+	   }
    
    public static StaRVOOrSResult start(File location, 
                                        boolean ensureDefaultTacletOptions,
@@ -109,20 +127,51 @@ public final class StaRVOOrSUtil {
          env.dispose();
       }
    }
-   
-   public static void setDefaultTacletOptions(File location) throws ProblemLoaderException {
-      // Ensure that Taclets are parsed
-      if (!ProofSettings.isChoiceSettingInitialised()) {
-         KeYEnvironment<?> env = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), location, null, null, null, true);
-         env.dispose();
+
+   public static StaRVOOrSResult start_javadl(File source, File formulas, boolean ensureDefaultTacletOptions) throws ProblemLoaderException, ProofInputException  {
+      if (ensureDefaultTacletOptions) {
+          setDefaultTacletOptions(source);
       }
-      // Set Taclet options
-      ChoiceSettings choiceSettings = ProofSettings.DEFAULT_SETTINGS.getChoiceSettings();
-      HashMap<String, String> oldSettings = choiceSettings.getDefaultChoices();
-      HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
-      newSettings.putAll(SymbolicExecutionUtil.getDefaultTacletOptions());
-      choiceSettings.setDefaultChoices(newSettings);
+            
+      File[] content = formulas.listFiles();
+      StaRVOOrSResult result = new StaRVOOrSResult();
+      
+      for (File file : content) {    	  
+    	  KeYEnvironment<?> env = KeYEnvironment.load(file);
+    	  try {     	      	      
+    	      StaRVOOrSProof proofResult = null;
+    	      try {
+        	      KeYUserProblemFile key = new KeYUserProblemFile(file.getName(),
+        	    		                                          file,
+        	    		                                          new DefaultUserInterfaceControl(),
+        	    		                                          env.getProfile());//new JavaProfile());
+        		  System.out.println("KeyFile to string:\n" + key.toString());	   
+        		  System.out.println("Proof obligation:\n"+key.getProofObligation());
+        		  System.out.println();
+        		   
+        	      proofResult = verify(env,key);
+    	      } catch (Exception e) {
+    	    	  System.out.println("PROBLEM");
+    	      }
+    	      if (proofResult != null) {
+                  result.addProof(proofResult);
+               }
+          } finally {
+    	      env.dispose();
+          }
+      }
+      return null;
    }
+   
+   //Verification of .key files containing dynamic logic formulae. 
+   protected static StaRVOOrSProof verify(KeYEnvironment<?> env, KeYUserProblemFile key) throws ProofInputException {
+	   InitConfig proofInitConfig = env.getInitConfig().deepCopy();
+	   ProofOblInput proofObligation = key;	   
+	   
+	   Proof proof = env.getUi().createProof(proofInitConfig, proofObligation); 
+	   return null;
+   }
+   
 
    protected static StaRVOOrSProof verify(KeYEnvironment<?> env, 
                                           Contract contract,
@@ -161,7 +210,7 @@ public final class StaRVOOrSUtil {
          proof.dispose();
       }
    }
-   
+      
    protected static String observerFunctionToString(IObserverFunction target) {
       if (target instanceof IProgramMethod) {
          IProgramMethod pm = (IProgramMethod) target;
