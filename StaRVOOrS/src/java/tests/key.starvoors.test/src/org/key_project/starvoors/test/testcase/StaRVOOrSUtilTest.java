@@ -22,6 +22,12 @@ public class StaRVOOrSUtilTest extends AbstractStaRVOOrSTest {
    /**
     * Tests {@link StaRVOOrSUtil#start(java.io.File)}.
     */
+	@Test
+	public void javadl_verification(){
+		
+	}
+	
+	
    @Test
    public void testStart_HashTable() throws Exception {
       doTest("data/hashtable/test/HashTable.java",

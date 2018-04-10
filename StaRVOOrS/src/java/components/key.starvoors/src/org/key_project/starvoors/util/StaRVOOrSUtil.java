@@ -18,7 +18,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.java.ArrayUtil;
 import org.key_project.util.java.IFilter;
-import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.java.PositionInfo;
@@ -38,7 +37,6 @@ import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.AbstractOperationPO;
-import de.uka.ilkd.key.proof.init.AbstractProfile;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.FunctionalOperationContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
@@ -87,7 +85,8 @@ public final class StaRVOOrSUtil {
 	      HashMap<String, String> newSettings = new HashMap<String, String>(oldSettings);
 	      newSettings.putAll(SymbolicExecutionUtil.getDefaultTacletOptions());
 	      choiceSettings.setDefaultChoices(newSettings);
-	   }
+	}
+   
    
    public static StaRVOOrSResult start(File location, 
                                        boolean ensureDefaultTacletOptions,
@@ -128,6 +127,7 @@ public final class StaRVOOrSUtil {
       }
    }
 
+   //Starts the verification of the files containing dynamic logic formulae
    public static StaRVOOrSResult start_javadl(File source, File formulas, boolean ensureDefaultTacletOptions) throws ProblemLoaderException, ProofInputException  {
       if (ensureDefaultTacletOptions) {
           setDefaultTacletOptions(source);
@@ -137,25 +137,23 @@ public final class StaRVOOrSUtil {
       StaRVOOrSResult result = new StaRVOOrSResult();
       
       for (File file : content) {    	  
-    	  KeYEnvironment<?> env = KeYEnvironment.load(file);
-    	  try {     	      	      
+    	  KeYEnvironment<?> env = KeYEnvironment.load(file);        	  
+    	  try {     
+    		  Proof proof = env.getLoadedProof();
+    		  System.out.println("Proof in env:\n" + proof.toString());
     	      StaRVOOrSProof proofResult = null;
     	      try {
         	      KeYUserProblemFile key = new KeYUserProblemFile(file.getName(),
         	    		                                          file,
         	    		                                          new DefaultUserInterfaceControl(),
-        	    		                                          env.getProfile());//new JavaProfile());
-        		  System.out.println("KeyFile to string:\n" + key.toString());	   
-        		  System.out.println("Proof obligation:\n"+key.getProofObligation());
-        		  System.out.println();
-        		   
+        	    		                                          new JavaProfile());        		   
         	      proofResult = verify(env,key);
     	      } catch (Exception e) {
     	    	  System.out.println("PROBLEM");
     	      }
     	      if (proofResult != null) {
                   result.addProof(proofResult);
-               }
+              }
           } finally {
     	      env.dispose();
           }
@@ -168,7 +166,11 @@ public final class StaRVOOrSUtil {
 	   InitConfig proofInitConfig = env.getInitConfig().deepCopy();
 	   ProofOblInput proofObligation = key;	   
 	   
-	   Proof proof = env.getUi().createProof(proofInitConfig, proofObligation); 
+	   //Proof proof = env.getUi().createProof(proofInitConfig, proofObligation); 
+	   
+       System.out.println("KeyFile to string:\n" + key.toString());	  
+	   System.out.println("Proof obligation:\n" + key.getProofObligation());
+	   System.out.println();
 	   return null;
    }
    
