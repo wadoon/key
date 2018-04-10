@@ -158,10 +158,10 @@ public final class StaRVOOrSUtil {
     	      env.dispose();
           }
       }
-      return null;
+      return result;
    }
    
-   //Verification of .key files containing dynamic logic formulae. 
+   //Verification of .key files containing dynamic logic formulae.
    protected static StaRVOOrSProof verify(KeYEnvironment<?> env, KeYUserProblemFile key) throws ProofInputException {
 	   InitConfig proofInitConfig = env.getInitConfig().deepCopy();
 	   ProofOblInput proofObligation = key;	   
