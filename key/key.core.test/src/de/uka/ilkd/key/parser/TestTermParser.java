@@ -561,6 +561,11 @@ public class TestTermParser extends AbstractTestTermParser {
 
 	}
 
+	public void testBoundVars() throws RecognitionException {
+		KeYParserF matchParser = getMatchParser("seqDef{?;}(?,?,?)");
+		Term t = matchParser.termEOF();
+	}
+
 	public void testSequentMatchParsing() throws RecognitionException {
     	KeYParserF matchParser = getMatchParser("==> true & false");
 		Sequent s = matchParser.seqEOF();
@@ -571,5 +576,14 @@ public class TestTermParser extends AbstractTestTermParser {
 
 	}
 
+	public void testQuantifierParsing() throws RecognitionException {
+		KeYParserF matchParser = getMatchParser("==> seqDef{int i;}(?,?,?) = seqDef{int i;}(?,?,?)");
+		Sequent s = matchParser.seqEOF();
+
+		KeYParserF matchParser1 = getMatchParser("==> \\exists int i; (?)");
+		Sequent s1 = matchParser1.seqEOF();
+
+
+	}
 
 }
