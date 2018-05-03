@@ -14,6 +14,7 @@ import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
+import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 
 /**
@@ -51,13 +52,19 @@ public class StaRVOOrSUtilTest extends AbstractStaRVOOrSTest {
 	         	      KeYUserProblemFile key = new KeYUserProblemFile(file.getName(),
 	         	    		                                          file,
 	         	    		                                          new DefaultUserInterfaceControl(),
-	         	    		                                          new JavaProfile());        		   
+	         	    		                                          new JavaProfile()); 
+               	      key.readProblem();
 	         	      System.out.println("KeyFile to string:\n" + key.toString());	  
 	         		  System.out.println("Proof obligation:\n" + key.getProofObligation());
 	         		  System.out.println();
 	         		  assertTrue(key.getProofObligation() != null);
-	     	      } catch (Exception e) {
+	     	      } catch (ProofInputException e) {
+	     	    	  e.printStackTrace();
+	     	    	  assertTrue(false);
+	     	      }
+	     	        catch (Exception e) {
 	     	    	  System.out.println("PROBLEM");
+	     	    	  assertTrue(false);
 	     	      }
 	           } finally {
 	     	      env.dispose();
