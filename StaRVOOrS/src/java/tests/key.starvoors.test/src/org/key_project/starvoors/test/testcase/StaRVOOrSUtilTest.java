@@ -4,13 +4,21 @@ import java.io.File;
 import java.util.HashMap;
 
 import org.junit.Test;
+import org.key_project.starvoors.model.StaRVOOrSProof;
 import org.key_project.starvoors.model.StaRVOOrSResult;
 import org.key_project.starvoors.model.io.StaRVOOrSReader;
 import org.key_project.starvoors.util.StaRVOOrSUtil;
 
+import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
+import de.uka.ilkd.key.symbolic_execution.strategy.ExecutedSymbolicExecutionTreeNodesStopCondition;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
+import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionEnvironment;
 
 /**
  * Contains tests for {@link StaRVOOrSUtil}.
@@ -39,16 +47,28 @@ public class StaRVOOrSUtilTest extends AbstractStaRVOOrSTest {
 	       File[] content = formulae.listFiles();
 	       
 	       for (File file : content) {    	  
-	     	  KeYEnvironment<?> env = KeYEnvironment.load(file);        	  
+	     	  //KeYEnvironment<?> env = KeYEnvironment.load(file);      
+	     	  KeYEnvironment<?> env = KeYEnvironment.load(SymbolicExecutionJavaProfile.getDefaultInstance(), file, null, null, null, true); 	  
 	     	  try {     
-	     		  Proof proof = env.getLoadedProof();
-	     	      try {       	      
-    	         	  env.getProofControl().startAndWaitForAutoMode(proof);
-    	         	  
-	         		  System.out.println("Proof obligation:\n" + proof.toString());
+	     		  //Proof proof = env.getLoadedProof();
+	     	      try {
+	         	      KeYUserProblemFile key = new KeYUserProblemFile(file.getName(),
+	         	    		                                          file,
+	         	    		                                          new DefaultUserInterfaceControl(),
+	         	    		                                          new JavaProfile()); 
+               	      //key.readProblem();
+	         	      
+	         	      //SymbolicExecutionEnvironment.configureProofForSymbolicExecution(proof, 
+                      //        ExecutedSymbolicExecutionTreeNodesStopCondition.MAXIMAL_NUMBER_OF_SET_NODES_TO_EXECUTE_PER_GOAL_IN_COMPLETE_RUN, 
+                      //         false, 
+                      //         false, 
+                      //         false,
+                      //         false, 
+                      //         false);     	
+	         	      System.out.println("KeyFile to string:\n" + key.toString());	  
+	         		  System.out.println("Proof obligation:\n" + key.getProofObligation());
 	         		  System.out.println();
-	         		  assertTrue(proof.closed());
-	         		  assertNotNull(proof);
+	         		  assertTrue(key.getProofObligation() != null);
 	     	      } catch (Exception e) {
 	     	    	  System.out.println("PROBLEM");
 	     	    	  assertTrue(false);

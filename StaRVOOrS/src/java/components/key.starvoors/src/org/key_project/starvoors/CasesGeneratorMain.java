@@ -107,14 +107,17 @@ public class CasesGeneratorMain {
    //Runs KeY in files containing dynamic logic formulae.
    public static void run_javadl(String[] args) throws Exception {
         String inputDir  = "", outputDir = "", formulae = "";
+        boolean useOperationContracts = true, useLoopInvariants = true;
         File file,out,formulas;
         boolean input = true, output = true ;
        
 		for (int i = 0; i < args.length; i++) {		
 			if (args[i].equals("-inline")) {
+				useOperationContracts = false;
 				continue;
 			}			
 			if (args[i].equals("-unroll")) {
+				useLoopInvariants = false;
 				continue;
 			}			
 			if (args[i].equals("-javadl")) {
@@ -163,7 +166,7 @@ public class CasesGeneratorMain {
         StaRVOOrSResult result;
         try {
         	//TODO: Create new start method to analyse dynamic logic formulae.
-            result = StaRVOOrSUtil.start_javadl(file, formulas, false);
+            result = StaRVOOrSUtil.start_javadl(file, formulas, false, useOperationContracts, useLoopInvariants);
         }
         catch (ProblemLoaderException e) {
             result = null;
@@ -191,6 +194,5 @@ public class CasesGeneratorMain {
        System.out.println(INLINE_METHODS + ": Inline method bodies instead of applying method contracts.");
        System.out.println(UNROLL_LOOPS + ": Unroll loops instead of applying loop invariants.");
        System.out.println(JAVA_DL + ": File(s) to analyse contain(s) (Java) dynamic logic formulae. Folder to formulae should be included as the final argument.");
-   }
-   
+   }   
 }

@@ -128,7 +128,8 @@ public final class StaRVOOrSUtil {
    }
 
    //Starts the verification of the files containing dynamic logic formulae
-   public static StaRVOOrSResult start_javadl(File source, File formulas, boolean ensureDefaultTacletOptions) throws ProblemLoaderException, ProofInputException  {
+   public static StaRVOOrSResult start_javadl(File source, File formulas, boolean ensureDefaultTacletOptions,
+		   boolean useOperationContracts, boolean useLoopInvarints) throws ProblemLoaderException, ProofInputException  {
       if (ensureDefaultTacletOptions) {
           setDefaultTacletOptions(source);
       }
@@ -139,7 +140,6 @@ public final class StaRVOOrSUtil {
       for (File file : content) {    	  
     	  KeYEnvironment<?> env = KeYEnvironment.load(file);        	  
     	  try {     
-    		  Proof proof = env.getLoadedProof();
     	      StaRVOOrSProof proofResult = null;
     	      try {        	             		  
         	      proofResult = verify(env);
