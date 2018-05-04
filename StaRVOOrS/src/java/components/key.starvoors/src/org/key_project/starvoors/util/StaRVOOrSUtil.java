@@ -87,7 +87,7 @@ public final class StaRVOOrSUtil {
 	      choiceSettings.setDefaultChoices(newSettings);
 	}
    
-   
+   //Starts the vrification of Java sources annotated with JML specs.
    public static StaRVOOrSResult start(File location, 
                                        boolean ensureDefaultTacletOptions,
                                        boolean useOperationContracts,
@@ -140,14 +140,9 @@ public final class StaRVOOrSUtil {
     	  KeYEnvironment<?> env = KeYEnvironment.load(file);        	  
     	  try {     
     		  Proof proof = env.getLoadedProof();
-    		  System.out.println("Proof in env:\n" + proof.toString());
     	      StaRVOOrSProof proofResult = null;
-    	      try {
-        	      KeYUserProblemFile key = new KeYUserProblemFile(file.getName(),
-        	    		                                          file,
-        	    		                                          new DefaultUserInterfaceControl(),
-        	    		                                          new JavaProfile());        		   
-        	      proofResult = verify(env,key);
+    	      try {        	             		  
+        	      proofResult = verify(env);
     	      } catch (Exception e) {
     	    	  System.out.println("PROBLEM");
     	      }
@@ -162,15 +157,9 @@ public final class StaRVOOrSUtil {
    }
    
    //Verification of .key files containing dynamic logic formulae.
-   protected static StaRVOOrSProof verify(KeYEnvironment<?> env, KeYUserProblemFile key) throws ProofInputException {
-	   InitConfig proofInitConfig = env.getInitConfig().deepCopy();
-	   ProofOblInput proofObligation = key;	   
-	   
-	   //Proof proof = env.getUi().createProof(proofInitConfig, proofObligation); 
-	   
-       System.out.println("KeyFile to string:\n" + key.toString());	  
-	   System.out.println("Proof obligation:\n" + key.getProofObligation());
-	   System.out.println();
+   protected static StaRVOOrSProof verify(KeYEnvironment<?> env) throws ProofInputException {
+	   Proof proof = env.getLoadedProof();
+	   env.getProofControl().startAndWaitForAutoMode(proof);
 	   return null;
    }
    

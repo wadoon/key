@@ -4,17 +4,12 @@ import java.io.File;
 import java.util.HashMap;
 
 import org.junit.Test;
-import org.key_project.starvoors.model.StaRVOOrSProof;
 import org.key_project.starvoors.model.StaRVOOrSResult;
 import org.key_project.starvoors.model.io.StaRVOOrSReader;
 import org.key_project.starvoors.util.StaRVOOrSUtil;
 
-import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.testcase.AbstractSymbolicExecutionTestCase;
 
 /**
@@ -47,22 +42,14 @@ public class StaRVOOrSUtilTest extends AbstractStaRVOOrSTest {
 	     	  KeYEnvironment<?> env = KeYEnvironment.load(file);        	  
 	     	  try {     
 	     		  Proof proof = env.getLoadedProof();
-	     		  System.out.println("Proof in env:\n" + proof.toString());
-	     	      try {
-	         	      KeYUserProblemFile key = new KeYUserProblemFile(file.getName(),
-	         	    		                                          file,
-	         	    		                                          new DefaultUserInterfaceControl(),
-	         	    		                                          new JavaProfile()); 
-               	      key.readProblem();
-	         	      System.out.println("KeyFile to string:\n" + key.toString());	  
-	         		  System.out.println("Proof obligation:\n" + key.getProofObligation());
+	     	      try {       	      
+    	         	  env.getProofControl().startAndWaitForAutoMode(proof);
+    	         	  
+	         		  System.out.println("Proof obligation:\n" + proof.toString());
 	         		  System.out.println();
-	         		  assertTrue(key.getProofObligation() != null);
-	     	      } catch (ProofInputException e) {
-	     	    	  e.printStackTrace();
-	     	    	  assertTrue(false);
-	     	      }
-	     	        catch (Exception e) {
+	         		  assertTrue(proof.closed());
+	         		  assertNotNull(proof);
+	     	      } catch (Exception e) {
 	     	    	  System.out.println("PROBLEM");
 	     	    	  assertTrue(false);
 	     	      }
