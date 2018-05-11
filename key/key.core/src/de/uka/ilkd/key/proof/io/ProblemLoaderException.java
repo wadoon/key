@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof.io;
 
+import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 
 public final class ProblemLoaderException extends Exception {
 
@@ -49,6 +50,11 @@ public final class ProblemLoaderException extends Exception {
         if (getCause() != null) {
             sb = sb.append("; caused by: ");
             sb = sb.append(getCause());
+            if (getCause() instanceof SLTranslationException) {
+                SLTranslationException tranlationException = (SLTranslationException) getCause();
+                sb.append(" at " + tranlationException.getFileName() + "(line:" + tranlationException.getLine() + 
+                        ", column:" + tranlationException.getColumn()+")");
+            }
         }
         sb = sb.append(')');
         return sb.toString();
