@@ -25,8 +25,6 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.eclipse.ResourceUtil;
 import org.key_project.util.java.StringUtil;
 
-import com.sun.xml.internal.messaging.saaj.util.ByteOutputStream;
-
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
 import de.uka.ilkd.key.proof.Goal;
@@ -54,7 +52,7 @@ import de.uka.ilkd.key.util.ProofStarter;
 /**
  * Runnable to perform the actual proof execution.
  * 
- * @author Stefan K�sdorf
+ * @author Stefan Kaesdorf
  */
 public class ProofRunnable implements Runnable {
 
