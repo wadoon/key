@@ -51,9 +51,11 @@ public final class ProblemLoaderException extends Exception {
             sb = sb.append("; caused by: ");
             sb = sb.append(getCause());
             if (getCause() instanceof SLTranslationException) {
-                SLTranslationException tranlationException = (SLTranslationException) getCause();
-                sb.append(" at " + tranlationException.getFileName() + "(line:" + tranlationException.getLine() + 
-                        ", column:" + tranlationException.getColumn()+")");
+                SLTranslationException tranlationException =
+                        (SLTranslationException) getCause();
+                sb.append(" at " + tranlationException.getFileName()
+                        + "(line:" + tranlationException.getLine()
+                        + ", column:" + tranlationException.getColumn() + ")");
             }
         }
         sb = sb.append(')');
