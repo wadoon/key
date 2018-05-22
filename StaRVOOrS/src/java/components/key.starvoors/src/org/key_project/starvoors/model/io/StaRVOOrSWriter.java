@@ -89,6 +89,8 @@ public class StaRVOOrSWriter {
       attributes.put(ATTRIBUTE_NEW_PRECONDITION, path.getNewPrecondition());
       if (path.getTerminationKind() != null) {
          attributes.put(ATTRIBUTE_TERMINATION_KIND, path.getTerminationKind().toString());
+      } else {
+    	  attributes.put(ATTRIBUTE_TERMINATION_KIND, "unknown");
       }
       XMLUtil.appendStartTag(level, TAG_EXECUTION_PATH, attributes, sb);
       appendMethodContractApplications(level + 1, TAG_NOT_FULFILLED_PRECONDITIONS, path.getNotFulfilledPreconditions(), sb);
