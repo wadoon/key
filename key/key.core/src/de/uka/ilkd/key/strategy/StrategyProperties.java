@@ -216,7 +216,7 @@ public final class StrategyProperties extends Properties {
         DEFAULT_MAP.setProperty(DEP_OPTIONS_KEY, DEP_ON);
         DEFAULT_MAP.setProperty(QUERY_OPTIONS_KEY, QUERY_OFF);
         DEFAULT_MAP.setProperty(QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON);
-        DEFAULT_MAP.setProperty(NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_NONE);
+        DEFAULT_MAP.setProperty(NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_DEF_OPS);
         DEFAULT_MAP.setProperty(QUANTIFIERS_OPTIONS_KEY,
                                QUANTIFIERS_NON_SPLITTING_WITH_PROGS);
         for (int i = 1; i <= USER_TACLETS_NUM; ++i) {
