@@ -71,7 +71,7 @@ public class ViewSettings implements Settings, Cloneable {
     /**Show Taclet uninstantiated in tooltip -- for learning  */
     private boolean showUninstantiatedTaclet = false;
     /** Show heatmap of most recently used sequent formulae*/
-    private boolean showHeatmap = true;
+    private boolean showHeatmap = false;
     /** Show heatmap for sequent formulas (true) or terms (false) */
     private boolean heatmapSF = true;
     /** Highlight newest formulas/terms (true) or all formulas/terms below specified age (false) */
