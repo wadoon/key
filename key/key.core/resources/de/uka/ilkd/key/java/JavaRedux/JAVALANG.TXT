@@ -46,3 +46,6 @@ java.io.IOException
 java.io.OutputStream
 java.io.PrintStream
 java.io.Serializable
+org.hyperledger.fabric.shim.ChaincodeStub
+org.hyperledger.fabric.shim.ChaincodeBase
+org.hyperledger.fabric.shim.Chaincode

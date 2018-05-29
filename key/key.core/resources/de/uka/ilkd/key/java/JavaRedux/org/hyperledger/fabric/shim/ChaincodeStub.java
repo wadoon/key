@@ -9,9 +9,9 @@ package org.hyperledger.fabric.shim;
 public interface ChaincodeStub {
 
 
-        //@ public ghost \seq transactionLog;
+        //@ public instance ghost \seq transactionLog;
 
-        //@ public model \map globalState;
+        //@ public instance model \map globalState;
 
         //@ represents globalState = \dl_constructMap(transactionLog);
 
@@ -25,13 +25,13 @@ public interface ChaincodeStub {
             ensures transactionLog == \dl_seqConcat(\old(transactionLog), \dl_seqSingleton(\dl_newEntry(key,value)));
             assignable transactionLog;
           @*/
-	void putState(String key, byte[] value);
+	void putState(int key, byte[] value);
 
         /*@ public normal_behaviour
             ensures transactionLog == \dl_seqConcat(\old(transactionLog), \dl_seqSingleton(\dl_newEntry(key,\dl_deleted)));
             assignable transactionLog;
           @*/
-	void delState(String key);
+	void delState(int key);
 
 
 }
