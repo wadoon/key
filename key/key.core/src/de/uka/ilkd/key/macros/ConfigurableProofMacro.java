@@ -1,0 +1,298 @@
+package de.uka.ilkd.key.macros;
+
+import de.uka.ilkd.key.control.UserInterfaceControl;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.strategy.Strategy;
+import org.key_project.util.collection.ImmutableList;
+
+import javax.swing.*;
+import javax.swing.table.AbstractTableModel;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * @author Alexander Weigl
+ * @version 1 (30.05.18)
+ */
+public abstract class ConfigurableProofMacro<Macro extends ProofMacro> extends StrategyProofMacro {
+    /**
+     *
+     */
+    protected final Macro internal;
+
+    protected AdaptableStrategy strategy;
+
+    public ConfigurableProofMacro(Macro internal) {
+        this.internal = internal;
+    }
+
+    private static List<Taclet> findTaclets(Proof p) {
+        Goal g = p.openGoals().head();
+        Services services = p.getServices();
+        TacletFilter filter = new TacletFilter() {
+            @Override
+            protected boolean filter(Taclet taclet) {
+                return true;
+            }
+        };
+        List<Taclet> set = new ArrayList<>();
+        RuleAppIndex index = g.ruleAppIndex();
+        index.tacletIndex().allNoPosTacletApps().forEach(t ->
+                set.add(t.taclet())
+        );
+
+/*        index.autoModeStopped();
+        for (SequentFormula sf : g.node().sequent().antecedent()) {
+            ImmutableList<TacletApp> apps = index.getTacletAppAtAndBelow(filter,
+                    new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
+                    services);
+            apps.forEach(t -> set.add(t.taclet()));
+        }
+
+        try {
+            for (SequentFormula sf : g.node().sequent().succedent()) {
+                ImmutableList<TacletApp> apps = index.getTacletAppAtAndBelow(filter,
+                        new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
+                        services);
+                apps.forEach(t -> set.add(t.taclet()));
+            }
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+  */
+        return set;
+    }
+
+    @Override
+    protected AdaptableStrategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+        if (this.strategy == null) {
+            this.strategy = new AdaptableStrategy(proof.getActiveStrategy());
+        }
+        return this.strategy;
+    }
+
+    @Override
+    public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
+        return internal.canApplyTo(proof, goals, posInOcc);
+    }
+
+    @Override
+    public boolean canApplyTo(Node node, PosInOccurrence posInOcc) {
+        return internal.canApplyTo(node, posInOcc);
+    }
+
+    @Override
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Proof proof,
+                                          ImmutableList<Goal> goals, PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws InterruptedException {
+        createStrategy(proof, null);
+        updateStrategyDialog(proof);
+        proof.setActiveStrategy(strategy);
+        ProofMacroFinishedInfo info = null;
+        try {
+            info = internal.applyTo(uic, proof, goals, posInOcc, listener);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        proof.setActiveStrategy(strategy.delegate);
+        return info;
+    }
+
+    @Override
+    public ProofMacroFinishedInfo applyTo(UserInterfaceControl uic, Node node, PosInOccurrence posInOcc,
+                                          ProverTaskListener listener) throws Exception {
+        updateStrategyDialog(node.proof());
+        node.proof().setActiveStrategy(strategy);
+        ProofMacroFinishedInfo info = internal.applyTo(uic, node, posInOcc, listener);
+        node.proof().setActiveStrategy(strategy.delegate);
+        return info;
+    }
+
+    private void updateStrategyDialog(Proof proof) {
+        JPanel panel = new JPanel(new BorderLayout());
+        JTabbedPane tabbedPane = new JTabbedPane();
+
+        JTable tacletFactor = new JTable(new TacletFactorModel(proof));
+        tabbedPane.addTab("Taclet Factor", new JScrollPane(tacletFactor));
+
+
+        JTable ruleSetFactor = new JTable(new RuleSetFactorModel(proof));
+        tabbedPane.addTab("RuleSet Factor", new JScrollPane(ruleSetFactor));
+
+        panel.add(tabbedPane);
+        JDialog dialog = new JDialog((Dialog) null, "Change Strategy Settings (locally)", true);
+        dialog.setContentPane(panel);
+        dialog.setSize(300,600);
+
+        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JButton btnOk = new JButton("Run");
+        btnOk.addActionListener(evt -> {
+            dialog.setVisible(false);
+        });
+        buttons.add(btnOk);
+        panel.add(buttons, BorderLayout.SOUTH);
+        dialog.setVisible(true);
+    }
+
+    private class TacletFactorModel extends AbstractTableModel {
+        private final AdaptableStrategy strategy;
+        public List<String> tacletNames = new ArrayList<>();
+
+
+        public TacletFactorModel(Proof p) {
+            this.strategy = createStrategy(p, null);
+            tacletNames = findTaclets(p).stream().map(t -> t.name()
+                    .toString())
+                    .sorted(String.CASE_INSENSITIVE_ORDER)
+                    .distinct()
+                    .collect(Collectors.toList());
+        }
+
+        @Override
+        public int getRowCount() {
+            return tacletNames.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return 2;
+        }
+
+        @Override
+        public String getColumnName(int columnIndex) {
+            switch (columnIndex) {
+                case 0:
+                    return "Taclet";
+                case 1:
+                    return "Cost Factor";
+                default:
+                    return "";
+            }
+        }
+
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            switch (columnIndex) {
+                case 0:
+                    return String.class;
+                case 1:
+                    return Integer.class;
+                default:
+                    return Object.class;
+            }
+        }
+
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return columnIndex == 1;
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            try {
+                String name = tacletNames.get(rowIndex);
+                switch (columnIndex) {
+                    case 0:
+                        return name;
+                    case 1:
+                        return strategy.factorForRuleNames.getOrDefault(name, 1L);
+                }
+            } catch (IndexOutOfBoundsException e) {
+                e.printStackTrace();
+            }
+            return "";
+        }
+
+        @Override
+        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            if (columnIndex == 1) {
+                String name = tacletNames.get(rowIndex);
+                long l = Long.parseLong(aValue.toString());
+                strategy.factorForRuleNames.put(name, l);
+            }
+        }
+    }
+
+    private class RuleSetFactorModel extends AbstractTableModel {
+        public List<String> ruleSetNames = new ArrayList<>();
+
+        public RuleSetFactorModel(Proof p) {
+            ruleSetNames = findTaclets(p).stream()
+                    .flatMap(t -> t.getRuleSets().stream())
+                    .map(RuleSet::name)
+                    .map(Object::toString)
+                    .sorted()
+                    .distinct()
+                    .collect(Collectors.toList());
+        }
+
+        @Override
+        public int getRowCount() {
+            return ruleSetNames.size();
+        }
+
+        @Override
+        public int getColumnCount() {
+            return 2;
+        }
+
+        @Override
+        public String getColumnName(int columnIndex) {
+            switch (columnIndex) {
+                case 0:
+                    return "Rule Set";
+                case 1:
+                    return "Cost Factor";
+                default:
+                    return "";
+            }
+        }
+
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            switch (columnIndex) {
+                case 0:
+                    return String.class;
+                case 1:
+                    return Long.class;
+                default:
+                    return Object.class;
+            }
+        }
+
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return columnIndex == 1;
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            String name = ruleSetNames.get(rowIndex);
+            switch (columnIndex) {
+                case 0:
+                    return name;
+                case 1:
+                    return strategy.factorForRulesets.getOrDefault(name, 1L);
+            }
+            return null;
+        }
+
+        @Override
+        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            if (columnIndex == 1) {
+                String name = ruleSetNames.get(rowIndex);
+                long l = Long.parseLong(aValue.toString());
+                strategy.factorForRulesets.put(name, l);
+            }
+        }
+    }
+
+}
+

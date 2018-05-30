@@ -17,36 +17,40 @@ package de.uka.ilkd.key.strategy;
  * Singleton implementation of the <code>RuleAppCost</code> interface, which
  * denotes a maximum cost (rule applications with this cost can't be afforded
  * at all)
+ * <p>
+ * History:
+ * <ul>
+ * <li>weigl: reformated, cleanup (delete hashCode, equals Method)</li>
+ * </ul>
  */
 public class TopRuleAppCost implements RuleAppCost {
+    /**
+     * Singleton Instance.
+     */
+    public static final TopRuleAppCost INSTANCE = new TopRuleAppCost();
 
-    private TopRuleAppCost () {}
+    private TopRuleAppCost() {
+    }
 
+    @Override
     public int compareTo(RuleAppCost o) {
-	if ( o instanceof TopRuleAppCost )
-	    return 0;
-	return 1;
+        if (o instanceof TopRuleAppCost)
+            return 0;
+        return 1;
     }
 
-    public boolean equals(Object o) {
-        if (o instanceof RuleAppCost) {
-            return compareTo((RuleAppCost) o) == 0;
-        }
-        return false;
-    }
-    
-    public int hashCode() {
-        return 91879827;
-    }
-    
-    public final RuleAppCost add (RuleAppCost cost2) {
+    @Override
+    public final RuleAppCost add(RuleAppCost cost2) {
         return INSTANCE;
     }
 
-    public String toString () {
-        return "Costs infinite";
+    @Override
+    public RuleAppCost mul(RuleAppCost cost) {
+        return INSTANCE;
     }
 
-    public static final TopRuleAppCost INSTANCE = new TopRuleAppCost ();
-
+    @Override
+    public String toString() {
+        return "Costs infinite";
+    }
 }

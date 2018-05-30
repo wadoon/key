@@ -13,25 +13,32 @@
 
 package de.uka.ilkd.key.strategy;
 
+import de.uka.ilkd.key.util.Debug;
 import org.key_project.util.LRUCache;
 
-import de.uka.ilkd.key.util.Debug;
+import java.util.Objects;
 
+/**
+ * History:
+ * <ul>
+ * <li>2018-05-30: weigl: add mul(), reimplemented hashCode/equals</li>
+ * </ul>
+ */
 public abstract class NumberRuleAppCost implements RuleAppCost {
 
-    private static final NumberRuleAppCost ZERO_COST = new IntRuleAppCost ( 0 );
+    private static final NumberRuleAppCost ZERO_COST = new IntRuleAppCost(0);
     /**
      * Requires thread save access as multiple proofs may be performed in parallel (Eclipse).
      */
-    private static final LRUCache<Integer,NumberRuleAppCost> cache = new LRUCache<Integer,NumberRuleAppCost>(255);
+    private static final LRUCache<Integer, NumberRuleAppCost> cache = new LRUCache<Integer, NumberRuleAppCost>(255);
 
     public static RuleAppCost getZeroCost() {
         return ZERO_COST;
     }
-    
+
     public static RuleAppCost create(int p_cost) {
-        if ( p_cost == 0 ) return NumberRuleAppCost.getZeroCost();
-        
+        if (p_cost == 0) return NumberRuleAppCost.getZeroCost();
+
         NumberRuleAppCost ac;
         synchronized (cache) { // Ensure thread save access which is required for parallel proofs (e.g. in Eclipse)
             ac = cache.get(p_cost);
@@ -40,77 +47,89 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
             ac = new IntRuleAppCost(p_cost);
             cache.put(p_cost, ac);
         }
-        
+
         return ac;
     }
-    
+
     public static RuleAppCost create(long p_cost) {
-        
-        if ( p_cost <= Integer.MAX_VALUE && p_cost >= Integer.MIN_VALUE) {
-            return create ((int) p_cost);
-        }        
-        
-        return new LongRuleAppCost ( p_cost );
+
+        if (p_cost <= Integer.MAX_VALUE && p_cost >= Integer.MIN_VALUE) {
+            return create((int) p_cost);
+        }
+
+        return new LongRuleAppCost(p_cost);
     }
-    
+
     /**
      * returns the cost
      */
     public abstract long getValue();
 
-
     @Override
     public int compareTo(RuleAppCost o) {
-        if ( o instanceof TopRuleAppCost )
+        if (o instanceof TopRuleAppCost)
             return -1;
-        return compareTo((NumberRuleAppCost)o);
-    }
-    
-    
-    public int compareTo(NumberRuleAppCost c) {
-        final long this_cost = getValue();
-        final long other_cost = c.getValue(); 
-        return (this_cost<other_cost ? -1 : (this_cost==other_cost ? 0 : 1));
+        return compareTo((NumberRuleAppCost) o);
     }
 
-    
-    
-    public boolean equals(Object o) {
-        if (o instanceof RuleAppCost) { 
-            return compareTo ( (RuleAppCost) o ) == 0;
-        }
-        return false;
+    //weigl: this does not work for Java containers!
+    public int compareTo(NumberRuleAppCost c) {
+        final long this_cost = getValue();
+        final long other_cost = c.getValue();
+        return Long.compare(this_cost, other_cost);
+        //this_cost < other_cost ? -1 : (this_cost == other_cost ? 0 : 1));
     }
-    
-    public int hashCode() {
-        return (int)getValue();
-    }
-    
-    public final RuleAppCost add (RuleAppCost cost2) {
-        if ( cost2 instanceof NumberRuleAppCost ) {
+
+    public final RuleAppCost add(RuleAppCost cost2) {
+        if (cost2 instanceof NumberRuleAppCost) {
             return add((NumberRuleAppCost) cost2);
-        } else if ( cost2 instanceof TopRuleAppCost ) {
+        } else if (cost2 instanceof TopRuleAppCost) {
             return TopRuleAppCost.INSTANCE;
         } else {
-            Debug.fail ( "Can't add costs of class " + cost2.getClass () );
+            Debug.fail("Can't add costs of class " + cost2.getClass());
             // Should not be reached
             return null;
         }
     }
 
     public final RuleAppCost add(NumberRuleAppCost cost2) {
-        if ( getValue() == 0 ) {
+        if (getValue() == 0) {
             return cost2;
-        } else if ( cost2.getValue() == 0 ) {
+        } else if (cost2.getValue() == 0) {
             return this;
         } else {
-            return NumberRuleAppCost.create ( getValue() + cost2 .getValue() );
+            return NumberRuleAppCost.create(getValue() + cost2.getValue());
         }
     }
 
     @Override
     public String toString() {
-        return ""+getValue();
+        return Long.toString(getValue());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null /*|| getClass() != o.getClass()*/) return false;
+        LongRuleAppCost that = (LongRuleAppCost) o;
+        return getValue() == that.getValue();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getValue());
+    }
+
+    @Override
+    public RuleAppCost mul(RuleAppCost cost) {
+        if (cost instanceof TopRuleAppCost) {
+            return cost.mul(this);
+        }
+        if (cost instanceof NumberRuleAppCost) {
+            NumberRuleAppCost numberRuleAppCost = (NumberRuleAppCost) cost;
+            return create(getValue() * numberRuleAppCost.getValue());
+        }
+        throw new IllegalArgumentException();
     }
 
     /**
@@ -122,12 +141,12 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
 
         private final long cost;
 
-        protected LongRuleAppCost ( long p_cost ) {
+        protected LongRuleAppCost(long p_cost) {
             cost = p_cost;
         }
 
         @Override
-        public final long getValue () {
+        public final long getValue() {
             return cost;
         }
     }
@@ -141,7 +160,7 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
             this.cost = p_cost;
         }
 
-     
+
         @Override
         public
         final long getValue() {
