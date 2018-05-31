@@ -7,7 +7,6 @@ import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.strategy.Strategy;
 import org.key_project.util.collection.ImmutableList;
 
 import javax.swing.*;
@@ -28,6 +27,7 @@ public abstract class ConfigurableProofMacro<Macro extends ProofMacro> extends S
     protected final Macro internal;
 
     protected AdaptableStrategy strategy;
+    protected AdaptableStrategy.RuleNameAndSetAdapter costAdapter;
 
     public ConfigurableProofMacro(Macro internal) {
         this.internal = internal;
@@ -74,6 +74,8 @@ public abstract class ConfigurableProofMacro<Macro extends ProofMacro> extends S
     protected AdaptableStrategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
         if (this.strategy == null) {
             this.strategy = new AdaptableStrategy(proof.getActiveStrategy());
+            this.costAdapter = new AdaptableStrategy.RuleNameAndSetAdapter();
+            this.strategy.costAdapter = this.costAdapter;
         }
         return this.strategy;
     }
@@ -116,20 +118,39 @@ public abstract class ConfigurableProofMacro<Macro extends ProofMacro> extends S
     }
 
     private void updateStrategyDialog(Proof proof) {
+        createStrategy(proof, null);
+
         JPanel panel = new JPanel(new BorderLayout());
         JTabbedPane tabbedPane = new JTabbedPane();
 
-        JTable tacletFactor = new JTable(new TacletFactorModel(proof));
+        List<Taclet> taclets = findTaclets(proof);
+        List<String> tacletNames = findTaclets(proof).stream()
+                .map(Taclet::name)
+                .map(Object::toString)
+                .sorted()
+                .distinct()
+                .collect(Collectors.toList());
+
+        List<String> ruleSetNames = taclets.stream()
+                .flatMap(t -> t.getRuleSets().stream())
+                .map(RuleSet::name)
+                .map(Object::toString)
+                .sorted()
+                .distinct()
+                .collect(Collectors.toList());
+
+
+        JTable tacletFactor = new JTable(new TacletCostModel(tacletNames, costAdapter.ruleName));
         tabbedPane.addTab("Taclet Factor", new JScrollPane(tacletFactor));
 
 
-        JTable ruleSetFactor = new JTable(new RuleSetFactorModel(proof));
+        JTable ruleSetFactor = new JTable(new TacletCostModel(ruleSetNames, costAdapter.ruleSet));
         tabbedPane.addTab("RuleSet Factor", new JScrollPane(ruleSetFactor));
 
         panel.add(tabbedPane);
         JDialog dialog = new JDialog((Dialog) null, "Change Strategy Settings (locally)", true);
         dialog.setContentPane(panel);
-        dialog.setSize(300,600);
+        dialog.setSize(300, 600);
 
         JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton btnOk = new JButton("Run");
@@ -141,28 +162,24 @@ public abstract class ConfigurableProofMacro<Macro extends ProofMacro> extends S
         dialog.setVisible(true);
     }
 
-    private class TacletFactorModel extends AbstractTableModel {
-        private final AdaptableStrategy strategy;
-        public List<String> tacletNames = new ArrayList<>();
 
+    private class TacletCostModel extends AbstractTableModel {
+        private final AdaptableStrategy.SetBasedCostAdapter<String> costAdapter;
+        private final List<String> keys;
 
-        public TacletFactorModel(Proof p) {
-            this.strategy = createStrategy(p, null);
-            tacletNames = findTaclets(p).stream().map(t -> t.name()
-                    .toString())
-                    .sorted(String.CASE_INSENSITIVE_ORDER)
-                    .distinct()
-                    .collect(Collectors.toList());
+        public TacletCostModel(List<String> keys, AdaptableStrategy.SetBasedCostAdapter<String> ruleSet) {
+            this.keys = keys;
+            costAdapter = ruleSet;
         }
 
         @Override
         public int getRowCount() {
-            return tacletNames.size();
+            return keys.size();
         }
 
         @Override
         public int getColumnCount() {
-            return 2;
+            return 3;
         }
 
         @Override
@@ -172,6 +189,8 @@ public abstract class ConfigurableProofMacro<Macro extends ProofMacro> extends S
                     return "Taclet";
                 case 1:
                     return "Cost Factor";
+                case 2:
+                    return "Cost Summand";
                 default:
                     return "";
             }
@@ -183,6 +202,7 @@ public abstract class ConfigurableProofMacro<Macro extends ProofMacro> extends S
                 case 0:
                     return String.class;
                 case 1:
+                case 2:
                     return Integer.class;
                 default:
                     return Object.class;
@@ -191,18 +211,20 @@ public abstract class ConfigurableProofMacro<Macro extends ProofMacro> extends S
 
         @Override
         public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return columnIndex == 1;
+            return columnIndex == 1 || columnIndex == 2;
         }
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
             try {
-                String name = tacletNames.get(rowIndex);
+                String name = keys.get(rowIndex);
                 switch (columnIndex) {
                     case 0:
                         return name;
                     case 1:
-                        return strategy.factorForRuleNames.getOrDefault(name, 1L);
+                        return costAdapter.factorMap.getOrDefault(name, 1L);
+                    case 2:
+                        return costAdapter.summandMap.getOrDefault(name, 0L);
                 }
             } catch (IndexOutOfBoundsException e) {
                 e.printStackTrace();
@@ -212,84 +234,12 @@ public abstract class ConfigurableProofMacro<Macro extends ProofMacro> extends S
 
         @Override
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            String name = keys.get(rowIndex);
+            long l = Long.parseLong(aValue.toString());
             if (columnIndex == 1) {
-                String name = tacletNames.get(rowIndex);
-                long l = Long.parseLong(aValue.toString());
-                strategy.factorForRuleNames.put(name, l);
-            }
-        }
-    }
-
-    private class RuleSetFactorModel extends AbstractTableModel {
-        public List<String> ruleSetNames = new ArrayList<>();
-
-        public RuleSetFactorModel(Proof p) {
-            ruleSetNames = findTaclets(p).stream()
-                    .flatMap(t -> t.getRuleSets().stream())
-                    .map(RuleSet::name)
-                    .map(Object::toString)
-                    .sorted()
-                    .distinct()
-                    .collect(Collectors.toList());
-        }
-
-        @Override
-        public int getRowCount() {
-            return ruleSetNames.size();
-        }
-
-        @Override
-        public int getColumnCount() {
-            return 2;
-        }
-
-        @Override
-        public String getColumnName(int columnIndex) {
-            switch (columnIndex) {
-                case 0:
-                    return "Rule Set";
-                case 1:
-                    return "Cost Factor";
-                default:
-                    return "";
-            }
-        }
-
-        @Override
-        public Class<?> getColumnClass(int columnIndex) {
-            switch (columnIndex) {
-                case 0:
-                    return String.class;
-                case 1:
-                    return Long.class;
-                default:
-                    return Object.class;
-            }
-        }
-
-        @Override
-        public boolean isCellEditable(int rowIndex, int columnIndex) {
-            return columnIndex == 1;
-        }
-
-        @Override
-        public Object getValueAt(int rowIndex, int columnIndex) {
-            String name = ruleSetNames.get(rowIndex);
-            switch (columnIndex) {
-                case 0:
-                    return name;
-                case 1:
-                    return strategy.factorForRulesets.getOrDefault(name, 1L);
-            }
-            return null;
-        }
-
-        @Override
-        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-            if (columnIndex == 1) {
-                String name = ruleSetNames.get(rowIndex);
-                long l = Long.parseLong(aValue.toString());
-                strategy.factorForRulesets.put(name, l);
+                costAdapter.factorMap.put(name, l);
+            } else {
+                costAdapter.summandMap.put(name, l);
             }
         }
     }
