@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -24,200 +23,188 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.Strategy;
 
 /**
- * Macro for test generation which perform double symbolic execution 
- * (include loop unwinding for multiple loops).
+ * Macro for test generation which perform double symbolic execution for noninterference-proofs
+ * (include loop unwinding for multiple loops)
  * @author Muessig
  *
  */
 public class TestGenInfoFlowMacro extends StrategyProofMacro {
-	
-	private static class TestGenInfoFlowStrategy extends FilterStrategy{
 
-		private static final Name NAME = new Name(
-		        TestGenInfoFlowStrategy.class.getSimpleName());
-		private static final Set<String> unwindRules;
-		private static final int UNWIND_COST = 1000;
-		private final int limitPerLoop;
-		private static HashMap<Integer, SourceElement> nodeJavaBlockMap;
-		
-		static {
-			nodeJavaBlockMap = new HashMap<Integer, SourceElement>();
-		}
-		
-		static {
-			unwindRules = new HashSet<String>();
-			TestGenInfoFlowStrategy.unwindRules.add("loopUnwind");
-			TestGenInfoFlowStrategy.unwindRules.add("doWhileUnwind");
-			TestGenInfoFlowStrategy.unwindRules.add("methodCall");
-			TestGenInfoFlowStrategy.unwindRules.add("methodCallWithAssignment");
-			TestGenInfoFlowStrategy.unwindRules.add("staticMethodCall");
-			TestGenInfoFlowStrategy.unwindRules.add("staticMethodCallWithAssignment");
-		}
+    private static class TestGenInfoFlowStrategy extends FilterStrategy {
 
-		private static boolean isUnwindRule(Rule rule) {
-			if (rule == null) {
-				return false;
-			}
-			final String name = rule.name().toString();
-			return TestGenInfoFlowStrategy.unwindRules.contains(name);
-		}
+        private static final Name NAME = new Name(TestGenInfoFlowStrategy.class.getSimpleName());
+        private static final Set<String> UNWIND_RULES;
+        private static final int UNWIND_COST = 1000;
+        private static HashMap<Integer, SourceElement> nodeJavaBlockMap;
+        private final int limitPerLoop;
 
-		public TestGenInfoFlowStrategy(Strategy delegate) {
-			super(delegate);
-			limitPerLoop = ProofIndependentSettings.DEFAULT_INSTANCE
-			        .getTestGenerationSettings().getMaximalUnwinds();
-		}
+        static {
+            nodeJavaBlockMap = new HashMap<Integer, SourceElement>();
+        }
 
-		@Override
-		public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
-		        Goal goal) {
-			if (TestGenInfoFlowStrategy.isUnwindRule(app.rule())) {
-				return NumberRuleAppCost.create(TestGenInfoFlowStrategy.UNWIND_COST);
-			}
-			return super.computeCost(app, pio, goal);
-		}
-		
-		
-		private int computeUnwindRules(Goal goal, PosInOccurrence pio, RuleApp appGoal) {
-			JavaBlock currentBlock = null;
-			
-			//search for the programm element
-			if (pio.subTerm().javaBlock().isEmpty()) {
-				for (Term t : pio.subTerm().subs()) {
-					if (!t.javaBlock().isEmpty()) {
-						currentBlock = t.javaBlock();
-						break;
-					}
-				}
-			} else {
-				currentBlock = pio.subTerm().javaBlock();
-			}
-			if(currentBlock == null) {
-				System.out.println("Warning: java block not found");
-				currentBlock = pio.subTerm().javaBlock();
-			}
-			
-			Node currentNode = goal.node();
-			int unwindings = 0;
-			SourceElement element = currentBlock.program().getFirstElementIncludingBlocks();
-			if (appGoal.rule().name().toString().equals("loopUnwind") || appGoal.rule().name().toString().equals("doWhileUnwind")) {
-				String whileString = element.toString();
-				//filter the javaBlock (get the loop)
-				while (!whileString.startsWith("while")) {
-					element = element.getFirstElementIncludingBlocks();
-					whileString = element.toString();
-				}
-			}
-			
-			//TODO maybe add the same thing for doWhileLoops ?
-                
-            //remember every javaBlock with unwind rule node
+        static {
+            UNWIND_RULES = new HashSet<String>();
+            TestGenInfoFlowStrategy.UNWIND_RULES.add("loopUnwind");
+            TestGenInfoFlowStrategy.UNWIND_RULES.add("doWhileUnwind");
+            TestGenInfoFlowStrategy.UNWIND_RULES.add("methodCall");
+            TestGenInfoFlowStrategy.UNWIND_RULES.add("methodCallWithAssignment");
+            TestGenInfoFlowStrategy.UNWIND_RULES.add("staticMethodCall");
+            TestGenInfoFlowStrategy.UNWIND_RULES.add("staticMethodCallWithAssignment");
+        }
+
+        public TestGenInfoFlowStrategy(Strategy delegate) {
+            super(delegate);
+            limitPerLoop = ProofIndependentSettings.DEFAULT_INSTANCE.
+                    getTestGenerationSettings().getMaximalUnwinds();
+        }
+
+        private static boolean isUnwindRule(Rule rule) {
+            if (rule == null) {
+                return false;
+            }
+            final String name = rule.name().toString();
+            return TestGenInfoFlowStrategy.UNWIND_RULES.contains(name);
+        }
+
+        @Override
+        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+            if (TestGenInfoFlowStrategy.isUnwindRule(app.rule())) {
+                return NumberRuleAppCost.create(TestGenInfoFlowStrategy.UNWIND_COST);
+            }
+            return super.computeCost(app, pio, goal);
+        }
+
+        private int computeUnwindRules(Goal goal, PosInOccurrence pio, RuleApp appGoal) {
+            JavaBlock currentBlock = null;
+
+            // search for the programm element
+            if (pio.subTerm().javaBlock().isEmpty()) {
+                for (Term t : pio.subTerm().subs()) {
+                    if (!t.javaBlock().isEmpty()) {
+                        currentBlock = t.javaBlock();
+                        break;
+                    }
+                }
+            } else {
+                currentBlock = pio.subTerm().javaBlock();
+            }
+            if (currentBlock == null) {
+                System.out.println("Warning: java block not found");
+                currentBlock = pio.subTerm().javaBlock();
+            }
+
+            Node currentNode = goal.node();
+            int unwindings = 0;
+            SourceElement element = currentBlock.program().getFirstElementIncludingBlocks();
+            if (appGoal.rule().name().toString().equals("loopUnwind")
+                    || appGoal.rule().name().toString().equals("doWhileUnwind")) {
+                String whileString = element.toString();
+                // filter the javaBlock (get the loop)
+                while (!whileString.startsWith("while")) {
+                    element = element.getFirstElementIncludingBlocks();
+                    whileString = element.toString();
+                }
+            }
+
+            // TODO maybe add the same thing for doWhileLoops ?
+
+            // remember every javaBlock with unwind rule node
             nodeJavaBlockMap.put(currentNode.serialNr(), element);
-            
-			//now count number of unwind rules with same java block 
-			while(!currentNode.root()) {
-				RuleApp app = currentNode.getAppliedRuleApp();
-				if (app != null) {
-					if(isUnwindRule(app.rule())) {
-						SourceElement currentElement = nodeJavaBlockMap.get(currentNode.serialNr());
-						if(element.equals(currentElement)) {
-							++unwindings;
-						}
-					}
-				}
-				currentNode = currentNode.parent();
-			}
-			return unwindings;
-			
-		}
-		
-		@Override
-		public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-			
-			if (!TestGenInfoFlowMacro.hasModality(goal.node())) {
-				return false;
-			}
 
-			if (TestGenInfoFlowStrategy.isUnwindRule(app.rule())) {
-				if (limitPerLoop == 0) {
-					return false;
-				}
-				int unwindings = computeUnwindRules(goal, pio, app);
-				//check the number of unwindings for the current loop
-				if (unwindings >= limitPerLoop) {
-					return false;
-				} else {
-					return true;
-				}
-			} else {
-				return super.isApprovedApp(app, pio, goal);
-			}
-			
-		}
-		
+            // now count number of unwind rules with same java block
+            while (!currentNode.root()) {
+                RuleApp app = currentNode.getAppliedRuleApp();
+                if (app != null) {
+                    if (isUnwindRule(app.rule())) {
+                        SourceElement currentElement = nodeJavaBlockMap.get(currentNode.serialNr());
+                        if (element.equals(currentElement)) {
+                            ++unwindings;
+                        }
+                    }
+                }
+                currentNode = currentNode.parent();
+            }
+            return unwindings;
+
+        }
+
+        @Override
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
+
+            if (!TestGenInfoFlowMacro.hasModality(goal.node())) {
+                return false;
+            }
+
+            if (TestGenInfoFlowStrategy.isUnwindRule(app.rule())) {
+                if (limitPerLoop == 0) {
+                    return false;
+                }
+                int unwindings = computeUnwindRules(goal, pio, app);
+                return !(unwindings >= limitPerLoop);
+            }
+            return super.isApprovedApp(app, pio, goal);
 
 
+        }
 
-		@Override
-		public Name name() {
-			return TestGenInfoFlowStrategy.NAME;
-		}
+        @Override
+        public Name name() {
+            return TestGenInfoFlowStrategy.NAME;
+        }
 
-      @Override
-      public boolean isStopAtFirstNonCloseableGoal() {
-         return false;
-      }
-	}
-	
-	/*
-	 * find a modality term in a node
-	 */
-	private static boolean hasModality(Node node) {
-		final Sequent sequent = node.sequent();
-		for (final SequentFormula sequentFormula : sequent) {
-			if (TestGenInfoFlowMacro.hasModality(sequentFormula.formula())) {
-				return true;
-			}
-		}
-		return false;
-	}
+        @Override
+        public boolean isStopAtFirstNonCloseableGoal() {
+            return false;
+        }
+    }
 
-	/*
-	 * recursively descent into the term to detect a modality.
-	 */
-	private static boolean hasModality(Term term) {
-		if (term.op() instanceof Modality) {
-			return true;
-		}
-		for (final Term sub : term.subs()) {
-			if (TestGenInfoFlowMacro.hasModality(sub)) {
-				return true;
-			}
-		}
-		return false;
-	}
-	
+    /*
+     * find a modality term in a node
+     */
+    private static boolean hasModality(Node node) {
+        final Sequent sequent = node.sequent();
+        for (final SequentFormula sequentFormula : sequent) {
+            if (TestGenInfoFlowMacro.hasModality(sequentFormula.formula())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	public String getName() {
-		return "TestGen (multiple finite loop unwinding for double symbolic execution)";
-	}
+    /*
+     * recursively descent into the term to detect a modality.
+     */
+    private static boolean hasModality(Term term) {
+        if (term.op() instanceof Modality) {
+            return true;
+        }
+        for (final Term sub : term.subs()) {
+            if (TestGenInfoFlowMacro.hasModality(sub)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	@Override
-	public String getCategory() {
-		// TODO Auto-generated method stub
-		
-		return null;
-	}
+    public String getName() {
+        return "TestGen (multiple finite loop unwinding for double symbolic execution)";
+    }
 
-	@Override
-	public String getDescription() {
-		return "Finish symbolic execution with multiple restrict loop unwindings.";
-	}
+    @Override
+    public String getCategory() {
+        // TODO Auto-generated method stub
 
-	@Override
-	protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
-		return new TestGenInfoFlowStrategy(proof
-		        .getActiveStrategy());
-	}
+        return null;
+    }
+
+    @Override
+    public String getDescription() {
+        return "Finish symbolic execution with multiple restrict loop unwindings.";
+    }
+
+    @Override
+    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+        return new TestGenInfoFlowStrategy(proof.getActiveStrategy());
+    }
 
 }

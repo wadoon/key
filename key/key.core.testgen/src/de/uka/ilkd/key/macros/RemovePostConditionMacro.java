@@ -14,89 +14,92 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
+/**
+ * KeY macro for removing the postcondition in noninterference-proofs
+ * @author Muessig
+ *
+ */
 public final class RemovePostConditionMacro extends StrategyProofMacro {
-	
-	private static class RemovePostconditionStrategy extends FilterStrategy{
 
-		private static final Name NAME = new Name(
-				RemovePostconditionStrategy.class.getSimpleName());
-		private static final Set<String> removeRules;
-		private static final int maxImpRight = 1;
-		
-		static {
-			removeRules = new HashSet<String>();
-			RemovePostconditionStrategy.removeRules.add("impRight");
-			RemovePostconditionStrategy.removeRules.add("hide_right");
-		}
+    private static class RemovePostconditionStrategy extends FilterStrategy {
 
-		private static boolean isRemoveRule(Rule rule) {
-			if (rule == null) {
-				return false;
-			}
-			final String name = rule.name().toString();
-			return RemovePostconditionStrategy.removeRules.contains(name);
-		}
+        private static final Name NAME =
+                new Name(RemovePostconditionStrategy.class.getSimpleName());
+        private static final Set<String> removeRules;
 
-		public RemovePostconditionStrategy(Strategy delegate) {
-			super(delegate);
-		}
+        static {
+            removeRules = new HashSet<String>();
+            RemovePostconditionStrategy.removeRules.add("impRight");
+            RemovePostconditionStrategy.removeRules.add("hide_right");
+        }
 
-		@Override
-		public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
-		        Goal goal) {
-			if (RemovePostconditionStrategy.isRemoveRule(app.rule())) {
-				if (app.rule().name().toString().equals("hide_right")) {
-					return NumberRuleAppCost.create(100);
-				}
-				return NumberRuleAppCost.create(10);
-			} else {
-				return TopRuleAppCost.INSTANCE;
-			}
-//			return super.computeCost(app, pio, goal);
-		}
-		
-		@Override
-		public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-			
-			if (RemovePostconditionStrategy.isRemoveRule(app.rule())) {
-				return true;
-			} else {
-				return false;
-			}
-			
-		}
+        public RemovePostconditionStrategy(Strategy delegate) {
+            super(delegate);
+        }
 
-		@Override
-		public Name name() {
-			return RemovePostconditionStrategy.NAME;
-		}
+        private static boolean isRemoveRule(Rule rule) {
+            if (rule == null) {
+                return false;
+            }
+            final String name = rule.name().toString();
+            return RemovePostconditionStrategy.removeRules.contains(name);
+        }
 
-      @Override
-      public boolean isStopAtFirstNonCloseableGoal() {
-         return false;
-      }
-	}
 
-	public String getName() {
-		return "remove Postcondition (noninterference Proofs)";
-	}
 
-	@Override
-	public String getCategory() {
-		// TODO Auto-generated method stub
-		
-		return null;
-	}
+        @Override
+        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+            if (RemovePostconditionStrategy.isRemoveRule(app.rule())) {
+                if (app.rule().name().toString().equals("hide_right")) {
+                    return NumberRuleAppCost.create(100);
+                }
+                return NumberRuleAppCost.create(10);
+            } else {
+                return TopRuleAppCost.INSTANCE;
+            }
+            // return super.computeCost(app, pio, goal);
+        }
 
-	@Override
-	public String getDescription() {
-		return "removes the postcondition for noninterference proofs";
-	}
+        @Override
+        public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
 
-	@Override
-	protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
-		return new RemovePostconditionStrategy(proof
-		        .getActiveStrategy());
-	}
+            if (RemovePostconditionStrategy.isRemoveRule(app.rule())) {
+                return true;
+            }
+            return false;
+
+        }
+
+        @Override
+        public Name name() {
+            return RemovePostconditionStrategy.NAME;
+        }
+
+        @Override
+        public boolean isStopAtFirstNonCloseableGoal() {
+            return false;
+        }
+    }
+
+    public String getName() {
+        return "remove Postcondition (noninterference Proofs)";
+    }
+
+    @Override
+    public String getCategory() {
+        // TODO Auto-generated method stub
+
+        return null;
+    }
+
+    @Override
+    public String getDescription() {
+        return "removes the postcondition for noninterference proofs";
+    }
+
+    @Override
+    protected Strategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
+        return new RemovePostconditionStrategy(proof.getActiveStrategy());
+    }
 
 }
