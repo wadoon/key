@@ -37,14 +37,20 @@ import de.uka.ilkd.key.testgen.oracle.OracleUnaryTerm.Op;
  */
 public class OracleGeneratorNoninterference extends OracleGenerator {
 
+    /**
+     * set of primitve data types
+     */
     private Set<String> primitiveTypes;
+    /**
+     * for remembering objects which are already checked for isomorphic
+     */
     private Set<String> newObjectsList;
 
     /**
      *
-     * @param services
-     * @param rflCreator
-     * @param useRFL
+     * @param services {@link Services}
+     * @param rflCreator The {@link ReflectionClassCreator} for the rlf usage
+     * @param useRFL true if rfl will be used for test case generation
      */
     public OracleGeneratorNoninterference(Services services, ReflectionClassCreator rflCreator,
             boolean useRFL) {
@@ -68,6 +74,8 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 
     @Override
     public OracleMethod generateOracleMethod(Term term) {
+        //  newObjectsList = new HashSet<String>();
+        newObjectsList.clear();
         constants = getConstants(term);
         methodArgs = getMethodArgs(term);
         OracleTerm body = generateNoninterferenceOracle(term, false, true, false);
@@ -162,7 +170,7 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
      * @param needPrestate not needed Anymore
      * @return An {@link OracleMethodCall} for the generated oracle method.
      */
-    public OracleTerm generateNoninterferenceOracle(Term term, boolean initialSelect,
+    private OracleTerm generateNoninterferenceOracle(Term term, boolean initialSelect,
             boolean firstCall, boolean needPrestate) {
         Operator op = term.op();
 
@@ -375,9 +383,7 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
             return OracleConstant.FALSE;
         } else if (term.arity() == 0) {
             return new OracleConstant(name, term.sort());
-        }
-
-        else if (name.endsWith("select")) {
+        } else if (name.endsWith("select")) {
 
             return translateSelect(term, initialSelect, firstCall, needPrestate);
         } else if (name.equals("arr")) {
@@ -452,9 +458,7 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
             OracleTerm sub = generateNoninterferenceOracle(term.sub(0),
                     initialSelect, firstCall, needPrestate);
             return new OracleUnaryTerm(sub, Op.Minus);
-        }
-
-        else if (name.equals("newObjectsIsomorphic")) {
+        } else if (name.equals("newObjectsIsomorphic")) {
             OracleMethod method = createIsomorphicOracleMethod(term,
                     initialSelect/* not needed */);
             if (method == null) {

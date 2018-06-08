@@ -26,7 +26,7 @@ import de.uka.ilkd.key.testgen.oracle.OracleMethodCall;
 public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
 
     /**
-     * Indication for the first execution. 
+     * Indication for the first execution.
      */
     private static final String A_EXECUTION = "_A";
     /**
@@ -203,7 +203,7 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
                 + TAB + oracleMethodCall + NEW_LINE);
     }
 
-    //TODO: method to long. Split into parts for objects, constants and fields
+
     private String generateTestCaseNoninterference(Model m, Heap heap,
             Map<String, Sort> typeInfMap) {
         // m.removeUnnecessaryObjects(); //TODO restore this if necessary
@@ -211,124 +211,13 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
         final List<Assignment> assignments = new LinkedList<Assignment>();
         final StringBuffer result = new StringBuffer();
         if (heap != null) {
-            // create Objects for heap
-            for (final ObjectVal o : heap.getObjects()) {
-                if (o.getName().equals("#o0")) {
-                    continue;
-                }
-                final String type = getSafeType(o.getSort());
-                String right;
-                if (type.endsWith("[]")) {
-                    right = "new " + type.substring(0, type.length() - 2)
-                        + "[" + o.getLength() + "]";
-                } else if (o.getSort() == null || o.getSort().toString().equals("Null")) {
-                    right = "null";
-                } else {
-                    if (useRFL) {
-                        right = "RFL.new" + ReflectionClassCreator.cleanTypeName(type) + "()";
-                        rflCreator.addSort(type);
-                    } else {
-                        right = "new " + type + "()";
-                    }
-                }
-                String objName = createObjectName(o) + getExecutionName(heap.getName());
-                assignments.add(new Assignment(type, objName, right));
-            }
-            // init constants
-            for (final String c : m.getConstants().keySet()) {
-                if (c.equals("self") || isPostName(c)) { // self and post
-                                                         // constants not needed
-                    continue;
-                }
-                String exName = getExecutionName(c);
-                String val = m.getConstants().get(c);
+            generatePreambleObjects(heap, assignments); // create Objects for heap
 
-                if (filterVal(val) && !c.equals("null")
-                        && (exName == getExecutionName(heap.getName().toString()))) {
-                    boolean isObject = false;
-                    String type = "int";
-                    String declType = "int";
-                    if (val.equals("true") || val.equals("false")) {
-                        type = "boolean";
-                    } else if (val.startsWith("#o")) {
-                        isObject = true;
-                        type = this.inferSort(typeInfMap, c);
-                    }
-                    if (isObject) {
-                        declType = NULLABLE + " " + type;
-                    } else {
-                        declType = type;
-                    }
-                    val = translateValueExpression(val);
-                    if (isObject && !val.equals("null")) {
-                        // if the constant name doesn't include the Execution A
-                        // or B do nothing
-                        if (exName.equals("")) {
+            initConstants(heap, m, typeInfMap, assignments); // init constants
 
-                        } else {
-                            val = val + exName;
-                            assignments.add(new Assignment(declType, c, "(" + type + ")" + val));
-                        }
-                    } else {
-                        val = translateValueExpression(val);
-                        assignments.add(new Assignment(declType, c, "(" + type + ")" + val));
-                    }
-                }
-            }
-            // init fields
-            if (heap != null) {
-                for (final ObjectVal o : heap.getObjects()) {
-                    if (o.getName().equals("#o0")
-                            || o.getSort().name().toString().endsWith("Exception")) {
-                        continue;
-                    }
-                    final String receiverObject = createObjectName(o)
-                            + getExecutionName(heap.getName());
-                    for (final String f : o.getFieldvalues().keySet()) {
-                        if (f.contains("<") || f.contains(">")) {
-                            continue;
-                        }
-                        String fieldName = f.substring(f.lastIndexOf(":") + 1);
-                        fieldName = fieldName.replace("|", "");
-                        String val = o.getFieldvalues().get(f);
-                        // final String vType = getTypeOfValue(heap, m, val);
-                        String fieldName2 = f.replace("|", "");
-                        final String vType = this.inferSort(typeInfMap, fieldName2);
-                        rflCreator.addSort(vType); // possible bug if vType
-                                                   // represents an abstract
-                                                   // type or an interface. See:
-                                                   // getSafeType.
-                        boolean fieldisObject = false;
-                        if (val.startsWith("#o")) {
-                            fieldisObject = true;
-                        }
-                        val = translateValueExpression(val);
-                        final String rcObjType = getSafeType(o.getSort());
-                        if (fieldisObject && !val.equals("null")) {
-                            assignments.add(new Assignment(
-                                    new RefEx(rcObjType, receiverObject, vType, fieldName),
-                                    "(" + vType + ")" + val + getExecutionName(heap.getName())));
-                        } else {
-                            assignments.add(new Assignment(
-                                    new RefEx(rcObjType, receiverObject, vType, fieldName),
-                                    "(" + vType + ")" + val));
-                        }
+            initFields(heap, typeInfMap, assignments); // init fields
 
-                    }
-                    if (o.getSort() != null && o.getSort().name().toString().endsWith("[]")) {
-                        String safeType = getSafeType(o.getSort());
-                        String elementType = safeType.substring(0, safeType.length() - 2);
-                        rflCreator.addSort(safeType);
-                        for (int i = 0; i < o.getLength(); i++) {
-                            final String fieldName = "[" + i + "]";
-                            String val = o.getArrayValue(i);
-                            val = translateValueExpression(val);
-                            assignments.add(new Assignment(receiverObject
-                                    + fieldName, "(" + elementType + ")" + val));
-                        }
-                    }
-                }
-            }
+
             for (final Assignment a : assignments) {
                 result.append(NEW_LINE + "   ");
                 result.append(a.toString(useRFL));
@@ -337,4 +226,132 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
         return result.toString();
     }
 
+    private void generatePreambleObjects(Heap heap, List<Assignment> assignments) {
+     // create Objects for heap
+        for (final ObjectVal o : heap.getObjects()) {
+            if (o.getName().equals("#o0")) {
+                continue;
+            }
+            final String type = getSafeType(o.getSort());
+            String right;
+            if (type.endsWith("[]")) {
+                right = "new " + type.substring(0, type.length() - 2)
+                    + "[" + o.getLength() + "]";
+            } else if (o.getSort() == null || o.getSort().toString().equals("Null")) {
+                right = "null";
+            } else {
+                if (useRFL) {
+                    right = "RFL.new" + ReflectionClassCreator.cleanTypeName(type) + "()";
+                    rflCreator.addSort(type);
+                } else {
+                    right = "new " + type + "()";
+                }
+            }
+            String objName = createObjectName(o) + getExecutionName(heap.getName());
+            assignments.add(new Assignment(type, objName, right));
+        }
+    }
+
+    private void initConstants(Heap heap, Model m, Map<String, Sort> typeInfMap,
+            List<Assignment> assignments) {
+        // init constants
+        for (final String c : m.getConstants().keySet()) {
+            if (c.equals("self") || isPostName(c)) { // self and post
+                                                     // constants not needed
+                continue;
+            }
+            String exName = getExecutionName(c);
+            String val = m.getConstants().get(c);
+
+            if (filterVal(val) && !c.equals("null")
+                    && (exName == getExecutionName(heap.getName().toString()))) {
+                boolean isObject = false;
+                String type = "int";
+                String declType = "int";
+                if (val.equals("true") || val.equals("false")) {
+                    type = "boolean";
+                } else if (val.startsWith("#o")) {
+                    isObject = true;
+                    type = this.inferSort(typeInfMap, c);
+                }
+                if (isObject) {
+                    declType = NULLABLE + " " + type;
+                } else {
+                    declType = type;
+                }
+                val = translateValueExpression(val);
+                if (isObject && !val.equals("null")) {
+                    // if the constant name doesn't include the Execution A
+                    // or B do nothing
+                    if (exName.equals("")) {
+
+                    } else {
+                        val = val + exName;
+                        assignments.add(new Assignment(declType, c, "(" + type + ")" + val));
+                    }
+                } else {
+                    val = translateValueExpression(val);
+                    assignments.add(new Assignment(declType, c, "(" + type + ")" + val));
+                }
+            }
+        }
+    }
+
+    private void initFields(Heap heap, Map<String, Sort> typeInfMap,
+            List<Assignment> assignments) {
+     // init fields
+        if (heap != null) {
+            for (final ObjectVal o : heap.getObjects()) {
+                if (o.getName().equals("#o0")
+                        || o.getSort().name().toString().endsWith("Exception")) {
+                    continue;
+                }
+                final String receiverObject = createObjectName(o)
+                        + getExecutionName(heap.getName());
+                for (final String f : o.getFieldvalues().keySet()) {
+                    if (f.contains("<") || f.contains(">")) {
+                        continue;
+                    }
+                    String fieldName = f.substring(f.lastIndexOf(":") + 1);
+                    fieldName = fieldName.replace("|", "");
+                    String val = o.getFieldvalues().get(f);
+                    // final String vType = getTypeOfValue(heap, m, val);
+                    String fieldName2 = f.replace("|", "");
+                    final String vType = this.inferSort(typeInfMap, fieldName2);
+                    rflCreator.addSort(vType); // possible bug if vType
+                                               // represents an abstract
+                                               // type or an interface. See:
+                                               // getSafeType.
+                    boolean fieldisObject = false;
+                    if (val.startsWith("#o")) {
+                        fieldisObject = true;
+                    }
+                    val = translateValueExpression(val);
+                    final String rcObjType = getSafeType(o.getSort());
+                    if (fieldisObject && !val.equals("null")) {
+                        assignments.add(new Assignment(
+                                new RefEx(rcObjType, receiverObject, vType, fieldName),
+                                "(" + vType + ")" + val + getExecutionName(heap.getName())));
+                    } else {
+                        assignments.add(new Assignment(
+                                new RefEx(rcObjType, receiverObject, vType, fieldName),
+                                "(" + vType + ")" + val));
+                    }
+
+                }
+                if (o.getSort() != null && o.getSort().name().toString().endsWith("[]")) {
+                    String safeType = getSafeType(o.getSort());
+                    String elementType = safeType.substring(0, safeType.length() - 2);
+                    rflCreator.addSort(safeType);
+                    for (int i = 0; i < o.getLength(); i++) {
+                        final String fieldName = "[" + i + "]";
+                        String val = o.getArrayValue(i);
+                        val = translateValueExpression(val);
+                        assignments.add(new Assignment(receiverObject
+                                + fieldName, "(" + elementType + ")" + val));
+                    }
+                }
+            }
+        }
+    }
 }
