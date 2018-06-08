@@ -679,6 +679,13 @@ public class TestCaseGenerator {
 	}
 	
 	//for normal testgeneration
+	/**
+	 * Creates the Body of the Testcase. This includes data initialization, MUT calls and oracle call
+	 * @param testMethod The {@link StringBuffer} which includes the current test case we create
+	 * @param m The current {@link Model} for the test case
+	 * @param typeInfMap Map which contains Name and {@link Sort} of program variables
+	 * @param oracleMethodCall the java code for the oracle call as String.
+	 */
 	protected void createTestCaseBody(StringBuffer testMethod, Model m ,Map<String, Sort> typeInfMap, String oracleMethodCall) {
 		testMethod
 		.append("   //Test preamble: creating objects and intializing test data"

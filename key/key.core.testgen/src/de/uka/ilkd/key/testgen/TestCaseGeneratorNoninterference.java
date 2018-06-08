@@ -25,7 +25,13 @@ import de.uka.ilkd.key.testgen.oracle.OracleMethodCall;
  */
 public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
 
+    /**
+     * Indication for the first execution. 
+     */
     private static final String A_EXECUTION = "_A";
+    /**
+     * Indication for the second execution.
+     */
     private static final String B_EXECUTION = "_B";
 
     /**
@@ -37,7 +43,7 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
 
     /**
      * return a String which includes an assertTrue-statement with the oracle call for
-     * informationflow test cases
+     * information flow test cases
      * @param oracleMethods The List which contains the oracle methods
      * @return The assert String which contains the oracle call
      */
@@ -110,7 +116,7 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
     protected String getRemainingConstants(Collection<String> existingConstants,
             Collection<Term> newConstants) {
         String result = "";
-        List<String> constantAlreadyInit = new ArrayList<String>();
+        //List<String> constantAlreadyInit = new ArrayList<String>();
         for (Term c : newConstants) {
             // filter post variables
             if (isPostName(c.toString())) {
@@ -197,7 +203,7 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
                 + TAB + oracleMethodCall + NEW_LINE);
     }
 
-    //TODO: method to long. Split into parts for objects, konstants and fields
+    //TODO: method to long. Split into parts for objects, constants and fields
     private String generateTestCaseNoninterference(Model m, Heap heap,
             Map<String, Sort> typeInfMap) {
         // m.removeUnnecessaryObjects(); //TODO restore this if necessary

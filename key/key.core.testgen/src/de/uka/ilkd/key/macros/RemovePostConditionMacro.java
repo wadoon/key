@@ -23,14 +23,20 @@ public final class RemovePostConditionMacro extends StrategyProofMacro {
 
     private static class RemovePostconditionStrategy extends FilterStrategy {
 
+        /**
+         * name
+         */
         private static final Name NAME =
                 new Name(RemovePostconditionStrategy.class.getSimpleName());
-        private static final Set<String> removeRules;
+        /**
+         * set of rules needed for the macro
+         */
+        private static final Set<String> REMOVE_RULES;
 
         static {
-            removeRules = new HashSet<String>();
-            RemovePostconditionStrategy.removeRules.add("impRight");
-            RemovePostconditionStrategy.removeRules.add("hide_right");
+            REMOVE_RULES = new HashSet<String>();
+            RemovePostconditionStrategy.REMOVE_RULES.add("impRight");
+            RemovePostconditionStrategy.REMOVE_RULES.add("hide_right");
         }
 
         public RemovePostconditionStrategy(Strategy delegate) {
@@ -42,7 +48,7 @@ public final class RemovePostConditionMacro extends StrategyProofMacro {
                 return false;
             }
             final String name = rule.name().toString();
-            return RemovePostconditionStrategy.removeRules.contains(name);
+            return RemovePostconditionStrategy.REMOVE_RULES.contains(name);
         }
 
 

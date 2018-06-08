@@ -32,10 +32,26 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 
     private static class TestGenInfoFlowStrategy extends FilterStrategy {
 
+        /**
+         * name of the macro
+         */
         private static final Name NAME = new Name(TestGenInfoFlowStrategy.class.getSimpleName());
+        /**
+         * set of rules needed for the macro
+         */
         private static final Set<String> UNWIND_RULES;
+        /**
+         * costs for an unwind rule
+         */
         private static final int UNWIND_COST = 1000;
+        /**
+         * hash map with node serialNr and the loop unwound at this node.
+         * Use this to check how often the current loop is unwound
+         */
         private static HashMap<Integer, SourceElement> nodeJavaBlockMap;
+        /**
+         * unwind limit per loop
+         */
         private final int limitPerLoop;
 
         static {
