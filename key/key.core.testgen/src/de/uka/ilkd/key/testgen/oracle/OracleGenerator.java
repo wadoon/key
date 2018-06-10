@@ -470,7 +470,7 @@ public class OracleGenerator {
     }
 	
 
-	private OracleTerm translateQuery(Term term, boolean initialSelect,
+	protected OracleTerm translateQuery(Term term, boolean initialSelect,
 			Operator op) {
 		
 		ProgramMethod pm = (ProgramMethod) op;		
@@ -528,7 +528,7 @@ public class OracleGenerator {
 	
 	
 
-	private OracleTerm translateSelect(Term term, boolean initialSelect) {
+	protected OracleTerm translateSelect(Term term, boolean initialSelect) {
 		Term heap = term.sub(0);	    	
 		OracleTerm heapTerm  = generateOracle(heap, true);	   	
 		
@@ -645,7 +645,7 @@ public class OracleGenerator {
 		
 	}
 	
-	private OracleMethod createInvariantMethod(Sort s, boolean initialSelect){		
+	protected OracleMethod createInvariantMethod(Sort s, boolean initialSelect){		
 		
 		String methodName = getSortInvName(s);
 		
@@ -667,7 +667,7 @@ public class OracleGenerator {
 		
 	}
 	
-	private OracleMethod createIfThenElseMethod(Term term, boolean initialSelect){
+	protected OracleMethod createIfThenElseMethod(Term term, boolean initialSelect){
 			
 		String methodName = generateMethodName();
 		List<OracleVariable> args = new LinkedList<OracleVariable>();
@@ -724,7 +724,7 @@ public class OracleGenerator {
 	}
 	
 	
-	private OracleMethod createQuantifierMethod(Term term, boolean initialSelect){		
+	protected OracleMethod createQuantifierMethod(Term term, boolean initialSelect){		
 		String methodName = generateMethodName();
 		ImmutableArray<QuantifiableVariable> vars = term.varsBoundHere(0);
 		QuantifiableVariable qv = vars.get(0);
