@@ -346,9 +346,16 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
                     for (int i = 0; i < o.getLength(); i++) {
                         final String fieldName = "[" + i + "]";
                         String val = o.getArrayValue(i);
-                        val = translateValueExpression(val);
-                        assignments.add(new Assignment(receiverObject
-                                + fieldName, "(" + elementType + ")" + val));
+                        if (val.startsWith("#o")) {
+                            val = translateValueExpression(val);
+                            assignments.add(new Assignment(receiverObject
+                                    + fieldName, "(" + elementType + ")" + val 
+                                    + getExecutionName(heap.getName())));
+                        } else {
+                            val = translateValueExpression(val);
+                            assignments.add(new Assignment(receiverObject
+                                    + fieldName, "(" + elementType + ")" + val));
+                        }
                     }
                 }
             }

@@ -574,7 +574,6 @@ public class TestCaseGenerator {
 	}
 
 	private Term getPostCondition() {
-		if (info instanceof NoninterferenceProofInfo) System.out.println("komisch");
 		return info.getPostCondition();
 	}
 	
@@ -955,7 +954,9 @@ public class TestCaseGenerator {
 				}
 				val = translateValueExpression(val);
 				assignments.add(new Assignment(declType, c, "("+type+")"+val));
-				if(junitFormat && isObject && isInPrestate(prestate, val)){
+				//isObject maybe wrong here -> oracle method will have the pre version of primitve data types as well
+				//second problem: if value is null -> getPreName(val) will create the value _prenull
+				if(junitFormat && isObject && isInPrestate(prestate, val)){ 
 					assignments.add(new Assignment(declType, getPreName(c), "("+type+")"+getPreName(val)));
 				}
 			}
