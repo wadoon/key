@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
@@ -52,7 +53,7 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
         /**
          * unwind limit per loop
          */
-        private final int limitPerLoop;
+        private int limitPerLoop;
 
         static {
             nodeJavaBlockMap = new HashMap<Integer, SourceElement>();
@@ -92,7 +93,6 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
 
         private int computeUnwindRules(Goal goal, PosInOccurrence pio, RuleApp appGoal) {
             JavaBlock currentBlock = null;
-
             // search for the programm element
             if (pio.subTerm().javaBlock().isEmpty()) {
                 for (Term t : pio.subTerm().subs()) {
@@ -112,17 +112,17 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
             Node currentNode = goal.node();
             int unwindings = 0;
             SourceElement element = currentBlock.program().getFirstElementIncludingBlocks();
-            if (appGoal.rule().name().toString().equals("loopUnwind")
-                    || appGoal.rule().name().toString().equals("doWhileUnwind")) {
+            if (appGoal.rule().name().toString().equals("loopUnwind")) {
                 String whileString = element.toString();
                 // filter the javaBlock (get the loop)
-                while (!whileString.startsWith("while")) {
+                while (!whileString.startsWith("while") && !whileString.startsWith("do")
+                        || appGoal.rule().name().toString().equals("doWhileUnwind")) {
                     element = element.getFirstElementIncludingBlocks();
                     whileString = element.toString();
                 }
             }
 
-            // TODO maybe add the same thing for doWhileLoops ?
+            //TODO check the other unwinding rules
 
             // remember every javaBlock with unwind rule node
             nodeJavaBlockMap.put(currentNode.serialNr(), element);
