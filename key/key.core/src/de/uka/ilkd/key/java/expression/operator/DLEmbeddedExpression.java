@@ -121,11 +121,18 @@ public class DLEmbeddedExpression extends Operator {
                     + " arguments, but received only " + actual);
         }
 
+        ProgramElementName progElemName;
         String name = containingClass.getSort().name().toString();	    
+        if(name.lastIndexOf('.') == -1) {
+            // unqualified ...
+            progElemName = new ProgramElementName(name);
+        } else {
+            // qualified ... (untested and not understood)
         String qualifier = name.lastIndexOf('.') != -1 ? name.substring(0, name.lastIndexOf('.')) : "";
         name = name.substring(name.lastIndexOf('.')+1);
-        TypeRef tr = 
-        		new TypeRef(new ProgramElementName(name, qualifier), 0, null, containingClass);
+            progElemName = new ProgramElementName(name, qualifier);
+        }
+        TypeRef tr = new TypeRef(progElemName, 0, null, containingClass);
         ExecutionContext ec = new ExecutionContext(tr, null, null);
 
         for (int i = 0; i < actual; i++) {
