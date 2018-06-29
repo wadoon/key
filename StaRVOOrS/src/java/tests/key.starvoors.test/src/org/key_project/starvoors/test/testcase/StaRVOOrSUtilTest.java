@@ -110,7 +110,7 @@ public class StaRVOOrSUtilTest extends AbstractStaRVOOrSTest {
          originalTacletOptions = setDefaultTacletOptions(PROJECT_ROOT_DIRECTORY, javaPath, cls, method);
          setOneStepSimplificationEnabled(null, true);
          // Analyze source code
-         StaRVOOrSResult result = StaRVOOrSUtil.start(javaFile, false, true, true);
+         StaRVOOrSResult result = StaRVOOrSUtil.start(javaFile, false, true, true,true);
          // Create oracle file if required
          createOracleFile(result, oraclePath);
          // Compare result with oracle file

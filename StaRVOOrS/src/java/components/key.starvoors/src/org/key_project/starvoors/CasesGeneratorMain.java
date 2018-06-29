@@ -15,13 +15,16 @@ public class CasesGeneratorMain {
    
    public static final String JAVA_DL = "-javadl";
    
+   public static final String STARVOORS = "-starvoors";
+   
+   
    public static void main(String[] args) {
       try {
     	  if (args.length >= 2) {
     		  boolean mode = true;
     		  
     		  for(String arg : args) {
-    			  if (arg.equals("-javadl"))
+    			  if (arg.equals(JAVA_DL))
     				  mode = false;
     		  }
     		  if (mode)
@@ -40,18 +43,23 @@ public class CasesGeneratorMain {
    public static void run(String[] args) throws Exception {	   
         String inputDir  = "", outputDir = "";
         boolean useOperationContracts = true, useLoopInvariants = true;
+        boolean starvoors = false;
         File file,out;
         boolean input = true ;
         
 		for (int i = 0; i < args.length; i++) {		
-			if (args[i].equals("-inline")) {
+			if (args[i].equals(INLINE_METHODS)) {
 				useOperationContracts = false;
 				continue;
 			}			
-			if (args[i].equals("-unroll")) {
+			if (args[i].equals(UNROLL_LOOPS)) {
 				useLoopInvariants = false;
 				continue;
 			}			
+			if (args[i].equals(STARVOORS)) {
+				starvoors = true;
+				continue;
+			}
 			if (input) {				
 				inputDir = args[i];
 			    input = false;
@@ -84,7 +92,7 @@ public class CasesGeneratorMain {
          System.out.println("Analysing the Hoare triple(s)...");
          StaRVOOrSResult result;
          try {
-             result = StaRVOOrSUtil.start(file, false, useOperationContracts, useLoopInvariants);
+             result = StaRVOOrSUtil.start(file, false, useOperationContracts, useLoopInvariants,starvoors);
          }
          catch (ProblemLoaderException e) {
              result = null;
@@ -112,15 +120,15 @@ public class CasesGeneratorMain {
         boolean input = true, output = true ;
        
 		for (int i = 0; i < args.length; i++) {		
-			if (args[i].equals("-inline")) {
+			if (args[i].equals(INLINE_METHODS)) {
 				useOperationContracts = false;
 				continue;
 			}			
-			if (args[i].equals("-unroll")) {
+			if (args[i].equals(UNROLL_LOOPS)) {
 				useLoopInvariants = false;
 				continue;
 			}			
-			if (args[i].equals("-javadl")) {
+			if (args[i].equals(JAVA_DL)) {
 				continue;
 			}			
 			if (input) {				
@@ -166,7 +174,7 @@ public class CasesGeneratorMain {
         StaRVOOrSResult result;
         try {
         	//TODO: Create new start method to analyse dynamic logic formulae.
-            result = StaRVOOrSUtil.start_javadl(file, formulas, false, useOperationContracts, useLoopInvariants);
+            result = StaRVOOrSUtil.start_javadl(file, formulas, false, useOperationContracts, useLoopInvariants,false);
         }
         catch (ProblemLoaderException e) {
             result = null;
