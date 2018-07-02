@@ -37,6 +37,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
@@ -46,6 +47,7 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.model.Model;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.testgen.TestCaseGeneratorNoninterference;
 import de.uka.ilkd.key.util.Debug;
@@ -85,8 +87,10 @@ public abstract class AbstractTestGenerator {
 
     public void generateTestCases(final StopRequest stopRequest, final TestGenerationLog log) {
 
+        
         TestGenerationSettings settings = ProofIndependentSettings.
                 DEFAULT_INSTANCE.getTestGenerationSettings();
+       
 
         boolean includePostcondition = settings.includePostCondition();
 
@@ -107,12 +111,13 @@ public abstract class AbstractTestGenerator {
         // macro removing post condition for informationflow tests
         if (!includePostcondition && isNoninterferenceProof) {
             log.writeln("Applying remove postcondition Macro (remove postcondition from proof)...");
-            if (originalProof.openEnabledGoals().size() > 1) {
+            if (originalProof.openEnabledGoals().size() > 1 
+                    || originalProof.openGoals().head().node() != originalProof.root()) {//TODO check second if condition
                 log.writeln(
-                        "did not remove postcondition, because already "
-                        + "removed and symbolic execution is already done");
+                        "did not remove postcondition: symbolic execution is already started");
                 log.writeln("please reload proof if you want to "
                         + "change the include postcondition option");
+                return;
             } else {
                 RemovePostConditionMacro macro = new RemovePostConditionMacro();
                 try {
@@ -131,10 +136,28 @@ public abstract class AbstractTestGenerator {
                 // old macro
                 // TestGenMacro macro = new TestGenMacro();
 
+
+                //set the StrategyProperty for Method inlining !
+//                StrategyProperties currentStrategyProperties = originalProof.getSettings()
+//                        .getStrategySettings().getActiveStrategyProperties();
+//                currentStrategyProperties.setProperty(StrategyProperties.METHOD_OPTIONS_KEY, StrategyProperties.METHOD_EXPAND);
+//                originalProof.getSettings().getStrategySettings().setActiveStrategyProperties(currentStrategyProperties);
+//                System.out.println(currentStrategyProperties);
+                //siehe weiter unten
+                
+//                StrategyProperties.setDefaultStrategyProperties(currentStrategyCopy, false, false, false, false, false, false); //TODO does not work because
+//                originalProof.getSettings().getStrategySettings()
+//                    .setActiveStrategyProperties(currentStrategyCopy);                                                                       // first argument is just a copy not the reference !!
+//                System.out.println(originalProof.getSettings().getStrategySettings().getActiveStrategyProperties().stringPropertyNames());
+//                ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(currentStrategyCopy);
+//                ProofSettings.DEFAULT_SETTINGS.update(currentStrategyCopy);
+//                originalProof.getSettings().update(currentStrategyCopy);
+                
                 // new macro for multiple loops (work for noninterference-proofs as well)
                 TestGenInfoFlowMacro macro = new TestGenInfoFlowMacro();
                 // Strategy backupStrategy = originalProof.getActiveStrategy();
                 // ProofSettings backupSettings = originalProof.getSettings();
+
 
                 macro.applyTo(ui, originalProof, originalProof.openEnabledGoals(), null, null);
 

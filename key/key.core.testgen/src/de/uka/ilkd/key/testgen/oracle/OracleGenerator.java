@@ -10,7 +10,6 @@ import java.util.Set;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.expression.operator.adt.AllObjects;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
@@ -19,7 +18,6 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -29,8 +27,6 @@ import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.smt.NumberTranslation;
-import de.uka.ilkd.key.smt.model.Heap;
-import de.uka.ilkd.key.strategy.feature.LeftmostNegAtomFeature;
 import de.uka.ilkd.key.testgen.ReflectionClassCreator;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.testgen.oracle.OracleUnaryTerm.Op;
@@ -348,8 +344,10 @@ public class OracleGenerator {
 			
 			//System.out.println(services.getVariableNamer().getRenamingMap());
 			
+
 			LocationVariable loc = (LocationVariable) var;
 			return new OracleConstant(loc.name().toString(), loc.sort());
+
 		}
 		
 		else{
