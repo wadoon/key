@@ -68,6 +68,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
+import de.uka.ilkd.key.speclang.translation.SLExpression;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -2256,5 +2257,10 @@ public class TermBuilder {
                                                                      // elsewhere
                         heap1_pre, heap1_post, locset1, heap2_pre, heap2_post,
                         locset2);
+    }
+
+    public Term arrayIndices(Term term) {
+        Function f = services.getNamespaces().functions().lookup("arrayIndices");
+        return func(f, term);
     }
 }

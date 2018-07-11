@@ -830,6 +830,7 @@ createLocset returns [Term result = null] throws SLTranslationException
     (LOCSET | SINGLETON) LPAREN list=exprList RPAREN
     {
         result = translator.translate("create locset", Term.class, list, services);
+        // if kexword == singleton ensure that result IS a singleton.
     }
     ;
 
@@ -885,13 +886,25 @@ predicate returns [Term result=null] throws SLTranslationException
 
 expression returns [SLExpression ret=null] throws SLTranslationException
 :
-    result=conditionalexpr
+    result=fromtoexpression
     {
         if(!result.isTerm()) {
             raiseError("Expected a term: " + result);
         }
         ret = result;
     }
+    ;
+
+fromtoexpression returns [SLExpression ret=null] throws SLTranslationException
+@after{ret=result;}
+:
+    result=conditionalexpr
+    (
+        DOTDOT a=conditionalexpr
+        {
+            result = translator.translate(JMLTranslator.JMLKeyWord.DOTDOT, services, result, a);
+        }
+    )? 
     ;
 
 conditionalexpr returns [SLExpression ret=null] throws SLTranslationException
@@ -1467,7 +1480,14 @@ primarysuffix[SLExpression receiver, String fullyQualifiedName]
         } else {
             lookupName = id.getText();
         }
-        try {
+
+        // TODO hack for ".indices"
+        if (receiver != null && receiver.getTerm().sort().toString().endsWith("]") &&
+            lookupName.equals("indices")) {
+            result = new SLExpression(tb.arrayIndices(receiver.getTerm()));
+        }
+
+        else try {
             result = lookupIdentifier(lookupName, receiver, null, id);
         } catch(SLTranslationException e) {
             result = lookupIdentifier(fullyQualifiedName + "." + lookupName, null, null, id);
@@ -2001,12 +2021,22 @@ specquantifiedexpression returns [SLExpression result = null] throws SLTranslati
     LPAREN
     q=quantifier
     (nullable=boundvarmodifiers)?
-    declVars=quantifiedvardecls SEMI
-    {
+    declVars=quantifiedvardecls {
         resolverManager.pushLocalVariablesNamespace();
         resolverManager.putIntoTopLocalVariablesNamespace(declVars.second, declVars.first);
     }
-    ((predicate SEMI) => p=predicate SEMI | SEMI)?
+    (
+      SEMI ((predicate SEMI) => p=predicate SEMI | SEMI)?
+    |
+      COLON range=expression SEMI
+      {
+        range = translator.translate("quantifierRange", SLExpression.class, 
+                     range.getTerm(), declVars.first, declVars.second, services);
+        p = range.getTerm();
+        p = tb.convertToFormula(p);
+      }
+    )
+
     expr=expression
     {
         resolverManager.popLocalVariablesNamespace();

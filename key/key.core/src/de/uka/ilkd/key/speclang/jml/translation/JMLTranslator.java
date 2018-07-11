@@ -57,6 +57,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.smt.newsmt2.LogicalVariableHandler;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
 import de.uka.ilkd.key.speclang.translation.JavaIntegerSemanticsHelper;
@@ -142,6 +143,7 @@ public final class JMLTranslator {
         NUM_OF ("\\num_of"),
         PRODUCT ("\\product"),
         SUM ("\\sum"),
+        QUANTIFIER_RANGE ("quantifierRange"),
 
         // ADT stuff
         SEQ_DEF ("\\seq_def"),
@@ -167,6 +169,7 @@ public final class JMLTranslator {
         INDEX ("\\index"),
         INDEX_OF ("\\seq_indexOf"),
         SEQ_CONST ("\\seq"),
+        DOTDOT (".."),
         SEQ_GET ("\\seq_get"),
         SEQ_CONCAT ("\\seq_concat"),
         REACH ("reach"),
@@ -819,6 +822,41 @@ public final class JMLTranslator {
 
         });
 
+        // range in quantifiers
+        translationMethods.put(JMLKeyWord.QUANTIFIER_RANGE, new JMLTranslationMethod() {
+
+            @Override
+            public Object translate(SLTranslationExceptionManager excManager,
+                    Object... params) throws SLTranslationException {
+                checkParameters(params,
+                        Term.class, KeYJavaType.class, ImmutableList.class, Services.class);
+                Term range = (Term) params[0];
+                ImmutableList<LogicVariable> variables = (ImmutableList<LogicVariable>) params[2];
+                Services services = (Services) params[3];
+
+                if(variables.size() != 1) {
+                    throw new SLTranslationException("quantifier ranges can only be used for single-variable quantifications");
+                }
+
+//                Function arrayIndexes = services.getNamespaces().functions().lookup("arrayIndexes");
+//                if(range.op() == arrayIndexes) {
+//                    Term array = range.sub(0);
+//                    Term result = tb.and(
+//                                    tb.leq(tb.zero(), variables.head()),
+//                                    tb.lt(variables.head(), tb.dotLength(array)));
+//                    return new SLExpression(result);
+//                }
+
+                Sort seqSort = services.getTypeConverter().getSeqLDT().targetSort();
+                if(range.sort() == seqSort) {
+                    Function seqContains = services.getNamespaces().functions().lookup("seqContains");
+                    Term result = tb.func(seqContains, range, tb.var(variables.head()));
+                    return new SLExpression(result);
+                }
+
+                throw new SLTranslationException("currently, range expressions must be sequences");
+            }});
+
         // primary expressions
         translationMethods.put(JMLKeyWord.INV, new JMLTranslationMethod() {
 
@@ -968,6 +1006,22 @@ public final class JMLTranslator {
                 final KeYJavaType seqtype =
                         services.getJavaInfo().getPrimitiveKeYJavaType("\\seq");
                 return new SLExpression(tb.seq(terms), seqtype);
+            }
+        });
+
+        translationMethods.put(JMLKeyWord.DOTDOT, new JMLTranslationMethod() {
+
+            @Override
+            public Object translate(SLTranslationExceptionManager excManager,
+                                    Object... params)
+                    throws SLTranslationException {
+                checkParameters(params, Services.class, SLExpression.class, SLExpression.class);
+
+                final Services services = (Services) params[0];
+                final Term from = ((SLExpression) params[1]).getTerm();
+                final Term to = ((SLExpression) params[2]).getTerm();
+                final Function seqRange = services.getNamespaces().functions().lookup("seqRange");
+                return new SLExpression(tb.func(seqRange, from, to));
             }
         });
 
