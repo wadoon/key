@@ -214,7 +214,7 @@ public final class StrategyProperties extends Properties {
         DEFAULT_MAP.setProperty(MPS_OPTIONS_KEY, MPS_MERGE);
         DEFAULT_MAP.setProperty(OSS_OPTIONS_KEY, OSS_ON);
         DEFAULT_MAP.setProperty(DEP_OPTIONS_KEY, DEP_ON);
-        DEFAULT_MAP.setProperty(QUERY_OPTIONS_KEY, QUERY_OFF);
+        DEFAULT_MAP.setProperty(QUERY_OPTIONS_KEY, QUERY_RESTRICTED);
         DEFAULT_MAP.setProperty(QUERYAXIOM_OPTIONS_KEY, QUERYAXIOM_ON);
         DEFAULT_MAP.setProperty(NON_LIN_ARITH_OPTIONS_KEY, NON_LIN_ARITH_DEF_OPS);
         DEFAULT_MAP.setProperty(QUANTIFIERS_OPTIONS_KEY,
