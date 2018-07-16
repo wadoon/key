@@ -14,9 +14,10 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.key_project.util.LRUCache;
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSLList;
@@ -38,7 +39,7 @@ class UniTrigger implements Trigger {
     private final boolean onlyUnify;
     private final boolean isElementOfMultitrigger;
    
-    private final LRUCache<Term, ImmutableSet<Substitution>> matchResults = new LRUCache<Term, ImmutableSet<Substitution>> ( 1000 );
+    private final LRUCache<Term, Set<Substitution>> matchResults = new LRUCache<Term, Set<Substitution>> ( 1000 );
     
     UniTrigger(Term trigger,ImmutableSet<QuantifiableVariable> uqvs,
                boolean isUnify,boolean isElementOfMultitrigger,
@@ -50,15 +51,21 @@ class UniTrigger implements Trigger {
         this.triggerSetThisBelongsTo = triggerSetThisBelongsTo;
     }
         
-    public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm, 
+    @Override
+    public Set<Substitution> getSubstitutionsFromTerms(Set<Term> targetTerm, 
             TermServices services) {
-        ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
-        for (Term aTargetTerm : targetTerm) allsubs = allsubs.union(getSubstitutionsFromTerm(aTargetTerm, services));
+        
+        final Set<Substitution> allsubs = new LinkedHashSet<>();
+        
+        for (Term aTargetTerm : targetTerm) { 
+            allsubs.addAll(getSubstitutionsFromTerm(aTargetTerm, services));
+        }
+        
         return allsubs;
     }
 
-    private ImmutableSet<Substitution> getSubstitutionsFromTerm(Term t, TermServices services) {
-        ImmutableSet<Substitution> res = matchResults.get ( t );
+    private Set<Substitution> getSubstitutionsFromTerm(Term t, TermServices services) {
+        Set<Substitution> res = matchResults.get ( t );
         if ( res == null ) {
             res = getSubstitutionsFromTermHelp ( t, services );
             matchResults.put ( t, res );
@@ -66,28 +73,35 @@ class UniTrigger implements Trigger {
         return res;
     }
 
-    private ImmutableSet<Substitution> getSubstitutionsFromTermHelp(Term t, TermServices services) {
-        ImmutableSet<Substitution> newSubs = DefaultImmutableSet.<Substitution>nil();
-        if ( t.freeVars ().size () > 0 || t.op () instanceof Quantifier )
+    private Set<Substitution> getSubstitutionsFromTermHelp(Term t, TermServices services) {
+        final Set<Substitution> newSubs;
+        if ( t.freeVars ().size () > 0 || t.op () instanceof Quantifier ) {
             newSubs = Matching.twoSidedMatching ( this, t, services );
-        else if ( !onlyUnify )
+        } else if ( !onlyUnify ) {
             newSubs = Matching.basicMatching ( this, t );
+        } else {
+            newSubs = new LinkedHashSet<>();
+        }
         return newSubs;
     }
-
-    
+  
     public Term getTriggerTerm() {
         return trigger;
     }
 
+    @Override
     public boolean equals(Object arg0) {
         if (!(arg0 instanceof UniTrigger)) return false;
         final UniTrigger a = (UniTrigger) arg0;
         return a.trigger.equals(trigger);
     }
+
+    @Override
     public int hashCode() {
         return trigger.hashCode();
     }
+    
+    @Override
     public String toString() {
         return "" + trigger;
     }
@@ -109,12 +123,13 @@ class UniTrigger implements Trigger {
      * @param searchTerm
      */
     public static boolean passedLoopTest(Term candidate, Term searchTerm) {
-        final ImmutableSet<Substitution> substs =
+        final Set<Substitution> substs =
             BasicMatching.getSubstitutions ( candidate, searchTerm );
 
         for (Substitution subst1 : substs) {
-            final Substitution subst = subst1;
-            if (containsLoop(subst)) return false;
+            if (containsLoop(subst1)) { 
+                return false;
+            }
         }
         return true;
     }

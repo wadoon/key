@@ -13,12 +13,7 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -29,14 +24,7 @@ import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.*;
 
 /**
  * This class is used to select and store <code>Trigger</code>s 
@@ -53,7 +41,7 @@ public class TriggersSet {
      * with its according trigger */
     private final Map<Term, Trigger> termToTrigger = new LinkedHashMap<Term, Trigger>();
     /**all universal variables of <code>allTerm</code>*/
-    private final ImmutableSet<QuantifiableVariable> uniQuantifiedVariables;
+    private final Set<QuantifiableVariable> uniQuantifiedVariables;
     /**
      * Replacement of the bound variables in <code>allTerm</code> with
      * metavariables and constants
@@ -89,17 +77,25 @@ public class TriggersSet {
      * @param allterm
      * @return return all univesal variables of <code>allterm</code>
      */
-    private ImmutableSet<QuantifiableVariable> getAllUQS(Term allterm) {
-        final Operator op = allterm.op();
-        if (op == Quantifier.ALL) {
-            QuantifiableVariable v =
-                    allterm.varsBoundHere(0).get(0);
-            return getAllUQS(allterm.sub(0)).add(v);
+    private Set<QuantifiableVariable> getAllUQS(Term allterm) {
+        
+        HashSet<QuantifiableVariable> res = new LinkedHashSet<>();
+
+        
+        Term current = allTerm;
+        
+        while (current != null) {
+            final Operator op = current.op();
+            if (op == Quantifier.ALL) {                
+                res.add(allterm.varsBoundHere(0).get(0));
+                current = current.sub(0);
+            } else if (op == Quantifier.EX) {
+                current = current.sub(0);
+            } else {
+                current = null;
+            }
         }
-        if (op == Quantifier.EX) {
-            return getAllUQS(allterm.sub(0));
-        }
-        return DefaultImmutableSet.<QuantifiableVariable>nil();
+        return res;
     }
 
     /**
@@ -186,9 +182,7 @@ public class TriggersSet {
 
         public ClauseTrigger(Term clause) {
             this.clause = clause;
-            selfUQVS = TriggerUtils.intersect(uniQuantifiedVariables, 
-                    clause.freeVars());
-
+            selfUQVS = TriggerUtils.intersect(uniQuantifiedVariables, clause.freeVars());
         }
 
         /**
@@ -440,7 +434,7 @@ public class TriggersSet {
         return replacementWithMVs;
     }
 
-    public ImmutableSet<QuantifiableVariable> getUniQuantifiedVariables() {
+    public Iterable<QuantifiableVariable> getUniQuantifiedVariables() {
         return uniQuantifiedVariables;
     }
 }

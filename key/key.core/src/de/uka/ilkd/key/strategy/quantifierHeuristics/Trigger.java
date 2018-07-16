@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import org.key_project.util.collection.ImmutableSet;
+import java.util.Set;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -26,8 +26,8 @@ public interface Trigger {
      * @return all substitution that found from the targeTerm by matching 
      * this trigger to targeTerm.
      */
-    public abstract ImmutableSet<Substitution> 
-                           getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm, 
+    public abstract Set<Substitution> 
+                           getSubstitutionsFromTerms(Set<Term> targetTerm, 
                                    TermServices services);
     
     public abstract Term getTriggerTerm();

@@ -14,24 +14,15 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
@@ -49,8 +40,7 @@ class Instantiation {
     * Literals occurring in the sequent at hand. This is used for branch
     * prediction
     */
-   private ImmutableSet<Term> assumedLiterals = DefaultImmutableSet
-         .<Term> nil();
+   private LinkedHashSet<Term> assumedLiterals = new LinkedHashSet<>();
 
    /** HashMap from instance(<code>Term</code>) to cost <code>Long</code> */
    private final Map<Term, Long> instancesWithCosts = new LinkedHashMap<Term, Long>();
@@ -85,12 +75,12 @@ class Instantiation {
       return result;
    }
 
-   private static ImmutableSet<Term> sequentToTerms(Sequent seq) {
-      ImmutableList<Term> res = ImmutableSLList.<Term> nil();
+   private static Set<Term> sequentToTerms(Sequent seq) {
+      final Set<Term> res = new LinkedHashSet<>();
       for (final SequentFormula cf : seq) {
-         res = res.prepend(cf.formula());
+         res.add(cf.formula());
       }
-      return DefaultImmutableSet.fromImmutableList(res);
+      return res;
    }
 
    /**
@@ -101,7 +91,7 @@ class Instantiation {
     *            their cost and store the pair of instance (Term) and
     *            cost(Long) in <code>instancesCostCache</code>
     */
-   private void addInstances(ImmutableSet<Term> terms, Services services) {
+   private void addInstances(Set<Term> terms, Services services) {
       for (final Trigger t : triggersSet.getAllTriggers()) {
          for (final Substitution sub : t.getSubstitutionsFromTerms(terms,
                services)) {
@@ -135,9 +125,10 @@ class Instantiation {
 
    private void addInstance(Substitution sub, Services services) {
       final long cost = PredictCostProver.computerInstanceCost(sub,
-            getMatrix(), assumedLiterals, services);
-      if (cost != -1)
+            getMatrix(), (Set<Term>) assumedLiterals.clone(), services);
+      if (cost != -1) {
          addInstance(sub, cost);
+      }
    }
 
    /**
@@ -161,21 +152,28 @@ class Instantiation {
     * @return all literals in antesequent, and all negation of literal in
     *         succedent
     */
-   private ImmutableSet<Term> initAssertLiterals(Sequent seq, TermServices services) {
-      ImmutableList<Term> assertLits = ImmutableSLList.nil();
+   private static LinkedHashSet<Term> initAssertLiterals(Sequent seq, TermServices services) {
+      LinkedHashSet<Term> assertLits = new LinkedHashSet<>();
       for (final SequentFormula cf : seq.antecedent()) {
          final Term atom = cf.formula();
          final Operator op = atom.op();
-         if ( !( op == Quantifier.ALL || op == Quantifier.EX ) )
-            assertLits = assertLits.prepend(atom);
+         if ( !( op == Quantifier.ALL || op == Quantifier.EX ) ) {
+            assertLits.add(atom);
+         }
       }
+      final TermBuilder termBuilder = services.getTermBuilder();
       for (final SequentFormula cf : seq.succedent()) {
          final Term atom = cf.formula();
          final Operator op = atom.op();
-         if ( !( op == Quantifier.ALL || op == Quantifier.EX ) )
-            assertLits = assertLits.prepend(services.getTermBuilder().not(atom));
+         if ( !( op == Quantifier.ALL || op == Quantifier.EX ) ) {
+             if (atom.op() == Junctor.NOT) {
+                 assertLits.add(atom.sub(0));
+             } else {
+                 assertLits.add(termBuilder.not(atom));
+             }
+         }
       }
-      return DefaultImmutableSet.fromImmutableList(assertLits);
+      return assertLits;
    }
 
    /**

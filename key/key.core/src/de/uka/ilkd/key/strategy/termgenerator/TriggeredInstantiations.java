@@ -15,28 +15,18 @@ package de.uka.ilkd.key.strategy.termgenerator;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
@@ -45,11 +35,7 @@ import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.Constraint;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.EqualityConstraint;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.PredictCostProver;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.Substitution;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
 
 public class TriggeredInstantiations implements TermGenerator {
 
@@ -58,8 +44,8 @@ public class TriggeredInstantiations implements TermGenerator {
     }
     
     private Sequent last = Sequent.EMPTY_SEQUENT;
-    private Set<Term> lastCandidates = new HashSet<Term>();
-    private ImmutableSet<Term> lastAxioms = DefaultImmutableSet.<Term>nil();
+    private LinkedHashSet<Term> lastCandidates = new LinkedHashSet<>();
+    private LinkedHashSet<Term> lastAxioms = new LinkedHashSet<>();
     
     private boolean checkConditions;
 
@@ -81,35 +67,29 @@ public class TriggeredInstantiations implements TermGenerator {
             final Services services = goal.proof().getServices();
             final TacletApp tapp = (TacletApp) app;
             final Taclet taclet = tapp.taclet();
-
-            final Set<Term> terms;
-            final Set<Term> axiomSet;
-            ImmutableSet<Term> axioms = DefaultImmutableSet.<Term>nil();
+            
+            final LinkedHashSet<Term> terms;
+            final LinkedHashSet<Term> axioms;
  
             
             final Sequent seq = goal.sequent();
-            if (seq != last) {
-                terms = new HashSet<Term>();
-                axiomSet = new HashSet<Term>();
-                computeAxiomAndCandidateSets(seq, terms, axiomSet, services);
-                for (Term axiom : axiomSet) {
-                    axioms = axioms.add(axiom);
-                }
+            synchronized (this) {
+                if (seq != last) {
+                    terms = new LinkedHashSet<Term>();
+                    axioms = new LinkedHashSet<Term>();
+                    
+                    computeAxiomAndCandidateSets(seq, terms, axioms, services);                    
 
-                synchronized (this) {
                     last = seq;
-                    lastCandidates = terms;
-                    lastAxioms = axioms;
-                }
-            } else {
-                synchronized (this) {
-                    terms = lastCandidates;
-                    axioms = lastAxioms;
+                    lastCandidates =  (LinkedHashSet<Term>) ((LinkedHashSet<Term>)terms).clone();
+                    lastAxioms = (LinkedHashSet<Term>)((LinkedHashSet<Term>)axioms).clone();
+                } else {
+                    terms = (LinkedHashSet<Term>)lastCandidates.clone();
+                    axioms = (LinkedHashSet<Term>)lastAxioms.clone();
                 }
             }
-
+            
             if (taclet.hasTrigger()) {
-
                 final Term comprehension = pos.subTerm();
 
                 if (tapp.uninstantiatedVars().size() <= 1) {
@@ -172,26 +152,29 @@ public class TriggeredInstantiations implements TermGenerator {
             Semisequent antecedent, boolean inAntecedent, TermServices services) {
         
         for (SequentFormula sf : antecedent) {
-            collectTerms(sf.formula(), terms, integerLDT);
-            if (sf.formula().op() instanceof Function || 
-                    sf.formula().op() == Equality.EQUALS) {
-                axioms.add(inAntecedent ? sf.formula() : services.getTermBuilder().not(sf.formula()));
+            final Term formula = sf.formula();
+            final Operator formulaOp = formula.op();
+
+            collectTerms(formula, terms, integerLDT);
+            if (formulaOp instanceof Function || 
+                    formulaOp == Equality.EQUALS) {
+                axioms.add(inAntecedent ? formula : formulaOp == Junctor.NOT ?
+                        formula.sub(0) : services.getTermBuilder().not(formula));
             }
         }
     }
 
-    private boolean isAvoidConditionProvable(Term cond, ImmutableSet<Term> axioms,
+    private boolean isAvoidConditionProvable(Term cond, LinkedHashSet<Term> axioms,
             Services services) {
-        
         long cost = PredictCostProver.computerInstanceCost(
                 new Substitution(DefaultImmutableMap.<QuantifiableVariable, Term>nilMap()), 
-                cond, axioms, services);
+                cond, (LinkedHashSet<Term>)axioms.clone(), services);
         return cost == -1;
     }
 
     private HashSet<Term> computeInstances(Services services,
             final Term comprehension, final Metavariable mv,
-            final Term trigger, Set<Term> terms, ImmutableSet<Term> axioms, TacletApp app) {
+            final Term trigger, Set<Term> terms, LinkedHashSet<Term> axioms, TacletApp app) {
 
         final HashSet<Term> instances = new HashSet<Term>();
         final HashSet<Term> alreadyChecked = new HashSet<Term>();
@@ -204,7 +187,7 @@ public class TriggeredInstantiations implements TermGenerator {
                 if (middle != null && !alreadyChecked.contains(middle)) {
                     alreadyChecked.add(middle);
                     if (!checkConditions && app.taclet().getTrigger().hasAvoidConditions()) {
-                        ImmutableList<Term> conditions = instantiateConditions(services, app, middle);
+                        final ImmutableList<Term> conditions = instantiateConditions(services, app, middle);
                         for (Term condition : conditions) {
                             if (isAvoidConditionProvable(condition, axioms, services)) {
                                 addToInstances = false;

@@ -13,10 +13,11 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -64,28 +65,28 @@ class TwoSidedMatching {
         }
     }
     
-    ImmutableSet<Substitution> getSubstitutions(TermServices services) {
+    Set<Substitution> getSubstitutions(TermServices services) {
         if (triggerWithMVs == null || targetWithMVs == null) {
             // non ground subs not supported yet
-            return DefaultImmutableSet.<Substitution>nil();
+            return new LinkedHashSet<>();
         }
 	return getAllSubstitutions ( targetWithMVs, services );
     }
     
-    private ImmutableSet<Substitution> getAllSubstitutions(Term target, TermServices services) {
-        ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
+    private Set<Substitution> getAllSubstitutions(Term target, TermServices services) {
+        Set<Substitution> allsubs = new LinkedHashSet<>();
         Substitution sub = match ( triggerWithMVs, target, services );
         if ( sub != null
              && ( trigger.isElementOfMultitrigger() || sub.isTotalOn ( trigger.getUniVariables() )
              // sub.containFreevar(trigger.ts.allTerm.
              // varsBoundHere(0).getQuantifiableVariable(0))
              ) ) {
-            allsubs = allsubs.add ( sub );
+            allsubs.add ( sub );
         }
         final Operator op = target.op ();
         if ( !( op instanceof Modality || op instanceof UpdateApplication ) ) {
             for ( int i = 0; i < target.arity (); i++ ) {
-                allsubs = allsubs.union ( getAllSubstitutions ( target.sub ( i ), services ) );
+                allsubs.addAll ( getAllSubstitutions ( target.sub ( i ), services ) );
             }
         }
         return allsubs;

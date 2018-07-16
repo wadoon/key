@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
@@ -37,14 +36,14 @@ public class PredictCostProver {
     private final Term trueT, falseT;
 
     /** assume that all literal in <code>assertLiterals</code> are true */
-    private ImmutableSet<Term> assertLiterals;
+    private final Set<Term> assertLiterals;
     
     /** clauses from <code>instance</code> of CNF */
     private Set<Clause> clauses = new LinkedHashSet<Clause>();
 
     private final Services services;
 
-    private PredictCostProver(Term instance, ImmutableSet<Term> assertList,
+    private PredictCostProver(Term instance, Set<Term> assertList,
 	    Services services) {
 	this.assertLiterals = assertList;
 	this.services = services;
@@ -55,7 +54,7 @@ public class PredictCostProver {
     }
 
     public static long computerInstanceCost(Substitution sub, Term matrix,
-	    ImmutableSet<Term> assertList, Services services) {
+	    Set<Term> assertList, Services services) {
 
 	if (!sub.isGround()) {
 	    // non-ground substitutions not supported yet
@@ -69,32 +68,9 @@ public class PredictCostProver {
 
     // init context
     private void initClauses(Term instance) {
-
-	for (Term t : TriggerUtils.setByOperator(instance, Junctor.AND)) {
- 	    for (ImmutableSet<Term> lit : createClause(TriggerUtils.setByOperator(t, Junctor.OR))) {
-		clauses.add(new Clause(lit));
-	    }
+	for (Term t : TriggerUtils.setByOperator2(instance, Junctor.AND)) {
+	    clauses.add(new Clause(TriggerUtils.setByOperator2(t, Junctor.OR)));            
 	}
-    }
-
-    private ImmutableSet<ImmutableSet<Term>> createClause(ImmutableSet<Term> set)  {
-	final ImmutableSet<ImmutableSet<Term>> nil =
-	    DefaultImmutableSet.<ImmutableSet<Term>>nil();	
-	ImmutableSet<ImmutableSet<Term>> res = nil.add(DefaultImmutableSet.<Term>nil());
-	for (Term t : set) {	    
-            ImmutableSet<ImmutableSet<Term>> tmp = nil;
-	    for (ImmutableSet<Term> cl : res) {
-		tmp = createClauseHelper(tmp, t, cl);
-	    }
-	    res = tmp;
-	}
-	return res;
-    }
-
-    private ImmutableSet<ImmutableSet<Term>> createClauseHelper(ImmutableSet<ImmutableSet<Term>> res, 
-	    Term self, ImmutableSet<Term> ts) {
-	res = res.add(ts.add(self));
-	return res;
     }
 
     // end
@@ -226,17 +202,19 @@ public class PredictCostProver {
 	    }
 	    if (c.literals.size() == 1) {
 		assertChanged = true;
-		assertLiterals = assertLiterals.union(c.literals);
+		assertLiterals.addAll(c.literals);
 	    } else {
 		res.add(c);
 	    }
 	    cost = cost * cCost;
 	}
 	clauses = res;
-	if (cost == 0)
+	if (cost == 0) {
 	    return 0;
-	if (res.isEmpty() && !assertChanged)
+	}
+	if (res.isEmpty() && !assertChanged) {
 	    return -1;
+	}
 	return cost;
     }
 
@@ -259,18 +237,28 @@ public class PredictCostProver {
     private class Clause implements Iterable<Term>{
 
 	/** all literals contains in this clause */
-	public ImmutableSet<Term> literals = DefaultImmutableSet.<Term> nil();
+	private Set<Term> literals = new LinkedHashSet<>();
 
-	public Clause(ImmutableSet<Term> lits) {
+	private Clause(Set<Term> lits) {
 	    literals = lits;
 	}	
 	
+	private Clause(ImmutableSet<Term> lits) {
+            for (Term t : lits) {
+                literals.add(t);
+            }
+        }
+	
 	public boolean equals(Object o) {
-	    if (!(o instanceof Clause)) return false;
-	    final Clause other = (Clause) o;
-	    if (other.literals.size() != literals.size()) {
-		return false;
+	    if ( o == this) {
+	        return true;
 	    }
+	    if (o == null || o.getClass() != getClass()) { 
+	        return false;
+	    }	
+	    
+	    final Clause other = (Clause) o;
+	
 	    return literals.equals(other.literals);
 	}
 	
@@ -311,21 +299,23 @@ public class PredictCostProver {
 	 * Refine literals in this clause, but it does not change literlas, only
 	 * return literals that can't be removed by refining
 	 */
-	public ImmutableSet<Term> refine(Iterable<? extends Term> assertLits) {
-	    ImmutableSet<Term> res = DefaultImmutableSet.<Term> nil();
+	private Set<Term> refine(Iterable<? extends Term> assertLits) {
+	    Set<Term> res = new LinkedHashSet<>();
 	    for (final Term lit : this) {
 		final Operator op = proveLiteral(lit, assertLits).op();
 		if (op == Junctor.TRUE) {
-		    res = DefaultImmutableSet.<Term> nil().add(trueT);
+		    res.clear();
+		    res.add(trueT);
 		    break;
 		}
 		if (op == Junctor.FALSE) {
 		    continue;
 		}
-		res = res.add(lit);
+		res.add(lit);
 	    }
-	    if (res.size() == 0)
-		res = res.add(falseT);
+	    if (res.size() == 0) {
+		res.add(falseT);
+	    }
 	    return res;
 	}
 
@@ -351,7 +341,7 @@ public class PredictCostProver {
 		    return true;
 		if (op == Junctor.FALSE && terms[0].equals(terms[j])) {
 		    next = next.remove(terms[j]);
-		    literals = literals.remove(terms[j]);
+		    literals.remove(terms[j]);
 		}
 	    }
 	    return selfRefine(next);

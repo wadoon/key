@@ -13,14 +13,11 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.LinkedHashSet;
 import java.util.Iterator;
+import java.util.Set;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -41,31 +38,30 @@ class MultiTrigger implements Trigger {
 	this.clause = clause;
     }
 
-    public ImmutableSet<Substitution> getSubstitutionsFromTerms(
-	    ImmutableSet<Term> targetTerms, TermServices services) {
-	ImmutableList<Substitution> res = ImmutableSLList.nil();
+    public Set<Substitution> getSubstitutionsFromTerms(
+	    Set<Term> targetTerms, TermServices services) {
+	Set<Substitution> res = new LinkedHashSet<>();
 	
-	ImmutableSet<Substitution> mulsubs = setMultiSubstitution(triggers.iterator(),
+	Set<Substitution> mulsubs = setMultiSubstitution(triggers.iterator(),
 		targetTerms, services);
 
 	for (Substitution sub : mulsubs) {
 	    if (sub.isTotalOn(qvs)) {
-		res = res.prepend(sub);
+		res.add(sub);
 	    }
 	}
 
-	return DefaultImmutableSet.fromImmutableList(res);
+	return res;
     }
 
     /** help function for getMultiSubstitution */
-    private ImmutableSet<Substitution> setMultiSubstitution(
-	    Iterator<? extends Trigger> ts, ImmutableSet<Term> terms, TermServices services) {
-	ImmutableList<Substitution> res = ImmutableSLList.nil();
+    private static Set<Substitution> setMultiSubstitution(
+	    Iterator<? extends Trigger> ts, Set<Term> terms, TermServices services) {
+	Set<Substitution> res = new LinkedHashSet<>();
 	if (ts.hasNext()) {
-	    ImmutableSet<Substitution> subi = ts.next().getSubstitutionsFromTerms(
+	    Set<Substitution> subi = ts.next().getSubstitutionsFromTerms(
 		    terms, services);
-	    ImmutableSet<Substitution> nextSubs = setMultiSubstitution(ts, terms,
-		    services);
+	    Set<Substitution> nextSubs = setMultiSubstitution(ts, terms, services);
 	    if (nextSubs.isEmpty()) {
 		return subi;
 	    } else if (subi.isEmpty()) {
@@ -75,13 +71,13 @@ class MultiTrigger implements Trigger {
 		for (Substitution subiSub : subi) {
 		    final Substitution sub1 = unifySubstitution(sub0, subiSub);
 		    if (sub1 != null) {
-			res = res.prepend(sub1);
+			res.add(sub1);
 		    }
 		}
 
 	    }
 	}
-	return DefaultImmutableSet.fromImmutableList(res);
+	return res;
     }
 
     /**
@@ -89,7 +85,7 @@ class MultiTrigger implements Trigger {
      * a new substitution with all universal quantifiable variables in two
      * substituition, otherwise return null
      */
-    private Substitution unifySubstitution(Substitution sub0, Substitution sub1) {
+    private static Substitution unifySubstitution(Substitution sub0, Substitution sub1) {
 	final ImmutableMap<QuantifiableVariable, Term> varMap1 = sub1.getVarMap();
 	ImmutableMap<QuantifiableVariable, Term> resMap = varMap1;
 

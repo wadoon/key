@@ -14,6 +14,8 @@
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
@@ -52,6 +54,17 @@ class TriggerUtils {
         return DefaultImmutableSet.<Term>nil().add ( term );
     }
 
+    public static Set<Term> setByOperator2(Term term, Operator op) {
+        final Set<Term> result;
+        if ( term.op () == op ) {
+            result = setByOperator2 ( term.sub ( 0 ), op );
+            result.addAll(  setByOperator2 ( term.sub ( 1 ), op ) );
+        } else {
+            result = new LinkedHashSet<>();
+            result.add ( term );
+        }
+        return result;
+    }
 
     /**
      * 
@@ -60,8 +73,8 @@ class TriggerUtils {
      * @return a set of quantifiableVariable which are belonged to 
      *          both set0 and set1 have
      */
-    public static ImmutableSet<QuantifiableVariable> intersect(ImmutableSet<QuantifiableVariable> set0,
-                                                      ImmutableSet<QuantifiableVariable> set1) {
+    public static ImmutableSet<QuantifiableVariable> intersect(Iterable<QuantifiableVariable> set0,
+                                                               ImmutableSet<QuantifiableVariable> set1) {
         ImmutableSet<QuantifiableVariable> res = DefaultImmutableSet.<QuantifiableVariable>nil();
         for (QuantifiableVariable aSet0 : set0) {
             final QuantifiableVariable el = aSet0;
