@@ -92,6 +92,9 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
         }
 
         private int computeUnwindRules(Goal goal, PosInOccurrence pio, RuleApp appGoal) {
+
+            //System.out.println(appGoal.rule().name().toString());
+
             JavaBlock currentBlock = null;
             // search for the programm element
             if (pio.subTerm().javaBlock().isEmpty()) {
@@ -112,11 +115,15 @@ public class TestGenInfoFlowMacro extends StrategyProofMacro {
             Node currentNode = goal.node();
             int unwindings = 0;
             SourceElement element = currentBlock.program().getFirstElementIncludingBlocks();
+            String whileString = element.toString();
             if (appGoal.rule().name().toString().equals("loopUnwind")) {
-                String whileString = element.toString();
                 // filter the javaBlock (get the loop)
-                while (!whileString.startsWith("while") && !whileString.startsWith("do")
-                        || appGoal.rule().name().toString().equals("doWhileUnwind")) {
+                while (!whileString.startsWith("while")) {
+                    element = element.getFirstElementIncludingBlocks();
+                    whileString = element.toString();
+                }
+            } else if (appGoal.rule().name().toString().equals("doWhileUnwind")) {
+                while (!whileString.startsWith("do")) {
                     element = element.getFirstElementIncludingBlocks();
                     whileString = element.toString();
                 }

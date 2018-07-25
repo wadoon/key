@@ -349,7 +349,7 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
                         if (val.startsWith("#o")) {
                             val = translateValueExpression(val);
                             assignments.add(new Assignment(receiverObject
-                                    + fieldName, "(" + elementType + ")" + val 
+                                    + fieldName, "(" + elementType + ")" + val
                                     + getExecutionName(heap.getName())));
                         } else {
                             val = translateValueExpression(val);
