@@ -495,6 +495,7 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
             i++;
         }
 
+        //TODO [0] wirklich abbrechen ?! erstes element könnte primitiver datentyp sein.
         // empty ?
         if (names[0] == null) {
             return null;
@@ -516,7 +517,9 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
             throw new RuntimeException("Could not translate oracle for: "
                     + term + " of type " + term.op());
         }
-
+        
+        //System.out.println(listSize);
+        
         // all objects in the list as String
         String[] objANames = getObjNamesFromList(objectListA, listSize);
         String[] objBNames = getObjNamesFromList(objectListB, listSize);

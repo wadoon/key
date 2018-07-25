@@ -16,6 +16,7 @@ import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.RemovePostConditionMacro;
@@ -37,6 +38,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
@@ -46,6 +48,7 @@ import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.model.Model;
+import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.testgen.TestCaseGeneratorNoninterference;
 import de.uka.ilkd.key.util.Debug;
@@ -85,8 +88,10 @@ public abstract class AbstractTestGenerator {
 
     public void generateTestCases(final StopRequest stopRequest, final TestGenerationLog log) {
 
+        
         TestGenerationSettings settings = ProofIndependentSettings.
                 DEFAULT_INSTANCE.getTestGenerationSettings();
+       
 
         boolean includePostcondition = settings.includePostCondition();
 
@@ -107,12 +112,13 @@ public abstract class AbstractTestGenerator {
         // macro removing post condition for informationflow tests
         if (!includePostcondition && isNoninterferenceProof) {
             log.writeln("Applying remove postcondition Macro (remove postcondition from proof)...");
-            if (originalProof.openEnabledGoals().size() > 1) {
+            if (originalProof.openEnabledGoals().size() > 1 
+                    || originalProof.openGoals().head().node() != originalProof.root()) {//TODO check second if condition
                 log.writeln(
-                        "did not remove postcondition, because already "
-                        + "removed and symbolic execution is already done");
+                        "did not remove postcondition: symbolic execution is already started");
                 log.writeln("please reload proof if you want to "
                         + "change the include postcondition option");
+                return;
             } else {
                 RemovePostConditionMacro macro = new RemovePostConditionMacro();
                 try {
@@ -130,11 +136,12 @@ public abstract class AbstractTestGenerator {
             try {
                 // old macro
                 // TestGenMacro macro = new TestGenMacro();
-
+                
                 // new macro for multiple loops (work for noninterference-proofs as well)
                 TestGenInfoFlowMacro macro = new TestGenInfoFlowMacro();
                 // Strategy backupStrategy = originalProof.getActiveStrategy();
                 // ProofSettings backupSettings = originalProof.getSettings();
+
 
                 macro.applyTo(ui, originalProof, originalProof.openEnabledGoals(), null, null);
 
@@ -262,7 +269,34 @@ public abstract class AbstractTestGenerator {
     protected void selectProof(UserInterfaceControl ui, Proof proof) {
         // Work has only to be done in the MainWindow implementation.
     }
+    
+    /*
+     * find a modality term in a node
+     */
+    private static boolean hasModality(Node node) {
+        final Sequent sequent = node.sequent();
+        for (final SequentFormula sequentFormula : sequent) {
+            if (hasModality(sequentFormula.formula())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    /*
+     * recursively descent into the term to detect a modality.
+     */
+    private static boolean hasModality(Term term) {
+        if (term.op() instanceof Modality) {
+            return true;
+        }
+        for (final Term sub : term.subs()) {
+            if (hasModality(sub)) {
+                return true;
+            }
+        }
+        return false;
+    }
     /**
      * Creates a proof for each open node if the selected proof is open and a
      * proof for each node on which the emptyModality rules was applied if the
@@ -281,7 +315,9 @@ public abstract class AbstractTestGenerator {
             getNodesWithEmptyModalities(originalProof.root(), nodes);
         } else {
             for (final Goal goal : oldGoals) {
-                nodes.add(goal.node());
+                if(!isNoninterferenceProof || !hasModality(goal.node())) { //remove goals modalities //TODO maybe remove the noninterference condition
+                    nodes.add(goal.node());
+                }
             }
         }
         final Iterator<Node> oldGoalIter = nodes.iterator();
