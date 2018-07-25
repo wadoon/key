@@ -519,8 +519,16 @@ public abstract class AbstractTestGenerator {
                 log.writeln(ex.getMessage());
             }
         }
+
+        float testCoverage = (solvedPaths * 100.0f) /originalProof.countBranches();
+        float feasibleTestCoverage = (solvedPaths * 100.0f) /(originalProof.openGoals().size());
+        
+        
         log.writeln("--- SMT Solver Results ---\n" + " solved pathconditions:" + solvedPaths + "\n"
                 + " invalid pre-/pathconditions:" + infeasiblePaths + "\n" + " unknown:" + unknown);
+        log.write(" total test coverage: " + String.format("%.2f", testCoverage) + " %" + "\n"
+                + " feasible test coverage: " + String.format("%.2f", feasibleTestCoverage) + " %");
+        
         if (problem > 0) {
             log.writeln(" problems             :" + problem);
         }
