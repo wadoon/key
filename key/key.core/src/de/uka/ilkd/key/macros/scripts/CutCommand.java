@@ -12,15 +12,22 @@ import de.uka.ilkd.key.rule.TacletApp;
 import java.util.Map;
 
 /**
- * The command object CutCommand has as scriptcommand name "cut"
+ * The command object CutCommand represents the script command  "cut"
  * As parameters:
- * a formula with the id "#2"
+ * <ul>
+ *     <li>#2: FORMULA: cut-formula</li>
+ *
+ * </ul>
  */
 public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
     private static final Name CUT_TACLET_NAME = new Name("cut");
 
     public CutCommand() {
         super(Parameters.class);
+    }
+
+    public static class Parameters {
+        @Option("#2") public Term formula;
     }
 
     @Override public String getName() {
@@ -52,11 +59,6 @@ public class CutCommand extends AbstractCommand<CutCommand.Parameters> {
         app = app.addCheckedInstantiation(sv, args.formula,
                 state.getProof().getServices(), true);
         state.getFirstOpenGoal().apply(app);
-    }
-
-    public static class Parameters {
-        @Option("#2")
-        public Term formula;
     }
 
 }

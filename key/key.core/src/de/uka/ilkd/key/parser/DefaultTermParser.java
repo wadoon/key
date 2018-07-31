@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.sort.BottomSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -29,70 +30,74 @@ import java.io.IOException;
 import java.io.Reader;
 
 
-/** This class wraps the default KeY-Term-Parser.
+/**
+ * This class wraps the default KeY-Term-Parser.
  *
  * @author Hubert Schmid
  */
 
 public final class DefaultTermParser {
 
-    /** The method reads the input and parses a term with the
+    /**
+     * The method reads the input and parses a term with the
      * specified namespaces. The method ensures, that the term has the
      * specified sort.
+     *
      * @param sort The expected sort of the term.
      * @return The parsed term of the specified sort.
      * @throws ParserException The method throws a ParserException, if
-     * the input could not be parsed correctly or the term has an
-     * invalid sort. */    
-    public Term parse(Reader in, 
-	    	      Sort sort, 
-	    	      Services services,
+     *                         the input could not be parsed correctly or the term has an
+     *                         invalid sort.
+     */
+    public Term parse(Reader in,
+                      Sort sort,
+                      Services services,
                       Namespace<QuantifiableVariable> var_ns,
                       Namespace<Function> func_ns,
                       Namespace<Sort> sort_ns,
                       Namespace<IProgramVariable> progVar_ns,
                       AbbrevMap scm)
-        throws ParserException
-    {
-	return parse(in , sort, services,
-		     new NamespaceSet(var_ns,
-				      func_ns, 
-				      sort_ns, 
-				      new Namespace<RuleSet>(),
-				      new Namespace<Choice>(),
-				      progVar_ns),		     
-		     scm);
+            throws ParserException {
+        return parse(in, sort, services,
+                new NamespaceSet(var_ns,
+                        func_ns,
+                        sort_ns,
+                        new Namespace<RuleSet>(),
+                        new Namespace<Choice>(),
+                        progVar_ns),
+                scm);
     }
 
 
-    /** The method reads the input and parses a term with the
+    /**
+     * The method reads the input and parses a term with the
      * specified namespaces. The method ensures, that the term has the
      * specified sort.
+     *
      * @param sort The expected sort of the term; must not be null.
      * @return The parsed term of the specified sort.
      * @throws ParserException The method throws a ParserException, if
-     * the input could not be parsed correctly or the term has an
-     * invalid sort. */    
-    public Term parse(Reader in, 
-	    	      Sort sort, 
-	    	      Services services,
-                      NamespaceSet nss, 
-                      AbbrevMap scm)
-        throws ParserException
-    {
-        KeYParserF parser = null;
-        try{
-            parser
-                = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""),
-				new Recoder2KeY (services, nss),
-                                services, 
-                                nss, 
-                                scm);
+     *                         the input could not be parsed correctly or the term has an
+     *                         invalid sort.
+     */
+    public Term parse(Reader in, Sort sort, Services services, NamespaceSet nss, AbbrevMap scm) throws ParserException {
+        return parse(in, sort, services, nss, scm, false);
+    }
 
+    public Term parse(Reader in, Sort sort, Services services, NamespaceSet nss, AbbrevMap scm, boolean enableMatching) throws ParserException {
+        KeYParserF parser = null;
+        try {
+            KeYLexerF lexer = new KeYLexerF(in, "");
+            lexer.setEnabledSchemaMatching(enableMatching);
+            if (enableMatching) {
+                nss.sorts().add(new BottomSort());
+            }
+            parser = new KeYParserF(ParserMode.TERM, lexer, new Recoder2KeY(services, nss), services, nss, scm);
+            parser.setEnabledSchemaMatching(enableMatching);
             final Term result = parser.termEOF();
-            if (sort != null &&  ! result.sort().extendsTrans(sort))
-	        throw new ParserException("Expected sort "+sort+", but parser returns sort "+result.sort()+".", null);
-        return result;
+            if (sort != null && !result.sort().extendsTrans(sort))
+                throw new ParserException("Expected sort " + sort + ", but parser returns sort " + result.sort() + ".", null);
+            return result;
         } catch (RecognitionException re) {
             // problemParser cannot be null since exception is thrown during parsing.
             String message = parser.getErrorMessage(re);
@@ -101,21 +106,34 @@ public final class DefaultTermParser {
             throw new ParserException(tse.getMessage(), null);
         }
     }
-    
-     /**
+
+    /**
      * The method reads the input and parses a sequent with the
      * specified namespaces.
+     *
      * @return the paresed String as Sequent Object
      * @throws ParserException The method throws a ParserException, if
-     * the input could not be parsed correctly
+     *                         the input could not be parsed correctly
      */
-    public Sequent parseSeq(Reader in, Services services, NamespaceSet nss, AbbrevMap scm) 
+    public Sequent parseSeq(Reader in, Services services, NamespaceSet nss, AbbrevMap scm) throws ParserException {
+        return parseSeq(in, services, nss, scm, false);
+    }
+
+    public Sequent parseSeq(Reader in, Services services, NamespaceSet nss, AbbrevMap scm, boolean enableMatching)
             throws ParserException {
         KeYParserF p = null;
         try {
-            p = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""), new Recoder2KeY(services, nss), services, nss, scm);
+            KeYLexerF keYLexerF = new KeYLexerF(in, "");
+            keYLexerF.setEnabledSchemaMatching(enableMatching);
+            p = new KeYParserF(ParserMode.TERM, keYLexerF, new Recoder2KeY(services, nss), services, nss, scm);
+            p.setEnabledSchemaMatching(enableMatching);
+            if (enableMatching) {
+                nss.sorts().add(new BottomSort());
+                nss.sorts().add(Sort.FORMULA);
+
+            }
             final Sequent seq = p.seqEOF();
-                return seq;
+            return seq;
         } catch (RecognitionException re) {
             // problemParser cannot be null since exception is thrown during parsing.
             String message = p.getErrorMessage(re);
@@ -124,6 +142,4 @@ public final class DefaultTermParser {
             throw new ParserException(tse.getMessage(), null);
         }
     }
-
-    
 }

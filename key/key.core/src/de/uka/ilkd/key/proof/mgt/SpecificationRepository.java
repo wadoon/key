@@ -989,10 +989,13 @@ public final class SpecificationRepository {
      */
     public void addClassInvariant(ClassInvariant inv) {
         final KeYJavaType kjt = inv.getKJT();
-        final IObserverFunction target = inv.isStatic()
-                ? services.getJavaInfo().getStaticInv(kjt)
-                : services.getJavaInfo().getInv();
-        invs.put(kjt, getClassInvariants(kjt).add(inv));
+        final IObserverFunction target = inv.isStatic() ? services
+                .getJavaInfo().getStaticInv(kjt) : services.getJavaInfo()
+                .getInv();
+        // do not add static invariants to the class invariant
+        if(!inv.isStatic()) {
+            invs.put(kjt, getClassInvariants(kjt).add(inv));
+        }
         final ImmutableSet<ClassWellDefinedness> cwds = getWdClassChecks(kjt);
         if (cwds.isEmpty()) {
             registerContract(new ClassWellDefinedness(inv, target, null, null,
@@ -1006,11 +1009,9 @@ public final class SpecificationRepository {
             registerContract(cwd);
         }
 
-        // in any case, create axiom with non-static target
-        addClassAxiom(new PartialInvAxiom(inv, false, services));
-        // for a static invariant, create also an axiom with a static target
-        if (inv.isStatic())
-            addClassAxiom(new PartialInvAxiom(inv, true, services));
+        // create axiom depending with static or non-static target depending on whether invariant is static
+        addClassAxiom(new PartialInvAxiom(inv, inv.isStatic(), services));
+
         // inherit non-private, non-static invariants
         if (!inv.isStatic()
                 && VisibilityModifier.allowsInheritance(inv.getVisibility())) {
@@ -1143,6 +1144,32 @@ public final class SpecificationRepository {
                         ImmutableSLList.<ProgramVariable> nil(), null);
                 result = result.add(invRepresentsAxiom);
             }
+
+            // add static invariant axioms
+            for (KeYJavaType kjt : services.getJavaInfo().getAllKeYJavaTypes()) {
+                final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(kjt);
+                Term invDef = tb.tt();
+                for (ClassInvariant inv : myInvs) {
+                    if(inv.isStatic()) {
+                        invDef = tb.and(invDef, inv.getOriginalInv());
+                    }
+                }
+                invDef = tb.tf().createTerm(Equality.EQV, tb.staticInv(kjt), invDef);
+                final IObserverFunction invSymbol = services.getJavaInfo().getStaticInv(kjt);
+
+                final ClassAxiom invRepresentsAxiom
+                = new RepresentsAxiom("Class static invariant axiom for " + kjt.getFullName(),
+                                      invSymbol,
+                                      kjt,
+                                      new Private(),
+                                      null,
+                                      invDef,
+                                      null,
+                                      ImmutableSLList.<ProgramVariable> nil(),
+                                      null);
+                result = result.add(invRepresentsAxiom);
+            }
+
             // add query axioms for own class
             for (IProgramMethod pm : services.getJavaInfo()
                     .getAllProgramMethods(selfKjt)) {

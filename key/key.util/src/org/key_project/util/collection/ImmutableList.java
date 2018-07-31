@@ -97,6 +97,10 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      */
     ImmutableList<T> take(int n);
 
+
+    // TODO comment
+    T get(int n);
+
     /**
      * Reverses this list
      */

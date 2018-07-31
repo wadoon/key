@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import de.uka.ilkd.key.logic.sort.BottomSort;
 import junit.framework.TestCase;
 
 import org.antlr.runtime.RecognitionException;
@@ -104,6 +105,16 @@ public class AbstractTestTermParser extends TestCase {
         return new KeYParserF(ParserMode.TERM, getLexer(s), services, nss);
     }
 
+    protected KeYParserF getMatchParser(String s){
+        KeYLexerF kl = new KeYLexerF(s,
+                "No file. Call of parser from parser/" + getClass().getSimpleName());
+        kl.setEnabledSchemaMatching(true);
+        nss.sorts().add(new BottomSort());
+        nss.sorts().add(Sort.FORMULA);
+        KeYParserF kp = new KeYParserF(ParserMode.TERM, kl, services, nss);
+        kp.setEnabledSchemaMatching(true);
+        return kp;
+    }
     public Term parseTerm(String s) throws Exception {
         return getParser(s).term();
     }

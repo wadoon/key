@@ -1,12 +1,23 @@
 package de.uka.ilkd.key.macros.scripts;
 
+import java.util.Map;
+
+import de.uka.ilkd.key.macros.scripts.meta.Flag;
+import de.uka.ilkd.key.macros.scripts.meta.Option;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.macros.scripts.meta.Option;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -15,10 +26,6 @@ import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
-import java.util.Map;
 
 /**
  * instantiate var=a occ=2 with="a_8" hide
@@ -32,6 +39,14 @@ public class InstantiateCommand
 
     public InstantiateCommand() {
         super(Parameters.class);
+    }
+
+    public static class Parameters {
+        @Option(value = "formula", required = false) public Term formula;
+        @Option(value = "var", required = false) public String var;
+        @Option(value = "occ", required = false) public int occ = 1;
+        @Flag("#2") public boolean hide;
+        @Option("with") public Term with;
     }
 
     @Override public Parameters evaluateArguments(EngineState state,
@@ -86,15 +101,13 @@ public class InstantiateCommand
 
     private ImmutableList<TacletApp> findAllTacletApps(Parameters p,
             EngineState state) throws ScriptException {
-        boolean hide = p.hide.equals("hide");
-
 
         String rulename;
         if (p.formula.op() == Quantifier.ALL) {
-            rulename = "allLeft" + (hide ? "Hide" : "");
+            rulename = "allLeft" + (p.hide ? "Hide" : "");
         }
         else {
-            rulename = "exRight" + (hide ? "Hide" : "");
+            rulename = "exRight" + (p.hide ? "Hide" : "");
         }
 
         Proof proof = state.getProof();
@@ -106,7 +119,7 @@ public class InstantiateCommand
 
         ImmutableList<TacletApp> allApps = ImmutableSLList.nil();
         for (SequentFormula sf : g.node().sequent().antecedent()) {
-            if (p.formula != null && !sf.formula().equals(p.formula)) {
+            if (p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
@@ -115,7 +128,7 @@ public class InstantiateCommand
         }
 
         for (SequentFormula sf : g.node().sequent().succedent()) {
-            if (p.formula != null && !sf.formula().equals(p.formula)) {
+            if (p.formula != null && !sf.formula().equalsModRenaming(p.formula)) {
                 continue;
             }
             allApps = allApps.append(index.getTacletAppAtAndBelow(filter,
@@ -133,12 +146,26 @@ public class InstantiateCommand
         for (TacletApp tacletApp : list) {
             if (tacletApp instanceof PosTacletApp) {
                 PosTacletApp pta = (PosTacletApp) tacletApp;
-                if (pta.posInOccurrence().subTerm().equals(p.formula)) {
+                if (pta.posInOccurrence().subTerm().equalsModRenaming(p.formula)) {
                     return pta;
                 }
             }
         }
         return null;
+    }
+
+    private static class TacletNameFilter extends TacletFilter {
+
+        private final Name rulename;
+
+        public TacletNameFilter(String rulename) {
+            this.rulename = new Name(rulename);
+        }
+
+        @Override protected boolean filter(Taclet taclet) {
+            return taclet.name().equals(rulename);
+        }
+
     }
 
     private void computeFormula(Parameters params, Goal goal)
@@ -246,39 +273,6 @@ public class InstantiateCommand
 */
     @Override public String getName() {
         return "instantiate";
-    }
-
-    /**
-     *
-     */
-    public static class Parameters {
-        @Option(value = "formula", required = false)
-        public Term formula;
-        @Option(value = "var", required = false)
-        public String var;
-        @Option(value = "occ", required = false)
-        public int occ = 1;
-
-        @Option(value = "#2", required = false)
-        public String hide = "";
-
-        @Option(value = "with", required = false)
-        public Term with;
-    }
-
-    private static class TacletNameFilter extends TacletFilter {
-
-        private final Name rulename;
-
-        public TacletNameFilter(String rulename) {
-            this.rulename = new Name(rulename);
-        }
-
-        @Override
-        protected boolean filter(Taclet taclet) {
-            return taclet.name().equals(rulename);
-        }
-
     }
 
 }

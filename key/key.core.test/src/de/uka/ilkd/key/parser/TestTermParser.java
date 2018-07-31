@@ -13,23 +13,20 @@
 
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.BottomSort;
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.TacletForTests;
+
+import java.io.StringReader;
 
 public class TestTermParser extends AbstractTestTermParser {
 
@@ -522,4 +519,71 @@ public class TestTermParser extends AbstractTestTermParser {
 //            // expected
 //        }
 //    }
+
+
+	public void testEllipsisConcrete() throws RecognitionException {
+		KeYParserF matchParser = getMatchParser("...x=y...");
+		Term t = matchParser.termEOF();
+		//what about sorts?
+
+	}
+	public void testMatchId() throws RecognitionException {
+		KeYParserF matchParser = getMatchParser("?X:int");
+		Term t = matchParser.termEOF();
+
+		matchParser = getMatchParser("?Y");
+		Term t1 = matchParser.termEOF();
+
+	}
+	public void testMatchUnderOp() throws RecognitionException {
+		KeYParserF matchParser = getMatchParser("!(?X)");
+		Term t = matchParser.termEOF();
+		KeYParserF matchParser1 = getMatchParser("head(?X:list)");
+		Term t1 = matchParser1.termEOF();
+		KeYParserF matchParser2 = getMatchParser("head(?X)");
+		Term t2 = matchParser2.termEOF();
+
+	}
+
+	public void testMatchInFormula() throws RecognitionException {
+		KeYParserF matchParser = getMatchParser("!(x = ?X)");
+		Term t = matchParser.termEOF();
+
+	}
+	public void testMatchBinder() throws RecognitionException {
+		KeYParserF matchParser = getMatchParser("(x=y):?RT:Formula");
+		Term t = matchParser.termEOF();
+		assertEquals(t.sub(0).sort(), Sort.FORMULA);
+		KeYParserF matchParser1 = getMatchParser("(x=y):?RT");
+		Term t1 = matchParser1.termEOF();
+		assertEquals(t1.sub(0).sort().getClass(), BottomSort.class);
+
+
+	}
+
+	public void testBoundVars() throws RecognitionException {
+		KeYParserF matchParser = getMatchParser("seqDef{?;}(?,?,?)");
+		Term t = matchParser.termEOF();
+	}
+
+	public void testSequentMatchParsing() throws RecognitionException {
+    	KeYParserF matchParser = getMatchParser("==> true & false");
+		Sequent s = matchParser.seqEOF();
+
+		KeYParserF matchParser1 = getMatchParser("==> ?X");
+		Sequent s1 = matchParser1.seqEOF();
+
+
+	}
+
+	public void testQuantifierParsing() throws RecognitionException {
+		KeYParserF matchParser = getMatchParser("==> seqDef{int i;}(?,?,?) = seqDef{int i;}(?,?,?)");
+		Sequent s = matchParser.seqEOF();
+
+		KeYParserF matchParser1 = getMatchParser("==> \\exists int i; (?)");
+		Sequent s1 = matchParser1.seqEOF();
+
+
+	}
+
 }

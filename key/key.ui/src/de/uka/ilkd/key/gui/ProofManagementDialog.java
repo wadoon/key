@@ -133,6 +133,9 @@ public final class ProofManagementDialog extends JDialog {
                 updateContractPanel();
             }
         });
+        
+        // expand all rows of the class tree -> all methods visible
+        classTree.expandAll(0, classTree.getRowCount());
 
         //create proof list
         proofList = new JList<>();

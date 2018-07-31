@@ -40,6 +40,7 @@ public class ViewSettings implements Settings, Cloneable {
     private static final String PRETTY_SYNTAX = "[View]PrettySyntax";
     private static final String USE_UNICODE = "[View]UseUnicodeSymbols";
     private static final String SYNTAX_HIGHLIGHTING = "[View]SyntaxHighlighting";
+    private static final String SHOW_UNINSTANTIATED_TACLET = "[View]ShowUninstantiatedTaclet";
     private static final String HIDE_PACKAGE_PREFIX = "[View]HidePackagePrefix";
     private static final String CONFIRM_EXIT = "[View]ConfirmExit";
     /** Heatmap options property */
@@ -245,6 +246,7 @@ public class ViewSettings implements Settings, Cloneable {
 		String val8 = props.getProperty(PRETTY_SYNTAX);
 		String val9 = props.getProperty(USE_UNICODE);
         String val10 = props.getProperty(SYNTAX_HIGHLIGHTING);
+		String val11 = props.getProperty(SHOW_UNINSTANTIATED_TACLET);
 		String hidePackage = props.getProperty(HIDE_PACKAGE_PREFIX);
 		String confirmExit = props.getProperty(CONFIRM_EXIT);
         String hm = props.getProperty(HEATMAP_OPTIONS);
@@ -282,6 +284,9 @@ public class ViewSettings implements Settings, Cloneable {
 		}
         if (val10 != null) {
             useSyntaxHighlighting = Boolean.valueOf(val10).booleanValue();
+        }
+        if (val11 != null) {
+        	showUninstantiatedTaclet = Boolean.valueOf(val11).booleanValue();
         }
 		if (hidePackage != null) {
 		    hidePackagePrefix = Boolean.valueOf(hidePackage);
@@ -322,6 +327,7 @@ public class ViewSettings implements Settings, Cloneable {
     	props.setProperty(PRETTY_SYNTAX, ""+ usePretty);
     	props.setProperty(USE_UNICODE, "" + useUnicode);
         props.setProperty(SYNTAX_HIGHLIGHTING, "" + useSyntaxHighlighting);
+    	props.setProperty(SHOW_UNINSTANTIATED_TACLET, "" + showUninstantiatedTaclet);
         props.setProperty(HIDE_PACKAGE_PREFIX, "" + hidePackagePrefix);
     	props.setProperty(CONFIRM_EXIT, ""+confirmExit);
         props.setProperty(HEATMAP_OPTIONS, "" + isShowHeatmap() + " " +
