@@ -85,7 +85,6 @@ public abstract class AbstractTestGenerator {
                 getPOForProof(originalProof);
         isNoninterferenceProof = po.getContract().getDisplayName().
                 startsWith("Non-interference"); // needed for contract checking
-        System.out.println(isNoninterferenceProof);
     }
 
     public void generateTestCases(final StopRequest stopRequest, final TestGenerationLog log) {
