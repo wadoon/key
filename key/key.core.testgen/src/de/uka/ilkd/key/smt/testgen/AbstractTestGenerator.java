@@ -22,6 +22,7 @@ import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.RemovePostConditionMacro;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.macros.TestGenInfoFlowMacro;
+import de.uka.ilkd.key.macros.TryCloseMacro;
 //import de.uka.ilkd.key.macros.TestGenMacro;
 import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
@@ -273,7 +274,7 @@ public abstract class AbstractTestGenerator {
     /*
      * find a modality term in a node
      */
-    private static boolean hasModality(Node node) {
+    private boolean hasModality(Node node) {
         final Sequent sequent = node.sequent();
         for (final SequentFormula sequentFormula : sequent) {
             if (hasModality(sequentFormula.formula())) {
@@ -286,7 +287,7 @@ public abstract class AbstractTestGenerator {
     /*
      * recursively descent into the term to detect a modality.
      */
-    private static boolean hasModality(Term term) {
+    private boolean hasModality(Term term) {
         if (term.op() instanceof Modality) {
             return true;
         }
@@ -520,15 +521,24 @@ public abstract class AbstractTestGenerator {
             }
         }
 
+        
+//        TryCloseMacro tryCloseMacro = new TryCloseMacro(200); //try to close all goals before feasible path calcuation        
+//        try {
+//            tryCloseMacro.applyTo(ui, originalProof, originalProof.openEnabledGoals(), null, null);
+//        } catch (Throwable ex) {
+//            log.writeException(ex);
+//        }
+        
         float testCoverage = (solvedPaths * 100.0f) /originalProof.countBranches();
         float feasibleTestCoverage = (solvedPaths * 100.0f) /(originalProof.openGoals().size());
-        
         
         log.writeln("--- SMT Solver Results ---\n" + " solved pathconditions:" + solvedPaths + "\n"
                 + " invalid pre-/pathconditions:" + infeasiblePaths + "\n" + " unknown:" + unknown);
         log.write(" total test coverage: " + String.format("%.2f", testCoverage) + " %" + "\n"
-                + " feasible test coverage: " + String.format("%.2f", feasibleTestCoverage) + " %");
+                + " feasible test coverage: " + String.format("%.2f", feasibleTestCoverage) + " %" + "\n"
+                + ""); //TODO feasible path could be better if close proovable goas done.
         
+
         if (problem > 0) {
             log.writeln(" problems             :" + problem);
         }
