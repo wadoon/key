@@ -257,6 +257,7 @@ public class OracleGenerator {
 		
 		Operator op = term.op();
 		
+		//System.out.println("Translate: "+term+" init: "+initialSelect);
 		
 		//binary terms
 		if(ops.containsKey(op)){			
