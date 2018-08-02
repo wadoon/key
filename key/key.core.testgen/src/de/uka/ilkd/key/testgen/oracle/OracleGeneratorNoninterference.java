@@ -495,7 +495,7 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
             i++;
         }
 
-        //TODO [0] wirklich abbrechen ?! erstes element könnte primitiver datentyp sein.
+        //TODO [0] dont abord here !
         // empty ?
         if (names[0] == null) {
             return null;
