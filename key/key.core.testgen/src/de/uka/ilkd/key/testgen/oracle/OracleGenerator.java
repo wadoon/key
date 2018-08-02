@@ -18,10 +18,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-<<<<<<< HEAD
 import de.uka.ilkd.key.logic.op.LogicVariable;
-=======
->>>>>>> fff2668af0dd218b08d740c1fe80cac5738d3356
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramMethod;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
