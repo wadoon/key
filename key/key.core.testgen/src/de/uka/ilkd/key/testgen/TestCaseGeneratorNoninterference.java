@@ -35,11 +35,6 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
     private static final String B_EXECUTION = "_B";
 
     /**
-     * includes already generated objects (preamble)
-     */
-    private List<String> genPreambleObj;
-
-    /**
      * @param proof {@link Proof}
      */
     public TestCaseGeneratorNoninterference(Proof proof) {
@@ -100,30 +95,21 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
         res.append(TAB + "Set<Object> " + ALL_OBJECTS + "= new HashSet<Object>();" + NEW_LINE);
 
         // create objects for HeapAtPre_A, HeapAtPre_B
-        for (String name : genPreambleObj) {
-            if (name.equals("#o0")) {
-                continue;
+        for (Heap h : heaps) {
+            for (ObjectVal o : h.getObjects()) {
+                String name = o.getName();
+                if (name.equals("#o0")) {
+                    continue;
+                }
+                name = name + getExecutionName(h.getName());
+                name = name.replace("#", "_");
+                res.append(TAB + ALL_OBJECTS + ".add(" + name + ");" + NEW_LINE);
+                // res.append(TAB+ALL_OBJECTS+".add("+getPreName(name)+");" +
+                // NEW_LINE);
+
             }
-            name = name.replace("#", "_");
-            res.append(TAB + ALL_OBJECTS
-                    + ".add(" + name + ");"
-                    + NEW_LINE);
         }
         return res.toString();
-//        for (Heap h : heaps) {
-//            for (ObjectVal o : h.getObjects()) {
-//                String name = o.getName();
-//                if (name.equals("#o0")) {
-//                    continue;
-//                }
-//                name = name + getExecutionName(h.getName());
-//                name = name.replace("#", "_");
-//                res.append(TAB + ALL_OBJECTS + ".add(" + name + ");" + NEW_LINE);
-//                // res.append(TAB+ALL_OBJECTS+".add("+getPreName(name)+");" +
-//                // NEW_LINE);
-//
-//            }
-//        }
     }
 
     @Override
@@ -177,9 +163,6 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
                     + getRemainingConstants(m.getConstants().keySet(), vars) + NEW_LINE
                     + NEW_LINE);
 
-        //for identical objects in the two heaps
-        genPreambleObj = new LinkedList<String>();
-
         // create preamble and method execution for execution A
         for (Heap heap : heaps) {
             if (getExecutionName(heap.getName()).equals(A_EXECUTION)) {
@@ -225,7 +208,6 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
             Map<String, Sort> typeInfMap) {
         // m.removeUnnecessaryObjects(); //TODO restore this if necessary
         // Set<String> objects = new HashSet<String>();
-
         final List<Assignment> assignments = new LinkedList<Assignment>();
         final StringBuffer result = new StringBuffer();
         if (heap != null) {
@@ -250,10 +232,6 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
             if (o.getName().equals("#o0")) {
                 continue;
             }
-            if (genPreambleObj.contains(o.getName())) {
-                //this object is already generated
-                continue;
-            }
             final String type = getSafeType(o.getSort());
             String right;
             if (type.endsWith("[]")) {
@@ -269,13 +247,7 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
                     right = "new " + type + "()";
                 }
             }
-            String objName = createObjectName(o);
-            if (!o.getName().startsWith("#o")) {
-                objName = objName + getExecutionName(heap.getName());
-            } else {
-                //remember this obj to reduce object duplicates
-                genPreambleObj.add(o.getName());
-            }
+            String objName = createObjectName(o) + getExecutionName(heap.getName());
             assignments.add(new Assignment(type, objName, right));
         }
     }
@@ -308,13 +280,13 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
                     declType = type;
                 }
                 val = translateValueExpression(val);
-                if (isObject && !val.equals("null")) { //TODO redundant if else!
+                if (isObject && !val.equals("null")) {
                     // if the constant name doesn't include the Execution A
                     // or B do nothing
                     if (exName.equals("")) {
 
                     } else {
-//                        val = val + exName; //removed: no differentiation between A and B objects
+                        val = val + exName;
                         assignments.add(new Assignment(declType, c, "(" + type + ")" + val));
                     }
                 } else {
@@ -334,13 +306,8 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
                         || o.getSort().name().toString().endsWith("Exception")) {
                     continue;
                 }
-                final String receiverObject;
-                if (!o.getName().startsWith("#o")) { //TODO necessary ? maybe remove if-else
-                    receiverObject = createObjectName(o)
-                            + getExecutionName(heap.getName());
-                } else { //executionName just if not an #o object
-                    receiverObject = createObjectName(o);
-                }
+                final String receiverObject = createObjectName(o)
+                        + getExecutionName(heap.getName());
                 for (final String f : o.getFieldvalues().keySet()) {
                     if (f.contains("<") || f.contains(">")) {
                         continue;
@@ -355,26 +322,21 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
                                                // represents an abstract
                                                // type or an interface. See:
                                                // getSafeType.
-                  //removed: no differentiation between A and B objects
-//                    boolean fieldisObject = false;
-//                    if (val.startsWith("#o")) {
-//                        fieldisObject = true;
-//                    }
+                    boolean fieldisObject = false;
+                    if (val.startsWith("#o")) {
+                        fieldisObject = true;
+                    }
                     val = translateValueExpression(val);
                     final String rcObjType = getSafeType(o.getSort());
-                  //removed: no differentiation between A and B objects
-//                    if (fieldisObject && !val.equals("null")) {
-//                        assignments.add(new Assignment(
-//                                new RefEx(rcObjType, receiverObject, vType, fieldName),
-//                                "(" + vType + ")" + val + getExecutionName(heap.getName())));
-//                    } else {
-//                        assignments.add(new Assignment(
-//                                new RefEx(rcObjType, receiverObject, vType, fieldName),
-//                                "(" + vType + ")" + val));
-//                    }
-                    assignments.add(new Assignment(
-                            new RefEx(rcObjType, receiverObject, vType, fieldName),
-                            "(" + vType + ")" + val));
+                    if (fieldisObject && !val.equals("null")) {
+                        assignments.add(new Assignment(
+                                new RefEx(rcObjType, receiverObject, vType, fieldName),
+                                "(" + vType + ")" + val + getExecutionName(heap.getName())));
+                    } else {
+                        assignments.add(new Assignment(
+                                new RefEx(rcObjType, receiverObject, vType, fieldName),
+                                "(" + vType + ")" + val));
+                    }
 
                 }
                 if (o.getSort() != null && o.getSort().name().toString().endsWith("[]")) {
@@ -384,20 +346,16 @@ public class TestCaseGeneratorNoninterference extends TestCaseGenerator {
                     for (int i = 0; i < o.getLength(); i++) {
                         final String fieldName = "[" + i + "]";
                         String val = o.getArrayValue(i);
-                        val = translateValueExpression(val);
-                        assignments.add(new Assignment(receiverObject
-                                + fieldName, "(" + elementType + ")" + val));
-                          //removed: no differentiation between A and B objects
-//                        if (val.startsWith("#o")) {
-//                            val = translateValueExpression(val);
-//                            assignments.add(new Assignment(receiverObject
-//                                    + fieldName, "(" + elementType + ")" + val
-//                                    + getExecutionName(heap.getName())));
-//                        } else {
-//                            val = translateValueExpression(val);
-//                            assignments.add(new Assignment(receiverObject
-//                                    + fieldName, "(" + elementType + ")" + val));
-//                        }
+                        if (val.startsWith("#o")) {
+                            val = translateValueExpression(val);
+                            assignments.add(new Assignment(receiverObject
+                                    + fieldName, "(" + elementType + ")" + val
+                                    + getExecutionName(heap.getName())));
+                        } else {
+                            val = translateValueExpression(val);
+                            assignments.add(new Assignment(receiverObject
+                                    + fieldName, "(" + elementType + ")" + val));
+                        }
                     }
                 }
             }
