@@ -28,6 +28,7 @@ class TestGenOptionsPanel extends TablePanel{
 	private JCheckBox includePostCondition;
 	private JCheckBox removeDuplicates;
 	private JCheckBox checkboxRFL;
+	private JCheckBox tryCloseProvableGoals;
 
 	private int minWidthOfTitle;
 	
@@ -44,6 +45,7 @@ class TestGenOptionsPanel extends TablePanel{
 	private static final String infoOpenJMLPath = "Set location of openjml.jar. OpenJML is a third-party runtime checker. KeYTestGen generates the shell scripts compileWithOpenJML.sh and executeWithOpenJML.sh in the test output directory to simplify compilation and execution of the tests. The user should visit the OpenJML's website for additional instructions.";
 	private static final String infoObjenesisPath = "Set location of objenesis.jar. Objenesis is a thrid-party library allows easy object creation from classes which do not have a (public) default constructur.";
 	private static final String infoIncludePostcondition = "Includes the negated post condition in the test data constraint when generating test data. The post condition can only be included for paths (branches) where symbolic execution has finished.";
+	private static final String infoTryCloseProvableGoals = "Close provable goals after symbolic execution.";
 	
 	public TestGenOptionsPanel(TestGenerationSettings settings){
 		super();
@@ -70,6 +72,7 @@ class TestGenOptionsPanel extends TablePanel{
        getJUnitPanel();         
        getOpenJMLPanel();
        getSaveToFilePanel();
+       getTryCloseProvableGoals();
     }
 	
 	public JTextField getMaxProcesses() {
@@ -243,6 +246,18 @@ class TestGenOptionsPanel extends TablePanel{
 		return includePostCondition;		
 	}
 	
+	public JCheckBox getTryCloseProvableGoals() {
+	    if(tryCloseProvableGoals == null) {
+	        tryCloseProvableGoals = addCheckBox("close provable Goals", infoTryCloseProvableGoals, settings.getTryCloseProvableGoals(), new ActionListener() {
+	            @Override
+	            public void actionPerformed(ActionEvent e) {
+	                settings.setTryCloseProvableGoals(tryCloseProvableGoals.isSelected());
+	                settings.fireSettingsChanged();
+	            }
+	        });
+	    }
+	    return tryCloseProvableGoals;
+	}
 	
 	
 	

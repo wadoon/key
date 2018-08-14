@@ -20,6 +20,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	private static final String DEFAULT_OPENJMLPATH = ".";
 	private static final String DEFAULT_OBJENESISPATH = ".";
 	private static final boolean DEFAULT_INCLUDEPOSTCONDITION = false;
+	private static final boolean DEFAULT_TRYCLOSEPROVABLEGOALS = false;
 	// Option fields
 	private boolean applySymbolicExecution;
 	private int maxUnwinds;
@@ -32,6 +33,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	private int concurrentProcesses;
 	private boolean invariantForAll;
 	private boolean includePostCondition;
+	private boolean tryCloseProvableGoals;
 	
 	private final Collection<SettingsListener> listeners;
 	// Property name
@@ -46,7 +48,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	private static final String propOpenjmlPath = "[TestGenSettings]OpenJMLPath";
 	private static final String propObjenesisPath = "[TestGenSettings]ObjenesisPath";
 	private static final String propIncludePostCondition = "[TestGenSettings]IncludePostCondition";
-	
+	private static final String propTryCloseProvableGoals = "[TestGenSettings]TryCloseProvableGoals";
 	
 	public TestGenerationSettings() {
 		listeners = new LinkedHashSet<SettingsListener>();
@@ -61,6 +63,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		openjmlPath = DEFAULT_OPENJMLPATH;
 		objenesisPath = DEFAULT_OBJENESISPATH;
 		includePostCondition  =DEFAULT_INCLUDEPOSTCONDITION;
+		tryCloseProvableGoals = DEFAULT_TRYCLOSEPROVABLEGOALS;
 	}
 
 	public TestGenerationSettings(TestGenerationSettings data) {
@@ -79,6 +82,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		openjmlPath = data.openjmlPath;
 		objenesisPath  = data.objenesisPath;
 		includePostCondition = data.includePostCondition;
+		tryCloseProvableGoals = data.tryCloseProvableGoals;
 		
 	}
 
@@ -120,6 +124,10 @@ public class TestGenerationSettings implements Settings, Cloneable {
 	public boolean includePostCondition(){
 		return includePostCondition;
 	}
+	
+	public boolean getTryCloseProvableGoals() {
+	    return tryCloseProvableGoals;
+	}
 
 	@Override
 	public void readSettings(Object sender, Properties props) {
@@ -158,6 +166,10 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		includePostCondition = SettingsConverter.read(props,
 				TestGenerationSettings.propIncludePostCondition,
 				TestGenerationSettings.DEFAULT_INCLUDEPOSTCONDITION);
+		
+		tryCloseProvableGoals = SettingsConverter.read(props,
+		        TestGenerationSettings.propTryCloseProvableGoals,
+		        TestGenerationSettings.DEFAULT_TRYCLOSEPROVABLEGOALS);
 	}
 
 	public boolean removeDuplicates() {
@@ -198,6 +210,10 @@ public class TestGenerationSettings implements Settings, Cloneable {
 
 	public void setUseJunit(boolean useJunit) {
 		this.useJunit = useJunit;
+	}
+	
+	public void setTryCloseProvableGoals(boolean tryCloseProvableGoals) {
+	    this.tryCloseProvableGoals = tryCloseProvableGoals;
 	}
 	
 	
@@ -257,5 +273,7 @@ public class TestGenerationSettings implements Settings, Cloneable {
 		        objenesisPath);
 		SettingsConverter.store(props, TestGenerationSettings.propIncludePostCondition,
 				includePostCondition);
+		SettingsConverter.store(props, TestGenerationSettings.propTryCloseProvableGoals,
+		        tryCloseProvableGoals);
 	}
 }
