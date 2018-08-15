@@ -45,6 +45,7 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
 
     private boolean checkSameTypeGenerated;
     private boolean isomorphicCheckGenerated;
+    private boolean helpIsomorphicCheckGenerated;
     
     /**
      *
@@ -81,6 +82,7 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
         newObjectsList.clear();
         checkSameTypeGenerated = false;
         isomorphicCheckGenerated = false;
+        helpIsomorphicCheckGenerated = false;
         constants = getConstants(term);
         methodArgs = getMethodArgs(term);
         OracleTerm body = generateOracle(term, false);
@@ -161,10 +163,10 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
                 args.addAll(methodArgs);
 
                 return new OracleMethodCall(compareLengthMethod, args);
-            } else if(objectIsomorphicCheck(term)) {
+            } else if(objectIsomorphicCheck(term)) { //compare objects -> check if objects isomorphic
                 //TODO IDEA: recursive for each == check if we compare objects -> remember those
                 //TODO at the end generate the isomorphic check for those objects (maybe with a second oracle Method which we have to call in each testcase 
-                OracleMethod method = createObjectsIsormophicOracleMethod(term, initialSelect);
+                OracleMethod method = createObjectsIsormophicOracleMethod(term.sub(0), term.sub(1), initialSelect);
                 oracleMethods.add(method);
                 List<OracleTerm> args = new LinkedList<OracleTerm>();
                 args.addAll(quantifiedVariables);
@@ -465,31 +467,32 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
             Operator rightOp = right.op();
             if (leftOp instanceof ProgramVariable 
                     && rightOp instanceof ProgramVariable) {
-                ProgramVariable leftVar = (ProgramVariable) left;
-                ProgramVariable rightVar = (ProgramVariable) right;
+                ProgramVariable leftVar = (ProgramVariable) leftOp;
+                ProgramVariable rightVar = (ProgramVariable) rightOp;
                 if (!primitiveTypes.contains(leftVar.sort().name().toString()) //eq with two objects ? 
-                        && !primitiveTypes.contains(leftVar.sort().name().toString())
-                        && leftVar.sort().name().toString().equals(rightVar.sort().name())) {
+                        && !primitiveTypes.contains(rightVar.sort().name().toString())
+                        && leftVar.sort().name().toString().equals(rightVar.sort().name().toString())) {
+                    System.out.println("compare two objects: check isomoprhic"); //TODO remove
                     return true;
                 }
                 
                 System.out.println("Sort left: " + leftVar.sort().name().toString()); //TODO remove
                 System.out.println("Sort right: " + rightVar.sort().name().toString()); //TODO remove
-            } else if (leftOp instanceof Function // eq with two select functions for objects ?
+            } 
+            
+            else if (leftOp instanceof Function // eq with two select functions for objects ?
                     && rightOp instanceof Function) {
                 Function leftFun = (Function) leftOp;
                 Function rightFun = (Function) rightOp;
                 String leftName = leftFun.name().toString();
                 String rightName = rightFun.name().toString();
                 
-                if (leftName.endsWith("select") && rightName.endsWith("select")) {
-                    
+                if (leftName.endsWith("select") && rightName.endsWith("select")) { //compare fields ?
                     //TODO check if the selected fields are objects -> create isomorphic check for them !
-
-                    if (!primitiveTypes.contains(left.sort().name().toString()) 
+                    if (!primitiveTypes.contains(left.sort().name().toString())  //field type not primitive ?
                             && !primitiveTypes.contains(right.sort().name().toString()) 
                             && left.sort().name().toString().equals(right.sort().name().toString())) {
-                        System.out.println("yes check isomporhic for old objects"); //TODO remove
+                        System.out.println("compare two objects: check isomoprhic"); //TODO remove
                         return true;
                     }
                 }
@@ -568,23 +571,30 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
     }
     
     //TODO pass list of objects to check. (at the moment: for each isomorphic check a new oracle method )
-    private OracleMethod createObjectsIsormophicOracleMethod (Term term, boolean initialSelect) { 
+    private OracleMethod createObjectsIsormophicOracleMethod (Term leftTerm, Term rightTerm, boolean initialSelect) { 
         String result = "";
         String methodName = generateMethodName();
         String tab = TestCaseGenerator.TAB;
-        OracleTerm leftSelect = translateFunction(term.sub(0), initialSelect); //objects to check
-        OracleTerm rightSelect = translateFunction(term.sub(1), initialSelect); 
-
-        String nameLeft = leftSelect.toString();
-        String nameRight = rightSelect.toString();
+        String nameLeft;
+        String nameRight;
         
+        if (leftTerm.op() instanceof Function && rightTerm.op() instanceof Function) {
+            OracleTerm leftSelect = translateFunction(leftTerm, initialSelect); //objects to check
+            OracleTerm rightSelect = translateFunction(rightTerm, initialSelect); 
+            nameLeft = leftSelect.toString();
+            nameRight = rightSelect.toString();
+        } else {
+            nameLeft = leftTerm.toString();
+            nameRight = rightTerm.toString();
+        }
+        nameLeft.replaceAll(AT_POST, "");
+        nameRight.replaceAll(AT_POST, "");
         
         String[] objANames = {nameLeft};
         String[] objBNames = {nameRight};
         
         result = result + generateObjectsListsOracle(objANames, objBNames, objANames.length); //generate object list string
-        
-        
+
         List<OracleVariable> args = new LinkedList<OracleVariable>();
         String name = "Object[]";
         Sort array = new SortImpl(new Name(name));
@@ -608,7 +618,7 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
         }
         OracleMethodCall callIsomorphicMethod = new OracleMethodCall(isomorphicMethod, args);
         
-        result = result + "\n" + tab + tab + "return " + callTypeCheck + " && " + callIsomorphicMethod;
+        result = result + "\n" + tab + tab + "return " + callTypeCheck + " && " + callIsomorphicMethod +";";
         
         //generate the main Oracle Method
         args = new LinkedList<OracleVariable>();
@@ -742,8 +752,10 @@ public class OracleGeneratorNoninterference extends OracleGenerator {
         argsHelp.add(new OracleVariable("o1", objectSort));
         argsHelp.add(new OracleVariable("o2", objectSort));
         OracleMethod helpIsomorphicCheck = isomorphicHelpMethod(argsHelp);
-        oracleMethods.add(helpIsomorphicCheck);
-
+        if(!helpIsomorphicCheckGenerated) {
+            oracleMethods.add(helpIsomorphicCheck);
+            helpIsomorphicCheckGenerated = true;
+        }
         OracleMethodCall helperCall = new OracleMethodCall(helpIsomorphicCheck, argsHelp);
 
         String body = "\n"
