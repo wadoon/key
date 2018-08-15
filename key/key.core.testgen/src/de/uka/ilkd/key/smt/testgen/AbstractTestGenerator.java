@@ -154,6 +154,19 @@ public abstract class AbstractTestGenerator {
                 log.writeException(ex);
             }
         }
+        
+        //check tryCloseProvableGoalsSetting
+        if(settings.getTryCloseProvableGoals()) {
+            log.writeln("Applying TryCloseProvableGoals Macro.");
+            try {
+                TryCloseMacro closeMacro = new TryCloseMacro();
+                closeMacro.applyTo(ui, originalProof, originalProof.openEnabledGoals(), null, null);
+            } catch (Throwable ex) {
+                log.writeException(ex);
+            }
+            log.writeln("Finished TryCloseProvableGoalsMacro.");
+        }
+        
 
         log.writeln("Extracting test data constraints (path conditions).");
         proofs = createProofsForTesting(settings.removeDuplicates(), !includePostcondition);
@@ -537,7 +550,7 @@ public abstract class AbstractTestGenerator {
                 + " invalid pre-/pathconditions:" + infeasiblePaths + "\n" + " unknown:" + unknown);
         log.write(" total test coverage: " + String.format("%.2f", testCoverage) + " %" + "\n"
                 + " feasible test coverage: " + String.format("%.2f", feasibleTestCoverage) + " %" + "\n"
-                + ""); //TODO feasible path could be better if close proovable goas done.
+                + "");
         
 
         if (problem > 0) {
