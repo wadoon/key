@@ -159,7 +159,7 @@ public abstract class AbstractTestGenerator {
         if(settings.getTryCloseProvableGoals()) {
             log.writeln("Applying TryCloseProvableGoals Macro.");
             try {
-                TryCloseMacro closeMacro = new TryCloseMacro();
+                TryCloseMacro closeMacro = new TryCloseMacro(settings.getMaxRulesTryCloseProvableGoals());
                 closeMacro.applyTo(ui, originalProof, originalProof.openEnabledGoals(), null, null);
             } catch (Throwable ex) {
                 log.writeException(ex);

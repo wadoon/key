@@ -22,6 +22,7 @@ class TestGenOptionsPanel extends TablePanel{
 	private FileChooserPanel objenesisPanel;
 	private JTextField maxProcesses;
 	private JTextField maxUnwinds;
+	private JTextField maxRulesTryCloseProvableGoals;
     private JCheckBox symbolicEx;
 	private JCheckBox useJUnit;
 	private JCheckBox invariantForAll;
@@ -46,6 +47,7 @@ class TestGenOptionsPanel extends TablePanel{
 	private static final String infoObjenesisPath = "Set location of objenesis.jar. Objenesis is a thrid-party library allows easy object creation from classes which do not have a (public) default constructur.";
 	private static final String infoIncludePostcondition = "Includes the negated post condition in the test data constraint when generating test data. The post condition can only be included for paths (branches) where symbolic execution has finished.";
 	private static final String infoTryCloseProvableGoals = "Close provable goals after symbolic execution.";
+	private static final String infoMaxRulesTryCloseProvableGoals = "Maximal number of rules for the TryCloseProvableGoals macro.";
 	
 	public TestGenOptionsPanel(TestGenerationSettings settings){
 		super();
@@ -73,6 +75,7 @@ class TestGenOptionsPanel extends TablePanel{
        getOpenJMLPanel();
        getSaveToFilePanel();
        getTryCloseProvableGoals();
+       getMaxRulesTryCloseProvableGoals();
     }
 	
 	public JTextField getMaxProcesses() {
@@ -117,6 +120,28 @@ class TestGenOptionsPanel extends TablePanel{
 			});
 		}
 		return maxProcesses;
+	}
+	
+	public JTextField getMaxRulesTryCloseProvableGoals() {
+	    if (maxRulesTryCloseProvableGoals == null) {
+	        maxRulesTryCloseProvableGoals = addTextField("Maximal TryClose rules:", minWidthOfTitle,
+	                Long.toString(settings.getMaxRulesTryCloseProvableGoals()), infoMaxRulesTryCloseProvableGoals, new ActionListener() {
+
+	            @Override
+                public void actionPerformed(
+                        ActionEvent e) {
+                    int value;
+                    try {
+                        value = Integer.parseInt(maxRulesTryCloseProvableGoals.getText());
+                    } catch (NumberFormatException ex) {
+                        value = settings.getMaxRulesTryCloseProvableGoals();
+                    }
+                    settings.setMaxRulesTryCloseProvableGoals(value);
+                    settings.fireSettingsChanged();
+                }      
+            });
+	    }
+	    return maxRulesTryCloseProvableGoals;
 	}
 	
 	public FileChooserPanel getSaveToFilePanel() {
