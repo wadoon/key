@@ -147,6 +147,16 @@ public class HTMLSyntaxHighlighter {
      *            Used to add CSS rules.
      */
     public HTMLSyntaxHighlighter(HTMLDocument document) {
+       setDocument(document);
+    }
+    
+    /**
+     * updates the document and add css rules
+     * @param document
+     *            The {@link HTMLDocument} of the parent {@link JEditorPane}.
+     *            Used to add CSS rules. 
+     */
+    public void setDocument(HTMLDocument document) {
         final String propLogicHighlightRule =
                 ".prop_logic_highlight { color: #000000; font-weight: bold; }";
         final String foLogicHighlightRule =
@@ -164,7 +174,7 @@ public class HTMLSyntaxHighlighter {
         document.getStyleSheet().addRule(foLogicHighlightRule);
         document.getStyleSheet().addRule(commentHighlightRule);
     }
-
+    
     /**
      * Computes a String for the given plain text where HTML elements have been
      * escaped and syntax highlighting has been added.

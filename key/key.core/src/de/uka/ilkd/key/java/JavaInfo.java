@@ -1484,11 +1484,11 @@ public final class JavaInfo {
 
     public boolean isCanonicalProgramMethod(IProgramMethod method, KeYJavaType context) {
         String name = method.getName().toString();
-        ImmutableArray<KeYJavaType> paramTypes = method.getParamTypes();
+        ImmutableArray<KeYJavaType> paramTypes = method.getParamTypes();        
         IProgramMethod canonicalMethod = getProgramMethod(context, name, paramTypes, context);
         if (method.isPublic()) {
             /*
-             * Canonical ProgramMmethod can be located in a supertype in case the method is public.
+             * Canonical Programmethod can be located in a supertype in case the method is public.
              */
             ImmutableList<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(context);
             Iterator<KeYJavaType> iterator = allSupertypes.iterator();

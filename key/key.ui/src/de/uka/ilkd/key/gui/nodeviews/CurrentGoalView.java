@@ -21,14 +21,12 @@ import java.awt.dnd.Autoscroll;
 import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DragSource;
 import java.awt.dnd.DropTarget;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.EventObject;
-import java.util.Iterator;
-import java.util.LinkedList;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.util.*;
 
 import javax.swing.SwingUtilities;
+import javax.swing.text.html.HTMLDocument;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -37,17 +35,11 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ApplyTacletDialog;
 import de.uka.ilkd.key.gui.GUIListener;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.pp.InitialPositionTable;
-import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.logic.FormulaChangeInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.pp.Range;
-import de.uka.ilkd.key.pp.SequentPrintFilter;
-import de.uka.ilkd.key.pp.SequentPrintFilterEntry;
-import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
+import de.uka.ilkd.key.logic.SequentFormula;
+import de.uka.ilkd.key.pp.*;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.TacletApp;
@@ -517,11 +509,19 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
             boolean errorocc;
             do {
                 errorocc = false;
-                try {
-                    setText(getSyntaxHighlighter().process(
+                try {          
+                    final HTMLDocument newDoc = (HTMLDocument) getEditorKit().createDefaultDocument();
+
+                    getSyntaxHighlighter().setDocument(newDoc);
+                    final String htmlContent = getSyntaxHighlighter().process(
                             getLogicPrinter().toString(),
-                            getMainWindow().getMediator().getSelectedNode()));
+                            getMainWindow().getMediator().getSelectedNode());
+                    read(new ByteArrayInputStream(htmlContent.getBytes()), newDoc);
                 } catch (Error e) {
+                    System.err.println("Error occurred while printing Sequent!");
+                    e.printStackTrace();
+                    errorocc = true;
+                } catch (IOException e) {
                     System.err.println("Error occurred while printing Sequent!");
                     e.printStackTrace();
                     errorocc = true;

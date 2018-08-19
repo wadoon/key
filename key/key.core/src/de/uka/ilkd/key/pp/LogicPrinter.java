@@ -30,6 +30,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.NullType;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -363,6 +364,7 @@ public class LogicPrinter {
                 printVarCond(taclet);
             }
             printGoalTemplates(taclet);
+
             if (showWholeTaclet) {
                 printHeuristics(taclet);
             }
@@ -1271,8 +1273,9 @@ public class LogicPrinter {
                     // in case arity > 1 we assume fieldName refers to a query (method call)
                     Term object = t.sub(1);
                     KeYJavaType keYJavaType = javaInfo.getKeYJavaType(object.sort());
-                    if (obs.isStatic()
-                            || ((obs instanceof IProgramMethod) && javaInfo.isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType))) {
+                    if (obs.isStatic() || (keYJavaType.getJavaType() instanceof NullType)                            
+                            || ((obs instanceof IProgramMethod) && 
+                                    javaInfo.isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType))) {
                         layouter.print(fieldName);
                     } else {
                         layouter.print("(" + t.op() + ")");
