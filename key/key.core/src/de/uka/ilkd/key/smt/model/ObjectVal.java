@@ -284,6 +284,15 @@ public class ObjectVal {
     }
 
     /**
+     * computes the hashcode of this object
+     * @return the hashcode
+     */
+    @Override
+    public int hashCode() {
+        return name != null ? 13*name.hashCode() : -1;
+    }
+
+    /**
      * Objects with equal names are equal.
      * @param o the Object to be compared to
      * @return true if this object and o have
@@ -311,7 +320,7 @@ public class ObjectVal {
 
     /**
      * sets a set of values to be associated with the given function names
-     * @param newArrayValues the map associated function names to their respective value
+     * @param newFunValues the map associated function names to their respective value
      */
     public void setFunValues(Map<String, String> newFunValues) {
         this.funValues = newFunValues;

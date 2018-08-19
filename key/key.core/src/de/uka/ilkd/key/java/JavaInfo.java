@@ -1484,7 +1484,7 @@ public final class JavaInfo {
 
     public boolean isCanonicalProgramMethod(IProgramMethod method, KeYJavaType context) {
         String name = method.getName().toString();
-        ImmutableArray<KeYJavaType> paramTypes = method.getParamTypes();        
+        ImmutableArray<KeYJavaType> paramTypes = method.getParamTypes();
         IProgramMethod canonicalMethod = getProgramMethod(context, name, paramTypes, context);
         if (method.isPublic()) {
             /*
