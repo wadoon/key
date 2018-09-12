@@ -106,7 +106,7 @@ public class KeYRecoderMapping{
 	if (res==null) {
 	    //System.out.println(revMap);
 	}
-        Debug.assertTrue(res!=null, "Model Element not known", pe);	
+        //Debug.assertTrue(res!=null, "Model Element not known", pe);	
 
         return (recoder.ModelElement)res;
     }
