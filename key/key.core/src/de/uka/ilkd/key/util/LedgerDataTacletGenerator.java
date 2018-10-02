@@ -2,66 +2,179 @@ package de.uka.ilkd.key.util;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.key_project.util.collection.ImmutableArray;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.java.abstraction.Type;
 
 public class LedgerDataTacletGenerator {
 
     private List<RewriteTaclet> newTaclets;
-    private List<Function> newFunctions;
     Services services;
     TermBuilder termBuilder;
+    Function constructorFun, objectToLdFun, serFun, deserFun, readLdFun;
+    Function lastEntryFun, getValueFun; // TODO where do we get these?
+    Sort heapSort, intSort, objectSort, seqSort;
+    Type intType, seqType, objectType, heapType; // TODO ...and these?
 
     public LedgerDataTacletGenerator(Services services) {
         this.services = services;
+        // TODO some of these are probably wrong
+        heapSort = services.getNamespaces().sorts().lookup("heap");
+        intSort = services.getNamespaces().sorts().lookup("integer");
+        objectSort = services.getNamespaces().sorts().lookup("object");
+        seqSort = services.getNamespaces().sorts().lookup("sequence");
         newTaclets = new LinkedList<>();
-        newFunctions = new LinkedList<>();
     }
 
     public void createTaclets(LedgerData ld) {
         Sort keyld = new SortImpl(new Name("k" + ld.getClass().getName()));
+        KeYJavaType ldkjt = services.getJavaInfo().getKeYJavaType(keyld);
         Field[] fields = getObjectFields(ld);
-        List<SchemaVariable> schemaVars = new LinkedList<>();
+        ArrayList<SchemaVariable> schemaVars = new ArrayList<>();
+        ArrayList<Function> getters = new ArrayList<>();
+        ArrayList<Sort> sorts = new ArrayList<>();
+        ArrayList<Type> types = new ArrayList<>();
+        ArrayList<String> names = new ArrayList<>();
+        ArrayList<KeYJavaType> kjts = new ArrayList<>();
+
         for (Field f : fields) {
-            KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(f.getName());
-            Type t = kjt.getJavaType();
+            String fieldName = f.getName();
+            names.add(fieldName);
+            KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(fieldName);
+            kjts.add(kjt);
             Sort sort = kjt.getSort();
-            SchemaVariable sv = SchemaVariableFactory.createTermSV(new Name(f.getName()), sort);
-            Function getFunc = new Function(new Name("get" + f.getName()), sort);
-            newFunctions.add(getFunc);
-            RewriteTaclet tac = createGetterTaclet(ld, f, fields, services);
+            sorts.add(sort);
+            Type type = kjt.getJavaType();
+            types.add(type);
+            SchemaVariable sv = SchemaVariableFactory.createTermSV(new Name(fieldName), sort);
+            schemaVars.add(sv);
+            Function getFunc = new Function(new Name("get" + fieldName), sort, keyld);
+            getters.add(getFunc);
+        }
+
+        createFunctions(ld, keyld, sorts);
+
+        for (int i = 0; i < schemaVars.size(); ++i) {
+            RewriteTaclet tac = createGetterTaclet(i, schemaVars, getters, types, ld, services);
             newTaclets.add(tac);
         }
+        newTaclets.add(equalsTaclet());
+        newTaclets.add(objectToLdTaclet(fields, sorts, names, kjts, ldkjt));
+        newTaclets.add(serializeTaclet());
+        newTaclets.add(readLdTaclet());
     }
 
-    private RewriteTaclet createGetterTaclet(LedgerData ld, Field f, Field[] fields, Services services) {
-        RewriteTacletBuilder<RewriteTaclet> tb = new RewriteTacletBuilder<>();
-        tb.setName(new Name(f.getName() + "OfNew" + ld.getClass().getName()));
-        for (Field field : fields) {
+    private RewriteTaclet readLdTaclet() {
+        RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
+        SchemaVariable indexVar = SchemaVariableFactory.createTermSV(new Name("index"), intSort);
+        SchemaVariable seqVar = SchemaVariableFactory.createTermSV(new Name("sequence"), seqSort);
+        tacletBuilder.addVarsNew(indexVar, intType);
+        tacletBuilder.addVarsNew(seqVar, seqType);
+        Term iTerm = termBuilder.var(indexVar);
+        Term seqTerm = termBuilder.var(seqVar);
+        tacletBuilder.setFind(termBuilder.func(readLdFun, iTerm, seqTerm));
+        tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+        Term getValueTerm = termBuilder.func(getValueFun, termBuilder.func(lastEntryFun, iTerm, seqTerm));
+        Term replaceWithTerm = termBuilder.func(deserFun, termBuilder.cast(seqSort, getValueTerm));
+        tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(replaceWithTerm));
+        return tacletBuilder.getTaclet();
+    }
 
+    private RewriteTaclet serializeTaclet() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-            tb.addVarsNew(sv, t);
-            schemaVars.add(sv);
+    private RewriteTaclet objectToLdTaclet(Field[] fields,
+                ArrayList<Sort> sorts, ArrayList<String> names,
+                ArrayList<KeYJavaType> types, KeYJavaType ldkjt) {
+        RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
+        SchemaVariable objectVar = SchemaVariableFactory.createTermSV(new Name("o"), objectSort);
+        SchemaVariable heapVar = SchemaVariableFactory.createTermSV(new Name("h"), heapSort);
+        tacletBuilder.addVarsNew(objectVar, objectType);
+        tacletBuilder.addVarsNew(heapVar, heapType);
+        Term heapVarTerm = termBuilder.var(heapVar);
+        Term objectVarTerm = termBuilder.var(objectVar);
+        Term findTerm = termBuilder.func(objectToLdFun, heapVarTerm, objectVarTerm);
+        tacletBuilder.setFind(findTerm);
+        tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+        Term[] args = new Term[fields.length];
+        for (int i = 0; i < fields.length; ++i) {
+            ProgramElementName pen = new ProgramElementName(names.get(i));
+            LocationVariable locVar = new LocationVariable(pen, types.get(i), ldkjt, false, false);
+            args[i] = termBuilder.select(sorts.get(i), heapVarTerm, objectVarTerm, locVar);
         }
-        findTerm = termBuilder.func(getFunc, termBuilder.func(newFunc));
-        tb.setFind(findTerm);
-        return tb.getTaclet();
+
+        Term replaceWithTerm = termBuilder.func(constructorFun, args);
+        tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(replaceWithTerm));
+
+        tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
+
+        return tacletBuilder.getTaclet();
+    }
+
+    private RewriteTaclet equalsTaclet() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    private void createFunctions(LedgerData ld, Sort keyld, ArrayList<Sort> argSorts) {
+        String ldName = ld.getClass().getName();
+        ImmutableArray<Sort> args = new ImmutableArray<>(argSorts);
+        constructorFun = new Function(new Name("new"+ldName), keyld, args);
+        objectToLdFun = new Function(new Name("object2" + ldName), heapSort, objectSort);
+        serFun = new Function(new Name("serialize" + ldName), seqSort, keyld);
+        deserFun = new Function(new Name("deserialize" + ldName), keyld, seqSort);
+        readLdFun = new Function(new Name("read" + ldName), keyld, seqSort, intSort);
+    }
+
+    private RewriteTaclet createGetterTaclet(int i, List<SchemaVariable> schemaVars,
+                List<Function> getters, List<Type> types,
+                LedgerData ld, Services services) {
+        RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
+        String fieldName = schemaVars.get(i).toString();
+        Term[] varTerms = new Term[schemaVars.size()];
+        for (int j = 0; j < schemaVars.size(); ++j) {
+            varTerms[j] = termBuilder.var(schemaVars.get(j));
+            tacletBuilder.addVarsNew(schemaVars.get(j), types.get(j));
+        }
+
+        tacletBuilder.setName(new Name(fieldName + "OfNew" + ld.getClass().getName()));
+
+        Term findTerm = termBuilder.func(getters.get(i), termBuilder.func(constructorFun, varTerms));
+        tacletBuilder.setFind(findTerm);
+
+        tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
+
+        tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
+
+        Term replaceWithTerm = termBuilder.var(schemaVars.get(i));
+        tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(replaceWithTerm));
+
+        return tacletBuilder.getTaclet();
     }
 
     public static Field[] getObjectFields(Object o) {
