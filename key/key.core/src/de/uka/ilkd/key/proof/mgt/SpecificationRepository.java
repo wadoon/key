@@ -453,7 +453,8 @@ public final class SpecificationRepository {
 
     private void registerContract(Contract contract,
             Pair<KeYJavaType, IObserverFunction> targetPair) {
-        if (!WellDefinednessCheck.isOn()
+        final Proof proof = services.getProof();
+        if (!WellDefinednessCheck.isOn(proof)
                 && contract instanceof WellDefinednessCheck) {
             return;
         }
@@ -595,8 +596,9 @@ public final class SpecificationRepository {
                     final FunctionalOperationContract iniContr = cf.func(pm,
                             inv);
                     addContractNoInheritance(iniContr);
-                    assert getContracts(kjt, pm)
-                            .size() == (WellDefinednessCheck.isOn() ? 2 : 1)
+                    assert getContracts(kjt, pm).size()
+                            == (WellDefinednessCheck.isOn(services.getProof())
+                                    ? 2 : 1)
                                     + oldContracts.size();
                 } else {
                     for (FunctionalOperationContract c : oldFuncContracts) {
@@ -772,7 +774,8 @@ public final class SpecificationRepository {
         for (ImmutableSet<Contract> s : contracts.values()) {
             result = result.union(s);
         }
-        return WellDefinednessCheck.isOn() ? result : removeWdChecks(result);
+        return WellDefinednessCheck.isOn(services.getProof())
+                ? result : removeWdChecks(result);
     }
 
     /**
@@ -785,7 +788,8 @@ public final class SpecificationRepository {
         target = getCanonicalFormForKJT(target, kjt);
         final Pair<KeYJavaType, IObserverFunction> pair = new Pair<KeYJavaType, IObserverFunction>(
                 kjt, target);
-        final ImmutableSet<Contract> result = WellDefinednessCheck.isOn()
+        final ImmutableSet<Contract> result =
+                WellDefinednessCheck.isOn(services.getProof())
                 ? contracts.get(pair) : removeWdChecks(contracts.get(pair));
         return result == null ? DefaultImmutableSet.<Contract> nil() : result;
     }

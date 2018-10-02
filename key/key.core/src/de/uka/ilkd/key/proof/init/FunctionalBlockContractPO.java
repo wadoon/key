@@ -312,7 +312,7 @@ public class FunctionalBlockContractPO extends AbstractPO implements ContractPO 
             final ImmutableSet<ProgramVariable> localInVariables,
             final ImmutableSet<ProgramVariable> localOutVariables, final BlockContract bc,
             final GoalsConfigurator configurator, final Services services, final TermBuilder tb) {
-        if (WellDefinednessCheck.isOn()) {
+        if (WellDefinednessCheck.isOn(services.getProof())) {
             final Term wdUpdate = services.getTermBuilder().parallel(updates[1], updates[2]);
 
             Term localAnonUpdate = createLocalAnonUpdate(localOutVariables, services, tb);

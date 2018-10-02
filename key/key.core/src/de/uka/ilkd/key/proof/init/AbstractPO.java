@@ -120,7 +120,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param proofConfig the proof configuration
      */
     void generateWdTaclets(InitConfig proofConfig) {
-        if (!WellDefinednessCheck.isOn()) {
+        if (!WellDefinednessCheck.isOn(proofConfig)) {
             return;
         }
         ImmutableSet<RewriteTaclet> res = DefaultImmutableSet.<RewriteTaclet>nil();

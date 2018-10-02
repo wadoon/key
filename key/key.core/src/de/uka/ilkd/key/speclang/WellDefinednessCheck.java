@@ -38,6 +38,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.OpReplacer;
+import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ContractPO;
 import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
@@ -970,12 +971,16 @@ public abstract class WellDefinednessCheck implements Contract {
     }
 
     /**
-     * This method checks, if well-definedness checks are generally turned on or off.
-     * @return true if on and false if off
+     * This method checks, if well-definedness checks are turned on or off for
+     * the current prover configuration.
+     * @param config the current prover configuration.
+     * @return True if on and false if off.
      */
-    public final static boolean isOn() {
+    public final static boolean isOn(final InitConfig config) {
+        final ProofSettings settings =
+                config != null ? config.getSettings() : ProofSettings.DEFAULT_SETTINGS;
         final String setting =
-                ProofSettings.DEFAULT_SETTINGS.getChoiceSettings().getDefaultChoices().get(OPTION);
+                settings.getChoiceSettings().getDefaultChoices().get(OPTION);
         if (setting.equals(OPTION + ":on")) {
             return true;
         } else if (setting.equals(OPTION + ":off")) {
@@ -984,6 +989,17 @@ public abstract class WellDefinednessCheck implements Contract {
             throw new RuntimeException("The setting for the wdProofs-option is not valid: "
                     + setting);
         }
+    }
+
+    /**
+     * This method checks, if well-definedness checks are turned on or off for
+     * the current prover configuration.
+     * @param proof the proof from which the prover configuration is extracted;
+     *              If it is null, the default settings are used.
+     * @return True if on and false if off.
+     */
+    public final static boolean isOn(final Proof proof) {
+        return isOn(proof != null ? proof.getInitConfig() : null);
     }
 
     /** collects terms for precondition,

@@ -70,7 +70,7 @@ public class WellDefinednessMacro extends StrategyProofMacro {
     public boolean canApplyTo(Proof proof, ImmutableList<Goal> goals, PosInOccurrence posInOcc) {
         if (proof == null
                 || proof.isDisposed()
-                || !WellDefinednessCheck.isOn()) {
+                || !WellDefinednessCheck.isOn(proof)) {
             return false;
         }
         final ContractPO po = proof.getServices().getSpecificationRepository().getPOForProof(proof);

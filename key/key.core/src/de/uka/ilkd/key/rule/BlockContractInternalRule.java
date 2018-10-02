@@ -200,7 +200,7 @@ public final class BlockContractInternalRule extends AbstractBlockContractRule {
             final GoalsConfigurator configurator, final Services services) {
         final ImmutableList<Goal> result;
         final LocationVariable heap = heaps.get(0);
-        if (WellDefinednessCheck.isOn()) {
+        if (WellDefinednessCheck.isOn(services.getProof())) {
             result = goal.split(4);
             final Term localAnonUpdate = createLocalAnonUpdate(localOutVariables, services);
             final Term wdUpdate

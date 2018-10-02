@@ -127,7 +127,8 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
         final Modality modality = (Modality) progPost.op();
 
         return !InfFlowCheckInfo.isInfFlow(goal)
-                && !WellDefinednessCheck.isOn() // TODO: Remove when wd goal is integrated,
+                && !WellDefinednessCheck.isOn(goal.proof())
+                                                // TODO: Remove when wd goal is integrated,
                                                 //  otherwise loop invariant rule would be unsound
                                                 //  w.r.t. well-definedness
                 && !(modality == Modality.BOX_TRANSACTION
