@@ -478,30 +478,37 @@ public final class ProblemInitializer {
      * Creates an initConfig / a proof environment and reads an EnvInput into it
      */
     public InitConfig prepare(EnvInput envInput) throws ProofInputException {
-       synchronized (SchemaJavaParser.class) { // The synchronized statement is required for thread save parsing since all JavaCC parser are generated static. For our own parser (ProofJavaParser.jj and SchemaJavaParser.jj) it is possible to generate them non static which is done on branch "hentschelJavaCCInstanceNotStatic". But recoder still uses static methods and the synchronized statement can not be avoided for this reason.
-           InitConfig currentBaseConfig = baseConfig; // It is required to work with a copy to make this method thread save required by the Eclipse plug-ins.
-           progressStarted(this);
-           alreadyParsed.clear();
+        synchronized (SchemaJavaParser.class) {
+            // The synchronized statement is required for thread save parsing
+            // since all JavaCC parser are generated static. For our own parser
+            // (ProofJavaParser.jj and SchemaJavaParser.jj) it is possible to
+            // generate them non static which is done on branch
+            // "hentschelJavaCCInstanceNotStatic". But recoder still uses
+            // static methods and the synchronized statement can not be avoided
+            // for this reason.
+            InitConfig currentBaseConfig = baseConfig;
+            // It is required to work with a copy to make this method thread
+            // save required by the Eclipse plug-ins.
+            progressStarted(this);
+            alreadyParsed.clear();
 
-           //the first time, read in standard rules
-           Profile profile = services.getProfile();
-           if(currentBaseConfig == null || profile != currentBaseConfig.getProfile()) {
-               currentBaseConfig = new InitConfig(services);
-               RuleSource tacletBase = profile.getStandardRules().getTacletBase();
-               if(tacletBase != null) {
-                   KeYFile tacletBaseFile
-                   = new KeYFile("taclet base",
-                                 profile.getStandardRules().getTacletBase(),
-                                 progMon,
-                                 profile);
-                   readEnvInput(tacletBaseFile, currentBaseConfig);
-               }
-               // remove traces of the generic sorts within the base configuration
-               cleanupNamespaces(currentBaseConfig);
-               baseConfig = currentBaseConfig;
-           }
-           return prepare(envInput, currentBaseConfig);
-       }
+            //the first time, read in standard rules
+            Profile profile = services.getProfile();
+            if (currentBaseConfig == null || profile != currentBaseConfig.getProfile()) {
+                currentBaseConfig = new InitConfig(services);
+                RuleSource tacletBase = profile.getStandardRules().getTacletBase();
+                if (tacletBase != null) {
+                    KeYFile tacletBaseFile =
+                            new KeYFile("taclet base", tacletBase,
+                                        progMon, profile);
+                    readEnvInput(tacletBaseFile, currentBaseConfig);
+                }
+                // remove traces of the generic sorts within the base configuration
+                cleanupNamespaces(currentBaseConfig);
+                baseConfig = currentBaseConfig;
+            }
+            return prepare(envInput, currentBaseConfig);
+        }
     }
 
     private InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)throws ProofInputException{

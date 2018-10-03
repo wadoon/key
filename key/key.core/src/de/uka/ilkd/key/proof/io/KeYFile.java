@@ -373,8 +373,8 @@ public class KeYFile implements EnvInput {
                 ImmutableList<Taclet> st = problemParser.getTaclets();
                 initConfig.setTaclets(st);
 
-                SpecificationRepository specRepos 
-                = initConfig.getServices().getSpecificationRepository();
+                SpecificationRepository specRepos =
+                        initConfig.getServices().getSpecificationRepository();
                 specRepos.addContracts(problemParser.getContracts());
                 specRepos.addClassInvariants(problemParser.getInvariants());
                 chooseContract = problemParser.getChooseContract();

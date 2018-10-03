@@ -452,7 +452,7 @@ public final class SpecificationRepository {
     }
 
     private void registerContract(Contract contract,
-            Pair<KeYJavaType, IObserverFunction> targetPair) {
+                                  Pair<KeYJavaType, IObserverFunction> targetPair) {
         final Proof proof = services.getProof();
         if (!WellDefinednessCheck.isOn(proof)
                 && contract instanceof WellDefinednessCheck) {
@@ -578,13 +578,13 @@ public final class SpecificationRepository {
      *             during contract construction from history constraint
      */
     private void createContractsFromInitiallyClause(InitiallyClause inv,
-            KeYJavaType kjt) throws SLTranslationException {
+                                                    KeYJavaType kjt)
+                                   throws SLTranslationException {
         if (!kjt.equals(inv.getKJT()))
             inv = inv.setKJT(kjt);
         for (IProgramMethod pm : services.getJavaInfo().getConstructors(kjt)) {
             if (!JMLInfoExtractor.isHelper(pm)) {
-                final ImmutableSet<Contract> oldContracts = getContracts(kjt,
-                        pm);
+                final ImmutableSet<Contract> oldContracts = getContracts(kjt, pm);
                 ImmutableSet<FunctionalOperationContract> oldFuncContracts = DefaultImmutableSet
                         .nil();
                 for (Contract old : oldContracts) {
@@ -780,9 +780,12 @@ public final class SpecificationRepository {
 
     /**
      * Returns all registered (atomic) contracts for the passed target.
+     * @param kjt the KeYJavaType
+     * @param target the passed target
+     * @return All respective registered contracts.
      */
     public ImmutableSet<Contract> getContracts(KeYJavaType kjt,
-            IObserverFunction target) {
+                                               IObserverFunction target) {
         assert kjt != null;
         assert target != null;
         target = getCanonicalFormForKJT(target, kjt);
@@ -884,9 +887,11 @@ public final class SpecificationRepository {
     /**
      * Returns a set encompassing the passed contracts and all its versions
      * inherited to overriding methods.
+     * @param contractSet the passed contracts as set.
+     * @return The passed contracts with its inherited contracts.
      */
-    public ImmutableSet<Contract> getInheritedContracts(
-            ImmutableSet<Contract> contractSet) {
+    public ImmutableSet<Contract>
+                getInheritedContracts(ImmutableSet<Contract> contractSet) {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract> nil();
         for (Contract c : contractSet) {
             result = result.union(getInheritedContracts(c));
@@ -999,8 +1004,9 @@ public final class SpecificationRepository {
         invs.put(kjt, getClassInvariants(kjt).add(inv));
         final ImmutableSet<ClassWellDefinedness> cwds = getWdClassChecks(kjt);
         if (cwds.isEmpty()) {
-            registerContract(new ClassWellDefinedness(inv, target, null, null,
-                    services));
+            registerContract(new ClassWellDefinedness(inv, target,
+                                                      null, null,
+                                                      services));
         } else {
             assert cwds.size() == 1;
             ClassWellDefinedness cwd = cwds.iterator().next();
@@ -1030,7 +1036,7 @@ public final class SpecificationRepository {
                         sub);
                 if (subCwds.isEmpty()) {
                     registerContract(new ClassWellDefinedness(subInv, subTarget,
-                            null, null, services));
+                                                              null, null, services));
                 } else {
                     for (ClassWellDefinedness cwd : subCwds) {
                         unregisterContract(cwd);
@@ -1625,7 +1631,8 @@ public final class SpecificationRepository {
      * @param addFunctionalContract whether or not to add a new {@link FunctionalBlockContract}
      *  based on {@code contract}.
      */
-    public void addBlockContract(final BlockContract contract, boolean addFunctionalContract) {
+    public void addBlockContract(final BlockContract contract,
+                                 boolean addFunctionalContract) {
         final StatementBlock block = contract.getBlock();
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
@@ -1669,7 +1676,8 @@ public final class SpecificationRepository {
      * @param addFunctionalContract whether or not to add a new {@link FunctionalLoopContract}
      *  based on {@code contract}.
      */
-    public void addLoopContract(final LoopContract contract, boolean addFunctionalContract) {
+    public void addLoopContract(final LoopContract contract,
+                                boolean addFunctionalContract) {
         final StatementBlock block = contract.getBlock();
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());

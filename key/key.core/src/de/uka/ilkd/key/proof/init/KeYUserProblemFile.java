@@ -100,47 +100,48 @@ public final class KeYUserProblemFile extends KeYFile implements ProofOblInput {
         try {
 
         	ProofSettings settings = getPreferences();
-            initConfig.setSettings(settings);	
-        	
-            ParserConfig pc = new ParserConfig
-                (initConfig.getServices(), 
-                 initConfig.namespaces());
+            initConfig.setSettings(settings);
+
+            ParserConfig pc =
+                    new ParserConfig(initConfig.getServices(),
+                                     initConfig.namespaces());
             problemParser = new KeYParserF
                 (ParserMode.PROBLEM, new KeYLexerF(getNewStream(), file.toString()),
                         pc, pc, null, null);
-            problemParser.parseWith();            
-        
+            problemParser.parseWith();
+
             settings.getChoiceSettings()
-                    .updateWith(problemParser.getActivatedChoices());           
-            
+                    .updateWith(problemParser.getActivatedChoices());
+
             initConfig.setActivatedChoices(settings.getChoiceSettings()
         	      		                   .getDefaultChoicesAsSet());
-            
+
         } catch(RecognitionException e) {
             // problemParser cannot be null here
             String message = problemParser.getErrorMessage(e);
             throw new ProofInputException(message, e);
         } catch (Exception e) {
-            throw new ProofInputException(e);      
-        }     
-	
+            throw new ProofInputException(e);
+        }
+
         //read in-code specifications
         ImmutableSet<PositionedString> warnings = DefaultImmutableSet.nil();
         try {
-        SLEnvInput slEnvInput = new SLEnvInput(readJavaPath(), 
-        				       readClassPath(), 
-        				       readBootClassPath(), getProfile(), null);
-        
+            SLEnvInput slEnvInput =
+                    new SLEnvInput(readJavaPath(), readClassPath(),
+                                   readBootClassPath(), getProfile(),
+                                   null);
+
         slEnvInput.setInitConfig(initConfig);
         warnings = warnings.union(slEnvInput.read());
         } catch (IOException ioe) {
             throw new ProofInputException(ioe);
         }
-                
+
         //read key file itself
         warnings = warnings.union(super.read());
         return warnings;
-    }    
+    }
 
 
     @Override
