@@ -978,7 +978,8 @@ public abstract class WellDefinednessCheck implements Contract {
      */
     public final static boolean isOn(final InitConfig config) {
         final ProofSettings settings =
-                config != null ? config.getSettings() : ProofSettings.DEFAULT_SETTINGS;
+                (config != null && config.getSettings() != null) ?
+                        config.getSettings() : ProofSettings.DEFAULT_SETTINGS;
         final String setting =
                 settings.getChoiceSettings().getDefaultChoices().get(OPTION);
         if (setting.equals(OPTION + ":on")) {
