@@ -13,6 +13,8 @@ import org.key_project.util.collection.ImmutableArray;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -23,43 +25,43 @@ import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.proof.init.JavaProfile;
+import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.abstraction.Type;
 
 public class LedgerDataTacletGenerator {
 
     private List<RewriteTaclet> newTaclets;
     Services services;
+    private NamespaceSet nss;
     TermBuilder termBuilder;
     Function constructorFun, objectToLdFun, serFun, deserFun, readLdFun;
     Function lastEntryFun, getValueFun; // TODO where do we get these?
     Sort heapSort, intSort, objectSort, seqSort;
-    Type intType, seqType, objectType, heapType;
+    Type intType, objectType;
 
     public LedgerDataTacletGenerator(Services services) {
         this.services = services;
-        // TODO some of these are probably wrong
-        KeYJavaType heapkjt = services.getJavaInfo().getKeYJavaType("heap");
-        KeYJavaType intkjt = services.getJavaInfo().getKeYJavaType("integer");
-        KeYJavaType objectkjt = services.getJavaInfo().getKeYJavaType("object");
-        KeYJavaType seqkjt = services.getJavaInfo().getKeYJavaType("sequence");
+        nss = services.getNamespaces();
+        termBuilder = services.getTermBuilder();
+        KeYJavaType intkjt = services.getJavaInfo().getKeYJavaType("int");
         intType = intkjt.getJavaType();
         intSort = intkjt.getSort();
-        heapType = heapkjt.getJavaType();
-        heapSort = heapkjt.getSort();
+        KeYJavaType objectkjt = services.getJavaInfo().getKeYJavaType("java.lang.Object");
         objectType = objectkjt.getJavaType();
         objectSort = objectkjt.getSort();
-        seqType = seqkjt.getJavaType();
-        seqSort = seqkjt.getSort();
+        heapSort = nss.sorts().lookup("Heap");
+        seqSort = nss.sorts().lookup("Seq");
         newTaclets = new LinkedList<>();
     }
 
     public void createTaclets(LedgerData ld) {
-        Sort ldSort = new SortImpl(new Name("k" + ld.getClass().getName()));
-        KeYJavaType ldkjt = services.getJavaInfo().getKeYJavaType(ldSort);
+        Sort ldSort = new SortImpl(new Name("k" + ld.getClass().getSimpleName()));
+        KeYJavaType ldkjt = new KeYJavaType(new ClassDeclaration(), ldSort); // TODO how to build this?
         Field[] fields = getObjectFields(ld);
         ArrayList<SchemaVariable> schemaVars = new ArrayList<>();
         ArrayList<Function> getters = new ArrayList<>();
@@ -69,9 +71,10 @@ public class LedgerDataTacletGenerator {
         ArrayList<KeYJavaType> kjts = new ArrayList<>();
 
         for (Field f : fields) {
-            String fieldName = f.getName();
+            String fieldName = f.getName(); //TODO not sure this works
+            String fieldTypeName = f.getType().getSimpleName();
             names.add(fieldName);
-            KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(fieldName);
+            KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(fieldTypeName);
             kjts.add(kjt);
             Sort sort = kjt.getSort();
             sorts.add(sort);
@@ -95,12 +98,16 @@ public class LedgerDataTacletGenerator {
         newTaclets.add(readLdTaclet());
     }
 
+    public List<RewriteTaclet> getNewTaclets() {
+        return newTaclets;
+    }
+
     private RewriteTaclet readLdTaclet() {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         SchemaVariable indexVar = SchemaVariableFactory.createTermSV(new Name("index"), intSort);
         SchemaVariable seqVar = SchemaVariableFactory.createTermSV(new Name("sequence"), seqSort);
         tacletBuilder.addVarsNew(indexVar, intType);
-        tacletBuilder.addVarsNew(seqVar, seqType);
+        tacletBuilder.addVarsNew((NewVarcond) seqVar); //TODO
         Term iTerm = termBuilder.var(indexVar);
         Term seqTerm = termBuilder.var(seqVar);
         tacletBuilder.setFind(termBuilder.func(readLdFun, iTerm, seqTerm));
@@ -128,7 +135,7 @@ public class LedgerDataTacletGenerator {
         SchemaVariable objectVar = SchemaVariableFactory.createTermSV(new Name("o"), objectSort);
         SchemaVariable heapVar = SchemaVariableFactory.createTermSV(new Name("h"), heapSort);
         tacletBuilder.addVarsNew(objectVar, objectType);
-        tacletBuilder.addVarsNew(heapVar, heapType);
+        tacletBuilder.addVarsNew((NewVarcond) heapVar); //TODO
         Term heapVarTerm = termBuilder.var(heapVar);
         Term objectVarTerm = termBuilder.var(objectVar);
         Term findTerm = termBuilder.func(objectToLdFun, heapVarTerm, objectVarTerm);
@@ -186,7 +193,7 @@ public class LedgerDataTacletGenerator {
         Term[] varTerms = new Term[schemaVars.size()];
         for (int j = 0; j < schemaVars.size(); ++j) {
             varTerms[j] = termBuilder.var(schemaVars.get(j));
-            tacletBuilder.addVarsNew(schemaVars.get(j), types.get(j));
+//            tacletBuilder.addVarsNew(schemaVars.get(j), types.get(j));
         }
 
         tacletBuilder.setName(new Name(fieldName + "OfNew" + ld.getClass().getName()));
