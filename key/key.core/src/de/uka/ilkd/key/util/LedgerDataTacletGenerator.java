@@ -40,11 +40,11 @@ public class LedgerDataTacletGenerator {
     private NamespaceSet nss;
     TermBuilder termBuilder;
     Function constructorFun, objectToLdFun, serFun, deserFun, readLdFun;
-    Function lastEntryFun, getValueFun; // TODO where do we get these?
+    Function lastEntryFun, getValueFun;
     Sort heapSort, intSort, objectSort, seqSort;
     Type intType, objectType;
 
-    public LedgerDataTacletGenerator(Services services) {
+    public LedgerDataTacletGenerator(Services services) { // TODO TYp als Parameter...? Generics...?...
         this.services = services;
         nss = services.getNamespaces();
         termBuilder = services.getTermBuilder();
@@ -57,11 +57,12 @@ public class LedgerDataTacletGenerator {
         heapSort = nss.sorts().lookup("Heap");
         seqSort = nss.sorts().lookup("Seq");
         newTaclets = new LinkedList<>();
+        lastEntryFun = services.getNamespaces().functions().lookup("lastEntry");
+        lastEntryFun = services.getNamespaces().functions().lookup("getValue");
     }
 
     public void createTaclets(LedgerData ld) {
         Sort ldSort = new SortImpl(new Name("k" + ld.getClass().getSimpleName()));
-        KeYJavaType ldkjt = new KeYJavaType(new ClassDeclaration(), ldSort); // TODO how to build this?
         Field[] fields = getObjectFields(ld);
         ArrayList<SchemaVariable> schemaVars = new ArrayList<>();
         ArrayList<Function> getters = new ArrayList<>();
@@ -106,8 +107,6 @@ public class LedgerDataTacletGenerator {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         SchemaVariable indexVar = SchemaVariableFactory.createTermSV(new Name("index"), intSort);
         SchemaVariable seqVar = SchemaVariableFactory.createTermSV(new Name("sequence"), seqSort);
-        tacletBuilder.addVarsNew(indexVar, intType);
-        tacletBuilder.addVarsNew((NewVarcond) seqVar); //TODO
         Term iTerm = termBuilder.var(indexVar);
         Term seqTerm = termBuilder.var(seqVar);
         tacletBuilder.setFind(termBuilder.func(readLdFun, iTerm, seqTerm));
@@ -121,7 +120,6 @@ public class LedgerDataTacletGenerator {
     private RewriteTaclet serializeTaclet(Sort ldSort, Type ldType) {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         SchemaVariable ldVar = SchemaVariableFactory.createTermSV(new Name("g"), ldSort);
-        tacletBuilder.addVarsNew(ldVar, ldType);
         tacletBuilder.setFind(termBuilder.func(deserFun, termBuilder.func(serFun, termBuilder.var(ldVar))));
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(termBuilder.var(ldVar)));
@@ -134,8 +132,6 @@ public class LedgerDataTacletGenerator {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         SchemaVariable objectVar = SchemaVariableFactory.createTermSV(new Name("o"), objectSort);
         SchemaVariable heapVar = SchemaVariableFactory.createTermSV(new Name("h"), heapSort);
-        tacletBuilder.addVarsNew(objectVar, objectType);
-        tacletBuilder.addVarsNew((NewVarcond) heapVar); //TODO
         Term heapVarTerm = termBuilder.var(heapVar);
         Term objectVarTerm = termBuilder.var(objectVar);
         Term findTerm = termBuilder.func(objectToLdFun, heapVarTerm, objectVarTerm);
@@ -160,8 +156,6 @@ public class LedgerDataTacletGenerator {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         SchemaVariable ldVar1 = SchemaVariableFactory.createTermSV(new Name("g"), ldSort);
         SchemaVariable ldVar2 = SchemaVariableFactory.createTermSV(new Name("g"), ldSort);
-        tacletBuilder.addVarsNew(ldVar1, ldType);
-        tacletBuilder.addVarsNew(ldVar2, ldType);
         tacletBuilder.setFind(termBuilder.equals(termBuilder.var(ldVar1), termBuilder.var(ldVar2)));
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
         Term[] args = new Term[getters.size()];
@@ -193,7 +187,6 @@ public class LedgerDataTacletGenerator {
         Term[] varTerms = new Term[schemaVars.size()];
         for (int j = 0; j < schemaVars.size(); ++j) {
             varTerms[j] = termBuilder.var(schemaVars.get(j));
-//            tacletBuilder.addVarsNew(schemaVars.get(j), types.get(j));
         }
 
         tacletBuilder.setName(new Name(fieldName + "OfNew" + ld.getClass().getName()));
@@ -217,11 +210,11 @@ public class LedgerDataTacletGenerator {
     }
 }
 
-/** superclass of all objects that can be stored on the ledger */
-abstract class LedgerData {
-
-    public abstract byte[] serialize(LedgerData ld);
-
-    public abstract LedgerData deserialize(byte[] b);
-
-}
+///** superclass of all objects that can be stored on the ledger */
+//abstract class LedgerData {
+//
+//    public abstract byte[] serialize(LedgerData ld);
+//
+//    public abstract LedgerData deserialize(byte[] b);
+//
+//}
