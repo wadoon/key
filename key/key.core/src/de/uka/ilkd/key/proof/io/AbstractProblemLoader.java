@@ -239,6 +239,7 @@ public abstract class AbstractProblemLoader {
             if (!problemInitializer.getWarnings().isEmpty()) {
                control.reportWarnings(problemInitializer.getWarnings());
             }
+            // TODO js: Hier Taclets generieren
             // Read proof obligation settings
             LoadedPOContainer poContainer = createProofObligationContainer();
             ProofAggregate proofList = null;
