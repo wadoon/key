@@ -13,17 +13,6 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Properties;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -52,7 +41,18 @@ import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
+import de.uka.ilkd.key.util.LedgerDataTacletGenerator;
 import de.uka.ilkd.key.util.Pair;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+
+import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Properties;
 
 
 /**
@@ -66,11 +66,11 @@ public abstract class AbstractPO implements IPersistablePO {
     protected final JavaInfo javaInfo;
     protected final HeapLDT heapLDT;
     protected final SpecificationRepository specRepos;
-    protected final String name;
+    protected final java.lang.String name;
     protected ImmutableSet<NoPosTacletApp> taclets;
     protected Term[] poTerms;
-    protected String[] poNames;
-    private String header;
+    protected java.lang.String[] poNames;
+    private java.lang.String header;
     private ProofAggregate proofAggregate;
 
 
@@ -88,7 +88,7 @@ public abstract class AbstractPO implements IPersistablePO {
     //constructors
     //-------------------------------------------------------------------------
     public AbstractPO(InitConfig initConfig,
-                      String name) {
+                      java.lang.String name) {
         this.environmentConfig = initConfig;
         this.environmentServices = initConfig.getServices();
         this.javaInfo = initConfig.getServices().getJavaInfo();
@@ -124,14 +124,14 @@ public abstract class AbstractPO implements IPersistablePO {
             return;
         }
         ImmutableSet<RewriteTaclet> res = DefaultImmutableSet.<RewriteTaclet>nil();
-        ImmutableSet<String> names = DefaultImmutableSet.<String>nil();
+        ImmutableSet<java.lang.String> names = DefaultImmutableSet.<java.lang.String>nil();
         for (WellDefinednessCheck ch: specRepos.getAllWdChecks()) {
             if (ch instanceof MethodWellDefinedness) {
                 MethodWellDefinedness mwd = (MethodWellDefinedness)ch;
                 // WD(callee.m(...))
                 RewriteTaclet mwdTaclet = mwd.createOperationTaclet(proofConfig.getServices());
-                String tName = mwdTaclet.name().toString();
-                final String prefix;
+                java.lang.String tName = mwdTaclet.name().toString();
+                final java.lang.String prefix;
                 if (tName.startsWith(WellDefinednessCheck.OP_TACLET)) {
                     prefix = WellDefinednessCheck.OP_TACLET;
                 } else if (tName.startsWith(WellDefinednessCheck.OP_EXC_TACLET)) {
@@ -156,6 +156,17 @@ public abstract class AbstractPO implements IPersistablePO {
         // WD(a.<inv>)
         res = res.union(ClassWellDefinedness.createInvTaclet(proofConfig.getServices()));
         for (RewriteTaclet t: res) {
+            register(t, proofConfig);
+        }
+    }
+
+    void generateLedgerTaclets(InitConfig proofConfig) {
+        Services services = proofConfig.getServices();
+        KeYJavaType ldkjt = services.getJavaInfo().getKeYJavaType("ledgerData");
+        LedgerDataTacletGenerator gen = new LedgerDataTacletGenerator(services, ldkjt);
+
+        List<Taclet> taclets = gen.createTaclets();
+        for (Taclet t : taclets) {
             register(t, proofConfig);
         }
     }
@@ -320,7 +331,7 @@ public abstract class AbstractPO implements IPersistablePO {
             this.lowLink = lowLink;
         }
 
-        public boolean equals(Object o) {
+        public boolean equals(java.lang.Object o) {
             if (o instanceof Vertex) {
                 Vertex other = (Vertex) o;
                 return core.equals(other.core);
@@ -447,7 +458,7 @@ public abstract class AbstractPO implements IPersistablePO {
     //public interface
     //-------------------------------------------------------------------------
     @Override
-    public final String name() {
+    public final java.lang.String name() {
         return name;
     }
 
@@ -456,15 +467,15 @@ public abstract class AbstractPO implements IPersistablePO {
      * Creates declarations necessary to save/load proof in textual form
      * (helper for createProof()).
      */
-    private void createProofHeader(String javaPath,
-            String classPath,
-            String bootClassPath,
-            String includedFiles,
-            Services services) {
+    private void createProofHeader(java.lang.String javaPath,
+                                   java.lang.String classPath,
+                                   java.lang.String bootClassPath,
+                                   java.lang.String includedFiles,
+                                   Services services) {
         if (header != null) {
             return;
         }
-        final StringBuffer sb = new StringBuffer();
+        final java.lang.StringBuffer sb = new java.lang.StringBuffer();
 
         //bootclasspath
         if (bootClassPath != null && !bootClassPath.equals("")) {
@@ -511,9 +522,9 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param proofConfig the proof configuration
      * @return the created proof
      */
-    protected Proof createProof(String proofName,
-            Term poTerm,
-            InitConfig proofConfig) {
+    protected Proof createProof(java.lang.String proofName,
+                                Term poTerm,
+                                InitConfig proofConfig) {
         if (proofConfig == null) {
             proofConfig = environmentConfig.deepCopy();
         }
@@ -531,8 +542,8 @@ public abstract class AbstractPO implements IPersistablePO {
     }
 
 
-    protected Proof createProofObject(String proofName, String proofHeader, Term poTerm,
-            InitConfig proofConfig) {
+    protected Proof createProofObject(java.lang.String proofName, java.lang.String proofHeader, Term poTerm,
+                                      InitConfig proofConfig) {
         Proof proof = new Proof(proofName,
                 poTerm,
                 proofHeader,
@@ -598,7 +609,7 @@ public abstract class AbstractPO implements IPersistablePO {
      * @param properties The properties to read from.
      * @return The name value.
      */
-    public static String getName(Properties properties) {
+    public static java.lang.String getName(Properties properties) {
         return properties.getProperty(IPersistablePO.PROPERTY_NAME);
     }
 

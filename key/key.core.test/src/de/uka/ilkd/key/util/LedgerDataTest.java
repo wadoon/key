@@ -1,18 +1,14 @@
 package de.uka.ilkd.key.util;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.rule.RewriteTaclet;
-import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.TacletForTests;
+import org.junit.Before;
+import org.junit.Test;
 
 public class LedgerDataTest {
     private Services s;
@@ -42,51 +38,49 @@ public class LedgerDataTest {
         objectType = nss.sorts().lookup("java.lang.Object");
         fieldType = nss.sorts().lookup("Field");
         this.tb = s.getTermBuilder();
-        gen = new LedgerDataTacletGenerator(s);
+        Sort s = new SortImpl(new Name("TestSort"));
     }
 
     @Test
     public void test() {
-        gen.createTaclets(new TestClass1());
-        List<RewriteTaclet> tacs = gen.getNewTaclets();
     }
 
 
 
 }
 
-class TestClass1 extends LedgerData {
+class TestClass1 extends org.hyperledger.fabric.shim.LedgerData {
 
     public static int x;
 
     @Override
-    public byte[] serialize(LedgerData ld) {
+    public byte[] serialize(org.hyperledger.fabric.shim.LedgerData ld) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public LedgerData deserialize(byte[] b) {
+    public org.hyperledger.fabric.shim.LedgerData deserialize(byte[] b) {
         // TODO Auto-generated method stub
         return null;
     }
 
 }
 
-class TestClass2 extends LedgerData {
+class TestClass2 extends org.hyperledger.fabric.shim.LedgerData {
 
     private boolean b;
     int y;
     TestClass1 tc1;
 
     @Override
-    public byte[] serialize(LedgerData ld) {
+    public byte[] serialize(org.hyperledger.fabric.shim.LedgerData ld) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public LedgerData deserialize(byte[] b) {
+    public org.hyperledger.fabric.shim.LedgerData deserialize(byte[] b) {
         // TODO Auto-generated method stub
         return null;
     }

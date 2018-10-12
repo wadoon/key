@@ -1,19 +1,10 @@
 package de.uka.ilkd.key.util;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -22,84 +13,95 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.logic.sort.SortImpl;
-import de.uka.ilkd.key.proof.init.JavaProfile;
-import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.abstraction.Type;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 public class LedgerDataTacletGenerator {
 
-    private List<RewriteTaclet> newTaclets;
+    public static final RuleSet SIMPLIFY = new RuleSet(new Name("simplify"));
+    private final Sort ldSort;
     Services services;
-    private NamespaceSet nss;
-    TermBuilder termBuilder;
-    Function constructorFun, objectToLdFun, serFun, deserFun, readLdFun;
-    Function lastEntryFun, getValueFun;
-    Sort heapSort, intSort, objectSort, seqSort;
-    Type intType, objectType;
+    private TermBuilder termBuilder;
+    private Function constructorFun, objectToLdFun, serFun, deserFun, readLdFun;
+    private Function lastEntryFun, getValueFun;
+    private Sort heapSort, intSort, objectSort, seqSort;
 
-    public LedgerDataTacletGenerator(Services services) { // TODO TYp als Parameter...? Generics...?...
+    public LedgerDataTacletGenerator(Services services, KeYJavaType ldkjt) {
         this.services = services;
-        nss = services.getNamespaces();
+        this.ldSort = ldkjt.getSort();
+        NamespaceSet nss = services.getNamespaces();
         termBuilder = services.getTermBuilder();
         KeYJavaType intkjt = services.getJavaInfo().getKeYJavaType("int");
-        intType = intkjt.getJavaType();
         intSort = intkjt.getSort();
         KeYJavaType objectkjt = services.getJavaInfo().getKeYJavaType("java.lang.Object");
-        objectType = objectkjt.getJavaType();
         objectSort = objectkjt.getSort();
         heapSort = nss.sorts().lookup("Heap");
         seqSort = nss.sorts().lookup("Seq");
-        newTaclets = new LinkedList<>();
         lastEntryFun = services.getNamespaces().functions().lookup("lastEntry");
-        lastEntryFun = services.getNamespaces().functions().lookup("getValue");
+        getValueFun = services.getNamespaces().functions().lookup("getValue");
     }
 
-    public void createTaclets(LedgerData ld) {
-        Sort ldSort = new SortImpl(new Name("k" + ld.getClass().getSimpleName()));
-        Field[] fields = getObjectFields(ld);
+    public List<Taclet> createTaclets() {
+        LinkedList<Taclet> res = new LinkedList<>();
+        Collection<Sort> sorts = services.getNamespaces().sorts().allElements();
+        Set<Sort> subSorts = childSorts(ldSort, sorts);
+
+        for (Sort s : subSorts) {
+            KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(s);
+            res.addAll(createTaclets(kjt));
+        }
+
+        return res;
+    }
+
+    List<Taclet> createTaclets(KeYJavaType ldkjt) {
+        List<Taclet> newTaclets = new LinkedList<>();
+        ImmutableList<Field> fields = services.getJavaInfo().getAllFields((TypeDeclaration) ldkjt.getJavaType());
         ArrayList<SchemaVariable> schemaVars = new ArrayList<>();
         ArrayList<Function> getters = new ArrayList<>();
         ArrayList<Sort> sorts = new ArrayList<>();
-        ArrayList<Type> types = new ArrayList<>();
         ArrayList<String> names = new ArrayList<>();
         ArrayList<KeYJavaType> kjts = new ArrayList<>();
 
         for (Field f : fields) {
-            String fieldName = f.getName(); //TODO not sure this works
-            String fieldTypeName = f.getType().getSimpleName();
+            String fieldName = f.getName();
+            String fieldTypeName = f.getType().getName();
             names.add(fieldName);
             KeYJavaType kjt = services.getJavaInfo().getKeYJavaType(fieldTypeName);
             kjts.add(kjt);
             Sort sort = kjt.getSort();
             sorts.add(sort);
-            Type type = kjt.getJavaType();
-            types.add(type);
             SchemaVariable sv = SchemaVariableFactory.createTermSV(new Name(fieldName), sort);
             schemaVars.add(sv);
             Function getFunc = new Function(new Name("get" + fieldName), sort, ldSort);
             getters.add(getFunc);
         }
 
-        createFunctions(ld, ldSort, sorts);
+        createFunctions(ldkjt, ldSort, sorts);
 
         for (int i = 0; i < schemaVars.size(); ++i) {
-            RewriteTaclet tac = createGetterTaclet(i, schemaVars, getters, types, ld, services);
+            RewriteTaclet tac = createGetterTaclet(i, schemaVars, getters, ldkjt);
             newTaclets.add(tac);
         }
-        newTaclets.add(equalsTaclet(ldSort, ldkjt.getJavaType(), getters));
+        newTaclets.add(equalsTaclet(ldSort, getters));
         newTaclets.add(objectToLdTaclet(fields, sorts, names, kjts, ldkjt));
-        newTaclets.add(serializeTaclet(ldSort, ldkjt.getJavaType()));
+        newTaclets.add(serializeTaclet(ldSort));
         newTaclets.add(readLdTaclet());
-    }
 
-    public List<RewriteTaclet> getNewTaclets() {
         return newTaclets;
     }
 
@@ -117,18 +119,18 @@ public class LedgerDataTacletGenerator {
         return tacletBuilder.getTaclet();
     }
 
-    private RewriteTaclet serializeTaclet(Sort ldSort, Type ldType) {
+    private RewriteTaclet serializeTaclet(Sort ldSort) {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         SchemaVariable ldVar = SchemaVariableFactory.createTermSV(new Name("g"), ldSort);
         tacletBuilder.setFind(termBuilder.func(deserFun, termBuilder.func(serFun, termBuilder.var(ldVar))));
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(termBuilder.var(ldVar)));
-        tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
+        tacletBuilder.addRuleSet(SIMPLIFY);
         return tacletBuilder.getTaclet();
     }
 
-    private RewriteTaclet objectToLdTaclet(Field[] fields, ArrayList<Sort> sorts, ArrayList<String> names, ArrayList<KeYJavaType> types,
-        KeYJavaType ldkjt) {
+    private RewriteTaclet objectToLdTaclet(ImmutableList<Field> fields, ArrayList<Sort> sorts, ArrayList<String> names, ArrayList<KeYJavaType> types,
+                                           KeYJavaType ldkjt) {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         SchemaVariable objectVar = SchemaVariableFactory.createTermSV(new Name("o"), objectSort);
         SchemaVariable heapVar = SchemaVariableFactory.createTermSV(new Name("h"), heapSort);
@@ -137,8 +139,8 @@ public class LedgerDataTacletGenerator {
         Term findTerm = termBuilder.func(objectToLdFun, heapVarTerm, objectVarTerm);
         tacletBuilder.setFind(findTerm);
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
-        Term[] args = new Term[fields.length];
-        for (int i = 0; i < fields.length; ++i) {
+        Term[] args = new Term[fields.size()];
+        for (int i = 0; i < fields.size(); ++i) {
             ProgramElementName pen = new ProgramElementName(names.get(i));
             LocationVariable locVar = new LocationVariable(pen, types.get(i), ldkjt, false, false);
             args[i] = termBuilder.select(sorts.get(i), heapVarTerm, objectVarTerm, locVar);
@@ -147,12 +149,12 @@ public class LedgerDataTacletGenerator {
         Term replaceWithTerm = termBuilder.func(constructorFun, args);
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(replaceWithTerm));
 
-        tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
+        tacletBuilder.addRuleSet(SIMPLIFY);
 
         return tacletBuilder.getTaclet();
     }
 
-    private RewriteTaclet equalsTaclet(Sort ldSort, Type ldType, ArrayList<Function> getters) {
+    private RewriteTaclet equalsTaclet(Sort ldSort, ArrayList<Function> getters) {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         SchemaVariable ldVar1 = SchemaVariableFactory.createTermSV(new Name("g"), ldSort);
         SchemaVariable ldVar2 = SchemaVariableFactory.createTermSV(new Name("g"), ldSort);
@@ -166,12 +168,11 @@ public class LedgerDataTacletGenerator {
         }
         Term replaceWithTerm = termBuilder.and(args);
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(replaceWithTerm));
-        // tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
         return tacletBuilder.getTaclet();
     }
 
-    private void createFunctions(LedgerData ld, Sort keyld, ArrayList<Sort> argSorts) {
-        String ldName = ld.getClass().getName();
+    private void createFunctions(KeYJavaType kjt, Sort keyld, ArrayList<Sort> argSorts) {
+        String ldName = kjt.getName();
         ImmutableArray<Sort> args = new ImmutableArray<>(argSorts);
         constructorFun = new Function(new Name("new" + ldName), keyld, args);
         objectToLdFun = new Function(new Name("object2" + ldName), heapSort, objectSort);
@@ -180,8 +181,8 @@ public class LedgerDataTacletGenerator {
         readLdFun = new Function(new Name("read" + ldName), keyld, seqSort, intSort);
     }
 
-    private RewriteTaclet createGetterTaclet(int i, List<SchemaVariable> schemaVars, List<Function> getters, List<Type> types, LedgerData ld,
-        Services services) {
+    private RewriteTaclet createGetterTaclet(int i, List<SchemaVariable> schemaVars,
+                                             List<Function> getters, KeYJavaType ldkjt) {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         String fieldName = schemaVars.get(i).toString();
         Term[] varTerms = new Term[schemaVars.size()];
@@ -189,14 +190,14 @@ public class LedgerDataTacletGenerator {
             varTerms[j] = termBuilder.var(schemaVars.get(j));
         }
 
-        tacletBuilder.setName(new Name(fieldName + "OfNew" + ld.getClass().getName()));
+        tacletBuilder.setName(new Name(fieldName + "OfNew" + ldkjt.getName()));
 
         Term findTerm = termBuilder.func(getters.get(i), termBuilder.func(constructorFun, varTerms));
         tacletBuilder.setFind(findTerm);
 
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
 
-        tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
+        tacletBuilder.addRuleSet(SIMPLIFY);
 
         Term replaceWithTerm = termBuilder.var(schemaVars.get(i));
         tacletBuilder.addTacletGoalTemplate(new RewriteTacletGoalTemplate(replaceWithTerm));
@@ -204,17 +205,13 @@ public class LedgerDataTacletGenerator {
         return tacletBuilder.getTaclet();
     }
 
-    public static Field[] getObjectFields(Object o) {
-        Class<? extends Object> c = o.getClass();
-        return c.getFields();
+    private Set<Sort> childSorts(Sort s, Collection<Sort> sorts) {
+        Set<Sort> res = new HashSet<>();
+        for (Sort child : sorts) {
+            if (!(s instanceof NullSort) && s.extendsTrans(child)) {
+                res.add(child);
+            }
+        }
+        return res;
     }
 }
-
-///** superclass of all objects that can be stored on the ledger */
-//abstract class LedgerData {
-//
-//    public abstract byte[] serialize(LedgerData ld);
-//
-//    public abstract LedgerData deserialize(byte[] b);
-//
-//}
