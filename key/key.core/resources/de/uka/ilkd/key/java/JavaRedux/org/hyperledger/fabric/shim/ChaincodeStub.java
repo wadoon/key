@@ -29,4 +29,14 @@ public interface ChaincodeStub {
 	void /*@helper@*/ delState(int key);
 
 
+         /*@ public normal_behaviour
+            ensures \result.length == \dl_seqLen(\dl_filterID(transactionLog, key, 0));
+            ensures (\forall int i; 0 <= i && i < \result.length;
+                             \dl_array2seq(\result[i]) ==
+                              \dl_getValue((\dl_getEntry(\dl_filterID(transactionLog, key, 0), i)) ));
+            assignable \nothing;
+          @*/
+        byte[][] /*@helper@*/ getHistoryForKey(int key);
+
+
 }
