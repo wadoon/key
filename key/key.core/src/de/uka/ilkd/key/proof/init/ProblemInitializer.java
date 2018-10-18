@@ -13,18 +13,6 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Vector;
-
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ParseExceptionInFile;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -64,12 +52,25 @@ import de.uka.ilkd.key.proof.io.RuleSource;
 import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.PositionedString;
+import de.uka.ilkd.key.util.LedgerDataTacletGenerator;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ProgressMonitor;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 import recoder.io.PathList;
 import recoder.io.ProjectSettings;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Vector;
 
 
 public final class ProblemInitializer {
@@ -545,6 +546,8 @@ public final class ProblemInitializer {
         } else
                 throw new ProofInputException("Problem initialization without JavaInfo!");
 
+        generateLedgerDataTaclets(initConfig);
+
         //read envInput
         readEnvInput(envInput, initConfig);
 
@@ -610,4 +613,18 @@ public final class ProblemInitializer {
       return warnings;
    }
 
+
+    private void generateLedgerDataTaclets(InitConfig initConfig) {
+        Services services = initConfig.getServices();
+        KeYJavaType ldkjt = services.getJavaInfo().getKeYJavaType("org.hyperledger.fabric.shim.LedgerData");
+        LedgerDataTacletGenerator gen = new LedgerDataTacletGenerator(services, ldkjt);
+
+        List<Taclet> taclets = gen.createTaclets();
+        for (Taclet t : taclets) {
+            initConfig.registerRule(t, AxiomJustification.INSTANCE);
+        }
+        for (Function f : gen.getNewFunctions()) {
+            initConfig.funcNS().add(f);
+        }
+    }
 }

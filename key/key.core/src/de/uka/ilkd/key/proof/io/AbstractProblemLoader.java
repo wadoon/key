@@ -13,22 +13,9 @@
 
 package de.uka.ilkd.key.proof.io;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.antlr.runtime.MismatchedTokenException;
-import org.key_project.util.reflection.ClassLoaderUtil;
-
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.parser.KeYLexer;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Node;
@@ -44,14 +31,30 @@ import de.uka.ilkd.key.proof.init.ProblemInitializer;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
+import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.util.ExceptionHandlerException;
+import de.uka.ilkd.key.util.LedgerDataTacletGenerator;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.Triple;
+import org.antlr.runtime.MismatchedTokenException;
+import org.key_project.util.reflection.ClassLoaderUtil;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * <p>
@@ -239,7 +242,6 @@ public abstract class AbstractProblemLoader {
             if (!problemInitializer.getWarnings().isEmpty()) {
                control.reportWarnings(problemInitializer.getWarnings());
             }
-            // TODO js: Hier Taclets generieren
             // Read proof obligation settings
             LoadedPOContainer poContainer = createProofObligationContainer();
             ProofAggregate proofList = null;

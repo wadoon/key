@@ -41,7 +41,6 @@ import de.uka.ilkd.key.speclang.ClassWellDefinedness;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.MethodWellDefinedness;
 import de.uka.ilkd.key.speclang.WellDefinednessCheck;
-import de.uka.ilkd.key.util.LedgerDataTacletGenerator;
 import de.uka.ilkd.key.util.Pair;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -156,17 +155,6 @@ public abstract class AbstractPO implements IPersistablePO {
         // WD(a.<inv>)
         res = res.union(ClassWellDefinedness.createInvTaclet(proofConfig.getServices()));
         for (RewriteTaclet t: res) {
-            register(t, proofConfig);
-        }
-    }
-
-    void generateLedgerTaclets(InitConfig proofConfig) {
-        Services services = proofConfig.getServices();
-        KeYJavaType ldkjt = services.getJavaInfo().getKeYJavaType("ledgerData");
-        LedgerDataTacletGenerator gen = new LedgerDataTacletGenerator(services, ldkjt);
-
-        List<Taclet> taclets = gen.createTaclets();
-        for (Taclet t : taclets) {
             register(t, proofConfig);
         }
     }

@@ -518,8 +518,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         // for JML annotation statements
         generateWdTaclets(proofConfig);
-
-        generateLedgerTaclets(proofConfig);
     }
 
     /**
