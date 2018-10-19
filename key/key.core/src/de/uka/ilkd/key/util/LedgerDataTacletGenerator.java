@@ -69,12 +69,12 @@ public class LedgerDataTacletGenerator {
         return res;
     }
 
-    List<Taclet> createTaclets(KeYJavaType ldkjt) {
+    private List<Taclet> createTaclets(KeYJavaType ldkjt) {
         List<Taclet> newTaclets = new LinkedList<>();
         ImmutableList<Field> allFields = services.getJavaInfo().getAllFields((TypeDeclaration) ldkjt.getJavaType());
         ArrayList<Field> fields = new ArrayList<>();
         for (Field f : allFields) {
-            if (!(f.getFullName().contains("class"))) { //TODO horrible hack. how to only get ACTUAL fields?
+            if (!(f.getFullName().contains("class"))) { //TODO horrible hack to exclude implicit fields. how to only get ACTUAL fields?
                 fields.add(f);
             }
         }
