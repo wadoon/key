@@ -621,7 +621,7 @@ public final class ProblemInitializer {
 
         List<Taclet> taclets = gen.createTaclets();
         for (Taclet t : taclets) {
-            initConfig.getTaclets().append(t);
+            initConfig.setTaclets(initConfig.getTaclets().append(t));
             initConfig.registerRule(t, AxiomJustification.INSTANCE);
         }
         for (Function f : gen.getNewFunctions()) {
