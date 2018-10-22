@@ -546,6 +546,7 @@ public final class ProblemInitializer {
         } else
                 throw new ProofInputException("Problem initialization without JavaInfo!");
 
+        //generate Taclets for Chaincode Data Types
         generateLedgerDataTaclets(initConfig);
 
         //read envInput
@@ -614,6 +615,10 @@ public final class ProblemInitializer {
    }
 
 
+    /**
+     * Creates the taclets that are needed to reason about reading/writing data to and from the ledger.
+     * @param initConfig the proof configuration for which the taclets are generated
+     */
     private void generateLedgerDataTaclets(InitConfig initConfig) {
         Services services = initConfig.getServices();
         KeYJavaType ldkjt = services.getJavaInfo().getKeYJavaType("org.hyperledger.fabric.shim.LedgerData");

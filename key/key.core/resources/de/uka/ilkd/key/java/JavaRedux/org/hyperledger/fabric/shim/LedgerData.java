@@ -4,14 +4,14 @@ package org.hyperledger.fabric.shim;
 public abstract class LedgerData {
 
     /*@ public normal_behaviour
-      ensures \dl_array2seq(\result) == \dl_serializeLedgerData(\dl_object2LedgerData(g));
+      ensures \dl_array2seq(\result) == \dl_serializeLedgerData(\dl_object2LedgerData(ld));
       ensures \fresh(\result);
       assignable \nothing;                
       @*/
     public abstract byte[] serialize(LedgerData ld);
 
     /*@ public normal_behaviour
-      ensures \dl_object2LedgerData(\result) == \dl_deserializeLedgerData(\dl_array2seq(bytes));
+      ensures \dl_object2LedgerData(\result) == \dl_deserializeLedgerData(\dl_array2seq(b));
       ensures \fresh(\result);
       assignable \nothing;                
       @*/
