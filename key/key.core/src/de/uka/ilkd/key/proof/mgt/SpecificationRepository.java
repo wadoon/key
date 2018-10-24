@@ -1148,7 +1148,6 @@ public final class SpecificationRepository {
                     .getAllProgramMethods(selfKjt)) {
                 if (!pm.isVoid() && !pm.isConstructor() && !pm.isImplicit()
                         && !pm.isModel()) {
-                    System.out.println("pm.getFullName() = " + pm.getFullName());
                     pm = services.getJavaInfo().getToplevelPM(selfKjt, pm);
 
                     StringBuffer sb = new StringBuffer();

@@ -315,7 +315,7 @@ public class LedgerDataTacletGenerator {
 
     //TODO jonas: assume hinzufügen, sodass taclet nur für "richtigen" typ 
     //angewandt werden kann (mit instanceof  ld)
-    
+
     /**
      * The serialization method is only specified for the LedgerData supertype. In order to extend this specification
      * to all subtypes, this taclet can be used.

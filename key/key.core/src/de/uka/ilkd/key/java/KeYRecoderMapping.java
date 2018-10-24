@@ -103,10 +103,11 @@ public class KeYRecoderMapping{
     */
     public recoder.ModelElement toRecoder(ModelElement pe) {
         Object res=revMap.get(pe);
-	if (res==null) {
-	    //System.out.println(revMap);
-	}
-        //Debug.assertTrue(res!=null, "Model Element not known", pe);	
+        if (res == null) {
+            //System.out.println(revMap);
+        }
+        //Debug.assertTrue(res!=null, "Model Element not known", pe);
+        // FIXME: What is this assertion? Why did you uncomment it?
 
         return (recoder.ModelElement)res;
     }

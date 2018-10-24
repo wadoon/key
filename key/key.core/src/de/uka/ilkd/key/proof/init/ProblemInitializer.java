@@ -505,16 +505,17 @@ public final class ProblemInitializer {
        }
     }
 
-    private InitConfig prepare(EnvInput envInput, InitConfig referenceConfig)throws ProofInputException{
+    private InitConfig prepare(EnvInput envInput,
+                               InitConfig referenceConfig) throws ProofInputException {
         //create initConfig
     	InitConfig initConfig = referenceConfig.copy();
-        
-    	
+
+
         //read Java
     	//readIncludes(envInput, initConfig);
         readJava(envInput, initConfig);
-        
-    	
+
+
         //register function and predicate symbols defined by Java program
         final JavaInfo javaInfo = initConfig.getServices().getJavaInfo();
         final Namespace<Function> functions
