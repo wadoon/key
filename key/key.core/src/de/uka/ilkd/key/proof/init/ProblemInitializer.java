@@ -512,7 +512,7 @@ public final class ProblemInitializer {
 
 
         //read Java
-    	//readIncludes(envInput, initConfig);
+        //readIncludes(envInput, initConfig);
         readJava(envInput, initConfig);
 
 
@@ -617,12 +617,14 @@ public final class ProblemInitializer {
 
 
     /**
-     * Creates the taclets that are needed to reason about reading/writing data to and from the ledger.
+     * Creates the taclets that are needed to reason about reading/writing data
+     * to and from the ledger.
      * @param initConfig the proof configuration for which the taclets are generated
      */
     private void generateLedgerDataTaclets(InitConfig initConfig) {
         Services services = initConfig.getServices();
-        KeYJavaType ldkjt = services.getJavaInfo().getKeYJavaType("org.hyperledger.fabric.shim.LedgerData");
+        KeYJavaType ldkjt =
+            services.getJavaInfo().getKeYJavaType("org.hyperledger.fabric.shim.LedgerData");
         LedgerDataTacletGenerator gen = new LedgerDataTacletGenerator(services, ldkjt);
 
         List<Taclet> taclets = gen.createTaclets();

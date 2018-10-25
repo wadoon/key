@@ -34,7 +34,9 @@ public class LedgerDataTacletGenerator {
 
     /** Ruleset for Taclets that should be always be used by automation */
     public static final RuleSet SIMPLIFY = new RuleSet(new Name("simplify"));
-    /** The sort of the LedgerData type, which is extended by the initially unknown actual Ledger Types. */
+    /** The sort of the LedgerData type, which is extended by the initially
+     *  unknown actual Ledger Types.
+     */
     private final Sort superSort;
     /** Services. Everyone needs them */
     Services services;
@@ -313,7 +315,7 @@ public class LedgerDataTacletGenerator {
         return res;
     }
 
-    //TODO jonas: assume hinzufügen, sodass taclet nur für "richtigen" typ 
+    //TODO jonas: assume hinzufügen, sodass taclet nur für "richtigen" typ
     //angewandt werden kann (mit instanceof  ld)
 
     /**
