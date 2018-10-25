@@ -13,9 +13,12 @@ limitations under the License.
 
 package org.hyperledger.fabric.lib.cid;
 
-public abstract class ClientIdentity {
+public final class ClientIdentity {
 
     // GetID returns the ID associated with the invoking identity. This ID
     // is guaranteed to be unique within the MSP.
-    int getID(org.hyperledger.fabric.shim.ChaincodeStub stub);
+    /*@ public normal_behaviour
+      @ ensures true;
+      @*/
+    public static /*@ pure helper @*/ int getID(org.hyperledger.fabric.shim.ChaincodeStub stub);
 }

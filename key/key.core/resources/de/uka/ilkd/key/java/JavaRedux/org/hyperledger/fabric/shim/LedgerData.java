@@ -8,13 +8,13 @@ public abstract class LedgerData {
       ensures \fresh(\result);
       assignable \nothing;                
       @*/
-    public abstract byte[] serialize(LedgerData ld);
+    public static abstract byte[] serialize(LedgerData ld);
 
     /*@ public normal_behaviour
       ensures \dl_object2LedgerData(\result) == \dl_deserializeLedgerData(\dl_array2seq(b));
       ensures \fresh(\result);
       assignable \nothing;                
       @*/
-    public abstract LedgerData deserialize(byte[] b);
+    public static abstract LedgerData deserialize(byte[] b);
 
 }
