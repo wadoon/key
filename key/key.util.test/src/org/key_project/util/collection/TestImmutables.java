@@ -9,6 +9,8 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.collection.Immutables;
 
+import java.lang.reflect.Method;
+
 public class TestImmutables extends TestCase {
 
     @Test
@@ -105,40 +107,41 @@ public class TestImmutables extends TestCase {
     }
     
     public void testUnion() {
-       for (int setSize = 0; setSize < DefaultImmutableSet.UNION_OPTIMIZATION_SIZE * 2 + 2; setSize++) {
-          ImmutableSet<Integer> s1 = DefaultImmutableSet.nil();
-          ImmutableSet<Integer> s2 = DefaultImmutableSet.nil();
-          ImmutableSet<Integer> s1UnionS2 = DefaultImmutableSet.nil();
-          for (int i = 0; i < setSize; i++) {
-             s1 = s1.add(i);
-             s2 = s2.add(i * -1);
-             s1UnionS2 = s1UnionS2.add(i);
-             s1UnionS2 = s1UnionS2.add(i * -1);
-          }
-          // Test union without duplicates
-          ImmutableSet<Integer> union = s1.union(s2);
-          assertEquals(s1UnionS2, union);
-          // Test union with duplicates
-          union = union.union(s1);
-          assertEquals(s1UnionS2, union);
-          union = union.union(s2);
-          assertEquals(s1UnionS2, union);
-          union = union.union(union);
-          assertEquals(s1UnionS2, union);
-          // Test union without duplicates (other way round)
-          union = s2.union(s1);
-          assertEquals(s1UnionS2, union);
-          // Test union with duplicates
-          union = union.union(s1);
-          assertEquals(s1UnionS2, union);
-          union = union.union(s2);
-          assertEquals(s1UnionS2, union);
-          union = union.union(union);
-          assertEquals(s1UnionS2, union);
-       }
+        for (int setSize = 0; setSize < DefaultImmutableSet.UNION_OPTIMIZATION_SIZE * 2 + 2; setSize++) {
+            ImmutableSet<Integer> s1 = DefaultImmutableSet.nil();
+            ImmutableSet<Integer> s2 = DefaultImmutableSet.nil();
+            ImmutableSet<Integer> s1UnionS2 = DefaultImmutableSet.nil();
+            for (int i = 0; i < setSize; i++) {
+                s1 = s1.add(i);
+                s2 = s2.add(i * -1);
+                s1UnionS2 = s1UnionS2.add(i);
+                s1UnionS2 = s1UnionS2.add(i * -1);
+            }
+            // Test union without duplicates
+            ImmutableSet<Integer> union = s1.union(s2);
+            assertEquals(s1UnionS2, union);
+            // Test union with duplicates
+            union = union.union(s1);
+            assertEquals(s1UnionS2, union);
+            union = union.union(s2);
+            assertEquals(s1UnionS2, union);
+            union = union.union(union);
+            assertEquals(s1UnionS2, union);
+            // Test union without duplicates (other way round)
+            union = s2.union(s1);
+            assertEquals(s1UnionS2, union);
+            // Test union with duplicates
+            union = union.union(s1);
+            assertEquals(s1UnionS2, union);
+            union = union.union(s2);
+            assertEquals(s1UnionS2, union);
+            union = union.union(union);
+            assertEquals(s1UnionS2, union);
+        }
+    }
 
     @Test
-    public void testImprovedSetUnion() {
+    public void testImprovedSetUnion() throws Exception {
         String[][] a = { { "a", "b", "c", "d"}, { "a", "b2", "c", "d3"},
                 { "a", "b", "a", "d", "e" }, { "a", "b", "d", "d", "e" },
                 { "a" }, { },
@@ -146,21 +149,28 @@ public class TestImmutables extends TestCase {
                 { null, "a"}, { "b" } };
 
         for (int i = 0; i < a.length; i+=2) {
-            ImmutableSet<String> s1 = DefaultImmutableSet.<String>nil();
+
+            ImmutableSet<String> s1 = DefaultImmutableSet.<String>XXXnil();
             for (int j = 0; j < a[i].length; j++) {
                 s1 = s1.add(a[i][j]);
             }
-            ImmutableSet<String> s2 = DefaultImmutableSet.<String>nil();
+            ImmutableSet<String> s2 = DefaultImmutableSet.<String>XXXnil();
             for (int j = 0; j < a[i+1].length; j++) {
                 s2 = s2.add(a[i+1][j]);
             }
 
-            DefaultImmutableSet<String> newUnion = ((DefaultImmutableSet<String>) s1).newUnion((DefaultImmutableSet<String>) s2);
-            DefaultImmutableSet<String> oldUnion = ((DefaultImmutableSet<String>) s2).originalUnion(s1);
+            Method methodNewUnion = DefaultImmutableSet.class.getDeclaredMethod("newUnion", DefaultImmutableSet.class);
+            Method methodOriginalUnion = DefaultImmutableSet.class.getDeclaredMethod("originalUnion", ImmutableSet.class);
+
+            methodNewUnion.setAccessible(true);
+            methodOriginalUnion.setAccessible(true);
+
+            Object newUnion = methodNewUnion.invoke(s1, s2);
+            Object oldUnion = methodOriginalUnion.invoke(s1, s2);
             assertEquals(oldUnion, newUnion);
 
-            newUnion = ((DefaultImmutableSet<String>) s2).newUnion((DefaultImmutableSet<String>) s1);
-            oldUnion = ((DefaultImmutableSet<String>) s2).originalUnion(s1);
+            newUnion = methodNewUnion.invoke(s2, s1);
+            oldUnion = methodOriginalUnion.invoke(s2, s1);
             assertEquals(oldUnion, newUnion);
         }
 

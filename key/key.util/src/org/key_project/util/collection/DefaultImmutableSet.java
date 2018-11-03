@@ -45,6 +45,11 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         return ImmutableTrieSet.<T>empty();
     }
 
+    // to really create instances of this type here ...
+    public static final <T> ImmutableSet<T> XXXnil() {
+        return (DefaultImmutableSet<T>) NILSet.NIL;
+    }
+
 
     protected DefaultImmutableSet() {
 	elementList = ImmutableSLList.<T>nil();
