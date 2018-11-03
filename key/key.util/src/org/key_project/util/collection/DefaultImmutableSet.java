@@ -40,8 +40,9 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     /** the empty set */
     @SuppressWarnings("unchecked")
-   public static final <T> DefaultImmutableSet<T> nil() {
-	return (DefaultImmutableSet<T>) NILSet.NIL;
+   public static final <T> ImmutableSet<T> nil() {
+//	return (DefaultImmutableSet<T>) NILSet.NIL;
+        return ImmutableTrieSet.<T>empty();
     }
 
 
@@ -128,25 +129,25 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 	if (set.isEmpty()) {
 	    return this;
 	}
-	
+
 	ImmutableList<T> unionElements = this.elementList;
-	for (T otherEl : set) {	    	    
+	for (T otherEl : set) {
 	    if (!contains(otherEl)) {
 		unionElements = unionElements.prepend(otherEl);
 	    }
 	}
 	return new DefaultImmutableSet<T>(unionElements);
     }
-    
+
     /** @return intersection of this set with set */
     public ImmutableSet<T> intersect(ImmutableSet<T> set) {
         complainAboutSize();
 	if (set.isEmpty()) {
 	    return set;
 	}
-	
+
 	ImmutableList<T> intersectElements = this.elementList;
-	for (T el : intersectElements) {	    	    
+	for (T el : intersectElements) {
 	    if (!set.contains(el)) {
 		intersectElements = intersectElements.removeFirst(el);
 	    }
@@ -175,7 +176,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     }
 
     /** @return true iff this set is subset of set s */
-    public boolean subset(ImmutableSet<T> s) {	
+    public boolean subset(ImmutableSet<T> s) {
 	if (size() > s.size()) {
 	    return false;
 	} else {
@@ -245,7 +246,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     public ImmutableList<T> toImmutableList() {
         return elementList;
     }
-    
+
     /**
      * Create an immutable set from an immutable list.
      *
@@ -278,7 +279,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
     private static class NILSet<T> extends DefaultImmutableSet<T> {
 
 	/**
-         * 
+         *
          */
         private static final long serialVersionUID = -8055357307337694419L;
         static final NILSet<?> NIL = new NILSet<>();

@@ -29,8 +29,9 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     /** the empty map*/
 
     @SuppressWarnings("unchecked")
-    public static <S,T> DefaultImmutableMap<S,T> nilMap() {
-	return (DefaultImmutableMap<S, T>) NILMap.EMPTY_MAP;
+    public static <S,T> ImmutableMap<S,T> nilMap() {
+//	return (DefaultImmutableMap<S, T>) NILMap.EMPTY_MAP;
+        return ImmutableTrieMap.<S,T>empty();
     }
 
     private final DefaultImmutableMap<S,T> parent;
@@ -39,7 +40,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     private final ImmutableMapEntry<S,T> entry;
 
     private final int size;
-    
+
     /** only for use by NILMap */
     protected DefaultImmutableMap() {
 	entry       = null;
@@ -50,17 +51,19 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 
     /** creates new map with mapping entry */
     protected DefaultImmutableMap(ImmutableMapEntry<S,T> entry) {
-	if (entry == null)
-	    throw new RuntimeException("'null' is not allowed as entry");
+	if (entry == null) {
+        throw new RuntimeException("'null' is not allowed as entry");
+    }
 	this.entry = entry;
-	this.parent = DefaultImmutableMap.<S,T>nilMap();
+	this.parent = (DefaultImmutableMap<S, T>) NILMap.EMPTY_MAP;
 	this.size = 1;
     }
 
     /** creates new map with mapping entry and parent map */
     protected DefaultImmutableMap(ImmutableMapEntry<S,T> entry, DefaultImmutableMap<S,T> parent) {
-	if (entry == null)
-	    throw new IllegalArgumentException("'null' is not allowed as entry");
+	if (entry == null) {
+        throw new IllegalArgumentException("'null' is not allowed as entry");
+    }
 	this.entry = entry;
 	this.parent = parent;
 	this.size = parent.size + 1;
@@ -197,9 +200,9 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	    queue = queue.parent;
 
 	}
-	
+
 	return counter < stack.length ?
-		createMap(stack, counter, DefaultImmutableMap.<S,T>nilMap()) : this;
+		createMap(stack, counter, (DefaultImmutableMap<S, T>) NILMap.EMPTY_MAP) : this;
     }
 
     /** @return iterator for all keys */
@@ -232,17 +235,19 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 
     @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
-	if ( ! ( o instanceof ImmutableMap ) )
-	    return false;
+	if ( ! ( o instanceof ImmutableMap ) ) {
+        return false;
+    }
 	if (o == this) {
 	    return true;
 	}
-	
+
 	ImmutableMap<S,T> o1 = null;
 	try {
 	    o1 = (ImmutableMap<S,T>)o;
-	if ( o1.size() != size() )
-	    return false;
+	if ( o1.size() != size() ) {
+        return false;
+    }
 	} catch (ClassCastException cce){
 	    return false;
 	}
@@ -273,9 +278,9 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 
         @SuppressWarnings("rawtypes")
         static final NILMap<?,?> EMPTY_MAP=new NILMap();
-	
+
 	/**
-	 * generated serial 
+	 * generated serial
 	 */
 	private static final long serialVersionUID = 412820308341055305L;
 
@@ -337,7 +342,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
     /** inner class for the entries */
     private static class MapEntry<S,T> implements ImmutableMapEntry<S,T> {
 	/**
-         * 
+         *
          */
         private static final long serialVersionUID = -6785625761293313622L;
     // the key
@@ -364,7 +369,7 @@ public class DefaultImmutableMap<S,T> implements ImmutableMap<S,T> {
 	/** @return true iff both objects have equal pairs of key and
 	 * value
 	 */
-	public boolean equals(Object obj) {	
+	public boolean equals(Object obj) {
 	    if (obj == this) {
 		return true;
 	    }

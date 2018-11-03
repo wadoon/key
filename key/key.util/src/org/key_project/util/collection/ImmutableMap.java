@@ -20,7 +20,7 @@ import java.util.Iterator;
  * This interface has to be implemented by a Class providing a
  * persistent Map.
  */
-public interface ImmutableMap<S,T> extends 
+public interface ImmutableMap<S,T> extends
     Iterable<ImmutableMapEntry<S,T>>, java.io.Serializable {
 
     /** adds a mapping <key,val> to the Map (old map is not modified)
@@ -62,6 +62,6 @@ public interface ImmutableMap<S,T> extends
 
     /** @return iterator for entries */
     Iterator<ImmutableMapEntry<S,T>> iterator();
-    
+
 
 }

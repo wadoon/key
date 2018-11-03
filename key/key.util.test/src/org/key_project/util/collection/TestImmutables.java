@@ -3,6 +3,11 @@ package org.key_project.util.collection;
 import junit.framework.TestCase;
 
 import org.junit.Test;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.Immutables;
 
 public class TestImmutables extends TestCase {
 
@@ -131,8 +136,37 @@ public class TestImmutables extends TestCase {
           union = union.union(union);
           assertEquals(s1UnionS2, union);
        }
+
+    @Test
+    public void testImprovedSetUnion() {
+        String[][] a = { { "a", "b", "c", "d"}, { "a", "b2", "c", "d3"},
+                { "a", "b", "a", "d", "e" }, { "a", "b", "d", "d", "e" },
+                { "a" }, { },
+                { "a", "b", "c" }, {"c","a", "b" } ,
+                { null, "a"}, { "b" } };
+
+        for (int i = 0; i < a.length; i+=2) {
+            ImmutableSet<String> s1 = DefaultImmutableSet.<String>nil();
+            for (int j = 0; j < a[i].length; j++) {
+                s1 = s1.add(a[i][j]);
+            }
+            ImmutableSet<String> s2 = DefaultImmutableSet.<String>nil();
+            for (int j = 0; j < a[i+1].length; j++) {
+                s2 = s2.add(a[i+1][j]);
+            }
+
+            DefaultImmutableSet<String> newUnion = ((DefaultImmutableSet<String>) s1).newUnion((DefaultImmutableSet<String>) s2);
+            DefaultImmutableSet<String> oldUnion = ((DefaultImmutableSet<String>) s2).originalUnion(s1);
+            assertEquals(oldUnion, newUnion);
+
+            newUnion = ((DefaultImmutableSet<String>) s2).newUnion((DefaultImmutableSet<String>) s1);
+            oldUnion = ((DefaultImmutableSet<String>) s2).originalUnion(s1);
+            assertEquals(oldUnion, newUnion);
+        }
+
     }
 
+    @Test
     public void testEqualityEmpty() throws Exception {
         ImmutableSet<Object> s1 = DefaultImmutableSet.<Object>nil();
         ImmutableSet<Object> s2 = DefaultImmutableSet.fromImmutableList(ImmutableSLList.nil());
@@ -142,6 +176,7 @@ public class TestImmutables extends TestCase {
         assertEquals(s1,s2);
     }
 
+    @Test
     public void testIntersectEmpty() {
         ImmutableSet<Object> s0 = DefaultImmutableSet.<Object>nil();
         ImmutableSet<Object> s1 = DefaultImmutableSet.<Object>nil().add("1");
@@ -152,6 +187,7 @@ public class TestImmutables extends TestCase {
         assertEquals(s0, sIntersect);
     }
 
+    @Test
     public void testHashCodes() {
 
         ImmutableSet<Object> s1 = DefaultImmutableSet.<Object>nil().add("one").add("two");
