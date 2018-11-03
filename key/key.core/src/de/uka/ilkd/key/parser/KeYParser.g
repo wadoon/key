@@ -3700,7 +3700,7 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
            Semisequent semi = new Semisequent(sform);
            Sequent addSeq = Sequent.createAnteSequent(semi);
            ImmutableList<Taclet> noTaclets = ImmutableSLList.<Taclet>nil();
-           DefaultImmutableSet<SchemaVariable> noSV = DefaultImmutableSet.<SchemaVariable>nil();
+           ImmutableSet<SchemaVariable> noSV = DefaultImmutableSet.<SchemaVariable>nil();
            addGoalTemplate(b, null, null, addSeq, noTaclets, noSV, null);
            b.setName(new Name(name.getText()));
            b.setChoices(choices_);

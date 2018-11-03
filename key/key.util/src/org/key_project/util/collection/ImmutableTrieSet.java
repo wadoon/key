@@ -1,7 +1,10 @@
 package org.key_project.util.collection;
 
+import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.Iterator;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.TrieNode.Entry;
 
@@ -77,6 +80,11 @@ public class ImmutableTrieSet<T> implements ImmutableSet<T> {
         return new Itr<T>(linearList);
     }
 
+    @Override
+    public Stream<T> stream() {
+        return StreamSupport.stream(spliterator(), false);
+    }
+
     private static final class Itr<T> implements Iterator<T> {
 
         private final Iterator<WeakReference<Entry<T, Object>>> it;
@@ -141,7 +149,7 @@ public class ImmutableTrieSet<T> implements ImmutableSet<T> {
     @Override
     public <S> S[] toArray(S[] array) {
         filterList();
-        return linearList.toArray(array);
+        return linearList.map(x -> x.get().key()).toArray(array);
     }
 
     private void filterList() {

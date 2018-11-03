@@ -14,6 +14,7 @@
 package org.key_project.util.collection;
 
 import java.util.Iterator;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -156,5 +157,13 @@ public interface ImmutableList<T> extends Iterable<T>, java.io.Serializable {
      */
     default Stream<T> stream() {
         return StreamSupport.stream(this.spliterator(), false);
+    }
+
+    default <U> ImmutableList<U> map(Function<T,U> f) {
+        ImmutableList<U> result = ImmutableSLList.nil();
+        for (T t : this) {
+            result = result.prepend(f.apply(t));
+        }
+        return result.reverse();
     }
 }

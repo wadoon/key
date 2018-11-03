@@ -3,6 +3,8 @@ package org.key_project.util.collection;
 import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 class SharedSet<T> {
 
@@ -288,6 +290,11 @@ public class ImmutableSharedHashSet<T> implements ImmutableSet<T> {
         ImmutableList<T> result = ImmutableSLList.<T>nil();
         result = result.prepend(list);
         return new ImmutableSharedHashSet<T>(result);
+    }
+
+    @Override
+    public Stream<T> stream() {
+        return StreamSupport.stream(spliterator(), false);
     }
 
 }
