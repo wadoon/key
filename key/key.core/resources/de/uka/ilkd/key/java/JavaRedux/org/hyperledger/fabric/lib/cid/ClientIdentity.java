@@ -18,7 +18,7 @@ public final class ClientIdentity {
     // GetID returns the ID associated with the invoking identity. This ID
     // is guaranteed to be unique within the MSP.
     /*@ public normal_behaviour
-      @ ensures true;
+      @ ensures \result != 0;
       @*/
     public static /*@ pure helper @*/ int getID(org.hyperledger.fabric.shim.ChaincodeStub stub);
 }
