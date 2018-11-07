@@ -2545,7 +2545,11 @@ elementary_update_term returns[Term _elementary_update_term=null]
             {
                 result = getServices().getTermBuilder().elementary(result, a);
             }
-        )?
+        )? |
+        EVENTUPDATE LPAREN marker=equivalence_term COMMA locset=equivalence_term COMMA timestamp=equivalence_term RPAREN
+         {
+                result = getServices().getTermBuilder().eventUpdate(marker, locset, timestamp);
+         }
    ;
         catch [TermCreationException ex] {
               raiseException
