@@ -37,5 +37,11 @@ public interface TermServices {
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */
     public abstract TermFactory getTermFactory();
+    
+    /**
+     * Returns the {@link TermBuilder} used to create {@link Term}s.
+     * @return The {@link TermBuilder} used to create {@link Term}s.
+     */
+    public abstract TermFactory getTermFactory(boolean useCache);
 
 }

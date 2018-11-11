@@ -98,7 +98,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 	        newVar = newVarFor ( getVariable (), warysvars );
 	    else
 	        newVar = getVariable ();
-	    newVarTerm = services.getTermBuilder().var ( newVar );
+	    newVarTerm = tb.var ( newVar );
 	}
     }
 
@@ -180,10 +180,10 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
         newSubterms[UpdateApplication.targetPos ()] = addSubst ? substWithNewVar ( target )
                                                    : target;
 
-        return services.getTermBuilder().tf().createTerm ( t.op (),
-                               	    newSubterms,
-                               	    getSingleArray(newBoundVars),
-                               	    t.javaBlock ());
+        return tf.createTerm ( t.op (),
+                newSubterms,
+                getSingleArray(newBoundVars),
+                t.javaBlock ());
     }
 
     /**
@@ -206,7 +206,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      */
     private Term addWarySubst (Term t) {
         createVariable ();
-        return services.getTermBuilder().subst(WarySubstOp.SUBST,
+        return tb.subst(WarySubstOp.SUBST,
         	        newVar,
         	        getSubstitutedTerm (),
         	        t );
@@ -218,7 +218,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
     private Term substWithNewVar (Term t) {
         createVariable ();
         final ClashFreeSubst cfs = new ClashFreeSubst ( getVariable (),
-                                                        newVarTerm, services );
+                                                        newVarTerm, tb, tf );
         return cfs.apply ( t );
     }
 }

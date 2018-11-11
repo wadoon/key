@@ -104,6 +104,8 @@ public class Services implements TermServices {
     
     private final TermBuilder termBuilder;
 
+    private final TermFactory noCacheTermFactory;
+
     /**
      * creates a new Services object with a new TypeConverter and a new
      * JavaInfo object with no information stored at none of these.
@@ -114,6 +116,7 @@ public class Services implements TermServices {
     	this.counters = new LinkedHashMap<String, Counter>();
     	this.caches = new ServiceCaches();
     	this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
+    	this.noCacheTermFactory = new TermFactory(null);
     	this.specRepos = new SpecificationRepository(this);
     	cee = new ConstantExpressionEvaluator(this);
     	typeconverter = new TypeConverter(this);
@@ -132,6 +135,7 @@ public class Services implements TermServices {
     	this.counters = counters;
     	this.caches = caches;
     	this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
+        this.noCacheTermFactory = new TermFactory(null);    	
     	this.specRepos = new SpecificationRepository(this);
     	cee = new ConstantExpressionEvaluator(this);
     	typeconverter = new TypeConverter(this);
@@ -154,6 +158,7 @@ public class Services implements TermServices {
         this.factory = s.factory;
         this.caches = s.caches;
         this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
+        this.noCacheTermFactory = new TermFactory(null);
     }
 
     public Services getOverlay(NamespaceSet namespaces) {
@@ -402,6 +407,11 @@ public class Services implements TermServices {
     public TermFactory getTermFactory() {
         return termBuilder.tf();
     }
+    
+    @Override
+    public TermFactory getTermFactory(boolean useCache) {
+        return useCache ? getTermFactory() : noCacheTermFactory;
+    }
 
     public ITermProgramVariableCollectorFactory getFactory() {
         return factory;
@@ -426,4 +436,5 @@ public class Services implements TermServices {
       assert this.javaModel == null;
       this.javaModel = javaModel;
    }
+
 }

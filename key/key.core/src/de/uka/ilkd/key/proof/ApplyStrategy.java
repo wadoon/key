@@ -20,7 +20,6 @@ http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html
 
 package de.uka.ilkd.key.proof;
 
-import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -28,7 +27,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
-import de.uka.ilkd.key.proof.proofevent.NodeReplacement;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -491,19 +489,15 @@ public class ApplyStrategy {
             final IStopCondition stopCondition) {
         time = System.currentTimeMillis();
         SingleRuleApplicationInfo srInfo = null;
-        try{
+        try {
             Debug.out("Strategy started.");
             boolean shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof,
                     time, countApplied.get(), srInfo);
-
-
-
             Goal exitGoal = null;
             // System.out.println("Running: " + running.get() + ":" + proof.openGoals().size());
             ecs.submit(new Task(proof.openEnabledGoals().head()));
             //System.out.println("Running: " + running.get());
             while (nrTasks.get() != 0) {
-                //   System.out.println("Done");                    
                 srInfo = ecs.take().get();
                 nrTasks.decrementAndGet();
                 if (!srInfo.isSuccess()) {
@@ -521,7 +515,6 @@ public class ApplyStrategy {
                         System.currentTimeMillis()-time, countApplied.get(),
                         closedGoals);
             }
-
             
             if (shouldStop) {
                 return new ApplyStrategyInfo(
