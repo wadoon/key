@@ -54,7 +54,7 @@ public class SwitchToIf extends ProgramTransformer {
     }
 
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
+    public synchronized ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations insts) {
         Switch sw = (Switch) pe;
         int i = 0;

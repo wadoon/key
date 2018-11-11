@@ -218,7 +218,7 @@ public class MethodCall extends ProgramTransformer {
      * @return the transformed program
      */
     @Override
-    public ProgramElement[] transform(ProgramElement pe, Services services,
+    public synchronized ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
         Debug.out("method-call: called for ", pe);
         if (resultVar != null) {
