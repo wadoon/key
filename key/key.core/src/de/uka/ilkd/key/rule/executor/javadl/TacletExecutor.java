@@ -389,10 +389,9 @@ public abstract class TacletExecutor<TacletKind extends Taclet> implements RuleE
                 continue;
             }
 
-            final VariableNamer vn = services.getVariableNamer();
+            final VariableNamer vn = services.getVariableNamer();            
             final ProgramVariable renamedInst = vn.rename(inst, goal, posOfFind);
             goal.addProgramVariable(renamedInst);
-            services.addNameProposal(renamedInst.name());
 
             HashMap<ProgramVariable, ProgramVariable> renamingMap =
                     vn.getRenamingMap();

@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.logic;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -54,46 +57,47 @@ public class InnerVariableNamer extends VariableNamer {
         ProgramElementName name = var.getProgramElementName();
         BasenameAndIndex bai = getBasenameAndIndex(name);
         Iterable<ProgramElementName> globals = wrapGlobals(goal.node().getLocalProgVars());
-        map.clear();
+        final HashMap<ProgramVariable,ProgramVariable> map = new LinkedHashMap<ProgramVariable,ProgramVariable>();
 
         //prepare renaming of inner var
         final NameCreationInfo nci = MethodStackInfo.create(getProgramFromPIO(posOfFind));
         ProgramElementName newname = null;
-
+        ProgramVariable newvar;
         final Name proposal;
         final NameRecorder nameRecorder = services.getNameRecorder();
+        
         synchronized(nameRecorder) { 
             proposal = nameRecorder.getProposal();
-        }
 
-        if (proposal != null) {
-            newname = new ProgramElementName(proposal.toString(), nci);
-        }
-        if (newname == null || !isUniqueInGlobals(newname.toString(), globals)
-            || services.getNamespaces()
-                .lookupLogicSymbol(newname) != null) {
-            newname = createName(bai.basename, bai.index, nci);
-            int newcounter = getMaxCounterInGlobalsAndProgram(
-                            bai.basename,
-                            globals,
-                            getProgramFromPIO(posOfFind),
-                            null);
-            final NamespaceSet namespaces = services.getNamespaces();
-
-            while (!isUniqueInGlobals(newname.toString(), globals)
-                    || namespaces.lookupLogicSymbol(newname) != null) {
-                newcounter += 1;
-                newname = createName(bai.basename, newcounter, nci);
+            if (proposal != null) {
+                newname = new ProgramElementName(proposal.toString(), nci);
             }
-        }
+            if (newname == null || !isUniqueInGlobals(newname.toString(), globals)
+                    || services.getNamespaces()
+                    .lookupLogicSymbol(newname) != null) {
+                newname = createName(bai.basename, bai.index, nci);
+                int newcounter = getMaxCounterInGlobalsAndProgram(
+                        bai.basename,
+                        globals,
+                        getProgramFromPIO(posOfFind),
+                        null);
+                final NamespaceSet namespaces = services.getNamespaces();
 
-        ProgramVariable newvar = var;
-        if (!newname.equals(name)) {
-            newvar = new LocationVariable(newname, var.getKeYJavaType());
-            map.put(var, newvar);
-            renamingHistory = map;
-        }
+                while (!isUniqueInGlobals(newname.toString(), globals)
+                        || namespaces.lookupLogicSymbol(newname) != null) {
+                    newcounter += 1;
+                    newname = createName(bai.basename, newcounter, nci);
+                }
+            }
 
+            newvar = var;
+            if (!newname.equals(name)) {
+                newvar = new LocationVariable(newname, var.getKeYJavaType());
+                map.put(var, newvar);
+                renamingHistory = map;
+            }
+            nameRecorder.addProposal(newname);
+        }
         assert newvar != null;
         assert isUniqueInGlobals(newvar.name().toString(), globals);
         assert services.getNamespaces().lookupLogicSymbol(newvar.name())==null;
