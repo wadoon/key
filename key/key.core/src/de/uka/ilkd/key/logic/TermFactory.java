@@ -200,20 +200,25 @@ public final class TermFactory {
             this.subs = subs == null ? NO_SUBTERMS : subs;
             this.boundVars = boundVars == null ? NO_BOUND_VARS : boundVars;
             this.labels = labels == null ? NO_LABELS : labels;
+            hashCode();
         }
 
         @Override
         public int hashCode() {
-            int result = hashCode;
-            if (result == -1) {
+            if (hashCode == -1) {            
                 final int prime = 31;
-                result = prime + boundVars.hashCode();                
+                int result = prime + boundVars.hashCode();                
                 result = prime * result +  labels.hashCode();
                 result = prime * result + op.hashCode();
                 result = prime * result + subs.hashCode();
-                if (result == -1) result = 0;
+                if (result == -1) { 
+                    hashCode = 0;
+                }
+                else { 
+                    hashCode = result;
+                }
             }
-            return result;
+            return hashCode;
         }
 
         @Override
