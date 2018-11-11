@@ -100,6 +100,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
     private static final Name NAME = new Name("Use Operation Contract");
 
+    private static Object lastFocusTermLock = new Object();
     private static Term lastFocusTerm;
     private static Instantiation lastInstantiation;
 
@@ -451,19 +452,21 @@ public final class UseOperationContractRule implements BuiltInRule {
 
 
     private static Instantiation instantiate(Term focusTerm, Services services) {
-	//result cached?
+        //result cached?
+        synchronized(lastFocusTermLock) {
+            if(focusTerm == lastFocusTerm) {
+                return lastInstantiation;
+            }
+        }
+        //compute
+        final Instantiation result = computeInstantiation(focusTerm, services);
 
-    if(focusTerm == lastFocusTerm) {
-	    return lastInstantiation;
-	}
-
-	//compute
-	final Instantiation result = computeInstantiation(focusTerm, services);
-
-	//cache and return
-	lastFocusTerm = focusTerm;
-	lastInstantiation = result;
-	return result;
+        //cache and return
+        synchronized(lastFocusTermLock) { 
+            lastFocusTerm = focusTerm;
+            lastInstantiation = result;
+        }
+        return result;
     }
 
     private static void applyInfFlow(Goal goal,
@@ -550,98 +553,98 @@ public final class UseOperationContractRule implements BuiltInRule {
      * Internally only serves as helper for instantiate().
      */
     public static Instantiation computeInstantiation(Term focusTerm, Services services) {
-	//leading update?
-	final Term u;
-	final Term progPost;
-   final TermBuilder TB = services.getTermBuilder();
-	if(focusTerm.op() instanceof UpdateApplication) {
-	    u = UpdateApplication.getUpdate(focusTerm);
-	    progPost = UpdateApplication.getTarget(focusTerm);
-	} else {
-	    u = TB.skip();
-	    progPost = focusTerm;
-	}
+        //leading update?
+        final Term u;
+        final Term progPost;
+        final TermBuilder TB = services.getTermBuilder();
+        if(focusTerm.op() instanceof UpdateApplication) {
+            u = UpdateApplication.getUpdate(focusTerm);
+            progPost = UpdateApplication.getTarget(focusTerm);
+        } else {
+            u = TB.skip();
+            progPost = focusTerm;
+        }
 
-	//focus (below update) must be modality term
-	if(progPost.op() != Modality.BOX && progPost.op() != Modality.DIA &&
-           progPost.op() != Modality.BOX_TRANSACTION && progPost.op() != Modality.DIA_TRANSACTION) {
-	    return null;
-	}
-	final Modality mod = (Modality) progPost.op();
+        //focus (below update) must be modality term
+        if(progPost.op() != Modality.BOX && progPost.op() != Modality.DIA &&
+                progPost.op() != Modality.BOX_TRANSACTION && progPost.op() != Modality.DIA_TRANSACTION) {
+            return null;
+        }
+        final Modality mod = (Modality) progPost.op();
 
-	//active statement must be method call or new
-	final Pair<Expression,MethodOrConstructorReference> methodCall
-	= getMethodCall(progPost.javaBlock(), services);
-	if(methodCall == null) {
-	    return null;
-	}
-	final Expression actualResult = methodCall.first;
-	final MethodOrConstructorReference mr = methodCall.second;
-    assert mr != null;
-	//arguments of method call must be simple expressions
-	final ExecutionContext ec
-	= JavaTools.getInnermostExecutionContext(progPost.javaBlock(),
-	        services);
-	for(Expression arg : mr.getArguments()) {
-	    if(!ProgramSVSort.SIMPLEEXPRESSION
-	            .canStandFor(arg, ec, services)) {
-	        return null;
-	    }
-	}
+        //active statement must be method call or new
+        final Pair<Expression,MethodOrConstructorReference> methodCall
+        = getMethodCall(progPost.javaBlock(), services);
+        if(methodCall == null) {
+            return null;
+        }
+        final Expression actualResult = methodCall.first;
+        final MethodOrConstructorReference mr = methodCall.second;
+        assert mr != null;
+        //arguments of method call must be simple expressions
+        final ExecutionContext ec
+        = JavaTools.getInnermostExecutionContext(progPost.javaBlock(),
+                services);
+        for(Expression arg : mr.getArguments()) {
+            if(!ProgramSVSort.SIMPLEEXPRESSION
+                    .canStandFor(arg, ec, services)) {
+                return null;
+            }
+        }
 
-	//collect further information
-	final KeYJavaType staticType = getStaticPrefixType(mr, services, ec);
-	assert staticType != null;
-	final IProgramMethod pm = getProgramMethod(mr,
-	        staticType,
-	        ec,
-	        services);
-	assert pm != null : "Getting program method failed.\nReference: " + mr +
-	                    ", static type: "+staticType+", execution context: " + ec;
-	final Term actualSelf = getActualSelf(mr, pm, ec, services);
-	final ImmutableList<Term> actualParams  = getActualParams(mr, ec, services);
+        //collect further information
+        final KeYJavaType staticType = getStaticPrefixType(mr, services, ec);
+        assert staticType != null;
+        final IProgramMethod pm = getProgramMethod(mr,
+                staticType,
+                ec,
+                services);
+        assert pm != null : "Getting program method failed.\nReference: " + mr +
+                ", static type: "+staticType+", execution context: " + ec;
+        final Term actualSelf = getActualSelf(mr, pm, ec, services);
+        final ImmutableList<Term> actualParams  = getActualParams(mr, ec, services);
 
-	//cache and return result
-	final Instantiation result = new Instantiation(u,
-	        progPost,
-	        mod,
-	        actualResult,
-	        actualSelf,
-	        staticType,
-	        mr,
-	        pm,
-	        actualParams,
-	        mod == Modality.DIA_TRANSACTION || mod == Modality.BOX_TRANSACTION);
-	return result;
+        //cache and return result
+        final Instantiation result = new Instantiation(u,
+                progPost,
+                mod,
+                actualResult,
+                actualSelf,
+                staticType,
+                mr,
+                pm,
+                actualParams,
+                mod == Modality.DIA_TRANSACTION || mod == Modality.BOX_TRANSACTION);
+        return result;
     }
 
 
     @Override
-    public synchronized boolean isApplicable(Goal goal,
-                                PosInOccurrence pio) {
-	//focus must be top level succedent
-	if(pio == null || !pio.isTopLevel() || pio.isInAntec()) {
-	    return false;
-	}
+    public boolean isApplicable(Goal goal,
+            PosInOccurrence pio) {
+        //focus must be top level succedent
+        if(pio == null || !pio.isTopLevel() || pio.isInAntec()) {
+            return false;
+        }
 
-	//instantiation must succeed
-	final Instantiation inst = instantiate(pio.subTerm(),
-		                               goal.proof().getServices());
-	if(inst == null) {
-	    return false;
-	}
+        //instantiation must succeed
+        final Instantiation inst = instantiate(pio.subTerm(),
+                goal.proof().getServices());
+        if(inst == null) {
+            return false;
+        }
 
-	// abort if inside of transformer
+        // abort if inside of transformer
         if (Transformer.inTransformer(pio)) {
             return false;
         }
 
         //there must be applicable contracts for the operation
         final ImmutableSet<FunctionalOperationContract> contracts
-                = getApplicableContracts(goal.proof().getServices(),
-                	                 inst.pm,
-                	                 inst.staticType,
-                	                 inst.mod);
+        = getApplicableContracts(goal.proof().getServices(),
+                inst.pm,
+                inst.staticType,
+                inst.mod);
         if(contracts.isEmpty()) {
             return false;
         }
@@ -657,7 +660,7 @@ public final class UseOperationContractRule implements BuiltInRule {
         //between proofs
         for(FunctionalOperationContract contract : contracts) {
             if(goal.proof().mgt().isContractApplicable(contract)) {
-        	return true;
+                return true;
             }
         }
         return false;

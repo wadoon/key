@@ -18,6 +18,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.NameRecorder;
 
 
 /**
@@ -58,10 +59,12 @@ public class InnerVariableNamer extends VariableNamer {
         //prepare renaming of inner var
         final NameCreationInfo nci = MethodStackInfo.create(getProgramFromPIO(posOfFind));
         ProgramElementName newname = null;
-        // ProgramElementName branchUniqueName = null;
 
-        // Name proposal = services.getProof().getNameRecorder().getProposal();
-        Name proposal = services.getNameRecorder().getProposal();
+        final Name proposal;
+        final NameRecorder nameRecorder = services.getNameRecorder();
+        synchronized(nameRecorder) { 
+            proposal = nameRecorder.getProposal();
+        }
 
         if (proposal != null) {
             newname = new ProgramElementName(proposal.toString(), nci);

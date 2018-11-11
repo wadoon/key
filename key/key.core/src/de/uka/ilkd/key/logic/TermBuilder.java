@@ -192,26 +192,28 @@ public class TermBuilder {
      *         above).
      */
     public String newName(String baseName, NamespaceSet localNamespace) {
-        final Name savedName = services.getNameRecorder().getProposal();
-        if (savedName != null) {
-            // CS: bugfix -- saving name proposals.
-            // getProposal() removes the name proposal form the name recorder,
-            // but we need to have it again for saving. Therefore I appended
-            // the proposal at the and of the list again.
-            services.getNameRecorder().addProposal(savedName);
+        synchronized(services.getNameRecorder()) {
+            final Name savedName = services.getNameRecorder().getProposal();
+            if (savedName != null) {
+                // CS: bugfix -- saving name proposals.
+                // getProposal() removes the name proposal form the name recorder,
+                // but we need to have it again for saving. Therefore I appended
+                // the proposal at the and of the list again.
+                services.getNameRecorder().addProposal(savedName);
 
-            return savedName.toString();
+                return savedName.toString();
+            }
+
+            int i = 0;
+            String result = baseName;
+            while (localNamespace.lookup(new Name(result)) != null) {
+                result = baseName + "_" + i++;
+            }
+
+            services.getNameRecorder().addProposal(new Name(result));
+
+            return result;
         }
-
-        int i = 0;
-        String result = baseName;
-        while (localNamespace.lookup(new Name(result)) != null) {
-            result = baseName + "_" + i++;
-        }
-
-        services.getNameRecorder().addProposal(new Name(result));
-
-        return result;
     }
 
     /**

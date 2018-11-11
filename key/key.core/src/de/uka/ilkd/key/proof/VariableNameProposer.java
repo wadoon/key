@@ -91,17 +91,18 @@ public class VariableNameProposer implements InstantiationProposer {
     public Name getNewName(Services services, Name baseName) {
         NamespaceSet namespaces = services.getNamespaces();
 
-        Name name = services.getNameRecorder().getProposal();            
-        if (name == null || namespaces.lookup(name) != null) {
-            int i = 0;
+        synchronized(services.getNameRecorder()) {
+            Name name = services.getNameRecorder().getProposal();            
+            if (name == null || namespaces.lookup(name) != null) {
+                int i = 0;
 
-            do {
-                name = new Name(baseName + "_" + i++);
-            } while(namespaces.lookup(name) != null);
+                do {
+                    name = new Name(baseName + "_" + i++);
+                } while(namespaces.lookup(name) != null);
 
+            }
+            return name;
         }
-
-        return name;
     }
 
     /**

@@ -59,6 +59,8 @@ import de.uka.ilkd.key.util.MiscTools;
  */
 public abstract class AbstractBlockContractRule extends AbstractBlockSpecificationElementRule {
 
+    private final Object lastFocusTermLock = new Object();
+    
     /**
      *
      * @param instantiation
@@ -365,7 +367,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
     }
 
     @Override
-    public synchronized boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
+    public boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
         if (occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
@@ -394,13 +396,16 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
      * @return a new instantiation.
      */
     public synchronized Instantiation instantiate(final Term formula, final Goal goal, final Services services) {
-        if (formula == getLastFocusTerm()) {
-            return getLastInstantiation();
-        } else {
-            final Instantiation result = new Instantiator(formula, goal, services).instantiate();
-            setLastFocusTerm(formula);
-            setLastInstantiation(result);
-            return result;
+        final Term lastFocusTerm = getLastFocusTerm();
+        synchronized(lastFocusTermLock) {
+            if (formula == lastFocusTerm) {
+                return getLastInstantiation();
+            } else {
+                final Instantiation result = new Instantiator(formula, goal, services).instantiate();
+                setLastFocusTerm(formula);
+                setLastInstantiation(result);
+                return result;
+            }
         }
     }
 

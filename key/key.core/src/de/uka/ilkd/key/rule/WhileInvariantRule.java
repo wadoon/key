@@ -96,6 +96,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
     public static final String BODY_PRESERVES_INVARIANT_LABEL = "Body Preserves Invariant";
 
+    private static Object lastFocusTermLock = new Object();
     private static Term lastFocusTerm;
     private static Instantiation lastInstantiation;
 
@@ -212,56 +213,59 @@ public final class WhileInvariantRule implements BuiltInRule {
     //-------------------------------------------------------------------------
 
     private static Instantiation instantiate(final LoopInvariantBuiltInRuleApp app,
-                                             Services services) throws RuleAbortException {
+            Services services) throws RuleAbortException {
         final Term focusTerm = app.posInOccurrence().subTerm();
-
-        if (focusTerm == lastFocusTerm &&
-                lastInstantiation.inv == services.getSpecificationRepository()
-                .getLoopSpec(lastInstantiation.loop)) {
-            return lastInstantiation;
+        synchronized(lastFocusTermLock) {
+            if (focusTerm == lastFocusTerm &&
+                    lastInstantiation.inv == services.getSpecificationRepository()
+                    .getLoopSpec(lastInstantiation.loop)) {
+                return lastInstantiation;
+            }
         }
+        
+        //leading update?
+        final Pair<Term, Term> update = applyUpdates(focusTerm, services);
+        final Term u        = update.first;
+        final Term progPost = update.second;
 
-	//leading update?
-	final Pair<Term, Term> update = applyUpdates(focusTerm, services);
-	final Term u        = update.first;
-	final Term progPost = update.second;
-
-	//focus (below update) must be modality term
+        //focus (below update) must be modality term
         if (!checkFocus(progPost)) {
             return null;
         }
 
-	//active statement must be while loop
-	final While loop = app.getLoopStatement();
+        //active statement must be while loop
+        final While loop = app.getLoopStatement();
 
-	// try to get invariant from JML specification
-	LoopSpecification spec = app.getSpec();
-	if (spec == null) // may happen after reloading proof 
-	    throw new RuleAbortException("no invariant found");
+        // try to get invariant from JML specification
+        LoopSpecification spec = app.getSpec();
+        if (spec == null) // may happen after reloading proof 
+            throw new RuleAbortException("no invariant found");
 
-	//collect self, execution context
-	final MethodFrame innermostMethodFrame =
-	        JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services);
-	if (innermostMethodFrame != null) {
-	    spec = spec.setTarget(innermostMethodFrame.getProgramMethod());
-	}
+        //collect self, execution context
+        final MethodFrame innermostMethodFrame =
+                JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services);
+        if (innermostMethodFrame != null) {
+            spec = spec.setTarget(innermostMethodFrame.getProgramMethod());
+        }
 
-	final Term selfTerm = innermostMethodFrame == null
-	                      ? null
-	                      : MiscTools.getSelfTerm(innermostMethodFrame, services);
+        final Term selfTerm = innermostMethodFrame == null
+                ? null
+                        : MiscTools.getSelfTerm(innermostMethodFrame, services);
 
-	final ExecutionContext innermostExecutionContext =
-	        innermostMethodFrame == null
-	        ? null
-	        : (ExecutionContext) innermostMethodFrame.getExecutionContext();
-	services.getSpecificationRepository().addLoopInvariant(spec);
+        final ExecutionContext innermostExecutionContext =
+                innermostMethodFrame == null
+                ? null
+                        : (ExecutionContext) innermostMethodFrame.getExecutionContext();
+        services.getSpecificationRepository().addLoopInvariant(spec);
 
-	//cache and return result
-	final Instantiation result = new Instantiation(u, progPost, loop, spec, selfTerm,
-	                                               innermostExecutionContext);
-	lastFocusTerm = focusTerm;
-	lastInstantiation = result;
-	return result;
+        //cache and return result
+        final Instantiation result = new Instantiation(u, progPost, loop, spec, selfTerm,
+                innermostExecutionContext);
+        synchronized(lastFocusTermLock) {
+            lastFocusTerm = focusTerm;
+            lastInstantiation = result;
+        }
+        return result;
     }
 
     private static Term createLocalAnonUpdate(ImmutableSet<ProgramVariable> localOuts,
@@ -749,7 +753,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     //-------------------------------------------------------------------------
 
     @Override
-    public synchronized boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
         return checkApplicability(goal,pio);
     }
 
