@@ -333,7 +333,7 @@ public final class LoopContractInternalRule extends AbstractLoopContractRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(final Goal goal, final Services services,
+    public synchronized ImmutableList<Goal> apply(final Goal goal, final Services services,
             final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof LoopContractInternalBuiltInRuleApp;
         LoopContractInternalBuiltInRuleApp application

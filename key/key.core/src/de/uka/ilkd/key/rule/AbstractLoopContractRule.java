@@ -46,7 +46,7 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
      *            services.
      * @return all applicable loop contracts for the instantiation.
      */
-    public static ImmutableSet<LoopContract> getApplicableContracts(
+    public synchronized static ImmutableSet<LoopContract> getApplicableContracts(
             final Instantiation instantiation, final Goal goal, final Services services) {
         if (instantiation == null) {
             return DefaultImmutableSet.nil();
@@ -67,7 +67,7 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
      *            the current goal.
      * @return all applicable loop contracts for the block from the repository.
      */
-    public static ImmutableSet<LoopContract> getApplicableContracts(
+    public synchronized static ImmutableSet<LoopContract> getApplicableContracts(
             final SpecificationRepository specifications, final StatementBlock block,
             final Modality modality, final Goal goal) {
         ImmutableSet<LoopContract> collectedContracts
@@ -142,7 +142,7 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
     }
 
     @Override
-    public boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
+    public synchronized boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
         if (occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
@@ -184,7 +184,7 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
      *            services.
      * @return a new instantiation.
      */
-    public Instantiation instantiate(final Term formula, final Goal goal, final Services services) {
+    public synchronized Instantiation instantiate(final Term formula, final Goal goal, final Services services) {
         if (formula == getLastFocusTerm()) {
             return getLastInstantiation();
         } else {

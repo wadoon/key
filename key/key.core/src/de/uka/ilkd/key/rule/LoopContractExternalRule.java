@@ -191,7 +191,7 @@ public final class LoopContractExternalRule extends AbstractLoopContractRule {
     }
 
     @Override
-    public boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
+    public synchronized boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
         return !InfFlowCheckInfo.isInfFlow(goal) && super.isApplicable(goal, occurrence);
     }
 

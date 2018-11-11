@@ -749,7 +749,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     //-------------------------------------------------------------------------
 
     @Override
-    public boolean isApplicable(Goal goal, PosInOccurrence pio) {
+    public synchronized boolean isApplicable(Goal goal, PosInOccurrence pio) {
         return checkApplicability(goal,pio);
     }
 
@@ -809,7 +809,7 @@ public final class WhileInvariantRule implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
+    public synchronized ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
             throws RuleAbortException {
         final TermLabelState termLabelState = new TermLabelState();
         assert ruleApp instanceof LoopInvariantBuiltInRuleApp;

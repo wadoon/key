@@ -194,12 +194,12 @@ public final class BlockContractExternalRule extends AbstractBlockContractRule {
     }
 
     @Override
-    public boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
+    public synchronized boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
         return !InfFlowCheckInfo.isInfFlow(goal) && super.isApplicable(goal, occurrence);
     }
 
     @Override
-    public ImmutableList<Goal> apply(final Goal goal, final Services services,
+    public synchronized ImmutableList<Goal> apply(final Goal goal, final Services services,
             final RuleApp ruleApp) throws RuleAbortException {
         assert ruleApp instanceof BlockContractExternalBuiltInRuleApp;
         BlockContractExternalBuiltInRuleApp application

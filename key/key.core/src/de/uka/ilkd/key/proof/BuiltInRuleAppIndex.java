@@ -27,7 +27,7 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 
 public class BuiltInRuleAppIndex {
 
-    private BuiltInRuleIndex index;
+    private final BuiltInRuleIndex index;
 
     private NewRuleListener  newRuleListener =
         NullNewRuleListener.INSTANCE;

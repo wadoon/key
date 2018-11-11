@@ -107,7 +107,7 @@ done
 $JAVA -ea:de.uka.ilkd.key...\
 -noverify\
 -Djvm.dir=$JVM_DIR\
--Xms64m -Xmx2048m \
+-Xms64m -Xmx16192m \
 -Dkey.home="$KEY_HOME" \
 -classpath "$keyclasspath" \
 "$@"

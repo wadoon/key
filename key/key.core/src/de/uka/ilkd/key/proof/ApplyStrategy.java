@@ -466,7 +466,7 @@ public class ApplyStrategy {
                 if (!shouldStop && n.childrenCount() > 1) {
                     for (int i = 0; i<n.childrenCount(); i++) {
                         final Goal g = proof.getGoal(n.child(i));
-                        if (g!=goal) {
+                        if (g!=goal && g != null) {
                             ecs.submit(new Task(g));                           
                         }
                     }

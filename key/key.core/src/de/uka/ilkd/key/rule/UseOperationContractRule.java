@@ -452,7 +452,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 
     private static Instantiation instantiate(Term focusTerm, Services services) {
 	//result cached?
-	if(focusTerm == lastFocusTerm) {
+
+    if(focusTerm == lastFocusTerm) {
 	    return lastInstantiation;
 	}
 
@@ -616,7 +617,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
 
     @Override
-    public boolean isApplicable(Goal goal,
+    public synchronized boolean isApplicable(Goal goal,
                                 PosInOccurrence pio) {
 	//focus must be top level succedent
 	if(pio == null || !pio.isTopLevel() || pio.isInAntec()) {
@@ -663,7 +664,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal,
+    public synchronized ImmutableList<Goal> apply(Goal goal,
 	    			     Services services,
 	    			     RuleApp ruleApp) {
        final TermLabelState termLabelState = new TermLabelState();

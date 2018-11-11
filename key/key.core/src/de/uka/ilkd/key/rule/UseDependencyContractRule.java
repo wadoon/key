@@ -381,7 +381,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     //-------------------------------------------------------------------------
 
     @Override
-    public boolean isApplicable(Goal goal,
+    public synchronized boolean isApplicable(Goal goal,
                                 PosInOccurrence pio) {
 	if(pio == null) {
 	    return false;
@@ -443,7 +443,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
 
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal,
+    public synchronized ImmutableList<Goal> apply(Goal goal,
 	    			     Services services,
 	    			     RuleApp ruleApp) {
 	//collect information

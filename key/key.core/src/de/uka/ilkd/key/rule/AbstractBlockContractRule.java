@@ -90,7 +90,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
      *            the current goal.
      * @return all applicable block contracts for the block from the repository.
      */
-    public static ImmutableSet<BlockContract> getApplicableContracts(
+    public synchronized static ImmutableSet<BlockContract> getApplicableContracts(
             final SpecificationRepository specifications, final StatementBlock block,
             final Modality modality, final Goal goal) {
         ImmutableSet<BlockContract> collectedContracts
@@ -113,7 +113,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
      *            the current goal.
      * @return the set with all non-applicable contracts filtered out.
      */
-    protected static ImmutableSet<BlockContract> filterAppliedContracts(
+    protected synchronized static ImmutableSet<BlockContract> filterAppliedContracts(
             final ImmutableSet<BlockContract> collectedContracts, final Goal goal) {
         ImmutableSet<BlockContract> result = DefaultImmutableSet.<BlockContract>nil();
         for (BlockContract contract : collectedContracts) {
@@ -365,7 +365,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
     }
 
     @Override
-    public boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
+    public synchronized boolean isApplicable(final Goal goal, final PosInOccurrence occurrence) {
         if (occursNotAtTopLevelInSuccedent(occurrence)) {
             return false;
         }
@@ -393,7 +393,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
      *            services.
      * @return a new instantiation.
      */
-    public Instantiation instantiate(final Term formula, final Goal goal, final Services services) {
+    public synchronized Instantiation instantiate(final Term formula, final Goal goal, final Services services) {
         if (formula == getLastFocusTerm()) {
             return getLastInstantiation();
         } else {
