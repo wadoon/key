@@ -18,30 +18,35 @@ import java.util.Iterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.AbstractFeatureStrategy;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
 
 public class OneOfCP implements Feature {
     
-    private final BackTrackingManager manager;
+    //private final BackTrackingManager manager;
+    private final AbstractFeatureStrategy strategy;
     private final Feature features[];
 
     private int theChosenOne;
     private final ChoicePoint cp = new CP ();
     
-    private OneOfCP(BackTrackingManager manager, Feature[] features) {
-        this.manager = manager;
+    private OneOfCP(AbstractFeatureStrategy strategy, Feature[] features) {
+        this.strategy = strategy;
         this.features = features;
     }
 
     public static Feature create(Feature[] features,
-                                 BackTrackingManager manager) {
-        return new OneOfCP ( manager, features );
+                                 AbstractFeatureStrategy strategy) { //BackTrackingManager manager) {
+        return new OneOfCP ( strategy, features );
     }
     
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {        
-        manager.passChoicePoint ( cp, this );
-        return features[theChosenOne].computeCost ( app, pos, goal );
+    public synchronized RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {        
+        BackTrackingManager manager = strategy.getBTManager(goal);
+        synchronized(manager) {
+            manager.passChoicePoint ( cp, this );
+        }
+        return features[theChosenOne].computeCost ( app, pos, goal );        
     }
     
     private final class CP implements ChoicePoint {

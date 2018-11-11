@@ -14,12 +14,11 @@
 package de.uka.ilkd.key.logic;
 
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -95,19 +94,19 @@ public class LexPathOrdering implements TermOrdering {
     }
     
     
-    private final HashMap<CacheKey, CompRes> cache = 
-        new LinkedHashMap<CacheKey, CompRes> ();
+    private final LRUCache<CacheKey, CompRes> cache = new LRUCache<CacheKey, CompRes> (10000);
     
     
     private CompRes compareHelp (Term p_a, Term p_b) {
         final CacheKey key = new CacheKey ( p_a, p_b );
-        CompRes res = cache.get ( key );
-        if ( res == null ) {
-            res = compareHelp2 ( p_a, p_b );
-            if ( cache.size () > 100000 ) cache.clear ();
-            cache.put ( key, res );
+        synchronized(cache) {
+            CompRes res = cache.get ( key );
+            if ( res == null ) {
+                res = compareHelp2 ( p_a, p_b );
+                cache.put ( key, res );
+            }
+            return res;
         }
-        return res;
     }
 
     private CompRes compareHelp2 (Term p_a, Term p_b) {
@@ -242,12 +241,14 @@ public class LexPathOrdering implements TermOrdering {
      *         completely messed up, but you get the idea
      */
     private int getSortDepth(Sort s) {
-        Integer res = sortDepthCache.get ( s );
-        if ( res == null ) {
-            res = Integer.valueOf ( getSortDepthHelp ( s ) );
-            sortDepthCache.put ( s, res );
+        synchronized(sortDepthCache) { 
+            Integer res = sortDepthCache.get ( s );
+            if ( res == null ) {
+                res = Integer.valueOf ( getSortDepthHelp ( s ) );
+                sortDepthCache.put ( s, res );
+            }
+            return res.intValue ();
         }
-        return res.intValue ();
     }
     
     private int getSortDepthHelp(Sort s) {

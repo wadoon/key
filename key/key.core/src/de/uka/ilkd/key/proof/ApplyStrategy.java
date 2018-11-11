@@ -450,24 +450,22 @@ public class ApplyStrategy {
             boolean shouldStop = false;
             running.incrementAndGet();
             while (!shouldStop) { 
-                Node n = goal.node();
+                final Node n = goal.node();
                 result = applyAutomaticRule(goal, 
                         stopCondition, stopAtFirstNonCloseableGoal);
-
-                //Thread.yield();
                 if (result.isSuccess()) {
                     countApplied.incrementAndGet();
-                    // fireTaskProgress ();
+                    fireTaskProgress ();
                     shouldStop = goal.node().isClosed() || stopCondition.shouldStop(maxApplications, timeout, proof, time,
                             countApplied.intValue(), result);                                                       
                 } else {
                     shouldStop = true;
                     // goalChooser.removeGoal(srInfo.getGoal()); 
                 }
+                       
                 if (!shouldStop && n.childrenCount() > 1) {
                     for (int i = 0; i<n.childrenCount(); i++) {
-                        final Node c = n.child(i);
-                        Goal g = proof.getGoal(c);
+                        final Goal g = proof.getGoal(n.child(i));
                         if (g!=goal) {
                             ecs.submit(new Task(g));                           
                         }
@@ -480,8 +478,8 @@ public class ApplyStrategy {
         }
 
     }
-    private static ExecutorService service = new ForkJoinPool(8);//new ThreadPoolExecutor(8, 64, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>());//
-
+    
+    private static ExecutorService service = new ThreadPoolExecutor(8, 8, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>());//new ForkJoinPool(16);//
     static ExecutorCompletionService<SingleRuleApplicationInfo> ecs = new ExecutorCompletionService<>(service); 
     AtomicInteger running = new AtomicInteger(0);
     volatile ImmutableList<Future<SingleRuleApplicationInfo>> futures = ImmutableSLList.nil();
@@ -514,17 +512,18 @@ public class ApplyStrategy {
                 }
             }
 
+            if (Thread.interrupted()) {                    
+                throw new InterruptedException();
+            }
+           
+
             if (exitGoal != null) {
                 return new ApplyStrategyInfo(srInfo.message(), proof, null, exitGoal,
                         System.currentTimeMillis()-time, countApplied.get(),
                         closedGoals);
             }
 
-            if (Thread.interrupted()) {
-                throw new InterruptedException();
-            }
-
-
+            
             if (shouldStop) {
                 return new ApplyStrategyInfo(
                         stopCondition.getStopMessage(maxApplications, timeout, proof, time,
@@ -721,8 +720,8 @@ public class ApplyStrategy {
                         newGoals = newGoals.prepend ( goal );
                 }
 
-                final IGoalChooser goalChooser = getGoalChooserForProof(proof);
-                goalChooser.updateGoalList ( rai.getOriginalNode (), newGoals );
+               /* final IGoalChooser goalChooser = getGoalChooserForProof(proof);
+                goalChooser.updateGoalList ( rai.getOriginalNode (), newGoals ); */
             }
         }
     }

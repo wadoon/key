@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.strategy;
 
+import java.util.WeakHashMap;
+
+import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -127,12 +130,25 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         d.clear ( getHeuristic ( ruleSet ) );
     }
     
-    private final BackTrackingManager btManager = new BackTrackingManager ();
+    private static final WeakHashMap<Goal, BackTrackingManager> btMap = new WeakHashMap<>(10); 
+    //private static final BackTrackingManager btManager = new BackTrackingManager ();
 
+    public BackTrackingManager getBTManager(Goal g) { 
+        synchronized(btMap) {
+            BackTrackingManager bt = btMap.get(g);
+            if (bt == null) {
+                bt = new BackTrackingManager();
+                btMap.put(g, bt);
+            }
+            return bt;
+        }
+    }
+    
     public  void instantiateApp ( RuleApp              app,
                                        PosInOccurrence      pio,
                                        Goal                 goal,
                                        RuleAppCostCollector collector ) {
+        final BackTrackingManager btManager = getBTManager(goal);
         synchronized(btManager) {
             btManager.setup ( app );
             do {
@@ -150,11 +166,11 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
                                                    Goal                 goal);
     
     protected Feature forEach(TermBuffer x, TermGenerator gen, Feature body) {
-        return ForEachCP.create ( x, gen, body, btManager );
+        return ForEachCP.create ( x, gen, body, this /* btManager */ );
     }
 
     protected Feature oneOf(Feature[] features) {
-        return OneOfCP.create ( features, btManager );
+        return OneOfCP.create ( features, this /* btManager */ );
     }
     
     protected Feature oneOf(Feature feature0, Feature feature1) {
@@ -175,14 +191,14 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     
     protected Feature instantiate(Name sv, ProjectionToTerm value) {
         if ( instantiateActive )
-            return SVInstantiationCP.create ( sv, value, btManager);
+            return SVInstantiationCP.create ( sv, value, this);//btManager);
         else
             return longConst ( 0 );
     }
 
     protected Feature instantiateTriggeredVariable(ProjectionToTerm value) {
         if ( instantiateActive )
-            return SVInstantiationCP.createTriggeredVarCP( value, btManager );
+            return SVInstantiationCP.createTriggeredVarCP( value, this);//btManager );
         else
             return longConst ( 0 );
     }

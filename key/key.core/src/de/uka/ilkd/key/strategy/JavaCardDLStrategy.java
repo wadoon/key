@@ -1948,10 +1948,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                 instOf("subsumRightBigger")) }));
 
         final TermBuffer one = new TermBuffer();
-        one.setContent(getServices().getTermBuilder().zTerm("1"));
+        synchronized(one) { 
+            one.setContent(getServices().getTermBuilder().zTerm("1"));
+        }
         final TermBuffer two = new TermBuffer();
-        two.setContent(getServices().getTermBuilder().zTerm("2"));
-
+        synchronized(two) { 
+            two.setContent(getServices().getTermBuilder().zTerm("2"));
+        }
         bindRuleSet(d, "inEqSimp_or_tautInEqs",
                 SumFeature.createSum(new Feature[] {
                         applyTF("tautLeft", tf.monomial),
@@ -2237,7 +2240,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         final TermBuffer intRel = new TermBuffer();
         final TermBuffer atom = new TermBuffer();
         final TermBuffer zero = new TermBuffer();
-        zero.setContent(getServices().getTypeConverter().getIntegerLDT().zero());
+        synchronized(zero) { 
+            zero.setContent(getServices().getTypeConverter().getIntegerLDT().zero());
+        }
         final TermBuffer rootInf = new TermBuffer();
 
         final Feature posNegSplitting =

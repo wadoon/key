@@ -77,13 +77,15 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
         final MonomialCollector m2 = new MonomialCollector ();
         m2.collect ( right.toTerm ( app, pos, goal ), goal.proof().getServices() );
 
-        setCurrentGoal ( goal );
-        
-        final boolean res = lessThan ( m1.getResult(), m2.getResult(), goal.proof().getServices().getCaches() );
-        
-        setCurrentGoal ( null );
-        
-        return res;
+        synchronized(this) {
+            setCurrentGoal ( goal );
+
+            final boolean res = lessThan ( m1.getResult(), m2.getResult(), goal.proof().getServices().getCaches() );
+
+            setCurrentGoal ( null );
+
+            return res;
+        }
     }
 
     /**

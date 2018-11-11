@@ -65,7 +65,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     private long nextRuleTime;
 
     @Override
-    public synchronized void setGoal(Goal p_goal) {
+    public void setGoal(Goal p_goal) {
         goal = p_goal;
     }
 
@@ -73,7 +73,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * Clear the heap of applicable rules
      */
     @Override
-    public synchronized void clearCache() {
+    public void clearCache() {
         queue = null;
         previousMinimum = null;
         IfInstantiationCache.ifInstCache.reset(null);
@@ -113,7 +113,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * rule app is added to the heap
      */
     @Override
-    public synchronized void ruleAdded(RuleApp rule, PosInOccurrence pos) {
+    public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
         if (queue == null) {
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us
@@ -130,7 +130,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      * rule app is added to the heap
      */
     @Override
-    public synchronized void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
+    public void rulesAdded(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
         if (queue == null) {
             // then the heap has to be rebuilt completely anyway, and the new
             // rule app is not of interest for us
@@ -175,7 +175,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      *         cache again.
      */
     @Override
-    public synchronized RuleApp peekNext() {
+    public RuleApp peekNext() {
         ensureQueueExists();
 
         final long currentTime = goal.getTime();
@@ -210,7 +210,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      *         of the heap that is not obsolete
      */
     @Override
-    public synchronized RuleApp next() {
+    public RuleApp next() {
         final RuleApp res = peekNext();
         clearNextRuleApp();
         return res;
@@ -315,12 +315,12 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
     }
 
     @Override
-    public synchronized AutomatedRuleApplicationManager copy() {
+    public AutomatedRuleApplicationManager copy() {
         return (AutomatedRuleApplicationManager) clone();
     }
 
     @Override
-    public synchronized Object clone() {
+    public Object clone() {
         QueueRuleApplicationManager res = new QueueRuleApplicationManager();
         res.queue = queue;
         res.previousMinimum = previousMinimum;

@@ -58,7 +58,7 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
         return new ClausesSmallerThanFeature ( left, right, numbers );
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected synchronized boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
         final Term leftTerm = left.toTerm ( app, pos, goal );
         final Term rightTerm = right.toTerm ( app, pos, goal );
 
@@ -83,9 +83,13 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
      */
     @Override
     protected boolean lessThan(Term t1, Term t2, ServiceCaches caches) {
-
-        final int t1Def = quanAnalyser.eliminableDefinition ( t1, focus );
-        final int t2Def = quanAnalyser.eliminableDefinition ( t2, focus );
+        
+        final int t1Def;
+        final int t2Def;
+        synchronized(quanAnalyser) {
+            t1Def = quanAnalyser.eliminableDefinition ( t1, focus );
+            t2Def = quanAnalyser.eliminableDefinition ( t2, focus );
+        }
 
         if ( t1Def > t2Def ) return true;
         if ( t1Def < t2Def ) return false;
@@ -100,7 +104,9 @@ public class ClausesSmallerThanFeature extends SmallerThanFeature {
             if ( t2.op () == Junctor.OR ) {
                 return true;
             } else {
-                return litComparator.compareTerms ( t1, t2, focus, services );
+                synchronized(litComparator) {
+                    return litComparator.compareTerms ( t1, t2, focus, services );
+                }
             }
         }        
     }

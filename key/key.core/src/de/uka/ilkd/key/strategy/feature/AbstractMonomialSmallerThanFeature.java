@@ -127,7 +127,7 @@ public abstract class AbstractMonomialSmallerThanFeature
     /**
      * @param currentGoal The currentGoal to set.
      */
-    protected void setCurrentGoal(Goal currentGoal) {
+    protected synchronized void setCurrentGoal(Goal currentGoal) {
         this.currentGoal = currentGoal;
     }
 

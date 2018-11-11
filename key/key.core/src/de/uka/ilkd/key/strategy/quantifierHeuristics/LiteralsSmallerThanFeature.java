@@ -63,7 +63,7 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
         return compareTerms ( leftTerm, rightTerm, pos, goal.proof ().getServices () );
     }
 
-    protected boolean compareTerms(Term leftTerm, Term rightTerm,
+    protected synchronized boolean compareTerms(Term leftTerm, Term rightTerm,
                                    PosInOccurrence pos, Services p_services) {
         services = p_services;
         focus = pos;
@@ -86,10 +86,12 @@ public class LiteralsSmallerThanFeature extends SmallerThanFeature {
      */
     @Override
     protected boolean lessThan(Term t1, Term t2, ServiceCaches caches) {
-
-        final int t1Def = quanAnalyser.eliminableDefinition ( t1, focus );
-        final int t2Def = quanAnalyser.eliminableDefinition ( t2, focus );
-
+       final int t1Def;
+       final int t2Def;
+        synchronized(quanAnalyser) {
+           t1Def = quanAnalyser.eliminableDefinition ( t1, focus );
+           t2Def = quanAnalyser.eliminableDefinition ( t2, focus );
+        }
         if ( t1Def > t2Def ) return true;
         if ( t1Def < t2Def ) return false;
                 

@@ -521,7 +521,7 @@ public class TermTacletAppIndex {
      * @param pos Pointer to the term/formula where a change occurred
      * @return the updated index object
      */
-    synchronized TermTacletAppIndex update ( PosInOccurrence pos,
+     TermTacletAppIndex update ( PosInOccurrence pos,
                                 Services        services,
                                 TacletIndex     tacletIndex,
                                 NewRuleListener listener,	

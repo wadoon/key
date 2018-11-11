@@ -171,7 +171,8 @@ public class IfInstantiator {
                 return null;
 
             // the cache contains formula lists for the right semisequent
-            return getCacheMap(p_antec).get(tacletAppContainer.getAge());
+            final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cacheMap = getCacheMap(p_antec);
+            return cacheMap.get(tacletAppContainer.getAge());
         }
     }
 

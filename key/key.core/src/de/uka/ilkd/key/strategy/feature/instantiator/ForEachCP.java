@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.AbstractFeatureStrategy;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
@@ -34,7 +35,7 @@ import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
  */
 public class ForEachCP implements Feature {
 
-    private final BackTrackingManager manager;
+    private final AbstractFeatureStrategy strategy;
 
     private final TermBuffer var;
     private final TermGenerator generator;
@@ -53,36 +54,39 @@ public class ForEachCP implements Feature {
     public static Feature create(TermBuffer var,
                                  TermGenerator generator,
                                  Feature body,
-                                 BackTrackingManager manager) {
-        return new ForEachCP ( var, generator, body, manager );
+                                 AbstractFeatureStrategy strategy) { //BackTrackingManager manager) {
+        return new ForEachCP ( var, generator, body, strategy); //manager );
     }
 
     private ForEachCP(TermBuffer var,
                       TermGenerator generator,
                       Feature body,
-                      BackTrackingManager manager) {
+                      AbstractFeatureStrategy strategy) { //BackTrackingManager manager) {
         this.var = var;
         this.generator = generator;
         this.body = body;
-        this.manager = manager;
+        this.strategy = strategy;
     }
 
     public synchronized RuleAppCost computeCost(final RuleApp app,
-                               final PosInOccurrence pos,
-                               final Goal goal) {
-        final Term outerVarContent = var.getContent ();
-        var.setContent ( null );
-        
-        manager.passChoicePoint ( new CP ( app, pos, goal ), this );
-       
-        final RuleAppCost res;
-        if ( var.getContent() != null )
-            res = body.computeCost ( app, pos, goal );
-        else
-            res = NumberRuleAppCost.getZeroCost();
-        
-        var.setContent ( outerVarContent );
-        return res;
+            final PosInOccurrence pos,
+            final Goal goal) {
+        final BackTrackingManager manager = strategy.getBTManager(goal);
+        synchronized(var) {
+            final Term outerVarContent = var.getContent ();        
+            var.setContent ( null );
+            synchronized(manager) {
+                manager.passChoicePoint ( new CP ( app, pos, goal ), this );        
+            }
+            final RuleAppCost res;
+            if ( var.getContent() != null )
+                res = body.computeCost ( app, pos, goal );
+            else
+                res = NumberRuleAppCost.getZeroCost();
+
+            var.setContent ( outerVarContent );
+            return res;            
+        }
     }
 
     private final class CP implements ChoicePoint {
@@ -95,15 +99,17 @@ public class ForEachCP implements Feature {
                 this.oldApp = oldApp;
             }
 
-            public boolean hasNext() {
+            public synchronized boolean hasNext() {
                 return terms.hasNext ();
             }
 
-            public CPBranch next() {
+            public synchronized CPBranch next() {
                 final Term generatedTerm = terms.next ();
                 return new CPBranch () {
                     public void choose() {
-                        var.setContent ( generatedTerm );
+                        synchronized(var) {
+                            var.setContent ( generatedTerm );
+                        }
                     }
                     public RuleApp getRuleAppForBranch() {
                         return oldApp;

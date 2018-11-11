@@ -25,17 +25,17 @@ import de.uka.ilkd.key.rule.RuleApp;
  */
 public class TermBuffer implements ProjectionToTerm {
 
-    private Term t = null;
+    private volatile Term t = null;
     
-    public Term getContent() {
+    public synchronized Term getContent() {
         return t;
     }
 
-    public void setContent(Term t) {
+    public synchronized void setContent(Term t) {
         this.t = t;
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public synchronized Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
         return t;
     }
 

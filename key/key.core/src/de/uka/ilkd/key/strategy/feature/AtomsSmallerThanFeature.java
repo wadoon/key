@@ -47,15 +47,16 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
     }
 
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        setCurrentGoal ( goal );
-        
-        final boolean res =
-            lessThan ( collectAtoms ( left.toTerm ( app, pos, goal ) ),
-                       collectAtoms ( right.toTerm ( app, pos, goal ) ), goal.proof().getServices().getCaches() );
-        
-        setCurrentGoal ( null );
-        
-        return res;
+        synchronized(this) { 
+            setCurrentGoal ( goal );
+            final boolean res =
+                    lessThan ( collectAtoms ( left.toTerm ( app, pos, goal ) ),
+                            collectAtoms ( right.toTerm ( app, pos, goal ) ), goal.proof().getServices().getCaches() );
+
+            setCurrentGoal ( null );
+
+            return res;
+        } 
     }
 
     /**

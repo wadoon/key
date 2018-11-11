@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.strategy.AbstractFeatureStrategy;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
@@ -41,34 +42,39 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class SVInstantiationCP implements Feature {
 
-    private final BackTrackingManager manager;
-
+    //private final BackTrackingManager manager;
+    private final AbstractFeatureStrategy strategy;
+    
     private final Name svToInstantiate;
     private final ProjectionToTerm value;
 
     public static Feature create(Name svToInstantiate,
                                  ProjectionToTerm value,
-                                 BackTrackingManager manager) {
-        return new SVInstantiationCP ( svToInstantiate, value, manager );
+                                 AbstractFeatureStrategy strategy) { //BackTrackingManager manager) {
+        return new SVInstantiationCP ( svToInstantiate, value, strategy );
     }
 
     public static Feature createTriggeredVarCP(ProjectionToTerm value,
-                                               BackTrackingManager manager) {
-        return new SVInstantiationCP ( null, value, manager );
+            AbstractFeatureStrategy strategy) {
+                                               //BackTrackingManager manager) {
+        return new SVInstantiationCP ( null, value, strategy );
     }
 
     
     private SVInstantiationCP(Name svToInstantiate,
                               ProjectionToTerm value,
-                              BackTrackingManager manager) {
+                              AbstractFeatureStrategy strategy) {
         this.svToInstantiate = svToInstantiate;
         this.value = value;
-        this.manager = manager;
+        this.strategy = strategy;
     }
 
     public synchronized RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        manager.passChoicePoint ( new CP (app, pos, goal), this );
-        return NumberRuleAppCost.getZeroCost();
+        BackTrackingManager manager = strategy.getBTManager(goal);
+        synchronized(manager) {
+            manager.passChoicePoint ( new CP (app, pos, goal), this );
+            return NumberRuleAppCost.getZeroCost();
+        }
     }
 
     private SchemaVariable findSVWithName(TacletApp app) {
@@ -104,7 +110,7 @@ public class SVInstantiationCP implements Feature {
             this.goal = goal;
         }
 
-        public Iterator<CPBranch> getBranches(RuleApp oldApp) {
+        public synchronized Iterator<CPBranch> getBranches(RuleApp oldApp) {
             if ( ! ( oldApp instanceof TacletApp ) )
                 Debug.fail ( "Instantiation feature is only applicable to " +
                              "taclet apps, but got " + oldApp );

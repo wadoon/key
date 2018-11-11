@@ -66,24 +66,25 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
      */
     private static ImmutableList<IfFormulaInstantiation> createListHelp(Sequent     p_s,                                                               
 							       boolean antec ) {
-	
-	ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.<IfFormulaInstantiation>nil();
-	Iterator<SequentFormula>  it;
+        ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.<IfFormulaInstantiation>nil();
+        Iterator<SequentFormula>  it;
         if (antec) it = p_s.antecedent().iterator ();
-           else it = p_s.succedent().iterator ();
-	while ( it.hasNext () ) {
-	    res = res.prepend(new IfFormulaInstSeq(p_s, antec, it.next()));
-	}
+        else it = p_s.succedent().iterator ();
+        while ( it.hasNext () ) {
+            res = res.prepend(new IfFormulaInstSeq(p_s, antec, it.next()));
+        }
 
-	return res;
-
+        return res;
     }
 
+    private static final Object antecCacheLock = new Object(); 
+    private static final Object succCacheLock  = new Object(); 
+    
     public static ImmutableList<IfFormulaInstantiation> createList ( Sequent     p_s,                                                            
                                                             boolean antec ) {
         final Semisequent ss = antec ? p_s.antecedent() : p_s.succedent();
         
-        synchronized ( cache ) {
+        synchronized ( antec ? antecCacheLock : succCacheLock ) {
             if ( ( antec ? cache.aKey : cache.sKey ) != ss ) {
                 final ImmutableList<IfFormulaInstantiation> val = createListHelp ( 
 		    p_s, antec );

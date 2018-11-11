@@ -31,17 +31,19 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
     
     public static RuleAppCost create(int p_cost) {
         if ( p_cost == 0 ) return NumberRuleAppCost.getZeroCost();
-        
-        NumberRuleAppCost ac;
+        return new IntRuleAppCost(p_cost);
+/*        NumberRuleAppCost ac;
         synchronized (cache) { // Ensure thread save access which is required for parallel proofs (e.g. in Eclipse)
             ac = cache.get(p_cost);
-            if (ac != null) return ac;
+            if (ac != null) { 
+                return ac;
+            }
 
             ac = new IntRuleAppCost(p_cost);
             cache.put(p_cost, ac);
         }
         
-        return ac;
+        return ac;*/
     }
     
     public static RuleAppCost create(long p_cost) {
