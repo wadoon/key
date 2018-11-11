@@ -559,13 +559,13 @@ public final class OneStepSimplifier implements BuiltInRule {
             settings = ProofSettings.DEFAULT_SETTINGS;
         }
 
-        final boolean newActive = settings.getStrategySettings()
+        final boolean newActive = false && settings.getStrategySettings()
                 .getActiveStrategyProperties()
                 .get(StrategyProperties.OSS_OPTIONS_KEY)
                 .equals(StrategyProperties.OSS_ON);
 
         if (active != newActive || lastProof != proof) {
-            active = newActive;
+            active = false;// newActive;
             if(active && proof != null && !proof.closed()) {
                 initIndices(proof);
             } else {
