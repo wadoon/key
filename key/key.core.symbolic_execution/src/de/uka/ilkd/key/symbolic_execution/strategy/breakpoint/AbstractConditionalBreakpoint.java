@@ -49,7 +49,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
@@ -146,11 +145,10 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
    public void updateState(int maxApplications, 
                           long timeout, 
                           Proof proof, 
-                          IGoalChooser goalChooser, 
                           long startTime, 
                           int countApplied, 
                           Goal goal) {
-      super.updateState(maxApplications, timeout, proof, goalChooser, startTime, countApplied, goal);
+      super.updateState(maxApplications, timeout, proof, startTime, countApplied, goal);
       if (goal != null) {
          Node node = goal.node();
          RuleApp ruleApp = goal.getRuleAppManager().peekNext();

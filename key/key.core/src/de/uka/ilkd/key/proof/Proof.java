@@ -492,13 +492,17 @@ public class Proof implements Named {
      * result of a rule application on goal
      */
     public void replace(Goal oldGoal, ImmutableList<Goal> newGoals) {
-        openGoals = openGoals.removeAll(oldGoal);
-
+        synchronized(openGoals) {
+            openGoals = openGoals.removeAll(oldGoal);
+            addSilent(newGoals);
+        }
         if ( closed () )
             fireProofClosed();
         else {
             fireProofGoalRemoved(oldGoal);
-            add(newGoals);
+            if (!newGoals.isEmpty()) {
+                fireProofGoalsAdded(newGoals);
+            }
         }
     }
 
@@ -520,7 +524,9 @@ public class Proof implements Named {
             if ( goal != null ) {
                 b = true;
                 if (!GeneralSettings.noPruningClosed) {
-                    closedGoals = closedGoals.prepend(goal);
+                    synchronized(closedGoals) { 
+                        closedGoals = closedGoals.prepend(goal);
+                    }
                 }
                 remove ( goal );
             }
@@ -555,9 +561,15 @@ public class Proof implements Named {
      * @param goal the Goal to be removed
      */
     private void remove(Goal goal) {
-        ImmutableList<Goal> newOpenGoals = openGoals.removeAll(goal);
-        if (newOpenGoals != openGoals) {
-            openGoals = newOpenGoals;
+        boolean changed = false;
+        synchronized(openGoals) {
+            ImmutableList<Goal> newOpenGoals = openGoals.removeAll(goal);
+            if (newOpenGoals != openGoals) {
+                openGoals = newOpenGoals;
+                changed = true;
+            }
+        }
+        if (changed) {
             if (closed()) {
                 fireProofClosed();
             } else {
@@ -570,11 +582,10 @@ public class Proof implements Named {
      * @param goal the Goal to be added
      */
     public void add(Goal goal) {
-        ImmutableList<Goal> newOpenGoals = openGoals.prepend(goal);
-        if (openGoals != newOpenGoals) {
-            openGoals = newOpenGoals;
-            fireProofGoalsAdded(goal);
-        }
+        synchronized(openGoals) {
+            openGoals = openGoals.prepend(goal);
+        }            
+        fireProofGoalsAdded(goal);
     }
 
 
@@ -582,14 +593,18 @@ public class Proof implements Named {
      * @param goals the IList<Goal> to be prepended
      */
     public void add(ImmutableList<Goal> goals) {
-        ImmutableList<Goal> newOpenGoals = openGoals.prepend(goals);
-        if (openGoals != newOpenGoals) {
-            openGoals = newOpenGoals;
-        }
-
+        addSilent(goals);
         // For the moment it is necessary to fire the message ALWAYS
         // in order to detect branch closing.
         fireProofGoalsAdded(goals);
+    }
+
+    private void addSilent(ImmutableList<Goal> goals) {
+        if (!goals.isEmpty()) {
+            synchronized(goals) {
+                openGoals = openGoals.prepend(goals);
+            }
+        }
     }
 
 
@@ -798,7 +813,7 @@ public class Proof implements Named {
      * parent node of the goal (if this parent node exists).
      * @param goal the Goal where the last rule application gets undone
      */
-    public synchronized void pruneProof(Goal goal) {
+    public void pruneProof(Goal goal) {
         if(goal.node().parent() != null) {
             pruneProof(goal.node().parent());
         }
@@ -811,11 +826,11 @@ public class Proof implements Named {
      * @param cuttingPoint
      * @return Returns the sub trees that has been pruned.
      */
-    public synchronized ImmutableList<Node> pruneProof(Node cuttingPoint) {
+    public ImmutableList<Node> pruneProof(Node cuttingPoint) {
         return pruneProof(cuttingPoint,true);
     }
 
-    public synchronized ImmutableList<Node> pruneProof(Node cuttingPoint, boolean fireChanges) {
+    public ImmutableList<Node> pruneProof(Node cuttingPoint, boolean fireChanges) {
         assert cuttingPoint.proof() == this;
         if(getGoal(cuttingPoint) != null) {
             return null;
@@ -978,8 +993,7 @@ public class Proof implements Named {
      * adds a listener to the proof
      * @param listener the ProofTreeListener to be added
      */
-    public synchronized void addProofTreeListener
-    (ProofTreeListener listener) {
+    public void addProofTreeListener(ProofTreeListener listener) {
         synchronized(listenerList) {
             listenerList.add(listener);
         }
@@ -990,8 +1004,7 @@ public class Proof implements Named {
      * removes a listener from the proof
      * @param listener the ProofTreeListener to be removed
      */
-    public synchronized void removeProofTreeListener
-    (ProofTreeListener listener) {
+    public void removeProofTreeListener(ProofTreeListener listener) {
         if (listenerList != null) { // TODO: check if necessary
             synchronized(listenerList) {
                 listenerList.remove(listener);
@@ -1000,7 +1013,7 @@ public class Proof implements Named {
     }
 
 
-    public synchronized boolean containsProofTreeListener(ProofTreeListener listener) {
+    public boolean containsProofTreeListener(ProofTreeListener listener) {
         synchronized(listenerList) {
             return listenerList.contains(listener);
         }
@@ -1021,12 +1034,14 @@ public class Proof implements Named {
      * node is an inner one
      */
     public Goal getGoal(Node node) {
-        for (final Goal result : openGoals) {
-            if (result.node() == node) {
-                return result;
+        synchronized(openGoals) {
+            for (final Goal result : openGoals) {
+                if (result.node() == node) {
+                    return result;
+                }
             }
         }
-        return null;
+        return null;        
     }
 
     /**
@@ -1045,9 +1060,11 @@ public class Proof implements Named {
      * node is an inner one or an open goal
      */
     public Goal getClosedGoal(Node node) {
-        for (final Goal result : closedGoals) {
-            if (result.node() == node) {
-                return result;
+        synchronized(closedGoals) {
+            for (final Goal result : closedGoals) {
+                if (result.node() == node) {
+                    return result;
+                }
             }
         }
         return null;
@@ -1062,10 +1079,12 @@ public class Proof implements Named {
     public ImmutableList<Goal> getSubtreeGoals(Node node) {
         ImmutableList<Goal> result = ImmutableSLList.<Goal>nil();
         List<Node> leaves = node.getLeaves();
-        for (final Goal goal : openGoals) {
-        	if (leaves.remove(goal.node())) { //if list contains node, remove it to make the list faster later
-        		result = result.prepend(goal);
-        	}
+        synchronized(openGoals) {
+            for (final Goal goal : openGoals) {
+                if (leaves.remove(goal.node())) { //if list contains node, remove it to make the list faster later
+                    result = result.prepend(goal);
+                }
+            }
         }
         return result;
     }
@@ -1078,10 +1097,12 @@ public class Proof implements Named {
     public ImmutableList<Goal> getClosedSubtreeGoals(Node node) {
         ImmutableList<Goal> result = ImmutableSLList.<Goal>nil();
         List<Node> leaves = node.getLeaves();
-        for (final Goal goal : closedGoals) {
-            //if list contains node, remove it to make the list faster later
-            if (leaves.remove(goal.node())) {
-                result = result.prepend(goal);
+        synchronized(closedGoals) {
+            for (final Goal goal : closedGoals) {
+                //if list contains node, remove it to make the list faster later
+                if (leaves.remove(goal.node())) {
+                    result = result.prepend(goal);
+                }
             }
         }
         return result;
@@ -1125,15 +1146,19 @@ public class Proof implements Named {
      * control the contents of the rule app index
      */
     public void setRuleAppIndexToAutoMode () {
-        for (final Goal g : openGoals) {
-            g.ruleAppIndex ().autoModeStarted ();
+        synchronized(openGoals) {
+            for (final Goal g : openGoals) {
+                g.ruleAppIndex ().autoModeStarted ();
+            }
         }
     }
 
 
     public void setRuleAppIndexToInteractiveMode () {
-        for (final Goal g : openGoals) {
-            g.ruleAppIndex ().autoModeStopped ();
+        synchronized(openGoals) {
+            for (final Goal g : openGoals) {
+                g.ruleAppIndex ().autoModeStopped ();
+            }
         }
     }
 

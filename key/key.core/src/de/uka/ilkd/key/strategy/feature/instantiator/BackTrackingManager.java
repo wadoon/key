@@ -78,7 +78,7 @@ public final class BackTrackingManager {
      *            run (after backtracking). The <code>ticket</code> must not
      *            change between two evaluation runs of the feature term
      */
-    public void passChoicePoint(ChoicePoint cp, Object ticket) {
+    public synchronized void passChoicePoint(ChoicePoint cp, Object ticket) {
         assert initialApp != null;
         assertValidTicket ( ticket );
         assert chosenBranches.size () == choices.size ();
@@ -120,7 +120,7 @@ public final class BackTrackingManager {
      * @return <code>true</code> iff there are paths left to explore, i.e., if
      *         evaluation should run a further time
      */
-    public boolean backtrack() {
+    public synchronized boolean backtrack() {
         position = 0;
 
         while ( !choices.isEmpty () ) {
@@ -146,7 +146,7 @@ public final class BackTrackingManager {
      * @return the resulting rule application when all choice points have
      *         applied their modifications
      */
-    public RuleApp getResultingapp() {
+    public synchronized RuleApp getResultingapp() {
         return getOldRuleApp ();
     }
 

@@ -74,8 +74,12 @@ public abstract class TacletAppContainer extends RuleAppContainer {
                                                         PosInOccurrence p_pio,
                                                         Goal p_goal,
                                                         boolean p_initial) {
+        final RuleAppCost computeCost;
+        final Strategy goalStrategy = p_goal.getGoalStrategy();
+        computeCost = goalStrategy.computeCost ( p_app, p_pio, p_goal );
+        
         return createContainer ( p_app, p_pio, p_goal,
-                                 p_goal.getGoalStrategy().computeCost ( p_app, p_pio, p_goal ),
+                                 computeCost,
                                  p_initial );
     }
 
@@ -229,9 +233,9 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             PosInOccurrence p_pio, Goal p_goal) {
         
         List<RuleAppCost> costs = new LinkedList<>();
-        
+        final Strategy goalStrategy = p_goal.getGoalStrategy();
         for (NoPosTacletApp app : p_app) {
-            costs.add(p_goal.getGoalStrategy().computeCost ( app, p_pio, p_goal ));
+            costs.add(goalStrategy.computeCost ( app, p_pio, p_goal ));
         }
         
         ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
@@ -320,7 +324,8 @@ public abstract class TacletAppContainer extends RuleAppContainer {
 
         TacletApp app = getTacletApp();
         PosInOccurrence pio = getPosInOccurrence(p_goal);
-        if (!p_goal.getGoalStrategy().isApprovedApp(app, pio, p_goal)) {
+        final Strategy goalStrategy = p_goal.getGoalStrategy();
+        if (!goalStrategy.isApprovedApp(app, pio, p_goal)) {
             return null;
         }
 

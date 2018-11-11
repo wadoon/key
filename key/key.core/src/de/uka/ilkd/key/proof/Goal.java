@@ -228,8 +228,8 @@ public final class Goal  {
      * to reduce unnecessary object creation the necessary information is passed
      * to the listener as parameters and not through an event object.
      */
-    protected void fireSequentChanged(SequentChangeInfo sci) {
-	getFormulaTagManager().sequentChanged(this, sci);
+    protected void fireSequentChanged(SequentChangeInfo sci) {	        
+        getFormulaTagManager().sequentChanged(this, sci);
 	ruleAppIndex()        .sequentChanged(this, sci);
 	for (GoalListener listener : listeners) {
 	    listener.sequentChanged(this, sci);
@@ -239,9 +239,9 @@ public final class Goal  {
     protected void fireGoalReplaced(Goal       goal,
 				    Node       parent,
 				    ImmutableList<Goal> newGoals) {
-	for (GoalListener listener : listeners) {
-	    listener.goalReplaced(goal, parent, newGoals);
-	}
+        for (GoalListener listener : listeners) {
+            listener.goalReplaced(goal, parent, newGoals);
+        }
     }
 
    protected void fireAautomaticStateChanged(boolean oldAutomatic, boolean newAutomatic) {
@@ -373,8 +373,8 @@ public final class Goal  {
      * desribing the applied changes to the sequent of the parent node
      */
     public void setSequent(SequentChangeInfo sci) {
-        node().setSequent(sci.sequent());
-        node().getNodeInfo().setSequentChangeInfo(sci);
+        node.setSequent(sci.sequent());
+        node.getNodeInfo().setSequentChangeInfo(sci);
         //VK reminder: now update the index
        	fireSequentChanged(sci);
     }
@@ -560,41 +560,41 @@ public final class Goal  {
      */
     public ImmutableList<Goal> split(int n) {
         ImmutableList<Goal> goalList = ImmutableSLList.<Goal>nil();
-	
-	final Node parent = node; // has to be stored because the node
-	// of this goal will be replaced
-	
-	if (n == 1) {
-	    Node newNode = new Node(parent.proof(),
-                parent.sequent(),
-                parent);
 
-        parent.add(newNode);
-        this.setNode(newNode);
-        goalList = goalList.prepend(this);  
-	} else if (n > 1) { // this would also work for n ==1 but the above avoids unnecessary creation of arrays
-	    Node[] newNode = new Node[n];
+        final Node parent = node; // has to be stored because the node
+        // of this goal will be replaced
 
-	    for (int i = 0; i<n; i++) {
-	        // create new node and add to tree
-	        newNode[i] = new Node(parent.proof(),
-	                parent.sequent(),
-	                parent);
-	    }
+        if (n == 1) {
+            Node newNode = new Node(parent.proof(),
+                    parent.sequent(),
+                    parent);
 
-        parent.addAll(newNode);
+            parent.add(newNode);
+            this.setNode(newNode);
+            goalList = goalList.prepend(this);  
+        } else if (n > 1) { // this would also work for n ==1 but the above avoids unnecessary creation of arrays
+            Node[] newNode = new Node[n];
 
-        this.setNode(newNode[0]);
-        goalList = goalList.prepend(this);      
-	    
-        for (int i = 1; i<n; i++) {
-            goalList = goalList.prepend(clone(newNode[i]));	    
-        }	    
-	}
+            for (int i = 0; i<n; i++) {
+                // create new node and add to tree
+                newNode[i] = new Node(parent.proof(),
+                        parent.sequent(),
+                        parent);
+            }
 
-	fireGoalReplaced ( this, parent, goalList );
+            parent.addAll(newNode);
 
-	return goalList;
+            this.setNode(newNode[0]);
+            goalList = goalList.prepend(this);      
+
+            for (int i = 1; i<n; i++) {
+                goalList = goalList.prepend(clone(newNode[i]));	    
+            }	    
+        }
+
+        fireGoalReplaced ( this, parent, goalList );
+
+        return goalList;
     }
 
     private void resetTagManager() {
@@ -632,7 +632,7 @@ public final class Goal  {
 
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);
         addGoalListener(journal);
-      
+
 
         final Node n = node;
 
@@ -645,26 +645,27 @@ public final class Goal  {
         final ImmutableList<Goal> goalList = ruleApp.execute(this, overlayServices);
 
         proof.getServices().saveNameRecorder(n);
-
         if (goalList != null){
             if (goalList.isEmpty() ) {
                 proof.closeGoal ( this );
             } else {
                 proof.replace ( this, goalList );
                 if ( ruleApp instanceof TacletApp &&
-                        ((TacletApp)ruleApp).taclet ().closeGoal () )
+                        ((TacletApp)ruleApp).taclet ().closeGoal () ) {
                     // the first new goal is the one to be closed
                     proof.closeGoal ( goalList.head () );
+                }
             }
         }
-
         adaptNamespacesNewGoals(goalList);
 
         final RuleAppInfo ruleAppInfo = journal.getRuleAppInfo(ruleApp);
 
-        if ( goalList != null )
+        if ( goalList != null ) {
             proof.fireRuleApplied( new ProofEvent ( proof, ruleAppInfo ) );
+        }
         return goalList;
+
     }
 
     /*

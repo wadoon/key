@@ -324,10 +324,10 @@ public class TermTacletAppIndex {
      * @return the updated TermTacletAppIndex
      */
     private TermTacletAppIndex updateHelp(PIOPathIterator pathToModification,
-                                          Services services,
-                                          TacletIndex tacletIndex,
-                                          NewRuleListener listener,
-                                          ITermTacletAppIndexCache indexCache) {
+            Services services,
+            TacletIndex tacletIndex,
+            NewRuleListener listener,
+            ITermTacletAppIndexCache indexCache) {
 
         pathToModification.next ();
 
@@ -337,7 +337,7 @@ public class TermTacletAppIndex {
 
         if ( completeRebuild )
             return updateCompleteRebuild ( pos, services, tacletIndex,
-                                           listener, indexCache );
+                    listener, indexCache );
 
         final Term newTerm = pathToModification.getSubTerm ();
 
@@ -348,13 +348,13 @@ public class TermTacletAppIndex {
         }
 
         final ImmutableList<TermTacletAppIndex> newSubIndices =
-            updateSubIndexes ( pathToModification, services, tacletIndex,
-                               listener, indexCache );
-            
+                updateSubIndexes ( pathToModification, services, tacletIndex,
+                        listener, indexCache );
+
         final TermTacletAppIndex res =
-            updateLocalApps ( pos, newTerm, services, tacletIndex,
-                              listener, newSubIndices );
-        
+                updateLocalApps ( pos, newTerm, services, tacletIndex,
+                        listener, newSubIndices );
+
         indexCache.putIndexForTerm ( newTerm, res );
         return res;
     }
@@ -521,12 +521,12 @@ public class TermTacletAppIndex {
      * @param pos Pointer to the term/formula where a change occurred
      * @return the updated index object
      */
-    TermTacletAppIndex update ( PosInOccurrence pos,
+    synchronized TermTacletAppIndex update ( PosInOccurrence pos,
                                 Services        services,
                                 TacletIndex     tacletIndex,
                                 NewRuleListener listener,	
                                 TermTacletAppIndexCacheSet indexCaches ) {       
-        
+       
         final ITermTacletAppIndexCache indexCache =
             determineIndexCache ( pos, indexCaches );
 
@@ -694,7 +694,6 @@ public class TermTacletAppIndex {
         
         TermTacletAppIndex index = this;        
         PosInOccurrence pos = pathToModification.getPosInOccurrence ();
-        
         while ( pathToModification.hasNext () ) {
             // assert collectedApps.get(pos) == null;
             collectedApps = collectedApps.put(pos, index.localTacletApps);
@@ -717,9 +716,8 @@ public class TermTacletAppIndex {
             pathToModification.next ();
             pos = pathToModification.getPosInOccurrence ();
         }
-        
+
         collectedApps = index.collectAllTacletAppsHereAndBelow ( pos, collectedApps );
-        
         return collectedApps;
     }
     

@@ -108,7 +108,7 @@ public final class RuleAppIndex  {
             }
 
             @Override
-            public void rulesAdded(ImmutableList<? extends RuleApp> rules,
+            public synchronized void rulesAdded(ImmutableList<? extends RuleApp> rules,
                     PosInOccurrence pos) {
                 informNewRuleListener(rules, pos);
             }
@@ -118,7 +118,7 @@ public final class RuleAppIndex  {
 	builtInRuleAppIndex      .setNewRuleListener ( newRuleListener );
     }
 
-    public void setup ( Goal p_goal ) {
+    public synchronized void setup ( Goal p_goal ) {
         goal = p_goal;
 	interactiveTacletAppIndex.setup ( p_goal );
 	automatedTacletAppIndex  .setup ( p_goal );
@@ -131,18 +131,18 @@ public final class RuleAppIndex  {
      * automated). This distinction could be replaced with a more general way to
      * control the contents of the rule app index
      */
-    public void autoModeStarted () {
+    public synchronized void autoModeStarted () {
 	autoMode = true;
     }
 
-    public void autoModeStopped () {
+    public synchronized void autoModeStopped () {
 	autoMode = false;
     }
 
     /**
      * returns the Taclet index for this ruleAppIndex. 
      */
-    public TacletIndex tacletIndex() {
+    public synchronized TacletIndex tacletIndex() {
 	return tacletIndex;
     }
 
@@ -150,7 +150,7 @@ public final class RuleAppIndex  {
      * returns the built-in rule application index for this
      * ruleAppIndex. 
      */
-    public BuiltInRuleAppIndex builtInRuleAppIndex() {
+    public synchronized BuiltInRuleAppIndex builtInRuleAppIndex() {
 	return builtInRuleAppIndex;
     }
 
@@ -159,7 +159,7 @@ public final class RuleAppIndex  {
      * adds a change listener to the index
      * @param l the AppIndexListener to add
      */
-    public void addNewRuleListener(NewRuleListener l) {
+    public synchronized void addNewRuleListener(NewRuleListener l) {
 	listenerList.add(l);
     }
    
@@ -167,7 +167,7 @@ public final class RuleAppIndex  {
      * removes a change listener to the index
      * @param l the AppIndexListener to remove
      */
-    public void removeNewRuleListener(NewRuleListener l) {
+    public synchronized void removeNewRuleListener(NewRuleListener l) {
 	listenerList.remove(l);
     }
 
@@ -179,7 +179,7 @@ public final class RuleAppIndex  {
      * @param services the Services object encapsulating information
      * about the java datastructures like (static)types etc.
      */
-    public ImmutableList<TacletApp> getTacletAppAt(TacletFilter    filter,
+    public synchronized ImmutableList<TacletApp> getTacletAppAt(TacletFilter    filter,
 					  PosInOccurrence pos,
 					  Services        services) { 
 	ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
@@ -209,7 +209,7 @@ public final class RuleAppIndex  {
      * about the java datastructures like (static)types etc.
      * @return the possible rule applications 
      */
-    public ImmutableList<TacletApp> getTacletAppAtAndBelow(TacletFilter    filter,
+    public synchronized ImmutableList<TacletApp> getTacletAppAtAndBelow(TacletFilter    filter,
 						  PosInOccurrence pos,
 						  Services        services) {
 	ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
@@ -238,7 +238,7 @@ public final class RuleAppIndex  {
      * about the java datastructures like (static)types etc.
      * @return list of all possible instantiations
      */
-    public ImmutableList<NoPosTacletApp> getFindTaclet(TacletFilter    filter,
+    public synchronized ImmutableList<NoPosTacletApp> getFindTaclet(TacletFilter    filter,
 					      PosInOccurrence pos,
 					      TermServices        services) { 
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
@@ -265,7 +265,7 @@ public final class RuleAppIndex  {
      * about the java datastructures like (static)types etc.
      * @return list of all possible instantiations
      */
-    public ImmutableList<NoPosTacletApp> getNoFindTaclet(TacletFilter    filter,
+    public synchronized ImmutableList<NoPosTacletApp> getNoFindTaclet(TacletFilter    filter,
 						Services        services) { 
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if ( !autoMode ) {
@@ -292,7 +292,7 @@ public final class RuleAppIndex  {
      * about the java datastructures like (static)types etc.
      * @return list of all possible instantiations
      */
-    public ImmutableList<NoPosTacletApp> getRewriteTaclet (TacletFilter    filter,
+    public synchronized ImmutableList<NoPosTacletApp> getRewriteTaclet (TacletFilter    filter,
 						  PosInOccurrence pos,
 						  TermServices        services) { 
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
@@ -316,7 +316,7 @@ public final class RuleAppIndex  {
      * returns a list of built-in rule applications applicable
      * for the given goal, user defined constraint and position
      */
-    public ImmutableList<IBuiltInRuleApp> getBuiltInRules(Goal g,
+    public synchronized ImmutableList<IBuiltInRuleApp> getBuiltInRules(Goal g,
 	    PosInOccurrence pos) {
 	 	 	
 	 return builtInRuleAppIndex().getBuiltInRule(g, pos);
@@ -328,7 +328,7 @@ public final class RuleAppIndex  {
      * of this TacletAppIndex.
      * @param tacletApp the NoPosTacletApp describing a partial instantiated Taclet to add
      */
-    public void addNoPosTacletApp(Iterable<NoPosTacletApp> tacletApps) {
+    public synchronized void addNoPosTacletApp(Iterable<NoPosTacletApp> tacletApps) {
         tacletIndex.addTaclets ( tacletApps );
 
         if ( autoMode )
@@ -343,7 +343,7 @@ public final class RuleAppIndex  {
      * of this TacletAppIndex.
      * @param tacletApp the NoPosTacletApp describing a partial instantiated Taclet to add
      */
-    public void addNoPosTacletApp(NoPosTacletApp tacletApp) {
+    public synchronized void addNoPosTacletApp(NoPosTacletApp tacletApp) {
         tacletIndex.add ( tacletApp );
 
         if ( autoMode )
@@ -358,7 +358,7 @@ public final class RuleAppIndex  {
      * Index of this TacletAppIndex.
      * @param tacletApp the NoPosTacletApp to remove
      */
-    public void removeNoPosTacletApp(NoPosTacletApp tacletApp) {
+    public synchronized void removeNoPosTacletApp(NoPosTacletApp tacletApp) {
         tacletIndex.remove ( tacletApp );
 
         if ( autoMode )
@@ -373,7 +373,7 @@ public final class RuleAppIndex  {
      * @param g the Goal which sequent has been changed
      * @param sci SequentChangeInfo describing the change of the sequent 
      */  
-    public void sequentChanged ( Goal g, SequentChangeInfo sci ) {
+    public synchronized void  sequentChanged ( Goal g, SequentChangeInfo sci ) {
 	if ( !autoMode )
             // the TacletAppIndex is able to detect modification of the
             // sequent itself, it is not necessary to clear the index
@@ -385,7 +385,7 @@ public final class RuleAppIndex  {
     /**
      * Empties all caches
      */
-    public void clearAndDetachCache () {
+    public synchronized void clearAndDetachCache () {
         // Currently this only applies to the taclet index
         interactiveTacletAppIndex.clearAndDetachCache ();
         automatedTacletAppIndex  .clearAndDetachCache ();
@@ -445,7 +445,7 @@ public final class RuleAppIndex  {
      * informs all observers, if a formula has been added, changed or 
      * removed
      */ 
-    private void informNewRuleListener(ImmutableList<? extends RuleApp> p_apps,
+    private synchronized void  informNewRuleListener(ImmutableList<? extends RuleApp> p_apps,
                                        PosInOccurrence p_pos) {
         for (final NewRuleListener listener : listenerList) {
             listener.rulesAdded(p_apps, p_pos);

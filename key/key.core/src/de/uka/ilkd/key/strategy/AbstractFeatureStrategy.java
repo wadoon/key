@@ -129,18 +129,20 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     
     private final BackTrackingManager btManager = new BackTrackingManager ();
 
-    public void instantiateApp ( RuleApp              app,
+    public  void instantiateApp ( RuleApp              app,
                                        PosInOccurrence      pio,
                                        Goal                 goal,
                                        RuleAppCostCollector collector ) {
-        btManager.setup ( app );
-        do {
-            final RuleAppCost cost = instantiateApp ( app, pio, goal );
-            if ( cost instanceof TopRuleAppCost ) continue;
-            final RuleApp res = btManager.getResultingapp ();
-            if ( res == app || res == null ) continue;
-            collector.collect ( res, cost );
-        } while ( btManager.backtrack () );
+        synchronized(btManager) {
+            btManager.setup ( app );
+            do {
+                final RuleAppCost cost = instantiateApp ( app, pio, goal );
+                if ( cost instanceof TopRuleAppCost ) continue;
+                final RuleApp res = btManager.getResultingapp ();
+                if ( res == app || res == null ) continue;
+                collector.collect ( res, cost );
+            } while ( btManager.backtrack () );
+        }
     }
  
     protected abstract RuleAppCost instantiateApp (RuleApp              app,

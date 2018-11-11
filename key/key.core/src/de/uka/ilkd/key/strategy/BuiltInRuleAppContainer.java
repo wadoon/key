@@ -119,7 +119,12 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
 	    					IBuiltInRuleApp bir,
 	    					PosInOccurrence pio,
 	    					Goal goal ) {
-        final RuleAppCost cost = goal.getGoalStrategy().computeCost(bir, pio, goal);
+        final RuleAppCost cost;
+        
+        final Strategy goalStrategy = goal.getGoalStrategy();
+        synchronized(goalStrategy) {
+            cost = goalStrategy.computeCost(bir, pio, goal);
+        }
 
         final BuiltInRuleAppContainer container 
         	= new BuiltInRuleAppContainer(bir, pio, cost, goal);
@@ -170,8 +175,11 @@ public class BuiltInRuleAppContainer extends RuleAppContainer {
         }
 
         final PosInOccurrence pio = getPosInOccurrence(goal);
-        if (!goal.getGoalStrategy().isApprovedApp(bir, pio, goal)) {
-            return null;
+        final Strategy goalStrategy = goal.getGoalStrategy();
+        synchronized (goalStrategy) {
+            if (!goalStrategy.isApprovedApp(bir, pio, goal)) {
+                return null;
+            }
         }
 
         final BuiltInRule rule = bir.rule();

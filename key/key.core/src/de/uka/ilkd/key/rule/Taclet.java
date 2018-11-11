@@ -909,7 +909,13 @@ public abstract class Taclet implements Rule, Named {
      */
    @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, RuleApp tacletApp) {
-        return getExecutor().apply(goal, services, tacletApp);
+        ImmutableList<Goal> result; 
+        
+        synchronized(goal) {
+            result = getExecutor().apply(goal, services, tacletApp);
+        }
+        
+        return result;
     }
 
     public TacletExecutor<? extends Taclet> getExecutor() {

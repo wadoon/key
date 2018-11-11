@@ -2803,7 +2803,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      */
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
             Goal goal) {
-        return costComputationF.computeCost(app, pio, goal);
+        final RuleAppCost computeCost = costComputationF.computeCost(app, pio, goal);        
+        return computeCost;
     }
 
     /**
@@ -2816,7 +2817,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      */
     public final boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
             Goal goal) {
-        return !(approvalF.computeCost(app, pio, goal) instanceof TopRuleAppCost);
+        final RuleAppCost computeCost = approvalF.computeCost(app, pio, goal);        
+        return !(computeCost instanceof TopRuleAppCost);
     }
 
     protected RuleAppCost instantiateApp(RuleApp app,

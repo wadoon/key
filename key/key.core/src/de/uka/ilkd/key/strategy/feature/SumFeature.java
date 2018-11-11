@@ -29,7 +29,7 @@ import de.uka.ilkd.key.util.Debug;
 public class SumFeature implements Feature {
     
     @Override
-    public RuleAppCost computeCost (RuleApp app, PosInOccurrence pos, Goal goal) {
+    public synchronized RuleAppCost computeCost (RuleApp app, PosInOccurrence pos, Goal goal) {
         // We require that there is at least one feature (in method
         // <code>createSum</code>)
         RuleAppCost res = features[0].computeCost ( app, pos, goal );

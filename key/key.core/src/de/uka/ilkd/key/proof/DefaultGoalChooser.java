@@ -78,7 +78,7 @@ public class DefaultGoalChooser implements IGoalChooser {
 
         if ( allGoalsSatisfiable ) {
             goalList = p_goals;
-            if(currentSubtreeRoot!=null) {
+            if(currentSubtreeRoot != null) {
                 findMinimalSubtree ( currentSubtreeRoot );
             }
         } else {

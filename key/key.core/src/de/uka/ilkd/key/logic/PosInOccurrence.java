@@ -47,7 +47,7 @@ public final class PosInOccurrence {
     /**
      * The subterm this object points to, or <code>null</code>
      */
-    private Term subTermCache = null;
+    private volatile Term subTermCache = null;
 
     public PosInOccurrence(SequentFormula sequentFormula,
                            PosInTerm posInTerm,
@@ -216,11 +216,11 @@ public final class PosInOccurrence {
     /**
      * returns the subterm this object points to
      */
-    public Term subTerm () {
-	if ( subTermCache == null ) {
-	    subTermCache = posInTerm.getSubTerm(sequentFormula.formula());
-	}
-	return subTermCache;
+    public Term subTerm () {        
+        if ( subTermCache == null ) {
+            subTermCache = posInTerm.getSubTerm(sequentFormula.formula());
+        }
+        return subTermCache;
     }
 
     /**

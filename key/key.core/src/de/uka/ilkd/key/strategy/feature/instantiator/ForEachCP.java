@@ -67,7 +67,7 @@ public class ForEachCP implements Feature {
         this.manager = manager;
     }
 
-    public RuleAppCost computeCost(final RuleApp app,
+    public synchronized RuleAppCost computeCost(final RuleApp app,
                                final PosInOccurrence pos,
                                final Goal goal) {
         final Term outerVarContent = var.getContent ();

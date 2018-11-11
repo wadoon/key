@@ -740,7 +740,12 @@ public class ProofTreeView extends JPanel {
 
             // now GUIProofTreeNode / GUIOneStepSimpTreeNode
 	    Node node = ((GUIAbstractTreeNode)value).getNode();
-	    String nodeText = node.serialNr()+":"+node.name();
+	    
+	    String nodeText = "";
+	    try {
+	        nodeText = node.serialNr()+":"+node.name();
+	    } catch (Throwable t) {}
+	    
 	    boolean isBranch = false;
 	    {
                 final Node child = ((GUIAbstractTreeNode)value).findChild( node );

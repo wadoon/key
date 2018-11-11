@@ -20,7 +20,9 @@ http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html
 
 package de.uka.ilkd.key.proof;
 
-import java.util.Iterator;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -70,13 +72,11 @@ public class ApplyStrategy {
          * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
          * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
          * @param proof The current {@link Proof}.
-         * @param goalChooser The current {@link IGoalChooser}.
          * @return The maximal amount of work or {@code 0} if it is unknown.
          */
         public int getMaximalWork(int maxApplications,
-                                  long timeout,
-                                  Proof proof,
-                                  IGoalChooser goalChooser);
+                long timeout,
+                Proof proof);
 
         /**
          * Checks if it is allowed to apply the next rule on the selected {@link Goal}
@@ -85,19 +85,17 @@ public class ApplyStrategy {
          * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
          * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
          * @param proof The current {@link Proof}.
-         * @param goalChooser The current {@link IGoalChooser}.
          * @param startTime The timestamp when the apply strategy has started, computed via {@link System#currentTimeMillis()}
          * @param countApplied The number of already applied rules.
          * @param goal The current {@link Goal} on which the next rule will be applied.
          * @return {@code true} rule application is allowed, {@code false} rule application is not allowed so stop apply strategy
          */
         public boolean isGoalAllowed(int maxApplications,
-                                     long timeout,
-                                     Proof proof,
-                                     IGoalChooser goalChooser,
-                                     long startTime,
-                                     int countApplied,
-                                     Goal goal);
+                long timeout,
+                Proof proof,
+                long startTime,
+                int countApplied,
+                Goal goal);
 
         /**
          * Returns the reason why the previous check via
@@ -106,38 +104,34 @@ public class ApplyStrategy {
          * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
          * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
          * @param proof The current {@link Proof}.
-         * @param goalChooser The current {@link IGoalChooser}.
          * @param startTime The timestamp when the apply strategy has started, computed via {@link System#currentTimeMillis()}
          * @param countApplied The number of already applied rules.
          * @param goal The current {@link Goal} on which the next rule will be applied.
          * @return
          */
         public String getGoalNotAllowedMessage(int maxApplications,
-                                               long timeout,
-                                               Proof proof,
-                                               IGoalChooser goalChooser,
-                                               long startTime,
-                                               int countApplied,
-                                               Goal goal);
+                long timeout,
+                Proof proof,
+                long startTime,
+                int countApplied,
+                Goal goal);
 
         /**
          * Checks after each applied rule if more rules should be applied or if the strategy should stop.
          * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
          * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
          * @param proof The current {@link Proof}.
-         * @param goalChooser The current {@link IGoalChooser}.
          * @param startTime The timestamp when the apply strategy has started, computed via {@link System#currentTimeMillis()}
          * @param countApplied The number of already applied rules.
          * @param singleRuleApplicationInfo An optional {@link SingleRuleApplicationInfo}.
          * @return {@code true} stop strategy, {@code false} continue strategy and apply next rule.
          */
         public boolean shouldStop(int maxApplications,
-                                  long timeout,
-                                  Proof proof,
-                                  IGoalChooser goalChooser,
-                                  long startTime,
-                                  int countApplied,
-                                  SingleRuleApplicationInfo singleRuleApplicationInfo);
+                long timeout,
+                Proof proof,
+                long startTime,
+                int countApplied,
+                SingleRuleApplicationInfo singleRuleApplicationInfo);
 
         /**
          * Returns a human readable message which explains why the previous
@@ -146,19 +140,17 @@ public class ApplyStrategy {
          * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
          * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
          * @param proof The current {@link Proof}.
-         * @param goalChooser The current {@link IGoalChooser}.
          * @param startTime The timestamp when the apply strategy has started, computed via {@link System#currentTimeMillis()}
          * @param countApplied The number of already applied rules.
          * @param singleRuleApplicationInfo An optional {@link SingleRuleApplicationInfo}.
          * @return The human readable message which explains the stop reason.
          */
         public String getStopMessage(int maxApplications,
-                                     long timeout,
-                                     Proof proof,
-                                     IGoalChooser goalChooser,
-                                     long startTime,
-                                     int countApplied,
-                                     SingleRuleApplicationInfo singleRuleApplicationInfo);
+                long timeout,
+                Proof proof,
+                long startTime,
+                int countApplied,
+                SingleRuleApplicationInfo singleRuleApplicationInfo);
     }
 
     /**
@@ -177,9 +169,8 @@ public class ApplyStrategy {
          */
         @Override
         public int getMaximalWork(int maxApplications,
-                                  long timeout,
-                                  Proof proof,
-                                  IGoalChooser goalChooser) {
+                long timeout,
+                Proof proof) {
             return maxApplications;
         }
 
@@ -188,12 +179,11 @@ public class ApplyStrategy {
          */
         @Override
         public boolean isGoalAllowed(int maxApplications,
-                                     long timeout,
-                                     Proof proof,
-                                     IGoalChooser goalChooser,
-                                     long startTime,
-                                     int countApplied,
-                                     Goal goal) {
+                long timeout,
+                Proof proof,
+                long startTime,
+                int countApplied,
+                Goal goal) {
             return true; // Default behavior is to accept all rules.
         }
 
@@ -202,12 +192,11 @@ public class ApplyStrategy {
          */
         @Override
         public String getGoalNotAllowedMessage(int maxApplications,
-                                               long timeout,
-                                               Proof proof,
-                                               IGoalChooser goalChooser,
-                                               long startTime,
-                                               int countApplied,
-                                               Goal goal) {
+                long timeout,
+                Proof proof,
+                long startTime,
+                int countApplied,
+                Goal goal) {
             return null;
         }
 
@@ -216,14 +205,13 @@ public class ApplyStrategy {
          */
         @Override
         public boolean shouldStop(int maxApplications,
-                                  long timeout,
-                                  Proof proof,
-                                  IGoalChooser goalChooser,
-                                  long startTime,
-                                  int countApplied,
-                                  SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                long timeout,
+                Proof proof,
+                long startTime,
+                int countApplied,
+                SingleRuleApplicationInfo singleRuleApplicationInfo) {
             return countApplied >= maxApplications ||
-                   timeout >= 0 && System.currentTimeMillis() - startTime >= timeout;
+                    timeout >= 0 && System.currentTimeMillis() - startTime >= timeout;
         }
 
         /**
@@ -231,12 +219,11 @@ public class ApplyStrategy {
          */
         @Override
         public String getStopMessage(int maxApplications,
-                                     long timeout,
-                                     Proof proof,
-                                     IGoalChooser goalChooser,
-                                     long startTime,
-                                     int countApplied,
-                                     SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                long timeout,
+                Proof proof,
+                long startTime,
+                int countApplied,
+                SingleRuleApplicationInfo singleRuleApplicationInfo) {
             return "Maximal number of rule applications reached or timed out.";
         }
     }
@@ -374,7 +361,7 @@ public class ApplyStrategy {
     private IGoalChooser defaultGoalChooser;
 
     /** number of rules automatically applied */
-    private int countApplied = 0;
+    private AtomicInteger countApplied = new AtomicInteger(0);
     private long time;
 
     /** interrupted by the user? */
@@ -408,41 +395,36 @@ public class ApplyStrategy {
     /** applies rules that are chosen by the active strategy
      * @return true iff a rule has been applied, false otherwise
      */
-    private synchronized SingleRuleApplicationInfo
-                            applyAutomaticRule (final IGoalChooser goalChooser,
-                                                final IStopCondition stopCondition,
-                                                boolean stopAtFirstNonClosableGoal) {
+    private  SingleRuleApplicationInfo
+    applyAutomaticRule (final Goal g,
+            final IStopCondition stopCondition,
+            boolean stopAtFirstNonClosableGoal) {
         // Look for the strategy ...
         RuleApp               app = null;
-        Goal                  g;
-        while ( ( g = goalChooser.getNextGoal () ) != null ) {
-            if (!stopCondition.isGoalAllowed(maxApplications, timeout, proof,
-                                             goalChooser, time, countApplied, g)) {
-               return new SingleRuleApplicationInfo(
-                       stopCondition.getGoalNotAllowedMessage(maxApplications, timeout, proof,
-                                                              goalChooser, time, countApplied, g),
-                       g, null);
-            }
-            app = g.getRuleAppManager().next();
-            //Hack: built in rules may become applicable without BuiltInRuleAppIndex noticing---->
-            if(app == null) {
-                g.ruleAppIndex().scanBuiltInRules(g);
-                app = g.getRuleAppManager().next();
-            }
-            //<-------
-
-            if (app == null) {
-                if (stopAtFirstNonClosableGoal) {
-                    return new SingleRuleApplicationInfo("Could not close goal.", g, app);
-                }
-                goalChooser.removeGoal(g);
-            } else {
-                break;
-            }
+        if (!stopCondition.isGoalAllowed(maxApplications, timeout, proof,
+                time, countApplied.intValue(), g)) {
+            return new SingleRuleApplicationInfo(
+                    stopCondition.getGoalNotAllowedMessage(maxApplications, timeout, proof,
+                            time, countApplied.intValue(), g),
+                    g, null);
         }
-         if (app == null) {
+        app = g.getRuleAppManager().next();
+        //Hack: built in rules may become applicable without BuiltInRuleAppIndex noticing---->
+        if(app == null) {
+            g.ruleAppIndex().scanBuiltInRules(g);
+            app = g.getRuleAppManager().next();
+        }
+        //<-------
+
+        if (app == null) {
+            if (stopAtFirstNonClosableGoal) {
+                return new SingleRuleApplicationInfo("Could not close goal.", g, null);
+            }
+        } 
+
+        if (app == null) {
             return new SingleRuleApplicationInfo("No more rules automatically applicable to any goal.",
-                                                 g, app);
+                    g, null);
         } else {
             assert g != null;
             g.apply(app);
@@ -450,50 +432,114 @@ public class ApplyStrategy {
         }
     }
 
+    volatile AtomicInteger nrTasks = new AtomicInteger(0);
+
+    class Task implements Callable<SingleRuleApplicationInfo> {
+
+        private final Goal goal;
+        private final Proof proof;
+
+        public Task(Goal goal) {
+            this.goal = goal;
+            this.proof = goal.proof();
+            nrTasks.incrementAndGet();
+        }
+        @Override
+        public SingleRuleApplicationInfo call() throws Exception {
+            SingleRuleApplicationInfo result = null;
+            boolean shouldStop = false;
+            running.incrementAndGet();
+            while (!shouldStop) { 
+                Node n = goal.node();
+                result = applyAutomaticRule(goal, 
+                        stopCondition, stopAtFirstNonCloseableGoal);
+
+                //Thread.yield();
+                if (result.isSuccess()) {
+                    countApplied.incrementAndGet();
+                    // fireTaskProgress ();
+                    shouldStop = goal.node().isClosed() || stopCondition.shouldStop(maxApplications, timeout, proof, time,
+                            countApplied.intValue(), result);                                                       
+                } else {
+                    shouldStop = true;
+                    // goalChooser.removeGoal(srInfo.getGoal()); 
+                }
+                if (!shouldStop && n.childrenCount() > 1) {
+                    for (int i = 0; i<n.childrenCount(); i++) {
+                        final Node c = n.child(i);
+                        Goal g = proof.getGoal(c);
+                        if (g!=goal) {
+                            ecs.submit(new Task(g));                           
+                        }
+                    }
+                }
+            }
+            running.decrementAndGet();
+            return result;
+
+        }
+
+    }
+    private static ExecutorService service = new ForkJoinPool(8);//new ThreadPoolExecutor(8, 64, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>());//
+
+    static ExecutorCompletionService<SingleRuleApplicationInfo> ecs = new ExecutorCompletionService<>(service); 
+    AtomicInteger running = new AtomicInteger(0);
+    volatile ImmutableList<Future<SingleRuleApplicationInfo>> futures = ImmutableSLList.nil();
 
     /**
      * applies rules until this is no longer
      * possible or the thread is interrupted.
      */
-    private synchronized ApplyStrategyInfo doWork(final IGoalChooser goalChooser,
-                                                  final IStopCondition stopCondition) {
+    private  ApplyStrategyInfo doWork(final IGoalChooser goalChooser,
+            final IStopCondition stopCondition) {
         time = System.currentTimeMillis();
         SingleRuleApplicationInfo srInfo = null;
         try{
             Debug.out("Strategy started.");
             boolean shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof,
-                                                          goalChooser, time, countApplied, srInfo);
+                    time, countApplied.get(), srInfo);
 
-            while (!shouldStop) {
-                srInfo = applyAutomaticRule(goalChooser, stopCondition, stopAtFirstNonCloseableGoal);
+
+
+            Goal exitGoal = null;
+            // System.out.println("Running: " + running.get() + ":" + proof.openGoals().size());
+            ecs.submit(new Task(proof.openEnabledGoals().head()));
+            //System.out.println("Running: " + running.get());
+            while (nrTasks.get() != 0) {
+                //   System.out.println("Done");                    
+                srInfo = ecs.take().get();
+                nrTasks.decrementAndGet();
                 if (!srInfo.isSuccess()) {
-                    return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(),
-                                                 System.currentTimeMillis()-time, countApplied,
-                                                 closedGoals);
+                    exitGoal = srInfo.getGoal();
                 }
-                countApplied++;
-                fireTaskProgress ();
-                if (Thread.interrupted()) {
-                    throw new InterruptedException();
-                }
-                shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof, goalChooser,
-                                                      time, countApplied, srInfo);
             }
+
+            if (exitGoal != null) {
+                return new ApplyStrategyInfo(srInfo.message(), proof, null, exitGoal,
+                        System.currentTimeMillis()-time, countApplied.get(),
+                        closedGoals);
+            }
+
+            if (Thread.interrupted()) {
+                throw new InterruptedException();
+            }
+
+
             if (shouldStop) {
                 return new ApplyStrategyInfo(
-                        stopCondition.getStopMessage(maxApplications, timeout, proof, goalChooser,
-                                                     time, countApplied, srInfo),
+                        stopCondition.getStopMessage(maxApplications, timeout, proof, time,
+                                countApplied.get(), srInfo),
                         proof, null, (Goal) null, System.currentTimeMillis()-time,
-                        countApplied, closedGoals);
+                        countApplied.get(), closedGoals);
             }
         } catch (InterruptedException e) {
             cancelled = true;
             return new ApplyStrategyInfo("Interrupted.", proof, null, goalChooser.getNextGoal(),
-                                         System.currentTimeMillis()-time, countApplied, closedGoals);
+                    System.currentTimeMillis()-time, countApplied.get(), closedGoals);
         } catch (Throwable t) { // treated later in finished()
             t.printStackTrace();
             return new ApplyStrategyInfo("Error.", proof, t, null, System.currentTimeMillis()-time,
-                                         countApplied, closedGoals);
+                    countApplied.get(), closedGoals);
         } finally{
             time = (System.currentTimeMillis()-time);
             Debug.out("Strategy stopped.");
@@ -502,22 +548,22 @@ public class ApplyStrategy {
         }
         assert srInfo != null;
         return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(), time,
-                                     countApplied, closedGoals);
+                countApplied.get(), closedGoals);
     }
 
-    private synchronized void fireTaskStarted (int maxSteps) {
+    private  void fireTaskStarted (int maxSteps) {
         for (ProverTaskListener ptl : proverTaskObservers) {
             ptl.taskStarted(new DefaultTaskStartedInfo(TaskKind.Strategy, PROCESSING_STRATEGY, maxSteps));
         }
     }
 
-    private synchronized void fireTaskProgress () {
+    private  void fireTaskProgress () {
         for (ProverTaskListener ptl : proverTaskObservers) {
-            ptl.taskProgress(countApplied);
+            ptl.taskProgress(countApplied.get());
         }
     }
 
-    private synchronized void fireTaskFinished (TaskFinishedInfo info) {
+    private  void fireTaskFinished (TaskFinishedInfo info) {
         for (ProverTaskListener ptl : proverTaskObservers) {
             ptl.taskFinished(info);
         }
@@ -528,29 +574,29 @@ public class ApplyStrategy {
         this.proof      = newProof;
         maxApplications = maxSteps;
         this.timeout    = timeout;
-        countApplied    = 0;
+        countApplied    = new AtomicInteger(0);
         closedGoals     = 0;
         cancelled       = false;
         stopCondition = proof.getSettings().getStrategySettings().getApplyStrategyStopCondition();
         assert stopCondition != null;
         goalChooser = getGoalChooserForProof(proof);
-        assert goalChooser != null;
+        assert goalChooser != null;       
         goalChooser.init ( newProof, goals );
         setAutoModeActive(true);
-        fireTaskStarted (stopCondition.getMaximalWork(maxSteps, timeout, newProof, goalChooser));
+        fireTaskStarted (stopCondition.getMaximalWork(maxSteps, timeout, newProof));
     }
 
-    public synchronized ApplyStrategyInfo start(Proof proof, Goal goal) {
+    public  ApplyStrategyInfo start(Proof proof, Goal goal) {
         return start(proof, ImmutableSLList.<Goal>nil().prepend(goal));
     }
 
-    public synchronized ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals) {
-       ProofSettings settings = proof.getSettings();
-       StrategySettings stratSet = settings.getStrategySettings();
-       return start(proof, goals, stratSet);
+    public  ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals) {
+        ProofSettings settings = proof.getSettings();
+        StrategySettings stratSet = settings.getStrategySettings();
+        return start(proof, goals, stratSet);
     }
 
-    public synchronized ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, StrategySettings stratSet) {
+    public  ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals, StrategySettings stratSet) {
 
         int maxSteps = stratSet.getMaxSteps();
         long timeout = stratSet.getTimeout();
@@ -559,7 +605,7 @@ public class ApplyStrategy {
                 proof.getSettings().getStrategySettings()
                 .getActiveStrategyProperties().getProperty(
                         StrategyProperties.STOPMODE_OPTIONS_KEY)
-                        .equals(StrategyProperties.STOPMODE_NONCLOSE);
+                .equals(StrategyProperties.STOPMODE_NONCLOSE);
         return start(proof, goals, maxSteps, timeout, stopAtFirstNonCloseableGoal);
     }
 
@@ -570,11 +616,11 @@ public class ApplyStrategy {
      *
      * @return
      */
-    public synchronized ApplyStrategyInfo start(Proof proof,
-                                                ImmutableList<Goal> goals,
-                                                int maxSteps,
-                                                long timeout,
-                                                boolean stopAtFirstNonCloseableGoal) {
+    public  ApplyStrategyInfo start(Proof proof,
+            ImmutableList<Goal> goals,
+            int maxSteps,
+            long timeout,
+            boolean stopAtFirstNonCloseableGoal) {
         assert proof != null;
 
         this.stopAtFirstNonCloseableGoal = stopAtFirstNonCloseableGoal;
@@ -588,7 +634,7 @@ public class ApplyStrategy {
 
 
     private ProofTreeListener prepareStrategy(Proof proof, ImmutableList<Goal> goals,
-                                              int maxSteps, long timeout) {
+            int maxSteps, long timeout) {
         ProofTreeListener treeListener = new ProofTreeAdapter() {
             @Override
             public void proofGoalsAdded(ProofTreeEvent e) {
@@ -626,8 +672,8 @@ public class ApplyStrategy {
         assert result != null; // CS
         proof.addAutoModeTime(result.getTime());
         fireTaskFinished (new DefaultTaskFinishedInfo(this, result, proof, result.getTime(),
-                                                      result.getAppliedRuleApps(),
-                                                      result.getClosedGoals()));
+                result.getAppliedRuleApps(),
+                result.getClosedGoals()));
     }
 
     /**
@@ -638,17 +684,17 @@ public class ApplyStrategy {
      * @return The {@link IGoalChooser} to use.
      */
     private IGoalChooser getGoalChooserForProof(Proof proof) {
-       IGoalChooser chooser = null;
-       if (proof != null) {
-          chooser = proof.getSettings().getStrategySettings().getCustomApplyStrategyGoalChooser();
-       }
-       return chooser != null ? chooser : defaultGoalChooser;
+        IGoalChooser chooser = null;
+        if (proof != null) {
+            chooser = proof.getSettings().getStrategySettings().getCustomApplyStrategyGoalChooser();
+        }
+        return chooser != null ? chooser : defaultGoalChooser;
     }
-    public synchronized void addProverTaskObserver(ProverTaskListener observer) {
+    public  void addProverTaskObserver(ProverTaskListener observer) {
         proverTaskObservers = proverTaskObservers.prepend(observer);
     }
 
-    public synchronized void removeProverTaskObserver(ProverTaskListener observer) {
+    public  void removeProverTaskObserver(ProverTaskListener observer) {
         proverTaskObservers = proverTaskObservers.removeAll(observer);
     }
 
@@ -693,11 +739,11 @@ public class ApplyStrategy {
      * When a proof obligation is abandoned all references to the proof must be reset.
      * @author gladisch */
     public void clear(){
-        final IGoalChooser goalChooser = getGoalChooserForProof(proof);
+        //final IGoalChooser goalChooser = getGoalChooserForProof(proof);
         proof = null;
-        if(goalChooser!=null){
-            goalChooser.init(null, ImmutableSLList.<Goal>nil());
-        }
+        //if(goalChooser!=null){
+        // goalChooser.init(null, ImmutableSLList.<Goal>nil());
+        //}
     }
 
     /**

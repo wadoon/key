@@ -15,7 +15,6 @@ package de.uka.ilkd.key.symbolic_execution.strategy;
 
 import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Proof;
 
 /**
@@ -41,7 +40,6 @@ public class StepReturnSymbolicExecutionTreeNodesStopCondition extends AbstractC
    public String getGoalNotAllowedMessage(int maxApplications, 
                                           long timeout, 
                                           Proof proof, 
-                                          IGoalChooser goalChooser, 
                                           long startTime, 
                                           int countApplied, 
                                           Goal goal) {

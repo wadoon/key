@@ -72,9 +72,9 @@ public class MediatorProofControl extends AbstractProofControl {
          ui.notify(new GeneralInformationEvent("No enabled goals available."));
          return;
      }
-     worker = new AutoModeWorker(proof, goals, ptl);
      ui.getMediator().stopInterface(true);
-     ui.getMediator().setInteractive(false);
+     ui.getMediator().stopInterface(true);
+     worker = new AutoModeWorker(proof, goals, ptl);
      worker.execute();
    }
 

@@ -308,37 +308,28 @@ public class KeYSelectionModel {
         return null;
     }
 
-
     public void addKeYSelectionListener(KeYSelectionListener listener) {
-	synchronized(listenerList) {
-	    Debug.log4jInfo("Adding "+listener.getClass(), "key.threading");
-	    listenerList.add(listener);
-	}
+        Debug.log4jInfo("Adding "+listener.getClass(), "key.threading");
+        listenerList.add(listener);
     }
 
     public void removeKeYSelectionListener(KeYSelectionListener listener) {
-	synchronized(listenerList) {
-	    Debug.log4jInfo("Removing "+listener.getClass(), "key.threading");
-	    listenerList.remove(listener);
-	}
+        Debug.log4jInfo("Removing "+listener.getClass(), "key.threading");
+        listenerList.remove(listener);
     }
 
-    public synchronized void fireSelectedNodeChanged() {
-	synchronized(listenerList) {
-            for (final KeYSelectionListener listener : listenerList) {
-                listener.selectedNodeChanged(selectionEvent);
-	    }
-	}
+    public void fireSelectedNodeChanged() {
+        for (final KeYSelectionListener listener : listenerList) {
+            listener.selectedNodeChanged(selectionEvent);
+        }
     }
 
-    public synchronized void fireSelectedProofChanged() {
-	synchronized(listenerList) {
-	    Debug.log4jInfo("Selected Proof changed, firing...", "key.threading");
-            for (final KeYSelectionListener listener : listenerList) {
-	        listener.selectedProofChanged(selectionEvent);
-	    }
-            Debug.log4jInfo("Selected Proof changed, done firing.", "key.threading");
-	}
+    public void fireSelectedProofChanged() {
+        Debug.log4jInfo("Selected Proof changed, firing...", "key.threading");
+        for (final KeYSelectionListener listener : listenerList) {
+            listener.selectedProofChanged(selectionEvent);
+        }
+        Debug.log4jInfo("Selected Proof changed, done firing.", "key.threading");
     }
 
 }

@@ -20,7 +20,6 @@ import java.util.Map;
 import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -47,8 +46,7 @@ public abstract class AbstractCallStackBasedStopCondition implements IStopCondit
    @Override
    public int getMaximalWork(int maxApplications, 
                              long timeout, 
-                             Proof proof, 
-                             IGoalChooser goalChooser) {
+                             Proof proof) {
       startingCallStackSizePerGoal.clear(); // Reset initial call stack size of all goals. Will be filled in isGoalAllowed.
       return 0; // Return unknown because there is no relation between applied rules and step over functionality.
    }
@@ -60,7 +58,6 @@ public abstract class AbstractCallStackBasedStopCondition implements IStopCondit
    public boolean isGoalAllowed(int maxApplications, 
                                 long timeout, 
                                 Proof proof, 
-                                IGoalChooser goalChooser, 
                                 long startTime, 
                                 int countApplied, 
                                 Goal goal) {
@@ -130,7 +127,6 @@ public abstract class AbstractCallStackBasedStopCondition implements IStopCondit
    public boolean shouldStop(int maxApplications, 
                              long timeout, 
                              Proof proof, 
-                             IGoalChooser goalChooser, 
                              long startTime, 
                              int countApplied, 
                              SingleRuleApplicationInfo singleRuleApplicationInfo) {
@@ -170,7 +166,6 @@ public abstract class AbstractCallStackBasedStopCondition implements IStopCondit
    public String getStopMessage(int maxApplications, 
                                 long timeout, 
                                 Proof proof, 
-                                IGoalChooser goalChooser, 
                                 long startTime, 
                                 int countApplied, 
                                 SingleRuleApplicationInfo singleRuleApplicationInfo) {

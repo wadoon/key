@@ -178,9 +178,11 @@ public class Node  {
      */
     void clearNodeInfo() {
         if (this.nodeInfo != null) {
-            SequentChangeInfo oldSeqChangeInfo = this.nodeInfo.getSequentChangeInfo();
-            this.nodeInfo = new NodeInfo(this);
-            this.nodeInfo.setSequentChangeInfo(oldSeqChangeInfo);
+            synchronized(nodeInfo) {
+                SequentChangeInfo oldSeqChangeInfo = this.nodeInfo.getSequentChangeInfo();
+                this.nodeInfo = new NodeInfo(this);
+                this.nodeInfo.setSequentChangeInfo(oldSeqChangeInfo);
+            }
         } else {
             this.nodeInfo = new NodeInfo(this);
         }
@@ -223,8 +225,10 @@ public class Node  {
     }
 
     public void addLocalProgVars(Iterable<? extends IProgramVariable> elements) {
-        for (IProgramVariable pv : elements) {
-            localProgVars = localProgVars.prepend(pv);
+        synchronized(localProgVars) { 
+            for (IProgramVariable pv : elements) {
+                localProgVars = localProgVars.prepend(pv);
+            }
         }
     }
 
@@ -236,12 +240,16 @@ public class Node  {
      * @return a non-null immutable list of function symbols.
      */
     public Iterable<Function> getLocalFunctions() {
-        return localFunctions;
+        synchronized(localFunctions) {
+            return localFunctions;
+        }
     }
 
     public void addLocalFunctions(Collection<? extends Function> elements) {
-        for (Function op : elements) {
-            localFunctions = localFunctions.prepend(op);
+        synchronized(localFunctions) {
+            for (Function op : elements) {
+                localFunctions = localFunctions.prepend(op);
+            }
         }
     }
 
@@ -250,7 +258,9 @@ public class Node  {
       * at this node
       */
      public void addNoPosTacletApp(NoPosTacletApp s) {
- 	localIntroducedRules = localIntroducedRules.add(s);
+        synchronized(localIntroducedRules) {
+            localIntroducedRules = localIntroducedRules.add(s);
+        }
      }
 
     /** returns the parent node of this node.
@@ -262,7 +272,7 @@ public class Node  {
     /** returns true, iff this node is a leaf, i.e. has no children.
      */
     public boolean leaf() {
-	return children.size()==0;
+	return children.isEmpty();
     }
 
     /** searches for a given node in the subtree starting with this node */
@@ -330,9 +340,11 @@ public class Node  {
      *  makes the given node a child of this node.
      */
     public void add(Node child) {
-        child.siblingNr = children.size();
-        children.add(child);
-        child.parent = this;
+        synchronized(children) {
+            child.siblingNr = children.size();
+            children.add(child);
+            child.parent = this;
+        }
         proof().fireProofExpanded(this);
     }
 
@@ -340,15 +352,16 @@ public class Node  {
      *  makes the given node a child of this node.
      */
     public void addAll(Node[] newChildren) {
-        final int size = children.size();
-        for (int i = 0; i<newChildren.length; i++) {
-            newChildren[i].siblingNr = i + size; 
-            newChildren[i].parent = this;
-        }        
-        
-        Collections.addAll(children, newChildren);
-        children.trimToSize();
-        
+        synchronized(children) {
+            final int size = children.size();
+            for (int i = 0; i<newChildren.length; i++) {
+                newChildren[i].siblingNr = i + size; 
+                newChildren[i].parent = this;
+            }        
+
+            Collections.addAll(children, newChildren);
+            children.trimToSize();
+        }
         proof().fireProofExpanded(this);
     }
     
@@ -392,14 +405,16 @@ public class Node  {
 	final List<Node> leaves = new LinkedList<>();
 	final LinkedList<Node> nodesToCheck = new LinkedList<>();
 	nodesToCheck.add(this);
-	do {
-	    final Node n = nodesToCheck.poll();
-	    if (n.leaf()) {
-		leaves.add(n);
-	    } else {
-		nodesToCheck.addAll(0, n.children);
-	    }
-	} while (!nodesToCheck.isEmpty());
+	synchronized(children) {
+	    do {
+	        final Node n = nodesToCheck.poll();
+	        if (n.leaf()) {
+	            leaves.add(n);
+	        } else {
+	            nodesToCheck.addAll(0, n.children);
+	        }
+	    } while (!nodesToCheck.isEmpty());
+	}
     	return leaves;
     }
 
@@ -415,7 +430,9 @@ public class Node  {
     /** returns an iterator for the direct children of this node.
      */
     public Iterator<Node> childrenIterator() {
-	return new NodeIterator(children.iterator());
+        synchronized(children) {
+            return new NodeIterator(children.iterator());
+        }
     }
 
     /** returns an iterator for all nodes in the subtree.
@@ -426,12 +443,16 @@ public class Node  {
 
     /** returns number of children */
     public int childrenCount() {
-	return children.size();
+        synchronized(children) {
+            return children.size();
+        }
     }
 
     /** returns i-th child */
     public Node child(int i) {
-	return children.get(i);
+        synchronized(children) {
+            return children.get(i);
+        }
     }
 
     /**
@@ -440,15 +461,16 @@ public class Node  {
      * <code>-1</code> otherwise
      */
     public int getChildNr ( Node p_node ) {
-	int            res = 0;
-	final Iterator<Node> it  = childrenIterator ();
+        synchronized(children) {
+            int            res = 0;
+            final Iterator<Node> it  = childrenIterator ();
 
-	while ( it.hasNext () ) {
-	    if ( it.next () == p_node )
-		return res;
-	    ++res;
-	}
-
+            while ( it.hasNext () ) {
+                if ( it.next () == p_node )
+                    return res;
+                ++res;
+            }
+        }
 	return -1;
     }
 
@@ -557,11 +579,10 @@ public class Node  {
 
     public String name() {
         if (cachedName == null) {
-
             RuleApp rap = getAppliedRuleApp();
             if (rap == null) {
                 Goal goal = proof().getGoal(this);
-                if ( goal == null || this.isClosed() )
+                if ( this.isClosed() )
                     return CLOSED_GOAL; // don't cache this
                 else if(goal.isLinked())
                    cachedName = LINKED_GOAL;
@@ -617,13 +638,16 @@ public class Node  {
 
     /** marks a node as closed */
     Node close() {
-        closed = true;
-        Node tmp = parent;
-        Node result = this;
-        while (tmp != null && tmp.isCloseable()) {
-            tmp.closed = true;
-            result = tmp;
-            tmp = tmp.parent();
+        Node result;
+        synchronized(this) {
+            closed = true;
+            Node tmp = parent;
+            result = this;
+            while (tmp != null && tmp.isCloseable()) {
+                tmp.closed = true;
+                result = tmp;
+                tmp = tmp.parent();
+            }
         }
         clearNameCache();
         return result;
@@ -640,11 +664,13 @@ public class Node  {
      * have a soundness issue.
      */
     void reopen() {
-        closed = false;
-        Node tmp = parent;
-        while (tmp != null && tmp.isClosed()) {
-            tmp.closed = false;
-            tmp = tmp.parent();
+        synchronized(this) {
+            closed = false;
+            Node tmp = parent;
+            while (tmp != null && tmp.isClosed()) {
+                tmp.closed = false;
+                tmp = tmp.parent();
+            }
         }
         clearNameCache();
     }
@@ -661,7 +687,9 @@ public class Node  {
     }
 
     public boolean isClosed() {
-	return closed;
+        synchronized(this) {
+            return closed;
+        }
     }
 
     /**

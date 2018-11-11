@@ -129,9 +129,15 @@ public class TacletAppIndex  {
      * returns a new TacletAppIndex with a given TacletIndex
      */
     TacletAppIndex copyWithTacletIndex(TacletIndex p_tacletIndex) {
-        return new TacletAppIndex ( p_tacletIndex, antecIndex, succIndex,
+       /* return new TacletAppIndex ( p_tacletIndex, antecIndex, succIndex,
+                            getGoal (), getSequent (), ruleFilter,
+                            indexCaches, cache );*/
+        final TacletAppIndex copy = new TacletAppIndex ( p_tacletIndex, antecIndex == null ? null : antecIndex.copy(), 
+                succIndex == null ? null : succIndex.copy(),
                                     getGoal (), getSequent (), ruleFilter,
                                     indexCaches, cache );
+        copy.createNewIndexCache();
+        return copy;
     }
 
     /**

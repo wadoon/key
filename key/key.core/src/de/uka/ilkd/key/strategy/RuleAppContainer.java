@@ -115,6 +115,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
                 result = result.append( BuiltInRuleAppContainer.createInitialAppContainers
                         ( builtInRuleApplications, pos, goal) );
             }        
+            
             result = result.prepend( TacletAppContainer.createInitialAppContainers
                     ( tacletApplications, pos, goal) );
         }

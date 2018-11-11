@@ -75,10 +75,10 @@ public class TermTacletAppIndexCacheSet {
      */
     private final static ITermTacletAppIndexCache noCache =
         new ITermTacletAppIndexCache () {
-            public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
+            public synchronized ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
                 return this;
             }
-            public TermTacletAppIndex getIndexForTerm(Term t) {
+            public synchronized TermTacletAppIndex getIndexForTerm(Term t) {
                 return null;
             }
             public void putIndexForTerm(Term t, TermTacletAppIndex index) {}        
@@ -102,7 +102,8 @@ public class TermTacletAppIndexCacheSet {
      * scope of binders. this is a mapping from
      * <code>IList<QuantifiedVariable></code> to <code>TopLevelCache</code>
      */
-    private final LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> topLevelCaches = new LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> ( MAX_CACHE_ENTRIES );
+    private final LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> topLevelCaches = 
+            new LRUCache<ImmutableList<QuantifiableVariable>, ITermTacletAppIndexCache> ( MAX_CACHE_ENTRIES );
     
     /**
      * cache for locations that are below updates, but not below programs or in
@@ -245,7 +246,7 @@ public class TermTacletAppIndexCacheSet {
             super ( prefix, cache );
         }
 
-        public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
+        public synchronized ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
             if ( isUpdateTargetPos ( t, subtermIndex ) )
                 return getBelowUpdateCache ( getExtendedPrefix ( t, subtermIndex ) );
             
@@ -266,12 +267,12 @@ public class TermTacletAppIndexCacheSet {
     
     ////////////////////////////////////////////////////////////////////////////
     
-    private class BelowUpdateCache extends PrefixTermTacletAppIndexCache {
+    private  class BelowUpdateCache extends PrefixTermTacletAppIndexCache {
         public BelowUpdateCache(ImmutableList<QuantifiableVariable> prefix) {
             super ( prefix );
         }
         
-        public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
+        public synchronized ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
             final Operator op = t.op ();
             if ( op instanceof Modality )
                 return getBelowProgCache ( getExtendedPrefix ( t, subtermIndex ) );
@@ -282,7 +283,7 @@ public class TermTacletAppIndexCacheSet {
             return noCache;            
         }
         
-        public TermTacletAppIndex getIndexForTerm(Term t) {
+        public synchronized TermTacletAppIndex getIndexForTerm(Term t) {
             return null;
         }
         
@@ -296,7 +297,7 @@ public class TermTacletAppIndexCacheSet {
             super ( prefix, cache );
         }
 
-        public ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
+        public synchronized ITermTacletAppIndexCache descend(Term t, int subtermIndex) {
             if ( isAcceptedOperator ( t.op () ) )
                 return getBelowProgCache ( getExtendedPrefix ( t, subtermIndex ) );            
 

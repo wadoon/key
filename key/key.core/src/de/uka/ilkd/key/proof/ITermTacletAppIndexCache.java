@@ -44,6 +44,6 @@ public interface ITermTacletAppIndexCache {
      * <code>TermTacletAppIndex</code> when recursively constructing the index
      * for a given term.
      */
-    ITermTacletAppIndexCache descend(Term t, int subtermIndex);
+     ITermTacletAppIndexCache descend(Term t, int subtermIndex);
     
 }
