@@ -41,10 +41,10 @@ public class OneOfCP implements Feature {
         return new OneOfCP ( strategy, features );
     }
     
-    public synchronized RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {        
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {        
         BackTrackingManager manager = strategy.getBTManager(goal);
         synchronized(manager) {
-            manager.passChoicePoint ( cp, this );
+            manager.passChoicePoint ( goal, cp, this );
         }
         return features[theChosenOne].computeCost ( app, pos, goal );        
     }
@@ -65,7 +65,7 @@ public class OneOfCP implements Feature {
             public CPBranch next() {
                 final int chosen = num++;
                 return new CPBranch () {
-                    public void choose () {
+                    public void choose (Goal g) {
                         theChosenOne = chosen;
                     }
                     public RuleApp getRuleAppForBranch () {

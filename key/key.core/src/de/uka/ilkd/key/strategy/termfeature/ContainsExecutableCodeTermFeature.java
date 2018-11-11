@@ -19,6 +19,7 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.proof.Goal;
 
 
 /**
@@ -37,11 +38,11 @@ public class ContainsExecutableCodeTermFeature extends BinaryTermFeature {
     public final static TermFeature PROGRAMS_OR_QUERIES =
         new ContainsExecutableCodeTermFeature ( true );
     
-    protected boolean filter(Term t, Services services) {
-        return containsExec ( t, services );
+    protected boolean filter(Goal goal, Term t, Services services) {
+        return containsExec ( goal, t, services );
     }
 
-    private boolean containsExec(Term t, Services services) {
+    private boolean containsExec(Goal goal, Term t, Services services) {
         if ( t.isRigid () ) return false;
         //if ( t.isContainsJavaBlockRecursive() ) return true;
         
@@ -52,7 +53,7 @@ public class ContainsExecutableCodeTermFeature extends BinaryTermFeature {
         if ( considerQueries && op instanceof IProgramMethod ) return true;
         
         for ( int i = 0; i != op.arity (); ++i ) {
-            final boolean res = filter ( t.sub ( i ), services );
+            final boolean res = filter ( goal, t.sub ( i ), services );
             if ( res ) return true;
         }
 

@@ -40,32 +40,32 @@ public abstract class SuperTermGenerator implements TermGenerator {
     
     public static TermGenerator upwards(TermFeature cond, final Services services) {
         return new SuperTermGenerator ( cond ) {
-            protected Iterator<Term> createIterator(PosInOccurrence focus) {
-                return new UpwardsIterator ( focus, services );
+            protected Iterator<Term> createIterator(PosInOccurrence focus, Goal goal) {
+                return new UpwardsIterator ( focus, goal );
             }
         };
     }
     
     public static TermGenerator upwardsWithIndex(TermFeature cond, final Services services) {
         return new SuperTermWithIndexGenerator ( cond ) {
-            protected Iterator<Term> createIterator(PosInOccurrence focus) {
-                return new UpwardsIterator ( focus, services );
+            protected Iterator<Term> createIterator(PosInOccurrence focus, Goal goal) {
+                return new UpwardsIterator ( focus, goal );
             }
         };
     }
     
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return createIterator ( pos );
+        return createIterator ( pos, goal );
     }
 
-    protected abstract Iterator<Term> createIterator(PosInOccurrence focus);
+    protected abstract Iterator<Term> createIterator(PosInOccurrence focus, Goal goal);
     
     protected Term generateOneTerm(Term superterm, int child) {
         return superterm;
     }
 
-    private boolean generateFurther(Term t, Services services) {
-        return ! ( cond.compute ( t, services ) instanceof TopRuleAppCost );
+    private boolean generateFurther(Term t, Goal goal) {
+        return ! ( cond.compute ( t, goal.proof().getServices(), goal ) instanceof TopRuleAppCost );
     }
 
     abstract static class SuperTermWithIndexGenerator extends SuperTermGenerator {
@@ -127,7 +127,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
 //                       new Sort[] { Sort.ANY, numbers.getNumberSymbol ().sort () } );
             }
             
-            return createIterator ( pos );
+            return createIterator ( pos, goal );
         }
 
         protected Term generateOneTerm(Term superterm, int child) {
@@ -138,12 +138,11 @@ public abstract class SuperTermGenerator implements TermGenerator {
     
     class UpwardsIterator implements Iterator<Term> {
         private PosInOccurrence currentPos;
+        private final Goal goal;
         
-        private final Services services;
-
-        private UpwardsIterator(PosInOccurrence startPos, Services services) {
+        private UpwardsIterator(PosInOccurrence startPos, Goal goal) {
             this.currentPos = startPos;
-            this.services = services;
+            this.goal = goal;
         }
 
         public boolean hasNext() {
@@ -154,7 +153,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
             final int child = currentPos.getIndex ();
             currentPos = currentPos.up ();
             final Term res = generateOneTerm ( currentPos.subTerm (), child );
-            if ( !generateFurther ( res, services ) ) currentPos = null;
+            if ( !generateFurther ( res, goal ) ) currentPos = null;
             return res;
         }
         

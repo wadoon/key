@@ -23,6 +23,7 @@ import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -1947,14 +1948,26 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                 instOf("subsumRightSmaller"),
                                 instOf("subsumRightBigger")) }));
 
-        final TermBuffer one = new TermBuffer();
-        synchronized(one) { 
-            one.setContent(getServices().getTermBuilder().zTerm("1"));
-        }
-        final TermBuffer two = new TermBuffer();
-        synchronized(two) { 
-            two.setContent(getServices().getTermBuilder().zTerm("2"));
-        }
+        final Term oneTerm = getServices().getTermBuilder().zTerm("1");
+        final TermBuffer one = new TermBuffer() {
+            public Term getContent(Goal g) {
+                return oneTerm;
+            }
+            public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+                return oneTerm;
+            }
+        };
+        
+        final Term twoTerm = getServices().getTermBuilder().zTerm("2");
+        final TermBuffer two = new TermBuffer() {
+            public Term getContent(Goal g) {
+                return twoTerm;
+            }
+            public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+                return twoTerm;
+            }
+        };
+        
         bindRuleSet(d, "inEqSimp_or_tautInEqs",
                 SumFeature.createSum(new Feature[] {
                         applyTF("tautLeft", tf.monomial),
@@ -2239,10 +2252,18 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private void setupInEqCaseDistinctions(RuleSetDispatchFeature d) {
         final TermBuffer intRel = new TermBuffer();
         final TermBuffer atom = new TermBuffer();
-        final TermBuffer zero = new TermBuffer();
-        synchronized(zero) { 
-            zero.setContent(getServices().getTypeConverter().getIntegerLDT().zero());
-        }
+        
+        
+        final Term zeroTerm = getServices().getTypeConverter().getIntegerLDT().zero();
+        final TermBuffer zero = new TermBuffer() {
+            public Term getContent(Goal g) {
+                return zeroTerm;
+            }
+            public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+                return zeroTerm;
+            }
+        };
+        
         final TermBuffer rootInf = new TermBuffer();
 
         final Feature posNegSplitting =

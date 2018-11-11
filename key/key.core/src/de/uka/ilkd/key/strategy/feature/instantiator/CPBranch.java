@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.strategy.feature.instantiator;
 
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
 /**
@@ -26,7 +27,7 @@ public interface CPBranch {
      * Invoked by branch manager when this branch of a choice point has been
      * chosen
      */
-    void choose ();
+    void choose (Goal g);
     
     /**
      * @return the updated <code>RuleApp</code> that results when this branch

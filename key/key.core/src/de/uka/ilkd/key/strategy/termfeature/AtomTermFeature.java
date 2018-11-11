@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.proof.Goal;
 
 public class AtomTermFeature extends BinaryTermFeature {
 
@@ -27,7 +28,7 @@ public class AtomTermFeature extends BinaryTermFeature {
     
     private AtomTermFeature () {}
     
-    protected boolean filter(Term term, Services services) {
+    protected boolean filter(Goal goal, Term term, Services services) {
         final Operator op = term.op ();
         return ! ( op instanceof Junctor
                    || op == Equality.EQV

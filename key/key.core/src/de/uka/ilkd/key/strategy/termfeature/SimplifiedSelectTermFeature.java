@@ -18,6 +18,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.proof.Goal;
 
 
 public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
@@ -35,13 +36,13 @@ public final class SimplifiedSelectTermFeature extends BinaryTermFeature {
     }
 
     @Override
-    protected boolean filter (Term t, Services services) {
+    protected boolean filter (Goal goal, Term t, Services services) {
             Boolean isSelectOp = heapLDT.getSortOfSelect(t.op()) != null;
             return  // either the operator is not a select operator
                     !isSelectOp ||
                     // or the heap term of the select operator is the base heap
                     // or another primitive heap variable
-                    primitiveHeapTermFeature.filter(t.sub(0), services) ||
+                    primitiveHeapTermFeature.filter(goal, t.sub(0), services) ||
                     // or the heap term of the select operator is an anon heap symbol
                     // (for instance an anonHeap function)
                     (   t.sub(0).op() instanceof Function &&

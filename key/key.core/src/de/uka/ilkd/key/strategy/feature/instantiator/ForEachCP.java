@@ -68,25 +68,23 @@ public class ForEachCP implements Feature {
         this.strategy = strategy;
     }
 
-    public synchronized RuleAppCost computeCost(final RuleApp app,
+    public RuleAppCost computeCost(final RuleApp app,
             final PosInOccurrence pos,
             final Goal goal) {
-        final BackTrackingManager manager = strategy.getBTManager(goal);
-        synchronized(var) {
-            final Term outerVarContent = var.getContent ();        
-            var.setContent ( null );
+            final BackTrackingManager manager = strategy.getBTManager(goal);
+            final Term outerVarContent = var.getContent (goal);        
+            var.setContent (goal,  null );
             synchronized(manager) {
-                manager.passChoicePoint ( new CP ( app, pos, goal ), this );        
+                manager.passChoicePoint ( goal, new CP ( app, pos, goal ), this );        
             }
             final RuleAppCost res;
-            if ( var.getContent() != null )
+            if ( var.getContent(goal) != null )
                 res = body.computeCost ( app, pos, goal );
             else
                 res = NumberRuleAppCost.getZeroCost();
 
-            var.setContent ( outerVarContent );
-            return res;            
-        }
+            var.setContent ( goal, outerVarContent );
+            return res;                    
     }
 
     private final class CP implements ChoicePoint {
@@ -106,9 +104,9 @@ public class ForEachCP implements Feature {
             public synchronized CPBranch next() {
                 final Term generatedTerm = terms.next ();
                 return new CPBranch () {
-                    public void choose() {
+                    public void choose(Goal g) {
                         synchronized(var) {
-                            var.setContent ( generatedTerm );
+                            var.setContent ( g, generatedTerm );
                         }
                     }
                     public RuleApp getRuleAppForBranch() {

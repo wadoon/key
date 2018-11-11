@@ -41,13 +41,13 @@ public class SeqContainsExecutableCodeFeature extends BinaryFeature {
         new SeqContainsExecutableCodeFeature ( true );
 
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return containsExec ( goal.sequent ().succedent ().iterator (), goal.proof().getServices() )
-            || containsExec ( goal.sequent ().antecedent().iterator (), goal.proof().getServices() );
+        return containsExec ( goal.sequent ().succedent ().iterator (), goal )
+            || containsExec ( goal.sequent ().antecedent().iterator (), goal );
     }
 
-    private boolean containsExec(Iterator<SequentFormula> it, Services services) {
+    private boolean containsExec(Iterator<SequentFormula> it, Goal goal) {
         while ( it.hasNext () ) {
-            if ( tf.compute ( it.next ().formula (), services ).equals (
+            if ( tf.compute ( it.next ().formula (),  goal.proof().getServices(), goal ).equals (
                  BinaryTermFeature.ZERO_COST ) )
                 return true;
         }

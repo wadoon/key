@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.strategy.termProjection;
 
+import java.util.WeakHashMap;
+
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
@@ -25,18 +27,25 @@ import de.uka.ilkd.key.rule.RuleApp;
  */
 public class TermBuffer implements ProjectionToTerm {
 
-    private volatile Term t = null;
+    private final WeakHashMap<Goal, Term> bufferMap = new WeakHashMap<>();
+    //private volatile Term t = null;
     
-    public synchronized Term getContent() {
-        return t;
+    public Term getContent(Goal g) {
+        synchronized(g) { 
+            return bufferMap.get(g);
+        }
     }
 
-    public synchronized void setContent(Term t) {
-        this.t = t;
+    public void setContent(Goal g,Term t) {
+        synchronized(g) { 
+            bufferMap.put(g, t);
+        }
     }
 
-    public synchronized Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return t;
+    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
+        synchronized(goal) { 
+            return bufferMap.get(goal);
+        }
     }
 
 }

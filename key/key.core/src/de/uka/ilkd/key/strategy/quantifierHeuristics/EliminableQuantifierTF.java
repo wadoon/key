@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.termfeature.BinaryTermFeature;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
@@ -30,7 +31,7 @@ public class EliminableQuantifierTF extends BinaryTermFeature {
     
     private EliminableQuantifierTF () {}
     
-    protected boolean filter(Term term, Services services) {
+    protected boolean filter(Goal goal, Term term, Services services) {
         final Operator op = term.op ();
         assert op == Quantifier.ALL || op == Quantifier.EX;
         

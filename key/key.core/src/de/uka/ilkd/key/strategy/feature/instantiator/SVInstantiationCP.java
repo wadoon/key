@@ -72,7 +72,7 @@ public class SVInstantiationCP implements Feature {
     public synchronized RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         BackTrackingManager manager = strategy.getBTManager(goal);
         synchronized(manager) {
-            manager.passChoicePoint ( new CP (app, pos, goal), this );
+            manager.passChoicePoint ( goal, new CP (app, pos, goal), this );
             return NumberRuleAppCost.getZeroCost();
         }
     }
@@ -126,7 +126,7 @@ public class SVInstantiationCP implements Feature {
                                                true );
 
             final CPBranch branch = new CPBranch () {
-                public void choose() {}
+                public void choose(Goal g) {}
                 public RuleApp getRuleAppForBranch() { return newApp; }
             };
             

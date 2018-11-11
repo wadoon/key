@@ -51,7 +51,7 @@ public abstract class SubtermGenerator implements TermGenerator {
                                              TermFeature cond) {
         return new SubtermGenerator (cTerm, cond) {
             public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
-                return new LeftIterator ( getTermInst ( app, pos, goal ), goal.proof().getServices() );
+                return new LeftIterator ( getTermInst ( app, pos, goal ), goal );
             }
         };
     }
@@ -64,7 +64,7 @@ public abstract class SubtermGenerator implements TermGenerator {
                                               TermFeature cond) {
         return new SubtermGenerator (cTerm, cond) {
             public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
-                return new RightIterator ( getTermInst ( app, pos, goal ), goal.proof().getServices() );
+                return new RightIterator ( getTermInst ( app, pos, goal ), goal );
             }
         };
     }
@@ -73,8 +73,8 @@ public abstract class SubtermGenerator implements TermGenerator {
         return completeTerm.toTerm ( app, pos, goal );
     }
     
-    private boolean descendFurther(Term t, Services services) {
-        return ! ( cond.compute ( t, services ) instanceof TopRuleAppCost );
+    private boolean descendFurther(Term t, Goal goal) {
+        return ! ( cond.compute ( t, goal.proof().getServices(), goal ) instanceof TopRuleAppCost );
     }
         
     abstract class SubIterator implements Iterator<Term> {
@@ -82,9 +82,12 @@ public abstract class SubtermGenerator implements TermGenerator {
         
         protected final Services services;
 
-        public SubIterator(Term t, Services services) {
+        protected final Goal goal;
+
+        public SubIterator(Term t, Goal goal) {
             termStack = ImmutableSLList.<Term>nil().prepend ( t );
-            this.services = services;
+            this.goal = goal;
+            this.services = goal.proof().getServices();
         }
 
         public boolean hasNext() {
@@ -93,15 +96,15 @@ public abstract class SubtermGenerator implements TermGenerator {
     }
 
     class LeftIterator extends SubIterator {
-        public LeftIterator(Term t, Services services) {
-            super ( t, services );
+        public LeftIterator(Term t, Goal goal) {
+            super ( t, goal );
         }
 
         public Term next() {
             final Term res = termStack.head ();
             termStack = termStack.tail ();
             
-            if ( descendFurther ( res, services ) ) {
+            if ( descendFurther ( res, goal ) ) {
                 for ( int i = res.arity () - 1; i >= 0; --i )
                     termStack = termStack.prepend ( res.sub ( i ) );
             }
@@ -119,15 +122,15 @@ public abstract class SubtermGenerator implements TermGenerator {
     }
 
     class RightIterator extends SubIterator {
-        public RightIterator(Term t, Services services) {
-            super ( t, services );
+        public RightIterator(Term t, Goal goal) {
+            super ( t, goal );
         }
 
         public Term next() {
             final Term res = termStack.head ();
             termStack = termStack.tail ();
             
-            if ( descendFurther ( res, services ) ) {
+            if ( descendFurther ( res, goal ) ) {
                 for ( int i = 0; i != res.arity (); ++i )
                     termStack = termStack.prepend ( res.sub ( i ) );
             }

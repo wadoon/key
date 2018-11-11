@@ -173,7 +173,7 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
         }
 
         private Term stripOffLiteral(Term te, Services services) {
-            if ( ! ( hasCoeff.compute ( te, services ) instanceof TopRuleAppCost ) )
+            if ( ! ( hasCoeff.compute ( te, services, null ) instanceof TopRuleAppCost ) )
                 // we leave out literals/coefficients on the right, because we
                 // do not want to compare these literals
                 return te.sub ( 0 );

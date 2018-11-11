@@ -19,6 +19,7 @@ import java.util.Stack;
 
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 
 
@@ -78,19 +79,19 @@ public final class BackTrackingManager {
      *            run (after backtracking). The <code>ticket</code> must not
      *            change between two evaluation runs of the feature term
      */
-    public synchronized void passChoicePoint(ChoicePoint cp, Object ticket) {
+    public synchronized void passChoicePoint( Goal goal, ChoicePoint cp, Object ticket) {
         assert initialApp != null;
         assertValidTicket ( ticket );
         assert chosenBranches.size () == choices.size ();
 
         if ( position == choices.size() ) {
             // phase where we have to ask the choice-points for possibilities
-            addChoicePoint ( cp );
+            addChoicePoint ( goal, cp );
         } else {
             assert choices.size () > position;
             // phase where we have to "replay" choices that have already
             // been made
-            chosenBranches.get ( position ).choose ();
+            chosenBranches.get ( position ).choose ( goal );
         }
         
         ++position;
@@ -156,7 +157,7 @@ public final class BackTrackingManager {
         chosenBranches.add ( chosen );
     }
 
-    private void addChoicePoint(ChoicePoint cp) {
+    private void addChoicePoint(Goal g, ChoicePoint cp) {
         final RuleApp oldApp = getOldRuleApp ();
         if ( oldApp == null ) {
             // This means that an earlier <code>ChoicePoint</code> did not have
@@ -177,7 +178,7 @@ public final class BackTrackingManager {
 
         final CPBranch chosen = chs.next ();
         pushChoices ( chs, chosen );
-        chosen.choose ();
+        chosen.choose (g);
     }
 
     private void cancelChoicePoint() {

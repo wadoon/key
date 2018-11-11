@@ -15,6 +15,7 @@ package de.uka.ilkd.key.strategy.termfeature;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
@@ -37,15 +38,15 @@ public class RecSubTermFeature implements TermFeature {
         return new RecSubTermFeature ( cond, summand );
     }
 
-    public RuleAppCost compute(Term term, Services services) {
-        RuleAppCost res = summand.compute(term, services);
+    public RuleAppCost compute(Term term, Services services, Goal goal) {
+        RuleAppCost res = summand.compute(term, services, goal);
 
         if ( res instanceof TopRuleAppCost ||
-             cond.compute ( term, services ) instanceof TopRuleAppCost ) return res;
+             cond.compute ( term, services, goal ) instanceof TopRuleAppCost ) return res;
         
         for ( int i = 0; i != term.arity ()
                          && !( res instanceof TopRuleAppCost ); ++i )
-            res = res.add ( compute ( term.sub ( i ), services ) );
+            res = res.add ( compute ( term.sub ( i ), services, goal ) );
 
         return res;
     }
