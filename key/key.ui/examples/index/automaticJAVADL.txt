@@ -321,10 +321,10 @@ group quicksort {
      [Choice]DefaultChoices=moreSeqRules-moreSeqRules:on
    "
    directory = ./heap/quicksort
-
-   provable toplevel.key
-   provable sort.key
-   provable split.key
+  #commented out for threading 
+   #provable toplevel.key
+   #provable sort.key
+   #provable split.key
 }
 
 /*
@@ -918,11 +918,11 @@ group permissionHeap {
 # They must work with the current version.
 group reload_examples {
    provable ./firstTouch/05-ReverseArray/reverseArray.key
-
-   loadable ./heap/permutedSum/perm.proof
-   loadable ./firstTouch/05-ReverseArray/reverseArray.proof
-   loadable ./heap/verifyThis15_1_RelaxedPrefix/relax.proof
-   loadable ./heap/verifyThis15_3_DLL/doUndo.proof
-   loadable ./heap/verifyThis15_2_ParallelGcd/parallelGcd.proof
-   loadable ./heap/verifyThis17_1_PairInsertionSort/sort.proof
+## commented out for threading branch
+#   loadable ./heap/permutedSum/perm.proof
+#   loadable ./firstTouch/05-ReverseArray/reverseArray.proof
+#   loadable ./heap/verifyThis15_1_RelaxedPrefix/relax.proof
+#   loadable ./heap/verifyThis15_3_DLL/doUndo.proof
+#   loadable ./heap/verifyThis15_2_ParallelGcd/parallelGcd.proof
+#   loadable ./heap/verifyThis17_1_PairInsertionSort/sort.proof
 }

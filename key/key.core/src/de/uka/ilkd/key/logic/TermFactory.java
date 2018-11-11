@@ -37,14 +37,14 @@ public final class TermFactory {
     
 
     private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<Term>();
-    private final Map<Term, Term> cache;
+    private final Map<CacheKey, Term> cache;
     
 
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
     
-    public TermFactory(Map<Term, Term> cache) {
+    public TermFactory(Map<CacheKey, Term> cache) {
         this.cache = cache;
     }
     
@@ -143,29 +143,107 @@ public final class TermFactory {
     private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
             JavaBlock javaBlock, ImmutableArray<TermLabel> labels) {
-        final Term newTerm 
-            = (labels == null || labels.isEmpty() ? 
-                    new TermImpl(op, subs, boundVars, javaBlock) : 
-                new LabeledTermImpl(op, subs, boundVars, javaBlock, labels)).checked();
         // Check if caching is possible. It is not possible if a non empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
-        if (!newTerm.containsJavaBlockRecursive()) {
-           
-           Term term;  
+        if ((javaBlock == null || javaBlock == JavaBlock.EMPTY_JAVABLOCK) &&
+                !containsJavaBlockRecursive(subs)) {
+           final CacheKey key = new CacheKey(op, subs, boundVars, labels); 
+           Term term; 
            synchronized(cache) { 
-               term = cache.get(newTerm);
+               term = cache.get(key);
            }
-           if(term == null) {
-               term = newTerm;
+           if (term == null) {
+               term = (labels == null || labels.isEmpty() ? 
+                       new TermImpl(op, subs, boundVars, javaBlock) : 
+                   new LabeledTermImpl(op, subs, boundVars, javaBlock, labels)).checked();
                synchronized(cache) { 
-                   cache.put(term, term);
+                   cache.put(key, term);
                }
            }
            return term;
         }
         else {
+            final Term newTerm 
+            = (labels == null || labels.isEmpty() ? 
+                    new TermImpl(op, subs, boundVars, javaBlock) : 
+                new LabeledTermImpl(op, subs, boundVars, javaBlock, labels)).checked();
            return newTerm;
         }
+    }
+    
+    private final boolean containsJavaBlockRecursive(ImmutableArray<Term> subs) {
+        if (subs != null && subs.size() > 0) {
+            for (final Term t : subs) {
+                if (t.containsJavaBlockRecursive()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public static class CacheKey {
+        final Operator op;
+        final ImmutableArray<Term> subs;
+        final ImmutableArray<QuantifiableVariable> boundVars;
+        final ImmutableArray<TermLabel> labels;
+        
+        private int hashCode = -1;
+        
+        public CacheKey(Operator op, ImmutableArray<Term> subs,
+                ImmutableArray<QuantifiableVariable> boundVars,
+                ImmutableArray<TermLabel> labels) {
+            this.op = op;
+            this.subs = subs;
+            this.boundVars = boundVars;
+            this.labels = labels;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = hashCode;
+            if (result == -1) {
+                final int prime = 31;
+                result = prime 
+                        + ((boundVars == null) ? 0 : boundVars.hashCode());                
+                result = prime * result
+                        + ((labels == null) ? 0 : labels.hashCode());
+                result = prime * result + op.hashCode();
+                result = prime * result + ((subs == null) ? 0 : subs.hashCode());
+                if (result == -1) result = 0;
+            }
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            CacheKey other = (CacheKey) obj;
+            if (boundVars == null) {
+                if (other.boundVars != null)
+                    return false;
+            } else if (!boundVars.equals(other.boundVars))
+                return false;            
+            if (labels == null) {
+                if (other.labels != null)
+                    return false;
+            } else if (!labels.equals(other.labels))
+                return false;
+            if (!op.equals(other.op))
+                return false;
+            if (subs == null) {
+                if (other.subs != null)
+                    return false;
+            } else if (!subs.equals(other.subs))
+                return false;
+            return true;
+        }
+        
     }
 }

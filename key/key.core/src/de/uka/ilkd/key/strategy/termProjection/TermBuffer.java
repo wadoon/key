@@ -31,19 +31,19 @@ public class TermBuffer implements ProjectionToTerm {
     //private volatile Term t = null;
     
     public Term getContent(Goal g) {
-        synchronized(g) { 
+        synchronized(bufferMap) { 
             return bufferMap.get(g);
         }
     }
 
     public void setContent(Goal g,Term t) {
-        synchronized(g) { 
+        synchronized(bufferMap) { 
             bufferMap.put(g, t);
         }
     }
 
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
-        synchronized(goal) { 
+        synchronized(bufferMap) { 
             return bufferMap.get(goal);
         }
     }

@@ -81,13 +81,18 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     private static final Object succCacheLock  = new Object(); 
     
     public static ImmutableList<IfFormulaInstantiation> createList ( Sequent     p_s,                                                            
-                                                            boolean antec ) {
+            boolean antec ) {
         final Semisequent ss = antec ? p_s.antecedent() : p_s.succedent();
-        
+        ImmutableList<IfFormulaInstantiation> val = null;
+        boolean change = false;
         synchronized ( antec ? antecCacheLock : succCacheLock ) {
             if ( ( antec ? cache.aKey : cache.sKey ) != ss ) {
-                final ImmutableList<IfFormulaInstantiation> val = createListHelp ( 
-		    p_s, antec );
+                change = true;
+            }
+        }
+        if (change) {
+            val = createListHelp ( p_s, antec );
+            synchronized ( antec ? antecCacheLock : succCacheLock ) {
                 if ( antec ) {
                     cache.aKey = ss;
                     cache.aVal = val;
@@ -96,10 +101,10 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
                     cache.sVal = val;
                 }
             }
-
-            return antec ? cache.aVal : cache.sVal;
         }
+        return antec ? cache.aVal : cache.sVal;
     }
+
         
     public String toString () {       
 	return toString(null);

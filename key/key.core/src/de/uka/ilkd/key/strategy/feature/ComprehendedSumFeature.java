@@ -61,19 +61,18 @@ public class ComprehendedSumFeature implements Feature {
 
     
     public RuleAppCost computeCost (RuleApp app, PosInOccurrence pos, Goal goal) {        
-        synchronized(generator) {
-            final Term outerVarContent = var.getContent (goal);
+        final Term outerVarContent = var.getContent (goal);
 
-            final Iterator<Term> it = generator.generate ( app, pos, goal );
-            RuleAppCost res = NumberRuleAppCost.getZeroCost();
-            while ( it.hasNext () && ! ( res instanceof TopRuleAppCost ) ) {
-                var.setContent ( goal, it.next () );
+        final Iterator<Term> it = generator.generate ( app, pos, goal );
+        
+        RuleAppCost res = NumberRuleAppCost.getZeroCost();
+        while ( it.hasNext () && ! ( res instanceof TopRuleAppCost ) ) {
+            var.setContent ( goal, it.next () );
 
-                res = res.add (body.computeCost ( app, pos, goal ) );
-            }
-
-            var.setContent ( goal, outerVarContent );
-            return res;
+            res = res.add (body.computeCost ( app, pos, goal ) );
         }
+
+        var.setContent ( goal, outerVarContent );
+        return res;        
     }
 }

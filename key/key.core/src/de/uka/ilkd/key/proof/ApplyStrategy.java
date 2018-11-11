@@ -707,7 +707,7 @@ public class ApplyStrategy {
             if ( rai == null )
                 return;
 
-            synchronized ( ApplyStrategy.this ) {
+           /* synchronized ( ApplyStrategy.this ) {
                 ImmutableList<Goal>                newGoals = ImmutableSLList.<Goal>nil();
                 Iterator<NodeReplacement> it       = rai.getReplacementNodes ();
                 Node                      node;
@@ -720,9 +720,9 @@ public class ApplyStrategy {
                         newGoals = newGoals.prepend ( goal );
                 }
 
-               /* final IGoalChooser goalChooser = getGoalChooserForProof(proof);
-                goalChooser.updateGoalList ( rai.getOriginalNode (), newGoals ); */
-            }
+                final IGoalChooser goalChooser = getGoalChooserForProof(proof);
+                goalChooser.updateGoalList ( rai.getOriginalNode (), newGoals ); 
+            }*/
         }
     }
 

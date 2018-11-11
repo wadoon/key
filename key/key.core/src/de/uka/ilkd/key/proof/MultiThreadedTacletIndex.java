@@ -32,7 +32,7 @@ import de.uka.ilkd.key.rule.Taclet;
  */
 final class MultiThreadedTacletIndex extends TacletIndex {
 
-    private static ForkJoinPool execs = new ForkJoinPool(16);//.commonPool(); // <- Use this once we switch to Java 8
+    private static ForkJoinPool execs = new ForkJoinPool(4); // <- Use this once we switch to Java 8
 
     MultiThreadedTacletIndex(Iterable<Taclet> tacletSet) {
         super(tacletSet);
@@ -78,7 +78,7 @@ final class MultiThreadedTacletIndex extends TacletIndex {
 
         if (tacletApps.size() > 256) {
             NoPosTacletApp[] toMatch = tacletApps.toArray(NoPosTacletApp.class);                        
-            final int localParallelism = (toMatch.length >> 5 > execs.getParallelism() ?  execs.getParallelism() : toMatch.length >> 5);
+            final int localParallelism = execs.getParallelism();//(toMatch.length >> 2 > execs.getParallelism() ?  execs.getParallelism() : toMatch.length >> 2);
             final int partitionSize = toMatch.length/localParallelism;
 
             List<TacletSetMatchTask> forks = new ArrayList<>();

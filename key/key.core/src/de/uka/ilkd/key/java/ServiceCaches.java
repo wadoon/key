@@ -20,6 +20,7 @@ import org.key_project.util.LRUCache;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
@@ -111,7 +112,7 @@ public class ServiceCaches {
    /**
     * Cache used by the TermFactory to avoid unnecessary creation of terms
     */
-   private final Map<Term, Term> termCache = new LRUCache<Term, Term>(20000);
+   private final Map<TermFactory.CacheKey, Term> termCache = new LRUCache<>(20000);
 
    /**
     * Cache used by TypeComparisonCondition
@@ -170,7 +171,7 @@ public class ServiceCaches {
       return graphCache;
    }
 
-   public final Map<Term, Term> getTermFactoryCache() {
+   public final Map<TermFactory.CacheKey, Term> getTermFactoryCache() {
        return termCache;
    }
 
