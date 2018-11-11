@@ -174,8 +174,8 @@ public final class TermFactory {
     
     private final boolean containsJavaBlockRecursive(ImmutableArray<Term> subs) {
         if (subs != null && subs.size() > 0) {
-            for (final Term t : subs) {
-                if (t.containsJavaBlockRecursive()) {
+            for (int i = 0, sz = subs.size(); i<sz; i++) {
+                if (subs.get(i).containsJavaBlockRecursive()) {
                     return true;
                 }
             }
@@ -184,6 +184,8 @@ public final class TermFactory {
     }
 
     public static class CacheKey {
+        final static private ImmutableArray<QuantifiableVariable> NO_BOUND_VARS = new ImmutableArray<>();
+        final static private ImmutableArray<TermLabel> NO_LABELS = new ImmutableArray<>();
         final Operator op;
         final ImmutableArray<Term> subs;
         final ImmutableArray<QuantifiableVariable> boundVars;
@@ -195,9 +197,9 @@ public final class TermFactory {
                 ImmutableArray<QuantifiableVariable> boundVars,
                 ImmutableArray<TermLabel> labels) {
             this.op = op;
-            this.subs = subs;
-            this.boundVars = boundVars;
-            this.labels = labels;
+            this.subs = subs == null ? NO_SUBTERMS : subs;
+            this.boundVars = boundVars == null ? NO_BOUND_VARS : boundVars;
+            this.labels = labels == null ? NO_LABELS : labels;
         }
 
         @Override
@@ -205,12 +207,10 @@ public final class TermFactory {
             int result = hashCode;
             if (result == -1) {
                 final int prime = 31;
-                result = prime 
-                        + ((boundVars == null) ? 0 : boundVars.hashCode());                
-                result = prime * result
-                        + ((labels == null) ? 0 : labels.hashCode());
+                result = prime + boundVars.hashCode();                
+                result = prime * result +  labels.hashCode();
                 result = prime * result + op.hashCode();
-                result = prime * result + ((subs == null) ? 0 : subs.hashCode());
+                result = prime * result + subs.hashCode();
                 if (result == -1) result = 0;
             }
             return result;
@@ -218,30 +218,19 @@ public final class TermFactory {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
             CacheKey other = (CacheKey) obj;
-            if (boundVars == null) {
-                if (other.boundVars != null)
-                    return false;
-            } else if (!boundVars.equals(other.boundVars))
+            if (!op.equals(other.op)) {
+                return false;
+            }
+            if (!boundVars.equals(other.boundVars)) {
                 return false;            
-            if (labels == null) {
-                if (other.labels != null)
-                    return false;
-            } else if (!labels.equals(other.labels))
+            } 
+            if (!labels.equals(other.labels)) {
                 return false;
-            if (!op.equals(other.op))
+            }
+            if (!subs.equals(other.subs)) {
                 return false;
-            if (subs == null) {
-                if (other.subs != null)
-                    return false;
-            } else if (!subs.equals(other.subs))
-                return false;
+            }
             return true;
         }
         
