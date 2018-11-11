@@ -479,10 +479,9 @@ public class ApplyStrategy {
 
     }
     
-    private static ExecutorService service = new ThreadPoolExecutor(8, 8, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>());//new ForkJoinPool(16);//
+    private static ExecutorService service = new ThreadPoolExecutor(8, 8, 10, TimeUnit.SECONDS, new LinkedBlockingQueue<>());//new ForkJoinPool(16);//
     static ExecutorCompletionService<SingleRuleApplicationInfo> ecs = new ExecutorCompletionService<>(service); 
     AtomicInteger running = new AtomicInteger(0);
-    volatile ImmutableList<Future<SingleRuleApplicationInfo>> futures = ImmutableSLList.nil();
 
     /**
      * applies rules until this is no longer
