@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -73,22 +73,27 @@ class TwoSidedMatching {
     }
     
     private ImmutableSet<Substitution> getAllSubstitutions(Term target, TermServices services) {
-        ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
+        final Set<Substitution> substitutions = new LinkedHashSet<>();
+        getAllSubstitutionsHelp(target, substitutions, services);
+        return DefaultImmutableSet.fromSet(substitutions);
+    }
+    
+    private void getAllSubstitutionsHelp(Term target, Set<Substitution> allsubs, TermServices services) {
         Substitution sub = match ( triggerWithMVs, target, services );
         if ( sub != null
              && ( trigger.isElementOfMultitrigger() || sub.isTotalOn ( trigger.getUniVariables() )
              // sub.containFreevar(trigger.ts.allTerm.
              // varsBoundHere(0).getQuantifiableVariable(0))
              ) ) {
-            allsubs = allsubs.add ( sub );
+            allsubs.add ( sub );
         }
         final Operator op = target.op ();
+        
         if ( !( op instanceof Modality || op instanceof UpdateApplication ) ) {
             for ( int i = 0; i < target.arity (); i++ ) {
-                allsubs = allsubs.union ( getAllSubstitutions ( target.sub ( i ), services ) );
+                getAllSubstitutionsHelp ( target.sub ( i ), allsubs, services );
             }
         }
-        return allsubs;
     }
     
     /** find a substitution in a allterm by using unification */

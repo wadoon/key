@@ -495,7 +495,11 @@ public class ApplyStrategy {
                     time, countApplied.get(), srInfo);
             Goal exitGoal = null;
             // System.out.println("Running: " + running.get() + ":" + proof.openGoals().size());
-            ecs.submit(new Task(proof.openEnabledGoals().head()));
+            if (!proof.openEnabledGoals().isEmpty()) { 
+                ecs.submit(new Task(proof.openEnabledGoals().head()));
+            } else {
+                shouldStop = true;
+            }
             //System.out.println("Running: " + running.get());
             while (nrTasks.get() != 0) {
                 srInfo = ecs.take().get();
@@ -508,14 +512,14 @@ public class ApplyStrategy {
             if (Thread.interrupted()) {                    
                 throw new InterruptedException();
             }
-           
+
 
             if (exitGoal != null) {
                 return new ApplyStrategyInfo(srInfo.message(), proof, null, exitGoal,
                         System.currentTimeMillis()-time, countApplied.get(),
                         closedGoals);
             }
-            
+
             if (shouldStop) {
                 return new ApplyStrategyInfo(
                         stopCondition.getStopMessage(maxApplications, timeout, proof, time,
@@ -537,6 +541,7 @@ public class ApplyStrategy {
             Debug.out("Applied ", countApplied);
             Debug.out("Time elapsed: ", time);
         }
+
         assert srInfo != null;
         return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(), time,
                 countApplied.get(), closedGoals);

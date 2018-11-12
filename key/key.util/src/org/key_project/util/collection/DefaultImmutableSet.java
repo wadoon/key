@@ -14,6 +14,7 @@
 package org.key_project.util.collection;
 
 import java.util.Iterator;
+import java.util.Set;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -258,6 +259,25 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
             return nil();
         } else {
             return new DefaultImmutableSet<T>(Immutables.removeDuplicates(list));
+        }
+    }
+    
+    /**
+     * Create an immutable set from a mutable set
+     *
+     * @param set
+     *            a non-null mutable set
+     * @return a fresh immutable set with all the elements in set
+     */
+    public static<T> ImmutableSet<T> fromSet(Set<T> set) {
+        if(set.isEmpty()) {
+            return nil();
+        } else {
+            ImmutableList<T> backerList = ImmutableSLList.nil();
+            for (T element : set) {
+                backerList = backerList.prepend(element);
+            }
+            return new DefaultImmutableSet<T>(backerList);
         }
     }
 

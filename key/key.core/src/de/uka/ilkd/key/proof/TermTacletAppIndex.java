@@ -27,6 +27,7 @@ import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Class whose objects represent an index of taclet apps for one particular
@@ -57,7 +58,12 @@ public class TermTacletAppIndex {
     }
 
 
-    private TermTacletAppIndex getSubIndex ( int subterm ) {
+    /**
+     * returns the {@link TermTacletAppIndex} at position {@code subterm}
+     * @param subterm the position
+     * @return the {@link TermTacletAppIndex} at position {@code subterm}
+     */
+    private final TermTacletAppIndex getSubIndex ( int subterm ) {
         return subtermIndices.get ( subterm );
     }
 
@@ -482,29 +488,19 @@ public class TermTacletAppIndex {
         return replace(oldSubindices, child, newSubIndex);
     }
 
-    
+    /**
+     * returns a new immutable array equal to the source array except for the element at position <code>at</code> which is <code>newIndex</code>
+     * @param src the source array where to 'replace' an element 
+     * @param at the position
+     * @param newIndex the to be element at position at
+     * @return the immutable array 
+     */
     private ImmutableArray<TermTacletAppIndex> replace(ImmutableArray<TermTacletAppIndex> src, int at, TermTacletAppIndex newIndex) {
         TermTacletAppIndex[] result = src.toArray(new TermTacletAppIndex[src.size()]);
         result[at] = newIndex;
         return new ImmutableArray<>(result);
     }
     
-    /**
-     * Prepend the first <code>n</code> elements of <code>toAdd</code> to
-     * <code>initialList</code>
-     */
-    private static ImmutableArray<TermTacletAppIndex> prepend(ImmutableArray<TermTacletAppIndex> initialList,
-                                                              ImmutableArray<TermTacletAppIndex> toAdd,
-                                                              int n) {
-        if ( n <= 0 ) return initialList;
-        
-        TermTacletAppIndex[] result = new TermTacletAppIndex[initialList.size() + n];
-        toAdd.arraycopy(0, result, 0, n);
-        initialList.arraycopy(0, result, n, initialList.size());
-        return new ImmutableArray<>(result);
-    }
-
-
     /**
      * Updates the TermTacletAppIndex after a change at or below 
      * position <code>pos</code>
@@ -594,11 +590,11 @@ public class TermTacletAppIndex {
         
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
         
-        final ImmutableMap<PosInOccurrence,ImmutableList<NoPosTacletApp>> allTacletsHereAndBelow = 
-                collectAllTacletAppsHereAndBelow( pos,  DefaultImmutableMap.<PosInOccurrence, ImmutableList<NoPosTacletApp>>nilMap() );
+        final ImmutableList<Pair<PosInOccurrence,ImmutableList<NoPosTacletApp>>> allTacletsHereAndBelow = 
+                collectAllTacletAppsHereAndBelow( pos,  ImmutableSLList.nil() );
         
-        for (final ImmutableMapEntry<PosInOccurrence,ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
-            result = convert(pair.value(), pair.key(), p_filter, result, services);
+        for (final Pair<PosInOccurrence,ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
+            result = convert(pair.second, pair.first, p_filter, result, services);
         }
 
         return result;
@@ -617,12 +613,11 @@ public class TermTacletAppIndex {
     void reportTacletApps ( PosInOccurrence pos,
                             NewRuleListener listener ) {
                 
-        final ImmutableMap<PosInOccurrence, ImmutableList<NoPosTacletApp>> result = 
-                DefaultImmutableMap.<PosInOccurrence, ImmutableList<NoPosTacletApp>>nilMap();
-        final ImmutableMap<PosInOccurrence, ImmutableList<NoPosTacletApp>> allTacletsHereAndBelow = 
+        final ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> result = ImmutableSLList.nil();
+        final ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> allTacletsHereAndBelow = 
                 collectAllTacletAppsHereAndBelow( pos, result );
-        for (final ImmutableMapEntry<PosInOccurrence,ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
-            fireRulesAdded ( listener, pair.value(), pair.key() );
+        for (final Pair<PosInOccurrence,ImmutableList<NoPosTacletApp>> pair : allTacletsHereAndBelow) {
+            fireRulesAdded ( listener, pair.second, pair.first );
         }
     }
         
@@ -638,19 +633,18 @@ public class TermTacletAppIndex {
      *            {@code pos} or any position below pos as key 
      * @return the resulting list of taclet applications from this and all subterm taclet indices
      */
-    private ImmutableMap<PosInOccurrence, ImmutableList<NoPosTacletApp>> collectAllTacletAppsHereAndBelow 
+    private ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> collectAllTacletAppsHereAndBelow 
         ( PosInOccurrence pos,
-                ImmutableMap<PosInOccurrence, ImmutableList<NoPosTacletApp>> collectedApps ) {
+                ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> collectedApps ) {
     
         // assert collectedApps.get(pos) == null;
-        collectedApps = collectedApps.put(pos, localTacletApps);
+        collectedApps = collectedApps.prepend(new Pair<>(pos, localTacletApps));
 
-        int subterm = 0;
-        for (final TermTacletAppIndex appIndex : subtermIndices) {
-            collectedApps = appIndex.collectAllTacletAppsHereAndBelow ( pos.down ( subterm ), collectedApps );
-            ++subterm;
+        for (int subterm = 0; subterm < subtermIndices.size(); subterm++) {
+            collectedApps = subtermIndices.get(subterm).
+                    collectAllTacletAppsHereAndBelow ( pos.down ( subterm ), collectedApps );
         }
-        
+
         return collectedApps;
     }
 
@@ -662,12 +656,11 @@ public class TermTacletAppIndex {
      */
     private void reportTacletApps ( PIOPathIterator pathToModification,
                                     NewRuleListener listener ) {
-        final ImmutableMap<PosInOccurrence, ImmutableList<NoPosTacletApp>> allTacletsHereAndBelow = 
-                collectAllTacletAppsAffectedByModification ( pathToModification, 
-                DefaultImmutableMap.<PosInOccurrence, ImmutableList<NoPosTacletApp>>nilMap() ); 
+        final ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> allTacletsHereAndBelow = 
+                collectAllTacletAppsAffectedByModification ( pathToModification, ImmutableSLList.nil() ); 
         
-        for (final ImmutableMapEntry<PosInOccurrence,ImmutableList<NoPosTacletApp>> pair  : allTacletsHereAndBelow ) {
-            fireRulesAdded ( listener, pair.value(), pair.key() );
+        for (final Pair<PosInOccurrence,ImmutableList<NoPosTacletApp>> pair  : allTacletsHereAndBelow ) {
+            fireRulesAdded ( listener, pair.second, pair.first );
         }
     }
     
@@ -679,14 +672,14 @@ public class TermTacletAppIndex {
      * <strong>The map of already collected apps must not contain any entry for a position on or below the path to modification.</strong> 
      * @return all affected taclet apps grouped by the corresponding {@link PosInOccurrence}
      */
-    private  ImmutableMap<PosInOccurrence, ImmutableList<NoPosTacletApp>> collectAllTacletAppsAffectedByModification 
-            ( PIOPathIterator pathToModification, ImmutableMap<PosInOccurrence, ImmutableList<NoPosTacletApp>> collectedApps ) {
+    private  ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> collectAllTacletAppsAffectedByModification 
+            ( PIOPathIterator pathToModification, ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> collectedApps ) {
         
         TermTacletAppIndex index = this;        
         PosInOccurrence pos = pathToModification.getPosInOccurrence ();
         while ( pathToModification.hasNext () ) {
             // assert collectedApps.get(pos) == null;
-            collectedApps = collectedApps.put(pos, index.localTacletApps);
+            collectedApps = collectedApps.prepend(new Pair<>(pos, index.localTacletApps));
 
             final Term subTerm = pos.subTerm ();
             final int nextSubtermIndex = pathToModification.getChild ();

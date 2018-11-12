@@ -192,6 +192,9 @@ public final class PosInOccurrence {
      */
     public PosInOccurrence replaceConstrainedFormula (SequentFormula p_newFormula) {
         assert p_newFormula != null;
+        if (p_newFormula == sequentFormula) {
+            return this;
+        }
         final PIOPathIterator it = iterator ();
         Term newTerm = p_newFormula.formula ();
         PosInTerm newPosInTerm = PosInTerm.getTopLevel();

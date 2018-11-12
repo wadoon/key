@@ -19,6 +19,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableArray;
@@ -89,6 +90,8 @@ public final class OneStepSimplifier implements BuiltInRule {
     private TacletIndex[] indices;
     private Map<Term,Term> notSimplifiableCaches[];
     private boolean active;
+    
+    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     //-------------------------------------------------------------------------
     //constructors
@@ -211,7 +214,7 @@ public final class OneStepSimplifier implements BuiltInRule {
      * Deactivate one-step simplification: clear caches, restore taclets to
      * the goals' taclet indices.
      */
-    public synchronized void shutdownIndices() {
+    private void shutdownIndices() {
         if (lastProof != null) {
             if (!lastProof.isDisposed()) {
                 for(Goal g : lastProof.openGoals()) {
@@ -343,7 +346,7 @@ public final class OneStepSimplifier implements BuiltInRule {
         if(pos != null) {
             ifInsts.add(pos);
             if(protocol != null) {
-                protocol.add(makeReplaceKnownTacletApp(in, inAntecedent, pos));
+                protocol.add(makeReplaceKnownTacletApp(in, inAntecedent, pos, services));
             }
             Term result = pos.isInAntec() ? services.getTermBuilder().tt() : services.getTermBuilder().ff();
             ImmutableArray<TermLabel> labels = TermLabelManager.instantiateLabels(new TermLabelState(),
@@ -420,24 +423,20 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
     }
 
-    private RuleApp makeReplaceKnownTacletApp(Term formula, boolean inAntecedent, PosInOccurrence pio) {
+    private RuleApp makeReplaceKnownTacletApp(Term formula, boolean inAntecedent, PosInOccurrence pio, Services services) {
         FindTaclet taclet;
         if(pio.isInAntec()) {
-            taclet = (FindTaclet) lastProof.getInitConfig().lookupActiveTaclet(new Name("replace_known_left"));
+            taclet = (FindTaclet) services.getProof().getInitConfig().lookupActiveTaclet(new Name("replace_known_left"));
         } else {
-            taclet = (FindTaclet) lastProof.getInitConfig().lookupActiveTaclet(new Name("replace_known_right"));
+            taclet = (FindTaclet) services.getProof().getInitConfig().lookupActiveTaclet(new Name("replace_known_right"));
         }
-
-        SVInstantiations svi = SVInstantiations.EMPTY_SVINSTANTIATIONS;
-        FormulaSV sv = SchemaVariableFactory.createFormulaSV(new Name("b"));
-        svi.add(sv, pio.sequentFormula().formula(), lastProof.getServices());
 
         PosInOccurrence applicatinPIO = new PosInOccurrence(new SequentFormula(formula),
                                                             PosInTerm.getTopLevel(), // TODO: This should be the precise sub term
                                                             inAntecedent); // It is required to create a new PosInOccurrence because formula and pio.constrainedFormula().formula() are only equals module renamings and term labels
         ImmutableList<IfFormulaInstantiation> ifInst = ImmutableSLList.nil();
         ifInst = ifInst.append(new IfFormulaInstDirect(pio.sequentFormula()));
-        TacletApp ta = PosTacletApp.createPosTacletApp(taclet, svi, ifInst, applicatinPIO, lastProof.getServices());
+        TacletApp ta = PosTacletApp.createPosTacletApp(taclet, SVInstantiations.EMPTY_SVINSTANTIATIONS, ifInst, applicatinPIO, services);
         return ta;
     }
 
@@ -538,7 +537,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     /**
      * Tells whether the passed formula can be simplified
      */
-    private synchronized boolean applicableTo(Services services, SequentFormula cf, boolean inAntecedent, Goal goal, RuleApp ruleApp) {
+    private boolean applicableTo(Services services, SequentFormula cf, boolean inAntecedent, Goal goal, RuleApp ruleApp) {
         final Boolean b = applicabilityCache.get(cf);
         if(b != null) {
             return b.booleanValue();
@@ -553,24 +552,29 @@ public final class OneStepSimplifier implements BuiltInRule {
         }
     }
 
-    private synchronized void refresh(Proof proof) {
-        ProofSettings settings = proof.getSettings();
-        if (settings == null) {
-            settings = ProofSettings.DEFAULT_SETTINGS;
-        }
-
-        final boolean newActive = false && settings.getStrategySettings()
-                .getActiveStrategyProperties()
-                .get(StrategyProperties.OSS_OPTIONS_KEY)
-                .equals(StrategyProperties.OSS_ON);
-
-        if (active != newActive || lastProof != proof) {
-            active = false;// newActive;
-            if(active && proof != null && !proof.closed()) {
-                initIndices(proof);
-            } else {
-                shutdownIndices();
+    private void refresh(Proof proof) {
+        try { 
+            lock.writeLock().lock();        
+            ProofSettings settings = proof.getSettings();
+            if (settings == null) {
+                settings = ProofSettings.DEFAULT_SETTINGS;
             }
+
+            final boolean newActive = settings.getStrategySettings()
+                    .getActiveStrategyProperties()
+                    .get(StrategyProperties.OSS_OPTIONS_KEY)
+                    .equals(StrategyProperties.OSS_ON);
+
+            if (active != newActive || lastProof != proof) {
+                active = newActive;
+                if(active && proof != null && !proof.closed()) {
+                    initIndices(proof);
+                } else {
+                    shutdownIndices();
+                }
+            }
+        } finally {
+            lock.writeLock().unlock();
         }
     }
 
@@ -598,63 +602,71 @@ public final class OneStepSimplifier implements BuiltInRule {
     @Override
     public boolean isApplicable(Goal goal,
                     PosInOccurrence pio) {
-        //abort if switched off
-        if(!active) {
-            return false;
-        }
+        try {
+            lock.readLock().lock();                
+            //abort if switched off
+            if(!active) {
+                return false;
+            }
 
-        //abort if not top level constrained formula
-        if(pio == null || !pio.isTopLevel()) {
-            return false;
-        }
+            //abort if not top level constrained formula
+            if(pio == null || !pio.isTopLevel()) {
+                return false;
+            }
 
-        // abort if inside of transformer
-        if (Transformer.inTransformer(pio)) {
-            return false;
-        }
+            // abort if inside of transformer
+            if (Transformer.inTransformer(pio)) {
+                return false;
+            }
 
-        //applicable to the formula?
-        return applicableTo(goal.proof().getServices(),
-                        pio.sequentFormula(),
-                        pio.isInAntec(),
-                        goal,
-                        null);
+            //applicable to the formula?
+            return applicableTo(goal.proof().getServices(),
+                    pio.sequentFormula(),
+                    pio.isInAntec(),
+                    goal,
+                    null);
+        } finally { 
+            lock.readLock().unlock();
+        }
     }
 
     @Override
-    public synchronized ImmutableList<Goal> apply(Goal goal,
+    public ImmutableList<Goal> apply(Goal goal,
                     Services services,
                     RuleApp ruleApp) {
+        try { 
+            lock.readLock().lock();        
+            assert ruleApp instanceof OneStepSimplifierRuleApp :
+                "The rule app must be suitable for OSS";
 
-        assert ruleApp instanceof OneStepSimplifierRuleApp :
-            "The rule app must be suitable for OSS";
+            final PosInOccurrence pos = ruleApp.posInOccurrence();
+            assert pos != null && pos.isTopLevel();
 
-        final PosInOccurrence pos = ruleApp.posInOccurrence();
-        assert pos != null && pos.isTopLevel();
+            Protocol protocol = new Protocol();
 
-        Protocol protocol = new Protocol();
+            // get instantiation
+            final Instantiation inst = computeInstantiation(services,
+                    pos,
+                    goal.sequent(),
+                    protocol,
+                    goal,
+                    ruleApp);
 
-        // get instantiation
-        final Instantiation inst = computeInstantiation(services,
-                                                        pos,
-                                                        goal.sequent(),
-                                                        protocol,
-                                                        goal,
-                                                        ruleApp);
+            ((OneStepSimplifierRuleApp)ruleApp).setProtocol(protocol);
 
-        ((OneStepSimplifierRuleApp)ruleApp).setProtocol(protocol);
-
-        // change goal, set if-insts
-        final ImmutableList<Goal> result = goal.split(1);
-        final Goal resultGoal = result.head();
-        resultGoal.changeFormula(inst.getCf(), pos);
-        goal.setBranchLabel(inst.getNumAppliedRules()
+            // change goal, set if-insts
+            final ImmutableList<Goal> result = goal.split(1);
+            final Goal resultGoal = result.head();
+            resultGoal.changeFormula(inst.getCf(), pos);
+            goal.setBranchLabel(inst.getNumAppliedRules()
                     + (inst.getNumAppliedRules() > 1
-                                    ? " rules" : " rule"));
-        ruleApp = ((IBuiltInRuleApp)ruleApp).setIfInsts(inst.getIfInsts());
+                            ? " rules" : " rule"));
+            ruleApp = ((IBuiltInRuleApp)ruleApp).setIfInsts(inst.getIfInsts());
 
-
-        return result;
+            return result;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
 

@@ -136,7 +136,7 @@ public class FindTacletAppContainer extends TacletAppContainer {
                 // <code>TermTacletAppIndex.updateCompleteRebuild</code>
                 if ( beforeChangeOp instanceof Modality ) {
                     final PosInOccurrence afterChangePos =
-                        changePos.replaceConstrainedFormula ( newFormula );
+                        changePos.replaceConstrainedFormula ( newFormula );                   
                     final Term afterChangeTerm = afterChangePos.subTerm ();
                     return beforeChangeOp == afterChangeTerm.op ()
                            && beforeChangeTerm.sub ( 0 )

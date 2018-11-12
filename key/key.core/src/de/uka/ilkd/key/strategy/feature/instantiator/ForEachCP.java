@@ -72,7 +72,7 @@ public class ForEachCP implements Feature {
             final PosInOccurrence pos,
             final Goal goal) {
             final BackTrackingManager manager = strategy.getBTManager(goal);
-            final Term outerVarContent = var.getContent (goal);        
+            final Term outerVarContent = var.getContent (goal);
             var.setContent (goal,  null );
             synchronized(manager) {
                 manager.passChoicePoint ( goal, new CP ( app, pos, goal ), this );        
