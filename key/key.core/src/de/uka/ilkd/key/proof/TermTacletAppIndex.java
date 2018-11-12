@@ -13,13 +13,7 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.Iterator;
-
-import org.key_project.util.collection.DefaultImmutableMap;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableMap;
-import org.key_project.util.collection.ImmutableMapEntry;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -45,7 +39,7 @@ public class TermTacletAppIndex {
     /** NoPosTacletApps for this term */
     private final ImmutableList<NoPosTacletApp> localTacletApps;
     /** indices for subterms */
-    private final ImmutableList<TermTacletAppIndex> subtermIndices;
+    private final ImmutableArray<TermTacletAppIndex> subtermIndices;
     /** */
     private final RuleFilter ruleFilter;
 
@@ -54,7 +48,7 @@ public class TermTacletAppIndex {
      */
     private TermTacletAppIndex( Term term,
                                 ImmutableList<NoPosTacletApp> localTacletApps,
-                                ImmutableList<TermTacletAppIndex> subtermIndices,
+                                ImmutableArray<TermTacletAppIndex> subtermIndices,
                                 RuleFilter ruleFilter ) {
         this.term              = term;
         this.subtermIndices    = subtermIndices;
@@ -64,7 +58,7 @@ public class TermTacletAppIndex {
 
 
     private TermTacletAppIndex getSubIndex ( int subterm ) {
-        return subtermIndices.take ( subterm ).head ();
+        return subtermIndices.get ( subterm );
     }
 
 
@@ -159,27 +153,26 @@ public class TermTacletAppIndex {
      * indices are to be created
      * @return list of the index objects
      */
-    private static ImmutableList<TermTacletAppIndex>
+    private static ImmutableArray<TermTacletAppIndex>
                    createSubIndices (PosInOccurrence pos,
                                      Services        services,
                                      TacletIndex     tacletIndex,
                                      NewRuleListener listener,
                                      RuleFilter      filter,
                                      ITermTacletAppIndexCache indexCache) {
-        ImmutableList<TermTacletAppIndex> result = ImmutableSLList.<TermTacletAppIndex>nil();
-        final Term localTerm = pos.subTerm ();
+        final Term localTerm = pos.subTerm ();        
+        final TermTacletAppIndex[] result = new TermTacletAppIndex[localTerm.arity()];
 
-        int i = localTerm.arity();
+        for (int i = 0; i < result.length; i++ ) {
+            result[i] =  createHelp ( pos.down(i),
+                                      services,
+                                      tacletIndex,
+                                      listener,
+                                      filter,
+                                      indexCache.descend ( localTerm, i ) );
+        }
 
-        while ( i-- != 0 )
-            result = result.prepend ( createHelp ( pos.down(i),
-                                                   services,
-                                                   tacletIndex,
-                                                   listener,
-                                                   filter,
-                                                   indexCache.descend ( localTerm, i ) ) );
-
-        return result;
+        return new ImmutableArray<TermTacletAppIndex>(result);
     }
 
 
@@ -235,7 +228,7 @@ public class TermTacletAppIndex {
                                                                         services,
                                                                         tacletIndex );
 
-        final ImmutableList<TermTacletAppIndex> subIndices =
+        final ImmutableArray<TermTacletAppIndex> subIndices =
             createSubIndices ( pos, services, tacletIndex,
                                listener, filter, indexCache );
 
@@ -277,7 +270,7 @@ public class TermTacletAppIndex {
                                               TacletIndex     tacletIndex,
                                               NewRuleListener listener) {
 
-        final ImmutableList<TermTacletAppIndex> newSubIndices =
+        final ImmutableArray<TermTacletAppIndex> newSubIndices =
             addTacletsSubIndices ( filter, pos, services, tacletIndex,
                                    listener );
 	
@@ -293,25 +286,22 @@ public class TermTacletAppIndex {
     }
 
 
-    private ImmutableList<TermTacletAppIndex> addTacletsSubIndices( RuleFilter      filter,
+    private ImmutableArray<TermTacletAppIndex> addTacletsSubIndices( RuleFilter      filter,
                                                            PosInOccurrence pos,
                                                            Services        services,
                                                            TacletIndex     tacletIndex,
                                                            NewRuleListener listener ) {
-        ImmutableList<TermTacletAppIndex> result = ImmutableSLList.<TermTacletAppIndex>nil();
-        final Iterator<TermTacletAppIndex> subIt = subtermIndices.iterator();
+        final TermTacletAppIndex[] result = new TermTacletAppIndex[subtermIndices.size()];
         
-        int i = 0;
-        while ( subIt.hasNext () ) {
-            final TermTacletAppIndex oldSubIndex = subIt.next ();
+        for (int i = 0; i<subtermIndices.size(); i++) {
+            final TermTacletAppIndex oldSubIndex = subtermIndices.get(i);
             final TermTacletAppIndex newSubIndex =
                 oldSubIndex.addTacletsHelp ( filter, pos.down ( i ), services,
                                              tacletIndex, listener );
-            result = result.append ( newSubIndex );
-            ++i;
+            result[i] = newSubIndex;
         }
         
-        return result;
+        return new ImmutableArray<>(result);
     }
 
 
@@ -347,7 +337,7 @@ public class TermTacletAppIndex {
             return cached;
         }
 
-        final ImmutableList<TermTacletAppIndex> newSubIndices =
+        final ImmutableArray<TermTacletAppIndex> newSubIndices =
                 updateSubIndexes ( pathToModification, services, tacletIndex,
                         listener, indexCache );
 
@@ -388,7 +378,7 @@ public class TermTacletAppIndex {
                                                Services services,
                                                TacletIndex tacletIndex,
                                                NewRuleListener listener,
-                                               ImmutableList<TermTacletAppIndex> newSubIndices) {
+                                               ImmutableArray<TermTacletAppIndex> newSubIndices) {
         final ImmutableList<NoPosTacletApp> localApps = getFindTaclet ( pos, ruleFilter,
                                                                services,
                                                                tacletIndex );
@@ -400,13 +390,13 @@ public class TermTacletAppIndex {
     }
 
 
-    private ImmutableList<TermTacletAppIndex>
+    private ImmutableArray<TermTacletAppIndex>
                updateSubIndexes(PIOPathIterator pathToModification,
                                 Services services,
                                 TacletIndex tacletIndex,
                                 NewRuleListener listener,
                                 ITermTacletAppIndexCache indexCache) {
-        ImmutableList<TermTacletAppIndex> newSubIndices = subtermIndices;
+        ImmutableArray<TermTacletAppIndex> newSubIndices = subtermIndices;
         
         final Term newTerm = pathToModification.getSubTerm ();
         final int child = pathToModification.getChild ();
@@ -437,8 +427,8 @@ public class TermTacletAppIndex {
      * whenever a part of the update has changed, because this also changes the
      * update context of taclet apps in the target.
      */
-    private ImmutableList<TermTacletAppIndex>
-                 updateIUpdateTarget ( ImmutableList<TermTacletAppIndex> oldSubindices,
+    private ImmutableArray<TermTacletAppIndex>
+                 updateIUpdateTarget ( ImmutableArray<TermTacletAppIndex> oldSubindices,
                                        int             updateTarget,
                                        PosInOccurrence targetPos,
                                        Services        services,
@@ -446,10 +436,8 @@ public class TermTacletAppIndex {
                                        NewRuleListener listener,
                                        ITermTacletAppIndexCache indexCache ) {
 
-        ImmutableList<TermTacletAppIndex> subindices = oldSubindices.take ( updateTarget );                              
-        final TermTacletAppIndex toBeRemoved = subindices.head ();
+        final TermTacletAppIndex toBeRemoved = oldSubindices.get(updateTarget);
         final Term targetTerm = toBeRemoved.term;
-        subindices = subindices.tail ();
 
         final TermTacletAppIndex newSubIndex;
         
@@ -468,9 +456,7 @@ public class TermTacletAppIndex {
                                        toBeRemoved.ruleFilter, indexCache );
         }
         
-        return prepend ( subindices.prepend ( newSubIndex ),
-                         oldSubindices,
-                         updateTarget );
+        return replace(oldSubindices, updateTarget, newSubIndex);
     }
 
     
@@ -478,8 +464,8 @@ public class TermTacletAppIndex {
      * Update the subtree of indices the given iterator
      * <code>pathToModification</code> descends to 
      */
-    private ImmutableList<TermTacletAppIndex>
-	              updateOneSubIndex ( ImmutableList<TermTacletAppIndex> oldSubindices,
+    private ImmutableArray<TermTacletAppIndex>
+	              updateOneSubIndex ( ImmutableArray<TermTacletAppIndex> oldSubindices,
 	                                  PIOPathIterator pathToModification,
 	                                  Services        services,
 	                                  TacletIndex     tacletIndex,
@@ -487,31 +473,35 @@ public class TermTacletAppIndex {
 	                                  ITermTacletAppIndexCache indexCache ) {
 
         final int child = pathToModification.getChild ();
-
-        ImmutableList<TermTacletAppIndex> subindices = oldSubindices.take ( child );                              
-        final TermTacletAppIndex toBeUpdated = subindices.head ();
-        subindices = subindices.tail ();
+        final TermTacletAppIndex toBeUpdated = oldSubindices.get (child);
 
         final TermTacletAppIndex newSubIndex =
             toBeUpdated.updateHelp ( pathToModification, services,
                                      tacletIndex, listener, indexCache );
         
-        return prepend ( subindices.prepend ( newSubIndex ), oldSubindices,
-                         child );
+        return replace(oldSubindices, child, newSubIndex);
     }
 
-
+    
+    private ImmutableArray<TermTacletAppIndex> replace(ImmutableArray<TermTacletAppIndex> src, int at, TermTacletAppIndex newIndex) {
+        TermTacletAppIndex[] result = src.toArray(new TermTacletAppIndex[src.size()]);
+        result[at] = newIndex;
+        return new ImmutableArray<>(result);
+    }
+    
     /**
      * Prepend the first <code>n</code> elements of <code>toAdd</code> to
      * <code>initialList</code>
      */
-    private static ImmutableList<TermTacletAppIndex> prepend(ImmutableList<TermTacletAppIndex> initialList,
-                                                    ImmutableList<TermTacletAppIndex> toAdd,
-                                                    int n) {
+    private static ImmutableArray<TermTacletAppIndex> prepend(ImmutableArray<TermTacletAppIndex> initialList,
+                                                              ImmutableArray<TermTacletAppIndex> toAdd,
+                                                              int n) {
         if ( n <= 0 ) return initialList;
-        if ( n == 1 ) return initialList.prepend ( toAdd.head () );
-        return prepend ( initialList, toAdd.tail (), n - 1 )
-               .prepend ( toAdd.head () );
+        
+        TermTacletAppIndex[] result = new TermTacletAppIndex[initialList.size() + n];
+        toAdd.arraycopy(0, result, 0, n);
+        initialList.arraycopy(0, result, n, initialList.size());
+        return new ImmutableArray<>(result);
     }
 
 

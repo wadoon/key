@@ -24,33 +24,43 @@ public class NameRecorder {
 
     private ImmutableList<Name> post = ImmutableSLList.<Name>nil();
 
-    public void setProposals(ImmutableList<Name> proposals) {
-        pre = proposals;
-    }
-
     public ImmutableList<Name> getProposals() {
         return post;
     }
 
     public void addProposal(Name proposal) {
-        post = post.append(proposal);
+        synchronized(post) {
+            post = post.append(proposal);
+        }
+    }
+
+    public void setProposals(ImmutableList<Name> proposals) {
+        synchronized(pre) {
+            pre = proposals;
+        }
     }
 
     public Name getProposal() {
-        Name proposal = null;
+        synchronized(pre) {
+            Name proposal = null;
 
-        if (pre != null && !pre.isEmpty()) {
-            proposal = pre.head();
-            pre = pre.tail();
+            if (pre != null && !pre.isEmpty()) {
+                proposal = pre.head();
+                pre = pre.tail();
+            }
+
+            return proposal;
         }
-
-        return proposal;
     }
 
     public NameRecorder copy() {
         final NameRecorder result = new NameRecorder();
-        result.pre = pre;
-        result.post = post;
-        return result;
+        synchronized(pre) {
+            synchronized(post) {
+                result.pre = pre;
+                result.post = post;
+                return result;
+            }
+        }
     }
 }

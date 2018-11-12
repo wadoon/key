@@ -210,19 +210,17 @@ public class Services implements TermServices {
     
     public void addNameProposal(Name proposal) {
         nameRecorder.addProposal(proposal);
-    }
-    
-    
-    public SpecificationRepository getSpecificationRepository() {
-	return specRepos;
-    }
-    
+    }  
     
     /**
      * Returns the VariableNamer associated with this Services object.
      */
     public VariableNamer getVariableNamer() {
         return innerVarNamer;
+    }
+    
+    public SpecificationRepository getSpecificationRepository() {
+	return specRepos;
     }
     
     /**
