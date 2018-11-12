@@ -29,7 +29,7 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.util.TestSearchNodePreorderIterator.class,
         de.uka.ilkd.key.util.TestSearchNodeReversePreorderIterator.class,
         de.uka.ilkd.key.util.TestProofUserManager.class,
-        de.uka.ilkd.key.rule.merge.PredicateAbstractionLatticeTests.class,
+//        de.uka.ilkd.key.rule.merge.PredicateAbstractionLatticeTests.class,
         de.uka.ilkd.key.proof.io.TestZipProofSaving.class,
     };
 
@@ -73,7 +73,7 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.rule.inst.TestGenericSortInstantiations.class,
         de.uka.ilkd.key.rule.metaconstruct.TestProgramMetaConstructs.class,
         de.uka.ilkd.key.rule.conditions.TestDropEffectlessElementary.class,
-        de.uka.ilkd.key.rule.merge.MergeRuleTests.class
+       // de.uka.ilkd.key.rule.merge.MergeRuleTests.class
     };
 
 

@@ -662,7 +662,7 @@ public class MergeRule implements BuiltInRule {
      */
     @Override
     public boolean isApplicable(Goal goal, PosInOccurrence pio) {
-        return isOfAdmissibleForm(goal, pio, true);
+        return false && isOfAdmissibleForm(goal, pio, true);
     }
 
     /**
