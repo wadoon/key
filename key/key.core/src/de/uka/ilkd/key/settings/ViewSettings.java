@@ -24,7 +24,7 @@ import java.util.Properties;
  * 2) the maximal number of lines a tooltip with instantiated SchemaVariables
  *    is allowed to have. If this number is exceeded no SchemaVariables get
  *    instantiated in the displayed tooltip.
- * 3) wether intermediate proofsteps should be hidden in the proof tree view
+ * 3) whether intermediate proofsteps should be hidden in the proof tree view
  */
 public class ViewSettings implements Settings, Cloneable {
     private static final String MAX_TOOLTIP_LINES_KEY = "[View]MaxTooltipLines";
@@ -43,13 +43,15 @@ public class ViewSettings implements Settings, Cloneable {
     private static final String SHOW_UNINSTANTIATED_TACLET = "[View]ShowUninstantiatedTaclet";
     private static final String HIDE_PACKAGE_PREFIX = "[View]HidePackagePrefix";
     private static final String CONFIRM_EXIT = "[View]ConfirmExit";
-    
+    /** Heatmap options property */
+    private static final String HEATMAP_OPTIONS = "[View]HeatmapOptions";
+
     /** default max number of displayed tooltip lines is 40 */
     private int maxTooltipLines = 40;
     /** do not print the find, varcond and heuristics part of taclets in
      * the TacletMenu by default */
     private boolean showWholeTaclet = false;
-    /** default fontsize */
+    /** default font size */
     private int sizeIndex = 2;
     /** do not hide intermediate proofsteps by default */
     private boolean hideIntermediateProofsteps = false;
@@ -69,10 +71,16 @@ public class ViewSettings implements Settings, Cloneable {
     private boolean confirmExit = true;
     /**Show Taclet uninstantiated in tooltip -- for learning  */
     private boolean showUninstantiatedTaclet = false;
-    
-    private LinkedList<SettingsListener> listenerList =
-        new LinkedList<SettingsListener>();
-
+    /** Show heatmap of most recently used sequent formulae*/
+    private boolean showHeatmap = false;
+    /** Show heatmap for sequent formulas (true) or terms (false) */
+    private boolean heatmapSF = true;
+    /** Highlight newest formulas/terms (true) or all formulas/terms below specified age (false) */
+    private boolean heatmapNewest = true;
+    /** Maximum age/number of newest terms/formulas for heatmap highlighting */
+    private int maxAgeForHeatmap = 5;
+    /** List of listeners that are notified if the settings change */
+    private LinkedList<SettingsListener> listenerList = new LinkedList<SettingsListener>();
 
     /**
      * @return the current maxTooltipLines
@@ -211,7 +219,7 @@ public class ViewSettings implements Settings, Cloneable {
     }
 
     /**
-     * @param hide Wether closed subtrees should be hidden
+     * @param hide Whether closed subtrees should be hidden
      */
     public void setHideClosedSubtrees(boolean hide) {
         if (hide != hideClosedSubtrees) {
@@ -225,6 +233,7 @@ public class ViewSettings implements Settings, Cloneable {
      * represents the stored settings
      * @param props the collection of properties
      */
+    @Override
     public void readSettings(Object sender, Properties props) {
 		String val1 = props.getProperty(MAX_TOOLTIP_LINES_KEY);
 		String val2 = props.getProperty(FONT_INDEX);
@@ -240,6 +249,7 @@ public class ViewSettings implements Settings, Cloneable {
 		String val11 = props.getProperty(SHOW_UNINSTANTIATED_TACLET);
 		String hidePackage = props.getProperty(HIDE_PACKAGE_PREFIX);
 		String confirmExit = props.getProperty(CONFIRM_EXIT);
+        String hm = props.getProperty(HEATMAP_OPTIONS);
 		if (val1 != null) {
 		        maxTooltipLines = Integer.valueOf(val1).intValue();
 		}
@@ -284,6 +294,11 @@ public class ViewSettings implements Settings, Cloneable {
 		if (confirmExit != null) {
 		    this.confirmExit = Boolean.valueOf(confirmExit);
 		}
+        if (hm != null) {
+            String[] s = hm.split(" ");
+            this.setHeatmapOptions(Boolean.valueOf(s[0]), Boolean.valueOf(s[1]),
+                    Boolean.valueOf(s[2]), Integer.valueOf(s[3]));
+        }
 	}
 
 
@@ -296,6 +311,7 @@ public class ViewSettings implements Settings, Cloneable {
 	 *           the Properties object where to write the settings as (key,
 	 *           value) pair
 	 */
+    @Override
     public void writeSettings(Object sender,Properties props) {
     	props.setProperty(MAX_TOOLTIP_LINES_KEY, "" + maxTooltipLines);
     	props.setProperty(SHOW_WHOLE_TACLET, "" + showWholeTaclet);
@@ -314,6 +330,8 @@ public class ViewSettings implements Settings, Cloneable {
     	props.setProperty(SHOW_UNINSTANTIATED_TACLET, "" + showUninstantiatedTaclet);
         props.setProperty(HIDE_PACKAGE_PREFIX, "" + hidePackagePrefix);
     	props.setProperty(CONFIRM_EXIT, ""+confirmExit);
+        props.setProperty(HEATMAP_OPTIONS, "" + isShowHeatmap() + " " +
+                    isHeatmapSF() + " " + isHeatmapNewest() + " " + getMaxAgeForHeatmap());
     }
 
     /** sends the message that the state of this setting has been
@@ -329,6 +347,7 @@ public class ViewSettings implements Settings, Cloneable {
      * adds a listener to the settings object
      * @param l the listener
      */
+    @Override
     public void addSettingsListener(SettingsListener l) {
 	listenerList.add(l);
     }
@@ -412,6 +431,7 @@ public void setUseUnicode(boolean useUnicode) {
         this.confirmExit = confirmExit;
         fireSettingsChanged();
     }
+
     public boolean getShowUninstantiatedTaclet(){
 	    return showUninstantiatedTaclet;
     }
@@ -420,4 +440,49 @@ public void setUseUnicode(boolean useUnicode) {
 		    fireSettingsChanged();
     }
 
+    /** @return whether heatmaps should be displayed */
+    public boolean isShowHeatmap() {
+        return showHeatmap;
+    }
+
+    /**
+     * Updates heatmap settings (all of the at the same time, so that
+     * fireSettingsChanged is called only once.
+     *
+     * @param showHeatmap
+     *            true if heatmap on
+     * @param heatmapSF
+     *            true for sequent formulas, false for terms
+     * @param heatmapNewest
+     *            true if newest, false for "up to age"
+     * @param maxAgeForHeatmap
+     *            the maximum age for term or sequent formulas, concerning
+     *            heatmap highlighting
+     */
+    public void setHeatmapOptions(boolean showHeatmap, boolean heatmapSF, boolean heatmapNewest,
+            int maxAgeForHeatmap) {
+        this.showHeatmap = showHeatmap;
+        this.heatmapSF = heatmapSF;
+        this.heatmapNewest = heatmapNewest;
+        this.maxAgeForHeatmap = maxAgeForHeatmap;
+        fireSettingsChanged();
+    }
+
+    /** @return whether sequent formulas or terms should be highlighted */
+    public boolean isHeatmapSF() {
+        return heatmapSF;
+    }
+
+    /** @return whether to highlight "newest" or "up to age" */
+    public boolean isHeatmapNewest() {
+        return heatmapNewest;
+    }
+
+    /**
+     * @return the maximum age for term or sequent formulas, concerning heatmap
+     *         highlighting
+     */
+    public int getMaxAgeForHeatmap() {
+        return maxAgeForHeatmap;
+    }
 }

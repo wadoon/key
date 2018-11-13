@@ -38,6 +38,28 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IfExThenElse;
+import de.uka.ilkd.key.logic.op.IfThenElse;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ParsableVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SubstOp;
+import de.uka.ilkd.key.logic.op.Transformer;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
+import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -47,7 +69,6 @@ import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.WellDefinednessCheck;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -1159,14 +1180,13 @@ public class TermBuilder {
     }
 
     /**
-     * @param numberString
-     *            String representing an integer
-     * @return Term in Z-Notation representing the given number
-     * @throws NumberFormatException
-     *             if <code>numberString</code> is not a number
+     * Creates Z-/C-terms for ints/chars.
+     * @param numberString a string containing the number in a decimal representation
+     * @param containsChar true iff the number represents a char
+     * @return Term in Z-/C-Notation representing the given number
+     * @throws NumberFormatException if <code>numberString</code> is not a number
      */
-    public Term zTerm(String numberString) {
-
+    private Term numberTerm(String numberString, boolean containsChar) {
         if (numberString == null || numberString.isEmpty()) {
             throw new NumberFormatException(numberString + " is not a number.");
         }
@@ -1217,19 +1237,28 @@ public class TermBuilder {
                 digit = 9;
                 break;
             default:
-                throw new NumberFormatException(
-                        numberString + " is not a number.");
+                throw new NumberFormatException(numberString + " is not a number.");
             }
-
-            numberLiteralTerm = func(intLDT.getNumberLiteralFor(digit),
-                    numberLiteralTerm);
+            numberLiteralTerm = func(intLDT.getNumberLiteralFor(digit), numberLiteralTerm);
         }
         if (negate) {
-            numberLiteralTerm = func(intLDT.getNegativeNumberSign(),
-                    numberLiteralTerm);
+            numberLiteralTerm = func(intLDT.getNegativeNumberSign(), numberLiteralTerm);
         }
-        numberLiteralTerm = func(intLDT.getNumberSymbol(), numberLiteralTerm);
+        // chars get a surrounding C, ints a surrounding Z
+        numberLiteralTerm = func(containsChar ? intLDT.getCharSymbol() : intLDT.getNumberSymbol(),
+                numberLiteralTerm);
         return numberLiteralTerm;
+    }
+
+    /**
+     * @param numberString
+     *            String representing an integer with radix 10, may be negative
+     * @return Term in Z-Notation representing the given number
+     * @throws NumberFormatException
+     *             if <code>numberString</code> is not a number
+     */
+    public Term zTerm(String numberString) {
+        return numberTerm(numberString, false);
     }
 
     /**
@@ -1239,6 +1268,16 @@ public class TermBuilder {
      */
     public Term zTerm(long number) {
         return zTerm("" + number);
+    }
+
+    /**
+     * @param numberString String containing the value of the char as a decimal number
+     * @return Term in C-Notation representing the given char
+     * @throws NumberFormatException
+     *             if <code>numberString</code> is not a number
+     */
+    public Term cTerm(String numberString) {
+        return numberTerm(numberString, true);
     }
 
     public Term add(Term t1, Term t2) {
@@ -1642,15 +1681,6 @@ public class TermBuilder {
     public Term label(Term term, ImmutableArray<TermLabel> labels) {
         if ((labels == null || labels.isEmpty())) {
             return term;
-        } else if (labels.size() == 1
-                && (labels.contains(
-                        ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL)
-                        || labels.contains(
-                                ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL)
-                        || labels.contains(
-                                ParameterlessTermLabel.UNDEFINED_VALUE_LABEL))
-                && !WellDefinednessCheck.isOn()) {
-            return term; // FIXME: This case is only for SET Tests
         } else {
             return tf.createTerm(term.op(), term.subs(), term.boundVars(),
                     term.javaBlock(), labels);
@@ -1666,14 +1696,8 @@ public class TermBuilder {
     }
 
     public Term shortcut(Term term) {
-        if ((term.op().equals(Junctor.AND) || term.op().equals(Junctor.OR))
-                && WellDefinednessCheck.isOn()) { // FIXME: Last condition is
-                                                  // only for SET Tests
-            return addLabel(term,
-                    ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL);
-        } else {
-            return term;
-        }
+        return addLabel(term,
+                        ParameterlessTermLabel.SHORTCUT_EVALUATION_LABEL);
     }
 
     public Term unlabel(Term term) {

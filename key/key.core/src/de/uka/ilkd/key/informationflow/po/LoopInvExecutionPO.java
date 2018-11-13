@@ -84,7 +84,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO
         this.context = context;
         this.guardTerm = guardTerm;
 
-        // consistensy check
+        // consistency check
         assert preAndPostExpressionsEqual() :
                 "Information flow loop invariant malformed. Pre expressions" +
                 "do not match post expressions.";
@@ -103,7 +103,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO
 
     @Override
     public void readProblem() throws ProofInputException {
-        final Services proofServices = postInit();
+        postInit();
 
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
@@ -253,8 +253,8 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO
 
 
     @Override
-    public IFProofObligationVars getLeaveIFVars() {
-        return getChildPO().getLeaveIFVars();
+    public IFProofObligationVars getLeafIFVars() {
+        return getChildPO().getLeafIFVars();
     }
 
 

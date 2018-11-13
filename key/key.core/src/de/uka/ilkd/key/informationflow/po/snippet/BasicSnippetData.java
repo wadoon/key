@@ -19,7 +19,7 @@ import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockContract.Variables;
+import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
@@ -102,7 +102,7 @@ class BasicSnippetData {
         /**
          * Variables originally used during parsing.
          */
-        BLOCK_VARS(Variables.class),
+        BLOCK_VARS(BlockSpecificationElement.Variables.class),
         LABELS(Label[].class),
         EXECUTION_CONTEXT(ExecutionContext.class); // this does not fit well here
 
@@ -149,6 +149,7 @@ class BasicSnippetData {
         this.tb = services.getTermBuilder();
 
         contractContents.put(Key.TARGET_METHOD, invariant.getTarget());
+        contractContents.put(Key.FOR_CLASS, invariant.getKJT());
         contractContents.put(Key.EXECUTION_CONTEXT, context);
         contractContents.put(Key.LOOP_INVARIANT, invariant);
         contractContents.put(Key.LOOP_INVARIANT_TERM, invariant.getInvariant(services));
@@ -156,7 +157,7 @@ class BasicSnippetData {
         contractContents.put(Key.MODALITY, Modality.BOX);
         contractContents.put(Key.INF_FLOW_SPECS, invariant.getInfFlowSpecs(services));
 
-        // add guard term to information flow specs (neccessary for soundness)
+        // add guard term to information flow specs (necessary for soundness)
         // and add the modified specs to the table
         ImmutableList<InfFlowSpec> infFlowSpecs =
                 invariant.getInfFlowSpecs(services);
@@ -215,7 +216,7 @@ class BasicSnippetData {
     BasicSnippetData(BlockContract contract,
                      ExecutionContext context,
                      Services services) {
-        this.hasMby = contract.hasMby();
+        this.hasMby = false; // Mby of block contracts is not further considered
         this.services = services;
         this.tb = services.getTermBuilder();
 

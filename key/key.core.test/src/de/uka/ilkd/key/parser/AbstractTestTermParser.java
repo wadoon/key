@@ -9,7 +9,6 @@ import de.uka.ilkd.key.logic.sort.BottomSort;
 import junit.framework.TestCase;
 
 import org.antlr.runtime.RecognitionException;
-import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Recoder2KeY;
