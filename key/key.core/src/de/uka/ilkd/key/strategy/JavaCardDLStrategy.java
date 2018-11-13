@@ -2606,7 +2606,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 .getProperty(StrategyProperties.DEP_OPTIONS_KEY);
         final SetRuleFilter depFilter = new SetRuleFilter();
         depFilter.addRuleToSet(UseDependencyContractRule.INSTANCE);
-        if (depProp.equals(StrategyProperties.DEP_ON)) {
+        if (depProp.equals(StrategyProperties.DEP_ON)) {            
             depSpecF =
                     ConditionalFeature.createConditional(
                             depFilter,

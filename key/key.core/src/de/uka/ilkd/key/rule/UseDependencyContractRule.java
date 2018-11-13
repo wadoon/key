@@ -13,10 +13,7 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -144,7 +141,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
     private static void getRawSteps(Term heapTerm,
             Sequent seq,
             Services services,
-            List<Term> result) {
+            Set<Term> result) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Operator op = heapTerm.op();
         assert heapTerm.sort().equals(heapLDT.targetSort());
@@ -313,7 +310,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
         }
 
         //get raw steps
-        final List<Term> rawSteps = new LinkedList<Term>();
+        final Set<Term> rawSteps = new LinkedHashSet<Term>();
         int index = 0;
         final int stateCount = ((IObserverFunction)focus.op()).getStateCount();
         final int numHeaps = ((IObserverFunction)focus.op()).getHeapCount(services);
