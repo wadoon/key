@@ -47,7 +47,7 @@ class ReplacerOfQuanVariablesWithMetavariables {
             Term m;
             if ( op == Quantifier.ALL ) {
                 Metavariable mv = new Metavariable ( ARBITRARY_NAME, q.sort () );
-                m = services.getTermFactory(false).createTerm ( mv );
+                m = services.getTermFactory().noCacheTermFactory().createTerm ( mv );
             } else {
                 Function f = new Function ( ARBITRARY_NAME, q.sort (),
                                             new Sort [0] );

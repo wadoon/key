@@ -39,13 +39,19 @@ public final class TermFactory {
     private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<Term>();
     private final Map<CacheKey, Term> cache;
     
-
+    private final TermFactory noCache;
     //-------------------------------------------------------------------------
     //constructors
     //-------------------------------------------------------------------------
     
+    private TermFactory() {
+        this.cache = null;
+        this.noCache = this;
+    }
+    
     public TermFactory(Map<CacheKey, Term> cache) {
         this.cache = cache;
+        this.noCache = new TermFactory();
     }
     
     //-------------------------------------------------------------------------
@@ -239,5 +245,9 @@ public final class TermFactory {
             return true;
         }
         
+    }
+
+    public TermFactory noCacheTermFactory() {
+        return noCache;
     }
 }

@@ -105,9 +105,7 @@ public class ForEachCP implements Feature {
                 final Term generatedTerm = terms.next ();
                 return new CPBranch () {
                     public void choose(Goal g) {
-                        synchronized(var) {
-                            var.setContent ( g, generatedTerm );
-                        }
+                        var.setContent ( g, generatedTerm );
                     }
                     public RuleApp getRuleAppForBranch() {
                         return oldApp;

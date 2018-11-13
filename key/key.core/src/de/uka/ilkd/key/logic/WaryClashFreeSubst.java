@@ -180,7 +180,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
         newSubterms[UpdateApplication.targetPos ()] = addSubst ? substWithNewVar ( target )
                                                    : target;
 
-        return tf.createTerm ( t.op (),
+        return tb.tf().createTerm ( t.op (),
                 newSubterms,
                 getSingleArray(newBoundVars),
                 t.javaBlock ());
@@ -218,7 +218,7 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
     private Term substWithNewVar (Term t) {
         createVariable ();
         final ClashFreeSubst cfs = new ClashFreeSubst ( getVariable (),
-                                                        newVarTerm, tb, tf );
+                                                        newVarTerm, tb );
         return cfs.apply ( t );
     }
 }

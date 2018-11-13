@@ -30,7 +30,6 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -38,7 +37,6 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.init.JavaProfile;
 
 
 /** 
@@ -170,7 +168,7 @@ public class EqualityConstraint implements Constraint {
         if ( t == null ) {
             t = map.get ( p_mv );
             if ( t == null )
-                t = services.getTermFactory(false).createTerm(p_mv);
+                t = services.getTermFactory().noCacheTermFactory().createTerm(p_mv);
             else
                 t = instantiate ( t, services );
 
@@ -187,7 +185,7 @@ public class EqualityConstraint implements Constraint {
     }
 
     /**
-     * instantiatiates term <code>p</code> according to the instantiations
+     * instantiates term <code>p</code> according to the instantiations
      * of the metavariables described by this constraint. 
      * @param p the Term p to be instantiated
      * @return the instantiated term 

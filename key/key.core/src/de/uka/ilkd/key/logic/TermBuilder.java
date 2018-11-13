@@ -2215,4 +2215,9 @@ public class TermBuilder {
             return tf.createTerm(Junctor.OR, t1, t2);
         }
     }
+
+    
+    public TermFactory getTermFactory(boolean useCache) {
+        return useCache ? tf : tf.noCacheTermFactory();
+    }
 }

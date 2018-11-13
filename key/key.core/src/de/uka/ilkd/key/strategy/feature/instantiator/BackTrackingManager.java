@@ -94,8 +94,7 @@ public final class BackTrackingManager {
             chosenBranches.get ( position ).choose ( goal );
         }
         
-        ++position;
-        
+        ++position;  
     }
 
     /**

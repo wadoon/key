@@ -25,21 +25,18 @@ public class ClashFreeSubst {
     protected Term s;
     protected ImmutableSet<QuantifiableVariable> svars;
     protected final TermBuilder tb;
-    protected final TermFactory tf;
 
     public ClashFreeSubst(QuantifiableVariable v,Term s, TermServices services) {
        this.v = v;
        this.s = s;
        this.tb = services.getTermBuilder();
-       this.tf = tb.tf();
        svars = s.freeVars();
     }
     
-    public ClashFreeSubst(QuantifiableVariable v,Term s, TermBuilder tb, TermFactory tf) {
+    public ClashFreeSubst(QuantifiableVariable v,Term s, TermBuilder tb) {
         this.v = v;
         this.s = s;
         this.tb = tb;
-        this.tf = tf;        
         svars = s.freeVars();
      }
     
@@ -107,7 +104,7 @@ public class ClashFreeSubst {
         for ( int i=0; i<arity; i++ ) {
             applyOnSubterm ( t, i, newSubterms, newBoundVars );
         }
-        return tf.createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.javaBlock(), t.getLabels());
+        return tb.tf().createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.javaBlock(), t.getLabels());
     }
 
     /**
@@ -177,7 +174,7 @@ public class ClashFreeSubst {
 
 		// Substitute that for the old one.
 		newBoundVars[varInd] = qv1;
-		new ClashFreeSubst(qv, tb.var(qv1), tb, tf)
+		new ClashFreeSubst(qv, tb.var(qv1), tb)
 		    .applyOnSubterm1(varInd+1, boundVars, newBoundVars,
 				    subInd,subTerm,newSubterms);
 		// then continue recursively, on the result.

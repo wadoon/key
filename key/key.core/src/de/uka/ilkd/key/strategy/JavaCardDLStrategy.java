@@ -2249,20 +2249,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     }
 
     private void setupInEqCaseDistinctions(RuleSetDispatchFeature d) {
-        final TermBuffer intRel = new TermBuffer();
-        final TermBuffer atom = new TermBuffer();
-        
-        
-        final Term zeroTerm = getServices().getTypeConverter().getIntegerLDT().zero();
-        final TermBuffer zero = new TermBuffer() {
-            public Term getContent(Goal g) {
-                return zeroTerm;
-            }
-            public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
-                return zeroTerm;
-            }
-        };
-        
+        final TermBuffer intRel  = new TermBuffer();
+        final TermBuffer atom    = new TermBuffer();
         final TermBuffer rootInf = new TermBuffer();
 
         final Feature posNegSplitting =
