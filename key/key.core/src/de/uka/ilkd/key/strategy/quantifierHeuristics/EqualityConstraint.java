@@ -193,13 +193,14 @@ public class EqualityConstraint implements Constraint {
     private Term instantiate ( Term p, Services services ) {
 	ConstraintAwareSyntacticalReplaceVisitor srVisitor =
 	    new ConstraintAwareSyntacticalReplaceVisitor(new TermLabelState(),
-	                                  services,
+	                                  services,	                                  
 	                                  this, 
 	                                  null,
 	                                  null,
 	                                  null,
 	                                  null,
-	                                  null);
+	                                  null,
+	                                  services.getTermBuilder().noCache());
 	p.execPostOrder ( srVisitor );
 	return srVisitor.getTerm ();
     }

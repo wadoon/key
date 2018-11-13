@@ -51,7 +51,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
 import de.uka.ilkd.key.rule.inst.ContextInstantiationEntry;
-import de.uka.ilkd.key.rule.inst.ContextStatementBlockInstantiation;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ConstraintAwareSyntacticalReplaceVisitor;
 
@@ -90,9 +89,44 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             Rule rule,
             RuleApp ruleApp,
             Services services) {
+        this(termLabelState, labelHint, applicationPosInOccurrence,
+                svInst, goal, rule, ruleApp, services, services.getTermBuilder());
+    }
+
+    protected SyntacticalReplaceVisitor(TermLabelState termLabelState,
+            TacletLabelHint labelHint,
+            PosInOccurrence applicationPosInOccurrence,
+            Goal goal,
+            Rule rule,
+            RuleApp ruleApp,
+            Services services,
+            TermBuilder tb) {
+        this(termLabelState,
+                labelHint,
+                applicationPosInOccurrence,
+                SVInstantiations.EMPTY_SVINSTANTIATIONS,
+                goal,
+                rule,
+                ruleApp,
+                services,
+                tb);
+    }
+
+    /**
+     * needed by subclass for quantifier instantiation
+     */
+    protected SyntacticalReplaceVisitor(TermLabelState termLabelState,
+            TacletLabelHint labelHint,
+            PosInOccurrence applicationPosInOccurrence,
+            SVInstantiations svInst,
+            Goal goal,
+            Rule rule,
+            RuleApp ruleApp,
+            Services services, 
+            TermBuilder tb) {        
         this.termLabelState   = termLabelState;
         this.services         = services;
-        this.tb               = services.getTermBuilder();
+        this.tb               = tb;
         this.svInst           = svInst;
         this.applicationPosInOccurrence = applicationPosInOccurrence;
         this.rule = rule;
@@ -104,24 +138,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
            labelHint.setTacletTermStack(tacletTermStack);
         }
     }
-
-    public SyntacticalReplaceVisitor(TermLabelState termLabelState,
-            TacletLabelHint labelHint,
-            PosInOccurrence applicationPosInOccurrence,
-            Goal goal,
-            Rule rule,
-            RuleApp ruleApp,
-            Services services) {
-        this(termLabelState,
-                labelHint,
-                applicationPosInOccurrence,
-                SVInstantiations.EMPTY_SVINSTANTIATIONS,
-                goal,
-                rule,
-                ruleApp,
-                services);
-    }
-
+    
     private JavaProgramElement addContext(StatementBlock pe) {
         final ContextInstantiationEntry cie =
                 svInst.getContextInstantiation();

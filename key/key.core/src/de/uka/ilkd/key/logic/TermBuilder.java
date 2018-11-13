@@ -91,16 +91,32 @@ public class TermBuilder {
 
     protected final Services services; // TODO; Make private
 
+    private final TermBuilder noCache;
+
     public TermBuilder(TermFactory tf, Services services) {
         assert services != null;
         this.services = services;
         this.tf = tf;
         this.tt = tf.createTerm(Junctor.TRUE);
         this.ff = tf.createTerm(Junctor.FALSE);
+        this.noCache = new TermBuilder(tf.noCacheTermFactory(), services, tt, ff);
+    }
+
+    private TermBuilder(TermFactory tf, Services services,
+            Term tt, Term ff) {
+        this.services = services;
+        this.tf = tf;
+        this.tt = tf.createTerm(Junctor.TRUE);
+        this.ff = tf.createTerm(Junctor.FALSE);
+        this.noCache = this;
     }
 
     public TermFactory tf() {
         return tf;
+    }
+    
+    public TermBuilder noCache() {
+        return noCache;
     }
 
     // -------------------------------------------------------------------------

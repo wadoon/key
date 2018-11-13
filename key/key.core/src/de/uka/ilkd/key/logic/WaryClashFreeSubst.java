@@ -59,9 +59,13 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
 	++depth;
 	try {
 	    res = super.apply ( t );
-	} finally { --depth; }
+	} finally { 
+	    --depth; 
+	}
 
-	if ( createQuantifier && depth == 0 ) res = addWarySubst ( res );
+	if ( createQuantifier && depth == 0 ) { 
+	    res = addWarySubst ( res );
+	}
 
 	return res;
     }

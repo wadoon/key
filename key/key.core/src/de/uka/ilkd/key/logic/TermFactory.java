@@ -136,6 +136,10 @@ public final class TermFactory {
     public Term createTerm(Operator op, ImmutableArray<TermLabel> labels) {
     	return createTerm(op, NO_SUBTERMS, null, null, labels);
     }
+    
+    public TermFactory noCacheTermFactory() {
+        return noCache;
+    }
 
     //-------------------------------------------------------------------------
     //private interface
@@ -245,9 +249,5 @@ public final class TermFactory {
             return true;
         }
         
-    }
-
-    public TermFactory noCacheTermFactory() {
-        return noCache;
     }
 }

@@ -3,6 +3,7 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Rule;
@@ -27,19 +28,20 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
             TermLabelState termLabelState, Services services,
             Constraint metavariableInst,
             PosInOccurrence applicationPosInOccurrence, Rule rule, RuleApp ruleApp,
-            TacletLabelHint labelHint, Goal goal) {
+            TacletLabelHint labelHint, Goal goal, TermBuilder tb) {
         super(termLabelState, labelHint,
-                applicationPosInOccurrence, goal, rule, ruleApp, services);
+                applicationPosInOccurrence, goal, rule, ruleApp, services, tb.noCache());
         this.metavariableInst = metavariableInst;
     }
     
     protected Term toTerm(Term t) {
         if ( EqualityConstraint.metaVars (t).size () != 0 && !metavariableInst.isBottom () ) {
-            // use the visitor recursively for replacing metavariables that
+            // use the vis      itor recursively for replacing metavariables that
             // might occur in the term (if possible)
             final ConstraintAwareSyntacticalReplaceVisitor srv =
                     new ConstraintAwareSyntacticalReplaceVisitor (termLabelState, services, metavariableInst, 
-                            applicationPosInOccurrence, rule, ruleApp, labelHint, goal);
+                            applicationPosInOccurrence, rule, ruleApp, labelHint, goal,
+                            services.getTermBuilder().noCache());
             t.execPostOrder ( srv );
             return srv.getTerm ();
         } else {
