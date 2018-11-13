@@ -107,7 +107,7 @@ public class ImmutableTrieSet<T> implements ImmutableSet<T> {
 
         @Override
         public void remove() {
-            it.remove();
+            throw new UnsupportedOperationException("Immutable data structure");
         }
     }
 
