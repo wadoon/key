@@ -18,107 +18,124 @@ import org.key_project.util.test.util.TestUtilsUtil;
 import de.uka.ilkd.key.proof.ApplyStrategy.IStopCondition;
 import de.uka.ilkd.key.proof.ApplyStrategy.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Proof;
 
 /**
  * This {@link IStopCondition} can be used to block the the auto mode temporary.
+ *
  * @author Martin Hentschel
  */
 public class SuspendingStopCondition implements IStopCondition {
-   /**
-    * {@code true} block the current {@link Thread}, {@code false} do not block current {@link Thread}.
-    */
-   private boolean sleep;
-   
-   /**
-    * The maximal number of allowed rules.
-    */
-   private int maxRules;
+    /**
+     * {@code true} block the current {@link Thread}, {@code false} do not block
+     * current {@link Thread}.
+     */
+    private boolean sleep;
 
-   /**
-    * The sleep time.
-    */
-   private int sleepTime;
-   
-   /**
-    * Default constructor.
-    */
-   public SuspendingStopCondition() {
-      this(false, 1000, 100);
-   }
-   
-   /**
-    * Constructor.
-    * @param sleep {@code true} block the current {@link Thread}, {@code false} do not block current {@link Thread}.
-    * @param maxRules  The maximal number of allowed rules.
-    * @param sleepTime The sleep time.
-    */
-   public SuspendingStopCondition(boolean sleep, int maxRules, int sleepTime) {
-      this.sleep = sleep;
-      this.maxRules = maxRules;
-      this.sleepTime = sleepTime;
-   }
+    /**
+     * The maximal number of allowed rules.
+     */
+    private int maxRules;
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public int getMaximalWork(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser) {
-      return 0;
-   }
+    /**
+     * The sleep time.
+     */
+    private int sleepTime;
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
-      if (sleep) {
-         TestUtilsUtil.sleep(sleepTime);
-      }
-      return countApplied <= this.maxRules;
-   }
+    /**
+     * Default constructor.
+     */
+    public SuspendingStopCondition() {
+        this(false, 1000, 100);
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getGoalNotAllowedMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, Goal goal) {
-      return null;
-   }
+    /**
+     * Constructor.
+     *
+     * @param sleep
+     *            {@code true} block the current {@link Thread}, {@code false}
+     *            do not block current {@link Thread}.
+     * @param maxRules
+     *            The maximal number of allowed rules.
+     * @param sleepTime
+     *            The sleep time.
+     */
+    public SuspendingStopCondition(boolean sleep, int maxRules, int sleepTime) {
+        this.sleep = sleep;
+        this.maxRules = maxRules;
+        this.sleepTime = sleepTime;
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public boolean shouldStop(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
-      if (sleep) {
-         TestUtilsUtil.sleep(sleepTime);
-      }
-      return countApplied > this.maxRules;
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getMaximalWork(int maxApplications, long timeout, Proof proof) {
+        return 0;
+    }
 
-   /**
-    * {@inheritDoc}
-    */
-   @Override
-   public String getStopMessage(int maxApplications, long timeout, Proof proof, IGoalChooser goalChooser, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
-      return null;
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isGoalAllowed(int maxApplications, long timeout, Proof proof,
+            long startTime, int countApplied, Goal goal) {
+        if (sleep) {
+            TestUtilsUtil.sleep(sleepTime);
+        }
+        return countApplied <= this.maxRules;
+    }
 
-   /**
-    * Defines if the current {@link Thread} should be blocked or not.
-    * @param sleep {@code true} block the current {@link Thread}, {@code false} do not block current {@link Thread}.
-    */
-   public void setSleep(boolean sleep) {
-      this.sleep = sleep;
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getGoalNotAllowedMessage(int maxApplications, long timeout,
+            Proof proof, long startTime, int countApplied, Goal goal) {
+        return null;
+    }
 
-   /**
-    * Sets the maximal number of allowed rules.
-    * @param maxRules The maximal number of allowed rules.
-    */
-   public void setMaxRules(int maxRules) {
-      this.maxRules = maxRules;
-   }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean shouldStop(int maxApplications, long timeout, Proof proof,
+            long startTime, int countApplied,
+            SingleRuleApplicationInfo singleRuleApplicationInfo) {
+        if (sleep) {
+            TestUtilsUtil.sleep(sleepTime);
+        }
+        return countApplied > this.maxRules;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getStopMessage(int maxApplications, long timeout, Proof proof,
+            long startTime, int countApplied,
+            SingleRuleApplicationInfo singleRuleApplicationInfo) {
+        return null;
+    }
+
+    /**
+     * Defines if the current {@link Thread} should be blocked or not.
+     *
+     * @param sleep
+     *            {@code true} block the current {@link Thread}, {@code false}
+     *            do not block current {@link Thread}.
+     */
+    public void setSleep(boolean sleep) {
+        this.sleep = sleep;
+    }
+
+    /**
+     * Sets the maximal number of allowed rules.
+     *
+     * @param maxRules
+     *            The maximal number of allowed rules.
+     */
+    public void setMaxRules(int maxRules) {
+        this.maxRules = maxRules;
+    }
 }
