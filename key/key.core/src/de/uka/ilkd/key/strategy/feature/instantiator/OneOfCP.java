@@ -24,7 +24,6 @@ import de.uka.ilkd.key.strategy.feature.Feature;
 
 public class OneOfCP implements Feature {
     
-    //private final BackTrackingManager manager;
     private final AbstractFeatureStrategy strategy;
     private final Feature features[];
 

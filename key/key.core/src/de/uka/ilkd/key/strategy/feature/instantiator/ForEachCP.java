@@ -40,7 +40,7 @@ public class ForEachCP implements Feature {
     private final TermBuffer var;
     private final TermGenerator generator;
     private final Feature body;
-    
+
     /**
      * @param var
      *            <code>TermBuffer</code> in which the terms are going to
@@ -52,39 +52,44 @@ public class ForEachCP implements Feature {
      *            possible values of <code>var</code>
      */
     public static Feature create(TermBuffer var,
-                                 TermGenerator generator,
-                                 Feature body,
-                                 AbstractFeatureStrategy strategy) { //BackTrackingManager manager) {
-        return new ForEachCP ( var, generator, body, strategy); //manager );
+            TermGenerator generator,
+            Feature body,
+            AbstractFeatureStrategy strategy) { //BackTrackingManager manager) {
+                return new ForEachCP ( var, generator, body, strategy); //manager );
     }
 
     private ForEachCP(TermBuffer var,
-                      TermGenerator generator,
-                      Feature body,
-                      AbstractFeatureStrategy strategy) { //BackTrackingManager manager) {
+            TermGenerator generator,
+            Feature body,
+            AbstractFeatureStrategy strategy) { //BackTrackingManager manager) {
         this.var = var;
         this.generator = generator;
         this.body = body;
         this.strategy = strategy;
     }
 
+    @Override
     public RuleAppCost computeCost(final RuleApp app,
             final PosInOccurrence pos,
             final Goal goal) {
-            final BackTrackingManager manager = strategy.getBTManager(goal);
-            final Term outerVarContent = var.getContent (goal);
-            var.setContent (goal,  null );
-            synchronized(manager) {
-                manager.passChoicePoint ( goal, new CP ( app, pos, goal ), this );        
-            }
-            final RuleAppCost res;
-            if ( var.getContent(goal) != null )
-                res = body.computeCost ( app, pos, goal );
-            else
-                res = NumberRuleAppCost.getZeroCost();
+        final BackTrackingManager manager = strategy.getBTManager(goal);
+        final Term outerVarContent = var.getContent(goal);
 
-            var.setContent ( goal, outerVarContent );
-            return res;                    
+        var.setContent (goal,  null );
+
+        synchronized(manager) {
+            manager.passChoicePoint ( goal, new CP ( app, pos, goal ), this );
+        }
+
+        final RuleAppCost res;
+        if ( var.getContent(goal) != null ) {
+            res = body.computeCost ( app, pos, goal );
+        } else {
+            res = NumberRuleAppCost.getZeroCost();
+        }
+
+        var.setContent(goal, outerVarContent);
+        return res;
     }
 
     private final class CP implements ChoicePoint {
@@ -97,22 +102,27 @@ public class ForEachCP implements Feature {
                 this.oldApp = oldApp;
             }
 
+            @Override
             public synchronized boolean hasNext() {
                 return terms.hasNext ();
             }
 
+            @Override
             public synchronized CPBranch next() {
                 final Term generatedTerm = terms.next ();
                 return new CPBranch () {
+                    @Override
                     public void choose(Goal g) {
                         var.setContent ( g, generatedTerm );
                     }
+                    @Override
                     public RuleApp getRuleAppForBranch() {
                         return oldApp;
                     }
                 };
             }
 
+            @Override
             public void remove() {
                 throw new UnsupportedOperationException();
             }
@@ -121,17 +131,17 @@ public class ForEachCP implements Feature {
         private final PosInOccurrence pos;
         private final RuleApp         app;
         private final Goal            goal;
-    
+
         private CP(RuleApp app, PosInOccurrence pos, Goal goal) {
             this.pos = pos;
             this.app = app;
             this.goal = goal;
         }
-    
+
+        @Override
         public Iterator<CPBranch> getBranches(RuleApp oldApp) {
             return new BranchIterator ( generator.generate ( app, pos, goal ),
-                                        oldApp );
+                    oldApp );
         }
     }
-    
 }
