@@ -49,12 +49,14 @@ public class BuiltInRuleAppIndex {
      * for the given goal and position
      */
     public ImmutableList<IBuiltInRuleApp> getBuiltInRule(Goal            goal, 
-						 PosInOccurrence pos) {
+						         PosInOccurrence pos) {
 
 	ImmutableList<IBuiltInRuleApp> result = ImmutableSLList.<IBuiltInRuleApp>nil();
 
-        for (BuiltInRule builtInRule : index.rules()) {
-            BuiltInRule bir = builtInRule;
+        ImmutableList<BuiltInRule> rules = index.rules();
+        while (!rules.isEmpty()) {
+            final BuiltInRule bir = rules.head();
+            rules = rules.tail();
             if (bir.isApplicable(goal, pos)) {
                 IBuiltInRuleApp app = bir.createApp(pos, goal.proof().getServices());
                 result = result.prepend(app);
@@ -89,13 +91,15 @@ public class BuiltInRuleAppIndex {
 
     private void scanSimplificationRule ( Goal       goal,
 					  NewRuleListener listener ) {
-        for (BuiltInRule builtInRule : index.rules()) {
+        ImmutableList<BuiltInRule> rules = index.rules();
+        while (!rules.isEmpty()) {
+            final BuiltInRule builtInRule = rules.head();
+            rules = rules.tail();
             if(builtInRule.isApplicable(goal, null)) {
                 IBuiltInRuleApp app = builtInRule.createApp( null, goal.proof().getServices() );                            
                 listener.ruleAdded ( app, null );
             }
-            
-            
+
             scanSimplificationRule(builtInRule, goal, false, listener);
             scanSimplificationRule(builtInRule, goal, true, listener);
         }
@@ -110,9 +114,8 @@ public class BuiltInRuleAppIndex {
 	final Node                   node = goal.node ();
 	final Sequent                seq  = node.sequent ();
 
-        for (Object o : (antec ? seq.antecedent() : seq.succedent())) {
-            final SequentFormula cfma = (SequentFormula) o;
-            scanSimplificationRule(rule, goal, antec, cfma, listener);
+        for (final SequentFormula sf : (antec ? seq.antecedent() : seq.succedent())) {
+            scanSimplificationRule(rule, goal, antec, sf, listener);
         }
     }
 

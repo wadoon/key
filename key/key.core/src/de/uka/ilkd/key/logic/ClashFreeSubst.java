@@ -99,15 +99,15 @@ public class ClashFreeSubst {
      * of <code>v</code>, and that the case <code>v==t<code> is already
      * handled. */
     private Term applyOnSubterms(Term t) {
-	final int arity = t.arity();
-	final Term[] newSubterms = new Term[arity];
-	@SuppressWarnings("unchecked")
-    final ImmutableArray<QuantifiableVariable>[] newBoundVars =
-	    new ImmutableArray[arity];
-	for ( int i=0; i<arity; i++ ) {
-	    applyOnSubterm ( t, i, newSubterms, newBoundVars );
+        final int arity = t.arity();
+        final Term[] newSubterms = new Term[arity];
+        @SuppressWarnings("unchecked")
+        final ImmutableArray<QuantifiableVariable>[] newBoundVars =
+        new ImmutableArray[arity];
+        for ( int i=0; i<arity; i++ ) {
+            applyOnSubterm ( t, i, newSubterms, newBoundVars );
         }
-	return tf.createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.javaBlock(), t.getLabels());
+        return tf.createTerm(t.op(), newSubterms, getSingleArray(newBoundVars), t.javaBlock(), t.getLabels());
     }
 
     /**

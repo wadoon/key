@@ -9,13 +9,11 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.FormulaTagManager;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.IfFormulaInstSeq;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 import de.uka.ilkd.key.rule.IfMatchResult;
@@ -64,17 +62,16 @@ public class IfInstantiator {
         Debug.assertTrue(tacletAppContainer.getTacletApp().ifFormulaInstantiations() == null,
                 "The if formulas have already been instantiated");
 
-        if (getTaclet().ifSequent().isEmpty())
+        final Sequent ifSequent = getTaclet().ifSequent();
+        if (ifSequent.isEmpty()) {
             addResult(tacletAppContainer.getTacletApp());
-        else {
+        } else {
             allAntecFormulas = IfFormulaInstSeq.createList(p_seq, true);
             allSuccFormulas = IfFormulaInstSeq.createList(p_seq, false);
             findIfFormulaInstantiationsHelp(
-                    createSemisequentList(getTaclet().ifSequent() // Matching
-                                                                  // starting
-                            .succedent()), // with the last formula
-                    createSemisequentList(getTaclet().ifSequent().antecedent()),
-                    ImmutableSLList.<IfFormulaInstantiation> nil(), tacletAppContainer.getTacletApp().matchConditions(),
+                    ifSequent.succedent().asList(), //// Matching with the last formula
+                    ifSequent.antecedent().asList(),
+                    ImmutableSLList.nil(), tacletAppContainer.getTacletApp().matchConditions(),
                     false);
         }
     }
@@ -113,12 +110,10 @@ public class IfInstantiator {
      *         <code>isNewFormula</code> returns <code>true</code>
      */
     private ImmutableList<IfFormulaInstantiation> selectNewFormulas(boolean p_antec) {
-        final Iterator<IfFormulaInstantiation> it = getAllSequentFormulas(p_antec).iterator();
-        ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.<IfFormulaInstantiation> nil();
+        ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.nil();
 
-        while (it.hasNext()) {
-            final IfFormulaInstantiation ifInstantiation = it.next();
-            if (isNewFormulaDirect(ifInstantiation))
+        for (final IfFormulaInstantiation ifInstantiation : getAllSequentFormulas(p_antec) ) {
+            if (isNewFormulaDirect((IfFormulaInstSeq) ifInstantiation))
                 res = res.prepend(ifInstantiation);
         }
 
@@ -131,8 +126,8 @@ public class IfInstantiator {
      *         if-formulas of the enclosing taclet app (container) have been
      *         matched
      */
-    private boolean isNewFormula(IfFormulaInstantiation p_ifInstantiation) {
-        final boolean antec = ((IfFormulaInstSeq) p_ifInstantiation).inAntec();
+    private boolean isNewFormula(IfFormulaInstSeq p_ifInstantiation) {
+        final boolean antec = p_ifInstantiation.inAntec();
 
         final ImmutableList<IfFormulaInstantiation> cache = getNewSequentFormulasFromCache(antec);
 
@@ -148,8 +143,8 @@ public class IfInstantiator {
      *         if-formulas of the enclosing taclet app (container) have been
      *         matched (this method does not use the cache)
      */
-    private boolean isNewFormulaDirect(IfFormulaInstantiation p_ifInstantiation) {
-        final boolean antec = ((IfFormulaInstSeq) p_ifInstantiation).inAntec();
+    private boolean isNewFormulaDirect(IfFormulaInstSeq p_ifInstantiation) {
+        final boolean antec = p_ifInstantiation.inAntec();
 
         final SequentFormula cfma = p_ifInstantiation.getConstrainedFormula();
         final PosInOccurrence pio = new PosInOccurrence(cfma, PosInTerm.getTopLevel(), antec);
@@ -234,39 +229,24 @@ public class IfInstantiator {
 
         // For each matching formula call the method again to match
         // the remaining terms
-        Iterator<IfFormulaInstantiation> itCand = mr.getFormulas().iterator();
         Iterator<MatchConditions> itMC = mr.getMatchConditions().iterator();
         p_ifSeqTail = p_ifSeqTail.tail();
-        while (itCand.hasNext()) {
-            final IfFormulaInstantiation ifInstantiation = itCand.next();
+        for (final IfFormulaInstantiation ifInstantiation : mr.getFormulas()) {
             final boolean nextAlreadyMatchedNewFor = lastIfFormula || p_alreadyMatchedNewFor
-                    || isNewFormula(ifInstantiation);
+                    || isNewFormula((IfFormulaInstSeq) ifInstantiation);
             findIfFormulaInstantiationsHelp(p_ifSeqTail, p_ifSeqTail2nd, p_alreadyMatched.prepend(ifInstantiation),
                     itMC.next(), nextAlreadyMatchedNewFor);
         }
     }
 
-    private Proof getProof() {
-        return goal.proof();
-    }
-
     private Services getServices() {
-        return getProof().getServices();
+        return goal.proof().getServices();
     }
 
     private NoPosTacletApp setAllInstantiations(MatchConditions p_matchCond,
             ImmutableList<IfFormulaInstantiation> p_alreadyMatched) {
         return NoPosTacletApp.createNoPosTacletApp(getTaclet(), p_matchCond.getInstantiations(), p_alreadyMatched,
                 getServices());
-    }
-
-    private ImmutableList<SequentFormula> createSemisequentList(Semisequent p_ss) {
-        ImmutableList<SequentFormula> res = ImmutableSLList.<SequentFormula> nil();
-
-        for (final SequentFormula cf : p_ss) {
-            res = res.prepend(cf);
-        }
-        return res;
     }
 
     /**

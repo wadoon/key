@@ -19,7 +19,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.rule.BuiltInRule;
 
 /**
- * Index for managing built-in-rules usch as integer decision or update
+ * Index for managing built-in-rules such as integer decision or update
  * simplification rule.
  */
 public class BuiltInRuleIndex implements java.io.Serializable {
@@ -29,10 +29,11 @@ public class BuiltInRuleIndex implements java.io.Serializable {
      */
     private static final long serialVersionUID = -4399004272449882750L;
     /** list of available built in rules */
-    private ImmutableList<BuiltInRule> rules = ImmutableSLList.<BuiltInRule>nil();
+    private final ImmutableList<BuiltInRule> rules;
 
     /** constructs empty rule index */
     public BuiltInRuleIndex() {
+        rules = ImmutableSLList.<BuiltInRule>nil();
     }
 
     /**
