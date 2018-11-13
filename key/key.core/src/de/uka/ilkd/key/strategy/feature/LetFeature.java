@@ -46,7 +46,7 @@ public class LetFeature implements Feature {
         this.body = body;
     }
 
-    public synchronized RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         final Term outerVarContent = var.getContent (goal);
 
         var.setContent ( goal, value.toTerm ( app, pos, goal ) );
