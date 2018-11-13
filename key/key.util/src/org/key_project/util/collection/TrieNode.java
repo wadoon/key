@@ -2,7 +2,7 @@ package org.key_project.util.collection;
 
 import java.util.Iterator;
 
-interface TrieNode<S, T>{
+interface TrieNode<S, T> extends Iterable<TrieNode.Entry<S,T>> {
     Entry<S, T> find(S key, int level);
     TrieNode<S, T> add(Entry<S, T> entry, int level);
     TrieNode<S, T> remove(S key, int level);
@@ -117,6 +117,20 @@ interface TrieNode<S, T>{
             return entries.size();
         }
 
+        @Override
+        public Iterator<Entry<S, T>> iterator() {
+            return entries.iterator();
+        }
+
+        @Override
+        public int hashCode() {
+            // The order must not matter!
+            int hashCode = 0x55555555;
+            for (Entry<S, T> entry : entries) {
+                hashCode ^= entry.hashCode();
+            }
+            return hashCode;
+        }
     }
 
     static class BroadNode<S, T> implements TrieNode<S,T> {
@@ -195,50 +209,55 @@ interface TrieNode<S, T>{
             return size;
         }
 
+        @Override
+        public Iterator<Entry<S, T>> iterator() {
+            return new Iter<S, T>(table);
+        }
     }
 
-//    static class Iter<S,T> implements Iterator<ImmutableMapEntry<S, T>> {
-//        private final Node<S,T>[] table;
-//        private int pos = 0;
-//        private Iterator<ImmutableMapEntry<S, T>> innerIt;
-//
-//        private Iter(Node<S, T>[] table) {
-//            this.table = table;
-//        }
-//
-//        @Override
-//        public boolean hasNext() {
-//
-//            do {
-//                if(innerIt == null) {
-//                    while(pos < table.length &&  table[pos] == null) {
-//                        pos ++;
-//                    }
-//                    if(pos == table.length) {
-//                        return false;
-//                    }
-//                    innerIt = table[pos].iterator();
-//                }
-//
-//                boolean result = innerIt.hasNext();
-//                if(result) {
-//                    return true;
-//                }
-//
-//                innerIt = null;
-//            } while(true);
-//        }
-//
-//        @Override
-//        public ImmutableMapEntry<S, T> next() {
-//            return innerIt.next();
-//        }
-//
-//        @Override
-//        public void remove() {
-//            innerIt.remove();
-//        }
-//    }
+    static class Iter<S,T> implements Iterator<Entry<S, T>> {
+        private final TrieNode<S,T>[] table;
+        private int pos = 0;
+        private Iterator<Entry<S, T>> innerIt;
+
+        private Iter(TrieNode<S, T>[] table) {
+            this.table = table;
+        }
+
+        @Override
+        public boolean hasNext() {
+
+            do {
+                if(innerIt == null) {
+                    while(pos < table.length && table[pos] == null) {
+                        pos ++;
+                    }
+                    if(pos == table.length) {
+                        return false;
+                    }
+                    innerIt = table[pos].iterator();
+                }
+
+                boolean result = innerIt.hasNext();
+                if(result) {
+                    return true;
+                }
+
+                pos ++;
+                innerIt = null;
+            } while(true);
+        }
+
+        @Override
+        public Entry<S, T> next() {
+            return innerIt.next();
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("Remove is not supported in immutable data structures.");
+        }
+    }
 
 
 }

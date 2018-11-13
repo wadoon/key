@@ -2,6 +2,7 @@ package org.key_project.util.collection;
 
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Array;
 import java.util.Iterator;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -12,20 +13,14 @@ public class ImmutableTrieSet<T> implements ImmutableSet<T> {
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     private static final ImmutableTrieSet EMPTY =
-            new ImmutableTrieSet(TrieNode.EMPTY, ImmutableSLList.nil());
+            new ImmutableTrieSet(TrieNode.EMPTY);
 
     private static Object THING = "X";
 
     private final TrieNode<T, Object> map;
-    private ImmutableList<WeakReference<TrieNode.Entry<T, Object>>> linearList;
 
-    private boolean hasbeenFiltered;
-
-    public ImmutableTrieSet(TrieNode<T, Object> map,
-            ImmutableList<WeakReference<TrieNode.Entry<T, Object>>> list) {
+    public ImmutableTrieSet(TrieNode<T, Object> map) {
         this.map = map;
-        this.linearList = list;
-        this.hasbeenFiltered = false;
     }
 
     @Override
@@ -34,9 +29,7 @@ public class ImmutableTrieSet<T> implements ImmutableSet<T> {
         if(entry == null) {
             entry = new Entry<T, Object>(element, THING);
             TrieNode<T, Object> newmap = map.add(entry, 0);
-            ImmutableList<WeakReference<TrieNode.Entry<T, Object>>> newlist =
-                    linearList.prepend(new WeakReference<>(entry));
-            return new ImmutableTrieSet<T>(newmap, newlist);
+            return new ImmutableTrieSet<T>(newmap);
         } else {
             return this;
         }
@@ -48,9 +41,7 @@ public class ImmutableTrieSet<T> implements ImmutableSet<T> {
         if(entry == null) {
             entry = new Entry<T, Object>(element, THING);
             TrieNode<T, Object> newmap = map.add(entry, 0);
-            ImmutableList<WeakReference<TrieNode.Entry<T, Object>>> newlist =
-                    linearList.prepend(new WeakReference<>(entry));
-            return new ImmutableTrieSet<T>(newmap, newlist);
+            return new ImmutableTrieSet<T>(newmap);
         } else {
             throw new NotUniqueException(element);
         }
@@ -67,48 +58,23 @@ public class ImmutableTrieSet<T> implements ImmutableSet<T> {
 
     @Override
     public ImmutableSet<T> intersect(ImmutableSet<T> set) {
-        ImmutableSet<T> result = this;
-        for (T t : set) {
-            result = result.add(t);
+        ImmutableSet<T> result = DefaultImmutableSet.nil();
+        for (T t : this) {
+            if(set.contains(t)) {
+                result = result.add(t);
+            }
         }
         return result;
     }
 
     @Override
     public Iterator<T> iterator() {
-        filterList();
-        return new Itr<T>(linearList);
+        return new MappedIterator<Entry<T,Object>, T>(map.iterator(),  x -> x.key());
     }
 
     @Override
     public Stream<T> stream() {
         return StreamSupport.stream(spliterator(), false);
-    }
-
-    private static final class Itr<T> implements Iterator<T> {
-
-        private final Iterator<WeakReference<Entry<T, Object>>> it;
-
-        public Itr(ImmutableList<WeakReference<Entry<T, Object>>> linearList) {
-            it = linearList.iterator();
-        }
-
-        @Override
-        public boolean hasNext() {
-            return it.hasNext();
-        }
-
-        @Override
-        public T next() {
-            Entry<T, Object> n = it.next().get();
-            assert n != null : "Filtering should have made this safe";
-            return n.key();
-        }
-
-        @Override
-        public void remove() {
-            throw new UnsupportedOperationException("Immutable data structure");
-        }
     }
 
     @Override
@@ -140,7 +106,7 @@ public class ImmutableTrieSet<T> implements ImmutableSet<T> {
     public ImmutableSet<T> remove(T element) {
         if(contains(element)) {
             TrieNode<T, Object> newmap = map.remove(element, 0);
-            return new ImmutableTrieSet<T>(newmap, linearList);
+            return new ImmutableTrieSet<T>(newmap);
         } else {
             return this;
         }
@@ -148,50 +114,16 @@ public class ImmutableTrieSet<T> implements ImmutableSet<T> {
 
     @Override
     public <S> S[] toArray(S[] array) {
-        filterList();
-        return linearList.map(x -> x.get().key()).toArray(array);
-    }
-
-    private void filterList() {
-
-        if(this.hasbeenFiltered) {
-            return;
+        if(size() > array.length) {
+            array = (S[]) Array.newInstance(array.getClass().getComponentType(), size());
         }
 
-        if(map.size() == linearList.size()) {
-            this.hasbeenFiltered = true;
-            return;
-        }
-
-        ImmutableList<WeakReference<Entry<T, Object>>> result = ImmutableSLList.nil();
-
-        WeakReference<Entry<T, Object>>[] res = (WeakReference<Entry<T, Object>>[]) new WeakReference[size()];
         int i = 0;
-        ImmutableList<WeakReference<Entry<T, Object>>> rest = linearList;
-        ImmutableList<WeakReference<Entry<T, Object>>> unmodifiedTail = linearList;
-        WeakReference<Entry<T, Object>> t;
-
-        TrieNode<T, Object> alreadyVisited = TrieNode.EMPTY;
-
-        while (!rest.isEmpty()) {
-            t = rest.head();
-            rest = (ImmutableSLList<WeakReference<Entry<T, Object>>>) rest.tail();
-
-            Entry<T, Object> entry = t.get();
-
-            if (entry != null && contains(entry.key()) && alreadyVisited.find(entry.key(), 0) == null) {
-                res[i++] = t;
-                alreadyVisited = alreadyVisited.add(entry, 0);
-            } else {
-                unmodifiedTail = rest;
-            }
+        for (T t : this) {
+            array[i++] = (S)t;
         }
 
-        this.linearList = ((ImmutableSLList)unmodifiedTail).prepend(res, i - unmodifiedTail.size());
-        this.hasbeenFiltered = true;
-
-        assert map.size() == linearList.size();
-
+        return array;
     }
 
     @SuppressWarnings("unchecked")
@@ -222,8 +154,8 @@ public class ImmutableTrieSet<T> implements ImmutableSet<T> {
 
     @Override
     public String toString() {
-        Iterator<T> it=this.iterator();
-        StringBuffer str=new StringBuffer("{");
+        Iterator<T> it = this.iterator();
+        StringBuffer str = new StringBuffer("{");
         while (it.hasNext()) {
             str.append(it.next());
             if (it.hasNext()) {
