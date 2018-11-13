@@ -30,7 +30,7 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
             PosInOccurrence applicationPosInOccurrence, Rule rule, RuleApp ruleApp,
             TacletLabelHint labelHint, Goal goal, TermBuilder tb) {
         super(termLabelState, labelHint,
-                applicationPosInOccurrence, goal, rule, ruleApp, services, tb.noCache());
+                applicationPosInOccurrence, goal, rule, ruleApp, services, tb);
         this.metavariableInst = metavariableInst;
     }
     
@@ -41,7 +41,7 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
             final ConstraintAwareSyntacticalReplaceVisitor srv =
                     new ConstraintAwareSyntacticalReplaceVisitor (termLabelState, services, metavariableInst, 
                             applicationPosInOccurrence, rule, ruleApp, labelHint, goal,
-                            services.getTermBuilder().noCache());
+                            tb);
             t.execPostOrder ( srv );
             return srv.getTerm ();
         } else {

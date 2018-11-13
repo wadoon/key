@@ -25,15 +25,8 @@ public class ClashFreeSubst {
     protected Term s;
     protected ImmutableSet<QuantifiableVariable> svars;
     protected final TermBuilder tb;
-
-    public ClashFreeSubst(QuantifiableVariable v,Term s, TermServices services) {
-       this.v = v;
-       this.s = s;
-       this.tb = services.getTermBuilder();
-       svars = s.freeVars();
-    }
     
-    public ClashFreeSubst(QuantifiableVariable v,Term s, TermBuilder tb) {
+    public ClashFreeSubst(QuantifiableVariable v, Term s, TermBuilder tb) {
         this.v = v;
         this.s = s;
         this.tb = tb;

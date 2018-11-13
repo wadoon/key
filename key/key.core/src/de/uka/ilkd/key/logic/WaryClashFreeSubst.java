@@ -38,8 +38,8 @@ public class WaryClashFreeSubst extends ClashFreeSubst {
      * term to be substituted */
     private ImmutableSet<QuantifiableVariable> warysvars            = null;
 
-    public WaryClashFreeSubst ( QuantifiableVariable v, Term s, TermServices services ) {
-	super ( v, s, services );
+    public WaryClashFreeSubst ( QuantifiableVariable v, Term s, TermBuilder tb ) {
+	super ( v, s, tb );
 	warysvars = null;
     }
 
