@@ -18,8 +18,8 @@ import java.util.Set;
 
 import org.key_project.util.collection.*;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -43,7 +43,7 @@ class TwoSidedMatching {
     private final Substitution triggerSubstWithMVs;
     private final Term targetWithMVs;
     
-    TwoSidedMatching(UniTrigger trigger, Term targetTerm, TermServices services) {
+    TwoSidedMatching(UniTrigger trigger, Term targetTerm, Services services) {
         this.trigger = trigger;
         this.targetSubstWithMVs =
             ReplacerOfQuanVariablesWithMetavariables.createSubstitutionForVars ( targetTerm, services );
@@ -64,21 +64,21 @@ class TwoSidedMatching {
         }
     }
     
-    ImmutableSet<Substitution> getSubstitutions(TermServices services) {
+    ImmutableSet<Substitution> getSubstitutions(Services services) {
         if (triggerWithMVs == null || targetWithMVs == null) {
             // non ground subs not supported yet
             return DefaultImmutableSet.<Substitution>nil();
         }
 	return getAllSubstitutions ( targetWithMVs, services );
     }
-    
-    private ImmutableSet<Substitution> getAllSubstitutions(Term target, TermServices services) {
+
+    private ImmutableSet<Substitution> getAllSubstitutions(Term target, Services services) {
         final Set<Substitution> substitutions = new LinkedHashSet<>();
         getAllSubstitutionsHelp(target, substitutions, services);
         return DefaultImmutableSet.fromSet(substitutions);
     }
-    
-    private void getAllSubstitutionsHelp(Term target, Set<Substitution> allsubs, TermServices services) {
+
+    private void getAllSubstitutionsHelp(Term target, Set<Substitution> allsubs, Services services) {
         Substitution sub = match ( triggerWithMVs, target, services );
         if ( sub != null
              && ( trigger.isElementOfMultitrigger() || sub.isTotalOn ( trigger.getUniVariables() )
@@ -88,17 +88,17 @@ class TwoSidedMatching {
             allsubs.add ( sub );
         }
         final Operator op = target.op ();
-        
+
         if ( !( op instanceof Modality || op instanceof UpdateApplication ) ) {
             for ( int i = 0; i < target.arity (); i++ ) {
                 getAllSubstitutionsHelp ( target.sub ( i ), allsubs, services );
             }
         }
     }
-    
+
     /** find a substitution in a allterm by using unification */
     private Substitution match(Term triggerTerm, Term targetTerm, 
-            TermServices services) {
+            Services services) {
         final Constraint c =
             Constraint.BOTTOM.unify ( targetTerm, triggerTerm,
                                       services );

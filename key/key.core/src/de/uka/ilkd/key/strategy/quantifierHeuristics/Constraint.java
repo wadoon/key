@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
@@ -62,7 +63,7 @@ public interface Constraint {
      *         substitutes the metavariable with can always be unified with the
      *         returned term).
      */
-    Term getInstantiation(Metavariable p_mv, TermServices services);
+    Term getInstantiation(Metavariable p_mv, Services services);
 
     /**
      * tries to unify the terms t1 and t2
@@ -171,7 +172,7 @@ public interface Constraint {
 	    return false;
 	}
 
-	public Term getInstantiation(Metavariable p_mv, TermServices services) {
+	public Term getInstantiation(Metavariable p_mv, Services services) {
 	    // As there is in fact no instantiation satisfying this
 	    // constraint, we could return everything
 	    return services.getTermBuilder().var(p_mv);
