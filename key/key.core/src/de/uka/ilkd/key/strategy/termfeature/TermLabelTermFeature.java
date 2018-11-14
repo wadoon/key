@@ -17,7 +17,6 @@ public class TermLabelTermFeature extends BinaryTermFeature {
         return new TermLabelTermFeature(label);
     }
 
-
     private final TermLabel label;
     
     private TermLabelTermFeature(TermLabel label) {

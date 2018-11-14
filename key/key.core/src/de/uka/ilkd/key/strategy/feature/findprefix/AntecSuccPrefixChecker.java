@@ -41,7 +41,7 @@ class AntecSuccPrefixChecker implements Checker {
     public static final AntecSuccPrefixChecker SUCC_POLARITY_CHECKER =
             new AntecSuccPrefixChecker(Polarity.SUCCEDENT);
 
-    private AntecSuccPrefixChecker.Polarity polarity;
+    private final AntecSuccPrefixChecker.Polarity polarity;
 
     private int pol;
 

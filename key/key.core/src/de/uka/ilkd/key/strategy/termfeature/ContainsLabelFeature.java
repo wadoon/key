@@ -23,16 +23,12 @@ public class ContainsLabelFeature extends BinaryFeature {
 
    private final TermLabel label;
 
-
    public ContainsLabelFeature(TermLabel label) {
       this.label = label;
    }
-   
-  
 
    @Override
    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
       return pos != null && pos.subTerm().containsLabel(label);
    }
-
 }

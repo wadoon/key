@@ -31,7 +31,8 @@ public class RuleJustificationInfo {
     public void addJustification(Rule r, RuleJustification j) {
         final RuleKey ruleKey = new RuleKey(r);
         if (rule2justif.containsKey(ruleKey)) {
-            // TODO: avoid double registration of certain class axioms and remove then the below check so that 
+            // TODO: avoid double registration of certain class axioms 
+            // and remove then the below check so that 
             // always an exception will be thrown
             for (RuleKey key : rule2justif.keySet()) {
                 if (key.equals(ruleKey) && r != key.r) {

@@ -32,6 +32,4 @@ public class TriggerVariableInstantiationProjection implements ProjectionToTerm 
         return instProj.toTerm(app, pos, goal);
     }
 
-    
-    
 }
