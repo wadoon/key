@@ -73,8 +73,8 @@ public class SVInstantiationCP implements Feature {
         BackTrackingManager manager = strategy.getBTManager(goal);
         synchronized(manager) {
             manager.passChoicePoint ( goal, new CP (app, pos, goal), this );
-            return NumberRuleAppCost.getZeroCost();
         }
+        return NumberRuleAppCost.getZeroCost();
     }
 
     private SchemaVariable findSVWithName(TacletApp app) {

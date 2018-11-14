@@ -51,6 +51,7 @@ public class LetFeature implements Feature {
 
         var.setContent ( goal, value.toTerm ( app, pos, goal ) );
         final RuleAppCost res = body.computeCost ( app, pos, goal );
+        
         var.setContent ( goal, outerVarContent );
         
         return res;

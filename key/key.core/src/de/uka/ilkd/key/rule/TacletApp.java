@@ -437,19 +437,15 @@ public abstract class TacletApp implements RuleApp {
      */
     @Override
     public ImmutableList<Goal> execute(Goal goal, Services services) {
-
-        
-        
 	if (!complete()) {
 	    throw new IllegalStateException("Tried to apply rule \n" + taclet
-		    + "\nthat is not complete.");
+		    + "\nthat is not complete." + this);
 	}
-	
 
 	if (!isExecutable(services)) {
-        throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " + this);
+	    throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " + this);
 	}
-    registerSkolemConstants(goal.getLocalNamespaces());
+	registerSkolemConstants(goal.getLocalNamespaces());
 	goal.addAppliedRuleApp(this);
 	return taclet().apply(goal, services, this);
     }
@@ -1090,7 +1086,7 @@ public abstract class TacletApp implements RuleApp {
      *         is needed
      */
     public boolean ifInstsComplete() {
-	return ifInstantiations != null || (taclet().ifSequent().isEmpty());
+	return ifInstantiations != null || taclet().ifSequent().isEmpty();
     }
 
     /**

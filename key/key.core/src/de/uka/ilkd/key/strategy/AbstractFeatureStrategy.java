@@ -15,7 +15,6 @@ package de.uka.ilkd.key.strategy;
 
 import java.util.WeakHashMap;
 
-import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -185,6 +184,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     protected void enableInstantiate() {
         instantiateActive = true;
     }
+    
     protected void disableInstantiate() {
         instantiateActive = false;
     }

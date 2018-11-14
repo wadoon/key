@@ -18,7 +18,7 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
  * Keys: Long Values: IList<IfFormulaInstantiation>
  */
 class IfInstantiationCache {
-    public Node cacheKey = null;
+    public volatile Node cacheKey = null;
 
     public final HashMap<Long, ImmutableList<IfFormulaInstantiation>> antecCache = new LinkedHashMap<>();
     public final HashMap<Long, ImmutableList<IfFormulaInstantiation>> succCache = new LinkedHashMap<>();
@@ -33,8 +33,10 @@ class IfInstantiationCache {
     public static final IfInstantiationCache ifInstCache = new IfInstantiationCache();
 
     public void reset(Node n) {
-        cacheKey = n;
-        antecCache.clear();
-        succCache.clear();
+        synchronized(ifInstCache) {
+            cacheKey = n;
+            antecCache.clear();
+            succCache.clear();
+        }
     }
 }
