@@ -46,7 +46,6 @@ import de.uka.ilkd.key.util.Debug;
  * the {@link de.uka.ilkd.key.proof.TacletIndex} manages no position taclet
  * application objects instead of the taclets itself. 
  * </li> </ul>
- * 
  */
 public class NoPosTacletApp extends TacletApp {
 
@@ -124,13 +123,15 @@ public class NoPosTacletApp extends TacletApp {
 						    services);
 	// Make the given SVs fixed
 	if ( res != null ) {
-	    final Iterator<SchemaVariable> it = instantiations.svIterator ();
-	    while ( it.hasNext () ) {
-		res.fixedVars = res.fixedVars.add ( it.next () );
-            }
-            res.updateContextFixed = true;
+	    res.computeFixedVars(instantiations);
         }
 	return res;
+    }
+   
+    
+    // not sure about this, originally it computed a set of fixed vars, but they were never used
+    private void computeFixedVars(SVInstantiations instantiations) {
+        updateContextFixed = true;
     }
    
     
@@ -362,8 +363,7 @@ public class NoPosTacletApp extends TacletApp {
      */
     public NoPosTacletApp matchFind(PosInOccurrence pos,
 				    Services        services) {
-        NoPosTacletApp result = matchFind(pos, services, null);
-	return result;
+        return matchFind(pos, services, null);
     }
 
 
@@ -431,8 +431,7 @@ public class NoPosTacletApp extends TacletApp {
         }
         
 	if ( taclet() instanceof RewriteTaclet ) {
-	    mc = ((RewriteTaclet)taclet ()).checkPrefix ( pos,
-								mc );
+	    mc = ((RewriteTaclet)taclet ()).checkPrefix ( pos, mc );
 	    if (mc == null) {
                 Debug.out("NoPosTacletApp: Update prefix check failed.");
             }

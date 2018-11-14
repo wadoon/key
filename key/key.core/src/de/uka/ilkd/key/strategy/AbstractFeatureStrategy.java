@@ -17,18 +17,22 @@ import java.util.WeakHashMap;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
@@ -133,28 +137,29 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     //private static final BackTrackingManager btManager = new BackTrackingManager ();
 
     public BackTrackingManager getBTManager(Goal g) { 
+        BackTrackingManager bt;
         synchronized(btMap) {
-            BackTrackingManager bt = btMap.get(g);
+            bt = btMap.get(g);
             if (bt == null) {
                 bt = new BackTrackingManager();
                 btMap.put(g, bt);
             }
-            return bt;
         }
+        return bt;
     }
     
     public  void instantiateApp ( RuleApp              app,
-                                       PosInOccurrence      pio,
-                                       Goal                 goal,
-                                       RuleAppCostCollector collector ) {
+                                  PosInOccurrence      pio,
+                                  Goal                 goal,
+                                  RuleAppCostCollector collector ) {
         final BackTrackingManager btManager = getBTManager(goal);
         synchronized(btManager) {
             btManager.setup ( app );
             do {
                 final RuleAppCost cost = instantiateApp ( app, pio, goal );
                 if ( cost instanceof TopRuleAppCost ) continue;
-                final RuleApp res = btManager.getResultingapp ();
-                if ( res == app || res == null ) continue;
+                final RuleApp res = btManager.getResultingapp ();                
+                if ( res == app || res == null ) continue;                
                 collector.collect ( res, cost );
             } while ( btManager.backtrack () );
         }

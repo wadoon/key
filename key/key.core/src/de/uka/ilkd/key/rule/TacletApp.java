@@ -93,8 +93,11 @@ public abstract class TacletApp implements RuleApp {
      * contains the instantiations of the schema variables of the Taclet
      */
     protected final SVInstantiations instantiations;
-    /** caches a created match condition (instantiations, RenameTable.EMPTY) */
-    private MatchConditions matchConditions;
+    
+    /** 
+     * caches a created match condition (instantiations, RenameTable.EMPTY) 
+     */
+    private final MatchConditions matchConditions;
 
     /**
      * chosen instantiations for the if sequent formulas
@@ -106,13 +109,7 @@ public abstract class TacletApp implements RuleApp {
      * instantiated but are not instantiated yet. This means SchemaVariables in
      * addrule-sections have to be ignored
      */
-    private ImmutableSet<SchemaVariable> missingVars = null;
-
-    /**
-     * the instantiations of the following SVs must not be changed; they must
-     * not be instantiated with meta variables either
-     */
-    protected ImmutableSet<SchemaVariable> fixedVars = DefaultImmutableSet.<SchemaVariable>nil();
+    private volatile ImmutableSet<SchemaVariable> missingVars = null;
 
     /**
      * the update context given by the current instantiations must not be
@@ -134,6 +131,7 @@ public abstract class TacletApp implements RuleApp {
 	this.taclet = taclet;
 	this.instantiations = instantiations;
 	this.ifInstantiations = ifInstantiations;
+	this.matchConditions = new MatchConditions(instantiations, RenameTable.EMPTY_TABLE);
     }
 
     /**
@@ -242,9 +240,6 @@ public abstract class TacletApp implements RuleApp {
     }
 
     public MatchConditions matchConditions() {
-        if (matchConditions == null) {
-            matchConditions = new MatchConditions(instantiations, RenameTable.EMPTY_TABLE);
-        }
         return matchConditions;
     }
 
@@ -499,20 +494,26 @@ public abstract class TacletApp implements RuleApp {
      * @return ImmutableSet<SchemaVariable> that need to be instantiated but are not
      */
     protected ImmutableSet<SchemaVariable> calculateNonInstantiatedSV() {
-	if (missingVars == null) {
-	    missingVars = DefaultImmutableSet.<SchemaVariable>nil();
-	    TacletSchemaVariableCollector coll = new TacletSchemaVariableCollector(
-		    instantiations());
-	    coll.visitWithoutAddrule(taclet());
-	    Iterator<SchemaVariable> it = coll.varIterator();
-	    while (it.hasNext()) {
-		SchemaVariable var = it.next();
-		if (!instantiations().isInstantiated(var)) {
-		    missingVars = missingVars.add(var);
-		}
-	    }
-	}
-	return missingVars;
+        if (missingVars == null) {
+            ImmutableSet<SchemaVariable> localMissingVars = DefaultImmutableSet.<SchemaVariable>nil();
+            TacletSchemaVariableCollector coll = new TacletSchemaVariableCollector(
+                    instantiations());
+            coll.visitWithoutAddrule(taclet());
+            Iterator<SchemaVariable> it = coll.varIterator();
+            while (it.hasNext()) {
+                SchemaVariable var = it.next();
+                if (!instantiations().isInstantiated(var)) {
+                    localMissingVars = localMissingVars.add(var);
+                }
+            }
+            synchronized(this) {
+                if (missingVars == null) {
+                    missingVars = localMissingVars;
+                }
+            }
+        }
+
+	return missingVars;	
     }
 
 

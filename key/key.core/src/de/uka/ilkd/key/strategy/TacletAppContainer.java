@@ -45,7 +45,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     // so age could be changed from long to int.
     // My benchmark tests however suggest that this would not
     // save any memory (at the moment).
-    // This is because Java's memory alingment.
+    // This is because Java's memory alignment.
     
     private final long age;
 

@@ -395,7 +395,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
      *            services.
      * @return a new instantiation.
      */
-    public synchronized Instantiation instantiate(final Term formula, final Goal goal, final Services services) {
+    public Instantiation instantiate(final Term formula, final Goal goal, final Services services) {
         final Term lastFocusTerm = getLastFocusTerm();
         synchronized(lastFocusTermLock) {
             if (formula == lastFocusTerm) {

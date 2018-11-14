@@ -91,7 +91,7 @@ public class RewriteTaclet extends FindTaclet {
      * the sequent</li>
      *</ul>
      */
-    private int applicationRestriction;
+    private final int applicationRestriction;
 
 
     /**

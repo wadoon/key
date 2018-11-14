@@ -104,7 +104,7 @@ public final class BackTrackingManager {
      * @param initialApp
      *            the original rule application in question
      */
-    public void setup(RuleApp initialApp) {
+    public synchronized void setup(RuleApp initialApp) {
         this.initialApp = initialApp;
         choices.clear ();
         chosenBranches.clear ();

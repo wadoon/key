@@ -72,10 +72,11 @@ public class ForEachCP implements Feature {
     public RuleAppCost computeCost(final RuleApp app,
             final PosInOccurrence pos,
             final Goal goal) {
-        final BackTrackingManager manager = strategy.getBTManager(goal);
         final Term outerVarContent = var.getContent(goal);
 
-        var.setContent (goal,  null );
+        var.setContent (goal,  null);
+        
+        final BackTrackingManager manager = strategy.getBTManager(goal);
 
         synchronized(manager) {
             manager.passChoicePoint ( goal, new CP ( app, pos, goal ), this );

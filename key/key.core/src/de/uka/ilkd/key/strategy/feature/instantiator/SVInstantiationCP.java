@@ -69,7 +69,7 @@ public class SVInstantiationCP implements Feature {
         this.strategy = strategy;
     }
 
-    public synchronized RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
         BackTrackingManager manager = strategy.getBTManager(goal);
         synchronized(manager) {
             manager.passChoicePoint ( goal, new CP (app, pos, goal), this );

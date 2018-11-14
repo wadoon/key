@@ -458,7 +458,6 @@ class TermImpl implements Term {
        if(o == this) {
           return true;
        }
-       
 
        if(o == null || o.getClass() != getClass()
              || hashCode() != o.hashCode()) {

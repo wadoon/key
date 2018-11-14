@@ -92,6 +92,7 @@ public final class RunAllProofsTestUnit implements Serializable {
             for (TestFile testFile : testFiles) {
                 TestResult testResult = testFile.runKey();
                 testResults.add(testResult);
+                if (!testResult.success) break;
             }
             break;
 
@@ -101,6 +102,8 @@ public final class RunAllProofsTestUnit implements Serializable {
                 TestResult testResult =
                         ForkedTestFileRunner.processTestFile(testFile, getTempDir());
                 testResults.add(testResult);
+                if (!testResult.success) break;
+
             }
             break;
 
@@ -125,7 +128,7 @@ public final class RunAllProofsTestUnit implements Serializable {
         String message = "group " + testName + ":\n";
         for (TestResult testResult : testResults) {
             success &= testResult.success;
-            message += testResult.message + "\n";
+            if (!testResult.success) message += testResult.message + "\n";
         }
         return new TestResult(message, success);
     }

@@ -267,6 +267,13 @@ public class ApplyStrategy {
         public RuleApp getAppliedRuleApp() {
             return appliedRuleApp;
         }
+
+        @Override
+        public String toString() {
+            return "SingleRuleApplicationInfo [success=" + success
+                    + ", message=" + message + ", goal=" + goal.node().serialNr()
+                    + ", appliedRuleApp=" + appliedRuleApp + "]";
+        }
     }
 
     /** The final result of the strategy application is stored in this container
@@ -455,12 +462,11 @@ public class ApplyStrategy {
                     countApplied.incrementAndGet();
                     fireTaskProgress ();
                     shouldStop = goal.node().isClosed() || stopCondition.shouldStop(maxApplications, timeout, proof, time,
-                            countApplied.intValue(), result);                                                       
+                            countApplied.intValue(), result);                     
                 } else {
-                    shouldStop = true;
+                    shouldStop = true;                    
                     // goalChooser.removeGoal(srInfo.getGoal()); 
                 }
-                       
                 if (!shouldStop && n.childrenCount() > 1) {
                     for (int i = 0; i<n.childrenCount(); i++) {
                         final Goal g = proof.getGoal(n.child(i));
@@ -508,6 +514,13 @@ public class ApplyStrategy {
                     exitGoal = srInfo.getGoal();
                 }
             }
+
+            if (!proof.closed() && proof.openGoals().isEmpty() ||
+                    proof.closed() && !proof.openGoals().isEmpty()) {
+                System.out.println("oops");
+                System.out.println(maxApplications + ":" + timeout + ":" + time + ":" +
+                        countApplied.intValue());
+            }     
 
             if (Thread.interrupted()) {                    
                 throw new InterruptedException();

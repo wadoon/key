@@ -61,7 +61,7 @@ public class TriggeredInstantiations implements TermGenerator {
     private Set<Term> lastCandidates = new HashSet<Term>();
     private ImmutableSet<Term> lastAxioms = DefaultImmutableSet.<Term>nil();
     
-    private boolean checkConditions;
+    private final boolean checkConditions;
 
     /**
      * 
@@ -182,7 +182,6 @@ public class TriggeredInstantiations implements TermGenerator {
 
     private boolean isAvoidConditionProvable(Term cond, ImmutableSet<Term> axioms,
             Services services) {
-        
         long cost = PredictCostProver.computerInstanceCost(
                 new Substitution(DefaultImmutableMap.<QuantifiableVariable, Term>nilMap()), 
                 cond, axioms, services);

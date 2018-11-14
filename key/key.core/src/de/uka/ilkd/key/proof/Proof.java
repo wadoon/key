@@ -511,8 +511,8 @@ public class Proof implements Named {
      * Add the given constraint to the closure constraint of the given
      * goal, i.e. the given goal is closed if p_c is satisfied.
      */
-    public void closeGoal ( Goal p_goal ) {
-
+    public synchronized void closeGoal ( Goal p_goal ) {
+        
         Node closedSubtree = p_goal.node().close();
 
         boolean        b    = false;
@@ -523,12 +523,7 @@ public class Proof implements Named {
             goal = getGoal ( it.next () );
             if ( goal != null ) {
                 b = true;
-                if (!GeneralSettings.noPruningClosed) {
-                    synchronized(closedGoals) { 
-                        closedGoals = closedGoals.prepend(goal);
-                    }
-                }
-                remove ( goal );
+                remove ( goal );                    
             }
         }
 
@@ -551,8 +546,10 @@ public class Proof implements Named {
      * @param p_goal The goal to be opened again.
      */
     public void reOpenGoal(Goal p_goal) {
-        p_goal.node().reopen();
-        closedGoals = closedGoals.removeAll(p_goal);
+        synchronized(closedGoals) {
+            p_goal.node().reopen();
+            closedGoals = closedGoals.removeAll(p_goal);
+        }
         fireProofStructureChanged();
     }
 
@@ -560,14 +557,16 @@ public class Proof implements Named {
      * removing the last goal will fire the proofClosed event
      * @param goal the Goal to be removed
      */
-    private void remove(Goal goal) {
+    private synchronized void remove(Goal goal) {
         boolean changed = false;
-        synchronized(openGoals) {
-            ImmutableList<Goal> newOpenGoals = openGoals.removeAll(goal);
-            if (newOpenGoals != openGoals) {
-                openGoals = newOpenGoals;
-                changed = true;
-            }
+
+        ImmutableList<Goal> newOpenGoals = openGoals.removeAll(goal);
+        if (newOpenGoals != openGoals) {
+            openGoals = newOpenGoals;
+            changed = true;
+        }
+        if (!GeneralSettings.noPruningClosed) {
+            closedGoals = closedGoals.prepend(goal);
         }
         if (changed) {
             if (closed()) {
@@ -578,14 +577,12 @@ public class Proof implements Named {
         }
     }
 
-    /** adds a new goal to the list of goals
+    /** 
+     * adds a new goal to the list of goals
      * @param goal the Goal to be added
      */
     public void add(Goal goal) {
-        synchronized(openGoals) {
-            openGoals = openGoals.prepend(goal);
-        }            
-        fireProofGoalsAdded(goal);
+        add(ImmutableSLList.<Goal>nil().prepend(goal));        
     }
 
 
@@ -601,20 +598,22 @@ public class Proof implements Named {
 
     private void addSilent(ImmutableList<Goal> goals) {
         if (!goals.isEmpty()) {
-            synchronized(goals) {
+            synchronized(openGoals) {
                 openGoals = openGoals.prepend(goals);
             }
         }
     }
 
-
     /**
      * returns true if the root node is marked as closed and all goals have been removed
      */
     public boolean closed () {
-        return root.isClosed() && openGoals.isEmpty();
+        synchronized(root) {
+            synchronized(openGoals) {
+                return root.isClosed() && openGoals.isEmpty();
+            }
+        }
     }
-
 
     /**
      * This class is responsible for pruning a proof tree at a certain cutting point.

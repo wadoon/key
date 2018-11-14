@@ -22,7 +22,8 @@ import java.util.Set;
 public class Pair<T1, T2> {    
     public final T1 first;
     public final T2 second;
-
+    
+    private volatile int hashcode = -1;
 
     public Pair(T1 first, T2 second) { 
         this.first = first;
@@ -39,17 +40,21 @@ public class Pair<T1, T2> {
         if(!(o instanceof Pair<?, ?>)) {
             return false;
         } 
-        Pair<?, ?> p = (Pair<?, ?>) o;
+        final Pair<?, ?> p = (Pair<?, ?>) o;
+
         return equalsOrNull(first, p.first)
                         && equalsOrNull(second, p.second);
     }
 
 
     public int hashCode() {
-        int res = 0;
-        if (first != null) res += first.hashCode();
-        if (second != null) res += second.hashCode();
-        return res;
+        if (hashcode == -1) {
+            int res = 0;
+            if (first != null) res += first.hashCode();
+            if (second != null) res += second.hashCode();
+            hashcode = res == -1 ? 4711 : res;
+        }
+        return hashcode;
     }
     
     ///////////////////////////////////////////////////////////

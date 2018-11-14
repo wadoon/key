@@ -38,10 +38,8 @@ import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.Transformer;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.proof.Goal;
@@ -547,7 +545,9 @@ public final class OneStepSimplifier implements BuiltInRule {
             = simplifyConstrainedFormula(services, cf, inAntecedent, null, null, null, goal, ruleApp);
             final boolean result = simplifiedCf != null
                             && !simplifiedCf.equals(cf);
+            
             applicabilityCache.put(cf, Boolean.valueOf(result));
+            
             return result;
         }
     }
@@ -560,7 +560,9 @@ public final class OneStepSimplifier implements BuiltInRule {
                 settings = ProofSettings.DEFAULT_SETTINGS;
             }
 
-            final boolean newActive = settings.getStrategySettings()
+            final boolean newActive = 
+//false && 
+                settings.getStrategySettings()
                     .getActiveStrategyProperties()
                     .get(StrategyProperties.OSS_OPTIONS_KEY)
                     .equals(StrategyProperties.OSS_ON);
@@ -603,7 +605,7 @@ public final class OneStepSimplifier implements BuiltInRule {
     public boolean isApplicable(Goal goal,
                     PosInOccurrence pio) {
         try {
-            lock.readLock().lock();                
+            lock.writeLock().lock();                
             //abort if switched off
             if(!active) {
                 return false;
@@ -626,7 +628,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                     goal,
                     null);
         } finally { 
-            lock.readLock().unlock();
+            lock.writeLock().unlock();
         }
     }
 
@@ -635,7 +637,7 @@ public final class OneStepSimplifier implements BuiltInRule {
                     Services services,
                     RuleApp ruleApp) {
         try { 
-            lock.readLock().lock();        
+            lock.writeLock().lock();        
             assert ruleApp instanceof OneStepSimplifierRuleApp :
                 "The rule app must be suitable for OSS";
 
@@ -665,7 +667,7 @@ public final class OneStepSimplifier implements BuiltInRule {
 
             return result;
         } finally {
-            lock.readLock().unlock();
+            lock.writeLock().unlock();        
         }
     }
 
