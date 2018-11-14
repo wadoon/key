@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.strategy.feature;
 
-import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -47,35 +46,30 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
     }
 
     protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        synchronized(this) { 
-            setCurrentGoal ( goal );
-            final boolean res =
-                    lessThan ( collectAtoms ( left.toTerm ( app, pos, goal ) ),
-                            collectAtoms ( right.toTerm ( app, pos, goal ) ), goal.proof().getServices().getCaches() );
-
-            setCurrentGoal ( null );
-
-            return res;
-        } 
+        final boolean res =
+                lessThan ( collectAtoms ( left.toTerm ( app, pos, goal ) ),
+                        collectAtoms ( right.toTerm ( app, pos, goal ) ), pos, goal );
+        return res;
     }
 
     /**
      * this overwrites the method of <code>SmallerThanFeature</code>
      */
     @Override
-    protected boolean lessThan(Term t1, Term t2, ServiceCaches caches) {
+    protected boolean lessThan(Term t1, Term t2, PosInOccurrence focus, Goal currentGoal) {
         if ( t1.op () == Z ) {
             if ( t2.op () != Z ) return true;
-            return super.lessThan ( t1, t2, caches );
+            return super.lessThan ( t1, t2, focus, currentGoal );
         } else {
             if ( t2.op () == Z ) return false;
         }
         
         final int v =
-            introductionTime ( t2.op (), caches ) - introductionTime ( t1.op (), caches );
+            introductionTime ( t2.op (), currentGoal ) -
+            introductionTime ( t1.op (), currentGoal );
         if ( v < 0 ) return true;
         if ( v > 0 ) return false;
     
-        return super.lessThan ( t1, t2, caches );
+        return super.lessThan ( t1, t2, focus, currentGoal );
     }
 }
