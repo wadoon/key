@@ -36,21 +36,19 @@ public class NameRecorder {
 
     public void setProposals(ImmutableList<Name> proposals) {
         synchronized(pre) {
-            pre = proposals;
+            pre = (proposals == null ? ImmutableSLList.nil() : proposals);
         }
     }
 
     public Name getProposal() {
+        Name proposal = null;
         synchronized(pre) {
-            Name proposal = null;
-
-            if (pre != null && !pre.isEmpty()) {
+            if (!pre.isEmpty()) {
                 proposal = pre.head();
                 pre = pre.tail();
             }
-
-            return proposal;
         }
+        return proposal;
     }
 
     public NameRecorder copy() {
