@@ -50,6 +50,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofCorrectnessMgt;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -724,6 +725,8 @@ public class Proof implements Named {
                         initConfig.getJustifInfo().removeJustificationFor(app.taclet());
                     }
 
+                    removeIntroducedRules(cuttingPoint);
+
                     firstGoal.pruneToParent();
 
                     final List<StrategyInfoUndoMethod> undoMethods =
@@ -732,7 +735,7 @@ public class Proof implements Named {
                         firstGoal.undoStrategyInfoAdd(undoMethod);
                     }
                 }
-            });
+            });           
 
 
             // do some cleaning and refreshing: Clearing indices, caches....
@@ -748,6 +751,21 @@ public class Proof implements Named {
 
             return subtrees;
 
+        }
+        
+        private void removeIntroducedRules(Node n) {
+            ImmutableList<Node> workingList = ImmutableSLList.<Node>nil().prepend(n);
+            final RuleJustificationInfo justifInfo = initConfig.getJustifInfo();
+            while (!workingList.isEmpty()) {            
+                final Node parent = workingList.head();
+                workingList = workingList.tail();
+                for (int i = 0; i<parent.childrenCount(); i++) {
+                    for (final NoPosTacletApp app :  parent.child(i).getLocalIntroducedRules()){
+                        justifInfo.removeJustificationFor(app.taclet());                    
+                    }
+                    workingList = workingList.prepend(parent.child(i));
+                }
+            }
         }
 
         private void refreshGoal(Goal goal, Node node) {
