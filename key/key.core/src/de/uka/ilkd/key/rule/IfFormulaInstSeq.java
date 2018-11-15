@@ -118,9 +118,10 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
         if ( ! ( p_obj instanceof IfFormulaInstSeq ) ) {
             return false;
         }
-        return seq == ( (IfFormulaInstSeq)p_obj ).seq
-                && cf == ( (IfFormulaInstSeq)p_obj ).cf
-                && antec == ( (IfFormulaInstSeq)p_obj ).antec;
+        final IfFormulaInstSeq other = (IfFormulaInstSeq)p_obj;
+        return seq == other.seq
+                && cf == other.cf
+                && antec == other.antec;
     }
 
     @Override
