@@ -67,7 +67,7 @@ public class IfInstantiator {
             addResult(tacletAppContainer.getTacletApp());
         } else {
             allAntecFormulas = IfFormulaInstSeq.createList(p_seq, true);
-            allSuccFormulas = IfFormulaInstSeq.createList(p_seq, false);
+            allSuccFormulas  = IfFormulaInstSeq.createList(p_seq, false);
             findIfFormulaInstantiationsHelp(
                     ifSequent.succedent().asList(), //// Matching with the last formula
                     ifSequent.antecedent().asList(),

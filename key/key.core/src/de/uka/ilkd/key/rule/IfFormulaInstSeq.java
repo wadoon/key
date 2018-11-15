@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -52,7 +53,6 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     }
 
 
-
     /**
      * @return the cf this is pointing to
      */
@@ -80,32 +80,36 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
         return res;
     }
 
-    private static final Object antecCacheLock = new Object();
-    private static final Object succCacheLock  = new Object();
+    private static final ReentrantReadWriteLock antecCacheLock = new ReentrantReadWriteLock();
+    private static final ReentrantReadWriteLock succCacheLock  = new ReentrantReadWriteLock();
 
     public static ImmutableList<IfFormulaInstantiation> createList(Sequent p_s,
             boolean antec) {
         final Semisequent ss = antec ? p_s.antecedent() : p_s.succedent();
         ImmutableList<IfFormulaInstantiation> val = null;
         boolean change = false;
-        synchronized (antec ? antecCacheLock : succCacheLock) {
-            if ((antec ? cache.aKey : cache.sKey) != ss) {
-                change = true;
-            }
+        final ReentrantReadWriteLock lock =  (antec ? antecCacheLock : succCacheLock);                    
+        lock.readLock().lock();
+        if ((antec ? cache.aKey : cache.sKey) != ss) {
+            change = true;
+        } else {
+            val = antec ? cache.aVal : cache.sVal;
         }
+        lock.readLock().unlock();
+        
         if (change) {
             val = createListHelp(p_s, antec);
-            synchronized (antec ? antecCacheLock : succCacheLock) {
-                if (antec) {
-                    cache.aKey = ss;
-                    cache.aVal = val;
-                } else {
-                    cache.sKey = ss;
-                    cache.sVal = val;
-                }
+            lock.writeLock().lock();
+            if (antec) {
+                cache.aKey = ss;
+                cache.aVal = val;
+            } else {
+                cache.sKey = ss;
+                cache.sVal = val;
             }
+            lock.writeLock().unlock();
         }
-        return antec ? cache.aVal : cache.sVal;
+        return val;
     }
 
     @Override
