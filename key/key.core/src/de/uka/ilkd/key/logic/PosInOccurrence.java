@@ -200,9 +200,6 @@ public final class PosInOccurrence {
                                      inAntec);
     }
 
-       
-    
-
     /**
      * returns the subterm this object points to
      */

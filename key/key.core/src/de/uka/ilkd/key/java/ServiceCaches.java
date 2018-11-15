@@ -28,8 +28,10 @@ import de.uka.ilkd.key.proof.PrefixTermTacletAppIndexCacheImpl.CacheKey;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.TermTacletAppIndex;
 import de.uka.ilkd.key.proof.TermTacletAppIndexCacheSet;
+import de.uka.ilkd.key.rule.IfFormulaInstantiationCache;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
+import de.uka.ilkd.key.strategy.IfInstantiationCachePool;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature.TermInfo;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesGraph;
@@ -132,7 +134,11 @@ public class ServiceCaches {
    private LRUCache<Pair<Term, Term>, Term> provedByArithSndCache = new LRUCache<Pair<Term, Term>, Term>(5000);
 
    /** Cache used by the exhaustive macro */
-   private Map<Node, PosInOccurrence> exhaustiveMacroCache = new WeakHashMap<Node, PosInOccurrence>();;
+   private Map<Node, PosInOccurrence> exhaustiveMacroCache = new WeakHashMap<Node, PosInOccurrence>();
+
+   /** Cache used by the ifinstantiator */
+   private IfInstantiationCachePool ifInstantiationCache = new IfInstantiationCachePool();
+
 
    
    /**
@@ -194,6 +200,10 @@ public class ServiceCaches {
    public final Map<Node, PosInOccurrence> getExhaustiveMacroCache() {
        return exhaustiveMacroCache;
    }
+
+   public final IfInstantiationCachePool getIfInstantiationCache() {
+       return ifInstantiationCache;
+    }
 
    
 }
