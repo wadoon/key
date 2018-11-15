@@ -13,12 +13,7 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.*;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -39,15 +34,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.rule.AntecTaclet;
@@ -96,10 +83,6 @@ public abstract class TacletIndex  {
     protected HashSet<NoPosTacletApp> partialInstantiatedRuleApps = 
         new LinkedHashSet<>(); 
 
-    // reused object to store prefix occurrences when retrieving
-    // taclets with java blocks.
-    private final PrefixOccurrences prefixOccurrences = new PrefixOccurrences();
-
 
     /** constructs empty rule index */
     TacletIndex() {
@@ -143,16 +126,18 @@ public abstract class TacletIndex  {
 	    if(indexObj instanceof SortDependingFunction) {
 		// indexed independently of sort
 		indexObj=((SortDependingFunction)indexObj).getKind ();
-	    } else if(indexObj instanceof ElementaryUpdate) {
+	    } else if (indexObj instanceof ElementaryUpdate) {
 		indexObj = ElementaryUpdate.class;
 	    }
 	}
 	
 	if(indexObj instanceof SchemaVariable) {
-	    if((indexObj instanceof TermSV && ((TermSV)indexObj).isStrict())
+	    if ( (indexObj instanceof TermSV && ((TermSV)indexObj).isStrict())
 		|| indexObj instanceof FormulaSV
 		|| indexObj instanceof UpdateSV) {
-		indexObj = ((SchemaVariable)indexObj).sort();
+		
+	        indexObj = ((SchemaVariable)indexObj).sort();
+		
 		if(indexObj instanceof GenericSort) {
 		    indexObj = GenericSort.class;
 		}
@@ -350,89 +335,90 @@ public abstract class TacletIndex  {
      * @param prefixOcc the PrefixOccurrence object used to keep track of the
      * occuring prefix elements
      */
-    private ImmutableList<NoPosTacletApp> getJavaTacletList
-	(HashMap<Object, ImmutableList<NoPosTacletApp>> map,
-	 ProgramElement pe,
-	 PrefixOccurrences prefixOcc) {
-	ImmutableList<NoPosTacletApp> result=ImmutableSLList.<NoPosTacletApp>nil();
-	if (pe instanceof ProgramPrefix) {
- 	    int next=prefixOcc.occurred(pe);
- 	    NonTerminalProgramElement nt=(NonTerminalProgramElement)pe;
- 	    if (next<nt.getChildCount()) {
- 		return getJavaTacletList(map, nt.getChildAt(next), prefixOcc);
- 	    }
-	} else {
-	    result=map.get(pe.getClass());	
-	    if (result==null) {
-		result=ImmutableSLList.<NoPosTacletApp>nil();
-	    }
-	}
-	return result.prepend(prefixOccurrences.getList(map));
+    private void getJavaTacletList(
+            HashMap<Object, ImmutableList<NoPosTacletApp>> map,
+            ProgramElement pe, PrefixOccurrences prefixOccurrences,
+            List<ImmutableList<NoPosTacletApp>> result) {        
+        if (pe instanceof ProgramPrefix) {
+            int next = prefixOccurrences.occurred(pe);
+            NonTerminalProgramElement nt = (NonTerminalProgramElement) pe;
+            if (next < nt.getChildCount()) { 
+                getJavaTacletList(map, nt.getChildAt(next), prefixOccurrences, result);
+                return;
+            }            
+        } else {
+            ImmutableList<NoPosTacletApp> apps = map.get(pe.getClass());
+            if (apps != null) {
+                result.add(apps);
+            }
+        }        
+        result.add(prefixOccurrences.getList(map));
     }
 
-    
     @SuppressWarnings("deprecation")
-    private ImmutableList<NoPosTacletApp> getListHelp(
-	    	HashMap<Object, ImmutableList<NoPosTacletApp>> map, 
-	    	Term term,
-	    	boolean ignoreUpdates) {
-	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
-		
-	assert !(term.op() instanceof de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable) : "metavariables are disabled";
+    private void getListHelp(
+	    	final HashMap<Object, ImmutableList<NoPosTacletApp>> map, 
+	    	final Term term,
+	    	final boolean ignoreUpdates,
+	    	final PrefixOccurrences prefixOccurrences,
+	    	final List<ImmutableList<NoPosTacletApp>> result) {
+	final Operator op = term.op();
+	
+	assert !(op instanceof de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable) : "metavariables are disabled";
 
 	if (!term.javaBlock().isEmpty()) {
 	    prefixOccurrences.reset();
-	    StatementBlock sb=(StatementBlock)term.javaBlock().program();
-	    result = getJavaTacletList(map, sb.getStatementAt(0),
-				       prefixOccurrences);
+	    final StatementBlock sb = (StatementBlock) term.javaBlock().program();
+	    getJavaTacletList(map, sb.getStatementAt(0), prefixOccurrences, result);
 	} 
 
-	if ( !term.javaBlock().isEmpty() ||
-	     term.op () instanceof ProgramVariable ) {
-	    ImmutableList<NoPosTacletApp> schemaList=map.get(DEFAULT_PROGSV_KEY);
-	    if (schemaList!=null) {
-		result=result.prepend(schemaList);
-	    }
-	}
+        if ( !term.javaBlock().isEmpty() ||
+                op instanceof ProgramVariable ) {
+            final ImmutableList<NoPosTacletApp> schemaList = map.get(DEFAULT_PROGSV_KEY);
+            if (schemaList != null ) {
+                result.add(schemaList);
+            }
+        }
 
 	final ImmutableList<NoPosTacletApp> inMap;
 
-	if (term.op () instanceof SortDependingFunction) {
-	    inMap = map.get(((SortDependingFunction)term.op()).getKind ());
-	} else if (term.op() instanceof ElementaryUpdate){
+	if (op instanceof SortDependingFunction) {
+	    inMap = map.get(((SortDependingFunction)op).getKind ());
+	} else if (op instanceof ElementaryUpdate){
 	    inMap = map.get(ElementaryUpdate.class);
 	} else {
-	    inMap = map.get(term.op());
+	    inMap = map.get(op);	    
 	}
+	
 	if (inMap != null) {
-	    result = result.prepend(inMap);
+	    result.add(inMap);
 	}
-	ImmutableList<NoPosTacletApp> schemaList = ImmutableSLList.<NoPosTacletApp>nil();
+
+	// collect taclets for target term, if updates shall be ignored
+	if (ignoreUpdates && op instanceof UpdateApplication) { 
+	    final Term target = UpdateApplication.getTarget(term);
+	    if (!(target.op() instanceof UpdateApplication)) { 
+	        getListHelp(map, target, false, prefixOccurrences, result);
+	        return;// otherwise only duplicates are added
+	    } 
+	} 
+	
 	ImmutableList<NoPosTacletApp> schemaList0 = map.get(term.sort());
 	if (schemaList0!=null) {
-	    schemaList=schemaList0;
+	    result.add(schemaList0);
 	}
 
 	schemaList0 = map.get(DEFAULT_SV_KEY);
-	if (schemaList0!=null) {
-	    schemaList = schemaList.prepend(schemaList0); 
+	if (schemaList0 != null) {
+	    result.add(schemaList0); 
 	}
 
 	schemaList0 = map.get(GenericSort.class);
 	if (schemaList0!=null) {
-	    schemaList = schemaList.prepend(schemaList0); 
+	    result.add(schemaList0); 
 	}
-
-	result=result.prepend(schemaList);
-	
-	if(ignoreUpdates && term.op() instanceof UpdateApplication) {
-	    result = result.prepend(getListHelp(map, UpdateApplication.getTarget(term), false));
-	}	
-	
-	return result;
     }
     
-
     /**
      * creates and returns a selection from the given map of NoPosTacletApps
      * that are compatible with the given term. It is assumed that the map
@@ -452,9 +438,22 @@ public abstract class TacletIndex  {
      * @param term the term that is used to find the selection
      */
     private ImmutableList<NoPosTacletApp> getList(HashMap<Object, ImmutableList<NoPosTacletApp>> map, 
-	    				 Term term,
-	    				 boolean ignoreUpdates) {
-	return getListHelp(map, term, ignoreUpdates);
+            Term term,
+            boolean ignoreUpdates) {
+        
+        final ArrayList<ImmutableList<NoPosTacletApp>> resultToConcatenate = new ArrayList<>();
+        getListHelp(map, term, ignoreUpdates, new PrefixOccurrences(), resultToConcatenate);
+
+        if (resultToConcatenate.size() > 0) {
+            ImmutableList<NoPosTacletApp> result = resultToConcatenate.get(0);
+            for (int i=1, sz=resultToConcatenate.size(); i<sz; i++) {
+                result = result.prepend(resultToConcatenate.get(i));
+            }
+            return result;
+        } else {
+            return ImmutableSLList.<NoPosTacletApp>nil();
+        }
+
     }
 
    /** get all Taclets for the antecedent.
@@ -658,20 +657,20 @@ public abstract class TacletIndex  {
 	 * @param pe the occurred program element
 	 * @return the number of the next possible prefix element
 	 */
-    public int occurred(ProgramElement pe) {
-        for (int i = 0; i < PREFIXTYPES; i++) {
-            if (prefixClasses[i].isInstance(pe)) {
-                occurred[i] = true;
-                if (pe instanceof MethodFrame) {
-                    return (((MethodFrame) pe).getProgramVariable() == null)
-                            ? 1 : 2;
-                } else {
-                    return nextChild[i];
-                }
-            }
-        }
-        return -1;
-    }
+	public int occurred(ProgramElement pe) {
+	    for (int i = 0; i < PREFIXTYPES; i++) {
+	        if (prefixClasses[i].isInstance(pe)) {
+	            occurred[i] = true;
+	            if (pe instanceof MethodFrame) {
+	                return (((MethodFrame) pe).getProgramVariable() == null)
+	                        ? 1 : 2;
+	            } else {
+	                return nextChild[i];
+	            }
+	        }
+	    }
+	    return -1;
+	}
 
 	/**
 	 * creates a selection of the given NoPosTacletApp map that comply with the
