@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.rule.match.vm;
 
-import java.util.LinkedList;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 import de.uka.ilkd.key.logic.Term;
 
@@ -19,7 +20,7 @@ public class TermNavigator {
      * the second component is less than the arity of the term in the 
      * first component
      */
-    private final LinkedList<TermNavigator.MutablePair<Term,Integer>> stack = new LinkedList<>();
+    private final Deque<TermNavigator.MutablePair<Term,Integer>> stack = new ArrayDeque<>();
     
     public TermNavigator(Term term) {
         stack.push(new TermNavigator.MutablePair<Term,Integer>(term, 0));
@@ -74,9 +75,9 @@ public class TermNavigator {
      * @param <Fst> the type of the first component of the tuple
      * @param <Snd> the type of the second component of the tuple
      */
-    private static class MutablePair<Fst,Snd> {
-        private Fst first;
-        private Snd second;
+    static class MutablePair<Fst,Snd> {
+        final Fst first;
+        Snd second;
         
         public MutablePair(Fst first, Snd second) {
             this.first = first;

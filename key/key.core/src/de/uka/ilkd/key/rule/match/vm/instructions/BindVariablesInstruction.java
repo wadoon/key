@@ -31,7 +31,6 @@ public class BindVariablesInstruction implements MatchInstruction {
         }
     }
 
-
     private interface VariableBinderSubinstruction {        
         public MatchConditions match(LogicVariable instantiationCandidate, MatchConditions matchCond, Services services);
     }

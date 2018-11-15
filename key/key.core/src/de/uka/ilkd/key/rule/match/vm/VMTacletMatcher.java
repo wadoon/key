@@ -127,12 +127,13 @@ public class VMTacletMatcher implements TacletMatcher {
                 formula = matchUpdateContext(context, formula);
             }
             if (formula != null) {// update context not present or update context match succeeded
-                final MatchConditions newMC = 
-                        checkConditions(prg.match(formula, p_matchCond, p_services), p_services);
-
+                MatchConditions newMC = prg.match(formula, p_matchCond, p_services);
                 if (newMC != null) {
-                    resFormulas = resFormulas.prepend(cf);
-                    resMC       = resMC.prepend(newMC);
+                    newMC = checkConditions(newMC, p_services);               
+                    if (newMC != null) {
+                        resFormulas = resFormulas.prepend(cf);
+                        resMC       = resMC.prepend(newMC);
+                    }
                 }
             }
         }
@@ -318,7 +319,11 @@ public class VMTacletMatcher implements TacletMatcher {
                 term = resultUpdateMatch.first;
                 matchCond = resultUpdateMatch.second;
             }
-            matchCond = checkConditions(findMatchProgram.match(term, matchCond, services), services);
+            
+            matchCond = findMatchProgram.match(term, matchCond, services);
+            if (matchCond != null) { 
+                matchCond = checkConditions(matchCond, services);
+            }
         } else {
             matchCond = null;
         }

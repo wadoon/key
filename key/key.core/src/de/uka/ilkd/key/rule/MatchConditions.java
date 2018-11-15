@@ -49,11 +49,11 @@ public class MatchConditions {
     }
 
     public MatchConditions    setInstantiations   ( SVInstantiations   p_instantiations ) {
-	if ( instantiations == p_instantiations )
+	if ( instantiations == p_instantiations ) {
 	    return this;
-	else
-	    return new MatchConditions ( p_instantiations, 
-                                         renameTable );
+	} else {
+	    return new MatchConditions ( p_instantiations, renameTable );
+	}
     }
     
     public MatchConditions extendRenameTable() {        

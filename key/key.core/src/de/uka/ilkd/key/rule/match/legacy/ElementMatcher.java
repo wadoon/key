@@ -101,8 +101,7 @@ public abstract class ElementMatcher<T extends Operator> {
                     return matchCond
                             .setInstantiations(instantiations.add(op, pe, services));
                 } catch (IllegalInstantiationException e) {
-                    Debug
-                    .out("Exception thrown by class Taclet at setInstantiations");
+                    Debug.out("Exception thrown by class Taclet at setInstantiations");
                 }
             } else {
                 Object peForCompare = pe;

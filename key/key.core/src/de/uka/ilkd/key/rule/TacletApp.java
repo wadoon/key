@@ -539,19 +539,19 @@ public abstract class TacletApp implements RuleApp {
                 + " is no variable.");
         }
         
-        MatchConditions newMC = taclet.getMatcher().matchSV(sv, term, matchConditions(), services);
+        final MatchConditions newMC = taclet.getMatcher().matchSV(sv, term, matchConditions(), services);
 
         if (newMC == null) {
             throw new IllegalInstantiationException("Instantiation " + term
                     + " of " + sv + "does not satisfy the variable conditions");
         }
 
+        SVInstantiations svInst = newMC.getInstantiations();        
         if (interesting) {
-            newMC = newMC.setInstantiations(newMC.getInstantiations()
-                    .makeInteresting(sv, services));
+            svInst = svInst.makeInteresting(sv, services);
         }
 
-        return addInstantiation(newMC.getInstantiations(), services);
+        return addInstantiation(svInst, services);
 
     }
 
@@ -876,20 +876,17 @@ public abstract class TacletApp implements RuleApp {
 	    				     Services services, 
 	    				     boolean interesting) {
 
-        MatchConditions cond = matchConditions();
-
-        cond = taclet().getMatcher().matchSV(sv, pe, cond, services);
+        final MatchConditions cond = taclet().getMatcher().matchSV(sv, pe, matchConditions, services);
 
         if (cond == null) {
             throw new IllegalInstantiationException("SchemaVariable " + sv + " could not be matched with program element " + 
-                    matchConditions() + " under the provided constraints " + matchConditions());
+                    pe + " under the provided constraints " + matchConditions);
         } else {
+            SVInstantiations svInst = cond.getInstantiations();
             if (interesting) {
-                cond = cond.setInstantiations(cond.getInstantiations()
-                        .makeInteresting(sv, services));
+                svInst = svInst.makeInteresting(sv, services);
             }
-
-            return addInstantiation(cond.getInstantiations(), services);
+            return addInstantiation(svInst, services);
         }
     }
 

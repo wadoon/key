@@ -426,8 +426,7 @@ public class NoPosTacletApp extends TacletApp {
         if (svInst.isEmpty()) {
             mc = MatchConditions.EMPTY_MATCHCONDITIONS;
         } else {
-            mc = new MatchConditions ( svInst,
-                    RenameTable.EMPTY_TABLE);
+            mc = new MatchConditions ( svInst, RenameTable.EMPTY_TABLE);
         }
         
 	if ( taclet() instanceof RewriteTaclet ) {
