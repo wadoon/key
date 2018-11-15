@@ -1,6 +1,5 @@
 package de.uka.ilkd.key.strategy;
 
-import java.util.HashMap;
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
@@ -21,13 +20,13 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.util.Debug;
-import static de.uka.ilkd.key.strategy.IfInstantiationCache.ifInstCache;
 
 /**
  * This class implements custom instantiation of if-formulas.
  */
 public class IfInstantiator {
     private final Goal goal;
+    private final IfInstantiationCache ifInstCache;
 
     private ImmutableList<IfFormulaInstantiation> allAntecFormulas;
     private ImmutableList<IfFormulaInstantiation> allSuccFormulas;
@@ -39,6 +38,7 @@ public class IfInstantiator {
     IfInstantiator(TacletAppContainer tacletAppContainer, final Goal goal) {
         this.goal = goal;
         this.tacletAppContainer = tacletAppContainer;
+        this.ifInstCache = IfInstantiationCache.getCache(goal.node());
     }
 
     private void addResult(NoPosTacletApp app) {
@@ -161,29 +161,13 @@ public class IfInstantiator {
     }
 
     private ImmutableList<IfFormulaInstantiation> getNewSequentFormulasFromCache(boolean p_antec) {
-        synchronized (ifInstCache) {
-            if (ifInstCache.cacheKey != goal.node())
-                return null;
-
-            // the cache contains formula lists for the right semisequent
-            final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cacheMap = getCacheMap(p_antec);
-            return cacheMap.get(tacletAppContainer.getAge());
-        }
+        return ifInstCache.get(p_antec, goal.node(), tacletAppContainer.getAge());
     }
 
     private void addNewSequentFormulasToCache(ImmutableList<IfFormulaInstantiation> p_list, boolean p_antec) {
-        synchronized (ifInstCache) {
-            if (ifInstCache.cacheKey != goal.node()) {
-                ifInstCache.reset(goal.node());
-            }
-
-            getCacheMap(p_antec).put(tacletAppContainer.getAge(), p_list);
-        }
+        ifInstCache.put(p_antec, goal.node(), tacletAppContainer.getAge(), p_list);        
     }
 
-    private HashMap<Long, ImmutableList<IfFormulaInstantiation>> getCacheMap(boolean p_antec) {
-        return p_antec ? ifInstCache.antecCache : ifInstCache.succCache;
-    }
 
     private ImmutableList<IfFormulaInstantiation> getAllSequentFormulas(boolean p_antec) {
         return p_antec ? allAntecFormulas : allSuccFormulas;
