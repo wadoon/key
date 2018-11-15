@@ -53,7 +53,7 @@ public final class PosInOccurrence {
                            PosInTerm posInTerm,
                            boolean inAntec) {
         assert posInTerm != null;
-    assert sequentFormula != null;
+        assert sequentFormula != null;
 	this.inAntec = inAntec;
 	this.sequentFormula = sequentFormula;	
 	this.posInTerm = posInTerm;	
@@ -195,21 +195,8 @@ public final class PosInOccurrence {
         if (p_newFormula == sequentFormula) {
             return this;
         }
-        final PIOPathIterator it = iterator ();
-        Term newTerm = p_newFormula.formula ();
-        PosInTerm newPosInTerm = PosInTerm.getTopLevel();
-
-        while ( true ) {
-            final int subNr = it.next ();
-            
-            if ( subNr == -1 ) break;
-
-            newPosInTerm = newPosInTerm.down( subNr );
-            newTerm = newTerm.sub ( subNr );
-        }
-
         return new PosInOccurrence ( p_newFormula,
-                                     newPosInTerm,
+                                     posInTerm,
                                      inAntec);
     }
 
