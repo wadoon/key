@@ -24,8 +24,8 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 class IfInstantiationCache {
     /**
      * This field causes a memory leak (that is ad-hoc-ly fixed in
-     * QueueRuleApplicationManager.clearCache()) because it is static and it has
-     * a reference to node which has again a reference to proof. Can this field
+     * QueueRuleApplicationManager.clearCache()) because it is static and has
+     * references to node which has again a reference to proof. Can this field
      * be made non-static by putting it in some other class? This field was
      * private before the fix
      */
@@ -36,19 +36,22 @@ class IfInstantiationCache {
         synchronized(cacheMgr) {
             cache = cacheMgr.get(n);
         }
+        
         if (cache != null) {
             return cache;
         }
+        
         cache = new IfInstantiationCache();
         
+        IfInstantiationCache cache2;
         synchronized(cacheMgr) {
-            IfInstantiationCache cache2;
             cache2 = cacheMgr.putIfAbsent(n, cache);
-            if (cache2 != null) {
-                cache = cache2;
-            }
         }
-
+        
+        if (cache2 != null) {
+            cache = cache2;
+        }
+        
         return cache;
     }
     
