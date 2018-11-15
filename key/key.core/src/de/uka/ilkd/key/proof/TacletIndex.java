@@ -447,7 +447,11 @@ public abstract class TacletIndex  {
         if (resultToConcatenate.size() > 0) {
             ImmutableList<NoPosTacletApp> result = resultToConcatenate.get(0);
             for (int i=1, sz=resultToConcatenate.size(); i<sz; i++) {
-                result = result.prepend(resultToConcatenate.get(i));
+                if (result.size() == 0) {
+                    result = resultToConcatenate.get(i);
+                } else {
+                    result = result.prependReverse(resultToConcatenate.get(i));
+                }
             }
             return result;
         } else {
@@ -501,15 +505,17 @@ public abstract class TacletIndex  {
       
         assert pos.isTopLevel();
               
-        return
-	    getFindTaclet(getList(rwList, pos.subTerm(), true), 
+        final ImmutableList<NoPosTacletApp> rwTaclets = getFindTaclet(getList(rwList, pos.subTerm(), true), 
 			  filter,
 			  pos,
-			  services)
-            .prepend(getFindTaclet(getList(findTaclets, pos.subTerm(), true),
-        			   filter,
-        			   pos,
-        			   services));
+			  services);
+        final ImmutableList<NoPosTacletApp> seqTaclets = getFindTaclet(getList(findTaclets, pos.subTerm(), true),
+        		   filter,
+        		   pos,
+        		   services);
+        return
+	    rwTaclets
+            .prepend(seqTaclets);
     }
 
 

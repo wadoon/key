@@ -15,6 +15,7 @@ package org.key_project.util.collection;
 
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -188,7 +189,16 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 	}
 	return true;
     }
-
+    
+    /**
+     * return true if predicate is fullfilled for at least one element
+     * @param predicate the predicate
+     * @return true if predicate is fullfilled for at least one element
+     */
+    public boolean exists(Predicate<T> predicate) {        
+        return elementList.exists(predicate);
+    }
+    
     /** @return int the cardinality of the set */
     public int size() {
 	return elementList.size();
