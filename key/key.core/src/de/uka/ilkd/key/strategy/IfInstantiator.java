@@ -92,18 +92,20 @@ public class IfInstantiator {
      *         <code>IfFormulaInstSeq.createList</code>)
      */
     private ImmutableList<IfFormulaInstantiation> getSequentFormulas(boolean p_antec, boolean p_all) {
-        if (p_all)
+        if (p_all) {
             return getAllSequentFormulas(p_antec);
+        }
 
-        final ImmutableList<IfFormulaInstantiation> cache = getNewSequentFormulasFromCache(p_antec);
-        if (cache != null)
+        ImmutableList<IfFormulaInstantiation> cache = getNewSequentFormulasFromCache(p_antec);
+        if (cache != null) {
             return cache;
+        }
 
-        final ImmutableList<IfFormulaInstantiation> newFormulas = selectNewFormulas(p_antec);
+        cache = selectNewFormulas(p_antec);
 
-        addNewSequentFormulasToCache(newFormulas, p_antec);
+        addNewSequentFormulasToCache(cache, p_antec);
 
-        return newFormulas;
+        return cache;
     }
 
     /**
@@ -116,8 +118,9 @@ public class IfInstantiator {
         ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.nil();
 
         for (final IfFormulaInstantiation ifInstantiation : getAllSequentFormulas(p_antec) ) {
-            if (isNewFormulaDirect((IfFormulaInstSeq) ifInstantiation))
+            if (isNewFormulaDirect((IfFormulaInstSeq) ifInstantiation)) {
                 res = res.prepend(ifInstantiation);
+            }
         }
 
         return res;
@@ -130,14 +133,14 @@ public class IfInstantiator {
      *         matched
      */
     private boolean isNewFormula(IfFormulaInstSeq p_ifInstantiation) {
-        final boolean antec = p_ifInstantiation.inAntec();
+        final ImmutableList<IfFormulaInstantiation> cache = 
+                getNewSequentFormulasFromCache(p_ifInstantiation.inAntec());
 
-        final ImmutableList<IfFormulaInstantiation> cache = getNewSequentFormulasFromCache(antec);
-
-        if (cache != null)
+        if (cache != null) {
             return cache.contains(p_ifInstantiation);
-
-        return isNewFormulaDirect(p_ifInstantiation);
+        } else {
+            return isNewFormulaDirect(p_ifInstantiation);
+        }
     }
 
     /**

@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -21,20 +20,22 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
  *
  * Keys: Long Values: IList<IfFormulaInstantiation>
  */
-public class IfInstantiationCachePool {
-    /**
-     * This field causes a memory leak (that is ad-hoc-ly fixed in
-     * QueueRuleApplicationManager.clearCache()) because it is static and has
-     * references to node which has again a reference to proof. Can this field
-     * be made non-static by putting it in some other class? This field was
-     * private before the fix
-     */
-    public final static LRUCache<Node, IfInstantiationCache> cacheMgr = new LRUCache<>(10);
+public final class IfInstantiationCachePool {
 
-    public IfInstantiationCache getCache(Node n) {
+    private final LRUCache<Node, IfInstantiationCache> cacheMgr = new LRUCache<>(20);
+    
+    private final ReentrantReadWriteLock cacheMgrlock = new ReentrantReadWriteLock();
+    private final ReadLock readMgrLock = cacheMgrlock.readLock();
+    private final WriteLock writeMgrLock = cacheMgrlock.writeLock();
+
+    public final IfInstantiationCache getCache(Node n) {
         IfInstantiationCache cache;
-        synchronized(cacheMgr) {
+        
+        try {
+            readMgrLock.lock();
             cache = cacheMgr.get(n);
+        } finally {
+            readMgrLock.unlock();
         }
         
         if (cache != null) {
@@ -44,8 +45,12 @@ public class IfInstantiationCachePool {
         cache = new IfInstantiationCache();
         
         IfInstantiationCache cache2;
-        synchronized(cacheMgr) {
+
+        try {
+            writeMgrLock.lock();
             cache2 = cacheMgr.putIfAbsent(n, cache);
+        } finally {
+            writeMgrLock.unlock();
         }
         
         if (cache2 != null) {
@@ -55,32 +60,34 @@ public class IfInstantiationCachePool {
         return cache;
     }
     
-    public void releaseAll() {
-        synchronized(cacheMgr) {
+    public final void releaseAll() {
+        try {
+            writeMgrLock.lock();
             cacheMgr.clear();
+        } finally {
+            writeMgrLock.unlock();
         }
     }  
     
-    public void release(Node n) {
-        IfInstantiationCache cache = null;
-        synchronized(cacheMgr) {
-           cache = cacheMgr.remove(n);           
-        }
-        if (cache != null) {
-            cache.reset();
+    public final void release(Node n) {
+        try {
+            writeMgrLock.lock();
+            cacheMgr.remove(n);           
+        } finally {
+            writeMgrLock.unlock();
         }
     }
     
-    public static class IfInstantiationCache {
+    public final static class IfInstantiationCache {
 
-        private final HashMap<Long, ImmutableList<IfFormulaInstantiation>> antecCache = new LinkedHashMap<>();
-        private final HashMap<Long, ImmutableList<IfFormulaInstantiation>> succCache = new LinkedHashMap<>();
+        private final HashMap<Long, ImmutableList<IfFormulaInstantiation>> antecCache = new HashMap<>();
+        private final HashMap<Long, ImmutableList<IfFormulaInstantiation>> succCache  = new HashMap<>();
 
         private final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
         private final ReadLock readLock = lock.readLock();
         private final WriteLock writeLock = lock.writeLock();
 
-        public ImmutableList<IfFormulaInstantiation> get(boolean antec, Long key) {
+        public final ImmutableList<IfFormulaInstantiation> get(boolean antec, Long key) {
             try {
                 readLock.lock();
                 final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cache = antec
@@ -92,21 +99,22 @@ public class IfInstantiationCachePool {
             }
         }
 
-        public void put(boolean antec, Long key, ImmutableList<IfFormulaInstantiation> value) {
-            final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cache = antec
-                    ? antecCache
-                    : succCache;
+        public final void put(boolean antec, Long key, ImmutableList<IfFormulaInstantiation> value) {
+            final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cache = antec 
+                    ? antecCache : succCache;
             try {
                 writeLock.lock();
+                
                 cache.put(key, value);
             } finally {
                 writeLock.unlock();
             }
         }
 
-        private void reset() {
+        public final void reset() {
             try {
                 writeLock.lock();
+                
                 antecCache.clear();
                 succCache.clear();
             } finally {
