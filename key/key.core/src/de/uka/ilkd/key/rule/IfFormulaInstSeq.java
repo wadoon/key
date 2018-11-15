@@ -14,8 +14,6 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -80,26 +78,19 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
         return res;
     }
 
-    private static final ReentrantReadWriteLock antecCacheLock = new ReentrantReadWriteLock();
-    private static final ReentrantReadWriteLock succCacheLock  = new ReentrantReadWriteLock();
-
     public static ImmutableList<IfFormulaInstantiation> createList(Sequent p_s,
             boolean antec) {
         final Semisequent ss = antec ? p_s.antecedent() : p_s.succedent();
-        ImmutableList<IfFormulaInstantiation> val = null;
-        boolean change = false;
-        final ReentrantReadWriteLock lock =  (antec ? antecCacheLock : succCacheLock);                    
-        lock.readLock().lock();
-        if ((antec ? cache.aKey : cache.sKey) != ss) {
-            change = true;
-        } else {
-            val = antec ? cache.aVal : cache.sVal;
-        }
-        lock.readLock().unlock();
         
-        if (change) {
-            val = createListHelp(p_s, antec);
-            lock.writeLock().lock();
+        synchronized(cache) {
+            if ((antec ? cache.aKey : cache.sKey) == ss) {
+                return antec ? cache.aVal : cache.sVal;
+            }
+        }        
+        
+        final ImmutableList<IfFormulaInstantiation> val = createListHelp(p_s, antec);
+        
+        synchronized(cache) {
             if (antec) {
                 cache.aKey = ss;
                 cache.aVal = val;
@@ -107,8 +98,8 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
                 cache.sKey = ss;
                 cache.sVal = val;
             }
-            lock.writeLock().unlock();
         }
+        
         return val;
     }
 
@@ -145,13 +136,17 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
         return antec;
     }
 
-    private PosInOccurrence pioCache = null;
+    private volatile PosInOccurrence pioCache = null;
 
     public PosInOccurrence toPosInOccurrence () {
         if (pioCache == null) {
-            pioCache = new PosInOccurrence ( getConstrainedFormula (),
-                    PosInTerm.getTopLevel(),
-                    inAntec () );
+            synchronized(pioCache) {
+                if (pioCache == null) {
+                    pioCache = new PosInOccurrence ( cf,
+                            PosInTerm.getTopLevel(),
+                            antec );
+                }
+            }
         }
         return pioCache;
     }

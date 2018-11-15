@@ -135,7 +135,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
     }
 
     @Override
-    protected synchronized boolean filter(TacletApp app,
+    protected boolean filter(TacletApp app,
                              PosInOccurrence pos,
                              Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
