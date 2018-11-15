@@ -265,7 +265,7 @@ abstract class AbstractInfFlowContractAppTacletBuilder extends AbstractInfFlowTa
                                                         varsNew,
                                                         varsNotFreeIn,
                                                         varsNewDependingOn,
-                                                        variableConditions),
+                                                        variableConditions, newSkolemUpdates),
                                      goals, ruleSets,
                                      attrs,
                                      find,

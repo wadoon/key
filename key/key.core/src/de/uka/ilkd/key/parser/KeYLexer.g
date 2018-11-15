@@ -216,6 +216,7 @@ lexer grammar KeYLexer;
 	VARIABLE : '\\variable';
 	SKOLEMTERM : '\\skolemTerm';
 	SKOLEMFORMULA : '\\skolemFormula';
+	SKOLEMUPDATE : '\\skolemUpdate';
 	TERMLABEL : '\\termlabel';
 
         // used in contracts
@@ -231,6 +232,7 @@ lexer grammar KeYLexer;
 	DISJOINTMODULONULL  : '\\disjointModuloNull';
 	DROP_EFFECTLESS_ELEMENTARIES : '\\dropEffectlessElementaries';
 	DROP_EFFECTLESS_STORES : '\\dropEffectlessStores';
+	ABSTRACT_UPDATE : '\\abstractUpdate';
 	SIMPLIFY_IF_THEN_ELSE_UPDATE : '\\simplifyIfThenElseUpdate';
 	ENUM_CONST : '\\enumConstant';
         FREELABELIN : '\\freeLabelIn';

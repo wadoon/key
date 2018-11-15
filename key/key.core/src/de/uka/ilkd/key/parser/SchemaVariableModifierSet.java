@@ -19,38 +19,38 @@ public abstract class SchemaVariableModifierSet {
     private boolean strict = false;
     private boolean rigid  = false;
     private boolean list = false;
-    
-    
+
+
     public boolean rigid() {
         return rigid;
     }
-    
-    
+
+
     protected boolean rigidEnabled() {
         return false;
     }
-    
-    
+
+
     public boolean strict() {
         return strict;
     }
-    
-    
+
+
     protected boolean strictEnabled() {
         return false;
     }
-    
+
 
     public boolean list() {
 	return list;
     }
-    
-    
+
+
     protected boolean listEnabled() {
 	return false;
     }
-    
-    
+
+
     /**
      * @return <code>true</code> iff <code>option</code> is a valid modifier
      *         for the considered kind of schema variables
@@ -66,7 +66,7 @@ public abstract class SchemaVariableModifierSet {
 
         return false;
     }
-        
+
     public boolean addRigid() {
         this.rigid = true;
         return rigidEnabled();
@@ -81,24 +81,29 @@ public abstract class SchemaVariableModifierSet {
     }
 
     public static class ProgramSV extends SchemaVariableModifierSet {
+        @Override
         protected boolean listEnabled() {
             return true;
         }
     }
 
-    public static class TermSV extends SchemaVariableModifierSet {        
+    public static class TermSV extends SchemaVariableModifierSet {
+        @Override
         protected boolean rigidEnabled() {
             return true;
         }
+        @Override
         protected boolean strictEnabled() {
             return true;
         }
+        @Override
         protected boolean listEnabled() {
             return true;
         }
     }
 
     public static class FormulaSV extends SchemaVariableModifierSet {
+        @Override
         protected boolean rigidEnabled() {
             return true;
         }
@@ -107,6 +112,8 @@ public abstract class SchemaVariableModifierSet {
     public static class VariableSV extends SchemaVariableModifierSet {}
 
     public static class SkolemTermSV extends SchemaVariableModifierSet {}
+
+    public static class SkolemUpdateSV extends SchemaVariableModifierSet {}
 
     public static class FreshProgVarSV extends SchemaVariableModifierSet {}
 

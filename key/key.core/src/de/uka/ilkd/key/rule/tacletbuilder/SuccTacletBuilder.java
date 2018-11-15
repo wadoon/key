@@ -80,7 +80,7 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
 						 varsNew,
 						 varsNotFreeIn,
 						 varsNewDependingOn,
-						 variableConditions),
+						 variableConditions, newSkolemUpdates),
 			      goals, ruleSets,
 			      attrs,
 			      find,

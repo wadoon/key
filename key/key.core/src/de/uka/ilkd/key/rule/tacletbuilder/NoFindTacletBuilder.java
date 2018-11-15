@@ -47,7 +47,7 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
 						   varsNew,
 						   varsNotFreeIn,
 						   varsNewDependingOn,
-						   variableConditions),
+						   variableConditions, newSkolemUpdates),
 				goals, ruleSets,
 				attrs,
 				prefixBuilder.getPrefixMap(),

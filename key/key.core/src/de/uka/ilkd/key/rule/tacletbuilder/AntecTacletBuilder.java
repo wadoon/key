@@ -96,7 +96,7 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet>{
 						varsNew,
 						varsNotFreeIn,
 						varsNewDependingOn,
-						variableConditions),
+						variableConditions, newSkolemUpdates),
 			     goals, ruleSets,
 			     attrs,
 			     find,

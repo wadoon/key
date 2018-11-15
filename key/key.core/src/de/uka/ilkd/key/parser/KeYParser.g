@@ -722,18 +722,18 @@ options {
     }
 
     private void schema_var_decl(String name, 
-    				 Sort s, 
-    				 boolean makeVariableSV,
-            			 boolean makeSkolemTermSV,
-                                 boolean makeTermLabelSV,
-            			 SchemaVariableModifierSet mods) 
-            			 	throws AmbigiousDeclException {
+                     Sort s, 
+                     boolean makeVariableSV,
+                     boolean makeSkolemTermSV,
+                     boolean makeTermLabelSV,
+                     SchemaVariableModifierSet mods) 
+                 throws AmbigiousDeclException {
         if (!skip_schemavariables) {
             SchemaVariable v;
             if(s == Sort.FORMULA && !makeSkolemTermSV) {
                 v = SchemaVariableFactory.createFormulaSV(new Name(name), 
                 					  mods.rigid());
-            } else if(s == Sort.UPDATE) {
+            } else if(s == Sort.UPDATE && !makeSkolemTermSV) {
                 v = SchemaVariableFactory.createUpdateSV(new Name(name));
             } else if(s instanceof ProgramSVSort) {
                 v = SchemaVariableFactory.createProgramSV(
@@ -744,9 +744,11 @@ options {
                 if(makeVariableSV) {
                     v = SchemaVariableFactory.createVariableSV
                     (new Name(name), s);
-                } else if(makeSkolemTermSV) {
+                } else if(makeSkolemTermSV && s != Sort.UPDATE) {
                     v = SchemaVariableFactory.createSkolemTermSV(new Name(name), 
                     				                 s);
+                } else if(makeSkolemTermSV && s == Sort.UPDATE) {
+                    v = SchemaVariableFactory.createSkolemUpdateSV(new Name(name));
                 } else if (makeTermLabelSV) {
                     v = SchemaVariableFactory.createTermLabelSV(new Name(name));
                 } else { v = SchemaVariableFactory.createTermSV(
@@ -1965,6 +1967,12 @@ one_schema_var_decl
     { mods = new SchemaVariableModifierSet.FormulaSV (); }
     ( schema_modifiers[mods] ) ?    
     {s = Sort.FORMULA;}
+    ids = simple_ident_comma_list  
+ | (SKOLEMUPDATE 
+    { makeSkolemTermSV = true; }
+    { s = Sort.UPDATE; }
+    { mods = new SchemaVariableModifierSet.SkolemUpdateSV (); }
+    ( schema_modifiers[mods] ) ?)    	
     ids = simple_ident_comma_list  
   | (    TERM
          { mods = new SchemaVariableModifierSet.TermSV (); }
@@ -3728,7 +3736,7 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
             b.setName(new Name(name.getText()));
             b.setIfSequent(ifSeq);
         }
-        ( VARCOND LPAREN varexplist[b] RPAREN ) ?
+        ( VARCOND LPAREN varexplist[b] RPAREN ) *
         goalspecs[b, find != null]
         modifiers[b]
         { 
@@ -3825,6 +3833,7 @@ varexp[TacletBuilder b]
 :
   ( varcond_applyUpdateOnRigid[b]
     | varcond_dropEffectlessElementaries[b]
+    | varcond_abstractUpdate[b, negated]
     | varcond_dropEffectlessStores[b]
     | varcond_enum_const[b]
     | varcond_free[b]
@@ -3843,6 +3852,7 @@ varexp[TacletBuilder b]
   ( (NOT_ {negated = true;} )? 
     (   varcond_abstractOrInterface[b, negated]
 	    | varcond_array[b, negated]
+        | varcond_abstractUpdate[b, negated]
         | varcond_array_length[b, negated]	
         | varcond_enumtype[b, negated]
         | varcond_freeLabelIn[b,negated]         
@@ -3881,6 +3891,14 @@ varcond_dropEffectlessElementaries[TacletBuilder b]
       b.addVariableCondition(new DropEffectlessElementariesCondition((UpdateSV)u, 
                                                                      (SchemaVariable)x, 
                                                                      (SchemaVariable)result));
+   }
+;
+
+varcond_abstractUpdate[TacletBuilder b, boolean negated]
+:
+   ABSTRACT_UPDATE LPAREN u=varId RPAREN 
+   {
+      b.addVariableCondition(new AbstractUpdateCondition((UpdateSV)u, negated));
    }
 ;
 
@@ -3950,20 +3968,17 @@ type_resolver returns [TypeResolver tr = null]
 varcond_new [TacletBuilder b]
 :
    NEW LPAREN x=varId COMMA
-      (
-          TYPEOF LPAREN y=varId RPAREN {
-	    b.addVarsNew((SchemaVariable) x, (SchemaVariable) y);
-	  }
-      |
-         DEPENDINGON LPAREN y=varId RPAREN {
-	    b.addVarsNewDependingOn((SchemaVariable)x, (SchemaVariable)y);
-	  }
-      | kjt=keyjavatype {
-		b.addVarsNew((SchemaVariable) x, kjt.getJavaType());
-	  }
-      )
+   (
+       TYPEOF LPAREN y=varId RPAREN
+       { b.addVarsNew((SchemaVariable) x, (SchemaVariable) y); }
+     | SKOLEMUPDATE
+       { b.addSkolemUpdateNew((SchemaVariable) x); }
+     | DEPENDINGON LPAREN y=varId RPAREN 
+       { b.addVarsNewDependingOn((SchemaVariable)x, (SchemaVariable)y); }
+     | kjt=keyjavatype 
+       { b.addVarsNew((SchemaVariable) x, kjt.getJavaType()); }
+   )
    RPAREN
-   
 ;
 
 varcond_newlabel [TacletBuilder b] 

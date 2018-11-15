@@ -6,22 +6,14 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.TermLabelSV;
-import de.uka.ilkd.key.logic.op.TermSV;
-import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.pp.SequentPrintFilter;
 import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.NewDependingOn;
+import de.uka.ilkd.key.rule.NewSkolemUpdate;
 import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -111,6 +103,10 @@ class TacletDescriber {
 
         for (final NewDependingOn ndo : t.varsNewDependingOn()) {
             schemaVars = schemaVars.add(ndo.first());
+        }
+
+        for (final NewSkolemUpdate nsku : t.newSkolemUpdates()) {
+            schemaVars = schemaVars.add(nsku.getSchemaVariable());
         }
 
         if (!schemaVars.isEmpty()) {

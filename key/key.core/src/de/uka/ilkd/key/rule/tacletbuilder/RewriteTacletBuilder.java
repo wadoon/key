@@ -89,7 +89,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
 						    varsNew,
 						    varsNotFreeIn,
 						    varsNewDependingOn,
-						    variableConditions),
+						    variableConditions, newSkolemUpdates),
 				 goals, ruleSets,
 				 attrs,
 				 find,
