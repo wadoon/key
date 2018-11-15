@@ -624,7 +624,7 @@ public final class ProblemInitializer {
     private void generateLedgerDataTaclets(InitConfig initConfig) {
         Services services = initConfig.getServices();
         KeYJavaType ldkjt =
-            services.getJavaInfo().getKeYJavaType("org.hyperledger.fabric.shim.LedgerData");
+            services.getJavaInfo().getKeYJavaType("LedgerData");
         LedgerDataTacletGenerator gen = new LedgerDataTacletGenerator(services, ldkjt);
 
         List<Taclet> taclets = gen.createTaclets();
