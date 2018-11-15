@@ -15,7 +15,6 @@ package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
 
-import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -81,7 +80,8 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     }
 
     public static ImmutableList<IfFormulaInstantiation> createList(Sequent p_s,
-            boolean antec) {
+            boolean antec, Services services) {
+        final IfFormulaInstantiationCache cache = services.getCaches().getIfFormulaInstantiationCache();
         final Semisequent semi = antec ? p_s.antecedent() : p_s.succedent();
         
         ImmutableList<IfFormulaInstantiation> val = cache.get(antec, semi);
@@ -143,19 +143,4 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
         return pioCache;
     }
 
-    // a simple cache for the results of the method <code>createList</code>
-    private static final class Cache {
-        private final LRUCache<Integer, ImmutableList<IfFormulaInstantiation>> antecCache = new LRUCache<>(50);
-        private final LRUCache<Integer, ImmutableList<IfFormulaInstantiation>> succCache = new LRUCache<>(50);
-
-        public synchronized ImmutableList<IfFormulaInstantiation> get(boolean antec, Semisequent s) {
-            return (antec ? antecCache : succCache).get(System.identityHashCode(s));
-        }
-
-        public synchronized void put(boolean antec, Semisequent s, ImmutableList<IfFormulaInstantiation> value) {
-            (antec ? antecCache : succCache).put(System.identityHashCode(s), value);
-        }
-    }
-
-    private static final Cache cache = new Cache ();
 }

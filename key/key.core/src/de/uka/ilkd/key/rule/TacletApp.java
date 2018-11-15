@@ -978,8 +978,8 @@ public abstract class TacletApp implements RuleApp {
 		createSemisequentList(taclet().ifSequent() // Matching starting
 			.succedent()), // with the last formula
 		createSemisequentList(taclet().ifSequent().antecedent()),
-		IfFormulaInstSeq.createList(p_seq, false), IfFormulaInstSeq
-			.createList(p_seq, true),
+		IfFormulaInstSeq.createList(p_seq, false, p_services), IfFormulaInstSeq
+			.createList(p_seq, true, p_services),
 		ImmutableSLList.<IfFormulaInstantiation>nil(), matchConditions(),
 		p_services);
 
