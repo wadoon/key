@@ -14,6 +14,8 @@
 package de.uka.ilkd.key.rule;
 
 import java.util.Iterator;
+
+import org.key_project.util.LRUCache;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -80,24 +82,13 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
 
     public static ImmutableList<IfFormulaInstantiation> createList(Sequent p_s,
             boolean antec) {
-        final Semisequent ss = antec ? p_s.antecedent() : p_s.succedent();
+        final Semisequent semi = antec ? p_s.antecedent() : p_s.succedent();
         
-        synchronized(cache) {
-            if ((antec ? cache.aKey : cache.sKey) == ss) {
-                return antec ? cache.aVal : cache.sVal;
-            }
-        }        
+        ImmutableList<IfFormulaInstantiation> val = cache.get(antec, semi);
         
-        final ImmutableList<IfFormulaInstantiation> val = createListHelp(p_s, antec);
-        
-        synchronized(cache) {
-            if (antec) {
-                cache.aKey = ss;
-                cache.aVal = val;
-            } else {
-                cache.sKey = ss;
-                cache.sVal = val;
-            }
+        if (val == null) {
+            val  = createListHelp(p_s, antec);
+            cache.put(antec, semi, val);
         }
         
         return val;
@@ -154,11 +145,16 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
 
     // a simple cache for the results of the method <code>createList</code>
     private static final class Cache {
-        public Semisequent aKey = null;
-        public ImmutableList<IfFormulaInstantiation> aVal = null;
+        private final LRUCache<Integer, ImmutableList<IfFormulaInstantiation>> antecCache = new LRUCache<>(50);
+        private final LRUCache<Integer, ImmutableList<IfFormulaInstantiation>> succCache = new LRUCache<>(50);
 
-        public Semisequent sKey = null;
-        public ImmutableList<IfFormulaInstantiation> sVal = null;
+        public synchronized ImmutableList<IfFormulaInstantiation> get(boolean antec, Semisequent s) {
+            return (antec ? antecCache : succCache).get(System.identityHashCode(s));
+        }
+
+        public synchronized void put(boolean antec, Semisequent s, ImmutableList<IfFormulaInstantiation> value) {
+            (antec ? antecCache : succCache).put(System.identityHashCode(s), value);
+        }
     }
 
     private static final Cache cache = new Cache ();
