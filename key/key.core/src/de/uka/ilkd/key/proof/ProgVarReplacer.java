@@ -159,64 +159,64 @@ public final class ProgVarReplacer {
      * replaces in an SVInstantiations
      */
     public SVInstantiations replace(SVInstantiations insts) {
-   	SVInstantiations result = insts;
+        SVInstantiations result = insts;
 
-    Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it;
-	it = insts.pairIterator();
-	while(it.hasNext()) {
-	    ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> e = it.next();
-	    SchemaVariable sv     = e.key();
-	    InstantiationEntry<?> ie = e.value();
-	    Object inst = ie.getInstantiation();
+        Iterator<ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>>> it;
+        it = insts.pairIterator();
+        while(it.hasNext()) {
+            ImmutableMapEntry<SchemaVariable,InstantiationEntry<?>> e = it.next();
+            SchemaVariable sv     = e.key();
+            InstantiationEntry<?> ie = e.value();
+            Object inst = ie.getInstantiation();
 
-	    if(ie instanceof ContextInstantiationEntry) {
-		ProgramElement pe = (ProgramElement) inst;
-		ProgramElement newPe = replace(pe);
-		if(newPe != pe) {
-		    ContextInstantiationEntry cie = (ContextInstantiationEntry) ie;
-		    result = result.replace(cie.prefix(),
-					    cie.suffix(),
-					    cie.activeStatementContext(),
-					    newPe,
-					    services);
-		}
-	    } else if(ie instanceof OperatorInstantiation) {
-	    	/*nothing to be done (currently)*/
-	    } else if(ie instanceof ProgramInstantiation) {
-		ProgramElement pe = (ProgramElement) inst;
-		ProgramElement newPe = replace(pe);
-		if(newPe != pe) {
-		    result = result.replace(sv, newPe, services);
-		}
-	    } else if(ie instanceof ProgramListInstantiation) {
-		@SuppressWarnings("unchecked")
-        ImmutableArray<ProgramElement> a = (ImmutableArray<ProgramElement>) inst;
-		int size = a.size();
+            if(ie instanceof ContextInstantiationEntry) {
+                ProgramElement pe = (ProgramElement) inst;
+                ProgramElement newPe = replace(pe);
+                if(newPe != pe) {
+                    ContextInstantiationEntry cie = (ContextInstantiationEntry) ie;
+                    result = result.replace(cie.prefix(),
+                            cie.suffix(),
+                            cie.activeStatementContext(),
+                            newPe,
+                            services);
+                }
+            } else if (ie instanceof OperatorInstantiation) {
+                /*nothing to be done (currently)*/
+            } else if (ie instanceof ProgramInstantiation) {
+                ProgramElement pe = (ProgramElement) inst;
+                ProgramElement newPe = replace(pe);
+                if(newPe != pe) {
+                    result = result.replace(sv, newPe, services);
+                }
+            } else if(ie instanceof ProgramListInstantiation) {
+                @SuppressWarnings("unchecked")
+                ImmutableArray<ProgramElement> a = (ImmutableArray<ProgramElement>) inst;
+                int size = a.size();
                 ProgramElement[] array = new ProgramElement[size];
 
-		boolean changedSomething = false;
-		for(int i = 0; i < size; i++) {
+                boolean changedSomething = false;
+                for(int i = 0; i < size; i++) {
                     ProgramElement pe = a.get(i);
-		    array[i] = replace(pe);
-		    if(array[i] != pe) {
-		    	changedSomething = true;
-		    }
-		}
+                    array[i] = replace(pe);
+                    if(array[i] != pe) {
+                        changedSomething = true;
+                    }
+                }
 
-		if(changedSomething) {
-		    ImmutableArray<ProgramElement> newA = new ImmutableArray<ProgramElement>(array);
-		    result = result.replace(sv, newA, services);
-		}
-	    } else if(ie instanceof TermInstantiation) {
-		Term t = (Term) inst;
-		Term newT = replace(t);
-		if(newT != t) {
-		    result = result.replace(sv, newT, services);
-		}
-	    } else {
-		assert false : "unexpected subtype of InstantiationEntry<?>";
-	    }
-	}
+                if(changedSomething) {
+                    ImmutableArray<ProgramElement> newA = new ImmutableArray<ProgramElement>(array);
+                    result = result.replace(sv, newA, services);
+                }
+            } else if (ie instanceof TermInstantiation) {
+                Term t = (Term) inst;
+                Term newT = replace(t);
+                if(newT != t) {
+                    result = result.replace(sv, newT, services);
+                }
+            } else {
+                assert false : "unexpected subtype of InstantiationEntry<?>";
+            }
+        }
 
 	return result;
     }

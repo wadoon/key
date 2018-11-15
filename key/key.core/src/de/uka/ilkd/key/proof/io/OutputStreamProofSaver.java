@@ -65,7 +65,6 @@ import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.inst.InstantiationEntry;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.rule.inst.TermInstantiation;
 import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -696,8 +695,12 @@ public class OutputStreamProofSaver {
         return printAnything(val, services, true).toString();
     }
 
+    @SuppressWarnings("rawtypes")
     public static StringBuffer printAnything(Object val, Services services,
             boolean shortAttrNotation) {
+        if (val instanceof InstantiationEntry) {
+            val = ((InstantiationEntry) val).getInstantiation();
+        }
         if (val instanceof ProgramElement) {
             return printProgramElement((ProgramElement) val);
         }
@@ -709,10 +712,6 @@ public class OutputStreamProofSaver {
         }
         else if (val instanceof Name) {
             return new StringBuffer(val.toString());
-        }
-        else if (val instanceof TermInstantiation) {
-            return printTerm(((TermInstantiation) val).getInstantiation(),
-                    services);
         }
         else if (val == null) {
             return null;

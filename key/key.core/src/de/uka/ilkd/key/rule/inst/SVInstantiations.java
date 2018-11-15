@@ -145,8 +145,8 @@ public class SVInstantiations {
      *         pair
      */
     public SVInstantiations add(SchemaVariable sv,
-								Term subst,
-								Services services) {
+                                Term subst,
+                                Services services) {
         return add(sv, new TermInstantiation(sv, subst), services);
     }
 

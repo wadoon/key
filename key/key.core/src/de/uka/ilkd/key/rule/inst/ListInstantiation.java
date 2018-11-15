@@ -17,7 +17,7 @@ import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
-public class ListInstantiation extends InstantiationEntry<ImmutableList<Object>> {
+class ListInstantiation extends InstantiationEntry<ImmutableList<Object>> {
 
     /** creates a new ContextInstantiationEntry 
      * @param sv the SchemaVariable that is
