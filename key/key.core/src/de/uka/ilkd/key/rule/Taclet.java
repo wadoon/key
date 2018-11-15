@@ -143,8 +143,6 @@ public abstract class Taclet implements Rule, Named {
     /** Additional generic conditions for schema variable instantiations. */
     private final ImmutableList<VariableCondition> variableConditions;
 
-    private final ImmutableList<NewSkolemUpdate> newSkolemUpdates;
-
     /**
      * the list of taclet goal descriptions
      */
@@ -236,7 +234,6 @@ public abstract class Taclet implements Rule, Named {
         varsNotFreeIn = applPart.varsNotFreeIn();
         varsNewDependingOn = applPart.varsNewDependingOn();
         variableConditions = applPart.getVariableConditions();
-        this.newSkolemUpdates = applPart.getNewSkolemUpdates();
         this.goalTemplates = goalTemplates;
         this.ruleSets = ruleSets;
         this.choices = choices;
@@ -413,10 +410,6 @@ public abstract class Taclet implements Rule, Named {
 
     public ImmutableList<NewDependingOn> varsNewDependingOn() {
         return varsNewDependingOn;
-    }
-
-    public ImmutableList<NewSkolemUpdate> newSkolemUpdates() {
-        return newSkolemUpdates;
     }
 
     /**

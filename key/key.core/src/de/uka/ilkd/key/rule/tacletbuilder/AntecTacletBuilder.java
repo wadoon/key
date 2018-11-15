@@ -29,7 +29,7 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet>{
      * term, if the sort of the given term is of Sort.FORMULA otherwise
      * nothing happens.
      * @return this AntecTacletBuilder
-     */ 
+     */
     public AntecTacletBuilder setFind(Term findTerm) {
 	if (findTerm.sort()==Sort.FORMULA) {
 	    find = findTerm;
@@ -42,11 +42,12 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet>{
      * the TacletGoalTemplate must not be a RewriteTacletGoalTemplate,
      * otherwise an illegal argument exception is thrown.
      */
+    @Override
     public void addTacletGoalTemplate(TacletGoalTemplate goal) {
 	if (goal instanceof RewriteTacletGoalTemplate) {
 	    throw new TacletBuilderException(this, "Tried to add a RewriteTaclet"+
 					   "GoalTemplate to a Antec"+
-					   "Taclet");	    
+					   "Taclet");
 	}
 	goals=goals.prepend(goal);
     }
@@ -59,12 +60,13 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet>{
      * corresponding parts of the Taclet are empty. No specification for
      * the if-sequent is represented as a sequent with two empty
      * semisequents. No specification for the interactive or
-     * recursive flags imply that the flags are not set. 
+     * recursive flags imply that the flags are not set.
      * No specified find part causes an IllegalStateException.
      */
+    @Override
     public AntecTaclet getTaclet(){
 	return getAntecTaclet();
-    } 
+    }
 
     /** builds and returns the AntecTaclet that is specified by
      * former set... / add... methods. If no name is specified then
@@ -73,17 +75,17 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet>{
      * corresponding parts of the Taclet are empty. No specification for
      * the if-sequence is represented as a sequent with two empty
      * semisequences. No specification for the interactive or
-     * recursive flags imply that the flags are not set. 
+     * recursive flags imply that the flags are not set.
      * No specified find part causes an IllegalStateException.
      * Throws an
      * TacletBuilderException if a bound SchemaVariable occurs more than once in if
-     * and find or an InvalidPrefixException if the building of the Taclet 
+     * and find or an InvalidPrefixException if the building of the Taclet
      * Prefix fails.
      */
     public AntecTaclet getAntecTaclet() {
 	if (find==null) {
 	    throw new TacletBuilderException(this, "No find part specified");
-	    
+
 	}
 	checkBoundInIfAndFind();
 
@@ -91,12 +93,12 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet>{
 
 	prefixBuilder.build();
 
-	return new AntecTaclet(name, 
+	return new AntecTaclet(name,
 			     new TacletApplPart(ifseq,
 						varsNew,
 						varsNotFreeIn,
 						varsNewDependingOn,
-						variableConditions, newSkolemUpdates),
+						variableConditions),
 			     goals, ruleSets,
 			     attrs,
 			     find,

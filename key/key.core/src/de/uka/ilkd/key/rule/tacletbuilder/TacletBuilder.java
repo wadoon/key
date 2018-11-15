@@ -13,11 +13,9 @@
 
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
-import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -34,7 +32,15 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.NewDependingOn;
+import de.uka.ilkd.key.rule.NewVarcond;
+import de.uka.ilkd.key.rule.NotFreeIn;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.TacletAnnotation;
+import de.uka.ilkd.key.rule.TacletAttributes;
+import de.uka.ilkd.key.rule.Trigger;
+import de.uka.ilkd.key.rule.VariableCondition;
 
 /**
  * abstract taclet builder class to be inherited from taclet builders
@@ -54,8 +60,6 @@ public abstract class TacletBuilder<T extends Taclet> {
             .<NotFreeIn> nil();
     protected ImmutableList<NewDependingOn> varsNewDependingOn = ImmutableSLList
             .<NewDependingOn> nil();
-    protected ImmutableList<NewSkolemUpdate> newSkolemUpdates = ImmutableSLList
-            .nil();
     protected ImmutableList<TacletGoalTemplate> goals = ImmutableSLList
             .<TacletGoalTemplate> nil();
     protected ImmutableList<RuleSet> ruleSets = ImmutableSLList.<RuleSet> nil();
@@ -172,23 +176,6 @@ public abstract class TacletBuilder<T extends Taclet> {
 
     public ImmutableSet<Choice> getChoices() {
         return choices;
-    }
-
-    public void addSkolemUpdateNew(SchemaVariable sv) {
-        newSkolemUpdates = newSkolemUpdates.prepend(new NewSkolemUpdate(sv));
-    }
-
-    public void addSkolemUpdateNew(NewSkolemUpdate newSkUpd) {
-        newSkolemUpdates = newSkolemUpdates.prepend(newSkUpd);
-    }
-
-    public void addSkolemUpdateNew(SchemaVariable... svs) {
-        Arrays.stream(svs).forEach(this::addSkolemUpdateNew);
-    }
-
-    public void addSkolemUpdateNew(Iterable<SchemaVariable> svs) {
-        StreamSupport.stream(svs.spliterator(), false)
-                .forEach(this::addSkolemUpdateNew);
     }
 
     /**

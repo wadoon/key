@@ -28,11 +28,11 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
      * term, if the sort of the given term is of Sort.FORMULA otherwise
      * nothing happens.
      * @return this SuccTacletBuilder
-     */ 
+     */
     public SuccTacletBuilder setFind(Term findTerm) {
-	if (findTerm.sort()==Sort.FORMULA) 
+	if (findTerm.sort()==Sort.FORMULA)
 	    find=findTerm;
-	checkContainsFreeVarSV(findTerm, this.getName(), "find term");	
+	checkContainsFreeVarSV(findTerm, this.getName(), "find term");
 	return this;
     }
 
@@ -41,12 +41,13 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
      * the TacletGoalTemplate must not be an RewriteTacletGoalTemplate,
      * otherwise an illegal argument exception is thrown.
      */
+    @Override
     public void addTacletGoalTemplate(TacletGoalTemplate goal) {
 	if (goal instanceof RewriteTacletGoalTemplate) {
-	    throw new TacletBuilderException(this, 
+	    throw new TacletBuilderException(this,
                     "Tried to add a RewriteTaclet"+
                     "GoalTemplate to a Succ"+
-	    "Taclet");	    
+	    "Taclet");
 	}
 	goals=goals.prepend(goal);
     }
@@ -59,28 +60,28 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
      * corresponding parts of the Taclet are empty. No specification for
      * the if-sequence is represented as a sequent with two empty
      * semisequents. No specification for the interactive or
-     * recursive flags imply that the flags are not set. 
+     * recursive flags imply that the flags are not set.
      * No specified find part causes an IllegalStateException.
      * Throws an
      * TacletBuilderException if a bound SchemaVariable occurs more than once in if
-     * and find or an InvalidPrefixException if the building of the Taclet 
+     * and find or an InvalidPrefixException if the building of the Taclet
      * Prefix fails.
      */
     public SuccTaclet getSuccTaclet(){
 	if (find == null) {
 	    throw new TacletBuilderException(this, "No find part specified");
-	    
+
 	}
 	checkBoundInIfAndFind();
-	final TacletPrefixBuilder prefixBuilder = 
+	final TacletPrefixBuilder prefixBuilder =
             new TacletPrefixBuilder(this);
 	prefixBuilder.build();
-	return new SuccTaclet(name, 
+	return new SuccTaclet(name,
 			      new TacletApplPart(ifseq,
 						 varsNew,
 						 varsNotFreeIn,
 						 varsNewDependingOn,
-						 variableConditions, newSkolemUpdates),
+						 variableConditions),
 			      goals, ruleSets,
 			      attrs,
 			      find,
@@ -88,7 +89,7 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
 			      prefixBuilder.getPrefixMap(),
 			      choices, tacletAnnotations);
     }
-    
+
     /** builds and returns the Taclet that is specified by
      * former set... / add... methods. If no name is specified then
      * an Taclet with an empty string name is build. No specifications
@@ -96,9 +97,10 @@ public class SuccTacletBuilder extends FindTacletBuilder<SuccTaclet> {
      * corresponding parts of the Taclet are empty. No specification for
      * the if-sequence is represented as a sequent with two empty
      * semisequences. No specification for the interactive or
-     * recursive flags imply that the flags are not set. 
+     * recursive flags imply that the flags are not set.
      * No specified find part causes an IllegalStateException.
      */
+    @Override
     public SuccTaclet getTaclet(){
 	return getSuccTaclet();
     }

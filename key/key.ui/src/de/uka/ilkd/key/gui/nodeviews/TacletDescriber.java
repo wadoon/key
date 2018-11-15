@@ -13,7 +13,6 @@ import de.uka.ilkd.key.pp.SequentViewLogicPrinter;
 import de.uka.ilkd.key.pp.VisibleTermLabels;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.NewDependingOn;
-import de.uka.ilkd.key.rule.NewSkolemUpdate;
 import de.uka.ilkd.key.rule.NewVarcond;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.Taclet;
@@ -103,10 +102,6 @@ class TacletDescriber {
 
         for (final NewDependingOn ndo : t.varsNewDependingOn()) {
             schemaVars = schemaVars.add(ndo.first());
-        }
-
-        for (final NewSkolemUpdate nsku : t.newSkolemUpdates()) {
-            schemaVars = schemaVars.add(nsku.getSchemaVariable());
         }
 
         if (!schemaVars.isEmpty()) {

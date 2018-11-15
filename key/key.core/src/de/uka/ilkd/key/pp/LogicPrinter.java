@@ -408,43 +408,27 @@ public class LogicPrinter {
         final ImmutableList<NotFreeIn> varsNotFreeIn = taclet.varsNotFreeIn();
         final ImmutableList<VariableCondition> variableConditions = taclet
                 .getVariableConditions();
-        final ImmutableList<NewSkolemUpdate> newSkolemUpdates = taclet
-                .newSkolemUpdates();
 
         if (!varsNew.isEmpty() || !varsNotFreeIn.isEmpty()
                 || !variableConditions.isEmpty()
-                || !varsNewDependingOn.isEmpty()
-                || !newSkolemUpdates.isEmpty()) {
+                || !varsNewDependingOn.isEmpty()) {
             layouter.brk().beginC(2).print("\\varcond (").brk();
 
             int countNewDependingOn = varsNewDependingOn.size() - 1;
             for (NewDependingOn ndo : varsNewDependingOn) {
                 printNewVarDepOnCond(ndo);
                 if (countNewDependingOn > 0 || !varsNotFreeIn.isEmpty()
-                        || !variableConditions.isEmpty()
-                        || !newSkolemUpdates.isEmpty()) {
+                        || !variableConditions.isEmpty()) {
                     layouter.print(",").brk();
                 }
                 --countNewDependingOn;
-            }
-
-            int countNewSkolemUpdates = newSkolemUpdates.size() - 1;
-            for (NewSkolemUpdate nsku : newSkolemUpdates) {
-                printNewSkolemUpdate(nsku);
-                if (countNewSkolemUpdates > 0 || !varsNotFreeIn.isEmpty()
-                        || !variableConditions.isEmpty()
-                        || !newSkolemUpdates.isEmpty()) {
-                    layouter.print(",").brk();
-                }
-                --countNewSkolemUpdates;
             }
 
             int countVarsNew = varsNew.size() - 1;
             for (final NewVarcond nvc : varsNew) {
                 printNewVarcond(nvc);
                 if (countVarsNew > 0 || !varsNotFreeIn.isEmpty()
-                        || !variableConditions.isEmpty()
-                        || !newSkolemUpdates.isEmpty()) {
+                        || !variableConditions.isEmpty()) {
                     layouter.print(",").brk();
                 }
             }
@@ -467,15 +451,6 @@ public class LogicPrinter {
             }
             layouter.brk(1, -2).print(")").end();
         }
-    }
-
-    private void printNewSkolemUpdate(NewSkolemUpdate nsku) throws IOException {
-        layouter.beginC(0);
-        layouter.brk().print("\\new( ");
-        printSchemaVariable(nsku.getSchemaVariable());
-        layouter.print(",").brk();
-        layouter.print("\\skolemUpdate");
-        layouter.brk(0, -2).print(")").end();
     }
 
     private void printNewVarDepOnCond(NewDependingOn on) throws IOException {

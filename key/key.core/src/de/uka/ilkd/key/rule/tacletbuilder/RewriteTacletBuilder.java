@@ -23,14 +23,14 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
 
     /**
      * encodes restrictions on the state where a rewrite taclet is applicable
-     * If the value is equal to 
-     * <ul> 
+     * If the value is equal to
+     * <ul>
      * <li> {@link RewriteTaclet#NONE} no state restrictions are posed</li>
-     * <li> {@link RewriteTaclet#SAME_UPDATE_LEVEL} then <code>\assumes</code> 
+     * <li> {@link RewriteTaclet#SAME_UPDATE_LEVEL} then <code>\assumes</code>
      * must match on a formula within the same state as <code>\find</code>
-     * rsp. <code>\add</code>. For efficiency no modalities are allowed above 
+     * rsp. <code>\add</code>. For efficiency no modalities are allowed above
      * the <code>\find</code> position  </li>
-     * <li> {@link RewriteTaclet#IN_SEQUENT_STATE} the <code>\find</code> part is 
+     * <li> {@link RewriteTaclet#IN_SEQUENT_STATE} the <code>\find</code> part is
      * only allowed to match on formulas which are evaluated in the same state as
      * the sequent</li>
      *</ul>
@@ -46,16 +46,16 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
 
     /* for information flow purposes; TODO: find better solution */
     protected boolean surviveSmbExec;
-    
+
     public void setSurviveSmbExec(boolean b) {
         surviveSmbExec = b;
     }
-    
-    
+
+
     /** sets the <I>find</I> of the Taclet that is to build to the given
      * term.
      * @return this RewriteTacletBuilder
-     */ 
+     */
     public RewriteTacletBuilder<T> setFind(Term findTerm) {
 	checkContainsFreeVarSV(findTerm, this.getName(), "find term");
 	find=findTerm;
@@ -69,11 +69,11 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
      * corresponding parts of the Taclet are empty. No specification for
      * the if-sequent is represented as a sequent with two empty
      * semisequents. No specification for the interactive or
-     * recursive flags imply that the flags are not set. 
+     * recursive flags imply that the flags are not set.
      * No specified find part causes an TacletBuilderException.
      * Throws an
      * TacletBuilderException if a bound SchemaVariable occurs more than once in if
-     * and find or an InvalidPrefixException if the building of the Taclet 
+     * and find or an InvalidPrefixException if the building of the Taclet
      * Prefix fails.
      */
     @SuppressWarnings("unchecked")
@@ -84,12 +84,12 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
 	checkBoundInIfAndFind();
 	TacletPrefixBuilder prefixBuilder=new TacletPrefixBuilder(this);
 	prefixBuilder.build();
-	return (T) new RewriteTaclet(name, 
+	return (T) new RewriteTaclet(name,
 				 new TacletApplPart(ifseq,
 						    varsNew,
 						    varsNotFreeIn,
 						    varsNewDependingOn,
-						    variableConditions, newSkolemUpdates),
+						    variableConditions),
 				 goals, ruleSets,
 				 attrs,
 				 find,
@@ -109,9 +109,9 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
 	if (goal instanceof AntecSuccTacletGoalTemplate) {
 	    throw new IllegalArgumentException("Tried to add a AntecSucc"+
 					       "GoalTemplate to a Rewrite"+
-					       "Taclet");	    
+					       "Taclet");
 	}
-	
+
 	goals = goals.prepend(goal);
     }
 
@@ -130,7 +130,7 @@ public class RewriteTacletBuilder<T extends RewriteTaclet> extends FindTacletBui
      * corresponding parts of the Taclet are empty. No specification for
      * the if-sequence is represented as a sequent with two empty
      * semisequences. No specification for the interactive or
-     * recursive flags imply that the flags are not set. 
+     * recursive flags imply that the flags are not set.
      * No specified find part causes an IllegalStateException.
      */
     @Override

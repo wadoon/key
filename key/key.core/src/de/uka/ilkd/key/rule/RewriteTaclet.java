@@ -313,7 +313,7 @@ public class RewriteTaclet extends FindTaclet {
     public RewriteTaclet setName(String s) {
         final TacletApplPart applPart = new TacletApplPart(ifSequent(),
             varsNew(), varsNotFreeIn(), varsNewDependingOn(),
-            getVariableConditions(), newSkolemUpdates());
+            getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes();
         attrs.setDisplayName(displayName());
 

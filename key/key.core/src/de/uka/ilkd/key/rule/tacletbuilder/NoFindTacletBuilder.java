@@ -20,11 +20,11 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApplPart;
 
 
-/** 
- * Due to the immutability of {@link Taclet}s, they are created in the parsers 
- * using {@link TacletBuilder}s. This builder is used for 
- * {@link NoFindTaclet} rules. Besides this some tests are performed that avoid 
- * some common errors on applicability of taclets.  
+/**
+ * Due to the immutability of {@link Taclet}s, they are created in the parsers
+ * using {@link TacletBuilder}s. This builder is used for
+ * {@link NoFindTaclet} rules. Besides this some tests are performed that avoid
+ * some common errors on applicability of taclets.
  */
 public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
 
@@ -36,18 +36,18 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
      * corresponding parts of the Taclet are empty. No specification for
      * the if-sequent is represented as a sequent with two empty
      * semisequences. No specification for the interactive or
-     * recursive flags imply that the flags are not set. 
+     * recursive flags imply that the flags are not set.
      */
     public NoFindTaclet getNoFindTaclet(){
 
 	TacletPrefixBuilder prefixBuilder=new TacletPrefixBuilder(this);
 	prefixBuilder.build();
-	return new NoFindTaclet(this.name, 
+	return new NoFindTaclet(this.name,
 				new TacletApplPart(ifseq,
 						   varsNew,
 						   varsNotFreeIn,
 						   varsNewDependingOn,
-						   variableConditions, newSkolemUpdates),
+						   variableConditions),
 				goals, ruleSets,
 				attrs,
 				prefixBuilder.getPrefixMap(),
@@ -55,24 +55,25 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
     }
 
 
-    /** 
+    /**
      * adds a new goal descriptions to the goal descriptions of the Taclet.
      * @param goal the TacletGoalTemplate specifying all the changes to be made
      * to achieve one of the resulting goals
      */
+    @Override
     public void addTacletGoalTemplate(TacletGoalTemplate goal) {
 	goals = goals.prepend(goal);
     }
 
 
-  
+
 
     /**
      * checks that a variableSV occurrs at most once in a quantifier of the
      * ifs and finds and throws an exception otherwise
      */
     protected void checkBoundInIfAndFind() {
-	final BoundUniquenessChecker ch = 
+	final BoundUniquenessChecker ch =
             new BoundUniquenessChecker(ifSequent());
 	if (!ch.correct()) {
 	    throw new TacletBuilderException
@@ -80,7 +81,7 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
 	}
     }
 
-    
+
     /**
      * builds and returns the Taclet that is specified by
      * former set... / add... methods. If no name is specified then
@@ -93,6 +94,7 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
      * TacletBuilderException if a bound SchemaVariable occurs more than once in if
      * and find.
      */
+    @Override
     public NoFindTaclet getTaclet(){
 	checkBoundInIfAndFind();
 	return getNoFindTaclet();

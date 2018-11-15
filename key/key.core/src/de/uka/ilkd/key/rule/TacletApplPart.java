@@ -30,7 +30,6 @@ public class TacletApplPart {
     private ImmutableList<NewVarcond> varsNew;
     private ImmutableList<NotFreeIn> varsNotFreeIn;
     private ImmutableList<NewDependingOn> varsNewDependingOn;
-    private ImmutableList<NewSkolemUpdate> newSkolemUpdates;
     private ImmutableList<VariableCondition> variableConditions;
 
     /**
@@ -44,14 +43,12 @@ public class TacletApplPart {
     public TacletApplPart(Sequent ifseq, ImmutableList<NewVarcond> varsNew,
             ImmutableList<NotFreeIn> varsNotFreeIn,
             ImmutableList<NewDependingOn> varsNewDependingOn,
-            ImmutableList<VariableCondition> variableConditions,
-            ImmutableList<NewSkolemUpdate> newSkolemUpdates) {
+            ImmutableList<VariableCondition> variableConditions) {
         this.ifseq = ifseq;
         this.varsNew = varsNew;
         this.varsNotFreeIn = varsNotFreeIn;
         this.varsNewDependingOn = varsNewDependingOn;
         this.variableConditions = variableConditions;
-        this.newSkolemUpdates = newSkolemUpdates;
     }
 
     /** returns the if-sequent of the application part of a Taclet */
@@ -78,10 +75,6 @@ public class TacletApplPart {
      */
     public ImmutableList<NewDependingOn> varsNewDependingOn() {
         return varsNewDependingOn;
-    }
-
-    public ImmutableList<NewSkolemUpdate> getNewSkolemUpdates() {
-        return newSkolemUpdates;
     }
 
     /**

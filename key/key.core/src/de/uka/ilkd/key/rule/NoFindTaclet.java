@@ -93,7 +93,7 @@ public class NoFindTaclet extends Taclet {
     public NoFindTaclet setName(String s) {
         final TacletApplPart applPart = new TacletApplPart(ifSequent(),
             varsNew(), varsNotFreeIn(), varsNewDependingOn(),
-            getVariableConditions(), newSkolemUpdates());
+            getVariableConditions());
         final TacletAttributes attrs = new TacletAttributes();
         attrs.setDisplayName(displayName());
 

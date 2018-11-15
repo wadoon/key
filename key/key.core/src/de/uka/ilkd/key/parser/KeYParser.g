@@ -3971,8 +3971,6 @@ varcond_new [TacletBuilder b]
    (
        TYPEOF LPAREN y=varId RPAREN
        { b.addVarsNew((SchemaVariable) x, (SchemaVariable) y); }
-     | SKOLEMUPDATE
-       { b.addSkolemUpdateNew((SchemaVariable) x); }
      | DEPENDINGON LPAREN y=varId RPAREN 
        { b.addVarsNewDependingOn((SchemaVariable)x, (SchemaVariable)y); }
      | kjt=keyjavatype 
