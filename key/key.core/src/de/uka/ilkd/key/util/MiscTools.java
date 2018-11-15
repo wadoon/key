@@ -153,7 +153,7 @@ public final class MiscTools {
     // =======================================================
     // Methods operating on Arrays
     // =======================================================
-    
+
     /**
      * Concatenates two arrays.
      * The second array may have an entry type that is a
@@ -505,7 +505,7 @@ public final class MiscTools {
        }
        return name;
     }
-    
+
     /**
      * <p>
      * Returns the name of the applied rule in the given {@link Node} of
@@ -525,7 +525,7 @@ public final class MiscTools {
        }
        return name;
     }
-    
+
     /**
      * <p>
      * Returns the name of the {@link RuleApp}.
@@ -547,7 +547,7 @@ public final class MiscTools {
        }
        return name;
     }
-    
+
     /**
      * Returns the {@link OneStepSimplifier} used in the given {@link Proof}.
      * @param proof The {@link Proof} to get its used {@link OneStepSimplifier}.
@@ -562,7 +562,7 @@ public final class MiscTools {
           return null;
        }
     }
-    
+
     /**
      * Returns the {@link OneStepSimplifier} used in the given {@link Profile}.
      * @param profile The {@link Profile} to get its used {@link OneStepSimplifier}.
@@ -584,7 +584,7 @@ public final class MiscTools {
      */
     public static ProgramVariable findActualVariable(ProgramVariable originalVar, Node node) {
         ProgramVariable actualVar = originalVar;
-        if (node != null) {          
+        if (node != null) {
             outer:
                 do {
                     if (node.getRenamingTable() != null) {
@@ -689,7 +689,7 @@ public final class MiscTools {
         }
         return result;
     }
-    
+
     /**
      * read an input stream to its end into a string.
      *
@@ -731,6 +731,7 @@ public final class MiscTools {
        result.put("assertions", "assertions:on");
        result.put("bigint", "bigint:on");
        result.put("intRules", "intRules:arithmeticSemanticsIgnoringOF");
+       result.put("lazySymbExec", "lazySymbExec:on");
        result.put("programRules", "programRules:Java");
        result.put("modelFields", "modelFields:showSatisfiability");
        result.put("initialisation", "initialisation:disableStaticInitialisation");
@@ -740,10 +741,10 @@ public final class MiscTools {
        result.put("optimisedSelectRules", "optimisedSelectRules:on");
        result.put("wdChecks", "wdChecks:off");
        result.put("wdOperator", "wdOperator:L");
-       result.put("permissions", "permissions:off"); 
+       result.put("permissions", "permissions:off");
        return result;
     }
-    
+
     /**
      * Returns the path to the source file defined by the given {@link PositionInfo}.
      * @param posInfo The {@link PositionInfo} to extract source file from.
