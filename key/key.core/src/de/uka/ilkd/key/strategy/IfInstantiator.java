@@ -58,9 +58,7 @@ public class IfInstantiator {
      * Find all possible instantiations of the if sequent formulas within the
      * sequent "p_seq".
      */
-    public void findIfFormulaInstantiations() {
-        final Sequent p_seq = goal.sequent();
-
+    public void findIfFormulaInstantiations() {        
         Debug.assertTrue(tacletAppContainer.getTacletApp().ifFormulaInstantiations() == null,
                 "The if formulas have already been instantiated");
 
@@ -68,9 +66,6 @@ public class IfInstantiator {
         if (ifSequent.isEmpty()) {
             addResult(tacletAppContainer.getTacletApp());
         } else {
-            final Services services = getServices();
-            allAntecFormulas = IfFormulaInstSeq.createList(p_seq, true, services);
-            allSuccFormulas  = IfFormulaInstSeq.createList(p_seq, false, services);
             findIfFormulaInstantiationsHelp(
                     ifSequent.succedent().asList(), //// Matching with the last formula
                     ifSequent.antecedent().asList(),
@@ -94,7 +89,7 @@ public class IfInstantiator {
     private ImmutableList<IfFormulaInstantiation> getSequentFormulas(boolean p_antec, boolean p_all) {
         if (p_all) {
             return getAllSequentFormulas(p_antec);
-        }
+        } 
 
         ImmutableList<IfFormulaInstantiation> cache = getNewSequentFormulasFromCache(p_antec);
         if (cache != null) {
@@ -176,6 +171,12 @@ public class IfInstantiator {
 
 
     private ImmutableList<IfFormulaInstantiation> getAllSequentFormulas(boolean p_antec) {
+        if (allAntecFormulas == null || allSuccFormulas == null) { 
+            final Sequent p_seq = goal.sequent();
+            allAntecFormulas = IfFormulaInstSeq.createList(p_seq, true, getServices());
+            allSuccFormulas  = IfFormulaInstSeq.createList(p_seq, false, getServices());
+        }
+
         return p_antec ? allAntecFormulas : allSuccFormulas;
     }
 
