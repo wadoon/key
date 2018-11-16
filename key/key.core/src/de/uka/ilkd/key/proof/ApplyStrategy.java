@@ -397,7 +397,6 @@ public class ApplyStrategy {
 
     IGoalChooser goalChooser;
 
-
     // Please create this object beforehand and re-use it.
     // Otherwise the addition/removal of the InteractiveProofListener
     // can cause a ConcurrentModificationException during ongoing operation
@@ -445,11 +444,13 @@ public class ApplyStrategy {
                                                  g, app);
         } else {
             assert g != null;
+            if(app instanceof de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp) {
+            	System.out.println(app.getClass());
+            }
             g.apply(app);
             return new SingleRuleApplicationInfo(g, app);
         }
     }
-
 
     /**
      * applies rules until this is no longer
