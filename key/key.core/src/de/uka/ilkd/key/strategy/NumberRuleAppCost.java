@@ -13,6 +13,10 @@
 
 package de.uka.ilkd.key.strategy;
 
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
 import org.key_project.util.LRUCache;
 
 import de.uka.ilkd.key.util.Debug;
@@ -24,26 +28,40 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
      * Requires thread save access as multiple proofs may be performed in parallel (Eclipse).
      */
     private static final LRUCache<Integer,NumberRuleAppCost> cache = new LRUCache<Integer,NumberRuleAppCost>(255);
-
+    private static final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
+    private static final WriteLock writeLock = lock.writeLock();
+    private static final ReadLock readLock = lock.readLock();
+    
+    
+    
     public static RuleAppCost getZeroCost() {
         return ZERO_COST;
     }
     
     public static RuleAppCost create(int p_cost) {
         if ( p_cost == 0 ) return NumberRuleAppCost.getZeroCost();
-        return new IntRuleAppCost(p_cost);
-/*        NumberRuleAppCost ac;
-        synchronized (cache) { // Ensure thread save access which is required for parallel proofs (e.g. in Eclipse)
+     //   return new IntRuleAppCost(p_cost);
+        NumberRuleAppCost ac;
+        try { 
+            readLock.lock();
             ac = cache.get(p_cost);
-            if (ac != null) { 
-                return ac;
-            }
-
-            ac = new IntRuleAppCost(p_cost);
-            cache.put(p_cost, ac);
+        } finally {
+            readLock.unlock();
         }
+        if (ac != null) { 
+            return ac;
+        }
+        ac = new IntRuleAppCost(p_cost);
         
-        return ac;*/
+        if (writeLock.tryLock()) {
+            try { 
+                cache.put(p_cost, ac);
+            } finally {
+                writeLock.unlock();
+            }
+        }
+
+        return ac;
     }
     
     public static RuleAppCost create(long p_cost) {
