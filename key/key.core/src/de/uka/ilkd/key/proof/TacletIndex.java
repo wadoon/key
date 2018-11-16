@@ -335,49 +335,46 @@ public abstract class TacletIndex  {
      * @param prefixOcc the PrefixOccurrence object used to keep track of the
      * occuring prefix elements
      */
-    private void getJavaTacletList(
+    private ImmutableList<NoPosTacletApp> getJavaTacletList(
             HashMap<Object, ImmutableList<NoPosTacletApp>> map,
-            ProgramElement pe, PrefixOccurrences prefixOccurrences,
-            List<ImmutableList<NoPosTacletApp>> result) {        
+            ProgramElement pe, PrefixOccurrences prefixOccurrences) {        
+        ImmutableList<NoPosTacletApp> res = ImmutableSLList.nil();
         if (pe instanceof ProgramPrefix) {
             int next = prefixOccurrences.occurred(pe);
             NonTerminalProgramElement nt = (NonTerminalProgramElement) pe;
             if (next < nt.getChildCount()) { 
-                getJavaTacletList(map, nt.getChildAt(next), prefixOccurrences, result);
-                return;
+                return getJavaTacletList(map, nt.getChildAt(next), prefixOccurrences);
             }            
         } else {
-            ImmutableList<NoPosTacletApp> apps = map.get(pe.getClass());
+            final ImmutableList<NoPosTacletApp> apps = map.get(pe.getClass());
             if (apps != null) {
-                result.add(apps);
+                res = apps;
             }
         }        
-        result.add(prefixOccurrences.getList(map));
+        return merge(res, prefixOccurrences.getList(map));
     }
 
     @SuppressWarnings("deprecation")
-    private void getListHelp(
+    private ImmutableList<NoPosTacletApp> getListHelp(
 	    	final HashMap<Object, ImmutableList<NoPosTacletApp>> map, 
 	    	final Term term,
 	    	final boolean ignoreUpdates,
-	    	final PrefixOccurrences prefixOccurrences,
-	    	final List<ImmutableList<NoPosTacletApp>> result) {
-	final Operator op = term.op();
+	    	final PrefixOccurrences prefixOccurrences) {
+	
+        ImmutableList<NoPosTacletApp> res = ImmutableSLList.nil();
+        final Operator op = term.op();
 	
 	assert !(op instanceof de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable) : "metavariables are disabled";
 
 	if (!term.javaBlock().isEmpty()) {
 	    prefixOccurrences.reset();
 	    final StatementBlock sb = (StatementBlock) term.javaBlock().program();
-	    getJavaTacletList(map, sb.getStatementAt(0), prefixOccurrences, result);
+	    res = getJavaTacletList(map, sb.getStatementAt(0), prefixOccurrences);
 	} 
 
         if ( !term.javaBlock().isEmpty() ||
                 op instanceof ProgramVariable ) {
-            final ImmutableList<NoPosTacletApp> schemaList = map.get(DEFAULT_PROGSV_KEY);
-            if (schemaList != null ) {
-                result.add(schemaList);
-            }
+            res = merge(res, map.get(DEFAULT_PROGSV_KEY));
         }
 
 	final ImmutableList<NoPosTacletApp> inMap;
@@ -390,33 +387,44 @@ public abstract class TacletIndex  {
 	    inMap = map.get(op);	    
 	}
 	
-	if (inMap != null) {
-	    result.add(inMap);
-	}
+	res = merge(res, inMap);
 
 	// collect taclets for target term, if updates shall be ignored
 	if (ignoreUpdates && op instanceof UpdateApplication) { 
 	    final Term target = UpdateApplication.getTarget(term);
 	    if (!(target.op() instanceof UpdateApplication)) { 
-	        getListHelp(map, target, false, prefixOccurrences, result);
-	        return;// otherwise only duplicates are added
+	        final ImmutableList<NoPosTacletApp> targetIndexed = 
+	                getListHelp(map, target, false, prefixOccurrences);
+	        return merge(res, targetIndexed);// otherwise only duplicates are added
 	    } 
 	} 
 	
-	ImmutableList<NoPosTacletApp> schemaList0 = map.get(term.sort());
-	if (schemaList0!=null) {
-	    result.add(schemaList0);
-	}
+	res = merge(res, map.get(term.sort()));
+	res = merge(res, map.get(DEFAULT_SV_KEY));
+	
+	return merge(res, map.get(GenericSort.class));
+    }
 
-	schemaList0 = map.get(DEFAULT_SV_KEY);
-	if (schemaList0 != null) {
-	    result.add(schemaList0); 
-	}
-
-	schemaList0 = map.get(GenericSort.class);
-	if (schemaList0!=null) {
-	    result.add(schemaList0); 
-	}
+    /**
+     * merges the two list in an execution time optimal manner
+     * @param first the first list 
+     * @param second the second list
+     * @return the merged list
+     */
+    private final ImmutableList<NoPosTacletApp> merge(
+            ImmutableList<NoPosTacletApp> first,
+            final ImmutableList<NoPosTacletApp> second) {        
+        if (second == null) {
+            return first;
+        } else if (first == null) {
+            return second;
+        } else { 
+            if (second.size() < first.size()) {
+                return first.prependReverse(second);
+            } else {
+                return second.prependReverse(first);
+            }
+        }
     }
     
     /**
@@ -440,24 +448,7 @@ public abstract class TacletIndex  {
     private ImmutableList<NoPosTacletApp> getList(HashMap<Object, ImmutableList<NoPosTacletApp>> map, 
             Term term,
             boolean ignoreUpdates) {
-        
-        final ArrayList<ImmutableList<NoPosTacletApp>> resultToConcatenate = new ArrayList<>();
-        getListHelp(map, term, ignoreUpdates, new PrefixOccurrences(), resultToConcatenate);
-
-        if (resultToConcatenate.size() > 0) {
-            ImmutableList<NoPosTacletApp> result = resultToConcatenate.get(0);
-            for (int i=1, sz=resultToConcatenate.size(); i<sz; i++) {
-                if (result.size() == 0) {
-                    result = resultToConcatenate.get(i);
-                } else {
-                    result = result.prependReverse(resultToConcatenate.get(i));
-                }
-            }
-            return result;
-        } else {
-            return ImmutableSLList.<NoPosTacletApp>nil();
-        }
-
+        return getListHelp(map, term, ignoreUpdates, new PrefixOccurrences());
     }
 
    /** get all Taclets for the antecedent.
@@ -478,15 +469,16 @@ public abstract class TacletIndex  {
 				  services);
     }
 
-  /** get all Taclets for the succedent.
- * @param pos the PosOfOccurrence describing the formula for which to look 
-* for top level taclets 
- * @param filter Only return taclets the filter selects
- * @param services the Services object encapsulating information
-* about the java datastructures like (static)types etc.
-    * @return IList<NoPosTacletApp> containing all applicable rules
-    * and the corresponding instantiations to get the rule fit.
-    */
+    /** 
+     * get all Taclets for the succedent.
+     * @param pos the PosOfOccurrence describing the formula for which to look 
+     * for top level taclets 
+     * @param filter Only return taclets the filter selects
+     * @param services the Services object encapsulating information
+     * about the java datastructures like (static)types etc.
+     * @return IList<NoPosTacletApp> containing all applicable rules
+     * and the corresponding instantiations to get the rule fit.
+     */
     public ImmutableList<NoPosTacletApp> getSuccedentTaclet(PosInOccurrence pos,						  
 						   RuleFilter filter,
 						   Services   services) {       
@@ -505,17 +497,17 @@ public abstract class TacletIndex  {
       
         assert pos.isTopLevel();
               
-        final ImmutableList<NoPosTacletApp> rwTaclets = getFindTaclet(getList(rwList, pos.subTerm(), true), 
-			  filter,
-			  pos,
-			  services);
-        final ImmutableList<NoPosTacletApp> seqTaclets = getFindTaclet(getList(findTaclets, pos.subTerm(), true),
-        		   filter,
-        		   pos,
-        		   services);
-        return
-	    rwTaclets
-            .prepend(seqTaclets);
+        final ImmutableList<NoPosTacletApp> rwTaclets = 
+                getFindTaclet(getList(rwList, pos.subTerm(), true), 
+                        filter,
+                        pos,
+                        services);
+        final ImmutableList<NoPosTacletApp> seqTaclets = 
+                getFindTaclet(getList(findTaclets, pos.subTerm(), true),
+                        filter,
+                        pos,
+                        services);
+        return rwTaclets.size() > 0 ? rwTaclets.prependReverse(seqTaclets) : seqTaclets.prependReverse(rwTaclets);
     }
 
 
