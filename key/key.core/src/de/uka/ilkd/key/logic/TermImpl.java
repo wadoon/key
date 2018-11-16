@@ -50,10 +50,10 @@ class TermImpl implements Term {
 
     //caches
     private static enum ThreeValuedTruth { TRUE, FALSE, UNKNOWN }
-    private int depth = -1;
-    private ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN; 
-    private ImmutableSet<QuantifiableVariable> freeVars = null;
-    private int hashcode = -1;
+    private volatile int depth = -1;
+    private volatile ThreeValuedTruth rigid = ThreeValuedTruth.UNKNOWN; 
+    private volatile ImmutableSet<QuantifiableVariable> freeVars = null;
+    private volatile int hashcode = -1;
     
     /**
      * This flag indicates that the {@link Term} itself or one
@@ -62,7 +62,7 @@ class TermImpl implements Term {
      * can't be cached because it is possible that the contained meta information
      * inside the {@link JavaBlock}, e.g. {@link PositionInfo}s, are different.
      */
-    private ThreeValuedTruth containsJavaBlockRecursive = ThreeValuedTruth.UNKNOWN;
+    private volatile ThreeValuedTruth containsJavaBlockRecursive = ThreeValuedTruth.UNKNOWN;
     
     //-------------------------------------------------------------------------
     //constructors
@@ -89,19 +89,20 @@ class TermImpl implements Term {
     //------------------------------------------------------------------------- 
     
    
-   private void determineFreeVars() {
-	freeVars = DefaultImmutableSet.<QuantifiableVariable>nil();
+   private ImmutableSet<QuantifiableVariable> determineFreeVars() {
+	ImmutableSet<QuantifiableVariable> localFreeVars = DefaultImmutableSet.<QuantifiableVariable>nil();
         
         if(op instanceof QuantifiableVariable) {
-            freeVars = freeVars.add((QuantifiableVariable) op);
+            localFreeVars = localFreeVars.add((QuantifiableVariable) op);
         } 
         for(int i = 0, ar = arity(); i < ar; i++) {
 	    ImmutableSet<QuantifiableVariable> subFreeVars = sub(i).freeVars();
 	    for(int j = 0, sz = varsBoundHere(i).size(); j < sz; j++) {
 		subFreeVars = subFreeVars.remove(varsBoundHere(i).get(j));
 	    }
-	    freeVars = freeVars.union(subFreeVars);	   
+	    localFreeVars = localFreeVars.union(subFreeVars);	   
 	}
+        return localFreeVars;
     }
 
 
@@ -186,13 +187,14 @@ class TermImpl implements Term {
     @Override
     public int depth() {
 	if(depth == -1) {
+	    int localDepth = -1;
             for (int i = 0, n = arity(); i < n; i++) {
                 final int subTermDepth = sub(i).depth();
-                if(subTermDepth > depth) {
-                    depth = subTermDepth;   
+                if(subTermDepth > localDepth) {
+                    localDepth = subTermDepth;   
                 }
             }
-            depth++;
+            depth = localDepth + 1;
 	}
         return depth;
     }
@@ -200,18 +202,20 @@ class TermImpl implements Term {
     
     @Override
     public boolean isRigid() {
+        ThreeValuedTruth localRigid;
 	if(rigid == ThreeValuedTruth.UNKNOWN) {
-            if(!op.isRigid()) {
-        	rigid = ThreeValuedTruth.FALSE;
+            if (!op.isRigid()) {
+                localRigid = ThreeValuedTruth.FALSE;
             } else {
-        	rigid = ThreeValuedTruth.TRUE;
+                localRigid = ThreeValuedTruth.TRUE;
         	for(int i = 0, n = arity(); i < n; i++) {
             	    if(!sub(i).isRigid()) {
-            		rigid = ThreeValuedTruth.FALSE;
+            	    localRigid = ThreeValuedTruth.FALSE;
             		break;
             	    }
         	}
             }
+            rigid = localRigid;
         }
             
        return rigid == ThreeValuedTruth.TRUE;
@@ -221,7 +225,7 @@ class TermImpl implements Term {
     @Override
     public ImmutableSet<QuantifiableVariable> freeVars() {
         if(freeVars == null) {
-            determineFreeVars();
+            freeVars = determineFreeVars();
         }
         return freeVars;
     }
@@ -477,7 +481,6 @@ class TermImpl implements Term {
     @Override
     public final int hashCode(){
         if(hashcode == -1) {
-            // compute into local variable first to be thread-safe.
             this.hashcode = computeHashCode();
         }
         return hashcode;
@@ -488,6 +491,7 @@ class TermImpl implements Term {
      * performs teh actual computation of the hashcode and can be overwritten by subclasses if necessary 
      */
     protected int computeHashCode() {
+        // compute into local variable first to be thread-safe.
         int hashcode = 5;
         hashcode = hashcode*17 + op().hashCode();
         hashcode = hashcode*17 + subs().hashCode();
@@ -576,7 +580,7 @@ class TermImpl implements Term {
      */
     @Override
     public boolean containsJavaBlockRecursive() {
-        if ( containsJavaBlockRecursive == ThreeValuedTruth.UNKNOWN ) {
+        if ( containsJavaBlockRecursive == ThreeValuedTruth.UNKNOWN ) {            
             ThreeValuedTruth result = ThreeValuedTruth.FALSE;
             if (javaBlock != null && !javaBlock.isEmpty() ) {
                 result = ThreeValuedTruth.TRUE;
