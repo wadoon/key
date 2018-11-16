@@ -20,7 +20,7 @@ import de.uka.ilkd.key.parser.KeYParser;
 /**
  * Defines the required which a {@link KeYParser} needs to parse a *.proof file
  * and to apply the rules again.
- * 
+ *
  * @author Martin Hentschel
  */
 public interface IProofFileParser {
@@ -28,10 +28,10 @@ public interface IProofFileParser {
     /**
      * Enumeration of the different syntactic elements occurring in a saved
      * proof tree representation.
-     * 
+     *
      * TODO: ProofSaver should not hardcode ids Enum names should be used
      * instead of rawnames (old proofs should be converted)
-     * 
+     *
      * @author Richard Bubel
      */
     static enum ProofElementID {
@@ -46,7 +46,8 @@ public interface IProofFileParser {
                 "userinteraction"), NEW_NAMES("newnames"), AUTOMODE_TIME(
                 "autoModeTime"), KeY_LOG("keyLog"), KeY_USER("keyUser"), KeY_VERSION(
                 "keyVersion"), KeY_SETTINGS("keySettings"), OPEN_GOAL(
-                "opengoal");
+                "opengoal"), LAZYSE_SYST_PH("loopHoleSymbStPH"), LAZYSE_PATHC_PH("loopHolePathCPH"),
+                LAZYSE_SYST_INST("loopHoleSymbStInst"), LAZYSE_PATHC_INST("loopHolePathCInst");
 
         private String rawName;
 

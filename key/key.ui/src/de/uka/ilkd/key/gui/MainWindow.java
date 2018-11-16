@@ -40,6 +40,7 @@ import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
+import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
@@ -806,10 +807,15 @@ public final class MainWindow extends JFrame {
         proof.addSeparator();
         proof.add(new CounterExampleAction(this));
         proof.add(new TestGenerationAction(this));
-        proof.addSeparator();
-        final JMenu lazySEPostProcMenu = new JMenu("Lazy SE Post-Processing");
-        lazySEPostProcMenu.add(new LazySEPostProcLoopByInvariantAction(this));
-        proof.add(lazySEPostProcMenu);
+        /* Experimental as of 2018/11: Lazy Symbolic Execution (DS) */
+        if (Main.isExperimentalMode()) {
+            proof.addSeparator();
+            final JMenu lazySEPostProcMenu = new JMenu(
+                "Lazy SE Post-Processing");
+            lazySEPostProcMenu
+                    .add(new LazySEPostProcLoopByInvariantAction(this));
+            proof.add(lazySEPostProcMenu);
+        }
 
         return proof;
     }

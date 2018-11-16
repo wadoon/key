@@ -30,22 +30,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.lazyse.InstantiateLoopHoleRule;
+import de.uka.ilkd.key.rule.lazyse.LoopHole;
+import de.uka.ilkd.key.rule.lazyse.LoopHoleInstantiation;
 
 /**
  * Dialog for instantiating holes left by lazy symbolic execution of a loop.
@@ -63,7 +61,7 @@ public class InstantiateLazyLoopHoleDialog extends JDialog {
     private final Proof proof;
 
     private boolean okPressed = false;
-    private List<SingleResult> results;
+    private List<LoopHoleInstantiation> results;
 
     private final List<ParserProblem> problems = new ArrayList<>();
     private final List<Runnable> problemChangeListeners = new ArrayList<>();
@@ -178,7 +176,7 @@ public class InstantiateLazyLoopHoleDialog extends JDialog {
     private boolean incompleteInput = false;
 
     private void collectResults() {
-        final List<SingleResult> result = new ArrayList<>();
+        final List<LoopHoleInstantiation> result = new ArrayList<>();
         incompleteInput = lastSelection.isEmpty();
 
         for (LoopHole lh : lastSelection) {
@@ -193,9 +191,33 @@ public class InstantiateLazyLoopHoleDialog extends JDialog {
 
             if (pathCondInstText.isEmpty() || symbStInstText.isEmpty()) {
                 incompleteInput = true;
+                break;
             }
 
-            result.add(new SingleResult(lh, pathCondInstText, symbStInstText));
+            Term pcInst = null, symbStInst = null;
+            try {
+                DefaultTermParser parser = new DefaultTermParser();
+                pcInst = parser.parse(new StringReader(pathCondInstText),
+                    Sort.FORMULA, proof.getServices(),
+                    proof.getServices().getNamespaces(), proof.abbreviations());
+
+                parser = new DefaultTermParser();
+                symbStInst = parser.parse(new StringReader(symbStInstText),
+                    Sort.UPDATE, proof.getServices(),
+                    proof.getServices().getNamespaces(), proof.abbreviations());
+            } catch (ParserException e) {
+                /*
+                 * Should not happen, because OK button is deactivated for
+                 * invalid inputs, and if there's an empty field we would have
+                 * broken out of the loop.
+                 */
+                e.printStackTrace();
+                incompleteInput = true;
+            }
+
+            assert pcInst != null && symbStInst != null;
+
+            result.add(new LoopHoleInstantiation(lh, pcInst, symbStInst));
         }
 
         this.results = result;
@@ -213,7 +235,7 @@ public class InstantiateLazyLoopHoleDialog extends JDialog {
         return compList;
     }
 
-    public List<SingleResult> getUserInput() {
+    public List<LoopHoleInstantiation> getUserInput() {
         return results;
     }
 
@@ -237,8 +259,8 @@ public class InstantiateLazyLoopHoleDialog extends JDialog {
                 if (incompleteInput) {
                     JOptionPane.showMessageDialog(
                         InstantiateLazyLoopHoleDialog.this,
-                        "You left some input fields empty. Please fill in"
-                                + " all the placeholder instantiations for"
+                        "You left some input fields empty or with invalid inputs."
+                                + " Please fill in all the placeholder instantiations for"
                                 + " all selected loop holes.",
                         "Incomplete Input", JOptionPane.ERROR_MESSAGE);
                 } else {
@@ -289,8 +311,17 @@ public class InstantiateLazyLoopHoleDialog extends JDialog {
 
         txtPCInst.addKeyListener(new KeyAdapter() {
             @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                    e.consume();
+                    ((Component) e.getSource()).transferFocus();
+                }
+            }
+
+            @Override
             public void keyReleased(KeyEvent e) {
                 final ParserProblem pp = getParserProblemObjectFor(selected);
+
                 if (txtPCInst.getText().isEmpty()) {
                     pp.setPathCondProblem(null);
                     return;
@@ -324,6 +355,14 @@ public class InstantiateLazyLoopHoleDialog extends JDialog {
         scrTxtSymbStInst.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         txtSymbStInst.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if (e.getKeyCode() == KeyEvent.VK_TAB) {
+                    e.consume();
+                    ((Component) e.getSource()).transferFocus();
+                }
+            }
+
             @Override
             public void keyReleased(KeyEvent e) {
                 final ParserProblem pp = getParserProblemObjectFor(selected);
@@ -384,28 +423,7 @@ public class InstantiateLazyLoopHoleDialog extends JDialog {
             return mockupRetrieveLoopHoles();
         }
 
-        final Iterable<Node> nodes = () -> proof.root().subtreeIterator();
-        final List<RuleApp> lazyLoopRules = //
-                StreamSupport.stream(nodes.spliterator(), false)
-                        .map(Node::getAppliedRuleApp) //
-                        .filter(ra -> ra != null) //
-                        .filter(ra -> ra.rule().name().toString()
-                                .equals("lazyLoop"))
-                        .collect(Collectors.toList());
-
-        final LoopHole[] result = new LoopHole[lazyLoopRules.size()];
-        for (int i = 0; i < result.length; i++) {
-            final SVInstantiations instantiations = //
-                    ((PosTacletApp) lazyLoopRules.get(i)).instantiations();
-            final String pcPlaceholderName = instantiations
-                    .lookupValue(new Name("C_sk")).toString();
-            final String symbStPlaceholderName = instantiations
-                    .lookupValue(new Name("U_sk")).toString();
-            result[i] = new LoopHole(i + 1, pcPlaceholderName,
-                symbStPlaceholderName);
-        }
-
-        return result;
+        return InstantiateLoopHoleRule.retrieveLoopHoles(proof);
     }
 
     private void informParserProblemChangeListeners() {
@@ -418,31 +436,6 @@ public class InstantiateLazyLoopHoleDialog extends JDialog {
             result[i] = new LoopHole(i + 1, "C_sk_" + i, "U_sk_" + i);
         }
         return result;
-    }
-
-    public static class SingleResult {
-        private final LoopHole loopHole;
-        private final String pathCondInst;
-        private final String symbStoreInst;
-
-        public SingleResult(LoopHole loopHole, String pathCondInst,
-                String symbStoreInst) {
-            this.loopHole = loopHole;
-            this.pathCondInst = pathCondInst;
-            this.symbStoreInst = symbStoreInst;
-        }
-
-        public LoopHole getLoopHole() {
-            return loopHole;
-        }
-
-        public String getPathCondInst() {
-            return pathCondInst;
-        }
-
-        public String getSymbStoreInst() {
-            return symbStoreInst;
-        }
     }
 
     private class ParserProblem {
@@ -466,37 +459,6 @@ public class InstantiateLazyLoopHoleDialog extends JDialog {
 
         public boolean hasAProblem() {
             return pathCondProblem.isPresent() || symbStProblem.isPresent();
-        }
-    }
-
-    private static class LoopHole {
-        private final int loopNum;
-        private final String pathCondPlaceholder;
-        private final String symbStorePlaceholder;
-
-        public LoopHole(int loopNum, String pathCondPlaceholder,
-                String symbStorePlaceholder) {
-            this.loopNum = loopNum;
-            this.pathCondPlaceholder = pathCondPlaceholder;
-            this.symbStorePlaceholder = symbStorePlaceholder;
-        }
-
-        public String getPathCondPlaceholder() {
-            return pathCondPlaceholder;
-        }
-
-        public String getSymbStorePlaceholder() {
-            return symbStorePlaceholder;
-        }
-
-        public String instTabTitle() {
-            return "Loop " + loopNum;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("Loop %d: (%s, %s)", loopNum,
-                pathCondPlaceholder, symbStorePlaceholder);
         }
     }
 

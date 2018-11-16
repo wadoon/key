@@ -28,10 +28,12 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
+import de.uka.ilkd.key.proof.io.intermediate.InstantiateLoopHoleRuleAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
+import de.uka.ilkd.key.rule.lazyse.InstantiateLoopHoleRule;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
 
@@ -41,17 +43,17 @@ import de.uka.ilkd.key.util.Pair;
  * This approach is more flexible than direct parsing; for instance, it is
  * capable of dealing with merge rule applications.
  * <p>
- * 
+ *
  * The returned intermediate proof closely resembles the structure of the parsed
  * proof file. Specifically, branch nodes are explicitly stored and, as in the
  * proof file, have exactly one child (or zero in the case of an empty proof).
  * The first node, that is also the main returned result, is a branch node with
  * the identifier "dummy ID" that is present in every proof.
  * <p>
- * 
+ *
  * Example for parsed intermediate proof:
  * <p>
- * 
+ *
  * <pre>
  * BranchNodeIntermediate "dummy ID"
  * - AppNodeIntermediate
@@ -66,18 +68,18 @@ import de.uka.ilkd.key.util.Pair;
  *     > ...
  * </pre>
  * <p>
- * 
+ *
  * Note that the last open goal in an unfinished proof is not represented by a
  * node in the intermediate representation (since no rule has been applied on
  * the goal yet).
  * <p>
- * 
+ *
  * The results of the parser may be obtained by calling {@link #getResult()}.
- * 
+ *
  * @author Dominic Scheurer
  */
-public class IntermediatePresentationProofFileParser implements
-        IProofFileParser {
+public class IntermediatePresentationProofFileParser
+        implements IProofFileParser {
 
     /* + The proof object for storing meta information */
     private Proof proof = null;
@@ -109,15 +111,14 @@ public class IntermediatePresentationProofFileParser implements
         switch (eid) {
         case BRANCH: // branch
         {
-            final BranchNodeIntermediate newNode =
-                    new BranchNodeIntermediate(str);
+            final BranchNodeIntermediate newNode = new BranchNodeIntermediate(
+                str);
 
             if (root == null) {
                 root = newNode;
                 currNode = newNode;
                 stack.push(newNode);
-            }
-            else {
+            } else {
                 stack.push(currNode);
                 currNode.addChild(newNode);
                 currNode = newNode;
@@ -139,8 +140,7 @@ public class IntermediatePresentationProofFileParser implements
             final int formula = Integer.parseInt(str);
             if (insideBuiltinIfInsts()) {
                 ((BuiltinRuleInformation) ruleInfo).currIfInstFormula = formula;
-            }
-            else {
+            } else {
                 ruleInfo.currFormula = formula;
             }
             break;
@@ -149,8 +149,7 @@ public class IntermediatePresentationProofFileParser implements
             final PosInTerm pos = PosInTerm.parseReverseString(str);
             if (insideBuiltinIfInsts()) {
                 ((BuiltinRuleInformation) ruleInfo).currIfInstPosInTerm = pos;
-            }
-            else {
+            } else {
                 ruleInfo.currPosInTerm = pos;
             }
             break;
@@ -171,16 +170,16 @@ public class IntermediatePresentationProofFileParser implements
         case ASSUMES_FORMULA_IN_SEQUENT: // ifseqformula
         {
             TacletInformation tacletInfo = (TacletInformation) ruleInfo;
-            tacletInfo.ifSeqFormulaList =
-                    tacletInfo.ifSeqFormulaList.append(str);
+            tacletInfo.ifSeqFormulaList = tacletInfo.ifSeqFormulaList
+                    .append(str);
         }
             break;
 
         case ASSUMES_FORMULA_DIRECT: // ifdirectformula
         {
             TacletInformation tacletInfo = (TacletInformation) ruleInfo;
-            tacletInfo.ifDirectFormulaList =
-                    tacletInfo.ifDirectFormulaList.append(str);
+            tacletInfo.ifDirectFormulaList = tacletInfo.ifDirectFormulaList
+                    .append(str);
         }
             break;
 
@@ -217,12 +216,11 @@ public class IntermediatePresentationProofFileParser implements
             break;
 
         case ASSUMES_INST_BUILT_IN: // ifInst (for built in rules)
-            BuiltinRuleInformation builtinInfo =
-                    (BuiltinRuleInformation) ruleInfo;
+            BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
 
             if (builtinInfo.builtinIfInsts == null) {
-                builtinInfo.builtinIfInsts =
-                        ImmutableSLList.<Pair<Integer, PosInTerm>> nil();
+                builtinInfo.builtinIfInsts = ImmutableSLList
+                        .<Pair<Integer, PosInTerm>> nil();
             }
             builtinInfo.currIfInstFormula = 0;
             builtinInfo.currIfInstPosInTerm = PosInTerm.getTopLevel();
@@ -232,18 +230,33 @@ public class IntermediatePresentationProofFileParser implements
             final String[] newNames = str.split(",");
             ruleInfo.currNewNames = ImmutableSLList.<Name> nil();
             for (int in = 0; in < newNames.length; in++) {
-                ruleInfo.currNewNames =
-                        ruleInfo.currNewNames.append(new Name(newNames[in]));
+                ruleInfo.currNewNames = ruleInfo.currNewNames
+                        .append(new Name(newNames[in]));
             }
             break;
 
         case AUTOMODE_TIME: // autoModeTime
             try {
                 proof.addAutoModeTime(Long.parseLong(str));
-            }
-            catch (NumberFormatException e) {
+            } catch (NumberFormatException e) {
                 /* ignore */
             }
+            break;
+
+        case LAZYSE_PATHC_PH:
+            ((BuiltinRuleInformation) ruleInfo).currLazySEPathCPH = str;
+            break;
+
+        case LAZYSE_SYST_PH:
+            ((BuiltinRuleInformation) ruleInfo).currLazySESymbStPH = str;
+            break;
+
+        case LAZYSE_PATHC_INST:
+            ((BuiltinRuleInformation) ruleInfo).currLazySEPathCInst = str;
+            break;
+
+        case LAZYSE_SYST_INST:
+            ((BuiltinRuleInformation) ruleInfo).currLazySESymbStInst = str;
             break;
 
         case MERGE_PROCEDURE: // merge procedure
@@ -251,18 +264,18 @@ public class IntermediatePresentationProofFileParser implements
             break;
 
         case NUMBER_MERGE_PARTNERS: // number of merge partners
-            ((BuiltinRuleInformation) ruleInfo).currNrPartners =
-                    Integer.parseInt(str);
+            ((BuiltinRuleInformation) ruleInfo).currNrPartners = Integer
+                    .parseInt(str);
             break;
 
         case MERGE_NODE: // corresponding merge node id
-            ((BuiltinRuleInformation) ruleInfo).currCorrespondingMergeNodeId =
-                    Integer.parseInt(str);
+            ((BuiltinRuleInformation) ruleInfo).currCorrespondingMergeNodeId = Integer
+                    .parseInt(str);
             break;
 
         case MERGE_ID: // merge node id
-            ((BuiltinRuleInformation) ruleInfo).currMergeNodeId =
-                    Integer.parseInt(str);
+            ((BuiltinRuleInformation) ruleInfo).currMergeNodeId = Integer
+                    .parseInt(str);
             break;
 
         case MERGE_DIST_FORMULA: // distinguishing formula for merges
@@ -270,13 +283,11 @@ public class IntermediatePresentationProofFileParser implements
             break;
 
         case MERGE_PREDICATE_ABSTRACTION_LATTICE_TYPE: // type of predicate
-                                                      // abstraction lattice
+                                                       // abstraction lattice
             try {
-                ((BuiltinRuleInformation) ruleInfo).currPredAbstraLatticeType =
-                        (Class<? extends AbstractPredicateAbstractionLattice>) Class
-                                .forName(str);
-            }
-            catch (ClassNotFoundException e) {
+                ((BuiltinRuleInformation) ruleInfo).currPredAbstraLatticeType = (Class<? extends AbstractPredicateAbstractionLattice>) Class
+                        .forName(str);
+            } catch (ClassNotFoundException e) {
                 errors.add(e);
             }
             break;
@@ -324,13 +335,10 @@ public class IntermediatePresentationProofFileParser implements
             break;
 
         case ASSUMES_INST_BUILT_IN: // ifInst (for built in rules)
-            BuiltinRuleInformation builtinInfo =
-                    (BuiltinRuleInformation) ruleInfo;
-            builtinInfo.builtinIfInsts =
-                    builtinInfo.builtinIfInsts
-                            .append(new Pair<Integer, PosInTerm>(
-                                    builtinInfo.currIfInstFormula,
-                                    builtinInfo.currIfInstPosInTerm));
+            BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
+            builtinInfo.builtinIfInsts = builtinInfo.builtinIfInsts.append(
+                new Pair<Integer, PosInTerm>(builtinInfo.currIfInstFormula,
+                    builtinInfo.currIfInstPosInTerm));
             break;
 
         default:
@@ -370,10 +378,10 @@ public class IntermediatePresentationProofFileParser implements
     private TacletAppIntermediate constructTacletApp() {
         TacletInformation tacletInfo = (TacletInformation) ruleInfo;
         return new TacletAppIntermediate(tacletInfo.currRuleName,
-                new Pair<Integer, PosInTerm>(tacletInfo.currFormula,
-                        tacletInfo.currPosInTerm), tacletInfo.loadedInsts,
-                tacletInfo.ifSeqFormulaList, tacletInfo.ifDirectFormulaList,
-                tacletInfo.currNewNames);
+            new Pair<Integer, PosInTerm>(tacletInfo.currFormula,
+                tacletInfo.currPosInTerm),
+            tacletInfo.loadedInsts, tacletInfo.ifSeqFormulaList,
+            tacletInfo.ifDirectFormulaList, tacletInfo.currNewNames);
     }
 
     /**
@@ -384,39 +392,36 @@ public class IntermediatePresentationProofFileParser implements
         BuiltinRuleInformation builtinInfo = (BuiltinRuleInformation) ruleInfo;
         BuiltInAppIntermediate result = null;
 
-        if (builtinInfo.currRuleName.equals("MergeRule")) {
-            result =
-                    new MergeAppIntermediate(builtinInfo.currRuleName,
-                            new Pair<Integer, PosInTerm>(
-                                    builtinInfo.currFormula,
-                                    builtinInfo.currPosInTerm),
-                            builtinInfo.currMergeNodeId,
-                            builtinInfo.currMergeProc,
-                            builtinInfo.currNrPartners,
-                            builtinInfo.currNewNames,
-                            builtinInfo.currDistFormula,
-                            builtinInfo.currPredAbstraLatticeType,
-                            builtinInfo.currAbstractionPredicates,
-                            builtinInfo.currUserChoices);
-        }
-        else if (builtinInfo.currRuleName.equals("CloseAfterMerge")) {
-            result =
-                    new MergePartnerAppIntermediate(builtinInfo.currRuleName,
-                            new Pair<Integer, PosInTerm>(
-                                    builtinInfo.currFormula,
-                                    builtinInfo.currPosInTerm),
-                            builtinInfo.currCorrespondingMergeNodeId,
-                            builtinInfo.currNewNames);
-        }
-        else {
-            result =
-                    new BuiltInAppIntermediate(builtinInfo.currRuleName,
-                            new Pair<Integer, PosInTerm>(
-                                    builtinInfo.currFormula,
-                                    builtinInfo.currPosInTerm),
-                            builtinInfo.currContract,
-                            builtinInfo.builtinIfInsts,
-                            builtinInfo.currNewNames);
+        if (builtinInfo.currRuleName
+                .equals(InstantiateLoopHoleRule.INSTANCE.displayName())) {
+            result = new InstantiateLoopHoleRuleAppIntermediate(
+                new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
+                    builtinInfo.currPosInTerm),
+                ImmutableSLList.nil(), builtinInfo.currLazySEPathCPH,
+                builtinInfo.currLazySEPathCInst, builtinInfo.currLazySESymbStPH,
+                builtinInfo.currLazySESymbStInst);
+        } else if (builtinInfo.currRuleName.equals("MergeRule")) {
+            result = new MergeAppIntermediate(builtinInfo.currRuleName,
+                new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
+                    builtinInfo.currPosInTerm),
+                builtinInfo.currMergeNodeId, builtinInfo.currMergeProc,
+                builtinInfo.currNrPartners, builtinInfo.currNewNames,
+                builtinInfo.currDistFormula,
+                builtinInfo.currPredAbstraLatticeType,
+                builtinInfo.currAbstractionPredicates,
+                builtinInfo.currUserChoices);
+        } else if (builtinInfo.currRuleName.equals("CloseAfterMerge")) {
+            result = new MergePartnerAppIntermediate(builtinInfo.currRuleName,
+                new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
+                    builtinInfo.currPosInTerm),
+                builtinInfo.currCorrespondingMergeNodeId,
+                builtinInfo.currNewNames);
+        } else {
+            result = new BuiltInAppIntermediate(builtinInfo.currRuleName,
+                new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
+                    builtinInfo.currPosInTerm),
+                builtinInfo.currContract, builtinInfo.builtinIfInsts,
+                builtinInfo.currNewNames);
         }
 
         return result;
@@ -493,14 +498,18 @@ public class IntermediatePresentationProofFileParser implements
         protected PosInTerm currIfInstPosInTerm;
         /* > Method Contract */
         protected String currContract = null;
+        /* > Lazy / Abstract SE Instantiations */
+        protected String currLazySEPathCPH = null;
+        protected String currLazySESymbStPH = null;
+        protected String currLazySEPathCInst = null;
+        protected String currLazySESymbStInst = null;
         /* > Merge Rule */
         protected String currMergeProc = null;
         protected int currNrPartners = 0;
         protected int currCorrespondingMergeNodeId = 0;
         protected int currMergeNodeId = 0;
         protected String currDistFormula = null;
-        protected Class<? extends AbstractPredicateAbstractionLattice> currPredAbstraLatticeType =
-                null;
+        protected Class<? extends AbstractPredicateAbstractionLattice> currPredAbstraLatticeType = null;
         protected String currAbstractionPredicates = null;
         public String currUserChoices = null;
 

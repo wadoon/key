@@ -14,13 +14,17 @@
 package de.uka.ilkd.key.gui.actions;
 
 import java.awt.event.ActionEvent;
+import java.util.List;
 import java.util.Optional;
 
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.InstantiateLazyLoopHoleDialog;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.rule.lazyse.InstantiateLoopHoleRuleApp;
+import de.uka.ilkd.key.rule.lazyse.LoopHoleInstantiation;
 
 public final class LazySEPostProcLoopByInvariantAction
         extends MainWindowAction {
@@ -63,10 +67,20 @@ public final class LazySEPostProcLoopByInvariantAction
 
     @Override
     public synchronized void actionPerformed(ActionEvent e) {
+        final Proof proof = getMediator().getSelectedProof();
         final InstantiateLazyLoopHoleDialog dialog = //
-                new InstantiateLazyLoopHoleDialog(mainWindow,
-                    getMediator().getSelectedProof());
+                new InstantiateLazyLoopHoleDialog(mainWindow, proof);
         dialog.setVisible(true);
+
+        if (dialog.okPressed()) {
+            List<LoopHoleInstantiation> insts = dialog.getUserInput();
+            for (LoopHoleInstantiation inst : insts) {
+                for (Goal g : proof
+                        .getSubtreeGoals(inst.getLoopHole().getProofNode())) {
+                    g.apply(new InstantiateLoopHoleRuleApp(inst));
+                }
+            }
+        }
     }
 
 }

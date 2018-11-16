@@ -143,6 +143,10 @@ options {
          prooflabel2tag.put("mergeId", ProofElementID.MERGE_ID);
          prooflabel2tag.put("userChoices", ProofElementID.MERGE_USER_CHOICES);
          prooflabel2tag.put("opengoal", ProofElementID.OPEN_GOAL);
+	     prooflabel2tag.put("loopHolePathCPH", ProofElementID.LAZYSE_PATHC_PH);
+	     prooflabel2tag.put("loopHolePathCInst", ProofElementID.LAZYSE_PATHC_INST);
+	     prooflabel2tag.put("loopHoleSymbStPH", ProofElementID.LAZYSE_SYST_PH);
+	     prooflabel2tag.put("loopHoleSymbStInst", ProofElementID.LAZYSE_SYST_INST);
    }
 
    private NamespaceSet nss;
