@@ -14,8 +14,6 @@
 package de.uka.ilkd.key.logic;
 
 import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.java.CollectionUtil;
-import org.key_project.util.java.IFilter;
 import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -28,7 +26,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
  * Two labeled terms are equal if they have equal term structure and equal
  * annotations. In contrast the method {@link Term#equalsModRenaming(Object)}
  * does not care about annotations and will just compare the term structure
- * alone modula renaming.
+ * alone modulo renaming.
  * 
  * @see Term
  * @see TermImpl
