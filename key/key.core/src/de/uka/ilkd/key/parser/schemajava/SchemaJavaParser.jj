@@ -3596,6 +3596,7 @@ Statement Statement() :
      | result = WhileStatement()
      | result = MergePointStatement()
      | result = LoopScopeStatement()
+     | result = AbstractPlaceholderStatement()
      | result = KeYMetaConstructStatement()
      | result = DoStatement()
      | result = ForStatement()
@@ -4454,6 +4455,26 @@ Statement stat;
 	checkConstruction(result);
 	return result;
     }
+}
+
+AbstractPlaceholderStatement AbstractPlaceholderStatement() :
+{
+  AbstractPlaceholderStatement result;
+  String id = null;
+}
+{
+  "abstract-program"
+  {
+    result = factory.createAbstractPlaceholderStatement();
+    setPrefixInfo(result);
+  }
+  (<IDENTIFIER> { id = token.image; })
+  ";"
+  {
+    result.setId(id);
+    checkConstruction(result);
+    return result;
+  }
 }
 
 LoopScopeBlock LoopScopeStatement() :
