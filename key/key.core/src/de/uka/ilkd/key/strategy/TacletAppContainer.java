@@ -65,18 +65,16 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     }
 
     private ImmutableList<NoPosTacletApp> incMatchIfFormulas (Goal p_goal) {
-        final IfInstantiator instantiator = new IfInstantiator (this, p_goal );
-        instantiator.findIfFormulaInstantiations ();
-        return instantiator.getResults ();
+        final IfInstantiator instantiator = new IfInstantiator(this, p_goal);
+        return instantiator.findIfFormulaInstantiations ();
     }
 
     protected static TacletAppContainer createContainer(NoPosTacletApp p_app,
                                                         PosInOccurrence p_pio,
                                                         Goal p_goal,
                                                         boolean p_initial) {
-        final RuleAppCost computeCost;
-        final Strategy goalStrategy = p_goal.getGoalStrategy();
-        computeCost = goalStrategy.computeCost ( p_app, p_pio, p_goal );
+        final Strategy goalStrategy   = p_goal.getGoalStrategy();
+        final RuleAppCost computeCost = goalStrategy.computeCost ( p_app, p_pio, p_goal );
         
         return createContainer ( p_app, p_pio, p_goal,
                                  computeCost,
@@ -329,7 +327,7 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             return null;
         }
 
-        Services services = p_goal.proof().getServices();
+        final Services services = p_goal.proof().getServices();
         if (pio != null) {
             app = app.setPosInOccurrence(pio, services);
             if (app == null) {

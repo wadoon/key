@@ -13,8 +13,6 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.Iterator;
-
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -36,7 +34,7 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     /**
      * Sequent and formula
      */
-    private final Sequent            seq;
+    private final Sequent seq;
     private final boolean antec;	// formula is in antecedent?
     private final SequentFormula cf;
 
@@ -63,19 +61,16 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     /**
      * Create a list with all formulas of a given semisequent
      */
-    private static ImmutableList<IfFormulaInstantiation> createListHelp(Sequent     p_s,
-            boolean antec ) {
+    private static ImmutableList<IfFormulaInstantiation> createListHelp(Sequent p_s, boolean antec) {
+        
+        ImmutableList<SequentFormula> semisequent = ( antec ? p_s.antecedent() : p_s.succedent()).asList();
         ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.<IfFormulaInstantiation>nil();
-        Iterator<SequentFormula>  it;
-        if (antec) {
-            it = p_s.antecedent().iterator ();
-        } else {
-            it = p_s.succedent().iterator ();
-        }
-        while ( it.hasNext () ) {
-            res = res.prepend(new IfFormulaInstSeq(p_s, antec, it.next()));
-        }
-
+        
+        while (!semisequent.isEmpty()) {
+            res = res.prepend(new IfFormulaInstSeq(p_s, antec, semisequent.head()));
+            semisequent = semisequent.tail();
+        }            
+        
         return res;
     }
 
@@ -129,10 +124,11 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     }
 
     private volatile PosInOccurrence pioCache = null;
-
+    private volatile Object pioCacheLock = new Object();
+    
     public PosInOccurrence toPosInOccurrence () {
         if (pioCache == null) {
-            synchronized(pioCache) {
+            synchronized(pioCacheLock) {
                 if (pioCache == null) {
                     pioCache = new PosInOccurrence ( cf,
                             PosInTerm.getTopLevel(),
