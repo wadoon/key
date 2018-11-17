@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-// This file is partially taken from the RECODER library, which is protected by 
+// This file is partially taken from the RECODER library, which is protected by
 // the LGPL, and modified.
 
 
@@ -21,22 +21,16 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
+import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
+import de.uka.ilkd.key.parser.proofjava.ParseException;
+import de.uka.ilkd.key.parser.proofjava.ProofJavaParser;
 import recoder.ParserException;
 import recoder.ServiceConfiguration;
 import recoder.convenience.TreeWalker;
 import recoder.io.ProjectSettings;
 import recoder.io.PropertyNames;
-import recoder.java.Comment;
-import recoder.java.CompilationUnit;
-import recoder.java.Expression;
-import recoder.java.Identifier;
-import recoder.java.JavaProgramFactory;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.ProgramElement;
-import recoder.java.SingleLineComment;
+import recoder.java.*;
 import recoder.java.SourceElement.Position;
-import recoder.java.Statement;
-import recoder.java.StatementBlock;
 import recoder.java.declaration.ConstructorDeclaration;
 import recoder.java.declaration.FieldDeclaration;
 import recoder.java.declaration.MemberDeclaration;
@@ -49,30 +43,28 @@ import recoder.java.reference.VariableReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
 import recoder.util.StringUtils;
-import de.uka.ilkd.key.java.recoderext.adt.MethodSignature;
-import de.uka.ilkd.key.parser.proofjava.ParseException;
-import de.uka.ilkd.key.parser.proofjava.ProofJavaParser;
 
 public class ProofJavaProgramFactory extends JavaProgramFactory {
-    
+
     /**
      Protected constructor - use {@link #getInstance} instead.
      */
     protected ProofJavaProgramFactory() {}
 
-    /** 
+    /**
      The singleton instance of the program factory.
      */
-    private static ProofJavaProgramFactory theFactory 
+    private static ProofJavaProgramFactory theFactory
 	= new ProofJavaProgramFactory();
 
-    /** 
+    /**
      Returns the single instance of this class.
      */
     public static JavaProgramFactory getInstance() {
         return theFactory;
     }
-    
+
+    @Override
     public void initialize(ServiceConfiguration cfg) {
 
       super.initialize(cfg);
@@ -80,16 +72,16 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
       /*// that is the original recoder code:
       ProofJavaParser.setAwareOfAssert(StringUtils.parseBooleanProperty(settings.getProperties().getProperty(
               PropertyNames.JDK1_4)));
-      ProofJavaParser.setJava5(ALLOW_JAVA5); 
+      ProofJavaParser.setJava5(ALLOW_JAVA5);
       */
       ProofJavaParser.setJava5(StringUtils.parseBooleanProperty(settings.getProperties().getProperty(
               PropertyNames.JAVA_5)));
       ProofJavaParser.setAwareOfAssert(true);
-      
+
   }
 
 
-    /** 
+    /**
      For internal reuse and synchronization.
      */
     private static final ProofJavaParser parser = new ProofJavaParser(System.in);
@@ -154,7 +146,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
             }
 	    if (pe.getFirstElement()!=null) {
 		Position pos = pe.getFirstElement().getStartPosition();
-		while ((commentIndex < commentCount) 
+		while ((commentIndex < commentCount)
 		       && pos.compareTo(cpos) > 0) {
 		    current.setPrefixed(true);
 		    attachComment(current, pe);
@@ -186,6 +178,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse a {@link CompilationUnit} from the given reader.
      */
+    @Override
     public CompilationUnit parseCompilationUnit(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try {
@@ -202,6 +195,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse a {@link TypeDeclaration} from the given reader.
      */
+    @Override
     public TypeDeclaration parseTypeDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
@@ -219,6 +213,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse a {@link FieldDeclaration} from the given reader.
      */
+    @Override
     public FieldDeclaration parseFieldDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
@@ -236,6 +231,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse a {@link MethodDeclaration} from the given reader.
      */
+    @Override
     public MethodDeclaration parseMethodDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
@@ -253,6 +249,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse a {@link MemberDeclaration} from the given reader.
      */
+    @Override
     public MemberDeclaration parseMemberDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
@@ -270,6 +267,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse a {@link ParameterDeclaration} from the given reader.
      */
+    @Override
     public ParameterDeclaration parseParameterDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
@@ -287,6 +285,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse a {@link ConstructorDeclaration} from the given reader.
      */
+    @Override
     public ConstructorDeclaration parseConstructorDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
@@ -304,6 +303,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse a {@link TypeReference} from the given reader.
      */
+    @Override
     public TypeReference parseTypeReference(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
@@ -321,6 +321,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse an {@link Expression} from the given reader.
      */
+    @Override
     public Expression parseExpression(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
@@ -338,6 +339,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse some {@link Statement}s from the given reader.
      */
+    @Override
     public ASTList<Statement> parseStatements(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
@@ -357,7 +359,8 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     /**
      * Parse a {@link StatementBlock} from the given string.
      */
-    public StatementBlock parseStatementBlock(Reader in) 
+    @Override
+    public StatementBlock parseStatementBlock(Reader in)
 	throws IOException, ParserException {
 	synchronized(parser) {
 	    try{
@@ -371,7 +374,7 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 
         }
     }
-    
+
     /**
      * Create a {@link PassiveExpression}.
      */
@@ -406,11 +409,15 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     public LoopScopeBlock createLoopScopeBlock() {
         return new LoopScopeBlock();
     }
-    
+
+    public AbstractPlaceholderStatement createAbstractPlaceholderStatement() {
+        return new AbstractPlaceholderStatement();
+    }
+
     public MergePointStatement createMergePointStatement() {
         return new MergePointStatement();
     }
-    
+
     public MergePointStatement createMergePointStatement(Expression expr) {
         return new MergePointStatement(expr);
     }
@@ -431,23 +438,25 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
 					     StatementBlock body) {
 	return new CatchAllStatement(param, body);
     }
-    
+
     /**
      * Create a comment.
      * @param text comment text
      */
+    @Override
     public Comment createComment(String text) {
         return new Comment(text);
     }
-    
+
     /**
      * Create a comment.
      * @param text comment text
      */
+    @Override
     public Comment createComment(String text, boolean prefixed) {
         return new Comment(text, prefixed);
     }
-    
+
     /**
      * Create an {@link ImplicitIdentifier}.
      */
@@ -456,12 +465,13 @@ public class ProofJavaProgramFactory extends JavaProgramFactory {
     }
 
 
+    @Override
     public Identifier createIdentifier(String text) {
         return new ExtendedIdentifier(text);
     }
-    
+
     public ObjectTypeIdentifier createObjectTypeIdentifier(String text) {
         return new ObjectTypeIdentifier(text);
     }
-    
+
 }

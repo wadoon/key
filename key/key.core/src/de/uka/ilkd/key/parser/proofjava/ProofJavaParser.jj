@@ -3645,7 +3645,8 @@ Statement Statement() :
 }
 {
 (
-  LOOKAHEAD(2)
+  result = AbstractPlaceholderStatement()
+| LOOKAHEAD(2)
   result = LabeledStatement()
 | result = Block()
 | result = EmptyStatement()
@@ -4027,6 +4028,27 @@ Expression StatementExpression() :
   )
 )
   {
+    checkConstruction(result);
+    setPostfixInfo(result);
+    return result;
+  }
+}
+
+AbstractPlaceholderStatement AbstractPlaceholderStatement() :
+{
+  AbstractPlaceholderStatement result;
+  String id = null;
+}
+{
+  "abstract-program"
+  {
+    result = factory.createAbstractPlaceholderStatement();
+    setPrefixInfo(result);
+  }
+  (<IDENTIFIER> { id = token.image; })
+  ";"
+  {
+    result.setId(id);
     checkConstruction(result);
     setPostfixInfo(result);
     return result;

@@ -32,48 +32,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.strategy.feature.AgeFeature;
-import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
-import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
-import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
-import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
-import de.uka.ilkd.key.strategy.feature.ContainsTermFeature;
-import de.uka.ilkd.key.strategy.feature.CountBranchFeature;
-import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
-import de.uka.ilkd.key.strategy.feature.CountPosDPathFeature;
-import de.uka.ilkd.key.strategy.feature.DeleteMergePointRuleFeature;
-import de.uka.ilkd.key.strategy.feature.DependencyContractFeature;
-import de.uka.ilkd.key.strategy.feature.DiffFindAndIfFeature;
-import de.uka.ilkd.key.strategy.feature.DiffFindAndReplacewithFeature;
-import de.uka.ilkd.key.strategy.feature.DirectlyBelowSymbolFeature;
-import de.uka.ilkd.key.strategy.feature.EqNonDuplicateAppFeature;
-import de.uka.ilkd.key.strategy.feature.Feature;
-import de.uka.ilkd.key.strategy.feature.FindDepthFeature;
-import de.uka.ilkd.key.strategy.feature.FindRightishFeature;
-import de.uka.ilkd.key.strategy.feature.FocusInAntecFeature;
-import de.uka.ilkd.key.strategy.feature.InEquationMultFeature;
-import de.uka.ilkd.key.strategy.feature.MatchedIfFeature;
-import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.NoSelfApplicationFeature;
-import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
-import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
-import de.uka.ilkd.key.strategy.feature.NotBelowBinderFeature;
-import de.uka.ilkd.key.strategy.feature.NotBelowQuantifierFeature;
-import de.uka.ilkd.key.strategy.feature.NotInScopeOfModalityFeature;
-import de.uka.ilkd.key.strategy.feature.OnlyInScopeOfQuantifiersFeature;
-import de.uka.ilkd.key.strategy.feature.PolynomialValuesCmpFeature;
-import de.uka.ilkd.key.strategy.feature.PurePosDPathFeature;
-import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
-import de.uka.ilkd.key.strategy.feature.ReducibleMonomialsFeature;
-import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
-import de.uka.ilkd.key.strategy.feature.SVNeedsInstantiation;
-import de.uka.ilkd.key.strategy.feature.ScaleFeature;
-import de.uka.ilkd.key.strategy.feature.SetsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.SumFeature;
-import de.uka.ilkd.key.strategy.feature.TermSmallerThanFeature;
-import de.uka.ilkd.key.strategy.feature.ThrownExceptionFeature;
-import de.uka.ilkd.key.strategy.feature.TopLevelFindFeature;
-import de.uka.ilkd.key.strategy.feature.TrivialMonomialLCRFeature;
+import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
@@ -266,6 +225,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             mergeRuleF = mergeRuleFeature(inftyConst());
         }
 
+        final Feature instLoopHolesF =  instLoopHoleFeature(inftyConst());
+
         // final Feature smtF = smtFeature(inftyConst());
 
         return SumFeature.createSum(
@@ -273,7 +234,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 NonDuplicateAppFeature.INSTANCE,
                 // splitF,
                 // strengthenConstraints,
-                AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF,
+                AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF, instLoopHolesF,
                 // smtF,
                 methodSpecF, queryF, depSpecF, loopInvF, blockFeature, loopBlockFeature,
                 loopBlockApplyHeadFeature,
@@ -973,15 +934,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private boolean classAxiomDelayedApplication() {
         String classAxiomSetting =
-                (String) strategyProperties
-                        .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
+                strategyProperties
+                .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
         return StrategyProperties.CLASS_AXIOM_DELAYED.equals(classAxiomSetting);
     }
 
     private boolean classAxiomApplicationEnabled() {
         String classAxiomSetting =
-                (String) strategyProperties
-                        .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
+                strategyProperties
+                .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
         return !StrategyProperties.CLASS_AXIOM_OFF.equals(classAxiomSetting);
     }
 
@@ -2768,6 +2729,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupInEqSimpInstantiationWithoutRetry(d);
     }
 
+    @Override
     public Name name() {
         return new Name(JAVA_CARD_DL_STRATEGY);
     }
@@ -2782,6 +2744,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule
      *         shall not be applied at all (it is discarded by the strategy).
      */
+    @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
             Goal goal) {
         return costComputationF.computeCost(app, pio, goal);
@@ -2795,11 +2758,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      * @param goal the goal
      * @return true iff the rule should be applied, false otherwise
      */
+    @Override
     public final boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
             Goal goal) {
         return !(approvalF.computeCost(app, pio, goal) instanceof TopRuleAppCost);
     }
 
+    @Override
     protected RuleAppCost instantiateApp(RuleApp app,
             PosInOccurrence pio, Goal goal) {
         return instantiationF.computeCost(app, pio, goal);

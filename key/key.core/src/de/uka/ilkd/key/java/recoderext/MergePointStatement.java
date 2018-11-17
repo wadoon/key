@@ -80,14 +80,14 @@ public class MergePointStatement extends JavaStatement
     public PositionedString getMergeParams() {
         return mergeParams;
     }
-    
+
     public void setIndexPV(Expression indexPV) {
         this.indexPV = indexPV;
     }
 
     /**
      * Finds the source element that occurs first in the source.
-     * 
+     *
      * @return the last source element in the syntactical representation of this
      *         element, may be equals to this element.
      */
@@ -98,7 +98,7 @@ public class MergePointStatement extends JavaStatement
 
     /**
      * Finds the source element that occurs last in the source.
-     * 
+     *
      * @return the last source element in the syntactical representation of this
      *         element, may be equals to this element.
      */
@@ -109,7 +109,7 @@ public class MergePointStatement extends JavaStatement
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
     @Override
@@ -120,7 +120,7 @@ public class MergePointStatement extends JavaStatement
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
+     *
      * @param index
      *            an index into this node's "virtual" child array
      * @return the program element at the given position
