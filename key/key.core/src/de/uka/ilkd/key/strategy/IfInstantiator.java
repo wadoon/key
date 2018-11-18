@@ -56,8 +56,8 @@ public class IfInstantiator {
             return ImmutableSLList.<NoPosTacletApp>nil().prepend(tacletAppContainer.getTacletApp());
         } else {
             return findIfFormulaInstantiationsHelp(
-                    ifSequent.succedent().asList(), //// Matching with the last formula
-                    ifSequent.antecedent().asList(),
+                    ifSequent.succedent().asList().reverse(), //// Matching with the last formula
+                    ifSequent.antecedent().asList().reverse(),
                     ImmutableSLList.nil(), 
                     tacletAppContainer.getTacletApp().matchConditions(),
                     false,
