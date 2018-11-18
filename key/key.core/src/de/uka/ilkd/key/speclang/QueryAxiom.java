@@ -62,55 +62,55 @@ import de.uka.ilkd.key.util.Pair;
  * method body.
  */
 public final class QueryAxiom extends ClassAxiom {
-    
+
     private final String name;
-    private final IProgramMethod target;    
-    private final KeYJavaType kjt;        
-    
+    private final IProgramMethod target;
+    private final KeYJavaType kjt;
+
     public QueryAxiom(String name, IProgramMethod target, KeYJavaType kjt) {
 	assert name != null;
 	assert target != null;
-	assert target.getReturnType() != null;	
+	assert target.getReturnType() != null;
 	assert kjt != null;
 	this.name = name;
 	this.target = target;
 	this.kjt = kjt;
     }
 
-    
+
     @Override
-    public boolean equals(Object o) {       
+    public boolean equals(Object o) {
        if (o == null || o.getClass() != getClass()) {
           return false;
        }
        final QueryAxiom other = (QueryAxiom) o;
-       return name.equals(other.name) && target.equals(other.target) && kjt.equals(other.kjt);  
+       return name.equals(other.name) && target.equals(other.target) && kjt.equals(other.kjt);
     }
-    
+
     @Override
     public int hashCode() {
        return name.hashCode() * 7 + target.hashCode() * 49 + kjt.hashCode() * 17;
     }
-    
+
 
     @Override
     public String getName() {
 	return name;
     }
-    
-    
+
+
     @Override
     public IObserverFunction getTarget() {
 	return target;
-    }    
-    
+    }
+
 
     @Override
     public KeYJavaType getKJT() {
 	return kjt;
     }
-    
-    
+
+
     @Override
     public VisibilityModifier getVisibility() {
 	return new Private();
@@ -272,15 +272,15 @@ public final class QueryAxiom extends ClassAxiom {
         if (!target.isStatic()) {
             tacletBuilder.addVarsNewDependingOn(skolemSV, selfSV);
             tacletBuilder.setIfSequent(ifSeq);
-            tacletBuilder.addVarsNew(selfProgSV, kjt.getJavaType());
+            tacletBuilder.addVarsNew(selfProgSV, kjt);
         }
         for (int i = 0; i < paramSVs.length; i++) {
             tacletBuilder.addVarsNewDependingOn(skolemSV, paramSVs[i]);
             tacletBuilder.addVarsNew(paramProgSVs[i],
-                                     target.getParamType(i).getJavaType());
+                                     target.getParamType(i));
         }
         tacletBuilder.addVarsNew(resultProgSV,
-                                 target.getReturnType().getJavaType());
+                                 target.getReturnType());
         tacletBuilder.setApplicationRestriction(RewriteTaclet.SAME_UPDATE_LEVEL);
         tacletBuilder.addTacletGoalTemplate(
                 new RewriteTacletGoalTemplate(addedSeq,
@@ -300,11 +300,11 @@ public final class QueryAxiom extends ClassAxiom {
 	    						Services services) {
 	return DefaultImmutableSet.nil();
     }
-    
-    
+
+
     @Override
     public String toString() {
 	return "query axiom for " + target;
     }
-    
+
 }

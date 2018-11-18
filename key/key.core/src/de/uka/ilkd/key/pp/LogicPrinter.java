@@ -474,7 +474,11 @@ public class LogicPrinter {
                 layouter.print(((ArrayType) sv.getType())
                         .getAlternativeNameRepresentation());
             } else {
-                layouter.print(sv.getType().getFullName());
+                if (sv.getType().getJavaType() == null) {
+                    layouter.print(sv.getType().getSort().name().toString());
+                } else {
+                    layouter.print(sv.getType().getFullName());
+                }
             }
         } else {
             layouter.print("\\typeof (").brk();

@@ -19,119 +19,106 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-
 /**
- * Objects of this class represent function and predicate symbols. Note
- * that program variables are a separate syntactic category, and not a type
- * of function.
+ * Objects of this class represent function and predicate symbols. Note that
+ * program variables are a separate syntactic category, and not a type of
+ * function.
  */
 public class Function extends AbstractSortedOperator {
 
     private final boolean unique;
     private final boolean skolemConstant;
 
+    // -------------------------------------------------------------------------
+    // constructors
+    // -------------------------------------------------------------------------
 
-    //-------------------------------------------------------------------------
-    //constructors
-    //-------------------------------------------------------------------------     
-
-    Function(Name name,
-             Sort sort,
-             ImmutableArray<Sort> argSorts,
-             ImmutableArray<Boolean> whereToBind,
-             boolean unique,
-             boolean isRigid,
-             boolean isSkolemConstant) {
-	super(name, argSorts, sort, whereToBind, isRigid);
-	this.unique = unique;
-	skolemConstant = isSkolemConstant;
-	assert sort != Sort.UPDATE;
-	assert !(unique && sort == Sort.FORMULA);
-	assert !(sort instanceof NullSort) || name.toString().equals("null")
-	       : "Functions with sort \"null\" are not allowed: " + this;
+    Function(Name name, Sort sort, ImmutableArray<Sort> argSorts,
+            ImmutableArray<Boolean> whereToBind, boolean unique,
+            boolean isRigid, boolean isSkolemConstant) {
+        super(name, argSorts, sort, whereToBind, isRigid);
+        this.unique = unique;
+        skolemConstant = isSkolemConstant;
+        /*
+         * NOTE (DS, 2018-11-18): Disabled the below assertion, since
+         * "abstract updates" (for abstract / lazy SE) are currently realized
+         * using function symbols of update sort. I don't know whether there's
+         * any further reason that I forgot... But I added another assertion
+         * below: If the sort is an update, then it must be a Skolem constant.
+         */
+        // assert sort != Sort.UPDATE;
+        assert sort != Sort.UPDATE || isSkolemConstant;
+        assert !(unique && sort == Sort.FORMULA);
+        assert !(sort instanceof NullSort) || name.toString().equals(
+            "null") : "Functions with sort \"null\" are not allowed: " + this;
     }
 
-    public Function(Name name,
-                    Sort sort,
-                    ImmutableArray<Sort> argSorts,
-                    ImmutableArray<Boolean> whereToBind,
-                    boolean unique) {
+    public Function(Name name, Sort sort, ImmutableArray<Sort> argSorts,
+            ImmutableArray<Boolean> whereToBind, boolean unique) {
         this(name, sort, argSorts, whereToBind, unique, true, false);
     }
 
-    public Function(Name name,
-                    Sort sort,
-                    ImmutableArray<Sort> argSorts,
-                    ImmutableArray<Boolean> whereToBind,
-                    boolean unique,
-                    boolean isSkolemConstant) {
+    public Function(Name name, Sort sort, ImmutableArray<Sort> argSorts,
+            ImmutableArray<Boolean> whereToBind, boolean unique,
+            boolean isSkolemConstant) {
         this(name, sort, argSorts, whereToBind, unique, true, isSkolemConstant);
     }
 
-    public Function(Name name,
-                    Sort sort,
-                    Sort[] argSorts,
-                    Boolean[] whereToBind,
-                    boolean unique) {
-	this(name,
-             sort,
-             new ImmutableArray<Sort>(argSorts),
-             whereToBind == null ? null : new ImmutableArray<Boolean>(whereToBind),
-             unique);
+    public Function(Name name, Sort sort, Sort[] argSorts,
+            Boolean[] whereToBind, boolean unique) {
+        this(name, sort, new ImmutableArray<Sort>(argSorts),
+            whereToBind == null ? null
+                    : new ImmutableArray<Boolean>(whereToBind),
+            unique);
     }
 
-    public Function(Name name,
-                    Sort sort,
-                    Sort[] argSorts,
-                    Boolean[] whereToBind,
-                    boolean unique,
-                    boolean isSkolemConstant) {
-        this(name,
-             sort,
-             new ImmutableArray<Sort>(argSorts),
-             whereToBind == null ? null : new ImmutableArray<Boolean>(whereToBind),
-             unique,
-             isSkolemConstant);
+    public Function(Name name, Sort sort, Sort[] argSorts,
+            Boolean[] whereToBind, boolean unique, boolean isSkolemConstant) {
+        this(name, sort, new ImmutableArray<Sort>(argSorts),
+            whereToBind == null ? null
+                    : new ImmutableArray<Boolean>(whereToBind),
+            unique, isSkolemConstant);
     }
 
-    Function(Name name, Sort sort, ImmutableArray<Sort> argSorts, boolean isRigid) {
+    Function(Name name, Sort sort, ImmutableArray<Sort> argSorts,
+            boolean isRigid) {
         this(name, sort, argSorts, null, false, isRigid, false);
     }
 
     public Function(Name name, Sort sort, ImmutableArray<Sort> argSorts) {
-	this(name, sort, argSorts, null, false);
+        this(name, sort, argSorts, null, false);
     }
 
-    public Function(Name name, Sort sort, Sort ... argSorts) {
-	this(name, sort, argSorts, null, false);
+    public Function(Name name, Sort sort, Sort... argSorts) {
+        this(name, sort, argSorts, null, false);
     }
 
-    public Function(Name name, Sort sort, boolean isSkolemConstant, Sort ... argSorts) {
+    public Function(Name name, Sort sort, boolean isSkolemConstant,
+            Sort... argSorts) {
         this(name, sort, argSorts, null, false, isSkolemConstant);
     }
 
     public Function(Name name, Sort sort) {
-	this(name, sort, new ImmutableArray<Sort>(), null, false);
+        this(name, sort, new ImmutableArray<Sort>(), null, false);
     }
 
     public Function(Name name, Sort sort, boolean isSkolemConstant) {
-        this(name, sort, new ImmutableArray<Sort>(), null, false, true, isSkolemConstant);
+        this(name, sort, new ImmutableArray<Sort>(), null, false, true,
+            isSkolemConstant);
     }
 
-
-    //-------------------------------------------------------------------------
-    //public interface
-    //-------------------------------------------------------------------------     
+    // -------------------------------------------------------------------------
+    // public interface
+    // -------------------------------------------------------------------------
 
     /**
      * Indicates whether the function or predicate symbol has the "uniqueness"
      * property. For two unique symbols f1: A1 -> B1, f2: A2 -> B2 by definition
-     * we have
-     * (1) f1(x) != f1(y) for all x, y in A1 with x != y (i.e., injectivity),
-     * and (2) f1(x) != f2(y) for all x in A1, y in A2.
+     * we have (1) f1(x) != f1(y) for all x, y in A1 with x != y (i.e.,
+     * injectivity), and (2) f1(x) != f2(y) for all x in A1, y in A2.
      */
     public final boolean isUnique() {
-	return unique;
+        return unique;
     }
 
     public final boolean isSkolemConstant() {
@@ -140,9 +127,8 @@ public class Function extends AbstractSortedOperator {
 
     @Override
     public final String toString() {
-	return (name() + (whereToBind() == null
-		          ? ""
-		          : "{" + whereToBind() + "}"));
+        return (name()
+                + (whereToBind() == null ? "" : "{" + whereToBind() + "}"));
     }
 
     /**
@@ -150,24 +136,25 @@ public class Function extends AbstractSortedOperator {
      * function or predicate symbol.
      */
     public final String proofToString() {
-       String s =
-	   (sort() == Sort.FORMULA ? "" : sort().toString()) + " ";
-       s += name();
-       if (arity()>0) {
-          int i = 0;
-          s+="(";
-          while (i<arity()) {
-             if (i>0) s+=",";
-             s+=argSort(i);
-             i++;
-          }
-          s+=")";
-       }
-       s+=";\n";
-       return s;
+        String s = (sort() == Sort.FORMULA ? "" : sort().toString()) + " ";
+        s += name();
+        if (arity() > 0) {
+            int i = 0;
+            s += "(";
+            while (i < arity()) {
+                if (i > 0)
+                    s += ",";
+                s += argSort(i);
+                i++;
+            }
+            s += ")";
+        }
+        s += ";\n";
+        return s;
     }
 
     public Function rename(Name newName) {
-        return new Function(newName, sort(), argSorts(), whereToBind(), unique, skolemConstant);
+        return new Function(newName, sort(), argSorts(), whereToBind(), unique,
+            skolemConstant);
     }
 }

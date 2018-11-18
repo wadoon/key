@@ -22,7 +22,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Sequent;
@@ -190,7 +190,7 @@ public abstract class TacletBuilder<T extends Taclet> {
      * adds a new <I>new</I> variable to the variable conditions of the Taclet:
      * v is new and has the given type
      */
-    public void addVarsNew(SchemaVariable v, Type type) {
+    public void addVarsNew(SchemaVariable v, KeYJavaType type) {
         addVarsNew(new NewVarcond(v, type));
     }
 

@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /**
@@ -23,7 +23,7 @@ public class NewVarcond {
 
     private final SchemaVariable sv;
     private final SchemaVariable peerSV;
-    private final Type type;
+    private final KeYJavaType type;
 
     /*
      * @param sv the Schemavariable representing a new variable.
@@ -38,7 +38,7 @@ public class NewVarcond {
         this.type = null;
     }
 
-    public NewVarcond(SchemaVariable sv, Type type) {
+    public NewVarcond(SchemaVariable sv, KeYJavaType type) {
         assert sv != null;
         assert type != null;
         this.sv = sv;
@@ -58,7 +58,7 @@ public class NewVarcond {
         return peerSV;
     }
 
-    public Type getType() {
+    public KeYJavaType getType() {
         return type;
     }
 
