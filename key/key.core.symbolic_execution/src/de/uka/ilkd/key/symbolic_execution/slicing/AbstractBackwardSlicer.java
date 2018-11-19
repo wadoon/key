@@ -16,7 +16,7 @@ import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.proof.Node;
@@ -58,8 +58,8 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
                if (oldAliases != null) {
                   try {
                      // Update relevant locations if required
-                     if (activeStatement instanceof CopyAssignment) {
-                        SourceElement originalTarget = ((CopyAssignment) activeStatement).getArguments().get(0);
+                     if (activeStatement instanceof Assignment) {
+                        SourceElement originalTarget = ((Assignment) activeStatement).getArguments().get(0);
                         ReferencePrefix relevantTarget = toReferencePrefix(originalTarget);
                         Location normalizedPrefix = normalizeAlias(services, relevantTarget, info);
                         relevantLocations = updateOutdatedLocations(services, relevantLocations, aliases, oldAliases, normalizedPrefix, thisReference);
@@ -102,7 +102,7 @@ public abstract class AbstractBackwardSlicer extends AbstractSlicer {
     * @param info The {@link SequentInfo} with the aliases and so on.
     * @param services The {@link Services} to use.
     */
-   protected void updateRelevantLocations(final ProgramElement read, 
+   protected void updateRelevantLocations(final ProgramElement read,
                                           final Set<Location> relevantLocations, 
                                           final SequentInfo info,
                                           final Services services) {

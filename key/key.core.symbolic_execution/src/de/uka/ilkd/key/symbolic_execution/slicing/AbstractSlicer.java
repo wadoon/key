@@ -476,15 +476,17 @@ public abstract class AbstractSlicer {
                                             List<Location> listToFill,
                                             ReferencePrefix thisReference,
                                             Set<Location> relevantLocations,
-                                            Node node) throws ProofInputException {
-      if (term.op() == heapLDT.getStore()) {
+                                            Node node) throws ProofInputException {      
+	  if (term.op() == heapLDT.getStore()) {
          // Analyze parent heap
          listModifiedHeapLocations(term.sub(0), services, heapLDT, listToFill, thisReference, relevantLocations, node);
          // Check for alias in current store
          if (SymbolicExecutionUtil.hasReferenceSort(services, term.sub(3))) {
             Location source = toLocation(services, term.sub(3));
             if (source != null) {
-               Location targetPrefix = toLocation(services, term.sub(1));
+               Location targetPrefix = toLocation(services, 
+            		   services.getTermBuilder().select(term.sub(3).sort(), 
+            				   term.sub(0), term.sub(1), term.sub(2)));
                listToFill.add(targetPrefix);
             }
          }
@@ -500,55 +502,7 @@ public abstract class AbstractSlicer {
          if (!relevantLocations.isEmpty()) { // Nothing to do if relevant locations are empty
             Term anonHeap = term.sub(2);
             // Idea: Compute all values of relevant locations in a side proof. Modified locations are anonymized.
-            ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(node.proof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
-            ApplyStrategyInfo info = null;
-            try {
-               // Create location terms
-               List<Location> resultLocations = new ArrayList<Location>(relevantLocations.size());
-               List<Term> resultTerms = new ArrayList<Term>(relevantLocations.size());
-               List<Sort> resultSorts = new ArrayList<Sort>(relevantLocations.size());
-               for (Location location : relevantLocations) {
-                  Term locationTerm = location.toTerm(sideProofEnv.getServicesForEnvironment());
-                  if (!(locationTerm.op() instanceof IProgramVariable)) { // Ignore local variables.
-                     resultLocations.add(location);
-                     resultTerms.add(locationTerm);
-                     resultSorts.add(locationTerm.sort());
-                  }
-               }
-               if (!resultTerms.isEmpty()) {
-                  // Create predicate which will be used in formulas to store the value interested in.
-                  Function newPredicate = new Function(new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, new ImmutableArray<Sort>(resultSorts));
-                  // Create formula which contains the value interested in.
-                  Term newTerm = sideProofEnv.getServicesForEnvironment().getTermBuilder().func(newPredicate, resultTerms.toArray(new Term[resultTerms.size()]));
-
-                  Sequent sequentToProve = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, node.getAppliedRuleApp().posInOccurrence(), newTerm);
-                  ProofStarter starter = SideProofUtil.createSideProof(sideProofEnv, sequentToProve, "Analyze Anon Update");
-                  info = SymbolicExecutionSideProofUtil.startSideProof(node.proof(), 
-                                                                       starter, 
-                                                                       StrategyProperties.METHOD_CONTRACT,
-                                                                       StrategyProperties.LOOP_INVARIANT,
-                                                                       StrategyProperties.QUERY_ON,
-                                                                       StrategyProperties.SPLITTING_NORMAL);
-                  // Check for anonymized values in the side proof goals
-                  assert !info.getProof().closed();
-                  for (Goal goal : info.getProof().openGoals()) {
-                     Term operatorTerm = SymbolicExecutionSideProofUtil.extractOperatorTerm(goal, newPredicate);
-                     assert operatorTerm != null;
-                     for (int i = 0; i < operatorTerm.arity(); i++) {
-                        Term valueTerm = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), operatorTerm.sub(i), services);
-                        if (valueTerm.arity() >= 1) {
-                           Term heap = valueTerm.sub(0);
-                           if (anonHeap.equals(heap)) {
-                              listToFill.add(resultLocations.get(i));
-                           }
-                        }
-                     }
-                  }
-               }
-            }
-            finally {
-               SymbolicExecutionSideProofUtil.disposeOrStore("Analyze Anon Update", info);
-            }
+            analyseAnonHeap(services, listToFill, relevantLocations, node, anonHeap);
          }
       }
       else if (SymbolicExecutionUtil.isHeap(term.op(), heapLDT)) {
@@ -594,8 +548,15 @@ public abstract class AbstractSlicer {
                         if (valueTerm.arity() >= 1) {
                            Term heap = valueTerm.sub(0);
                            if (heap.containsLabel(ParameterlessTermLabel.ANON_HEAP_LABEL)) {
-                              listToFill.add(resultLocations.get(i));
-                           }
+                        	   boolean equalOthers = true;
+                        	   for (int j = 1; j<valueTerm.arity(); j++) {
+                        		   equalOthers &= valueTerm.sub(j).equals(resultTerms.get(i).sub(j));
+                        		   if (!equalOthers) break;
+                        	   }
+                        	   if (equalOthers) {
+                        		   listToFill.add(resultLocations.get(i));
+                        	   }
+    	            	   }
                         }
                      }
                   }
@@ -610,6 +571,67 @@ public abstract class AbstractSlicer {
          throw new IllegalStateException("Can not analyze update '" + term + "'.");
       }
    }
+
+public void analyseAnonHeap(Services services, List<Location> listToFill,
+		Set<Location> relevantLocations, Node node,
+		Term anonHeap) throws ProofInputException {
+	ProofEnvironment sideProofEnv = SymbolicExecutionSideProofUtil.cloneProofEnvironmentWithOwnOneStepSimplifier(node.proof(), true); // New OneStepSimplifier is required because it has an internal state and the default instance can't be used parallel.
+	ApplyStrategyInfo info = null;
+	try {
+	   // Create location terms
+	   List<Location> resultLocations = new ArrayList<Location>(relevantLocations.size());
+	   List<Term> resultTerms = new ArrayList<Term>(relevantLocations.size());
+	   List<Sort> resultSorts = new ArrayList<Sort>(relevantLocations.size());
+	   for (Location location : relevantLocations) {
+	      Term locationTerm = location.toTerm(sideProofEnv.getServicesForEnvironment());
+	      if (!(locationTerm.op() instanceof IProgramVariable)) { // Ignore local variables.
+	         resultLocations.add(location);
+	         resultTerms.add(locationTerm);
+	         resultSorts.add(locationTerm.sort());
+	      }
+	   }
+	   if (!resultTerms.isEmpty()) {
+	      // Create predicate which will be used in formulas to store the value interested in.
+	      Function newPredicate = new Function(new Name(sideProofEnv.getServicesForEnvironment().getTermBuilder().newName("ResultPredicate")), Sort.FORMULA, new ImmutableArray<Sort>(resultSorts));
+	      // Create formula which contains the value interested in.
+	      Term newTerm = sideProofEnv.getServicesForEnvironment().getTermBuilder().func(newPredicate, resultTerms.toArray(new Term[resultTerms.size()]));
+
+	      Sequent sequentToProve = SymbolicExecutionUtil.createSequentToProveWithNewSuccedent(node, node.getAppliedRuleApp().posInOccurrence(), newTerm);
+	      ProofStarter starter = SideProofUtil.createSideProof(sideProofEnv, sequentToProve, "Analyze Anon Update");
+	      info = SymbolicExecutionSideProofUtil.startSideProof(node.proof(), 
+	                                                           starter, 
+	                                                           StrategyProperties.METHOD_CONTRACT,
+	                                                           StrategyProperties.LOOP_INVARIANT,
+	                                                           StrategyProperties.QUERY_ON,
+	                                                           StrategyProperties.SPLITTING_NORMAL);
+	      // Check for anonymized values in the side proof goals
+	      assert !info.getProof().closed();
+	      for (Goal goal : info.getProof().openGoals()) {
+	         Term operatorTerm = SymbolicExecutionSideProofUtil.extractOperatorTerm(goal, newPredicate);
+	         assert operatorTerm != null;
+	         for (int i = 0; i < operatorTerm.arity(); i++) {
+	            Term valueTerm = SymbolicExecutionUtil.replaceSkolemConstants(goal.sequent(), operatorTerm.sub(i), services);
+	            if (valueTerm.arity() >= 1) {
+	               Term heap = valueTerm.sub(0);
+	               if (anonHeap.equals(heap)) {
+	            	   boolean equalOthers = true;
+	            	   for (int j = 1; j<valueTerm.arity(); j++) {
+	            		   equalOthers &= valueTerm.sub(j).equals(resultTerms.get(i).sub(j));
+	            		   if (!equalOthers) break;
+	            	   }
+	            	   if (equalOthers) { 
+	            		   listToFill.add(resultLocations.get(i));
+	            	   }
+	               }
+	            }
+	         }
+	      }
+	   }
+	}
+	finally {
+	   SymbolicExecutionSideProofUtil.disposeOrStore("Analyze Anon Update", info);
+	}
+}
 
    /**
     * Adds the found alias consisting of first and second {@link ReferencePrefix} to the alias {@link Map}.
@@ -714,8 +736,8 @@ public abstract class AbstractSlicer {
          normalizedAccesses = normalizedAccesses.append(access);
          Location oldLocation = new Location(normalizedAccesses);
          Location newLocation = computeRepresentativeAlias(oldLocation, info.getAliases());
-         if (!oldLocation.equals(newLocation)) {
-            normalizedAccesses = normalizeAlias(services, newLocation, info).getAccesses();
+         if (!oldLocation.equals(newLocation)) {        	 
+             normalizedAccesses = normalizeAlias(services, newLocation, info).getAccesses();
          }
       }
       return new Location(normalizedAccesses);

@@ -7,9 +7,10 @@ import java.util.Set;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
+import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -37,13 +38,17 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
                             SourceElement activeStatement) throws ProofInputException {
       try {
          boolean accept = false;
-         if (activeStatement instanceof CopyAssignment) {
-            CopyAssignment copyAssignment = (CopyAssignment) activeStatement;
+         if (activeStatement instanceof Assignment) {
+        	Assignment copyAssignment = (Assignment) activeStatement;
             ImmutableArray<Expression> arguments = copyAssignment.getArguments();
             if (arguments.size() >= 1) {
                SourceElement originalTarget = arguments.get(0);
                ReferencePrefix relevantTarget = toReferencePrefix(originalTarget);
-               if (relevantTarget != null && removeRelevant(services, relevantTarget, relevantLocations, info)) {
+               if (relevantTarget != null && 
+            		   removeRelevant(services, relevantTarget, relevantLocations, info)) {
+            	  if (PositionInfo.UNDEFINED.equals(activeStatement.getPositionInfo())) {
+            		  updateRelevantLocations(relevantTarget, relevantLocations, info, services);
+            	  }
                   accept = true;
                   for (int i = 1; i < arguments.size(); i++) {
                      Expression read = arguments.get(i);
@@ -71,17 +76,18 @@ public class ThinBackwardSlicer extends AbstractBackwardSlicer {
             if (loopConditionModalityTerm.op() != UpdateApplication.UPDATE_APPLICATION) {
                throw new IllegalStateException("Use Loop Invariant/Operation Contract rule implementation has changed at node " + node.serialNr() + ".");
             }
+            
             Term updateTerm = UpdateApplication.getTarget(loopConditionModalityTerm);
             while (updateTerm.op() == UpdateApplication.UPDATE_APPLICATION) {
-               listModifiedLocations(UpdateApplication.getUpdate(updateTerm), 
-                                     services, 
-                                     services.getTypeConverter().getHeapLDT(), 
-                                     modifiedLocations, 
-                                     info.getExecutionContext(), 
-                                     info.getThisReference(), 
-                                     relevantLocations,
-                                     previousChild);
-               updateTerm = UpdateApplication.getTarget(updateTerm);
+            	listModifiedLocations(UpdateApplication.getUpdate(updateTerm), 
+            			services, 
+            			services.getTypeConverter().getHeapLDT(), 
+            			modifiedLocations, 
+            			info.getExecutionContext(), 
+            			info.getThisReference(), 
+            			relevantLocations,
+            			previousChild);
+            	updateTerm = UpdateApplication.getTarget(updateTerm);
             }
             // Check modified locations
             for (Location location : modifiedLocations) {
