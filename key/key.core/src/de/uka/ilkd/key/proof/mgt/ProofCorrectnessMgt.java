@@ -22,8 +22,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofTreeAdapter;
@@ -144,50 +142,6 @@ public final class ProofCorrectnessMgt {
             }
 	}
 	
-        return true;
-    }
-    
-    
-    @Deprecated
-    public boolean contractApplicableFor(KeYJavaType kjt,
-	                                 IObserverFunction target) {
-	target = specRepos.unlimitObs(target);
-	
-        //get the target which is being verified in the passed goal
-        final IObserverFunction targetUnderVerification 
-            = specRepos.getTargetOfProof(proof);
-        if(targetUnderVerification == null) {
-            return true;
-        }
-        
-        //collect all proofs on which the specification of the 
-        //passed target may depend
-        ImmutableSet<Proof> proofs = specRepos.getProofs(kjt, target);    
-        ImmutableSet<Proof> newProofs = proofs;
-        while(newProofs.size() > 0) {
-            final Iterator<Proof> it = newProofs.iterator();
-            newProofs = DefaultImmutableSet.<Proof>nil();
-            
-            while(it.hasNext()) {
-                final Proof p = it.next();
-                for(Contract contract : p.mgt().getUsedContracts()) {
-                    ImmutableSet<Proof> proofsForContractTarget 
-                    	= specRepos.getProofs(contract.getKJT(),
-                    		              contract.getTarget());
-                    newProofs = newProofs.union(proofsForContractTarget);
-                    proofs = proofs.union(proofsForContractTarget);                    
-                }
-            }
-        }
-        
-        //is one of those proofs about the target under verification? 
-        for(Proof p : proofs) {
-            final IObserverFunction target2 = specRepos.getTargetOfProof(p);
-            if(target2.equals(targetUnderVerification)) {
-                return false;
-            }
-        }
-        
         return true;
     }
 
