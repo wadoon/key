@@ -142,13 +142,13 @@ public class BuiltInRuleAppIndex {
     
     //TODO: optimise?
     private void scanSimplificationRule ( ImmutableList<BuiltInRule> rules,
-	    				  Goal goal,
+	    				                  Goal goal,
                                           PosInOccurrence pos,
                                           NewRuleListener listener ) {
-        ImmutableList<BuiltInRule> it = rules;
-        while (!it.isEmpty()) {
-            final BuiltInRule rule = it.head();
-            it = it.tail();
+        ImmutableList<BuiltInRule> workingList = rules;
+        while (!workingList.isEmpty()) {
+            final BuiltInRule rule = workingList.head();
+            workingList = workingList.tail();
             if (rule.isApplicable ( goal, pos ) ) {
                 IBuiltInRuleApp app = rule.createApp( pos, goal.proof().getServices() );                            
                 listener.ruleAdded ( app, pos );
