@@ -27,7 +27,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  */
 public abstract class GenericSortCondition {
 
-    private GenericSort gs;
+    private final GenericSort gs;
 
     /**
      * Create the condition that needs to be fulfilled for the given
@@ -195,7 +195,7 @@ public abstract class GenericSortCondition {
     
 
     static class GSCSupersort extends GenericSortCondition {
-	Sort        s;
+	final Sort        s;
 
 	protected GSCSupersort  ( GenericSort p_gs,
 				  Sort        p_s ) {
@@ -226,7 +226,7 @@ public abstract class GenericSortCondition {
 
 
     static class GSCIdentity  extends GenericSortCondition {
-	Sort        s;
+	final Sort        s;
 
 	protected GSCIdentity   ( GenericSort p_gs,
 				  Sort        p_s ) {
@@ -254,7 +254,7 @@ public abstract class GenericSortCondition {
 
 
     static class GSCForceInstantiation extends GenericSortCondition {
-	boolean maximum;
+	final boolean maximum;
 
 	protected GSCForceInstantiation ( GenericSort p_gs,
 					  boolean     p_maximum ) {
