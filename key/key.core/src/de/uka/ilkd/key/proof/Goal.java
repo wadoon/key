@@ -210,7 +210,9 @@ public final class Goal  {
      * @param l the GoalListener to be added
      */
     public void addGoalListener(GoalListener l) {
-	listeners.add(l);
+        synchronized(listeners) {
+            listeners.add(l);
+        }
     }
 
     /**
@@ -220,7 +222,9 @@ public final class Goal  {
      * @param l the GoalListener to be removed
      */
     public void removeGoalListener(GoalListener l) {
-       listeners.remove(l);
+        synchronized(listeners) {
+            listeners.remove(l);
+        }
     }
 
     /**
@@ -229,26 +233,32 @@ public final class Goal  {
      * to the listener as parameters and not through an event object.
      */
     protected void fireSequentChanged(SequentChangeInfo sci) {
-	getFormulaTagManager().sequentChanged(this, sci);
-	ruleAppIndex()        .sequentChanged(this, sci);
-	for (GoalListener listener : listeners) {
-	    listener.sequentChanged(this, sci);
-	}
+        getFormulaTagManager().sequentChanged(this, sci);
+        ruleAppIndex()        .sequentChanged(this, sci);
+        synchronized(listeners) {
+            for (GoalListener listener : listeners) {
+                listener.sequentChanged(this, sci);
+            }
+        }
     }
 
     protected void fireGoalReplaced(Goal       goal,
-				    Node       parent,
-				    ImmutableList<Goal> newGoals) {
-	for (GoalListener listener : listeners) {
-	    listener.goalReplaced(goal, parent, newGoals);
-	}
+            Node       parent,
+            ImmutableList<Goal> newGoals) {
+        synchronized(listeners) {
+            for (GoalListener listener : listeners) {
+                listener.goalReplaced(goal, parent, newGoals);
+            }
+        }
     }
 
-   protected void fireAautomaticStateChanged(boolean oldAutomatic, boolean newAutomatic) {
-      for (GoalListener listener : listeners) {
-         listener.automaticStateChanged(this, oldAutomatic, newAutomatic);
-      }
-   }
+    protected void fireAautomaticStateChanged(boolean oldAutomatic, boolean newAutomatic) {
+        synchronized(listeners) {
+            for (GoalListener listener : listeners) {
+                listener.automaticStateChanged(this, oldAutomatic, newAutomatic);
+            }
+        }
+    }
 
     /**
      * set the node the goal is related to

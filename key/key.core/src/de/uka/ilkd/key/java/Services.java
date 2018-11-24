@@ -336,10 +336,16 @@ public class Services implements TermServices {
      * returns an existing named counter, creates a new one otherwise
      */
     public Counter getCounter(String name) {
-        Counter c = counters.get(name);
-        if (c != null) return c;
-        c = new Counter(name);
-        counters.put(name, c);
+        Counter c;
+        synchronized(counters) {
+            c = counters.get(name);
+            if (c != null) { 
+                return c;
+            }
+            c = new Counter(name);
+            counters.put(name, c);
+        }
+        
         return c;
     }
 

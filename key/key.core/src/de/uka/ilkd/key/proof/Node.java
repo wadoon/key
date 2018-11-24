@@ -626,9 +626,11 @@ public class Node  {
         Node tmp = parent;
         Node result = this;
         while (tmp != null && tmp.isCloseable()) {
-            tmp.closed = true;
-            result = tmp;
-            tmp = tmp.parent();
+            synchronized(tmp) {
+                tmp.closed = true;
+                result = tmp;
+                tmp = tmp.parent();
+            }
         }
         clearNameCache();
         return result;
@@ -656,17 +658,17 @@ public class Node  {
 
     /** checks if an inner node is closeable */
     private boolean isCloseable() {
-	assert childrenCount() > 0;
-	for (Node child: children) {
-	    if ( !child.isClosed() ) {
-		return false;
-	    }
-	}
-	return true;
+        assert childrenCount() > 0;
+        for (Node child: children) {
+            if ( !child.isClosed() ) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public boolean isClosed() {
-	return closed;
+        return closed;
     }
 
     /**
