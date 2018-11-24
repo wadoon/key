@@ -282,6 +282,7 @@ public class KeYMediator {
 
     private void setProofHelper(Proof newProof) {
         Proof oldProof = getSelectedProof();
+        if (oldProof == newProof) return;
         if (oldProof != null) {
             oldProof.removeProofTreeListener(proofTreeListener);
             oldProof.removeRuleAppListener(proofListener);
