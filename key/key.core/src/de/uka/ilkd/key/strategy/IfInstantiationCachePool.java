@@ -22,7 +22,7 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
  * Keys: Long Values: IList<IfFormulaInstantiation>
  */
 public class IfInstantiationCachePool {
-    
+
     public final LRUCache<Node, IfInstantiationCache> cacheMgr = new LRUCache<>(10);
 
     public IfInstantiationCache getCache(Node n) {
@@ -30,41 +30,41 @@ public class IfInstantiationCachePool {
         synchronized(cacheMgr) {
             cache = cacheMgr.get(n);
         }
-        
+
         if (cache != null) {
             return cache;
         }
-        
+
         cache = new IfInstantiationCache();
-        
+
         IfInstantiationCache cache2;
         synchronized(cacheMgr) {
             cache2 = cacheMgr.putIfAbsent(n, cache);
         }
-        
+
         if (cache2 != null) {
             cache = cache2;
         }
-        
+
         return cache;
     }
-    
+
     public void releaseAll() {
         synchronized(cacheMgr) {
             cacheMgr.clear();
         }
     }  
-    
+
     public void release(Node n) {
         IfInstantiationCache cache = null;
         synchronized(cacheMgr) {
-           cache = cacheMgr.remove(n);           
+            cache = cacheMgr.remove(n);           
         }
         if (cache != null) {
             cache.reset();
         }
     }
-    
+
     public static class IfInstantiationCache {
 
         private final HashMap<Long, ImmutableList<IfFormulaInstantiation>> antecCache = new LinkedHashMap<>();
@@ -79,7 +79,7 @@ public class IfInstantiationCachePool {
                 readLock.lock();
                 final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cache = antec
                         ? antecCache
-                        : succCache;
+                                : succCache;
                 return cache.get(key);
             } finally {
                 readLock.unlock();
@@ -89,7 +89,7 @@ public class IfInstantiationCachePool {
         public void put(boolean antec, Long key, ImmutableList<IfFormulaInstantiation> value) {
             final HashMap<Long, ImmutableList<IfFormulaInstantiation>> cache = antec
                     ? antecCache
-                    : succCache;
+                            : succCache;
             try {
                 writeLock.lock();
                 cache.put(key, value);

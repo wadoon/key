@@ -164,11 +164,15 @@ public class IfInstantiator {
     }
 
     private ImmutableList<IfFormulaInstantiation> getNewSequentFormulasFromCache(boolean p_antec) {
-        return ifInstCache.get(p_antec, tacletAppContainer.getAge());
+        synchronized(ifInstCache) {
+            return ifInstCache.get(p_antec, tacletAppContainer.getAge());
+        }
     }
 
     private void addNewSequentFormulasToCache(ImmutableList<IfFormulaInstantiation> p_list, boolean p_antec) {
-        ifInstCache.put(p_antec, tacletAppContainer.getAge(), p_list);        
+        synchronized(ifInstCache) {
+            ifInstCache.put(p_antec, tacletAppContainer.getAge(), p_list);
+        }
     }
 
 

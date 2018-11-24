@@ -35,11 +35,16 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         NumberRuleAppCost ac;
         synchronized (cache) { // Ensure thread save access which is required for parallel proofs (e.g. in Eclipse)
             ac = cache.get(p_cost);
-            if (ac != null) return ac;
-
-            ac = new IntRuleAppCost(p_cost);
-            cache.put(p_cost, ac);
         }
+        if (ac != null) return ac;
+
+        ac = new IntRuleAppCost(p_cost);
+        synchronized (cache) {
+            NumberRuleAppCost cached = cache.putIfAbsent(p_cost, ac);
+            if (cached != null) {
+                ac = cached;
+            }
+        }        
         
         return ac;
     }
