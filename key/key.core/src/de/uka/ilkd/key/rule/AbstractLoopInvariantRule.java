@@ -49,6 +49,12 @@ import de.uka.ilkd.key.util.Pair;
 public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
     /**
+     * Lock for thread safe access of the {@link #lastFocusTerm} and {@link #lastInstantiation}
+     * caches
+     */
+    private static Object lockCache = new Object();
+    
+    /**
      * The last formula the loop invariant rule was applied to. Used for
      * checking whether {@link #lastInstantiation} can be used instead of doing
      * a new instantiation.
@@ -441,10 +447,12 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             throws RuleAbortException {
         final Term focusTerm = app.posInOccurrence().subTerm();
 
-        if (focusTerm == lastFocusTerm && lastInstantiation.inv == services
-                .getSpecificationRepository()
-                .getLoopSpec(lastInstantiation.loop)) {
-            return lastInstantiation;
+        synchronized(lockCache) {
+            if (focusTerm == lastFocusTerm && lastInstantiation.inv == services
+                    .getSpecificationRepository()
+                    .getLoopSpec(lastInstantiation.loop)) {
+                return lastInstantiation;
+            }
         }
 
         // leading update?
@@ -487,9 +495,11 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final Instantiation result = new Instantiation( //
                 u, progPost, loop, spec, selfTerm, innermostExecutionContext);
 
-        lastFocusTerm = focusTerm;
-        lastInstantiation = result;
-
+        synchronized(lockCache) {
+            lastFocusTerm = focusTerm;
+            lastInstantiation = result;
+        }
+            
         return result;
     }
 

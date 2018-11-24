@@ -185,14 +185,23 @@ public abstract class AbstractLoopContractRule extends AbstractBlockSpecificatio
      * @return a new instantiation.
      */
     public Instantiation instantiate(final Term formula, final Goal goal, final Services services) {
-        if (formula == getLastFocusTerm()) {
-            return getLastInstantiation();
-        } else {
-            final Instantiation result = new Instantiator(formula, goal, services).instantiate();
-            setLastFocusTerm(formula);
-            setLastInstantiation(result);
-            return result;
+        final Term lastTerm;
+        final Instantiation lastInstantiation;
+        synchronized(this) { 
+            lastTerm = getLastFocusTerm();
+            lastInstantiation = getLastInstantiation();            
         }
+        final Instantiation result;
+        if (formula == lastTerm) {
+            result = lastInstantiation;            
+        } else {
+            result = new Instantiator(formula, goal, services).instantiate();
+            synchronized(this) { 
+                setLastFocusTerm(formula);
+                setLastInstantiation(result);
+            }
+        }
+        return result;
     }
 
     /**

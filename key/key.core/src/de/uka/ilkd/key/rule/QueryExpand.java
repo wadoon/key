@@ -140,7 +140,7 @@ public class QueryExpand implements BuiltInRule {
      * @author Richard Bubel
      * @author gladisch
      */
-    public Pair<Term,Term> queryEvalTerm(Services services, Term query, LogicVariable[] instVars){
+    private Pair<Term,Term> queryEvalTerm(Services services, Term query, LogicVariable[] instVars){
 
     	   final IProgramMethod method = (IProgramMethod)query.op();
 
@@ -648,13 +648,13 @@ public class QueryExpand implements BuiltInRule {
         return false;
     }
 
-    private void storeTimeOfQuery(Term query, Goal goal){
+    private synchronized void storeTimeOfQuery(Term query, Goal goal){
     	if(timeOfTerm.get(query)==null){
     		timeOfTerm.put(query, goal.getTime());
     	}
     }
 
-    public Long getTimeOfQuery(Term t){
+    public synchronized Long getTimeOfQuery(Term t){
     	if(t==null || !(t.op() instanceof IProgramMethod)){
     		System.err.println("QueryExpand::getAgeOfQuery(t). The term is expected to be a query but it is:"+(t!=null?t:"null"));
     		return null;
@@ -672,7 +672,7 @@ public class QueryExpand implements BuiltInRule {
     * {@inheritDoc}
     */
    @Override
-   public boolean isApplicableOnSubTerms() {
+   public synchronized boolean isApplicableOnSubTerms() {
       return true;
    }
 }

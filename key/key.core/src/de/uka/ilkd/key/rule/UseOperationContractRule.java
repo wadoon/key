@@ -100,6 +100,7 @@ public final class UseOperationContractRule implements BuiltInRule {
 
     private static final Name NAME = new Name("Use Operation Contract");
 
+    private static Object lockCache = new Object();
     private static Term lastFocusTerm;
     private static Instantiation lastInstantiation;
 
@@ -451,18 +452,21 @@ public final class UseOperationContractRule implements BuiltInRule {
 
 
     private static Instantiation instantiate(Term focusTerm, Services services) {
-	//result cached?
-	if(focusTerm == lastFocusTerm) {
-	    return lastInstantiation;
-	}
+        //result cached?
+        synchronized(lockCache) {
+            if(focusTerm == lastFocusTerm) {
+                return lastInstantiation;
+            }
+        }
+        //compute
+        final Instantiation result = computeInstantiation(focusTerm, services);
 
-	//compute
-	final Instantiation result = computeInstantiation(focusTerm, services);
-
-	//cache and return
-	lastFocusTerm = focusTerm;
-	lastInstantiation = result;
-	return result;
+        //cache and return
+        synchronized(lockCache) {
+            lastFocusTerm = focusTerm;
+            lastInstantiation = result;
+        }
+        return result;
     }
 
     private static void applyInfFlow(Goal goal,
@@ -616,8 +620,8 @@ public final class UseOperationContractRule implements BuiltInRule {
 
 
     @Override
-    public boolean isApplicable(Goal goal,
-                                PosInOccurrence pio) {
+    public  boolean isApplicable(Goal goal,
+                                 PosInOccurrence pio) {
 	//focus must be top level succedent
 	if(pio == null || !pio.isTopLevel() || pio.isInAntec()) {
 	    return false;
@@ -663,7 +667,7 @@ public final class UseOperationContractRule implements BuiltInRule {
     }
 
     @Override
-    public ImmutableList<Goal> apply(Goal goal,
+    public synchronized ImmutableList<Goal> apply(Goal goal,
 	    			     Services services,
 	    			     RuleApp ruleApp) {
        final TermLabelState termLabelState = new TermLabelState();
