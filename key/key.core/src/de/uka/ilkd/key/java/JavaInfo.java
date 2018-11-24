@@ -82,6 +82,10 @@ public final class JavaInfo {
      * the type of null
      */
     private KeYJavaType nullType = null;
+    /**
+     * locks nullType cache 
+     */
+    private Object nullTypeLock = new Object();
 
     /**
      * as accessed very often caches:
@@ -90,6 +94,12 @@ public final class JavaInfo {
      * in </em>in this order</em>
      */
     protected KeYJavaType[] commonTypes = new KeYJavaType[3];
+    
+    /**
+     * locks commonTypes cache 
+     */
+    private final Object commonTypesLock = new Object();
+
 
     //some caches for the getKeYJavaType methods.
     private HashMap<Sort, List<KeYJavaType>> sort2KJTCache = null;
@@ -99,6 +109,10 @@ public final class JavaInfo {
 
     private LRUCache<Pair<KeYJavaType,KeYJavaType>, ImmutableList<KeYJavaType>> commonSubtypeCache
     	= new LRUCache<Pair<KeYJavaType,KeYJavaType>, ImmutableList<KeYJavaType>>(200);
+    /**
+     * locks commonSubTypesLock cache 
+     */
+    private final Object commonSubTypesLock = new Object();
 
     private int nameCachedSize = 0;
     private int sortCachedSize = 0;
@@ -113,25 +127,42 @@ public final class JavaInfo {
      * valid execution context.
      */
     protected ExecutionContext defaultExecutionContext;
+    /**
+     * locks defaultExecutionContextLock cache 
+     */
+    private final Object defaultExecutionContextLock = new Object();
 
-    protected boolean commonTypesCacheValid;
+    protected volatile boolean commonTypesCacheValid;
 
     /** caches the arrays' length attribute*/
     private ProgramVariable length;
+    /**
+     * locks lengthLock cache 
+     */
+    private final Object lengthLock = new Object();
 
     /** caches the program variable for {@code <inv>} */
     private ProgramVariable invProgVar;
+    
+    /**
+     * locks invProgVarLock cache 
+     */
+    private final Object invProgVarLock = new Object();
 
     /** caches the observer for {@code <inv>} */
     private ObserverFunction inv;
+    
+    /**
+     * locks invLock cache 
+     */
+    private final Object invLock = new Object();
 
     /** the name of the class used as default execution context */
     protected static final String DEFAULT_EXECUTION_CONTEXT_CLASS = "<Default>";
     protected static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<defaultMethod>";
 
     private HashMap<KeYJavaType,ObserverFunction> staticInvs = new LinkedHashMap<KeYJavaType,ObserverFunction>();
-
-
+    
     /**
      * creates a new JavaInfo object by giving a KeYProgModelInfo to access
      * the Recoder SourceInfo and using the given {@link Services} object.
@@ -240,17 +271,19 @@ public final class JavaInfo {
      * caches all known types using their qualified name as retrieval key
      */
     private void buildNameCache() {
-        nameCachedSize = kpmi.rec2key().size();
-        name2KJTCache = new LinkedHashMap<String, KeYJavaType>();
-        for (final Object o : kpmi.allElements()) {
-            if (o != null && o instanceof KeYJavaType){
-                final KeYJavaType oKJT = (KeYJavaType)o;
-                if (oKJT.getJavaType() instanceof ArrayType) {
-                    final ArrayType at = (ArrayType) oKJT.getJavaType();
-                    name2KJTCache.put(at.getFullName(), oKJT);
-                    name2KJTCache.put(at.getAlternativeNameRepresentation(), oKJT);
-                } else {
-                    name2KJTCache.put(getFullName(oKJT), oKJT);
+        synchronized(name2KJTCacheLock) {
+            nameCachedSize = kpmi.rec2key().size();
+            name2KJTCache = new LinkedHashMap<String, KeYJavaType>();
+            for (final Object o : kpmi.allElements()) {
+                if (o != null && o instanceof KeYJavaType){
+                    final KeYJavaType oKJT = (KeYJavaType)o;
+                    if (oKJT.getJavaType() instanceof ArrayType) {
+                        final ArrayType at = (ArrayType) oKJT.getJavaType();
+                        name2KJTCache.put(at.getFullName(), oKJT);
+                        name2KJTCache.put(at.getAlternativeNameRepresentation(), oKJT);
+                    } else {
+                        name2KJTCache.put(getFullName(oKJT), oKJT);
+                    }
                 }
             }
         }
@@ -334,31 +367,39 @@ public final class JavaInfo {
     }
 
 
-    public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
-	assert type != null;
-	KeYJavaType result = null;
-	if(type2KJTCache != null) {
-	    result = type2KJTCache.get(type);
-	}
+private final Object type2KJTCacheLock = new Object();
+private final Object name2KJTCacheLock = new Object();
 
-	if(name2KJTCache != null) {
-      result = name2KJTCache.get(type.getName());
-	}
-	
-	if(result == null) {
-	    Name ldtName = type.getCorrespondingLDTName();
-	    final Namespace<Sort> sorts = services.getNamespaces().sorts();
-	    final Sort sort;
-	    sort = (Sort) sorts.lookup(ldtName);
-	    assert sort != null : "could not find sort for type: " + type;
-	    result = new KeYJavaType(type, sort);
-	    if(type2KJTCache != null) {
-		type2KJTCache.put(type, result);
-	    }
-	}
+public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
+    assert type != null;
+    KeYJavaType result = null;
+    synchronized (type2KJTCacheLock) {
 
-	return result;
+        if(type2KJTCache != null) {
+            result = type2KJTCache.get(type);
+        }
+        
+        synchronized (name2KJTCacheLock) {
+            if(name2KJTCache != null) {
+                result = name2KJTCache.get(type.getName());
+            }
+        }
+
+        if(result == null) {
+            Name ldtName = type.getCorrespondingLDTName();
+            final Namespace<Sort> sorts = services.getNamespaces().sorts();
+            final Sort sort;
+            sort = (Sort) sorts.lookup(ldtName);
+            assert sort != null : "could not find sort for type: " + type;
+            result = new KeYJavaType(type, sort);
+            if(type2KJTCache != null) {
+                type2KJTCache.put(type, result);
+            }
+        }
+
+        return result;
     }
+}
 
 
     /**
@@ -459,21 +500,25 @@ public final class JavaInfo {
         return null;
     }
 
+    private final Object sort2KJTCacheLock = new Object();
+    
     private void updateSort2KJTCache() {
-        if (sort2KJTCache == null || kpmi.rec2key().size() > sortCachedSize) {
-            sortCachedSize = kpmi.rec2key().size();
-            sort2KJTCache = new HashMap<Sort, List<KeYJavaType>>();
-            for (final Object o : kpmi.allElements()) {
-                if (o instanceof KeYJavaType) {
-                    final KeYJavaType oKJT = (KeYJavaType) o;
-                    Sort s = oKJT.getSort();
-                    List<KeYJavaType> l = sort2KJTCache.get(s);
-                    if (l == null) {
-                        l = new LinkedList<KeYJavaType>();
-                        sort2KJTCache.put(s, l);
-                    }
-                    if (!l.contains(oKJT)) {
-                        l.add(oKJT);
+        synchronized(sort2KJTCacheLock) {
+            if (sort2KJTCache == null || kpmi.rec2key().size() > sortCachedSize) {
+                sortCachedSize = kpmi.rec2key().size();
+                sort2KJTCache = new HashMap<Sort, List<KeYJavaType>>();
+                for (final Object o : kpmi.allElements()) {
+                    if (o instanceof KeYJavaType) {
+                        final KeYJavaType oKJT = (KeYJavaType) o;
+                        Sort s = oKJT.getSort();
+                        List<KeYJavaType> l = sort2KJTCache.get(s);
+                        if (l == null) {
+                            l = new LinkedList<KeYJavaType>();
+                            sort2KJTCache.put(s, l);
+                        }
+                        if (!l.contains(oKJT)) {
+                            l.add(oKJT);
+                        }
                     }
                 }
             }
@@ -1182,15 +1227,18 @@ public final class JavaInfo {
 
 
     protected void fillCommonTypesCache() {
-	if (commonTypesCacheValid) return;
+        if (commonTypesCacheValid) return;
+        synchronized(commonTypesLock) {
+            if (!commonTypesCacheValid) {
+                final String[] fullNames = new String[] {"java.lang.Object",
+                        "java.lang.Cloneable", "java.io.Serializable"};
 
-	final String[] fullNames = new String[] {"java.lang.Object",
-		"java.lang.Cloneable", "java.io.Serializable"};
-
-	for (int i = 0; i<fullNames.length; i++) {
-	    commonTypes[i] = getTypeByClassName(fullNames[i]);
-	}
-	commonTypesCacheValid = true;
+                for (int i = 0; i<fullNames.length; i++) {
+                    commonTypes[i] = getTypeByClassName(fullNames[i]);
+                }
+                commonTypesCacheValid = true;
+            }
+        }
     }
 
     /**
@@ -1281,12 +1329,14 @@ public final class JavaInfo {
      * returns the KeYJavaType  representing the type of 'null'
      */
     public KeYJavaType getNullType() {
-        if (nullType==null) {
-            nullType = getTypeByClassName("null");
-            Debug.assertTrue(nullType!=null
-                    , "we should already have it in the map");
+        synchronized(nullTypeLock) {
+            if (nullType==null) {
+                nullType = getTypeByClassName("null");
+                Debug.assertTrue(nullType!=null
+                        , "we should already have it in the map");
+            }
+            return nullType;
         }
-        return nullType;
     }
 
 
@@ -1296,17 +1346,19 @@ public final class JavaInfo {
      * @return the default execution context
      */
     public ExecutionContext getDefaultExecutionContext() {
-        if (defaultExecutionContext == null) {
-            // ensure that default classes are available
-            if (!kpmi.rec2key().parsedSpecial()) {
-                readJava("{}");
+        synchronized(defaultExecutionContextLock) {
+            if (defaultExecutionContext == null) {
+                // ensure that default classes are available
+                if (!kpmi.rec2key().parsedSpecial()) {
+                    readJava("{}");
+                }
+                final KeYJavaType kjt =
+                        getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
+                defaultExecutionContext =
+                        new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.<KeYJavaType>nil()), null);
             }
-            final KeYJavaType kjt =
-                getTypeByClassName(DEFAULT_EXECUTION_CONTEXT_CLASS);
-            defaultExecutionContext =
-                new ExecutionContext(new TypeRef(kjt), getToplevelPM(kjt, DEFAULT_EXECUTION_CONTEXT_METHOD, ImmutableSLList.<KeYJavaType>nil()), null);
+            return defaultExecutionContext;
         }
-        return defaultExecutionContext;
     }
 
 
@@ -1374,47 +1426,53 @@ public final class JavaInfo {
      */
     public ImmutableList<KeYJavaType> getCommonSubtypes(KeYJavaType k1, KeYJavaType k2) {
         final Pair<KeYJavaType,KeYJavaType> ck = new Pair<KeYJavaType, KeYJavaType>(k1, k2);
-        ImmutableList<KeYJavaType> result = commonSubtypeCache.get(ck);
 
-        if (result != null) {
-            return result;
-        }
+        
+        synchronized(commonSubTypesLock) {
+            ImmutableList<KeYJavaType> result = commonSubtypeCache.get(ck);
 
-        result = ImmutableSLList.<KeYJavaType>nil();
+            if (result != null) {
+                return result;
+            }
 
-        if (k1.getSort().extendsTrans(k2.getSort())) {
-            result = getAllSubtypes(k1).prepend(k1);
-        } else if (k2.getSort().extendsTrans(k1.getSort())) {
-            result = getAllSubtypes(k2).prepend(k2);
-        } else {
-            final ImmutableList<KeYJavaType> l1 = getAllSubtypes(k1);
-            final ImmutableList<KeYJavaType> l2 = getAllSubtypes(k2);
+            result = ImmutableSLList.<KeYJavaType>nil();
 
-            for (KeYJavaType aL1 : l1) {
-                final KeYJavaType next = aL1;
-                if (l2.contains(next)) {
-                    result = result.prepend(next);
+            if (k1.getSort().extendsTrans(k2.getSort())) {
+                result = getAllSubtypes(k1).prepend(k1);
+            } else if (k2.getSort().extendsTrans(k1.getSort())) {
+                result = getAllSubtypes(k2).prepend(k2);
+            } else {
+                final ImmutableList<KeYJavaType> l1 = getAllSubtypes(k1);
+                final ImmutableList<KeYJavaType> l2 = getAllSubtypes(k2);
+
+                for (KeYJavaType aL1 : l1) {
+                    final KeYJavaType next = aL1;
+                    if (l2.contains(next)) {
+                        result = result.prepend(next);
+                    }
                 }
             }
-        }
 
-        commonSubtypeCache.put(ck, result);
-        return result;
+            commonSubtypeCache.put(ck, result);
+            return result;
+        }
     }
 
     /** returns the length attribute for arrays */
     public ProgramVariable getArrayLength() {
-        if (length == null) {
-            final SuperArrayDeclaration sad =
-                (SuperArrayDeclaration)
-                rec2key().getSuperArrayType().getJavaType();
-            length =
-                (ProgramVariable) sad.length().getVariables().
-                get(0).getProgramVariable();
-            assert "length".equals(length.name().toString()) : "Wrong array length";
-        }
+        synchronized (lengthLock) {
+            if (length == null) {
+                final SuperArrayDeclaration sad =
+                        (SuperArrayDeclaration)
+                        rec2key().getSuperArrayType().getJavaType();
+                length =
+                        (ProgramVariable) sad.length().getVariables().
+                        get(0).getProgramVariable();
+                assert "length".equals(length.name().toString()) : "Wrong array length";
+            }
 
-        return length;
+            return length;
+        }
     }
 
     /**
@@ -1422,23 +1480,25 @@ public final class JavaInfo {
      * @see #getInvProgramVar()
      */
     public IObserverFunction getInv() {
-       // TODO: Create function when source code is parsed and register it in namespace. Return only function from namespace here. No lazy creation to ensure that all proofs of the same proof environment have the same <inv> symbol.
-       if(inv == null || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) { // TODO: Why is the initial check with the heaps needed?
-          inv = (ObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<inv>", getJavaLangObject()));
-          if (inv == null) {
-             inv = new ObserverFunction("<inv>",
-                          Sort.FORMULA,
-                          null,
-                          services.getTypeConverter().getHeapLDT().targetSort(),
-                          getJavaLangObject(),
-                          false,
-                          new ImmutableArray<KeYJavaType>(),
-                          HeapContext.getModHeaps(services, false).size(),
-                          1);
-             services.getNamespaces().functions().add(inv);
-          }
-       }
-       return inv;
+        // TODO: Create function when source code is parsed and register it in namespace. Return only function from namespace here. No lazy creation to ensure that all proofs of the same proof environment have the same <inv> symbol.
+        synchronized (invLock) {
+            if(inv == null || inv.getHeapCount(services) != HeapContext.getModHeaps(services, false).size()) { // TODO: Why is the initial check with the heaps needed?
+                inv = (ObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<inv>", getJavaLangObject()));
+                if (inv == null) {
+                    inv = new ObserverFunction("<inv>",
+                            Sort.FORMULA,
+                            null,
+                            services.getTypeConverter().getHeapLDT().targetSort(),
+                            getJavaLangObject(),
+                            false,
+                            new ImmutableArray<KeYJavaType>(),
+                            HeapContext.getModHeaps(services, false).size(),
+                            1);
+                    services.getNamespaces().functions().add(inv);
+                }
+            }        
+        }
+        return inv;
     }
 
     /**
@@ -1448,11 +1508,13 @@ public final class JavaInfo {
      * @see #getInv()
      */
     public ProgramVariable getInvProgramVar() {
-        if(invProgVar == null) {
-            ProgramElementName pen = new ProgramElementName("<inv>", "java.lang.Object");
-            invProgVar = new LocationVariable(pen,
-                                getPrimitiveKeYJavaType(PrimitiveType.JAVA_BOOLEAN),
-                                getJavaLangObject(), false, true);
+        synchronized(invProgVarLock) {
+            if(invProgVar == null) {
+                ProgramElementName pen = new ProgramElementName("<inv>", "java.lang.Object");
+                invProgVar = new LocationVariable(pen,
+                        getPrimitiveKeYJavaType(PrimitiveType.JAVA_BOOLEAN),
+                        getJavaLangObject(), false, true);
+            }
         }
         return invProgVar;
     }
@@ -1462,24 +1524,26 @@ public final class JavaInfo {
      */
     public IObserverFunction getStaticInv(KeYJavaType target) {
        // TODO: Create functions when source code is parsed and register them in namespace. Return only functions from namespace here. No lazy creation to ensure that all proofs of the same proof environment have the same <$inv> symbols.
-       ObserverFunction inv = staticInvs.get(target);
-        if (inv == null) {
-           inv = (ObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<$inv>", target));
+       synchronized(staticInvs) {
+           ObserverFunction inv = staticInvs.get(target);
            if (inv == null) {
-              inv = new ObserverFunction("<$inv>",
-                    Sort.FORMULA,
-                    null,
-                    services.getTypeConverter().getHeapLDT().targetSort(),
-                    target,
-                    true,
-                    new ImmutableArray<KeYJavaType>(),
-               HeapContext.getModHeaps(services, false).size(),
-                    1);
-              services.getNamespaces().functions().add(inv);
+               inv = (ObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<$inv>", target));
+               if (inv == null) {
+                   inv = new ObserverFunction("<$inv>",
+                           Sort.FORMULA,
+                           null,
+                           services.getTypeConverter().getHeapLDT().targetSort(),
+                           target,
+                           true,
+                           new ImmutableArray<KeYJavaType>(),
+                           HeapContext.getModHeaps(services, false).size(),
+                           1);
+                   services.getNamespaces().functions().add(inv);
+               }
+               staticInvs.put(target, inv);
            }
-           staticInvs.put(target, inv);
-        }
-        return inv;
+           return inv;
+       }
     }
 
     /**
