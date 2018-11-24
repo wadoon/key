@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 /**
  * Projection that can store and returns an arbitrary term or formula. Objects
@@ -24,19 +25,17 @@ import de.uka.ilkd.key.rule.RuleApp;
  * like <code>LetFeature</code> and <code>ForEachCP</code>.
  */
 public class TermBuffer implements ProjectionToTerm {
-
-    private Term t = null;
     
-    public Term getContent() {
-        return t;
+    public void setContent(Term t, MutableState mState) {
+        mState.assign(this, t);
     }
 
-    public void setContent(Term t) {
-        this.t = t;
+    public Term getContent(MutableState mState) {
+        return mState.read(this);
     }
 
-    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return t;
+    public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        return mState.read(this);
     }
 
 }

@@ -22,6 +22,7 @@ import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
 
 
@@ -132,7 +133,8 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
         if ( focFormula != null && pos != null ) {
             if ( isSameFormula ( pos, focFormula ) ) {
                 if ( !isBelow ( focFormula, pos ) || 
-                		NonDuplicateAppModPositionFeature.INSTANCE.computeCost(rule, pos, goal).equals(BinaryFeature.TOP_COST))
+                		NonDuplicateAppModPositionFeature.INSTANCE.computeCost(rule, pos, 
+                		        goal, new MutableState()).equals(BinaryFeature.TOP_COST))
                     // rule app within the focussed formula, but not within the
                     // focussed subterm
                     return false;

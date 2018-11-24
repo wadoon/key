@@ -33,7 +33,7 @@ public class EqNonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
 
     private EqNonDuplicateAppFeature () {}
     
-    public boolean filter (TacletApp app, PosInOccurrence pos, Goal goal) {
+    public boolean filter (TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         if ( !app.ifInstsComplete () ) return true;

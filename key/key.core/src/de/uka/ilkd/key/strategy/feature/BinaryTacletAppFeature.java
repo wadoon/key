@@ -39,9 +39,9 @@ public abstract class BinaryTacletAppFeature extends BinaryFeature {
         nonTacletValue = p_nonTacletValue;
     }
 
-    final protected boolean filter ( RuleApp app, PosInOccurrence pos, Goal goal ) {
+    final protected boolean filter ( RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState ) {
         if ( app instanceof TacletApp )
-            return filter ( (TacletApp)app, pos, goal );
+            return filter ( (TacletApp)app, pos, goal, mState );
         return nonTacletValue;
     }
     
@@ -55,9 +55,10 @@ public abstract class BinaryTacletAppFeature extends BinaryFeature {
      *            position where <code>app</code> is to be applied
      * @param goal
      *            the goal on which <code>app</code> is to be applied
+     * @param mState TODO
      * @return true iff the the result of the feature is supposed to be zero.
      */
     protected abstract boolean filter ( TacletApp app,
                                         PosInOccurrence pos,
-                                        Goal goal );
+                                        Goal goal, MutableState mState );
 }

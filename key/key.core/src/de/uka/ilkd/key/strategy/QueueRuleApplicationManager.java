@@ -33,7 +33,7 @@ import de.uka.ilkd.key.rule.RuleApp;
  * be equipped with a {@link RuleAppCost} by converting it into a
  * {@link RuleAppContainer}. The cost of a {@link RuleApp} is computed according
  * to a given {@link Strategy} (see
- * {@link Strategy#computeCost(RuleApp, PosInOccurrence, Goal)}).
+ * {@link Strategy#computeCost(RuleApp, PosInOccurrence, Goal, MutableState)}).
  */
 public class QueueRuleApplicationManager implements AutomatedRuleApplicationManager {
 

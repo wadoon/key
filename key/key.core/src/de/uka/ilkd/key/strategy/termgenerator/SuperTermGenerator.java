@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 
 public abstract class SuperTermGenerator implements TermGenerator {
@@ -40,32 +41,32 @@ public abstract class SuperTermGenerator implements TermGenerator {
     
     public static TermGenerator upwards(TermFeature cond, final Services services) {
         return new SuperTermGenerator ( cond ) {
-            protected Iterator<Term> createIterator(PosInOccurrence focus) {
-                return new UpwardsIterator ( focus, services );
+            protected Iterator<Term> createIterator(PosInOccurrence focus, MutableState mState) {
+                return new UpwardsIterator ( focus, services, mState );
             }
         };
     }
     
     public static TermGenerator upwardsWithIndex(TermFeature cond, final Services services) {
         return new SuperTermWithIndexGenerator ( cond ) {
-            protected Iterator<Term> createIterator(PosInOccurrence focus) {
-                return new UpwardsIterator ( focus, services );
+            protected Iterator<Term> createIterator(PosInOccurrence focus, MutableState mState) {
+                return new UpwardsIterator ( focus, services, mState );
             }
         };
     }
     
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return createIterator ( pos );
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        return createIterator ( pos, mState );
     }
 
-    protected abstract Iterator<Term> createIterator(PosInOccurrence focus);
+    protected abstract Iterator<Term> createIterator(PosInOccurrence focus, MutableState mState);
     
     protected Term generateOneTerm(Term superterm, int child) {
         return superterm;
     }
 
-    private boolean generateFurther(Term t, Services services) {
-        return ! ( cond.compute ( t, services ) instanceof TopRuleAppCost );
+    private boolean generateFurther(Term t, Services services, MutableState mState) {
+        return ! ( cond.compute ( t, services, mState ) instanceof TopRuleAppCost );
     }
 
     abstract static class SuperTermWithIndexGenerator extends SuperTermGenerator {
@@ -76,7 +77,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
             super ( cond );
         }
 
-        public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+        public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
             if ( services == null ) {
                 services = goal.proof ().getServices ();
                 final IntegerLDT numbers = services.getTypeConverter ().getIntegerLDT ();
@@ -127,7 +128,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
 //                       new Sort[] { Sort.ANY, numbers.getNumberSymbol ().sort () } );
             }
             
-            return createIterator ( pos );
+            return createIterator ( pos, mState );
         }
 
         protected Term generateOneTerm(Term superterm, int child) {
@@ -140,10 +141,12 @@ public abstract class SuperTermGenerator implements TermGenerator {
         private PosInOccurrence currentPos;
         
         private final Services services;
+        private final MutableState mState;
 
-        private UpwardsIterator(PosInOccurrence startPos, Services services) {
+        private UpwardsIterator(PosInOccurrence startPos, Services services, MutableState mState) {
             this.currentPos = startPos;
             this.services = services;
+            this.mState = mState;
         }
 
         public boolean hasNext() {
@@ -154,7 +157,7 @@ public abstract class SuperTermGenerator implements TermGenerator {
             final int child = currentPos.getIndex ();
             currentPos = currentPos.up ();
             final Term res = generateOneTerm ( currentPos.subTerm (), child );
-            if ( !generateFurther ( res, services ) ) currentPos = null;
+            if ( !generateFurther ( res, services, mState ) ) currentPos = null;
             return res;
         }
         

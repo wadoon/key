@@ -16,6 +16,7 @@ package de.uka.ilkd.key.strategy.termfeature;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 /**
  * Term feature for checking whether the top operator of a term has an instance
@@ -33,7 +34,7 @@ public class OperatorClassTF extends BinaryTermFeature {
         return new OperatorClassTF ( op );
     }
 
-    protected boolean filter(Term term, Services services) {
+    protected boolean filter(Term term, Services services, MutableState mState) {
         return opClass.isInstance ( term.op () );
     }
 }

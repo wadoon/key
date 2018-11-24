@@ -31,6 +31,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Monomial;
 import de.uka.ilkd.key.rule.metaconstruct.arith.Polynomial;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 /**
@@ -65,13 +66,13 @@ public class MultiplesModEquationsGenerator implements TermGenerator {
         return new MultiplesModEquationsGenerator ( source, target );
     }
     
-    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof ().getServices ();
         
         final Monomial sourceM =
-            Monomial.create ( source.toTerm ( app, pos, goal ), services );
+            Monomial.create ( source.toTerm ( app, pos, goal, mState ), services );
         final Monomial targetM =
-            Monomial.create ( target.toTerm ( app, pos, goal ), services );
+            Monomial.create ( target.toTerm ( app, pos, goal, mState ), services );
 
         if ( targetM.divides ( sourceM ) )
             return toIterator ( targetM.reduce ( sourceM ).toTerm ( services ) );

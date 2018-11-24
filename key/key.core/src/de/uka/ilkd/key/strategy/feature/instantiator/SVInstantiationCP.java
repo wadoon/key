@@ -28,6 +28,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 import de.uka.ilkd.key.util.Debug;
 
@@ -41,33 +42,28 @@ import de.uka.ilkd.key.util.Debug;
  */
 public class SVInstantiationCP implements Feature {
 
-    private final BackTrackingManager manager;
-
     private final Name svToInstantiate;
     private final ProjectionToTerm value;
 
     public static Feature create(Name svToInstantiate,
-                                 ProjectionToTerm value,
-                                 BackTrackingManager manager) {
-        return new SVInstantiationCP ( svToInstantiate, value, manager );
+                                 ProjectionToTerm value) {
+        return new SVInstantiationCP ( svToInstantiate, value );
     }
 
-    public static Feature createTriggeredVarCP(ProjectionToTerm value,
-                                               BackTrackingManager manager) {
-        return new SVInstantiationCP ( null, value, manager );
+    public static Feature createTriggeredVarCP(ProjectionToTerm value) {
+        return new SVInstantiationCP ( null, value );
     }
 
     
     private SVInstantiationCP(Name svToInstantiate,
-                              ProjectionToTerm value,
-                              BackTrackingManager manager) {
+                              ProjectionToTerm value) {
         this.svToInstantiate = svToInstantiate;
         this.value = value;
-        this.manager = manager;
     }
 
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
-        manager.passChoicePoint ( new CP (app, pos, goal), this );
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        final BackTrackingManager manager = mState.getBacktrackingManager();
+        manager.passChoicePoint ( new CP (app, pos, goal, mState), this );
         return NumberRuleAppCost.getZeroCost();
     }
 
@@ -97,11 +93,13 @@ public class SVInstantiationCP implements Feature {
         private final PosInOccurrence pos;
         private final RuleApp         app;
         private final Goal            goal;
+        private final MutableState    mState;
     
-        private CP(RuleApp app, PosInOccurrence pos, Goal goal) {
+        private CP(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
             this.pos = pos;
             this.app = app;
             this.goal = goal;
+            this.mState = mState;
         }
 
         public Iterator<CPBranch> getBranches(RuleApp oldApp) {
@@ -111,7 +109,7 @@ public class SVInstantiationCP implements Feature {
             final TacletApp tapp = (TacletApp)oldApp;
             
             final SchemaVariable sv = findSVWithName ( tapp );
-            final Term instTerm = value.toTerm ( app, pos, goal );
+            final Term instTerm = value.toTerm ( app, pos, goal, mState );
 
             final RuleApp newApp =
                 tapp.addCheckedInstantiation ( sv,

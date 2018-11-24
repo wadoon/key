@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 /**
  * Generic interface for evaluating the cost of
@@ -32,6 +33,22 @@ public interface Strategy extends Named, Feature {
      */
     boolean isStopAtFirstNonCloseableGoal();
 
+    
+    /**
+     * Evaluate the cost of a <code>RuleApp</code>. Starts a new independent computation.
+     *
+     * @param app the RuleApp
+     * @param pos position where <code>app</code> is to be applied
+     * @param goal the goal on which <code>app</code> is to be applied
+     * @return the cost of the rule application expressed as a
+     * <code>RuleAppCost</code> object. <code>TopRuleAppCost.INSTANCE</code>
+     * indicates that the rule shall not be applied at all (it is discarded by
+     * the strategy).
+     */
+    default RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+        return computeCost(app, pos, goal, new MutableState());
+    }
+    
     /**
      * Re-Evaluate a <code>RuleApp</code>. This method is
      * called immediately before a rule is really applied

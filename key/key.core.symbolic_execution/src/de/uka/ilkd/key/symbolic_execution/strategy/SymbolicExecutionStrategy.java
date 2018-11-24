@@ -33,6 +33,7 @@ import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
 import de.uka.ilkd.key.strategy.feature.CountBranchFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
 import de.uka.ilkd.key.strategy.feature.ScaleFeature;
 import de.uka.ilkd.key.strategy.feature.instantiator.OneOfCP;
@@ -124,7 +125,7 @@ public class SymbolicExecutionStrategy extends JavaCardDLStrategy {
        // Make sure that modalities without symbolic execution label are executed first because they might forbid rule application on modalities with symbolic execution label (see loop body branches)
        globalF = add(globalF, ifZero(not(new BinaryFeature() {
           @Override
-          protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+          protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
              return pos != null && SymbolicExecutionUtil.hasSymbolicExecutionLabel(pos.subTerm());
           }
        }), longConst(-3000)));

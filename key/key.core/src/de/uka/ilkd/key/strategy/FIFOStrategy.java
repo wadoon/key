@@ -19,6 +19,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 /**
  * Trivial implementation of the Strategy interface
@@ -42,7 +43,7 @@ public class FIFOStrategy implements Strategy {
      */
     public RuleAppCost computeCost ( RuleApp         app,
 	                             PosInOccurrence pio,
-	                             Goal            goal ) {
+	                             Goal            goal, MutableState mState ) {
 	return NumberRuleAppCost.create ( goal.getTime () );
     }
 

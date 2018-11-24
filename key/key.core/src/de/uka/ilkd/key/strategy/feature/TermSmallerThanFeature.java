@@ -35,9 +35,9 @@ public class TermSmallerThanFeature extends SmallerThanFeature {
         this.right = right;
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        return lessThan ( left.toTerm ( app, pos, goal ),
-                          right.toTerm ( app, pos, goal ), pos, goal );
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        return lessThan ( left.toTerm ( app, pos, goal, mState ),
+                          right.toTerm ( app, pos, goal, mState ), pos, goal );
     }
 
 }

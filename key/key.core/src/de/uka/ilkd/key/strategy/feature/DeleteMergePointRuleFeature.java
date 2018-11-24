@@ -41,7 +41,7 @@ public class DeleteMergePointRuleFeature implements Feature {
 
     @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos,
-            Goal goal) {
+            Goal goal, MutableState mState) {
         return goal.node().parent()
                 .getAppliedRuleApp() instanceof MergeRuleBuiltInRuleApp
                         ? NumberRuleAppCost.create(-50000)

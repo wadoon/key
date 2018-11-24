@@ -45,10 +45,10 @@ public class AtomsSmallerThanFeature extends AbstractMonomialSmallerThanFeature 
         return new AtomsSmallerThanFeature ( left, right, numbers );
     }
 
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final boolean res =
-                lessThan ( collectAtoms ( left.toTerm ( app, pos, goal ) ),
-                           collectAtoms ( right.toTerm ( app, pos, goal ) ), pos, goal );
+                lessThan ( collectAtoms ( left.toTerm ( app, pos, goal, mState ) ),
+                           collectAtoms ( right.toTerm ( app, pos, goal, mState ) ), pos, goal );
         return res;
     }
 

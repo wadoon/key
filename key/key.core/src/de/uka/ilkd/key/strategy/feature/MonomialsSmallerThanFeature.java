@@ -70,11 +70,11 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
         return new MonomialsSmallerThanFeature ( left, right, numbers );
     }
     
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final MonomialCollector m1 = new MonomialCollector ();
-        m1.collect ( left.toTerm ( app, pos, goal ), goal.proof().getServices() );
+        m1.collect ( left.toTerm ( app, pos, goal, mState ), goal.proof().getServices(), mState );
         final MonomialCollector m2 = new MonomialCollector ();
-        m2.collect ( right.toTerm ( app, pos, goal ), goal.proof().getServices() );
+        m2.collect ( right.toTerm ( app, pos, goal, mState ), goal.proof().getServices(), mState );
 
         return lessThan ( m1.getResult(), m2.getResult(), pos, goal );
         
@@ -154,19 +154,19 @@ public class MonomialsSmallerThanFeature extends AbstractMonomialSmallerThanFeat
     }
 
     private class MonomialCollector extends Collector {
-        protected void collect(Term te, Services services) {
+        protected void collect(Term te, Services services, MutableState mState) {
             if ( te.op () == add ) {
-                collect ( te.sub ( 0 ), services );
-                collect ( te.sub ( 1 ), services );
+                collect ( te.sub ( 0 ), services, mState );
+                collect ( te.sub ( 1 ), services, mState );
             } else if ( te.op() == Z ) {
               // nothing  
             } else {
-                addTerm ( stripOffLiteral ( te, services ) );
+                addTerm ( stripOffLiteral ( te, services, mState ) );
             }
         }
 
-        private Term stripOffLiteral(Term te, Services services) {
-            if ( ! ( hasCoeff.compute ( te, services ) instanceof TopRuleAppCost ) )
+        private Term stripOffLiteral(Term te, Services services, MutableState mState) {
+            if ( ! ( hasCoeff.compute ( te, services, mState ) instanceof TopRuleAppCost ) )
                 // we leave out literals/coefficients on the right, because we
                 // do not want to compare these literals
                 return te.sub ( 0 );

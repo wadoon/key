@@ -37,7 +37,7 @@ public abstract class DirectlyBelowFeature extends BinaryFeature {
         this.index = index;
     }
     
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         if ( pos == null ) return false;
         if ( pos.isTopLevel () ) return false;
         if ( !isBadSymbol( pos.up ().subTerm ().op () ) ) return false;

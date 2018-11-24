@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 /**
  * Abstract superclass for features that have either zero cost or top cost.
@@ -31,10 +32,10 @@ public abstract class BinaryTermFeature implements TermFeature {
     /** Constant that represents the boolean value false */
     public static final RuleAppCost TOP_COST  = TopRuleAppCost.INSTANCE;
     
-    final public RuleAppCost compute ( Term term, Services services ) {
-        return filter ( term, services ) ? ZERO_COST : TOP_COST; 
+    final public RuleAppCost compute ( Term term, Services services, MutableState mState ) {
+        return filter ( term, services, mState ) ? ZERO_COST : TOP_COST; 
     }
     
-    protected abstract boolean filter ( Term term, Services services );
+    protected abstract boolean filter ( Term term, Services services, MutableState mState );
 
 }

@@ -123,9 +123,9 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
         };
     }
     
-    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
-        return compare ( getPolynomial ( left, leftCoeff, app, pos, goal ),
-                         getPolynomial ( right, rightCoeff, app, pos, goal ) );
+    protected boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        return compare ( getPolynomial ( left, leftCoeff, app, pos, goal, mState ),
+                         getPolynomial ( right, rightCoeff, app, pos, goal, mState ) );
     }
 
     protected abstract boolean compare(Polynomial leftPoly, Polynomial rightPoly);
@@ -134,13 +134,14 @@ public abstract class PolynomialValuesCmpFeature extends BinaryTacletAppFeature 
                                      ProjectionToTerm coeffProj,
                                      TacletApp app,
                                      PosInOccurrence pos,
-                                     Goal goal) {
+                                     Goal goal,
+                                     MutableState mState) {
         final Services services = goal.proof ().getServices ();
         final Polynomial poly =
-            Polynomial.create ( polyProj.toTerm ( app, pos, goal ), services );
+            Polynomial.create ( polyProj.toTerm ( app, pos, goal, mState ), services );
 
         if (coeffProj == null) return poly;
-        final Term coeffT = coeffProj.toTerm ( app, pos, goal );
+        final Term coeffT = coeffProj.toTerm ( app, pos, goal, mState );
         if ( coeffT == null ) return poly;
         
         final BigInteger coeff =

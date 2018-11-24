@@ -40,6 +40,7 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
@@ -147,7 +148,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
 
         @Override
         public boolean isApprovedApp(RuleApp app, PosInOccurrence pio, Goal goal) {
-            return computeCost(app, pio, goal) != TopRuleAppCost.INSTANCE &&
+            return computeCost(app, pio, goal, new MutableState()) != TopRuleAppCost.INSTANCE &&
                    // Assumptions are normally not considered by the cost
                    // computation, because they are normally not yet
                    // instantiated when the costs are computed. Because the
@@ -162,7 +163,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+        public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal, MutableState mState) {
 
             Rule rule = app.rule();
             if(isNonHumanInteractionTagged(rule)) {
@@ -170,7 +171,7 @@ public class AutoPilotPrepareProofMacro extends StrategyProofMacro {
             }
 
             if(hasModality(goal.node())) {
-                return delegate.computeCost(app, pio, goal);
+                return delegate.computeCost(app, pio, goal, mState);
             }
 
             String name = rule.name().toString();

@@ -23,7 +23,7 @@ import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 
 /**
  * Same as {@link RunAllProofsFunctional} but we alter
- * {@link JavaCardDLStrategy#computeCost(de.uka.ilkd.key.rule.RuleApp, de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.proof.Goal)}
+ * {@link JavaCardDLStrategy#computeCost(de.uka.ilkd.key.rule.RuleApp, de.uka.ilkd.key.logic.PosInOccurrence, de.uka.ilkd.key.proof.Goal, MutableState)}
  * so that statistical data about that method can be recorded (time duration,
  * number of invocations and potentially other stuff).
  */

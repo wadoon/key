@@ -20,6 +20,7 @@ import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
 
 /**
@@ -58,12 +59,12 @@ public class SimpleFilteredStrategy implements Strategy {
      */
     public RuleAppCost computeCost ( RuleApp         app,
 	                             PosInOccurrence pio,
-	                             Goal            goal ) {
+	                             Goal            goal, MutableState mState ) {
 	if ( app instanceof TacletApp &&
 	     !ruleFilter.filter ( app.rule () ) )
 	    return TopRuleAppCost.INSTANCE;
     
-	RuleAppCost res = NonDuplicateAppFeature.INSTANCE.computeCost(app, pio, goal);
+	RuleAppCost res = NonDuplicateAppFeature.INSTANCE.computeCost(app, pio, goal, mState);
 	if (res == TopRuleAppCost.INSTANCE)
 	    return res;
 
@@ -85,7 +86,7 @@ public class SimpleFilteredStrategy implements Strategy {
 	                           Goal            goal ) {
     	// do not apply a rule twice
     	if ( app instanceof TacletApp &&
-            NonDuplicateAppFeature.INSTANCE.computeCost(app, pio, goal) == TopRuleAppCost.INSTANCE)
+            NonDuplicateAppFeature.INSTANCE.computeCost(app, pio, goal, new MutableState()) == TopRuleAppCost.INSTANCE)
 	    return false;
 	
 	return true;

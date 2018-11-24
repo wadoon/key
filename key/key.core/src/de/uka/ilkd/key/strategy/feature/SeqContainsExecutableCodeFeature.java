@@ -40,14 +40,14 @@ public class SeqContainsExecutableCodeFeature extends BinaryFeature {
     public final static Feature PROGRAMS_OR_QUERIES =
         new SeqContainsExecutableCodeFeature ( true );
 
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-        return containsExec ( goal.sequent ().succedent ().iterator (), goal.proof().getServices() )
-            || containsExec ( goal.sequent ().antecedent().iterator (), goal.proof().getServices() );
+    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+        return containsExec ( goal.sequent ().succedent ().iterator (), goal.proof().getServices(), mState )
+            || containsExec ( goal.sequent ().antecedent().iterator (), goal.proof().getServices(), mState );
     }
 
-    private boolean containsExec(Iterator<SequentFormula> it, Services services) {
+    private boolean containsExec(Iterator<SequentFormula> it, Services services, MutableState mState) {
         while ( it.hasNext () ) {
-            if ( tf.compute ( it.next ().formula (), services ).equals (
+            if ( tf.compute ( it.next ().formula (), services, mState ).equals (
                  BinaryTermFeature.ZERO_COST ) )
                 return true;
         }

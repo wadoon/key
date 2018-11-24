@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 /**
  * A conditional feature, in which the condition itself is a (binary) feature.
@@ -59,11 +60,11 @@ public class ShannonTermFeature implements TermFeature {
         elseFeature = p_elseFeature;
     }
 
-    public RuleAppCost compute(Term term, Services services) {
-        if ( cond.compute ( term, services ).equals ( trueCost ) )
-            return thenFeature.compute ( term, services );
+    public RuleAppCost compute(Term term, Services services, MutableState mState) {
+        if ( cond.compute ( term, services, mState ).equals ( trueCost ) )
+            return thenFeature.compute ( term, services, mState );
         else
-            return elseFeature.compute ( term, services );
+            return elseFeature.compute ( term, services, mState );
     }
 
     /**

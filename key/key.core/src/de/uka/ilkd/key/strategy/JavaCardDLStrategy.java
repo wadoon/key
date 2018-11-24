@@ -23,6 +23,7 @@ import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -54,6 +55,7 @@ import de.uka.ilkd.key.strategy.feature.FocusInAntecFeature;
 import de.uka.ilkd.key.strategy.feature.InEquationMultFeature;
 import de.uka.ilkd.key.strategy.feature.MatchedIfFeature;
 import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.NoSelfApplicationFeature;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
@@ -1947,10 +1949,32 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                 instOf("subsumRightSmaller"),
                                 instOf("subsumRightBigger")) }));
 
-        final TermBuffer one = new TermBuffer();
-        one.setContent(getServices().getTermBuilder().zTerm("1"));
-        final TermBuffer two = new TermBuffer();
-        two.setContent(getServices().getTermBuilder().zTerm("2"));
+        final Term tOne = getServices().getTermBuilder().zTerm("1");
+        final TermBuffer one = new TermBuffer() {
+            public void setContent(Term t, MutableState mState) {
+            }
+
+            public Term getContent(MutableState mState) {
+                return tOne;
+            }
+
+            public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+                return tOne;
+            }
+        };
+        final Term tTwo = getServices().getTermBuilder().zTerm("2");
+        final TermBuffer two = new TermBuffer() {
+            public void setContent(Term t, MutableState mState) {
+            }
+
+            public Term getContent(MutableState mState) {
+                return tTwo;
+            }
+
+            public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+                return tTwo;
+            }
+        };
 
         bindRuleSet(d, "inEqSimp_or_tautInEqs",
                 SumFeature.createSum(new Feature[] {
@@ -2236,8 +2260,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     private void setupInEqCaseDistinctions(RuleSetDispatchFeature d) {
         final TermBuffer intRel = new TermBuffer();
         final TermBuffer atom = new TermBuffer();
-        final TermBuffer zero = new TermBuffer();
-        zero.setContent(getServices().getTypeConverter().getIntegerLDT().zero());
         final TermBuffer rootInf = new TermBuffer();
 
         final Feature posNegSplitting =
@@ -2794,16 +2816,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     /**
      * Evaluate the cost of a <code>RuleApp</code>.
      * @param app rule application
-     * @param pio corresponding {@link PosInOccurrence}
      * @param goal corresponding goal
+     * @param pio corresponding {@link PosInOccurrence}
      * @return the cost of the rule application expressed as a
      *         <code>RuleAppCost</code> object.
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule
      *         shall not be applied at all (it is discarded by the strategy).
      */
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
-            Goal goal) {
-        return costComputationF.computeCost(app, pio, goal);
+            Goal goal, MutableState mState) {
+        return costComputationF.computeCost(app, pio, goal, mState);
     }
 
     /**
@@ -2814,14 +2836,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      * @param goal the goal
      * @return true iff the rule should be applied, false otherwise
      */
-    public final boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
+    public boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
             Goal goal) {
-        return !(approvalF.computeCost(app, pio, goal) instanceof TopRuleAppCost);
+        return !(approvalF.computeCost(app, pio, goal, new MutableState()) instanceof TopRuleAppCost);
     }
 
     protected RuleAppCost instantiateApp(RuleApp app,
-            PosInOccurrence pio, Goal goal) {
-        return instantiationF.computeCost(app, pio, goal);
+            PosInOccurrence pio, Goal goal, MutableState mState) {
+        return instantiationF.computeCost(app, pio, goal, mState);
     }
 
     // //////////////////////////////////////////////////////////////////////////

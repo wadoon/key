@@ -16,6 +16,7 @@ package de.uka.ilkd.key.strategy.termfeature;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 
 /**
@@ -34,7 +35,7 @@ public class SortExtendsTransTermFeature extends BinaryTermFeature {
         this.sort = sort;
     }
     
-    protected boolean filter(Term term, Services services) {
+    protected boolean filter(Term term, Services services, MutableState mState) {
         return term.sort ().extendsTrans ( sort );
     }
 

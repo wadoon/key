@@ -41,7 +41,7 @@ public class NonDuplicateAppFeature extends AbstractNonDuplicateAppFeature {
         return false;
     }
 
-    public boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    public boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         if ( !app.ifInstsComplete () ) {
             return true;
         }

@@ -30,7 +30,7 @@ public class NonDuplicateAppModPositionFeature extends NonDuplicateAppFeature {
 
     public static final Feature INSTANCE = new NonDuplicateAppModPositionFeature ();
 
-    public boolean filter(TacletApp app, PosInOccurrence pos, Goal goal) {
+    public boolean filter(TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         if ( !app.ifInstsComplete () ) {
             return true;
         }

@@ -38,12 +38,12 @@ public class SimplifyReplaceKnownCandidateFeature
     
     /**
      * Compute the cost of a RuleApp.
-     * @param ruleApp the RuleApp
      * @param pos position where <code>app</code> is to be applied
      * @param goal the goal on which <code>app</code> is to be applied
+     * @param ruleApp the RuleApp
      * @return the cost of <code>app</code>
      */
-    public RuleAppCost computeCost (RuleApp ruleApp, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost (RuleApp ruleApp, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
         
         if ( !isAllowedPosition ( pos ) ) return BinaryFeature.TOP_COST;

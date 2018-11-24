@@ -17,6 +17,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.feature.BinaryTacletAppFeature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 
 /**
@@ -122,7 +123,7 @@ public class FindPrefixRestrictionFeature extends BinaryTacletAppFeature {
     @Override
     protected boolean filter(TacletApp app,
                              PosInOccurrence pos,
-                             Goal goal) {
+                             Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         // apply the position modifiers

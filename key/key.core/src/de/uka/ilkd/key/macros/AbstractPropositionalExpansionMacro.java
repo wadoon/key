@@ -29,6 +29,7 @@ import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 /**
  * The Class AbstractPropositionalExpansionMacro applies purely propositional
@@ -111,12 +112,12 @@ public abstract class AbstractPropositionalExpansionMacro extends StrategyProofM
         }
 
         @Override
-        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal) {
+        public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pio, Goal goal, MutableState mState) {
             String name = ruleApp.rule().name().toString();
             if (ruleApp instanceof OneStepSimplifierRuleApp && allowOSS) {
-                return delegate.computeCost(ruleApp, pio, goal);
+                return delegate.computeCost(ruleApp, pio, goal, mState);
             } else if(admittedRuleNames.contains(name)) {
-                final RuleAppCost origCost = delegate.computeCost(ruleApp, pio, goal);
+                final RuleAppCost origCost = delegate.computeCost(ruleApp, pio, goal, mState);
                 // pass through negative costs
                 if (origCost instanceof NumberRuleAppCost && ((NumberRuleAppCost) origCost).getValue() < 0)
                     return origCost;

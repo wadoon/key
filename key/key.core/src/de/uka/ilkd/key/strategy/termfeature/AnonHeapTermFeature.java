@@ -17,6 +17,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 
 public final class AnonHeapTermFeature extends BinaryTermFeature {
@@ -27,7 +28,7 @@ public final class AnonHeapTermFeature extends BinaryTermFeature {
     }
 
     @Override
-    protected boolean filter (Term t, Services services) {
+    protected boolean filter (Term t, Services services, MutableState mState) {
         return  // the heap term is an anon heap symbol
                 // (for instance an anonHeap function)
                 t.hasLabels() &&

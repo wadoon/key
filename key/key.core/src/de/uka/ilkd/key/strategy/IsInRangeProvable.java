@@ -17,6 +17,7 @@ import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.util.ProofStarter;
 import de.uka.ilkd.key.util.SideProofUtil;
 
@@ -157,7 +158,7 @@ public class IsInRangeProvable implements Feature {
 
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         final Services services = goal.proof().getServices();
        
         final ImmutableSet<Term> axioms = collectAxioms(goal.sequent(), pos, services);

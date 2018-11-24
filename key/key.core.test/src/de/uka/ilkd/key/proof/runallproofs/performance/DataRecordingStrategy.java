@@ -10,6 +10,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategy;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 /**
  * Modification of {@link JavaCardDLStrategy} so that profiling data gets collected during strategy run.
@@ -33,9 +34,9 @@ class DataRecordingStrategy extends JavaCardDLStrategy {
     }
 
     @Override
-    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal) {
+    public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio, Goal goal, MutableState mState) {
         long begin = System.nanoTime();
-        RuleAppCost result = super.computeCost(app, pio, goal);
+        RuleAppCost result = super.computeCost(app, pio, goal, mState);
         long end = System.nanoTime();
         computeCostData.addDurationToData(app, goal, end - begin);
         return result;

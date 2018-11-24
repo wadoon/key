@@ -22,6 +22,7 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
@@ -33,8 +34,6 @@ import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
  * to instantiate a rule application
  */
 public class ForEachCP implements Feature {
-
-    private final BackTrackingManager manager;
 
     private final TermBuffer var;
     private final TermGenerator generator;
@@ -52,36 +51,34 @@ public class ForEachCP implements Feature {
      */
     public static Feature create(TermBuffer var,
                                  TermGenerator generator,
-                                 Feature body,
-                                 BackTrackingManager manager) {
-        return new ForEachCP ( var, generator, body, manager );
+                                 Feature body) {
+        return new ForEachCP ( var, generator, body );
     }
 
     private ForEachCP(TermBuffer var,
                       TermGenerator generator,
-                      Feature body,
-                      BackTrackingManager manager) {
+                      Feature body) {
         this.var = var;
         this.generator = generator;
         this.body = body;
-        this.manager = manager;
     }
 
     public RuleAppCost computeCost(final RuleApp app,
                                final PosInOccurrence pos,
-                               final Goal goal) {
-        final Term outerVarContent = var.getContent ();
-        var.setContent ( null );
+                               final Goal goal, MutableState mState) {
+        final BackTrackingManager manager = mState.getBacktrackingManager();
+        final Term outerVarContent = var.getContent (mState);
+        var.setContent ( null, mState );
         
-        manager.passChoicePoint ( new CP ( app, pos, goal ), this );
+        manager.passChoicePoint ( new CP ( app, pos, goal, mState ), this );
        
         final RuleAppCost res;
-        if ( var.getContent() != null )
-            res = body.computeCost ( app, pos, goal );
+        if ( var.getContent(mState) != null )
+            res = body.computeCost ( app, pos, goal, mState );
         else
             res = NumberRuleAppCost.getZeroCost();
         
-        var.setContent ( outerVarContent );
+        var.setContent ( outerVarContent, mState );
         return res;
     }
 
@@ -103,7 +100,7 @@ public class ForEachCP implements Feature {
                 final Term generatedTerm = terms.next ();
                 return new CPBranch () {
                     public void choose() {
-                        var.setContent ( generatedTerm );
+                        var.setContent ( generatedTerm, mState );
                     }
                     public RuleApp getRuleAppForBranch() {
                         return oldApp;
@@ -119,15 +116,17 @@ public class ForEachCP implements Feature {
         private final PosInOccurrence pos;
         private final RuleApp         app;
         private final Goal            goal;
+        private final MutableState    mState;
     
-        private CP(RuleApp app, PosInOccurrence pos, Goal goal) {
+        private CP(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
             this.pos = pos;
             this.app = app;
             this.goal = goal;
+            this.mState = mState;
         }
     
         public Iterator<CPBranch> getBranches(RuleApp oldApp) {
-            return new BranchIterator ( generator.generate ( app, pos, goal ),
+            return new BranchIterator ( generator.generate ( app, pos, goal, mState ),
                                         oldApp );
         }
     }

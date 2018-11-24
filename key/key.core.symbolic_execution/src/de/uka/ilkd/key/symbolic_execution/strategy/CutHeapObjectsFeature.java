@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
 
 /**
@@ -45,8 +46,8 @@ public class CutHeapObjectsFeature extends BinaryFeature {
     * {@inheritDoc}
     */
    @Override
-   protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-      Term cutFormula = SVInstantiationProjection.create(new Name("cutFormula"), false).toTerm(app, pos, goal);
+   protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
+      Term cutFormula = SVInstantiationProjection.create(new Name("cutFormula"), false).toTerm(app, pos, goal, mState);
       if (cutFormula != null) {
          if (cutFormula.op() == Junctor.NOT) {
             cutFormula = cutFormula.sub(0);

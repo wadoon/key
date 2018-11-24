@@ -32,7 +32,7 @@ public class DiffFindAndReplacewithFeature extends BinaryTacletAppFeature {
 
     private DiffFindAndReplacewithFeature () {}
     
-    protected boolean filter ( TacletApp app, PosInOccurrence pos, Goal goal ) {
+    protected boolean filter ( TacletApp app, PosInOccurrence pos, Goal goal, MutableState mState ) {
         assert pos != null && app.rule() instanceof RewriteTaclet 
                : "Feature is only applicable to rewrite taclets";
         

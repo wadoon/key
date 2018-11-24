@@ -31,7 +31,7 @@ public class NotBelowBinderFeature extends BinaryFeature {
 
     private NotBelowBinderFeature () {}
     
-    public boolean filter (RuleApp app, PosInOccurrence pos, Goal goal) {
+    public boolean filter (RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         Debug.assertFalse ( pos == null,
                             "Feature is only applicable to rules with find" );
 

@@ -18,6 +18,7 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 public class ContainsLabelFeature extends BinaryFeature {
 
@@ -31,7 +32,7 @@ public class ContainsLabelFeature extends BinaryFeature {
   
 
    @Override
-   protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+   protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
       return pos != null && pos.subTerm().containsLabel(label);
    }
 

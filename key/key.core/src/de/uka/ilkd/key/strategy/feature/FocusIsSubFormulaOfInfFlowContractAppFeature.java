@@ -43,7 +43,7 @@ public class FocusIsSubFormulaOfInfFlowContractAppFeature implements Feature {
     @Override
     public RuleAppCost computeCost(RuleApp ruleApp,
                                PosInOccurrence pos,
-                               Goal goal) {
+                               Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find.";
         assert ruleApp instanceof TacletApp : "Feature is only applicable " +
                                               "to Taclets.";

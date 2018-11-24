@@ -26,6 +26,7 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
 
@@ -34,7 +35,7 @@ public class SplittableQuantifiedFormulaFeature extends BinaryFeature {
     public static final Feature INSTANCE =
         new SplittableQuantifiedFormulaFeature ();
     
-    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
+    protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final Analyser analyser = new Analyser ();

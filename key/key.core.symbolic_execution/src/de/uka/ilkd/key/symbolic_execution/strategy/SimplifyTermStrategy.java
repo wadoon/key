@@ -18,6 +18,7 @@ import de.uka.ilkd.key.strategy.StrategyProperties;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 import de.uka.ilkd.key.strategy.definition.StrategySettingsDefinition;
 import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
@@ -55,7 +56,7 @@ public class SimplifyTermStrategy extends JavaCardDLStrategy {
       Feature superFeature = super.setupApprovalF();
       Feature labelFeature = new Feature() {
          @Override
-         public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal) {
+         public RuleAppCost computeCost(RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState) {
             boolean hasLabel = false;
             if (pos != null && app instanceof TacletApp) {
                Term findTerm = pos.subTerm();
