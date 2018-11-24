@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.key_project.util.collection.ImmutableSet;
 
@@ -47,6 +48,11 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * indicates whether this namespace has been sealed or not.
      */
     private boolean sealed;
+
+    /** 
+     * reentrant lock for thread-safe access
+     */
+    private ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
 
     /**
      * Construct an empty Namespace without a parent namespace.
@@ -91,15 +97,20 @@ public class Namespace<E extends Named> implements java.io.Serializable {
         if(old != null && old != sym) {
             System.err.println("Clash! Name already used: " + sym.name().toString());
         }
-        */
+         */
 
-        if (symbols == null) {
-            symbols = Collections.singletonMap(sym.name(), sym);
-        } else {
-            if (symbols.size() == 1) {
-                symbols = new LinkedHashMap<Name, E>(symbols);
+        try { 
+            lock.writeLock().lock();
+            if (symbols == null) {
+                symbols = Collections.singletonMap(sym.name(), sym);
+            } else {
+                if (symbols.size() == 1) {
+                    symbols = new LinkedHashMap<Name, E>(symbols);
+                }
+                symbols.put(sym.name(), sym);
             }
-            symbols.put(sym.name(), sym);
+        } finally {
+            lock.writeLock().unlock();
         }
 
     }
@@ -120,13 +131,17 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * already there.
      */
     public void addSafely(E sym) {
-        Named old = lookup(sym.name());
-        if(old != null && old != sym) {
-            throw new RuntimeException("Name already in namespace: "
-                                       + sym.name());
+        try { 
+            lock.writeLock().lock();
+            Named old = lookup(sym.name());
+            if(old != null && old != sym) {
+                throw new RuntimeException("Name already in namespace: "
+                        + sym.name());
+            }
+            add(sym);
+        } finally {
+            lock.writeLock().unlock();
         }
-
-        add(sym);
     }
 
     public void addSafely(Iterable<? extends E> names) {
@@ -144,15 +159,25 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      */
     public void remove(Name name){
         if(symbols != null){
-            symbols.remove(name);
+            try { 
+                lock.writeLock().lock();
+                symbols.remove(name);
+            } finally {
+                lock.writeLock().unlock();
+            }
         }
     }
 
-    protected E lookupLocally(Name name){
-        if (symbols != null) {
-            return symbols.get(name);
-        } else {
-            return null;
+    protected synchronized E lookupLocally(Name name){
+        try { 
+            lock.readLock().lock();
+            if (symbols != null) {
+                return symbols.get(name);
+            } else {
+                return null;
+            }
+        } finally {
+            lock.readLock().unlock();
         }
     }
 
@@ -171,19 +196,23 @@ public class Namespace<E extends Named> implements java.io.Serializable {
         return result;
     }
 
-   /**
-    * looks if a registered object is declared in this namespace, if
-    * negative it asks its parent
-    * @param name a Name representing the name of the symbol to look for
-    * @return Object with name "name" or null if no such an object
-    * has been found
-    */
+    /**
+     * looks if a registered object is declared in this namespace, if
+     * negative it asks its parent
+     * @param name a Name representing the name of the symbol to look for
+     * @return Object with name "name" or null if no such an object
+     * has been found
+     */
     public E lookup(Name name) {
-        E symbol = lookupLocally(name);
-        if (symbol != null) {
-            return symbol;
+        try { 
+            lock.readLock().lock();
+            E symbol = lookupLocally(name);
+            if (symbol != null) {
+                return symbol;
+            }
+        } finally {
+            lock.readLock().unlock();
         }
-
         if (parent != null) {
             return parent.lookup(name);
         }
@@ -201,43 +230,58 @@ public class Namespace<E extends Named> implements java.io.Serializable {
      * @return the list of the named objects
      */
     public Collection<E> elements() {
-        if(symbols == null) {
-            return Collections.emptyList();
-        } else {
-        return Collections.unmodifiableCollection(symbols.values());
-    }
+        try { 
+            lock.readLock().lock();
+            if(symbols == null) {
+                return Collections.emptyList();
+            } else {
+                return Collections.unmodifiableCollection(symbols.values());
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
 
     public Collection<E> allElements() {
-	if (parent==null) {
-	    return new ArrayList<>(elements());
-	} else {
-	    Collection<E> result = parent().allElements();
-	    result.addAll(elements());
-	    return result;
-	}
+        try { 
+            lock.readLock().lock();
+            if (parent==null) {
+                return new ArrayList<>(elements());
+            } else {
+                Collection<E> result = parent().allElements();
+                result.addAll(elements());
+                return result;
+            }
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     /** returns the fall-back Namespace of this Namespace, i.e. the one
      * where symbols are looked up that are not found in this one.
      */
-    public Namespace<E> parent() {
-	return parent;
+    public synchronized Namespace<E> parent() {
+        return parent;
     }
 
     public String toString() {
-	String res="Namespace: [local:" + symbols;
-	if (parent!=null) res=res+"; parent:"+parent;
-	return res+"]";
+        String res="Namespace: [local:" + symbols;
+        if (parent!=null) res=res+"; parent:"+parent;
+        return res+"]";
     }
 
     public Namespace<E> copy() {
-        Namespace<E> copy = new Namespace<E>(parent);
-        if(symbols != null)
-            copy.add(symbols.values());
+        try { 
+            lock.readLock().lock();
+            Namespace<E> copy = new Namespace<E>(parent);
+            if(symbols != null)
+                copy.add(symbols.values());
 
-        return copy;
+            return copy;
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     private void reset() {
@@ -246,16 +290,31 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     public <T extends E> void set(ImmutableSet<T> names) {
-        reset();
-        addSafely(names);
+        try {
+            lock.writeLock().lock();
+            reset();
+            addSafely(names);
+        } finally {
+            lock.writeLock().unlock();
+        }   
     }
 
     public void seal() {
-        sealed = true;
+        try {
+            lock.writeLock().lock();
+            sealed = true;
+        } finally {
+            lock.writeLock().unlock();
+        }    
     }
 
     public boolean isEmpty() {
-        return symbols == null || symbols.isEmpty();
+        try { 
+            lock.readLock().lock();
+            return symbols == null || symbols.isEmpty();
+        } finally {
+            lock.readLock().unlock();
+        }
     }
 
     public boolean isSealed() {
@@ -263,17 +322,28 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     public Namespace<E> simplify() {
-        if (parent != null && isSealed() && isEmpty()) {
-            return parent;
-        } else {
-            return this;
+        try { 
+            lock.readLock().lock();
+            if (parent != null && isSealed() && isEmpty()) {
+                return parent;
+            } else {
+                return this;
+            }
+        } finally {
+            lock.readLock().unlock();
         }
     }
 
     public Namespace<E> compress() {
         // TODO the order may be changed! This seems rather inefficient ...
-        Namespace<E> result = new Namespace<E>();
-        result.add(allElements());
+        Namespace<E> result;
+        try {
+            lock.writeLock().lock();
+             result = new Namespace<E>();
+            result.add(allElements());
+        } finally {
+            lock.writeLock().unlock();
+        } 
         return result;
     }
 
@@ -282,15 +352,20 @@ public class Namespace<E extends Named> implements java.io.Serializable {
     }
 
     public void flushToParent() {
-        if (parent == null) {
-            return;
-        }
+        try {
+            lock.writeLock().lock();
+            if (parent == null) {
+                return;
+            }
 
-        for (E element : elements()) {
-            parent.add(element);
-        }
-//      all symbols are contained in parent now ... we are empty again.
-        symbols = null;
+            for (E element : elements()) {
+                parent.add(element);
+            }
+            //      all symbols are contained in parent now ... we are empty again.
+            symbols = null;
+        } finally {
+            lock.writeLock().unlock();
+        } 
     }
 
 }

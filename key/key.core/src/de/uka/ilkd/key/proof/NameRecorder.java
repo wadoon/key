@@ -21,13 +21,8 @@ import de.uka.ilkd.key.logic.Name;
 public class NameRecorder {
 
     private ImmutableList<Name> pre = ImmutableSLList.<Name>nil();
-
     private ImmutableList<Name> post = ImmutableSLList.<Name>nil();
-
-    public void setProposals(ImmutableList<Name> proposals) {
-        pre = proposals;
-    }
-
+    
     public ImmutableList<Name> getProposals() {
         return post;
     }
@@ -36,14 +31,16 @@ public class NameRecorder {
         post = post.append(proposal);
     }
 
+    public void setProposals(ImmutableList<Name> proposals) {
+        pre = proposals;            
+    }
+
     public Name getProposal() {
         Name proposal = null;
-
         if (pre != null && !pre.isEmpty()) {
             proposal = pre.head();
             pre = pre.tail();
         }
-
         return proposal;
     }
 

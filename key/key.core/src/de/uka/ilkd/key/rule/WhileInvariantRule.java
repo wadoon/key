@@ -870,11 +870,11 @@ public final class WhileInvariantRule implements BuiltInRule {
         final Map<LocationVariable,Map<Term,Term>> heapToBeforeLoop =
                 new LinkedHashMap<LocationVariable,Map<Term,Term>>();
 
+        final Namespace<IProgramVariable> programVariables = services.getNamespaces().programVariables();
         for(LocationVariable heap : heapContext) {
             heapToBeforeLoop.put(heap, new LinkedHashMap<Term,Term>());
-            final LocationVariable lv =
-                    tb.heapAtPreVar(heap+"Before_LOOP", heap.sort(), true);
-            services.getNamespaces().programVariables().addSafely(lv);
+            final LocationVariable lv = tb.heapAtPreVar(heap+"Before_LOOP", heap.sort(), true);
+            programVariables.addSafely(lv);
             final Term u = tb.elementary(lv, tb.var(heap));
             if (beforeLoopUpdate == null) {
                 beforeLoopUpdate = u;
@@ -896,11 +896,9 @@ public final class WhileInvariantRule implements BuiltInRule {
         }
 
         for (ProgramVariable pv : localOuts) {
-            final String pvBeforeLoopName
-            = tb.newName(pv.name().toString() + "Before_LOOP");
-            final LocationVariable pvBeforeLoop
-            = new LocationVariable(new ProgramElementName(pvBeforeLoopName), pv.getKeYJavaType());
-            services.getNamespaces().programVariables().addSafely(pvBeforeLoop);
+            final String pvBeforeLoopName = tb.newName(pv.name().toString() + "Before_LOOP");
+            final LocationVariable pvBeforeLoop = new LocationVariable(new ProgramElementName(pvBeforeLoopName), pv.getKeYJavaType());
+            programVariables.addSafely(pvBeforeLoop);
             beforeLoopUpdate = tb.parallel(beforeLoopUpdate,
                                            tb.elementary(pvBeforeLoop, 
                                                          tb.var(pv)));

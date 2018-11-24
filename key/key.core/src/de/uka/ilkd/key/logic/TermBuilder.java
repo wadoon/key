@@ -64,6 +64,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.NameRecorder;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations.UpdateLabelPair;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -192,26 +193,29 @@ public class TermBuilder {
      *         above).
      */
     public String newName(String baseName, NamespaceSet localNamespace) {
-        final Name savedName = services.getNameRecorder().getProposal();
-        if (savedName != null) {
-            // CS: bugfix -- saving name proposals.
-            // getProposal() removes the name proposal form the name recorder,
-            // but we need to have it again for saving. Therefore I appended
-            // the proposal at the and of the list again.
-            services.getNameRecorder().addProposal(savedName);
+        
+        final NameRecorder nameRecorder = services.getNameRecorder();
+        synchronized(nameRecorder) {
+            final Name savedName = nameRecorder.getProposal();
+            if (savedName != null) {
+                // CS: bugfix -- saving name proposals.
+                // getProposal() removes the name proposal form the name recorder,
+                // but we need to have it again for saving. Therefore I appended
+                // the proposal at the and of the list again.
+                nameRecorder.addProposal(savedName);
 
-            return savedName.toString();
+                return savedName.toString();
+            }            
+
+            int i = 0;
+            String result = baseName;
+            while (localNamespace.lookup(new Name(result)) != null) {
+                result = baseName + "_" + i++;
+            }
+
+            nameRecorder.addProposal(new Name(result));
+            return result;
         }
-
-        int i = 0;
-        String result = baseName;
-        while (localNamespace.lookup(new Name(result)) != null) {
-            result = baseName + "_" + i++;
-        }
-
-        services.getNameRecorder().addProposal(new Name(result));
-
-        return result;
     }
 
     /**

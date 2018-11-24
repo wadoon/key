@@ -219,9 +219,12 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         Term beforeLoopUpdate = null;
         for (LocationVariable heap : heapContext) {
             heapToBeforeLoop.put(heap, new LinkedHashMap<Term, Term>());
-            final LocationVariable lv = tb.heapAtPreVar(heap + "Before_LOOP",
-                    heap.sort(), true);
-            progVarNS.addSafely(lv);
+            final LocationVariable  lv;
+            synchronized(progVarNS) {
+                lv = tb.heapAtPreVar(heap + "Before_LOOP",
+                        heap.sort(), true);
+                progVarNS.addSafely(lv);
+            }
 
             final Term u = tb.elementary(lv, tb.var(heap));
             if (beforeLoopUpdate == null) {

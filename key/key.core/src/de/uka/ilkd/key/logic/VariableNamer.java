@@ -88,7 +88,6 @@ public abstract class VariableNamer implements InstantiationProposer {
      */
     protected final Services services;
 
-    protected final HashMap<ProgramVariable,ProgramVariable> map = new LinkedHashMap<ProgramVariable,ProgramVariable>();
     protected HashMap<ProgramVariable,ProgramVariable> renamingHistory = new LinkedHashMap<ProgramVariable,ProgramVariable>();
 
     //-------------------------------------------------------------------------
