@@ -221,7 +221,11 @@ public class TermTacletAppIndex {
             ITermTacletAppIndexCache indexCache) {
         final Term localTerm = pos.subTerm ();
 
-        final TermTacletAppIndex cached = indexCache.getIndexForTerm ( localTerm );
+        final TermTacletAppIndex cached;
+        synchronized(indexCache) {
+            cached = indexCache.getIndexForTerm ( localTerm );
+        }
+
         if ( cached != null ) {
             cached.reportTacletApps ( pos, listener );
             return cached;
@@ -241,9 +245,13 @@ public class TermTacletAppIndex {
                 localApps,
                 subIndices,
                 filter );
-        indexCache.putIndexForTerm ( localTerm, res );
+
+        synchronized(indexCache) {
+            indexCache.putIndexForTerm ( localTerm, res );
+        }
 
         return res;
+
     }
 
 
@@ -335,7 +343,10 @@ public class TermTacletAppIndex {
 
         final Term newTerm = pathToModification.getSubTerm ();
 
-        final TermTacletAppIndex cached = indexCache.getIndexForTerm ( newTerm );
+        final TermTacletAppIndex cached;
+        synchronized(indexCache) {
+            cached = indexCache.getIndexForTerm ( newTerm );
+        }
         if ( cached != null ) {
             cached.reportTacletApps ( pathToModification, listener );
             return cached;
@@ -349,7 +360,9 @@ public class TermTacletAppIndex {
                 updateLocalApps ( pos, newTerm, services, tacletIndex,
                         listener, newSubIndices );
 
-        indexCache.putIndexForTerm ( newTerm, res );
+        synchronized(indexCache) {
+            indexCache.putIndexForTerm ( newTerm, res );
+        }
         return res;
     }
 
