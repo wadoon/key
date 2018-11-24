@@ -13,10 +13,8 @@
 
 package de.uka.ilkd.key.strategy.termgenerator;
 
+import java.util.ArrayDeque;
 import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -79,14 +77,15 @@ public abstract class SubtermGenerator implements TermGenerator {
     }
         
     abstract class SubIterator implements Iterator<Term> {
-        protected ImmutableList<Term> termStack;
+        protected ArrayDeque<Term> termStack;
         
         protected final Services services;
 
         protected final MutableState mState;
 
         public SubIterator(Term t, Services services, MutableState mState) {
-            termStack = ImmutableSLList.<Term>nil().prepend ( t );
+            termStack = new ArrayDeque<>();
+            termStack.push ( t );
             this.services = services;
             this.mState = mState;
         }
@@ -102,12 +101,11 @@ public abstract class SubtermGenerator implements TermGenerator {
         }
 
         public Term next() {
-            final Term res = termStack.head ();
-            termStack = termStack.tail ();
+            final Term res = termStack.pop ();
             
             if ( descendFurther ( res, services, mState ) ) {
                 for ( int i = res.arity () - 1; i >= 0; --i )
-                    termStack = termStack.prepend ( res.sub ( i ) );
+                    termStack.push ( res.sub ( i ) );
             }
             
             return res;
@@ -128,12 +126,11 @@ public abstract class SubtermGenerator implements TermGenerator {
         }
 
         public Term next() {
-            final Term res = termStack.head ();
-            termStack = termStack.tail ();
+            final Term res = termStack.pop ();
             
             if ( descendFurther ( res, services, mState ) ) {
                 for ( int i = 0; i != res.arity (); ++i )
-                    termStack = termStack.prepend ( res.sub ( i ) );
+                    termStack.push ( res.sub ( i ) );
             }
             
             return res;
