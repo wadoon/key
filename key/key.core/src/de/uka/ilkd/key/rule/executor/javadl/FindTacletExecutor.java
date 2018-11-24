@@ -18,8 +18,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 
 public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends TacletExecutor<TacletKind> {
-    
-    
+
+
     public FindTacletExecutor(TacletKind taclet) {
         super(taclet);
     }
@@ -37,11 +37,11 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
      * @param services the {@link Services} encapsulating all Java model information
      */
     protected abstract void applyReplacewith(TacletGoalTemplate gt, TermLabelState termLabelState, 
-                         SequentChangeInfo currentSequent, PosInOccurrence posOfFind,
-                         MatchConditions matchCond,
-                         Goal goal,
-                         RuleApp ruleApp,
-                         Services services);
+            SequentChangeInfo currentSequent, PosInOccurrence posOfFind,
+            MatchConditions matchCond,
+            Goal goal,
+            RuleApp ruleApp,
+            Services services);
 
 
     /**
@@ -56,14 +56,14 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
      * @param services the {@link Services} encapsulating all Java model information
      */
     protected abstract void applyAdd(Sequent add, TermLabelState termLabelState, SequentChangeInfo currentSequent,
-                     PosInOccurrence posOfFind,
-                     MatchConditions matchCond,
-                     Goal goal,
-                     RuleApp ruleApp,
-                     Services services);
+            PosInOccurrence posOfFind,
+            MatchConditions matchCond,
+            Goal goal,
+            RuleApp ruleApp,
+            Services services);
 
 
-    
+
     /**  
      * the rule is applied on the given goal using the
      * information of rule application. 
@@ -72,85 +72,85 @@ public abstract class FindTacletExecutor<TacletKind extends FindTaclet> extends 
      * @param ruleApp the taclet application that is executed.
      */
     public final ImmutableList<Goal> apply(Goal     goal,
-                Services services,
-                RuleApp  ruleApp) {
-   final TermLabelState termLabelState = new TermLabelState();
-    // Number without the if-goal eventually needed
-    int                          numberOfNewGoals = taclet.goalTemplates().size();
+            Services services,
+            RuleApp  ruleApp) {
+        final TermLabelState termLabelState = new TermLabelState();
+        // Number without the if-goal eventually needed
+        int                          numberOfNewGoals = taclet.goalTemplates().size();
 
-    TacletApp                    tacletApp        = (TacletApp) ruleApp;
-    MatchConditions              mc               = tacletApp.matchConditions ();
+        TacletApp                    tacletApp        = (TacletApp) ruleApp;
+        MatchConditions              mc               = tacletApp.matchConditions ();
 
-    ImmutableList<SequentChangeInfo>                   newSequentsForGoals         =
-        checkIfGoals ( goal,
-               tacletApp.ifFormulaInstantiations (),
-               mc,
-               numberOfNewGoals );
-    
-    ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
-    
-    Iterator<TacletGoalTemplate> it               = taclet.goalTemplates().iterator(); 
-    Iterator<Goal>               goalIt           = newGoals.iterator();
-   Iterator<SequentChangeInfo> newSequentsIt = newSequentsForGoals.iterator();
+        ImmutableList<SequentChangeInfo>                   newSequentsForGoals         =
+                checkIfGoals ( goal,
+                        tacletApp.ifFormulaInstantiations (),
+                        mc,
+                        numberOfNewGoals );
 
-    while (it.hasNext()) {
-        TacletGoalTemplate gt          = it    .next();
-        Goal               currentGoal = goalIt.next();
-       SequentChangeInfo  currentSequent = newSequentsIt.next();
+        ImmutableList<Goal> newGoals = goal.split(newSequentsForGoals.size());
 
-        // add first because we want to use pos information that
-        // is lost applying replacewith
-        
-        applyAdd(gt.sequent(), termLabelState,
-                  currentSequent,
-                  tacletApp.posInOccurrence(),
-                  mc,
-                  goal,
-                  ruleApp,
-                  services);
+        Iterator<TacletGoalTemplate> it               = taclet.goalTemplates().iterator(); 
+        Iterator<Goal>               goalIt           = newGoals.iterator();
+        Iterator<SequentChangeInfo> newSequentsIt = newSequentsForGoals.iterator();
 
-        applyReplacewith(gt, 
-                 termLabelState, currentSequent,
-                 tacletApp.posInOccurrence(),
-                 mc,
-                 currentGoal,
-                 ruleApp,
-                 services);
+        while (it.hasNext()) {
+            TacletGoalTemplate gt          = it    .next();
+            Goal               currentGoal = goalIt.next();
+            SequentChangeInfo  currentSequent = newSequentsIt.next();
 
-        applyAddrule( gt.rules(),
-                  currentGoal,
-                  services,
-                  mc );
+            // add first because we want to use pos information that
+            // is lost applying replacewith
 
-        
-        applyAddProgVars( gt.addedProgVars(),
-                currentSequent,
-                  currentGoal,
-               tacletApp.posInOccurrence(),
-               services,
-                  mc);
-       
-       TermLabelManager.mergeLabels(currentSequent, services);
-       
-       currentGoal.setSequent(currentSequent);              
-        
-       currentGoal.setBranchLabel(gt.name());
-       
-       TermLabelManager.refactorSequent(termLabelState, services, ruleApp.posInOccurrence(), ruleApp.rule(), currentGoal, null, null);
-    }
-    
-    // in case the assumes sequent of the taclet did not
-    // already occur in the goal sequent, we had to perform a cut
-    // in this loop we make sure to assign the cut goal its correct
-    // sequent
-    while (newSequentsIt.hasNext()) {
-       Goal nextGoal = goalIt.next();
-       nextGoal.setSequent(newSequentsIt.next());
-       TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), ruleApp.rule(), nextGoal, null, null);
-    }
-    
-    assert !goalIt.hasNext();
+            applyAdd(gt.sequent(), termLabelState,
+                    currentSequent,
+                    tacletApp.posInOccurrence(),
+                    mc,
+                    goal,
+                    ruleApp,
+                    services);
 
-    return newGoals;
+            applyReplacewith(gt, 
+                    termLabelState, currentSequent,
+                    tacletApp.posInOccurrence(),
+                    mc,
+                    currentGoal,
+                    ruleApp,
+                    services);
+
+            applyAddrule( gt.rules(),
+                    currentGoal,
+                    services,
+                    mc );
+
+
+            applyAddProgVars( gt.addedProgVars(),
+                    currentSequent,
+                    currentGoal,
+                    tacletApp.posInOccurrence(),
+                    services,
+                    mc);
+
+            TermLabelManager.mergeLabels(currentSequent, services);
+
+            currentGoal.setSequent(currentSequent);              
+
+            currentGoal.setBranchLabel(gt.name());
+
+            TermLabelManager.refactorSequent(termLabelState, services, ruleApp.posInOccurrence(), ruleApp.rule(), currentGoal, null, null);
+        }
+
+        // in case the assumes sequent of the taclet did not
+        // already occur in the goal sequent, we had to perform a cut
+        // in this loop we make sure to assign the cut goal its correct
+        // sequent
+        while (newSequentsIt.hasNext()) {
+            Goal nextGoal = goalIt.next();
+            nextGoal.setSequent(newSequentsIt.next());
+            TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), ruleApp.rule(), nextGoal, null, null);
+        }
+
+        assert !goalIt.hasNext();
+
+        return newGoals;
     }
 }

@@ -176,8 +176,10 @@ public class TermTacletAppIndexCacheSet {
     private ITermTacletAppIndexCache
             getTopLevelCache(ImmutableList<QuantifiableVariable> prefix) {
         if ( prefix.isEmpty () ) return topLevelCacheEmptyPrefix;
+                
         ITermTacletAppIndexCache res =
             topLevelCaches.get ( prefix );
+        
         if ( res == null ) {
             res = new TopLevelCache ( prefix, cache );
             topLevelCaches.put ( prefix, res );

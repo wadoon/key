@@ -1281,12 +1281,12 @@ public final class JavaInfo {
      * returns the KeYJavaType  representing the type of 'null'
      */
     public KeYJavaType getNullType() {
-	if (nullType==null) {
-	    nullType = getTypeByClassName("null");
-	    Debug.assertTrue(nullType!=null
-			 , "we should already have it in the map");
-	}
-	return nullType;
+        if (nullType==null) {
+            nullType = getTypeByClassName("null");
+            Debug.assertTrue(nullType!=null
+                    , "we should already have it in the map");
+        }
+        return nullType;
     }
 
 

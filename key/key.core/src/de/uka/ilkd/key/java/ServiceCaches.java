@@ -101,8 +101,10 @@ public class ServiceCaches {
 
    private final LRUCache<Term, Polynomial> polynomialCache = new LRUCache<Term, Polynomial> ( 2000 );
 
-   /**a <code>HashMap</code> from <code>Term</code> to 
-    * <code>TriggersSet</code> uses to cache all created TriggersSets*/
+   /**
+    * a <code>HashMap</code> from <code>Term</code> to 
+    * <code>TriggersSet</code> uses to cache all created TriggersSets
+    */
    private final Map<Term, TriggersSet> triggerSetCache = new LRUCache<Term, TriggersSet>(1000);
 
    /**
