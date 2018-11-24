@@ -23,6 +23,7 @@ import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
+import de.uka.ilkd.key.prover.impl.MultiCoreProver;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.strategy.StrategyProperties;
 
@@ -150,7 +151,8 @@ public class MediatorProofControl extends AbstractProofControl {
                              ProverTaskListener ptl) {
            this.proof = proof;
            this.goals = goals;
-           this.applyStrategy = new ApplyStrategy(proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create());
+           this.applyStrategy = new MultiCoreProver();
+           //this.applyStrategy = new ApplyStrategy(proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create());
            if (ptl != null) {
               applyStrategy.addProverTaskObserver(ptl);
            }

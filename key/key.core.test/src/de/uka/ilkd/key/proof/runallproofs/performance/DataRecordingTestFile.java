@@ -11,6 +11,7 @@ import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestFile;
 import de.uka.ilkd.key.proof.runallproofs.proofcollection.TestProperty;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
+import de.uka.ilkd.key.prover.impl.MultiCoreProver;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.util.Pair;
 
@@ -43,7 +44,8 @@ class DataRecordingTestFile extends TestFile<ProfilingDirectories> {
     
     private static ApplyStrategyInfo applyStrategy(Proof proof, Strategy strategy) {
         proof.setActiveStrategy(strategy);
-        ApplyStrategyInfo applyStrategyInfo = new ApplyStrategy(proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create()).start(proof, proof.openGoals().head());
+        ApplyStrategyInfo applyStrategyInfo = new MultiCoreProver().start(proof, proof.openGoals().head())  ;
+                //new ApplyStrategy(proof.getInitConfig().getProfile().getSelectedGoalChooserBuilder().create()).start(proof, proof.openGoals().head());
         return applyStrategyInfo;
     }
 

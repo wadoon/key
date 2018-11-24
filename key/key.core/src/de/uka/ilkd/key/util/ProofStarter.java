@@ -35,6 +35,7 @@ import de.uka.ilkd.key.prover.ProverCore;
 import de.uka.ilkd.key.prover.ProverTaskListener;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
 import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
+import de.uka.ilkd.key.prover.impl.MultiCoreProver;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -241,7 +242,7 @@ public class ProofStarter {
            OneStepSimplifier.refreshOSS(proof);
 
            GoalChooser goalChooser = profile.getSelectedGoalChooserBuilder().create();
-           ProverCore prover = new ApplyStrategy(goalChooser);
+           ProverCore prover = new MultiCoreProver();// new ApplyStrategy(goalChooser);
            if (ptl != null) {
               prover.addProverTaskObserver(ptl);
            }
