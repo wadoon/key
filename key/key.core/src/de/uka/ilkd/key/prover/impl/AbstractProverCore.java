@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.prover.impl;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -13,9 +15,6 @@ import de.uka.ilkd.key.prover.TaskStartedInfo.TaskKind;
  * @author Richard Bubel
  */
 public abstract class AbstractProverCore implements ProverCore {
-
-    /** number of rules automatically applied */
-    protected int countApplied = 0;
 
     /**
      * We use an immutable list to store listeners to allow for
@@ -40,11 +39,11 @@ public abstract class AbstractProverCore implements ProverCore {
     /**
      * propagation of task progress information to be displayed e.g. in a progress bar
      */
-    protected void fireTaskProgress() {
+    protected void fireTaskProgress(int appliedRules) {
         // no need to synchronize here as we use immutable list and hence
         // the add/remove task observer methods won't interfere
         for (final ProverTaskListener ptl : proverTaskObservers) {
-            ptl.taskProgress(countApplied);
+            ptl.taskProgress(appliedRules);
         }
     }
 
@@ -83,4 +82,11 @@ public abstract class AbstractProverCore implements ProverCore {
         }
     }
 
+    /**
+     * unregisters all observers
+     */
+    @Override
+    public void clear() {
+        //proverTaskObservers = ImmutableSLList.<ProverTaskListener>nil();
+    }
 }

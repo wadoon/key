@@ -336,5 +336,17 @@ public class DefaultGoalChooser implements GoalChooser {
 	return !p_root.isClosed();
     }
 
+    @Override
+    public void dispose() {
+        proof.removeProofTreeListener(proofTreeListener);
+        proofTreeListener = null;
+        proof = null;
+        nextGoals = null;
+        goalList = null;
+        currentSubtreeRoot = null;
+        selectedList = null;
+        
+    }
+
 
 }

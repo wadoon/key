@@ -51,4 +51,9 @@ public interface GoalChooser {
      */
     public abstract void updateGoalList(Node node, ImmutableList<Goal> newGoals);
 
+    /**
+     * releases resources; after calling this method the goal chooser must not be used anymore
+     */
+    public abstract void dispose();
+
 }

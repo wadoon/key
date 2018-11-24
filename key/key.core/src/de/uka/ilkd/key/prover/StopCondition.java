@@ -89,7 +89,7 @@ public interface StopCondition {
      * @param proof The current {@link Proof}.
      * @param startTime The timestamp when the apply strategy has started, computed via {@link System#currentTimeMillis()}
      * @param countApplied The number of already applied rules.
-     * @param singleRuleApplicationInfo An optional {@link SingleRuleApplicationInfo}.
+     * @param goal An optional {@link Goal}.
      * @return {@code true} stop strategy, {@code false} continue strategy and apply next rule.
      */
     public boolean shouldStop(int maxApplications,
@@ -97,18 +97,18 @@ public interface StopCondition {
                               Proof proof,
                               long startTime,
                               int countApplied,
-                              SingleRuleApplicationInfo singleRuleApplicationInfo);
+                              Goal goal);
 
     /**
      * Returns a human readable message which explains why the previous
-     * {@link #shouldStop(ApplyStrategy, Proof, GoalChooser, long, int, SingleRuleApplicationInfo)}
+     * {@link #shouldStop(ApplyStrategy, Proof, GoalChooser, long, int, Goal)}
      * has stopped the strategy.
      * @param maxApplications The defined maximal number of rules to apply. Can be different to {@link StrategySettings#getMaxSteps()} in side proofs.
      * @param timeout The defined timeout in ms or {@code -1} if disabled. Can be different to {@link StrategySettings#getTimeout()} in side proofs.
      * @param proof The current {@link Proof}.
      * @param startTime The timestamp when the apply strategy has started, computed via {@link System#currentTimeMillis()}
      * @param countApplied The number of already applied rules.
-     * @param singleRuleApplicationInfo An optional {@link SingleRuleApplicationInfo}.
+     * @param goal An optional {@link Goal}.
      * @return The human readable message which explains the stop reason.
      */
     public String getStopMessage(int maxApplications,
@@ -116,5 +116,5 @@ public interface StopCondition {
                                  Proof proof,
                                  long startTime,
                                  int countApplied,
-                                 SingleRuleApplicationInfo singleRuleApplicationInfo);
+                                 Goal goal);
 }

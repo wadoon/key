@@ -20,7 +20,6 @@ http://java.sun.com/products/jfc/tsc/articles/threads/threads2.html
 
 package de.uka.ilkd.key.prover.impl;
 
-
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -53,6 +52,9 @@ public class ApplyStrategy extends AbstractProverCore {
     private Proof proof;
     /** the maximum of allowed rule applications */
     private int maxApplications;
+    
+    /** number of rules automatically applied */
+    protected int countApplied = 0;
 
     /** The default {@link GoalChooser} to choose goals to which rules are applied if the {@link StrategySettings} of the proof provides no customized one.*/
     private GoalChooser defaultGoalChooser;
@@ -139,7 +141,7 @@ public class ApplyStrategy extends AbstractProverCore {
         try{
             Debug.out("Strategy started.");
             boolean shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof,
-                                                          time, countApplied, srInfo);
+                                                          time, countApplied, null);
 
             while (!shouldStop) {
                 srInfo = applyAutomaticRule(goalChooser, stopCondition, stopAtFirstNonClosableGoal);
@@ -149,17 +151,17 @@ public class ApplyStrategy extends AbstractProverCore {
                                                  closedGoals);
                 }
                 countApplied++;
-                fireTaskProgress ();
+                fireTaskProgress (countApplied);
                 if (Thread.interrupted()) {
                     throw new InterruptedException();
                 }
                 shouldStop = stopCondition.shouldStop(maxApplications, timeout, proof, time,
-                                                      countApplied, srInfo);
+                                                      countApplied, srInfo.getGoal());
             }
             if (shouldStop) {
                 return new ApplyStrategyInfo(
                         stopCondition.getStopMessage(maxApplications, timeout, proof, time,
-                                                     countApplied, srInfo),
+                                                     countApplied, srInfo.getGoal()),
                         proof, null, (Goal) null, System.currentTimeMillis()-time,
                         countApplied, closedGoals);
             }
@@ -181,7 +183,6 @@ public class ApplyStrategy extends AbstractProverCore {
         return new ApplyStrategyInfo(srInfo.message(), proof, null, srInfo.getGoal(), time,
                                      countApplied, closedGoals);
     }
-
 
     private void init(Proof newProof, ImmutableList<Goal> goals, int maxSteps, long timeout) {
         this.proof      = newProof;

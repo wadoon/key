@@ -60,7 +60,7 @@ public final class AppliedRuleStopCondition implements StopCondition {
                               Proof proof,
                               long startTime,
                               int countApplied,
-                              SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                              Goal goal) {
         return countApplied >= maxApplications ||
                timeout >= 0 && System.currentTimeMillis() - startTime >= timeout;
     }
@@ -74,7 +74,7 @@ public final class AppliedRuleStopCondition implements StopCondition {
                                  Proof proof,
                                  long startTime,
                                  int countApplied,
-                                 SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                                 Goal goal) {
         return "Maximal number of rule applications reached or timed out.";
     }
 }

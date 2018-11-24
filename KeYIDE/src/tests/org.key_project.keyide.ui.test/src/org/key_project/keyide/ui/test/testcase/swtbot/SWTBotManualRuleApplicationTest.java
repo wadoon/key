@@ -35,7 +35,6 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.StopCondition;
-import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -59,7 +58,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                        TestKeYUIUtil.createOperationContractId("PayCard", "PayCard", "isValid()", "0", "normal_behavior"),
                        new StopCondition() {
                           @Override
-                          public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                          public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, Goal goal) {
                               return false;
                           }
                         
@@ -71,7 +70,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                           }
                         
                           @Override
-                          public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                          public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, Goal goal) {
                               return null;
                           }
                         
@@ -155,7 +154,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                @Override
                public boolean shouldStop(int maxApplications, long timeout, Proof proof,
                      long startTime, int countApplied,
-                     SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                     Goal goal) {
                   return false;
                }
                
@@ -169,7 +168,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                @Override
                public String getStopMessage(int maxApplications, long timeout, Proof proof,
                      long startTime, int countApplied,
-                     SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                     Goal goal) {
                   return null;
                }
                
@@ -228,7 +227,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                @Override
                public boolean shouldStop(int maxApplications, long timeout, Proof proof,
                      long startTime, int countApplied,
-                     SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                     Goal goal) {
                   return false;
                }
                
@@ -242,7 +241,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                @Override
                public String getStopMessage(int maxApplications, long timeout, Proof proof,
                      long startTime, int countApplied,
-                     SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                     Goal goal) {
                   return null;
                }
                
@@ -287,7 +286,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                         TestKeYUIUtil.createOperationContractId("PayCard", "PayCard", "chargeAndRecord(int)", "0", "normal_behavior"),
                         new StopCondition() {
                            @Override
-                           public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                           public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, Goal goal) {
                               return false;
                            }
                            
@@ -298,7 +297,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                            }
                            
                            @Override
-                           public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                           public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, Goal goal) {
                               return null;
                            }
                            
@@ -347,7 +346,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             TestKeYUIUtil.createOperationContractId("BlockContractExample", "BlockContractExample", "main()", "0", "normal_behavior"),
             new StopCondition() {
                @Override
-               public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, Goal goal) {
                   return false;
                }
                
@@ -358,7 +357,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                }
                
                @Override
-               public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, Goal goal) {
                   return null;
                }
                
@@ -405,7 +404,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             TestKeYUIUtil.createOperationContractId("BlockContractExample", "BlockContractExample", "main()", "0", "normal_behavior"),
             new StopCondition() {
                @Override
-               public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, Goal goal) {
                   return false;
                }
                
@@ -416,7 +415,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                }
                
                @Override
-               public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, Goal goal) {
                   return null;
                }
                
@@ -463,7 +462,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             TestKeYUIUtil.createOperationContractId("BlockContractExample", "BlockContractExample", "main()", "0", "normal_behavior"),
             new StopCondition() {
                @Override
-               public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, Goal goal) {
                   return false;
                }
                
@@ -474,7 +473,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                }
                
                @Override
-               public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, Goal goal) {
                   return null;
                }
                
@@ -534,7 +533,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             "DependencyContractExample.proof", 
             new StopCondition() {
                @Override
-               public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, Goal goal) {
                   return false;
                }
                
@@ -545,7 +544,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                }
                
                @Override
-               public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, Goal goal) {
                   return null;
                }
                
@@ -597,7 +596,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
             "DependencyContractExample.proof", 
             new StopCondition() {
                @Override
-               public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public boolean shouldStop(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, Goal goal) {
                   return false;
                }
                
@@ -608,7 +607,7 @@ public class SWTBotManualRuleApplicationTest extends AbstractSWTBotKeYEditorTest
                }
                
                @Override
-               public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, SingleRuleApplicationInfo singleRuleApplicationInfo) {
+               public String getStopMessage(int maxApplications, long timeout, Proof proof, long startTime, int countApplied, Goal goal) {
                   return null;
                }
                

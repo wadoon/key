@@ -22,7 +22,6 @@ import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.prover.StopCondition;
 import de.uka.ilkd.key.prover.impl.ApplyStrategy;
-import de.uka.ilkd.key.prover.impl.SingleRuleApplicationInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.StrategySettings;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
@@ -227,11 +226,10 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
                              Proof proof, 
                              long startTime, 
                              int countApplied, 
-                             SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                             Goal goal) {
       // Check if a rule was applied
-      if (singleRuleApplicationInfo != null) {
+      if (goal != null) {
          // Get the node on which a rule was applied.
-         Goal goal = singleRuleApplicationInfo.getGoal();
          Node goalNode = goal.node();
          assert goalNode.childrenCount() == 0; // Make sure that this is the current goal node
          Node updatedNode = goalNode.parent();
@@ -266,7 +264,7 @@ public class ExecutedSymbolicExecutionTreeNodesStopCondition implements StopCond
                                 Proof proof, 
                                 long startTime, 
                                 int countApplied, 
-                                SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                                Goal goal) {
       return null;
    }
 

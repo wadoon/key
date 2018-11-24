@@ -127,12 +127,12 @@ public class CompoundStopCondition implements StopCondition {
                              Proof proof, 
                              long startTime, 
                              int countApplied, 
-                             SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                             Goal goal) {
       boolean stop = false;
       Iterator<StopCondition> childIter = children.iterator();
       while (!stop && childIter.hasNext()) {
          lastShouldStopChild = childIter.next();
-         stop = lastShouldStopChild.shouldStop(maxApplications, timeout, proof, startTime, countApplied, singleRuleApplicationInfo);
+         stop = lastShouldStopChild.shouldStop(maxApplications, timeout, proof, startTime, countApplied, goal);
       }
       return stop;
    }
@@ -146,9 +146,9 @@ public class CompoundStopCondition implements StopCondition {
                                 Proof proof, 
                                 long startTime, 
                                 int countApplied, 
-                                SingleRuleApplicationInfo singleRuleApplicationInfo) {
+                                Goal goal) {
       return lastShouldStopChild != null ?
-             lastShouldStopChild.getStopMessage(maxApplications, timeout, proof, startTime, countApplied, singleRuleApplicationInfo) :
+             lastShouldStopChild.getStopMessage(maxApplications, timeout, proof, startTime, countApplied, goal) :
              null;
    }
 
