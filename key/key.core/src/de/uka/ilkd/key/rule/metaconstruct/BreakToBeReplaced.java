@@ -22,26 +22,26 @@ class BreakToBeReplaced {
     private ProgramVariable pvar;
 
     public BreakToBeReplaced(Break brk, 
-			     ProgramVariable pvar) {
-	this.brk  = brk;
-	this.pvar = pvar;
+            ProgramVariable pvar) {
+        this.brk  = brk;
+        this.pvar = pvar;
     }
 
     public BreakToBeReplaced(Break brk) {
-	this.brk  = brk;
-	this.pvar = null;
+        this.brk  = brk;
+        this.pvar = null;
     }
 
     Break getBreak() {
-	return brk;
+        return brk;
     }
 
     ProgramVariable getProgramVariable() {
-	return pvar;
+        return pvar;
     }
-    
+
     void setProgramVariable(ProgramVariable pvar) {
-	this.pvar = pvar;
+        this.pvar = pvar;
     }
 
 }

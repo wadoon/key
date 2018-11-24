@@ -57,9 +57,9 @@ public abstract class ProgramTransformer extends JavaNonTerminalProgramElement
     implements StatementContainer, Statement, Expression, TypeReference {
 
     /** the name of the meta construct */
-    private Name name;
+    private final Name name;
     /** the encapsulated program element */
-    private ProgramElement body;
+    private final ProgramElement body;
 
     /** creates a ProgramTransformer 
      * @param name the Name of the meta construct 

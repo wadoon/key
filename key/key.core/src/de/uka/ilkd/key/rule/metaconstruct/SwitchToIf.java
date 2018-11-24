@@ -27,6 +27,7 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.expression.operator.New;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -41,7 +42,6 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public class SwitchToIf extends ProgramTransformer {
 
     public static int labelCount = 0;
-    private boolean noNewBreak = true;
 
     /**
      * creates a switch-to-if ProgramTransformer
@@ -56,6 +56,8 @@ public class SwitchToIf extends ProgramTransformer {
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations insts) {
+        BooleanContainer noNewBreak = new BooleanContainer();
+        noNewBreak.setVal(true);
         Switch sw = (Switch) pe;
         int i = 0;
         ExtList extL = new ExtList();
@@ -85,7 +87,7 @@ public class SwitchToIf extends ProgramTransformer {
         }
 
         extL.add(exV);
-        sw = changeBreaks(sw, newBreak);
+        sw = changeBreaks(sw, newBreak, noNewBreak);
         while (i < sw.getBranchCount()) {
             if (sw.getBranchAt(i) instanceof Case) {
                 extL.add(((Case) sw.getBranchAt(i)).getExpression());
@@ -113,7 +115,7 @@ public class SwitchToIf extends ProgramTransformer {
             i++;
         }
         result = KeYJavaASTFactory.insertStatementInBlock(result, ifs);
-        if (noNewBreak) {
+        if (noNewBreak.val()) {
             return new ProgramElement[] { result };
         } else {
             return new ProgramElement[] { KeYJavaASTFactory.labeledStatement(l,
@@ -143,28 +145,29 @@ public class SwitchToIf extends ProgramTransformer {
     /**
      * Replaces all breaks in <code>sw</code>, whose target is sw, with
      * <code>b</code>
+     * @param noNewBreak 
      */
-    private Switch changeBreaks(Switch sw, Break b) {
+    private Switch changeBreaks(Switch sw, Break b, BooleanContainer noNewBreak) {
         int n = sw.getBranchCount();
         Branch[] branches = new Branch[n];
         for (int i = 0; i < n; i++) {
-            branches[i] = (Branch) recChangeBreaks(sw.getBranchAt(i), b);
+            branches[i] = (Branch) recChangeBreaks(sw.getBranchAt(i), b, noNewBreak);
         }
         return KeYJavaASTFactory.switchBlock(sw.getExpression(), branches);
     }
 
-    private ProgramElement recChangeBreaks(ProgramElement p, Break b) {
+    private ProgramElement recChangeBreaks(ProgramElement p, Break b, BooleanContainer noNewBreak) {
         if (p == null) {
             return null;
         }
         if (p instanceof Break && ((Break) p).getLabel() == null) {
-            noNewBreak = false;
+            noNewBreak.setVal(false);
             return b;
         }
         if (p instanceof Branch) {
             Statement[] s = new Statement[((Branch) p).getStatementCount()];
             for (int i = 0; i < ((Branch) p).getStatementCount(); i++) {
-                s[i] = (Statement) recChangeBreaks(((Branch) p).getStatementAt(i), b);
+                s[i] = (Statement) recChangeBreaks(((Branch) p).getStatementAt(i), b, noNewBreak);
             }
             if (p instanceof Case) {
                 return KeYJavaASTFactory.caseBlock(((Case) p).getExpression(),
@@ -189,15 +192,15 @@ public class SwitchToIf extends ProgramTransformer {
         }
         if (p instanceof If) {
             return KeYJavaASTFactory.ifElse(((If) p).getExpression(),
-                (Then) recChangeBreaks(((If) p).getThen(), b),
-                (Else) recChangeBreaks(((If) p).getElse(), b));
+                (Then) recChangeBreaks(((If) p).getThen(), b, noNewBreak),
+                (Else) recChangeBreaks(((If) p).getElse(), b, noNewBreak));
         }
         if (p instanceof StatementBlock) {
             Statement[] s = new Statement[((StatementBlock) p)
                     .getStatementCount()];
             for (int i = 0; i < ((StatementBlock) p).getStatementCount(); i++) {
                 s[i] = (Statement) recChangeBreaks(
-                    ((StatementBlock) p).getStatementAt(i), b);
+                    ((StatementBlock) p).getStatementAt(i), b, noNewBreak);
             }
             return KeYJavaASTFactory.block(s);
         }
@@ -205,10 +208,10 @@ public class SwitchToIf extends ProgramTransformer {
             int n = ((Try) p).getBranchCount();
             Branch[] branches = new Branch[n];
             for (int i = 0; i < n; i++) {
-                branches[i] = (Branch) recChangeBreaks(((Try) p).getBranchAt(i), b);
+                branches[i] = (Branch) recChangeBreaks(((Try) p).getBranchAt(i), b, noNewBreak);
             }
             return KeYJavaASTFactory.tryBlock(
-                (StatementBlock) recChangeBreaks(((Try) p).getBody(), b),
+                (StatementBlock) recChangeBreaks(((Try) p).getBody(), b, noNewBreak),
                 branches);
         }
         return p;

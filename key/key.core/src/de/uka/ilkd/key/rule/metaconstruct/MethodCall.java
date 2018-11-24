@@ -60,15 +60,18 @@ import de.uka.ilkd.key.util.Debug;
 public class MethodCall extends ProgramTransformer {
 
     private final SchemaVariable resultVar;
+    private final IExecutionContext execContextSV;
 
-    protected MethodReference methRef;
-    private IProgramMethod pm;
-    protected ReferencePrefix newContext;
-    protected ProgramVariable pvar;
-    private IExecutionContext execContextSV;
-    private ExecutionContext execContext;
-    protected ImmutableArray<Expression> arguments;
-    protected KeYJavaType staticPrefixType;
+    
+    class InternalTransformationState {
+        MethodReference methRef;
+        IProgramMethod pm;
+        ReferencePrefix newContext;
+        ProgramVariable pvar;
+        ExecutionContext execContext;
+        ImmutableArray<Expression> arguments;
+        KeYJavaType staticPrefixType;
+    }
 
     /**
      * creates the methodcall-MetaConstruct
@@ -126,7 +129,7 @@ public class MethodCall extends ProgramTransformer {
 
     /** gets an array of expression and returns a list of types */
     private ImmutableList<KeYJavaType> getTypes(ImmutableArray<Expression> args,
-            Services services) {
+            ExecutionContext execContext, Services services) {
         ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType> nil();
         for (int i = args.size() - 1; i >= 0; i--) {
             Expression argument = args.get(i);
@@ -137,7 +140,7 @@ public class MethodCall extends ProgramTransformer {
     }
 
     private KeYJavaType getStaticPrefixType(ReferencePrefix refPrefix,
-            Services services) {
+            ExecutionContext execContext, Services services) {
         if (refPrefix == null || refPrefix instanceof ThisReference
                 && refPrefix.getReferencePrefix() == null) {
             return execContext.getTypeReference().getKeYJavaType();
@@ -179,20 +182,20 @@ public class MethodCall extends ProgramTransformer {
      * @return TODO
      */
     protected IProgramMethod getMethod(KeYJavaType prefixType,
-            MethodReference mr, Services services) {
+            MethodReference mr, Services services, InternalTransformationState state) {
         IProgramMethod result;
-        if (execContext != null) {
-            result = mr.method(services, prefixType, execContext);
+        if (state.execContext != null) {
+            result = mr.method(services, prefixType, state.execContext);
             if (result == null) {
                 // if a method is declared protected and prefix and
                 // execContext are in different packages we have to
                 // simulate visibility rules like being in prefixType
                 result = mr.method(services, prefixType,
-                    mr.getMethodSignature(services, execContext), prefixType);
+                    mr.getMethodSignature(services, state.execContext), prefixType);
             }
         } else {
             result = mr.method(services, prefixType,
-                mr.getMethodSignature(services, execContext), prefixType);
+                mr.getMethodSignature(services, state.execContext), prefixType);
         }
         return result;
     }
@@ -220,126 +223,130 @@ public class MethodCall extends ProgramTransformer {
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
+        
+        InternalTransformationState state = new InternalTransformationState();
+        
         Debug.out("method-call: called for ", pe);
         if (resultVar != null) {
-            pvar = (ProgramVariable) svInst.getInstantiation(resultVar);
+            state.pvar = (ProgramVariable) svInst.getInstantiation(resultVar);
         }
 
-        execContext = execContextSV == null
+        state.execContext = execContextSV == null
                 ? svInst.getContextInstantiation().activeStatementContext()
                 : (ExecutionContext) svInst
                         .getInstantiation((SchemaVariable) execContextSV);
-        methRef = (MethodReference) pe;
+        state.methRef = (MethodReference) pe;
 
-        ReferencePrefix refPrefix = methRef.getReferencePrefix();
+        ReferencePrefix refPrefix = state.methRef.getReferencePrefix();
         if (refPrefix == null) {
-            if (execContext.getRuntimeInstance() == null) {
-                refPrefix = execContext.getTypeReference();
+            if (state.execContext.getRuntimeInstance() == null) {
+                refPrefix = state.execContext.getTypeReference();
             } else {
-                refPrefix = execContext.getRuntimeInstance();
+                refPrefix = state.execContext.getRuntimeInstance();
             }
         }
 
-        staticPrefixType = getStaticPrefixType(methRef.getReferencePrefix(),
-            services);
-        pm = execContext == null ? methRef.method(services, staticPrefixType,
-            methRef.getMethodSignature(services, null), staticPrefixType)
-                : methRef.method(services, staticPrefixType, execContext);
-        if (pm == null) {
-            Debug.fail("methodcall:No implementation available for ", methRef);
+        state.staticPrefixType = getStaticPrefixType(state.methRef.getReferencePrefix(),
+            state.execContext, services);
+        state.pm = state.execContext == null ? state.methRef.method(services, state.staticPrefixType,
+                state.methRef.getMethodSignature(services, null), state.staticPrefixType)
+                : state.methRef.method(services, state.staticPrefixType, state.execContext);
+        if (state.pm == null) {
+            Debug.fail("methodcall:No implementation available for ", state.methRef);
         }
 
-        newContext = methRef.getReferencePrefix();
-        if (newContext == null) {
+        state.newContext = state.methRef.getReferencePrefix();
+        if (state.newContext == null) {
             Term self = services.getTypeConverter().findThisForSort(
-                pm.getContainerType().getSort(), execContext);
+                    state.pm.getContainerType().getSort(), state.execContext);
             if (self != null) {
-                newContext = (ReferencePrefix) services.getTypeConverter()
+                state.newContext = (ReferencePrefix) services.getTypeConverter()
                         .convertToProgramElement(self);
             }
-        } else if (newContext instanceof ThisReference) {
-            newContext = (ReferencePrefix) services.getTypeConverter()
+        } else if (state.newContext instanceof ThisReference) {
+            state.newContext = (ReferencePrefix) services.getTypeConverter()
                     .convertToProgramElement(services.getTypeConverter()
-                            .convertToLogicElement(newContext, execContext));
-        } else if (newContext instanceof FieldReference) {
-            final FieldReference fieldContext = (FieldReference) newContext;
+                            .convertToLogicElement(state.newContext, state.execContext));
+        } else if (state.newContext instanceof FieldReference) {
+            final FieldReference fieldContext = (FieldReference) state.newContext;
             if (fieldContext.referencesOwnInstanceField()) {
-                newContext = fieldContext
-                        .setReferencePrefix(execContext.getRuntimeInstance());
+                state.newContext = fieldContext
+                        .setReferencePrefix(state.execContext.getRuntimeInstance());
             }
         }
 
-        VariableSpecification[] paramSpecs = createParamSpecs(services);
-        Statement[] paramDecl = createParamAssignments(paramSpecs);
-        arguments = getVariables(paramSpecs);
+        VariableSpecification[] paramSpecs = createParamSpecs(services,state);
+        Statement[] paramDecl = createParamAssignments(state.pm, paramSpecs);
+        state.arguments = getVariables(paramSpecs);
 
         Statement result = null;
-        if (pm.isStatic()) { // Static invocation mode
-            result = handleStatic(services);
+        if (state.pm.isStatic()) { // Static invocation mode
+            result = handleStatic(services, state);
         } else if (refPrefix instanceof SuperReference) {
-            result = handleSuperReference(services);
+            result = handleSuperReference(services, state);
         } else { // Instance invocation mode
-            result = handleInstanceInvocation(services, result);
+            result = handleInstanceInvocation(services, result, state);
         }
         return new ProgramElement[] { KeYJavaASTFactory.insertStatementInBlock(
             paramDecl, KeYJavaASTFactory.block(result)) };
     }
 
-    private Statement handleStatic(Services services) {
+    private Statement handleStatic(Services services, InternalTransformationState state) {
         Statement result;
         Debug.out("method-call: invocation of static method detected");
-        newContext = null;
-        IProgramMethod staticMethod = getMethod(staticPrefixType, methRef,
-            services);
-        result = KeYJavaASTFactory.methodBody(pvar, newContext, staticMethod,
-            arguments);
+        state.newContext = null;
+        IProgramMethod staticMethod = getMethod(state.staticPrefixType, state.methRef,
+            services, state);
+        result = KeYJavaASTFactory.methodBody(state.pvar, state.newContext, staticMethod,
+                state.arguments);
         return result;
     }
 
-    private Statement handleSuperReference(Services services) {
+    private Statement handleSuperReference(Services services, InternalTransformationState state) {
         Statement result;
         Debug.out("method-call: super invocation of method detected."
                 + "Requires static resolving.");
-        IProgramMethod superMethod = getSuperMethod(execContext, methRef,
+        IProgramMethod superMethod = getSuperMethod(state.execContext, state.methRef,
             services);
-        result = KeYJavaASTFactory.methodBody(pvar,
-            execContext.getRuntimeInstance(), superMethod, arguments);
+        result = KeYJavaASTFactory.methodBody(state.pvar,
+                state.execContext.getRuntimeInstance(), superMethod, state.arguments);
         return result;
     }
 
     private Statement handleInstanceInvocation(Services services,
-            Statement result) {
-        if (pm.isPrivate() || (methRef.implicit() && methRef.getName().equals(
+            Statement result, 
+            InternalTransformationState state) {
+        if (state.pm.isPrivate() || (state.methRef.implicit() && state.methRef.getName().equals(
             ConstructorNormalformBuilder.CONSTRUCTOR_NORMALFORM_IDENTIFIER))) {
             // private methods or constructor invocations are bound
             // statically
             Debug.out("method-call: invocation of private method detected."
                     + "Requires static resolving.");
-            result = makeMbs(staticPrefixType, services);
+            result = makeMbs(state.staticPrefixType, services, state);
         } else {
             Debug.out("method-call: invocation of non-private"
                     + " instance method detected."
                     + "Requires dynamic resolving.");
             ImmutableList<KeYJavaType> imps = services.getJavaInfo()
-                    .getKeYProgModelInfo().findImplementations(staticPrefixType,
-                        methRef.getName(), getTypes(arguments, services));
+                    .getKeYProgModelInfo().findImplementations(state.staticPrefixType,
+                            state.methRef.getName(), getTypes(state.arguments, state.execContext, services));
             if (imps.isEmpty()) {
                 imps = services.getJavaInfo().getKeYProgModelInfo()
-                        .findImplementations(pm.getContainerType(),
-                            methRef.getName(), getTypes(arguments, services));
+                        .findImplementations(state.pm.getContainerType(),
+                                state.methRef.getName(), getTypes(state.arguments, state.execContext, services));
             }
             if (imps.isEmpty()) {
-                Type staticPrefix = staticPrefixType.getJavaType();
+                Type staticPrefix = state.staticPrefixType.getJavaType();
                 if (staticPrefix instanceof ClassType
                         && (((ClassType) staticPrefix).isInterface()
                                 || ((ClassType) staticPrefix).isAbstract())) {
                     // no implementing sub type found
                     // insert mbs with interface type so that contracts are
                     // applicable
-                    result = makeMbs(staticPrefixType, services);
+                    result = makeMbs(state.staticPrefixType, services, state);
                 }
             } else {
-                result = makeIfCascade(imps, services);
+                result = makeIfCascade(imps, services, state);
             }
         }
         return result;
@@ -347,22 +354,22 @@ public class MethodCall extends ProgramTransformer {
 
     // ***************** Dynamic Binding Construction Utilities ***************
 
-    private Statement makeMbs(KeYJavaType t, Services services) {
+    private Statement makeMbs(KeYJavaType t, Services services, InternalTransformationState state) {
         Statement result;
-        IProgramMethod meth = getMethod(t, methRef, services);
+        IProgramMethod meth = getMethod(t, state.methRef, services, state);
 
         // Add a down cast if the programvariable is of a supertype
         // bugfix for #1226 (first bugfix was in expand, but moved here and
         // modified it to avoid incompleteness issues)
         if (!meth.isStatic()) {
 
-            final Expression newContextAsExp = (Expression) newContext;
-            ReferencePrefix localContext = newContext;
+            final Expression newContextAsExp = (Expression) state.newContext;
+            ReferencePrefix localContext = state.newContext;
 
             LocalVariableDeclaration castedThisVar = null;
             final KeYJavaType targetType = meth.getContainerType();
             if (newContextAsExp.getKeYJavaType(services,
-                execContext) != targetType) {
+                    state.execContext) != targetType) {
                 castedThisVar = KeYJavaASTFactory.declare(
                     new ProgramElementName(
                         services.getTermBuilder().newName("target")),
@@ -374,21 +381,21 @@ public class MethodCall extends ProgramTransformer {
                         .getProgramVariable();
             }
 
-            result = KeYJavaASTFactory.methodBody(pvar, localContext, meth,
-                arguments);
+            result = KeYJavaASTFactory.methodBody(state.pvar, localContext, meth,
+                    state.arguments);
             if (castedThisVar != null) {
                 result = KeYJavaASTFactory.block(castedThisVar, result);
             }
 
         } else {
-            result = KeYJavaASTFactory.methodBody(pvar, newContext, meth,
-                arguments);
+            result = KeYJavaASTFactory.methodBody(state.pvar, state.newContext, meth,
+                    state.arguments);
         }
         return result;
 
     }
 
-    private Expression makeIOf(Type t) {
+    private Expression makeIOf(ReferencePrefix newContext, Type t) {
         Debug.assertTrue(newContext != null);
         return KeYJavaASTFactory.instanceOf((Expression) newContext,
             (KeYJavaType) t);
@@ -403,21 +410,24 @@ public class MethodCall extends ProgramTransformer {
      *            The Services object.
      * @return TODO
      */
-    protected Statement makeIfCascade(ImmutableList<KeYJavaType> imps,
-            Services services) {
+    protected Statement makeIfCascade(final ImmutableList<KeYJavaType> imps,
+            Services services, 
+            InternalTransformationState state) {
         KeYJavaType currType = imps.head();
         if (imps.size() == 1) {
-            return makeMbs(currType, services);
+            return makeMbs(currType, services, state);
         } else {
-            return KeYJavaASTFactory.ifElse(makeIOf(currType),
-                makeMbs(currType, services),
-                makeIfCascade(imps.tail(), services));
+            return KeYJavaASTFactory.ifElse(makeIOf(state.newContext, currType),
+                makeMbs(currType, services, state),
+                makeIfCascade(imps.tail(), services, state));
         }
     }
 
-    private VariableSpecification[] createParamSpecs(Services services) {
+    private VariableSpecification[] createParamSpecs(
+            Services services,
+            InternalTransformationState state) {
 
-        MethodDeclaration methDecl = pm.getMethodDeclaration();
+        MethodDeclaration methDecl = state.pm.getMethodDeclaration();
         int params = methDecl.getParameterDeclarationCount();
         VariableSpecification[] varSpecs = new VariableSpecification[params];
         for (int i = 0; i < params; i++) {
@@ -437,17 +447,17 @@ public class MethodCall extends ProgramTransformer {
             // in the context of a method with a variable number of args.
             // see makeVariableArgument below
             if (i == params - 1 && methDecl.isVarArgMethod()
-                    && (methRef.getArguments().size() != params
-                            || !assignmentCompatible(methRef.getArgumentAt(i),
-                                originalSpec.getType(), services))) {
+                    && (state.methRef.getArguments().size() != params
+                            || !assignmentCompatible(state.methRef.getArgumentAt(i),
+                                originalSpec.getType(), state.execContext, services))) {
                 // variable argument
                 varSpecs[i] = KeYJavaASTFactory.variableSpecification(paramVar,
-                    1, makeVariableArgument(originalSpec),
+                    1, makeVariableArgument(originalSpec, state.pm, state.methRef),
                     originalSpec.getType());
             } else {
                 // normal argument
                 varSpecs[i] = KeYJavaASTFactory.variableSpecification(paramVar,
-                    originalSpec.getDimensions(), methRef.getArgumentAt(i),
+                    originalSpec.getDimensions(), state.methRef.getArgumentAt(i),
                     originalSpec.getType());
             }
         }
@@ -489,7 +499,9 @@ public class MethodCall extends ProgramTransformer {
      *         be zero.
      */
     private Expression makeVariableArgument(
-            VariableSpecification originalSpec) {
+            final VariableSpecification originalSpec,
+            final IProgramMethod pm, 
+            final MethodReference methRef) {
 
         int params = pm.getMethodDeclaration().getParameterDeclarationCount();
         int args = methRef.getArguments().size();
@@ -516,7 +528,7 @@ public class MethodCall extends ProgramTransformer {
         return newArray;
     }
 
-    private Statement[] createParamAssignments(VariableSpecification[] specs) {
+    private Statement[] createParamAssignments(IProgramMethod pm, VariableSpecification[] specs) {
         MethodDeclaration methDecl = pm.getMethodDeclaration();
         Statement[] paramDecl = new Statement[specs.length];
         for (int i = 0; i < specs.length; i++) {
@@ -556,7 +568,7 @@ public class MethodCall extends ProgramTransformer {
      * @return true iff exp is assign compatible with type
      */
     private boolean assignmentCompatible(Expression exp, Type type,
-            Services services) {
+            ExecutionContext execContext, Services services) {
         Sort expSort = exp.getKeYJavaType(services, execContext).getSort();
         Sort typeSort = ((KeYJavaType) type).getSort();
         /* was: services.getJavaInfo().getKeYJavaType(type); */
