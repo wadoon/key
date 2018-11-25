@@ -164,6 +164,7 @@ public class Services implements TermServices {
     public Services getOverlay(NamespaceSet namespaces) {
         Services result = new Services(this);
         result.setNamespaces(namespaces);
+        result.nameRecorder = new NameRecorder();
         return result;
     }
 
