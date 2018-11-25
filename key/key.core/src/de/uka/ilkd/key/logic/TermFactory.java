@@ -167,19 +167,22 @@ public final class TermFactory {
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
         if (cache != null && !newTerm.containsJavaBlockRecursive()) {
-           Term term;          
-           try {
-               read_lock.lock();
-               term = cache.get(newTerm);
-           } finally { 
-               read_lock.unlock();
+            Term term = null;          
+            if (read_lock.tryLock()) { // only try <- otherwise problems with quantifiers wait for a long time
+                try {
+                    term = cache.get(newTerm);
+
+                } finally { 
+                    read_lock.unlock();
+                }
            }
            if(term == null) {
-               try { 
-                   write_lock.lock();
-                   term = cache.putIfAbsent(newTerm, newTerm);                   
-               } finally {
-                   write_lock.unlock();
+               if (write_lock.tryLock()) {// only try <- otherwise problems with quantifiers wait for a long time
+                   try { 
+                       term = cache.putIfAbsent(newTerm, newTerm);                   
+                   } finally {
+                       write_lock.unlock();
+                   }
                }
                if (term == null) {
                    term = newTerm.checked(); // check if well-typed
