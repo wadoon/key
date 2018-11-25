@@ -169,7 +169,7 @@ public final class PosInTerm {
         final PosInTerm result;        
         if (localCopy) {        
             final char[] newPositions = 
-                    new char[positions.length <= size ? size + 4 : positions.length];
+                    new char[positions.length <= size ? size + 12 : positions.length];
             System.arraycopy(positions, 0, newPositions, 0, size);
             newPositions[size] = (char)i;
             result = new PosInTerm(newPositions, (char)(size + 1), false);

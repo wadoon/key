@@ -152,27 +152,39 @@ public class TermNavigator {
                 }
             }
             if (pair != null) {
-                pair.set(first, second);
+                pair.first = first;
+                pair.second = second;
             } else {
                 pair = new MutablePair(first, second);
             }
             return pair;
         }
         
-        
+
+        /**
+         *  first component of the pair
+         */
         Term first;
+        /**
+         *  second component of the pair
+         */
         Integer second;
         
+        /**
+         * creates an instance of a mutable pair
+         * 
+         * @param first  the first component of the pair
+         * @param second the second component of the pair
+         */
         public MutablePair(Term first, Integer second) {
             this.first = first;
             this.second = second;
         }
         
-        public final void set(Term first, Integer second) {
-            this.first = first;
-            this.second = second;
-        }
-
+        /**
+         * instances of this class managed by a pool
+         * this method releases them to the pool 
+         */
         public final void release() {
             first = null;
             second = null;
