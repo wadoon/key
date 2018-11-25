@@ -159,10 +159,10 @@ public final class TermFactory {
     private Term doCreateTerm(Operator op, ImmutableArray<Term> subs,
             ImmutableArray<QuantifiableVariable> boundVars,
             JavaBlock javaBlock, ImmutableArray<TermLabel> labels) {
-        final Term newTerm 
+        final TermImpl newTerm 
             = (labels == null || labels.isEmpty() ? 
                     new TermImpl(op, subs, boundVars, javaBlock) : 
-                new LabeledTermImpl(op, subs, boundVars, javaBlock, labels)).checked();
+                new LabeledTermImpl(op, subs, boundVars, javaBlock, labels));
         // Check if caching is possible. It is not possible if a non empty JavaBlock is available
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
@@ -177,18 +177,18 @@ public final class TermFactory {
            if(term == null) {
                try { 
                    write_lock.lock();
-                   term = cache.putIfAbsent(newTerm, newTerm);
-                   if (term == null) {
-                       term = newTerm;
-                   }
+                   term = cache.putIfAbsent(newTerm, newTerm);                   
                } finally {
                    write_lock.unlock();
+               }
+               if (term == null) {
+                   term = newTerm.checked(); // check if well-typed
                }
            }
            return term;
         }
         else {
-           return newTerm;
+           return newTerm.checked();
         }
     }
 }
