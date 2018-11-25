@@ -24,10 +24,12 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class NumberRuleAppCost implements RuleAppCost {
 
     private static final NumberRuleAppCost ZERO_COST = new IntRuleAppCost ( 0 );
+    
     /**
      * Requires thread save access as multiple proofs may be performed in parallel (Eclipse).
      */
-    private static final LRUCache<Integer,NumberRuleAppCost> cache = new LRUCache<Integer,NumberRuleAppCost>(255);
+    private static final LRUCache<Number,NumberRuleAppCost> cache = new LRUCache<Number,NumberRuleAppCost>(1024);
+    
     /**
      * 
      * read/write lock for cache access to avoid unnecessary locking
@@ -40,40 +42,37 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         return ZERO_COST;
     }
     
-    public static RuleAppCost create(int p_cost) {
+    public static RuleAppCost create(long p_cost) {
         if ( p_cost == 0 ) return NumberRuleAppCost.getZeroCost();
         
+        final Long cost = p_cost; // <- avoids boxing a long twice in case of a cache miss
         NumberRuleAppCost ac;
         
         try { // Ensure thread save access which is required for parallel proofs (e.g. in Eclipse) 
             READ_LOCK.lock();
-            ac = cache.get(p_cost);
+            ac = cache.get(cost);
         } finally {
             READ_LOCK.unlock();
         }
         if (ac != null) return ac;
-
-        ac = new IntRuleAppCost(p_cost);
-        try {
-            WRITE_LOCK.lock();
-            NumberRuleAppCost cached = cache.putIfAbsent(p_cost, ac);
-            if (cached != null) {
-                ac = cached;
-            }
-        } finally {
-            WRITE_LOCK.unlock();            
-        }
-        
-        return ac;
-    }
-    
-    public static RuleAppCost create(long p_cost) {
         
         if ( p_cost <= Integer.MAX_VALUE && p_cost >= Integer.MIN_VALUE) {
-            return create ((int) p_cost);
+            ac = new IntRuleAppCost((int)p_cost);
+        } else {
+            ac = new LongRuleAppCost ( p_cost );   
         }        
         
-        return new LongRuleAppCost ( p_cost );
+        NumberRuleAppCost cached;
+        try {
+            WRITE_LOCK.lock();
+            cached = cache.putIfAbsent(cost, ac);
+        } finally {
+            WRITE_LOCK.unlock();
+        }
+        if (cached != null) {
+            ac = cached;
+        }        
+        return ac;
     }
     
     /**
