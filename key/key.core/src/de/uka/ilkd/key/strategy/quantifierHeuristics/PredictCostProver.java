@@ -43,7 +43,7 @@ public class PredictCostProver {
     private Set<Clause> clauses = new LinkedHashSet<Clause>();
 
     private final Services services;
-
+    
     private PredictCostProver(Term instance, ImmutableSet<Term> assertList,
 	    Services services) {
 	this.assertLiterals = assertList;

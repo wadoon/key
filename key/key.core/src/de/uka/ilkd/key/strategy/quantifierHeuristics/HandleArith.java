@@ -13,9 +13,9 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import org.key_project.util.LRUCache;
 
 import de.uka.ilkd.key.java.ServiceCaches;
 import de.uka.ilkd.key.java.Services;
@@ -37,7 +37,7 @@ import de.uka.ilkd.key.util.Pair;
  */
 public class HandleArith {
 
-    private HandleArith() {
+    public HandleArith() {
     }
 
     /**
@@ -48,12 +48,10 @@ public class HandleArith {
      *         <code>falseT</code> if false, and <code>problem</code> if it
      *         cann't be proved.
      */
-    public static Term provedByArith(Term problem, Services services) {
-        final LRUCache<Term, Term> provedByArithFstCache = services.getCaches()
-                .getProvedByArithFstCache();
-        provedByArithFstLock.readLock().lock();
+    public static final Term provedByArith(Term problem, Services services) {
+        final Map<Term, Term> provedByArithFstCache = 
+                Collections.synchronizedMap(services.getCaches().getProvedByArithFstCache());
         Term result = provedByArithFstCache.get(problem);
-        provedByArithFstLock.readLock().unlock();
 
         if (result != null) { 
             return result; 
@@ -128,13 +126,13 @@ public class HandleArith {
     final static ReentrantReadWriteLock provedByArithSndLock = new ReentrantReadWriteLock();
 
 
-    private static <K,V> void putInTermCache(
-            final LRUCache<K, V> cache,
+    private static <K,V>  void putInTermCache(
+            final Map<K, V> provedByArithFstCache,
             final ReentrantReadWriteLock lock,
-            final K key, final V value) {
-        lock.writeLock().lock();
-        cache.put(key, value);
-        lock.writeLock().unlock();
+            final K problem, final V result) {
+       // lock.writeLock().lock();
+        provedByArithFstCache.put(problem, result);
+      //  lock.writeLock().unlock();
     }
     
     /**
@@ -147,16 +145,14 @@ public class HandleArith {
      * @param axiom
      * @return trueT if true, falseT if false, and atom if can't be prove;
      */
-    public static Term provedByArith(Term problem, Term axiom,
+    public final static Term provedByArith(Term problem, Term axiom,
             Services services) {
         final Pair<Term, Term> key = new Pair<Term, Term>(problem, axiom);
-        final LRUCache<Pair<Term, Term>, Term> provedByArithSndCache = services
-                .getCaches().getProvedByArithSndCache();
+        final Map<Pair<Term, Term>, Term> provedByArithSndCache = Collections.synchronizedMap(services
+                .getCaches().getProvedByArithSndCache());
         Term result;
         
-        provedByArithSndLock.readLock().lock();
         result = provedByArithSndCache.get(key);
-        provedByArithSndLock.readLock().unlock();
 
         if (result != null) {
             return result; 
@@ -207,14 +203,12 @@ public class HandleArith {
      * @param problem
      * @return falseT if <code>term</code>'s operator is not >= or <=
      */
-    private static Term formatArithTerm(final Term problem, TermBuilder tb,
+    private final static Term formatArithTerm(final Term problem, TermBuilder tb,
             IntegerLDT ig, ServiceCaches caches) {
-        final LRUCache<Term, Term> formattedTermCache = caches
-                .getFormattedTermCache();
+        final Map<Term, Term> formattedTermCache = Collections.synchronizedMap(caches
+                .getFormattedTermCache());
         Term pro;
-        formattedTermCacheLock.readLock().lock();
         pro = formattedTermCache.get(problem);
-        formattedTermCacheLock.readLock().unlock();
         
         if (pro != null) { 
             return pro;
