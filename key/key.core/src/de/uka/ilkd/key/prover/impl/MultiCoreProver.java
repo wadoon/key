@@ -1,13 +1,6 @@
 package de.uka.ilkd.key.prover.impl;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorCompletionService;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Future;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.key_project.util.collection.ImmutableList;
@@ -26,15 +19,20 @@ public class MultiCoreProver extends AbstractProverCore {
     private SchedulingGoalChooser goalChooser;
     private StopCondition stopCondition;
 
+    /** number of closed goals */
     private final AtomicInteger closedGoals = new AtomicInteger(0);
+   
     /** number of rules automatically applied */
-    protected AtomicInteger countApplied = new AtomicInteger(0);
+    protected final AtomicInteger countApplied = new AtomicInteger(0);
+    
+    /** number of currently running tasks */
+    protected final AtomicInteger numberOfTasks = new AtomicInteger(0);
 
     private int maxApplications;
     private long startTime = 0;
     private long timeout = -1;
 
-    private final ExecutorService threadpool = new ThreadPoolExecutor(6, 8, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+    private final ExecutorService threadpool = Executors.newCachedThreadPool();//new ThreadPoolExecutor(6, 8, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
     private final ExecutorCompletionService<SingleRuleApplicationInfo> completionService = new ExecutorCompletionService<>(threadpool);
     private boolean hasBeenInterrupted;
 
@@ -171,8 +169,9 @@ public class MultiCoreProver extends AbstractProverCore {
         Goal exitGoal = null;
         try {
             boolean shouldStop = proof.closed();
-            while (!shouldStop && !goalChooser.noTasksAvailable()) {
+            while (!shouldStop && numberOfTasks.get() != 0) {
                 final Future<SingleRuleApplicationInfo> result = completionService.take();
+                numberOfTasks.decrementAndGet();
                 info = result.get();
                 goalChooser.removeGoal(info.getGoal());
                 if (!info.isSuccess()) {
@@ -233,7 +232,8 @@ public class MultiCoreProver extends AbstractProverCore {
 
     public void submit(Goal nextGoal) {
         if (!threadpool.isShutdown()) {
-            completionService.submit(new ProverTask(nextGoal));
+            numberOfTasks.incrementAndGet();
+            completionService.submit(new ProverTask(nextGoal));            
         }
     }
 }
