@@ -76,11 +76,13 @@ public class MultiCoreChooser implements SchedulingGoalChooser {
 
     @Override
     public void schedule() {
-        synchronized(nextList) {
-            while (!nextList.isEmpty()) {
-                final Goal nextGoal = getNextGoal();
-                currentlyScheduled.put(nextGoal, nextGoal);
-                prover.submit(nextGoal);
+        synchronized(currentlyScheduled) {
+            synchronized(nextList) {
+                while (!nextList.isEmpty()) {
+                    final Goal nextGoal = getNextGoal();
+                    currentlyScheduled.put(nextGoal, nextGoal);
+                    prover.submit(nextGoal);
+                }
             }
         }
     }
