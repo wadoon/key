@@ -13,6 +13,10 @@
 
 package de.uka.ilkd.key.strategy;
 
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
+
 import org.key_project.util.LRUCache;
 
 import de.uka.ilkd.key.util.Debug;
@@ -24,7 +28,14 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
      * Requires thread save access as multiple proofs may be performed in parallel (Eclipse).
      */
     private static final LRUCache<Integer,NumberRuleAppCost> cache = new LRUCache<Integer,NumberRuleAppCost>(255);
-
+    /**
+     * 
+     * read/write lock for cache access to avoid unnecessary locking
+     */
+    private static final ReentrantReadWriteLock RW_LOCK = new ReentrantReadWriteLock();
+    private static final ReadLock READ_LOCK = RW_LOCK.readLock();
+    private static final WriteLock WRITE_LOCK = RW_LOCK.writeLock();
+    
     public static RuleAppCost getZeroCost() {
         return ZERO_COST;
     }
@@ -33,18 +44,25 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         if ( p_cost == 0 ) return NumberRuleAppCost.getZeroCost();
         
         NumberRuleAppCost ac;
-        synchronized (cache) { // Ensure thread save access which is required for parallel proofs (e.g. in Eclipse)
+        
+        try { // Ensure thread save access which is required for parallel proofs (e.g. in Eclipse) 
+            READ_LOCK.lock();
             ac = cache.get(p_cost);
+        } finally {
+            READ_LOCK.unlock();
         }
         if (ac != null) return ac;
 
         ac = new IntRuleAppCost(p_cost);
-        synchronized (cache) {
+        try {
+            WRITE_LOCK.lock();
             NumberRuleAppCost cached = cache.putIfAbsent(p_cost, ac);
             if (cached != null) {
                 ac = cached;
             }
-        }        
+        } finally {
+            WRITE_LOCK.unlock();            
+        }
         
         return ac;
     }

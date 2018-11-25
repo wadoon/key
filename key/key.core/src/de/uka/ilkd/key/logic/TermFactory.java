@@ -14,6 +14,9 @@
 package de.uka.ilkd.key.logic;
 
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
 
 import org.key_project.util.collection.ImmutableArray;
 
@@ -38,7 +41,13 @@ public final class TermFactory {
 
     private static final ImmutableArray<Term> NO_SUBTERMS = new ImmutableArray<Term>();
     private final Map<Term, Term> cache;
-    
+    /**
+     * 
+     * read/write lock for cache access to avoid unnecessary locking
+     */
+    private final ReentrantReadWriteLock rw_lock = new ReentrantReadWriteLock();
+    private final ReadLock read_lock = rw_lock.readLock();
+    private final WriteLock write_lock = rw_lock.writeLock();
 
     //-------------------------------------------------------------------------
     //constructors
@@ -158,14 +167,22 @@ public final class TermFactory {
         // in the term or in one of its children because the meta information like PositionInfos
         // may be different.
         if (cache != null && !newTerm.containsJavaBlockRecursive()) {
-           Term term;           
-           synchronized(cache) { 
+           Term term;          
+           try {
+               read_lock.lock();
                term = cache.get(newTerm);
+           } finally { 
+               read_lock.unlock();
            }
            if(term == null) {
-               term = newTerm;
-               synchronized(cache) { 
-                   cache.put(term, term);
+               try { 
+                   write_lock.lock();
+                   term = cache.putIfAbsent(newTerm, newTerm);
+                   if (term == null) {
+                       term = newTerm;
+                   }
+               } finally {
+                   write_lock.unlock();
                }
            }
            return term;

@@ -24,11 +24,21 @@ import de.uka.ilkd.key.rule.IfFormulaInstantiation;
 public class IfInstantiationCachePool {
 
     public final LRUCache<Node, IfInstantiationCache> cacheMgr = new LRUCache<>(10);
+    /**
+     * 
+     * read/write lock for cache access to avoid unnecessary locking
+     */
+    private final ReentrantReadWriteLock rw_lock = new ReentrantReadWriteLock();
+    private final ReadLock read_lock = rw_lock.readLock();
+    private final WriteLock write_lock = rw_lock.writeLock();
 
     public IfInstantiationCache getCache(Node n) {
         IfInstantiationCache cache;
-        synchronized(cacheMgr) {
+        try {
+            read_lock.lock();
             cache = cacheMgr.get(n);
+        } finally {
+            read_lock.unlock();
         }
 
         if (cache != null) {
@@ -38,8 +48,11 @@ public class IfInstantiationCachePool {
         cache = new IfInstantiationCache();
 
         IfInstantiationCache cache2;
-        synchronized(cacheMgr) {
+        try {
+            write_lock.lock();
             cache2 = cacheMgr.putIfAbsent(n, cache);
+        } finally {
+            write_lock.unlock();
         }
 
         if (cache2 != null) {
