@@ -161,9 +161,7 @@ public final class SortDependingFunction extends Function {
                     while(functions.parent() != null) {
                         functions = functions.parent();
                     }
-                    synchronized(functions) {
-                        functions.addSafely(result);
-                    }
+                    functions.addSafely(result);
                 }
             }
         }
