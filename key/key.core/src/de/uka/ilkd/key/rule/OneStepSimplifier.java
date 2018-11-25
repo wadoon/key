@@ -538,8 +538,11 @@ public final class OneStepSimplifier implements BuiltInRule {
     /**
      * Tells whether the passed formula can be simplified
      */
-    private synchronized boolean applicableTo(Services services, SequentFormula cf, boolean inAntecedent, Goal goal, RuleApp ruleApp) {
-        final Boolean b = applicabilityCache.get(cf);
+    private boolean applicableTo(Services services, SequentFormula cf, boolean inAntecedent, Goal goal, RuleApp ruleApp) {
+        final Boolean b;
+        synchronized(applicabilityCache) { 
+            b = applicabilityCache.get(cf);
+        }
         if(b != null) {
             return b.booleanValue();
         } else {
@@ -548,7 +551,9 @@ public final class OneStepSimplifier implements BuiltInRule {
             = simplifyConstrainedFormula(services, cf, inAntecedent, null, null, null, goal, ruleApp);
             final boolean result = simplifiedCf != null
                             && !simplifiedCf.equals(cf);
-            applicabilityCache.put(cf, Boolean.valueOf(result));
+            synchronized(applicabilityCache) { 
+                applicabilityCache.put(cf, Boolean.valueOf(result));
+            }
             return result;
         }
     }
