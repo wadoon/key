@@ -1024,7 +1024,7 @@ public final class MainWindow extends JFrame  {
     /*
      * Updates the sequent displayed in the main frame.
      */
-    private synchronized void updateSequentView() {
+    private void updateSequentView() {
 
         if (disableCurrentGoalView) {
             return;
@@ -1037,9 +1037,11 @@ public final class MainWindow extends JFrame  {
         } else {
             Goal goal = getMediator().getSelectedGoal();
             if (goal != null && !goal.node().isClosed()) {
-                currentGoalView.setPrinter(goal);
-                currentGoalView.printSequent();
-                newSequentView = currentGoalView;
+                synchronized(currentGoalView) {
+                    currentGoalView.setPrinter(goal);
+                    currentGoalView.printSequent();
+                    newSequentView = currentGoalView;
+                }
             } else {
                 newSequentView = new InnerNodeView(getMediator().getSelectedNode(), this);
             }
@@ -1068,7 +1070,7 @@ public final class MainWindow extends JFrame  {
 
         /** focused node has changed */
         @Override
-        public synchronized void selectedNodeChanged(KeYSelectionEvent e) {
+        public void selectedNodeChanged(KeYSelectionEvent e) {
             if (getMediator().isInAutoMode()) {
                 return;
             }
@@ -1079,18 +1081,19 @@ public final class MainWindow extends JFrame  {
          * the selected proof has changed (e.g. a new proof has been loaded)
          */
         @Override
-        public synchronized void selectedProofChanged(KeYSelectionEvent e) {
+        public void selectedProofChanged(KeYSelectionEvent e) {
             Debug.out("Main: initialize with new proof");
 
-            if ( proof != null  && !proof.isDisposed()) {
-                proof.getSettings().getStrategySettings().removeSettingsListener ( this );
+            synchronized(this) {
+                if ( proof != null  && !proof.isDisposed()) {
+                    proof.getSettings().getStrategySettings().removeSettingsListener ( this );
+                }
+                proof = e.getSource().getSelectedProof();
+                if ( proof != null ) {
+                    proof.getSettings().getStrategySettings().addSettingsListener( this );
+                }
+                disableCurrentGoalView = false;
             }
-            proof = e.getSource().getSelectedProof();
-            if ( proof != null ) {
-                proof.getSettings().getStrategySettings().addSettingsListener( this );
-            }
-
-            disableCurrentGoalView = false;
             updateSequentView();
             makePrettyView();
         }
@@ -1099,7 +1102,7 @@ public final class MainWindow extends JFrame  {
          * invoked if automatic execution has started
          */
         @Override
-        public synchronized void autoModeStarted(ProofEvent e) {
+        public void autoModeStarted(ProofEvent e) {
             Debug.log4jWarn("Automode started", MainWindow.class.getName());
             disableCurrentGoalView = true;
             getMediator().removeKeYSelectionListener(proofListener);
@@ -1110,7 +1113,7 @@ public final class MainWindow extends JFrame  {
          * invoked if automatic execution has stopped
          */
         @Override
-        public synchronized void autoModeStopped(ProofEvent e) {
+        public void autoModeStopped(ProofEvent e) {
             if (Debug.ENABLE_DEBUG) {
 		Debug.log4jWarn("Automode stopped", MainWindow.class.getName());
 		Debug.log4jDebug("From " + Debug.stackTrace(),
@@ -1124,7 +1127,7 @@ public final class MainWindow extends JFrame  {
 
         /** invoked when the strategy of a proof has been changed */
         @Override
-        public synchronized void settingsChanged ( EventObject e ) {
+        public  void settingsChanged ( EventObject e ) {
             if ( proof.getSettings().getStrategySettings() == e.getSource()) {
                 // updateAutoModeConfigButton();
             }
