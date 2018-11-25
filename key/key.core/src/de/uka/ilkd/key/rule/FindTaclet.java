@@ -167,9 +167,17 @@ public abstract class FindTaclet extends Taclet {
        return find.equals(((FindTaclet)o).find);       
     }
       
-    
+    @Override
     public int hashCode() {
-       return 13* super.hashCode() + find.hashCode(); 
+       if (hashcode == 0) {
+           int localHash = 13 * computeHash() + find.hashCode();
+           if (localHash == 0) {
+               localHash = -1;
+           }
+           hashcode = localHash;
+       }
+       return hashcode;
+      
     }
 
     /**

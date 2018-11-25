@@ -174,7 +174,7 @@ public abstract class Taclet implements Rule, Named {
     private ImmutableMap<SchemaVariable,SchemaVariable> svNameCorrespondences = null;
 	
     /** Integer to cache the hashcode */
-    private int hashcode = 0;    
+    protected int hashcode = 0;    
     
     private final Trigger trigger;
     
@@ -506,13 +506,18 @@ public abstract class Taclet implements Rule, Named {
    @Override
     public int hashCode() {
         if (hashcode == 0) {
-           hashcode = 37 * name.hashCode() + 17;
-            if (hashcode == 0) {
-                hashcode = -1;
-            }
+           computeHash();
         }
         return hashcode;
     }
+
+   protected final int computeHash() {
+       int localHash = 37 * name.hashCode() + 17;
+       if (localHash == 0) {
+           localHash = -1;
+       }
+       return localHash;
+   }
 
     /**
      * returns the set of schemavariables of the taclet's if-part
