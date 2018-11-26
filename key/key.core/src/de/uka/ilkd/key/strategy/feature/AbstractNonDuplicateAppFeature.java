@@ -26,6 +26,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.proof.FormulaTagManager;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.rule.IfFormulaInstantiation;
@@ -76,9 +77,13 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
 	
         // compare the position of application
         if ( newPio != null ) {
-            if ( ! ( cmp instanceof PosTacletApp ) ) return false;
+            if ( ! ( cmp instanceof PosTacletApp ) ) { 
+                return false;
+            }
             final PosInOccurrence oldPio = cmp.posInOccurrence();
-            if ( !comparePio ( newApp, cmp, newPio, oldPio ) ) return false;
+            if ( !comparePio ( newApp, cmp, newPio, oldPio ) ) { 
+                return false;
+            }
         }
 
         
@@ -159,8 +164,12 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
     
         Node node = goal.node ();
     
+        final FormulaTagManager formulaTagManager = goal.getFormulaTagManager();
+        long formulaAge = formulaTagManager.getAgeForTag(formulaTagManager.getTagForPos(pos));
+        long lastPosOfComputation = goal.getTime() > formulaAge ? goal.getTime() : -1;
+        
         int i = 0;
-        while ( !node.root () ) {
+        while ( !node.root () && lastPosOfComputation >= formulaAge) {
             final Node par = node.parent ();
             
             ++i;
@@ -177,12 +186,12 @@ public abstract class AbstractNonDuplicateAppFeature extends BinaryTacletAppFeat
                 }
             }
             
-            if ( sameApplication ( par.getAppliedRuleApp (), app, pos ) )
+            if ( sameApplication ( par.getAppliedRuleApp (), app, pos ) ) {
                     return false;
-    
+            }    
             node = par;
+            lastPosOfComputation--;
         }
-    
         return true;
     }
 
