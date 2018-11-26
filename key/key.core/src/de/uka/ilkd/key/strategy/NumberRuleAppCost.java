@@ -31,6 +31,11 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
     private static final LRUCache<Number,NumberRuleAppCost> cache = new LRUCache<Number,NumberRuleAppCost>(1024);
     
     /**
+     * cache Long instances as they are often Used
+     */
+    private static Long[] longCache = new Long[1024];
+    
+    /**
      * 
      * read/write lock for cache access to avoid unnecessary locking
      */
@@ -45,7 +50,20 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
     public static RuleAppCost create(long p_cost) {
         if ( p_cost == 0 ) return NumberRuleAppCost.getZeroCost();
         
-        final Long cost = p_cost; // <- avoids boxing a long twice in case of a cache miss
+        Long cost;
+        int idx = (int)(Math.abs(p_cost % longCache.length));
+        synchronized(longCache) {
+            if (longCache[idx] != null) { // <- avoids boxing if possible
+                cost = longCache[idx];
+                if (cost.longValue() != p_cost) {
+                    longCache[idx] = p_cost;
+                    cost = p_cost;
+                }
+            } else {
+                cost = p_cost;
+                longCache[idx] = cost;
+            }
+        }
         
         NumberRuleAppCost ac = null;
         
