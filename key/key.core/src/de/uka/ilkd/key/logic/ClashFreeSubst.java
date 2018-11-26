@@ -94,8 +94,7 @@ public class ClashFreeSubst {
         final int arity = t.arity();
         final Term[] newSubterms = new Term[arity];
         @SuppressWarnings("unchecked")
-        final ImmutableArray<QuantifiableVariable>[] newBoundVars =
-        new ImmutableArray[arity];
+        final ImmutableArray<QuantifiableVariable>[] newBoundVars = new ImmutableArray[arity];
         for ( int i=0; i<arity; i++ ) {
             applyOnSubterm ( t, i, newSubterms, newBoundVars );
         }
