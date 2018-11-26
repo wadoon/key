@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.rule.match.vm;
 
 import java.util.ArrayDeque;
+import java.util.concurrent.locks.ReentrantLock;
 
 import de.uka.ilkd.key.logic.Term;
 
@@ -11,6 +12,8 @@ public class TermNavigator {
     
     
     private static final int POOL_SIZE = 100;
+    private static ReentrantLock TERM_NAVIGATOR_POOL_WRITE_LOCK = new ReentrantLock();
+
     /** 
      * TERM_NAVIGATOR_POOL of TermNavigator as these are created very often and short-living
      * we reuse them as far as possible 
@@ -31,10 +34,11 @@ public class TermNavigator {
      */
     public static TermNavigator get(Term term) {
         TermNavigator tn = null;
-        synchronized(TERM_NAVIGATOR_POOL) {
+        if (TERM_NAVIGATOR_POOL_WRITE_LOCK.tryLock()) {
             if (!TERM_NAVIGATOR_POOL.isEmpty()) {
                 tn = TERM_NAVIGATOR_POOL.pop();
-            }            
+            }
+            TERM_NAVIGATOR_POOL_WRITE_LOCK.unlock();
         }
         if (tn != null) {
             tn.stack.push(MutablePair.get(term, 0));
@@ -113,8 +117,9 @@ public class TermNavigator {
         stack.forEach((e)->e.release());
         stack.clear();
         if (TERM_NAVIGATOR_POOL.size() < POOL_SIZE) {
-            synchronized(TERM_NAVIGATOR_POOL) {
+            if (TERM_NAVIGATOR_POOL_WRITE_LOCK.tryLock()) {
                 TERM_NAVIGATOR_POOL.push(this);
+                TERM_NAVIGATOR_POOL_WRITE_LOCK.unlock();
             }
         }
     }
@@ -127,6 +132,9 @@ public class TermNavigator {
         
         private static final int PAIR_POOL_SIZE = 1000;
 
+        private static ReentrantLock PAIR_POOL_WRITE_LOCK = new ReentrantLock();
+        
+        
         /** 
          * TERM_NAVIGATOR_POOL of TermNavigator.MutablePair as these are created very often and short-living
          * we reuse them as far as possible 
@@ -146,11 +154,14 @@ public class TermNavigator {
          */
         static MutablePair get(Term first, Integer second) {
             MutablePair pair = null;
-            synchronized(PAIR_POOL) {
+
+            if ( PAIR_POOL_WRITE_LOCK.tryLock() ) {
                 if (!PAIR_POOL.isEmpty()) {
                     pair = PAIR_POOL.pop();
                 }
+                PAIR_POOL_WRITE_LOCK.unlock();
             }
+            
             if (pair != null) {
                 pair.first = first;
                 pair.second = second;
@@ -188,10 +199,11 @@ public class TermNavigator {
         public final void release() {
             first = null;
             second = null;
-            if (PAIR_POOL.size() < PAIR_POOL_SIZE) {
-                synchronized(PAIR_POOL) { 
+            if (PAIR_POOL_WRITE_LOCK.tryLock()) {
+                if (PAIR_POOL.size() < PAIR_POOL_SIZE) {
                     PAIR_POOL.push(this);
                 }
+                PAIR_POOL_WRITE_LOCK.unlock();
             }
         }
         

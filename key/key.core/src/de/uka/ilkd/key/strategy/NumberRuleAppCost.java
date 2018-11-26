@@ -46,12 +46,12 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
         if ( p_cost == 0 ) return NumberRuleAppCost.getZeroCost();
         
         final Long cost = p_cost; // <- avoids boxing a long twice in case of a cache miss
-        NumberRuleAppCost ac;
         
-        try { // Ensure thread save access which is required for parallel proofs (e.g. in Eclipse) 
-            READ_LOCK.lock();
+        NumberRuleAppCost ac = null;
+        
+        // Ensure thread save access which is required for parallel proofs (e.g. in Eclipse) 
+        if (READ_LOCK.tryLock()) {
             ac = cache.get(cost);
-        } finally {
             READ_LOCK.unlock();
         }
         if (ac != null) return ac;
@@ -62,11 +62,9 @@ public abstract class NumberRuleAppCost implements RuleAppCost {
             ac = new LongRuleAppCost ( p_cost );   
         }        
         
-        NumberRuleAppCost cached;
-        try {
-            WRITE_LOCK.lock();
+        NumberRuleAppCost cached = null;
+        if (WRITE_LOCK.tryLock()) {
             cached = cache.putIfAbsent(cost, ac);
-        } finally {
             WRITE_LOCK.unlock();
         }
         if (cached != null) {
