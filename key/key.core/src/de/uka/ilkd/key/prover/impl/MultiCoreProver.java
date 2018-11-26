@@ -32,7 +32,7 @@ public class MultiCoreProver extends AbstractProverCore {
     private long startTime = 0;
     private long timeout = -1;
 
-    private final ExecutorService threadpool = Executors.newCachedThreadPool();//new ThreadPoolExecutor(6, 8, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+    private final ExecutorService threadpool = new ThreadPoolExecutor(6, 8, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
     private final ExecutorCompletionService<SingleRuleApplicationInfo> completionService = new ExecutorCompletionService<>(threadpool);
     private boolean hasBeenInterrupted;
 
