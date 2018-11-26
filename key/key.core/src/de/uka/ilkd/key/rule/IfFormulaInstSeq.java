@@ -13,10 +13,7 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
+import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -63,28 +60,27 @@ public class IfFormulaInstSeq implements IfFormulaInstantiation {
     /**
      * Create a list with all formulas of a given semisequent
      */
-    private static ImmutableList<IfFormulaInstantiation> createListHelp(Sequent     p_s,
-            boolean antec ) {
-        ImmutableList<IfFormulaInstantiation> res = ImmutableSLList.<IfFormulaInstantiation>nil();
-        Iterator<SequentFormula>  it;
-        if (antec) {
-            it = p_s.antecedent().iterator ();
-        } else {
-            it = p_s.succedent().iterator ();
+    private static ImmutableArray<IfFormulaInstantiation> createListHelp(Sequent     p_s, boolean antec ) {
+        
+        final Semisequent semi = antec ? p_s.antecedent() : p_s.succedent();
+        final IfFormulaInstantiation[] res = new IfFormulaInstantiation[semi.size()];
+        
+        int i = res.length - 1;
+        for (final SequentFormula sf : semi) {
+            res[i] = new IfFormulaInstSeq(p_s, antec, sf);
+            i--;
         }
-        while ( it.hasNext () ) {
-            res = res.prepend(new IfFormulaInstSeq(p_s, antec, it.next()));
-        }
-
-        return res;
+        
+        return new ImmutableArray<>(res);
     }
 
-    public static ImmutableList<IfFormulaInstantiation> createList(Sequent p_s,
+    public static ImmutableArray<IfFormulaInstantiation> createList(Sequent p_s,
             boolean antec, Services services) {
+        // the cache is thread-safe
         final IfFormulaInstantiationCache cache = services.getCaches().getIfFormulaInstantiationCache();
         final Semisequent semi = antec ? p_s.antecedent() : p_s.succedent();
         
-        ImmutableList<IfFormulaInstantiation> val = cache.get(antec, semi);
+        ImmutableArray<IfFormulaInstantiation> val = cache.get(antec, semi);
         
         if (val == null) {
             val  = createListHelp(p_s, antec);

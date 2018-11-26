@@ -1,22 +1,37 @@
 package de.uka.ilkd.key.api;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.antlr.runtime.RecognitionException;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.Choice;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
 import de.uka.ilkd.key.parser.ParserMode;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.IfFormulaInstSeq;
+import de.uka.ilkd.key.rule.IfFormulaInstantiation;
+import de.uka.ilkd.key.rule.IfMatchResult;
+import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.match.legacy.LegacyTacletMatcher;
-import org.antlr.runtime.RecognitionException;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableList;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Matcher to deal with matching a string pattern against a sequent
@@ -77,9 +92,9 @@ public class Matcher {
         List<SearchNode> finalCandidates = new ArrayList<>(100);
         if(size > 0) {
             //Iteratoren durch die Sequent
-            ImmutableList<IfFormulaInstantiation> antecCand =
+            ImmutableArray<IfFormulaInstantiation> antecCand =
                     IfFormulaInstSeq.createList(currentSeq, true, copyServices);
-            ImmutableList<IfFormulaInstantiation> succCand =
+            ImmutableArray<IfFormulaInstantiation> succCand =
                     IfFormulaInstSeq.createList(currentSeq, false, copyServices);
 
             SequentFormula[] patternArray = new SequentFormula[patternSeq.size()];

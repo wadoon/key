@@ -3,6 +3,7 @@ package de.uka.ilkd.key.rule.match.vm;
 import java.util.HashMap;
 import java.util.Iterator;
 
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -99,10 +100,10 @@ public class VMTacletMatcher implements TacletMatcher {
     
 
     /** (non-Javadoc)
-     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(ImmutableList, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
+     * @see de.uka.ilkd.key.rule.TacletMatcher#matchIf(Iterable, de.uka.ilkd.key.logic.Term, de.uka.ilkd.key.rule.MatchConditions, de.uka.ilkd.key.java.Services)
      */
     @Override
-    public final IfMatchResult matchIf (   ImmutableList<IfFormulaInstantiation> p_toMatch,
+    public final IfMatchResult matchIf (   Iterable<IfFormulaInstantiation> p_toMatch,
             Term                             p_template,
             MatchConditions                  p_matchCond,
             Services                         p_services ) {
@@ -121,11 +122,7 @@ public class VMTacletMatcher implements TacletMatcher {
             context = p_matchCond.getInstantiations().getUpdateContext();   
         }
         
-        ImmutableList<IfFormulaInstantiation> workingList = p_toMatch;
-        while (!workingList.isEmpty()) {
-        	final IfFormulaInstantiation cf = workingList.head();
-        	workingList = workingList.tail();
-            
+        for (final IfFormulaInstantiation cf : p_toMatch) {
         	Term formula = cf.getConstrainedFormula().formula();
 
             if (updateContextPresent) {                 
@@ -186,8 +183,7 @@ public class VMTacletMatcher implements TacletMatcher {
 
         for (final IfFormulaInstantiation candidateInst: p_toMatch) {
             assert itIfSequent.hasNext() : "p_toMatch and assumes sequent must have same number of elements";
-            newMC = matchIf ( ImmutableSLList.<IfFormulaInstantiation>nil()
-                    .prepend ( candidateInst ),
+            newMC = matchIf ( new ImmutableArray<IfFormulaInstantiation>( candidateInst ),
                     itIfSequent.next ().formula (),
                     p_matchCond,
                     p_services ).getMatchConditions ();

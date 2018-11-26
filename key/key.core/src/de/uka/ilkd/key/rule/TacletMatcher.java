@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.rule;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -25,8 +23,8 @@ public interface TacletMatcher {
     * against p_template, and the corresponding MatchConditions.
     */
    public abstract IfMatchResult matchIf(
-         ImmutableList<IfFormulaInstantiation> p_toMatch, Term p_template,
-         MatchConditions p_matchCond, Services p_services);
+           Iterable<IfFormulaInstantiation> p_toMatch, Term p_template,
+           MatchConditions p_matchCond, Services p_services);
 
    /**
     * Match the whole if sequent using the given list of
@@ -37,8 +35,8 @@ public interface TacletMatcher {
     * p_toMatch does not match
     */
    public abstract MatchConditions matchIf(
-         Iterable<IfFormulaInstantiation> p_toMatch,
-         MatchConditions p_matchCond, Services p_services);
+           Iterable<IfFormulaInstantiation> p_toMatch,
+           MatchConditions p_matchCond, Services p_services);
 
    /**
     * checks the provided matches against the variable conditions of this taclet

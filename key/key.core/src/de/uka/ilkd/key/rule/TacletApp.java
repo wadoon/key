@@ -1000,8 +1000,8 @@ public abstract class TacletApp implements RuleApp {
     private ImmutableList<TacletApp> findIfFormulaInstantiationsHelp(
 	    ImmutableList<SequentFormula> p_ifSeqTail,
 	    ImmutableList<SequentFormula> p_ifSeqTail2nd,
-	    ImmutableList<IfFormulaInstantiation> p_toMatch,
-	    ImmutableList<IfFormulaInstantiation> p_toMatch2nd,
+	    ImmutableArray<IfFormulaInstantiation> p_toMatch,
+	    ImmutableArray<IfFormulaInstantiation> p_toMatch2nd,
 	    ImmutableList<IfFormulaInstantiation> p_alreadyMatched,
 	    MatchConditions p_matchCond, Services p_services) {
 

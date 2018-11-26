@@ -42,6 +42,11 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
         content = (S[]) Array.newInstance(arr.getClass().getComponentType(), arr.length);
         System.arraycopy(arr, 0, content, 0, arr.length);
     }
+    
+    public ImmutableArray(S[] arr, int lower, int upper) {
+        content = (S[]) Array.newInstance(arr.getClass().getComponentType(), upper - lower);
+        System.arraycopy(arr, lower, content, 0, upper-lower);
+    }
 
 
     /** creates a new <S>Array
