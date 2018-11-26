@@ -32,6 +32,7 @@ public abstract class BinaryFeature implements Feature {
     /** Constant that represents the boolean value false */
     public static final RuleAppCost TOP_COST  = TopRuleAppCost.INSTANCE;
     
+    @Override
     public RuleAppCost computeCost ( RuleApp app, PosInOccurrence pos, Goal goal, MutableState mState ) {
         return filter ( app, pos, goal, mState ) ? ZERO_COST : TOP_COST; 
     }

@@ -192,8 +192,12 @@ public class MultiCoreProver extends AbstractProverCore {
         } finally {
             time = System.currentTimeMillis() - startTime;
             shutdown();
+            try {
+                threadpool.awaitTermination(2, TimeUnit.SECONDS);
+            } catch (InterruptedException e) {                
+                e.printStackTrace();
+            }
         }
-
         return new ApplyStrategyInfo(info == null ? "" : info.message(), proof, null, exitGoal,
                 time, countApplied.get(), closedGoals.get());
     }

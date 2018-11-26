@@ -323,7 +323,7 @@ public class KeYSelectionModel {
 	}
     }
 
-    public synchronized void fireSelectedNodeChanged() {
+    public void fireSelectedNodeChanged() {
 	synchronized(listenerList) {
             for (final KeYSelectionListener listener : listenerList) {
                 listener.selectedNodeChanged(selectionEvent);
@@ -331,7 +331,7 @@ public class KeYSelectionModel {
 	}
     }
 
-    public synchronized void fireSelectedProofChanged() {
+    public void fireSelectedProofChanged() {
 	synchronized(listenerList) {
 	    Debug.log4jInfo("Selected Proof changed, firing...", "key.threading");
             for (final KeYSelectionListener listener : listenerList) {
