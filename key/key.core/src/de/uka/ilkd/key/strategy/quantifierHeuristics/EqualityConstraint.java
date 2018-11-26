@@ -13,12 +13,7 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.WeakHashMap;
+import java.util.*;
 
 import org.key_project.util.LRUCache;
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -30,7 +25,6 @@ import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.BooleanContainer;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -77,33 +71,37 @@ public class EqualityConstraint implements Constraint {
     }
 
 
-    /* cache to speed up meta variable search */
-    private static WeakHashMap<Term, ImmutableSet<Metavariable>> mvCache = 
-	new WeakHashMap<Term, ImmutableSet<Metavariable>>(2000);
     
     
-    public static ImmutableSet<Metavariable> metaVars(Term t) {
-	
-	if (mvCache.containsKey(t)) {
-	    return mvCache.get(t);
-	}
-	
-        ImmutableSet<Metavariable> metaVars = DefaultImmutableSet.<Metavariable>nil();
+    public static ImmutableSet<Metavariable> metaVars(Term t, Services services) {
+        final LRUCache<Term, ImmutableSet<Metavariable>> mvCache = services.getCaches().getMVCache(); 
         
-        Operator op = t.op();
-        
+        ImmutableSet<Metavariable> metaVars = null;
+        synchronized(mvCache) {
+            metaVars = mvCache.get(t);
+        }
+        if (metaVars != null) {
+            return metaVars;
+        } else {
+            metaVars = DefaultImmutableSet.<Metavariable>nil();
+        }
+
+        final Operator op = t.op();
+
         if(op instanceof Metavariable) {
             metaVars = metaVars.add((Metavariable) op);
         }
+
         for(int i = 0, ar = t.arity(); i < ar; i++) {
-	    metaVars = metaVars.union(metaVars(t.sub(i)));
-	}
-        
-        if (mvCache.size() > 10000) {
-            mvCache.clear();
+            metaVars = metaVars.union(metaVars(t.sub(i), services));
         }
-        mvCache.put(t, metaVars);
-        
+
+        synchronized(mvCache) {
+            final ImmutableSet<Metavariable> result = mvCache.putIfAbsent(t, metaVars);
+            if (result != null) {
+                return result;
+            }
+        }
         return metaVars;
     }
     
@@ -220,7 +218,7 @@ public class EqualityConstraint implements Constraint {
      * @return TOP if not possible, else a new constraint with after
      * unification of t1 and t2
      */
-    public Constraint unify ( Term t1, Term t2, TermServices services  ) {
+    public Constraint unify ( Term t1, Term t2, Services services  ) {
 	return unify(t1, t2, services, CONSTRAINTBOOLEANCONTAINER);
     }
 
@@ -236,7 +234,7 @@ public class EqualityConstraint implements Constraint {
      */
     public Constraint unify ( Term             t1,
 			      Term             t2,
-                              TermServices        services,
+                              Services        services,
 			      BooleanContainer unchanged ) {
 	final Constraint newConstraint = unifyHelp ( t1, t2, false, services );
 
@@ -331,7 +329,7 @@ public class EqualityConstraint implements Constraint {
                                    ImmutableList<QuantifiableVariable> cmpBoundVars,
                                    NameAbstractionTable       nat,
                                    boolean                    modifyThis, 
-                                   TermServices services ) {
+                                   Services services ) {
 
 	if ( t0 == t1 && ownBoundVars.equals ( cmpBoundVars ) )
                 return this;
@@ -402,7 +400,7 @@ public class EqualityConstraint implements Constraint {
     private Constraint introduceNewMV (Term t0,
                                        Term t1,
                                        boolean modifyThis,
-                                       TermServices services) {
+                                       Services services) {
 /*        if (services == null) return Constraint.TOP;
         
         final ImmutableSet<Sort> set = 
@@ -476,7 +474,7 @@ public class EqualityConstraint implements Constraint {
                        ImmutableList<QuantifiableVariable> cmpBoundVars,
                        NameAbstractionTable nat,
                        boolean modifyThis,
-                       TermServices services) {
+                       Services services) {
         Constraint newConstraint = this;
 
         for ( int i = 0; i < t0.arity (); i++ ) {
@@ -516,7 +514,7 @@ public class EqualityConstraint implements Constraint {
     private Constraint handleTwoMetavariables (Term t0,
                                                Term t1,
                                                boolean modifyThis,
-                                               TermServices services) {
+                                               Services services) {
         final Metavariable mv0 = (Metavariable)t0.op ();
         final Metavariable mv1 = (Metavariable)t1.op ();
         final Sort mv0S = mv0.sort ();
@@ -568,7 +566,7 @@ public class EqualityConstraint implements Constraint {
      *         <code>Constraint.TOP</code> is always returned for ununifiable
      *         terms
      */
-    private Constraint unifyHelp (Term t1, Term t2, boolean modifyThis, TermServices services) {
+    private Constraint unifyHelp (Term t1, Term t2, boolean modifyThis, Services services) {
 	return unifyHelp ( t1, t2,
 			   ImmutableSLList.<QuantifiableVariable>nil(), 
 			   ImmutableSLList.<QuantifiableVariable>nil(),
@@ -593,7 +591,7 @@ public class EqualityConstraint implements Constraint {
      */ 
     private Constraint normalize(Metavariable mv, Term t,
                                  boolean modifyThis, 
-                                 TermServices services) {
+                                 Services services) {
 	// MV cycles are impossible if the orders of MV pairs are
 	// correct
 
@@ -601,7 +599,7 @@ public class EqualityConstraint implements Constraint {
 
         // metavariable instantiations must not contain free variables
         if ( t.freeVars ().size () != 0
-                || ( modifyThis ? hasCycle ( mv, t ) : hasCycleByInst ( mv, t ) ) ) // cycle
+                || ( modifyThis ? hasCycle ( mv, t, services ) : hasCycleByInst ( mv, t, services ) ) ) // cycle
             return Constraint.TOP;
         else if ( map.containsKey ( mv ) )
                 return unifyHelp ( valueOf ( mv ), t, modifyThis, services );
@@ -675,7 +673,7 @@ public class EqualityConstraint implements Constraint {
      * @param co Constraint to be joined with this one
      * @return the joined constraint 
      */	
-    public Constraint join(Constraint co, TermServices services) { 
+    public Constraint join(Constraint co, Services services) { 
 	return join(co, services, CONSTRAINTBOOLEANCONTAINER); 
     }
     
@@ -691,7 +689,7 @@ public class EqualityConstraint implements Constraint {
      * @return the joined constraint     
      */
     public synchronized Constraint join (Constraint co, 
-            TermServices services, 
+            Services services, 
             BooleanContainer unchanged) {
         if ( co.isBottom () || co == this ) {
             unchanged.setVal ( true );
@@ -743,7 +741,7 @@ public class EqualityConstraint implements Constraint {
     }
 
         
-    private Constraint joinHelp (EqualityConstraint co, TermServices services) {
+    private Constraint joinHelp (EqualityConstraint co, Services services) {
         Constraint newConstraint = this;
         boolean newCIsNew = false;
         for (Map.Entry<Metavariable, Term> entry : co.map.entrySet ()) {
@@ -768,18 +766,18 @@ public class EqualityConstraint implements Constraint {
      * @return a boolean that is true iff. adding a mapping (mv,term)
      * would cause a cycle 
      */
-    private boolean hasCycle ( Metavariable mv, Term term ) {
+    private boolean hasCycle ( Metavariable mv, Term term, Services services ) {
         ImmutableList<Metavariable> body          = ImmutableSLList.<Metavariable>nil();
         ImmutableList<Term>         fringe        = ImmutableSLList.<Term>nil();
         Term               checkForCycle = term;
         
         while ( true ) {
-            for (Metavariable metavariable : metaVars(checkForCycle)) {
+            for (Metavariable metavariable : metaVars(checkForCycle, services)) {
                 final Metavariable termMV = metavariable;
                 if (!body.contains(termMV)) {
                     final Term termMVterm = getInstantiationIfExisting(termMV);
                     if (termMVterm != null) {
-                        if (metaVars(termMVterm).contains(mv))
+                        if (metaVars(termMVterm, services).contains(mv))
                             return true;
                     } else {
                         if (map.containsKey(termMV))
@@ -799,17 +797,17 @@ public class EqualityConstraint implements Constraint {
         }        
     }
 
-    private boolean hasCycleByInst (Metavariable mv, Term term) {
+    private boolean hasCycleByInst (Metavariable mv, Term term, Services services) {
 
-        for (Metavariable metavariable : metaVars(term)) {
+        for (Metavariable metavariable : metaVars(term, services)) {
             final Metavariable termMV = metavariable;
             if (termMV == mv) return true;
             final Term termMVterm = getInstantiationIfExisting(termMV);
             if (termMVterm != null) {
-                if (metaVars(termMVterm).contains(mv)) return true;
+                if (metaVars(termMVterm, services).contains(mv)) return true;
             } else {
                 if (map.containsKey(termMV)
-                        && hasCycle(mv, getDirectInstantiation(termMV)))
+                        && hasCycle(mv, getDirectInstantiation(termMV), services))
                     return true;
             }
         }

@@ -13,24 +13,25 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.util.concurrent.atomic.AtomicLong;
+
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.ParsableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
-@Deprecated
 public final class Metavariable extends AbstractSortedOperator
     implements ParsableVariable, Comparable<Metavariable> {
 
     // Used to define an alternative order of all existing
     // metavariables
-    private static int maxSerial = 0;
-    private        int serial;
+    private static AtomicLong maxSerial = new AtomicLong(0);
+    private        long serial;
     
     private final boolean isTemporaryVariable;
     
-    private synchronized void setSerial () {
-	serial = maxSerial++;
+    private void setSerial () {
+        serial = maxSerial.getAndIncrement();
     }
 
     private Metavariable(Name name, Sort sort, boolean isTemporaryVariable) {
@@ -63,11 +64,11 @@ public final class Metavariable extends AbstractSortedOperator
 	
 	// temporary variables are the greatest ones
 	if ( isTemporaryVariable () ) {
-            if ( !p_mr.isTemporaryVariable () ) return 1;
-        } else {
-            if ( p_mr.isTemporaryVariable () ) return -1;
-        }
-    
+	    if ( !p_mr.isTemporaryVariable () ) return 1;
+	} else {
+	    if ( p_mr.isTemporaryVariable () ) return -1;
+	}
+
 	int t = name ().toString ().compareTo ( p_mr.name ().toString () );
 	if ( t == 0 )
 	    return serial < p_mr.serial ? -1 : 1;
@@ -79,13 +80,13 @@ public final class Metavariable extends AbstractSortedOperator
 	if(! (o instanceof Metavariable)) {
 	    return false;
 	}
-	return compareTo((Metavariable)o) == 0;
+	return this == o;
     }
     
     
     @Override
     public int hashCode() {
-	return name().hashCode();
+	return 37+17*name().hashCode();
     }
     
     

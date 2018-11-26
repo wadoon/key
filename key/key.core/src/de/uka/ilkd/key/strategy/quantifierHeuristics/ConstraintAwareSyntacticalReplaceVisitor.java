@@ -34,8 +34,8 @@ public class ConstraintAwareSyntacticalReplaceVisitor extends
         this.metavariableInst = metavariableInst;
     }
     
-    protected Term toTerm(Term t) {
-        if ( EqualityConstraint.metaVars (t).size () != 0 && !metavariableInst.isBottom () ) {
+    protected Term toTerm(Term t, Services services) {
+        if ( EqualityConstraint.metaVars (t, services).size () != 0 && !metavariableInst.isBottom () ) {
             // use the visitor recursively for replacing metavariables that
             // might occur in the term (if possible)
             final ConstraintAwareSyntacticalReplaceVisitor srv =

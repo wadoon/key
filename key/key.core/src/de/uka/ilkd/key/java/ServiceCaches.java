@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.key_project.util.LRUCache;
+import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Term;
@@ -34,6 +35,7 @@ import de.uka.ilkd.key.strategy.IfInstantiationCachePool;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.feature.AbstractBetaFeature.TermInfo;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesGraph;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.Metavariable;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.TriggersSet;
 import de.uka.ilkd.key.util.Pair;
 
@@ -143,6 +145,9 @@ public class ServiceCaches {
    /** Cache used IfFormulaInstSeq */
    private final IfFormulaInstantiationCache ifFormulaInstantiationCache = new IfFormulaInstantiationCache();
 
+   /** Cache used by EqualityConstraint to speed up meta variable search */
+   private final LRUCache<Term, ImmutableSet<Metavariable>> mvCache = new LRUCache<Term, ImmutableSet<Metavariable>>(2000);
+
    
    /**
     * Returns the cache used by {@link TermTacletAppIndexCacheSet} instances.
@@ -211,5 +216,9 @@ public class ServiceCaches {
    public final IfFormulaInstantiationCache getIfFormulaInstantiationCache() {
        return ifFormulaInstantiationCache;
     }
+
+   public LRUCache<Term, ImmutableSet<Metavariable>> getMVCache() {
+       return mvCache;
+   }
    
 }
