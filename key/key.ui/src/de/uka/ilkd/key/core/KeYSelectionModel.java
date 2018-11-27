@@ -28,17 +28,21 @@ public class KeYSelectionModel {
 
     /** the proof to listen to */
     private Proof proof;
+    
     /** if true the selectedGoal field below can be trusted */
     private boolean goalIsValid;
+    
     /** is the selected node a goal */
     private Goal selectedGoal;
+    
     /** the current displayed node */
     private Node selectedNode;
+    
     /** the listeners to this model */
     private final List<KeYSelectionListener> listenerList;
+    
     /** cached selected node event */
-    private KeYSelectionEvent selectionEvent =
-	new KeYSelectionEvent(this);
+    private KeYSelectionEvent selectionEvent = new KeYSelectionEvent(this);
 
     public KeYSelectionModel() {
 	listenerList = Collections.synchronizedList(new ArrayList<KeYSelectionListener>(5));

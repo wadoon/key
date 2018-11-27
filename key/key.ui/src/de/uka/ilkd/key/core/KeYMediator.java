@@ -531,8 +531,6 @@ public class KeYMediator {
                getUI().getProofControl().fireAutoModeStopped (new ProofEvent(getSelectedProof())); // TODO: Is this wrong use of auto mode really required?
             }
             ui.notifyAutomodeStopped();
-            if (getSelectedProof() != null)
-                keySelectionModel.fireSelectedProofChanged();
          }
       };
       ThreadUtilities.invokeOnEventQueue(interfaceSignaller);

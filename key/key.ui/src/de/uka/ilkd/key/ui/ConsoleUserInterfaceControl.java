@@ -158,6 +158,7 @@ public class ConsoleUserInterfaceControl extends AbstractMediatorUserInterfaceCo
            }
            System.exit(1);
        }
+       
        final int openGoals = proof.openGoals().size();
        final Object result2 = info.getResult();
        if (info.getSource() instanceof ProverCore ||
