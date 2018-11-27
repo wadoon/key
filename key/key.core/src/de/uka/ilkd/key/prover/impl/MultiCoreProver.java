@@ -140,7 +140,7 @@ public class MultiCoreProver extends AbstractProverCore {
     }
 
     @Override
-    public ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals,
+    public synchronized ApplyStrategyInfo start(Proof proof, ImmutableList<Goal> goals,
             int maxSteps, long timeout, boolean stopAtFirstNonCloseableGoal) {
         this.proof = proof;
         this.stopCondition = proof.getSettings().getStrategySettings().getApplyStrategyStopCondition();
@@ -148,6 +148,7 @@ public class MultiCoreProver extends AbstractProverCore {
         this.timeout = proof.getSettings().getStrategySettings().getTimeout();
         initGoalChooser(goals);
 
+        
         final ApplyStrategyInfo result = run(proof, stopAtFirstNonCloseableGoal);
 
         proof.addAutoModeTime(result.getTime());
@@ -185,7 +186,7 @@ public class MultiCoreProver extends AbstractProverCore {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
             hasBeenInterrupted = true;
-            return new ApplyStrategyInfo(e.getCause().getMessage(), proof, e,
+            return new ApplyStrategyInfo((e.getCause() != null ? e.getCause().getMessage(): "Proof Search Cancelled"), proof, e,
                     null, System.currentTimeMillis() - startTime, countApplied.get(), closedGoals.get());
         } catch (final Throwable t) {
             t.printStackTrace();

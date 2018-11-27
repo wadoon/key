@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.prover.impl;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
