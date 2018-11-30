@@ -17,6 +17,7 @@ import java.util.ArrayList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -82,15 +83,59 @@ public class CreateMutualExclusionFormulaCondition
         done = true;
 
         try {
-            // svInst.getInstantiation(participatingSVs.get(0))
-            final Term excIsNull = services.getTermBuilder().equals(
-                services.getTermBuilder().var(participatingVars.get(0)),
-                services.getTermBuilder().NULL());
+            final TermBuilder tb = services.getTermBuilder();
+            Term result = tb.tt();
+
+            for (ProgramVariable pv : participatingVars) {
+                result = tb.and(result, falseTerm(pv, services));
+            }
+
+            for (int i = 0; i < participatingVars.size(); i++) {
+                Term subResult = tb.tt();
+                for (int j = 0; j < participatingVars.size(); j++) {
+                    if (i == j) {
+                        subResult = tb.and(subResult,
+                            trueTerm(participatingVars.get(j), services));
+                    } else {
+                        subResult = tb.and(subResult,
+                            falseTerm(participatingVars.get(j), services));
+                    }
+                }
+                result = tb.or(result, subResult);
+            }
 
             return matchCond.setInstantiations(
-                svInst.add(targetFormulaSV, excIsNull, services));
+                svInst.add(targetFormulaSV, result, services));
         } catch (Throwable t) {
             return matchCond;
+        }
+    }
+
+    private Term trueTerm(ProgramVariable var, Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        if (var.sort().extendsTrans(services.getJavaInfo().objectSort())) {
+            return tb.not(tb.equals(tb.var(var), tb.NULL()));
+        } else if (var.sort().equals(
+            services.getTypeConverter().getBooleanLDT().targetSort())) {
+            return tb.equals(tb.var(var), tb.TRUE());
+        } else {
+            throw new RuntimeException(String.format(
+                "Unexpected type %s, expected an Object type or boolean",
+                var.sort().name()));
+        }
+    }
+
+    private Term falseTerm(ProgramVariable var, Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        if (var.sort().extendsTrans(services.getJavaInfo().objectSort())) {
+            return tb.equals(tb.var(var), tb.NULL());
+        } else if (var.sort().equals(
+            services.getTypeConverter().getBooleanLDT().targetSort())) {
+            return tb.equals(tb.var(var), tb.FALSE());
+        } else {
+            throw new RuntimeException(String.format(
+                "Unexpected type %s, expected an Object type or boolean",
+                var.sort().name()));
         }
     }
 
