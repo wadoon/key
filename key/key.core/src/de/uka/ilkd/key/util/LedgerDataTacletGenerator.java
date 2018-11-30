@@ -315,9 +315,6 @@ public class LedgerDataTacletGenerator {
         return res;
     }
 
-    //TODO jonas: assume hinzufügen, sodass taclet nur für "richtigen" typ
-    //angewandt werden kann (mit instanceof  ld)
-
     /**
      * The serialization method is only specified for the LedgerData supertype. In order to extend this specification
      * to all subtypes, this taclet can be used.
@@ -329,7 +326,7 @@ public class LedgerDataTacletGenerator {
     private RewriteTaclet serializationExtensionTaclet(KeYJavaType kjt, Function serFun, Function o2DFun) {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         tacletBuilder.setName(new Name("extendSerializationTo" + kjt.getSort().name()));
-        SchemaVariable ldVar1 = SchemaVariableFactory.createTermSV(new Name("ld"), superSort);
+        SchemaVariable ldVar1 = SchemaVariableFactory.createTermSV(new Name("ld"), kjt.getSort());
         SchemaVariable heapVar = SchemaVariableFactory.createTermSV(new Name("h"), heapSort);
         Term findTerm = termBuilder.func(superSerFun, termBuilder.func(superObjectToLdFun, termBuilder.var(heapVar), termBuilder.var(ldVar1)));
         tacletBuilder.setFind(findTerm);
@@ -350,8 +347,8 @@ public class LedgerDataTacletGenerator {
     private RewriteTaclet deserializationExtensionTaclet(KeYJavaType kjt, Function deserFun, Function o2DFun) {
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
         tacletBuilder.setName(new Name("extendDeserializationTo" + kjt.getSort().name()));
-        SchemaVariable var1 = SchemaVariableFactory.createTermSV(new Name("x"), superSort);
-        SchemaVariable var2 = SchemaVariableFactory.createTermSV(new Name("y"), superSort);
+        SchemaVariable var1 = SchemaVariableFactory.createTermSV(new Name("x"), kjt.getSort());
+        SchemaVariable var2 = SchemaVariableFactory.createTermSV(new Name("y"), objectSort);
         SchemaVariable heapVar = SchemaVariableFactory.createTermSV(new Name("h"), heapSort);
         Term o2dTerm = termBuilder.func(superObjectToLdFun, termBuilder.var(heapVar), termBuilder.var(var1));
         Term deserOfArrayTerm = termBuilder.func(superDeserFun, termBuilder.func(a2sFun, termBuilder.var(heapVar), termBuilder.var(var2)));
