@@ -66,9 +66,11 @@ public class MultiCoreChooser implements SchedulingGoalChooser {
 
     private void insertNewGoals(ImmutableList<Goal> newGoals) {
         synchronized(nextList) {
-            for (final Goal newGoal : newGoals) {
-                if (!currentlyScheduled.containsKey(newGoal)) {
-                    nextList.add(newGoal);
+            synchronized(currentlyScheduled) {
+                for (final Goal newGoal : newGoals) {
+                    if (!currentlyScheduled.containsKey(newGoal)) {
+                        nextList.add(newGoal);
+                    }
                 }
             }
         }
