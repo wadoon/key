@@ -83,7 +83,7 @@ public final class JavaInfo {
      */
     private KeYJavaType nullType = null;
     /**
-     * locks nullType cache 
+     * locks nullType cache
      */
     private Object nullTypeLock = new Object();
 
@@ -94,9 +94,9 @@ public final class JavaInfo {
      * in </em>in this order</em>
      */
     protected KeYJavaType[] commonTypes = new KeYJavaType[3];
-    
+
     /**
-     * locks commonTypes cache 
+     * locks commonTypes cache
      */
     private final Object commonTypesLock = new Object();
 
@@ -108,9 +108,9 @@ public final class JavaInfo {
 
 
     private LRUCache<Pair<KeYJavaType,KeYJavaType>, ImmutableList<KeYJavaType>> commonSubtypeCache
-    	= new LRUCache<Pair<KeYJavaType,KeYJavaType>, ImmutableList<KeYJavaType>>(200);
+    = new LRUCache<Pair<KeYJavaType,KeYJavaType>, ImmutableList<KeYJavaType>>(200);
     /**
-     * locks commonSubTypesLock cache 
+     * locks commonSubTypesLock cache
      */
     private final Object commonSubTypesLock = new Object();
 
@@ -128,7 +128,7 @@ public final class JavaInfo {
      */
     protected ExecutionContext defaultExecutionContext;
     /**
-     * locks defaultExecutionContextLock cache 
+     * locks defaultExecutionContextLock cache
      */
     private final Object defaultExecutionContextLock = new Object();
 
@@ -137,23 +137,23 @@ public final class JavaInfo {
     /** caches the arrays' length attribute*/
     private ProgramVariable length;
     /**
-     * locks lengthLock cache 
+     * locks lengthLock cache
      */
     private final Object lengthLock = new Object();
 
     /** caches the program variable for {@code <inv>} */
     private ProgramVariable invProgVar;
-    
+
     /**
-     * locks invProgVarLock cache 
+     * locks invProgVarLock cache
      */
     private final Object invProgVarLock = new Object();
 
     /** caches the observer for {@code <inv>} */
     private ObserverFunction inv;
-    
+
     /**
-     * locks invLock cache 
+     * locks invLock cache
      */
     private final Object invLock = new Object();
 
@@ -162,19 +162,19 @@ public final class JavaInfo {
     protected static final String DEFAULT_EXECUTION_CONTEXT_METHOD = "<defaultMethod>";
 
     private HashMap<KeYJavaType,ObserverFunction> staticInvs = new LinkedHashMap<KeYJavaType,ObserverFunction>();
-    
+
     /**
      * creates a new JavaInfo object by giving a KeYProgModelInfo to access
      * the Recoder SourceInfo and using the given {@link Services} object.
      */
     protected JavaInfo(KeYProgModelInfo kpmi, Services s) {
-	this.kpmi 	= kpmi;
-	services	= s;
+        this.kpmi 	= kpmi;
+        services	= s;
     }
 
     protected JavaInfo(JavaInfo proto, Services s) {
-	this ( proto.getKeYProgModelInfo().copy(), s );
-	nullType  = proto.getNullType();
+        this ( proto.getKeYProgModelInfo().copy(), s );
+        nullType  = proto.getNullType();
     }
 
     /**
@@ -194,7 +194,7 @@ public final class JavaInfo {
      * the KeYProgModelInfo of this JavaInfo
      */
     public KeYRecoderMapping rec2key() {
-	return getKeYProgModelInfo().rec2key();
+        return getKeYProgModelInfo().rec2key();
     }
 
     /**
@@ -204,7 +204,7 @@ public final class JavaInfo {
      * @return a copy of the JavaInfo
      */
     public JavaInfo copy(Services serv) {
- 	return new JavaInfo(this, serv);
+        return new JavaInfo(this, serv);
     }
 
     /**
@@ -222,7 +222,7 @@ public final class JavaInfo {
      * returns the services associated with this JavaInfo
      */
     public Services getServices(){
-	return services;
+        return services;
     }
 
     //------------------- common services ----------------------
@@ -245,11 +245,17 @@ public final class JavaInfo {
     }
 
     public void resetCaches(){
-	sort2KJTCache = null;
-	type2KJTCache = null;
-	name2KJTCache = null;
-	nameCachedSize = 0;
-	sortCachedSize = 0;
+        synchronized(sort2KJTCacheLock) {
+            synchronized(type2KJTCacheLock) {
+                type2KJTCache = null;
+                sort2KJTCache = null;
+                sortCachedSize = 0;
+            }
+        }
+        synchronized(name2KJTCacheLock) {
+            name2KJTCache = null;
+            nameCachedSize = 0;
+        }
     }
 
     /**
@@ -261,10 +267,12 @@ public final class JavaInfo {
      */
     public KeYJavaType getTypeByName(String fullName) {
         fullName = translateArrayType(fullName);
-        if(name2KJTCache == null || kpmi.rec2key().size() > nameCachedSize){
-            buildNameCache();
+        synchronized(name2KJTCacheLock) {
+            if(name2KJTCache == null || kpmi.rec2key().size() > nameCachedSize){
+                buildNameCache();
+            }
+            return name2KJTCache.get(fullName);
         }
-        return name2KJTCache.get(fullName);
     }
 
     /**
@@ -296,38 +304,43 @@ public final class JavaInfo {
      * @return true iff name refers to a package
      */
     public boolean isPackage(String name) {
-	return kpmi.isPackage(name);
+        return kpmi.isPackage(name);
     }
 
     /**
      * Translates things like int[] into [I, etc.
      */
     private String translateArrayType(String s) {
-        if ("byte[]".equals(s))
+        if ("byte[]".equals(s)) {
             return "[B";
-        else if ("int[]".equals(s))
+        }
+        else if ("int[]".equals(s)) {
             return "[I";
-        else if ("long[]".equals(s))
+        }
+        else if ("long[]".equals(s)) {
             return "[J";
-        else if ("short[]".equals(s))
+        }
+        else if ("short[]".equals(s)) {
             return "[S";
-        else if ("char[]".equals(s))
+        }
+        else if ("char[]".equals(s)) {
             return "[C";
-// Strangely, this one is not n
-//        else if ("boolean[]".equals(s))
-//            return "[Z";
-// Not sure if these are needed, commented out for efficiency
-//        else if ("char[]".equals(s))
-//            return "[C";
-//        else if ("double[]".equals(s))
-//            return "[D";
-//        else if ("float[]".equals(s))
-//            return "[F";
-//      else if ("\\real[]".equals(s))
-//            return "[R";
-//      else if ("\\bigint[]".equals(s))
-//            return "[Y";
-	return s;
+        }
+        // Strangely, this one is not n
+        //        else if ("boolean[]".equals(s))
+        //            return "[Z";
+        // Not sure if these are needed, commented out for efficiency
+        //        else if ("char[]".equals(s))
+        //            return "[C";
+        //        else if ("double[]".equals(s))
+        //            return "[D";
+        //        else if ("float[]".equals(s))
+        //            return "[F";
+        //      else if ("\\real[]".equals(s))
+        //            return "[R";
+        //      else if ("\\bigint[]".equals(s))
+        //            return "[Y";
+        return s;
     }
 
     /**
@@ -357,61 +370,61 @@ public final class JavaInfo {
      * program type model
      */
     public Set<KeYJavaType> getAllKeYJavaTypes() {
-	final Set<KeYJavaType> result  = new LinkedHashSet<KeYJavaType>();
+        final Set<KeYJavaType> result  = new LinkedHashSet<KeYJavaType>();
         for (final Object o : kpmi.allElements()) {
-	    if (o instanceof KeYJavaType) {
-	        result.add((KeYJavaType)o);
-	    }
-	}
-	return result;
-    }
-
-
-private final Object type2KJTCacheLock = new Object();
-private final Object name2KJTCacheLock = new Object();
-
-public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
-    assert type != null;
-    KeYJavaType result = null;
-    synchronized (type2KJTCacheLock) {
-
-        if(type2KJTCache != null) {
-            result = type2KJTCache.get(type);
-        }
-        
-        synchronized (name2KJTCacheLock) {
-            if(name2KJTCache != null) {
-                result = name2KJTCache.get(type.getName());
+            if (o instanceof KeYJavaType) {
+                result.add((KeYJavaType)o);
             }
         }
-
-        if(result == null) {
-            Name ldtName = type.getCorrespondingLDTName();
-            final Namespace<Sort> sorts = services.getNamespaces().sorts();
-            final Sort sort;
-            sort = (Sort) sorts.lookup(ldtName);
-            assert sort != null : "could not find sort for type: " + type;
-            result = new KeYJavaType(type, sort);
-            if(type2KJTCache != null) {
-                type2KJTCache.put(type, result);
-            }
-        }
-
         return result;
     }
-}
+
+
+    private final Object type2KJTCacheLock = new Object();
+    private final Object name2KJTCacheLock = new Object();
+
+    public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
+        assert type != null;
+        KeYJavaType result = null;
+        synchronized (type2KJTCacheLock) {
+
+            if(type2KJTCache != null) {
+                result = type2KJTCache.get(type);
+            }
+
+            synchronized (name2KJTCacheLock) {
+                if(name2KJTCache != null) {
+                    result = name2KJTCache.get(type.getName());
+                }
+            }
+
+            if(result == null) {
+                Name ldtName = type.getCorrespondingLDTName();
+                final Namespace<Sort> sorts = services.getNamespaces().sorts();
+                final Sort sort;
+                sort = sorts.lookup(ldtName);
+                assert sort != null : "could not find sort for type: " + type;
+                result = new KeYJavaType(type, sort);
+                if(type2KJTCache != null) {
+                    type2KJTCache.put(type, result);
+                }
+            }
+
+            return result;
+        }
+    }
 
 
     /**
      * returns a primitive KeYJavaType matching the given typename.
      */
     public KeYJavaType getPrimitiveKeYJavaType(String typename) {
-	PrimitiveType type = PrimitiveType.getPrimitiveType(typename);
-	if(type != null) {
-	    return getPrimitiveKeYJavaType(type);
-	} else {
-	    return null;
-	}
+        PrimitiveType type = PrimitiveType.getPrimitiveType(typename);
+        if(type != null) {
+            return getPrimitiveKeYJavaType(type);
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -423,7 +436,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
         KeYJavaType result = getPrimitiveKeYJavaType(fullName);
         return (result == null
                 ? getTypeByClassName(fullName)
-                : result);
+                        : result);
     }
 
 
@@ -457,26 +470,34 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
         } else if (t instanceof ArrayType) {
             final ArrayType at = (ArrayType) t;
             return isPrivate(at.getBaseType().getKeYJavaType());
-        } else // primitive type or null
+        }
+        else {
             return true;
+        }
     }
 
     public static boolean isVisibleTo(SpecificationElement ax, KeYJavaType visibleTo) {
         final KeYJavaType kjt = ax.getKJT();
         // elements of private types are not visible
-        if (isPrivate(kjt)) return kjt.equals(visibleTo);
+        if (isPrivate(kjt)) {
+            return kjt.equals(visibleTo);
+        }
         //TODO: package information not yet available
         // BUGFIX: package-private is understood as private (see bug #1268)
         final boolean visibleToPackage = false;
         final VisibilityModifier visibility = ax.getVisibility();
-        if (VisibilityModifier.isPublic(visibility))
+        if (VisibilityModifier.isPublic(visibility)) {
             return true;
-        if (VisibilityModifier.allowsInheritance(visibility))
+        }
+        if (VisibilityModifier.allowsInheritance(visibility)) {
             return visibleTo.getSort().extendsTrans(kjt.getSort()) || visibleToPackage;
-        if (VisibilityModifier.isPackageVisible(visibility))
+        }
+        if (VisibilityModifier.isPackageVisible(visibility)) {
             return visibleToPackage;
-        else
+        }
+        else {
             return kjt.equals(visibleTo);
+        }
     }
 
     /**
@@ -501,7 +522,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
     }
 
     private final Object sort2KJTCacheLock = new Object();
-    
+
     private void updateSort2KJTCache() {
         synchronized(sort2KJTCacheLock) {
             if (sort2KJTCache == null || kpmi.rec2key().size() > sortCachedSize) {
@@ -534,20 +555,26 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      * returns the KeYJavaType belonging to the given Type t
      */
     public KeYJavaType getKeYJavaType(Type t) {
-	if(type2KJTCache == null) {
-	    type2KJTCache = new LinkedHashMap<Type, KeYJavaType>();
-	    for (final Object o : kpmi.allElements()) {
-		if (o instanceof KeYJavaType) {
-		    final KeYJavaType oKJT = (KeYJavaType)o;
-		    type2KJTCache.put(oKJT.getJavaType(), oKJT);
-		}
-	    }
-	}
-	if(t instanceof PrimitiveType) {
-	    return getPrimitiveKeYJavaType((PrimitiveType)t);
-	} else {
-	    return type2KJTCache.get(t);
-	}
+        if(type2KJTCache == null) {            
+            synchronized(type2KJTCacheLock) {
+                if(type2KJTCache == null) {            
+                    type2KJTCache = new LinkedHashMap<Type, KeYJavaType>();
+                    for (final Object o : kpmi.allElements()) {
+                        if (o instanceof KeYJavaType) {
+                            final KeYJavaType oKJT = (KeYJavaType)o;
+                            type2KJTCache.put(oKJT.getJavaType(), oKJT);
+                        }
+                    }
+                }
+            }
+        }
+        if(t instanceof PrimitiveType) {
+            return getPrimitiveKeYJavaType((PrimitiveType)t);
+        } else {
+            synchronized(type2KJTCacheLock) {
+                return type2KJTCache.get(t);
+            }
+        }
     }
 
     /**
@@ -580,12 +607,12 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
 
 
     public ImmutableList<IProgramMethod> getConstructors(KeYJavaType kjt) {
-	return kpmi.getConstructors(kjt);
+        return kpmi.getConstructors(kjt);
     }
 
     public IProgramMethod getConstructor(KeYJavaType kjt,
-	    				ImmutableList<KeYJavaType> signature) {
-	return kpmi.getConstructor(kjt, signature);
+            ImmutableList<KeYJavaType> signature) {
+        return kpmi.getConstructor(kjt, signature);
     }
 
     /**
@@ -600,9 +627,9 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      * @return a matching program method
      */
     public IProgramMethod getProgramMethod(KeYJavaType classType,
-            			          String methodName,
-            			          ImmutableList<? extends Type> signature,
-            			          KeYJavaType context) {
+            String methodName,
+            ImmutableList<? extends Type> signature,
+            KeYJavaType context) {
         return kpmi.getProgramMethod(classType, methodName, signature, context);
     }
 
@@ -612,7 +639,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
             KeYJavaType context) {
         return getProgramMethod(classType, methodName, signature.toImmutableList(), context);
     }
-    
+
     private IProgramMethod getProgramMethodFromPartialSignature(KeYJavaType classType,
             String methodName,
             List<List<KeYJavaType>> signature,
@@ -645,7 +672,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
             String methodName,
             List<List<KeYJavaType>> signature,
             KeYJavaType context) {
-        ImmutableList<KeYJavaType> partialSignature = ImmutableSLList.nil();
+        final ImmutableList<KeYJavaType> partialSignature = ImmutableSLList.nil();
         return getProgramMethodFromPartialSignature(classType, methodName, signature, partialSignature, context);
     }
 
@@ -663,9 +690,9 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      * @return a matching program method
      */
     public IProgramMethod getProgramMethod(KeYJavaType classType,
-	    				  String methodName,
-	    				  ProgramVariable[] args,
-	    				  KeYJavaType context){
+            String methodName,
+            ProgramVariable[] args,
+            KeYJavaType context){
         ImmutableList<Type> types = ImmutableSLList.<Type>nil();
         for (int i = args.length - 1; i>=0; i--) {
             types = types.prepend(args[i].getKeYJavaType());
@@ -674,8 +701,8 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
     }
 
     public IProgramMethod getToplevelPM(KeYJavaType kjt,
-	    			       String methodName,
-	    			       ImmutableList<KeYJavaType> sig) {
+            String methodName,
+            ImmutableList<KeYJavaType> sig) {
         return findToplevelPM(kjt, methodName, sig, kjt);
     }
 
@@ -685,24 +712,24 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
             ImmutableList<KeYJavaType> sig,
             KeYJavaType context) {
 
-	for(KeYJavaType sup : getAllSupertypes(kjt).removeAll(kjt)) {
+        for(KeYJavaType sup : getAllSupertypes(kjt).removeAll(kjt)) {
             final IProgramMethod result = findToplevelPM(sup, methodName, sig, context);
-	    if(result != null) {
-		return result;
-	    }
-	}
+            if(result != null) {
+                return result;
+            }
+        }
         return getProgramMethod(kjt, methodName, sig, context);
     }
 
 
     public IProgramMethod getToplevelPM(KeYJavaType kjt, IProgramMethod pm) {
-	final String methodName = pm.getName();
-    	final ImmutableList<KeYJavaType> sig
-		= ImmutableSLList.<KeYJavaType>nil()
-		                 .append(pm.getParamTypes()
-		                	   .toArray(
-		                      new KeYJavaType[pm.getNumParams()]));
-	return getToplevelPM(kjt, methodName, sig);
+        final String methodName = pm.getName();
+        final ImmutableList<KeYJavaType> sig
+        = ImmutableSLList.<KeYJavaType>nil()
+        .append(pm.getParamTypes()
+                .toArray(
+                        new KeYJavaType[pm.getNumParams()]));
+        return getToplevelPM(kjt, methodName, sig);
     }
 
     private List<List<KeYJavaType>> termArrayToSignature(Term[] args) {
@@ -741,7 +768,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
          * Method is referenced from a non-static context.
          */
         if (traverseHierarchy) {
-            /* 
+            /*
              * Traverse type hierarchy to find a method with the specified name.
              */
             ImmutableList<KeYJavaType> allSupertypes = kpmi.getAllSupertypes(classKJT).reverse();
@@ -758,7 +785,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
                 }
             }
         } else {
-            /* 
+            /*
              * Do not traverse type hierarchy. pm stays null in case classKJT
              * does not contain a method with the specified name.
              */
@@ -832,49 +859,49 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      * @return KeYJavaType of the extended supertype
      */
     public KeYJavaType getSuperclass(KeYJavaType type) {
-	KeYJavaType result = null;
-	final ClassType javaType = (ClassType) type.getJavaType();
+        KeYJavaType result = null;
+        final ClassType javaType = (ClassType) type.getJavaType();
 
-	if (javaType.isInterface()) {
-	    return null;
-	}
+        if (javaType.isInterface()) {
+            return null;
+        }
 
-	final ImmutableList<KeYJavaType> localSupertypes = javaType.getSupertypes();
-	final Iterator<KeYJavaType> it = localSupertypes.iterator();
-	while (result == null && it.hasNext()) {
-	    final KeYJavaType keYType = it.next();
-	    if (!((ClassType)keYType.getJavaType()).isInterface()) {
-		result = keYType;
-	    }
-	}
-
-	if(result == null && ((ClassDeclaration) javaType).isAnonymousClass()){
-        for (Sort sort : type.getSort().extendsSorts()) {
-            Sort s = sort;
-            if (!((ClassType) getKeYJavaType(s).getJavaType()).isInterface()) {
-                return getKeYJavaType(s);
+        final ImmutableList<KeYJavaType> localSupertypes = javaType.getSupertypes();
+        final Iterator<KeYJavaType> it = localSupertypes.iterator();
+        while (result == null && it.hasNext()) {
+            final KeYJavaType keYType = it.next();
+            if (!((ClassType)keYType.getJavaType()).isInterface()) {
+                result = keYType;
             }
         }
-	}
 
-	if (result == null) {
-	    result = getJavaLangObject();
-	}
+        if(result == null && ((ClassDeclaration) javaType).isAnonymousClass()){
+            for (Sort sort : type.getSort().extendsSorts()) {
+                Sort s = sort;
+                if (!((ClassType) getKeYJavaType(s).getJavaType()).isInterface()) {
+                    return getKeYJavaType(s);
+                }
+            }
+        }
+
+        if (result == null) {
+            result = getJavaLangObject();
+        }
 
         return result;
     }
 
     /** gets an array of expression and returns a list of types */
     private ImmutableList<KeYJavaType> getKeYJavaTypes(ImmutableArray<? extends Expression> args) {
-	ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
-	if (args != null) {
-	    for (int i = args.size()-1; i >= 0 ; i--) {
-		final Expression argument = args.get(i);
-		result = result.prepend
-		    (getTypeConverter().getKeYJavaType(argument));
-	    }
-	}
-	return result;
+        ImmutableList<KeYJavaType> result = ImmutableSLList.<KeYJavaType>nil();
+        if (args != null) {
+            for (int i = args.size()-1; i >= 0 ; i--) {
+                final Expression argument = args.get(i);
+                result = result.prepend
+                        (getTypeConverter().getKeYJavaType(argument));
+            }
+        }
+        return result;
     }
 
 
@@ -885,7 +912,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      * @return the signature
      */
     public ImmutableList<KeYJavaType> createSignature(ImmutableArray<? extends Expression> arguments) {
-	return getKeYJavaTypes(arguments);
+        return getKeYJavaTypes(arguments);
     }
 
     /**
@@ -896,7 +923,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      * @return all attributes declared in class <tt>cl</tt>
      */
     public ImmutableList<Field> getAllFields(TypeDeclaration classDecl) {
-	return filterLocalDeclaredFields(classDecl, Filter.TRUE);
+        return filterLocalDeclaredFields(classDecl, Filter.TRUE);
     }
 
     /**
@@ -927,14 +954,14 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
         for (int i = members.size()-1; i>=0; i--) {
             final MemberDeclaration member = members.get(i);
             if (member instanceof FieldDeclaration) {
-        	final ImmutableArray<FieldSpecification> specs =
-        	    ((FieldDeclaration)member).getFieldSpecifications();
-        	for (int j = specs.size()-1; j>=0; j--) {
-        	    final FieldSpecification fieldSpec = specs.get(j);
+                final ImmutableArray<FieldSpecification> specs =
+                        ((FieldDeclaration)member).getFieldSpecifications();
+                for (int j = specs.size()-1; j>=0; j--) {
+                    final FieldSpecification fieldSpec = specs.get(j);
                     if (filter.isSatisfiedBy(fieldSpec)) {
                         fields = fields.prepend(fieldSpec);
                     }
-        	}
+                }
             }
         }
         return fields;
@@ -946,13 +973,13 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      * reads a Java block given as a string java as it was in the given
      * TypeDeclaration asIn.
      */
-     public JavaBlock readJavaBlock(String java, TypeDeclaration asIn) {
+    public JavaBlock readJavaBlock(String java, TypeDeclaration asIn) {
         ClassDeclaration cd = null;
         if (asIn instanceof ClassDeclaration) {
             cd = (ClassDeclaration)asIn;
         } else {
             Debug.out("Reading Java Block from an InterfaceDeclaration:"
-                      +" Not yet implemented.");
+                    +" Not yet implemented.");
         }
         final NamespaceSet nss = services.getNamespaces().copy();
         final JavaBlock block = kpmi.readBlock(java, cd, nss);
@@ -983,7 +1010,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      */
     public ProgramElement readJava(String java) {
         return ((StatementBlock)readJavaBlock("{"+java+"}")
-		.program()).getChildAt(0);
+                .program()).getChildAt(0);
     }
 
     /**
@@ -994,7 +1021,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      * found
      */
     private final ProgramVariable find(String programName,
-                                       ImmutableList<Field> fields) {
+            ImmutableList<Field> fields) {
         for (Field field1 : fields) {
             Field field = field1;
             if (programName.equals(field.getProgramName())) {
@@ -1002,7 +1029,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
                         field.getProgramVariable();
             }
         }
-	return null;
+        return null;
     }
 
     /**
@@ -1013,12 +1040,12 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      * int the field declaration of the given list
      */
     private final ImmutableList<Field> getFields(FieldDeclaration field) {
-	ImmutableList<Field> result = ImmutableSLList.<Field>nil();
-	final ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
-	for (int i = spec.size()-1; i>=0; i--) {
-	    result = result.prepend(spec.get(i));
-	}
-	return result;
+        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        final ImmutableArray<FieldSpecification> spec = field.getFieldSpecifications();
+        for (int i = spec.size()-1; i>=0; i--) {
+            result = result.prepend(spec.get(i));
+        }
+        return result;
     }
 
     /**
@@ -1030,15 +1057,15 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      * int the field declaration of the given list
      */
     private ImmutableList<Field> getFields(ImmutableArray<MemberDeclaration> list) {
-	ImmutableList<Field> result = ImmutableSLList.<Field>nil();
-	for (int i = list.size()-1; i >= 0; i--) {
-	    final MemberDeclaration pe = list.get(i);
-	    if (pe instanceof FieldDeclaration) {
-		result = result.append
-		    (getFields((FieldDeclaration)pe));
-	    }
-	}
-	return result;
+        ImmutableList<Field> result = ImmutableSLList.<Field>nil();
+        for (int i = list.size()-1; i >= 0; i--) {
+            final MemberDeclaration pe = list.get(i);
+            if (pe instanceof FieldDeclaration) {
+                result = result.append
+                        (getFields((FieldDeclaration)pe));
+            }
+        }
+        return result;
     }
 
     /**
@@ -1059,7 +1086,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
         }
 
         return getAttribute(fullyQualifiedName.substring(idx+2),
-			    fullyQualifiedName.substring(0, idx));
+                fullyQualifiedName.substring(0, idx));
     }
 
 
@@ -1076,25 +1103,25 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      */
     public ProgramVariable getAttribute(String programName,
             String qualifiedClassName) {
-    	if (qualifiedClassName == null || qualifiedClassName.length() == 0) {
-    		throw new IllegalArgumentException("Missing qualified classname");
-    	}
+        if (qualifiedClassName == null || qualifiedClassName.length() == 0) {
+            throw new IllegalArgumentException("Missing qualified classname");
+        }
 
-    	KeYJavaType kjt = null;
-    	try {
-	    kjt = getTypeByClassName(qualifiedClassName);
-    	} catch (Exception e) {
-    		if (qualifiedClassName.endsWith("]")) {
-    			readJavaBlock("{" + qualifiedClassName + " k;}");
-    			kjt = getKeYJavaType(qualifiedClassName);
-    		}
-    	}
+        KeYJavaType kjt = null;
+        try {
+            kjt = getTypeByClassName(qualifiedClassName);
+        } catch (Exception e) {
+            if (qualifiedClassName.endsWith("]")) {
+                readJavaBlock("{" + qualifiedClassName + " k;}");
+                kjt = getKeYJavaType(qualifiedClassName);
+            }
+        }
 
-    	if (kjt == null) {
-    		throw new UnknownJavaTypeException("Java type '" + qualifiedClassName + "' not known.");
-    	}
+        if (kjt == null) {
+            throw new UnknownJavaTypeException("Java type '" + qualifiedClassName + "' not known.");
+        }
 
-    	return getAttribute(programName, kjt);
+        return getAttribute(programName, kjt);
     }
 
 
@@ -1104,29 +1131,29 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      * @return the attribute of the given name declared in <tt>classType</tt>
      */
     public ProgramVariable getAttribute(final String name,
-					KeYJavaType classType) {
-	if (classType.getJavaType() instanceof ArrayDeclaration) {
-	    ProgramVariable res = find(name,
-		    getFields(((ArrayDeclaration) classType.getJavaType())
-		            .getMembers()));
-	    if (res == null) {
-		return getAttribute(name, getJavaLangObject());
-	    }
-	    return res;
-	} else {
-	    final ImmutableList<Field> list = kpmi
-		    .getAllFieldsLocallyDeclaredIn(classType);
-	    for (Field aList : list) {
-		final Field f = aList;
-		if (f != null
-		        && (f.getName().equals(name) || f.getProgramName()
-		                .equals(name))) {
-		    return (ProgramVariable) f
-			    .getProgramVariable();
-		}
-	    }
-	}
-	return null;
+            KeYJavaType classType) {
+        if (classType.getJavaType() instanceof ArrayDeclaration) {
+            ProgramVariable res = find(name,
+                    getFields(((ArrayDeclaration) classType.getJavaType())
+                            .getMembers()));
+            if (res == null) {
+                return getAttribute(name, getJavaLangObject());
+            }
+            return res;
+        } else {
+            final ImmutableList<Field> list = kpmi
+                    .getAllFieldsLocallyDeclaredIn(classType);
+            for (Field aList : list) {
+                final Field f = aList;
+                if (f != null
+                        && (f.getName().equals(name) || f.getProgramName()
+                                .equals(name))) {
+                    return (ProgramVariable) f
+                            .getProgramVariable();
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -1134,15 +1161,15 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      * in object type <tt>s</tt>
      */
     public ProgramVariable getAttribute(String attributeName, Sort s) {
-	assert s.extendsTrans(objectSort());
+        assert s.extendsTrans(objectSort());
         return getAttribute(attributeName, getKeYJavaType(s));
     }
-    
+
     /*
      * Traverses the type hierarchy to find the first {@link KeYJavaType} in which
      * a field of name {@code fieldName} is declared, starting from parameter {@code kjt}. And
      * then returns a {@link ProgramVariable} for that field/type combination.
-    
+
      * Type detection in this method is canonical, i.e. selecting a field of name
      * {@code fieldName} on an object of (dynamic) type {@code kjt} during Java program
      * execution would end up in the same type as the type of the returned {@link ProgramVariable}.
@@ -1157,10 +1184,10 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
     }
 
     public ImmutableList<ProgramVariable> getAllAttributes(String programName,
-                                                  KeYJavaType type) {
+            KeYJavaType type) {
         return getAllAttributes(programName, type, true);
     }
-    
+
     /**
      * returns a list of all attributes with the given program name
      * declared in one of <tt>type</tt>'s sub- or supertype including
@@ -1179,19 +1206,19 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      * @return list of found attributes with name <tt>programName</tt>
      */
     public ImmutableList<ProgramVariable> getAllAttributes(String programName,
-                                                  KeYJavaType type,
-                                                  boolean traverseSubtypes) {
+            KeYJavaType type,
+            boolean traverseSubtypes) {
         ImmutableList<ProgramVariable> result =
-            ImmutableSLList.<ProgramVariable>nil();
+                ImmutableSLList.<ProgramVariable>nil();
 
-	if (!(type.getSort().extendsTrans(objectSort()))) {
-	    return result;
-	}
+        if (!(type.getSort().extendsTrans(objectSort()))) {
+            return result;
+        }
 
         if (type.getJavaType() instanceof ArrayType) {
             ProgramVariable var = find(programName, getFields
-                        (((ArrayDeclaration)type.getJavaType())
-                         .getMembers()));
+                    (((ArrayDeclaration)type.getJavaType())
+                            .getMembers()));
             if (var != null) { result = result.prepend(var); }
             var = getAttribute(programName, getJavaLangObject());
             if (var != null) { result = result.prepend(var); }
@@ -1213,13 +1240,13 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
 
         final Iterator<KeYJavaType> it = hierarchy.iterator();
         while (it.hasNext()) {
-	    KeYJavaType st = it.next();
-	    if(st != null){
-		final ProgramVariable var = getAttribute(programName, st);
-		if (var != null) {
-		    result = result.prepend(var);
-		}
-	    }
+            KeYJavaType st = it.next();
+            if(st != null){
+                final ProgramVariable var = getAttribute(programName, st);
+                if (var != null) {
+                    result = result.prepend(var);
+                }
+            }
         }
 
         return result;
@@ -1227,7 +1254,9 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
 
 
     protected void fillCommonTypesCache() {
-        if (commonTypesCacheValid) return;
+        if (commonTypesCacheValid) {
+            return;
+        }
         synchronized(commonTypesLock) {
             if (!commonTypesCacheValid) {
                 final String[] fullNames = new String[] {"java.lang.Object",
@@ -1277,7 +1306,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      */
     public Sort objectSort() {
         if (getJavaLangObject() == null) {
-            return (Sort) services.getNamespaces().sorts().lookup("java.lang.Object");
+            return services.getNamespaces().sorts().lookup("java.lang.Object");
         } else {
             return getJavaLangObject().getSort();
         }
@@ -1288,7 +1317,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      */
     public Sort cloneableSort() {
         if (getJavaLangCloneable() == null) {
-            return (Sort) services.getNamespaces().sorts().lookup("java.lang.Cloneable");
+            return services.getNamespaces().sorts().lookup("java.lang.Cloneable");
         } else {
             return getJavaLangCloneable().getSort();
         }
@@ -1299,14 +1328,14 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      */
     public Sort serializableSort() {
         if (getJavaIoSerializable() == null) {
-            return (Sort) services.getNamespaces().sorts().lookup("java.io.Serializable");
+            return services.getNamespaces().sorts().lookup("java.io.Serializable");
         } else {
             return getJavaIoSerializable().getSort();
         }
     }
 
     public Sort nullSort() {
-	return getNullType().getSort();
+        return getNullType().getSort();
     }
 
     /**
@@ -1379,8 +1408,9 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
     public ImmutableList<KeYJavaType> getAllSupertypes(KeYJavaType type) {
         if (type.getJavaType() instanceof ArrayType) {
             ImmutableList<KeYJavaType> res = ImmutableSLList.<KeYJavaType>nil();
-            for (Sort s: getSuperSorts(type.getSort()))
+            for (Sort s: getSuperSorts(type.getSort())) {
                 res = res.append(getKeYJavaType(s));
+            }
             return res;
         }
         return kpmi.getAllSupertypes(type);
@@ -1389,10 +1419,11 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
     private ImmutableList<Sort> getSuperSorts(Sort sort){
         ImmutableList<Sort> res = ImmutableSLList.<Sort>nil();
         final Sort object = getJavaLangObject().getSort();
-        if (sort != object)
+        if (sort != object) {
             for (Sort exsort: sort.extendsSorts(services)) {
                 res = res.append(getSuperSorts(exsort)).append(exsort);
             }
+        }
         return res;
     }
 
@@ -1408,7 +1439,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      * @return the field of the given name
      */
     public ProgramVariable lookupVisibleAttribute(String programName,
-                                                  KeYJavaType classType) {
+            KeYJavaType classType) {
         return find(programName, kpmi.getAllVisibleFields(classType));
     }
 
@@ -1427,7 +1458,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
     public ImmutableList<KeYJavaType> getCommonSubtypes(KeYJavaType k1, KeYJavaType k2) {
         final Pair<KeYJavaType,KeYJavaType> ck = new Pair<KeYJavaType, KeYJavaType>(k1, k2);
 
-        
+
         synchronized(commonSubTypesLock) {
             ImmutableList<KeYJavaType> result = commonSubtypeCache.get(ck);
 
@@ -1496,7 +1527,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
                             1);
                     services.getNamespaces().functions().add(inv);
                 }
-            }        
+            }
         }
         return inv;
     }
@@ -1523,27 +1554,27 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
      * Returns the special symbol <code>&lt;staticInv&gt;</code> which stands for the static invariant of a type.
      */
     public IObserverFunction getStaticInv(KeYJavaType target) {
-       // TODO: Create functions when source code is parsed and register them in namespace. Return only functions from namespace here. No lazy creation to ensure that all proofs of the same proof environment have the same <$inv> symbols.
-       synchronized(staticInvs) {
-           ObserverFunction inv = staticInvs.get(target);
-           if (inv == null) {
-               inv = (ObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<$inv>", target));
-               if (inv == null) {
-                   inv = new ObserverFunction("<$inv>",
-                           Sort.FORMULA,
-                           null,
-                           services.getTypeConverter().getHeapLDT().targetSort(),
-                           target,
-                           true,
-                           new ImmutableArray<KeYJavaType>(),
-                           HeapContext.getModHeaps(services, false).size(),
-                           1);
-                   services.getNamespaces().functions().add(inv);
-               }
-               staticInvs.put(target, inv);
-           }
-           return inv;
-       }
+        // TODO: Create functions when source code is parsed and register them in namespace. Return only functions from namespace here. No lazy creation to ensure that all proofs of the same proof environment have the same <$inv> symbols.
+        synchronized(staticInvs) {
+            ObserverFunction inv = staticInvs.get(target);
+            if (inv == null) {
+                inv = (ObserverFunction) services.getNamespaces().functions().lookup(ObserverFunction.createName("<$inv>", target));
+                if (inv == null) {
+                    inv = new ObserverFunction("<$inv>",
+                            Sort.FORMULA,
+                            null,
+                            services.getTypeConverter().getHeapLDT().targetSort(),
+                            target,
+                            true,
+                            new ImmutableArray<KeYJavaType>(),
+                            HeapContext.getModHeaps(services, false).size(),
+                            1);
+                    services.getNamespaces().functions().add(inv);
+                }
+                staticInvs.put(target, inv);
+            }
+            return inv;
+        }
     }
 
     /**
@@ -1589,6 +1620,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
         /** the universally satisfied filter */
         final static Filter TRUE = new Filter() {
 
+            @Override
             public boolean isSatisfiedBy(ProgramElement pe) {
                 return true;
             }
@@ -1599,6 +1631,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
          */
         final static Filter IMPLICITFIELD = new Filter() {
 
+            @Override
             public boolean isSatisfiedBy(ProgramElement pe) {
                 return pe instanceof ImplicitFieldSpecification;
             }
@@ -1627,7 +1660,7 @@ public KeYJavaType getPrimitiveKeYJavaType(PrimitiveType type) {
         KeYJavaType result = getTypeByName(name);
         if (result == null) {
             if (containerType != null) {
-                   result = kpmi.resolveType(name, containerType);
+                result = kpmi.resolveType(name, containerType);
             }
 
             if (result == null) {

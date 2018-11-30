@@ -540,12 +540,17 @@ public final class SpecificationRepository {
         final KeYJavaType kjt = contract.getKJT();
         final Pair<KeYJavaType, IObserverFunction> tp = new Pair<KeYJavaType, IObserverFunction>(
                 kjt, contract.getTarget());
-        contracts.put(tp, contracts.get(tp).remove(contract));
+        synchronized(contracts) {
+            contracts.put(tp, contracts.get(tp).remove(contract));
+        }
         if (contract instanceof FunctionalOperationContract) {
             final Pair<KeYJavaType, IProgramMethod> tp2 = new Pair<KeYJavaType, IProgramMethod>(
                     tp.first, (IProgramMethod) tp.second);
-            operationContracts.put(tp2, operationContracts.get(tp2)
-                    .remove((FunctionalOperationContract) contract));
+            synchronized(operationContracts) {
+                operationContracts.put(tp2, operationContracts.get(tp2)
+                        .remove((FunctionalOperationContract) contract));
+            }
+            
             if (!getWdChecks(contract.getKJT(), contract.getTarget())
                     .isEmpty()) {
                 ImmutableSet<WellDefinednessCheck> wdcs = getWdChecks(
@@ -769,8 +774,10 @@ public final class SpecificationRepository {
      */
     public ImmutableSet<Contract> getAllContracts() {
         ImmutableSet<Contract> result = DefaultImmutableSet.<Contract> nil();
-        for (ImmutableSet<Contract> s : contracts.values()) {
-            result = result.union(s);
+        synchronized(contracts) {
+            for (ImmutableSet<Contract> s : contracts.values()) {
+                result = result.union(s);
+            }
         }
         return WellDefinednessCheck.isOn() ? result : removeWdChecks(result);
     }
@@ -783,10 +790,11 @@ public final class SpecificationRepository {
         assert kjt != null;
         assert target != null;
         target = getCanonicalFormForKJT(target, kjt);
-        final Pair<KeYJavaType, IObserverFunction> pair = new Pair<KeYJavaType, IObserverFunction>(
-                kjt, target);
-        final ImmutableSet<Contract> result = WellDefinednessCheck.isOn()
-                ? contracts.get(pair) : removeWdChecks(contracts.get(pair));
+        final Pair<KeYJavaType, IObserverFunction> pair = new Pair<>(kjt, target);
+        final ImmutableSet<Contract> result;
+        synchronized(contracts) {
+            result = WellDefinednessCheck.isOn() ? contracts.get(pair) : removeWdChecks(contracts.get(pair));
+        }
         return result == null ? DefaultImmutableSet.<Contract> nil() : result;
     }
 
@@ -797,10 +805,10 @@ public final class SpecificationRepository {
     public ImmutableSet<FunctionalOperationContract> getOperationContracts(
             KeYJavaType kjt, IProgramMethod pm) {
         pm = (IProgramMethod) getCanonicalFormForKJT(pm, kjt);
-        final Pair<KeYJavaType, IProgramMethod> pair = new Pair<KeYJavaType, IProgramMethod>(
-                kjt, pm);
-        final ImmutableSet<FunctionalOperationContract> result = operationContracts
-                .get(pair);
+        final ImmutableSet<FunctionalOperationContract> result;
+        synchronized(operationContracts) {
+            result = operationContracts.get(new Pair<>(kjt, pm));
+        }
         return result == null
                 ? DefaultImmutableSet.<FunctionalOperationContract> nil()
                 : result;
@@ -812,8 +820,7 @@ public final class SpecificationRepository {
      */
     public ImmutableSet<FunctionalOperationContract> getOperationContracts(
             KeYJavaType kjt, IProgramMethod pm, Modality modality) {
-        ImmutableSet<FunctionalOperationContract> result = getOperationContracts(
-                kjt, pm);
+        ImmutableSet<FunctionalOperationContract> result = getOperationContracts(kjt, pm);
         final boolean transactionModality = (modality == Modality.DIA_TRANSACTION
                 || modality == Modality.BOX_TRANSACTION);
         final Modality matchModality = transactionModality
@@ -1282,36 +1289,42 @@ public final class SpecificationRepository {
         if (ax instanceof RepresentsAxiom) {
             // there may only be one conjoined represents axiom per model field
             RepresentsAxiom oldRep = getRepresentsAxiom(kjt, ax);
-            if (oldRep != null) {
-                final RepresentsAxiom newRep = oldRep
-                        .conjoin((RepresentsAxiom) ax, tb);
-                axioms.put(kjt, currentAxioms.remove(oldRep).add(newRep));
-            } else {
-                axioms.put(kjt, currentAxioms.add(ax));
+            synchronized(axioms) {
+                if (oldRep != null) {
+                    final RepresentsAxiom newRep = oldRep
+                            .conjoin((RepresentsAxiom) ax, tb);
+                    axioms.put(kjt, currentAxioms.remove(oldRep).add(newRep));
+                } else {
+                    axioms.put(kjt, currentAxioms.add(ax));
+                }
             }
             // inherit represents clauses to subclasses and conjoin together
             if (VisibilityModifier.allowsInheritance(ax.getVisibility())) {
                 final ImmutableList<KeYJavaType> subs = services.getJavaInfo()
                         .getAllSubtypes(kjt);
-                for (KeYJavaType sub : subs) {
-                    RepresentsAxiom subAx = ((RepresentsAxiom) ax).setKJT(sub);
-                    currentAxioms = axioms.get(sub);
-                    if (currentAxioms == null) {
-                        currentAxioms = DefaultImmutableSet.<ClassAxiom> nil();
-                    }
-                    oldRep = getRepresentsAxiom(sub, subAx);
-                    if (oldRep == null)
-                        axioms.put(sub, currentAxioms.add(subAx));
-                    else {
-                        final RepresentsAxiom newSubRep = oldRep.conjoin(subAx,
-                                tb);
-                        axioms.put(sub,
-                                currentAxioms.remove(oldRep).add(newSubRep));
+                synchronized(axioms) {
+                    for (KeYJavaType sub : subs) {
+                        RepresentsAxiom subAx = ((RepresentsAxiom) ax).setKJT(sub);
+                        currentAxioms = axioms.get(sub);
+                        if (currentAxioms == null) {
+                            currentAxioms = DefaultImmutableSet.<ClassAxiom> nil();
+                        }
+                        oldRep = getRepresentsAxiom(sub, subAx);
+                        if (oldRep == null)
+                            axioms.put(sub, currentAxioms.add(subAx));
+                        else {
+                            final RepresentsAxiom newSubRep = oldRep.conjoin(subAx,
+                                    tb);
+                            axioms.put(sub,
+                                    currentAxioms.remove(oldRep).add(newSubRep));
+                        }
                     }
                 }
             }
         } else {
-            axioms.put(kjt, currentAxioms.add(ax));
+            synchronized(axioms) {
+                axioms.put(kjt, currentAxioms.add(ax));
+            }
         }
     }
 
@@ -1329,15 +1342,17 @@ public final class SpecificationRepository {
      */
     public ImmutableSet<Proof> getProofs(ProofOblInput po) {
         ImmutableSet<Proof> result = DefaultImmutableSet.<Proof> nil();
-        for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs
-                .entrySet()) {
-            ProofOblInput mapPO = entry.getKey();
-            ImmutableSet<Proof> sop = entry.getValue();
-            if (mapPO.implies(po)) {
-                result = result.union(sop);
+        synchronized(proofs) {
+            for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs
+                    .entrySet()) {
+                ProofOblInput mapPO = entry.getKey();
+                ImmutableSet<Proof> sop = entry.getValue();
+                if (mapPO.implies(po)) {
+                    result = result.union(sop);
+                }
             }
+            return result;
         }
-        return result;
     }
 
     /**
@@ -1345,17 +1360,18 @@ public final class SpecificationRepository {
      * combined contracts including the passed atomic contract
      */
     public ImmutableSet<Proof> getProofs(Contract atomicContract) {
-        assert !atomicContract.getName().contains(
-                CONTRACT_COMBINATION_MARKER) : "Contract must be atomic";
+        assert !atomicContract.getName().contains(CONTRACT_COMBINATION_MARKER) : "Contract must be atomic";
 
         ImmutableSet<Proof> result = DefaultImmutableSet.<Proof> nil();
-        for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs
-                .entrySet()) {
-            final ProofOblInput po = entry.getKey();
-            if (po instanceof ContractPO) {
-                final Contract poContract = ((ContractPO) po).getContract();
-                if (splitContract(poContract).contains(atomicContract)) {
-                    result = result.union(entry.getValue());
+        synchronized(proofs) {
+            for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs
+                    .entrySet()) {
+                final ProofOblInput po = entry.getKey();
+                if (po instanceof ContractPO) {
+                    final Contract poContract = ((ContractPO) po).getContract();
+                    if (splitContract(poContract).contains(atomicContract)) {
+                        result = result.union(entry.getValue());
+                    }
                 }
             }
         }
@@ -1368,20 +1384,20 @@ public final class SpecificationRepository {
      */
     public ImmutableSet<Proof> getProofs(KeYJavaType kjt,
             IObserverFunction target) {
-        final ImmutableSet<Pair<KeYJavaType, IObserverFunction>> targets = getOverridingTargets(
-                kjt, target).add(
-                        new Pair<KeYJavaType, IObserverFunction>(kjt, target));
+        final ImmutableSet<Pair<KeYJavaType, IObserverFunction>> targets = 
+                getOverridingTargets(kjt, target).add(new Pair<>(kjt, target));
         ImmutableSet<Proof> result = DefaultImmutableSet.<Proof> nil();
-        for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs
-                .entrySet()) {
-            final ProofOblInput po = entry.getKey();
-            final ImmutableSet<Proof> sop = entry.getValue();
-            if (po instanceof ContractPO) {
-                final Contract contract = ((ContractPO) po).getContract();
-                final Pair<KeYJavaType, IObserverFunction> pair = new Pair<KeYJavaType, IObserverFunction>(
-                        contract.getKJT(), contract.getTarget());
-                if (targets.contains(pair)) {
-                    result = result.union(sop);
+        synchronized(proofs) {
+            for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs.entrySet()) {
+                final ProofOblInput po = entry.getKey();
+                final ImmutableSet<Proof> sop = entry.getValue();
+                if (po instanceof ContractPO) {
+                    final Contract contract = ((ContractPO) po).getContract();
+                    final Pair<KeYJavaType, IObserverFunction> pair = 
+                            new Pair<>(contract.getKJT(), contract.getTarget());
+                    if (targets.contains(pair)) {
+                        result = result.union(sop);
+                    }
                 }
             }
         }
@@ -1393,9 +1409,11 @@ public final class SpecificationRepository {
      */
     public ImmutableSet<Proof> getAllProofs() {
         ImmutableSet<Proof> result = DefaultImmutableSet.<Proof> nil();
-        Collection<ImmutableSet<Proof>> proofSets = proofs.values();
-        for (ImmutableSet<Proof> proofSet : proofSets) {
-            result = result.union(proofSet);
+        synchronized(proofs) {
+            Collection<ImmutableSet<Proof>> proofSets = proofs.values();
+            for (ImmutableSet<Proof> proofSet : proofSets) {
+                result = result.union(proofSet);
+            }
         }
         return result;
     }
@@ -1416,22 +1434,26 @@ public final class SpecificationRepository {
      * Returns the PO that the passed contract is about, or null.
      */
     public ContractPO getPO(Contract c) {
-        for (ProofOblInput po : proofs.keySet()) {
-            if (po instanceof ContractPO
-                    && ((ContractPO) po).getContract().equals(c)) {
-                return (ContractPO) po;
+        synchronized(proofs) {
+            for (ProofOblInput po : proofs.keySet()) {
+                if (po instanceof ContractPO
+                        && ((ContractPO) po).getContract().equals(c)) {
+                    return (ContractPO) po;
+                }
             }
         }
         return null;
     }
 
     public ContractPO getPOForProof(Proof proof) {
-        for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs
-                .entrySet()) {
-            ProofOblInput po = entry.getKey();
-            ImmutableSet<Proof> sop = entry.getValue();
-            if (sop.contains(proof) && po instanceof ContractPO) {
-                return (ContractPO) po;
+        synchronized(proofs) {
+            for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs
+                    .entrySet()) {
+                ProofOblInput po = entry.getKey();
+                ImmutableSet<Proof> sop = entry.getValue();
+                if (sop.contains(proof) && po instanceof ContractPO) {
+                    return (ContractPO) po;
+                }
             }
         }
         return null;
@@ -1447,12 +1469,14 @@ public final class SpecificationRepository {
      *         {@code null} if not available.
      */
     public ProofOblInput getProofOblInput(Proof proof) {
-        for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs
-                .entrySet()) {
-            ProofOblInput po = entry.getKey();
-            ImmutableSet<Proof> sop = entry.getValue();
-            if (sop.contains(proof)) {
-                return po;
+        synchronized(proofs) {
+            for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs
+                    .entrySet()) {
+                ProofOblInput po = entry.getKey();
+                ImmutableSet<Proof> sop = entry.getValue();
+                if (sop.contains(proof)) {
+                    return po;
+                }
             }
         }
         return null;
@@ -1470,24 +1494,28 @@ public final class SpecificationRepository {
      * Registers the passed proof.
      */
     public void registerProof(ProofOblInput po, Proof proof) {
-        proofs.put(po, getProofs(po).add(proof));
+        synchronized(proofs) {
+            proofs.put(po, getProofs(po).add(proof));
+        }
     }
 
     /**
      * Unregisters the passed proof.
      */
     public void removeProof(Proof proof) {
-        for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs
-                .entrySet()) {
-            ImmutableSet<Proof> sop = entry.getValue();
-            if (sop.contains(proof)) {
-                sop = sop.remove(proof);
-                if (sop.size() == 0) {
-                    proofs.remove(entry.getKey());
-                } else {
-                    proofs.put(entry.getKey(), sop);
+        synchronized(proofs) {
+            for (Map.Entry<ProofOblInput, ImmutableSet<Proof>> entry : proofs
+                    .entrySet()) {
+                ImmutableSet<Proof> sop = entry.getValue();
+                if (sop.contains(proof)) {
+                    sop = sop.remove(proof);
+                    if (sop.size() == 0) {
+                        proofs.remove(entry.getKey());
+                    } else {
+                        proofs.put(entry.getKey(), sop);
+                    }
+                    return;
                 }
-                return;
             }
         }
     }
@@ -1499,10 +1527,13 @@ public final class SpecificationRepository {
         final int line = loop.getStartPosition().getLine();
         Pair<LoopStatement, Integer> l = new Pair<LoopStatement, Integer>(loop,
                 line);
-        LoopSpecification inv = loopInvs.get(l);
-        if (inv == null && line != -1) {
-            l = new Pair<LoopStatement, Integer>(loop, -1);
+        LoopSpecification inv;
+        synchronized(loopInvs) {
             inv = loopInvs.get(l);
+            if (inv == null && line != -1) {
+                l = new Pair<LoopStatement, Integer>(loop, -1);
+                inv = loopInvs.get(l);
+            }
         }
         return inv;
     }
@@ -1535,17 +1566,22 @@ public final class SpecificationRepository {
         final int line = loop.getStartPosition().getLine();
         Pair<LoopStatement, Integer> l = new Pair<LoopStatement, Integer>(loop,
                 line);
-        loopInvs.put(l, inv);
-        if (line != -1) {
-            l = new Pair<LoopStatement, Integer>(loop, -1);
+        synchronized(loopInvs) {
             loopInvs.put(l, inv);
+            if (line != -1) {
+                l = new Pair<LoopStatement, Integer>(loop, -1);
+                loopInvs.put(l, inv);
+            }
         }
     }
 
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
-        final ImmutableSet<BlockContract> contracts = blockContracts.get(b);
+        final ImmutableSet<BlockContract> contracts;
+        synchronized(blockContracts) {
+            contracts = blockContracts.get(b);
+        }
         if (contracts == null) {
             return DefaultImmutableSet.<BlockContract> nil();
         } else {
@@ -1556,7 +1592,10 @@ public final class SpecificationRepository {
     public ImmutableSet<LoopContract> getLoopContracts(StatementBlock block) {
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
-        final ImmutableSet<LoopContract> contracts = loopContracts.get(b);
+        final ImmutableSet<LoopContract> contracts;
+        synchronized(loopContracts) {
+            contracts = loopContracts.get(b);
+        }
         if (contracts == null) {
             return DefaultImmutableSet.<LoopContract> nil();
         } else {
@@ -1566,7 +1605,10 @@ public final class SpecificationRepository {
 
     public ImmutableSet<MergeContract> getMergeContracts(
             MergePointStatement mps) {
-        final ImmutableSet<MergeContract> contracts = mergeContracts.get(mps);
+        final ImmutableSet<MergeContract> contracts;
+        synchronized(mergeContracts) {
+            contracts = mergeContracts.get(mps);
+        }
         if (contracts == null) {
             return DefaultImmutableSet.<MergeContract> nil();
         } else {
@@ -1625,7 +1667,9 @@ public final class SpecificationRepository {
         final StatementBlock block = contract.getBlock();
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
-        blockContracts.put(b, getBlockContracts(block).add(contract));
+        synchronized(blockContracts) {
+            blockContracts.put(b, getBlockContracts(block).add(contract));
+        }
 
         if (addFunctionalContract) {
             addContract(cf.funcBlock(contract));
@@ -1643,9 +1687,10 @@ public final class SpecificationRepository {
         final StatementBlock block = contract.getBlock();
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
-
-        ImmutableSet<BlockContract> set = blockContracts.get(b);
-        blockContracts.put(b, set.remove(contract));
+        synchronized(blockContracts) {
+            ImmutableSet<BlockContract> set = blockContracts.get(b);
+            blockContracts.put(b, set.remove(contract));
+        }
     }
 
     /**
@@ -1669,9 +1714,11 @@ public final class SpecificationRepository {
         final StatementBlock block = contract.getBlock();
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
-        loopContracts.put(b, getLoopContracts(block).add(contract));
-
-        if (addFunctionalContract) {
+        synchronized(loopContracts) {
+            loopContracts.put(b, getLoopContracts(block).add(contract));
+        }
+        
+        if (addFunctionalContract) {            
             addContract(cf.funcLoop(contract));
         }
     }
@@ -1687,9 +1734,10 @@ public final class SpecificationRepository {
         final StatementBlock block = contract.getBlock();
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
-
-        ImmutableSet<LoopContract> set = loopContracts.get(b);
-        loopContracts.put(b, set.remove(contract));
+        synchronized(loopContracts) {
+            ImmutableSet<LoopContract> set = loopContracts.get(b);
+            loopContracts.put(b, set.remove(contract));
+        }
     }
 
     /**
@@ -1700,7 +1748,9 @@ public final class SpecificationRepository {
      */
     public void addMergeContract(final MergeContract mc) {
         final MergePointStatement mps = mc.getMergePointStatement();
-        mergeContracts.put(mps, getMergeContracts(mps).add(mc));
+        synchronized(mergeContracts) {
+            mergeContracts.put(mps, getMergeContracts(mps).add(mc));
+        }
     }
 
     /**
