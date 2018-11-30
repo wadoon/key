@@ -226,6 +226,12 @@ lexer grammar KeYLexer;
 	PROGRAMVARIABLES : '\\programVariables';
 
         // Keywords for varcond and related stuff
+    CREATE_MUTUAL_EXCLUSION_FORMULA : '\\createMutualExclusionFormula' ;
+    PREFIX_CONTAINS_ELEMENT : '\\prefixContainsElement' ;
+    INSTANTIATE_VARS_FRESH : '\\instantiateVarsFresh' ;
+    STORE_RESULT_VAR_IN : '\\storeResultVarIn' ;
+    STORE_CONTEXT_LABELS_IN : '\\storeContextLabelsIn' ;
+	ISNULL : '\\isnull';
 	VARCOND : '\\varcond';
 	APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';
         DEPENDINGON : '\\dependingOn';

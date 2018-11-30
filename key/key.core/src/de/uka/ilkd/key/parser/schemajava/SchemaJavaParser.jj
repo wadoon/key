@@ -592,6 +592,8 @@ TOKEN :
 		    | < SWITCHTOIF: "#switch-to-if" >
 		    | < UNPACK: "#unpack" >
 		    | < FORINITUNFOLDTRANSFORMER: "#forInitUnfoldTransformer" >
+		    | < FOREACH: "#foreach" >
+		    | < IN: "in" >
 		    | < SET: "#set" >
 		    }
 
@@ -3591,13 +3593,13 @@ Statement Statement() :
 		throw new ParseException("ExpressionStatement expected");
 	    }
 	}
+     | result = KeYMetaConstructStatement()
      | result = SwitchStatement()
      | result = IfStatement()
      | result = WhileStatement()
      | result = MergePointStatement()
      | result = LoopScopeStatement()
      | result = AbstractPlaceholderStatement()
-     | result = KeYMetaConstructStatement()
      | result = DoStatement()
      | result = ForStatement()
      | result = TransactionStatement()
@@ -4143,13 +4145,39 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
     LabeledStatement labStat;
     Statement stat;
     Expression methRef, consRef, activeAccess;
-    ProgramVariableSVWrapper sv = null;
+    ProgramVariableSVWrapper sv = null, sv1 = null;
     ExecCtxtSVWrapper execsv = null;
     JumpLabelSVWrapper innerLabel, outerLabel;
     ASTList<LoopInitializer> loopInit;
 }
-{ (
-   "#unwind-loop" "("
+{ 
+  //(
+  //  "#foreach" "(" ( sv = VariableSV() ) "," ( sv1 = VariableSV() ) "," ( stat = Statement() ) ")" ";"
+  //   {
+  //     result = factory.createRKeYMetaConstruct();
+  //     setPrefixInfo(result);
+  //     result.addSV(sv);
+  //     result.addSV(sv1);
+  //     result.setChild(stat);
+  //     result.setName("#foreach");
+  //     return result;
+  //   }
+  //)
+  (
+    "#foreach" "(" { result = factory.createRKeYMetaConstruct(); }
+      ( sv = VariableSV() { result.addSV(sv); } ) ( "," sv = VariableSV() { result.addSV(sv); } ) *
+      "in"
+      ( sv = VariableSV() { result.addSV(sv); } ) ( "," sv = VariableSV() { result.addSV(sv); } ) *
+    ")" "{" (stat = Statement()) "}"
+     {
+       setPrefixInfo(result);
+       result.setChild(stat);
+       result.setName("#foreach");
+       return result;
+     }
+  )
+  |
+   ("#unwind-loop" "("
    (innerLabel = JumpLabelSV() "," outerLabel = JumpLabelSV() ","
       (  loopStat = WhileStatement()
        | loopStat = ForStatement()
@@ -4157,15 +4185,15 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
       )
     )
    ")" ";"
-{
-    result = factory.createRKeYMetaConstruct();
-    setPrefixInfo(result);
-    result.setChild(loopStat);
-    result.addSV(innerLabel);
-    result.addSV(outerLabel);
-    result.setName("#unwind-loop");
-    return result;
-}
+   {
+       result = factory.createRKeYMetaConstruct();
+       setPrefixInfo(result);
+       result.setChild(loopStat);
+       result.addSV(innerLabel);
+       result.addSV(outerLabel);
+       result.setName("#unwind-loop");
+       return result;
+   }
    )
      |
      (

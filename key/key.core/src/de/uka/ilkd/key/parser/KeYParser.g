@@ -3836,7 +3836,13 @@ varexp[TacletBuilder b]
 }
 :
   ( varcond_applyUpdateOnRigid[b]
+    | varcond_createMutualExclusionFormula[b]
+    | varcond_prefixContainsElement[b, negated]
     | varcond_dropEffectlessElementaries[b]
+    | varcond_instantiateVarsFresh[b]
+    | varcond_storeResultVarIn[b]
+    | varcond_storeContextLabelsIn[b]
+    | varcond_isNull[b, negated]
     | varcond_abstractUpdate[b, negated]
     | varcond_dropEffectlessStores[b]
     | varcond_enum_const[b]
@@ -3855,7 +3861,9 @@ varexp[TacletBuilder b]
   | 
   ( (NOT_ {negated = true;} )? 
     (   varcond_abstractOrInterface[b, negated]
+        | varcond_prefixContainsElement[b, negated]
 	    | varcond_array[b, negated]
+        | varcond_isNull[b, negated]
         | varcond_abstractUpdate[b, negated]
         | varcond_array_length[b, negated]	
         | varcond_enumtype[b, negated]
@@ -3888,6 +3896,30 @@ varcond_applyUpdateOnRigid [TacletBuilder b]
    }
 ;
 
+varcond_instantiateVarsFresh[TacletBuilder b]
+:
+   INSTANTIATE_VARS_FRESH LPAREN varsList=varId COMMA varsListForLength=varId COMMA namePattern=string_literal COMMA t=keyjavatype RPAREN 
+   {
+      b.addVariableCondition(new InstantiateVarsFreshCondition((ProgramSV) varsList, (ProgramSV) varsListForLength, namePattern, t));
+   }
+;
+
+varcond_storeResultVarIn[TacletBuilder b]
+:
+   STORE_RESULT_VAR_IN LPAREN sv=varId RPAREN 
+   {
+      b.addVariableCondition(new StoreResultVarInCondition((ProgramSV) sv));
+   }
+;
+
+varcond_storeContextLabelsIn[TacletBuilder b]
+:
+   STORE_CONTEXT_LABELS_IN LPAREN sv=varId RPAREN 
+   {
+      b.addVariableCondition(new StoreContextLabelsInCondition((ProgramSV) sv));
+   }
+;
+
 varcond_dropEffectlessElementaries[TacletBuilder b]
 :
    DROP_EFFECTLESS_ELEMENTARIES LPAREN u=varId COMMA x=varId COMMA result=varId RPAREN 
@@ -3903,6 +3935,37 @@ varcond_abstractUpdate[TacletBuilder b, boolean negated]
    ABSTRACT_UPDATE LPAREN u=varId RPAREN 
    {
       b.addVariableCondition(new AbstractUpdateCondition((UpdateSV)u, negated));
+   }
+;
+
+varcond_createMutualExclusionFormula[TacletBuilder b]
+@init{
+  CreateMutualExclusionFormulaCondition cond = new CreateMutualExclusionFormulaCondition();
+}
+:
+   CREATE_MUTUAL_EXCLUSION_FORMULA
+   LPAREN 
+     fmlSv=varId { cond.setTargetFormulaSV((FormulaSV) fmlSv); }
+     ( COMMA sv=varId { cond.addSV((ProgramSV) sv); } ) *
+   RPAREN 
+   {
+      b.addVariableCondition(cond);
+   }
+;
+
+varcond_prefixContainsElement[TacletBuilder b, boolean negated]
+:
+   PREFIX_CONTAINS_ELEMENT LPAREN className=string_literal RPAREN 
+   {
+      b.addVariableCondition(new PrefixContainsElementCondition(className, negated));
+   }
+;
+
+varcond_isNull[TacletBuilder b, boolean negated]
+:
+   ISNULL LPAREN sv=varId RPAREN 
+   {
+      b.addVariableCondition(new IsNullCondition((SchemaVariable) sv, negated));
    }
 ;
 
