@@ -3836,7 +3836,6 @@ varexp[TacletBuilder b]
 }
 :
   ( varcond_applyUpdateOnRigid[b]
-    | varcond_createMutualExclusionFormula[b]
     | varcond_prefixContainsElement[b, negated]
     | varcond_dropEffectlessElementaries[b]
     | varcond_instantiateVarsFresh[b]
@@ -3935,21 +3934,6 @@ varcond_abstractUpdate[TacletBuilder b, boolean negated]
    ABSTRACT_UPDATE LPAREN u=varId RPAREN 
    {
       b.addVariableCondition(new AbstractUpdateCondition((UpdateSV)u, negated));
-   }
-;
-
-varcond_createMutualExclusionFormula[TacletBuilder b]
-@init{
-  CreateMutualExclusionFormulaCondition cond = new CreateMutualExclusionFormulaCondition();
-}
-:
-   CREATE_MUTUAL_EXCLUSION_FORMULA
-   LPAREN 
-     fmlSv=varId { cond.setTargetFormulaSV((FormulaSV) fmlSv); }
-     ( COMMA sv=varId { cond.addSV((ProgramSV) sv); } ) *
-   RPAREN 
-   {
-      b.addVariableCondition(cond);
    }
 ;
 

@@ -21,7 +21,15 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 
@@ -68,8 +76,8 @@ public abstract class Notation {
 	print(t, sp);
     }
 
-    
-    
+
+
     /**
      * The standard concrete syntax for constants like true and false.
      */
@@ -81,7 +89,8 @@ public abstract class Notation {
 	    this.name = name;
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printConstant(t, name);
 	}
     }
@@ -99,7 +108,8 @@ public abstract class Notation {
 	    this.ass = ass;
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printPrefixTerm(name, t, t.sub(0), ass);
 	}
 
@@ -119,7 +129,8 @@ public abstract class Notation {
 	    this.assRight = assRight;
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printInfixTerm(t.sub(0), assLeft, name, t, t.sub(1), assRight);
 	}
 
@@ -127,30 +138,32 @@ public abstract class Notation {
          * Print a term without beginning a new block. This calls the
          * {@link LogicPrinter#printTermContinuingBlock(Term)} method.
          */
-	public void printContinuingBlock(Term t, LogicPrinter sp)
+	@Override
+    public void printContinuingBlock(Term t, LogicPrinter sp)
 		throws IOException {
 	    sp.printInfixTermContinuingBlock(t.sub(0), assLeft, name, t, t.sub(1), assRight);
 	}
 
     }
-    
+
 
     public static final class LabelNotation extends Notation {
-        
+
         private final String left;
         private final String right;
-        
+
         public LabelNotation(String beginLabel, String endLabel, int prio) {
             super(prio);
             left = beginLabel;
             right = endLabel;
         }
-        
+
+        @Override
         public void print(Term t, LogicPrinter sp) throws IOException {
             sp.printLabels(t, left, right);
         }
     }
-    
+
     /**
      * The standard concrete syntax for quantifiers.
      */
@@ -164,12 +177,13 @@ public abstract class Notation {
 	    this.ass = ass;
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), ass);
 	}
 
     }
-    
+
 
     /**
      * The standard concrete syntax for DL modalities box and diamond.
@@ -186,13 +200,14 @@ public abstract class Notation {
 	    this.ass = ass;
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    assert t.op() instanceof Modality;
 	    assert t.javaBlock() != null;
 	    sp.printModalityTerm(left, t.javaBlock(), right, t, ass);
 	}
     }
-    
+
 
     /**
      * The concrete syntax for DL modalities represented with a
@@ -206,13 +221,14 @@ public abstract class Notation {
 	    this.ass = ass;
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printModalityTerm("\\modality{" + t.op().name().toString()
 			+ "}", t.javaBlock(), "\\endmodality", t, ass);
 	}
     }
 
-    
+
     /**
      * The standard concrete syntax for update application.
      */
@@ -222,19 +238,20 @@ public abstract class Notation {
 	    super(115);
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    assert t.op() == UpdateApplication.UPDATE_APPLICATION;
 	    final Operator targetOp = UpdateApplication.getTarget(t).op();
-	    final int assTarget 
-	    = (t.sort() == Sort.FORMULA 
-		    ? (targetOp.arity() == 1 ? 60 : 85) 
+	    final int assTarget
+	    = (t.sort() == Sort.FORMULA
+		    ? (targetOp.arity() == 1 ? 60 : 85)
 			    : 110);
 
 	    sp.printUpdateApplicationTerm("{", "}", t, assTarget);
 	}
     }
-    
-    
+
+
     /**
      * The standard concrete syntax for elementary updates.
      */
@@ -244,14 +261,15 @@ public abstract class Notation {
 	    super(150);
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printElementaryUpdate(":=", t, 0);
 	}
-    }    
-    
-    
+    }
+
+
     /**
-     * The standard concrete syntax for parallel updates 
+     * The standard concrete syntax for parallel updates
      */
     public static final class ParallelUpdateNotation extends Notation {
 
@@ -259,14 +277,15 @@ public abstract class Notation {
 	    super(100);
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    assert t.op() == UpdateJunctor.PARALLEL_UPDATE;
-	    
+
 	    sp.printParallelUpdate("||", t, 10);
 	}
-    }    
-    
-    
+    }
+
+
     /**
       * The standard concrete syntax for substitution terms.
       */
@@ -275,14 +294,15 @@ public abstract class Notation {
 	    super(120);
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    QuantifiableVariable v = instQV(t, sp, 1);
 	    final int assTarget = (t.sort() == Sort.FORMULA ? (t.sub(1)
 		    .op() == Equality.EQUALS ? 75 : 60) : 110);
 	    sp.printSubstTerm("{\\subst ", v, t.sub(0), 0, "}", t.sub(1),
 		    assTarget);
 	}
-	
+
 	private QuantifiableVariable instQV(Term t, LogicPrinter sp, int subTerm) {
 	    QuantifiableVariable v = t.varsBoundHere(subTerm).get(0);
 
@@ -300,7 +320,7 @@ public abstract class Notation {
 	}
     }
 
-    
+
     /**
      * The standard concrete syntax for function and predicate terms.
      */
@@ -310,12 +330,13 @@ public abstract class Notation {
 	    super(130);
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printFunctionTerm(t);
 	}
     }
 
-    
+
     /**
      * The standard concrete syntax for casts.
      */
@@ -332,11 +353,12 @@ public abstract class Notation {
 	    this.ass = ass;
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printCast(pre, post, t, ass);
 	}
     }
-    
+
 
     /**
      * The standard concrete syntax for observer function terms.
@@ -388,6 +410,7 @@ public abstract class Notation {
             super(140);
         }
 
+        @Override
         public void print(Term t, LogicPrinter sp) throws IOException {
             sp.printHeapConstructor(t, true);
         }
@@ -402,10 +425,12 @@ public abstract class Notation {
      */
     public static final class StoreNotation extends HeapConstructorNotation {
 
+        @Override
         public void print(Term t, LogicPrinter sp) throws IOException {
             sp.printStore(t, true);
         }
 
+        @Override
         public void printEmbeddedHeap(Term t, LogicPrinter sp) throws IOException {
             sp.printStore(t, false);
         }
@@ -416,20 +441,21 @@ public abstract class Notation {
      * The standard concrete syntax for length.
      */
     public static final class Postfix extends Notation {
-        
+
         private final String postfix;
-        
+
 	public Postfix(String postfix) {
 	    super(130);
 	    this.postfix = postfix;
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printPostfix(t,postfix);
 	}
-    }       
-    
-    
+    }
+
+
     /**
      * The standard concrete syntax for singleton sets.
      */
@@ -439,11 +465,12 @@ public abstract class Notation {
 	    super(130);
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printSingleton(t);
 	}
     }
-    
+
     /**
      * The standard concrete syntax for the element of operator.
      */
@@ -453,24 +480,25 @@ public abstract class Notation {
 	public ElementOfNotation() {
 	    super(130);
 	}
-	
+
 	    public ElementOfNotation(String symbol){
 	        this();
 	        this.symbol = symbol;
 	    }
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printElementOf(t, symbol);
 	}
-    }      
-    
-    
-    
+    }
+
+
+
     /**
      * The standard concrete syntax for set comprehension.
      */
-    
-    
+
+
     /**
      * The standard concrete syntax for conditional terms
      * <code>if (phi) (t1) (t2)</code>.
@@ -484,12 +512,13 @@ public abstract class Notation {
 	    keyword = keyw;
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printIfThenElseTerm(t, keyword);
 	}
     }
 
-    
+
     /**
      * The standard concrete syntax for all kinds of variables.
      */
@@ -498,7 +527,8 @@ public abstract class Notation {
 	    super(1000);
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    if (t.op() instanceof ProgramVariable) {
 		sp
 			.printConstant(t.op().name().toString().replaceAll(
@@ -510,10 +540,11 @@ public abstract class Notation {
 	}
     }
 
-    
+
     public static final class SchemaVariableNotation extends VariableNotation {
 
-	@SuppressWarnings("unchecked")
+	@Override
+    @SuppressWarnings("unchecked")
     public void print(Term t, LogicPrinter sp) throws IOException {
 	    // logger.debug("SSV: " + t+ " [" + t.op() + "]");
 	    Debug.assertTrue(t.op() instanceof SchemaVariable);
@@ -548,7 +579,8 @@ public abstract class Notation {
 			}
 			sp.getLayouter().print("}");
 		    } else {
-			Debug.assertTrue(o instanceof Term);
+//			Debug.assertTrue(o instanceof Term);
+		        if (o instanceof Term)
 			sp.printTerm((Term) o);
 		    }
 		}
@@ -556,7 +588,7 @@ public abstract class Notation {
 	}
     }
 
-    
+
     /**
      * The standard concrete syntax for the number literal indicator `Z'.
      * This is only used in the `Pretty&amp;Untrue' syntax.
@@ -602,7 +634,8 @@ public abstract class Notation {
 	    return number.toString();
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    final String number = printNumberTerm(t);
 	    if (number != null) {
 		sp.printConstant(number);
@@ -611,7 +644,7 @@ public abstract class Notation {
 	    }
 	}
     }
-    
+
 
     /**
      * The standard concrete syntax for the character literal indicator `C'.
@@ -646,7 +679,8 @@ public abstract class Notation {
 	    return ("'" + Character.valueOf(charVal)) + "'";
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    final String charString = printCharTerm(t);
 	    if (charString != null) {
 		sp.printConstant(charString);
@@ -655,9 +689,9 @@ public abstract class Notation {
 	    }
 	}
     }
-    
 
-  
+
+
 
     /**
      * The standard concrete syntax for sequence singletons.
@@ -671,11 +705,12 @@ public abstract class Notation {
             this.rDelimiter = rDelimiter;
 	}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
+	@Override
+    public void print(Term t, LogicPrinter sp) throws IOException {
 	    sp.printSeqSingleton(t, lDelimiter, rDelimiter);
 	}
     }
-    
+
     public static final class SeqConcatNotation extends Notation {
 
         private final Function seqSingleton;
@@ -683,14 +718,14 @@ public abstract class Notation {
         private final Function charLiteral;
 
 
-        public SeqConcatNotation(Function seqConcat, Function seqSingleton, Function charLiteral) {           
+        public SeqConcatNotation(Function seqConcat, Function seqSingleton, Function charLiteral) {
             super(130);
             this.seqConcat = seqConcat;
             this.seqSingleton = seqSingleton;
             this.charLiteral = charLiteral;
         }
 
-        
+
         private String printStringTerm(Term t) {
             String result = "\"";
             Term term = t;
@@ -700,10 +735,10 @@ public abstract class Notation {
               term = term.sub(1);
             }
             result = result
-                    + CharLiteral.printCharTerm(term.sub(0)).charAt(1);            
+                    + CharLiteral.printCharTerm(term.sub(0)).charAt(1);
             return (result + "\"");
         }
-        
+
         @Override
         public void print(Term t, LogicPrinter sp) throws IOException {
             if (isCharLiteralSequence(t)) {
@@ -711,9 +746,9 @@ public abstract class Notation {
                 try {
                     sLit = printStringTerm(t);
                 } catch (Exception e) {
-                    sp.printFunctionTerm(t);                    
+                    sp.printFunctionTerm(t);
                     return;
-                }                
+                }
                 sp.printConstant(sLit);
             } else {
                 sp.printFunctionTerm(t);
@@ -721,10 +756,10 @@ public abstract class Notation {
         }
 
 
-        private boolean isCharLiteralSequence(Term t) {            
+        private boolean isCharLiteralSequence(Term t) {
             if (t.op() == seqConcat && isCharLiteralSequenceHelp(t.sub(0))) {
                 return isCharLiteralSequenceHelp(t.sub(1)) || isCharLiteralSequence(t.sub(1));
-            } 
+            }
             return false;
         }
 
@@ -734,7 +769,7 @@ public abstract class Notation {
         }
 
     }
-    
+
     public static final class SeqGetNotation extends Notation {
 
         public SeqGetNotation() {
