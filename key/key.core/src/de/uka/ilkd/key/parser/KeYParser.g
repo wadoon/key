@@ -4017,17 +4017,35 @@ type_resolver returns [TypeResolver tr = null]
 ;
 
 varcond_new [TacletBuilder b]
+@init {
+  boolean isDependingOn = false;
+}
 :
    NEW LPAREN x=varId COMMA
    (
-       TYPEOF LPAREN y=varId RPAREN
-       { b.addVarsNew((SchemaVariable) x, (SchemaVariable) y); }
-     | DEPENDINGON LPAREN y=varId RPAREN 
-       { b.addVarsNewDependingOn((SchemaVariable)x, (SchemaVariable)y); }
-     | kjt=keyjavatype 
-       { b.addVarsNew((SchemaVariable) x, kjt); }
+      (
+        ( TYPEOF LPAREN y=varId RPAREN | kjt=keyjavatype )
+        ( COMMA FRESHFOR LPAREN z=varId RPAREN ) ?
+      )
+   |  DEPENDINGON LPAREN y=varId RPAREN 
+      { isDependingOn = true; }
    )
    RPAREN
+   {
+     if (isDependingOn) {
+       b.addVarsNewDependingOn((SchemaVariable) x, (SchemaVariable) y);
+     } else {
+       if (y != null && z == null) {
+         b.addVarsNew((SchemaVariable) x, (SchemaVariable) y);
+       } else if (y != null && z != null) {
+         b.addVarsNew((SchemaVariable) x, (SchemaVariable) y, (SchemaVariable) z);
+       } else if (kjt != null && z == null) {
+         b.addVarsNew((SchemaVariable) x, kjt);
+       } else if (kjt != null && z != null) {
+         b.addVarsNew((SchemaVariable) x, kjt, (SchemaVariable) z);
+       }
+     }
+   }
 ;
 
 varcond_newlabel [TacletBuilder b] 

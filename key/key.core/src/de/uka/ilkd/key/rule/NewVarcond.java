@@ -23,19 +23,16 @@ public class NewVarcond {
 
     private final SchemaVariable sv;
     private final SchemaVariable peerSV;
+    private final SchemaVariable freshForSV;
     private final KeYJavaType type;
 
-    /*
-     * @param sv the Schemavariable representing a new variable.
-     *
-     * @param peerSV a Schemavariable defining the type of the new variable.
-     */
     public NewVarcond(SchemaVariable sv, SchemaVariable peerSV) {
         assert sv != null;
         assert peerSV != null;
         this.sv = sv;
         this.peerSV = peerSV;
         this.type = null;
+        this.freshForSV = null;
     }
 
     public NewVarcond(SchemaVariable sv, KeYJavaType type) {
@@ -44,6 +41,27 @@ public class NewVarcond {
         this.sv = sv;
         this.peerSV = null;
         this.type = type;
+        this.freshForSV = null;
+    }
+
+    public NewVarcond(SchemaVariable sv, SchemaVariable peerSV, SchemaVariable freshForSV) {
+        assert sv != null;
+        assert peerSV != null;
+        assert freshForSV != null;
+        this.sv = sv;
+        this.peerSV = peerSV;
+        this.type = null;
+        this.freshForSV = freshForSV;
+    }
+
+    public NewVarcond(SchemaVariable sv, KeYJavaType type, SchemaVariable freshForSV) {
+        assert sv != null;
+        assert type != null;
+        assert freshForSV != null;
+        this.sv = sv;
+        this.peerSV = null;
+        this.type = type;
+        this.freshForSV = freshForSV;
     }
 
     public boolean isDefinedByType() {
@@ -56,6 +74,10 @@ public class NewVarcond {
 
     public SchemaVariable getPeerSchemaVariable() {
         return peerSV;
+    }
+
+    public SchemaVariable getFreshForSV() {
+        return freshForSV;
     }
 
     public KeYJavaType getType() {

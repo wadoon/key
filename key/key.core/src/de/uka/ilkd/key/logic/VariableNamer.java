@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -86,6 +87,8 @@ public abstract class VariableNamer implements InstantiationProposer {
 
     protected final HashMap<ProgramVariable, ProgramVariable> map = new LinkedHashMap<ProgramVariable, ProgramVariable>();
     protected HashMap<ProgramVariable, ProgramVariable> renamingHistory = new LinkedHashMap<ProgramVariable, ProgramVariable>();
+
+    private final Map<Object, ProgramElementName> freshForNames = new HashMap<>();
 
     // -------------------------------------------------------------------------
     // constructors
@@ -473,7 +476,17 @@ public abstract class VariableNamer implements InstantiationProposer {
         // determine a suitable base name
         String basename = null;
         NewVarcond nv = app.taclet().varDeclaredNew(var);
+        SchemaVariable freshForSV = null;
+        Object freshForInst = null;
         if (nv != null) {
+            freshForSV = nv.getFreshForSV();
+            if (freshForSV != null) {
+                freshForInst = app.instantiations().getInstantiation(freshForSV);
+                if (freshForNames.containsKey(freshForInst)) {
+                    return freshForNames.get(freshForInst).toString();
+                }
+            }
+
             Type type = nv.getType();
             if (type == null) {
                 type = services.getJavaInfo().getKeYJavaType(type);
@@ -503,6 +516,11 @@ public abstract class VariableNamer implements InstantiationProposer {
         // get the proposal
         ProgramElementName name = getNameProposalForSchemaVariable(basename,
             var, app.posInOccurrence(), posOfDeclaration, previousProposals);
+
+        if (freshForSV != null) {
+            freshForNames.put(freshForInst, name);
+        }
+
         return (name == null ? null : name.toString());
     }
 
