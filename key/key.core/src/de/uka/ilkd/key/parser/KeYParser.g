@@ -727,6 +727,7 @@ options {
 
     private void schema_var_decl(String name, 
                      Sort s, 
+                     SchemaVariable freshForSV,
                      boolean makeVariableSV,
                      boolean makeSkolemTermSV,
                      boolean makeTermLabelSV,
@@ -749,10 +750,9 @@ options {
                     v = SchemaVariableFactory.createVariableSV
                     (new Name(name), s);
                 } else if(makeSkolemTermSV && s != Sort.UPDATE) {
-                    v = SchemaVariableFactory.createSkolemTermSV(new Name(name), 
-                    				                 s);
+                    v = SchemaVariableFactory.createSkolemTermSV(new Name(name), s, freshForSV);
                 } else if(makeSkolemTermSV && s == Sort.UPDATE) {
-                    v = SchemaVariableFactory.createSkolemUpdateSV(new Name(name));
+                    v = SchemaVariableFactory.createSkolemUpdateSV(new Name(name), freshForSV);
                 } else if (makeTermLabelSV) {
                     v = SchemaVariableFactory.createTermLabelSV(new Name(name));
                 } else { v = SchemaVariableFactory.createTermSV(
@@ -2003,6 +2003,7 @@ one_schema_var_decl
      while(it.hasNext())
        schema_var_decl(it.next(),
                        s,
+                       (SchemaVariable) z,
                        makeVariableSV,
                        makeSkolemTermSV,
                        makeTermLabelSV,

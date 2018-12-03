@@ -33,6 +33,24 @@ public final class SkolemUpdateSV extends SkolemSV {
         super(name, Sort.UPDATE);
     }
 
+    /**
+     * Creates a new schema variable that is used as placeholder for skolem
+     * updates.
+     *
+     * @param name
+     *            the Name of the SchemaVariable
+     * @param freshForSV
+     *            A {@link SchemaVariable} for which this {@link SkolemSV}
+     *            should be deterministically instantiated. That is, the first
+     *            time, it's created like a normal {@link SkolemSV}, but the
+     *            second time you call this method for the same freshForSV, the
+     *            same instantiation is returned. Realizes a kind of weak
+     *            Skolemization.
+     */
+    SkolemUpdateSV(Name name, SchemaVariable freshForSV) {
+        super(name, Sort.UPDATE, freshForSV);
+    }
+
     @Override
     public String toString() {
         return toString("skolem update");

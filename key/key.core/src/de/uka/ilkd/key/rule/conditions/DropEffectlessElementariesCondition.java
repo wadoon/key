@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -44,7 +45,8 @@ public final class DropEffectlessElementariesCondition
     }
 
     private static Term dropEffectlessElementariesHelper(Term update,
-            Set<LocationVariable> relevantVars, TermServices services) {
+            Term target, Set<LocationVariable> relevantVars,
+            TermServices services) {
         if (update.op() instanceof ElementaryUpdate) {
             ElementaryUpdate eu = (ElementaryUpdate) update.op();
             LocationVariable lhs = (LocationVariable) eu.lhs();
@@ -68,10 +70,10 @@ public final class DropEffectlessElementariesCondition
              * first descend to the second sub-update to keep relevantVars in
              * good order
              */
-            Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars,
-                services);
-            Term newSub0 = dropEffectlessElementariesHelper(sub0, relevantVars,
-                services);
+            Term newSub1 = dropEffectlessElementariesHelper(sub1, target,
+                relevantVars, services);
+            Term newSub0 = dropEffectlessElementariesHelper(sub0, target,
+                relevantVars, services);
             if (newSub0 == null && newSub1 == null) {
                 return null;
             } else {
@@ -82,10 +84,17 @@ public final class DropEffectlessElementariesCondition
         } else if (update.op() == UpdateApplication.UPDATE_APPLICATION) {
             Term sub0 = update.sub(0);
             Term sub1 = update.sub(1);
-            Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars,
-                services);
+            Term newSub1 = dropEffectlessElementariesHelper(sub1, target,
+                relevantVars, services);
             return newSub1 == null ? null
                     : services.getTermBuilder().apply(sub0, newSub1, null);
+        } else if (AbstractUpdateCondition.isAbstractUpdate(update)) {
+            if (target.op().equals(Junctor.TRUE)
+                    || target.op().equals(Junctor.FALSE)) {
+                return services.getTermBuilder().skip();
+            } else {
+                return null;
+            }
         } else {
             return null;
         }
@@ -101,7 +110,7 @@ public final class DropEffectlessElementariesCondition
                 .create(services);
         target.execPostOrder(collector);
         Set<LocationVariable> varsInTarget = collector.result();
-        Term simplifiedUpdate = dropEffectlessElementariesHelper(update,
+        Term simplifiedUpdate = dropEffectlessElementariesHelper(update, target,
             varsInTarget, services);
         return simplifiedUpdate == null ? null
                 : services.getTermBuilder().apply(simplifiedUpdate, target,

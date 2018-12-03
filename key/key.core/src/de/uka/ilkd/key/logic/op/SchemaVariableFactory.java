@@ -115,10 +115,42 @@ public class SchemaVariableFactory {
     }
 
     /**
+     * creates a SchemaVariable representing a skolem term
+     *
+     * @param freshForSV
+     *            A {@link SchemaVariable} for which this {@link SkolemSV}
+     *            should be deterministically instantiated. That is, the first
+     *            time, it's created like a normal {@link SkolemSV}, but the
+     *            second time you call this method for the same freshForSV, the
+     *            same instantiation is returned. Realizes a kind of weak
+     *            Skolemization.
+     */
+    public static SkolemTermSV createSkolemTermSV(Name name, Sort s,
+            SchemaVariable freshForSV) {
+        return new SkolemTermSV(name, s, freshForSV);
+    }
+
+    /**
      * creates a SchemaVariable representing a skolem update
      */
     public static SkolemUpdateSV createSkolemUpdateSV(Name name) {
         return new SkolemUpdateSV(name);
+    }
+
+    /**
+     * creates a SchemaVariable representing a skolem update
+     *
+     * @param freshForSV
+     *            A {@link SchemaVariable} for which this {@link SkolemSV}
+     *            should be deterministically instantiated. That is, the first
+     *            time, it's created like a normal {@link SkolemSV}, but the
+     *            second time you call this method for the same freshForSV, the
+     *            same instantiation is returned. Realizes a kind of weak
+     *            Skolemization.
+     */
+    public static SkolemUpdateSV createSkolemUpdateSV(Name name,
+            SchemaVariable freshForSV) {
+        return new SkolemUpdateSV(name, freshForSV);
     }
 
     /**

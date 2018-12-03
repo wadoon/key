@@ -735,10 +735,27 @@ public abstract class TacletApp implements RuleApp {
     public TacletApp createSkolemConstant(String instantiation,
             SchemaVariable sv, Sort sort, boolean interesting,
             Services services) {
+        assert sv instanceof SkolemSV : "SchemaVariable should be a SkolemSV in this method.";
+        final SkolemSV skSv = (SkolemSV) sv;
+
+        final Object freshForInst = skSv.getFreshForSV() == null ? null
+                : instantiations.getInstantiation(skSv.getFreshForSV());
+        if (freshForInst != null && services
+                .getFreshForInstantiation(freshForInst, skSv).isPresent()) {
+            return addInstantiation(sv,
+                services.getFreshForInstantiation(freshForInst, skSv).get(),
+                interesting, services);
+        }
+
         final Function c = new Function(new Name(instantiation), sort, true,
             new Sort[0]);
-        return addInstantiation(sv, services.getTermBuilder().func(c),
-            interesting, services);
+        final Term skSvInst = services.getTermBuilder().func(c);
+
+        if (freshForInst != null) {
+            services.addFreshForInstantiation(freshForInst, skSv, skSvInst);
+        }
+
+        return addInstantiation(sv, skSvInst, interesting, services);
     }
 
     public void registerSkolemConstants(NamespaceSet nss) {
@@ -746,7 +763,7 @@ public abstract class TacletApp implements RuleApp {
         final Iterator<SchemaVariable> svIt = insts.svIterator();
         while (svIt.hasNext()) {
             final SchemaVariable sv = svIt.next();
-            if (sv instanceof SkolemTermSV || sv instanceof SkolemUpdateSV) {
+            if (sv instanceof SkolemSV) {
                 final Term inst = (Term) insts.getInstantiation(sv);
                 final Namespace<Function> functions = nss.functions();
 

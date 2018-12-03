@@ -23,9 +23,25 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * @author Dominic Steinhöfel
  */
 public abstract class SkolemSV extends AbstractSV {
+    /**
+     * A {@link SchemaVariable} for which this {@link SkolemSV} should be
+     * deterministically instantiated. That is, the first time, it's created
+     * like a normal {@link SkolemSV}, but the second time you call this method
+     * for the same freshForSV, the same instantiation is returned. Realizes a
+     * kind of weak Skolemization.
+     */
+    private final SchemaVariable freshForSV;
 
-    SkolemSV(Name name, Sort sort) {
+    SkolemSV(Name name, Sort sort, SchemaVariable freshForSV) {
         super(name, sort, true, false);
+        this.freshForSV = freshForSV;
     }
 
+    SkolemSV(Name name, Sort sort) {
+        this(name, sort, null);
+    }
+
+    public SchemaVariable getFreshForSV() {
+        return freshForSV;
+    }
 }
