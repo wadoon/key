@@ -3911,7 +3911,11 @@ varcond_instantiateVarsFresh[TacletBuilder b]
      ( FRESHFOR LPAREN z=varId RPAREN ) ?
    RPAREN 
    {
-      b.addVariableCondition(new InstantiateVarsFreshCondition((ProgramSV) varsList, (ProgramSV) varsListForLength, namePattern, t));
+      b.addVariableCondition(
+        new InstantiateVarsFreshCondition(
+          (ProgramSV) varsList, 
+          (ProgramSV) varsListForLength,
+           namePattern, t, (SchemaVariable) z));
    }
 ;
 

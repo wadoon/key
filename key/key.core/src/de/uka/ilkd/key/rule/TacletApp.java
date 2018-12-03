@@ -742,8 +742,8 @@ public abstract class TacletApp implements RuleApp {
                 : instantiations.getInstantiation(skSv.getFreshForSV());
         if (freshForInst != null && services
                 .getFreshForInstantiation(freshForInst, skSv).isPresent()) {
-            return addInstantiation(sv,
-                services.getFreshForInstantiation(freshForInst, skSv).get(),
+            return addInstantiation(sv, (Term) services
+                    .getFreshForInstantiation(freshForInst, skSv).get(),
                 interesting, services);
         }
 

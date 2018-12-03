@@ -30,7 +30,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.SkolemSV;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.proof.Counter;
 import de.uka.ilkd.key.proof.JavaModel;
 import de.uka.ilkd.key.proof.NameRecorder;
@@ -124,8 +124,11 @@ public class Services implements TermServices {
      * where the same abstract program can occur multiple times in a sequent,
      * and should then express the same behavior. For this, we need that
      * instantiations memory.
+     *
+     * The target of the inner map is typically either a Term or a
+     * ProgramElement, depending on where it's used.
      */
-    private Map<Object, Map<SkolemSV, Term>> freshForInstantiations = new HashMap<>();
+    private Map<Object, Map<SchemaVariable, Object>> freshForInstantiations = new HashMap<>();
 
     /**
      * creates a new Services object with a new TypeConverter and a new JavaInfo
@@ -494,8 +497,8 @@ public class Services implements TermServices {
      * @return true iff there was no previous association of that kind in our
      *         store and we thus successfully added the new one.
      */
-    public boolean addFreshForInstantiation(Object svInst, SkolemSV skSv,
-            Term skInst) {
+    public boolean addFreshForInstantiation(Object svInst, SchemaVariable skSv,
+            Object skInst) {
         if (!freshForInstantiations.containsKey(svInst)) {
             freshForInstantiations.put(svInst, new HashMap<>());
         }
@@ -511,8 +514,8 @@ public class Services implements TermServices {
     /**
      * See {@link #freshForInstantiations}.
      */
-    public Optional<Term> getFreshForInstantiation(Object svInst,
-            SkolemSV skSv) {
+    public Optional<Object> getFreshForInstantiation(Object svInst,
+            SchemaVariable skSv) {
         return Optional.ofNullable(freshForInstantiations.get(svInst))
                 .map(m -> m.get(skSv));
     }

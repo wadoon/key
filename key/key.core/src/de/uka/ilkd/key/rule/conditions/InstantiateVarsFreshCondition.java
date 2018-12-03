@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Optional;
+
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -43,9 +45,11 @@ public class InstantiateVarsFreshCondition implements VariableCondition {
     private final int size;
     private final String namePattern;
     private final KeYJavaType type;
+    private final Optional<SchemaVariable> freshForSV;
 
     public InstantiateVarsFreshCondition(ProgramSV varsList,
-            ProgramSV varsListForLength, String namePattern, KeYJavaType type) {
+            ProgramSV varsListForLength, String namePattern, KeYJavaType type,
+            SchemaVariable freshForSV) {
         assert varsList.isListSV();
         assert varsListForLength.isListSV();
 
@@ -54,10 +58,11 @@ public class InstantiateVarsFreshCondition implements VariableCondition {
         this.size = -1;
         this.namePattern = namePattern;
         this.type = type;
+        this.freshForSV = Optional.ofNullable(freshForSV);
     }
 
     public InstantiateVarsFreshCondition(ProgramSV varsList, int size,
-            String namePattern, KeYJavaType type) {
+            String namePattern, KeYJavaType type, SchemaVariable freshForSV) {
         assert varsList.isListSV();
 
         this.varsList = varsList;
@@ -65,6 +70,7 @@ public class InstantiateVarsFreshCondition implements VariableCondition {
         this.size = size;
         this.namePattern = namePattern;
         this.type = type;
+        this.freshForSV = Optional.ofNullable(freshForSV);
     }
 
     @Override
@@ -74,6 +80,19 @@ public class InstantiateVarsFreshCondition implements VariableCondition {
 
         if (svInst.isInstantiated(varsList)) {
             return matchCond;
+        }
+
+        if (freshForSV.isPresent() && svInst.isInstantiated(freshForSV.get())
+                && services
+                        .getFreshForInstantiation(
+                            svInst.getInstantiation(freshForSV.get()), varsList)
+                        .isPresent()) {
+            return matchCond.setInstantiations(svInst.add(varsList,
+                (ProgramList) services
+                        .getFreshForInstantiation(
+                            svInst.getInstantiation(freshForSV.get()), varsList)
+                        .get(),
+                services));
         }
 
         @SuppressWarnings("rawtypes")
@@ -92,6 +111,11 @@ public class InstantiateVarsFreshCondition implements VariableCondition {
 
         ProgramList pl = new ProgramList(
             new ImmutableArray<ProgramElement>(freshVars));
+
+        if (freshForSV.isPresent()) {
+            services.addFreshForInstantiation(
+                svInst.getInstantiation(freshForSV.get()), varsList, pl);
+        }
 
         return matchCond.setInstantiations(svInst.add(varsList, pl, services));
     }
