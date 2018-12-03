@@ -16,8 +16,10 @@ package de.uka.ilkd.key.java.statement;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Comment;
+import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 
 /**
@@ -62,6 +64,21 @@ public class AbstractPlaceholderStatement extends JavaStatement {
     @Override
     public int hashCode() {
         return 17 * super.hashCode() + id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof AbstractPlaceholderStatement)) {
+            return false;
+        }
+
+        return ((AbstractPlaceholderStatement) o).getId().equals(this.id);
+    }
+
+    @Override
+    public boolean equalsModRenaming(SourceElement se,
+            NameAbstractionTable nat) {
+        return se.equals(this);
     }
 
     @Override

@@ -22,7 +22,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * varcond, although with the removal of the meta variable mechanism, this would
  * no longer really be necessary.
  */
-public final class SkolemTermSV extends AbstractSV {
+public final class SkolemTermSV extends SkolemSV {
 
     /**
      * Creates a new schema variable that is used as placeholder for skolem
@@ -35,7 +35,7 @@ public final class SkolemTermSV extends AbstractSV {
      *            match a list of program constructs
      */
     SkolemTermSV(Name name, Sort sort) {
-        super(name, sort, true, false);
+        super(name, sort);
         assert sort != Sort.UPDATE;
     }
 

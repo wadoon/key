@@ -1971,13 +1971,15 @@ one_schema_var_decl
     { mods = new SchemaVariableModifierSet.FormulaSV (); }
     ( schema_modifiers[mods] ) ?    
     {s = Sort.FORMULA;}
-    ids = simple_ident_comma_list  
+    ids = simple_ident_comma_list
+    ( FRESHFOR LPAREN z=varId RPAREN ) ?
  | (SKOLEMUPDATE 
     { makeSkolemTermSV = true; }
     { s = Sort.UPDATE; }
     { mods = new SchemaVariableModifierSet.SkolemUpdateSV (); }
     ( schema_modifiers[mods] ) ?)    	
     ids = simple_ident_comma_list  
+    ( FRESHFOR LPAREN z=varId RPAREN ) ?
   | (    TERM
          { mods = new SchemaVariableModifierSet.TermSV (); }
          ( schema_modifiers[mods] ) ?
@@ -1985,13 +1987,16 @@ one_schema_var_decl
          { makeVariableSV = true; }
          { mods = new SchemaVariableModifierSet.VariableSV (); }
          ( schema_modifiers[mods] ) ?)
-      | (SKOLEMTERM 
-         { makeSkolemTermSV = true; }
-         { mods = new SchemaVariableModifierSet.SkolemTermSV (); }
-         ( schema_modifiers[mods] ) ?)    	
     )
     s = any_sortId_check[true]
     ids = simple_ident_comma_list 
+  | (SKOLEMTERM 
+    { makeSkolemTermSV = true; }
+    { mods = new SchemaVariableModifierSet.SkolemTermSV (); }
+    ( schema_modifiers[mods] ) ?)
+    s = any_sortId_check[true]
+    ids = simple_ident_comma_list 
+    ( FRESHFOR LPAREN z=varId RPAREN ) ?
   ) SEMI
    { 
      Iterator<String> it = ids.iterator();

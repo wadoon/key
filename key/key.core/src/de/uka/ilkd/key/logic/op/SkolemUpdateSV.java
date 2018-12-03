@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * Schema variable representing an update that is instantiated with fresh Skolem
  * constants.
  */
-public final class SkolemUpdateSV extends AbstractSV {
+public final class SkolemUpdateSV extends SkolemSV {
 
     /**
      * Creates a new schema variable that is used as placeholder for skolem
@@ -30,7 +30,7 @@ public final class SkolemUpdateSV extends AbstractSV {
      *            the Name of the SchemaVariable
      */
     SkolemUpdateSV(Name name) {
-        super(name, Sort.UPDATE, true, false);
+        super(name, Sort.UPDATE);
     }
 
     @Override

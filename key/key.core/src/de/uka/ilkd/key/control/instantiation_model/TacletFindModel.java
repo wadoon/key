@@ -39,8 +39,8 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SkolemSV;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.SkolemUpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
@@ -403,8 +403,7 @@ public class TacletFindModel extends AbstractTableModel {
                 checkNeededInputAvailable(irow);
                 sv = (SchemaVariable) getValueAt(irow, 0);
                 sort = null;
-                if (sv instanceof VariableSV || sv instanceof SkolemTermSV
-                        || sv instanceof SkolemUpdateSV) {
+                if (sv instanceof VariableSV || sv instanceof SkolemSV) {
                     IdDeclaration idd = parseIdDeclaration(irow);
                     sort = idd.getSort();
                     if (sort == null) {
