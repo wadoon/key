@@ -4030,7 +4030,6 @@ varcond_new [TacletBuilder b]
    (
       (
         ( TYPEOF LPAREN y=varId RPAREN | kjt=keyjavatype )
-        ( COMMA FRESHFOR LPAREN z=varId RPAREN ) ?
       )
    |  DEPENDINGON LPAREN y=varId RPAREN 
       { isDependingOn = true; }
@@ -4040,14 +4039,10 @@ varcond_new [TacletBuilder b]
      if (isDependingOn) {
        b.addVarsNewDependingOn((SchemaVariable) x, (SchemaVariable) y);
      } else {
-       if (y != null && z == null) {
+       if (y != null) {
          b.addVarsNew((SchemaVariable) x, (SchemaVariable) y);
-       } else if (y != null && z != null) {
-         b.addVarsNew((SchemaVariable) x, (SchemaVariable) y, (SchemaVariable) z);
-       } else if (kjt != null && z == null) {
+       } else if (kjt != null) {
          b.addVarsNew((SchemaVariable) x, kjt);
-       } else if (kjt != null && z != null) {
-         b.addVarsNew((SchemaVariable) x, kjt, (SchemaVariable) z);
        }
      }
    }

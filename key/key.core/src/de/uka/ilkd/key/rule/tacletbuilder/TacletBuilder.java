@@ -195,25 +195,6 @@ public abstract class TacletBuilder<T extends Taclet> {
     }
 
     /**
-     * adds a new <i>new for <code>freshForSV</code></i> variable to the
-     * variable conditions of the Taclet: v is new and has the same type as
-     * peerSV
-     */
-    public void addVarsNew(SchemaVariable v, SchemaVariable peerSV,
-            SchemaVariable freshForSV) {
-        addVarsNew(new NewVarcond(v, peerSV, freshForSV));
-    }
-
-    /**
-     * adds a new <i>new for <code>freshForSV</code></i> variable to the
-     * variable conditions of the Taclet: v is new and has the given type
-     */
-    public void addVarsNew(SchemaVariable v, KeYJavaType type,
-            SchemaVariable freshForSV) {
-        addVarsNew(new NewVarcond(v, type, freshForSV));
-    }
-
-    /**
      * adds a new <I>new</I> variable to the variable conditions of the Taclet:
      * v is new.
      */
