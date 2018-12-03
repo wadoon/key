@@ -3847,6 +3847,7 @@ varexp[TacletBuilder b]
     | varcond_instantiateVarsFresh[b]
     | varcond_storeResultVarIn[b]
     | varcond_storeContextLabelsIn[b]
+    | varcond_freshAbstractProgram[b]
     | varcond_isNull[b, negated]
     | varcond_abstractUpdate[b, negated]
     | varcond_dropEffectlessStores[b]
@@ -3932,6 +3933,14 @@ varcond_storeContextLabelsIn[TacletBuilder b]
    STORE_CONTEXT_LABELS_IN LPAREN sv=varId RPAREN 
    {
       b.addVariableCondition(new StoreContextLabelsInCondition((ProgramSV) sv));
+   }
+;
+
+varcond_freshAbstractProgram[TacletBuilder b]
+:
+   FRESH_ABSTRACT_PROGRAM LPAREN sv=varId RPAREN 
+   {
+      b.addVariableCondition(new FreshAbstractProgramCondition((ProgramSV) sv));
    }
 ;
 

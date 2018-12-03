@@ -229,6 +229,7 @@ lexer grammar KeYLexer;
     PREFIX_CONTAINS_ELEMENT : '\\prefixContainsElement' ;
     INSTANTIATE_VARS_FRESH : '\\instantiateVarsFresh' ;
     STORE_RESULT_VAR_IN : '\\storeResultVarIn' ;
+    FRESH_ABSTRACT_PROGRAM : '\\freshAbstractProgram' ;
     STORE_CONTEXT_LABELS_IN : '\\storeContextLabelsIn' ;
 	ISNULL : '\\isnull';
 	VARCOND : '\\varcond';

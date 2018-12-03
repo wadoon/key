@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
@@ -27,6 +28,7 @@ public class NamespaceSet {
     private Namespace<RuleSet> ruleSetNS = new Namespace<RuleSet>();
     private Namespace<Sort> sortNS = new Namespace<Sort>();
     private Namespace<Choice> choiceNS = new Namespace<Choice>();
+    private Namespace<AbstractPlaceholderStatement> abstractProgramSymbolsNS = new Namespace<>();
 
     public NamespaceSet() {
     }
@@ -34,24 +36,26 @@ public class NamespaceSet {
     public NamespaceSet(Namespace<QuantifiableVariable> varNS,
             Namespace<Function> funcNS, Namespace<Sort> sortNS,
             Namespace<RuleSet> ruleSetNS, Namespace<Choice> choiceNS,
-            Namespace<IProgramVariable> programVarNS) {
+            Namespace<IProgramVariable> programVarNS,
+            Namespace<AbstractPlaceholderStatement> abstractProgramSymbolsNS) {
         this.varNS = varNS;
         this.progVarNS = programVarNS;
         this.funcNS = funcNS;
         this.sortNS = sortNS;
         this.ruleSetNS = ruleSetNS;
         this.choiceNS = choiceNS;
+        this.abstractProgramSymbolsNS = abstractProgramSymbolsNS;
     }
 
     public NamespaceSet copy() {
         return new NamespaceSet(variables().copy(), functions().copy(),
             sorts().copy(), ruleSets().copy(), choices().copy(),
-            programVariables().copy());
+            programVariables().copy(), abstractProgramSymbols().copy());
     }
 
     public NamespaceSet shallowCopy() {
         return new NamespaceSet(variables(), functions(), sorts(), ruleSets(),
-            choices(), programVariables());
+            choices(), programVariables(), abstractProgramSymbols());
     }
 
     // TODO MU: Rename into sth with wrap or similar
@@ -61,7 +65,8 @@ public class NamespaceSet {
             new Namespace<Function>(functions()), new Namespace<Sort>(sorts()),
             new Namespace<RuleSet>(ruleSets()),
             new Namespace<Choice>(choices()),
-            new Namespace<IProgramVariable>(programVariables()));
+            new Namespace<IProgramVariable>(programVariables()),
+            new Namespace<>(abstractProgramSymbols()));
     }
 
     public Namespace<QuantifiableVariable> variables() {
@@ -74,6 +79,10 @@ public class NamespaceSet {
 
     public Namespace<IProgramVariable> programVariables() {
         return progVarNS;
+    }
+
+    public Namespace<AbstractPlaceholderStatement> abstractProgramSymbols() {
+        return abstractProgramSymbolsNS;
     }
 
     public void setProgramVariables(Namespace<IProgramVariable> progVarNS) {
@@ -119,6 +128,7 @@ public class NamespaceSet {
         ruleSets().add(ns.ruleSets());
         functions().add(ns.functions());
         choices().add(ns.choices());
+        abstractProgramSymbols().add(ns.abstractProgramSymbols());
     }
 
     /**
@@ -126,7 +136,7 @@ public class NamespaceSet {
      */
     private Namespace<?>[] asArray() {
         return new Namespace[] { variables(), programVariables(), sorts(),
-            ruleSets(), functions(), choices() };
+            ruleSets(), functions(), choices(), abstractProgramSymbols() };
     }
 
     /**
@@ -134,7 +144,8 @@ public class NamespaceSet {
      * (this means all namespaces without variables, choices and ruleSets)
      */
     private Namespace<?>[] logicAsArray() {
-        return new Namespace[] { programVariables(), sorts(), functions() };
+        return new Namespace[] { programVariables(), sorts(), functions(),
+            abstractProgramSymbols() };
     }
 
     /**
@@ -178,7 +189,8 @@ public class NamespaceSet {
         return "Sorts: " + sorts() + "\n" + "Functions: " + functions() + "\n"
                 + "Variables: " + variables() + "\n" + "ProgramVariables: "
                 + programVariables() + "\n" + "Heuristics: " + ruleSets() + "\n"
-                + "Taclet Options: " + choices() + "\n";
+                + "Taclet Options: " + choices() + "\n"
+                + "Abstract Program Symbols" + abstractProgramSymbols() + "\n";
     }
 
     public <T extends Name> boolean containsAll(Iterable<T> names) {
@@ -197,25 +209,26 @@ public class NamespaceSet {
         ruleSetNS.seal();
         sortNS.seal();
         choiceNS.seal();
+        abstractProgramSymbolsNS.seal();
     }
 
     public boolean isEmpty() {
         return varNS.isEmpty() && programVariables().isEmpty()
                 && funcNS.isEmpty() && ruleSetNS.isEmpty() && sortNS.isEmpty()
-                && choiceNS.isEmpty();
+                && choiceNS.isEmpty() && abstractProgramSymbolsNS.isEmpty();
     }
 
     // create a namespace
     public NamespaceSet simplify() {
         return new NamespaceSet(varNS.simplify(), funcNS.simplify(),
             sortNS.simplify(), ruleSetNS.simplify(), choiceNS.simplify(),
-            progVarNS.simplify());
+            progVarNS.simplify(), abstractProgramSymbolsNS.simplify());
     }
 
     public NamespaceSet getCompression() {
         return new NamespaceSet(varNS.compress(), funcNS.compress(),
             sortNS.compress(), ruleSetNS.compress(), choiceNS.compress(),
-            progVarNS.compress());
+            progVarNS.compress(), abstractProgramSymbolsNS.compress());
     }
 
     public void flushToParent() {
@@ -227,7 +240,7 @@ public class NamespaceSet {
     public NamespaceSet getParent() {
         return new NamespaceSet(varNS.parent(), funcNS.parent(),
             sortNS.parent(), ruleSetNS.parent(), choiceNS.parent(),
-            progVarNS.parent());
+            progVarNS.parent(), abstractProgramSymbolsNS.parent());
     }
 
 }

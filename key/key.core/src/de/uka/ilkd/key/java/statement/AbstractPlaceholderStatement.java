@@ -21,6 +21,8 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.visitor.Visitor;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
 
 /**
  * An abstract placeholder statement "_abstract P;" represents an arbitrary Java
@@ -30,30 +32,39 @@ import de.uka.ilkd.key.java.visitor.Visitor;
  *
  * @author Dominic Steinhöfel
  */
-public class AbstractPlaceholderStatement extends JavaStatement {
+public class AbstractPlaceholderStatement extends JavaStatement implements Named {
 
     // Those are used for JML to JavaDL conversions
     protected final String id;
+    protected final Name name;
     protected final Comment[] comments;
 
     public AbstractPlaceholderStatement(String id) {
         this.id = id;
+        this.name = new Name(id);
         this.comments = null;
     }
 
     public AbstractPlaceholderStatement(String id, Comment[] comments) {
         this.id = id;
+        this.name = new Name(id);
         this.comments = comments;
     }
 
     public AbstractPlaceholderStatement(ExtList children) {
         super(children);
         id = children.get(String.class);
+        this.name = new Name(id);
         comments = children.get(Comment[].class);
     }
 
     public String getId() {
         return id;
+    }
+
+    @Override
+    public Name name() {
+        return name;
     }
 
     @Override
