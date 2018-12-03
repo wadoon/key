@@ -3902,7 +3902,13 @@ varcond_applyUpdateOnRigid [TacletBuilder b]
 
 varcond_instantiateVarsFresh[TacletBuilder b]
 :
-   INSTANTIATE_VARS_FRESH LPAREN varsList=varId COMMA varsListForLength=varId COMMA namePattern=string_literal COMMA t=keyjavatype RPAREN 
+   INSTANTIATE_VARS_FRESH LPAREN
+     varsList=varId COMMA
+     varsListForLength=varId COMMA
+     namePattern=string_literal COMMA 
+     t=keyjavatype
+     ( FRESHFOR LPAREN z=varId RPAREN ) ?
+   RPAREN 
    {
       b.addVariableCondition(new InstantiateVarsFreshCondition((ProgramSV) varsList, (ProgramSV) varsListForLength, namePattern, t));
    }
