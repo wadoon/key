@@ -80,7 +80,7 @@ import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Saves a proof to a given {@link OutputStream}.
- * 
+ *
  * @author Kai Wallisch
  */
 public class OutputStreamProofSaver {
@@ -157,47 +157,47 @@ public class OutputStreamProofSaver {
 
         try {
             ps = new PrintWriter(out, true);
-            final ProofOblInput po =
-                    proof.getServices().getSpecificationRepository()
-                            .getProofOblInput(proof);
+            final ProofOblInput po = proof.getServices()
+                    .getSpecificationRepository().getProofOblInput(proof);
             printer = createLogicPrinter(proof.getServices(), false);
 
             // profile
             ps.println(writeProfile(proof.getServices().getProfile()));
 
             // settings
-            final StrategySettings strategySettings =
-                    proof.getSettings().getStrategySettings();
-            final StrategyProperties strategyProperties =
-                    strategySettings.getActiveStrategyProperties();
+            final StrategySettings strategySettings = proof.getSettings()
+                    .getStrategySettings();
+            final StrategyProperties strategyProperties = strategySettings
+                    .getActiveStrategyProperties();
             if (po instanceof AbstractInfFlowPO
-                    && (po instanceof InfFlowCompositePO || !((InfFlowProof) proof)
-                            .getIFSymbols().isFreshContract())) {
+                    && (po instanceof InfFlowCompositePO
+                            || !((InfFlowProof) proof).getIFSymbols()
+                                    .isFreshContract())) {
                 strategyProperties.put(
-                        StrategyProperties.INF_FLOW_CHECK_PROPERTY,
-                        StrategyProperties.INF_FLOW_CHECK_TRUE);
+                    StrategyProperties.INF_FLOW_CHECK_PROPERTY,
+                    StrategyProperties.INF_FLOW_CHECK_TRUE);
                 strategySettings
                         .setActiveStrategyProperties(strategyProperties);
                 for (final SequentFormula s : proof.root().sequent().succedent()
                         .asList()) {
                     ((InfFlowProof) proof).addLabeledTotalTerm(s.formula());
                 }
-            }
-            else {
+            } else {
                 strategyProperties.put(
-                        StrategyProperties.INF_FLOW_CHECK_PROPERTY,
-                        StrategyProperties.INF_FLOW_CHECK_FALSE);
+                    StrategyProperties.INF_FLOW_CHECK_PROPERTY,
+                    StrategyProperties.INF_FLOW_CHECK_FALSE);
                 strategySettings
                         .setActiveStrategyProperties(strategyProperties);
             }
             ps.println(writeSettings(proof.getSettings()));
 
             if (po instanceof AbstractInfFlowPO
-                    && (po instanceof InfFlowCompositePO || !((InfFlowProof) proof)
-                            .getIFSymbols().isFreshContract())) {
+                    && (po instanceof InfFlowCompositePO
+                            || !((InfFlowProof) proof).getIFSymbols()
+                                    .isFreshContract())) {
                 strategyProperties.put(
-                        StrategyProperties.INF_FLOW_CHECK_PROPERTY,
-                        StrategyProperties.INF_FLOW_CHECK_FALSE);
+                    StrategyProperties.INF_FLOW_CHECK_PROPERTY,
+                    StrategyProperties.INF_FLOW_CHECK_FALSE);
                 strategySettings
                         .setActiveStrategyProperties(strategyProperties);
             }
@@ -209,8 +209,10 @@ public class OutputStreamProofSaver {
 
             // \problem or \proofObligation
             if (po instanceof IPersistablePO
-                    && (!(po instanceof AbstractInfFlowPO) || (!(po instanceof InfFlowCompositePO) && ((InfFlowProof) proof)
-                            .getIFSymbols().isFreshContract()))) {
+                    && (!(po instanceof AbstractInfFlowPO)
+                            || (!(po instanceof InfFlowCompositePO)
+                                    && ((InfFlowProof) proof).getIFSymbols()
+                                            .isFreshContract()))) {
                 final Properties properties = new Properties();
                 ((IPersistablePO) po).fillSaveProperties(properties);
                 final StringWriter writer = new StringWriter();
@@ -218,15 +220,14 @@ public class OutputStreamProofSaver {
                     properties.store(writer, "Proof Obligation Settings");
                     ps.println("\\proofObligation \""
                             + escapeCharacters(writer.toString()) + "\";\n");
-                }
-                finally {
+                } finally {
                     writer.close();
                 }
-            }
-            else {
+            } else {
                 if (po instanceof AbstractInfFlowPO
-                        && (po instanceof InfFlowCompositePO || !((InfFlowProof) proof)
-                                .getIFSymbols().isFreshContract())) {
+                        && (po instanceof InfFlowCompositePO
+                                || !((InfFlowProof) proof).getIFSymbols()
+                                        .isFreshContract())) {
                     final Properties properties = new Properties();
                     ((IPersistablePO) po).fillSaveProperties(properties);
                     ps.print(((InfFlowProof) proof).printIFSymbols());
@@ -244,8 +245,7 @@ public class OutputStreamProofSaver {
             ps.println("(autoModeTime \"" + proof.getAutoModeTime() + "\")\n");node2Proof(proof.root(), ps);
             ps.println("}");
 
-        }
-        finally {
+        } finally {
             if (out != null) {
                 out.close();
             }
@@ -257,7 +257,7 @@ public class OutputStreamProofSaver {
     }
 
     protected String getBasePath() throws IOException {
-        returngetJavaSourceLocation(proof).getCanonicalPath();
+        returngetJavaSourceLocation( proof).getCanonicalPath();
     }
 
     /**
@@ -265,9 +265,8 @@ public class OutputStreamProofSaver {
      * replace them by paths relative to the proof file to be saved.
      */
     private String makePathsRelative(String header) {
-        final String[] search =
-                new String[] { "\\javaSource", "\\bootclasspath",
-                        "\\classpath", "\\include" };
+        final String[] search = new String[] { "\\javaSource",
+            "\\bootclasspath", "\\classpath", "\\include" };
         final String basePath;
         String tmp = header;
         try {
@@ -299,23 +298,20 @@ public class OutputStreamProofSaver {
 
                     // add new relative path
                     final String absPath = tmp.substring(k, j);
-                    final String relPath =
-                            tryToMakeFilenameRelative(absPath, basePath);
-                    relPathString =
-                            relPathString + " \"" + escapeCharacters(relPath)
-                                    + "\"";
+                    final String relPath = tryToMakeFilenameRelative(absPath,
+                        basePath);
+                    relPathString = relPathString + " \""
+                            + escapeCharacters(relPath) + "\"";
                     i = j + 1;
                 }
                 tmp2 = tmp2 + s + relPathString + ";";
 
                 // put back in the rest
-                tmp =
-                        tmp2
-                                + (i < tmp.length() ? tmp.substring(l + 1,
-                                        tmp.length()) : "");
+                tmp = tmp2
+                        + (i < tmp.length() ? tmp.substring(l + 1, tmp.length())
+                                : "");
             }
-        }
-        catch (final IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
         return tmp;
@@ -329,8 +325,7 @@ public class OutputStreamProofSaver {
             String basePath) {
         try {
             return MiscTools.makeFilenameRelative(absPath, basePath);
-        }
-        catch (final RuntimeException e) {
+        } catch (final RuntimeException e) {
             return absPath;
         }
     }
@@ -358,6 +353,7 @@ public class OutputStreamProofSaver {
      * @param output the writer in which the rule is printed
      * @throws IOException an exception thrown when printing fails
      */
+
     private void printSingleTacletApp(TacletApp appliedRuleApp,
                                       Node node, String prefix,
                                       Appendable output)
@@ -368,11 +364,12 @@ public class OutputStreamProofSaver {
             output.append(appliedRuleApp.rule().name().toString());
             output.append("\"");
             output.append(posInOccurrence2Proof(node.sequent(),
-                    appliedRuleApp.posInOccurrence()));
+                appliedRuleApp.posInOccurrence()));
             output.append(newNames2Proof(node));
-            output.append(getInteresting( appliedRuleApp
-                    .instantiations()));
-        final ImmutableList<IfFormulaInstantiation> l = appliedRuleApp.ifFormulaInstantiations();
+            output.append(
+                getInteresting( appliedRuleApp.instantiations()));
+        final ImmutableList<IfFormulaInstantiation> l = appliedRuleApp
+                    .ifFormulaInstantiations();
             if (l != null) {
             output.append(ifFormulaInsts(node, l));
             }
@@ -390,7 +387,7 @@ public class OutputStreamProofSaver {
     private void printPredicatesForSingleMergeRuleApp (MergeWithPredicateAbstraction predAbstrRule,
                                                       Appendable output)
             throws IOException {
-            output.append("(").append(ProofElementID.MERGE_ABSTRACTION_PREDICATES.getRawName()).append("\"");
+            output.append("(").append(ProofElementID.MERGE_ABSTRACTION_PREDICATES.getRawName()).append(" \"");
             boolean first = true;
         for (final Map.Entry<Sort, ArrayList<AbstractionPredicate>> predsForSorts :
             predAbstrRule.getPredicates().entrySet()) {
@@ -401,21 +398,20 @@ public class OutputStreamProofSaver {
             } else {
                     output.append(", ");
             }
-                output.append(pred
-                                .toParseableString(
+                output.append(pred.toParseableString(
                                         proof.getServices()));
-
-                }
+            }
         }
 
         output.append("\")");
 
         output.append(" (")
             .append(ProofElementID.MERGE_PREDICATE_ABSTRACTION_LATTICE_TYPE
-                    .getRawName()).append(" \"");
-        output.append(predAbstrRule.getLatticeType().getName());
-        output.append("\")");
-    }
+                    .getRawName()).append("\"");
+            output.append(predAbstrRule.getLatticeType().getName());
+
+            output.append("\")");
+            }
 
     /**
      * Print predicates for applied merge rule application into the passed writer.
@@ -428,26 +424,27 @@ public class OutputStreamProofSaver {
             throws IOException {
         final Map<ProgramVariable, AbstractDomainElement> userChoices =
                 concreteRule.getUserChoices();
-        if (!userChoices.isEmpty()) {
-            output.append(" (")
-                    .append(ProofElementID.MERGE_USER_CHOICES
-                            .getRawName()).append(" \"");
-            boolean first = true;
-            for (final ProgramVariable v : userChoices.keySet()) {
+
+            if (!userChoices.isEmpty()) {
+                output.append(" (")
+                        .append(ProofElementID.MERGE_USER_CHOICES.getRawName())
+                        .append(" \"");
+                boolean first = true;
+            for(final ProgramVariable v : userChoices.keySet()) {
                 if (first) {
                 first = false;
                 } else {
                     output.append("`), ");
+
                 }
                 final AbstractDomainElement elem = userChoices.get(v);
-                output.append("('")
-                    .append(v.sort().toString())
-                    .append(" ")
-                    .append(v.toString())
+                output.append(" ('")
+                        .append(v.sort().toString())
+                        .append("").append(v.toString())
                     .append("', `")
                     .append(elem.toParseableString(proof
                             .getServices())).append("`), ");
-            }
+                }
 
             output.append("\")");
         }
@@ -486,20 +483,20 @@ public class OutputStreamProofSaver {
 
                 if (mergeApp.getDistinguishingFormula() != null) {
                     output.append(" (")
-                            .append(ProofElementID.MERGE_DIST_FORMULA
-                                    .getRawName()).append(" \"");
-                    output.append(escapeCharacters(printAnything(
-                            mergeApp.getDistinguishingFormula(),
+                            .append(
+                                ProofElementID.MERGE_DIST_FORMULA.getRawName())
+                            .append(" \"");
+                    output.append(escapeCharacters(
+                        printAnything(mergeApp.getDistinguishingFormula(),
                             proof.getServices(), false).toString().trim()
-                            .replaceAll("(\\r|\\n|\\r\\n)+", "")));
+                                    .replaceAll("(\\r|\\n|\\r\\n)+", "")));
                     output.append("\")");
                 }
 
                 // Predicates for merges with predicate abstraction.
                 MergeWithPredicateAbstraction predAbstrRule;
                 if (concreteRule instanceof MergeWithPredicateAbstraction
-                        && (
-                                (MergeWithPredicateAbstraction) concreteRule)
+                        && ( (MergeWithPredicateAbstraction) concreteRule)
                                 .getPredicates().size() > 0) {
 
                     printPredicatesForSingleMergeRuleApp((MergeWithPredicateAbstraction) concreteRule,
@@ -512,43 +509,42 @@ public class OutputStreamProofSaver {
         }
     }
 
-     /* Print applied instantiate loopp hole app for a single rule application into the passed writer.
+     /* Print applied abstract execution hole app for a single rule application into the passed writer.
      * @param ilhra the rule application to be printed
      * @param prefix a string which the printed rule is concatenated to
      * @param output the writer in which the rule is printed
      * @throws IOException an exception thrown when printing fails
      */
-    private void printSingleInstantiateLoopHoleRuleApp
-                        (InstantiateLoopHoleRuleApp ilhra,
+    private void printSingleInstantiateAbstractExecutionHoleRuleApp
+                        (InstantiateAbstractExecutionHoleRuleApp ilhra,
                                          Node node, String prefix, Appendable output)
             throws IOException {
                 output.append(" (")
-                        .append(ProofElementID.LAZYSE_PATHC_PH.getRawName())
-                        .append(" \"").append(ilhra.getLoopHoleInstantiation()
-                                .getLoopHole().getPathCondPlaceholder())
-                        .append("\")");
-                output.append(" (")
-                        .append(ProofElementID.LAZYSE_PATHC_INST.getRawName())
-                        .append(" \"")
-                        .append(printTerm(
-                            ilhra.getLoopHoleInstantiation().getPathCondInst(),
-                            proof.getServices()))
-                        .append("\")");
-                output.append(" (")
-                        .append(ProofElementID.LAZYSE_SYST_PH.getRawName())
-                        .append(" \"").append(ilhra.getLoopHoleInstantiation()
-                                .getLoopHole().getSymbStorePlaceholder())
-                        .append("\")");
-                output.append(" (")
-                        .append(ProofElementID.LAZYSE_SYST_INST.getRawName())
-                        .append(" \"")
-                        .append(printTerm(
-                            ilhra.getLoopHoleInstantiation().getSymbStoreInst(),
-                            proof.getServices()))
-                        .append("\")");
-    }
+                            .append(ProofElementID.LAZYSE_PATHC_PH
+                                    .getRawName())
+                            .append(" \"").append (ilhra.getAbstractExecutionHoleInstantiation()
+                            .getLoopHole().getPathCondPlaceholder())
+                                    .append("\") ");
+                        output.append(" (").append(
+                        ProofElementID.LAZYSE_PATHC_INST
+                                .getRawName())
+                            .append(" \"").append(printTerm(
+                            ilhra.getAbstractExecutionHoleInstantiation().getPathCondInst(),
+                            proof.getServices())).append("\")");
 
-    /**
+                output.append(" (").append(
+                            ProofElementID.LAZYSE_SYST_PH.getRawName())
+                                .append(" \"").append(ilhra.getAbstractExecutionHoleInstantiation()
+                                .getAbstractExecutionHole().getSymbStorePlaceholder())
+                                    .append("\")");
+                output.append(" (").append(ProofElementID.LAZYSE_SYST_INST.getRawName())
+                                    .append(" \"")
+                                    .append(printTerm(
+                            ilhra.getAbstractExecutionHoleInstantiation().getSymbStoreInst(),
+                            proof.getServices()))
+                                    .append("\")");
+                    }
+                /**
      * Print applied close-after-merge rule for a single close-after-merge rule application
      * into the passed writer.
      * @param closeApp the rule application to be printed
@@ -559,29 +555,27 @@ public class OutputStreamProofSaver {
     private void printSingleCloseAfterMergeRuleApp(CloseAfterMergeRuleBuiltInRuleApp closeApp,
                                                    Node node, String prefix, Appendable output)
             throws IOException {
-        // TODO (DS): There may be problems here if the merge node is
-        // pruned away. Need to test some cases and either check for
-        // null pointers at this place or find a better solution.
-        output.append(" (")
-                            .append(ProofElementID.MERGE_NODE
-                                    .getRawName()).append(" \"");
-                    output.append(Integer.toString (closeApp.getCorrespondingMergeNode()
-                            .parent().serialNr()));
 
-                    output.append("\")");
+                // TODO (DS): There may be problems here if the merge node is
+                // pruned away. Need to test some cases and either check for
+                // null pointers at this place or find a better solution.
+                output.append(" (").append(ProofElementID.MERGE_NODE.getRawName())
+                        .append(" \"");
+                output.append(Integer.toString (
+                    closeApp.getCorrespondingMergeNode().parent().serialNr()));
+                output.append("\")");
+            }
 
-                    }
-
-    /**
+            /**
      * Print rule justification for applied built-in rule application into the passed writer.
      * @param appliedRuleApp the rule application to be printed
      * @param output the writer in which the rule is printed
      * @throws IOException an exception thrown when printing fails
      */
-    private void printRuleJustification(IBuiltInRuleApp appliedRuleApp,
+    private void printRuleJustification (IBuiltInRuleApp appliedRuleApp,
                                         Appendable output)
             throws IOException {
-        final RuleJustification ruleJusti =
+                final RuleJustification ruleJusti =
                 proof.getInitConfig()
                 .getJustifInfo()
                 .getJustification(appliedRuleApp,
@@ -592,10 +586,10 @@ public class OutputStreamProofSaver {
 
         final RuleJustificationBySpec ruleJustiBySpec =
                 (RuleJustificationBySpec) ruleJusti;
-        output.append(" (contract \"");
-                    output.append(ruleJustiBySpec.getSpec().getName());
+                output.append(" (contract \"");
+                    output.append(ruleJustiBySpec.getSpec()
+                                .getName());
                     output.append("\")");
-
                 }
 
                 /**
@@ -611,11 +605,10 @@ public class OutputStreamProofSaver {
                     output
                                     .append(prefix);
                     output.append(" (builtin \"");
-                        output.append(appliedRuleApp.rule()
-                                    .name().toString());
-        output.append("\"");
+                        output.append(appliedRuleApp.rule().name().toString());
+        output.append(" \"");
         output.append(posInOccurrence2Proof(node.sequent(),
-                appliedRuleApp.posInOccurrence()));
+                            appliedRuleApp.posInOccurrence()));
 
         output.append(newNames2Proof(node));
         output.append(builtinRuleIfInsts(node, appliedRuleApp
@@ -635,14 +628,14 @@ public class OutputStreamProofSaver {
                         (CloseAfterMergeRuleBuiltInRuleApp) appliedRuleApp,
                                               node, prefix, output);
         }
-        if (appliedRuleApp instanceof InstantiateLoopHoleRuleApp) {
-                printSingleInstantiateLoopHoleRuleApp(
-                        (InstantiateLoopHoleRuleApp) appliedRuleApp,
+        if (appliedRuleApp instanceof AbstractExecutionHoleRuleApp) {
+                printSingleInstantiateAbstractExecutionHoleRuleApp(
+                        (InstantiateAbstractExecutionHoleRuleApp) appliedRuleApp,
                                               node, prefix, output);
         }
 
         output.append("");
-        userInteraction2Proof(node, output);
+                userInteraction2Proof(node, output);
 
         output.append(")\n");
     }
@@ -661,9 +654,10 @@ public class OutputStreamProofSaver {
         if (appliedRuleApp == null && (proof.getGoal(node) != null)) {
                 // open goal
             output.append(prefix);
-            output.append(" (opengoal \"");
+                output.append(" (opengoal \"");
                 final LogicPrinter logicPrinter =
-                    createLogicPrinter(proof.getServices(), false);
+                    createLogicPrinter(
+                            proof.getServices(), false);
 
             logicPrinter.printSequent(node.sequent());
             output.append(escapeCharacters(printer.result().toString()
@@ -715,10 +709,9 @@ public class OutputStreamProofSaver {
             // print it if we have it, ignore it otherwise. (MU)
             if (branchLabel == null) {
                 output.append("(branch\n");
-            }
-            else {
-                output.append("(branch \"" + escapeCharacters(branchLabel)
-                        + "\"\n");
+            } else {
+                output.append(
+                    "(branch \"" + escapeCharacters(branchLabel) + "\"\n");
             }
 
             collectProof(child, prefix + "   ", output);
@@ -747,18 +740,19 @@ public class OutputStreamProofSaver {
      * @throws IOException an exception thrown when printing fails
      */
     public void node2Proof(Node node, Appendable ps) throws IOException {
-        ps.append(
-                "(branch \"dummy ID\"\n"); collectProof(node, "", ps);
+        ps.append( "(branch \"dummy ID\"\n"); collectProof(node, "", ps);
         ps.append( ")\n");
     }
 
-    public static String posInOccurrence2Proof(Sequent seq, PosInOccurrence pos) {
+    public static String posInOccurrence2Proof(Sequent seq,
+            PosInOccurrence pos) {
         if (pos == null) {
             return "";
         }
-        return " (formula \""+seq.formulaNumberInSequent(pos.isInAntec(),
-                pos.sequentFormula())+"\")"+
-                posInTerm2Proof(pos.posInTerm());
+        return " (formula \""
+                + seq.formulaNumberInSequent(pos.isInAntec(),
+                    pos.sequentFormula())
+                + "\")" + posInTerm2Proof(pos.posInTerm());
     }
 
     public static String posInTerm2Proof(PosInTerm pos) {
@@ -783,20 +777,19 @@ public class OutputStreamProofSaver {
 
             final Object value = pair.value().getInstantiation();
 
-            if (!(value instanceof Term || value instanceof ProgramElement || value instanceof Name)) {
-                throw new RuntimeException("Saving failed.\n"
-                        + "FIXME: Unhandled instantiation type: "
-                        + value.getClass());
+            if (!(value instanceof Term || value instanceof ProgramElement
+                    || value instanceof Name)) {
+                throw new RuntimeException(
+                    "Saving failed.\n" + "FIXME: Unhandled instantiation type: "
+                            + value.getClass());
             }
 
-            final StringBuffer singleInstantiation =
-                    new StringBuffer(var.name().toString()).append("=").append(
-                            printAnything(value, proof.getServices(), false));
+            final StringBuffer singleInstantiation = new StringBuffer(
+                var.name().toString()).append("=").append(
+                    printAnything(value, proof.getServices(), false));
 
-            s +=
-                    " (inst \""
-                            + escapeCharacters(singleInstantiation.toString())
-                            + "\")";
+            s += " (inst \"" + escapeCharacters(singleInstantiation.toString())
+                    + "\")";
         }
 
         return s;
@@ -809,23 +802,19 @@ public class OutputStreamProofSaver {
             final IfFormulaInstantiation iff = aL;
             if (iff instanceof IfFormulaInstSeq) {
                 final SequentFormula f = iff.getConstrainedFormula();
-                s +=
-                        " (ifseqformula \""
-                                + node.sequent().formulaNumberInSequent(
-                                        ((IfFormulaInstSeq) iff).inAntec(), f)
-                                + "\")";
-            }
-            else if (iff instanceof IfFormulaInstDirect) {
+                s += " (ifseqformula \""
+                        + node.sequent().formulaNumberInSequent(
+                            ((IfFormulaInstSeq) iff).inAntec(), f)
+                        + "\")";
+            } else if (iff instanceof IfFormulaInstDirect) {
 
-                final String directInstantiation =
-                        printTerm(iff.getConstrainedFormula().formula(),
-                                node.proof().getServices()).toString();
+                final String directInstantiation = printTerm(
+                    iff.getConstrainedFormula().formula(),
+                    node.proof().getServices()).toString();
 
-                s +=
-                        " (ifdirectformula \""
-                                + escapeCharacters(directInstantiation) + "\")";
-            }
-            else {
+                s += " (ifdirectformula \""
+                        + escapeCharacters(directInstantiation) + "\")";
+            } else {
                 throw new RuntimeException("Unknown If-Seq-Formula type");
         }
         }
@@ -847,7 +836,7 @@ public class OutputStreamProofSaver {
     /**
      * double escapes quotation marks and backslashes to be storeable in a text
      * file
-     * 
+     *
      * @param toEscape
      *            the String to double escape
      * @return the escaped version of the string
@@ -869,8 +858,7 @@ public class OutputStreamProofSaver {
         final ProgramPrinter prgPrinter = new ProgramPrinter(sw);
         try {
             pe.prettyPrint(prgPrinter);
-        }
-        catch (final IOException ioe) {
+        } catch (final IOException ioe) {
             System.err.println(ioe);
         }
         return sw.getBuffer();
@@ -886,8 +874,7 @@ public class OutputStreamProofSaver {
         final LogicPrinter logicPrinter = createLogicPrinter(serv, shortAttrNotation);
         try {
             logicPrinter.printTerm(t);
-        }
-        catch (final IOException ioe) {
+        } catch (final IOException ioe) {
             System.err.println(ioe);
         }
         result = logicPrinter.result();
@@ -905,26 +892,20 @@ public class OutputStreamProofSaver {
             boolean shortAttrNotation) {
         if (val instanceof ProgramElement) {
             return printProgramElement((ProgramElement) val);
-        }
-        else if (val instanceof Term) {
+        } else if (val instanceof Term) {
             return printTerm((Term) val, services, shortAttrNotation);
-        }
-        else if (val instanceof Sequent) {
+        } else if (val instanceof Sequent) {
             return printSequent((Sequent) val, services);
-        }
-        else if (val instanceof Name) {
+        } else if (val instanceof Name) {
             return new StringBuffer(val.toString());
-        }
-        else if (val instanceof TermInstantiation) {
+        } else if (val instanceof TermInstantiation) {
             return printTerm(((TermInstantiation) val).getInstantiation(),
-                    services);
-        }
-        else if (val == null) {
+                services);
+        } else if (val == null) {
             return null;
-        }
-        else {
-            System.err.println("Don't know how to prettyprint "
-                    + val.getClass());
+        } else {
+            System.err
+                    .println("Don't know how to prettyprint " + val.getClass());
             // try to String by chance
             return new StringBuffer(val.toString());
         }
@@ -942,9 +923,8 @@ public class OutputStreamProofSaver {
         final NotationInfo ni = new NotationInfo();
         LogicPrinter p = null;
 
-        p =
-                new LogicPrinter(new ProgramPrinter(null), ni,
-                        (shortAttrNotation ? serv : null), true);
+        p = new LogicPrinter(new ProgramPrinter(null), ni,
+            (shortAttrNotation ? serv : null), true);
         return p;
     }
 

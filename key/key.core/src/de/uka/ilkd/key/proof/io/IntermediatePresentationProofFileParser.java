@@ -33,7 +33,7 @@ import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
-import de.uka.ilkd.key.rule.lazyse.InstantiateLoopHoleRule;
+import de.uka.ilkd.key.rule.lazyse.InstantiateAbstractExecutionHoleRule;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
 
@@ -393,7 +393,7 @@ public class IntermediatePresentationProofFileParser
         BuiltInAppIntermediate result = null;
 
         if (builtinInfo.currRuleName
-                .equals(InstantiateLoopHoleRule.INSTANCE.displayName())) {
+                .equals(InstantiateAbstractExecutionHoleRule.INSTANCE.displayName())) {
             result = new InstantiateLoopHoleRuleAppIntermediate(
                 new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
                     builtinInfo.currPosInTerm),

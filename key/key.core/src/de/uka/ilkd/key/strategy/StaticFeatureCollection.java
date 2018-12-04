@@ -15,7 +15,7 @@ import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.QueryExpand;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.rule.lazyse.InstantiateLoopHoleRule;
+import de.uka.ilkd.key.rule.lazyse.InstantiateAbstractExecutionHoleRule;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
@@ -132,7 +132,7 @@ public abstract class StaticFeatureCollection {
 
     protected static Feature instLoopHoleFeature(Feature cost) {
         SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(InstantiateLoopHoleRule.INSTANCE);
+        filter.addRuleToSet(InstantiateAbstractExecutionHoleRule.INSTANCE);
         return ConditionalFeature.createConditional(filter, cost);
     }
 

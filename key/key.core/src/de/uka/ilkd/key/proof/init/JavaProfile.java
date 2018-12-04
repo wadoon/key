@@ -26,7 +26,7 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooserBuilder;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.lazyse.InstantiateLoopHoleRule;
+import de.uka.ilkd.key.rule.lazyse.InstantiateAbstractExecutionHoleRule;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -146,7 +146,7 @@ public class JavaProfile extends AbstractProfile {
                                    .prepend(getOneStepSimpilifier())
                                    .prepend(QueryExpand.INSTANCE)
                                    .prepend(MergeRule.INSTANCE)
-                                   .prepend(InstantiateLoopHoleRule.INSTANCE)
+                                   .prepend(InstantiateAbstractExecutionHoleRule.INSTANCE)
                                    .prepend(LoopContractApplyHeadRule.INSTANCE);
 
         //contract insertion rule, ATTENTION: ProofMgt relies on the fact

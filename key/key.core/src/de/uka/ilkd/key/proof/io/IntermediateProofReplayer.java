@@ -67,10 +67,10 @@ import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
 import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.lazyse.InstantiateLoopHoleRule;
-import de.uka.ilkd.key.rule.lazyse.InstantiateLoopHoleRuleApp;
-import de.uka.ilkd.key.rule.lazyse.LoopHole;
-import de.uka.ilkd.key.rule.lazyse.LoopHoleInstantiation;
+import de.uka.ilkd.key.rule.lazyse.InstantiateAbstractExecutionHoleRule;
+import de.uka.ilkd.key.rule.lazyse.InstantiateAbstractExecutionHoleRuleApp;
+import de.uka.ilkd.key.rule.lazyse.AbstractExecutionHole;
+import de.uka.ilkd.key.rule.lazyse.AbstractExecutionHoleInstantiation;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -127,7 +127,7 @@ public class IntermediateProofReplayer {
     /** Maps join node IDs to previously seen join partners */
     private HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>> joinPartnerNodes = new HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>>();
 
-    private LoopHole[] loopHoles = null;
+    private AbstractExecutionHole[] loopHoles = null;
 
     /** The current open goal */
     private Goal currGoal = null;
@@ -576,7 +576,7 @@ public class IntermediateProofReplayer {
             }
         }
 
-        if (InstantiateLoopHoleRule.INSTANCE.displayName().equals(ruleName)) {
+        if (InstantiateAbstractExecutionHoleRule.INSTANCE.displayName().equals(ruleName)) {
             final InstantiateLoopHoleRuleAppIntermediate ilhrai = //
                     (InstantiateLoopHoleRuleAppIntermediate) currInterm;
 
@@ -603,9 +603,9 @@ public class IntermediateProofReplayer {
 
                 assert lhIdx > -1;
 
-                final LoopHole currLH = loopHoles[lhIdx];
-                return new InstantiateLoopHoleRuleApp(
-                    new LoopHoleInstantiation(currLH, pcInst, symbStInst));
+                final AbstractExecutionHole currLH = loopHoles[lhIdx];
+                return new InstantiateAbstractExecutionHoleRuleApp(
+                    new AbstractExecutionHoleInstantiation(currLH, pcInst, symbStInst));
             } catch (ParserException e) {
                 reportError(
                     ERROR_LOADING_PROOF_LINE + "Line " + currInterm.getLineNr()
@@ -706,7 +706,7 @@ public class IntermediateProofReplayer {
     }
 
     private void refreshLoopHoles() {
-        loopHoles = InstantiateLoopHoleRule.retrieveLoopHoles(proof);
+        loopHoles = InstantiateAbstractExecutionHoleRule.retrieveLoopHoles(proof);
     }
 
     private int findLoopHole(String pathCPH, String symbStPH) {
@@ -714,7 +714,7 @@ public class IntermediateProofReplayer {
             refreshLoopHoles();
         }
         for (int i = 0; i < loopHoles.length; i++) {
-            final LoopHole currLH = loopHoles[i];
+            final AbstractExecutionHole currLH = loopHoles[i];
             if (currLH.getPathCondPlaceholder().equals(pathCPH)
                     && currLH.getSymbStorePlaceholder().equals(symbStPH)) {
                 return i;
