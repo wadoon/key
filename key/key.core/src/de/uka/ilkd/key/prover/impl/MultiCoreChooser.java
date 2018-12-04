@@ -8,8 +8,21 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.proofevent.RuleAppInfo;
 
+/**
+ * Multi threading enabled goal chooser, but otherwise really dumb. 
+ * 
+ * The goal chooser registers to the proof and listens for newly created goals.
+ * Each of these goal is immediatley scheduled for execution.
+ * 
+ * 
+ * 
+ * @author Richard Bubel
+ */
 public class MultiCoreChooser implements SchedulingGoalChooser {
 
+    /**
+     * Listens for applied rules and registers the new created goal for immediate scheduling 
+     */
     final class PopulateGoals implements RuleAppListener {
         @Override
         public void ruleApplied(ProofEvent e) {
@@ -21,16 +34,26 @@ public class MultiCoreChooser implements SchedulingGoalChooser {
         }
     }
 
+    /** list of goals to be scheduled */
     private ArrayDeque<Goal> nextList = new ArrayDeque<>();
+    /** identity hashmap of currently scheduled goals */
     private IdentityHashMap<Goal,Goal> currentlyScheduled = new IdentityHashMap<>();
+    /** the prover to which this goal chooser serves new goals */
     private MultiCoreProver prover;
+    /** listener for new goals */
     private PopulateGoals listener;
+    /** the proof object */
     private Proof proof;
 
+    /** 
+     * creates a new multi core goal chooser for the given prover
+     * @param prover the ProverCore
+     */
     public MultiCoreChooser(MultiCoreProver prover) {
         this.prover = prover;
     }
 
+    
     @Override
     public void init(Proof p_proof, ImmutableList<Goal> p_goals) {
         this.proof = p_proof;
