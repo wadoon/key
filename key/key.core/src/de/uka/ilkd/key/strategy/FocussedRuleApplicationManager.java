@@ -20,10 +20,12 @@ import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.FormulaTag;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.strategy.feature.BinaryFeature;
 import de.uka.ilkd.key.strategy.feature.MutableState;
 import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
+import de.uka.ilkd.key.util.Pair;
 
 
 /**
@@ -40,7 +42,7 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     private final PosInOccurrence         focussedSubterm;
 
     private Goal                          goal;
-    
+
     // Until <code>next</code> was called for the first time only rule
     // applications for the focussed formula are accepted, after that also
     // applications for other formulas. The idea is that then the rule index
@@ -48,32 +50,32 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     // formulas (this works at least for delegate
     // <code>QueueRuleApplicationManager</code>)
     private boolean                       onlyModifyFocussedFormula;
-    
+
     private FocussedRuleApplicationManager (AutomatedRuleApplicationManager delegate,
-                                    Goal goal,
-                                    FormulaTag focussedFormula,
-                                    PosInOccurrence focussedSubterm,
-                                    boolean onlyModifyFocussedFormula) {
+            Goal goal,
+            FormulaTag focussedFormula,
+            PosInOccurrence focussedSubterm,
+            boolean onlyModifyFocussedFormula) {
         this.delegate = delegate;
         this.rootManager = delegate instanceof QueueRuleApplicationManager
                 ? (QueueRuleApplicationManager) delegate
-                : ((FocussedRuleApplicationManager) delegate).rootManager;
-        this.focussedFormula = focussedFormula;
-        this.focussedSubterm = focussedSubterm;
-        this.goal = goal;
-        this.onlyModifyFocussedFormula = onlyModifyFocussedFormula;
+                        : ((FocussedRuleApplicationManager) delegate).rootManager;
+                this.focussedFormula = focussedFormula;
+                this.focussedSubterm = focussedSubterm;
+                this.goal = goal;
+                this.onlyModifyFocussedFormula = onlyModifyFocussedFormula;
     }
-    
+
     public FocussedRuleApplicationManager (AutomatedRuleApplicationManager delegate,
-                                   Goal goal,
-                                   PosInOccurrence focussedSubterm) {
+            Goal goal,
+            PosInOccurrence focussedSubterm) {
         this ( delegate,
-               goal,
-               goal.getFormulaTagManager ()
-                   .getTagForPos ( focussedSubterm.topLevel () ),
-               focussedSubterm,
-               true );
-        
+                goal,
+                goal.getFormulaTagManager ()
+                .getTagForPos ( focussedSubterm.topLevel () ),
+                focussedSubterm,
+                true );
+
         clearCache ();
     }
 
@@ -90,16 +92,16 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     @Override
     public Object clone () {
         return new FocussedRuleApplicationManager ( delegate.copy (),
-                                            null,
-                                            focussedFormula,
-                                            focussedSubterm,
-                                            onlyModifyFocussedFormula );
+                null,
+                focussedFormula,
+                focussedSubterm,
+                onlyModifyFocussedFormula );
     }
-    
+
     @Override
-    public RuleApp peekNext () {   
-	return delegate.peekNext();
-    } 
+    public RuleApp peekNext () {
+        return delegate.peekNext();
+    }
 
     @Override
     public RuleApp next () {
@@ -116,9 +118,9 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
 
     @Override
     public void ruleAdded (RuleApp rule, PosInOccurrence pos) {
-        if ( isRuleApplicationForFocussedFormula(rule, pos) ) {            
+        if ( isRuleApplicationForFocussedFormula(rule, pos) ) {
             delegate.ruleAdded ( rule, pos );
-        }         
+        }
     }
 
     protected boolean isRuleApplicationForFocussedFormula(RuleApp rule,
@@ -127,14 +129,14 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
         // focussed subterm or to other formulas that have been added after creation
         // of the manager (we rely on the fact that the caching rule indexes only
         // report rules for modified/added formulas anyway)
-        
+
         final PosInOccurrence focFormula = getPIOForFocussedSubterm ();
 
         if ( focFormula != null && pos != null ) {
             if ( isSameFormula ( pos, focFormula ) ) {
-                if ( !isBelow ( focFormula, pos ) || 
-                		NonDuplicateAppModPositionFeature.INSTANCE.computeCost(rule, pos, 
-                		        goal, new MutableState()).equals(BinaryFeature.TOP_COST))
+                if ( !isBelow ( focFormula, pos ) ||
+                        NonDuplicateAppModPositionFeature.INSTANCE.computeCost(rule, pos,
+                                goal, new MutableState()).equals(BinaryFeature.TOP_COST))
                     // rule app within the focussed formula, but not within the
                     // focussed subterm
                     return false;
@@ -147,7 +149,7 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
         return true;
     }
 
-    
+
     @Override
     public void rulesAdded (ImmutableList<? extends RuleApp> rules, PosInOccurrence pos) {
         ImmutableList<RuleApp> applicableRules = ImmutableSLList.<RuleApp>nil();
@@ -156,28 +158,36 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
                 applicableRules = applicableRules.prepend(r);
             }
         }
-        
+
         delegate.rulesAdded ( applicableRules, pos );
     }
 
-    
+    @Override
+    public void rulesAdded(
+            ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> rules) {
+        for (Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>> pair : rules) {
+            rulesAdded(pair.second, pair.first);
+        }
+    }
+
+
     private boolean isSameFormula (PosInOccurrence pio1,
-                                   PosInOccurrence pio2) {
+            PosInOccurrence pio2) {
         return pio2.isInAntec () == pio1.isInAntec ()
-               && pio2.sequentFormula ().equals ( pio1.sequentFormula () );
+                && pio2.sequentFormula ().equals ( pio1.sequentFormula () );
     }
 
     private PosInOccurrence getPIOForFocussedSubterm () {
         final PosInOccurrence formula =
-            goal.getFormulaTagManager ().getPosForTag ( focussedFormula );
+                goal.getFormulaTagManager ().getPosForTag ( focussedFormula );
 
         if ( formula == null ) return null;
 
         return
-            focussedSubterm
-            .replaceConstrainedFormula ( formula.sequentFormula () );
+                focussedSubterm
+                .replaceConstrainedFormula ( formula.sequentFormula () );
     }
-    
+
     private boolean isBelow (PosInOccurrence over, PosInOccurrence under) {
         final PIOPathIterator overIt = over.iterator ();
         final PIOPathIterator underIt = under.iterator ();
@@ -193,4 +203,6 @@ public class FocussedRuleApplicationManager implements AutomatedRuleApplicationM
     public AutomatedRuleApplicationManager getDelegate () {
         return delegate;
     }
+
+
 }

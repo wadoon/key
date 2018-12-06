@@ -13,7 +13,9 @@
 
 package de.uka.ilkd.key.proof;
 
-import org.key_project.util.collection.*;
+import org.key_project.util.collection.ImmutableArray;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PIOPathIterator;
@@ -634,10 +636,7 @@ public class TermTacletAppIndex {
         final ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>>
         allTacletsHereAndBelow = collectAllTacletAppsHereAndBelow( pos, result );
 
-        for (final Pair<PosInOccurrence,ImmutableList<NoPosTacletApp>> pair :
-            allTacletsHereAndBelow) {
-            fireRulesAdded ( listener, pair.second, pair.first );
-        }
+        fireRulesAdded(listener, allTacletsHereAndBelow);
     }
 
     /**
@@ -742,6 +741,10 @@ public class TermTacletAppIndex {
         listener.rulesAdded(taclets, pos);
     }
 
+    private static void fireRulesAdded(NewRuleListener listener,
+            ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> rules) {
+        listener.rulesAdded(rules);
+    }
 
     /**
      * @param p_filter the {@link RuleFilter} to be used

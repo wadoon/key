@@ -1,6 +1,6 @@
 package de.uka.ilkd.key.strategy;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -17,34 +17,39 @@ import de.uka.ilkd.key.rule.FindTaclet;
 import de.uka.ilkd.key.rule.NoFindTaclet;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.Pair;
 
 public class TacletAppContainerBuilder {
     private static ExecutorService exService = Executors.newFixedThreadPool(4);// ,
-                                                                               // new
-                                                                               // MyThreadFactory(Executors.defaultThreadFactory(),
-                                                                               // "cost"));
+    // new
+    // MyThreadFactory(Executors.defaultThreadFactory(),
+    // "cost"));
 
-    static class CostComputationTask implements Callable<TacletAppContainer> {
+    static class CostComputationTask implements Callable<ImmutableList<RuleAppContainer>> {
 
         private final Goal p_goal;
-        private final NoPosTacletApp p_app;
+        private final ImmutableList<NoPosTacletApp> apps;
         private final PosInOccurrence p_pio;
 
-        public CostComputationTask(Goal p_goal, NoPosTacletApp p_app,
+        public CostComputationTask(Goal p_goal, ImmutableList<NoPosTacletApp> apps,
                 PosInOccurrence p_pio) {
             this.p_goal = p_goal;
-            this.p_app = p_app;
+            this.apps = apps;
             this.p_pio = p_pio;
         }
 
         @Override
-        public TacletAppContainer call() throws Exception {
-            final RuleAppCost cost = p_goal.getGoalStrategy().computeCost(p_app,
-                    p_pio, p_goal);
-            final TacletAppContainer container = createContainer(p_app, p_pio,
-                    p_goal, cost, true);
-
-            return container;
+        public ImmutableList<RuleAppContainer> call() throws Exception {
+            ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
+            for (NoPosTacletApp app : apps) {
+                final RuleAppCost cost = p_goal.getGoalStrategy().computeCost(app,
+                        p_pio, p_goal);
+                final TacletAppContainer container = createContainer(app, p_pio,
+                        p_goal, cost, true);
+                if (container != null)
+                    result = result.prepend(container);
+            }
+            return result;
         }
 
     }
@@ -55,22 +60,38 @@ public class TacletAppContainerBuilder {
 
         ImmutableList<RuleAppContainer> result = ImmutableSLList
                 .<RuleAppContainer> nil();
-        final List<CostComputationTask> list = new LinkedList<>();
-        while (!p_app.isEmpty()) {
-            final CostComputationTask task = new CostComputationTask(p_goal,
-                    p_app.head(), p_pio);
-            list.add(task);
-            p_app = p_app.tail();
-        }
+        final CostComputationTask task = new CostComputationTask(p_goal,
+                p_app, p_pio);
         try {
-            final List<Future<TacletAppContainer>> futures = exService
-                    .invokeAll(list);
+            final Future<ImmutableList<RuleAppContainer>> futures = exService.submit(task);
+            result = futures.get();
+        }
+        catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
 
-            for (final Future<TacletAppContainer> future : futures) {
-                final TacletAppContainer container = future.get();
-                if (container != null) {
-                    result = result.prepend(container);
-                }
+    protected static ImmutableList<RuleAppContainer> createInitialAppContainers(
+            ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> rules,
+            Goal p_goal) {
+
+        ImmutableList<RuleAppContainer> result = ImmutableSLList
+                .<RuleAppContainer> nil();
+
+        List<CostComputationTask> tasks = new ArrayList<>();
+        for (Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>> pair : rules) {
+            if (!pair.second.isEmpty()) {
+                final CostComputationTask task = new CostComputationTask(p_goal,
+                        pair.second, pair.first);
+                tasks.add(task);
+            }
+        }
+
+        try {
+            List<Future<ImmutableList<RuleAppContainer>>> futures = exService.invokeAll(tasks);
+            for(Future<ImmutableList<RuleAppContainer>> future : futures) {
+                result = result.prependReverse(future.get());
             }
         }
         catch (InterruptedException | ExecutionException e) {
@@ -112,7 +133,7 @@ public class TacletAppContainerBuilder {
 
     /**
      * Create containers for FindTaclets or NoFindTaclets.
-     * 
+     *
      * @param p_app
      *            if <code>p_pio</code> is null, <code>p_app</code> has to be a
      *            <code>TacletApp</code> for a <code>NoFindTaclet</code>,

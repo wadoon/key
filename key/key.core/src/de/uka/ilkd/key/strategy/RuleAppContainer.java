@@ -22,6 +22,7 @@ import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Container for RuleApp instances with cost as determined by
@@ -115,6 +116,20 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
             }
             result = result.prepend( TacletAppContainerBuilder.createInitialAppContainers
                     ( tacletApplications, pos, goal) );
+        }
+        return result;
+    }
+
+    /**
+     * Create containers for RuleApps.
+     * @return list of containers for the currently applicable RuleApps, the cost
+     * may be an instance of <code>TopRuleAppCost</code>.
+     */
+    public static ImmutableList<RuleAppContainer> createAppContainers(ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> rules, Goal goal) {
+        ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
+
+        if (rules.size() >= 1) {
+            result = result.prepend( TacletAppContainerBuilder.createInitialAppContainers( rules, goal) );
         }
         return result;
     }

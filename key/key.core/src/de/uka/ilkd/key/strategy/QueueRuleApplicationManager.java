@@ -22,7 +22,10 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.feature.MutableState;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Implementation of {@link AutomatedRuleApplicationManager} that stores
@@ -140,6 +143,26 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         }
 
         final ImmutableList<RuleAppContainer> containers = RuleAppContainer.createAppContainers(rules, pos, goal);
+        ensureQueueExists();
+        for (RuleAppContainer rac : containers) {
+            queue = push(rac, queue);
+        }
+    }
+
+    /**
+     * Implementation of the method from <code>NewRuleListener</code>. The new
+     * rule app is added to the heap
+     */
+    @Override
+    public void rulesAdded(ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> rules) {
+        if (queue == null) {
+            // then the heap has to be rebuilt completely anyway, and the new
+            // rule app is not of interest for us
+            return;
+        }
+
+        final ImmutableList<RuleAppContainer> containers =
+                RuleAppContainer.createAppContainers(rules, goal);
         ensureQueueExists();
         for (RuleAppContainer rac : containers) {
             queue = push(rac, queue);
