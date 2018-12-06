@@ -13,7 +13,16 @@
 
 package de.uka.ilkd.key.strategy;
 
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -134,6 +143,27 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         return instantiateApp ( app, targetList, p_goal );
     }
 
+    private static ExecutorService exServiceInit = Executors.newFixedThreadPool(4, new MyThreadFactory(Executors.defaultThreadFactory(), "init"));
+
+    class InitComputationTask implements Runnable {
+
+        private Goal p_goal;
+        private NoPosTacletApp app;
+        private RuleAppCostCollector collector;
+        public InitComputationTask(Goal p_goal, NoPosTacletApp app, RuleAppCostCollector collector) {
+            this.p_goal = p_goal;
+            this.app = app;
+            this.collector = collector;
+        }
+        @Override
+        public void run() {
+            p_goal.getGoalStrategy().instantiateApp ( app,
+                    getPosInOccurrence ( p_goal ),
+                    p_goal,
+                    collector );
+        }
+
+    }
     /**
      * Use the method <code>instantiateApp</code> of the strategy for choosing
      * the values of schema variables that have not been instantiated so far
@@ -144,25 +174,34 @@ public abstract class TacletAppContainer extends RuleAppContainer {
         // just for being able to modify the result-list in an
         // anonymous class
         @SuppressWarnings("unchecked")
-        final ImmutableList<RuleAppContainer>[] resA =  new ImmutableList[] { targetList };
-
+        //        final ImmutableList<RuleAppContainer>[] resA =  new ImmutableList[] { targetList };
+        final ArrayBlockingQueue<RuleAppContainer> resArrayQueue = new ArrayBlockingQueue<>(10000);
         final RuleAppCostCollector collector =
                 new RuleAppCostCollector () {
             @Override
             public void collect(RuleApp newApp, RuleAppCost cost) {
                 if (cost instanceof TopRuleAppCost) return;
-                resA[0] = addContainer ( (NoPosTacletApp)newApp,
-                        resA[0],
+                addContainer ( (NoPosTacletApp)newApp,
                         p_goal,
-                        cost );
+                        cost, resArrayQueue );
             }
         };
-        p_goal.getGoalStrategy().instantiateApp ( app,
-                getPosInOccurrence ( p_goal ),
-                p_goal,
-                collector );
-
-        return resA[0];
+        Future<?> future = exServiceInit.submit(new InitComputationTask(p_goal, app, collector));
+        try {
+            future.get();
+        }
+        catch (InterruptedException | ExecutionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        //        p_goal.getGoalStrategy().instantiateApp ( app,
+        //                getPosInOccurrence ( p_goal ),
+        //                p_goal,
+        //                collector );
+        for (RuleAppContainer container : resArrayQueue) {
+            targetList = targetList.prepend(container);
+        }
+        return targetList;
     }
 
     /**
@@ -185,12 +224,11 @@ public abstract class TacletAppContainer extends RuleAppContainer {
      * is <code>sufficientlyComplete</code>, and add the container to
      * <code>targetList</code>
      */
-    private ImmutableList<RuleAppContainer> addContainer(NoPosTacletApp app,
-            ImmutableList<RuleAppContainer> targetList,
+    private void addContainer(NoPosTacletApp app,
             Goal p_goal,
-            RuleAppCost cost) {
-        if ( !sufficientlyCompleteApp ( app ) ) return targetList;
-        return targetList.prepend ( TacletAppContainer
+            RuleAppCost cost, Collection<RuleAppContainer> newApps) {
+        if ( !sufficientlyCompleteApp ( app ) ) return;
+        newApps.add ( TacletAppContainer
                 .createContainer ( app,
                         getPosInOccurrence ( p_goal ),
                         p_goal,
@@ -222,17 +260,54 @@ public abstract class TacletAppContainer extends RuleAppContainer {
     static RuleAppContainer createAppContainers( NoPosTacletApp p_app, Goal p_goal ) {
         return createAppContainers ( p_app, null, p_goal );
     }
+    private static ExecutorService exService = Executors.newFixedThreadPool(4, new MyThreadFactory(Executors.defaultThreadFactory(), "cost"));
+    static class CostComputationTask implements Callable<TacletAppContainer> {
 
+        private Goal p_goal;
+        private NoPosTacletApp p_app;
+        private PosInOccurrence p_pio;
+        public CostComputationTask(Goal p_goal, NoPosTacletApp p_app, PosInOccurrence p_pio) {
+            this.p_goal = p_goal;
+            this.p_app = p_app;
+            this.p_pio = p_pio;
+        }
+        @Override
+        public TacletAppContainer call() throws Exception {
+            final RuleAppCost cost = p_goal.getGoalStrategy().computeCost ( p_app, p_pio, p_goal );
+            final TacletAppContainer container = createContainer ( p_app, p_pio, p_goal, cost, true );
+
+            return container;
+        }
+
+    }
     protected static ImmutableList<RuleAppContainer> createInitialAppContainers(ImmutableList<NoPosTacletApp> p_app,
             PosInOccurrence p_pio, Goal p_goal) {
 
         ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
+        List<CostComputationTask> list = new LinkedList<>();
         while (!p_app.isEmpty()) {
-            final RuleAppCost cost = p_goal.getGoalStrategy().computeCost ( p_app.head(), p_pio, p_goal );
-            final TacletAppContainer container = createContainer ( p_app.head(), p_pio, p_goal, cost, true );
-            if (container != null) { result = result.prepend(container); }
+            CostComputationTask task = new CostComputationTask(p_goal, p_app.head(), p_pio);
+            list.add(task);
             p_app = p_app.tail();
         }
+        try {
+            List<Future<TacletAppContainer>> futures = exService.invokeAll(list);
+
+            for (Future<TacletAppContainer> future : futures) {
+                TacletAppContainer container = future.get();
+                if (container != null) {
+                    result = result.prepend(container);
+                }
+            }
+        }
+        catch (InterruptedException | ExecutionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        //            final RuleAppCost cost = p_goal.getGoalStrategy().computeCost ( p_app.head(), p_pio, p_goal );
+        //            final TacletAppContainer container = createContainer ( p_app.head(), p_pio, p_goal, cost, true );
+        //            if (container != null) { result = result.prepend(container); }
+        //            p_app = p_app.tail();
         return result;
     }
 
@@ -310,12 +385,28 @@ public abstract class TacletAppContainer extends RuleAppContainer {
             return null;
         }
 
-        TacletApp app = getTacletApp();
+        final TacletApp app2 = getTacletApp();
         PosInOccurrence pio = getPosInOccurrence(p_goal);
-        if (!p_goal.getGoalStrategy().isApprovedApp(app, pio, p_goal)) {
-            return null;
-        }
 
+        Future<Boolean> future = exService.submit(new Callable<Boolean>() {
+
+            @Override
+            public Boolean call() throws Exception {
+                // TODO Auto-generated method stub
+                return !p_goal.getGoalStrategy().isApprovedApp(app2, pio, p_goal);
+            }
+
+        });
+        try {
+            if (future.get()) {
+                return null;
+            }
+        }
+        catch (InterruptedException | ExecutionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        TacletApp app = app2;
         Services services = p_goal.proof().getServices();
         if (pio != null) {
             app = app.setPosInOccurrence(pio, services);

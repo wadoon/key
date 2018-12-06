@@ -23,6 +23,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.strategy.feature.MutableState;
 
 /**
  * Implementation of {@link AutomatedRuleApplicationManager} that stores
@@ -116,15 +117,17 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
      */
     @Override
     public void ruleAdded(RuleApp rule, PosInOccurrence pos) {
-        if (queue == null) {
-            // then the heap has to be rebuilt completely anyway, and the new
-            // rule app is not of interest for us
-            return;
-        }
 
-        RuleAppContainer c = RuleAppContainer.createAppContainer(rule, pos, goal);
-        ensureQueueExists();
-        queue = push(c, queue);
+        rulesAdded(ImmutableSLList.<RuleApp>nil().prepend(rule), pos);
+        //        if (queue == null) {
+        //            // then the heap has to be rebuilt completely anyway, and the new
+        //            // rule app is not of interest for us
+        //            return;
+        //        }
+        //
+        //        RuleAppContainer c = RuleAppContainer.createAppContainer(rule, pos, goal);
+        //        ensureQueueExists();
+        //        queue = push(c, queue);
     }
 
     /**
