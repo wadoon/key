@@ -625,6 +625,7 @@ public final class ProblemInitializer {
         Services services = initConfig.getServices();
         KeYJavaType ldkjt =
             services.getJavaInfo().getKeYJavaType("LedgerData");
+        if (ldkjt == null) return;
         LedgerDataTacletGenerator gen = new LedgerDataTacletGenerator(services, ldkjt);
 
         List<Taclet> taclets = gen.createTaclets();
