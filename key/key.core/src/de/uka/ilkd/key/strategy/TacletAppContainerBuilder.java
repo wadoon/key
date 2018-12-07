@@ -79,17 +79,16 @@ public class TacletAppContainerBuilder {
         ImmutableList<RuleAppContainer> result = ImmutableSLList
                 .<RuleAppContainer> nil();
 
-        List<CostComputationTask> tasks = new ArrayList<>();
+        List<Future<ImmutableList<RuleAppContainer>>> futures = new ArrayList<>();
         for (Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>> pair : rules) {
             if (!pair.second.isEmpty()) {
                 final CostComputationTask task = new CostComputationTask(p_goal,
                         pair.second, pair.first);
-                tasks.add(task);
+                futures.add(exService.submit(task));
             }
         }
 
         try {
-            List<Future<ImmutableList<RuleAppContainer>>> futures = exService.invokeAll(tasks);
             for(Future<ImmutableList<RuleAppContainer>> future : futures) {
                 result = result.prependReverse(future.get());
             }
