@@ -167,7 +167,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         final List<Future<ImmutableList<RuleAppContainer>>> futures =
                 RuleAppContainer.createAppContainers(rules, goal);
         ensureQueueExists();
-        for(Future<ImmutableList<RuleAppContainer>> future : futures) {
+        for (Future<ImmutableList<RuleAppContainer>> future : futures) {
             try {
                 for (RuleAppContainer rac : future.get())
                     queue = push(rac, queue);

@@ -25,13 +25,16 @@ public class TacletAppContainerBuilder {
     // MyThreadFactory(Executors.defaultThreadFactory(),
     // "cost"));
 
+    private static int BUCKET_SIZE = 5;
+    private static int THRESHOLD = 3 * BUCKET_SIZE / 2;
+
     static class CostComputationTask implements Callable<ImmutableList<RuleAppContainer>> {
 
         private final Goal p_goal;
-        private final ImmutableList<NoPosTacletApp> apps;
+        private final Iterable<NoPosTacletApp> apps;
         private final PosInOccurrence p_pio;
 
-        public CostComputationTask(Goal p_goal, ImmutableList<NoPosTacletApp> apps,
+        public CostComputationTask(Goal p_goal, Iterable<NoPosTacletApp> apps,
                 PosInOccurrence p_pio) {
             this.p_goal = p_goal;
             this.apps = apps;
@@ -78,9 +81,20 @@ public class TacletAppContainerBuilder {
 
         List<Future<ImmutableList<RuleAppContainer>>> futures = new ArrayList<>();
         for (Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>> pair : rules) {
-            if (!pair.second.isEmpty()) {
+            ImmutableList<NoPosTacletApp> apps = pair.second;
+            while (apps.size() > THRESHOLD) {
+                ArrayList<NoPosTacletApp> bucket = new ArrayList<>(BUCKET_SIZE);
+                for (int i = 0; i < BUCKET_SIZE; ++i) {
+                    bucket.add(apps.head());
+                    apps = apps.tail();
+                }
                 final CostComputationTask task = new CostComputationTask(p_goal,
-                        pair.second, pair.first);
+                        bucket, pair.first);
+                futures.add(exService.submit(task));
+            }
+            if (!apps.isEmpty()) {
+                final CostComputationTask task = new CostComputationTask(p_goal,
+                        apps, pair.first);
                 futures.add(exService.submit(task));
             }
         }
