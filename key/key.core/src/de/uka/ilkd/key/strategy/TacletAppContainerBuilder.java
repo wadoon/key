@@ -72,12 +72,9 @@ public class TacletAppContainerBuilder {
         return result;
     }
 
-    protected static ImmutableList<RuleAppContainer> createInitialAppContainers(
+    protected static List<Future<ImmutableList<RuleAppContainer>>> createInitialAppContainers(
             ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> rules,
             Goal p_goal) {
-
-        ImmutableList<RuleAppContainer> result = ImmutableSLList
-                .<RuleAppContainer> nil();
 
         List<Future<ImmutableList<RuleAppContainer>>> futures = new ArrayList<>();
         for (Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>> pair : rules) {
@@ -88,15 +85,7 @@ public class TacletAppContainerBuilder {
             }
         }
 
-        try {
-            for(Future<ImmutableList<RuleAppContainer>> future : futures) {
-                result = result.prependReverse(future.get());
-            }
-        }
-        catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
-        }
-        return result;
+        return futures;
     }
 
     protected static TacletAppContainer createContainer(NoPosTacletApp p_app,

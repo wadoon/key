@@ -14,6 +14,9 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.key_project.util.collection.ImmutableHeap;
 import org.key_project.util.collection.ImmutableLeftistHeap;
@@ -161,11 +164,16 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             return;
         }
 
-        final ImmutableList<RuleAppContainer> containers =
+        final List<Future<ImmutableList<RuleAppContainer>>> futures =
                 RuleAppContainer.createAppContainers(rules, goal);
         ensureQueueExists();
-        for (RuleAppContainer rac : containers) {
-            queue = push(rac, queue);
+        for(Future<ImmutableList<RuleAppContainer>> future : futures) {
+            try {
+                for (RuleAppContainer rac : future.get())
+                    queue = push(rac, queue);
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
         }
     }
 
