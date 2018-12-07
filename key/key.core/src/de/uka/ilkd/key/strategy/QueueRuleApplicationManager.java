@@ -144,10 +144,19 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             return;
         }
 
-        final Iterable<RuleAppContainer> containers = RuleAppContainer.createAppContainers(rules, pos, goal);
+        final Iterable<Future<RuleAppContainer>> futures =
+                RuleAppContainer.createAppContainersForTaclets(rules, pos, goal);
         ensureQueueExists();
-        for (RuleAppContainer rac : containers) {
+        for (RuleAppContainer rac : RuleAppContainer.createAppContainersForBuiltins(rules, pos, goal)) {
             queue = push(rac, queue);
+        }
+        for (Future<RuleAppContainer> future : futures) {
+            try {
+                RuleAppContainer rac = future.get();
+                queue = push(rac, queue);
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
         }
     }
 

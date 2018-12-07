@@ -27,16 +27,15 @@ public class TacletAppContainerBuilder {
         return createContainer(app, p_pio, p_goal, cost, true);
     }
 
-    protected static Iterable<RuleAppContainer> createInitialAppContainers(
+    protected static Iterable<Future<RuleAppContainer>> createInitialAppContainers(
             ImmutableList<NoPosTacletApp> p_app, PosInOccurrence p_pio,
             Goal p_goal) {
 
-        ArrayList<RuleAppContainer> result = new ArrayList<>();
+        List<Future<RuleAppContainer>> futures = new ArrayList<>();
         for (NoPosTacletApp app : p_app) {
-            // sequential
-            result.add(calculateCost(p_goal, app, p_pio));
+            futures.add(exService.submit(() -> { return calculateCost(p_goal, app, p_pio); }));
         }
-        return result;
+        return futures;
     }
 
     protected static Iterable<Future<RuleAppContainer>> createInitialAppContainers(
