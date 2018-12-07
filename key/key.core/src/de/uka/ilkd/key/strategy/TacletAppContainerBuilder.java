@@ -2,7 +2,6 @@ package de.uka.ilkd.key.strategy;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -23,25 +22,9 @@ public class TacletAppContainerBuilder {
     // MyThreadFactory(Executors.defaultThreadFactory(),
     // "cost"));
 
-    static class CostComputationTask implements Callable<RuleAppContainer> {
-
-        private final Goal p_goal;
-        private final NoPosTacletApp app;
-        private final PosInOccurrence p_pio;
-
-        public CostComputationTask(Goal p_goal, NoPosTacletApp app, PosInOccurrence p_pio) {
-            this.p_goal = p_goal;
-            this.app = app;
-            this.p_pio = p_pio;
-        }
-
-        @Override
-        public RuleAppContainer call() {
-            final RuleAppCost cost = p_goal.getGoalStrategy().computeCost(app,
-                    p_pio, p_goal);
-            return createContainer(app, p_pio, p_goal, cost, true);
-        }
-
+    private static RuleAppContainer calculateCost(Goal p_goal, NoPosTacletApp app, PosInOccurrence p_pio) {
+        final RuleAppCost cost = p_goal.getGoalStrategy().computeCost(app, p_pio, p_goal);
+        return createContainer(app, p_pio, p_goal, cost, true);
     }
 
     protected static Iterable<RuleAppContainer> createInitialAppContainers(
@@ -50,24 +33,22 @@ public class TacletAppContainerBuilder {
 
         ArrayList<RuleAppContainer> result = new ArrayList<>();
         for (NoPosTacletApp app : p_app) {
-            final CostComputationTask task = new CostComputationTask(p_goal, app, p_pio);
             // sequential
-            result.add(task.call());
+            result.add(calculateCost(p_goal, app, p_pio));
         }
         return result;
     }
 
     protected static Iterable<Future<RuleAppContainer>> createInitialAppContainers(
             ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> rules,
-            Goal p_goal) {
+            final Goal p_goal) {
 
         List<Future<RuleAppContainer>> futures = new ArrayList<>();
         for (Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>> pair : rules) {
             ImmutableList<NoPosTacletApp> apps = pair.second;
-            for (NoPosTacletApp app : apps) {
-                final CostComputationTask task = new CostComputationTask(p_goal,
-                        app, pair.first);
-                futures.add(exService.submit(task));
+            final PosInOccurrence pio = pair.first;
+            for (final NoPosTacletApp app : apps) {
+                futures.add(exService.submit(() -> { return calculateCost(p_goal, app, pio); }));
             }
         }
 
