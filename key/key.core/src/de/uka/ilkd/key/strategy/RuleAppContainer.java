@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.strategy;
 
-import java.util.List;
 import java.util.concurrent.Future;
 
 import org.key_project.util.collection.ImmutableList;
@@ -128,7 +127,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * @return list of containers for the currently applicable RuleApps, the cost
      * may be an instance of <code>TopRuleAppCost</code>.
      */
-    public static List<Future<Iterable<RuleAppContainer>>> createAppContainers(ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> rules, Goal goal) {
+    public static Iterable<Future<RuleAppContainer>> createAppContainers(ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> rules, Goal goal) {
         return TacletAppContainerBuilder.createInitialAppContainers(rules, goal);
     }
 

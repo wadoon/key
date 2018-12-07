@@ -23,34 +23,23 @@ public class TacletAppContainerBuilder {
     // MyThreadFactory(Executors.defaultThreadFactory(),
     // "cost"));
 
-    private static int BUCKET_SIZE = 5;
-    private static int THRESHOLD = 3 * BUCKET_SIZE / 2;
-
-    static class CostComputationTask implements Callable<Iterable<RuleAppContainer>> {
+    static class CostComputationTask implements Callable<RuleAppContainer> {
 
         private final Goal p_goal;
-        private final Iterable<NoPosTacletApp> apps;
+        private final NoPosTacletApp app;
         private final PosInOccurrence p_pio;
 
-        public CostComputationTask(Goal p_goal, Iterable<NoPosTacletApp> apps,
-                PosInOccurrence p_pio) {
+        public CostComputationTask(Goal p_goal, NoPosTacletApp app, PosInOccurrence p_pio) {
             this.p_goal = p_goal;
-            this.apps = apps;
+            this.app = app;
             this.p_pio = p_pio;
         }
 
         @Override
-        public Iterable<RuleAppContainer> call() {
-            ArrayList<RuleAppContainer> result = new ArrayList<>();
-            for (NoPosTacletApp app : apps) {
-                final RuleAppCost cost = p_goal.getGoalStrategy().computeCost(app,
-                        p_pio, p_goal);
-                final TacletAppContainer container = createContainer(app, p_pio,
-                        p_goal, cost, true);
-                if (container != null)
-                    result.add(container);
-            }
-            return result;
+        public RuleAppContainer call() {
+            final RuleAppCost cost = p_goal.getGoalStrategy().computeCost(app,
+                    p_pio, p_goal);
+            return createContainer(app, p_pio, p_goal, cost, true);
         }
 
     }
@@ -59,33 +48,25 @@ public class TacletAppContainerBuilder {
             ImmutableList<NoPosTacletApp> p_app, PosInOccurrence p_pio,
             Goal p_goal) {
 
-        final CostComputationTask task = new CostComputationTask(p_goal,
-                p_app, p_pio);
-
-        // sequential
-        return task.call();
+        ArrayList<RuleAppContainer> result = new ArrayList<>();
+        for (NoPosTacletApp app : p_app) {
+            final CostComputationTask task = new CostComputationTask(p_goal, app, p_pio);
+            // sequential
+            result.add(task.call());
+        }
+        return result;
     }
 
-    protected static List<Future<Iterable<RuleAppContainer>>> createInitialAppContainers(
+    protected static Iterable<Future<RuleAppContainer>> createInitialAppContainers(
             ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> rules,
             Goal p_goal) {
 
-        List<Future<Iterable<RuleAppContainer>>> futures = new ArrayList<>();
+        List<Future<RuleAppContainer>> futures = new ArrayList<>();
         for (Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>> pair : rules) {
             ImmutableList<NoPosTacletApp> apps = pair.second;
-            while (apps.size() > THRESHOLD) {
-                ArrayList<NoPosTacletApp> bucket = new ArrayList<>(BUCKET_SIZE);
-                for (int i = 0; i < BUCKET_SIZE; ++i) {
-                    bucket.add(apps.head());
-                    apps = apps.tail();
-                }
+            for (NoPosTacletApp app : apps) {
                 final CostComputationTask task = new CostComputationTask(p_goal,
-                        bucket, pair.first);
-                futures.add(exService.submit(task));
-            }
-            if (!apps.isEmpty()) {
-                final CostComputationTask task = new CostComputationTask(p_goal,
-                        apps, pair.first);
+                        app, pair.first);
                 futures.add(exService.submit(task));
             }
         }

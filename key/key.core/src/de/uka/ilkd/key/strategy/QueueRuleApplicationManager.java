@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.strategy;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -164,13 +163,13 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             return;
         }
 
-        final List<Future<Iterable<RuleAppContainer>>> futures =
+        final Iterable<Future<RuleAppContainer>> futures =
                 RuleAppContainer.createAppContainers(rules, goal);
         ensureQueueExists();
-        for (Future<Iterable<RuleAppContainer>> future : futures) {
+        for (Future<RuleAppContainer> future : futures) {
             try {
-                for (RuleAppContainer rac : future.get())
-                    queue = push(rac, queue);
+                RuleAppContainer rac = future.get();
+                queue = push(rac, queue);
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
