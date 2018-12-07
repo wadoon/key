@@ -145,7 +145,7 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             return;
         }
 
-        final ImmutableList<RuleAppContainer> containers = RuleAppContainer.createAppContainers(rules, pos, goal);
+        final Iterable<RuleAppContainer> containers = RuleAppContainer.createAppContainers(rules, pos, goal);
         ensureQueueExists();
         for (RuleAppContainer rac : containers) {
             queue = push(rac, queue);
@@ -164,10 +164,10 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
             return;
         }
 
-        final List<Future<ImmutableList<RuleAppContainer>>> futures =
+        final List<Future<Iterable<RuleAppContainer>>> futures =
                 RuleAppContainer.createAppContainers(rules, goal);
         ensureQueueExists();
-        for (Future<ImmutableList<RuleAppContainer>> future : futures) {
+        for (Future<Iterable<RuleAppContainer>> future : futures) {
             try {
                 for (RuleAppContainer rac : future.get())
                     queue = push(rac, queue);

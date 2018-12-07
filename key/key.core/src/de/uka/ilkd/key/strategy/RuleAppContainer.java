@@ -98,7 +98,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * @return list of containers for the currently applicable RuleApps, the cost
      * may be an instance of <code>TopRuleAppCost</code>.
      */
-    public static ImmutableList<RuleAppContainer> createAppContainers(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos, Goal goal) {
+    public static Iterable<RuleAppContainer> createAppContainers(ImmutableList<? extends RuleApp> rules, PosInOccurrence pos, Goal goal) {
         ImmutableList<RuleAppContainer> result = ImmutableSLList.<RuleAppContainer>nil();
 
         if (rules.size() >= 1) {
@@ -117,7 +117,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
                 result = result.append( BuiltInRuleAppContainer.createInitialAppContainers
                         ( builtInRuleApplications, pos, goal) );
             }
-            result = result.prepend( TacletAppContainerBuilder.createInitialAppContainers
+            result = result.prependReverse( TacletAppContainerBuilder.createInitialAppContainers
                     ( tacletApplications, pos, goal) );
         }
         return result;
@@ -128,7 +128,7 @@ public abstract class RuleAppContainer implements Comparable<RuleAppContainer> {
      * @return list of containers for the currently applicable RuleApps, the cost
      * may be an instance of <code>TopRuleAppCost</code>.
      */
-    public static List<Future<ImmutableList<RuleAppContainer>>> createAppContainers(ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> rules, Goal goal) {
+    public static List<Future<Iterable<RuleAppContainer>>> createAppContainers(ImmutableList<Pair<PosInOccurrence, ImmutableList<NoPosTacletApp>>> rules, Goal goal) {
         return TacletAppContainerBuilder.createInitialAppContainers(rules, goal);
     }
 
