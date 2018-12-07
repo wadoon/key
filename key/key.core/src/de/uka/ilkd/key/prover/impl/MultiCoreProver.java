@@ -1,6 +1,13 @@
 package de.uka.ilkd.key.prover.impl;
 
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorCompletionService;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.key_project.util.collection.ImmutableList;
@@ -21,10 +28,10 @@ public class MultiCoreProver extends AbstractProverCore {
 
     /** number of closed goals */
     private final AtomicInteger closedGoals = new AtomicInteger(0);
-   
+
     /** number of rules automatically applied */
     protected final AtomicInteger countApplied = new AtomicInteger(0);
-    
+
     /** number of currently running tasks */
     protected final AtomicInteger numberOfTasks = new AtomicInteger(0);
 
@@ -148,7 +155,7 @@ public class MultiCoreProver extends AbstractProverCore {
         this.timeout = proof.getSettings().getStrategySettings().getTimeout();
         initGoalChooser(goals);
 
-        
+
         final ApplyStrategyInfo result = run(proof, stopAtFirstNonCloseableGoal);
 
         proof.addAutoModeTime(result.getTime());
@@ -159,7 +166,7 @@ public class MultiCoreProver extends AbstractProverCore {
     }
 
     private ApplyStrategyInfo run(Proof proof, boolean stopAtFirstNonCloseableGoal) {
-        long time;        
+        long time;
         SingleRuleApplicationInfo info = null;
         fireTaskStarted(maxApplications);
 
@@ -195,7 +202,7 @@ public class MultiCoreProver extends AbstractProverCore {
             shutdown();
             try {
                 threadpool.awaitTermination(2, TimeUnit.SECONDS);
-            } catch (InterruptedException e) {                
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
@@ -238,7 +245,7 @@ public class MultiCoreProver extends AbstractProverCore {
     public void submit(Goal nextGoal) {
         if (!threadpool.isShutdown()) {
             numberOfTasks.incrementAndGet();
-            completionService.submit(new ProverTask(nextGoal));            
+            completionService.submit(new ProverTask(nextGoal));
         }
     }
 }

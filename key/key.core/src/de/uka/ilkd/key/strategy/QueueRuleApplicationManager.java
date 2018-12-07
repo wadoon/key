@@ -13,8 +13,12 @@
 
 package de.uka.ilkd.key.strategy;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.key_project.util.collection.ImmutableHeap;
@@ -41,6 +45,9 @@ import de.uka.ilkd.key.util.Pair;
  * {@link Strategy#computeCost(RuleApp, PosInOccurrence, Goal, MutableState)}).
  */
 public class QueueRuleApplicationManager implements AutomatedRuleApplicationManager {
+
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final Collection<Future<?>> pendingChanges = new ArrayList<Future<?>>();
 
     /**
      * The goal this manager belongs to.
@@ -147,17 +154,19 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         final Iterable<Future<RuleAppContainer>> futures =
                 RuleAppContainer.createAppContainersForTaclets(rules, pos, goal);
         ensureQueueExists();
-        for (RuleAppContainer rac : RuleAppContainer.createAppContainersForBuiltins(rules, pos, goal)) {
-            queue = push(rac, queue);
-        }
-        for (Future<RuleAppContainer> future : futures) {
-            try {
-                RuleAppContainer rac = future.get();
+        pendingChanges.add(executor.submit(() -> {
+            for (RuleAppContainer rac : RuleAppContainer.createAppContainersForBuiltins(rules, pos, goal)) {
                 queue = push(rac, queue);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
             }
-        }
+            for (Future<RuleAppContainer> future : futures) {
+                try {
+                    RuleAppContainer rac = future.get();
+                    queue = push(rac, queue);
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        }));
     }
 
     /**
@@ -175,14 +184,16 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         final Iterable<Future<RuleAppContainer>> futures =
                 RuleAppContainer.createAppContainers(rules, goal);
         ensureQueueExists();
-        for (Future<RuleAppContainer> future : futures) {
-            try {
-                RuleAppContainer rac = future.get();
-                queue = push(rac, queue);
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+        pendingChanges.add(executor.submit(() -> {
+            for (Future<RuleAppContainer> future : futures) {
+                try {
+                    RuleAppContainer rac = future.get();
+                    queue = push(rac, queue);
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
             }
-        }
+        }));
     }
 
     /**
@@ -208,6 +219,23 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         }
     }
 
+    private void ensureQueueIsReady() {
+        if (pendingChanges.isEmpty())
+            return;
+
+        for (Future<?> pending : pendingChanges) {
+            try {
+                pending.get();
+            }
+            catch (InterruptedException | ExecutionException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        pendingChanges.clear();
+    }
+
     /**
      * @return the first applicable rule app, i.e. the least expensive element
      *         of the heap that is not obsolete and caches the result of this
@@ -228,6 +256,8 @@ public class QueueRuleApplicationManager implements AutomatedRuleApplicationMana
         if (nextRuleApp != null) {
             return nextRuleApp;
         }
+
+        ensureQueueIsReady();
 
         goal.ruleAppIndex().fillCache();
 
