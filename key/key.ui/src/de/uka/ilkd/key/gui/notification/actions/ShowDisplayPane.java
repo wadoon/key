@@ -31,6 +31,7 @@ public abstract class ShowDisplayPane implements NotificationAction {
      * the message to be displayed
      */
     private String message = "";
+    private String title = "";
     protected Frame parentComponent;
     
     
@@ -40,7 +41,15 @@ public abstract class ShowDisplayPane implements NotificationAction {
     public ShowDisplayPane(Frame parentComponent) {
         this.parentComponent=parentComponent;
     }
-    
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return this.title;
+    }
+
     /**
      * sets the message to be displayed
      * @param message the String to be displayed
@@ -55,5 +64,5 @@ public abstract class ShowDisplayPane implements NotificationAction {
     public String getMessage() {
         return message;
     }
-    
+
 }

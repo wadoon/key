@@ -72,6 +72,8 @@ public class IconFactory {
         getImage("images/toolbar/open.png");
     private static Image openMostRecentKeYFile =
         getImage("images/toolbar/openMostRecent.png");
+    private static Image reloadCurrentProof =
+            getImage("images/toolbar/reloadCurrent.png");
     private static Image saveFile =
         getImage("images/toolbar/saveFile.png");
     private static Image editFile =
@@ -345,6 +347,10 @@ public class IconFactory {
 
     public static Icon openMostRecent(int size) {
         return scaleIcon(openMostRecentKeYFile, size, size);
+    }
+
+    public static Icon reloadCurrent(int size) {
+        return scaleIcon(reloadCurrentProof, size, size);
     }
 
     public static Icon openKeYFile(int size) {

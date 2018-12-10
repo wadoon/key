@@ -107,6 +107,10 @@ public class ExceptionDialog extends JDialog {
         reloadButton.setAction(MainWindow.getInstance().getOpenMostRecentFileAction());
         reloadButton.addActionListener(closeListener);
 
+        JButton refreshButton = new JButton("Refresh");
+        refreshButton.setAction(MainWindow.getInstance().getReloadCurrentProofAction());
+        refreshButton.addActionListener(closeListener);
+
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(closeListener);
         getRootPane().setDefaultButton(closeButton);

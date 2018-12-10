@@ -323,7 +323,7 @@ public class Node  {
     }
 
     public Statistics statistics() {
-        return new Statistics(this);
+        return new Statistics(this, proof().openGoals().size());
     }
 
     /**

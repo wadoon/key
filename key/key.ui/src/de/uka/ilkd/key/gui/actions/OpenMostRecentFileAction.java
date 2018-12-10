@@ -50,6 +50,9 @@ public final class OpenMostRecentFileAction extends MainWindowAction {
                         KeYFileChooser.getFileChooser("Select file to load proof or problem");
                 fileChooser.selectFile(file);
                 mainWindow.loadProblem(file);
+                // TODO: Abandon proof from here
+                // if (removalConfirmed) {
+                // getMediator().getSelectedProof().dispose();
             }
         }
     }

@@ -31,7 +31,8 @@ public final class SideProofStatistics extends Statistics {
      * @param loopInvApps amount of loop invariant rule applications
      * @param autoModeTime accumulated (spent) auto mode time
      */
-    private SideProofStatistics(int sideProofs,
+    private SideProofStatistics(int openGoals,
+                                int sideProofs,
                                 int nodes,
                                 int branches,
                                 int interactiveSteps,
@@ -46,7 +47,7 @@ public final class SideProofStatistics extends Statistics {
                                 int blockLoopContractApps,
                                 int loopInvApps,
                                 long autoModeTime) {
-        super(nodes, branches, interactiveSteps, symbExApps,
+        super(openGoals, nodes, branches, interactiveSteps, symbExApps,
               quantifierInstantiations, ossApps, mergeRuleApps, totalRuleApps,
               smtSolverApps, dependencyContractApps, operationContractApps,
               blockLoopContractApps, loopInvApps, autoModeTime,
@@ -64,7 +65,8 @@ public final class SideProofStatistics extends Statistics {
      *         but with the side proof number set to one.
      */
     static SideProofStatistics create(SideProofStatistics stat) {
-        return new SideProofStatistics(1, stat.nodes,
+        return new SideProofStatistics(stat.openGoals, 1,
+                                       stat.nodes,
                                        stat.branches,
                                        stat.interactiveSteps,
                                        stat.symbExApps,
@@ -87,7 +89,8 @@ public final class SideProofStatistics extends Statistics {
      *         but as side proof statistics and with the side proof number set to one.
      */
     static SideProofStatistics create(Statistics stat) {
-        return new SideProofStatistics(1, stat.nodes,
+        return new SideProofStatistics(stat.openGoals, 1,
+                                       stat.nodes,
                                        stat.branches,
                                        stat.interactiveSteps,
                                        stat.symbExApps,
@@ -109,7 +112,8 @@ public final class SideProofStatistics extends Statistics {
      * @return the sum of both side proof statistics objects.
      */
     SideProofStatistics add(SideProofStatistics stat) {
-        return new SideProofStatistics(this.sideProofs + stat.sideProofs,
+        return new SideProofStatistics(this.openGoals,
+                                       this.sideProofs + stat.sideProofs,
                                        this.nodes + stat.nodes,
                                        this.branches + stat.branches,
                                        this.interactiveSteps + stat.interactiveSteps,
@@ -133,7 +137,8 @@ public final class SideProofStatistics extends Statistics {
      * @return the sum of the proof statistics and the side proof statistics object.
      */
     public SideProofStatistics add(Statistics stat) {
-        return new SideProofStatistics(this.sideProofs + 1, this.nodes + stat.nodes,
+        return new SideProofStatistics(stat.openGoals,
+                this.sideProofs + 1, this.nodes + stat.nodes,
                                        this.branches + stat.branches,
                                        this.interactiveSteps + stat.interactiveSteps,
                                        this.symbExApps + stat.symbExApps,
@@ -156,7 +161,7 @@ public final class SideProofStatistics extends Statistics {
      * @return identical side proof statistics object, but with changed auto mode time.
      */
     public SideProofStatistics setAutoModeTime(long autoTime) {
-        return new SideProofStatistics(sideProofs, nodes, branches,
+        return new SideProofStatistics(openGoals, sideProofs, nodes, branches,
                                        interactiveSteps, symbExApps,
                                        quantifierInstantiations, ossApps,
                                        mergeRuleApps, totalRuleApps,

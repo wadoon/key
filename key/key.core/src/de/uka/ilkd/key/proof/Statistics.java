@@ -1,9 +1,14 @@
 package de.uka.ilkd.key.proof;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.Map.Entry;
 
 import de.uka.ilkd.key.informationflow.proof.InfFlowProof;
 import de.uka.ilkd.key.informationflow.proof.SideProofStatistics;
@@ -25,6 +30,7 @@ import de.uka.ilkd.key.util.Pair;
  *
  */
 public class Statistics {
+    public final int openGoals;
     public final int nodes;
     public final int branches;
     public final int interactiveSteps;
@@ -48,7 +54,8 @@ public class Statistics {
     private final HashMap<String, Integer> interactiveAppsDetails =
             new HashMap<String, Integer>();
 
-    protected Statistics(int nodes,
+    protected Statistics(int openGoals,
+                         int nodes,
                          int branches,
                          int interactiveSteps,
                          int symbExApps,
@@ -64,6 +71,7 @@ public class Statistics {
                          long autoModeTimeInMillis,
                          long timeInMillis,
                          float timePerStepInMillis) {
+        this.openGoals = openGoals;
         this.nodes = nodes;
         this.branches = branches;
         this.interactiveSteps = interactiveSteps;
@@ -82,7 +90,7 @@ public class Statistics {
         this.timePerStepInMillis = timePerStepInMillis;
     }
 
-    Statistics(Node startNode) {
+    Statistics(Node startNode, int openGoals) {
         final Iterator<Node> it = startNode.subtreeIterator();
 
         TemporaryStatistics tmp = new TemporaryStatistics();
@@ -93,6 +101,7 @@ public class Statistics {
             tmp.changeOnNode(node, interactiveAppsDetails);
         }
 
+        this.openGoals = openGoals;
         this.nodes = tmp.nodes;
         this.branches = tmp.branches;
         this.interactiveSteps = tmp.interactive;
@@ -114,11 +123,12 @@ public class Statistics {
     }
 
     Statistics(Proof proof) {
-        this(proof.root());
+        this(proof.root(), proof.openGoals().size());
     }
 
     static Statistics create(Statistics side, long creationTime) {
-        return new Statistics(side.nodes,
+        return new Statistics(side.openGoals,
+                              side.nodes,
                               side.branches,
                               side.interactiveSteps,
                               side.symbExApps,
@@ -353,6 +363,115 @@ public class Statistics {
                 res = 0;
             }
             return res;
+        }
+    }
+
+    public HTMLMessage getHTMLMessage() {
+        final int openGoals = this.openGoals;
+        int heightCnt = 1;
+        int widthCnt = 100;
+        String txt = "";
+        String stats = "<html><head>"
+                + "<style type=\"text/css\">"
+                + "body {font-weight: normal;}"
+                + "td {padding: 1px;}"
+                + "th {padding: 2px; font-weight: bold;}"
+                + "</style></head><body>";
+
+        if (openGoals > 0) {
+            txt = openGoals + " open goal" + (openGoals > 1 ? "s." : ".");
+        } else {
+            txt = "Proved.";
+        }
+        widthCnt = widthCnt < txt.length() ? txt.length() : widthCnt;
+        stats += "<strong>" + txt + "</strong>";
+
+        stats += "<br/><br/><table>";
+
+        for (Pair<String, String> x : getSummary()) {
+            widthCnt = widthCnt < x.first.length() ? x.first.length() : widthCnt;
+            widthCnt = widthCnt < x.second.length() ? x.second.length() : widthCnt;
+            if ("".equals(x.second)) {
+                stats +=
+                        "<tr><th colspan=\"2\">" + x.first
+                                + "</th></tr>";
+            } else {
+                stats +=
+                        "<tr><td>" + x.first + "</td><td>" + x.second
+                                + "</td></tr>";
+            }
+            heightCnt++;
+        }
+
+        if (interactiveSteps > 0) {
+            txt = "Details on Interactive Apps";
+            widthCnt = widthCnt < txt.length() ? txt.length() : widthCnt;
+            stats +=
+                    "<tr><th colspan=\"2\">"
+                            + txt
+                            + "</th></tr>";
+            heightCnt++;
+
+            SortedSet<Map.Entry<String, Integer>> sortedEntries =
+                    new TreeSet<Map.Entry<String, Integer>>(
+                            new Comparator<Map.Entry<String, Integer>>() {
+                                @Override
+                                public int compare(
+                                        Entry<String, Integer> o1,
+                                        Entry<String, Integer> o2) {
+                                    int cmpRes =
+                                            o2.getValue().compareTo(
+                                                    o1.getValue());
+
+                                    if (cmpRes == 0) {
+                                        cmpRes =
+                                                o1.getKey().compareTo(
+                                                        o2.getKey());
+                                    }
+
+                                    return cmpRes;
+                                }
+                            });
+            sortedEntries.addAll(getInteractiveAppsDetails().entrySet());
+
+            for (Map.Entry<String, Integer> entry : sortedEntries) {
+                widthCnt =
+                        widthCnt < (entry.getKey() + entry.getValue()).length()
+                        ? (entry.getKey() + entry.getValue()).length()
+                                : widthCnt;
+                stats +=
+                        "<tr><td>" + entry.getKey() + "</td><td>"
+                                + entry.getValue() + "</td></tr>";
+                heightCnt++;
+            }
+        }
+
+        stats += "</table></body></html>";
+
+        return new HTMLMessage(stats, widthCnt, heightCnt);
+    }
+
+    public class HTMLMessage {
+        private int width;
+        private int height;
+        private String message;
+
+        HTMLMessage(String message, int width, int height) {
+            this.message = message;
+            this.width = width;
+            this.height = height;
+        }
+
+        public int getWidth() {
+            return this.width;
+        }
+
+        public int getHeight() {
+            return this.height;
+        }
+
+        public String getMessageString() {
+            return this.message;
         }
     }
 }

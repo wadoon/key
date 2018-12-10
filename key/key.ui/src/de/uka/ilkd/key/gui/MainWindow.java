@@ -131,6 +131,9 @@ public final class MainWindow extends JFrame  {
     /** action for opening the most recent KeY file */
     private OpenMostRecentFileAction openMostRecentFileAction;
 
+    /** action for refreshing the current proof */
+    private ReloadCurrentProofAction reloadCurrentProofAction;
+
     /** action for editing the most recent KeY file */
     private EditMostRecentFileAction editMostRecentFileAction;
 
@@ -322,6 +325,7 @@ public final class MainWindow extends JFrame  {
         openFileAction            = new OpenFileAction(this);
         openExampleAction         = new OpenExampleAction(this);
         openMostRecentFileAction  = new OpenMostRecentFileAction(this);
+        reloadCurrentProofAction  = new ReloadCurrentProofAction(this);
         editMostRecentFileAction  = new EditMostRecentFileAction(this);
         saveFileAction            = new SaveFileAction(this);
         quickSaveAction           = new QuickSaveAction(this);
@@ -395,6 +399,7 @@ public final class MainWindow extends JFrame  {
 	JToolBar fileOperations = new JToolBar("File Operations");
         fileOperations.add(openFileAction);
         fileOperations.add(openMostRecentFileAction);
+        fileOperations.add(reloadCurrentProofAction);
         fileOperations.add(editMostRecentFileAction);
         fileOperations.add(saveFileAction);
         fileOperations.addSeparator();
@@ -649,6 +654,7 @@ public final class MainWindow extends JFrame  {
         fileMenu.add(openExampleAction);
         fileMenu.add(openFileAction);
         fileMenu.add(openMostRecentFileAction);
+        fileMenu.add(reloadCurrentProofAction);
         fileMenu.add(editMostRecentFileAction);
         fileMenu.add(saveFileAction);
         fileMenu.add(quickSaveAction);
@@ -1445,6 +1451,10 @@ public final class MainWindow extends JFrame  {
 
     public Action getOpenMostRecentFileAction() {
         return openMostRecentFileAction;
+    }
+
+    public Action getReloadCurrentProofAction() {
+        return reloadCurrentProofAction;
     }
 
     public Action getUnicodeToggleAction() {

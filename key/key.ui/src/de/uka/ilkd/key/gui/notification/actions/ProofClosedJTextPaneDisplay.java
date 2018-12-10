@@ -44,6 +44,7 @@ public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
     
     public ProofClosedJTextPaneDisplay(Frame parentComponent) {
         super(parentComponent);
+        setTitle("Proof closed");
     }
     /**
      * Displays a JOptionPane informing the user about a closed proof.
@@ -54,7 +55,7 @@ public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
         if (pcne instanceof ProofClosedNotificationEvent) {
             Proof proof = ((ProofClosedNotificationEvent)pcne).getProof();
             if (proof != null) {
-                setMessage(ShowProofStatistics.getHTMLStatisticsMessage(proof));
+                setMessage(proof.getStatistics().getHTMLMessage().getMessageString());
             }
         } else {
             setMessage("Proof Closed. No statistics available.");
@@ -81,7 +82,7 @@ public class ProofClosedJTextPaneDisplay extends ShowDisplayPane {
         
         JOptionPane.showMessageDialog
             (parentComponent, scrollPane,
-                    "Proof closed", JOptionPane.INFORMATION_MESSAGE);
+                    getTitle(), JOptionPane.INFORMATION_MESSAGE);
         
         return true;
     }
