@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.op.LocationVariable;
 public class TermProgramVariableCollector extends DefaultVisitor {
 
     private final HashSet<LocationVariable> result = new LinkedHashSet<LocationVariable> ();
+    private boolean containsNonRigidFunctionSymbol = false;
     private final Services services;
 
     
@@ -41,7 +42,9 @@ public class TermProgramVariableCollector extends DefaultVisitor {
     public void visit(Term t) {
 	if ( t.op() instanceof LocationVariable ) {
 	    result.add ( (LocationVariable) t.op() );
-	} 
+	} else if (!t.op().isRigid()) {
+		containsNonRigidFunctionSymbol = true;
+	}
 	
 	if ( !t.javaBlock ().isEmpty() ) {
 	    ProgramVariableCollector pvc
@@ -54,4 +57,9 @@ public class TermProgramVariableCollector extends DefaultVisitor {
     public HashSet<LocationVariable> result() { 
 	return result;
     }    
+    
+    public boolean containsNonRigidNonProgramVariableSymbol() {
+    	return containsNonRigidFunctionSymbol;
+    }
 }
+

@@ -212,6 +212,7 @@ lexer grammar KeYLexer;
 	FORMULA : '\\formula';
 	TERM : '\\term';
 	UPDATE : '\\update';
+	EVENT_UPDATE : '\\eventUpdate';
 	VARIABLES : '\\variables';
 	VARIABLE : '\\variable';
 	SKOLEMTERM : '\\skolemTerm';
@@ -226,6 +227,7 @@ lexer grammar KeYLexer;
 
         // Keywords for varcond and related stuff
 	VARCOND : '\\varcond';
+	NONRIGID : '\\nonRigid';
 	APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';
         DEPENDINGON : '\\dependingOn';
 	DISJOINTMODULONULL  : '\\disjointModuloNull';
@@ -279,8 +281,7 @@ lexer grammar KeYLexer;
 	ELSE : '\\else';
 	EVENTUPDATE: '\\event';
 	
-
-        // inclusion and stuff, things that (usually) come at the beginning
+    // inclusion and stuff, things that (usually) come at the beginning
 	// of the file
 	INCLUDE:'\\include';
 	INCLUDELDTS:'\\includeLDTs';

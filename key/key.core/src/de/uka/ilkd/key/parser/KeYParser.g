@@ -724,16 +724,16 @@ options {
     private void schema_var_decl(String name, 
     				 Sort s, 
     				 boolean makeVariableSV,
-            			 boolean makeSkolemTermSV,
-                                 boolean makeTermLabelSV,
-            			 SchemaVariableModifierSet mods) 
+            	     boolean makeSkolemTermSV,
+                     boolean makeTermLabelSV,
+            	     SchemaVariableModifierSet mods) 
             			 	throws AmbigiousDeclException {
         if (!skip_schemavariables) {
             SchemaVariable v;
             if(s == Sort.FORMULA && !makeSkolemTermSV) {
                 v = SchemaVariableFactory.createFormulaSV(new Name(name), 
                 					  mods.rigid());
-            } else if(s == Sort.UPDATE) {
+            } else if (s == Sort.UPDATE) {
                 v = SchemaVariableFactory.createUpdateSV(new Name(name));
             } else if(s instanceof ProgramSVSort) {
                 v = SchemaVariableFactory.createProgramSV(
@@ -1958,8 +1958,8 @@ one_schema_var_decl
   | UPDATE
     { mods = new SchemaVariableModifierSet.FormulaSV (); }
     ( schema_modifiers[mods] ) ?
-    {s = Sort.UPDATE;}
-    ids = simple_ident_comma_list 
+    { s = Sort.UPDATE;}
+    ids = simple_ident_comma_list  
   | SKOLEMFORMULA
     { makeSkolemTermSV = true; } 
     { mods = new SchemaVariableModifierSet.FormulaSV (); }
@@ -2045,7 +2045,11 @@ one_schema_modal_op_decl
     ;
 
 pred_decl
+@init {
+   boolean isRigid = true;
+}
     :
+        (NONRIGID {isRigid=false;})?
         pred_name = funcpred_name
         
         (
@@ -2086,7 +2090,7 @@ pred_decl
                     		     Sort.FORMULA, 
                     		     argSorts,
                     		     whereToBind,
-                    		     false);
+                    		     false, isRigid, false);
                 }
 		if (lookup(p.name()) != null) {
 		    if(!isProblemParser()) {
