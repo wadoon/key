@@ -32,7 +32,7 @@ public class AbstractExecutionHoleInstantiation {
         this.symbStoreInst = symbStoreInst;
     }
 
-    public AbstractExecutionHole getLoopHole() {
+    public AbstractExecutionHole getAbstractExecutionHole() {
         return loopHole;
     }
 

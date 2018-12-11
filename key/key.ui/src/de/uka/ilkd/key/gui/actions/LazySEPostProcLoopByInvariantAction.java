@@ -76,7 +76,7 @@ public final class LazySEPostProcLoopByInvariantAction
             List<AbstractExecutionHoleInstantiation> insts = dialog.getUserInput();
             for (AbstractExecutionHoleInstantiation inst : insts) {
                 for (Goal g : proof
-                        .getSubtreeGoals(inst.getLoopHole().getProofNode())) {
+                        .getSubtreeGoals(inst.getAbstractExecutionHole().getProofNode())) {
                     g.apply(new InstantiateAbstractExecutionHoleRuleApp(inst));
                 }
             }

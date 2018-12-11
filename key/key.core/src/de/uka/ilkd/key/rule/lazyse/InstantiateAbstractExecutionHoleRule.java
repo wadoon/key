@@ -67,7 +67,7 @@ public class InstantiateAbstractExecutionHoleRule implements BuiltInRule {
         final AbstractExecutionHoleInstantiation loopHoleInst = //
                 ((InstantiateAbstractExecutionHoleRuleApp) ruleApp)
                         .getAbstractExecutionHoleInstantiation();
-        final AbstractExecutionHole loopHole = loopHoleInst.getLoopHole();
+        final AbstractExecutionHole loopHole = loopHoleInst.getAbstractExecutionHole();
         final Goal newGoal = newGoals.head();
 
         Sequent sequent = newGoal.sequent();

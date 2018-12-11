@@ -73,7 +73,7 @@ public class AbstractPlaceholderStatement extends JavaStatement implements Named
     }
 
     @Override
-    public int hashCode() {
+    public int computeHashCode() {
         return 17 * super.hashCode() + id.hashCode();
     }
 
