@@ -544,8 +544,9 @@ public final class ProblemInitializer {
                     }
                 }
             }
-        } else
-                throw new ProofInputException("Problem initialization without JavaInfo!");
+        } else {
+            throw new ProofInputException("Problem initialization without JavaInfo!");
+        }
 
         //generate Taclets for Chaincode Data Types
         generateLedgerDataTaclets(initConfig);
@@ -624,8 +625,10 @@ public final class ProblemInitializer {
     private void generateLedgerDataTaclets(InitConfig initConfig) {
         Services services = initConfig.getServices();
         KeYJavaType ldkjt =
-            services.getJavaInfo().getKeYJavaType("LedgerData");
-        if (ldkjt == null) return;
+            services.getJavaInfo().getKeYJavaType("org.hyperledger.fabric.shim.LedgerData");
+        if (ldkjt == null) {
+            return;
+        }
         LedgerDataTacletGenerator gen = new LedgerDataTacletGenerator(services, ldkjt);
 
         List<Taclet> taclets = gen.createTaclets();

@@ -165,6 +165,10 @@ public class LedgerDataTacletGenerator {
         newTaclets.add(serializationExtensionTaclet(dataKJT, serFun, objectToLdFun));
         newTaclets.add(deserializationExtensionTaclet(dataKJT, deserFun, objectToLdFun));
 
+        for (Taclet t : newTaclets) {
+            System.out.println(t.toString());
+        }
+
         return newTaclets;
     }
 
