@@ -3845,6 +3845,8 @@ varexp[TacletBuilder b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
     | varcond_differentFields[b]
+    | varcond_noEventUpdate[b]
+   // | varcond_applyEventOnRigid[b]
   ) 
   | 
   ( (NOT_ {negated = true;} )? 
@@ -4277,6 +4279,30 @@ varcond_constant [TacletBuilder b, boolean negated]
            }
         }
 ;
+
+varcond_noEventUpdate [TacletBuilder b]
+:
+   NO_EVENT_UPDATE
+   LPAREN
+     x = varId
+   RPAREN
+   {
+            b.addVariableCondition(new NoEventUpdate((SchemaVariable)x));
+   }
+;
+
+/*varcond_applyEventOnRigid [TacletBuilder b]
+:
+   APPLY_EVENT_ON_RIGID
+   LPAREN
+     x = varId
+     y = varId
+   RPAREN
+   {
+            b.addVariableCondition(new ApplyEventOnRigid((SchemaVariable)x, (SchemaVariable)y));
+   }
+;*/
+
 
 varcond_label [TacletBuilder b, boolean negated]
 :

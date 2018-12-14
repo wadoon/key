@@ -270,7 +270,8 @@ lexer grammar KeYLexer;
 	STRICT    : '\\strict';
 	TYPEOF : '\\typeof';
 	INSTANTIATE_GENERIC : '\\instantiateGeneric';
-
+	NO_EVENT_UPDATE: '\\noEventUpdate';
+	//APPLY_EVENT_ON_RIGID: '\\applyEventOnRigid'; 
 	// Quantifiers, binding, substitution
         FORALL : '\\forall' | '\u2200';
         EXISTS : '\\exists' | '\u2203';
