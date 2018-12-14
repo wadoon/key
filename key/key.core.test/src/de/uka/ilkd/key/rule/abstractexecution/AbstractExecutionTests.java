@@ -37,6 +37,52 @@ public class AbstractExecutionTests extends TestCase {
             "resources/testcase/abstractexecution/";
 
     @Test
+    public void testProofCorrectIfThenElseCommonPrefixRefactoringWithJMLNotAssignableSpec() {
+        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX,
+                "correct-refactoring-ite-pullout-prefix-with-notassgn-spec/pulloutITEPrefixRef.key");
+        startAutomaticStrategy(proof);
+
+        assertFalse(proof.closed());
+
+        /*
+         * TODO (DS, 2018-12-14): This should eventually be closed after the JML
+         * support for assignable_not to abstract placeholder symbols has been
+         * added. Change this then, and maybe add some more checks.
+         */
+    }
+
+    @Test
+    public void testProofCorrectIfThenElseCommonPostfixRefactoringInJavaFile() {
+        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX,
+                "correct-refactoring-ite-pullout-postfix/pulloutITEPostfixRef.key");
+        startAutomaticStrategy(proof);
+
+        assertTrue(proof.closed());
+
+        final Iterator<Node> it = proof.root().subtreeIterator();
+        int abstractExecAppsCnt = 0;
+        while (it.hasNext()) {
+            final Node nextNode = it.next();
+            if (nextNode.getAppliedRuleApp() == null) {
+                continue;
+            }
+
+            final Rule rule = nextNode.getAppliedRuleApp().rule();
+            if (rule instanceof FindTaclet
+                    && ((Taclet) rule).getRuleSets().stream().anyMatch(rs -> rs
+                            .name().toString().equals("abstractExecution"))) {
+                abstractExecAppsCnt++;
+            }
+        }
+
+        final int expectedNumAEApps = 16;
+        assertEquals(
+                String.format("There should be %d abstract execution apps.",
+                        expectedNumAEApps),
+                expectedNumAEApps, abstractExecAppsCnt);
+    }
+
+    @Test
     public void testProofCorrectIfThenElseCommonPostfixRefactoring() {
         final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX,
                 "correct-refactoring-ite-pullout-postfix.key");
