@@ -50,17 +50,22 @@ public abstract class SchemaVariableModifierSet {
     public boolean addModifier(String option) {
         if ("strict".equals(option)) {
             return addStrict();
-        } else if ("rigid".equals(option)) {
-            return addRigid();
-        } else if ("list".equals(option)) {
+        }
+        else if ("nonrigid".equals(option)) {
+            return addRigid(false);
+        }
+        else if ("rigid".equals(option)) {
+            return addRigid(true);
+        }
+        else if ("list".equals(option)) {
             return addList();
         }
 
         return false;
     }
 
-    public boolean addRigid() {
-        this.rigid = true;
+    public boolean addRigid(boolean rigid) {
+        this.rigid = rigid;
         return rigidEnabled();
     }
 

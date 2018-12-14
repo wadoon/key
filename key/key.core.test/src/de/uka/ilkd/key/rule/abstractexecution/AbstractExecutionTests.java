@@ -74,6 +74,7 @@ public class AbstractExecutionTests extends TestCase {
         startAutomaticStrategy(proof);
 
         assertFalse(proof.closed());
+        assertEquals(4, proof.openGoals().size());
 
         final Iterator<Node> it = proof.root().subtreeIterator();
         int abstractExecAppsCnt = 0;

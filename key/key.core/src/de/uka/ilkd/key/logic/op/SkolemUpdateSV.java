@@ -48,7 +48,7 @@ public final class SkolemUpdateSV extends SkolemSV {
      *            Skolemization.
      */
     SkolemUpdateSV(Name name, SchemaVariable freshForSV) {
-        super(name, Sort.UPDATE, freshForSV);
+        super(name, Sort.UPDATE, false, freshForSV);
     }
 
     @Override

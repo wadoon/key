@@ -32,13 +32,13 @@ public abstract class SkolemSV extends AbstractSV {
      */
     private final SchemaVariable freshForSV;
 
-    SkolemSV(Name name, Sort sort, SchemaVariable freshForSV) {
-        super(name, sort, true, false);
+    SkolemSV(Name name, Sort sort, boolean rigid, SchemaVariable freshForSV) {
+        super(name, sort, rigid, false);
         this.freshForSV = freshForSV;
     }
 
     SkolemSV(Name name, Sort sort) {
-        this(name, sort, null);
+        this(name, sort, true, null);
     }
 
     public SchemaVariable getFreshForSV() {

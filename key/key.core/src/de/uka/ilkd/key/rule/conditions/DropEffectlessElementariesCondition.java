@@ -18,14 +18,7 @@ import java.util.Set;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.op.UpdateSV;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -60,10 +53,19 @@ public final class DropEffectlessElementariesCondition
 //                }
                 //@formatter:on
                 return null;
-            } else {
+            }
+            else if (!target.op().isRigid()) {
+                /*
+                 * (DS) Special case introduced for non-rigid abstract path
+                 * conditions arising from abstract execution.
+                 */
+                return null;
+            }
+            else {
                 return services.getTermBuilder().skip();
             }
-        } else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
+        }
+        else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
             Term sub0 = update.sub(0);
             Term sub1 = update.sub(1);
             /*
@@ -71,31 +73,41 @@ public final class DropEffectlessElementariesCondition
              * good order
              */
             Term newSub1 = dropEffectlessElementariesHelper(sub1, target,
-                relevantVars, services);
+                    relevantVars, services);
             Term newSub0 = dropEffectlessElementariesHelper(sub0, target,
-                relevantVars, services);
+                    relevantVars, services);
             if (newSub0 == null && newSub1 == null) {
                 return null;
-            } else {
+            }
+            else {
                 newSub0 = newSub0 == null ? sub0 : newSub0;
                 newSub1 = newSub1 == null ? sub1 : newSub1;
                 return services.getTermBuilder().parallel(newSub0, newSub1);
             }
-        } else if (update.op() == UpdateApplication.UPDATE_APPLICATION) {
+        }
+        else if (update.op() == UpdateApplication.UPDATE_APPLICATION) {
             Term sub0 = update.sub(0);
             Term sub1 = update.sub(1);
             Term newSub1 = dropEffectlessElementariesHelper(sub1, target,
-                relevantVars, services);
+                    relevantVars, services);
             return newSub1 == null ? null
                     : services.getTermBuilder().apply(sub0, newSub1, null);
-        } else if (AbstractUpdateCondition.isAbstractUpdate(update)) {
-            if (target.op().equals(Junctor.TRUE)
-                    || target.op().equals(Junctor.FALSE)) {
+        }
+        else if (AbstractUpdateCondition.isAbstractUpdate(update)) {
+            if (relevantVars.isEmpty() && target.op().isRigid()) {
+                /*
+                 * We drop abstract updates in front of rigid symbols, like
+                 * "true" or some predicate, but not in front of anything
+                 * containing program variables, or the special nonrigid
+                 * predicates for abstract path conditions.
+                 */
                 return services.getTermBuilder().skip();
-            } else {
+            }
+            else {
                 return null;
             }
-        } else {
+        }
+        else {
             return null;
         }
     }
@@ -106,15 +118,15 @@ public final class DropEffectlessElementariesCondition
             return null;
         }
 
-        TermProgramVariableCollector collector = services.getFactory()
-                .create(services);
+        TermProgramVariableCollector collector =
+                services.getFactory().create(services);
         target.execPostOrder(collector);
         Set<LocationVariable> varsInTarget = collector.result();
         Term simplifiedUpdate = dropEffectlessElementariesHelper(update, target,
-            varsInTarget, services);
+                varsInTarget, services);
         return simplifiedUpdate == null ? null
                 : services.getTermBuilder().apply(simplifiedUpdate, target,
-                    null);
+                        null);
     }
 
     @Override
@@ -128,16 +140,19 @@ public final class DropEffectlessElementariesCondition
             return mc;
         }
 
-        Term properResultInst = dropEffectlessElementaries(uInst, xInst,
-            services);
+        Term properResultInst =
+                dropEffectlessElementaries(uInst, xInst, services);
         if (properResultInst == null) {
             return null;
-        } else if (resultInst == null) {
+        }
+        else if (resultInst == null) {
             svInst = svInst.add(result, properResultInst, services);
             return mc.setInstantiations(svInst);
-        } else if (resultInst.equals(properResultInst)) {
+        }
+        else if (resultInst.equals(properResultInst)) {
             return mc;
-        } else {
+        }
+        else {
             return null;
         }
     }

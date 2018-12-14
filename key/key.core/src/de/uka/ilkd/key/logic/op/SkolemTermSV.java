@@ -23,7 +23,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * no longer really be necessary.
  */
 public final class SkolemTermSV extends SkolemSV {
-
     /**
      * Creates a new schema variable that is used as placeholder for skolem
      * terms.
@@ -56,8 +55,8 @@ public final class SkolemTermSV extends SkolemSV {
      *            same instantiation is returned. Realizes a kind of weak
      *            Skolemization.
      */
-    SkolemTermSV(Name name, Sort sort, SchemaVariable freshForSV) {
-        super(name, sort, freshForSV);
+    SkolemTermSV(Name name, Sort sort, boolean rigid, SchemaVariable freshForSV) {
+        super(name, sort, rigid, freshForSV);
         assert sort != Sort.UPDATE;
     }
 

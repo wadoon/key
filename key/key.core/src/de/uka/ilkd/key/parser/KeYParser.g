@@ -750,7 +750,7 @@ options {
                     v = SchemaVariableFactory.createVariableSV
                     (new Name(name), s);
                 } else if(makeSkolemTermSV && s != Sort.UPDATE) {
-                    v = SchemaVariableFactory.createSkolemTermSV(new Name(name), s, freshForSV);
+                    v = SchemaVariableFactory.createSkolemTermSV(new Name(name), s, mods.rigid(), freshForSV);
                 } else if(makeSkolemTermSV && s == Sort.UPDATE) {
                     v = SchemaVariableFactory.createSkolemUpdateSV(new Name(name), freshForSV);
                 } else if (makeTermLabelSV) {

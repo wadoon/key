@@ -126,8 +126,8 @@ public class SchemaVariableFactory {
      *            Skolemization.
      */
     public static SkolemTermSV createSkolemTermSV(Name name, Sort s,
-            SchemaVariable freshForSV) {
-        return new SkolemTermSV(name, s, freshForSV);
+            boolean rigid, SchemaVariable freshForSV) {
+        return new SkolemTermSV(name, s, rigid, freshForSV);
     }
 
     /**
