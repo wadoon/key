@@ -468,6 +468,7 @@ top returns [Object ret = null] throws  SLTranslationException
 :
     (   accessibleclause { ret = $accessibleclause.ret; }
     |   assignableclause { ret = $assignableclause.ret; }
+    |   assignablenotclause { ret = $assignablenotclause.ret; }
     |   breaksclause { ret = $breaksclause.result; }
     |   continuesclause { ret = $continuesclause.result; }
     |   dependsclause { ret = $dependsclause.result; }
@@ -507,6 +508,16 @@ assignableclause returns [Term ret = null] throws SLTranslationException
         { result = translator.translate(ass.getText(), Term.class, result, services); }
     | STRICTLY_NOTHING
         { result = tb.strictlyNothing(); }
+    )
+    ;
+
+assignablenotclause returns [Term ret = null] throws SLTranslationException
+@after{ ret = result; }
+:
+    ass=ASSIGNABLE_NOT
+    (
+       result=storeRefUnion
+       { result = translator.translate(ass.getText(), Term.class, result, services); }
     )
     ;
 

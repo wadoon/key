@@ -13,12 +13,7 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -42,13 +37,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
-import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.speclang.MergeContract;
-import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
-import de.uka.ilkd.key.speclang.UnparameterizedMergeContract;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Quadruple;
@@ -158,6 +147,8 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                         = new LinkedHashMap<LocationVariable, Term>();
                 final Map<LocationVariable, Term> newModifiesClauses
                         = new LinkedHashMap<LocationVariable, Term>();
+                final Map<LocationVariable, Term> newModifiesNotClauses
+                        = new LinkedHashMap<LocationVariable, Term>();
 
                 for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                         .getAllHeaps()) {
@@ -171,9 +162,11 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
                             contract.getPostcondition(heap, newVariables, services));
                     newModifiesClauses.put(heap,
                             contract.getModifiesClause(heap, newVariables.self, services));
+                    newModifiesNotClauses.put(heap,
+                            contract.getModifiesNotClause(heap, newVariables.self, services));
                 }
                 updateBlockOrLoopContract(block, contract, newVariables, newPreconditions,
-                        newPostconditions, newModifiesClauses, services);
+                        newPostconditions, newModifiesClauses, newModifiesNotClauses, services);
             }
         }
     }
@@ -490,21 +483,23 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             final BlockSpecificationElement.Variables newVariables,
             final Map<LocationVariable, Term> newPreconditions,
             final Map<LocationVariable, Term> newPostconditions,
-            final Map<LocationVariable, Term> newModifiesClauses, Services services) {
+            final Map<LocationVariable, Term> newModifiesClauses,
+            Map<LocationVariable, Term> newModifiesNotClauses,
+            Services services) {
         if (contract instanceof BlockContract) {
             final BlockContract newBlockContract
                     = ((BlockContract) contract).update(block, newPreconditions, newPostconditions,
-                            newModifiesClauses, contract.getInfFlowSpecs(), newVariables,
-                            contract.getMby(newVariables, services));
+                            newModifiesClauses, newModifiesNotClauses, contract.getInfFlowSpecs(),
+                            newVariables, contract.getMby(newVariables, services));
 
             services.getSpecificationRepository().removeBlockContract((BlockContract) contract);
             services.getSpecificationRepository().addBlockContract(newBlockContract, false);
         } else if (contract instanceof LoopContract) {
             final LoopContract newLoopContract
                     = ((LoopContract) contract).update(block, newPreconditions, newPostconditions,
-                            newModifiesClauses, contract.getInfFlowSpecs(), newVariables,
-                            contract.getMby(newVariables, services),
-                            ((LoopContract) contract).getDecreases(newVariables, services));
+                            newModifiesClauses, newModifiesNotClauses, contract.getInfFlowSpecs(),
+                            newVariables,
+                            contract.getMby(newVariables, services), ((LoopContract) contract).getDecreases(newVariables, services));
 
             services.getSpecificationRepository().removeLoopContract((LoopContract) contract);
             services.getSpecificationRepository().addLoopContract(newLoopContract, false);

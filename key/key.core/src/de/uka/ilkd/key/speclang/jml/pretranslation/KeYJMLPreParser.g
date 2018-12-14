@@ -733,6 +733,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 :
     (
 	    ps=assignable_clause     { sc.addAssignable(ps); }
+	|   ps=assignable_not_clause { sc.addAssignableNot(ps); }
 	|   ps=accessible_clause     { sc.addAccessible(ps); }
 	|   ps=ensures_clause        { sc.addEnsures(ps); }
 	|   ps=ensures_free_clause   { sc.addEnsuresFree(ps); }
@@ -823,6 +824,15 @@ assignable_clause
 @after { r = result; }
 :
     assignable_keyword result=expression { result = flipHeaps("assignable", result); }
+;
+
+assignable_not_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    ASSIGNABLE_NOT result=expression { result = flipHeaps("assignable_not", result); }
 ;
 
 

@@ -18,11 +18,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
-import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 
@@ -91,6 +87,7 @@ class BasicSnippetData {
         LOOP_INVARIANT(LoopSpecification.class),
         LOOP_INVARIANT_TERM(Term.class),
         MODIFIES(Term.class),
+        MODIFIES_NOT(Term.class),
         DEPENDENS(Term.class),
         MEASURED_BY(Term.class),
         MODALITY(Modality.class),
@@ -139,7 +136,7 @@ class BasicSnippetData {
                 new StateVars(contract.getSelf(), contract.getParams(),
                               contract.getResult(), contract.getExc(), heap);
     }
-    
+
     BasicSnippetData(LoopSpecification invariant,
                      ExecutionContext context,
                      Term guardTerm,
@@ -189,8 +186,8 @@ class BasicSnippetData {
         origVars = new StateVars(invariant.getInternalSelfTerm(),
                                  guardTerm, localVarsTerms, heap);
     }
-    
-    
+
+
     BasicSnippetData(InformationFlowContract contract,
                      Services services) {
         this.hasMby = contract.hasMby();
@@ -199,7 +196,7 @@ class BasicSnippetData {
 
         contractContents.put(Key.TARGET_METHOD, contract.getTarget());
         contractContents.put(Key.FOR_CLASS, contract.getKJT());
-        contractContents.put(Key.PRECONDITION, contract.getPre());        
+        contractContents.put(Key.PRECONDITION, contract.getPre());
         contractContents.put(Key.MODIFIES, contract.getMod());
         contractContents.put(Key.DEPENDENS, contract.getDep());
         contractContents.put(Key.MEASURED_BY, contract.getMby());
@@ -228,6 +225,7 @@ class BasicSnippetData {
         contractContents.put(Key.PRECONDITION, contract.getPre(services));
         contractContents.put(Key.POSTCONDITION, contract.getPost(services));
         contractContents.put(Key.MODIFIES, contract.getMod(services));
+        contractContents.put(Key.MODIFIES_NOT, contract.getNonMod(services));
         contractContents.put(Key.MODALITY, contract.getModality());
         contractContents.put(Key.INF_FLOW_SPECS, contract.getInfFlowSpecs());
         List<Label> labels = contract.getLabels();

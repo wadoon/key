@@ -119,6 +119,7 @@ public interface LoopContract extends BlockSpecificationElement {
      * @param newPreconditions the new preconditions.
      * @param newPostconditions the new postconditions.
      * @param newModifiesClauses the new modifies clauses.
+     * @param newModifiesNotClauses TODO
      * @param newinfFlowSpecs the new information flow specifications.
      * @param newVariables the new variables.
      * @param newMeasuredBy the new measured-by clause.
@@ -128,8 +129,8 @@ public interface LoopContract extends BlockSpecificationElement {
     LoopContract update(StatementBlock newBlock, Map<LocationVariable, Term> newPreconditions,
             Map<LocationVariable, Term> newPostconditions,
             Map<LocationVariable, Term> newModifiesClauses,
-            ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables, Term newMeasuredBy,
-            Term newDecreases);
+            Map<LocationVariable, Term> newModifiesNotClauses, ImmutableList<InfFlowSpec> newinfFlowSpecs, Variables newVariables,
+            Term newMeasuredBy, Term newDecreases);
 
     /**
      * @param newKJT

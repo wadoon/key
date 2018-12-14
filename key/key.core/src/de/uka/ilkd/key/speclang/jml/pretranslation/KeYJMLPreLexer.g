@@ -31,6 +31,7 @@ lexer grammar KeYJMLPreLexer;
     ASSUME                      : 'assume';
     ASSUME_REDUNDANTLY          : 'assume_redundantly';
     ASSIGNABLE 			: 'assignable';
+    ASSIGNABLE_NOT		: 'assignable_not';
     ASSIGNABLE_RED 		: 'assignable_redundantly';
     ASSIGNS          : 'assigns';
     ASSIGNS_RED      : 'assigns_redundantly';

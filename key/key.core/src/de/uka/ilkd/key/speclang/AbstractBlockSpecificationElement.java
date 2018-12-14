@@ -1,10 +1,6 @@
 package de.uka.ilkd.key.speclang;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -84,6 +80,11 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
     protected final Map<LocationVariable, Term> modifiesClauses;
 
     /**
+     * @see #getModifiesNotClause(LocationVariable, Services)
+     */
+    protected final Map<LocationVariable, Term> modifiesNotClauses;
+
+    /**
      * @see #getInfFlowSpecs()
      */
     protected ImmutableList<InfFlowSpec> infFlowSpecs;
@@ -102,6 +103,11 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
      * @see #hasModifiesClause(LocationVariable)
      */
     protected final Map<LocationVariable, Boolean> hasMod;
+
+    /**
+     * @see #hasModifiesNotClause(LocationVariable)
+     */
+    protected final Map<LocationVariable, Boolean> hasNonMod;
 
     /**
      * @see #getBaseName()
@@ -128,6 +134,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
      *            this contract's postconditions on every heap.
      * @param modifiesClauses
      *            this contract's modifies clauses on every heap.
+     * @param modifiesNotClauses TODO
      * @param infFlowSpecs
      *            this contract's information flow specifications.
      * @param variables
@@ -136,14 +143,17 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
      *            whether or not this contract is applicable for transactions.
      * @param hasMod
      *            a map specifying on which heaps this contract has a modified clause.
+     * @param hasNonMod
+     *            a map specifying on which heaps this contract has a not modified clause.
      */
     public AbstractBlockSpecificationElement(final String baseName, final StatementBlock block,
             final List<Label> labels, final IProgramMethod method, final Modality modality,
             final Map<LocationVariable, Term> preconditions, final Term measuredBy,
             final Map<LocationVariable, Term> postconditions,
             final Map<LocationVariable, Term> modifiesClauses,
-            final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
-            final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod) {
+            final Map<LocationVariable, Term> modifiesNotClauses, final ImmutableList<InfFlowSpec> infFlowSpecs,
+            final Variables variables, final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
+            final Map<LocationVariable, Boolean> hasNonMod) {
         assert block != null;
         assert labels != null;
         assert method != null;
@@ -165,10 +175,12 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         this.measuredBy = measuredBy;
         this.postconditions = postconditions;
         this.modifiesClauses = modifiesClauses;
+        this.modifiesNotClauses = modifiesNotClauses;
         this.infFlowSpecs = infFlowSpecs;
         this.variables = variables;
         this.transactionApplicable = transactionApplicable;
         this.hasMod = hasMod;
+        this.hasNonMod = hasNonMod;
     }
 
     @Override
@@ -219,12 +231,19 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
     @Override
     public boolean isReadOnly(final Services services) {
         return modifiesClauses.get(services.getTypeConverter().getHeapLDT().getHeap())
-                .op() == services.getTypeConverter().getLocSetLDT().getEmpty();
+                .op() == services.getTypeConverter().getLocSetLDT().getEmpty() &&
+                modifiesNotClauses.get(services.getTypeConverter().getHeapLDT().getHeap())
+                .op() != services.getTypeConverter().getLocSetLDT().getEmpty();
     }
 
     @Override
     public boolean hasModifiesClause(LocationVariable heap) {
         return hasMod.get(heap);
+    }
+
+    @Override
+    public boolean hasModifiesNotClause(LocationVariable heap) {
+        return hasNonMod.get(heap);
     }
 
     @Override
@@ -372,6 +391,19 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
     }
 
     @Override
+    public Term getModifiesNotClause(final LocationVariable heap, final ProgramVariable self,
+            final Services services) {
+        assert heap != null;
+        assert (self == null) == (variables.self == null);
+        assert services != null;
+        final Map<ProgramVariable, ProgramVariable> replacementMap = createReplacementMap(
+                new Variables(self, null, null, null, null, null, null, null, null, null, services),
+                services);
+        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
+        return replacer.replace(modifiesNotClauses.get(heap));
+    }
+
+    @Override
     public Term getModifiesClause(final LocationVariable heapVariable, final Term heap,
             final Term self, final Services services) {
         assert heapVariable != null;
@@ -385,8 +417,26 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
     }
 
     @Override
+    public Term getModifiesNotClause(final LocationVariable heapVariable, final Term heap,
+            final Term self, final Services services) {
+        assert heapVariable != null;
+        assert heap != null;
+        assert (self == null) == (variables.self == null);
+        assert services != null;
+        final Map<Term, Term> replacementMap = createReplacementMap(heap,
+                new Terms(self, null, null, null, null, null, null, null, null, null), services);
+        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
+        return replacer.replace(modifiesNotClauses.get(heapVariable));
+    }
+
+    @Override
     public Term getModifiesClause(final LocationVariable heap, final Services services) {
         return getModifiesClause(heap, variables.self, services);
+    }
+
+    @Override
+    public Term getModifiesNotClause(final LocationVariable heap, final Services services) {
+        return getModifiesNotClause(heap, variables.self, services);
     }
 
     @Override
@@ -412,6 +462,11 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
     @Override
     public Term getMod(Services services) {
         return modifiesClauses.get(services.getTypeConverter().getHeapLDT().getHeap());
+    }
+
+    @Override
+    public Term getNonMod(Services services) {
+        return modifiesNotClauses.get(services.getTypeConverter().getHeapLDT().getHeap());
     }
 
     @Override
@@ -458,6 +513,11 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
     @Override
     public Term getAssignable(LocationVariable heap) {
         return modifiesClauses.get(heap);
+    }
+
+    @Override
+    public Term getAssignableNot(LocationVariable heap) {
+        return modifiesNotClauses.get(heap);
     }
 
     @Override
@@ -568,6 +628,9 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
             return false;
         } else if ((modifiesClauses == null && other.modifiesClauses != null)
                 || (modifiesClauses != null && !modifiesClauses.equals(other.modifiesClauses))) {
+            return false;
+        } else if ((modifiesNotClauses == null && other.modifiesNotClauses != null)
+                || (modifiesNotClauses != null && !modifiesNotClauses.equals(other.modifiesNotClauses))) {
             return false;
         } else if ((postconditions == null && other.postconditions != null)
                 || (postconditions != null && !postconditions.equals(other.postconditions))) {
@@ -1094,6 +1157,11 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         private final Map<LocationVariable, Term> assignables;
 
         /**
+         * A map from every heap to a <b>not</b> assignable term.
+         */
+        private final Map<LocationVariable, Term> assignableNots;
+
+        /**
          * A list of heaps used in this contract.
          */
         private final ImmutableList<LocationVariable> heaps;
@@ -1102,6 +1170,11 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
          * A map specifying on which heaps this contract has a modifies clause.
          */
         private final Map<LocationVariable, Boolean> hasMod;
+
+        /**
+         * A map specifying on which heaps this contract has a modifies clause.
+         */
+        private final Map<LocationVariable, Boolean> hasNonMod;
 
         /**
          *
@@ -1143,8 +1216,10 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
          *            a diverges clause.
          * @param assignables
          *            map from every heap to an assignable term.
+         * @param assignableNots TODO
          * @param hasMod
          *            map specifying on which heaps this contract has a modifies clause.
+         * @param hasNonMod TODO
          * @param services
          *            services.
          */
@@ -1156,7 +1231,8 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
                 final Map<Label, Term> continues, final Term returns, final Term signals,
                 final Term signalsOnly, final Term diverges,
                 final Map<LocationVariable, Term> assignables,
-                final Map<LocationVariable, Boolean> hasMod, final Services services) {
+                Map<LocationVariable, Term> assignableNots, final Map<LocationVariable, Boolean> hasMod,
+                Map<LocationVariable, Boolean> hasNonMod, final Services services) {
             super(services.getTermFactory(), services);
             this.baseName = baseName;
             this.block = block;
@@ -1175,8 +1251,10 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
             this.signalsOnly = signalsOnly;
             this.diverges = diverges;
             this.assignables = assignables;
+            this.assignableNots = assignableNots;
             this.heaps = services.getTypeConverter().getHeapLDT().getAllHeaps();
             this.hasMod = hasMod;
+            this.hasNonMod = hasNonMod;
         }
 
         /**
@@ -1184,8 +1262,8 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
          * @return a new contract.
          */
         public ImmutableSet<T> create() {
-            return create(buildPreconditions(), buildPostconditions(), buildModifiesClauses(),
-                    infFlowSpecs);
+            return create(buildPreconditions(), buildPostconditions(),
+                    buildModifiesClauses(), buildModifiesNotClauses(), infFlowSpecs);
         }
 
         /**
@@ -1461,12 +1539,22 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
 
         /**
          *
+         * @return the contract's modifies clauses.
+         */
+        private Map<LocationVariable, Term> buildModifiesNotClauses() {
+            return assignableNots;
+        }
+
+        /**
+         *
          * @param preconditions
          *            the contracts' preconditions.
          * @param postconditions
          *            the contracts' postconditions.
          * @param modifiesClauses
          *            the contracts' modifies clauses.
+         * @param modifiesClauses
+         *            TODO
          * @param infFlowSpecs
          *            the contracts' information flow specifications.
          * @return a set of one or two contracts (depending on whether the {@code diverges} clause
@@ -1475,19 +1563,21 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         private ImmutableSet<T> create(final Map<LocationVariable, Term> preconditions,
                 final Map<LocationVariable, Term> postconditions,
                 final Map<LocationVariable, Term> modifiesClauses,
+                final Map<LocationVariable, Term> modifiesNotClauses,
                 final ImmutableList<InfFlowSpec> infFlowSpecs) {
             ImmutableSet<T> result = DefaultImmutableSet.nil();
             final boolean transactionApplicable = modifiesClauses
                     .get(services.getTypeConverter().getHeapLDT().getSavedHeap()) != null;
             result = result.add(build(baseName, block, labels, method,
-                    diverges.equals(ff()) ? Modality.DIA : Modality.BOX, preconditions, measuredBy,
-                    postconditions, modifiesClauses, infFlowSpecs, variables, transactionApplicable,
-                    hasMod));
+                    diverges.equals(ff()) ? Modality.DIA : Modality.BOX,
+                    preconditions, measuredBy, postconditions, modifiesClauses,
+                    modifiesNotClauses, infFlowSpecs, variables,
+                    transactionApplicable, hasMod, hasNonMod));
             if (divergesConditionCannotBeExpressedByAModality()) {
                 result = result.add(build(baseName, block, labels, method, Modality.DIA,
                         addNegatedDivergesConditionToPreconditions(preconditions), measuredBy,
-                        postconditions, modifiesClauses, infFlowSpecs, variables,
-                        transactionApplicable, hasMod));
+                        postconditions, modifiesClauses, modifiesNotClauses, infFlowSpecs,
+                        variables, transactionApplicable, hasMod, hasNonMod));
             }
             return result;
         }
@@ -1512,6 +1602,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
          *            this contract's postconditions on every heap.
          * @param modifiesClauses
          *            this contract's modifies clauses on every heap.
+         * @param modifiesNotClauses TODO
          * @param infFlowSpecs
          *            this contract's information flow specifications.
          * @param variables
@@ -1520,14 +1611,15 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
          *            whether or not this contract is applicable for transactions.
          * @param hasMod
          *            a map specifying on which heaps this contract has a modified clause.
+         * @param hasNonMod TODO
          * @return an instance of {@code T} with the specified attributes.
          */
         protected abstract T build(String baseName, StatementBlock block, List<Label> labels,
                 IProgramMethod method, Modality modality, Map<LocationVariable, Term> preconditions,
                 Term measuredBy, Map<LocationVariable, Term> postconditions,
                 Map<LocationVariable, Term> modifiesClauses,
-                ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
-                boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod);
+                Map<LocationVariable, Term> modifiesNotClauses, ImmutableList<InfFlowSpec> infFlowSpecs,
+                Variables variables, boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasNonMod);
 
         /**
          *
@@ -1597,6 +1689,11 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         protected final Map<LocationVariable, Term> modifiesClauses;
 
         /**
+         * @see BlockSpecificationElement#getModifiesNotClause(LocationVariable, Services)
+         */
+        protected final Map<LocationVariable, Term> modifiesNotClauses;
+
+        /**
          *
          * @param contracts
          *            the contracts to combine.
@@ -1609,6 +1706,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
             preconditions = new LinkedHashMap<LocationVariable, Term>();
             postconditions = new LinkedHashMap<LocationVariable, Term>();
             modifiesClauses = new LinkedHashMap<LocationVariable, Term>();
+            modifiesNotClauses = new LinkedHashMap<LocationVariable, Term>();
         }
 
         /**
@@ -1644,6 +1742,7 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
                 final Term precondition = addPreconditionFrom(contract, heap);
                 addPostconditionFrom(precondition, contract, heap);
                 addModifiesClauseFrom(contract, heap);
+                addModifiesNotClauseFrom(contract, heap);
             }
         }
 
@@ -1686,7 +1785,6 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
         }
 
         /**
-         *
          * @param contract
          *            the contract whose modified clause to add.
          * @param heap
@@ -1698,6 +1796,21 @@ public abstract class AbstractBlockSpecificationElement implements BlockSpecific
             if (additionalModifiesClause != null) {
                 modifiesClauses.put(heap,
                         unionPossiblyNull(modifiesClauses.get(heap), additionalModifiesClause));
+            }
+        }
+
+        /**
+         * @param contract
+         *            the contract whose modified not clause to add.
+         * @param heap
+         *            the heap to use.
+         */
+        private void addModifiesNotClauseFrom(final T contract, final LocationVariable heap) {
+            final Term additionalModifiesNotClause
+                    = contract.getModifiesNotClause(heap, placeholderVariables.self, services);
+            if (additionalModifiesNotClause != null) {
+                modifiesNotClauses.put(heap,
+                        unionPossiblyNull(modifiesNotClauses.get(heap), additionalModifiesNotClause));
             }
         }
 

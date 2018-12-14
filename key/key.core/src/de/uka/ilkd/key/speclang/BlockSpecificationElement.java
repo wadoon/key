@@ -1,10 +1,6 @@
 package de.uka.ilkd.key.speclang;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -12,28 +8,16 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.LoopInitializer;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.statement.Break;
-import de.uka.ilkd.key.java.statement.Continue;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.LabelJumpStatement;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.java.visitor.OuterBreakContinueAndReturnCollector;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.BlockContractBuilders;
 import de.uka.ilkd.key.speclang.Contract.OriginalVariables;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -113,6 +97,11 @@ public interface BlockSpecificationElement extends SpecificationElement {
      * @return whether this contract is strictly pure.
      */
     public boolean hasModifiesClause(LocationVariable heap);
+
+    /**
+     * TODO
+     */
+    boolean hasModifiesNotClause(LocationVariable heap);
 
     /**
      *
@@ -243,7 +232,6 @@ public interface BlockSpecificationElement extends SpecificationElement {
     public Term getModifiesClause(LocationVariable heap, ProgramVariable self, Services services);
 
     /**
-     *
      * @param heapVariable
      *            the heap to use.
      * @param heap
@@ -258,7 +246,6 @@ public interface BlockSpecificationElement extends SpecificationElement {
             Services services);
 
     /**
-     *
      * @param heap
      *            the heap to use.
      * @param services
@@ -266,6 +253,43 @@ public interface BlockSpecificationElement extends SpecificationElement {
      * @return this contract's modifies clause on the specified heap.
      */
     public Term getModifiesClause(LocationVariable heap, Services services);
+
+    /**
+     * @param heap
+     *            the heap to use.
+     * @param services
+     *            services.
+     * @return this contract's modifies not clause on the specified heap.
+     */
+    public Term getModifiesNotClause(LocationVariable heap, Services services);
+
+    /**
+     * @param heapVariable
+     *            the heap to use.
+     * @param heap
+     *            the heap to use.
+     * @param self
+     *            the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *            services.
+     * @return this contract's modifies not clause on the specified heap.
+     */
+    public Term getModifiesNotClause(LocationVariable heapVariable, Term heap,
+            Term self, Services services);
+
+    /**
+     * @param heapVariable
+     *            the heap to use.
+     * @param heap
+     *            the heap to use.
+     * @param self
+     *            the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
+     * @param services
+     *            services.
+     * @return this contract's modifies not clause on the specified heap.
+     */
+    Term getModifiesNotClause(LocationVariable heap, ProgramVariable self,
+            Services services);
 
     /**
      *
@@ -284,12 +308,19 @@ public interface BlockSpecificationElement extends SpecificationElement {
     public Term getEnsures(LocationVariable heap);
 
     /**
-     *
      * @param heap
      *            the heap to use.
      * @return this contract's assignable term on the specified heap.
      */
     public Term getAssignable(LocationVariable heap);
+
+
+    /**
+     * @param heap
+     *            the heap to use.
+     * @return this contract's assignable not term on the specified heap.
+     */
+    public Term getAssignableNot(LocationVariable heap);
 
     /**
      * Accepts a visitor.
@@ -421,6 +452,13 @@ public interface BlockSpecificationElement extends SpecificationElement {
      * @return the original modifies clause of the contract.
      */
     Term getMod(Services services);
+
+    /**
+     * @param services
+     *            services.
+     * @return the original modifies not clause of the contract.
+     */
+    Term getNonMod(Services services);
 
     /**
      * @return the original information flow specification clause of the contract.

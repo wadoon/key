@@ -13,13 +13,7 @@
 
 package de.uka.ilkd.key.speclang.jml.translation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
@@ -37,23 +31,8 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.TermCreationException;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -75,22 +54,22 @@ import de.uka.ilkd.key.util.Triple;
 
 public final class JMLTranslator {
 
-    private final TermBuilder tb; 
+    private final TermBuilder tb;
     private final String fileName;
     private TermServices services;                          // to be used in future
     private SLTranslationExceptionManager excManager;
     private List<PositionedString> warnings = new ArrayList<PositionedString>();
 
     private EnumMap<JMLKeyWord, JMLTranslationMethod> translationMethods;
-    
+
     /*
      * Register new JML function symbols in this map. It maps JML function names
-     * to JDL function names. 
+     * to JDL function names.
      * The following files (and possibly additional ones) need adjustment
      * as well for proper recognition of the symbols:
      * ProofJavaParser.jj, jmlparser.g, jmllexer.g
      * (Kai Wallisch 04/2014)
-     * 
+     *
      */
     public static final Map<String,String> jml2jdl;
     static{
@@ -122,6 +101,7 @@ public final class JMLTranslator {
         // clauses
         ACCESSIBLE ("accessible"),
         ASSIGNABLE ("assignable"),
+        ASSIGNABLE_NOT ("assignable_not"),
         DEPENDS ("depends"),
         ENSURES ("ensures"),
         ENSURES_FREE ("ensures_free"),
@@ -266,7 +246,6 @@ public final class JMLTranslator {
         });
         translationMethods.put(JMLKeyWord.ASSIGNABLE,
                                new JMLTranslationMethod() {
-
             @Override
             public Term translate(SLTranslationExceptionManager excManager,
                                   Object... params)
@@ -284,6 +263,30 @@ public final class JMLTranslator {
                 }
             }
         });
+        /*
+         * TODO (DS, 2018-12-14): Copied this translation method from assignable
+         * and did not change anything, maybe that's not correct...
+         */
+        translationMethods.put(JMLKeyWord.ASSIGNABLE_NOT,
+                new JMLTranslationMethod() {
+                    @Override
+                    public Term translate(
+                            SLTranslationExceptionManager excManager,
+                            Object... params) throws SLTranslationException {
+                        checkParameters(params, Term.class, Services.class);
+                        Term ensuresTerm = (Term) params[0];
+                        Services services = (Services) params[1];
+
+                        BooleanLDT booleanLDT =
+                                services.getTypeConverter().getBooleanLDT();
+                        if (ensuresTerm.sort() == booleanLDT.targetSort()) {
+                            return tb.convertToFormula(ensuresTerm);
+                        }
+                        else {
+                            return ensuresTerm;
+                        }
+                    }
+                });
         translationMethods.put(JMLKeyWord.DEPENDS,
                                new JMLTranslationMethod() {
 
@@ -348,7 +351,7 @@ public final class JMLTranslator {
         translationMethods.put(JMLKeyWord.REQUIRES, termTranslationMethod);
         translationMethods.put(JMLKeyWord.REQUIRES_FREE, termTranslationMethod);
         translationMethods.put(JMLKeyWord.MERGE_PROC, new JMLTranslationMethod() {
-            
+
             @Override
             public Object translate(SLTranslationExceptionManager excManager,
                     Object... params) throws SLTranslationException {
@@ -447,7 +450,7 @@ public final class JMLTranslator {
                 checkParameters(params, Term.class, String.class, Services.class);
                 Term term = (Term) params[0];
                 String label = (String) params[1];
-                
+
                 @SuppressWarnings("unused")// please keep it for documentation purposes
                 TermServices services = (TermServices) params[2];
                 Term formula = term == null ? tb.tt() : tb.convertToFormula(term);
@@ -635,7 +638,7 @@ public final class JMLTranslator {
                 return res;
             }
 
-            
+
             @Override
             public Object translate(
                     SLTranslationExceptionManager excManager,
@@ -694,7 +697,7 @@ public final class JMLTranslator {
                 }
                 return res;
             }
-            
+
             @Override
             public Object translate(
                     SLTranslationExceptionManager excManager,
@@ -1089,7 +1092,7 @@ public final class JMLTranslator {
                     Object... params)
                     throws SLTranslationException {
                 checkParameters(params,
-                                ImmutableList.class, 
+                                ImmutableList.class,
                                 Map.class,
                                 Services.class);
                 @SuppressWarnings("unchecked")
@@ -1439,7 +1442,7 @@ public final class JMLTranslator {
 
                 // strip leading "\dl_"
                 String functName = escape.getText().substring(4);
-                
+
                 return translateToJDLTerm(escape, functName, services, tb, list, excManager);
                 }
         });
@@ -1654,6 +1657,13 @@ public final class JMLTranslator {
                                 addIgnoreWarning("local variable in assignable clause");
                                 Debug.out("Can't create a locset from local variable "+ t + ".\n" +
                                         "In this version of KeY, you do not need to put them in assignable clauses.");
+                                /*
+                                 * XXX (DS, 2018-12-14): This is a hack
+                                 * for assignable_not clauses. For
+                                 * assignable, we still want to ignore
+                                 * them...
+                                 */
+                                singletons = singletons.append(t);
                             } else {
                                 throw excManager.createException("Can't create a locset from "+ t + ".");
                             }
@@ -1720,7 +1730,7 @@ public final class JMLTranslator {
 			               .getKeYJavaType(PrimitiveType.JAVA_SEQ);
 				return new SLExpression(tb.values(),t);
 			}});
-        
+
         translationMethods.put(JMLKeyWord.INF_FLOW_SPEC_LIST, new JMLTranslationMethod() {
 
             @Override
@@ -1792,7 +1802,7 @@ public final class JMLTranslator {
         try {
             result = parser.top();
             // maybe return pair<T, Warnings>?
-            //List<PositionedString> warnings = parser.getWarnings();            
+            //List<PositionedString> warnings = parser.getWarnings();
         } catch (RecognitionException e) {
             throw parser.getExceptionManager().convertException(e);
         }
@@ -1807,7 +1817,7 @@ public final class JMLTranslator {
         }
         return castToReturnType(result, resultClass);
     }
-    
+
     /**
      * For testing only.
      */
@@ -2119,7 +2129,7 @@ public final class JMLTranslator {
             Term cond = tb.convertToBoolean(tb.and(t1, t2));
             return new SLExpression(translateQuantifier(qv, cond),resultType);
         }
-        
+
 
         public abstract Term combineQuantifiedTerms(Term t1,
                                                     Term t2)
@@ -2290,7 +2300,7 @@ public final class JMLTranslator {
             return null;
         }
     }
-    
+
     private abstract class JMLEqualityTranslationMethod implements
             JMLTranslationMethod {
 
@@ -2513,7 +2523,7 @@ public final class JMLTranslator {
         }
 
     }
-    
+
     /*
      * Translate a term of type \map to JavaDL, if it occurs in a JML
      * expression.
@@ -2527,9 +2537,9 @@ public final class JMLTranslator {
         return translateToJDLTerm(t, functName, services, tb, list, excManager);
     }
 
-    /** Provide restriction terms for the declared KeYJavaType 
+    /** Provide restriction terms for the declared KeYJavaType
      *  Note that these restrictions only apply to the JML to DL translation.
-     *  See also {@link TermBuilder#reachableValue(Term, KeYJavaType)}. 
+     *  See also {@link TermBuilder#reachableValue(Term, KeYJavaType)}.
      */
     protected Term typerestrict(KeYJavaType kjt, final boolean nullable, Iterable<? extends QuantifiableVariable> qvs, Services services) {
         final Type type = kjt.getJavaType();
@@ -2558,5 +2568,5 @@ public final class JMLTranslator {
         }
         return res;
     }
-    
+
 }

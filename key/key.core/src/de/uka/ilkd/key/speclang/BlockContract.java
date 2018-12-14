@@ -60,20 +60,21 @@ public interface BlockContract extends BlockSpecificationElement {
     /**
     *
     * @param newBlock the new block.
-    * @param newPreconditions the new preconditions.
-    * @param newPostconditions the new postconditions.
-    * @param newModifiesClauses the new modifies clauses.
-    * @param newInfFlowSpecs the new information flow specifications.
-    * @param newVariables the new variables.
-    * @param newMeasuredBy the new measured-by clause.
+     * @param newPreconditions the new preconditions.
+     * @param newPostconditions the new postconditions.
+     * @param newModifiesClauses the new modifies clauses.
+     * @param newModifiesNotClauses TODO
+     * @param newInfFlowSpecs the new information flow specifications.
+     * @param newVariables the new variables.
+     * @param newMeasuredBy the new measured-by clause.
     * @return a new block contract with the specified attributes.
     */
     public BlockContract update(StatementBlock newBlock,
             Map<LocationVariable, Term> newPreconditions,
             Map<LocationVariable, Term> newPostconditions,
             Map<LocationVariable, Term> newModifiesClauses,
-            final ImmutableList<InfFlowSpec> newInfFlowSpecs, Variables newVariables,
-            Term newMeasuredBy);
+            Map<LocationVariable, Term> newModifiesNotClauses, final ImmutableList<InfFlowSpec> newInfFlowSpecs,
+            Variables newVariables, Term newMeasuredBy);
 
     /**
      * @param newKJT

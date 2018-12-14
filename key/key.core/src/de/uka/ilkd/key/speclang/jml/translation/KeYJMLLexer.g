@@ -37,6 +37,7 @@ lexer grammar KeYJMLLexer;
     /* JML and JML* keywords */
     ACCESSIBLE      : 'accessible';
     ASSIGNABLE      : 'assignable';
+    ASSIGNABLE_NOT  : 'assignable_not';
     BREAKS          : 'breaks';
     CONTINUES       : 'continues';
     DECREASES       : 'decreases'; // internal translation for 'measured_by'

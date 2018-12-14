@@ -13,28 +13,14 @@
 
 package de.uka.ilkd.key.speclang.jml.translation;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableArray;
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
+import org.key_project.util.collection.*;
 
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
-import de.uka.ilkd.key.java.Label;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -43,61 +29,22 @@ import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.statement.BranchStatement;
-import de.uka.ilkd.key.java.statement.For;
-import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.MergeByIfThenElse;
 import de.uka.ilkd.key.rule.merge.procedures.MergeWithPredicateAbstraction;
 import de.uka.ilkd.key.rule.merge.procedures.ParametricMergeProcedure;
 import de.uka.ilkd.key.rule.merge.procedures.UnparametricMergeProcedure;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
-import de.uka.ilkd.key.speclang.ClassAxiom;
-import de.uka.ilkd.key.speclang.ClassAxiomImpl;
-import de.uka.ilkd.key.speclang.ClassInvariant;
-import de.uka.ilkd.key.speclang.ClassInvariantImpl;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.ContractFactory;
-import de.uka.ilkd.key.speclang.FunctionalOperationContract;
-import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.InformationFlowContract;
-import de.uka.ilkd.key.speclang.InitiallyClause;
-import de.uka.ilkd.key.speclang.InitiallyClauseImpl;
-import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.LoopSpecImpl;
-import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.speclang.MergeContract;
-import de.uka.ilkd.key.speclang.PositionedString;
-import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
-import de.uka.ilkd.key.speclang.RepresentsAxiom;
-import de.uka.ilkd.key.speclang.SimpleBlockContract;
-import de.uka.ilkd.key.speclang.SimpleLoopContract;
-import de.uka.ilkd.key.speclang.UnparameterizedMergeContract;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.jml.JMLSpecExtractor;
-import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassAxiom;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLClassInv;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLConstruct;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLDepends;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLInitially;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
-import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
+import de.uka.ilkd.key.speclang.jml.pretranslation.*;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.speclang.translation.SLWarningException;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -250,6 +197,8 @@ public class JMLSpecFactory {
         public Term decreases;
         public Map<LocationVariable, Term> assignables
                 = new LinkedHashMap<LocationVariable, Term>();
+        public Map<LocationVariable, Term> assignableNots
+                = new LinkedHashMap<LocationVariable, Term>();
         public Map<ProgramVariable, Term> accessibles = new LinkedHashMap<ProgramVariable, Term>();
         public Map<LocationVariable, Term> ensures = new LinkedHashMap<LocationVariable, Term>();
         public Map<LocationVariable, Term> ensuresFree
@@ -262,6 +211,8 @@ public class JMLSpecFactory {
         public Map<Label, Term> continues;
         public Term returns;
         public Map<LocationVariable, Boolean> hasMod
+                = new LinkedHashMap<LocationVariable, Boolean>();
+        public Map<LocationVariable, Boolean> hasNonMod
                 = new LinkedHashMap<LocationVariable, Boolean>();
         public ImmutableList<InfFlowSpec> infFlowSpecs;
     }
@@ -390,6 +341,8 @@ public class JMLSpecFactory {
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             translateAssignable(pm, progVars, heap, savedHeap,
                     textualSpecCase.getAssignable(heap.name().toString()), clauses);
+            translateAssignableNot(pm, progVars, heap, savedHeap,
+                    textualSpecCase.getAssignableNot(heap.name().toString()), clauses);
             translateRequires(pm, progVars, heap, savedHeap,
                     textualSpecCase.getRequires(heap.name().toString()),
                     textualSpecCase.getRequiresFree(heap.name().toString()), clauses);
@@ -512,6 +465,31 @@ public class JMLSpecFactory {
         } else {
             clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
                     progVars.paramVars, progVars.atPres, progVars.atBefores, mod));
+        }
+    }
+
+    private void translateAssignableNot(IProgramMethod pm, ProgramVariableCollection progVars,
+            LocationVariable heap, final LocationVariable savedHeap,
+            final ImmutableList<PositionedString> nonMod, ContractClauses clauses)
+            throws SLTranslationException {
+        /*
+         * TODO (DS, 2018-12-14): Check this implementation. Has been copied
+         * from translateAssignable, and semantics might have to be changed.
+         */
+        clauses.hasNonMod.put(heap,
+                !translateStrictlyPure(pm, progVars.selfVar, progVars.paramVars, nonMod));
+        if (heap == savedHeap && nonMod.isEmpty()) {
+            clauses.assignableNots.put(heap, null);
+        //@formatter:off
+        // } else if (!clauses.hasNonMod.get(heap)) {
+        //     final ImmutableList<PositionedString> assignableNothing = ImmutableSLList
+        //             .<PositionedString>nil().append(new PositionedString("assignable \\nothing;"));
+        //     clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
+        //             progVars.paramVars, progVars.atPres, progVars.atBefores, assignableNothing));
+        //@formatter:on
+        } else {
+            clauses.assignableNots.put(heap, translateAssignableNot(pm, progVars.selfVar,
+                    progVars.paramVars, progVars.atPres, progVars.atBefores, nonMod));
         }
     }
 
@@ -722,7 +700,22 @@ public class JMLSpecFactory {
             ImmutableList<ProgramVariable> paramVars, Map<LocationVariable, Term> atPres,
             Map<LocationVariable, Term> atBefores, ImmutableList<PositionedString> originalClauses)
             throws SLTranslationException {
+        if (originalClauses.isEmpty()) {
+            return tb.allLocs();
+        } else {
+            return translateUnionClauses(pm, selfVar, paramVars, atPres, atBefores,
+                    originalClauses);
+        }
+    }
 
+    private Term translateAssignableNot(IProgramMethod pm, ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars, Map<LocationVariable, Term> atPres,
+            Map<LocationVariable, Term> atBefores, ImmutableList<PositionedString> originalClauses)
+            throws SLTranslationException {
+        /*
+         * TODO (DS, 2018-12-14): Check this implementation. Has been copied
+         * from translateAssignable, and semantics might have to be changed.
+         */
         if (originalClauses.isEmpty()) {
             return tb.allLocs();
         } else {
@@ -1301,7 +1294,7 @@ public class JMLSpecFactory {
                 method, behavior, variables, clauses.requires, clauses.measuredBy, clauses.ensures,
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
                 clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
-                clauses.hasMod, services).create();
+                clauses.assignableNots, clauses.hasMod, clauses.hasNonMod, services).create();
     }
 
     /**
@@ -1336,7 +1329,7 @@ public class JMLSpecFactory {
                 method, behavior, variables, clauses.requires, clauses.measuredBy, clauses.ensures,
                 clauses.infFlowSpecs, clauses.breaks, clauses.continues, clauses.returns,
                 clauses.signals, clauses.signalsOnly, clauses.diverges, clauses.assignables,
-                clauses.hasMod, clauses.decreases, services).create();
+                clauses.assignableNots, clauses.hasMod, clauses.hasNonMod, clauses.decreases, services).create();
     }
 
     /**
