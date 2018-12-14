@@ -174,7 +174,7 @@ public class MergeRuleTests extends TestCase {
      * This test case semi-automatically proves the Gcd problem with two merges
      * in the following way:
      * <p>
-     * 
+     *
      * <ol>
      * <li>Run the {@link FinishSymbolicExecutionUntilMergePointMacro} on the
      * root</li>
@@ -184,14 +184,14 @@ public class MergeRuleTests extends TestCase {
      * <li>Let the automatic strategy finish the proof</li>
      * </ol>
      * <p>
-     * 
+     *
      * At the end, the proof should be closed.
      *
      * @throws ProblemLoaderException
      *             If the proof could not be loaded.
      */
     @Test
-    public void testDoManualGcdProof() throws Exception {
+    public void testGcdProofWithMacroAndManualITEMerge() throws Exception {
         final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX, "gcd.key");
 
         for (int i = 0; i < 2; i++) {
