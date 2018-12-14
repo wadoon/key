@@ -92,7 +92,7 @@ public class AbstractExecutionTests extends TestCase {
             }
         }
 
-        final int expectedNumAEApps = 22;
+        final int expectedNumAEApps = 18;
         assertEquals(
                 String.format("There should be %d abstract execution apps.",
                         expectedNumAEApps),

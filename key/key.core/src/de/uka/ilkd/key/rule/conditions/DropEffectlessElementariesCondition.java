@@ -54,7 +54,7 @@ public final class DropEffectlessElementariesCondition
                 //@formatter:on
                 return null;
             }
-            else if (!target.op().isRigid()) {
+            else if (target.op() instanceof Function && !target.op().isRigid()) {
                 /*
                  * (DS) Special case introduced for non-rigid abstract path
                  * conditions arising from abstract execution.
