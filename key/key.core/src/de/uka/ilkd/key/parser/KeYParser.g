@@ -3848,7 +3848,7 @@ varexp[TacletBuilder b]
     | varcond_storeResultVarIn[b]
     | varcond_storeContextLabelsIn[b]
     | varcond_freshAbstractProgram[b]
-    | varcond_isNull[b, negated]
+    | varcond_isDefined[b, negated]
     | varcond_abstractUpdate[b, negated]
     | varcond_dropEffectlessStores[b]
     | varcond_enum_const[b]
@@ -3869,7 +3869,7 @@ varexp[TacletBuilder b]
     (   varcond_abstractOrInterface[b, negated]
         | varcond_prefixContainsElement[b, negated]
 	    | varcond_array[b, negated]
-        | varcond_isNull[b, negated]
+        | varcond_isDefined[b, negated]
         | varcond_abstractUpdate[b, negated]
         | varcond_array_length[b, negated]	
         | varcond_enumtype[b, negated]
@@ -3970,11 +3970,11 @@ varcond_prefixContainsElement[TacletBuilder b, boolean negated]
    }
 ;
 
-varcond_isNull[TacletBuilder b, boolean negated]
+varcond_isDefined[TacletBuilder b, boolean negated]
 :
-   ISNULL LPAREN sv=varId RPAREN 
+   IS_DEFINED LPAREN sv=varId RPAREN 
    {
-      b.addVariableCondition(new IsNullCondition((SchemaVariable) sv, negated));
+      b.addVariableCondition(new IsDefinedCondition((SchemaVariable) sv, negated));
    }
 ;
 

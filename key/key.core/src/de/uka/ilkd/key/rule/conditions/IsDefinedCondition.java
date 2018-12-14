@@ -21,15 +21,16 @@ import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * Checks whether the instantiation for a given schema variable is null or not.
+ * Checks whether the instantiation for a given schema variable is set (its
+ * instantiation is not null) or not.
  *
  * @author Dominic Steinhöfel
  */
-public class IsNullCondition implements VariableCondition {
+public class IsDefinedCondition implements VariableCondition {
     private final SchemaVariable svToCheck;
     private final boolean negated;
 
-    public IsNullCondition(SchemaVariable svToCheck, boolean negated) {
+    public IsDefinedCondition(SchemaVariable svToCheck, boolean negated) {
         this.svToCheck = svToCheck;
         this.negated = negated;
     }
@@ -40,9 +41,10 @@ public class IsNullCondition implements VariableCondition {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
         if (svInst.getInstantiation(svToCheck) == null) {
-            return negated ? null : matchCond;
-        } else {
             return negated ? matchCond : null;
+        }
+        else {
+            return negated ? null : matchCond;
         }
     }
 

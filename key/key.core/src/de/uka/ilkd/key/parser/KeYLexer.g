@@ -231,7 +231,7 @@ lexer grammar KeYLexer;
     STORE_RESULT_VAR_IN : '\\storeResultVarIn' ;
     FRESH_ABSTRACT_PROGRAM : '\\freshAbstractProgram' ;
     STORE_CONTEXT_LABELS_IN : '\\storeContextLabelsIn' ;
-	ISNULL : '\\isnull';
+	IS_DEFINED : '\\isDefined';
 	VARCOND : '\\varcond';
 	APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';
     DEPENDINGON : '\\dependingOn';
