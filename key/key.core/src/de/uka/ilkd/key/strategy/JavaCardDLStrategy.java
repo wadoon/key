@@ -14,12 +14,7 @@
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.BooleanLDT;
-import de.uka.ilkd.key.ldt.CharListLDT;
-import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.ldt.IntegerLDT;
-import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -34,38 +29,10 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.strategy.feature.*;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCost;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCostScalerFeature;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.SplittableQuantifiedFormulaFeature;
-import de.uka.ilkd.key.strategy.termProjection.AssumptionProjection;
-import de.uka.ilkd.key.strategy.termProjection.CoeffGcdProjection;
-import de.uka.ilkd.key.strategy.termProjection.DividePolynomialsProjection;
-import de.uka.ilkd.key.strategy.termProjection.FocusFormulaProjection;
-import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
-import de.uka.ilkd.key.strategy.termProjection.MonomialColumnOp;
-import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
-import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
-import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
-import de.uka.ilkd.key.strategy.termfeature.AnonHeapTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.IsInductionVariable;
-import de.uka.ilkd.key.strategy.termfeature.IsNonRigidTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.IsSelectSkolemConstantTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
-import de.uka.ilkd.key.strategy.termfeature.PrimitiveHeapTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.SimplifiedSelectTermFeature;
-import de.uka.ilkd.key.strategy.termfeature.TermFeature;
-import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.HeapGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.RootsGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
-import de.uka.ilkd.key.strategy.termgenerator.TriggeredInstantiations;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
+import de.uka.ilkd.key.strategy.termProjection.*;
+import de.uka.ilkd.key.strategy.termfeature.*;
+import de.uka.ilkd.key.strategy.termgenerator.*;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -227,6 +194,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         final Feature instLoopHolesF =  instLoopHoleFeature(inftyConst());
 
+        final Feature ifElseTacletF = StaticFeatureCollection.ifElseFeature(longConst(10000));
+
         // final Feature smtF = smtFeature(inftyConst());
 
         return SumFeature.createSum(
@@ -234,7 +203,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 NonDuplicateAppFeature.INSTANCE,
                 // splitF,
                 // strengthenConstraints,
-                AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF, instLoopHolesF,
+                AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF, instLoopHolesF, ifElseTacletF,
                 // smtF,
                 methodSpecF, queryF, depSpecF, loopInvF, blockFeature, loopBlockFeature,
                 loopBlockApplyHeadFeature,
@@ -2602,7 +2571,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                 .create(heapLDT),
                                                 not(ff.ifThenElse)))),
                         not(ContainsTermFeature.create(instOf("s"), instOf("t1")))));
-        
+
         // Without EqNonDuplicateAppFeature.INSTANCE
         // rule 'applyEq' might be applied on the same term
         // without changing the sequent for a really long time. This is tested by
