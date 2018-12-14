@@ -50,7 +50,8 @@ public class Function extends AbstractSortedOperator {
         assert sort != Sort.UPDATE || isSkolemConstant;
         assert !(unique && sort == Sort.FORMULA);
         assert !(sort instanceof NullSort) || name.toString().equals(
-            "null") : "Functions with sort \"null\" are not allowed: " + this;
+                "null") : "Functions with sort \"null\" are not allowed: "
+                        + this;
     }
 
     public Function(Name name, Sort sort, ImmutableArray<Sort> argSorts,
@@ -67,17 +68,18 @@ public class Function extends AbstractSortedOperator {
     public Function(Name name, Sort sort, Sort[] argSorts,
             Boolean[] whereToBind, boolean unique) {
         this(name, sort, new ImmutableArray<Sort>(argSorts),
-            whereToBind == null ? null
-                    : new ImmutableArray<Boolean>(whereToBind),
-            unique);
+                whereToBind == null ? null
+                        : new ImmutableArray<Boolean>(whereToBind),
+                unique);
     }
 
     public Function(Name name, Sort sort, Sort[] argSorts,
-            Boolean[] whereToBind, boolean unique, boolean rigid, boolean isSkolemConstant) {
+            Boolean[] whereToBind, boolean unique, boolean rigid,
+            boolean isSkolemConstant) {
         this(name, sort, new ImmutableArray<Sort>(argSorts),
-            whereToBind == null ? null
-                    : new ImmutableArray<Boolean>(whereToBind),
-            unique, rigid, isSkolemConstant);
+                whereToBind == null ? null
+                        : new ImmutableArray<Boolean>(whereToBind),
+                unique, rigid, isSkolemConstant);
     }
 
     Function(Name name, Sort sort, ImmutableArray<Sort> argSorts,
@@ -93,8 +95,8 @@ public class Function extends AbstractSortedOperator {
         this(name, sort, argSorts, null, false);
     }
 
-    public Function(Name name, Sort sort, boolean isSkolemConstant, boolean rigid,
-            Sort... argSorts) {
+    public Function(Name name, Sort sort, boolean isSkolemConstant,
+            boolean rigid, Sort... argSorts) {
         this(name, sort, argSorts, null, false, rigid, isSkolemConstant);
     }
 
@@ -104,7 +106,7 @@ public class Function extends AbstractSortedOperator {
 
     public Function(Name name, Sort sort, boolean isSkolemConstant) {
         this(name, sort, new ImmutableArray<Sort>(), null, false, true,
-            isSkolemConstant);
+                isSkolemConstant);
     }
 
     // -------------------------------------------------------------------------
@@ -155,6 +157,6 @@ public class Function extends AbstractSortedOperator {
 
     public Function rename(Name newName) {
         return new Function(newName, sort(), argSorts(), whereToBind(), unique,
-            skolemConstant);
+                skolemConstant);
     }
 }

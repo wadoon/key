@@ -14,12 +14,7 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Point;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -36,7 +31,7 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
 
     private final SequentView sequentView;
     private boolean showTermInfo = false;
-    
+
     //do not refresh when set to false
     private static boolean refresh = true;
 
@@ -57,7 +52,7 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
                             tOpClassString.lastIndexOf('.') + 1);
                     // The hash code is displayed here since sometimes terms with
                     // equal string representation are still different.
-                    info = operator + ", Sort: " + t.sort() + ", Hash:" + t.hashCode();
+                    info =  operator + " (" + (t.isRigid() ? "Rigid" : "Nonrigid") + "), Sort: " + t.sort() + ", Hash:" + t.hashCode();
 
                     Sequent seq = sequentView.getMainWindow().getMediator().getSelectedNode().sequent();
                     info += ProofSaver.posInOccurrence2Proof(seq, posInOcc);
@@ -71,8 +66,8 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
             }
         }
     }
-    
-    
+
+
 
     public static boolean isRefresh() {
 		return refresh;
