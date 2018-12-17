@@ -25,28 +25,15 @@ import java.util.Stack;
 
 import org.key_project.util.collection.ImmutableArray;
 
-import de.uka.ilkd.key.java.ContextStatementBlock;
-import de.uka.ilkd.key.java.JavaNonTerminalProgramElement;
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.visitor.ProgramContextAdder;
 import de.uka.ilkd.key.java.visitor.ProgramReplaceVisitor;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.ModalOperatorSV;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
-import de.uka.ilkd.key.logic.op.SubstOp;
-import de.uka.ilkd.key.logic.op.TermTransformer;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.rule.Taclet.TacletLabelHint;
@@ -80,7 +67,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
     private final Boolean newMarker = new Boolean(true);
     private final Deque<Term> tacletTermStack = new ArrayDeque<Term>();
 
-    
+
     /**
      * constructs a term visitor replacing any occurrence of a schemavariable found
      * in {@code svInst} by its instantiation
@@ -117,7 +104,7 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             labelHint.setTacletTermStack(tacletTermStack);
         }
     }
-    
+
     /**
      * constructs a term visitor replacing any occurrence of a schemavariable found
      * in {@code svInst} by its instantiation
@@ -138,8 +125,8 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
             Rule rule,
             RuleApp ruleApp,
             Services services) {
-        this(termLabelState, labelHint, applicationPosInOccurrence, svInst, 
-                goal, rule, ruleApp, services, services.getTermBuilder());    
+        this(termLabelState, labelHint, applicationPosInOccurrence, svInst,
+                goal, rule, ruleApp, services, services.getTermBuilder());
     }
 
     public SyntacticalReplaceVisitor(TermLabelState termLabelState,
@@ -275,6 +262,11 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         } else if (p_operatorToBeInstantiated instanceof SchemaVariable) {
             if (p_operatorToBeInstantiated instanceof ProgramSV && ((ProgramSV)p_operatorToBeInstantiated).isListSV()){
                 instantiatedOp = p_operatorToBeInstantiated;
+            }
+            else if (p_operatorToBeInstantiated instanceof ProgramSV
+                    && ((ProgramSV) p_operatorToBeInstantiated)
+                            .sort() == ProgramSVSort.ABSTRACTPROGRAM) {
+                instantiatedOp = p_operatorToBeInstantiated;
             } else {
                 instantiatedOp = (Operator)svInst.getInstantiation((SchemaVariable)p_operatorToBeInstantiated);
             }
@@ -326,7 +318,10 @@ public class SyntacticalReplaceVisitor extends DefaultVisitor {
         if (visitedOp instanceof SchemaVariable
                 && visitedOp.arity() == 0
                 && svInst.isInstantiated((SchemaVariable) visitedOp)
-                && (!(visitedOp instanceof ProgramSV && ((ProgramSV) visitedOp).isListSV()))) {
+                && (!(visitedOp instanceof ProgramSV && (((ProgramSV) visitedOp)
+                        .isListSV()
+                        || ((ProgramSV) visitedOp)
+                                .sort() == ProgramSVSort.ABSTRACTPROGRAM)))) {
             final Term newTerm = toTerm(svInst.getTermInstantiation((SchemaVariable) visitedOp, svInst.getExecutionContext(), services));
             final Term labeledTerm = TermLabelManager.label(services,
                     termLabelState,

@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.AbstractExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.TermTransformer;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
@@ -33,7 +34,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public final class AELabel extends AbstractTermTransformer {
 
     public AELabel() {
-        super(new Name("#AELabel"), 3);
+        super(new Name("#AELabel"), 2);
     }
 
     @Override
@@ -41,15 +42,14 @@ public final class AELabel extends AbstractTermTransformer {
             Services services) {
         final Term abstrUpdTerm = term.sub(0);
         final AbstractPlaceholderStatement abstrProg =
-                (AbstractPlaceholderStatement) term.sub(1).javaBlock().program()
-                        .getFirstElement();
-        final Term targetTerm = term.sub(2);
+                (AbstractPlaceholderStatement) svInst
+                        .getInstantiation((SchemaVariable) term.sub(1).op());
 
         final AbstractExecutionTermLabel label =
                 new AbstractExecutionTermLabel(abstrProg);
 
         final TermBuilder tb = services.getTermBuilder();
 
-        return tb.apply(tb.label(abstrUpdTerm, label), targetTerm);
+        return tb.label(abstrUpdTerm, label);
     }
 }

@@ -38,7 +38,8 @@ public final class UpdateApplication extends AbstractOperator {
 
     @Override
     public boolean additionalValidTopLevel(Term term) {
-        return term.sub(0).sort() == Sort.UPDATE;
+        return term.sub(0).sort() == Sort.UPDATE
+                || term.sub(0).sort() == AbstractTermTransformer.METASORT;
     }
 
     /**
