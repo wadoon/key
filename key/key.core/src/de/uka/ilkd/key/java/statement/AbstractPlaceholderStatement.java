@@ -29,22 +29,24 @@ import de.uka.ilkd.key.logic.Named;
  * @author Dominic Steinhöfel
  */
 public class AbstractPlaceholderStatement extends JavaStatement implements Named {
-
-    // Those are used for JML to JavaDL conversions
     protected final String id;
     protected final Name name;
     protected final Comment[] comments;
+
+    private final int hashCode;
 
     public AbstractPlaceholderStatement(String id) {
         this.id = id;
         this.name = new Name(id);
         this.comments = null;
+        this.hashCode = id.hashCode();
     }
 
     public AbstractPlaceholderStatement(String id, Comment[] comments) {
         this.id = id;
         this.name = new Name(id);
         this.comments = comments;
+        this.hashCode = id.hashCode();
     }
 
     public AbstractPlaceholderStatement(ExtList children) {
@@ -52,6 +54,7 @@ public class AbstractPlaceholderStatement extends JavaStatement implements Named
         id = children.get(String.class);
         this.name = new Name(id);
         comments = children.get(Comment[].class);
+        this.hashCode = id.hashCode();
     }
 
     public String getId() {
@@ -81,6 +84,11 @@ public class AbstractPlaceholderStatement extends JavaStatement implements Named
     public boolean equalsModRenaming(SourceElement se,
             NameAbstractionTable nat) {
         return se.equals(this);
+    }
+
+    @Override
+    protected int computeHashCode() {
+        return hashCode;
     }
 
     @Override

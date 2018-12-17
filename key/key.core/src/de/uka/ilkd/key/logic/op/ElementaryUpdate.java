@@ -57,4 +57,9 @@ public final class ElementaryUpdate extends AbstractSortedOperator {
     public UpdateableOperator lhs() {
         return lhs;
     }
+
+    @Override
+    public int hashCode() {
+        return 5 + 17 * lhs.hashCode();
+    }
 }

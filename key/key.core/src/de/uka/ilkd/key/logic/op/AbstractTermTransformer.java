@@ -22,13 +22,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
-import de.uka.ilkd.key.rule.metaconstruct.AddCast;
-import de.uka.ilkd.key.rule.metaconstruct.ArrayBaseInstanceOf;
-import de.uka.ilkd.key.rule.metaconstruct.ConstantValue;
-import de.uka.ilkd.key.rule.metaconstruct.EnumConstantValue;
-import de.uka.ilkd.key.rule.metaconstruct.ExpandQueriesMetaConstruct;
-import de.uka.ilkd.key.rule.metaconstruct.IntroAtPreDefsOp;
-import de.uka.ilkd.key.rule.metaconstruct.MemberPVToField;
+import de.uka.ilkd.key.rule.metaconstruct.*;
 import de.uka.ilkd.key.rule.metaconstruct.arith.*;
 import de.uka.ilkd.key.util.Debug;
 
@@ -90,6 +84,8 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer MEMBER_PV_TO_FIELD = new MemberPVToField();
 
     public static final AbstractTermTransformer ADD_CAST = new AddCast();
+
+    public static final AbstractTermTransformer AELABEL = new AELabel();
 
     public static final AbstractTermTransformer EXPAND_QUERIES = new ExpandQueriesMetaConstruct();
 
