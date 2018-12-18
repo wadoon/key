@@ -12,7 +12,7 @@ public class PulloutITEPrefixRef {
     }
     
     public int after(int result, boolean b) {
-        //@ assignable_not b, result;
+        //@ assignable_not b;
         { abstract-program P; }
         if (b) {
             abstract-program Q1;
