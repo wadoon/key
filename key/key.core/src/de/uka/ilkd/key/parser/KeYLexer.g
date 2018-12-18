@@ -228,6 +228,7 @@ lexer grammar KeYLexer;
         // Keywords for varcond and related stuff
     PREFIX_CONTAINS_ELEMENT : '\\prefixContainsElement' ;
     INSTANTIATE_VARS_FRESH : '\\instantiateVarsFresh' ;
+    NEW_PV : '\\newPV' ;
     STORE_RESULT_VAR_IN : '\\storeResultVarIn' ;
     FRESH_ABSTRACT_PROGRAM : '\\freshAbstractProgram' ;
     STORE_CONTEXT_LABELS_IN : '\\storeContextLabelsIn' ;

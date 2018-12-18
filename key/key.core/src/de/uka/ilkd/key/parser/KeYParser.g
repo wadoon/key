@@ -3847,6 +3847,7 @@ varexp[TacletBuilder b]
     | varcond_prefixContainsElement[b, negated]
     | varcond_dropEffectlessElementaries[b]
     | varcond_instantiateVarsFresh[b]
+    | varcond_newPV[b]
     | varcond_storeResultVarIn[b]
     | varcond_storeContextLabelsIn[b]
     | varcond_freshAbstractProgram[b]
@@ -3901,6 +3902,27 @@ varcond_applyUpdateOnRigid [TacletBuilder b]
       b.addVariableCondition(new ApplyUpdateOnRigidCondition((UpdateSV)u, 
                                                              (SchemaVariable)x, 
                                                              (SchemaVariable)x2));
+   }
+;
+
+varcond_newPV[TacletBuilder b]
+:
+   NEW_PV LPAREN
+     pvSV=varId COMMA
+     namePattern=string_literal COMMA 
+     ( TYPEOF LPAREN y=varId RPAREN | kjt=keyjavatype )
+     ( FRESHFOR LPAREN z=varId RPAREN ) ?
+   RPAREN 
+   {
+      if (y == null) {
+        b.addVariableCondition(
+          new NewProgramVariableCondition(
+            (ProgramSV) pvSV, namePattern, kjt, (ProgramSV) z));
+      } else {
+        b.addVariableCondition(
+          new NewProgramVariableCondition(
+            (ProgramSV) pvSV, namePattern, (ProgramSV) y, (ProgramSV) z));
+      }
    }
 ;
 
