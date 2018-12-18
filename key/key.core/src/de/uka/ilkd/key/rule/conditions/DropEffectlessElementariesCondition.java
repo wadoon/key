@@ -100,7 +100,7 @@ public final class DropEffectlessElementariesCondition
                     : services.getTermBuilder().apply(sub0, newSub1, null);
         }
         else if (AbstractUpdateCondition.isAbstractUpdate(update)) {
-            if (relevantVars.isEmpty() && target.op().isRigid()) {
+            if (relevantVars.isEmpty() && target.isRigid()) {
                 /*
                  * We drop abstract updates in front of rigid symbols, like
                  * "true" or some predicate, but not in front of anything
@@ -118,7 +118,7 @@ public final class DropEffectlessElementariesCondition
                     .map(AbstractExecutionTermLabel::getAbstrPlaceholderStmt)
                     .orElse(null);
 
-            if (abstrProg != null) {
+            if (!relevantVars.isEmpty() && abstrProg != null) {
                 final ImmutableSet<BlockContract> contracts = services
                         .getSpecificationRepository()
                         .getAbstractPlaceholderStatementContracts(abstrProg);
