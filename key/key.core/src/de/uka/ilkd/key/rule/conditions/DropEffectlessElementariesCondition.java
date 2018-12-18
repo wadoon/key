@@ -142,7 +142,7 @@ public final class DropEffectlessElementariesCondition
 
                     /*
                      * If all the relevant variables are explicitly declared to
-                     * be not assignable, we can drop this updates.
+                     * be not assignable, we can drop this update.
                      */
                     if (relevantVars.stream().map(LocationVariable::toString)
                             .allMatch(relvar -> notAssgnVars.stream()
