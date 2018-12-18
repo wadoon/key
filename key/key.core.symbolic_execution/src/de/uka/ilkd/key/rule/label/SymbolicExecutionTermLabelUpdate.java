@@ -20,7 +20,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
-import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -32,8 +31,12 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.AbstractBlockContractRule;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementRule;
+import de.uka.ilkd.key.rule.BlockContractExternalRule;
+import de.uka.ilkd.key.rule.BlockContractInternalRule;
+import de.uka.ilkd.key.rule.LoopContractExternalRule;
+import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
@@ -51,7 +54,10 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
    public ImmutableList<Name> getSupportedRuleNames() {
       return ImmutableSLList.<Name>nil()
                             .prepend(WhileInvariantRule.INSTANCE.name())
-                            .prepend(BlockContractRule.INSTANCE.name());
+                            .prepend(BlockContractInternalRule.INSTANCE.name())
+                            .prepend(BlockContractExternalRule.INSTANCE.name())
+                            .prepend(LoopContractInternalRule.INSTANCE.name())
+                            .prepend(LoopContractExternalRule.INSTANCE.name());
    }
 
    /**
@@ -65,7 +71,6 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
                             Term modalityTerm,
                             Rule rule,
                             RuleApp ruleApp,
-                            Goal goal,
                             Object hint,
                             Term tacletTerm,
                             Operator newTermOp,
@@ -74,7 +79,9 @@ public class SymbolicExecutionTermLabelUpdate implements TermLabelUpdate {
                             JavaBlock newTermJavaBlock,
                             Set<TermLabel> labels) {
       if (rule instanceof WhileInvariantRule && "LoopBodyModality".equals(hint) ||
-          rule instanceof BlockContractRule && StringUtil.startsWith(hint, "ValidityModality: exceptionVar=")) {
+          ( rule instanceof AbstractBlockSpecificationElementRule && 
+                  ((AbstractBlockContractRule.BlockContractHint)hint).getExceptionalVariable() != null) 
+          ) {
          TermLabel label = CollectionUtil.searchAndRemove(labels, new IFilter<TermLabel>() {
             @Override
             public boolean select(TermLabel element) {

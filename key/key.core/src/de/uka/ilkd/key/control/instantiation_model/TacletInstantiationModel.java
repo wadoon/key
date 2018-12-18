@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.IfMismatchException;
@@ -139,9 +140,9 @@ public class TacletInstantiationModel {
 
 	if ( size > 0 ) {
 	    ImmutableList<IfFormulaInstantiation> antecCand =
-		IfFormulaInstSeq.createList ( seq, true );
+		IfFormulaInstSeq.createList ( seq, true, services );
 	    ImmutableList<IfFormulaInstantiation> succCand  =
-		IfFormulaInstSeq.createList ( seq, false );
+		IfFormulaInstSeq.createList ( seq, false, services );
 
 	    Iterator<SequentFormula> it        = ifseq.iterator();
 	    Term                         ifFma;
@@ -242,7 +243,7 @@ public class TacletInstantiationModel {
 	app = app.prepareUserInstantiation(services);	
     }
 
-    public Namespace programVariables() {
+    public Namespace<IProgramVariable> programVariables() {
         return nss.programVariables();
     }
 

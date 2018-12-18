@@ -6,10 +6,10 @@
          <methodCall name="&lt;call BlockContractWithReturnPostconditionNotVerified.magic(x_3)&gt;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
             <blockContract name="result_0 = magic()) catch(exc_0)
-pre x_3 = 2
+pre measuredByEmpty &amp; x_3 = 2
 post returned = TRUE
 &amp; exc_0 = null
-&amp; (returned = TRUE -&gt; result_0 = javaUnaryMinusInt(2))
+&amp; (returned = TRUE -&gt; result_0 = -2)
 mod {}termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true">
                <callStackEntry path="/0/0/0"/>
                <callStackEntry path="/0"/>
@@ -20,9 +20,9 @@ mod {}termination diamond" pathCondition="true" pathConditionChanged="false" pre
                      <callStackEntry path="/0/0/0"/>
                      <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true">
                         <callStackEntry path="/0/0/0"/>
-                        <statement name="returned=true;" pathCondition="true" pathConditionChanged="false">
+                        <statement name="returned_1=true;" pathCondition="true" pathConditionChanged="false">
                            <callStackEntry path="/0/0/0"/>
-                           <statement name="result_0=-4711;" pathCondition="true" pathConditionChanged="false">
+                           <statement name="result_0_1=-4711;" pathCondition="true" pathConditionChanged="false">
                               <callStackEntry path="/0/0/0"/>
                               <termination name="&lt;block contract end&gt;" pathCondition="true" pathConditionChanged="false" terminationKind="BLOCK_CONTRACT_NORMAL" branchVerified="false">
                               </termination>

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates and open the template in
- * the editor.
- */
 package de.uka.ilkd.key.informationflow.proof.init;
 
 import java.util.Iterator;
@@ -22,6 +18,7 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -447,7 +444,7 @@ public class StateVars {
 
     static void register(ProgramVariable pv,
                          Services services) {
-        Namespace progVarNames = services.getNamespaces().programVariables();
+        Namespace<IProgramVariable> progVarNames = services.getNamespaces().programVariables();
         if (pv != null && progVarNames.lookup(pv.name()) == null) {
             progVarNames.addSafely(pv);
         }
@@ -464,7 +461,7 @@ public class StateVars {
 
     static void register(Function f,
                          Services services) {
-        Namespace functionNames = services.getNamespaces().functions();
+        Namespace<Function> functionNames = services.getNamespaces().functions();
         if (f != null && functionNames.lookup(f.name()) == null) {
             assert f.sort() != Sort.UPDATE;
             if (f.sort() == Sort.FORMULA) {

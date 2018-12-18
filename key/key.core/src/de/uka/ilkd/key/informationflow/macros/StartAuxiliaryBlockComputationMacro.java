@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.uka.ilkd.key.informationflow.macros;
 
 import org.key_project.util.collection.ImmutableList;
@@ -19,9 +15,9 @@ import de.uka.ilkd.key.macros.AbstractProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProverTaskListener;
 import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
+import de.uka.ilkd.key.prover.ProverTaskListener;
+import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.BlockContract;
 
@@ -68,11 +64,11 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro impl
         final Services services = proof.getServices();
 
         final RuleApp app = goals.head().node().parent().getAppliedRuleApp();
-        if (!(app instanceof BlockContractBuiltInRuleApp)) {
+        if (!(app instanceof BlockContractInternalBuiltInRuleApp)) {
             return false;
         }
-        final BlockContractBuiltInRuleApp blockRuleApp =
-                (BlockContractBuiltInRuleApp) app;
+        final BlockContractInternalBuiltInRuleApp blockRuleApp =
+                (BlockContractInternalBuiltInRuleApp) app;
         final BlockContract contract = blockRuleApp.getContract();
         final IFProofObligationVars ifVars =
                 blockRuleApp.getInformationFlowProofObligationVars();
@@ -98,8 +94,9 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro impl
                                           ImmutableList<Goal> goals,
                                           PosInOccurrence posInOcc,
                                           ProverTaskListener listener) throws Exception {
-        final BlockContractBuiltInRuleApp blockRuleApp = 
-                (BlockContractBuiltInRuleApp) goals.head().node().parent().getAppliedRuleApp();
+        final BlockContractInternalBuiltInRuleApp blockRuleApp =
+                (BlockContractInternalBuiltInRuleApp)
+                    goals.head().node().parent().getAppliedRuleApp();
 
         final InitConfig initConfig = proof.getEnv().getInitConfigForEnvironment();
 
@@ -111,7 +108,7 @@ public class StartAuxiliaryBlockComputationMacro extends AbstractProofMacro impl
                                      ifVars.symbExecVars.labelHeapAtPreAsAnonHeapFunc(),
                                      goals.head(), blockRuleApp.getExecutionContext(),
                                      proof.getServices());
-        
+
         final InfFlowProof p;
         synchronized (blockExecPO) {
             p = (InfFlowProof) uic.createProof(initConfig, blockExecPO);

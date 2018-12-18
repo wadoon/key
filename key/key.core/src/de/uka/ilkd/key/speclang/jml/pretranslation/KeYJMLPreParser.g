@@ -44,7 +44,9 @@ options {
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLFieldDecl;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLInitially;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLLoopSpec;
+    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMethodDecl;
+    import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLMergePointDecl;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLRepresents;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSetStatement;
     import de.uka.ilkd.key.speclang.jml.pretranslation.TextualJMLSpecCase;
@@ -268,12 +270,14 @@ methodlevel_element[ImmutableList<String> mods]
 :
         result=field_or_method_declaration[mods]
     |   result=set_statement[mods]
+    |   result=merge_point_statement[mods]
     |   result=loop_specification[mods]
     |   result=assert_statement[mods]
     |   result=assume_statement[mods]
     |   result=nowarn_pragma[mods]
     |   result=debug_statement[mods]
     |   result=block_specification[mods]
+    |   result=block_loop_specification[mods]
 ;
 
 
@@ -733,10 +737,10 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=ensures_clause        { sc.addEnsures(ps); }
 	|   ps=ensures_free_clause   { sc.addEnsuresFree(ps); }
 	|   ps=signals_clause        { sc.addSignals(ps); }
-   |   ps=joinproc_clause        { sc.addJoinProcs(ps); }
 	|   ps=signals_only_clause   { sc.addSignalsOnly(ps); }
 	|   ps=diverges_clause       { sc.addDiverges(ps); }
 	|   ps=measured_by_clause    { sc.addMeasuredBy(ps); }
+	|   ps=variant_function      { sc.addDecreases(ps); }
 	|   ps=name_clause           { sc.addName(ps); }
 	|   captures_clause
 	|   when_clause
@@ -826,6 +830,8 @@ assignable_keyword
 :
 	ASSIGNABLE
     |   ASSIGNABLE_RED
+    |   ASSIGNS
+    |   ASSIGNS_RED
     |   MODIFIABLE
     |   MODIFIABLE_RED
     |   MODIFIES
@@ -1374,6 +1380,28 @@ set_statement[ImmutableList<String> mods]
     }
 ;
 
+//-----------------------------------------------------------------------------
+//merge point statement
+//-----------------------------------------------------------------------------
+
+merge_point_statement[ImmutableList<String> mods]
+	returns [ImmutableList<TextualJMLConstruct> result = null]
+:
+    MERGE_POINT
+    (MERGE_PROC   (mpr = STRING_LITERAL))?
+    (MERGE_PARAMS (mpa = BODY))?
+    SEMICOLON
+    {
+	TextualJMLMergePointDecl mpd =
+		mpr == null ?
+		new TextualJMLMergePointDecl(mods) :
+		(mpa == null ?
+		 new TextualJMLMergePointDecl(mods, createPositionedString(mpr.getText(), mpr)) :
+		 new TextualJMLMergePointDecl(mods, createPositionedString(mpr.getText(), mpr), createPositionedString(mpa.getText(), mpa)));
+	result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(mpd);
+    }
+;
+
 
 
 //-----------------------------------------------------------------------------
@@ -1388,11 +1416,13 @@ loop_specification[ImmutableList<String> mods]
    result = ImmutableSLList.<TextualJMLConstruct>nil().prepend(ls);
 }
 :
-    ps=loop_invariant       { ls.addInvariant(ps); }
+    (ps=loop_invariant       { ls.addInvariant(ps); }
+    | 	ps=loop_invariant_free       { ls.addFreeInvariant(ps); })
     (
 	options { greedy = true; }
 	:
             ps=loop_invariant       { ls.addInvariant(ps); }
+        |   ps=loop_invariant_free       { ls.addFreeInvariant(ps); }
         |   ps=loop_separates_clause      { ls.addInfFlowSpecs(ps); }
         |   ps=loop_determines_clause      { ls.addInfFlowSpecs(ps); }
         |   ps=assignable_clause    { ls.addAssignable(ps); }
@@ -1406,6 +1436,12 @@ loop_invariant returns [PositionedString r = null]
 @after { r = result; }
 :
     maintaining_keyword result=expression { result = flipHeaps("", result); }
+;
+loop_invariant_free returns [PositionedString r = null]
+@init { result = r; }
+@after { r = result; }
+:
+    LOOP_INVARIANT_FREE result=expression { result = flipHeaps("", result); }
 ;
 
 maintaining_keyword
@@ -1431,6 +1467,8 @@ decreasing_keyword
     |   DECREASING_REDUNDANTLY
     |   DECREASES
     |   DECREASES_REDUNDANTLY
+    |   LOOP_VARIANT
+    |   LOOP_VARIANT_RED
 ;
 
 
@@ -1531,6 +1569,34 @@ block_specification[ImmutableList<String> mods]
     result=method_specification[mods]
 ;
 
+block_loop_specification[ImmutableList<String> mods]
+	returns [ImmutableList<TextualJMLConstruct> r = null]
+	throws SLTranslationException
+@init {
+    list = ImmutableSLList.<TextualJMLConstruct>nil();
+    result = r;
+}
+@after { r = result; }
+:
+    (
+    loop_contract_keyword result=spec_case[mods]
+    (
+	options { greedy = true; }
+	:
+	(also_keyword)+ loop_contract_keyword list=spec_case[ImmutableSLList.<String>nil()]
+	{
+	    result = result.append(list);
+	}
+    )*)
+    {
+        for (TextualJMLConstruct construct : result) {
+            construct.setLoopContract(true);
+        }
+    }
+;
+
+loop_contract_keyword : LOOP_CONTRACT;
+
 
 assert_statement[ImmutableList<String> mods]
 	returns [ImmutableList<TextualJMLConstruct> result = null]
@@ -1599,21 +1665,6 @@ returns_clause
 returns_keyword
 :
 	RETURNS
-;
-
-joinproc_clause
-   returns [PositionedString r = null]
-   throws SLTranslationException
-@init { result = r; }
-@after { r = result; }
-:
-   joinproc_keyword result=expression { result = result.prepend("join_proc "); }
-;
-
-
-joinproc_keyword
-:
-   JOIN_PROC
 ;
 
 

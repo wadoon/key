@@ -47,13 +47,13 @@ lexer grammar KeYJMLLexer;
     LOOP_DETERMINES : 'loop_determines';  // internal translation for 'determines' in loop invariants
     LOOP_SEPARATES  : 'loop_separates';  //KeY extension, deprecated
     MODEL_METHOD_AXIOM    : 'model_method_axiom';  //KeY extension, not official JML
+    MERGE_PARAMS    : 'merge_params';  //KeY extension, not official JML
     NON_NULL        : 'non_null';
     NULLABLE        : 'nullable';
     REPRESENTS      : 'represents';
     REQUIRES        : 'requires';
     REQUIRES_FREE   : 'requires_free';
     RETURNS         : 'returns';  //KeY extension, not official JML
-    JOIN_PROC       : 'join_proc';  //KeY extension, not official JML
     SEPARATES       : 'separates';  //KeY extension, not official JML
     SIGNALS         : 'signals';
     SIGNALS_ONLY    : 'signals_only';
@@ -62,6 +62,7 @@ lexer grammar KeYJMLLexer;
     ALLFIELDS            : '\\all_fields';  //KeY extension, not official JML
     ALLOBJECTS           : '\\all_objects';  //KeY extension, not official JML
     BACKUP               : '\\backup';  //KeY extension, not official JML
+    BEFORE               : '\\before';  //KeY extension, not official JML
     BIGINT               : '\\bigint';
     BSUM                 : '\\bsum';  //KeY extension, not official JML
     BY                   : '\\by';  //KeY extension, not official JML
@@ -183,6 +184,7 @@ MULT : '*';
 NOT : '!';
 PLUS : '+';
 QUESTIONMARK : '?';
+RARROW : '->';
 RBRACE : '}';
 SEMI : ';';
 SHIFTLEFT : '<<';
@@ -202,23 +204,24 @@ LT_IMPLICIT_GT_DISPATCH
     ;
 
 LPAREN
-	:
-	'('
-	;
+    :
+    '('
+    ;
 
 RPAREN
-:	')'
+    :
+    ')'
     ;
 
 LBRACKET
-	:
-	'['
-	;
+    :
+    '['
+    ;
 
 RBRACKET
-	:
-	']'
-	;
+    :
+    ']'
+    ;
 
 fragment
 LETTER
@@ -232,9 +235,34 @@ LETTER
         '$'
 ;
 
+
+fragment
+BINDIGIT
+    :
+        '0'..'1'
+;
+
+fragment
+OCTDIGIT
+    :
+        '0'..'7'
+;
+
+fragment
+NONZERODECDIGIT
+    :
+        '1'..'9'
+;
+
+fragment
+DECDIGIT
+    :
+        '0'..'9'
+;
+
 fragment
 DIGIT
-	:
+    :
         '0'..'9'
 ;
 
@@ -243,6 +271,50 @@ HEXDIGIT
     :
         DIGIT | 'a' .. 'f'
               | 'A' .. 'F'
+;
+
+fragment
+BINPREFIX
+    :
+        '0' ('b'|'B')
+;
+
+fragment
+OCTPREFIX
+    :
+        '0'
+;
+
+fragment
+HEXPREFIX
+    :
+        '0' ('x'|'X')
+;
+
+fragment
+LONGSUFFIX
+    :
+        'l' | 'L'
+;
+
+BINLITERAL
+    :
+        BINPREFIX BINDIGIT ((BINDIGIT | '_')* BINDIGIT)? LONGSUFFIX?
+;
+
+OCTLITERAL
+    :
+        OCTPREFIX OCTDIGIT ((OCTDIGIT | '_')* OCTDIGIT)? LONGSUFFIX?
+;
+
+DECLITERAL
+    :
+        ('0' | (NONZERODECDIGIT ((DECDIGIT | '_')* DECDIGIT)?)) LONGSUFFIX?
+;
+
+HEXLITERAL
+    :
+        HEXPREFIX ((HEXDIGIT | '_')* HEXDIGIT)? LONGSUFFIX?
 ;
 
 fragment
@@ -257,7 +329,7 @@ IDENT
 ;
 
 fragment
-JML_IDENT 
+JML_IDENT
   :
   '\\' IDENT ;
 
@@ -271,15 +343,22 @@ BACKSLASH_PREFIXED:
  | JML_IDENT
  ;
 
-HEXNUMERAL
+/*
+HEXLITERAL
     :
-        '0' ('x'|'X') (HEXDIGIT)+
-;
+        '0' ('x'|'X') (HEXDIGIT)+ ( 'l'|'L' )?
+    ;
 
-DIGITS
+OCTLITERAL
     :
-        (DIGIT)+
-;
+        '0' (DIGIT)+ ( 'l'|'L' )?
+    ;
+
+DECLITERAL
+    :
+        (('1'..'9') (DIGIT)* | '0') ( 'l'|'L' )?
+    ;
+*/
 
 fragment
 NonIntegerNumber
@@ -309,19 +388,24 @@ FLOAT_LITERAL
     ;
 
 DOUBLE_LITERAL
-    :   ( (DIGIT)+ '.' '.' ) => DIGITS { $type = DIGITS; }
-    |   NonIntegerNumber DoubleSuffix?
+    :  /*  MU2018: DIGITS was removed, the following was not accessible.
+    It is strange anyway ...
+     ( (DIGIT)+ '.' '.' ) => DIGITS { $type = DIGITS; }
+    | */
+    NonIntegerNumber DoubleSuffix?
     ;
     
 CHAR_LITERAL:
         '\''
-                ((' '..'&') |
-                 ('('..'[') |
-                 (']'..'~') |
-                 ('\\' ('\'' | '\\' | 'n' | 'r' | 't' | 'b' | 'f' | '"' | 'u' HEXDIGIT+ ))
+                (~('\''|'\\') |
+                 ('\\' ('\'' | '\\' | 'n' | 'r' | 't' | 'b' | 'f' | '"' | OCT_CHAR))
+                 // note: unicode escapes are processed earlier
                 )
       '\''
     ;
+
+fragment OCT_CHAR:
+        (('0'|'1'|'2'|'3') OCTDIGIT OCTDIGIT) | (OCTDIGIT OCTDIGIT) | OCTDIGIT;
 
 STRING_LITERAL
     : '"' ( ESC | ~('"'|'\\') )* '"'
@@ -329,30 +413,30 @@ STRING_LITERAL
 
 fragment
 ESC
-    :	'\\'
-    (	'n'
-	|	'r'
-	|	't'
-	|	'b'
-	|	'f'
-	|	'"'
-	|	'\''
-	|	'\\'
-	|	':'
-	|	' '
+    :   '\\'
+    (   'n'
+    |  'r'
+    |  't'
+    |  'b'
+    |  'f'
+    |  '"'
+    |  '\''
+    |  '\\'
+    |  ':'
+    |  ' '
     )
     ;
 
 WS
-	:	(' '
-	|	'\t'
-	|	'\n'
-	|	'\r'
-//	| PRAGMA (~';')* SEMI
+    :   (' '
+    |   '\t'
+    |   '\n'
+    |   '\r'
+//  | PRAGMA (~';')* SEMI
         |       '\u000C'
         |       '@')
-		{$channel=HIDDEN;}
-	;
+        {$channel=HIDDEN;}
+    ;
 
 
 INFORMAL_DESCRIPTION
@@ -372,15 +456,14 @@ SL_COMMENT
     ;
 
 DOC_COMMENT
-	:
-	'/**'
-	( options {greedy=false;} : . )*
-	'*/'
-	{$channel=HIDDEN;}
-	;
+    :
+    '/**'
+    ( options {greedy=false;} : . )*
+    '*/'
+    {$channel=HIDDEN;}
+    ;
 
 fragment PRAGMA
     :
     '\\nowarn'
     ;
-

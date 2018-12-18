@@ -16,8 +16,9 @@
 		       fork="yes" forkMode="once" haltonerror="no"
 		       enableTestListenerEvents="false"
 		       showoutput="yes" dir="${basedir}">
-			<jvmarg value="-Xmx2048m"/>
+			<jvmarg value="-Xmx4096m"/>
 			<jvmarg value="-XX:MaxPermSize=256m"/>
+			<jvmarg value="-Dkey.disregardSettings=true"/>
 			<jvmarg value="-ea"/>
 			<classpath>
 				<pathelement location="${dist.dir}/key.core.jar"/>
@@ -57,8 +58,9 @@
 		       fork="yes" forkMode="once" haltonerror="no"
 		       enableTestListenerEvents="false"
 		       showoutput="yes" dir="${basedir}">
-			<jvmarg value="-Xmx2048m"/>
+			<jvmarg value="-Xmx3072m"/>
 			<jvmarg value="-XX:MaxPermSize=256m"/>
+			<jvmarg value="-Dkey.disregardSettings=true"/>
 			<jvmarg value="-ea"/>
 			<classpath>
 				<pathelement path="${basedir}/../key.core/bin"/>
@@ -83,6 +85,7 @@
 		       showoutput="yes" dir="${basedir}">
 			<jvmarg value="-Xmx2048m"/>
 			<jvmarg value="-XX:MaxPermSize=256m"/>
+			<jvmarg value="-Dkey.disregardSettings=true"/>
 			<jvmarg value="-ea"/>
 			<classpath>
 				<pathelement path="${basedir}/../key.core/bin"/>
@@ -107,6 +110,7 @@
 		       showoutput="yes" dir="${basedir}">
 			<jvmarg value="-Xmx2048m"/>
 			<jvmarg value="-XX:MaxPermSize=256m"/>
+			<jvmarg value="-Dkey.disregardSettings=true"/>
 			<jvmarg value="-ea"/>
 			<classpath>
 				<pathelement path="${basedir}/../key.core/bin"/>
@@ -136,8 +140,8 @@
 		       destdir="${build.dir}" 
 		       sourcepath="${src.dir}" 
 		       includeantruntime="false" 
-		       source="1.7" 
-		       target="1.7"
+		       source="1.8" 
+		       target="1.8"
 		       deprecation="off" 
 		       debug="on" 
 		       depend="${build.depend}" 

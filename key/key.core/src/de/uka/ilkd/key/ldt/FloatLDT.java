@@ -239,8 +239,10 @@ public final class FloatLDT extends LDT implements IFloatingPointLDT {
 	    //Use IntegerLDT to translate the Integer & Fraction to literals
 	    IntLiteral il1 = (IntLiteral)intLDT.translateTerm(t.sub(0),
 		children, services);
-	    int bits = Integer.parseInt(il1.getValue());
-	    Float f1 = Float.intBitsToFloat(bits);
+	    long bits = il1.getValue();
+        assert bits == (int) bits :
+                "At this point, we assumed that the long would be an int.";
+	    Float f1 = Float.intBitsToFloat((int) bits);
 
 	    return new FloatLiteral(f1.toString());
 	}

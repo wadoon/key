@@ -11,8 +11,8 @@ import org.key_project.util.java.IFilter;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
 import de.uka.ilkd.key.control.KeYEnvironment;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.symbolic_execution.util.event.ISideProofStoreListener;
 import de.uka.ilkd.key.symbolic_execution.util.event.SideProofStoreEvent;
 import de.uka.ilkd.key.util.ProofUserManager;
@@ -295,7 +295,7 @@ public final class SideProofStore {
          this.description = description;
          this.proof = proof;
          DefaultUserInterfaceControl ui = new DefaultUserInterfaceControl();
-         this.environment = new KeYEnvironment<DefaultUserInterfaceControl>(ui, proof.getInitConfig(), proof, null);
+         this.environment = new KeYEnvironment<DefaultUserInterfaceControl>(ui, proof.getInitConfig(), proof, null, null);
       }
 
       /**

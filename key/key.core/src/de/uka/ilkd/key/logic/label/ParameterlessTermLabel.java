@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.logic.label;
 
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 
 /**
  * The Class {@link ParameterlessTermLabel} can be used to define labels without parameters.
@@ -66,8 +67,9 @@ public final class ParameterlessTermLabel implements TermLabel {
    public static final Name SHORTCUT_EVALUATION_LABEL_NAME = new Name("SC");
 
    /**
-    * Label attached to a term with the logical operator '||' or '&&' to distinguish
-    * from '|' or '&' respectively.
+    * Label attached to a term with the logical operator '{@literal ||}' or
+    * '{@literal &&}' to distinguish from '{@literal |}' or '{@literal &}'
+    * respectively.
     */
    public static final TermLabel SHORTCUT_EVALUATION_LABEL =
            new ParameterlessTermLabel(SHORTCUT_EVALUATION_LABEL_NAME);
@@ -79,9 +81,9 @@ public final class ParameterlessTermLabel implements TermLabel {
 
    /**
     * Label attached to a term which denotes an undefined value. At present it is only
-    * used for the else-part of the {@link #IfExThenElse} operator, when it is used
-    * for the translation of JML's \min and \max operator. It is necessary to evaluate
-    * this constant expression to be not well-defined.
+    * used for the else-part of the {@link de.uka.ilkd.key.logic.op.IfExThenElse} operator,
+    * when it is used for the translation of JML's \min and \max operator. It is necessary
+    * to evaluate this constant expression to be not well-defined.
     */
    public static final TermLabel UNDEFINED_VALUE_LABEL =
            new ParameterlessTermLabel(UNDEFINED_VALUE_LABEL_NAME);
@@ -104,6 +106,17 @@ public final class ParameterlessTermLabel implements TermLabel {
 
    public static final TermLabel POST_CONDITION_LABEL =
            new ParameterlessTermLabel(POST_CONDITION_LABEL_NAME);
+   
+   /**
+    * Name of {@link #LOOP_SCOPE_INDEX_LABEL}.
+    */
+   public static final Name LOOP_SCOPE_INDEX_LABEL_NAME = new Name("loopScopeIndex");
+
+   /**
+    * Label attached to loop scope index variables in {@link LoopScopeInvariantRule}.
+    */
+   public static final TermLabel LOOP_SCOPE_INDEX_LABEL =
+           new ParameterlessTermLabel(LOOP_SCOPE_INDEX_LABEL_NAME);
 
     /**
      * The unique name of this label.
@@ -116,8 +129,7 @@ public final class ParameterlessTermLabel implements TermLabel {
      *
      * @param name
      *            the name, not <code>null</code>
-     * @param instantiator
-     *            the fixed associated instantiator, may be <code>null</code>.
+     * The fixed associated instantiator, may be <code>null</code>.
      */
     public ParameterlessTermLabel(Name name) {
         assert name != null;

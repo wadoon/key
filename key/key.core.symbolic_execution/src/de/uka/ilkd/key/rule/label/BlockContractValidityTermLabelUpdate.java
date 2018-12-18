@@ -20,7 +20,6 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.java.CollectionUtil;
 import org.key_project.util.java.IFilter;
-import org.key_project.util.java.StringUtil;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -32,15 +31,15 @@ import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelState;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.BlockContractInternalRule;
+import de.uka.ilkd.key.rule.LoopContractInternalRule;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Makes sure that {@link SymbolicExecutionUtil#BLOCK_CONTRACT_VALIDITY_LABEL} is introduced
- * when a {@link BlockContractRule} is applied.
+ * Makes sure that {@link BlockContractValidityTermLabel} is introduced
+ * when a {@link BlockContractInternalRule} is applied.
  * @author Martin Hentschel
  */
 public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
@@ -49,7 +48,7 @@ public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
     */
    @Override
    public ImmutableList<Name> getSupportedRuleNames() {
-      return ImmutableSLList.<Name>nil().append(BlockContractRule.INSTANCE.name());
+      return ImmutableSLList.<Name>nil().append(BlockContractInternalRule.INSTANCE.name());
    }
 
    /**
@@ -63,7 +62,6 @@ public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
                             Term modalityTerm,
                             Rule rule,
                             RuleApp ruleApp,
-                            Goal goal,
                             Object hint,
                             Term tacletTerm,
                             Operator newTermOp,
@@ -71,18 +69,19 @@ public class BlockContractValidityTermLabelUpdate implements TermLabelUpdate {
                             ImmutableArray<QuantifiableVariable> newTermBoundVars,
                             JavaBlock newTermJavaBlock,
                             Set<TermLabel> labels) {
-      if (rule instanceof BlockContractRule &&
-          StringUtil.startsWith(hint, "ValidityModality: exceptionVar=") &&
-          SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {
-         if (CollectionUtil.search(labels, new IFilter<TermLabel>() {
-                                              @Override
-                                              public boolean select(TermLabel element) {
-                                                 return element instanceof BlockContractValidityTermLabel;
-                                              }
-                                   }) == null) {
-            String exceptionVarName = ((String) hint).substring("ValidityModality: exceptionVar=".length());
-            labels.add(new BlockContractValidityTermLabel(exceptionVarName));
-         }
+       if ((rule instanceof BlockContractInternalRule
+    		   || rule instanceof LoopContractInternalRule)
+    		   && ((BlockContractInternalRule.BlockContractHint)hint).getExceptionalVariable()
+    		   		!= null 
+               && SymbolicExecutionUtil.hasSymbolicExecutionLabel(modalityTerm)) {
+           if (CollectionUtil.search(labels, new IFilter<TermLabel>() {
+               @Override
+               public boolean select(TermLabel element) {
+                   return element instanceof BlockContractValidityTermLabel;
+               }
+           }) == null) {
+               labels.add(new BlockContractValidityTermLabel(((BlockContractInternalRule.BlockContractHint)hint).getExceptionalVariable()));
+           }
       }
    }
 }

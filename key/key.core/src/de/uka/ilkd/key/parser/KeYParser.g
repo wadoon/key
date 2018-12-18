@@ -118,6 +118,8 @@ options {
     private static final int NORMAL_NONRIGID = 0;
     private static final int LOCATION_MODIFIER = 1;
 
+    private static final String LIMIT_SUFFIX = "\$lmtd";
+
     static HashMap<String, IProofFileParser.ProofElementID> prooflabel2tag = new LinkedHashMap<>(15);
     static {
          prooflabel2tag.put("branch", ProofElementID.BRANCH);
@@ -138,15 +140,19 @@ options {
          prooflabel2tag.put("userinteraction", ProofElementID.USER_INTERACTION);
          prooflabel2tag.put("newnames", ProofElementID.NEW_NAMES);
          prooflabel2tag.put("autoModeTime", ProofElementID.AUTOMODE_TIME);  
-         prooflabel2tag.put("joinProc", ProofElementID.JOIN_PROCEDURE);
-         prooflabel2tag.put("nrJoinPartners", ProofElementID.NUMBER_JOIN_PARTNERS);
-         prooflabel2tag.put("distFormula", ProofElementID.JOIN_DIST_FORMULA);
-         prooflabel2tag.put("joinNode", ProofElementID.JOIN_NODE);
-         prooflabel2tag.put("joinId", ProofElementID.JOIN_ID);
+         prooflabel2tag.put("mergeProc", ProofElementID.MERGE_PROCEDURE);
+         prooflabel2tag.put("abstractionPredicates", ProofElementID.MERGE_ABSTRACTION_PREDICATES);
+         prooflabel2tag.put("latticeType", ProofElementID.MERGE_PREDICATE_ABSTRACTION_LATTICE_TYPE);
+         prooflabel2tag.put("nrMergePartners", ProofElementID.NUMBER_MERGE_PARTNERS);
+         prooflabel2tag.put("distFormula", ProofElementID.MERGE_DIST_FORMULA);
+         prooflabel2tag.put("mergeNode", ProofElementID.MERGE_NODE);
+         prooflabel2tag.put("mergeId", ProofElementID.MERGE_ID);
+         prooflabel2tag.put("userChoices", ProofElementID.MERGE_USER_CHOICES);
          prooflabel2tag.put("opengoal", ProofElementID.OPEN_GOAL);
    }
 
    private NamespaceSet nss;
+   private Namespace<SchemaVariable> schemaVariablesNamespace;
    private HashMap<String, String> category2Default = new LinkedHashMap<String, String>();
    private boolean onlyWith=false;
    private ImmutableSet<Choice> activatedChoices = DefaultImmutableSet.<Choice>nil();
@@ -238,6 +244,7 @@ options {
         this.parserMode = mode;
  	this.services = services;
 	this.nss = nss;
+	this.schemaVariablesNamespace = new Namespace<>();
     if (this.isTacletParser()) {
         switchToSchemaMode();
     } else {
@@ -432,28 +439,36 @@ options {
         return nss;
     }
 
-    private Namespace sorts() {
+    private Namespace<Sort> sorts() {
         return namespaces().sorts();
     }
 
-    private Namespace functions() {
+    private Namespace<Function> functions() {
         return namespaces().functions();
     }
 
-    private Namespace ruleSets() {
+    private Namespace<RuleSet> ruleSets() {
         return namespaces().ruleSets();
     }
 
-    private Namespace variables() {
+    private Namespace<QuantifiableVariable> variables() {
         return namespaces().variables();
     }
 
-    private Namespace programVariables() {
+    private Namespace<IProgramVariable> programVariables() {
         return namespaces().programVariables();
     }
 
-    private Namespace choices(){
+    private Namespace<Choice> choices(){
         return namespaces().choices();
+    }
+
+    public Namespace<SchemaVariable> schemaVariables() {
+        return schemaVariablesNamespace;
+    }
+
+    public void setSchemaVariablesNamespace(Namespace<SchemaVariable> ns) {
+        this.schemaVariablesNamespace = ns;
     }
 
     public ImmutableList<Taclet> getTaclets(){
@@ -746,21 +761,22 @@ options {
                 					mods.rigid(), 
                 					mods.strict());
                 }
-            }          
+            }
 
             if (inSchemaMode()) {
-               if (variables().lookup(v.name()) != null) {
+               if (variables().lookup(v.name()) != null ||
+                   schemaVariables().lookup(v.name()) != null) {
             	 throw new AmbigiousDeclException(v.name().toString(), 
             	 			          getSourceName(), 
             	  				  getLine(), 
             	  				  getColumn());
                }
-               variables().add(v);
+               schemaVariables().add(v);
             }
         }
     }
 
-    private Term toZNotation(String number, Namespace functions){    
+    private Term toZNotation(String number, Namespace<Function> functions) {
 	String s = number;
         final boolean negative = (s.charAt(0) == '-');
 	if (negative) {
@@ -805,7 +821,7 @@ options {
         
         if (inSchemaMode()) {
             // if we are currently reading taclets we look for schema variables first
-            result = (SchemaVariable)variables().lookup(new Name(attributeName));
+            result = schemaVariables().lookup(new Name(attributeName));
         }
         
         assert inSchemaMode() || result == null; 
@@ -959,7 +975,7 @@ options {
         return reference.sort().name().equals(IntegerLDT.NAME);
     }
     
-    private void unbindVars(Namespace orig) {
+    private void unbindVars(Namespace<QuantifiableVariable> orig) {
         if(isGlobalDeclTermParser()) {
             Debug.fail("unbindVars was called in Global Declaration Term parser.");
         }
@@ -1027,7 +1043,7 @@ options {
                 if(isProblemParser()) // Alt jr==null;
                 jr = new SchemaRecoder2KeY(parserConfig.services(), 
                     parserConfig.namespaces());
-                ((SchemaJavaReader)jr).setSVNamespace(variables());
+                ((SchemaJavaReader)jr).setSVNamespace(schemaVariables());
             } else{
                 if(isProblemParser()) // Alt jr==null;
                 jr = new Recoder2KeY(parserConfig.services(), 
@@ -1109,8 +1125,14 @@ options {
     private Operator lookupVarfuncId(String varfunc_name, Term[] args) 
         throws RecognitionException/*NotDeclException, SemanticException*/ {
 
-        // case 1: variable
-        Operator v = (Operator) variables().lookup(new Name(varfunc_name));
+        // case 1a: variable
+        // case 1b: schema variable
+        Name name = new Name(varfunc_name);
+        Operator v = variables().lookup(name);
+        if(v == null) {
+            v = schemaVariables().lookup(name);
+        }
+
         if (v != null && (args == null || (inSchemaMode() && v instanceof ModalOperatorSV))) {
             return v;
         }
@@ -1406,10 +1428,11 @@ options {
     
     private ImmutableSet<Modality> lookupOperatorSV(String opName, ImmutableSet<Modality> modalities) 
     		throws RecognitionException/*KeYSemanticException*/ {
-	ModalOperatorSV osv = (ModalOperatorSV)variables().lookup(new Name(opName));
-        if(osv == null) {
-	    semanticError("Schema variable "+opName+" not defined.");
-	}
+        SchemaVariable sv = schemaVariables().lookup(new Name(opName));
+        if(sv == null || !(sv instanceof ModalOperatorSV)) {
+            semanticError("Schema variable "+opName+" not defined.");
+        }
+        ModalOperatorSV osv = (ModalOperatorSV)sv;
         modalities = modalities.union(osv.getModalities());
         return modalities;
     } 
@@ -2013,7 +2036,7 @@ one_schema_modal_op_decl
             while(it1.hasNext()) {
   	      modalities = opSVHelper(it1.next(), modalities);
   	    }
-            SchemaVariable osv = (SchemaVariable)variables().lookup(new Name(id));
+            SchemaVariable osv = schemaVariables().lookup(new Name(id));
             if(osv != null)
               semanticError("Schema variable "+id+" already defined.");
 
@@ -2021,7 +2044,7 @@ one_schema_modal_op_decl
                         sort, modalities);
             
             if (inSchemaMode()) {
-                variables().add(osv);
+                schemaVariables().add(osv);
                 //functions().add(osv);
             }
         }
@@ -2512,8 +2535,13 @@ term returns [Term _term = null]
               raiseException
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
-        
-        
+
+termEOF returns [Term _term = null]
+@after { _term = result; }
+    :
+        result = term EOF
+    ;
+
 elementary_update_term returns[Term _elementary_update_term=null]
 @after { _elementary_update_term = result; }
 :
@@ -2780,8 +2808,8 @@ term110 returns [Term _term110 = null]
 @after { _term110 = result; }
     :
         (
-            result = braces_term |
-            result = accessterm
+          result = braces_term
+        | { globalSelectNestingDepth=0; } result = accessterm
         )
         {
 	/*
@@ -3150,10 +3178,11 @@ array_access_suffix [Term arrayReference] returns [Term _array_access_suffix = n
         }
 
 
-
+/*
+// This would require repeated { globalSelectNestingDepth=0; }
 accesstermlist returns [HashSet accessTerms = new LinkedHashSet()] :
      (t=accessterm {accessTerms.add(t);} ( COMMA t=accessterm {accessTerms.add(t);})* )? ;
-
+*/
 
 atom returns [Term _atom = null]
 @after { _atom = a; }
@@ -3200,14 +3229,14 @@ single_label returns [TermLabel label=null]
   {
       try {
           if (inSchemaMode()) {
-               Named var = variables().lookup(new Name(labelName));
+               SchemaVariable var = schemaVariables().lookup(new Name(labelName));
                if (var instanceof TermLabel) {
                     label = (TermLabel)var;
                }
           }
           if (label == null) {
                 label = getServices().getProfile()
-                                .getTermLabelManager().parseLabel(labelName, parameters);
+                                .getTermLabelManager().parseLabel(labelName, parameters, getServices());
           }
       } catch(TermLabelException ex) {
           raiseException
@@ -3259,7 +3288,7 @@ ifExThenElseTerm returns [Term _if_ex_then_else_term = null]
 @init{
     exVars 
     	= ImmutableSLList.<QuantifiableVariable>nil();
-    Namespace orig = variables();
+    Namespace<QuantifiableVariable> orig = variables();
     Term result = null;
 }
 @after{ _if_ex_then_else_term = result; }
@@ -3312,7 +3341,7 @@ argument returns [Term _argument = null]
 quantifierterm returns [Term _quantifier_term = null]
 @init{
     Operator op = null;
-    Namespace orig = variables();  
+    Namespace<QuantifiableVariable> orig = variables();  
     Term a = null;
 }
 @after{ _quantifier_term = a; }
@@ -3358,7 +3387,7 @@ location_term returns[Term result]
 substitutionterm returns [Term _substitution_term = null] 
 @init{
   SubstOp op = WarySubstOp.SUBST;
-   Namespace orig = variables();  
+   Namespace<QuantifiableVariable> orig = variables();  
   Term result = null;
 }
 @after{ _substitution_term = result; }
@@ -3434,7 +3463,7 @@ one_schema_bound_variable returns[QuantifiableVariable v=null]
 }
 :
    id = simple_ident {
-      ts = (Operator) variables().lookup(new Name(id));   
+      ts = schemaVariables().lookup(new Name(id));   
       if ( ! (ts instanceof VariableSV)) {
         semanticError(ts+" is not allowed in a quantifier. Note, that you can't "
         + "use the normal syntax for quantifiers of the form \"\\exists int i;\""
@@ -3478,7 +3507,7 @@ modality_dl_term returns [Term _modality_dl_term = null]
            semanticError
              ("No schema elements allowed outside taclet declarations ("+sjb.opName+")");
          }
-         op = (SchemaVariable)variables().lookup(new Name(sjb.opName));
+         op = schemaVariables().lookup(new Name(sjb.opName));
        } else {
          op = Modality.getModality(sjb.opName);
        }
@@ -3526,7 +3555,7 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
 @init{
     String neg = "";
     boolean opSV = false;
-    Namespace orig = variables();
+    Namespace<QuantifiableVariable> orig = variables();
     boolean limited = false;  
 }
 @after { _func_pred_var_term = a; }
@@ -3558,7 +3587,7 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
         { a = getServices().getTypeConverter().convertToLogicElement(
 		new DoubleLiteral(neg+fl.getText())); }
     | AT a = abbreviation
-    | varfuncid = funcpred_name (LIMITED {limited = true;})?
+    | varfuncid = funcpred_name
         ( (~LBRACE | LBRACE bound_variables) =>
             (
                LBRACE 
@@ -3573,21 +3602,23 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
         //args.size()==0 indicates open-close-parens ()
                 
         {  
-            if(varfuncid.equals("inReachableState") && args == null) {
-	        a = getServices().getTermBuilder().wellFormed(getServices().getTypeConverter().getHeapLDT().getHeap());
-	    } else if(varfuncid.equals("skip") && args == null) {
+            if(varfuncid.equals("skip") && args == null) {
 	        a = getTermFactory().createTerm(UpdateJunctor.SKIP);
 	    } else {
-	            Operator op = lookupVarfuncId(varfuncid, args);  
-	            if(limited) {
-	                if(op.getClass() == ObserverFunction.class) {
+	            Operator op;
+	            if(varfuncid.endsWith(LIMIT_SUFFIX)) {
+	                varfuncid = varfuncid.substring(0, varfuncid.length()-5);
+	                op = lookupVarfuncId(varfuncid, args);
+	                if(ObserverFunction.class.isAssignableFrom(op.getClass())) {
 	                    op = getServices().getSpecificationRepository()
 	                                      .limitObs((ObserverFunction)op).first;
 	                } else {
 	                    semanticError("Cannot can be limited: " + op);
 	                }
-	            }   
-	                   
+	            } else {
+	                op = lookupVarfuncId(varfuncid, args);
+	            }
+
 	            if (op instanceof ParsableVariable) {
 	                a = termForParsedVariable((ParsableVariable)op);
 	            } else {
@@ -3654,7 +3685,10 @@ varId returns [ParsableVariable v = null]
     :
         id=IDENT 
         {   
-            v = (ParsableVariable) variables().lookup(new Name(id.getText()));
+            v = variables().lookup(new Name(id.getText()));
+            if (v == null) {
+                v = schemaVariables().lookup(new Name(id.getText()));
+            }
             if (v == null) {
                 throw new NotDeclException(input, "variable", id.getText());
             }
@@ -3672,6 +3706,9 @@ varIds returns [LinkedList list = new LinkedList()]
 	    String id = it.next();
             v = (ParsableVariable) variables().lookup(new Name(id));
             if (v == null) {
+                v = schemaVariables().lookup(new Name(id));
+            }
+            if (v == null) {
                semanticError("Variable " +id + " not declared.");
             }
 	    list.add(v);
@@ -3683,22 +3720,22 @@ triggers[TacletBuilder b]
 @init {
    id = null;
    t = null;
-   Named triggerVar = null;
+   SchemaVariable triggerVar = null;
    avoidCond = null;
    ImmutableList<Term> avoidConditions = ImmutableSLList.<Term>nil();
 } :
    TRIGGER
      LBRACE id = simple_ident 
      	{  
-     	  triggerVar = variables().lookup(new Name(id));
-     	  if (triggerVar == null || !(triggerVar instanceof SchemaVariable)) {
+     	  triggerVar = schemaVariables().lookup(new Name(id));
+     	  if (triggerVar == null) {
      	  	semanticError("Undeclared schemavariable: " + id);
      	  }  
      	}   RBRACE     
      t=term (AVOID avoidCond=term {avoidConditions = avoidConditions.append(avoidCond);} 
       (COMMA avoidCond=term {avoidConditions = avoidConditions.append(avoidCond);})*)? SEMI
    {
-     b.setTrigger(new Trigger((SchemaVariable)triggerVar, t, avoidConditions));
+     b.setTrigger(new Trigger(triggerVar, t, avoidConditions));
    }
 ;
 
@@ -3736,7 +3773,7 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
         {
            switchToSchemaMode();
            //  schema var decls
-           namespaces().setVariables(new Namespace(variables()));
+           schemaVariablesNamespace = new Namespace(schemaVariables());
         }
         ( SCHEMAVAR one_schema_var_decl ) *
         ( ASSUMES LPAREN ifSeq=seq RPAREN ) ?
@@ -3760,8 +3797,8 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
             b.setAnnotations(tacletAnnotations);
             r = b.getTaclet(); 
             taclet2Builder.put(r,b);
-	  // dump local schema var decls
-	  namespaces().setVariables(variables().parent());
+            // dump local schema var decls
+            schemaVariablesNamespace = schemaVariables().parent();
         }
     )
     RBRACE
@@ -3791,6 +3828,11 @@ seq returns [Sequent s] :
          raiseException
                 (new KeYSemanticException(input, getSourceName(), ex));
      }
+
+seqEOF returns [Sequent s] :
+         ss=seq EOF
+         {s = ss;}
+     ;
      
 termorseq returns [Object o]
     :
@@ -3856,7 +3898,7 @@ varexp[TacletBuilder b]
     | varcond_different[b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
-    | varcond_differentFields[b]  
+    | varcond_differentFields[b]
   ) 
   | 
   ( (NOT_ {negated = true;} )? 
@@ -4483,7 +4525,7 @@ contracts
 
 invariants
 @init{
-  Namespace orig = variables();  
+  Namespace<QuantifiableVariable> orig = variables();  
 }
 :
    INVARIANTS LPAREN selfVar=one_logic_bound_variable RPAREN

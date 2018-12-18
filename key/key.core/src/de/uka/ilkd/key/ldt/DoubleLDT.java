@@ -230,7 +230,7 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 	if(f == doubleLit) {
 	    IntLiteral il1 = (IntLiteral)intLDT.translateTerm(t.sub(0),
 		children, services);
-	    long bits = Long.parseLong(il1.getValue());
+	    long bits = il1.getValue();
 	    Double d1 = Double.longBitsToDouble(bits);
 
 	    return new DoubleLiteral(d1.toString());

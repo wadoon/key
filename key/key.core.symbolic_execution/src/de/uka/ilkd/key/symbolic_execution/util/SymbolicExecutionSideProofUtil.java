@@ -32,7 +32,6 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
@@ -44,6 +43,7 @@ import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.proof.mgt.RuleJustificationInfo;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Taclet;
@@ -313,17 +313,17 @@ public final class SymbolicExecutionSideProofUtil {
     * @param term The {@link Term} to check its {@link Name}s.
     */
    public static void addNewNamesToNamespace(Services services, Term term) {
-      final Namespace functions = services.getNamespaces().functions();
-      final Namespace progVars = services.getNamespaces().programVariables();
+      final Namespace<Function> functions = services.getNamespaces().functions();
+      final Namespace<IProgramVariable> progVars = services.getNamespaces().programVariables();
       // LogicVariables are always local bound
       term.execPreOrder(new DefaultVisitor() {
          @Override
          public void visit(Term visited) {
             if (visited.op() instanceof Function) {
-               functions.add(visited.op());
+               functions.add((Function) visited.op());
             }
             else if (visited.op() instanceof IProgramVariable) {
-               progVars.add(visited.op());
+               progVars.add((IProgramVariable) visited.op());
             }
          }
       });

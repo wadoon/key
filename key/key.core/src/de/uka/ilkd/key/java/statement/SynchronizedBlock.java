@@ -21,10 +21,12 @@ import de.uka.ilkd.key.java.ExpressionContainer;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.ProgramPrefixUtil;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.MetaClassReference;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.PosInProgram;
@@ -99,12 +101,6 @@ public class SynchronizedBlock extends JavaStatement
     innerMostMethodFrame = info.getInnerMostMethodFrame();
 
     }
-
-    @Override
-    public int hashCode() {
-        return 17*super.hashCode() + body.hashCode();
-    }
-
 
     @Override
     public boolean hasNextPrefixElement() {

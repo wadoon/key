@@ -24,7 +24,7 @@ import de.uka.ilkd.key.logic.SequentFormula;
  * An InitialPositionTable is a PositionTable that describes the
  * beginning of the element/subelement relationship. Thus, an
  * InitialPositionTable describes the information on where the
- * semisequents of a sequent are located. It is the root of the tree of
+ * {@link SequentFormula}e of a sequent are located. It is the root of the tree of
  * PositionTables and may be asked for a PosInSequent for a given index
  * position and a given Sequent.
  *
@@ -91,25 +91,32 @@ public class InitialPositionTable extends PositionTable{
 	if (posList.isEmpty() || posList.tail().isEmpty()) {
 	    return PosInSequent.createSequentPos();	
 	} else {
-	    return child[0].getSequentPIS(posList.tail(),filter);
+            return children[0].getSequentPIS(posList.tail(), filter);
 	}
     }
 
 
-    /** Returns the path for a given PosInOccurrence.  This is 
-     * built up from the initial 0, the number of the 
-     * SequentFormula in the sequent, the position in the 
+    /**
+     * Returns the path for a given PosInOccurrence.  This is
+     * built up from the initial 0, the number of the
+     * SequentFormula in the sequent, the position in the
      * constrained formula, and possibly inside a Metavariable
-     * instantiation. */
+     * instantiation.
+     * @param pio the given PosInOccurrence
+     * @param filter the current filter
+     * @return the path for the given pio
+     */
     public ImmutableList<Integer> pathForPosition(PosInOccurrence pio,
-					 SequentPrintFilter filter) {
-	ImmutableList<Integer> p = ImmutableSLList.<Integer>nil();
-
-	p = prependPathInFormula(p,pio);
-	p = p.prepend(Integer.valueOf(indexOfCfma(pio.sequentFormula(),
-					      filter)));
-	p = p.prepend(Integer.valueOf(0));
-	return p;
+                                                  SequentPrintFilter filter) {
+        ImmutableList<Integer> p = ImmutableSLList.<Integer>nil();
+        p = prependPathInFormula(p, pio);
+        int index = indexOfCfma(pio.sequentFormula(), filter);
+        if (index == -1) {
+            return null;
+        }
+        p = p.prepend(Integer.valueOf(index));
+        p = p.prepend(Integer.valueOf(0));
+        return p;
     }
 
     private ImmutableList<Integer> prependPathInFormula(ImmutableList<Integer> p,
@@ -120,21 +127,26 @@ public class InitialPositionTable extends PositionTable{
 	}
 	return p;
     }
-    
 
-    /** Returns the index of the constrained formula in the sequent
-     * as printed. */
+
+    /**
+     * Returns the index of the constrained formula in the sequent
+     * as printed.
+     * @param cfma   the sequent formula
+     * @param filter the current filter
+     * @return the index of the given formula in the sequent as printed
+     */
     private int indexOfCfma(SequentFormula cfma,
-			    SequentPrintFilter filter) {
-	ImmutableList<SequentPrintFilterEntry> list =
-	    filter.getAntec().append(filter.getSucc());
-	int k;
-	for ( k=0 ; !list.isEmpty(); k++,list = list.tail() ) {
-	    if (list.head().getOriginalFormula()==cfma) {
-		return k;
-	    }
-	}
-	return -1;
+                            SequentPrintFilter filter) {
+        ImmutableList<SequentPrintFilterEntry> list =
+                filter.getFilteredAntec().append(filter.getFilteredSucc());
+        int k;
+        for (k = 0; !list.isEmpty(); k++, list = list.tail()) {
+            if (list.head().getOriginalFormula() == cfma) {
+                return k;
+            }
+        }
+        return -1;
     }
 
     /**

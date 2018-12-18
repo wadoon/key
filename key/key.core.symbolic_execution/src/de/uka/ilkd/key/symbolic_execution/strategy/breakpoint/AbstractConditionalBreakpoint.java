@@ -43,17 +43,17 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.IGoalChooser;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
@@ -145,11 +145,10 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
    public void updateState(int maxApplications, 
                           long timeout, 
                           Proof proof, 
-                          IGoalChooser goalChooser, 
                           long startTime, 
                           int countApplied, 
                           Goal goal) {
-      super.updateState(maxApplications, timeout, proof, goalChooser, startTime, countApplied, goal);
+      super.updateState(maxApplications, timeout, proof, startTime, countApplied, goal);
       if (goal != null) {
          Node node = goal.node();
          RuleApp ruleApp = goal.getRuleAppManager().peekNext();
@@ -167,7 +166,7 @@ public abstract class AbstractConditionalBreakpoint extends AbstractHitCountBrea
     * @param inScope
     */
    private void putValuesFromGlobalVars(ProgramVariable varForCondition, Node node, boolean inScope) {
-      for(ProgramVariable progVar : node.getGlobalProgVars()){
+      for(IProgramVariable progVar : node.getLocalProgVars()){
          if(inScope&&varForCondition.name().equals(progVar.name())&&(getVariableNamingMap().get(varForCondition)==null||getVariableNamingMap().get(varForCondition).equals(varForCondition))){
             toKeep.add((LocationVariable) progVar);
             getVariableNamingMap().put(varForCondition, progVar);

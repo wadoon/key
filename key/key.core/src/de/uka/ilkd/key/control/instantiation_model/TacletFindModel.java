@@ -34,8 +34,10 @@ import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.VariableNamer;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
@@ -200,7 +202,7 @@ public class TacletFindModel extends AbstractTableModel {
      * @param varNS the variable namespace
      * @param functNS the function namespace
      */
-    private Term parseTerm(String s, Namespace varNS, Namespace functNS)
+    private Term parseTerm(String s, Namespace<QuantifiableVariable> varNS, Namespace<Function> functNS)
         throws ParserException
     {
         NamespaceSet copy = nss.copy();
@@ -268,7 +270,7 @@ public class TacletFindModel extends AbstractTableModel {
      * @param functNS the function namespace that will be passed to parseTerm
      * @return the parsed term
      */
-    private Term parseRow(int irow, Namespace varNS, Namespace functNS)
+    private Term parseRow(int irow, Namespace<QuantifiableVariable> varNS, Namespace<Function> functNS)
         throws SVInstantiationParserException,
                MissingInstantiationException {
 
@@ -287,12 +289,12 @@ public class TacletFindModel extends AbstractTableModel {
                                                          irow + (loc.getLine() <= 0 ? 0
                                                                  : loc.getLine()),
                                                          loc.getColumn(), pe.getMessage(),
-                                                         false);
+                                                         false).initCause(pe);
             } else {
                 throw new SVInstantiationParserException(instantiation,
                                                          irow, -1,
                                                          pe.getMessage(),
-                                                         false);
+                                                         false).initCause(pe);
             }
         }
     }
@@ -470,10 +472,10 @@ public class TacletFindModel extends AbstractTableModel {
                     result = result.addCheckedInstantiation(sv, pe, services, true);
                 } else{   
                     if (isInputAvailable ( irow ) ) {
-                        final Namespace extVarNS =
+                        final Namespace<QuantifiableVariable> extVarNS =
                             result.extendVarNamespaceForSV(nss.variables(), sv);
                         
-                        Namespace functNS =
+                        Namespace<Function> functNS =
                             result.extendedFunctionNameSpace(nss.functions());
                         
                         final Term instance = parseRow(irow, extVarNS, functNS);

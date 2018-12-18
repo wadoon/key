@@ -49,7 +49,6 @@ import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.expression.Operator;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
-import de.uka.ilkd.key.java.expression.literal.BigintLiteral;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
@@ -139,6 +138,8 @@ import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.MergePointStatement;
+import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Return;
@@ -1072,16 +1073,7 @@ public class PrettyPrinter {
     public void printIntLiteral(IntLiteral x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        write(x.getValue());
-        printFooter(x);
-    }
-    
-
-
-    public void printBigintLiteral(BigintLiteral x) throws IOException {
-        printHeader(x);
-        writeInternalIndentation(x);
-        write(x.getValue());
+        write(x.getValueString());
         printFooter(x);
     }
 
@@ -1286,7 +1278,7 @@ public class PrettyPrinter {
     public void printCharLiteral(CharLiteral x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        write(encodeUnicodeChars(x.getValue()));
+        write(encodeUnicodeChars(x.toString()));
         printFooter(x);
     }
 
@@ -1296,11 +1288,28 @@ public class PrettyPrinter {
         write(x.getValue());
         printFooter(x);
     }
+    
+    public void printMergePointStatementBlock(MergePointStatement x) throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+
+        // Mark statement start ...
+        markStart(0, x);
+        
+        write("//@ merge_point (");
+        write(x.getExpression().toString());
+        write(");");
+
+        // Mark statement end ...
+        markEnd(0, x);
+        
+        printFooter(x);
+    }
 
     public void printLongLiteral(LongLiteral x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
-        write(x.getValue());
+        write(x.getValueString());
         printFooter(x);
     }
 
@@ -2315,6 +2324,24 @@ public class PrettyPrinter {
         if (x.getBody() != null) {
             writeElement(1, x.getBody());
         }
+        printFooter(x);
+    }
+
+
+    public void printLoopScopeBlock(LoopScopeBlock x) 
+    throws java.io.IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+//        write("\u21BB"); // UTF-8 loop scope sign
+        write("loop-scope(");
+        if (x.getIndexPV() != null) {
+            writeElement(x.getIndexPV());
+        }
+        write(")");
+        if (x.getBody() != null) {
+            writeElement(1, x.getBody());
+        }
+//        write("\u21BA"); // UTF-8 loop scope end sign
         printFooter(x);
     }
 

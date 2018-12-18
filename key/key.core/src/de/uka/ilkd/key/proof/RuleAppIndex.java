@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -270,12 +269,9 @@ public final class RuleAppIndex  {
 						Services        services) { 
 	ImmutableList<NoPosTacletApp> result = ImmutableSLList.<NoPosTacletApp>nil();
 	if ( !autoMode ) {
-	    result = result.prepend 
-		( interactiveTacletAppIndex.getNoFindTaclet
-		  (filter,
-		   services) ); 
+	    result = interactiveTacletAppIndex.getNoFindTaclet(filter, services) ; 
 	}
-	result = result.prepend 
+	result = result.prepend
 	    ( automatedTacletAppIndex.getNoFindTaclet
 	      (filter,
 	       services) ); 
@@ -309,6 +305,7 @@ public final class RuleAppIndex  {
 	      (pos,
 	       filter,
 	       services) ); 
+	
 	return result;
     }
 

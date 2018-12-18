@@ -44,7 +44,7 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 /**
  * 
@@ -104,7 +104,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      *      de.uka.ilkd.key.rule.inst.SVInstantiations)
      */
     @Override
-    public ProgramElement transform(ProgramElement pe,
+    public ProgramElement[] transform(ProgramElement pe,
             Services services, SVInstantiations svInst) {
 
         assert pe instanceof EnhancedFor : "Only works on enhanced fors";
@@ -120,7 +120,7 @@ public class EnhancedForElimination extends ProgramTransformer {
             result = makeArrayForLoop(enhancedFor, services);
         }
         
-        return result;
+        return new ProgramElement[] { result };
     }
 
     /**
@@ -274,7 +274,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      * @param services
      */
     private void setInvariant (EnhancedFor original, LoopStatement transformed, Services services) {
-        LoopInvariant li = services.getSpecificationRepository().getLoopInvariant(original);
+        LoopSpecification li = services.getSpecificationRepository().getLoopSpec(original);
         if (li != null) {
             li = li.setLoop(transformed);
             services.getSpecificationRepository().addLoopInvariant(li);

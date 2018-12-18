@@ -473,6 +473,7 @@ TOKEN :
 | < LOCSET: "\\locset">
 | < LONG: "long" >
 | < MAP: "\\map" >
+| < MERGE_POINT: "merge_point" >
 | < METHODFRAME: "method-frame" >
 | < NATIVE: "native" >
 | < NEW: "new" >
@@ -1503,7 +1504,7 @@ VariableSpecification VariableDeclarator(boolean isForField) :
     } else {
         result = factory.createVariableSpecification(id, dim, init);
     }
-    //    setPrefixInfo(result); // only after "=" !!!!!!!!!!!!!!!
+    setPrefixInfo(result); // only after "=" !!!!!!!!!!!!!!!        // TODO: WP:
     checkConstruction(result);
     setPostfixInfo(result);
     return result;
@@ -1999,7 +2000,7 @@ TypeReference PrimitiveType() :
     result = factory.createTypeReference(id);
     checkConstruction(result);
     setPostfixInfo(result);
-    //    setPrefixInfo(result);
+    setPrefixInfo(result);      // TODO: WP:
     return result;
   }
 }
@@ -3675,6 +3676,8 @@ Statement Statement() :
 | result = ReturnStatement()
 | result = ThrowStatement()
 | result = SynchronizedStatement()
+| result = MergePointStatement()
+| result = LoopScope()
 | result = TryStatement()
 | result = AssertStatement()
 | result = KeYCatchAllStatement()
@@ -3936,7 +3939,7 @@ LocalVariableDeclaration LocalVariableDeclaration() :
 {
   {
     result = factory.createLocalVariableDeclaration();
-    setPrefixInfo(result);
+    //setPrefixInfo(result);            // TODO: WP:
   }
   (annot = AnnotationUse() { declSpecs.add(annot); })*
   [ "final"
@@ -3961,6 +3964,7 @@ LocalVariableDeclaration LocalVariableDeclaration() :
       result.setTypeReference(tr);
       result.setVariableSpecifications(vl);
       checkConstruction(result);
+      setPrefixInfo(result);            // TODO: WP: moved from the top of the method
       setPostfixInfo(result);
       return result;
   }
@@ -4238,7 +4242,7 @@ Do DoStatement() :
     setPostfixInfo(result);
     return result;
   }
-}
+} 
 
 LoopStatement ForStatement() :
 {
@@ -4248,6 +4252,7 @@ LoopStatement ForStatement() :
     ASTList<Expression> update = null;
     Statement body;
 }
+
 {
   "for"
 //  {
@@ -4488,6 +4493,53 @@ SynchronizedBlock SynchronizedStatement() :
       checkConstruction(result);
       setPostfixInfo(result);
       return result;
+  }
+}
+
+LoopScopeBlock LoopScope() :
+{
+    LoopScopeBlock result;
+    Expression indexPV;
+    StatementBlock block;
+}
+{
+  "loop-scope"
+  {
+      result = factory.createLoopScopeBlock();
+      setPrefixInfo(result);
+  }
+  "(" indexPV = Expression() ")"
+  block = Block()
+  {
+      result.setIndexPV(indexPV);
+      result.setBody(block);
+      checkConstruction(result);
+      setPostfixInfo(result);
+      return result;
+  }
+}
+
+MergePointStatement MergePointStatement() :
+{
+    Expression expr = null;
+    MergePointStatement result;
+}
+{
+  "merge_point"
+  {
+      result = factory.createMergePointStatement();
+      setPrefixInfo(result);
+  }
+  "(" expr = Expression()
+    {
+        result.setIndexPV(expr);
+    }
+  ")"
+  ";"
+  {
+    checkConstruction(result);
+    setPostfixInfo(result);
+    return result;
   }
 }
 

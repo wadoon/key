@@ -25,7 +25,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.GenericSort;
 import de.uka.ilkd.key.logic.sort.GenericSupersortException;
@@ -752,7 +751,7 @@ public class TestGenericSortInstantiations extends TestCase {
 	
 	Services services = TacletForTests.services();
 	Sort nullSort = new NullSort(services.getJavaInfo().objectSort());
-	services.getNamespaces().sorts().add(ImmutableSLList.<Named>nil().prepend(A1OBJ)
+	services.getNamespaces().sorts().add(ImmutableSLList.<Sort>nil().prepend(A1OBJ)
 		                                                     .prepend(A2OBJ)
 		                                                     .prepend(A3OBJ)
 		                                                     .prepend(A4OBJ)

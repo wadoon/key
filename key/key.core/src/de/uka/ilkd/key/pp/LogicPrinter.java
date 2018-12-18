@@ -151,12 +151,13 @@ public class LogicPrinter {
 
     public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         final NotationInfo ni = new NotationInfo();
-        if (services != null) {
-            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
-        }
+
         LogicPrinter p = new LogicPrinter(new ProgramPrinter(),
                                           ni,
                                           services);
+        if (services != null) {
+            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
+        }
         try {
             p.printTerm(t);
         } catch (IOException ioe) {
@@ -723,8 +724,8 @@ public class LogicPrinter {
     public void printSequent(SequentPrintFilter filter,
                              boolean finalbreak) {
         try {
-            ImmutableList<SequentPrintFilterEntry> antec = filter.getAntec();
-            ImmutableList<SequentPrintFilterEntry> succ  = filter.getSucc();
+            ImmutableList<SequentPrintFilterEntry> antec = filter.getFilteredAntec();
+            ImmutableList<SequentPrintFilterEntry> succ  = filter.getFilteredSucc();
             markStartSub();
             startTerm(antec.size()+succ.size());
             layouter.beginC(1).ind();
@@ -1271,12 +1272,26 @@ public class LogicPrinter {
                     // in case arity > 1 we assume fieldName refers to a query (method call)
                     Term object = t.sub(1);
                     KeYJavaType keYJavaType = javaInfo.getKeYJavaType(object.sort());
-                    if (obs.isStatic()
-                            || ((obs instanceof IProgramMethod) && javaInfo.isCanonicalProgramMethod((IProgramMethod) obs, keYJavaType))) {
-                        layouter.print(fieldName);
-                    } else {
-                        layouter.print("(" + t.op() + ")");
+                    String p;
+                    try {
+                        boolean canonical =
+                                obs.isStatic()
+                                || ((obs instanceof IProgramMethod)
+                                        && javaInfo.isCanonicalProgramMethod(
+                                                (IProgramMethod) obs,
+                                                keYJavaType));
+                        if (canonical) {
+                            p = fieldName;
+                        } else {
+                            p = "(" + t.op() + ")";
+                        }
+                    } catch (NullPointerException e) {
+                        // MU & MK: There are cases where this method fails.
+                        // (e.g., if the receiver of the observer happens to be replaced by "null").
+                        // better conservatively print empty String.
+                        p = "";
                     }
+                    layouter.print(p);
                 } else {
                     // in case arity == 1 we assume fieldName refers to an array
                     layouter.print(fieldName);
@@ -1603,13 +1618,15 @@ public class LogicPrinter {
 
 	layouter.brk(1).print(separator + " ");
 
-	if(t.sub(1).op() == UpdateJunctor.PARALLEL_UPDATE) {
-	    markStartSub();
-	    printParallelUpdateHelper(separator, t.sub(1), ass);
-	    markEndSub();
-	} else {
-	    maybeParens(t.sub(1), ass);
-	}
+        if (t.sub(1).op() == UpdateJunctor.PARALLEL_UPDATE) {
+            markStartSub();
+            layouter.print("(");
+            printParallelUpdateHelper(separator, t.sub(1), ass);
+            layouter.print(")");
+            markEndSub();
+        } else {
+            maybeParens(t.sub(1), ass);
+        }
     }
 
 

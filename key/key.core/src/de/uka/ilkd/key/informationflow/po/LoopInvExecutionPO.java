@@ -27,13 +27,13 @@ import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.ContractFactory;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 public class LoopInvExecutionPO extends AbstractInfFlowPO
         implements InfFlowCompositePO {
     
-    private final LoopInvariant loopInvariant;
+    private final LoopSpecification loopInvariant;
 
     private final ProofObligationVars symbExecVars;
 
@@ -54,7 +54,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO
      * the InitConfig.
      */
     public LoopInvExecutionPO(InitConfig initConfig,
-                              LoopInvariant loopInv,
+                              LoopSpecification loopInv,
                               ProofObligationVars symbExecVars,
                               Goal initiatingGoal,
                               ExecutionContext context,
@@ -67,7 +67,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO
 
 
     public LoopInvExecutionPO(InitConfig initConfig,
-                              LoopInvariant loopInv,
+                              LoopSpecification loopInv,
                               ProofObligationVars symbExecVars,
                               Goal initiatingGoal,
                               ExecutionContext context,
@@ -84,7 +84,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO
         this.context = context;
         this.guardTerm = guardTerm;
 
-        // consistensy check
+        // consistency check
         assert preAndPostExpressionsEqual() :
                 "Information flow loop invariant malformed. Pre expressions" +
                 "do not match post expressions.";
@@ -103,7 +103,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO
 
     @Override
     public void readProblem() throws ProofInputException {
-        final Services proofServices = postInit();
+        postInit();
 
         // generate snippet factory for symbolic execution
         BasicPOSnippetFactory symbExecFactory =
@@ -140,7 +140,7 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO
         return loopInvariant.equals(lPO.loopInvariant);
     }
 
-    public LoopInvariant getLoopInvariant() {
+    public LoopSpecification getLoopInvariant() {
         return loopInvariant;
     }
 
@@ -253,8 +253,8 @@ public class LoopInvExecutionPO extends AbstractInfFlowPO
 
 
     @Override
-    public IFProofObligationVars getLeaveIFVars() {
-        return getChildPO().getLeaveIFVars();
+    public IFProofObligationVars getLeafIFVars() {
+        return getChildPO().getLeafIFVars();
     }
 
 

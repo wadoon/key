@@ -13,23 +13,8 @@
 
 package de.uka.ilkd.key.gui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Container;
-import java.awt.Cursor;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.GraphicsEnvironment;
-import java.awt.GridBagLayout;
-import java.awt.Point;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.File;
 import java.util.Collection;
 import java.util.EventObject;
@@ -39,29 +24,11 @@ import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
-import javax.swing.Action;
-import javax.swing.Box;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.JMenu;
-import javax.swing.JMenuBar;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JRadioButtonMenuItem;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JToggleButton;
-import javax.swing.JToolBar;
-import javax.swing.SwingUtilities;
-import javax.swing.ToolTipManager;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
 import javax.swing.event.MouseInputAdapter;
 
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -69,58 +36,9 @@ import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
-import de.uka.ilkd.key.gui.actions.AboutAction;
-import de.uka.ilkd.key.gui.actions.AutoModeAction;
-import de.uka.ilkd.key.gui.actions.AutoSave;
-import de.uka.ilkd.key.gui.actions.CounterExampleAction;
-import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
-import de.uka.ilkd.key.gui.actions.ExitMainAction;
-import de.uka.ilkd.key.gui.actions.FontSizeAction;
-import de.uka.ilkd.key.gui.actions.GoalBackAction;
-import de.uka.ilkd.key.gui.actions.HidePackagePrefixToggleAction;
-import de.uka.ilkd.key.gui.actions.KeYProjectHomepageAction;
-import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
-import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
-import de.uka.ilkd.key.gui.actions.LicenseAction;
-import de.uka.ilkd.key.gui.actions.MacroKeyBinding;
-import de.uka.ilkd.key.gui.actions.MainWindowAction;
-import de.uka.ilkd.key.gui.actions.MenuSendFeedackAction;
-import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
-import de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction;
-import de.uka.ilkd.key.gui.actions.OpenExampleAction;
-import de.uka.ilkd.key.gui.actions.OpenFileAction;
-import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
-import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
-import de.uka.ilkd.key.gui.actions.ProofManagementAction;
-import de.uka.ilkd.key.gui.actions.PruneProofAction;
-import de.uka.ilkd.key.gui.actions.QuickLoadAction;
-import de.uka.ilkd.key.gui.actions.QuickSaveAction;
-import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
-import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
-import de.uka.ilkd.key.gui.actions.SaveFileAction;
-import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
-import de.uka.ilkd.key.gui.actions.SearchInSequentAction;
-import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
-import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
-import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
-import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
-import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
-import de.uka.ilkd.key.gui.actions.SyntaxHighlightingToggleAction;
-import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
-import de.uka.ilkd.key.gui.actions.TermLabelMenu;
-import de.uka.ilkd.key.gui.actions.TestGenerationAction;
-import de.uka.ilkd.key.gui.actions.ToggleConfirmExitAction;
-import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
-import de.uka.ilkd.key.gui.actions.UndoLastStepAction;
-import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
+import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
-import de.uka.ilkd.key.gui.nodeviews.EmptySequent;
-import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
-import de.uka.ilkd.key.gui.nodeviews.MainFrame;
-import de.uka.ilkd.key.gui.nodeviews.SequentView;
-import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
+import de.uka.ilkd.key.gui.nodeviews.*;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
@@ -128,6 +46,7 @@ import de.uka.ilkd.key.gui.proofdiff.ProofDiffFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SolverListener;
+import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
@@ -141,11 +60,7 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
-import de.uka.ilkd.key.util.Debug;
-import de.uka.ilkd.key.util.KeYConstants;
-import de.uka.ilkd.key.util.KeYResourceManager;
-import de.uka.ilkd.key.util.PreferenceSaver;
-import de.uka.ilkd.key.util.ThreadUtilities;
+import de.uka.ilkd.key.util.*;
 
 public final class MainWindow extends JFrame  {
 
@@ -167,13 +82,16 @@ public final class MainWindow extends JFrame  {
 
     /** the second toolbar */
     private JToolBar fileOpToolBar;
-    
+
     /** JScrollPane for displaying SequentViews*/
     private final MainFrame mainFrame;
 
+    /** the view to show source code and symbolic execution information */
+    private final JComponent sourceView;
+
     /** SequentView for the current goal */
     public final CurrentGoalView currentGoalView;
-    
+
     /** Use this SequentView in case no proof is loaded. */
     private final EmptySequent emptySequent;
 
@@ -193,7 +111,7 @@ public final class MainWindow extends JFrame  {
 
     /** listener to global proof events */
     private final MainProofListener proofListener;
-    
+
     private final RecentFileMenu recentFileMenu;
 
     public boolean frozen = false;
@@ -231,13 +149,10 @@ public final class MainWindow extends JFrame  {
     private LemmaGenerationAction loadKeYTaclets;
     private LemmaGenerationBatchModeAction lemmaGenerationBatchModeAction;
 
-    private final OneStepSimplificationToggleAction oneStepSimplAction =
-        new OneStepSimplificationToggleAction(this);
-
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
 
     private final NotificationManager notificationManager;
-    
+
     private final PreferenceSaver prefSaver =
         new PreferenceSaver(Preferences.userNodeForPackage(MainWindow.class));
 
@@ -251,9 +166,9 @@ public final class MainWindow extends JFrame  {
     private UnicodeToggleAction unicodeToggleAction;
     private final HidePackagePrefixToggleAction hidePackagePrefixToggleAction =
         new HidePackagePrefixToggleAction(this);
-    
+
     private final TermLabelMenu termLabelMenu;
-    
+
     public TermLabelVisibilityManager getVisibleTermLabels(){
         return termLabelMenu.getVisibleTermLabels();
     }
@@ -278,6 +193,7 @@ public final class MainWindow extends JFrame  {
         autoModeAction = new AutoModeAction(this);
         mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
         mainFrame = new MainFrame(this, emptySequent);
+        sourceView = SourceView.getSourceView(this);
         proofList = new TaskTree(mediator);
         notificationManager = new NotificationManager(mediator, this);
         recentFileMenu = new RecentFileMenu(mediator);
@@ -307,7 +223,7 @@ public final class MainWindow extends JFrame  {
         }
         return instance;
     }
-    
+
     /**
      * <p>
      * Checks if an instance of the main window is already created or not.
@@ -321,7 +237,7 @@ public final class MainWindow extends JFrame  {
     public static boolean hasInstance() {
        return instance != null;
     }
-    
+
     /**
      * Workaround to an issue with the Gnome window manager.
      * This sets the application title in the app menu (in the top bar)
@@ -446,11 +362,15 @@ public final class MainWindow extends JFrame  {
 
         JPanel rightPane = new JPanel();
         rightPane.setLayout(new BorderLayout());
-	rightPane.add(mainFrame, BorderLayout.CENTER);
-	rightPane.add(sequentViewSearchBar,
-                BorderLayout.SOUTH);
+        rightPane.add(mainFrame, BorderLayout.CENTER);
+        rightPane.add(sequentViewSearchBar, BorderLayout.SOUTH);
 
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, rightPane);
+        JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rightPane, sourceView);
+        pane.setResizeWeight(0.5);
+        pane.setOneTouchExpandable(true);
+        pane.setName("split2");
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPane, pane);
         splitPane.setResizeWeight(0); // the right pane is more important
         splitPane.setOneTouchExpandable(true);
         splitPane.setName("splitPane");
@@ -495,17 +415,85 @@ public final class MainWindow extends JFrame  {
         ComplexButton comp = createSMTComponent();
         toolBar.add(comp.getActionComponent());
         toolBar.add(comp.getSelectionComponent());
-        toolBar.addSeparator();        
+        toolBar.addSeparator();
         toolBar.add(new CounterExampleAction(this));
         toolBar.add(new TestGenerationAction(this));
         toolBar.addSeparator();
         toolBar.add(new GoalBackAction(this, false));
-        toolBar.add(new PruneProofAction(this, false));
-        JToggleButton oneStep = new JToggleButton(oneStepSimplAction);
-        oneStep.setHideActionText(true);
+        toolBar.add(new PruneProofAction(this));
         toolBar.addSeparator();
-        toolBar.add(oneStep);
+        toolBar.add(createHeatmapToggle());
+        toolBar.add(createHeatmapMenuOpener());
+
         return toolBar;
+    }
+
+    private JToggleButton createHeatmapToggle() {
+        JToggleButton toggleHeatmapButton = new JToggleButton();
+        toggleHeatmapButton.setEnabled(getMediator().getSelectedProof() != null);
+        toggleHeatmapButton.setToolTipText("Enable or disable "
+            + "age heatmaps in the sequent view.");
+        toggleHeatmapButton.setIcon(IconFactory.heatmapIcon(TOOLBAR_ICON_SIZE));
+
+        de.uka.ilkd.key.settings.ViewSettings vs =
+            ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings();
+        toggleHeatmapButton.setSelected(vs.isShowHeatmap());
+        final SettingsListener setListener = new SettingsListener() {
+            @Override
+            public void settingsChanged(EventObject e) {
+                toggleHeatmapButton.setSelected(vs.isShowHeatmap());
+            }
+        };
+        vs.addSettingsListener(setListener);
+
+        final KeYSelectionListener selListener = new KeYSelectionListener() {
+            @Override
+            public void selectedNodeChanged(KeYSelectionEvent e) {
+                final Proof proof = getMediator().getSelectedProof();
+                toggleHeatmapButton.setEnabled(proof != null);
+            }
+
+            @Override
+            public void selectedProofChanged(KeYSelectionEvent e) {
+                selectedNodeChanged(e);
+            }
+        };
+        getMediator().addKeYSelectionListener(selListener);
+
+        toggleHeatmapButton.addActionListener(new AbstractAction() {
+            /**
+             * version id
+             */
+            private static final long serialVersionUID = 8366752959467104985L;
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                vs.setHeatmapOptions(!vs.isShowHeatmap(), vs.isHeatmapSF(),
+                    vs.isHeatmapNewest(), vs.getMaxAgeForHeatmap());
+            }
+        });
+        return toggleHeatmapButton;
+    }
+
+    private JButton createHeatmapMenuOpener() {
+        JButton openMenuButton = new JButton();
+        HeatmapSettingsAction a = new HeatmapSettingsAction(this);
+        openMenuButton.addActionListener(a);
+        openMenuButton.setEnabled(getMediator().getSelectedProof() != null);
+        openMenuButton.setIcon(IconFactory.selectDecProcArrow(TOOLBAR_ICON_SIZE));
+        final KeYSelectionListener selListener = new KeYSelectionListener() {
+            @Override
+            public void selectedNodeChanged(KeYSelectionEvent e) {
+                final Proof proof = getMediator().getSelectedProof();
+                openMenuButton.setEnabled(proof != null);
+            }
+            @Override
+            public void selectedProofChanged(KeYSelectionEvent e) {
+                selectedNodeChanged(e);
+            }
+        };
+        getMediator().addKeYSelectionListener(selListener);
+        return openMenuButton;
     }
 
     private ComplexButton createSMTComponent() {
@@ -703,7 +691,7 @@ public final class MainWindow extends JFrame  {
             }});
 //        view.add(laf); // uncomment this line to include the option in the menu
 
-        
+
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
         view.add(new JCheckBoxMenuItem(unicodeToggleAction));
         view.add(new JCheckBoxMenuItem(new SyntaxHighlightingToggleAction(this)));
@@ -713,14 +701,20 @@ public final class MainWindow extends JFrame  {
         view.addSeparator();
         {
             JMenu fontSize = new JMenu("Font Size");
-            fontSize.add(new FontSizeAction(this, FontSizeAction.Mode.SMALLER));
-            fontSize.add(new FontSizeAction(this, FontSizeAction.Mode.LARGER));
+            fontSize.add(new DecreaseFontSizeAction(this));
+            fontSize.add(new IncreaseFontSizeAction(this));
             view.add(fontSize);
         }
         view.add(new ToolTipOptionsAction(this));
 
         view.add(new ProofDiffFrame.Action(this));
-                
+
+        view.addSeparator();
+
+        JMenuItem hmItem = new JMenuItem("Heatmap Options");
+        hmItem.addActionListener(new HeatmapSettingsAction(this));
+        view.add(hmItem);
+
         return view;
     }
 
@@ -729,7 +723,27 @@ public final class MainWindow extends JFrame  {
         proof.setMnemonic(KeyEvent.VK_P);
 
         proof.add(autoModeAction);
-        proof.add(new UndoLastStepAction(this, true));
+        GoalBackAction goalBack = new GoalBackAction(this, true);
+        proof.addMenuListener(new MenuListener() {
+            @Override
+            public void menuSelected(MenuEvent e) {
+                /* we use this MenuListener to update the name only if the menu is shown since it
+                 * would be slower to update the name (which means scanning all open and closed
+                 * goals) at every selection change (via the KeYSelectionListener in GoalBackAction)
+                 */
+                goalBack.updateName();
+            }
+
+            @Override
+            public void menuDeselected(MenuEvent e) {
+            }
+
+            @Override
+            public void menuCanceled(MenuEvent e) {
+            }
+        });
+        proof.add(goalBack);
+        proof.add(new PruneProofAction(this));
         proof.add(new AbandonTaskAction(this));
         proof.addSeparator();
         proof.add(new SearchInProofTreeAction(this));
@@ -759,7 +773,6 @@ public final class MainWindow extends JFrame  {
 	    options.add(new JCheckBoxMenuItem(new AutoSave(this)));
         options.add(new MinimizeInteraction(this));
         options.add(new JCheckBoxMenuItem(new RightMouseClickToggleAction(this)));
-        options.add(new JCheckBoxMenuItem(oneStepSimplAction));
 
         return options;
 
@@ -880,7 +893,7 @@ public final class MainWindow extends JFrame  {
     public ProofTreeView getProofTreeView() {
         return mainWindowTabbedPane.getProofTreeView();
     }
-    
+
     /**
      * Returns the current goal view.
      */
@@ -984,7 +997,7 @@ public final class MainWindow extends JFrame  {
         @Override
         public void modalDialogClosed(EventObject e) {
             if (e.getSource() instanceof ApplyTacletDialog) {
-                // enable all previously diabled elements ...
+                // enable all previously disabled elements ...
                 enableMenuBar(MainWindow.this.getJMenuBar(), true);
                 MainWindow.this.mainFrame.setEnabled(true);
                 mainWindowTabbedPane.setEnabledForAllTabs(true);
@@ -1149,14 +1162,14 @@ public final class MainWindow extends JFrame  {
                @Override
                public void keyReleased(KeyEvent e) {
                   e.consume();
-                  
+
                }
 
                @Override
                public void keyTyped(KeyEvent e) {
-                  e.consume();                  
+                  e.consume();
                }
-               
+
             });
         }
     }
@@ -1267,6 +1280,7 @@ public final class MainWindow extends JFrame  {
             currentComponent.dispatchEvent(new MouseEvent(currentComponent,
                     e.getID(),
                     e.getWhen(),
+                    // do not use as it freezes the stop button: e.getModifiersEx(),
                     e.getModifiers(),
                     componentPoint.x,
                     componentPoint.y,
@@ -1436,7 +1450,7 @@ public final class MainWindow extends JFrame  {
     public Action getUnicodeToggleAction() {
     	return unicodeToggleAction;
     }
-    
+
     public Action getHidePackagePrefixToggleAction() {
         return hidePackagePrefixToggleAction;
     }
@@ -1541,7 +1555,7 @@ public final class MainWindow extends JFrame  {
      * list of them.
      */
     public List<Name> getSortedTermLabelNames() {
-        /* 
+        /*
          * Get list of labels from profile. This list is not always identical,
          * since the used Profile may change during execution.
          */
@@ -1557,7 +1571,7 @@ public final class MainWindow extends JFrame  {
    public JToolBar getControlToolBar() {
       return controlToolBar;
    }
-   
+
    /**
     * Defines if talcet infos are shown or not.
     * <p>

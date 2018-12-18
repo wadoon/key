@@ -42,12 +42,12 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.strategy.StrategyProperties;
@@ -249,7 +249,9 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
       synchronized (this) {
          if (!isAnalysed()) {
             // Get path condition
-            Term pathCondition = SymbolicExecutionUtil.computePathCondition(node, settings.isSimplifyConditions(), false);
+            Term pathCondition = SymbolicExecutionUtil.computePathCondition(node, 
+                                                                            true, // Path condition needs always to be simplified, because otherwise additinal symbolic values might be introduced.
+                                                                            false);
             pathCondition = removeImplicitSubTermsFromPathCondition(pathCondition);
             // Compute all locations used in path conditions and updates. The values of the locations will be later computed in the state computation (and finally shown in a memory layout).
             Set<ExtractLocationParameter> temporaryCurrentLocations = new LinkedHashSet<ExtractLocationParameter>();
@@ -821,7 +823,10 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             SymbolicObject target = objects.get(valueTerm);
             if (target != null) {
                SymbolicAssociation association;
-               if (pair.isArrayIndex()) {
+               if (pair.isArrayRange()) {
+                  association = new SymbolicAssociation(getServices(), pair.getArrayIndex(), pair.getArrayStartIndex(), pair.getArrayEndIndex(), target, pair.getCondition(), settings);
+               }
+               else if (pair.isArrayIndex()) {
                   association = new SymbolicAssociation(getServices(), pair.getArrayIndex(), target, pair.getCondition(), settings);
                }
                else {
@@ -842,7 +847,10 @@ public class SymbolicLayoutExtractor extends AbstractUpdateExtractor {
             }
             else {
                SymbolicValue value;
-               if (pair.isArrayIndex()) {
+               if (pair.isArrayRange()) {
+                  value = new SymbolicValue(getServices(), pair.getArrayIndex(), pair.getArrayStartIndex(), pair.getArrayEndIndex(), valueTerm, pair.getCondition(), settings);
+               }
+               else if (pair.isArrayIndex()) {
                   value = new SymbolicValue(getServices(), pair.getArrayIndex(), valueTerm, pair.getCondition(), settings);
                }
                else {

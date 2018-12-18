@@ -25,17 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.swing.BorderFactory;
-import javax.swing.JButton;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.KeyStroke;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 
 import org.key_project.util.collection.ImmutableSet;
 
@@ -45,31 +35,22 @@ import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.control.instantiation_model.TacletInstantiationModel;
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.gui.joinrule.JoinRuleCompletion;
+import de.uka.ilkd.key.gui.mergerule.MergeRuleCompletion;
 import de.uka.ilkd.key.gui.notification.events.GeneralFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.macros.ProofMacro;
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.parser.Location;
-import de.uka.ilkd.key.proof.ApplyStrategy;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.ProofAggregate;
-import de.uka.ilkd.key.proof.TaskFinishedInfo;
-import de.uka.ilkd.key.proof.TaskStartedInfo;
+import de.uka.ilkd.key.proof.*;
 import de.uka.ilkd.key.proof.event.ProofDisposedEvent;
+import de.uka.ilkd.key.proof.init.*;
 import de.uka.ilkd.key.proof.init.IPersistablePO.LoadedPOContainer;
-import de.uka.ilkd.key.proof.init.InitConfig;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.proof.init.Profile;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.init.ProofOblInput;
-import de.uka.ilkd.key.proof.io.AbstractProblemLoader;
+import de.uka.ilkd.key.proof.io.*;
 import de.uka.ilkd.key.proof.io.AbstractProblemLoader.ReplayResult;
-import de.uka.ilkd.key.proof.io.ProblemLoader;
-import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.prover.ProverCore;
+import de.uka.ilkd.key.prover.TaskFinishedInfo;
+import de.uka.ilkd.key.prover.TaskStartedInfo;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
 import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
@@ -97,8 +78,9 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
         completions.add(new FunctionalOperationContractCompletion());
         completions.add(new DependencyContractCompletion());
         completions.add(new LoopInvariantRuleCompletion());
-        completions.add(new BlockContractCompletion(mainWindow));
-        completions.add(JoinRuleCompletion.INSTANCE);
+        completions.add(new BlockContractInternalCompletion(mainWindow));
+        completions.add(new BlockContractExternalCompletion(mainWindow));
+        completions.add(MergeRuleCompletion.INSTANCE);
     }
 
     @Override
@@ -168,15 +150,16 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
     @Override
     public void taskFinished(TaskFinishedInfo info) {
         super.taskFinished(info);
-        if (info.getSource() instanceof ApplyStrategy) {
+        if (info != null && info.getSource() instanceof ProverCore) {
             if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
             }
-            ApplyStrategy.ApplyStrategyInfo result =
+            ApplyStrategyInfo result =
                     (ApplyStrategyInfo) info.getResult();
 
             Proof proof = info.getProof();
-            if (proof != null && !proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
+            if (proof != null && !proof.closed()
+                    && mainWindow.getMediator().getSelectedProof() == proof) {
                 Goal g = result.nonCloseableGoal();
                 if (g == null) {
                     g = proof.openGoals().head();
@@ -192,12 +175,13 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                 }
             }
             mainWindow.displayResults(info.toString());
-        } else if (info.getSource() instanceof ProofMacro) {
+        } else if (info != null && info.getSource() instanceof ProofMacro) {
             if (!isAtLeastOneMacroRunning()) {
                 resetStatus(this);
                 assert info instanceof ProofMacroFinishedInfo;
                 Proof proof = info.getProof();
-                if (proof != null && !proof.closed() && mainWindow.getMediator().getSelectedProof() == proof) {
+                if (proof != null && !proof.closed()
+                        && mainWindow.getMediator().getSelectedProof() == proof) {
                     Goal g = proof.openGoals().head();
                     mainWindow.getMediator().goalChosen(g);
                     if (inStopAtFirstUncloseableGoalMode(info.getProof())) {
@@ -210,7 +194,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                     }
                 }
             }
-        } else if (info.getSource() instanceof ProblemLoader) {
+        } else if (info != null && info.getSource() instanceof ProblemLoader) {
             resetStatus(this);
             Throwable result = (Throwable) info.getResult();
             if (info.getResult() != null) {
@@ -225,8 +209,10 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
                     Pair<String, Location> scriptAndLoc;
                     try {
                         scriptAndLoc = problemLoader.readProofScript();
-                        ProofScriptWorker psw = new ProofScriptWorker(mainWindow.getMediator(),
-                                scriptAndLoc.first, scriptAndLoc.second);
+                        ProofScriptWorker psw =
+                                new ProofScriptWorker(mainWindow.getMediator(),
+                                                      scriptAndLoc.first,
+                                                      scriptAndLoc.second);
                         psw.init();
                         psw.execute();
                     } catch (ProofInputException e) {
@@ -239,7 +225,7 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
             }
         } else {
             resetStatus(this);
-            if (!info.toString().isEmpty()) {
+            if (info != null && !info.toString().isEmpty()) {
                 mainWindow.displayResults(info.toString());
             }
         }
@@ -372,8 +358,12 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
        if (saved) {
            file = jFC.getSelectedFile();
            final String filename = file.getAbsolutePath();
-           ProofSaver saver =
-                   new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
+           ProofSaver saver;
+           if (jFC.useCompression()) {
+               saver = new GZipProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
+           } else {
+               saver = new ProofSaver(proof, filename, KeYConstants.INTERNAL_VERSION);
+           }
            String errorMsg;
            try {
                errorMsg = saver.save();
@@ -534,7 +524,8 @@ public class WindowUserInterfaceControl extends AbstractMediatorUserInterfaceCon
       }
       AbstractProblemLoader loader = main.getUserInterface().load(profile, location, classPaths, bootClassPath, includes, null, forceNewProfileOfNewProofs);
       InitConfig initConfig = loader.getInitConfig();
-      return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig, loader.getProof(), loader.getResult());
+      return new KeYEnvironment<WindowUserInterfaceControl>(main.getUserInterface(), initConfig,
+          loader.getProof(), loader.getProofScript(), loader.getResult());
    }
 
    @Override

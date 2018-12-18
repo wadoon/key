@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.uka.ilkd.key.informationflow.po.snippet;
 
 import de.uka.ilkd.key.java.Services;
@@ -11,7 +7,7 @@ import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
-import de.uka.ilkd.key.speclang.LoopInvariant;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 
 
 /**
@@ -28,7 +24,7 @@ public class POSnippetFactory {
     }
     
     public static BasicPOSnippetFactory getBasicFactory(
-            LoopInvariant invariant,
+            LoopSpecification invariant,
             ProofObligationVars vars,
             ExecutionContext context,
             Term guardTerm,
@@ -59,7 +55,7 @@ public class POSnippetFactory {
     }
 
     public static InfFlowPOSnippetFactory getInfFlowFactory(
-            LoopInvariant invariant,
+            LoopSpecification invariant,
             ProofObligationVars vars1,
             ProofObligationVars vars2,
             ExecutionContext context,

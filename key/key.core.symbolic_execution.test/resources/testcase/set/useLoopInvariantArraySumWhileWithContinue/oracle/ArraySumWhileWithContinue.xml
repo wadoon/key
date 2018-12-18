@@ -5,10 +5,15 @@
          <callStackEntry path="/0"/>
          <statement name="int i = 0;" pathCondition="true" pathConditionChanged="false">
             <callStackEntry path="/0"/>
-            <loopInvariant name="invariant: i &gt;= 0
-&amp; i &lt;= array.length
-&amp; result_1 = javaCastInt(bsum{int j;}(0, i, array[j]));
-variant: javaSubInt(array.length, i)
+            <loopInvariant name="invariant: (  (geq(i, Z(0(#)))
+ &amp; leq(i, length(array)))&lt;&lt;SC&gt;&gt;
+ &amp;   result_1
+   = javaCastInt(bsum{int j;}(Z(0(#)),
+                              i,
+                              int::select(heap,
+                                          array,
+                                          arr(j)))))&lt;&lt;SC&gt;&gt;;
+variant: javaSubInt(length(array), i)
 mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="true">
                <callStackEntry path="/0"/>
                <branchCondition name="and(or(lt(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0))),not(equals(array,null)))" pathCondition="imp(geq(length(array),Z(0(#))),and(and(and(not(equals(array,null)),geq(i_0,Z(0(#)))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0)))" pathConditionChanged="true" branchCondition="and(or(lt(length(array),Z(0(#))),and(and(geq(i_0,Z(0(#))),gt(length(array),i_0)),equals(bsum{j:int}(Z(0(#)),i_0,int::select(heap,array,arr(j))),result_1_0))),not(equals(array,null)))" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Body Preserves Invariant">
@@ -34,7 +39,12 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
                   <branchCondition name="equals(array,null)" pathCondition="lt(length(array),Z(0(#)))" pathConditionChanged="true" branchCondition="equals(array,null)" mergedBranchCondition="false" isBranchConditionComputed="true">
                      <loopCondition name="i&lt;array.length" pathCondition="lt(length(array),Z(0(#)))" pathConditionChanged="false" blockOpened="false">
                         <callStackEntry path="/0"/>
-                        <termination name="&lt;loop body end&gt;" pathCondition="lt(length(array),Z(0(#)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="false">
+                        <termination name="&lt;loop body end&gt;" pathCondition="lt(length(array),Z(0(#)))" pathConditionChanged="false" terminationKind="LOOP_BODY" branchVerified="true">
+                           <exceptionalMethodReturn name="&lt;throw java.lang.Throwable&gt;" signature="&lt;exceptional return of &lt;call ArraySumWhileWithContinue.sum(array)&gt;&gt;" pathCondition="lt(length(array),Z(0(#)))" pathConditionChanged="false" methodReturnCondition="false">
+                              <callStackEntry path="/0"/>
+                              <termination name="&lt;uncaught java.lang.NullPointerException&gt;" pathCondition="lt(length(array),Z(0(#)))" pathConditionChanged="false" terminationKind="EXCEPTIONAL" branchVerified="true">
+                              </termination>
+                           </exceptionalMethodReturn>
                         </termination>
                      </loopCondition>
                   </branchCondition>
@@ -53,9 +63,11 @@ mod: false" pathCondition="true" pathConditionChanged="false" initiallyValid="tr
             </loopInvariant>
          </statement>
       </statement>
+      <methodReturnEntry path="/0/0/0/0/0/1/0/0/0"/>
       <methodReturnEntry path="/0/0/0/0/1/0/0"/>
    </methodCall>
    <terminationEntry path="/0/0/0/0/0/0/0/0/0/0/0"/>
    <terminationEntry path="/0/0/0/0/0/1/0/0"/>
+   <terminationEntry path="/0/0/0/0/0/1/0/0/0/0"/>
    <terminationEntry path="/0/0/0/0/1/0/0/0"/>
 </start>

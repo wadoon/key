@@ -25,12 +25,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import recoder.CrossReferenceServiceConfiguration;
-import recoder.abstraction.ClassType;
-import recoder.abstraction.Type;
-import recoder.java.NonTerminalProgramElement;
-import recoder.java.declaration.TypeDeclaration;
-import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.ArrayDeclaration;
@@ -65,6 +59,7 @@ import de.uka.ilkd.key.java.expression.ArrayInitializer;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
 import de.uka.ilkd.key.java.expression.PassiveExpression;
+import de.uka.ilkd.key.java.expression.literal.AbstractIntegerLiteral;
 import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
 import de.uka.ilkd.key.java.expression.literal.CharLiteral;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
@@ -164,6 +159,7 @@ import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.If;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopInit;
+import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Return;
@@ -189,7 +185,12 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
-
+import recoder.CrossReferenceServiceConfiguration;
+import recoder.abstraction.ClassType;
+import recoder.abstraction.Type;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.declaration.TypeDeclaration;
+import recoder.list.generic.ASTList;
 
 /**
  * Objects of this class can be used to transform an AST returned by the recoder
@@ -542,8 +543,8 @@ public class Recoder2KeYConverter {
     private PositionInfo positionInfo(recoder.java.SourceElement se) {
         Position relPos = new Position(se.getRelativePosition().getLine(), se
                 .getRelativePosition().getColumn());
-        Position startPos = new Position(se.getStartPosition().getLine(), se
-                .getStartPosition().getColumn());
+        Position startPos = new Position(se.getStartPosition().getLine(),
+                se.getStartPosition().getColumn());
         Position endPos = new Position(se.getEndPosition().getLine(), se
                 .getEndPosition().getColumn());
         if ((!inLoopInit))
@@ -559,7 +560,6 @@ public class Recoder2KeYConverter {
     private Literal getLiteralFor(
             recoder.service.ConstantEvaluator.EvaluationResult p_er) {
         switch (p_er.getTypeCode()) {
-        // XXX need to add one for \bigint, too?
         case recoder.service.ConstantEvaluator.BOOLEAN_TYPE:
             return BooleanLiteral.getBooleanLiteral(p_er.getBoolean());
         case recoder.service.ConstantEvaluator.CHAR_TYPE:
@@ -944,17 +944,17 @@ public class Recoder2KeYConverter {
         return new FloatLiteral(collectComments(floatLit), floatLit.getValue());
     }
 
-    /** convert a recoder LongLiteral to a KeY LongLiteral */
-    public LongLiteral convert(
-            recoder.java.expression.literal.LongLiteral longLit) {
-
+    /** convert a recoder LongLiteral to a KeY LongLiteral
+     * @param longLit the LongLiteral from recoder
+     * @return a KeY LongLiteral (immutable)*/
+    public LongLiteral convert(recoder.java.expression.literal.LongLiteral longLit) {
         return new LongLiteral(collectComments(longLit), longLit.getValue());
     }
 
-    /** convert a recoder CharLiteral to a KeY CharLiteral */
-    public CharLiteral convert(
-            recoder.java.expression.literal.CharLiteral charLit) {
-
+    /** convert a recoder CharLiteral to a KeY CharLiteral
+     * @param charLit the CharLiteral from recoder
+     * @return a KeY CharLiteral (immutable)*/
+    public CharLiteral convert(recoder.java.expression.literal.CharLiteral charLit) {
         return new CharLiteral(collectComments(charLit), charLit.getValue());
     }
 
@@ -1042,6 +1042,20 @@ public class Recoder2KeYConverter {
         return new MethodBodyStatement(bodySource, resultVar, mr);
     }
 
+    public MergePointStatement convert(
+        de.uka.ilkd.key.java.recoderext.MergePointStatement mps) {
+        final LocationVariable locVar = new LocationVariable(
+                services.getVariableNamer().getTemporaryNameProposal("x"),
+                (Sort) services.getNamespaces().sorts().lookup("boolean"));
+        
+        final Comment[] comments = new Comment[mps.getComments().size()];
+        for (int i = 0; i < mps.getComments().size(); i++) {
+            comments[i] = convert(mps.getComments().get(i));
+        }
+        
+        return new MergePointStatement(locVar, comments);
+    }
+
     public CatchAllStatement convert(
 	    	de.uka.ilkd.key.java.recoderext.CatchAllStatement cas) {
         return new CatchAllStatement
@@ -1090,7 +1104,6 @@ public class Recoder2KeYConverter {
       kjt.setJavaType(keyEnumDecl);
       return keyEnumDecl;
    }
-
 
     public InterfaceDeclaration convert(
             recoder.java.declaration.InterfaceDeclaration td) {
@@ -1452,6 +1465,7 @@ public class Recoder2KeYConverter {
             try {
         	if (ce.isCompileTimeConstant(init, er))
         	    return getLiteralFor(er);
+            } catch (NumberFormatException t) {
             } catch (java.lang.ArithmeticException t) {
             }
         }
@@ -1704,7 +1718,6 @@ public class Recoder2KeYConverter {
          return new EnhancedFor(convertLoopInitializers(f), convertGuard(f),
                  convertBody(f),collectComments(f),positionInfo(f));
      }
-
 
     /**
      * converts a While.
@@ -2176,7 +2189,36 @@ public class Recoder2KeYConverter {
         return new UnsignedShiftRightAssignment(collectChildrenAndComments(arg));
     }
 
-    public Negative convert(recoder.java.expression.operator.Negative arg) {
+    /**
+     * Converts the Negative from recoder to the corresponding KeY JavaProgramElement.
+     * If the minus sign belongs to the (decimal) literal, it is included into the literal
+     * and the corresponding Int-/LongLiteral is returned. Otherwise a KeY Negative is returned.
+     * @param arg the recoder Negative
+     * @return a KeY Int-/LongLiteral if the minus sign belongs to the literal or a KeY Negative
+     * otherwise
+     */
+    public JavaProgramElement convert(recoder.java.expression.operator.Negative arg) {
+        /* if the minus surrounds a decimal Int-/LongLiteral
+         * -> minus belongs to the literal, no separate javaUnaryMinus(...) */
+        if (arg.getChildCount() > 0) {
+            if (arg.getChildAt(0) instanceof recoder.java.expression.literal.IntLiteral) {
+                recoder.java.expression.literal.IntLiteral lit =
+                        (recoder.java.expression.literal.IntLiteral)arg.getChildAt(0);
+                // decimal: unary minus belongs to the literal
+                if (AbstractIntegerLiteral.representsDecLiteral(lit.getValue())) {
+                    // encode the minus into the literal
+                    return new IntLiteral(collectComments(lit), "-" + lit.getValue());
+                }
+            } else if (arg.getChildAt(0) instanceof recoder.java.expression.literal.LongLiteral) {
+                recoder.java.expression.literal.LongLiteral lit =
+                        (recoder.java.expression.literal.LongLiteral)arg.getChildAt(0);
+                // decimal: unary minus belongs to the literal
+                if (AbstractIntegerLiteral.representsDecLiteral(lit.getValue())) {
+                    // encode the minus into the literal
+                    return new LongLiteral(collectComments(lit), "-" + lit.getValue());
+                }
+            }
+        }
         return new Negative(collectChildrenAndComments(arg));
     }
 

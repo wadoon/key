@@ -69,7 +69,7 @@ public class ProofObligationCreator {
 
               for (Taclet taclet : taclets) {
                  InitConfig initConfig = initConfigs[i];
-                 initConfig.setTaclets(initConfig.getTaclets().prepend(axioms));
+                 initConfig.setTaclets(initConfig.getTaclets().prependReverse(axioms));
                  UserDefinedSymbols symbolsForAxioms = analyzeTaclets(axioms, initConfig.namespaces());
 
                  symbolsForAxioms.addSymbolsToNamespaces(initConfig.namespaces());
@@ -127,16 +127,16 @@ public class ProofObligationCreator {
                         
                         if(term.op() instanceof Function){
                                 if(sort == Sort.FORMULA){
-                                     userDefinedSymbols.addPredicate(term.op());
+                                     userDefinedSymbols.addPredicate((Function) term.op());
                                 }else{
-                                     userDefinedSymbols.addFunction(term.op());  
+                                     userDefinedSymbols.addFunction((Function) term.op());
                                 }                                      
                         }
                         if(term.op() instanceof LogicVariable){
-                                userDefinedSymbols.addVariable(term.op());
+                                userDefinedSymbols.addVariable((LogicVariable) term.op());
                         } 
                         if(term.op() instanceof SchemaVariable){
-                                userDefinedSymbols.addSchemaVariable(term.op());
+                                userDefinedSymbols.addSchemaVariable((SchemaVariable) term.op());
                         }
        
                 }   

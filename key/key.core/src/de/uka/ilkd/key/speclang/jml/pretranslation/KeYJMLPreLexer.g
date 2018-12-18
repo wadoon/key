@@ -32,6 +32,8 @@ lexer grammar KeYJMLPreLexer;
     ASSUME_REDUNDANTLY          : 'assume_redundantly';
     ASSIGNABLE 			: 'assignable';
     ASSIGNABLE_RED 		: 'assignable_redundantly';
+    ASSIGNS          : 'assigns';
+    ASSIGNS_RED      : 'assigns_redundantly';
     AXIOM                       : 'axiom';
     BEHAVIOR 			: 'behavior';
     BEHAVIOUR 			: 'behaviour';
@@ -55,6 +57,8 @@ lexer grammar KeYJMLPreLexer;
     DECREASES_REDUNDANTLY  	: 'decreases_redundantly';
     DECREASING  		: 'decreasing';
     DECREASING_REDUNDANTLY  	: 'decreasing_redundantly';
+    LOOP_VARIANT     : 'loop_variant';
+    LOOP_VARIANT_RED     : 'loop_variant_redundantly';
     DETERMINES                  : 'determines';
     DIVERGES 			: 'diverges';
     DIVERGES_RED 		: 'diverges_redundantly';
@@ -79,15 +83,19 @@ lexer grammar KeYJMLPreLexer;
     INSTANCE 			: 'instance';
     INVARIANT 			: 'invariant';
     INVARIANT_RED 		: 'invariant_redundantly';
-    JOIN_PROC           : 'join_proc';
+    LOOP_CONTRACT  		: 'loop_contract';
     LOOP_INVARIANT  		: 'loop_invariant';
     LOOP_INVARIANT_RED  	: 'loop_invariant_redundantly';
+    LOOP_INVARIANT_FREE	: 'loop_invariant_free';
     MAINTAINING  		: 'maintaining';
     MAINTAINING_REDUNDANTLY	: 'maintaining_redundantly';
     MAPS			: 'maps';
     MAPS_RED			: 'maps_redundantly';
     MEASURED_BY                 : 'measured_by';
     MEASURED_BY_REDUNDANTLY     : 'measured_by_redundantly';
+    MERGE_POINT         : 'merge_point';
+    MERGE_PROC          : 'merge_proc';
+    MERGE_PARAMS        : 'merge_params';
     MODEL 			: 'model';
     MODEL_BEHAVIOR 		: 'model_behavior' ;
     MODEL_BEHAVIOUR 		: 'model_behaviour' ;
@@ -273,9 +281,30 @@ SEMICOLON
     ';'
 ;
 
+
+//TODO (DS): I wanted two enable the usage of "\old" in STRING_LITERALs for merge params specifications.
+//           Therefore, I changed the definition like it can be seen below. Now, however, ANTLR is reporting
+//           issues like:
+//             Decision can match input such as "'\\''r'" using multiple alternatives: 1, 2
+//             As a result, alternative(s) 2 were disabled for that input
+//           This probably should be resolved...
 STRING_LITERAL
     : '"' ( ESC | ~('"'|'\\') )* '"'
     ;
+
+CHAR_LITERAL:
+        '\''
+                (~('\''|'\\') |
+                 ('\\' ('\'' | '\\' | 'n' | 'r' | 't' | 'b' | 'f' | '"' | OCT_CHAR))
+                 // note: unicode escapes are processed earlier
+                )
+      '\''
+    ;
+
+fragment OCT_CHAR:
+        (('0'|'1'|'2'|'3') OCTDIGIT OCTDIGIT) | (OCTDIGIT OCTDIGIT) | OCTDIGIT;
+
+fragment OCTDIGIT: '0'..'7';
 
 fragment
 ESC

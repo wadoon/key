@@ -26,31 +26,45 @@ import de.uka.ilkd.key.core.Main;
 
 
 public class KeYFileChooser {
-    
+
     private static final File HOME_DIR = IOUtil.getHomeDirectory();
     private static final FileFilter FILTER = new FileFilter() {
         public boolean accept(File f) {
-           
-            return 
+            return
                             f.isDirectory()
                             || "java".equals(IOUtil.getFileExtension(f))
                             || "key".equals(IOUtil.getFileExtension(f))
-                            || "proof".equals(IOUtil.getFileExtension(f));
+                            || "proof".equals(IOUtil.getFileExtension(f))
+                            || f.getName().endsWith(".proof.gz");
         }
 
         public String getDescription() {
-            return "Java files, KeY files and Source Directories";
+            return "Java files, (compressed) KeY files and source directories";
         }
     };
+
+    private static final FileFilter COMPRESSED_FILTER = new FileFilter() {
+        public boolean accept(File f) {
+            return f.getName().endsWith(".proof.gz") || f.isDirectory();
+        }
+
+        public String getDescription() {
+            return "compressed KeY proof files (.proof.gz)";
+        }
+    };
+
+
     private static KeYFileChooser INSTANCE;
 
     private final JFileChooser fileChooser;
-    
-
 
     private boolean saveDialog;
 
     private File resetFile = null;
+
+    public boolean useCompression() {
+        return getSelectedFile().getName().endsWith(".proof.gz");
+    }
 
     private KeYFileChooser(File initDir) {
         fileChooser = new JFileChooser(initDir) {
@@ -65,21 +79,23 @@ public class KeYFileChooser {
                 super.approveSelection();
             }
         };
+        fileChooser.addChoosableFileFilter(COMPRESSED_FILTER);
         fileChooser.setFileFilter(FILTER);
     }
 
     public void prepare() {
         File selFile = fileChooser.getSelectedFile();
-        if ((selFile != null) && selFile.isFile()) { // present & not dir.
-            String filename = selFile.getAbsolutePath();    
-            if (!filename.endsWith(".proof")) 
-                fileChooser.setSelectedFile(new File(filename+".proof")); 
-        } else if (selFile == null) {
-            fileChooser.setSelectedFile(null);
-            fileChooser.setCurrentDirectory(HOME_DIR);
-        } else { // is directory
-            fileChooser.setSelectedFile(null);
-            fileChooser.setCurrentDirectory(selFile);
+        
+        if (selFile == null) {
+            if (fileChooser.getCurrentDirectory() == null) {
+                fileChooser.setCurrentDirectory(HOME_DIR);                
+            } 
+        } else if (selFile.isFile()) { // present & not dir.
+            String filename = selFile.getAbsolutePath();
+            if (!filename.endsWith(".proof"))
+                fileChooser.setSelectedFile(new File(filename+".proof"));
+        } else if (selFile.isDirectory()) {
+            fileChooser.setCurrentDirectory(selFile);                            
         }
     }
 
@@ -93,11 +109,11 @@ public class KeYFileChooser {
 
     private void setSaveDialog(boolean b) {
         saveDialog = b;
-        fileChooser.setFileSelectionMode(b 
-                        ? JFileChooser.FILES_ONLY 
-                                        : JFileChooser.FILES_AND_DIRECTORIES);        
+        fileChooser.setFileSelectionMode(b
+                        ? JFileChooser.FILES_ONLY
+                                        : JFileChooser.FILES_AND_DIRECTORIES);
     }
-    
+
     public boolean showSaveDialog(Component parent) {
         return showSaveDialog(parent, null, null);
     }
@@ -111,18 +127,41 @@ public class KeYFileChooser {
      * @return
      */
     public boolean showSaveDialog(Component parent, File originalFile, String extension) {
-        final String recDir = originalFile != null ?
-                        // if directory stay there, otherwise go to parent directory
-                        (originalFile.isDirectory()? originalFile.toString(): originalFile.getParent()) 
-                        : fileChooser.getCurrentDirectory().toString();
-        resetFile = (extension != null) ? new File(recDir, extension): originalFile;
+        File selectedFile;
+        if (originalFile == null) {
+            selectedFile = fileChooser.getCurrentDirectory();
+        } else {
+            selectedFile = originalFile.getAbsoluteFile();
+            if (selectedFile.isFile() || (!selectedFile.exists() && selectedFile.getName().contains("."))) {
+                selectedFile = selectedFile.getParentFile();
+            }
+        }
+        
+        if (extension != null) {
+            // the idea is to find the right place where to put a key vs. proof file
+            // we should actually have a project file containing that information in a more reliable way
+            File dirForExtension = selectedFile;
+            if (extension.endsWith(".key")) {
+                // serach for "src" folder; 
+                while (dirForExtension != null && !"src".equals(dirForExtension.getName())) {
+                    dirForExtension = dirForExtension.getParentFile();                    
+                }
+            }
+            // project structure for KeY would be the sane thing to do; avoid NPE at any cost
+            
+            resetFile = "src".equals(dirForExtension.getName()) && dirForExtension.getParentFile() != null ? 
+                    dirForExtension.getParentFile() : selectedFile;
+            
+            selectedFile = new File(resetFile, extension);             
+        } else {
+            resetFile = selectedFile;
+        }
+        
+        
         fileChooser.setSelectedFile(resetFile);
         setSaveDialog(true);
-        final String poDir = resetFile.getParent().endsWith("src") ?
-                             new File(resetFile.getParent()).getParent() : resetFile.getParent();
-        final String proofDir = resetFile.getParent();
-        originalFile = new File(extension.endsWith(".key") ? poDir : proofDir, resetFile.getName());
-        return showSaveDialog(parent, originalFile);
+        
+        return showSaveDialog(parent, selectedFile);
     }
 
     public boolean showSaveDialog(Component parent, File selectedFile) {
@@ -156,7 +195,7 @@ public class KeYFileChooser {
     public File getCurrentDirectory() {
         return fileChooser.getCurrentDirectory();
     }
-    
+
     public boolean showOpenDialog(Component component) {
         setSaveDialog(false);
 
@@ -198,14 +237,14 @@ public class KeYFileChooser {
 
     /**
      * Gets <b>the</b> file chooser for the prover.
-     * 
+     *
      * The chooser is created lazily when first requested. It points to the
      * directory of the command line argument (if present), otherwise to the
      * user's home directory.
-     * 
+     *
      * @param title
      *            the title of the key file chooser
-     * 
+     *
      * @return the key file chooser
      */
     public static KeYFileChooser getFileChooser(String title) {
@@ -213,7 +252,7 @@ public class KeYFileChooser {
             File initDir = Main.getWorkingDir();
             INSTANCE = new KeYFileChooser(initDir);
         }
-        
+
         INSTANCE.setDialogTitle(title);
         INSTANCE.prepare();
         return INSTANCE;

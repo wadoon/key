@@ -14,6 +14,8 @@
 package org.key_project.util.collection;
 
 import java.util.Iterator;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /** interface implemented by non-destructive Sets.
  * CONVENTION: Each SetOf<T> implementation has to offer a public static
@@ -34,6 +36,16 @@ public interface ImmutableSet<T> extends Iterable<T>, java.io.Serializable {
     /** @return Iterator<T> of the set */
     @Override
     Iterator<T> iterator();
+    
+    /** @return Stream<T> of the set */
+    Stream<T> stream();
+    
+    /**
+     * return true if predicate is fullfilled for at least one element
+     * @param predicate the predicate
+     * @return true if predicate is fullfilled for at least one element
+     */
+    boolean exists(Predicate<T> predicate);
 
     /** @return true iff obj in set */
     boolean contains(T obj);

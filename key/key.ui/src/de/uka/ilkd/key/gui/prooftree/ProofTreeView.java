@@ -84,20 +84,21 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.proof.ProofVisitor;
 import de.uka.ilkd.key.proof.RuleAppListener;
+import de.uka.ilkd.key.settings.GeneralSettings;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.Pair;
 
 public class ProofTreeView extends JPanel {
 
     private static final long serialVersionUID = 3732875161168302809L;
-    private static final Color GRAY_COLOR = Color.DARK_GRAY;
-    private static final Color BISQUE_COLOR = new Color(240,228,196);
-    private static final Color LIGHT_BLUE_COLOR = new Color(230,254,255);
-    private static final Color DARK_BLUE_COLOR = new Color(31,77,153);
-    private static final Color DARK_GREEN_COLOR = new Color(0,128,51);
-    private static final Color DARK_RED_COLOR = new Color(191,0,0);
-    private static final Color PINK_COLOR = new Color(255,0,240);
-    private static final Color ORANGE_COLOR = new Color(255,140,0);
+    public static final Color GRAY_COLOR = Color.DARK_GRAY;
+    public static final Color BISQUE_COLOR = new Color(240,228,196);
+    public static final Color LIGHT_BLUE_COLOR = new Color(230,254,255);
+    public static final Color DARK_BLUE_COLOR = new Color(31,77,153);
+    public static final Color DARK_GREEN_COLOR = new Color(0,128,51);
+    public static final Color DARK_RED_COLOR = new Color(191,0,0);
+    public static final Color PINK_COLOR = new Color(255,0,240);
+    public static final Color ORANGE_COLOR = new Color(255,140,0);
 
     /** the mediator is stored here */
     private KeYMediator mediator;
@@ -889,18 +890,21 @@ public class ProofTreeView extends JPanel {
             this.add(macroMenu);
         }
 
-	    this.add(prune);
-	    if (branch != path) {
-		prune.addActionListener(this);
-		prune.setIcon(IconFactory.pruneLogo(ICON_SIZE));
-		prune.setEnabled(false);
-		if (proof != null) {
-		    if (proof.isGoal(invokedNode) ||
-		        proof.getSubtreeGoals(invokedNode).size()>0) {
-		        prune.setEnabled(true);
-		    }
-		}
-	    }
+        this.add(prune);
+        prune.setIcon(IconFactory.pruneLogo(ICON_SIZE));
+        prune.setEnabled(false);
+        if (proof != null) {
+            // disable pruning for goals and disable it for closed subtrees if the command line
+            // option "--no-pruning-closed" is set (saves memory)
+            if (!proof.isGoal(invokedNode)
+                && !proof.isClosedGoal(invokedNode)
+                && (proof.getSubtreeGoals(invokedNode).size() > 0
+                    || (!GeneralSettings.noPruningClosed
+                        && proof.getClosedSubtreeGoals(invokedNode).size() > 0))) {
+                prune.addActionListener(this);
+                prune.setEnabled(true);
+            }
+        }
 
 	    if(branch != path){
 	        delayedCut.addActionListener(this);

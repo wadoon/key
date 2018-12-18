@@ -17,14 +17,15 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.proof.init.KeYUserProblemFile;
-import de.uka.ilkd.key.speclang.ContractFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.key_project.util.java.IOUtil;
 import org.key_project.util.reflection.ClassLoaderUtil;
+import org.xml.sax.SAXException;
 
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.ExampleChooser;
@@ -49,10 +50,7 @@ import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.rifl.RIFLTransformer;
-import org.xml.sax.SAXException;
 import recoder.ParserException;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * The main entry point for KeY
@@ -70,6 +68,11 @@ public final class Main {
     private static final String AUTO_LOADONLY = "--auto-loadonly";
     private static final String AUTOSAVE = "--autosave";
     private static final String EXPERIMENTAL = "--experimental";
+    /**
+     * This parameter disables the possibility to prune in closed branches. It is meant as a
+     * fallback solution if storing all closed goals needs too much memory.
+     */
+    private static final String NO_PRUNING_CLOSED = "--no-pruning-closed";
     private static final String DEBUG = "--debug";
     private static final String MACRO = "--macro";
     private static final String NO_JMLSPECS = "--no-jmlspecs";
@@ -90,7 +93,6 @@ public final class Main {
     public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
     public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX + "signature";
     private static final String VERBOSITY = "--verbose";
-
     /**
      * The {@link KeYDesktop} used by KeY. The default implementation is
      * replaced in Eclipse. For this reason the {@link Desktop} should never
@@ -249,6 +251,8 @@ public final class Main {
         cl.addOption(LAST, null, "start prover with last loaded problem (only possible with GUI)");
         cl.addOption(AUTOSAVE, "<number>", "save intermediate proof states each n proof steps to a temporary location (default: 0 = off)");
         cl.addOption(EXPERIMENTAL, null, "switch experimental features on");
+        cl.addOption(NO_PRUNING_CLOSED, null,
+                "disables pruning and goal back in closed branches (saves memory)");
         cl.addSection("Batchmode options:");
         cl.addOption(TACLET_DIR, "<dir>", "load base taclets from a directory, not from internal structures");
         cl.addOption(DEBUG, null, "start KeY in debug mode");
@@ -417,12 +421,18 @@ public final class Main {
                 if (macro.equals(m.getClass().getSimpleName())) {
                     // memorize macro for later
                     try {
-                        autoMacro = m.getClass().newInstance();
+                        autoMacro = m.getClass().getDeclaredConstructor().newInstance();
                     } catch (InstantiationException e) {
                         System.err.println("Automatic proof macro can not be instantiated!");
                         e.printStackTrace();
                     } catch (IllegalAccessException e) {
                         System.err.println("Automatic proof macro can not be accessed!");
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        System.err.println("Automatic proof macro can not be invoked!");
+                        e.printStackTrace();
+                    } catch (NoSuchMethodException e) {
+                        System.err.println("Automatic proof macro can not be called!");
                         e.printStackTrace();
                     }
                     break;
@@ -442,6 +452,9 @@ public final class Main {
                     cl.getString(TACLET_DIR, ""));
         }
 
+        if (cl.isSet(NO_PRUNING_CLOSED)) {
+            GeneralSettings.noPruningClosed = true;
+        }
     }
 
     /**
@@ -501,6 +514,11 @@ public final class Main {
             return new ConsoleUserInterfaceControl(verbosity, loadOnly);
         } else {
             updateSplashScreen();
+
+            /* explicitly enable pruning in closed branches for interactive mode
+             * (if not manually disabled) */
+            GeneralSettings.noPruningClosed = cl.isSet(NO_PRUNING_CLOSED) ? true : false;
+
             MainWindow mainWindow = MainWindow.getInstance();
 
             if (loadRecentFile) {

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package de.uka.ilkd.key.informationflow.macros;
 
 import java.util.Map;
@@ -73,7 +69,8 @@ public abstract class AbstractFinishAuxiliaryComputationMacro extends AbstractPr
         final Term[] goalFormulas = buildFormulasFromGoals(symbExecGoals);
         final InfFlowProgVarRenamer renamer =
                         new InfFlowProgVarRenamer(goalFormulas, vsMap,
-                                                  c.postfix, initGoal, services);
+                                                  c.postfix, initGoal,
+                                                  services.getOverlay(initGoal.getLocalNamespaces()));
         final Term[] renamedGoalFormulas =
                 renamer.renameVariablesAndSkolemConstants();
         Term[] result = new Term[renamedGoalFormulas.length];

@@ -19,6 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.ObjectUtil;
 
 import de.uka.ilkd.key.java.JavaSourceElement;
 import de.uka.ilkd.key.java.Position;
@@ -27,11 +28,12 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.SequentChangeInfo;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.PosTacletApp;
 import de.uka.ilkd.key.rule.RuleApp;
@@ -46,6 +48,8 @@ import de.uka.ilkd.key.rule.TacletApp;
  * carry something of logical value.
  */
 public class NodeInfo {
+
+    private static Set<Name> symbolicExecNames = new HashSet<Name>(9);
 
     /** firstStatement stripped of method frames */
     private SourceElement activeStatement                 = null;
@@ -69,13 +73,13 @@ public class NodeInfo {
     /** User-provided plain-text annotations to the node. */
     private String notes;
 
+    /** Information about changes respective to the parent of this node. */
+    private SequentChangeInfo sequentChangeInfo;
 
     public NodeInfo(Node node) {
         this.node = node;
     }
 
-
-    private static Set<Name> symbolicExecNames = new HashSet<Name>(9);
     static {
         symbolicExecNames.add(new Name("method_expand"));
         symbolicExecNames.add(new Name("simplify_prog"));
@@ -179,31 +183,30 @@ public class NodeInfo {
         determineFirstAndActiveStatement();
     }
 
-
     /**
      * Checks if a rule is applied on the given {@link Node} which performs symbolic execution.
      * @param node The {@link Node} to check.
      * @return {@code true} symbolic execution is performed, {@code false} otherwise.
      */
     public static boolean isSymbolicExecutionRuleApplied(Node node) {
-       if (node != null) {
-          return isSymbolicExecutionRuleApplied(node.getAppliedRuleApp());
-       }
-       else {
-          return false;
-       }
+        if (node != null) {
+            return isSymbolicExecutionRuleApplied(node.getAppliedRuleApp());
+        } else {
+            return false;
+        }
     }
 
     /**
      * Checks if the given {@link RuleApp} performs symbolic execution.
-     * @param node The {@link Node} to check.
+     * @param app The {@link RuleApp} to check.
      * @return {@code true} symbolic execution is performed, {@code false} otherwise.
      */
     public static boolean isSymbolicExecutionRuleApplied(RuleApp app) {
-       return app instanceof BlockContractBuiltInRuleApp ||
-              app instanceof AbstractContractRuleApp ||
-              app instanceof LoopInvariantBuiltInRuleApp ||
-              app instanceof TacletApp && NodeInfo.isSymbolicExecution(((TacletApp) app).taclet());
+        return app instanceof AbstractBlockSpecificationElementBuiltInRuleApp ||
+                app instanceof AbstractContractRuleApp ||
+                app instanceof LoopInvariantBuiltInRuleApp ||
+                app instanceof TacletApp
+                    && NodeInfo.isSymbolicExecution(((TacletApp) app).taclet());
     }
 
     public static boolean isSymbolicExecution(Taclet t) {
@@ -222,6 +225,7 @@ public class NodeInfo {
      * returns the active statement of the JavaBlock the applied
      * rule has been matched against or null if no rule has been applied yet
      * or the applied rule was no taclet or program transformation rule
+     * @return active statement as described above
      */
     public SourceElement getActiveStatement() {
 	determineFirstAndActiveStatement();
@@ -230,6 +234,7 @@ public class NodeInfo {
 
     /**
      * returns the branch label
+     * @return branch label
      */
     public String getBranchLabel() {
         return branchLabel;
@@ -240,6 +245,7 @@ public class NodeInfo {
      * occurs or the string <tt>NONE</tt> if the statement does not originate from a
      * source file (e.g. created by a taclet application or part of a
      * generated implicit method)
+     * @return name of source file as described above
      */
     public String getExecStatementParentClass() {
         determineFirstAndActiveStatement();
@@ -252,16 +258,19 @@ public class NodeInfo {
     /**
      * returns the position of the executed statement in its source code
      * or Position.UNDEFINED
+     * @return statement position as described above
      */
     public Position getExecStatementPosition() {
         determineFirstAndActiveStatement();
-        return (activeStatement == null) ? Position.UNDEFINED : activeStatement
-                .getStartPosition();
+        return (activeStatement == null) ?
+                Position.UNDEFINED
+                : activeStatement.getStartPosition();
     }
 
     /**
      * returns a string representation of the first statement or null if no such
      * exists
+     * @return string representation of first statement as described above
      */
     public String getFirstStatementString() {
         determineFirstAndActiveStatement();
@@ -333,18 +342,35 @@ public class NodeInfo {
     /**
      * returns true if the rule applied on this node has been performed
      * manually by the user
+     * @return boolean for interactive rule application as described above
      */
     public boolean getInteractiveRuleApplication() {
         return interactiveApplication;
     }
 
-    /** Add user-provided plain-text annotations. */
-    public void setNotes (String newNotes) {
+    /** Add user-provided plain-text annotations.
+     * @param newNotes annotations as described above
+     */
+    public void setNotes(String newNotes) {
+        String oldNotes = notes;
         notes = newNotes;
+        if (!ObjectUtil.equals(oldNotes, newNotes)) {
+           node.proof().fireNotesChanged(node);
+        }
     }
 
-    /** Get user-provided plain-text annotations. */
+    /** Get user-provided plain-text annotations.
+     * @return annotations as described above
+     */
     public String getNotes() {
         return notes;
+    }
+
+    public SequentChangeInfo getSequentChangeInfo() {
+        return sequentChangeInfo;
+    }
+
+    public void setSequentChangeInfo(SequentChangeInfo sequentChangeInfo) {
+        this.sequentChangeInfo = sequentChangeInfo;
     }
 }

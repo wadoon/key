@@ -41,7 +41,7 @@ import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
-import de.uka.ilkd.key.gui.joinrule.JoinRuleMenuItem;
+import de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
@@ -61,9 +61,13 @@ import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.join.JoinIsApplicable;
 import de.uka.ilkd.key.proof.join.ProspectivePartner;
-import de.uka.ilkd.key.rule.BlockContractRule;
+import de.uka.ilkd.key.rule.BlockContractInternalRule;
+import de.uka.ilkd.key.rule.BlockContractExternalRule;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.rule.FindTaclet;
+import de.uka.ilkd.key.rule.LoopContractExternalRule;
+import de.uka.ilkd.key.rule.LoopContractInternalRule;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
@@ -71,7 +75,7 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.TacletSchemaVariableCollector;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
-import de.uka.ilkd.key.rule.join.JoinRule;
+import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
@@ -150,10 +154,10 @@ public class TacletMenu extends JMenu {
     /** creates a new menu that displays all applicable rules at the given
      * position
      * @param sequentView the SequentView that is the parent of this menu
-     * @param findList IList<Taclet> with all applicable FindTaclets
-     * @param rewriteList IList<Taclet> with all applicable RewriteTaclets
-     * @param noFindList IList<Taclet> with all applicable noFindTaclets
-     * @param builtInList IList<BuiltInRule> with all applicable BuiltInRules
+     * @param findList {@link IList<Taclet>} with all applicable FindTaclets
+     * @param rewriteList {@link IList<Taclet>} with all applicable RewriteTaclets
+     * @param noFindList {@link IList<Taclet>} with all applicable noFindTaclets
+     * @param builtInList {@link IList<BuiltInRule>} with all applicable BuiltInRules
      * @param pos the PosInSequent
      */
     TacletMenu(CurrentGoalView sequentView,
@@ -172,7 +176,7 @@ public class TacletMenu extends JMenu {
 
 
     /** removes RewriteTaclet from list
-     * @param list the IList<Taclet> from where the RewriteTaclet are
+     * @param list the {@link IList<Taclet>} from where the RewriteTaclet are
      * removed
      * @return list without RewriteTaclets
      */
@@ -218,7 +222,7 @@ public class TacletMenu extends JMenu {
 
 	createBuiltInRuleMenu(builtInList, control);
     createDelayedCutJoinMenu(control);
-    createDefocusingJoinMenu();
+    createMergeRuleMenu();
 
 	if(pos!= null && pos.isSequent()){
 	    createSMTMenu(control);
@@ -297,18 +301,15 @@ public class TacletMenu extends JMenu {
     }
     
     /**
-     * Creates the menu item for the "defocusing" join rule which links partner
-     * nodes to join nodes.
+     * Creates the menu item for the "defocusing" merge rule which links partner
+     * nodes to merge nodes.
      */
-    private void createDefocusingJoinMenu() {
-        if (Main.isExperimentalMode()) {
-            if (JoinRule.isOfAdmissibleForm(mediator.getSelectedGoal(),
-                    pos.getPosInOccurrence(), false)) {
-                JMenuItem item = new JoinRuleMenuItem(
-                        mediator.getSelectedGoal(), pos.getPosInOccurrence(),
-                        mediator);
-                add(item);
-            }
+    private void createMergeRuleMenu() {
+        if (MergeRule.isOfAdmissibleForm(mediator.getSelectedGoal(),
+                pos.getPosInOccurrence(), true)) {
+            JMenuItem item = new MergeRuleMenuItem(mediator.getSelectedGoal(),
+                    pos.getPosInOccurrence(), mediator);
+            add(item);
         }
     }
     
@@ -318,7 +319,8 @@ public class TacletMenu extends JMenu {
      */
     private void addBuiltInRuleItem(BuiltInRule builtInRule, MenuControl control) {
         JMenuItem item;
-        if (builtInRule == WhileInvariantRule.INSTANCE) {
+        if (builtInRule == WhileInvariantRule.INSTANCE ||
+                builtInRule == LoopScopeInvariantRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(
                     builtInRule.displayName(),
@@ -330,12 +332,45 @@ public class TacletMenu extends JMenu {
             item.addActionListener(control);
             add(item);
         }
-        else if (builtInRule == BlockContractRule.INSTANCE) {
+        else if (builtInRule == BlockContractInternalRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(
                     builtInRule.displayName(),
                     APPLY_RULE,
                     "Applies a known and complete block specification immediately.",
+                    CHOOSE_AND_APPLY_CONTRACT,
+                    "Asks to select the contract to be applied.", builtInRule);
+            item.addActionListener(control);
+            add(item);
+        }
+        else if (builtInRule == BlockContractExternalRule.INSTANCE) {
+            // we add two items in this case: one for auto one for interactive
+            item = new MenuItemForTwoModeRules(
+                    builtInRule.displayName(),
+                    APPLY_RULE,
+                    "All available contracts of the block are combined and applied.",
+                    CHOOSE_AND_APPLY_CONTRACT,
+                    "Asks to select the contract to be applied.", builtInRule);
+            item.addActionListener(control);
+            add(item);
+        }
+        else if (builtInRule == LoopContractInternalRule.INSTANCE) {
+            // we add two items in this case: one for auto one for interactive
+            item = new MenuItemForTwoModeRules(
+                    builtInRule.displayName(),
+                    APPLY_RULE,
+                    "Applies a known and complete loop block specification immediately.",
+                    CHOOSE_AND_APPLY_CONTRACT,
+                    "Asks to select the contract to be applied.", builtInRule);
+            item.addActionListener(control);
+            add(item);
+        }
+        else if (builtInRule == LoopContractExternalRule.INSTANCE) {
+            // we add two items in this case: one for auto one for interactive
+            item = new MenuItemForTwoModeRules(
+                    builtInRule.displayName(),
+                    APPLY_RULE,
+                    "All available contracts of the loop block are combined and applied.",
                     CHOOSE_AND_APPLY_CONTRACT,
                     "Asks to select the contract to be applied.", builtInRule);
             item.addActionListener(control);
@@ -351,14 +386,8 @@ public class TacletMenu extends JMenu {
             item.addActionListener(control);
             add(item);
         }
-        else if (builtInRule == JoinRule.INSTANCE) {
-            // (DS) At the moment, we want to use the join rule as an
-            // experimental feature only. However, it may not be removed
-            // from JavaProfile. Therefore, it is just not added as a menu item
-            // at this place.
-            // TODO (DS): Remove this if-branch and the registration of \\
-            // JoinRule as an experimental feature if it survived some \\
-            // serious case studies.
+        else if (builtInRule == MergeRule.INSTANCE) {
+            // (DS) MergeRule has a special menu item, and thus is not added here.
         }
         else {
             item = new DefaultBuiltInRuleMenuItem(builtInRule);
@@ -444,7 +473,7 @@ public class TacletMenu extends JMenu {
 
     /** adds a TacletMenuItem for each taclet in the list and sets
      * the given MenuControl as the ActionListener
-     * @param taclets IList<Taclet> with the Taclets the items represent
+     * @param taclets {@link IList<Taclet>} with the Taclets the items represent
      * @param control the ActionListener
      */
     private void createMenuItems(ImmutableList<TacletApp> taclets,

@@ -13,6 +13,7 @@
 	                <jvmarg value="-Xmx2048m"/>
 			<jvmarg value="-XX:MaxPermSize=256m"/>
 			<jvmarg value="-ea"/>
+			<jvmarg value="-Dkey.disregardSettings=true"/>
 			<classpath>
 				<pathelement location="${dist.dir}/key.util.jar"/>
 				<pathelement location="${ext.dir}/junit-4.12.jar"/>
@@ -49,8 +50,8 @@
 		       destdir="${build.dir}" 
 		       sourcepath="${src.dir}" 
 		       includeantruntime="false" 
-		       source="1.7" 
-		       target="1.7"
+		       source="1.8" 
+		       target="1.8"
 		       deprecation="off" 
 		       debug="on" 
 		       depend="${build.depend}" 

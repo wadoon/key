@@ -66,7 +66,7 @@ import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Try;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.java.visitor.ContainsStatementVisitor;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -107,7 +107,6 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.pp.NotationInfo;
 import de.uka.ilkd.key.pp.ProgramPrinter;
-import de.uka.ilkd.key.proof.ApplyStrategy.ApplyStrategyInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
@@ -117,8 +116,12 @@ import de.uka.ilkd.key.proof.init.InitConfig;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
+import de.uka.ilkd.key.rule.AbstractBlockContractBuiltInRuleApp;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementBuiltInRuleApp;
 import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BlockContractBuiltInRuleApp;
+import de.uka.ilkd.key.rule.BlockContractInternalBuiltInRuleApp;
+import de.uka.ilkd.key.rule.BlockContractExternalBuiltInRuleApp;
 import de.uka.ilkd.key.rule.ContractRuleApp;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
 import de.uka.ilkd.key.rule.OneStepSimplifierRuleApp;
@@ -127,6 +130,9 @@ import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.SyntacticalReplaceVisitor;
 import de.uka.ilkd.key.rule.TacletApp;
+import de.uka.ilkd.key.rule.merge.CloseAfterMerge;
+import de.uka.ilkd.key.rule.merge.CloseAfterMergeRuleBuiltInRuleApp;
+import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.ProofSettings;
@@ -1154,13 +1160,13 @@ public final class SymbolicExecutionUtil {
    }
 
    /**
-    * Checks if the given node should be represented as block contract.
+    * Checks if the given node should be represented as block/loop contract.
     * @param node The current {@link Node} in the proof tree of KeY.
     * @param ruleApp The {@link RuleApp} may used or not used in the rule.
     * @return {@code true} represent node as block contract, {@code false} represent node as something else. 
     */
-   public static boolean isBlockContract(Node node, RuleApp ruleApp) {
-      return ruleApp instanceof BlockContractBuiltInRuleApp;
+   public static boolean isBlockSpecificationElement(Node node, RuleApp ruleApp) {
+      return ruleApp instanceof AbstractBlockSpecificationElementBuiltInRuleApp;
    }
 
    /**
@@ -1575,7 +1581,7 @@ public final class SymbolicExecutionUtil {
          else if (isLoopInvariant(node, ruleApp)) {
             return true;
          }
-         else if (isBlockContract(node, ruleApp)) {
+         else if (isBlockSpecificationElement(node, ruleApp)) {
             return true;
          }
          else {
@@ -1692,19 +1698,8 @@ public final class SymbolicExecutionUtil {
     * @return The found {@link Goal}s.
     */
    public static ImmutableList<Goal> collectGoalsInSubtree(Node node) {
-      ImmutableList<Goal> result = ImmutableSLList.nil();
-      if (node != null) {
-         Proof proof = node.proof();
-         Iterator<Node> iter = node.leavesIterator();
-         while (iter.hasNext()) {
-            Node next = iter.next();
-            Goal nextGoal = proof.getGoal(next);
-            if (nextGoal != null) {
-               result = result.append(nextGoal);
-            }
-         }
-      }
-      return result;
+      Proof proof = node.proof();
+      return proof.getSubtreeEnabledGoals(node);
    }
 
    /**
@@ -1795,7 +1790,7 @@ public final class SymbolicExecutionUtil {
       else if (parent.getAppliedRuleApp() instanceof LoopInvariantBuiltInRuleApp) {
          return computeLoopInvariantBuiltInRuleAppBranchCondition(parent, node, simplify, improveReadability);
       }
-      else if (parent.getAppliedRuleApp() instanceof BlockContractBuiltInRuleApp) {
+      else if (parent.getAppliedRuleApp() instanceof AbstractBlockContractBuiltInRuleApp) {
          return computeBlockContractBuiltInRuleAppBranchCondition(parent, node, simplify, improveReadability);
       }
       else {
@@ -2275,7 +2270,8 @@ public final class SymbolicExecutionUtil {
 
    /**
     * <p>
-    * Computes the branch condition of the given {@link Node} which was constructed by a {@link BlockContractBuiltInRuleApp}.
+    * Computes the branch condition of the given {@link Node} which was constructed by an
+    * {@link AbstractBlockContractBuiltInRuleApp}.
     * </p>
     * <p>
     * The branch conditions are:
@@ -2291,17 +2287,25 @@ public final class SymbolicExecutionUtil {
     * @return The computed branch condition.
     * @throws ProofInputException Occurred Exception.
     */
-   private static Term computeBlockContractBuiltInRuleAppBranchCondition(Node parent, Node node, boolean simplify, boolean improveReadability) throws ProofInputException {
+   private static Term computeBlockContractBuiltInRuleAppBranchCondition(
+           Node parent, Node node, boolean simplify, boolean improveReadability)
+                   throws ProofInputException {
       // Make sure that a computation is possible
-      if (!(parent.getAppliedRuleApp() instanceof BlockContractBuiltInRuleApp)) {
-         throw new ProofInputException("Only BlockContractBuiltInRuleApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found.");
+      if (!(parent.getAppliedRuleApp() instanceof AbstractBlockContractBuiltInRuleApp)) {
+         throw new ProofInputException("Only AbstractBlockContractBuiltInRuleApp is allowed in branch computation but rule \"" + parent.getAppliedRuleApp() + "\" was found.");
       }
+      
+      RuleApp app = parent.getAppliedRuleApp();
+      
       // Make sure that branch is supported
       int childIndex = CollectionUtil.indexOf(parent.childrenIterator(), node);
-      if (childIndex == 0) { // Validity branch
+      if (app instanceof BlockContractInternalBuiltInRuleApp && childIndex == 0) {
+         // Validity branch
          return parent.proof().getServices().getTermBuilder().tt();
       }
-      else if (childIndex == 2) { // Usage branch
+      else if ((app instanceof BlockContractInternalBuiltInRuleApp && childIndex == 2)
+              || (app instanceof BlockContractExternalBuiltInRuleApp && childIndex == 1)) {
+         // Usage branch
          // Compute invariant (last antecedent formula of the use branch)
          Services services = parent.proof().getServices();
          Semisequent antecedent = node.sequent().antecedent();
@@ -3893,51 +3897,6 @@ public final class SymbolicExecutionUtil {
    }
    
    /**
-    * Utilits class used by {@link SymbolicExecutionUtil#containsStatement(MethodFrame, ProgramElement, Services)}.
-    * @author Martin Hentschel
-    */
-   private static class ContainsStatementVisitor extends JavaASTVisitor {
-      /**
-       * The {@link ProgramElement} to search.
-       */
-      private final SourceElement toSearch;
-      
-      /**
-       * The result.
-       */
-      private boolean contained = false;
-      
-      /**
-       * Constructor.
-       * @param root The {@link ProgramElement} to start search in.
-       * @param toSearch The {@link SourceElement} to search.
-       * @param services The {@link Services} to use.
-       */
-      public ContainsStatementVisitor(ProgramElement root, SourceElement toSearch, Services services) {
-         super(root, services);
-         this.toSearch = toSearch;
-      }
-
-      /**
-       * {@inheritDoc}
-       */
-      @Override
-      protected void doDefaultAction(SourceElement se) {
-         if (equalsWithPosition(se, toSearch)) { // Comparison by == is not possible since loops are recreated
-            contained = true;
-         }
-      }
-
-      /**
-       * Returns the result.
-       * @return {@code true} contained, {@code false} not contained.
-       */
-      public boolean isContained() {
-         return contained;
-      }
-   }
-   
-   /**
     * Creates recursive a term which can be used to determine the value
     * of {@link #getProgramVariable()}.
     * @param services The {@link Services} to use.
@@ -4186,6 +4145,40 @@ public final class SymbolicExecutionUtil {
       if (pio != null) {
          Term applicationTerm = TermBuilder.goBelowUpdates(pio.subTerm());
          return applicationTerm.getLabel(BlockContractValidityTermLabel.NAME) != null;
+      }
+      else {
+         return false;
+      }
+   }
+
+   /**
+    * Checks if the {@link MergeRuleBuiltInRuleApp} is applied.
+    * @param ruleApp The {@link RuleApp} to check.
+    * @return {@code true} is {@link MergeRuleBuiltInRuleApp}, {@code false} otherwise.
+    */
+   public static boolean isJoin(RuleApp ruleApp) {
+      return ruleApp instanceof MergeRuleBuiltInRuleApp &&
+             !((MergeRuleBuiltInRuleApp) ruleApp).getMergePartners().isEmpty();
+   }
+
+   /**
+    * Checks if the {@link CloseAfterMergeRuleBuiltInRuleApp} is applied.
+    * @param ruleApp The {@link RuleApp} to check.
+    * @return {@code true} is {@link CloseAfterMergeRuleBuiltInRuleApp}, {@code false} otherwise.
+    */
+   public static boolean isCloseAfterJoin(RuleApp ruleApp) {
+      return ruleApp instanceof CloseAfterMergeRuleBuiltInRuleApp;
+   }
+
+   /**
+    * Checks if the weakening goal is enabled or not.
+    * @param proof The {@link Proof} to check.
+    * @return {@code true} enabled, {@code false} disabled.
+    */
+   public static boolean isWeakeningGoalEnabled(Proof proof) {
+      if (proof != null && !proof.isDisposed()) {
+         String value = proof.getSettings().getChoiceSettings().getDefaultChoices().get(CloseAfterMerge.MERGE_GENERATE_IS_WEAKENING_GOAL_CFG);
+         return CloseAfterMerge.MERGE_GENERATE_IS_WEAKENING_GOAL_CFG_ON.equals(value);
       }
       else {
          return false;

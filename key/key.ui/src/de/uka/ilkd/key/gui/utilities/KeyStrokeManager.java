@@ -20,6 +20,8 @@ import java.util.Map;
 
 import javax.swing.KeyStroke;
 
+import de.uka.ilkd.key.gui.actions.DecreaseFontSizeAction;
+import de.uka.ilkd.key.gui.actions.IncreaseFontSizeAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.macros.ProofMacro;
 
@@ -40,7 +42,7 @@ import de.uka.ilkd.key.macros.ProofMacro;
  *
  */
 public final class KeyStrokeManager {
-    
+
     /**
      * If true, F keys are used for macros, otherwise CTRL+SHIFT+letter.
      */
@@ -73,6 +75,7 @@ public final class KeyStrokeManager {
             mapping.put(de.uka.ilkd.key.macros.TestGenMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F8,0));
             mapping.put(de.uka.ilkd.key.macros.HeapSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F9,0));
             mapping.put(de.uka.ilkd.key.macros.UpdateSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F10,0));
+            mapping.put(de.uka.ilkd.key.macros.IntegerSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_F11,0));
             
             mapping.put(de.uka.ilkd.key.gui.actions.QuickSaveAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_S,MULTI_KEY_MASK));
             mapping.put(de.uka.ilkd.key.gui.actions.QuickLoadAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_O,MULTI_KEY_MASK));
@@ -88,6 +91,7 @@ public final class KeyStrokeManager {
             mapping.put(de.uka.ilkd.key.macros.TestGenMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_T,MULTI_KEY_MASK));
             mapping.put(de.uka.ilkd.key.macros.HeapSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_H,MULTI_KEY_MASK));
             mapping.put(de.uka.ilkd.key.macros.UpdateSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_L,MULTI_KEY_MASK));
+            mapping.put(de.uka.ilkd.key.macros.IntegerSimplificationMacro.class, KeyStroke.getKeyStroke(KeyEvent.VK_I,MULTI_KEY_MASK));
 
             mapping.put(de.uka.ilkd.key.gui.actions.KeYProjectHomepageAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_F1,0));
             mapping.put(de.uka.ilkd.key.gui.actions.QuickSaveAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_F5,0));
@@ -97,9 +101,15 @@ public final class KeyStrokeManager {
         // default mappings
         mapping.put(de.uka.ilkd.key.gui.actions.OpenExampleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_E,MULTI_KEY_MASK));
         mapping.put(de.uka.ilkd.key.gui.actions.EditMostRecentFileAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_E,SHORTCUT_KEY_MASK));
-        mapping.put(de.uka.ilkd.key.gui.actions.OneStepSimplificationToggleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_T,MULTI_KEY_MASK));
         mapping.put(de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_P,MULTI_KEY_MASK));
         mapping.put(de.uka.ilkd.key.gui.actions.UnicodeToggleAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_U,MULTI_KEY_MASK));
+        mapping.put(IncreaseFontSizeAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, SHORTCUT_KEY_MASK));
+        mapping.put(DecreaseFontSizeAction.class, KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, SHORTCUT_KEY_MASK));
+
+        mapping.put(de.uka.ilkd.key.gui.actions.PruneProofAction.class,
+                KeyStroke.getKeyStroke(KeyEvent.VK_DELETE, 0));
+        mapping.put(de.uka.ilkd.key.gui.actions.GoalBackAction.class,
+                KeyStroke.getKeyStroke(KeyEvent.VK_Z, SHORTCUT_KEY_MASK));
     }
     
     public static KeyStroke get (ProofMacro macro) {

@@ -19,7 +19,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.event.ProofSaverEvent;
 import de.uka.ilkd.key.proof.io.event.ProofSaverListener;
@@ -32,7 +31,6 @@ import de.uka.ilkd.key.util.KeYConstants;
 public class ProofSaver extends OutputStreamProofSaver {
 
    private final File file;
-   LogicPrinter printer;
 
    /**
     * <p>
@@ -58,10 +56,26 @@ public class ProofSaver extends OutputStreamProofSaver {
       this.file = file;
    }
 
+    /**
+     * Save the proof to file referenced by {@code file}.
+     *
+     * The format in which the proof is stored depends on the class. Thr base
+     * class creates a plain output file. Subclasses may choose to use other
+     * formats.
+     *
+     * @param file
+     *            the file to write to
+     * @throws IOException
+     *             if I/O fails
+     */
+    protected void save(File file) throws IOException {
+        save(new FileOutputStream(file));
+    }
+
    public String save() throws IOException {
       String errorMsg = null;
       try {
-         save(new FileOutputStream(file));
+            save(file);
       }
       catch (IOException ioe) {
          errorMsg = "Could not save \n" + filename() + ".\n";

@@ -17,14 +17,14 @@
 [SMTSettings]instantiateHierarchyAssumptions=true
 [StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
 [StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
-[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT_INTERNAL
 [StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
 [StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
 [StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF
 [Strategy]Timeout=-1
 [Strategy]MaximumNumberOfAutomaticApplications=10000
 [SMTSettings]integersMaximum=2147483645
-[Choice]DefaultChoices=wdChecks-wdChecks\\:off , JavaCard-JavaCard\\:off , bigint-bigint\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , moreSeqRules-moreSeqRules\\:off , joinGenerateIsWeakeningGoal-joinGenerateIsWeakeningGoal\\:off , sequences-sequences\\:on , integerSimplificationRules-integerSimplificationRules\\:full , runtimeExceptions-runtimeExceptions\\:allow , Strings-Strings\\:on , reach-reach\\:on , assertions-assertions\\:on , wdOperator-wdOperator\\:L , modelFields-modelFields\\:showSatisfiability , initialisation-initialisation\\:disableStaticInitialisation , permissions-permissions\\:off
+[Choice]DefaultChoices=wdChecks-wdChecks\\:off , JavaCard-JavaCard\\:off , bigint-bigint\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , programRules-programRules\\:Java , moreSeqRules-moreSeqRules\\:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off , sequences-sequences\\:on , integerSimplificationRules-integerSimplificationRules\\:full , runtimeExceptions-runtimeExceptions\\:allow , Strings-Strings\\:on , reach-reach\\:on , assertions-assertions\\:on , wdOperator-wdOperator\\:L , modelFields-modelFields\\:showSatisfiability , initialisation-initialisation\\:disableStaticInitialisation , permissions-permissions\\:off
 [SMTSettings]useConstantsForBigOrSmallIntegers=true
 [StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
 [StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
@@ -76,7 +76,7 @@ class=de.uka.ilkd.key.proof.init.FunctionalOperationContractPO
 (builtin "One Step Simplification" (formula "4"))
 (rule "methodBodyExpand" (formula "4") (term "1") (newnames "heapBefore_magic,savedHeapBefore_magic"))
 (builtin "One Step Simplification" (formula "4"))
-(builtin "Block Contract" (formula "4") (newnames "anon_heap,result_0,exc_0,heap_Before_BLOCK,savedHeap_Before_BLOCK,o,f"))
+(builtin "Block Contract (Internal)" (formula "4") (newnames "anon_heap,result_0,exc_0,heap_Before_BLOCK,savedHeap_Before_BLOCK,o,f"))
 (branch "Validity"
    (builtin "One Step Simplification" (formula "5"))
    (builtin "One Step Simplification" (formula "4") (ifInst ""  (formula "1")))

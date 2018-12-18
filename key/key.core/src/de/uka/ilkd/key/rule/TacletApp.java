@@ -40,6 +40,7 @@ import de.uka.ilkd.key.logic.ClashFreeSubst.VariableCollectVisitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PIOPathIterator;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.RenameTable;
@@ -54,6 +55,7 @@ import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
@@ -91,8 +93,11 @@ public abstract class TacletApp implements RuleApp {
      * contains the instantiations of the schema variables of the Taclet
      */
     protected final SVInstantiations instantiations;
-    /** caches a created match condition (instantiations, RenameTable.EMPTY) */
-    private MatchConditions matchConditions;
+    
+    /** 
+     * caches a created match condition (instantiations, RenameTable.EMPTY) 
+     */
+    private final MatchConditions matchConditions;
 
     /**
      * chosen instantiations for the if sequent formulas
@@ -104,13 +109,7 @@ public abstract class TacletApp implements RuleApp {
      * instantiated but are not instantiated yet. This means SchemaVariables in
      * addrule-sections have to be ignored
      */
-    private ImmutableSet<SchemaVariable> missingVars = null;
-
-    /**
-     * the instantiations of the following SVs must not be changed; they must
-     * not be instantiated with meta variables either
-     */
-    protected ImmutableSet<SchemaVariable> fixedVars = DefaultImmutableSet.<SchemaVariable>nil();
+    private volatile ImmutableSet<SchemaVariable> missingVars = null;
 
     /**
      * the update context given by the current instantiations must not be
@@ -132,6 +131,7 @@ public abstract class TacletApp implements RuleApp {
 	this.taclet = taclet;
 	this.instantiations = instantiations;
 	this.ifInstantiations = ifInstantiations;
+	this.matchConditions = new MatchConditions(instantiations, RenameTable.EMPTY_TABLE);
     }
 
     /**
@@ -240,9 +240,6 @@ public abstract class TacletApp implements RuleApp {
     }
 
     public MatchConditions matchConditions() {
-        if (matchConditions == null) {
-            matchConditions = new MatchConditions(instantiations, RenameTable.EMPTY_TABLE);
-        }
         return matchConditions;
     }
 
@@ -401,7 +398,7 @@ public abstract class TacletApp implements RuleApp {
 	if (t.op() instanceof SchemaVariable) {
 	    if (!(t.op() instanceof VariableSV)) {
 		SchemaVariable sv = (SchemaVariable) t.op();
-		ClashFreeSubst cfSubst = new ClashFreeSubst(x, y, services);
+		ClashFreeSubst cfSubst = new ClashFreeSubst(x, y, services.getTermBuilder());
 		result = result.replace(sv, 
 					cfSubst.apply((Term) insts.getInstantiation(sv)),
 					services);
@@ -435,19 +432,15 @@ public abstract class TacletApp implements RuleApp {
      */
     @Override
     public ImmutableList<Goal> execute(Goal goal, Services services) {
-
-        
-        
 	if (!complete()) {
 	    throw new IllegalStateException("Tried to apply rule \n" + taclet
-		    + "\nthat is not complete.");
+		    + "\nthat is not complete." + this);
 	}
-	
 
 	if (!isExecutable(services)) {
-        throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " + this);
+	    throw new RuntimeException("taclet application with unsatisfied 'checkPrefix': " + this);
 	}
-    registerSkolemConstants(services);
+	registerSkolemConstants(goal.getLocalNamespaces());
 	goal.addAppliedRuleApp(this);
 	return taclet().apply(goal, services, this);
     }
@@ -501,20 +494,22 @@ public abstract class TacletApp implements RuleApp {
      * @return ImmutableSet<SchemaVariable> that need to be instantiated but are not
      */
     protected ImmutableSet<SchemaVariable> calculateNonInstantiatedSV() {
-	if (missingVars == null) {
-	    missingVars = DefaultImmutableSet.<SchemaVariable>nil();
-	    TacletSchemaVariableCollector coll = new TacletSchemaVariableCollector(
-		    instantiations());
-	    coll.visitWithoutAddrule(taclet());
-	    Iterator<SchemaVariable> it = coll.varIterator();
-	    while (it.hasNext()) {
-		SchemaVariable var = it.next();
-		if (!instantiations().isInstantiated(var)) {
-		    missingVars = missingVars.add(var);
-		}
-	    }
-	}
-	return missingVars;
+        if (missingVars == null) {
+            ImmutableSet<SchemaVariable> localMissingVars = DefaultImmutableSet.<SchemaVariable>nil();
+            TacletSchemaVariableCollector coll = new TacletSchemaVariableCollector(
+                    instantiations());
+            coll.visitWithoutAddrule(taclet());
+            Iterator<SchemaVariable> it = coll.varIterator();
+            while (it.hasNext()) {
+                SchemaVariable var = it.next();
+                if (!instantiations().isInstantiated(var)) {
+                    localMissingVars = localMissingVars.add(var);
+                }
+            }
+            missingVars = localMissingVars;
+        }
+
+	return missingVars;	
     }
 
 
@@ -540,19 +535,19 @@ public abstract class TacletApp implements RuleApp {
                 + " is no variable.");
         }
         
-        MatchConditions newMC = taclet.getMatcher().matchSV(sv, term, matchConditions(), services);
+        final MatchConditions newMC = taclet.getMatcher().matchSV(sv, term, matchConditions(), services);
 
         if (newMC == null) {
             throw new IllegalInstantiationException("Instantiation " + term
                     + " of " + sv + "does not satisfy the variable conditions");
         }
 
+        SVInstantiations svInst = newMC.getInstantiations();        
         if (interesting) {
-            newMC = newMC.setInstantiations(newMC.getInstantiations()
-                    .makeInteresting(sv, services));
+            svInst = svInst.makeInteresting(sv, services);
         }
 
-        return addInstantiation(newMC.getInstantiations(), services);
+        return addInstantiation(svInst, services);
 
     }
 
@@ -783,20 +778,19 @@ public abstract class TacletApp implements RuleApp {
     }
     
     
-    public void registerSkolemConstants(TermServices services) {
+    public void registerSkolemConstants(NamespaceSet nss) {
 	final SVInstantiations insts = instantiations();
 	final Iterator<SchemaVariable> svIt = insts.svIterator();
 	while(svIt.hasNext()) {
 	    final SchemaVariable sv = svIt.next();
 	    if(sv instanceof SkolemTermSV) {
 		final Term inst = (Term) insts.getInstantiation(sv);
-		final Namespace functions =
-                        services.getNamespaces().functions();
+                final Namespace<Function> functions = nss.functions();
 
                 // skolem constant might already be registered in
                 // case it is used in the \addrules() section of a rule
                 if (functions.lookup(inst.op().name()) == null) {
-                    functions.addSafely(inst.op());
+                    functions.addSafely((Function) inst.op());
                 }
 	    }
 	}
@@ -878,20 +872,17 @@ public abstract class TacletApp implements RuleApp {
 	    				     Services services, 
 	    				     boolean interesting) {
 
-        MatchConditions cond = matchConditions();
-
-        cond = taclet().getMatcher().matchSV(sv, pe, cond, services);
+        final MatchConditions cond = taclet().getMatcher().matchSV(sv, pe, matchConditions, services);
 
         if (cond == null) {
             throw new IllegalInstantiationException("SchemaVariable " + sv + " could not be matched with program element " + 
-                    matchConditions() + " under the provided constraints " + matchConditions());
+                    pe + " under the provided constraints " + matchConditions);
         } else {
+            SVInstantiations svInst = cond.getInstantiations();
             if (interesting) {
-                cond = cond.setInstantiations(cond.getInstantiations()
-                        .makeInteresting(sv, services));
+                svInst = svInst.makeInteresting(sv, services);
             }
-
-            return addInstantiation(cond.getInstantiations(), services);
+            return addInstantiation(svInst, services);
         }
     }
 
@@ -958,7 +949,7 @@ public abstract class TacletApp implements RuleApp {
 		&& ifInstantiations == null : "If instantiations list has wrong size or is null "
 		+ "or the if formulas have already been instantiated";
 
-	MatchConditions mc = taclet().getMatcher().matchIf(p_list, matchConditions(), p_services);
+	MatchConditions mc = taclet().getMatcher().matchIf(p_list, matchConditions, p_services);
 
 	return mc == null ? null : setAllInstantiations(mc, p_list, p_services);
     }
@@ -983,8 +974,8 @@ public abstract class TacletApp implements RuleApp {
 		createSemisequentList(taclet().ifSequent() // Matching starting
 			.succedent()), // with the last formula
 		createSemisequentList(taclet().ifSequent().antecedent()),
-		IfFormulaInstSeq.createList(p_seq, false), IfFormulaInstSeq
-			.createList(p_seq, true),
+		IfFormulaInstSeq.createList(p_seq, false, p_services), IfFormulaInstSeq
+			.createList(p_seq, true, p_services),
 		ImmutableSLList.<IfFormulaInstantiation>nil(), matchConditions(),
 		p_services);
 
@@ -1089,7 +1080,7 @@ public abstract class TacletApp implements RuleApp {
      *         is needed
      */
     public boolean ifInstsComplete() {
-	return ifInstantiations != null || (taclet().ifSequent().isEmpty());
+	return ifInstantiations != null || taclet().ifSequent().isEmpty();
     }
 
     /**
@@ -1163,8 +1154,8 @@ public abstract class TacletApp implements RuleApp {
      *            the old variable namespace
      * @return the new created variable namespace
      */
-    public Namespace extendVarNamespaceForSV(Namespace var_ns, SchemaVariable sv) {
-	Namespace ns = new Namespace(var_ns);
+    public Namespace<QuantifiableVariable> extendVarNamespaceForSV(Namespace<QuantifiableVariable> var_ns, SchemaVariable sv) {
+	Namespace<QuantifiableVariable> ns = new Namespace<QuantifiableVariable>(var_ns);
 	Iterator<SchemaVariable> it = taclet().getPrefix(sv).prefix()
 		.iterator();
 	while (it.hasNext()) {
@@ -1187,17 +1178,21 @@ public abstract class TacletApp implements RuleApp {
      * 
      * @author mulbrich
      * @param func_ns
-     *            the original function namespace
+     *            the original function namespace, not <code>null</code>
      * @return the new function namespace that bases on the original one
      */
-    public Namespace extendedFunctionNameSpace(Namespace func_ns) {
-	Namespace ns = new Namespace(func_ns);
+    public Namespace<Function> extendedFunctionNameSpace(Namespace<Function> func_ns) {
+	Namespace<Function> ns = new Namespace<Function>(func_ns);
 	Iterator<SchemaVariable> it = instantiations.svIterator();
 	while (it.hasNext()) {
 	    SchemaVariable sv = it.next();
 	    if (sv instanceof SkolemTermSV) {
 		Term inst = (Term) instantiations.getInstantiation(sv);
-		ns.addSafely(inst.op());
+		Operator op = inst.op();
+		assert op instanceof Function :
+		    "At this point the skolem instantiation is expected to "
+		    + "be a function symbol, not " + inst;
+        ns.addSafely((Function) op);
 	    }
 	}
 	return ns;
