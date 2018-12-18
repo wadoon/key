@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,16 +22,10 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.java.visitor.LabelCollector;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.SkolemUpdateSV;
-import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.TacletApp;
 
@@ -42,7 +37,8 @@ public class VariableNameProposer implements InstantiationProposer {
     /**
      * An instance of VariableNameProposer.
      */
-    public static final VariableNameProposer DEFAULT = new VariableNameProposer();
+    public static final VariableNameProposer DEFAULT =
+            new VariableNameProposer();
 
     private static final String SKOLEMTERM_VARIABLE_NAME_POSTFIX = "_";
     private static final String LABEL_NAME_PREFIX = "_label";
@@ -61,14 +57,17 @@ public class VariableNameProposer implements InstantiationProposer {
             ImmutableList<String> previousProposals) {
         if (var instanceof SkolemTermSV || var instanceof SkolemUpdateSV) {
             return getNameProposalForSkolemTermVariable(app, var, services,
-                undoAnchor, previousProposals);
-        } else if (var instanceof VariableSV) {
+                    undoAnchor, previousProposals);
+        }
+        else if (var instanceof VariableSV) {
             return getNameProposalForVariableSV(app, var, services,
-                previousProposals);
-        } else if (var.sort() == ProgramSVSort.LABEL) {
+                    previousProposals);
+        }
+        else if (var.sort() == ProgramSVSort.LABEL) {
             return getNameProposalForLabel(app, var, services, undoAnchor,
-                previousProposals);
-        } else {
+                    previousProposals);
+        }
+        else {
             return null;
         }
     }
@@ -86,7 +85,8 @@ public class VariableNameProposer implements InstantiationProposer {
 
             do {
                 name = new Name(baseName + "_" + i++);
-            } while (namespaces.lookup(name) != null);
+            }
+            while (namespaces.lookup(name) != null);
 
         }
 
@@ -101,8 +101,9 @@ public class VariableNameProposer implements InstantiationProposer {
             SchemaVariable p_var, Services services, Node undoAnchor,
             ImmutableList<String> previousProposals) {
         return getNameProposalForSkolemTermVariable(
-            createBaseNameProposalBasedOnCorrespondence(p_app, p_var, services),
-            services, undoAnchor, previousProposals);
+                createBaseNameProposalBasedOnCorrespondence(p_app, p_var,
+                        services),
+                services, undoAnchor, previousProposals);
     }
 
     /**
@@ -112,18 +113,32 @@ public class VariableNameProposer implements InstantiationProposer {
     protected static String createBaseNameProposalBasedOnCorrespondence(
             TacletApp p_app, SchemaVariable p_var, Services services) {
         final String result;
-        final SchemaVariable v = p_app.taclet().getNameCorrespondent(p_var,
-            services);
+        final SchemaVariable v =
+                p_app.taclet().getNameCorrespondent(p_var, services);
         if (v != null && p_app.instantiations().isInstantiated(v)) {
 
             final Object inst = p_app.instantiations().getInstantiation(v);
 
             if (inst instanceof Term) {
                 result = ((Term) inst).op().name().toString();
-            } else {
+            }
+            else {
                 result = "" + inst;
             }
-        } else {
+        }
+        else if (p_var instanceof SkolemSV
+                && ((SkolemSV) p_var).getFreshForSV() != null
+                && ((SkolemSV) p_var).getFreshForSV()
+                        .sort() == ProgramSVSort.ABSTRACTPROGRAM) {
+            result = "" + p_var.name()
+                    + Optional
+                            .ofNullable(p_app.instantiations().getInstantiation(
+                                    ((SkolemSV) p_var).getFreshForSV()))
+                            .map(AbstractPlaceholderStatement.class::cast)
+                            .map(AbstractPlaceholderStatement::getId)
+                            .map(id -> "_" + id).orElse("");
+        }
+        else {
             // ... otherwise use the name of the SkolemTermSV
             result = "" + p_var.name();
         }
@@ -150,8 +165,8 @@ public class VariableNameProposer implements InstantiationProposer {
             name = basename + cnt;
             l_name = new Name(name);
             cnt++;
-        } while (nss.lookup(l_name) != null
-                && !previousProposals.contains(name));
+        }
+        while (nss.lookup(l_name) != null && !previousProposals.contains(name));
 
         return name;
     }
@@ -166,11 +181,13 @@ public class VariableNameProposer implements InstantiationProposer {
                 name = basename
                         + services.getCounter(GENERALNAMECOUNTER_PREFIX + name)
                                 .getCountPlusPlus();
-            } else {
+            }
+            else {
                 name = basename.length() > 0 ? basename : "gen";
             }
             l_name = new Name(name);
-        } while (nss.lookup(l_name) != null);
+        }
+        while (nss.lookup(l_name) != null);
 
         return name;
     }
@@ -199,8 +216,8 @@ public class VariableNameProposer implements InstantiationProposer {
             }
         }
 
-        throw new Error(
-            "name proposer for " + baseName + " has run into infinite loop");
+        throw new Error("name proposer for " + baseName
+                + " has run into infinite loop");
 
     }
 
@@ -227,7 +244,8 @@ public class VariableNameProposer implements InstantiationProposer {
         do {
             proposal = LABEL_NAME_PREFIX
                     + services.getCounter(LABELCOUNTER_NAME).getCountPlusPlus();
-        } while (lc.contains(new ProgramElementName(proposal))
+        }
+        while (lc.contains(new ProgramElementName(proposal))
                 || previousProposals.contains(proposal));
 
         return proposal;
