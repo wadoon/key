@@ -42,12 +42,10 @@ public class AbstractExecutionTests extends TestCase {
                 "correct-refactoring-ite-pullout-prefix-with-notassgn-spec/pulloutITEPrefixRef.key");
         startAutomaticStrategy(proof);
 
-        assertFalse(proof.closed());
+        assertTrue(proof.closed());
 
         /*
-         * TODO (DS, 2018-12-14): This should eventually be closed after the JML
-         * support for assignable_not to abstract placeholder symbols has been
-         * added. Change this then, and maybe add some more checks.
+         * TODO (DS, 2018-12-18): Add some more checks.
          */
     }
 
