@@ -111,6 +111,8 @@ options {
         this.javaInfo       = services.getJavaInfo();
         containerType       =   specInClass;
         this.intLDT         = services.getTypeConverter().getIntegerLDT();
+        this.floatLDT       = services.getTypeConverter().getFloatLDT();
+        this.doubleLDT      = services.getTypeConverter().getDoubleLDT();
         this.heapLDT        = services.getTypeConverter().getHeapLDT();
         this.locSetLDT      = services.getTypeConverter().getLocSetLDT();
         this.booleanLDT     = services.getTypeConverter().getBooleanLDT();

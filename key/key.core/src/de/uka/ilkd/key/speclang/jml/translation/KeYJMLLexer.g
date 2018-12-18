@@ -77,6 +77,10 @@ lexer grammar KeYJMLLexer;
     EXCEPTION            : '\\exception';
     EXISTS               : '\\exists';
     FORALL               : '\\forall';
+    FP_INFINITE          : '\\fp_infinite';
+    FP_NAN               : '\\fp_nan';
+    FP_NORMAL            : '\\fp_normal';
+    FP_SUBNORMAL         : '\\fp_subnormal';
     FREE                 : '\\free';  //KeY extension, not official JML
     FRESH                : '\\fresh';
     INDEX                : '\\index';
