@@ -547,6 +547,33 @@ public class TestJMLTranslator extends TestCase {
                                       testClassType))));
     }
 
+    public void testNumericPromotion() throws SLTranslationException {
+        Term result = null;
+        ProgramVariable selfVar = buildSelfVarAsProgVar();
+
+        result = JMLTranslator.translate(new PositionedString("0 == 0.0f"),
+                testClassType, selfVar, null, null, null, null, Term.class, services);
+        assertEquals(result.sub(1), result.sub(0));
+
+        result = JMLTranslator.translate(new PositionedString("0.0f == 0"),
+                testClassType, selfVar, null, null, null, null, Term.class, services);
+
+        assertEquals(result.sub(0), result.sub(1));
+    }
+
+    public void testUnaryFloatMinus() throws SLTranslationException {
+        Term result = null;
+        ProgramVariable selfVar = buildSelfVarAsProgVar();
+
+        result = JMLTranslator.translate(new PositionedString("-1.0f"),
+                testClassType, selfVar, null, null, null, null, Term.class, services);
+        assertEquals("FP(6(1(2(3(5(3(5(6(0(1(#)))))))))),0(#))", result.sub(0).toString());
+
+        result = JMLTranslator.translate(new PositionedString("-1.0"),
+                testClassType, selfVar, null, null, null, null, Term.class, services);
+        assertEquals("todo", result.sub(0).toString());
+
+    }
 
     public void testHexLiteral() {
         Term result = null;
@@ -561,8 +588,8 @@ public class TestJMLTranslator extends TestCase {
             assertTrue(false);
         }
 
-        assertTrue(result != null);
-        assertTrue(result.op().equals(Equality.EQUALS));
+        assertNotNull(result);
+        assertEquals(Equality.EQUALS, result.op());
         assertTrue(termContains(result, TB.zTerm("18")));
     }
 
