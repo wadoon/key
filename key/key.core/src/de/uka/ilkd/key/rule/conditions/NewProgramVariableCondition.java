@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -92,4 +93,14 @@ public class NewProgramVariableCondition implements VariableCondition {
         return matchCond.setInstantiations(svInst.add(newSV, result, services));
     }
 
+    @Override
+    public String toString() {
+        return String.format("\\varcond(\\newPV(%s, \"%s\", %s%s))", newSV,
+                namePattern,
+                maybePeerSV.map(psv -> "\\typeof(" + psv + ")")
+                        .orElse(type.map(KeYJavaType::getSort)
+                                .map(Sort::toString).orElse("ERROR")),
+                maybeFreshForSV.map(sv -> " \\freshFor(" + sv + ")")
+                        .orElse(""));
+    }
 }

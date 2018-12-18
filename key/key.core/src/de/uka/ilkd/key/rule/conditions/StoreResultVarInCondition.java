@@ -45,7 +45,7 @@ public class StoreResultVarInCondition implements VariableCondition {
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
         final MethodFrame mf = JavaTools.getInnermostMethodFrame(
-            svInst.getContextInstantiation().contextProgram(), services);
+                svInst.getContextInstantiation().contextProgram(), services);
 
         IProgramVariable resultVar = null;
         if (mf != null) {
@@ -54,10 +54,15 @@ public class StoreResultVarInCondition implements VariableCondition {
 
         if (resultVar != null) {
             return matchCond.setInstantiations(
-                svInst.add(resultVarSV, resultVar, services));
+                    svInst.add(resultVarSV, resultVar, services));
         }
 
         return matchCond;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("\\varcond (\\storeResultVarIn(%s))", resultVarSV);
     }
 
 }

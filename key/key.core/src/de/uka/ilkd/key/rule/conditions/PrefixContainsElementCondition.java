@@ -47,10 +47,16 @@ public class PrefixContainsElementCondition implements VariableCondition {
             if (prefix.getClass().getSimpleName().equals(className)) {
                 return negated ? null : matchCond;
             }
-        } while (prefix.hasNextPrefixElement()
+        }
+        while (prefix.hasNextPrefixElement()
                 && (prefix = prefix.getNextPrefixElement()) != null);
 
         return negated ? matchCond : null;
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s\\varcond (\\prefixContainsElement(\"%s\"))",
+                negated ? "\\not " : "", className);
+    }
 }

@@ -56,14 +56,19 @@ public class StoreContextLabelsInCondition implements VariableCondition {
             if (prefix instanceof LabeledStatement) {
                 labels.add(((LabeledStatement) prefix).getLabel());
             }
-        } while (prefix.hasNextPrefixElement()
+        }
+        while (prefix.hasNextPrefixElement()
                 && (prefix = prefix.getNextPrefixElement()) != null);
 
-        ProgramList pl = new ProgramList(
-            new ImmutableArray<ProgramElement>(labels));
+        ProgramList pl =
+                new ProgramList(new ImmutableArray<ProgramElement>(labels));
 
-        return matchCond
-                .setInstantiations(svInst.add(labelsSV, pl, services));
+        return matchCond.setInstantiations(svInst.add(labelsSV, pl, services));
     }
 
+    @Override
+    public String toString() {
+        return String.format("\\varcond (\\storeContextLabelsIn(%s))",
+                labelsSV);
+    }
 }

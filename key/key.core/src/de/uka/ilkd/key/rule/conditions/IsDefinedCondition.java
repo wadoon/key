@@ -48,4 +48,9 @@ public class IsDefinedCondition implements VariableCondition {
         }
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s\\varcond (\\isDefined(%s))",
+                negated ? "\\not " : "", svToCheck);
+    }
 }

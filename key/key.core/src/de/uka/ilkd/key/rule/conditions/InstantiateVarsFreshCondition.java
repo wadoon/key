@@ -21,11 +21,7 @@ import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.ProgramList;
@@ -83,16 +79,14 @@ public class InstantiateVarsFreshCondition implements VariableCondition {
         }
 
         if (freshForSV.isPresent() && svInst.isInstantiated(freshForSV.get())
-                && services
-                        .getFreshForInstantiation(
-                            svInst.getInstantiation(freshForSV.get()), varsList)
+                && services.getFreshForInstantiation(
+                        svInst.getInstantiation(freshForSV.get()), varsList)
                         .isPresent()) {
             return matchCond.setInstantiations(svInst.add(varsList,
-                (ProgramList) services
-                        .getFreshForInstantiation(
+                    (ProgramList) services.getFreshForInstantiation(
                             svInst.getInstantiation(freshForSV.get()), varsList)
-                        .get(),
-                services));
+                            .get(),
+                    services));
         }
 
         @SuppressWarnings("rawtypes")
@@ -102,22 +96,32 @@ public class InstantiateVarsFreshCondition implements VariableCondition {
                                 .getInstantiation(varsListForLength)).size()];
 
         for (int i = 0; i < freshVars.length; i++) {
-            final String newName = services.getTermBuilder()
-                    .newName(namePattern);
+            final String newName =
+                    services.getTermBuilder().newName(namePattern);
             freshVars[i] = //
                     new LocationVariable(new ProgramElementName(newName), type);
             services.getNamespaces().programVariables().add(freshVars[i]);
         }
 
-        ProgramList pl = new ProgramList(
-            new ImmutableArray<ProgramElement>(freshVars));
+        ProgramList pl =
+                new ProgramList(new ImmutableArray<ProgramElement>(freshVars));
 
         if (freshForSV.isPresent()) {
             services.addFreshForInstantiation(
-                svInst.getInstantiation(freshForSV.get()), varsList, pl);
+                    svInst.getInstantiation(freshForSV.get()), varsList, pl);
         }
 
         return matchCond.setInstantiations(svInst.add(varsList, pl, services));
     }
 
+    @Override
+    public String toString() {
+        return String.format(
+                "\\varcond (\\instantiateVarsFresh(%s, %s, \"%s\", %s%s)",
+                varsList,
+                Optional.ofNullable(varsListForLength).map(ProgramSV::toString)
+                        .orElse("" + size),
+                namePattern, type.getSort(),
+                freshForSV.map(sv -> " \\freshFor(" + sv + ")").orElse(""));
+    }
 }
