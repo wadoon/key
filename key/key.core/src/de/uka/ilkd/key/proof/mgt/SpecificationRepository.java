@@ -1657,7 +1657,15 @@ public final class SpecificationRepository {
                         block.getStartPosition().getLine());
 
         ImmutableSet<BlockContract> set = blockContracts.get(b);
-        blockContracts.put(b, set.remove(contract));
+        final ImmutableSet<BlockContract> newContractSet = set.remove(contract);
+        blockContracts.put(b, newContractSet);
+
+        if (block.getBody().size() == 1 && block.getBody()
+                .get(0) instanceof AbstractPlaceholderStatement) {
+            abstractPlaceholderStatementContracts.put(
+                    (AbstractPlaceholderStatement) block.getBody().get(0),
+                    newContractSet);
+        }
     }
 
     /**
