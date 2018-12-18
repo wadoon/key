@@ -13,16 +13,21 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Optional;
 import java.util.Set;
 
+import org.key_project.util.collection.ImmutableSet;
+
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.label.AbstractExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.speclang.BlockContract;
 
 public final class DropEffectlessElementariesCondition
         implements VariableCondition {
@@ -39,7 +44,7 @@ public final class DropEffectlessElementariesCondition
 
     private static Term dropEffectlessElementariesHelper(Term update,
             Term target, Set<LocationVariable> relevantVars,
-            TermServices services) {
+            Services services) {
         if (update.op() instanceof ElementaryUpdate) {
             ElementaryUpdate eu = (ElementaryUpdate) update.op();
             LocationVariable lhs = (LocationVariable) eu.lhs();
@@ -54,7 +59,8 @@ public final class DropEffectlessElementariesCondition
                 //@formatter:on
                 return null;
             }
-            else if (target.op() instanceof Function && !target.op().isRigid()) {
+            else if (target.op() instanceof Function
+                    && !target.op().isRigid()) {
                 /*
                  * (DS) Special case introduced for non-rigid abstract path
                  * conditions arising from abstract execution.
@@ -99,13 +105,65 @@ public final class DropEffectlessElementariesCondition
                  * We drop abstract updates in front of rigid symbols, like
                  * "true" or some predicate, but not in front of anything
                  * containing program variables, or the special nonrigid
-                 * predicates for abstract path conditions.
+                 * predicates for abstract path conditions -- if there is no
+                 * explicit assignable_not specification (see below).
                  */
                 return services.getTermBuilder().skip();
             }
-            else {
-                return null;
+
+            final AbstractPlaceholderStatement abstrProg = Optional
+                    .ofNullable(
+                            update.getLabel(AbstractExecutionTermLabel.NAME))
+                    .map(AbstractExecutionTermLabel.class::cast)
+                    .map(AbstractExecutionTermLabel::getAbstrPlaceholderStmt)
+                    .orElse(null);
+
+            if (abstrProg != null) {
+                final ImmutableSet<BlockContract> contracts = services
+                        .getSpecificationRepository()
+                        .getAbstractPlaceholderStatementContracts(abstrProg);
+
+                for (final BlockContract contract : contracts) {
+                    /*
+                     * Try to find a contract which permits dropping the update
+                     * since all the relevant variables are not assignable.
+                     */
+                    final Term assignableNot = contract.getAssignableNot(
+                            services.getTypeConverter().getHeapLDT().getHeap());
+
+                    /*
+                     * This assignableNot term is a nested union of LocSet
+                     * terms. We extract all program variables from it.
+                     */
+                    final TermProgramVariableCollector coll =
+                            new TermProgramVariableCollector(services);
+                    assignableNot.execPostOrder(coll);
+                    Set<LocationVariable> notAssgnVars = coll.result();
+
+                    /*
+                     * If all the relevant variables are explicitly declared to
+                     * be not assignable, we can drop this updates.
+                     */
+                    if (relevantVars.stream().map(LocationVariable::toString)
+                            .allMatch(relvar -> notAssgnVars.stream()
+                                    .map(LocationVariable::toString)
+                                    .anyMatch(notAssngVar -> relvar
+                                            .equals(notAssngVar)))) {
+                        /*
+                         * TODO (DS, 2018-12-18): The above String comparison is
+                         * a hack. It should actually be
+                         * "notAssgnVars.containsAll(relevantVars)", but the
+                         * variables in the block contract are different objects
+                         * from those in the proof. Maybe we have to extend some
+                         * visitor / update method or the like.
+                         */
+                        return services.getTermBuilder().skip();
+                    }
+                }
             }
+
+            /* We cannot do anything here -- keep the abstract update. */
+            return null;
         }
         else {
             return null;

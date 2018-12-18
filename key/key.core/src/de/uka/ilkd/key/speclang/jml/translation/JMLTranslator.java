@@ -1663,7 +1663,7 @@ public final class JMLTranslator {
                                  * assignable, we still want to ignore
                                  * them...
                                  */
-                                singletons = singletons.append(t);
+                                singletons = singletons.append(tb.singletonPV(t));
                             } else {
                                 throw excManager.createException("Can't create a locset from "+ t + ".");
                             }

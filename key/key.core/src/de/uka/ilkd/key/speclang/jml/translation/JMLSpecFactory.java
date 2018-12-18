@@ -717,7 +717,7 @@ public class JMLSpecFactory {
          * from translateAssignable, and semantics might have to be changed.
          */
         if (originalClauses.isEmpty()) {
-            return tb.allLocs();
+            return tb.empty();
         } else {
             return translateUnionClauses(pm, selfVar, paramVars, atPres, atBefores,
                     originalClauses);
