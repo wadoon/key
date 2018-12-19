@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -46,7 +47,16 @@ public class AbstractUpdateCondition implements VariableCondition {
      *         i.e., an abstract update.
      */
     public static boolean isAbstractUpdate(Term target) {
-        return target.sort() == Sort.UPDATE && target.op() instanceof Function;
+        if (target.sort() != Sort.UPDATE) {
+            return false;
+        }
+
+        final OpCollector opCollector = new OpCollector();
+        target.execPostOrder(opCollector);
+        final boolean containsNonRigidFuncSymbs = opCollector.ops().stream()
+                .anyMatch(op -> op instanceof Function && !op.isRigid());
+
+        return containsNonRigidFuncSymbs;
     }
 
     @Override

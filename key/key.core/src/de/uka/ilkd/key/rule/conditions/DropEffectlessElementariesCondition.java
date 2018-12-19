@@ -20,6 +20,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.AbstractExecutionTermLabel;
 import de.uka.ilkd.key.logic.op.*;
@@ -118,7 +119,12 @@ public final class DropEffectlessElementariesCondition
                     .map(AbstractExecutionTermLabel::getAbstrPlaceholderStmt)
                     .orElse(null);
 
-            if (!relevantVars.isEmpty() && abstrProg != null) {
+            final OpCollector opCollector = new OpCollector();
+            target.execPostOrder(opCollector);
+            final boolean containsNonRigidFuncSymbs = opCollector.ops().stream()
+                    .anyMatch(op -> op instanceof Function && !op.isRigid());
+
+            if (!containsNonRigidFuncSymbs && abstrProg != null) {
                 final ImmutableSet<BlockContract> contracts = services
                         .getSpecificationRepository()
                         .getAbstractPlaceholderStatementContracts(abstrProg);
