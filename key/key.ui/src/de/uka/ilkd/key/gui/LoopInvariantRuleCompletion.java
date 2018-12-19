@@ -38,6 +38,12 @@ import de.uka.ilkd.key.util.MiscTools;
 public class LoopInvariantRuleCompletion implements
         InteractiveRuleApplicationCompletion {
 
+	private enum Mode {
+		FORCED, ABSTRACT, INTERACTIVE
+	}
+	
+	public LoopInvariantRuleCompletion() {}
+	
     @Override
     public IBuiltInRuleApp complete(IBuiltInRuleApp app, Goal goal, boolean forced) {
         Services services = goal.proof().getServices();
