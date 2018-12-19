@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.ldt;
 
+import de.uka.ilkd.key.logic.op.Operator;
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -180,20 +181,16 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 	
 
 	long doubleBits = Double.doubleToLongBits(Double.parseDouble(s));
-	String bitString = Long.toBinaryString(doubleBits);
-	long number = Long.parseLong(bitString, 2);
-
+        // String bitString = Long.toBinaryString(doubleBits);
+        // long number = Long.parseLong(bitString, 2);
+        long number = doubleBits;
 
 	IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 	Term intTerm, fractionTerm;
 
-	if (negative) {
-	    intTerm = intLDT.translateLiteral(new LongLiteral("-" + number), services).sub(0);
-	} else {
-	    intTerm = intLDT.translateLiteral(new LongLiteral(number), services).sub(0);
-	}
+        intTerm = services.getTermBuilder().zTerm(number).sub(0);
 
-	//Set the second number to 0 for now
+        // Set the second number to 0 for now
 	fractionTerm = intLDT.translateLiteral(new LongLiteral(0), services).sub(0);
 
 	return services.getTermFactory().createTerm(doubleLit, intTerm, fractionTerm);
@@ -216,6 +213,42 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 	return containsFunction(f) && (f.arity()==0);
     }
 
+    private static boolean isNumberLiteral(Operator f) {
+        char c = f.name().toString().charAt(0);
+        return (c-'0'>=0) && (c-'0'<=9);
+    }
+
+    public long longBits(Term t, IntegerLDT integerLDT) {
+
+        boolean neg = false;
+
+        if (t.op() == doubleLit) {
+            t = t.sub(0);
+        }
+
+        if (t.op() == integerLDT.getNegativeNumberSign()) {
+            neg = true;
+            t = t.sub(0);
+        }
+
+        StringBuffer sb = new StringBuffer("");
+        while (isNumberLiteral(t.op())) {
+            sb.append(t.op().name());
+            t = t.sub(0);
+        }
+        // numbers must end with a sharp
+        if (t.op() != integerLDT.getNumberTerminator()) {
+            throw new NumberFormatException("Not supported: " + t);
+        }
+
+        if (neg) {
+            sb.append("-");
+        }
+
+        sb.reverse();
+        return Long.parseLong(sb.toString());
+
+    }
 
 
     @Override

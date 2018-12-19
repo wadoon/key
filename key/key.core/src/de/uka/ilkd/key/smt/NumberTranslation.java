@@ -124,11 +124,7 @@ public final class NumberTranslation {
      */
     public static String translateDoubleToSMTLIB(Term term, Services services) {
 	DoubleLDT doubleLDT = services.getTypeConverter().getDoubleLDT();
-	String asString = ((DoubleLiteral)doubleLDT.translateTerm(
-			  term, new ExtList(), services)).getValue();
-
-	Double f = new Double(asString);
-	long doubleBits = Double.doubleToLongBits(f);
+	long doubleBits = doubleLDT.longBits(term, services.getTypeConverter().getIntegerLDT());
 
 	String doubleString, sign, m, e;
 

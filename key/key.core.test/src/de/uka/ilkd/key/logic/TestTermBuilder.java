@@ -15,6 +15,8 @@ package de.uka.ilkd.key.logic;
 
 import java.io.File;
 
+import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
+import de.uka.ilkd.key.ldt.DoubleLDT;
 import junit.framework.TestCase;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TestJavaInfo;
@@ -103,6 +105,24 @@ public class TestTermBuilder extends TestCase {
         checkDigits(tb.zTerm(number), expected, services.getTypeConverter().getIntegerLDT(), false);
     }
 
+    private void testDoubleLongPatterns(String number) {
+        double doubleVal = Double.parseDouble(number);
+        DoubleLDT doubleLDT = services.getTypeConverter().getDoubleLDT();
+        DoubleLiteral doubleLit = new DoubleLiteral(number);
+        Term doubleTerm = doubleLDT.translateLiteral(doubleLit, services);
+        long actual = doubleLDT.longBits(doubleTerm, services.getTypeConverter().getIntegerLDT());
+        assertEquals(Double.doubleToLongBits(doubleVal), actual);
+    }
     
+    public void testDoubleLongPatterns() {
+        testDoubleLongPatterns("1");
+        testDoubleLongPatterns("0.");
+        testDoubleLongPatterns("-1");
+        testDoubleLongPatterns("-0.");
+        testDoubleLongPatterns("123.33");
+        testDoubleLongPatterns("123e-2");
+        testDoubleLongPatterns("22e307");
+        testDoubleLongPatterns("-22e307");
+    }
     
 }
