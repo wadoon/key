@@ -102,6 +102,7 @@ public class TacletMenu extends JMenu {
 	private static final String APPLY_CONTRACT = "Apply Contract";
 	private static final String CHOOSE_AND_APPLY_CONTRACT = "Choose and Apply Contract";
 	private static final String ENTER_LOOP_SPECIFICATION = "Enter Loop Specification";
+	private static final String ABSTRACT_LOOP = "Abstract Loop";
 	private static final String APPLY_RULE = "Apply Rule";
 	private static final String NO_RULES_APPLICABLE = "No rules applicable.";
 	/**
@@ -322,10 +323,13 @@ public class TacletMenu extends JMenu {
         if (builtInRule == WhileInvariantRule.INSTANCE ||
                 builtInRule == LoopScopeInvariantRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
-            item = new MenuItemForTwoModeRules(
+            //item = new MenuItemForTwoModeRules(
+        	item = new MenuItemForThreeModeRules(
                     builtInRule.displayName(),
                     APPLY_RULE,
                     "Applies a known and complete loop specification immediately.",
+                    ABSTRACT_LOOP,
+                    "Abstracts loop by fresh predicate symbol denoting unspecified invariant.",
                     ENTER_LOOP_SPECIFICATION,
                     "Allows to modify an existing or to enter a new loop specification.",
                     builtInRule);

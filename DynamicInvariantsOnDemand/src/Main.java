@@ -37,7 +37,7 @@ public class Main {
 	private static boolean firstCallInvGen = true;
 	
 	public static void main(String[] args) {
-		keyAPI = new KeYAPI(benchmarksFile1);
+		keyAPI = new KeYAPI(benchmarksFile2);
 		List<Contract> proofContracts = keyAPI.getContracts(); // Kopf von Cohen, public normal_behavior @ requires (0 <= x) && (0 < y); @ ensures \result*y <= x && x <= (\result+1)*y;
 		ProofResult result;
 		for(Contract currentContract : proofContracts) {
@@ -62,7 +62,7 @@ public class Main {
 				} else {
 					Invariant invariant = (Invariant)result;
 					keyAPI.applyInvariantRule(currentGoal, invariant);
-					attemptProve(proof); //!!! Rekursiv. Beim ersten Durchlauf bis hier: Invariant für Loop 1 angewendet. Dadurch beim nächsten attemptProve, openGoal mit "abgerollter"/gelöster 1. Schleife
+					attemptProve(proof); //!!! Rekursiv. Beim ersten Durchlauf bis hier: Invariant fï¿½r Loop 1 angewendet. Dadurch beim nï¿½chsten attemptProve, openGoal mit "abgerollter"/gelï¿½ster 1. Schleife
 				}
 			}
 		}
@@ -77,12 +77,12 @@ public class Main {
 		Term update				= sequent.getUpdate();  // parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(_x)(x),elem-update(_y)(y)),elem-update(exc)(null)),elem-update(q)(Z(0(#)))),elem-update(r)(x))
 		
 		if (firstCall) {
-			// Hier möchte ich jetzt eine Invariante generieren
-			// Dazu 1. Java Code erstellen, der ausführbar ist, um traces zu erhalten
+			// Hier mï¿½chte ich jetzt eine Invariante generieren
+			// Dazu 1. Java Code erstellen, der ausfï¿½hrbar ist, um traces zu erhalten
 			// Java Code als File abspeichern (warum? warum nicht einfach in memory)
 			// FIXME wie Variablen in jedem Schleifendurchlauf am Kopf tracen? gibt es passendes Reflection feature? -> eher unwahrscheinlich.
-			//       Möglich: In Klasse ArrayLists für die Variablen anlegen, und in den generierten Code die Zwischenwerte den ArrayLists hinzufügen
-			//				  Danach sogar ohne Reflection möglich darauf zuzugreifen
+			//       Mï¿½glich: In Klasse ArrayLists fï¿½r die Variablen anlegen, und in den generierten Code die Zwischenwerte den ArrayLists hinzufï¿½gen
+			//				  Danach sogar ohne Reflection mï¿½glich darauf zuzugreifen
 			String javaCode = getExecuteableJavaCodeFromKeYFormat(program, update);
 			
 			//Write Code to file in workspace
@@ -119,7 +119,7 @@ public class Main {
 		
 		
 		// Extrahiere input / parameter Variables von visitor
-		// Und local Variables mit Assignment um deren Anfangs-Zuweisungen zum Programm zu ergänzen (fehlt in StatementBlock)
+		// Und local Variables mit Assignment um deren Anfangs-Zuweisungen zum Programm zu ergï¿½nzen (fehlt in StatementBlock)
 		ArrayList<String> inputVars = new ArrayList<String>();
 		HashMap<String, String> localVarsAndAssignment = new HashMap<String, String>();
 		for (Entry<String, String> e : varNameCollector.variables.entrySet()) {

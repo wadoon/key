@@ -47,18 +47,23 @@ import javax.swing.text.Document;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.gui.invgen.InvGenOptionsPanel;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.rule.IBuiltInRuleApp;
 import de.uka.ilkd.key.rule.RuleAbortException;
+import de.uka.ilkd.key.specgen.generator.dynamic.DynamicSpecGenerator;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
@@ -113,7 +118,7 @@ public class InvariantConfigurator {
      * @return LoopInvariant
      */
     public LoopSpecification getLoopInvariant (final LoopSpecification loopInv,
-            final Services services, final boolean requiresVariant, final List<LocationVariable> heapContext)
+            final Services services, final boolean requiresVariant, final List<LocationVariable> heapContext, IBuiltInRuleApp app, Goal goal)
                     throws RuleAbortException {
         // Check if there is a LoopInvariant
         if (loopInv == null) {
@@ -218,10 +223,17 @@ public class InvariantConfigurator {
              */
             private void initButtonPanel(JPanel buttonPanel) throws RuleAbortException {
                 buttonPanel.setLayout(new FlowLayout(FlowLayout.RIGHT));
+                JButton generateButton = new JButton("generate");
                 JButton applyButton = new JButton("apply");
                 JButton cancelButton = new JButton("cancel");
                 JButton storeButton = new JButton("store");
 
+                generateButton.addActionListener(new ActionListener() {
+					
+					public void actionPerformed(ActionEvent e) {
+						generateActionPerformed(e, loopInv, services, requiresVariant, heapContext, app, goal);
+					}
+				});
                 applyButton.addActionListener(new ActionListener() {
 
                     public void actionPerformed(ActionEvent e) {
@@ -241,6 +253,7 @@ public class InvariantConfigurator {
                     }
                 });
 
+                buttonPanel.add(generateButton);
                 buttonPanel.add(applyButton);
                 buttonPanel.add(storeButton);
                 buttonPanel.add(cancelButton);
@@ -738,6 +751,34 @@ public class InvariantConfigurator {
                     this.dispose();
                 }
 
+            }
+            
+            /**
+             * generate and invariant and write it to newInvariant. If
+             * generation fails, an error message is displayed.
+             * 
+             * @param ae
+             */
+            public void generateActionPerformed(ActionEvent ae, final LoopSpecification loopSpec,
+		            final Services services, final boolean requiresVariant, final List<LocationVariable> heapContext, IBuiltInRuleApp app, Goal goal) {
+            	//try {
+            		Sequent sequent = goal.sequent();
+            		DynamicSpecGenerator specGenerator = new DynamicSpecGenerator(services);
+            		Term loopInvariant = specGenerator.generate(sequent);
+            		LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+            		invariantTerm.put(baseHeap, loopInvariant);
+            		
+            		//invariants.add(e);
+            		newInvariant = loopInv.configurate(invariantTerm, freeInvariantTerm, modifiesTerm,
+                            infFlowSpecs, variantTerm);
+					//InvGenOptionsPanel.getInstance().generateLoopSpecification(loopInv, services, requiresVariant, heapContext, app, goal);
+				//} catch (RuleAbortException e) {
+					// TODO Auto-generated catch block
+					//e.printStackTrace();
+				//}
+            		
+                    
+                
             }
 
             /**
