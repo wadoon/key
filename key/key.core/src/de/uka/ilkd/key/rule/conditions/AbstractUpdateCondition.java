@@ -56,9 +56,16 @@ public class AbstractUpdateCondition implements VariableCondition {
         final Term uInst = (Term) svInst.getInstantiation(u);
         if (negated ^ isAbstractUpdate(uInst)) {
             return matchCond;
-        } else {
+        }
+        else {
             return null;
         }
+    }
+
+    @Override
+    public String toString() {
+        return String.format( //
+                "%s\\abstractUpdate(%s)", negated ? "\\not" : "", u);
     }
 
 }

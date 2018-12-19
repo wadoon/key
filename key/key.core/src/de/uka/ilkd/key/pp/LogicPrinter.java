@@ -34,11 +34,7 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.AbstractSort;
@@ -1605,7 +1601,7 @@ public class LogicPrinter {
         assert t.arity() == 2;
         startTerm(2);
 
-        if (t.sub(0).op() == UpdateJunctor.PARALLEL_UPDATE) {
+        if (t.sub(0).op() == UpdateJunctor.PARALLEL_UPDATE || t.sub(0).op() == UpdateJunctor.CONCATENATED_UPDATE) {
             markStartSub();
             printParallelUpdateHelper(separator, t.sub(0), ass);
             markEndSub();
@@ -1615,7 +1611,7 @@ public class LogicPrinter {
 
         layouter.brk(1).print(separator + " ");
 
-        if (t.sub(1).op() == UpdateJunctor.PARALLEL_UPDATE) {
+        if (t.sub(1).op() == UpdateJunctor.PARALLEL_UPDATE || t.sub(1).op() == UpdateJunctor.CONCATENATED_UPDATE) {
             markStartSub();
             layouter.print("(");
             printParallelUpdateHelper(separator, t.sub(1), ass);

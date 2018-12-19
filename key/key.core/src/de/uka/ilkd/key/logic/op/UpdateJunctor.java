@@ -24,14 +24,17 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * the parallel update connector "|".
  */
 public final class UpdateJunctor extends AbstractSortedOperator {
-    
-    public static final UpdateJunctor SKIP 
+
+    public static final UpdateJunctor SKIP
     	= new UpdateJunctor(new Name("skip"), 0);
-    
-    public static final UpdateJunctor PARALLEL_UPDATE 
+
+    public static final UpdateJunctor PARALLEL_UPDATE
     	= new UpdateJunctor(new Name("parallel-upd"), 2);
-    
-    
+
+    public static final UpdateJunctor CONCATENATED_UPDATE
+    	= new UpdateJunctor(new Name("concat-upd"), 2);
+
+
     private static Sort[] createUpdateSortArray(int arity) {
 	Sort[] result = new Sort[arity];
 	for(int i = 0; i < arity; i++) {
@@ -39,9 +42,9 @@ public final class UpdateJunctor extends AbstractSortedOperator {
 	}
 	return result;
     }
-    
-    
+
+
     private UpdateJunctor(Name name, int arity) {
 	super(name, createUpdateSortArray(arity), Sort.UPDATE, false);
-    } 
+    }
 }

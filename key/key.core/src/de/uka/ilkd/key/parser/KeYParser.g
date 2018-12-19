@@ -2538,11 +2538,18 @@ term returns [Term _term = null]
     :
         result=elementary_update_term
         (
-           PARALLEL a=elementary_update_term
-           {
-               result = getTermFactory().createTerm(UpdateJunctor.PARALLEL_UPDATE, result, a);
-           }
-            
+           (
+              PARALLEL a=elementary_update_term
+              {
+                  result = getTermFactory().createTerm(UpdateJunctor.PARALLEL_UPDATE, result, a);
+              }
+           ) |
+           (
+              CONCAT_UPD a=elementary_update_term
+              {
+                  result = getTermFactory().createTerm(UpdateJunctor.CONCATENATED_UPDATE, result, a);
+              }
+           ) 
         )*
     ;
         catch [TermCreationException ex] {
