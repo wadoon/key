@@ -110,6 +110,11 @@ public final class DropEffectlessElementariesCondition
                  * explicit assignable_not specification (see below).
                  */
                 return services.getTermBuilder().skip();
+
+                /*
+                 * NOTE (DS, 2018-12-19): This should actually no longer be
+                 * necessary since we now have special rules for rigid targets.
+                 */
             }
 
             final AbstractPlaceholderStatement abstrProg = Optional
