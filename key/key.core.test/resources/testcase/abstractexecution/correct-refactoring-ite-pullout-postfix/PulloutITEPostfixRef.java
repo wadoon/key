@@ -1,11 +1,11 @@
 public class PulloutITEPostfixRef {
     public int before(int result, boolean b) {
         if (b) {
-            abstract-program Q1;
-            abstract-program P;
+            abstract_program Q1;
+            abstract_program P;
         } else {
-            abstract-program Q2;
-            abstract-program P;
+            abstract_program Q2;
+            abstract_program P;
         }
         
         return result;
@@ -13,11 +13,11 @@ public class PulloutITEPostfixRef {
     
     public int after(int result, boolean b) {
         if (b) {
-            abstract-program Q1;
+            abstract_program Q1;
         } else {
-            abstract-program Q2;
+            abstract_program Q2;
         }
-        abstract-program P;
+        abstract_program P;
         
         return result;
     }

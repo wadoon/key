@@ -508,6 +508,7 @@ MORE :
 TOKEN :
 {
   < ABSTRACT: "abstract" >
+| < ABSTRACT_PROGRAM: "abstract_program" >
 | < ASSERT: "assert" >  {
       if (!SchemaJavaParser.jdk1_4) {
           matchedToken.kind = IDENTIFIER;
@@ -4491,7 +4492,7 @@ AbstractPlaceholderStatement AbstractPlaceholderStatement() :
   String id = null;
 }
 {
-  "abstract-program"
+  <ABSTRACT_PROGRAM>
   {
     result = factory.createAbstractPlaceholderStatement();
     setPrefixInfo(result);

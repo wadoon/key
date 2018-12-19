@@ -1,11 +1,11 @@
 public class PulloutITEPrefixRef {
     public int before(int result, boolean b) {
         if (b) {
-            abstract-program P;
-            abstract-program Q1;
+            abstract_program P;
+            abstract_program Q1;
         } else {
-            abstract-program P;
-            abstract-program Q2;
+            abstract_program P;
+            abstract_program Q2;
         }
         
         return result;
@@ -13,11 +13,11 @@ public class PulloutITEPrefixRef {
     
     public int after(int result, boolean b) {
         //@ assignable_not b;
-        { abstract-program P; }
+        { abstract_program P; }
         if (b) {
-            abstract-program Q1;
+            abstract_program Q1;
         } else {
-            abstract-program Q2;
+            abstract_program Q2;
         }
         
         return result;

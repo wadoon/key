@@ -15,11 +15,7 @@ package de.uka.ilkd.key.java;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.Stack;
+import java.util.*;
 
 import org.key_project.util.collection.ImmutableArray;
 
@@ -41,11 +37,7 @@ import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.pp.Range;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
@@ -2240,7 +2232,7 @@ public class PrettyPrinter {
         markStart(0, x);
         printHeader(x);
         writeInternalIndentation(x);
-        write("abstract-program ");
+        write("abstract_program ");
         write(x.getId());
         write(";");
         printFooter(x);
