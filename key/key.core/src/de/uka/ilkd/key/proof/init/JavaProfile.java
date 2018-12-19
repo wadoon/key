@@ -17,9 +17,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
-import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
-import de.uka.ilkd.key.logic.label.TermLabel;
+import de.uka.ilkd.key.logic.label.*;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
@@ -120,6 +118,11 @@ public class JavaProfile extends AbstractProfile {
                     ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
                     new SingletonLabelFactory<TermLabel>(
                             ParameterlessTermLabel.POST_CONDITION_LABEL)
+            ));
+        result = result.prepend(
+            new TermLabelConfiguration(
+                    AbstractExecutionTermLabel.NAME,
+                    new AbstractExecutionTermLabelFactory()
             ));
         return result;
     }
