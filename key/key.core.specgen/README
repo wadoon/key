@@ -1,0 +1,9 @@
+Specification Generation
+========================
+automatically compute
+* invariant
+* measure
+* assignable
+* method contract
+* class invariant
+in uniform framework
