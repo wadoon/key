@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.metaconstruct.arith;
+package de.uka.ilkd.key.rule.metaconstruct;
 
 /**
  * @see MutualExclusionFormula

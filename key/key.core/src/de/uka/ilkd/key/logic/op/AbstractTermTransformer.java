@@ -92,6 +92,8 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer MUTUAL_EXCLUSION_FORMULA_2 = new MutualExclusionFormula2();
     public static final AbstractTermTransformer MUTUAL_EXCLUSION_FORMULA_3 = new MutualExclusionFormula3();
 
+    public static final AbstractTermTransformer RETURN_SPEC = new ReturnSpec();
+
     private static Sort[] createMetaSortArray(int arity) {
         Sort[] result = new Sort[arity];
         for (int i = 0; i < arity; i++) {
