@@ -63,6 +63,10 @@ public interface Visitor {
 
     void performActionOnSingleton(Singleton x);
 
+    void performActionOnSingletonPV(SingletonPV singletonPV);
+
+    void performActionOnSingletonPVFun(SingletonPVFun singletonPVFun);
+
     void performActionOnSetUnion(SetUnion x);
 
     void performActionOnIntersect(Intersect x);

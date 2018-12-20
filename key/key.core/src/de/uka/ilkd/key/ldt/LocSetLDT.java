@@ -21,10 +21,7 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
 import de.uka.ilkd.key.java.expression.operator.Intersect;
-import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
-import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
-import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
-import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
+import de.uka.ilkd.key.java.expression.operator.adt.*;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -170,9 +167,9 @@ public final class LocSetLDT extends LDT {
     @Override
     public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
             Term sub, TermServices services, ExecutionContext ec) {
-        return op instanceof Singleton || op instanceof SetUnion
-                || op instanceof Intersect || op instanceof SetMinus
-                || op instanceof AllFields;
+        return op instanceof Singleton || op instanceof SingletonPV
+                || op instanceof SetUnion || op instanceof Intersect
+                || op instanceof SetMinus || op instanceof AllFields;
     }
 
     @Override
@@ -186,6 +183,9 @@ public final class LocSetLDT extends LDT {
             Services serv, ExecutionContext ec) {
         if (op instanceof Singleton) {
             return singleton;
+        }
+        else if (op instanceof SingletonPV) {
+            return singletonPV;
         }
         else if (op instanceof SetUnion) {
             return union;

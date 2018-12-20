@@ -196,6 +196,16 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
+    public void performActionOnSingletonPV(SingletonPV x) {
+        doDefaultAction(x);
+    }
+
+    @Override
+    public void performActionOnSingletonPVFun(SingletonPVFun x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnSetUnion(SetUnion x) {
         doDefaultAction(x);
     }

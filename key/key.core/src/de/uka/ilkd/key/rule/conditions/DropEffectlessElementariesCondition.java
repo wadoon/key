@@ -18,8 +18,11 @@ import java.util.Set;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.AbstractExecutionTermLabel;
@@ -29,6 +32,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 public final class DropEffectlessElementariesCondition
         implements VariableCondition {
@@ -60,8 +64,7 @@ public final class DropEffectlessElementariesCondition
                 //@formatter:on
                 return null;
             }
-            else if (target.op() instanceof Function
-                    && !target.op().isRigid()) {
+            else if (containsNonRigidFunctionSymbols(target)) {
                 /*
                  * (DS) Special case introduced for non-rigid abstract path
                  * conditions arising from abstract execution.
@@ -69,7 +72,17 @@ public final class DropEffectlessElementariesCondition
                 return null;
             }
             else {
-                return services.getTermBuilder().skip();
+                /*
+                 * In the standard case, we can drop the update here. However,
+                 * if the target contains abstract programs that might access
+                 * the left-hand-side of this update, we have to keep it.
+                 */
+                if (!containsAbstractStatementUsingLHS(target, lhs, services)) {
+                    return services.getTermBuilder().skip();
+                }
+                else {
+                    return null;
+                }
             }
         }
         else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
@@ -103,6 +116,11 @@ public final class DropEffectlessElementariesCondition
         else if (AbstractUpdateCondition.isAbstractUpdate(update)) {
             if (relevantVars.isEmpty() && target.isRigid()) {
                 /*
+                 * NOTE (DS, 2018-12-19): This should actually no longer be
+                 * necessary since we now have special rules for rigid targets.
+                 */
+
+                /*
                  * We drop abstract updates in front of rigid symbols, like
                  * "true" or some predicate, but not in front of anything
                  * containing program variables, or the special nonrigid
@@ -110,11 +128,6 @@ public final class DropEffectlessElementariesCondition
                  * explicit assignable_not specification (see below).
                  */
                 return services.getTermBuilder().skip();
-
-                /*
-                 * NOTE (DS, 2018-12-19): This should actually no longer be
-                 * necessary since we now have special rules for rigid targets.
-                 */
             }
 
             final AbstractPlaceholderStatement abstrProg = Optional
@@ -124,10 +137,8 @@ public final class DropEffectlessElementariesCondition
                     .map(AbstractExecutionTermLabel::getAbstrPlaceholderStmt)
                     .orElse(null);
 
-            final OpCollector opCollector = new OpCollector();
-            target.execPostOrder(opCollector);
-            final boolean containsNonRigidFuncSymbs = opCollector.ops().stream()
-                    .anyMatch(op -> op instanceof Function && !op.isRigid());
+            final boolean containsNonRigidFuncSymbs =
+                    containsNonRigidFunctionSymbols(target);
 
             if (!containsNonRigidFuncSymbs && abstrProg != null) {
                 final ImmutableSet<BlockContract> contracts = services
@@ -135,39 +146,8 @@ public final class DropEffectlessElementariesCondition
                         .getAbstractPlaceholderStatementContracts(abstrProg);
 
                 for (final BlockContract contract : contracts) {
-                    /*
-                     * Try to find a contract which permits dropping the update
-                     * since all the relevant variables are not assignable.
-                     */
-                    final Term assignableNot = contract.getAssignableNot(
-                            services.getTypeConverter().getHeapLDT().getHeap());
-
-                    /*
-                     * This assignableNot term is a nested union of LocSet
-                     * terms. We extract all program variables from it.
-                     */
-                    final TermProgramVariableCollector coll =
-                            new TermProgramVariableCollector(services);
-                    assignableNot.execPostOrder(coll);
-                    Set<LocationVariable> notAssgnVars = coll.result();
-
-                    /*
-                     * If all the relevant variables are explicitly declared to
-                     * be not assignable, we can drop this update.
-                     */
-                    if (relevantVars.stream().map(LocationVariable::toString)
-                            .allMatch(relvar -> notAssgnVars.stream()
-                                    .map(LocationVariable::toString)
-                                    .anyMatch(notAssngVar -> relvar
-                                            .equals(notAssngVar)))) {
-                        /*
-                         * TODO (DS, 2018-12-18): The above String comparison is
-                         * a hack. It should actually be
-                         * "notAssgnVars.containsAll(relevantVars)", but the
-                         * variables in the block contract are different objects
-                         * from those in the proof. Maybe we have to extend some
-                         * visitor / update method or the like.
-                         */
+                    if (allVarsNotAssignable(relevantVars, contract,
+                            services)) {
                         return services.getTermBuilder().skip();
                     }
                 }
@@ -230,5 +210,90 @@ public final class DropEffectlessElementariesCondition
     public String toString() {
         return "\\dropEffectlessElementaries(" + u + ", " + x + ", " + result
                 + ")";
+    }
+
+    private static boolean containsAbstractStatementUsingLHS(Term target,
+            LocationVariable lhs, Services services) {
+        final ContainsAbstractStatementUsingLHSVisitor visitor =
+                new ContainsAbstractStatementUsingLHSVisitor(
+                        MergeRuleUtils.getJavaBlockRecursive(target).program(),
+                        lhs, services);
+        visitor.start();
+        final boolean containsAbstractStatementUsingLHS = visitor.result();
+        return containsAbstractStatementUsingLHS;
+    }
+
+    private static boolean containsNonRigidFunctionSymbols(Term target) {
+        final OpCollector opCollector = new OpCollector();
+        target.execPostOrder(opCollector);
+        final boolean containsNonRigidFuncSymbs = opCollector.ops().stream()
+                .anyMatch(op -> op instanceof Function && !op.isRigid());
+        return containsNonRigidFuncSymbs;
+    }
+
+    private static boolean allVarsNotAssignable(
+            Set<LocationVariable> relevantVars, final BlockContract contract,
+            Services services) {
+        /*
+         * Try to find a contract which permits dropping the update since all
+         * the relevant variables are not assignable.
+         */
+        final Term assignableNot = contract.getAssignableNot(
+                services.getTypeConverter().getHeapLDT().getHeap());
+
+        /*
+         * This assignableNot term is a nested union of LocSet terms. We extract
+         * all program variables from it.
+         */
+        final TermProgramVariableCollector coll =
+                new TermProgramVariableCollector(services);
+        assignableNot.execPostOrder(coll);
+        Set<LocationVariable> notAssgnVars = coll.result();
+
+        /*
+         * If all the relevant variables are explicitly declared to be not
+         * assignable, we can drop this update.
+         */
+        final boolean allVarsNotAssignable = relevantVars.stream()
+                .map(LocationVariable::toString)
+                .allMatch(relvar -> notAssgnVars.stream()
+                        .map(LocationVariable::toString)
+                        .anyMatch(notAssngVar -> relvar.equals(notAssngVar)));
+        /*
+         * TODO (DS, 2018-12-18): The above String comparison is a hack. It
+         * should actually be "notAssgnVars.containsAll(relevantVars)", but the
+         * variables in the block contract are different objects from those in
+         * the proof. Maybe we have to extend some visitor / update method or
+         * the like.
+         */
+
+        return allVarsNotAssignable;
+    }
+
+    private static class ContainsAbstractStatementUsingLHSVisitor
+            extends JavaASTVisitor {
+        final LocationVariable lhs;
+        boolean result = false;
+
+        public ContainsAbstractStatementUsingLHSVisitor(ProgramElement root,
+                LocationVariable lhs, Services services) {
+            super(root, services);
+            this.lhs = lhs;
+        }
+
+        @Override
+        protected void doDefaultAction(SourceElement node) {
+            if (node instanceof AbstractPlaceholderStatement) {
+                result = true;
+                /*
+                 * TODO (DS, 2018-12-20): Check whether that statement may use
+                 * this lhs, i.e. whether it's accessible.
+                 */
+            }
+        }
+
+        public boolean result() {
+            return result;
+        }
     }
 }

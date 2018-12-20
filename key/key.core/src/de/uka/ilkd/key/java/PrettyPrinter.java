@@ -34,6 +34,8 @@ import de.uka.ilkd.key.java.expression.literal.*;
 import de.uka.ilkd.key.java.expression.operator.*;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqGet;
 import de.uka.ilkd.key.java.expression.operator.adt.SeqLength;
+import de.uka.ilkd.key.java.expression.operator.adt.SingletonPV;
+import de.uka.ilkd.key.java.expression.operator.adt.SingletonPVFun;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -985,6 +987,25 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
+    public void printSingletonPV(SingletonPV x) throws IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\singletonPV", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(")");
+        printFooter(x);
+    }
+
+    public void printSingletonPVFun(SingletonPVFun x) throws IOException {
+        printHeader(x);
+        writeInternalIndentation(x);
+        writeToken(0, "\\PV", x);
+        write("(");
+        writeElement(0, x.getChildAt(0));
+        write(")");
+        printFooter(x);
+    }
     public void printSetUnion(de.uka.ilkd.key.java.expression.operator.adt.SetUnion x) throws java.io.IOException {
         printHeader(x);
         writeInternalIndentation(x);
@@ -3093,4 +3114,5 @@ public class PrettyPrinter {
         write("\\map_empty");
         printFooter(x);
     }
+
 }
