@@ -27,12 +27,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.LoopContract;
-import de.uka.ilkd.key.speclang.LoopSpecification;
-import de.uka.ilkd.key.speclang.MergeContract;
-import de.uka.ilkd.key.speclang.PredicateAbstractionMergeContract;
-import de.uka.ilkd.key.speclang.UnparameterizedMergeContract;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.InfFlowSpec;
 
 /**
@@ -87,6 +82,12 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     @Override
     public void performActionOnLocationVariable(LocationVariable x) {
         result.add(x);
+    }
+
+    @Override
+    public void performActionOnAbstractPlaceholderStatementContract(
+            BlockContract x) {
+        performActionOnBlockContract(x);
     }
 
     @Override
@@ -202,6 +203,13 @@ public class ProgramVariableCollector extends JavaASTVisitor {
             Term modifiesClause = x.getModifiesClause(heap, services);
             if (modifiesClause != null) {
                 modifiesClause.execPostOrder(collector);
+            }
+        }
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
+                .getAllHeaps()) {
+            Term modifiesNotClause = x.getModifiesNotClause(heap, services);
+            if (modifiesNotClause != null) {
+                modifiesNotClause.execPostOrder(collector);
             }
         }
         ImmutableList<InfFlowSpec> infFlowSpecs = x.getInfFlowSpecs();
