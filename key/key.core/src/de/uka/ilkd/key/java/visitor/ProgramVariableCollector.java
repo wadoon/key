@@ -212,6 +212,13 @@ public class ProgramVariableCollector extends JavaASTVisitor {
                 modifiesNotClause.execPostOrder(collector);
             }
         }
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
+                .getAllHeaps()) {
+            Term accessibleClause = x.getAccessibleClause(heap, services);
+            if (accessibleClause != null) {
+                accessibleClause.execPostOrder(collector);
+            }
+        }
         ImmutableList<InfFlowSpec> infFlowSpecs = x.getInfFlowSpecs();
         for (InfFlowSpec ts : infFlowSpecs) {
             for (Term t : ts.preExpressions) {

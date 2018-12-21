@@ -15,6 +15,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableSet;
 
@@ -250,24 +251,13 @@ public final class DropEffectlessElementariesCondition
         assignableNot.execPostOrder(coll);
         Set<LocationVariable> notAssgnVars = coll.result();
 
-        /*
-         * If all the relevant variables are explicitly declared to be not
-         * assignable, we can drop this update.
-         */
-        final boolean allVarsNotAssignable = relevantVars.stream()
-                .map(LocationVariable::toString)
-                .allMatch(relvar -> notAssgnVars.stream()
-                        .map(LocationVariable::toString)
-                        .anyMatch(notAssngVar -> relvar.equals(notAssngVar)));
-        /*
-         * TODO (DS, 2018-12-18): The above String comparison is a hack. It
-         * should actually be "notAssgnVars.containsAll(relevantVars)", but the
-         * variables in the block contract are different objects from those in
-         * the proof. Maybe we have to extend some visitor / update method or
-         * the like.
-         */
-
-        return allVarsNotAssignable;
+        final boolean stringCmpResult =
+                notAssgnVars.stream().map(LocationVariable::toString)
+                        .collect(Collectors.toList())
+                        .containsAll(relevantVars.stream()
+                                .map(LocationVariable::toString)
+                                .collect(Collectors.toList()));
+        return notAssgnVars.containsAll(relevantVars);
     }
 
     private static class ContainsAbstractStatementUsingLHSVisitor

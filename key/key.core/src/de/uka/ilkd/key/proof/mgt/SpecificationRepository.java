@@ -80,7 +80,7 @@ public final class SpecificationRepository {
             new LinkedHashMap<Pair<LoopStatement, Integer>, LoopSpecification>();
     private final Map<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>> blockContracts =
             new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<BlockContract>>();
-    private final Map<AbstractPlaceholderStatement, ImmutableSet<BlockContract>> abstractPlaceholderStatementContracts =
+    private final Map<Pair<AbstractPlaceholderStatement, Integer>, ImmutableSet<BlockContract>> abstractPlaceholderStatementContracts =
             new LinkedHashMap<>();
     private final Map<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>> loopContracts =
             new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>>();
@@ -1519,14 +1519,12 @@ public final class SpecificationRepository {
 
     public ImmutableSet<BlockContract> getAbstractPlaceholderStatementContracts(
             AbstractPlaceholderStatement stmt) {
+        final Pair<AbstractPlaceholderStatement, Integer> abstrStmtWithLineNo =
+                new Pair<>(stmt, stmt.getStartPosition().getLine());
         final ImmutableSet<BlockContract> contracts =
-                abstractPlaceholderStatementContracts.get(stmt);
-        if (contracts == null) {
-            return DefaultImmutableSet.<BlockContract> nil();
-        }
-        else {
-            return contracts;
-        }
+                abstractPlaceholderStatementContracts.get(abstrStmtWithLineNo);
+        return Optional.ofNullable(contracts)
+                .orElseGet(() -> DefaultImmutableSet.nil());
     }
 
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
@@ -1534,12 +1532,8 @@ public final class SpecificationRepository {
                 new Pair<StatementBlock, Integer>(block,
                         block.getStartPosition().getLine());
         final ImmutableSet<BlockContract> contracts = blockContracts.get(b);
-        if (contracts == null) {
-            return DefaultImmutableSet.<BlockContract> nil();
-        }
-        else {
-            return contracts;
-        }
+        return Optional.ofNullable(contracts)
+                .orElseGet(() -> DefaultImmutableSet.nil());
     }
 
     public ImmutableSet<LoopContract> getLoopContracts(StatementBlock block) {
@@ -1547,23 +1541,15 @@ public final class SpecificationRepository {
                 new Pair<StatementBlock, Integer>(block,
                         block.getStartPosition().getLine());
         final ImmutableSet<LoopContract> contracts = loopContracts.get(b);
-        if (contracts == null) {
-            return DefaultImmutableSet.<LoopContract> nil();
-        }
-        else {
-            return contracts;
-        }
+        return Optional.ofNullable(contracts)
+                .orElseGet(() -> DefaultImmutableSet.nil());
     }
 
     public ImmutableSet<MergeContract> getMergeContracts(
             MergePointStatement mps) {
         final ImmutableSet<MergeContract> contracts = mergeContracts.get(mps);
-        if (contracts == null) {
-            return DefaultImmutableSet.<MergeContract> nil();
-        }
-        else {
-            return contracts;
-        }
+        return Optional.ofNullable(contracts)
+                .orElseGet(() -> DefaultImmutableSet.nil());
     }
 
     public ImmutableSet<BlockContract> getBlockContracts(
@@ -1628,9 +1614,13 @@ public final class SpecificationRepository {
 
         if (block.getBody().size() == 1 && block.getBody()
                 .get(0) instanceof AbstractPlaceholderStatement) {
-            abstractPlaceholderStatementContracts.put(
-                    (AbstractPlaceholderStatement) block.getBody().get(0),
-                    newContractSet);
+            final AbstractPlaceholderStatement abstrStmt =
+                    (AbstractPlaceholderStatement) block.getBody().get(0);
+            final Pair<AbstractPlaceholderStatement, Integer> abstrStmtWithLineNo =
+                    new Pair<>(abstrStmt,
+                            abstrStmt.getStartPosition().getLine());
+            abstractPlaceholderStatementContracts.put( //
+                    abstrStmtWithLineNo, newContractSet);
         }
 
         if (addFunctionalContract) {
@@ -1662,9 +1652,12 @@ public final class SpecificationRepository {
 
         if (block.getBody().size() == 1 && block.getBody()
                 .get(0) instanceof AbstractPlaceholderStatement) {
-            abstractPlaceholderStatementContracts.put(
-                    (AbstractPlaceholderStatement) block.getBody().get(0),
-                    newContractSet);
+            final AbstractPlaceholderStatement abstrStmt =
+                    (AbstractPlaceholderStatement) block.getBody().get(0);
+            final Pair<AbstractPlaceholderStatement, Integer> abstrStmtWithLineNo =
+                    new Pair<>(abstrStmt, abstrStmt.getStartPosition().getLine());
+            abstractPlaceholderStatementContracts.put( //
+                    abstrStmtWithLineNo, newContractSet);
         }
     }
 
