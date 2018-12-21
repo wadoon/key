@@ -51,6 +51,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             ImmutableSLList.<PositionedString>nil();
     private ImmutableList<PositionedString> decreases =
             ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> contractsOfs =
+            ImmutableSLList.<PositionedString>nil();
 
     private ImmutableList<Triple<PositionedString,PositionedString,PositionedString>> abbreviations =
             ImmutableSLList.<Triple<PositionedString,PositionedString,PositionedString>>nil();
@@ -132,6 +134,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         res.addInfFlowSpecs(tsc.getInfFlowSpecs());
         res.addDiverges(tsc.getDiverges());
         res.addMeasuredBy(tsc.getMeasuredBy());
+        res.addContractsOf(tsc.getContractsOfs());
         return res;
     }
 
@@ -147,6 +150,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         res.signalsOnly = signalsOnly;
         res.assignables = new LinkedHashMap(assignables);
         res.assignableNots = new LinkedHashMap(assignableNots);
+        res.contractsOfs = contractsOfs;
         res.accessibles = new LinkedHashMap(accessibles);
         res.infFlowSpecs = infFlowSpecs;
         res.depends = depends;
@@ -199,6 +203,10 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         measuredBy = measuredBy.append(l);
     }
 
+    public void addContractsOfs(ImmutableList<PositionedString> l) {
+        contractsOfs = contractsOfs.append(l);
+    }
+
     public void addDecreases(PositionedString ps) {
         decreases = decreases.append(ps);
         setPosition(ps);
@@ -231,6 +239,14 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         for(PositionedString ps : l) {
           addAccessible(ps);
         }
+    }
+
+    public void addContractsOf(PositionedString ps) {
+    	contractsOfs = contractsOfs.append(ps);
+    }
+
+    public void addContractsOf(ImmutableList<PositionedString> ps) {
+    	contractsOfs = contractsOfs.append(ps);
     }
 
     public void addEnsures(PositionedString ps) {
@@ -435,6 +451,9 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return name;
     }
 
+    public ImmutableList<PositionedString> getContractsOfs() {
+        return contractsOfs;
+    }
 
     public ImmutableList<PositionedString> getSignals() {
         return signals;
@@ -603,6 +622,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                && requiresFree.equals(sc.requiresFree)
                && assignables.equals(sc.assignables)
                && assignableNots.equals(sc.assignableNots)
+               && contractsOfs.equals(sc.contractsOfs)
                && accessibles.equals(sc.accessibles)
                && axioms.equals(sc.axioms)
                && ensures.equals(sc.ensures)
@@ -627,6 +647,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                + requiresFree.hashCode()
                + assignables.hashCode()
                + assignableNots.hashCode()
+               + contractsOfs.hashCode()
                + accessibles.hashCode()
                + axioms.hashCode()
                + ensures.hashCode()

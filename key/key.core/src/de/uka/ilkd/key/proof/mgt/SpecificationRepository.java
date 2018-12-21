@@ -1527,6 +1527,16 @@ public final class SpecificationRepository {
                 .orElseGet(() -> DefaultImmutableSet.nil());
     }
 
+    public ImmutableSet<BlockContract> getAbstractPlaceholderStatementContracts(
+            String abstrPlaceholderStmtId) {
+        return abstractPlaceholderStatementContracts.keySet().stream().filter(
+                stmt -> stmt.first.getId().equals(abstrPlaceholderStmtId))
+                .findAny()
+                .map(lineStmtPair -> abstractPlaceholderStatementContracts
+                        .get(lineStmtPair))
+                .orElseGet(() -> DefaultImmutableSet.nil());
+    }
+
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
         final Pair<StatementBlock, Integer> b =
                 new Pair<StatementBlock, Integer>(block,
@@ -1655,7 +1665,8 @@ public final class SpecificationRepository {
             final AbstractPlaceholderStatement abstrStmt =
                     (AbstractPlaceholderStatement) block.getBody().get(0);
             final Pair<AbstractPlaceholderStatement, Integer> abstrStmtWithLineNo =
-                    new Pair<>(abstrStmt, abstrStmt.getStartPosition().getLine());
+                    new Pair<>(abstrStmt,
+                            abstrStmt.getStartPosition().getLine());
             abstractPlaceholderStatementContracts.put( //
                     abstrStmtWithLineNo, newContractSet);
         }

@@ -3851,6 +3851,7 @@ varexp[TacletBuilder b]
 }
 :
   ( varcond_applyUpdateOnRigid[b]
+    | varcond_initializeParametricSkolemUpdate[b]
     | varcond_prefixContainsElement[b, negated]
     | varcond_dropEffectlessElementaries[b]
     | varcond_instantiateVarsFresh[b]
@@ -3948,6 +3949,20 @@ varcond_instantiateVarsFresh[TacletBuilder b]
           (ProgramSV) varsList, 
           (ProgramSV) varsListForLength,
            namePattern, t, (SchemaVariable) z));
+   }
+;
+
+varcond_initializeParametricSkolemUpdate[TacletBuilder b]
+:
+   INITIALIZE_PARAMETRIC_SKOLEM_UPDATE LPAREN
+     updateSV=varId COMMA
+     abstrProgramSV=varId
+   RPAREN 
+   {
+      b.addVariableCondition(
+        new InitializeParametricSkolemUpdate(
+          (SchemaVariable) updateSV, 
+          (ProgramSV) abstrProgramSV));
    }
 ;
 

@@ -28,7 +28,8 @@ import de.uka.ilkd.key.logic.Named;
  *
  * @author Dominic Steinhöfel
  */
-public class AbstractPlaceholderStatement extends JavaStatement implements Named {
+public class AbstractPlaceholderStatement extends JavaStatement
+        implements Named {
     protected final String id;
     protected final Name name;
     protected final Comment[] comments;
@@ -42,7 +43,8 @@ public class AbstractPlaceholderStatement extends JavaStatement implements Named
         this.hashCode = id.hashCode();
     }
 
-    public AbstractPlaceholderStatement(String id, Comment[] comments) {
+    public AbstractPlaceholderStatement(String id, Comment[] comments, PositionInfo pi) {
+        super(pi);
         this.id = id;
         this.name = new Name(id);
         this.comments = comments;
@@ -117,4 +119,5 @@ public class AbstractPlaceholderStatement extends JavaStatement implements Named
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printAbstractPlaceholderStatement(this);
     }
+
 }

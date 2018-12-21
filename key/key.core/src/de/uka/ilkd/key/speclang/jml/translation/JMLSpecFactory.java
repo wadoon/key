@@ -14,6 +14,8 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -421,6 +423,11 @@ public class JMLSpecFactory {
                             heap.name().toString() + "AtPre"),
                     clauses);
         }
+
+        if (!textualSpecCase.getContractsOfs().isEmpty()) {
+            System.out.println();
+        }
+
         clauses.signals = translateSignals(pm, progVars.selfVar,
                 progVars.paramVars, progVars.resultVar, progVars.excVar,
                 progVars.atPres, progVars.atBefores, originalBehavior,
@@ -1522,6 +1529,25 @@ public class JMLSpecFactory {
             throws SLTranslationException {
         if (specificationCase.isLoopContract()) {
             return DefaultImmutableSet.nil();
+        }
+
+        if (!specificationCase.getContractsOfs().isEmpty()) {
+            assert specificationCase.getContractsOfs().size() == 1;
+            final String contractsOfSpec =
+                    specificationCase.getContractsOfs().iterator().next().text
+                            .trim();
+            final String regexPattern = "contracts_of +([^;]+) *;";
+            final Pattern p = Pattern.compile(regexPattern);
+            final Matcher m = p.matcher(contractsOfSpec);
+            if (!m.find()) {
+                return DefaultImmutableSet.nil();
+            }
+
+            final String progId = m.group(1);
+            return services.getSpecificationRepository()
+                    .getAbstractPlaceholderStatementContracts(progId).stream()
+                    .map(c -> c.setBlock(block))
+                    .collect(DefaultImmutableSet.toImmutableSet());
         }
 
         final Behavior behavior = specificationCase.getBehavior();

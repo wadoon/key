@@ -226,6 +226,7 @@ lexer grammar KeYLexer;
 	PROGRAMVARIABLES : '\\programVariables';
 
         // Keywords for varcond and related stuff
+    INITIALIZE_PARAMETRIC_SKOLEM_UPDATE : '\\initializeParametricSkolemUpdate' ;
     PREFIX_CONTAINS_ELEMENT : '\\prefixContainsElement' ;
     INSTANTIATE_VARS_FRESH : '\\instantiateVarsFresh' ;
     NEW_PV : '\\newPV' ;

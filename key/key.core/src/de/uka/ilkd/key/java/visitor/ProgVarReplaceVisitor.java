@@ -181,6 +181,12 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
     private Term replaceVariablesInTerm(Term t) {
+        return replaceVariablesInTerm(t, this.replaceMap, services);
+    }
+
+    private static Term replaceVariablesInTerm(Term t,
+            Map<ProgramVariable, ProgramVariable> replaceMap,
+            Services services) {
         if (t == null) {
             return null;
         }
@@ -197,7 +203,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             boolean changed = false;
             Term subTerms[] = new Term[t.arity()];
             for (int i = 0, n = t.arity(); i < n; i++) {
-                subTerms[i] = replaceVariablesInTerm(t.sub(i));
+                subTerms[i] =
+                        replaceVariablesInTerm(t.sub(i), replaceMap, services);
                 changed = changed || subTerms[i] != t.sub(i);
             }
             Operator op = t.op();
@@ -328,16 +335,16 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
          */
         final Map<ProgramVariable, ProgramVariable> fishyReplacementMap =
                 new HashMap<>();
-//        for (ProgramVariable pvToReplace : replaceMap.keySet()) {
-//            final List<ProgramVariable> fishyMatches = pvs.stream()
-//                    .filter(pv -> !replaceMap.containsKey(pv))
-//                    .filter(pv -> pv.toString().equals(pvToReplace.toString()))
-//                    .collect(Collectors.toList());
-//
-//            for (ProgramVariable fishyPV : fishyMatches) {
-//                fishyReplacementMap.put(fishyPV, replaceMap.get(pvToReplace));
-//            }
-//        }
+        for (ProgramVariable pvToReplace : replaceMap.keySet()) {
+            final List<ProgramVariable> fishyMatches = pvs.stream()
+                    .filter(pv -> !replaceMap.containsKey(pv))
+                    .filter(pv -> pv.toString().equals(pvToReplace.toString()))
+                    .collect(Collectors.toList());
+
+            for (ProgramVariable fishyPV : fishyMatches) {
+                fishyReplacementMap.put(fishyPV, replaceMap.get(pvToReplace));
+            }
+        }
 
         if (!fishyReplacementMap.isEmpty()) {
             ProgramVariable exampleRepl =
@@ -351,7 +358,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     exampleRepl, fishyReplacementMap.get(exampleRepl)));
         }
 
-        services.getSpecificationRepository().removeBlockContract(x);
+//        services.getSpecificationRepository().removeBlockContract(x);
         services.getSpecificationRepository()
                 .addBlockContract(createNewBlockContract(x, x.getBlock(), false,
                         fishyReplacementMap));
@@ -438,6 +445,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             final BlockContract oldContract, final StatementBlock newBlock,
             final boolean blockChanged,
             final Map<ProgramVariable, ProgramVariable> fishyReplacementMap) {
+        final Map<ProgramVariable, ProgramVariable> replMap = new HashMap<>();
+        replMap.putAll(this.replaceMap);
+        replMap.putAll(fishyReplacementMap);
+
         final BlockContract.Variables newVariables =
                 replaceBlockContractVariables(
                         oldContract.getPlaceholderVariables());
@@ -466,12 +477,15 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     oldContract.getAccessibleClause(heap, services);
 
             final Term newPrecondition =
-                    replaceVariablesInTerm(oldPrecondition);
+                    replaceVariablesInTerm(oldPrecondition, replMap, services);
             final Term newPostcondition =
-                    replaceVariablesInTerm(oldPostcondition);
-            final Term newModifies = replaceVariablesInTerm(oldModifies);
-            final Term newModifiesNot = replaceVariablesInTerm(oldModifiesNot);
-            final Term newAccessible = replaceVariablesInTerm(oldAccessible);
+                    replaceVariablesInTerm(oldPostcondition, replMap, services);
+            final Term newModifies =
+                    replaceVariablesInTerm(oldModifies, replMap, services);
+            final Term newModifiesNot =
+                    replaceVariablesInTerm(oldModifiesNot, replMap, services);
+            final Term newAccessible =
+                    replaceVariablesInTerm(oldAccessible, replMap, services);
 
             newPreconditions.put(heap,
                     (newPrecondition != oldPrecondition) ? newPrecondition
@@ -499,7 +513,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                         oldContract.getInfFlowSpecs());
 
         OpReplacer replacer =
-                new OpReplacer(replaceMap, services.getTermFactory());
+                new OpReplacer(replMap, services.getTermFactory());
 
         return changed ? oldContract.update(newBlock, newPreconditions,
                 newPostconditions, newModifiesClauses, newModifiesNotClauses,

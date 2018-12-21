@@ -47,6 +47,7 @@ lexer grammar KeYJMLPreLexer;
     CODE_BIGINT_MATH 		: 'code_bigint_math';
     CODE_JAVA_MATH 		: 'code_java_math';
     CODE_SAFE_MATH		: 'code_safe_math';
+    CONTRACTS_OF         : 'contracts_of';
     CONST 			: 'const';
     CONSTRAINT			: 'constraint';
     CONSTRAINT_RED		: 'constraint_redundantly';

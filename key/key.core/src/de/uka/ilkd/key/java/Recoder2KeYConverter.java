@@ -41,19 +41,8 @@ import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
 import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.VariableNamer;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IProgramVariable;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramConstant;
-import de.uka.ilkd.key.logic.op.ProgramMethod;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 import recoder.CrossReferenceServiceConfiguration;
@@ -972,6 +961,8 @@ public class Recoder2KeYConverter {
 
     public AbstractPlaceholderStatement convert(
             de.uka.ilkd.key.java.recoderext.AbstractPlaceholderStatement aps) {
+        final PositionInfo pi = positionInfo(aps);
+
         Comment[] comments;
         if (aps.getComments() == null) {
             comments = new Comment[0];
@@ -982,7 +973,7 @@ public class Recoder2KeYConverter {
             }
         }
 
-        return new AbstractPlaceholderStatement(aps.getId(), comments);
+        return new AbstractPlaceholderStatement(aps.getId(), comments, pi);
     }
 
     public CatchAllStatement convert(
