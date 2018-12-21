@@ -399,6 +399,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 new LinkedHashMap<LocationVariable, Term>();
         final Map<LocationVariable, Term> newModifiesNotClauses =
                 new LinkedHashMap<LocationVariable, Term>();
+        final Map<ProgramVariable, Term> newAccessibleClauses =
+                new LinkedHashMap<>();
         boolean changed = blockChanged;
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                 .getAllHeaps()) {
@@ -410,6 +412,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     oldContract.getModifiesClause(heap, services);
             final Term oldModifiesNot =
                     oldContract.getModifiesNotClause(heap, services);
+            final Term oldAccessible =
+                    oldContract.getAccessibleClause(heap, services);
 
             final Term newPrecondition =
                     replaceVariablesInTerm(oldPrecondition);
@@ -417,6 +421,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     replaceVariablesInTerm(oldPostcondition);
             final Term newModifies = replaceVariablesInTerm(oldModifies);
             final Term newModifiesNot = replaceVariablesInTerm(oldModifiesNot);
+            final Term newAccessible = replaceVariablesInTerm(oldAccessible);
 
             newPreconditions.put(heap,
                     (newPrecondition != oldPrecondition) ? newPrecondition
@@ -429,11 +434,15 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             newModifiesNotClauses.put(heap,
                     (newModifies != oldModifiesNot) ? newModifies
                             : oldModifiesNot);
+            newAccessibleClauses.put(heap,
+                    (newAccessible != oldAccessible) ? newAccessible
+                            : oldAccessible);
 
             changed |= ((newPrecondition != oldPrecondition)
                     || (newPostcondition != oldPostcondition)
                     || (newModifies != oldModifies)
-                    || (newModifiesNot != oldModifiesNot));
+                    || (newModifiesNot != oldModifiesNot)
+                    || (newAccessible != oldAccessible));
         }
         final ImmutableList<InfFlowSpec> newInfFlowSpecs =
                 replaceVariablesInTermListTriples(
@@ -444,7 +453,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
         return changed ? oldContract.update(newBlock, newPreconditions,
                 newPostconditions, newModifiesClauses, newModifiesNotClauses,
-                newInfFlowSpecs, newVariables,
+                newAccessibleClauses, newInfFlowSpecs, newVariables,
                 replacer.replace(oldContract.getMby())) : oldContract;
     }
 
@@ -461,6 +470,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 new LinkedHashMap<LocationVariable, Term>();
         final Map<LocationVariable, Term> newModifiesNotClauses =
                 new LinkedHashMap<LocationVariable, Term>();
+        final Map<ProgramVariable, Term> newAccessibleClauses =
+                new LinkedHashMap<>();
         boolean changed = blockChanged;
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                 .getAllHeaps()) {
@@ -472,6 +483,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     oldContract.getModifiesClause(heap, services);
             final Term oldModifiesNot =
                     oldContract.getModifiesNotClause(heap, services);
+            final Term oldAccessible =
+                    oldContract.getAccessibleClause(heap, services);
 
             final Term newPrecondition =
                     replaceVariablesInTerm(oldPrecondition);
@@ -479,6 +492,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     replaceVariablesInTerm(oldPostcondition);
             final Term newModifies = replaceVariablesInTerm(oldModifies);
             final Term newModifiesNot = replaceVariablesInTerm(oldModifiesNot);
+            final Term newAccessible = replaceVariablesInTerm(oldAccessible);
 
             newPreconditions.put(heap,
                     (newPrecondition != oldPrecondition) ? newPrecondition
@@ -491,11 +505,15 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             newModifiesNotClauses.put(heap,
                     (newModifiesNot != oldModifiesNot) ? newModifiesNot
                             : oldModifiesNot);
+            newAccessibleClauses.put(heap,
+                    (newAccessible != oldAccessible) ? newAccessible
+                            : oldAccessible);
 
             changed |= ((newPrecondition != oldPrecondition)
                     || (newPostcondition != oldPostcondition)
                     || (newModifies != oldModifies)
-                    || (newModifiesNot != oldModifiesNot));
+                    || (newModifiesNot != oldModifiesNot)
+                    || (newAccessible != oldAccessible));
         }
         final ImmutableList<InfFlowSpec> newInfFlowSpecs =
                 replaceVariablesInTermListTriples(
@@ -504,13 +522,11 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         OpReplacer replacer =
                 new OpReplacer(replaceMap, services.getTermFactory());
 
-        return changed
-                ? oldContract.update(newBlock, newPreconditions,
-                        newPostconditions, newModifiesClauses,
-                        newModifiesNotClauses, newInfFlowSpecs, newVariables,
-                        replacer.replace(oldContract.getMby()),
-                        replacer.replace(oldContract.getDecreases()))
-                : oldContract;
+        return changed ? oldContract.update(newBlock, newPreconditions,
+                newPostconditions, newModifiesClauses, newModifiesNotClauses,
+                newAccessibleClauses, newInfFlowSpecs, newVariables,
+                replacer.replace(oldContract.getMby()),
+                replacer.replace(oldContract.getDecreases())) : oldContract;
     }
 
     private BlockSpecificationElement.Variables replaceBlockContractVariables(

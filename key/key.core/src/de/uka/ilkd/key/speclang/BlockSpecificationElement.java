@@ -98,10 +98,9 @@ public interface BlockSpecificationElement extends SpecificationElement {
      */
     public boolean hasModifiesClause(LocationVariable heap);
 
-    /**
-     * TODO
-     */
     boolean hasModifiesNotClause(LocationVariable heap);
+
+    Term getAccessibleClause(LocationVariable heap);
 
     /**
      *
@@ -253,6 +252,13 @@ public interface BlockSpecificationElement extends SpecificationElement {
      * @return this contract's modifies clause on the specified heap.
      */
     public Term getModifiesClause(LocationVariable heap, Services services);
+
+    public Term getAccessibleClause(LocationVariable heap, ProgramVariable self, Services services);
+
+    public Term getAccessibleClause(LocationVariable heapVariable, Term heap, Term self,
+            Services services);
+
+    public Term getAccessibleClause(LocationVariable heap, Services services);
 
     /**
      * @param heap

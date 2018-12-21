@@ -27,10 +27,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
 import de.uka.ilkd.key.util.InfFlowSpec;
@@ -70,7 +67,8 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
      *            this contract's postconditions on every heap.
      * @param modifiesClauses
      *            this contract's modifies clauses on every heap.
-     * @param modifiesNotClauses TODO
+     * @param modifiesNotClauses
+     *            TODO
      * @param infFlowSpecs
      *            this contract's information flow specifications.
      * @param variables
@@ -80,7 +78,8 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
      * @param hasMod
      *            a map specifying on which heaps this contract has a modified
      *            clause.
-     * @param hasNonMod TODO
+     * @param hasNonMod
+     *            TODO
      * @param functionalContracts
      *            the functional loop contracts corresponding to this contract.
      */
@@ -91,13 +90,17 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
             final Term measuredBy,
             final Map<LocationVariable, Term> postconditions,
             final Map<LocationVariable, Term> modifiesClauses,
-            Map<LocationVariable, Term> modifiesNotClauses,
-            final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
-            final boolean transactionApplicable,
-            final Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasNonMod, ImmutableSet<FunctionalBlockContract> functionalContracts) {
+            final Map<LocationVariable, Term> modifiesNotClauses,
+            final Map<ProgramVariable, Term> accessibleClauses,
+            final ImmutableList<InfFlowSpec> infFlowSpecs,
+            final Variables variables, final boolean transactionApplicable,
+            final Map<LocationVariable, Boolean> hasMod,
+            Map<LocationVariable, Boolean> hasNonMod,
+            ImmutableSet<FunctionalBlockContract> functionalContracts) {
         super(baseName, block, labels, method, modality, preconditions,
                 measuredBy, postconditions, modifiesClauses, modifiesNotClauses,
-                infFlowSpecs, variables, transactionApplicable, hasMod, hasNonMod);
+                accessibleClauses, infFlowSpecs, variables,
+                transactionApplicable, hasMod, hasNonMod);
 
         this.functionalContracts = functionalContracts;
     }
@@ -162,18 +165,22 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
             final Map<LocationVariable, Term> newPreconditions,
             final Map<LocationVariable, Term> newPostconditions,
             final Map<LocationVariable, Term> newModifiesClauses,
-            Map<LocationVariable, Term> newModifiesNotClauses,
-            final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables, Term newMeasuredBy) {
+            final Map<LocationVariable, Term> newModifiesNotClauses,
+            final Map<ProgramVariable, Term> accessibleClauses,
+            final ImmutableList<InfFlowSpec> newinfFlowSpecs,
+            final Variables newVariables, Term newMeasuredBy) {
         return new SimpleBlockContract(baseName, newBlock, labels, method,
                 modality, newPreconditions, newMeasuredBy, newPostconditions,
-                newModifiesClauses, newModifiesNotClauses, newinfFlowSpecs,
-                newVariables, transactionApplicable, hasMod, hasMod, functionalContracts);
+                newModifiesClauses, newModifiesNotClauses, accessibleClauses,
+                newinfFlowSpecs, newVariables, transactionApplicable, hasMod,
+                hasMod, functionalContracts);
     }
 
     @Override
     public BlockContract setBlock(StatementBlock newBlock) {
         return update(newBlock, preconditions, postconditions, modifiesClauses,
-                modifiesNotClauses, infFlowSpecs, variables, measuredBy);
+                modifiesNotClauses, accessibleClauses, infFlowSpecs, variables,
+                measuredBy);
     }
 
     @Override
@@ -183,8 +190,9 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
         assert newKJT.equals(newPM.getContainerType());
         return new SimpleBlockContract(baseName, block, labels,
                 (IProgramMethod) newPM, modality, preconditions, measuredBy,
-                postconditions, modifiesClauses, modifiesNotClauses, infFlowSpecs,
-                variables, transactionApplicable, hasMod, hasMod, functionalContracts);
+                postconditions, modifiesClauses, modifiesNotClauses,
+                accessibleClauses, infFlowSpecs, variables,
+                transactionApplicable, hasMod, hasMod, functionalContracts);
     }
 
     @Override
@@ -250,10 +258,13 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
          *            map from every heap to an assignable term.
          * @param assignableNots
          *            TODO
+         * @param accessibles
+         *            TODO
          * @param hasMod
          *            map specifying on which heaps this contract has a modifies
          *            clause.
-         * @param hasNonMod TODO
+         * @param hasNonMod
+         *            TODO
          * @param services
          *            services.
          */
@@ -266,11 +277,14 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
                 Term returns, Term signals, Term signalsOnly, Term diverges,
                 Map<LocationVariable, Term> assignables,
                 Map<LocationVariable, Term> assignableNots,
-                Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasNonMod, Services services) {
+                Map<ProgramVariable, Term> accessibles,
+                Map<LocationVariable, Boolean> hasMod,
+                Map<LocationVariable, Boolean> hasNonMod, Services services) {
             super(baseName, block, labels, method, behavior, variables,
                     requires, measuredBy, ensures, infFlowSpecs, breaks,
                     continues, returns, signals, signalsOnly, diverges,
-                    assignables, assignableNots, hasMod, hasNonMod, services);
+                    assignables, assignableNots, accessibles, hasMod, hasNonMod,
+                    services);
         }
 
         @Override
@@ -279,13 +293,17 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
                 Map<LocationVariable, Term> preconditions, Term measuredBy,
                 Map<LocationVariable, Term> postconditions,
                 Map<LocationVariable, Term> modifiesClauses,
-                Map<LocationVariable, Term> modifiesNotClauses, ImmutableList<InfFlowSpec> infFlowSpecs,
-                Variables variables,
-                boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod, Map<LocationVariable, Boolean> hasNonMod) {
+                Map<LocationVariable, Term> modifiesNotClauses,
+                Map<ProgramVariable, Term> accessibleClauses,
+                ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
+                boolean transactionApplicable,
+                Map<LocationVariable, Boolean> hasMod,
+                Map<LocationVariable, Boolean> hasNonMod) {
             return new SimpleBlockContract(baseName, block, labels, method,
                     modality, preconditions, measuredBy, postconditions,
-                    modifiesClauses, modifiesNotClauses, infFlowSpecs,
-                    variables, transactionApplicable, hasMod, hasMod, null);
+                    modifiesClauses, modifiesNotClauses, accessibleClauses,
+                    infFlowSpecs, variables, transactionApplicable, hasMod,
+                    hasMod, null);
         }
     }
 
@@ -353,8 +371,9 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
                     head.getBlock(), head.getLabels(), head.getMethod(),
                     head.getModality(), preconditions, contracts[0].getMby(),
                     postconditions, modifiesClauses, modifiesNotClauses,
-                    head.getInfFlowSpecs(), placeholderVariables,
-                    head.isTransactionApplicable(), hasMod, hasMod, functionalContracts);
+                    accessibleClauses, head.getInfFlowSpecs(),
+                    placeholderVariables, head.isTransactionApplicable(),
+                    hasMod, hasMod, functionalContracts);
 
             return result;
         }
