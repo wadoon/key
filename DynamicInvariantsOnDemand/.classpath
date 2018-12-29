@@ -15,5 +15,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/org.key_project.ui"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.key_project.util"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.key_project.util.test"/>
+	<classpathentry kind="lib" path="libs/tools-1.7.0.13.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
