@@ -1,18 +1,21 @@
 package core;
 //FIXME 1
+import genmethod.GeneratedMethodReturnObject;
+
 import java.util.ArrayList;
 //import groovy.util.Eval
+
 
 public class MainMuster_EasyLoop1 {
 	public static void main(String[] args) {
 		//Caller
-		TraceMethodReturnObject traceMethodReturnObject = method1(5);
+		GeneratedMethodReturnObject traceMethodReturnObject = method1(5);
 		System.out.println("done");
 	}
 	
-    public static TraceMethodReturnObject method1(int x) {
+    public static GeneratedMethodReturnObject method1(int x) {
     	//Callable
-    	TraceMethodReturnObject traceMethodReturnObject = new TraceMethodReturnObject();
+    	GeneratedMethodReturnObject traceMethodReturnObject = new GeneratedMethodReturnObject();
 	    int  y = x;
     	int  z = 0;
     	//@ loop_invariant ((z == (x - y) * x) && (y >= 0));

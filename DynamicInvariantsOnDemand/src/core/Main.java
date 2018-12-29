@@ -82,14 +82,12 @@ public class Main {
 			// Hier möchte ich jetzt eine Invariante generieren
 			// Dazu 1. Java Code erstellen, der ausführbar ist, um traces zu erhalten
 			// Java Code als File abspeichern (warum? warum nicht einfach in memory)
-			// FIXME wie Variablen in jedem Schleifendurchlauf am Kopf tracen? gibt es passendes Reflection feature? -> eher unwahrscheinlich.
-			//       Möglich: In Klasse ArrayLists für die Variablen anlegen, und in den generierten Code die Zwischenwerte den ArrayLists hinzufügen
-			//				  Danach sogar ohne Reflection möglich darauf zuzugreifen
-			String javaCode = getExecuteableJavaCodeFromKeYFormat(program, update);
+			// FIXME innere Schleife behandeln (nicht nur first call)
+			String javaCode = generateMethodFromKeYFormat(program, update);
 			
 			//Write Code to file in workspace
 			Path currentPath = Paths.get(System.getProperty("user.dir"));
-			Path filePath = Paths.get(currentPath.toString(), "generated", "gen.java");
+			Path filePath = Paths.get(currentPath.toString(), "dynacode", "sample", "GeneratedMethod.java");
 			writeStringToFile(javaCode, filePath.toString());
 		}
 	    
@@ -97,7 +95,7 @@ public class Main {
 		return new Invariant(suggestedInvariant);
 	}
 	
-	public static String getExecuteableJavaCodeFromKeYFormat(StatementBlock program, Term update) {
+	public static String generateMethodFromKeYFormat(StatementBlock program, Term update) {
 		//FIXME: sind in Update wirklich immer alle relevanten Variablen? Siehe ImmutableList<Goal> openGoals = keyAPI.prove(proof);
 		//FIXME: was passiert, wenn darüber schon autoprooft wird, und die Variablen quasi schon älter sind, wurden dann die Updates schon vorher durchgeführt und die Variablen tauchen hier nicht mehr auf?
 		// Extrahiere Funktions-Input-Variablen (die die Zuweisung wie elem-update(_x)(x) haben) und extrahiere weitere Variablen, die relevant in der Schleife sind (elem-update(q)(Z(0(#))) & elem-update(r)(x))
