@@ -52,7 +52,9 @@ public class TermVariableNameCollectorVisitor implements Visitor{
 			else {
 				getsUpdatedWithName = visited.sub(0).op().name().toString();
 			}
-			variables.put(variableName, getsUpdatedWithName);
+			//FIXME better logic. Ignore the exception variable exc
+			if (!variableName.equals("exc"))
+				variables.put(variableName, getsUpdatedWithName);
 		}
 	}
 

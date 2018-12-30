@@ -1,4 +1,6 @@
 package core;
+import genmethod.MethodGenerator;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -32,13 +34,13 @@ import prover.SequentWrapper;
 public class Main {
 
 	private static String benchmarksFile1 = "benchmarks/Cohen.java";
-	private static String benchmarksFile2 = "benchmarks/Loop1.java";
+	private static String benchmarksFile2 = "benchmarks/EasyLoop1.java";
 	private static KeYAPI keyAPI;
 	
 	private static boolean firstCallInvGen = true;
 	
 	public static void main(String[] args) {
-		keyAPI = new KeYAPI(benchmarksFile1);
+		keyAPI = new KeYAPI(benchmarksFile2);
 		List<Contract> proofContracts = keyAPI.getContracts(); // Kopf von Cohen, public normal_behavior @ requires (0 <= x) && (0 < y); @ ensures \result*y <= x && x <= (\result+1)*y;
 		ProofResult result;
 		for(Contract currentContract : proofContracts) {
@@ -83,119 +85,16 @@ public class Main {
 			// Dazu 1. Java Code erstellen, der ausführbar ist, um traces zu erhalten
 			// Java Code als File abspeichern (warum? warum nicht einfach in memory)
 			// FIXME innere Schleife behandeln (nicht nur first call)
-			String javaCode = generateMethodFromKeYFormat(program, update);
+			String javaCode = MethodGenerator.generateMethodFromKeYFormat(program, update, loop);
 			
 			//Write Code to file in workspace
 			Path currentPath = Paths.get(System.getProperty("user.dir"));
-			Path filePath = Paths.get(currentPath.toString(), "dynacode", "sample", "GeneratedMethod.java");
+			Path filePath = Paths.get(currentPath.toString(), "dynacode", "genmethod", "GeneratedMethod.java");
 			writeStringToFile(javaCode, filePath.toString());
 		}
 	    
 		Term suggestedInvariant	= keyAPI.getSuggestedInvariant(loop); // Erste (User angegebene) Loop Invariante: and(leq(Z(0(#)),r),equals(_x,javaAddInt(javaMulInt(q,_y),r)))<<SC>>
 		return new Invariant(suggestedInvariant);
-	}
-	
-	public static String generateMethodFromKeYFormat(StatementBlock program, Term update) {
-		//FIXME: sind in Update wirklich immer alle relevanten Variablen? Siehe ImmutableList<Goal> openGoals = keyAPI.prove(proof);
-		//FIXME: was passiert, wenn darüber schon autoprooft wird, und die Variablen quasi schon älter sind, wurden dann die Updates schon vorher durchgeführt und die Variablen tauchen hier nicht mehr auf?
-		// Extrahiere Funktions-Input-Variablen (die die Zuweisung wie elem-update(_x)(x) haben) und extrahiere weitere Variablen, die relevant in der Schleife sind (elem-update(q)(Z(0(#))) & elem-update(r)(x))
-		TermVariableNameCollectorVisitor varNameCollector = new TermVariableNameCollectorVisitor();
-		update.execPreOrder(varNameCollector);
-		
-		StringBuilder javaCodeBuilder = new StringBuilder();
-		StringBuilder functionHeaderParameterBuilder = new StringBuilder();
-		StringBuilder localVariableAssignmentBuilder = new StringBuilder();
-		StringBuilder functionHeaderBuilder = new StringBuilder();
-		
-		final String classHeader = "public class foo {";
-		
-		// FIXME: Better Logic
-		String functionType = "";
-		if (program.toString().contains("return;") || !program.toString().contains("return"))
-			functionType = "void";
-		else
-			functionType = "int";
-		functionHeaderBuilder.append("public ");
-		functionHeaderBuilder.append(functionType);
-		functionHeaderBuilder.append(" bar(");
-		
-		
-		// Extrahiere input / parameter Variables von visitor
-		// Und local Variables mit Assignment um deren Anfangs-Zuweisungen zum Programm zu ergänzen (fehlt in StatementBlock)
-		ArrayList<String> inputVars = new ArrayList<String>();
-		HashMap<String, String> localVarsAndAssignment = new HashMap<String, String>();
-		for (Entry<String, String> e : varNameCollector.variables.entrySet()) {
-			// Function parameter Variables start with underscore _
-			String variableName = e.getKey().toString();
-			if (variableName.startsWith("_")) {
-				inputVars.add(variableName);
-			} 
-			else {
-				localVarsAndAssignment.put(e.getKey(), e.getValue());
-			}
-		}
-		
-		// Build local variable assignments
-		for (Entry<String, String> e : localVarsAndAssignment.entrySet()) {
-			localVariableAssignmentBuilder.append(e.getKey());
-			localVariableAssignmentBuilder.append(" = ");
-			localVariableAssignmentBuilder.append(e.getValue());
-			localVariableAssignmentBuilder.append(";");
-		}
-		
-		// Build Parameter List for Function
-		for (String var : inputVars) {
-			//only integer supported atm
-			if (functionHeaderParameterBuilder.length() > 0) 
-				functionHeaderParameterBuilder.append(", ");
-			functionHeaderParameterBuilder.append("int ");
-			functionHeaderParameterBuilder.append(var);
-		}
-		functionHeaderBuilder.append(functionHeaderParameterBuilder.toString());
-		functionHeaderBuilder.append(")");
-		
-		// Build Code
-		javaCodeBuilder.append(classHeader);
-		javaCodeBuilder.append(System.lineSeparator());
-		javaCodeBuilder.append(functionHeaderBuilder.toString());
-		javaCodeBuilder.append(System.lineSeparator());
-		javaCodeBuilder.append("{");
-		javaCodeBuilder.append(localVariableAssignmentBuilder.toString());
-		javaCodeBuilder.append(System.lineSeparator());
-		//Remove leading "{" of StatementBlock to inject variable assignments
-		javaCodeBuilder.append(program.toSource().replaceAll("^\\{+", ""));
-		// Close Class declaration
-		javaCodeBuilder.append(System.lineSeparator());
-		javaCodeBuilder.append("}");
-
-		return javaCodeBuilder.toString();
-	}
-
-	public static ArrayList<String> getArrayListVarStringsFromVars(ArrayList<String> variables, boolean beginLoop) {
-		// beginLoop=false -> Names with afterLoop.
-		// Example: Returns for variables(x,y): ArrayList<Integer> beginLoop_x = new ArrayList<Integer>();
-		//										ArrayList<Integer> beginLoop_y = new ArrayList<Integer>();
-		ArrayList<String> arrayListVarStrings = new ArrayList<String>();
-		
-		final String BEGIN_DECLARATION = "ArrayList<Integer> ";
-		final String PREFIX_VAR_NAME = beginLoop ? "beginLoop" : "afterLoop";
-		final String END_DECLARATION = " = new ArrayList<Integer>();";
-		
-		StringBuilder arrayListVarStringBuilder = new StringBuilder();
-		for (String var : variables) {
-			arrayListVarStringBuilder.append(BEGIN_DECLARATION);
-			arrayListVarStringBuilder.append(PREFIX_VAR_NAME);
-			arrayListVarStringBuilder.append("_");
-			arrayListVarStringBuilder.append(var);
-			arrayListVarStringBuilder.append(END_DECLARATION);
-			
-			//Add ArrayListVarStrings for this variable to the returned List
-			arrayListVarStrings.add(arrayListVarStringBuilder.toString());
-			//Clear Builder for next var
-			arrayListVarStringBuilder.setLength(0);
-		}
-		
-		return arrayListVarStrings;
 	}
 	
 	public static void writeStringToFile(String content, String fileDest) {
