@@ -32,7 +32,8 @@ public abstract class MethodGenerator {
 		StringBuilder inputVariableFromParameterListBuilder = new StringBuilder();
 		StringBuilder variableAssignmentBuilder = new StringBuilder();
 		StringBuilder functionHeaderBuilder = new StringBuilder();
-		StringBuilder beforeLoopArrayListVarStringBuilder = new StringBuilder();
+		StringBuilder beginLoopAddTracesBuilder = new StringBuilder();
+		StringBuilder beginLoopArrayListVarStringBuilder = new StringBuilder();
 		StringBuilder afterLoopVarDeclarationBuilder = new StringBuilder();
 		
 		final String packageString = "package genmethod;";
@@ -90,20 +91,29 @@ public abstract class MethodGenerator {
 		}
 		
 		// Build code like ArrayList<Integer> beginLoop_x = new ArrayList<Integer>();
-		ArrayList<String> beforeLoopVarNames = getVariablesNamesWithPrefix(varNameCollector.variables.keySet(), "beforeLoop_");
-		ArrayList<String> beforeLoopArrayListVarStrings = getArrayListVarStringsFromVars(beforeLoopVarNames);
-		for (String s : beforeLoopArrayListVarStrings) {
-			beforeLoopArrayListVarStringBuilder.append(s);
-			beforeLoopArrayListVarStringBuilder.append(System.lineSeparator());
+		ArrayList<String> beginLoopVarNames = getVariablesNamesWithPrefix(varNameCollector.variables.keySet(), "beginLoop_");
+		ArrayList<String> beginLoopArrayListVarStrings = getArrayListVarStringsFromVars(beginLoopVarNames);
+		for (String s : beginLoopArrayListVarStrings) {
+			beginLoopArrayListVarStringBuilder.append(s);
+			beginLoopArrayListVarStringBuilder.append(System.lineSeparator());
+		}
+		
+		Iterator<String> varNames = varNameCollector.variables.keySet().iterator();
+		for (String s : beginLoopVarNames) {
+			beginLoopAddTracesBuilder.append(s);
+			beginLoopAddTracesBuilder.append(".add(");
+			beginLoopAddTracesBuilder.append(varNames.next());
+			beginLoopAddTracesBuilder.append(");");
+			beginLoopAddTracesBuilder.append(System.lineSeparator());
 		}
 		
 		ArrayList<String> afterLoopVarNames = getVariablesNamesWithPrefix(varNameCollector.variables.keySet(), "afterLoop_");
-		Iterator<String> varNames = varNameCollector.variables.keySet().iterator();
+		Iterator<String> varNames2 = varNameCollector.variables.keySet().iterator();
 		for (String s : afterLoopVarNames) {
 			afterLoopVarDeclarationBuilder.append("int ");
 			afterLoopVarDeclarationBuilder.append(s);
 			afterLoopVarDeclarationBuilder.append(" = ");
-			afterLoopVarDeclarationBuilder.append(varNames.next());
+			afterLoopVarDeclarationBuilder.append(varNames2.next());
 			afterLoopVarDeclarationBuilder.append(";");
 			afterLoopVarDeclarationBuilder.append(System.lineSeparator());
 		}
@@ -126,14 +136,26 @@ public abstract class MethodGenerator {
 		javaCodeBuilder.append(variableAssignmentBuilder.toString());
 		//Remove leading "{" of StatementBlock to inject variable assignments (done above)
 		//javaCodeBuilder.append(program.toSource().replaceAll("^\\{+", ""));
-		for (String s : beforeLoopArrayListVarStrings) {
+		for (String s : beginLoopArrayListVarStrings) {
 			javaCodeBuilder.append(s);
 			javaCodeBuilder.append(System.lineSeparator());
 		}
-		javaCodeBuilder.append(loop.toSource());
+		
+		
+		String loopString = loop.toSource();
+		Matcher m = Pattern.compile("while.*(\\{)").matcher(loopString);
+		String replacement = "{" +  beginLoopAddTracesBuilder.toString();
+		if (m.find()) {
+			String injectedInWhile = new StringBuilder(loopString).replace(m.start(1), m.end(1), replacement).toString();
+			javaCodeBuilder.append(injectedInWhile);
+		} else
+			javaCodeBuilder.append(loop.toSource());
+		
+		
+		
 		javaCodeBuilder.append(System.lineSeparator());
 		javaCodeBuilder.append(afterLoopVarDeclarationBuilder.toString());
-		javaCodeBuilder.append(buildCodeForReturnObject(returnObject, beforeLoopVarNames, afterLoopVarNames, returnVariable));
+		javaCodeBuilder.append(buildCodeForReturnObject(returnObject, beginLoopVarNames, afterLoopVarNames, returnVariable));
 		javaCodeBuilder.append("return " + returnObject + ";");
 		javaCodeBuilder.append(System.lineSeparator());
 		javaCodeBuilder.append("}");
@@ -144,15 +166,15 @@ public abstract class MethodGenerator {
 		return javaCodeBuilder.toString();
 	}
 	
-	private static String buildCodeForReturnObject(String returnObject, ArrayList<String> beforeLoopVarNames, ArrayList<String> afterLoopVarNames, String returnVariable) {
+	private static String buildCodeForReturnObject(String returnObject, ArrayList<String> beginLoopVarNames, ArrayList<String> afterLoopVarNames, String returnVariable) {
 		StringBuilder code = new StringBuilder();
 		
      	//Set beginLoop Variables in object
      	String beginLoopTracesAssignment = returnObject + ".beginLoopTraces.add";
-		for (String beforeLoopVar : beforeLoopVarNames) {
+		for (String beginLoopVar : beginLoopVarNames) {
 			code.append(beginLoopTracesAssignment);
 			code.append("(");
-			code.append(beforeLoopVar);
+			code.append(beginLoopVar);
 			code.append(");");
 			code.append(System.lineSeparator());
 		}
@@ -182,9 +204,10 @@ public abstract class MethodGenerator {
 		
 		Pattern p = Pattern.compile(Pattern.quote(pattern1) + "(.*?)" + Pattern.quote(pattern2));
 		Matcher m = p.matcher(line);
-		m.find();
-
-		return m.group(1);
+		if (m.find())
+			return m.group(1);
+		else
+			return null;
 	}
 	
 	public static ArrayList<String> getVariablesNamesWithPrefix(Set<String> variables, String prefix) {
