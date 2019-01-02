@@ -18,33 +18,36 @@ import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SVSubstitute;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.util.Pair;
 
 /**
- * Instantiates a parametric skolem update for abstract execution. The update
- * receives two LocSets for its assignable and accessible locations; those are
+ * Instantiates a parametric skolem path condition for abstract execution. The
+ * such generated formula receives one LocSet for its assignable; those are
  * obtained from the block contracts of the {@link AbstractPlaceholderStatement}
  * it is generated for.
  *
  * @author Dominic Steinhöfel
  */
-public class InitializeParametricSkolemUpdate extends
+public class InitializeParametricSkolemPathCondition extends
         InitializeParametricSkolemConstructsForAE implements VariableCondition {
-    private final SchemaVariable updateSV;
+    private final SchemaVariable pathCondSV;
     private final ProgramSV abstrProgSV;
+    private final ProgramSV excSV;
+    private final ProgramSV returnedSV;
+    private final ProgramSV resultSV;
 
-    public InitializeParametricSkolemUpdate(SchemaVariable updateSV,
-            ProgramSV abstrProgSV) {
-        this.updateSV = updateSV;
+    public InitializeParametricSkolemPathCondition(SchemaVariable pathCondSV,
+            ProgramSV abstrProgSV, ProgramSV excSV, ProgramSV returnedSV,
+            ProgramSV resultSV) {
+        this.pathCondSV = pathCondSV;
         this.abstrProgSV = abstrProgSV;
+        this.excSV = excSV;
+        this.returnedSV = returnedSV;
+        this.resultSV = resultSV;
     }
 
     @Override
@@ -52,7 +55,7 @@ public class InitializeParametricSkolemUpdate extends
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
-        if (svInst.isInstantiated(updateSV)) {
+        if (svInst.isInstantiated(pathCondSV)) {
             return matchCond;
         }
 
@@ -62,29 +65,33 @@ public class InitializeParametricSkolemUpdate extends
 
         final TermBuilder tb = services.getTermBuilder();
 
-        final Pair<Term, Term> accessibleAndAssignableClause =
-                getAccessibleAndAssignableTerms(abstrStmt, svInst, services);
-        final Term accessibleClause = accessibleAndAssignableClause.first;
-        final Term assignableClause = accessibleAndAssignableClause.second;
+        Term accessibleClause = getAccessibleAndAssignableTerms(abstrStmt,
+                svInst, services).first;
 
-        final String updateName = tb
-                .newName(updateSV.name().toString() + "_" + abstrStmt.getId());
+        for (final ProgramSV furtherSV : new ProgramSV[] { excSV, returnedSV,
+                resultSV }) {
+            final LocationVariable furtherLV =
+                    (LocationVariable) svInst.getInstantiation(furtherSV);
+            accessibleClause = tb.union(accessibleClause,
+                    tb.singletonPV(tb.var(furtherLV)));
+        }
+
+        final String pathCondName = tb.newName(
+                pathCondSV.name().toString() + "_" + abstrStmt.getId());
         final Sort locSetSort =
                 services.getTypeConverter().getLocSetLDT().targetSort();
 
-        final Term update = tb.func(
-                new Function(new Name(updateName), Sort.UPDATE, true, false,
-                        locSetSort, locSetSort),
-                assignableClause, accessibleClause);
+        final Term pathCond = tb.func(new Function(new Name(pathCondName),
+                Sort.FORMULA, true, false, locSetSort), accessibleClause);
 
         return matchCond
-                .setInstantiations(svInst.add(updateSV, update, services));
+                .setInstantiations(svInst.add(pathCondSV, pathCond, services));
     }
 
     @Override
     public String toString() {
         return String.format(
-                "\\varcond (\\initializeParametricSkolemUpdate(%s, %s))",
-                updateSV, abstrProgSV);
+                "\\varcond (\\initializeParametricSkolemPathCondition(%s, %s))",
+                pathCondSV, abstrProgSV);
     }
 }

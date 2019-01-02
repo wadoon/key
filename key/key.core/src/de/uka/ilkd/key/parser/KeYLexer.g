@@ -227,6 +227,7 @@ lexer grammar KeYLexer;
 
         // Keywords for varcond and related stuff
     INITIALIZE_PARAMETRIC_SKOLEM_UPDATE : '\\initializeParametricSkolemUpdate' ;
+    INITIALIZE_PARAMETRIC_SKOLEM_PATH_CONDITION : '\\initializeParametricSkolemPathCondition' ;
     PREFIX_CONTAINS_ELEMENT : '\\prefixContainsElement' ;
     INSTANTIATE_VARS_FRESH : '\\instantiateVarsFresh' ;
     NEW_PV : '\\newPV' ;

@@ -3852,6 +3852,7 @@ varexp[TacletBuilder b]
 :
   ( varcond_applyUpdateOnRigid[b]
     | varcond_initializeParametricSkolemUpdate[b]
+    | varcond_initializeParametricSkolemPathCondition[b]
     | varcond_prefixContainsElement[b, negated]
     | varcond_dropEffectlessElementaries[b]
     | varcond_instantiateVarsFresh[b]
@@ -3963,6 +3964,26 @@ varcond_initializeParametricSkolemUpdate[TacletBuilder b]
         new InitializeParametricSkolemUpdate(
           (SchemaVariable) updateSV, 
           (ProgramSV) abstrProgramSV));
+   }
+;
+
+varcond_initializeParametricSkolemPathCondition[TacletBuilder b]
+:
+   INITIALIZE_PARAMETRIC_SKOLEM_PATH_CONDITION LPAREN
+     formulaSV=varId COMMA
+     abstrProgramSV=varId COMMA
+     excSV=varId COMMA
+     returnedSV=varId COMMA
+     resultSV=varId
+   RPAREN 
+   {
+      b.addVariableCondition(
+        new InitializeParametricSkolemPathCondition(
+          (SchemaVariable) formulaSV, 
+          (ProgramSV) abstrProgramSV,
+          (ProgramSV) excSV,
+          (ProgramSV) returnedSV,
+          (ProgramSV) resultSV));
    }
 ;
 
