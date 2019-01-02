@@ -335,16 +335,16 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
          */
         final Map<ProgramVariable, ProgramVariable> fishyReplacementMap =
                 new HashMap<>();
-        for (ProgramVariable pvToReplace : replaceMap.keySet()) {
-            final List<ProgramVariable> fishyMatches = pvs.stream()
-                    .filter(pv -> !replaceMap.containsKey(pv))
-                    .filter(pv -> pv.toString().equals(pvToReplace.toString()))
-                    .collect(Collectors.toList());
+        //for (ProgramVariable pvToReplace : replaceMap.keySet()) {
+        //    final List<ProgramVariable> fishyMatches = pvs.stream()
+        //            .filter(pv -> !replaceMap.containsKey(pv))
+        //            .filter(pv -> pv.toString().equals(pvToReplace.toString()))
+        //            .collect(Collectors.toList());
 
-            for (ProgramVariable fishyPV : fishyMatches) {
-                fishyReplacementMap.put(fishyPV, replaceMap.get(pvToReplace));
-            }
-        }
+        //    for (ProgramVariable fishyPV : fishyMatches) {
+        //        fishyReplacementMap.put(fishyPV, replaceMap.get(pvToReplace));
+        //    }
+        //}
 
         if (!fishyReplacementMap.isEmpty()) {
             ProgramVariable exampleRepl =
@@ -358,7 +358,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     exampleRepl, fishyReplacementMap.get(exampleRepl)));
         }
 
-//        services.getSpecificationRepository().removeBlockContract(x);
+        services.getSpecificationRepository().removeBlockContract(x);
         services.getSpecificationRepository()
                 .addBlockContract(createNewBlockContract(x, x.getBlock(), false,
                         fishyReplacementMap));

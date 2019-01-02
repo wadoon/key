@@ -73,7 +73,7 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
                  */
                 .collect(Collectors.toList());
 
-        // assert contracts.size() <= 1;
+        assert contracts.size() <= 1;
 
         Term accessibleClause;
         Term assignableClause;

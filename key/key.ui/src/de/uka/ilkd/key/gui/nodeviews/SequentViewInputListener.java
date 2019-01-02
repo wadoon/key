@@ -19,6 +19,9 @@ import java.awt.event.*;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
@@ -27,12 +30,13 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class SequentViewInputListener implements KeyListener, MouseMotionListener, MouseListener {
+public class SequentViewInputListener
+        implements KeyListener, MouseMotionListener, MouseListener {
 
     private final SequentView sequentView;
     private boolean showTermInfo = false;
 
-    //do not refresh when set to false
+    // do not refresh when set to false
     private static boolean refresh = true;
 
     protected void showTermInfo(Point p) {
@@ -47,41 +51,57 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
                 final PosInOccurrence posInOcc = mousePos.getPosInOccurrence();
                 if (posInOcc != null) {
                     t = posInOcc.subTerm();
-                    String tOpClassString = t.op().getClass().toString();
-                    String operator = tOpClassString.substring(
-                            tOpClassString.lastIndexOf('.') + 1);
-                    // The hash code is displayed here since sometimes terms with
-                    // equal string representation are still different.
-                    info =  operator + " (" + (t.isRigid() ? "Rigid" : "Nonrigid") + "), Sort: " + t.sort() + ", Hash:" + t.hashCode();
+                    String operator = opStrFromTerm(t);
+                    /*
+                     * The hash code is displayed here since sometimes terms
+                     * with equal string representation are still different.
+                     */
+                    info = operator + " ("
+                            + (t.isRigid() ? "Rigid" : "Nonrigid") + "), Sort: "
+                            + t.sort() + ", Hash: " + t.hashCode();
 
-                    Sequent seq = sequentView.getMainWindow().getMediator().getSelectedNode().sequent();
+                    if (t.op() instanceof LocationVariable) {
+                        info += ", Op Hash: " + t.op().hashCode();
+                    }
+
+                    if (t.op() instanceof ElementaryUpdate) {
+                        final Operator lhs = ((ElementaryUpdate) t.op()).lhs();
+                        info += String.format(" (LHS: Sort: %s, Hash: %d)",
+                                ((LocationVariable) lhs).sort(),
+                                lhs.hashCode());
+                    }
+
+                    Sequent seq = sequentView.getMainWindow().getMediator()
+                            .getSelectedNode().sequent();
                     info += ProofSaver.posInOccurrence2Proof(seq, posInOcc);
                 }
             }
 
             if (info == null) {
                 sequentView.getMainWindow().setStandardStatusLine();
-            } else {
+            }
+            else {
                 sequentView.getMainWindow().setStatusLine(info);
             }
         }
     }
 
-
+    private String opStrFromTerm(Term t) {
+        final String tOpClassString = t.op().getClass().toString();
+        final String operator =
+                tOpClassString.substring(tOpClassString.lastIndexOf('.') + 1);
+        return operator;
+    }
 
     public static boolean isRefresh() {
-		return refresh;
-	}
+        return refresh;
+    }
 
+    public static void setRefresh(boolean refresh) {
+        SequentViewInputListener.refresh = refresh;
+    }
 
-
-	public static void setRefresh(boolean refresh) {
-		SequentViewInputListener.refresh = refresh;
-	}
-
-
-
-	SequentViewInputListener(SequentView sequentView) {
+    SequentViewInputListener(SequentView sequentView) {
         this.sequentView = sequentView;
     }
 
@@ -90,9 +110,6 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
         // This method is required by KeyListener interface.
     }
 
-    /* (non-Javadoc)
-     * @see java.awt.event.KeyListener#keyPressed(java.awt.event.KeyEvent)
-     */
     @Override
     public void keyPressed(KeyEvent e) {
         if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) != 0) {
@@ -101,12 +118,10 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
         }
     }
 
-    /* (non-Javadoc)
-     * @see java.awt.event.KeyListener#keyReleased(java.awt.event.KeyEvent)
-     */
     @Override
     public void keyReleased(KeyEvent e) {
-        if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) == 0 && showTermInfo) {
+        if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) == 0
+                && showTermInfo) {
             showTermInfo = false;
             sequentView.getMainWindow().setStandardStatusLine();
         }
@@ -120,7 +135,8 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
     @Override
     public void mouseMoved(MouseEvent me) {
         showTermInfo(me.getPoint());
-        if (sequentView.refreshHighlightning && refresh && sequentView.getDocument().getLength() > 0) {
+        if (sequentView.refreshHighlightning && refresh
+                && sequentView.getDocument().getLength() > 0) {
             sequentView.highlight(me.getPoint());
         }
     }

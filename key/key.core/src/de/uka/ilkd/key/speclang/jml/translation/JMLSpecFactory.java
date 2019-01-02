@@ -1531,6 +1531,13 @@ public class JMLSpecFactory {
             return DefaultImmutableSet.nil();
         }
 
+        /*
+         * XXX (DS, 2019-01-02: This is buggy... Somehow, it breaks the
+         * selection mechanism for the contracts / the variables renaming. In
+         * any case, there is a variable name mismatch. We have to copy
+         * contracts textually for now, and either fix or remove this buggy
+         * contracts_of mechanism.
+         */
         if (!specificationCase.getContractsOfs().isEmpty()) {
             assert specificationCase.getContractsOfs().size() == 1;
             final String contractsOfSpec =
