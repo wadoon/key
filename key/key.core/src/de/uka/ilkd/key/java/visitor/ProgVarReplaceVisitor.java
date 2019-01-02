@@ -13,7 +13,10 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
@@ -315,53 +318,16 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     @Override
     public void performActionOnAbstractPlaceholderStatementContract(
             BlockContract x) {
-        final ProgramVariableCollector pvc =
-                new ProgramVariableCollector(x.getBlock(), services);
-        pvc.start();
-        final Set<LocationVariable> pvs = pvc.result();
-
+        // services.getSpecificationRepository().removeBlockContract(x);
         /*
-         * XXX (DS, 2018-12-21): Below you witness a super-evil hack the
-         * consequences of which I would not dare to estimate. Problem here is
-         * that the accessible and assignable clauses of the block contracts for
-         * abstract placeholder statements are obviously at one point not
-         * replaced when they should be, and here it's too late then -- we have
-         * stale PVS w/o any connection to the sequent. Therefore this
-         * "normalization" step where we judge PVs by names. This is only sound
-         * if there are not actually two *different* PVs with the same names
-         * present, which though might happen I think.
-         *
-         * REMOVE THIS HACK EVENTUALLY.
+         * NOTE (DS, 2019-02-01): We cannot remove the block contracts, since in
+         * typical equivalence proofs, the old one has to be used again for the
+         * other branch of a biimplication. Classes like
+         * InitializeParametricSkolemUpdate will then somehow choose the
+         * matching contract.
          */
-        final Map<ProgramVariable, ProgramVariable> fishyReplacementMap =
-                new HashMap<>();
-        //for (ProgramVariable pvToReplace : replaceMap.keySet()) {
-        //    final List<ProgramVariable> fishyMatches = pvs.stream()
-        //            .filter(pv -> !replaceMap.containsKey(pv))
-        //            .filter(pv -> pv.toString().equals(pvToReplace.toString()))
-        //            .collect(Collectors.toList());
-
-        //    for (ProgramVariable fishyPV : fishyMatches) {
-        //        fishyReplacementMap.put(fishyPV, replaceMap.get(pvToReplace));
-        //    }
-        //}
-
-        if (!fishyReplacementMap.isEmpty()) {
-            ProgramVariable exampleRepl =
-                    fishyReplacementMap.keySet().iterator().next();
-            System.err.println(String.format(
-                    "Evil hack happend %d times in %s: Replacing, e.g., PV %s by %s although"
-                            + " not contained in initial replacement map"
-                            + " (another PV with the same name is contained,"
-                            + " though, we made a normalization)",
-                    fishyReplacementMap.size(), this.getClass().getSimpleName(),
-                    exampleRepl, fishyReplacementMap.get(exampleRepl)));
-        }
-
-        services.getSpecificationRepository().removeBlockContract(x);
-        services.getSpecificationRepository()
-                .addBlockContract(createNewBlockContract(x, x.getBlock(), false,
-                        fishyReplacementMap));
+        services.getSpecificationRepository().addBlockContract(
+                createNewBlockContract(x, x.getBlock(), false));
     }
 
     @Override
@@ -437,17 +403,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     private BlockContract createNewBlockContract(
             final BlockContract oldContract, final StatementBlock newBlock,
             final boolean blockChanged) {
-        return createNewBlockContract(oldContract, newBlock, blockChanged,
-                new HashMap<>());
-    }
-
-    private BlockContract createNewBlockContract(
-            final BlockContract oldContract, final StatementBlock newBlock,
-            final boolean blockChanged,
-            final Map<ProgramVariable, ProgramVariable> fishyReplacementMap) {
         final Map<ProgramVariable, ProgramVariable> replMap = new HashMap<>();
         replMap.putAll(this.replaceMap);
-        replMap.putAll(fishyReplacementMap);
 
         final BlockContract.Variables newVariables =
                 replaceBlockContractVariables(
