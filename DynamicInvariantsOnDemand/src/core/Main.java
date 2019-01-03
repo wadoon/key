@@ -7,7 +7,9 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -21,9 +23,25 @@ import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
+import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
+import de.uka.ilkd.key.proof.DefaultTaskStartedInfo;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProverTaskListener;
+import de.uka.ilkd.key.proof.TaskFinishedInfo;
+import de.uka.ilkd.key.proof.TaskStartedInfo.TaskKind;
+import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
+import de.uka.ilkd.key.settings.ProofIndependentSettings;
+import de.uka.ilkd.key.settings.SMTSettings;
+import de.uka.ilkd.key.smt.SMTProblem;
+import de.uka.ilkd.key.smt.SMTSolver;
+import de.uka.ilkd.key.smt.SolverLauncher;
+import de.uka.ilkd.key.smt.SolverLauncherListener;
+import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.util.Debug;
 import prover.CounterExample;
 import prover.InvGenResult;
 import prover.Invariant;
@@ -40,7 +58,7 @@ public class Main {
 	private static boolean firstCallInvGen = true;
 	
 	public static void main(String[] args) {
-		keyAPI = new KeYAPI(benchmarksFile2);
+		keyAPI = new KeYAPI(benchmarksFile1);
 		List<Contract> proofContracts = keyAPI.getContracts(); // Kopf von Cohen, public normal_behavior @ requires (0 <= x) && (0 < y); @ ensures \result*y <= x && x <= (\result+1)*y;
 		ProofResult result;
 		for(Contract currentContract : proofContracts) {
@@ -57,7 +75,7 @@ public class Main {
 			for(Goal currentGoal : openGoals) {
 				SequentWrapper currentSequent = keyAPI.getSequent(currentGoal);
 				// FIXME: better solution here. Also, this won't work for multiple functions in one class
-				InvGenResult result = attemptInvGen(currentSequent, firstCallInvGen);
+				InvGenResult result = attemptInvGen(currentSequent, firstCallInvGen, proof);
 				if (firstCallInvGen) firstCallInvGen = false;
 				if(result instanceof CounterExample) {
 					CounterExample counterexample = (CounterExample)result;
@@ -72,7 +90,7 @@ public class Main {
 		return new ProofWrapper(proof); 
 	}
 	
-	public static InvGenResult attemptInvGen(SequentWrapper sequent, boolean firstCall) {
+	public static InvGenResult attemptInvGen(SequentWrapper sequent, boolean firstCall, Proof proof) {
 		List<Term> gamma 		= sequent.getGamma();   // [wellFormed(heap), equals(boolean::select(heap,self,java.lang.Object::<created>),TRUE), equals(SimpleExamples::exactInstance(self),TRUE), measuredByEmpty, geq(x,Z(0(#))), geq(y,Z(1(#))), not(equals(self,null))]
 		StatementBlock program 	= sequent.getProgram(); // {while ( _y<=r ) {     int a = 1;     int b = _y;                         while ( 2*b<=r ) {       a=2*a;       b=2*b;     }     r=r-b;     q=q+a;   }                 return  q; }
 		Term phi 				= sequent.getPhi();		// Cohen Kopf: and(and(and(leq(mul(y,result),x),geq(mul(y,result),add(x,mul(y,Z(neglit(1(#)))))))<<SC>>,java.lang.Object::<inv>(heap,self)<<impl>>)<<SC>>,equals(exc,null)<<impl>>)
@@ -80,7 +98,51 @@ public class Main {
 		Term update				= sequent.getUpdate();  // parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(_x)(x),elem-update(_y)(y)),elem-update(exc)(null)),elem-update(q)(Z(0(#)))),elem-update(r)(x))
 														// Für innere Invariante: parallel-upd(parallel-upd(parallel-upd(parallel-upd(parallel-upd(parallel-upd(elem-update(_x)(x),elem-update(_y)(y)),elem-update(exc)(null)),parallel-upd(elem-update(heapBefore_LOOP)(heap),parallel-upd(parallel-upd(elem-update(q)(q_0),elem-update(r)(r_0)),elem-update(heap)(anon(heap,empty,anon_heap_LOOP<<anonHeapFunction>>))))),elem-update(exc_1)(FALSE)),elem-update(a)(Z(1(#)))),elem-update(b_2)(y))
 														// Also a = 1, b_2 = y, neue Temp Vars für q und r (q_0, r_0). Warum a, aber b_2?
-		if (firstCall) {	
+		if (firstCall) {
+			/* Z3 BELEGUNGEN TEST
+			*/
+			
+		    final Collection<SMTProblem> problems = new LinkedList<SMTProblem>();
+		    problems.add(new SMTProblem(gamma.get(4)));
+
+		    //create special smt settings for test case generation
+		    final ProofIndependentSMTSettings piSettings = ProofIndependentSettings.DEFAULT_INSTANCE
+		          .getSMTSettings().clone();
+		    piSettings.setMaxConcurrentProcesses(1);
+		    final ProofDependentSMTSettings pdSettings = proof.getSettings()
+		          .getSMTSettings().clone();
+		    //pdSettings.invariantForall = settings.invaraiantForAll();
+		    // invoke z3 for counterexamples
+		    final SMTSettings smtsettings = new SMTSettings(pdSettings,
+		          piSettings, proof);
+		    SolverLauncher launcher = new SolverLauncher(smtsettings);
+		    launcher.addListener(new SolverLauncherListener() {
+		       @Override
+		       public void launcherStopped(SolverLauncher launcher, Collection<SMTSolver> finishedSolvers) {
+		          System.out.println("launcher stopped");
+		       }
+		       
+		       @Override
+		       public void launcherStarted(Collection<SMTProblem> problems, Collection<SolverType> solverTypes, SolverLauncher launcher) {
+		    	   System.out.println("launcher started");
+		       }
+		    });
+		    // launcher.addListener(new SolverListener(settings));
+		    final List<SolverType> solvers = new LinkedList<SolverType>();
+		    solvers.add(SolverType.Z3_CE_SOLVER);
+		    if (SolverType.Z3_CE_SOLVER.checkForSupport()) {
+			    launcher.launch(solvers, problems, proof.getServices());
+				System.out.println("launcher launched");
+		    } else {
+		    	System.out.println("Z3 not installed or wrong version");
+		    }
+
+			/* Z3 TEST ENDE
+			*/
+		    
+		    
+		    
+		    
 			// Hier möchte ich jetzt eine Invariante generieren
 			// Dazu 1. Java Code erstellen, der ausführbar ist, um traces zu erhalten
 			// Java Code als File abspeichern (warum? warum nicht einfach in memory)
