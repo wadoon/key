@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import de.uka.ilkd.key.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Operator;
 
@@ -37,6 +38,9 @@ public class OpCollector extends DefaultVisitor {
         ops.add(t.op());
         if (t.op() instanceof ElementaryUpdate) {
             ops.add(((ElementaryUpdate) t.op()).lhs());
+        }
+        if (t.op() instanceof AbstractUpdate) {
+            ((AbstractUpdate) t.op()).lhs().execPostOrder(this);
         }
     }
 

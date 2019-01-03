@@ -21,7 +21,15 @@ import org.key_project.util.collection.ImmutableList;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
 
@@ -47,7 +55,7 @@ public abstract class Notation {
 
     /** get the priority of the term */
     public final int getPriority() {
-        return priority;
+        return this.priority;
     }
 
     /**
@@ -81,7 +89,7 @@ public abstract class Notation {
 
         @Override
         public void print(Term t, LogicPrinter sp) throws IOException {
-            sp.printConstant(t, name);
+            sp.printConstant(t, this.name);
         }
     }
 
@@ -100,7 +108,7 @@ public abstract class Notation {
 
         @Override
         public void print(Term t, LogicPrinter sp) throws IOException {
-            sp.printPrefixTerm(name, t, t.sub(0), ass);
+            sp.printPrefixTerm(this.name, t, t.sub(0), this.ass);
         }
 
     }
@@ -121,7 +129,7 @@ public abstract class Notation {
 
         @Override
         public void print(Term t, LogicPrinter sp) throws IOException {
-            sp.printInfixTerm(t.sub(0), assLeft, name, t, t.sub(1), assRight);
+            sp.printInfixTerm(t.sub(0), this.assLeft, this.name, t, t.sub(1), this.assRight);
         }
 
         /**
@@ -131,8 +139,8 @@ public abstract class Notation {
         @Override
         public void printContinuingBlock(Term t, LogicPrinter sp)
                 throws IOException {
-            sp.printInfixTermContinuingBlock(t.sub(0), assLeft, name, t,
-                    t.sub(1), assRight);
+            sp.printInfixTermContinuingBlock(t.sub(0), this.assLeft, this.name, t,
+                    t.sub(1), this.assRight);
         }
 
     }
@@ -144,13 +152,13 @@ public abstract class Notation {
 
         public LabelNotation(String beginLabel, String endLabel, int prio) {
             super(prio);
-            left = beginLabel;
-            right = endLabel;
+            this.left = beginLabel;
+            this.right = endLabel;
         }
 
         @Override
         public void print(Term t, LogicPrinter sp) throws IOException {
-            sp.printLabels(t, left, right);
+            sp.printLabels(t, this.left, this.right);
         }
     }
 
@@ -169,7 +177,7 @@ public abstract class Notation {
 
         @Override
         public void print(Term t, LogicPrinter sp) throws IOException {
-            sp.printQuantifierTerm(name, t.varsBoundHere(0), t.sub(0), ass);
+            sp.printQuantifierTerm(this.name, t.varsBoundHere(0), t.sub(0), this.ass);
         }
 
     }
@@ -193,7 +201,7 @@ public abstract class Notation {
         public void print(Term t, LogicPrinter sp) throws IOException {
             assert t.op() instanceof Modality;
             assert t.javaBlock() != null;
-            sp.printModalityTerm(left, t.javaBlock(), right, t, ass);
+            sp.printModalityTerm(this.left, t.javaBlock(), this.right, t, this.ass);
         }
     }
 
@@ -211,7 +219,7 @@ public abstract class Notation {
         @Override
         public void print(Term t, LogicPrinter sp) throws IOException {
             sp.printModalityTerm("\\modality{" + t.op().name().toString() + "}",
-                    t.javaBlock(), "\\endmodality", t, ass);
+                    t.javaBlock(), "\\endmodality", t, this.ass);
         }
     }
 
@@ -248,6 +256,21 @@ public abstract class Notation {
         @Override
         public void print(Term t, LogicPrinter sp) throws IOException {
             sp.printElementaryUpdate(":=", t, 0);
+        }
+    }
+
+    /**
+     * The standard concrete syntax for elementary updates.
+     */
+    public static final class AbstractUpdateNotation extends Notation {
+
+        public AbstractUpdateNotation() {
+            super(150);
+        }
+
+        @Override
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printAbstractUpdate(":=", t, 0);
         }
     }
 
@@ -353,7 +376,7 @@ public abstract class Notation {
 
         @Override
         public void print(Term t, LogicPrinter sp) throws IOException {
-            sp.printCast(pre, post, t, ass);
+            sp.printCast(this.pre, this.post, t, this.ass);
         }
     }
 
@@ -451,7 +474,7 @@ public abstract class Notation {
 
         @Override
         public void print(Term t, LogicPrinter sp) throws IOException {
-            sp.printPostfix(t, postfix);
+            sp.printPostfix(t, this.postfix);
         }
     }
 
@@ -487,7 +510,7 @@ public abstract class Notation {
 
         @Override
         public void print(Term t, LogicPrinter sp) throws IOException {
-            sp.printElementOf(t, symbol);
+            sp.printElementOf(t, this.symbol);
         }
     }
 
@@ -505,12 +528,12 @@ public abstract class Notation {
 
         public IfThenElse(int priority, String keyw) {
             super(priority);
-            keyword = keyw;
+            this.keyword = keyw;
         }
 
         @Override
         public void print(Term t, LogicPrinter sp) throws IOException {
-            sp.printIfThenElseTerm(t, keyword);
+            sp.printIfThenElseTerm(t, this.keyword);
         }
     }
 
@@ -704,7 +727,7 @@ public abstract class Notation {
 
         @Override
         public void print(Term t, LogicPrinter sp) throws IOException {
-            sp.printSeqSingleton(t, lDelimiter, rDelimiter);
+            sp.printSeqSingleton(t, this.lDelimiter, this.rDelimiter);
         }
     }
 
@@ -753,7 +776,7 @@ public abstract class Notation {
         }
 
         private boolean isCharLiteralSequence(Term t) {
-            if (t.op() == seqConcat && isCharLiteralSequenceHelp(t.sub(0))) {
+            if (t.op() == this.seqConcat && isCharLiteralSequenceHelp(t.sub(0))) {
                 return isCharLiteralSequenceHelp(t.sub(1))
                         || isCharLiteralSequence(t.sub(1));
             }
@@ -761,7 +784,7 @@ public abstract class Notation {
         }
 
         private boolean isCharLiteralSequenceHelp(Term t) {
-            return (t.op() == seqSingleton && t.sub(0).op() == charLiteral);
+            return (t.op() == this.seqSingleton && t.sub(0).op() == this.charLiteral);
         }
 
     }

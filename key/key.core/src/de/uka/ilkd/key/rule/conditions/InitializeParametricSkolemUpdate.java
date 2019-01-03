@@ -15,14 +15,11 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -52,39 +49,32 @@ public class InitializeParametricSkolemUpdate extends
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
-        if (svInst.isInstantiated(updateSV)) {
+        if (svInst.isInstantiated(this.updateSV)) {
             return matchCond;
         }
 
-        final AbstractPlaceholderStatement abstrStmt =
-                (AbstractPlaceholderStatement) svInst
-                        .getInstantiation(abstrProgSV);
+        final AbstractPlaceholderStatement abstrStmt = (AbstractPlaceholderStatement) svInst
+                .getInstantiation(this.abstrProgSV);
 
         final TermBuilder tb = services.getTermBuilder();
 
-        final Pair<Term, Term> accessibleAndAssignableClause =
+        final Pair<Term, Term> accessibleAndAssignableClause = //
                 getAccessibleAndAssignableTerms(abstrStmt, svInst, services);
         final Term accessibleClause = accessibleAndAssignableClause.first;
         final Term assignableClause = accessibleAndAssignableClause.second;
 
-        final String updateName = tb
-                .newName(updateSV.name().toString() + "_" + abstrStmt.getId());
-        final Sort locSetSort =
-                services.getTypeConverter().getLocSetLDT().targetSort();
-
-        final Term update = tb.func(
-                new Function(new Name(updateName), Sort.UPDATE, true, false,
-                        locSetSort, locSetSort),
-                assignableClause, accessibleClause);
+        final Term update = //
+                tb.abstractUpdate(abstrStmt, assignableClause,
+                        accessibleClause);
 
         return matchCond
-                .setInstantiations(svInst.add(updateSV, update, services));
+                .setInstantiations(svInst.add(this.updateSV, update, services));
     }
 
     @Override
     public String toString() {
         return String.format(
                 "\\varcond (\\initializeParametricSkolemUpdate(%s, %s))",
-                updateSV, abstrProgSV);
+                this.updateSV, this.abstrProgSV);
     }
 }
