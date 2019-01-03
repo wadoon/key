@@ -240,6 +240,7 @@ lexer grammar KeYLexer;
     DEPENDINGON : '\\dependingOn';
     FRESHFOR : '\\freshFor';
 	DISJOINTMODULONULL  : '\\disjointModuloNull';
+	SIMPLIFY_ABSTRACT_UPDATE_RENAME_SUBST : '\\simplifyAbstractUpdateRenameSubst';
 	DROP_EFFECTLESS_ELEMENTARIES : '\\dropEffectlessElementaries';
 	DROP_EFFECTLESS_STORES : '\\dropEffectlessStores';
 	ABSTRACT_UPDATE : '\\abstractUpdate';

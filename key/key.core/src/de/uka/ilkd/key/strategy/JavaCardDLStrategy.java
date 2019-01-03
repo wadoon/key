@@ -14,7 +14,12 @@
 package de.uka.ilkd.key.strategy;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.*;
+import de.uka.ilkd.key.ldt.BooleanLDT;
+import de.uka.ilkd.key.ldt.CharListLDT;
+import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.ldt.IntegerLDT;
+import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
@@ -27,12 +32,81 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.strategy.feature.*;
+import de.uka.ilkd.key.strategy.feature.AgeFeature;
+import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
+import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
+import de.uka.ilkd.key.strategy.feature.CheckApplyEqFeature;
+import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
+import de.uka.ilkd.key.strategy.feature.ContainsTermFeature;
+import de.uka.ilkd.key.strategy.feature.CountBranchFeature;
+import de.uka.ilkd.key.strategy.feature.CountMaxDPathFeature;
+import de.uka.ilkd.key.strategy.feature.CountPosDPathFeature;
+import de.uka.ilkd.key.strategy.feature.DeleteMergePointRuleFeature;
+import de.uka.ilkd.key.strategy.feature.DependencyContractFeature;
+import de.uka.ilkd.key.strategy.feature.DiffFindAndIfFeature;
+import de.uka.ilkd.key.strategy.feature.DiffFindAndReplacewithFeature;
+import de.uka.ilkd.key.strategy.feature.DirectlyBelowSymbolFeature;
+import de.uka.ilkd.key.strategy.feature.EqNonDuplicateAppFeature;
+import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.FindDepthFeature;
+import de.uka.ilkd.key.strategy.feature.FindRightishFeature;
+import de.uka.ilkd.key.strategy.feature.FocusInAntecFeature;
+import de.uka.ilkd.key.strategy.feature.InEquationMultFeature;
+import de.uka.ilkd.key.strategy.feature.MatchedIfFeature;
+import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.NoSelfApplicationFeature;
+import de.uka.ilkd.key.strategy.feature.NonDuplicateAppFeature;
+import de.uka.ilkd.key.strategy.feature.NonDuplicateAppModPositionFeature;
+import de.uka.ilkd.key.strategy.feature.NotBelowBinderFeature;
+import de.uka.ilkd.key.strategy.feature.NotBelowQuantifierFeature;
+import de.uka.ilkd.key.strategy.feature.NotInScopeOfModalityFeature;
+import de.uka.ilkd.key.strategy.feature.OnlyInScopeOfQuantifiersFeature;
+import de.uka.ilkd.key.strategy.feature.PolynomialValuesCmpFeature;
+import de.uka.ilkd.key.strategy.feature.PurePosDPathFeature;
+import de.uka.ilkd.key.strategy.feature.QueryExpandCost;
+import de.uka.ilkd.key.strategy.feature.ReducibleMonomialsFeature;
+import de.uka.ilkd.key.strategy.feature.RuleSetDispatchFeature;
+import de.uka.ilkd.key.strategy.feature.SVNeedsInstantiation;
+import de.uka.ilkd.key.strategy.feature.ScaleFeature;
+import de.uka.ilkd.key.strategy.feature.SetsSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.SumFeature;
+import de.uka.ilkd.key.strategy.feature.TermSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.ThrownExceptionFeature;
+import de.uka.ilkd.key.strategy.feature.TopLevelFindFeature;
+import de.uka.ilkd.key.strategy.feature.TrivialMonomialLCRFeature;
 import de.uka.ilkd.key.strategy.feature.findprefix.FindPrefixRestrictionFeature;
-import de.uka.ilkd.key.strategy.quantifierHeuristics.*;
-import de.uka.ilkd.key.strategy.termProjection.*;
-import de.uka.ilkd.key.strategy.termfeature.*;
-import de.uka.ilkd.key.strategy.termgenerator.*;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.ClausesSmallerThanFeature;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.EliminableQuantifierTF;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.HeuristicInstantiation;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCost;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.InstantiationCostScalerFeature;
+import de.uka.ilkd.key.strategy.quantifierHeuristics.SplittableQuantifiedFormulaFeature;
+import de.uka.ilkd.key.strategy.termProjection.AssumptionProjection;
+import de.uka.ilkd.key.strategy.termProjection.CoeffGcdProjection;
+import de.uka.ilkd.key.strategy.termProjection.DividePolynomialsProjection;
+import de.uka.ilkd.key.strategy.termProjection.FocusFormulaProjection;
+import de.uka.ilkd.key.strategy.termProjection.FocusProjection;
+import de.uka.ilkd.key.strategy.termProjection.MonomialColumnOp;
+import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+import de.uka.ilkd.key.strategy.termProjection.ReduceMonomialsProjection;
+import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
+import de.uka.ilkd.key.strategy.termfeature.AnonHeapTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.ContainsExecutableCodeTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.IsInductionVariable;
+import de.uka.ilkd.key.strategy.termfeature.IsNonRigidTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.IsSelectSkolemConstantTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.OperatorClassTF;
+import de.uka.ilkd.key.strategy.termfeature.PrimitiveHeapTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.SimplifiedSelectTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.TermFeature;
+import de.uka.ilkd.key.strategy.termgenerator.AllowedCutPositionsGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.HeapGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.MultiplesModEquationsGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.RootsGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.SuperTermGenerator;
+import de.uka.ilkd.key.strategy.termgenerator.TriggeredInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -287,6 +361,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 "update_elim",
                 add(longConst(-8000), ScaleFeature.createScaled(
                         FindDepthFeature.INSTANCE, 10.0)));
+
+        // taclets for special abstract update handling which should
+        // be prioritized to the other update rules.
+        bindRuleSet(d, "abstrUpdPriorityRules", -10000);
+
         bindRuleSet(
                 d,
                 "update_apply_on_update",

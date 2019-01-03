@@ -3854,6 +3854,7 @@ varexp[TacletBuilder b]
     | varcond_initializeParametricSkolemUpdate[b]
     | varcond_initializeParametricSkolemPathCondition[b]
     | varcond_prefixContainsElement[b, negated]
+    | varcond_simplifyAbstractUpdateRenameSubst[b]
     | varcond_dropEffectlessElementaries[b]
     | varcond_instantiateVarsFresh[b]
     | varcond_newPV[b]
@@ -4008,6 +4009,17 @@ varcond_freshAbstractProgram[TacletBuilder b]
    FRESH_ABSTRACT_PROGRAM LPAREN sv=varId RPAREN 
    {
       b.addVariableCondition(new FreshAbstractProgramCondition((ProgramSV) sv));
+   }
+;
+
+varcond_simplifyAbstractUpdateRenameSubst[TacletBuilder b]
+:
+   SIMPLIFY_ABSTRACT_UPDATE_RENAME_SUBST LPAREN u1=varId COMMA u2=varId COMMA x=varId COMMA result=varId RPAREN 
+   {
+      b.addVariableCondition(new SimplifyAbstractUpdateRenameSubstCondition((UpdateSV)u1, 
+                                                                            (UpdateSV)u2, 
+                                                                            (SchemaVariable)x, 
+                                                                            (SchemaVariable)result));
    }
 ;
 

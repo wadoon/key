@@ -166,10 +166,6 @@ public final class DropEffectlessElementariesCondition
 
     private static Term dropEffectlessElementaries(Term update, Term target,
             Services services) {
-        // if (AbstractUpdateCondition.isAbstractUpdate(target)) {
-        // return null;
-        // }
-
         TermProgramVariableCollector collector = services.getFactory()
                 .create(services);
         target.execPostOrder(collector);

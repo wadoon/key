@@ -91,7 +91,7 @@ import de.uka.ilkd.key.util.Triple;
  * This class encapsulates static methods used in the MergeRule implementation.
  * The methods are organized into different sections (see comments):
  * <p>
- * 
+ *
  * <ol>
  * <li>SIMPLE AUXILIARIES</li>
  * <li>GENERAL LOGIC
@@ -105,9 +105,9 @@ import de.uka.ilkd.key.util.Triple;
  * <li>MERGE RELATED</li>
  * <li>PRIVATE</li>
  * </ol>
- * 
+ *
  * Feel free to make private methods publicly visible if you need them.
- * 
+ *
  * @author Dominic Scheurer
  */
 public class MergeRuleUtils {
@@ -119,7 +119,7 @@ public class MergeRuleUtils {
     /**
      * Wraps the given object s.th. if it is null, a None value is returned, and
      * a Some value wrapping the object is returned otherwise.
-     * 
+     *
      * @param obj
      *            The object to wrap.
      * @return None iff obj is null, Some(obj) otherwise.
@@ -135,7 +135,7 @@ public class MergeRuleUtils {
     /**
      * For Strings "xxx_i", this method returns "xxx". For Strings without the
      * underscore, the original String is returned.
-     * 
+     *
      * @param name
      *            Name to remove the index from.
      * @return The name without the index, if any.
@@ -164,7 +164,7 @@ public class MergeRuleUtils {
 
     /**
      * Creates an {@link ArrayList} containing exactly the given element.
-     * 
+     *
      * @param elem
      *            Element that is contained in the returned list.
      * @return An {@link ArrayList} containing exactly the given element.
@@ -216,7 +216,7 @@ public class MergeRuleUtils {
                     .add((LocationVariable) ((ElementaryUpdate) u.op()).lhs());
             return result;
 
-        } else if (u.op() instanceof UpdateJunctor) {
+        } else if (u.op() == UpdateJunctor.PARALLEL_UPDATE) {
 
             ImmutableSet<LocationVariable> result = DefaultImmutableSet.nil();
             for (Term sub : u.subs()) {
@@ -233,17 +233,17 @@ public class MergeRuleUtils {
 
     /**
      * Returns all elementary updates of a parallel update.
-     * 
+     *
      * @param u
      *            Parallel update to get elementary updates from.
      * @return Elementary updates of the supplied parallel update.
      */
-    public static LinkedList<Term> getElementaryUpdates(Term u) {
+    public static List<Term> getElementaryUpdates(Term u) {
         LinkedList<Term> result = new LinkedList<Term>();
 
         if (u.op() instanceof ElementaryUpdate) {
             result.add(u);
-        } else if (u.op() instanceof UpdateJunctor) {
+        } else if (u.op() == UpdateJunctor.PARALLEL_UPDATE) {
             for (Term sub : u.subs()) {
                 result.addAll(getElementaryUpdates(sub));
             }
@@ -256,7 +256,7 @@ public class MergeRuleUtils {
 
     /**
      * Returns all program variables in the given term.
-     * 
+     *
      * @param term
      *            The term to extract program variables from.
      * @return All program variables of the given term.
@@ -282,7 +282,7 @@ public class MergeRuleUtils {
 
     /**
      * Returns all program variables in the given sequent.
-     * 
+     *
      * @param sequent
      *            The sequent to extract program variables from.
      * @return All program variables of the given sequent.
@@ -300,7 +300,7 @@ public class MergeRuleUtils {
 
     /**
      * Returns all program variables in the given term.
-     * 
+     *
      * @param term
      *            The term to extract program variables from.
      * @return All program variables of the given term.
@@ -326,7 +326,7 @@ public class MergeRuleUtils {
 
     /**
      * Returns all Skolem constants in the given term.
-     * 
+     *
      * @param term
      *            The term to extract Skolem constants from.
      * @return All SkolemConstants of the given term.
@@ -349,7 +349,7 @@ public class MergeRuleUtils {
     /**
      * Returns the right side for a given location variable in an update (in
      * normal form).
-     * 
+     *
      * @param update
      *            Update term to search.
      * @param leftSide
@@ -365,7 +365,7 @@ public class MergeRuleUtils {
     /**
      * Returns the right side for a given location variable in an update (in
      * normal form).
-     * 
+     *
      * @param update
      *            Update term to search.
      * @param leftSide
@@ -380,8 +380,7 @@ public class MergeRuleUtils {
 
             return update.sub(0);
 
-        } else if (update.op() instanceof UpdateJunctor
-                && update.op().equals(UpdateJunctor.PARALLEL_UPDATE)) {
+        } else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
 
             for (Term sub : update.subs()) {
                 Term rightSide = getUpdateRightSideFor(sub, leftSide);
@@ -399,7 +398,7 @@ public class MergeRuleUtils {
 
     /**
      * Counts the atoms in a formula.
-     * 
+     *
      * @param term
      *            Formula to count atoms for.
      * @return Number of atoms in the formula
@@ -425,7 +424,7 @@ public class MergeRuleUtils {
 
     /**
      * Counts the disjunctions in a formula.
-     * 
+     *
      * @param term
      *            Formula to count disjunctions for.
      * @param negated
@@ -468,7 +467,7 @@ public class MergeRuleUtils {
     /**
      * Computes and registers a new Skolem constant with the given prefix in its
      * name of the given sort.
-     * 
+     *
      * @param prefix
      *            Prefix for the name of the constant.
      * @param sort
@@ -495,7 +494,7 @@ public class MergeRuleUtils {
     /**
      * Computes and registers a fresh variable with the given prefix in its name
      * of the given sort.
-     * 
+     *
      * @param prefix
      *            Prefix for the name of the variable.
      * @param sort
@@ -522,7 +521,7 @@ public class MergeRuleUtils {
     /**
      * Computes and registers a fresh location variable with the given prefix in
      * its name of the given sort.
-     * 
+     *
      * @param prefix
      *            Prefix for the name of the variable.
      * @param sort
@@ -552,7 +551,7 @@ public class MergeRuleUtils {
     /**
      * Substitutes all constants in the given term by fresh variables. Multiple
      * occurrences of a constant are substituted by the same variable.
-     * 
+     *
      * @param term
      *            Term in which to substitute constants by variables.
      * @param replMap
@@ -571,7 +570,7 @@ public class MergeRuleUtils {
      * restrictTo by fresh variables. If restrictTo is null, then all constants
      * in the term are replaced. Multiple occurrences of a constant are
      * substituted by the same variable.
-     * 
+     *
      * @param term
      *            Term in which to substitute constants by variables.
      * @param restrictTo
@@ -591,7 +590,7 @@ public class MergeRuleUtils {
         if (term.op() instanceof Function
                 && ((Function) term.op()).isSkolemConstant()
                 && (restrictTo == null
-                        || restrictTo.contains((Function) term.op()))) {
+                        || restrictTo.contains(term.op()))) {
 
             Function constant = (Function) term.op();
 
@@ -622,7 +621,7 @@ public class MergeRuleUtils {
     /**
      * Existentially closes all logical and location variables in the given
      * term.
-     * 
+     *
      * @param term
      *            Term to existentially close.
      * @param services
@@ -640,7 +639,7 @@ public class MergeRuleUtils {
 
     /**
      * Universally closes all logical and location variables in the given term.
-     * 
+     *
      * @param term
      *            Term to universally close.
      * @param services
@@ -658,7 +657,7 @@ public class MergeRuleUtils {
 
     /**
      * Checks if an update is of the form { x := v || ... || z := q}.
-     * 
+     *
      * @param u
      *            Update to check.
      * @return true iff u is in normal form.
@@ -666,7 +665,7 @@ public class MergeRuleUtils {
     public static boolean isUpdateNormalForm(Term u) {
         if (u.op() instanceof ElementaryUpdate) {
             return true;
-        } else if (u.op() instanceof UpdateJunctor) {
+        } else if (u.op() == UpdateJunctor.PARALLEL_UPDATE) {
             boolean result = true;
             for (Term sub : u.subs()) {
                 result = result && isUpdateNormalForm(sub);
@@ -679,7 +678,7 @@ public class MergeRuleUtils {
 
     /**
      * Dissects a conjunction into its conjunctive elements.
-     * 
+     *
      * @param term
      *            Conjunctive formula to dissect (may be a conjunction of one
      *            element, i.e. no "real" conjunction). In this case, the
@@ -704,7 +703,7 @@ public class MergeRuleUtils {
      * corresponding to the given goal, but not necessarily globally unique. The
      * variable with the first branch-unique name w.r.t. a numeric index is
      * returned.
-     * 
+     *
      * @param var
      *            Variable to get a branch-unique correspondent for.
      * @param startLeaf
@@ -742,7 +741,7 @@ public class MergeRuleUtils {
     /**
      * Finds the node, from the given leaf on, where the variable was
      * introduced.
-     * 
+     *
      * @param var
      *            Variable to find introducing node for.
      * @param node
@@ -764,7 +763,7 @@ public class MergeRuleUtils {
      * Returns the first Java block in the given term that can be found by
      * recursive search, or the empty block if there is no non-empty Java block
      * in the term.
-     * 
+     *
      * @param term
      *            The term to extract Java blocks for.
      * @return The first Java block in the given term or the empty block if
@@ -796,7 +795,7 @@ public class MergeRuleUtils {
     /**
      * Tries to prove the given formula without splitting and returns whether
      * the prove could be closed.
-     * 
+     *
      * @param toProve
      *            Formula to prove.
      * @param services
@@ -813,7 +812,7 @@ public class MergeRuleUtils {
     /**
      * Tries to prove the given formula with splitting and returns whether the
      * prove could be closed.
-     * 
+     *
      * @param toProve
      *            Formula to prove.
      * @param services
@@ -830,7 +829,7 @@ public class MergeRuleUtils {
     /**
      * Tries to prove the given formula without splitting and returns whether
      * the prove could be closed.
-     * 
+     *
      * @param toProve
      *            Sequent to prove.
      * @param services
@@ -847,7 +846,7 @@ public class MergeRuleUtils {
     /**
      * Tries to prove the given formula with splitting and returns whether the
      * prove could be closed.
-     * 
+     *
      * @param toProve
      *            Sequent to prove.
      * @param services
@@ -864,7 +863,7 @@ public class MergeRuleUtils {
     /**
      * Tries to prove the equivalence of term1 and term2 and throws a
      * {@link RuntimeException} if the proof fails.
-     * 
+     *
      * @param term1
      *            First term to check.
      * @param term2
@@ -873,7 +872,7 @@ public class MergeRuleUtils {
      *            The services object.
      * @param timeout
      *            Time in milliseconds after which the side proof is aborted.
-     * 
+     *
      * @throws RuntimeException
      *             iff proving the equivalence of term1 and term2 fails.
      */
@@ -899,10 +898,10 @@ public class MergeRuleUtils {
      * the simplified formula is returned; otherwise, the original formula is
      * returned.
      * <p>
-     * 
+     *
      * <i>Please note that using this method can consume a great amount of
      * time!</i>
-     * 
+     *
      * @param parentProof
      *            The parent {@link Proof}.
      * @param term
@@ -915,7 +914,7 @@ public class MergeRuleUtils {
      *            Time in milliseconds after which the side proof is aborted.
      * @return The simplified {@link Term} or the original term, if
      *         simplification was not successful.
-     * 
+     *
      * @see #simplify(Proof, Term)
      * @see SymbolicExecutionUtil#simplify(Proof, Term)
      */
@@ -945,7 +944,7 @@ public class MergeRuleUtils {
 
     /**
      * Deletes all formulae of the succedent / antecedent.
-     * 
+     *
      * @param goal
      *            Goal to delete formulae from.
      * @param antec
@@ -965,7 +964,7 @@ public class MergeRuleUtils {
     /**
      * An equals method that, before the comparison, replaces all program
      * locations in the supplied arguments by their branch-unique versions.
-     * 
+     *
      * @param se1
      *            First element to check equality (mod renaming) for.
      * @param se2
@@ -1012,21 +1011,21 @@ public class MergeRuleUtils {
      * formula can be literally shorter than each of the two formulae; in this
      * case, it consists of the common elements of those.
      * <p>
-     * 
+     *
      * The underlying idea is based upon the observation that many path
      * conditions that should be merged are conjunctions of mostly the same
      * elements and, in addition, formulae phi and !phi that vanish after
      * creating the disjunction of the path conditions. The corresponding valid
      * formula is <code>(phi & psi) | (phi & !psi) <-> phi</code>
      * <p>
-     * 
+     *
      * For formulae that cannot be simplified by this law, the method performs
      * two additional steps:<br>
      * (1) it applies, if possible, distributivity to simplify the result<br>
      * (2) it checks whether the disjunction is already equivalent to the common
      * parts of the formulae only. This often happens when merging all branches
      * that occur in symbolic execution.<br>
-     * 
+     *
      * @param cond1
      *            First path condition to merge.
      * @param cond2
@@ -1083,7 +1082,7 @@ public class MergeRuleUtils {
      * pair; the "rest" is contained in the second. It always holds that the
      * conjunction of the first element of the pair and the second element of
      * the pair is equivalent to pathCondition1.
-     * 
+     *
      * @param pathCondition1
      *            The first formula to compute a distinguishing formula for.
      * @param pathCondition2
@@ -1170,7 +1169,7 @@ public class MergeRuleUtils {
 
     /**
      * Closes the given partner goal, using the {@link CloseAfterMerge} rule.
-     * 
+     *
      * @param mergeNodeParent
      *            Parent of remaining join node.
      * @param mergePartner
@@ -1208,7 +1207,7 @@ public class MergeRuleUtils {
      * replaced by branch-unique correspondents in order to enable merging of
      * different branches declaring local variables.
      * <p>
-     * 
+     *
      * @param goal
      *            Current goal.
      * @param pio
@@ -1233,7 +1232,7 @@ public class MergeRuleUtils {
      * and in the symbolic state are replaced by branch-unique correspondents in
      * order to enable merging of different branches declaring local variables.
      * <p>
-     * 
+     *
      * The problem which makes this renaming necessary is the fact that when
      * executing a program like <code>int x; x = ...</code>, the variable x is
      * renamed to x_1, x_2 and so on in different branches, which makes a
@@ -1242,7 +1241,7 @@ public class MergeRuleUtils {
      * is not effected by the switch to branch-unique names. However, merged
      * nodes are then of course potentially different from their predecessors
      * concerning the involved local variable symbols.
-     * 
+     *
      * @param goal
      *            Current goal.
      * @param pio
@@ -1316,7 +1315,7 @@ public class MergeRuleUtils {
      * These include program variables as well as Skolem constants. This method
      * finds all name clashes and renames the corresponding entities in the
      * {@link SymbolicExecutionState} state.
-     * 
+     *
      * @param mergeState
      *            The {@link SymbolicExecutionState} in which the partners
      *            should be merged.
@@ -1325,7 +1324,7 @@ public class MergeRuleUtils {
      *            partner.
      * @param services
      *            The {@link Services} object.
-     * 
+     *
      * @return The renamed {@link SymbolicExecutionState} of the second merge
      *         partner.
      */
@@ -1376,7 +1375,7 @@ public class MergeRuleUtils {
                 final Operator mergeStateOp = thisGoalSymbols.parallelStream()
                         .filter(s -> s.name().equals(partnerStateOp.name()))
                         .collect(Collectors.toList()).get(0);
-                
+
                 Operator newOp1;
                 Operator newOp2;
                 if (partnerStateOp instanceof Function) {
@@ -1410,7 +1409,7 @@ public class MergeRuleUtils {
                             "MergeRule: Unexpected type of Operator involved in name clash: "
                                     + partnerStateOp.getClass().getSimpleName());
                 }
-                
+
                 mergeState = new SymbolicExecutionState(
                         OpReplacer.replace(mergeStateOp, newOp1,
                                 mergeState.getSymbolicState(), tb.tf()),
@@ -1480,7 +1479,7 @@ public class MergeRuleUtils {
                     "Expecting an input of type &lt;SORT&gt; &lt;NAME&gt;");
         }
 
-        Sort sort = (Sort) services.getNamespaces().sorts().lookup(chunks[0]);
+        Sort sort = services.getNamespaces().sorts().lookup(chunks[0]);
 
         if (sort == null) {
             throw new SortNotKnownException(
@@ -1558,7 +1557,7 @@ public class MergeRuleUtils {
      * <code>{ ... || x := vx || ...} term</code> where vx is a fresh variable.
      * Returns all free variables of the new termin the second component of the
      * pair.
-     * 
+     *
      * @param term
      *            Term to anonymize.
      * @param services
@@ -1592,7 +1591,7 @@ public class MergeRuleUtils {
 
     /**
      * Joins a list of sequent formulae to an and-connected term.
-     * 
+     *
      * @param formulae
      *            Formulae to join.
      * @param services
@@ -1614,7 +1613,7 @@ public class MergeRuleUtils {
     /**
      * Returns all used program locations in the given term. The term must be of
      * the form \<{ ... }\> phi (or \[{ ... }\] phi).
-     * 
+     *
      * @param programCounterTerm
      *            The term (program counter) to extract locations from.
      * @param services
@@ -1638,7 +1637,7 @@ public class MergeRuleUtils {
     /**
      * Returns all used program locations in the given term. The term must be of
      * the form \<{ ... }\> phi (or \[{ ... }\] phi).
-     * 
+     *
      * @param programCounterTerm
      *            The term (program counter) to extract locations from.
      * @param services
@@ -1667,7 +1666,7 @@ public class MergeRuleUtils {
 
     /**
      * Joins a list of formulae to a conjunction.
-     * 
+     *
      * @param elems
      *            Formulae to join.
      * @param services
@@ -1694,7 +1693,7 @@ public class MergeRuleUtils {
 
     /**
      * Tries to prove the given formula and returns the result.
-     * 
+     *
      * @param toProve
      *            Formula to prove.
      * @param services
@@ -1719,7 +1718,7 @@ public class MergeRuleUtils {
 
     /**
      * Tries to prove the given formula and returns the result.
-     * 
+     *
      * @param toProve
      *            Sequent to prove.
      * @param services
@@ -1759,7 +1758,7 @@ public class MergeRuleUtils {
 
     /**
      * creates the strategy configuration to be used for the side proof
-     * 
+     *
      * @return the StrategyProperties
      */
     private static StrategyProperties setupStrategy() {
@@ -1788,7 +1787,7 @@ public class MergeRuleUtils {
     /**
      * Tries to prove the given formula and returns whether the prove could be
      * closed.
-     * 
+     *
      * @param toProve
      *            Formula to prove.
      * @param services
@@ -1814,7 +1813,7 @@ public class MergeRuleUtils {
     /**
      * Tries to prove the given formula and returns whether the prove could be
      * closed.
-     * 
+     *
      * @param toProve
      *            Sequent to prove.
      * @param services
@@ -1840,7 +1839,7 @@ public class MergeRuleUtils {
      * Simplifies the given {@link Term} in a side proof with splits. This code
      * has been copied from {@link SymbolicExecutionUtil} and only been slightly
      * modified (to allow for splitting the proof).
-     * 
+     *
      * @param parentProof
      *            The parent {@link Proof}.
      * @param term
@@ -1850,7 +1849,7 @@ public class MergeRuleUtils {
      * @return The simplified {@link Term}.
      * @throws ProofInputException
      *             Occurred Exception.
-     * 
+     *
      * @see SymbolicExecutionUtil#simplify(Proof, Term)
      */
     private static Term simplify(Proof parentProof, Term term, int timeout)
@@ -1883,7 +1882,7 @@ public class MergeRuleUtils {
      * "/\ Gamma -> \/ Delta"; however, the formulae in Gamma are shifted to the
      * succedent by the negation-left rule, so the result of this method is a
      * disjunction, not an implication.
-     * 
+     *
      * @param sequent
      *            The sequent to convert to a formula.
      * @param services
@@ -1911,12 +1910,12 @@ public class MergeRuleUtils {
 
     /**
      * Tells whether a name is unique in the passed list of global variables.
-     * 
+     *
      * @param name
      *            The name to check uniqueness for.
      * @param globals
-     *            The global variables for the givan branch.
-     * @see VariableNamer#isUniqueInGlobals(String, Globals)
+     *            The global variables for the given branch.
+     * @see VariableNamer#isUniqueInGlobals(String, Iterable)
      */
     private static boolean isUniqueInGlobals(String name,
             Iterable<IProgramVariable> globals) {
@@ -1930,7 +1929,7 @@ public class MergeRuleUtils {
 
     /**
      * Looks up a program variable by its name in the PV namespace.
-     * 
+     *
      * @param name
      *            Name to find a PV for.
      * @return The PV with the given name in the global namespace, or null if
@@ -1947,7 +1946,7 @@ public class MergeRuleUtils {
      * formulas. For instance, if cond1 = "phi & psi" and cond2 = "phi & psi'",
      * the specific parts will be "psi" and "psi'", respectively, while the
      * common part will be "phi".
-     * 
+     *
      * @param cond1
      *            The conjunctive elements of the first formula.
      * @param cond2
@@ -1968,7 +1967,7 @@ public class MergeRuleUtils {
      * formulas. For instance, if cond1 = "phi & psi" and cond2 = "phi & psi'",
      * the specific parts will be "psi" and "psi'", respectively, while the
      * common part will be "phi".
-     * 
+     *
      * @param cond1
      *            The first formula.
      * @param cond2
@@ -2028,7 +2027,7 @@ public class MergeRuleUtils {
     }
 
     /**
-     * 
+     *
      * TODO
      *
      * @author Dominic Scheurer
@@ -2119,6 +2118,7 @@ public class MergeRuleUtils {
                 this.value = value;
             }
 
+            @Override
             public T getValue() {
                 return value;
             }
@@ -2172,7 +2172,7 @@ public class MergeRuleUtils {
 
     /**
      * Visitor for collecting program locations in a Java block.
-     * 
+     *
      * @author Dominic Scheurer
      */
     private static class CollectLocationVariablesVisitor
@@ -2192,7 +2192,7 @@ public class MergeRuleUtils {
 
         /**
          * Call start() before calling this method!
-         * 
+         *
          * @return All program locations in the given Java block.
          */
         public ImmutableSet<LocationVariable> getLocationVariables() {
@@ -2203,7 +2203,7 @@ public class MergeRuleUtils {
 
     /**
      * Visitor for collecting program locations in a Java block.
-     * 
+     *
      * @author Dominic Scheurer
      */
     private static class CollectLocationVariablesVisitorHashSet
@@ -2222,7 +2222,7 @@ public class MergeRuleUtils {
 
         /**
          * Call start() before calling this method!
-         * 
+         *
          * @return All program locations in the given Java block.
          */
         public HashSet<LocationVariable> getLocationVariables() {
@@ -2236,7 +2236,7 @@ public class MergeRuleUtils {
      * into this map has absolutely no effect; the get method just relies on the
      * {@link LocationVariable#getBranchUniqueName()} method of the respective
      * location variable. Therefore, this map is also a singleton object.
-     * 
+     *
      * @author Dominic Scheurer
      */
     private static class LocVarReplBranchUniqueMap
