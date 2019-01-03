@@ -3854,6 +3854,7 @@ varexp[TacletBuilder b]
     | varcond_initializeParametricSkolemUpdate[b]
     | varcond_initializeParametricSkolemPathCondition[b]
     | varcond_prefixContainsElement[b, negated]
+    | varcond_sequentialUpdateSimplAbstr[b]
     | varcond_simplifyAbstractUpdateRenameSubst[b]
     | varcond_dropEffectlessElementaries[b]
     | varcond_instantiateVarsFresh[b]
@@ -4020,6 +4021,17 @@ varcond_simplifyAbstractUpdateRenameSubst[TacletBuilder b]
                                                                             (UpdateSV)u2, 
                                                                             (SchemaVariable)x, 
                                                                             (SchemaVariable)result));
+   }
+;
+
+varcond_sequentialUpdateSimplAbstr[TacletBuilder b]
+:
+   SEQUENTIAL_UPDATE_SIMPL_ABSTR LPAREN u1=varId COMMA u2=varId COMMA x=varId COMMA result=varId RPAREN 
+   {
+      b.addVariableCondition(new SequentialUpdateSimplAbstrCondition((UpdateSV)u1, 
+                                                                     (UpdateSV)u2, 
+                                                                     (SchemaVariable)x, 
+                                                                     (SchemaVariable)result));
    }
 ;
 

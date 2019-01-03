@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -100,6 +101,15 @@ public final class SimplifyAbstractUpdateRenameSubstCondition
             return null;
         }
 
+        if (!(u1Inst.op() instanceof AbstractUpdate)) {
+            /*
+             * We can assume that u1Inst is abstract, but it might be
+             * constructed of an update junctor. In that case, we continue here.
+             */
+            assert u1Inst.op() instanceof UpdateJunctor;
+            return null;
+        }
+
         /*
          * Find an assignable of the abstract update u1 which is a right-hand
          * side of u1 and not used in xInst.
@@ -113,19 +123,8 @@ public final class SimplifyAbstractUpdateRenameSubstCondition
                 .map(t -> t.sub(0).sub(0).op())
                 .map(LocationVariable.class::cast).iterator();
 
-        final OpCollector opColl = new OpCollector();
-        xInst.execPostOrder(opColl);
-        final Set<LocationVariable> occurringLocVars = opColl.ops().stream()
-                .filter(op -> op instanceof LocationVariable)
-                .map(LocationVariable.class::cast).collect(Collectors.toSet());
-
-        if (xInst.containsJavaBlockRecursive()) {
-            final JavaBlock jb = MergeRuleUtils.getJavaBlockRecursive(xInst);
-            final ProgramVariableCollector pvc = new ProgramVariableCollector(
-                    jb.program(), services);
-            pvc.start();
-            occurringLocVars.addAll(pvc.result());
-        }
+        final Set<LocationVariable> occurringLocVars = //
+                collectLocVars(services, xInst);
 
         for (LocationVariable lhs : assgnVarsOfAbstrUpd) {
             /* Check that lhs does not occur in the target. */
@@ -151,21 +150,11 @@ public final class SimplifyAbstractUpdateRenameSubstCondition
 
             final LocationVariable lhs2 = potentialSubstCandidates.get(0);
 
-            /* Create the new abstract update */
-            final Map<LocationVariable, LocationVariable> substMap = new HashMap<>();
-            substMap.put(lhs, lhs2);
-            final OpReplacer opRepl = new OpReplacer(substMap,
-                    services.getTermFactory());
-            final Term newAbstrUpdLHS = opRepl.replace(abstrUpd.lhs());
-            final Term newAbstrUpd = tb.abstractUpdate(
-                    abstrUpd.getAbstractPlaceholderStatement(), newAbstrUpdLHS,
-                    u1Inst.sub(0));
+            final Term newAbstrUpd = //
+                    createNewAbstractUpdate(u1Inst, lhs, lhs2, services);
 
-            /* Create the new concrete update */
-            final Term newConcreteUpdate = tb.parallel(MergeRuleUtils
-                    .getElementaryUpdates(u2Inst).stream()
-                    .filter(t -> ((ElementaryUpdate) t.op()).lhs() != lhs2)
-                    .collect(ImmutableSLList.toImmutableList()));
+            final Term newConcreteUpdate = //
+                    createNewConcreteUpdate(u2Inst, lhs2, tb);
 
             final Term newResultInst = tb.apply(newAbstrUpd,
                     tb.apply(newConcreteUpdate, xInst));
@@ -175,6 +164,61 @@ public final class SimplifyAbstractUpdateRenameSubstCondition
         }
 
         return null;
+    }
+
+    private Term createNewConcreteUpdate(final Term oldConcreteUpdate,
+            final LocationVariable lhs2, final TermBuilder tb) {
+        final Term newConcreteUpdate = tb.parallel(
+                MergeRuleUtils.getElementaryUpdates(oldConcreteUpdate).stream()
+                        .filter(t -> ((ElementaryUpdate) t.op()).lhs() != lhs2)
+                        .collect(ImmutableSLList.toImmutableList()));
+        return newConcreteUpdate;
+    }
+
+    private Term createNewAbstractUpdate(Term abstractUpdateTerm,
+            LocationVariable lhs1, LocationVariable lhs2, Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final AbstractUpdate abstrUpd = //
+                (AbstractUpdate) abstractUpdateTerm.op();
+
+        final Term oldAssignables = abstrUpd.lhs();
+
+        final Term newAbstrUpdLHS = //
+                replaceVarInTerm(lhs1, lhs2, oldAssignables, services);
+
+        final Term newAbstrUpd = tb.abstractUpdate(
+                abstrUpd.getAbstractPlaceholderStatement(), newAbstrUpdLHS,
+                abstractUpdateTerm.sub(0));
+
+        return newAbstrUpd;
+    }
+
+    static Term replaceVarInTerm(LocationVariable lhs1, LocationVariable lhs2,
+            final Term oldAssignables, Services services) {
+        final Map<LocationVariable, LocationVariable> substMap = new HashMap<>();
+        substMap.put(lhs1, lhs2);
+        final OpReplacer opRepl = new OpReplacer(substMap,
+                services.getTermFactory());
+        final Term newAbstrUpdLHS = opRepl.replace(oldAssignables);
+        return newAbstrUpdLHS;
+    }
+
+    private Set<LocationVariable> collectLocVars(Services services,
+            final Term xInst) {
+        final OpCollector opColl = new OpCollector();
+        xInst.execPostOrder(opColl);
+        final Set<LocationVariable> occurringLocVars = opColl.ops().stream()
+                .filter(op -> op instanceof LocationVariable)
+                .map(LocationVariable.class::cast).collect(Collectors.toSet());
+
+        if (xInst.containsJavaBlockRecursive()) {
+            final JavaBlock jb = MergeRuleUtils.getJavaBlockRecursive(xInst);
+            final ProgramVariableCollector pvc = new ProgramVariableCollector(
+                    jb.program(), services);
+            pvc.start();
+            occurringLocVars.addAll(pvc.result());
+        }
+        return occurringLocVars;
     }
 
     @Override

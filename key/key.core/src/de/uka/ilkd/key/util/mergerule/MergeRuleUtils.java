@@ -108,7 +108,7 @@ import de.uka.ilkd.key.util.Triple;
  *
  * Feel free to make private methods publicly visible if you need them.
  *
- * @author Dominic Scheurer
+ * @author Dominic Steinhoefel
  */
 public class MergeRuleUtils {
 

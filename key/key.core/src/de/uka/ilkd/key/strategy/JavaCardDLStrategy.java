@@ -371,7 +371,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 "update_apply_on_update",
                 add(longConst(-7000), ScaleFeature.createScaled(
                         FindDepthFeature.INSTANCE, 10.0)));
+
         bindRuleSet(d, "update_join", -4600);
+
+        // taclets for special abstract update handling which should
+        // be lower prioritized to the other update rules, or actually
+        // to most other rules.
+        bindRuleSet(d, "abstrUpdLowPrioRules", 10000);
+
         bindRuleSet(d, "update_apply", -4500);
 
         setUpStringNormalisation(d);
