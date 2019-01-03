@@ -133,7 +133,6 @@ options {
          prooflabel2tag.put("ifInst", ProofElementID.ASSUMES_INST_BUILT_IN);     
          prooflabel2tag.put("userinteraction", ProofElementID.USER_INTERACTION);
          prooflabel2tag.put("notes", ProofElementID.NOTES);
-         prooflabel2tag.put("proofscript", ProofElementID.PROOF_SCRIPT);
          prooflabel2tag.put("newnames", ProofElementID.NEW_NAMES);
          prooflabel2tag.put("autoModeTime", ProofElementID.AUTOMODE_TIME);  
          prooflabel2tag.put("mergeProc", ProofElementID.MERGE_PROCEDURE);
@@ -1078,7 +1077,7 @@ options {
                  throwRecognitionException(input, e);
                  //throw  new JavaParserException(e.getMessage(), t.getText(), getSourceName(), t.getLine(), t.getCharPositionInLine(), lineOffset, colOffset); 
                             
-            }
+            }   
             throwRecognitionException(input, e);
             //throw new JavaParserException(e.getMessage(), t.getText(), getSourceName(), t.getLine(), t.getCharPositionInLine());
         } 
@@ -1168,7 +1167,6 @@ options {
             	if (baseName.startsWith("<$" + "inv" + ">")) {
 					return getJavaInfo().getStaticInv(getJavaInfo().getKeYJavaType(sort));            	
             	}
-
                 v = firstInstance.getInstanceFor(sort, getServices());
                 if(v != null) {
                     return v;
@@ -1177,7 +1175,6 @@ options {
         }
         
         // not found
-
         if (args==null) {
             throw new NotDeclException
                 (input, "(program) variable or constant", varfunc_name);
@@ -2084,7 +2081,7 @@ pred_decl
 	            String baseName = pred_name.substring(separatorIndex + 2);
 		    Sort genSort = lookupSort(sortName);
 		    
-		    if (baseName.startsWith("<$" + "inv" + ">")) {
+		    if(baseName.startsWith("<$" + "inv" + ">")) {
 		    	p = (Function) getJavaInfo().getStaticInv(getJavaInfo().getKeYJavaType(genSort));
 		    } else if(genSort instanceof GenericSort) {	        	            	
 		    	p = SortDependingFunction.createFirstInstance(
@@ -2181,7 +2178,7 @@ func_decl
 	            String baseName = func_name.substring(separatorIndex + 2);
 		    Sort genSort = lookupSort(sortName);
 		    
-		    if (baseName.startsWith("<$" + "inv" + ">")) {
+		    if(baseName.startsWith("<$" + "inv" + ">")) {
 		    	f = (Function) getJavaInfo().getStaticInv(getJavaInfo().getKeYJavaType(genSort));
 		    } else if(genSort instanceof GenericSort) {	        	            	
 		    	f = SortDependingFunction.createFirstInstance(
@@ -2489,6 +2486,7 @@ id_declaration returns [ IdDeclaration idd = null ]
 
 funcpred_name returns [String result = null]
     :
+     
     (sort_name DOUBLECOLON LESS) => (prefix = sort_name 
         DOUBLECOLON LESS name = simple_ident GREATER {result = prefix + "::<" + name + ">";})
   | 
@@ -3576,7 +3574,7 @@ funcpredvarterm returns [Term _func_pred_var_term = null]
 	            } else {
 	                op = lookupVarfuncId(varfuncid, args);
 	            }
-	            
+
 	            if (op.name().toString().equals("<$" + "inv>")) {
 	            	a = getServices().getTermBuilder().staticInv(getJavaInfo().getKeYJavaType(varfuncid.substring(0, varfuncid.indexOf("::"))));
 	            } else if (op instanceof ParsableVariable) {
@@ -3845,6 +3843,7 @@ varexp[TacletBuilder b]
 }
 :
   ( varcond_applyUpdateOnRigid[b]
+    | varcond_getInvariant[b]
     | varcond_dropEffectlessElementaries[b]
     | varcond_dropEffectlessStores[b]
     | varcond_enum_const[b]
@@ -3873,7 +3872,7 @@ varexp[TacletBuilder b]
         | varcond_reference[b, negated]        
         | varcond_referencearray[b, negated]
         | varcond_static[b,negated]
-        | varcond_staticmethod[b,negated]
+        | varcond_staticmethod[b,negated]  
         | varcond_mayexpandmethod[b,negated]
         | varcond_final[b,negated]
         | varcond_typecheck[b, negated]
@@ -3881,10 +3880,11 @@ varexp[TacletBuilder b]
         | varcond_label[b, negated]
         | varcond_static_field[b, negated]
         | varcond_subFormulas[b, negated]
-        | varcond_containsAssignment[b, negated]
+        | varcond_containsAssignment[b, negated]        
       )
   )
 ;
+
 
 varcond_sameObserver[TacletBuilder b]
 :
@@ -3893,8 +3893,6 @@ varcond_sameObserver[TacletBuilder b]
     b.addVariableCondition(new SameObserverCondition(t1, t2));
   }
   ;
-
-
 varcond_applyUpdateOnRigid [TacletBuilder b]
 :
    APPLY_UPDATE_ON_RIGID LPAREN u=varId COMMA x=varId COMMA x2=varId RPAREN 
@@ -3902,6 +3900,14 @@ varcond_applyUpdateOnRigid [TacletBuilder b]
       b.addVariableCondition(new ApplyUpdateOnRigidCondition((UpdateSV)u, 
                                                              (SchemaVariable)x, 
                                                              (SchemaVariable)x2));
+   }
+;
+
+varcond_getInvariant [TacletBuilder b]
+:
+   GET_INVARIANT LPAREN inv=varId COMMA u=varId RPAREN
+   { 
+      b.addVariableCondition(new LoopInvariantCondition((SchemaVariable)inv, (UpdateSV)u)); 
    }
 ;
 
@@ -4590,7 +4596,6 @@ skipBracedBlock
     }
     RBRACE
     ;
-
 problem returns [ Term _problem = null ]
 @init {
     boolean axiomMode = false;
@@ -4630,8 +4635,7 @@ problem returns [ Term _problem = null ]
         (  ( RULES { axiomMode = false;} 
            | AXIOMS { axiomMode = true;}
            )
-
-           ( choices = option_list[choices] )?
+        ( choices = option_list[choices] )?
            (
               // #MT-1185: KeY parses the same file several times.
               // During problem parsing, some aspects of taclets
@@ -4640,7 +4644,7 @@ problem returns [ Term _problem = null ]
               { skip_taclets }? =>
               skipBracedBlock
            |
-            LBRACE
+	    LBRACE
             { 
                 switchToSchemaMode(); 
             }
@@ -4662,7 +4666,7 @@ problem returns [ Term _problem = null ]
                 }
             )*
             RBRACE {choices=DefaultImmutableSet.<Choice>nil();}
-           )
+        )
         ) *
 
         { if(input.index() == 0) {
