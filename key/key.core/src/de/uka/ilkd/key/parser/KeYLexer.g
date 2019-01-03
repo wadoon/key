@@ -226,6 +226,7 @@ lexer grammar KeYLexer;
 
         // Keywords for varcond and related stuff
 	VARCOND : '\\varcond';
+	GET_INVARIANT : '\\getInvariant';
 	APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';
         DEPENDINGON : '\\dependingOn';
 	DISJOINTMODULONULL  : '\\disjointModuloNull';
