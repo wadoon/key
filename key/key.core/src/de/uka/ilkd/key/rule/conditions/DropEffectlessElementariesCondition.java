@@ -13,26 +13,32 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
-import java.util.Optional;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.label.AbstractExecutionTermLabel;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 public final class DropEffectlessElementariesCondition
@@ -65,13 +71,20 @@ public final class DropEffectlessElementariesCondition
                 //@formatter:on
                 return null;
             }
-            else if (containsNonRigidFunctionSymbols(target)) {
-                /*
-                 * (DS) Special case introduced for non-rigid abstract path
-                 * conditions arising from abstract execution.
-                 */
-                return null;
-            }
+            /*
+             * TODO (DS, 2019-01-03): Dropped this since it's too restrictive;
+             * however, we have to add special treatment for the allLocs
+             * location set, which has to prevent dropping *anything*!
+             */
+            //@formatter:off
+            // else if (containsNonRigidFunctionSymbols(target)) {
+            //     /*
+            //      * (DS) Special case introduced for non-rigid abstract path
+            //      * conditions arising from abstract execution.
+            //      */
+            //     return null;
+            // }
+            //@formatter:on
             else {
                 /*
                  * In the standard case, we can drop the update here. However,
@@ -85,6 +98,38 @@ public final class DropEffectlessElementariesCondition
                     return null;
                 }
             }
+        }
+        else if (update.op() instanceof AbstractUpdate) {
+            final TermBuilder tb = services.getTermBuilder();
+            final LocSetLDT locSetLDT = services.getTypeConverter()
+                    .getLocSetLDT();
+
+            final AbstractUpdate oldUpdate = (AbstractUpdate) update.op();
+            final List<Term> assignables = oldUpdate.getAssignables();
+
+            /*
+             * TODO (DS, 2019-01-03): There might also be fields in the loc set,
+             * we might have to eventually consider this. As of now, there are
+             * no examples for this case...
+             */
+            final List<Term> relevantAssignables = assignables.stream()
+                    .filter(t -> t.op() != locSetLDT.getSingletonPV()
+                            || relevantVars.contains(t.sub(0).sub(0).op()))
+                    .collect(Collectors.toList());
+
+            relevantVars.removeAll(relevantAssignables.stream()
+                    .filter(t -> t.op() == locSetLDT.getSingletonPV())
+                    .map(t -> t.sub(0).sub(0)).map(Term::op)
+                    .map(LocationVariable.class::cast)
+                    .collect(Collectors.toList()));
+
+            if (assignables.size() == relevantAssignables.size()) {
+                return null;
+            }
+
+            return services.getTermBuilder().abstractUpdate(
+                    oldUpdate.getAbstractPlaceholderStatement(),
+                    tb.union(relevantAssignables), update.sub(0));
         }
         else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
             Term sub0 = update.sub(0);
@@ -114,49 +159,6 @@ public final class DropEffectlessElementariesCondition
             return newSub1 == null ? null
                     : services.getTermBuilder().apply(sub0, newSub1, null);
         }
-        else if (AbstractUpdateCondition.isAbstractUpdate(update)) {
-            if (relevantVars.isEmpty() && target.isRigid()) {
-                /*
-                 * NOTE (DS, 2018-12-19): This should actually no longer be
-                 * necessary since we now have special rules for rigid targets.
-                 */
-
-                /*
-                 * We drop abstract updates in front of rigid symbols, like
-                 * "true" or some predicate, but not in front of anything
-                 * containing program variables, or the special nonrigid
-                 * predicates for abstract path conditions -- if there is no
-                 * explicit assignable_not specification (see below).
-                 */
-                return services.getTermBuilder().skip();
-            }
-
-            final AbstractPlaceholderStatement abstrProg = Optional
-                    .ofNullable(
-                            update.getLabel(AbstractExecutionTermLabel.NAME))
-                    .map(AbstractExecutionTermLabel.class::cast)
-                    .map(AbstractExecutionTermLabel::getAbstrPlaceholderStmt)
-                    .orElse(null);
-
-            final boolean containsNonRigidFuncSymbs =
-                    containsNonRigidFunctionSymbols(target);
-
-            if (!containsNonRigidFuncSymbs && abstrProg != null) {
-                final ImmutableSet<BlockContract> contracts = services
-                        .getSpecificationRepository()
-                        .getAbstractPlaceholderStatementContracts(abstrProg);
-
-                for (final BlockContract contract : contracts) {
-                    if (allVarsNotAssignable(relevantVars, contract,
-                            services)) {
-                        return services.getTermBuilder().skip();
-                    }
-                }
-            }
-
-            /* We cannot do anything here -- keep the abstract update. */
-            return null;
-        }
         else {
             return null;
         }
@@ -164,12 +166,12 @@ public final class DropEffectlessElementariesCondition
 
     private static Term dropEffectlessElementaries(Term update, Term target,
             Services services) {
-        if (AbstractUpdateCondition.isAbstractUpdate(target)) {
-            return null;
-        }
+        // if (AbstractUpdateCondition.isAbstractUpdate(target)) {
+        // return null;
+        // }
 
-        TermProgramVariableCollector collector =
-                services.getFactory().create(services);
+        TermProgramVariableCollector collector = services.getFactory()
+                .create(services);
         target.execPostOrder(collector);
         Set<LocationVariable> varsInTarget = collector.result();
         Term simplifiedUpdate = dropEffectlessElementariesHelper(update, target,
@@ -190,8 +192,8 @@ public final class DropEffectlessElementariesCondition
             return mc;
         }
 
-        Term properResultInst =
-                dropEffectlessElementaries(uInst, xInst, services);
+        Term properResultInst = dropEffectlessElementaries(uInst, xInst,
+                services);
         if (properResultInst == null) {
             return null;
         }
@@ -215,10 +217,9 @@ public final class DropEffectlessElementariesCondition
 
     private static boolean containsAbstractStatementUsingLHS(Term target,
             LocationVariable lhs, Services services) {
-        final ContainsAbstractStatementUsingLHSVisitor visitor =
-                new ContainsAbstractStatementUsingLHSVisitor(
-                        MergeRuleUtils.getJavaBlockRecursive(target).program(),
-                        lhs, services);
+        final ContainsAbstractStatementUsingLHSVisitor visitor = new ContainsAbstractStatementUsingLHSVisitor(
+                MergeRuleUtils.getJavaBlockRecursive(target).program(), lhs,
+                services);
         visitor.start();
         final boolean containsAbstractStatementUsingLHS = visitor.result();
         return containsAbstractStatementUsingLHS;
@@ -230,34 +231,6 @@ public final class DropEffectlessElementariesCondition
         final boolean containsNonRigidFuncSymbs = opCollector.ops().stream()
                 .anyMatch(op -> op instanceof Function && !op.isRigid());
         return containsNonRigidFuncSymbs;
-    }
-
-    private static boolean allVarsNotAssignable(
-            Set<LocationVariable> relevantVars, final BlockContract contract,
-            Services services) {
-        /*
-         * Try to find a contract which permits dropping the update since all
-         * the relevant variables are not assignable.
-         */
-        final Term assignableNot = contract.getAssignableNot(
-                services.getTypeConverter().getHeapLDT().getHeap());
-
-        /*
-         * This assignableNot term is a nested union of LocSet terms. We extract
-         * all program variables from it.
-         */
-        final TermProgramVariableCollector coll =
-                new TermProgramVariableCollector(services);
-        assignableNot.execPostOrder(coll);
-        Set<LocationVariable> notAssgnVars = coll.result();
-
-        final boolean stringCmpResult =
-                notAssgnVars.stream().map(LocationVariable::toString)
-                        .collect(Collectors.toList())
-                        .containsAll(relevantVars.stream()
-                                .map(LocationVariable::toString)
-                                .collect(Collectors.toList()));
-        return notAssgnVars.containsAll(relevantVars);
     }
 
     private static class ContainsAbstractStatementUsingLHSVisitor

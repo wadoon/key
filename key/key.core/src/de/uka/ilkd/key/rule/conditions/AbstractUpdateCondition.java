@@ -16,11 +16,10 @@ package de.uka.ilkd.key.rule.conditions;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -41,22 +40,15 @@ public class AbstractUpdateCondition implements VariableCondition {
     }
 
     /**
-     * @param target
+     * @param updateTerm
      *            The term to check.
      * @return true iff target is an update with a function symbol as operator,
      *         i.e., an abstract update.
      */
-    public static boolean isAbstractUpdate(Term target) {
-        if (target.sort() != Sort.UPDATE) {
-            return false;
-        }
-
-        final OpCollector opCollector = new OpCollector();
-        target.execPostOrder(opCollector);
-        final boolean containsNonRigidFuncSymbs = opCollector.ops().stream()
-                .anyMatch(op -> op instanceof Function && !op.isRigid());
-
-        return containsNonRigidFuncSymbs;
+    public static boolean isAbstractUpdate(Term updateTerm) {
+        final OpCollector opColl = new OpCollector();
+        updateTerm.execPostOrder(opColl);
+        return opColl.ops().stream().anyMatch(op -> op instanceof AbstractUpdate);
     }
 
     @Override

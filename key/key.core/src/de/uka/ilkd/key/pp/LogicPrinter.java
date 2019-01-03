@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.Stack;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -1642,6 +1643,45 @@ public class LogicPrinter {
     }
 
     /**
+     * Print an abstract update. This looks like
+     * <code>U_P(locset1 := locset2)</code>. If line breaks are necessary, the
+     * format is
+     *
+     * <pre>
+     * U_P(locset1 :=
+     *     locset2)
+     * </pre>
+     *
+     * @param asgn
+     *            the update operator (including spaces)
+     */
+    public void printAbstractUpdate(String asgn, Term t, int ass2)
+            throws IOException {
+        AbstractUpdate op = (AbstractUpdate) t.op();
+
+        assert t.arity() == 1;
+        String updateName = op.getUpdateName();
+        this.layouter.beginC(updateName.length() + 1).print(updateName);
+        startTerm(1);
+
+        this.layouter.print("(");
+
+        this.layouter.print(op.getAssignables().stream().map(Term::toString)
+                .collect(Collectors.joining(" \\cup ")));
+
+        this.layouter.print(asgn);
+        this.layouter.brk(0);
+
+        markStartSub();
+        printTerm(t.sub(0));
+        markEndSub();
+
+        this.layouter.print(")");
+
+        layouter.end();
+    }
+
+    /**
      * Print an elementary update. This looks like <code>loc := val</code>
      *
      * @param asgn
@@ -1661,28 +1701,6 @@ public class LogicPrinter {
         this.layouter.print(asgn);
 
         maybeParens(t.sub(0), ass2);
-    }
-
-    /**
-     * Print an abstract update. This looks like
-     * <code>U_P(locset1 := locset2)</code>
-     *
-     * @param asgn
-     *            the update operator (including spaces)
-     */
-    public void printAbstractUpdate(String asgn, Term t, int ass2) throws IOException {
-        AbstractUpdate op = (AbstractUpdate) t.op();
-
-        assert t.arity() == 1;
-        startTerm(1);
-
-        this.layouter
-                .print("U_" + op.getAbstractPlaceholderStatement().getId());
-        this.layouter.print("(");
-        maybeParens(op.lhs(), ass2);
-        this.layouter.print(asgn);
-        maybeParens(t.sub(0), ass2);
-        this.layouter.print(")");
     }
 
     private void printParallelUpdateHelper(String separator, Term t, int ass)
