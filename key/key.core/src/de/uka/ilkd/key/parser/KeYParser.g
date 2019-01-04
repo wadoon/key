@@ -3857,6 +3857,7 @@ varexp[TacletBuilder b]
     | varcond_sequentialUpdateSimplAbstr[b]
     | varcond_simplifyAbstractUpdateRenameSubst[b]
     | varcond_dropEffectlessElementaries[b]
+    | varcond_dropEffectlessAbstractUpdate[b]
     | varcond_instantiateVarsFresh[b]
     | varcond_newPV[b]
     | varcond_storeResultVarIn[b]
@@ -4032,6 +4033,13 @@ varcond_sequentialUpdateSimplAbstr[TacletBuilder b]
                                                                      (UpdateSV)u2, 
                                                                      (SchemaVariable)x, 
                                                                      (SchemaVariable)result));
+   }
+;
+varcond_dropEffectlessAbstractUpdate[TacletBuilder b]
+:
+   DROP_EFFECTLESS_ABSTRACT_UPDATE LPAREN u=varId COMMA x=varId RPAREN 
+   {
+      b.addVariableCondition(new DropEffectlessAbstractUpdateCondition((UpdateSV)u, (SchemaVariable)x));
    }
 ;
 

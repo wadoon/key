@@ -211,6 +211,11 @@ public final class DropEffectlessElementariesCondition
                 + ")";
     }
 
+    /*
+     * TODO (DS, 2019-01-04): Maybe we actually don't need this, since when
+     * collecting variables in a JavaBlock, also the variables in the contracts
+     * should be collected for an abstract placeholder statement...
+     */
     private static boolean containsAbstractStatementUsingLHS(Term target,
             LocationVariable lhs, Services services) {
         final ContainsAbstractStatementUsingLHSVisitor visitor = new ContainsAbstractStatementUsingLHSVisitor(
