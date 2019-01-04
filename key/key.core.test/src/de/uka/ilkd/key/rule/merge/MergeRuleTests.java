@@ -362,6 +362,36 @@ public class MergeRuleTests extends TestCase {
      * @return The loaded proof.
      */
     public static Proof loadProof(String directory, String proofFileName) {
+        try {
+            return loadProof(directory, proofFileName, true);
+        }
+        catch (ProblemLoaderException e) {
+            /*
+             * This is not possible, since the failInCaseOfError flag is set to
+             * true, therefore the calling test will fail and the exception is
+             * not thrown.
+             */
+            return null;
+        }
+    }
+
+    /**
+     * Loads the given proof file. Checks if the proof file exists and the proof
+     * is not null. Fails if the proof could not be loaded and failInCaseOfError
+     * is true, otherwise, potential exceptions are forwarded.
+     *
+     * @param directory
+     *            The test directory.
+     * @param proofFileName
+     *            The file name of the proof file to load.
+     *
+     * @return The loaded proof.
+     * @throws ProblemLoaderException
+     *             if the proof could not be loaded and failInCaseOfError is
+     *             false.
+     */
+    public static Proof loadProof(String directory, String proofFileName,
+            boolean failInCaseOfError) throws ProblemLoaderException {
         File proofFile = new File(directory + proofFileName);
         assertTrue(proofFile.exists());
 
@@ -375,9 +405,14 @@ public class MergeRuleTests extends TestCase {
             return proof;
         }
         catch (ProblemLoaderException e) {
-            e.printStackTrace();
-            fail("Proof could not be loaded:\n" + e.getMessage());
-            return null;
+            if (failInCaseOfError) {
+                e.printStackTrace();
+                fail("Proof could not be loaded:\n" + e.getMessage());
+                return null;
+            }
+            else {
+                throw e;
+            }
         }
     }
 
