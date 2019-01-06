@@ -154,6 +154,8 @@ public interface Contract extends SpecificationElement {
 
     public Term getAssignable(LocationVariable heap);
 
+    public Term getDeclares(LocationVariable heap);
+
     public Term getAccessible(ProgramVariable heap);
 
     public Term getGlobalDefs();

@@ -37,11 +37,11 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
 
     private LoopWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                 LocationVariable heap, OriginalVariables origVars,
-                                Condition requires, Term assignable, Term accessible,
-                                Condition ensures, Term mby, Term rep, LoopSpecification inv,
-                                TermBuilder tb) {
+                                Condition requires, Term assignable, Term declares,
+                                Term accessible, Condition ensures, Term mby, Term rep,
+                                LoopSpecification inv, TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires,
-              assignable, accessible, ensures, mby, rep, tb);
+              assignable, declares, accessible, ensures, mby, rep, tb);
         this.inv = inv;
     }
 
@@ -68,6 +68,7 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
                                            TB.and(wdPre, imp)));
     }
 
+    @Override
     public LoopSpecification getStatement() {
         return this.inv;
     }
@@ -81,17 +82,17 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
     public Contract setID(int newId) {
         return new LoopWellDefinedness(getName(), newId, type(), getTarget(), getHeap(),
                                        getOrigVars(), getRequires(), getAssignable(),
-                                       getAccessible(), getEnsures(), getMby(),
-                                       getRepresents(), getStatement(), TB);
+                                       getDeclares(), getAccessible(), getEnsures(),
+                                       getMby(), getRepresents(), getStatement(), TB);
     }
 
     @Override
     public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         return new LoopWellDefinedness(getName(), id(), type(), newPM, getHeap(),
                                        getOrigVars(), getRequires(), getAssignable(),
-                                       getAccessible(), getEnsures(), getMby(),
-                                       getRepresents(),
-                                       getStatement().setTarget(newKJT, newPM), TB);
+                                       getDeclares(), getAccessible(), getEnsures(),
+                                       getMby(),
+                                       getRepresents(), getStatement().setTarget(newKJT, newPM), TB);
     }
 
     @Override

@@ -51,7 +51,7 @@ public class ContractFactory {
             "Symbolic Execution";
     public static final String INFORMATION_FLOW_CONTRACT_BASENAME =
             "Non-interference contract";
-    
+
     private static final String INVALID_ID = "INVALID_ID";
     private static final String UNKNOWN_CONTRACT_IMPLEMENTATION = "unknown contract implementation";
     private static final String CONTRACT_COMBINATION_MARKER = "#";
@@ -78,7 +78,7 @@ public class ContractFactory {
                         Map<LocationVariable, LocationVariable> atPreVars) {
         assert old instanceof FunctionalOperationContractImpl : UNKNOWN_CONTRACT_IMPLEMENTATION;
         FunctionalOperationContractImpl foci = (FunctionalOperationContractImpl) old;
-        addedPost = replaceVariables(addedPost, selfVar, resultVar, excVar, paramVars, atPreVars, 
+        addedPost = replaceVariables(addedPost, selfVar, resultVar, excVar, paramVars, atPreVars,
                                      foci.originalSelfVar, foci.originalResultVar,
                                      foci.originalExcVar, foci.originalParamVars,
                                      foci.originalAtPreVars);
@@ -106,6 +106,7 @@ public class ContractFactory {
             foci.originalFreePosts,
             foci.originalAxioms,
             foci.originalMods,
+            foci.originalDeclares,
             foci.originalDeps,
             foci.hasRealModifiesClause,
             foci.originalSelfVar,
@@ -115,8 +116,7 @@ public class ContractFactory {
             foci.originalAtPreVars,
             foci.globalDefs,
             foci.id,
-            foci.toBeSaved,
-            foci.transaction, services);
+            foci.toBeSaved, foci.transaction, services);
     }
 
     /** Add the specification contained in InitiallyClause as a postcondition. */
@@ -164,6 +164,7 @@ public class ContractFactory {
                                                    foci.originalFreePosts,
                                                    foci.originalAxioms,
                                                    foci.originalMods,
+                                                   foci.originalDeclares,
                                                    foci.originalDeps,
                                                    foci.hasRealModifiesClause,
                                                    foci.originalSelfVar,
@@ -176,8 +177,7 @@ public class ContractFactory {
                                                    foci.toBeSaved,
                                                    foci.originalMods
                                                    .get(services.getTypeConverter()
-                                                           .getHeapLDT().getSavedHeap()) != null,
-                                                   services);
+                                                           .getHeapLDT().getSavedHeap()) != null, services);
     }
 
     /**
@@ -193,12 +193,12 @@ public class ContractFactory {
                                                    foci.originalPres, foci.originalFreePres,
                                                    foci.originalMby, foci.originalPosts,
                                                    foci.originalFreePosts, foci.originalAxioms,
-                                                   foci.originalMods, foci.originalDeps,
-                                                   foci.hasRealModifiesClause,
-                                                   foci.originalSelfVar, foci.originalParamVars,
-                                                   foci.originalResultVar, foci.originalExcVar,
-                                                   foci.originalAtPreVars, globalDefs, foci.id,
-                                                   foci.toBeSaved,foci.transaction, services);
+                                                   foci.originalMods, foci.originalDeclares,
+                                                   foci.originalDeps,
+                                                   foci.hasRealModifiesClause, foci.originalSelfVar,
+                                                   foci.originalParamVars, foci.originalResultVar,
+                                                   foci.originalExcVar, foci.originalAtPreVars, globalDefs,
+                                                   foci.id,foci.toBeSaved, foci.transaction, services);
     }
 
     public DependencyContract dep(KeYJavaType containerType,
@@ -231,7 +231,7 @@ public class ContractFactory {
         	if(heap == targetHeap) {
               accessibles.put(heap, dep.second);
         	}else{
-              accessibles.put(heap, tb.allLocs());        		
+              accessibles.put(heap, tb.allLocs());
         	}
         }
         // TODO: insert static invariant??
@@ -327,21 +327,21 @@ public class ContractFactory {
                                              Map<LocationVariable,Term> freePosts,
                                              Map<LocationVariable,Term> axioms,
                                              Map<LocationVariable,Term> mods,
+                                             Map<LocationVariable, Term> declares,
                                              Map<ProgramVariable, Term> accs,
                                              Map<LocationVariable,Boolean> hasMod,
                                              ProgramVariable selfVar,
                                              ImmutableList<ProgramVariable> paramVars,
                                              ProgramVariable resultVar,
                                              ProgramVariable excVar,
-                                             Map<LocationVariable,LocationVariable> atPreVars,
-                                             boolean toBeSaved) {
+                                             Map<LocationVariable,LocationVariable> atPreVars, boolean toBeSaved) {
         return new FunctionalOperationContractImpl(baseName, null, kjt, pm, pm.getContainerType(),
                                                    modality, pres, freePres, mby, posts, freePosts,
-                                                   axioms, mods, accs, hasMod, selfVar, paramVars,
-                                                   resultVar, excVar, atPreVars, null,
-                                                   Contract.INVALID_ID, toBeSaved,
-                                                   mods.get(services.getTypeConverter().getHeapLDT()
-                                                           .getSavedHeap()) != null, services);
+                                                   axioms, mods, declares, accs, hasMod, selfVar,
+                                                   paramVars, resultVar, excVar, atPreVars,
+                                                   null, Contract.INVALID_ID,
+                                                   toBeSaved, mods.get(services.getTypeConverter().getHeapLDT()
+                                                                   .getSavedHeap()) != null, services);
     }
 
     public FunctionalOperationContract func (String baseName,
@@ -354,12 +354,12 @@ public class ContractFactory {
                                              Map<LocationVariable, Term> freePosts,
                                              Map<LocationVariable, Term> axioms,
                                              Map<LocationVariable, Term> mods,
+                                             Map<LocationVariable, Term> declares,
                                              Map<ProgramVariable, Term> accessibles,
-                                             Map<LocationVariable, Boolean> hasMod,
-                                             ProgramVariableCollection pv) {
+                                             Map<LocationVariable, Boolean> hasMod, ProgramVariableCollection pv) {
         return func(baseName, pm, terminates ? Modality.DIA : Modality.BOX, pres,
                     freePres, mby, posts, freePosts, axioms,
-                    mods, accessibles, hasMod, pv, false, mods.get(
+                    mods, declares, accessibles, hasMod, pv, false, mods.get(
                             services.getTypeConverter().getHeapLDT().getSavedHeap()) != null);
     }
 
@@ -374,18 +374,18 @@ public class ContractFactory {
                                              Map<LocationVariable, Term> freePosts,
                                              Map<LocationVariable, Term> axioms,
                                              Map<LocationVariable, Term> mods,
+                                             Map<LocationVariable, Term> declares,
                                              Map<ProgramVariable, Term> accessibles,
                                              Map<LocationVariable, Boolean> hasMod,
-                                             ProgramVariableCollection progVars,
-                                             boolean toBeSaved, boolean transaction) {
+                                             ProgramVariableCollection progVars, boolean toBeSaved, boolean transaction) {
         return new FunctionalOperationContractImpl(baseName, null, pm.getContainerType(), pm,
                                                    pm.getContainerType(), modality, pres, freePres,
                                                    mby, posts, freePosts,
-                                                   axioms, mods, accessibles, hasMod,
-                                                   progVars.selfVar, progVars.paramVars,
-                                                   progVars.resultVar, progVars.excVar,
-                                                   progVars.atPreVars, null,
-                                                   Contract.INVALID_ID, toBeSaved, transaction, services);
+                                                   axioms, mods, declares, accessibles,
+                                                   hasMod, progVars.selfVar,
+                                                   progVars.paramVars, progVars.resultVar,
+                                                   progVars.excVar, progVars.atPreVars,
+                                                   null, Contract.INVALID_ID, toBeSaved, transaction, services);
     }
 
     /**
@@ -452,6 +452,13 @@ public class ContractFactory {
             }
         }
         Map<LocationVariable,Term> mods = t.originalMods;
+        /*
+         * TODO (DS, 2019-01-04): I'm not doing anything with declares for now
+         * due to time reasons, so it's completely ignored for unions. This has
+         * to be changed eventually! Reminder: declares offers the possibility
+         * to declares Skolem location sets that can be used for abstract execution.
+         */
+        Map<LocationVariable,Term> declares = t.originalDeclares;
         Map<ProgramVariable,Term> deps = t.originalDeps;
         Modality moda = t.modality;
         for(FunctionalOperationContract other : others) {
@@ -505,7 +512,7 @@ public class ContractFactory {
                         mby = tb.ife(otherPre, otherMby, mby);
                     }
                 }
-                
+
                 // the modifies clause must be computed before the preconditions
                 if (hasMod.get(h) || t.hasModifiesClause(h) || other.hasModifiesClause(h)) {
                     hasMod.put(h, true);
@@ -532,7 +539,7 @@ public class ContractFactory {
                         mods.put(h, nm);
                     }
                 }
-                
+
                 if(otherPre != null) {
                     pres.put(h,pres.get(h) == null ? otherPre : tb.or(pres.get(h), otherPre));
                 }
@@ -549,7 +556,7 @@ public class ContractFactory {
                     axioms.put(h, axioms.get(h) == null ? oAxiom : tb.and(axioms.get(h), oAxiom));
                 }
 
-                
+
             }
 
             for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
@@ -613,6 +620,7 @@ public class ContractFactory {
                                                    freePosts,
                                                    axioms,
                                                    mods,
+                                                   declares,
                                                    deps,
                                                    hasMod,
                                                    t.originalSelfVar,
@@ -622,8 +630,7 @@ public class ContractFactory {
                                                    t.originalAtPreVars,
                                                    t.globalDefs,
                                                    Contract.INVALID_ID,
-                                                   t.toBeSaved,
-                                                   t.transaction, services);
+                                                   t.toBeSaved, t.transaction, services);
     }
 
 
@@ -652,7 +659,7 @@ public class ContractFactory {
                                   ImmutableList<ProgramVariable> paramVars,
                                   Map<LocationVariable,LocationVariable> atPreVars,
                                   ProgramVariable originalSelfVar,
-                                  ImmutableList<ProgramVariable> originalParamVars, 
+                                  ImmutableList<ProgramVariable> originalParamVars,
                                   Map<LocationVariable,LocationVariable> originalAtPreVars) {
         return replaceVariables(original,
                                 selfVar, null, null, paramVars, atPreVars,

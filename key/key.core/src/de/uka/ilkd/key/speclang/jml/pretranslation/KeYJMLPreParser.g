@@ -736,6 +736,7 @@ simple_spec_body_clause[TextualJMLSpecCase sc, Behavior b]
 	|   ps=assignable_not_clause { sc.addAssignableNot(ps); }
 	|   ps=contracts_of_clause   { sc.addContractsOf(ps); }
 	|   ps=accessible_clause     { sc.addAccessible(ps); }
+	|   ps=declares_clause       { sc.addDeclares(ps); }
 	|   ps=ensures_clause        { sc.addEnsures(ps); }
 	|   ps=ensures_free_clause   { sc.addEnsuresFree(ps); }
 	|   ps=signals_clause        { sc.addSignals(ps); }
@@ -817,6 +818,14 @@ determines_keyword
         DETERMINES
 ;
 
+declares_clause
+	returns [PositionedString r = null]
+	throws SLTranslationException
+@init { result = r; }
+@after { r = result; }
+:
+    DECLARES result=expression { result = flipHeaps("declares", result); }
+;
 
 assignable_clause
 	returns [PositionedString r = null]

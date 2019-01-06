@@ -42,11 +42,11 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
 
     private ClassWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                  LocationVariable heap, OriginalVariables origVars,
-                                 Condition requires, Term assignable, Term accessible,
-                                 Condition ensures, Term mby, Term rep, ClassInvariant inv,
-                                 TermBuilder tb) {
+                                 Condition requires, Term assignable, Term declares,
+                                 Term accessible, Condition ensures, Term mby, Term rep,
+                                 ClassInvariant inv, TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires,
-              assignable, accessible, ensures, mby, rep, tb);
+              assignable, declares, accessible, ensures, mby, rep, tb);
         this.inv = inv;
     }
 
@@ -143,16 +143,16 @@ public final class ClassWellDefinedness extends WellDefinednessCheck {
     public ClassWellDefinedness setID(int newId) {
         return new ClassWellDefinedness(getName(), newId, type(), getTarget(), getHeap(),
                                         getOrigVars(), getRequires(), getAssignable(),
-                                        getAccessible(), getEnsures(), getMby(),
-                                        getRepresents(), getInvariant(), TB);
+                                        getDeclares(), getAccessible(), getEnsures(),
+                                        getMby(), getRepresents(), getInvariant(), TB);
     }
 
     @Override
     public ClassWellDefinedness setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         return new ClassWellDefinedness(getName(), id(), type(), newPM, getHeap(),
                                         getOrigVars(), getRequires(), getAssignable(),
-                                        getAccessible(), getEnsures(), getMby(),
-                                        getRepresents(), getInvariant().setKJT(newKJT), TB);
+                                        getDeclares(), getAccessible(), getEnsures(),
+                                        getMby(), getRepresents(), getInvariant().setKJT(newKJT), TB);
     }
 
     @Override

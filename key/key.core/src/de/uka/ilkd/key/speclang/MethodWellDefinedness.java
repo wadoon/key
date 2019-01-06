@@ -57,11 +57,11 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
 
     private MethodWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                   LocationVariable heap, OriginalVariables origVars,
-                                  Condition requires, Term assignable, Term accessible,
-                                  Condition ensures, Term mby, Term rep, Contract contract,
-                                  Term globalDefs, Term axiom, boolean model, TermBuilder tb) {
-        super(name, id, type, target, heap, origVars, requires, assignable, accessible,
-              ensures, mby, rep, tb);
+                                  Condition requires, Term assignable, Term declares,
+                                  Term accessible, Condition ensures, Term mby, Term rep,
+                                  Contract contract, Term globalDefs, Term axiom, boolean model, TermBuilder tb) {
+        super(name, id, type, target, heap, origVars, requires, assignable, declares,
+              accessible, ensures, mby, rep, tb);
         this.contract = contract;
         this.globalDefs = globalDefs;
         this.axiom = axiom;
@@ -475,14 +475,14 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                          getOrigVars(),
                                          getRequires(),
                                          getAssignable(),
+                                         getDeclares(),
                                          getAccessible(),
                                          getEnsures(),
                                          getMby(),
                                          getRepresents(),
                                          contract,
                                          globalDefs,
-                                         axiom,
-                                         modelField(), TB);
+                                         axiom, modelField(), TB);
     }
 
     @Override
@@ -495,6 +495,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                          getOrigVars(),
                                          getRequires(),
                                          getAssignable(),
+                                         getDeclares(),
                                          getAccessible(),
                                          getEnsures(),
                                          getMby(),
@@ -502,8 +503,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
                                          contract.setTarget(newKJT, newPM),
                                          globalDefs,
                                          axiom,
-                                         modelField(),
-                                         TB);
+                                         modelField(), TB);
     }
 
     @Override

@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.speclang.dl.translation;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -52,7 +53,7 @@ import de.uka.ilkd.key.speclang.FunctionalOperationContract;
  */
 public final class DLSpecFactory {
     private final Services services;
-        
+
 
     //-------------------------------------------------------------------------
     //constructors
@@ -63,12 +64,12 @@ public final class DLSpecFactory {
 	this.services = services;
     }
 
-    
-    
+
+
     //-------------------------------------------------------------------------
     //internal methods
     //-------------------------------------------------------------------------
-    
+
     private Term extractPre(Term fma) throws ProofInputException {
 	if(!fma.op().equals(Junctor.IMP)) {
 	    throw new ProofInputException("Implication expected");
@@ -76,9 +77,9 @@ public final class DLSpecFactory {
 	    return fma.sub(0);
 	}
     }
-    
-    
-    private LocationVariable extractHeapAtPre(Term fma) 
+
+
+    private LocationVariable extractHeapAtPre(Term fma)
     		throws ProofInputException {
 	if(fma.sub(1).op() instanceof UpdateApplication) {
 	    final Term update = fma.sub(1).sub(0);
@@ -101,13 +102,13 @@ public final class DLSpecFactory {
 	    return null;
 	}
     }
-    
-    
+
+
     private ProgramVariable extractExcVar(Term fma) {
 	final Term modFma = fma.sub(1).op() instanceof UpdateApplication
 	                    ? fma.sub(1).sub(1)
-	                    : fma.sub(1);	
-	
+	                    : fma.sub(1);
+
 	final SourceElement se = modFma.javaBlock().program().getFirstElement();
 	if(se instanceof CatchAllStatement) {
 	    return ((CatchAllStatement) se).getParam();
@@ -116,37 +117,37 @@ public final class DLSpecFactory {
 	}
     }
 
-    
-    private UseOperationContractRule.Instantiation extractInst(Term fma) 
+
+    private UseOperationContractRule.Instantiation extractInst(Term fma)
     		throws ProofInputException {
-	final UseOperationContractRule.Instantiation result 
-		= UseOperationContractRule.computeInstantiation(fma.sub(1), 
+	final UseOperationContractRule.Instantiation result
+		= UseOperationContractRule.computeInstantiation(fma.sub(1),
 								services);
 	if(result == null) {
-	    throw new ProofInputException("Contract formula of wrong shape: " 
+	    throw new ProofInputException("Contract formula of wrong shape: "
 		    	                  + fma.sub(1));
 	}
 
 	return result;
     }
 
-    
+
     private IProgramMethod extractProgramMethod(
-	    			UseOperationContractRule.Instantiation inst) 
+	    			UseOperationContractRule.Instantiation inst)
     		throws ProofInputException {
 	return inst.pm;
     }
 
-    
+
     private Modality extractModality(
-	    			UseOperationContractRule.Instantiation inst) 
+	    			UseOperationContractRule.Instantiation inst)
     		throws ProofInputException {
 	return inst.mod;
     }
-    
-    
+
+
     private ProgramVariable extractSelfVar(
-    				UseOperationContractRule.Instantiation inst) 
+    				UseOperationContractRule.Instantiation inst)
     		throws ProofInputException {
 	if(inst.actualSelf == null) {
 	    assert inst.pm.isStatic();
@@ -158,13 +159,13 @@ public final class DLSpecFactory {
 		    			  + "but found: " + inst.actualSelf);
 	}
     }
-    
+
 
     private ImmutableList<ProgramVariable> extractParamVars(
-	    			UseOperationContractRule.Instantiation inst) 
+	    			UseOperationContractRule.Instantiation inst)
 	    	throws ProofInputException {
-	ImmutableList<ProgramVariable> result 
-		= ImmutableSLList.<ProgramVariable> nil();	
+	ImmutableList<ProgramVariable> result
+		= ImmutableSLList.<ProgramVariable> nil();
 	for(Term param : inst.actualParams) {
 	    if(param.op() instanceof ProgramVariable) {
 		result = result.append((ProgramVariable) param.op());
@@ -176,9 +177,9 @@ public final class DLSpecFactory {
 	return result;
     }
 
-    
+
     private ProgramVariable extractResultVar(
-	    			UseOperationContractRule.Instantiation inst) 
+	    			UseOperationContractRule.Instantiation inst)
 	    	throws ProofInputException {
 	if(inst.actualResult == null) {
 	    return null;
@@ -189,7 +190,7 @@ public final class DLSpecFactory {
 		   		          + "but found: " + inst.actualResult);
 	}
     }
-    
+
 
     private Term extractPost(Term fma) {
 	final Term modFma = fma.sub(1).op() instanceof UpdateApplication
@@ -197,9 +198,9 @@ public final class DLSpecFactory {
 	                    : fma.sub(1);
 	return modFma.sub(0);
     }
-    
-    
-    
+
+
+
 
     //-------------------------------------------------------------------------
     //public interface
@@ -209,8 +210,8 @@ public final class DLSpecFactory {
      * Creates a class invariant from a formula and a designated "self".
      */
     public ClassInvariant createDLClassInvariant(String name,
-	    					 String displayName, 
-	    					 ParsableVariable selfVar, 
+	    					 String displayName,
+	    					 ParsableVariable selfVar,
 	    					 Term inv)
 	    throws ProofInputException {
 	assert name != null;
@@ -220,66 +221,66 @@ public final class DLSpecFactory {
 	assert selfVar != null;
 	assert inv != null;
 
-	final KeYJavaType kjt 
+	final KeYJavaType kjt
 		= services.getJavaInfo().getKeYJavaType(selfVar.sort());
 	assert kjt != null;
 
-	return new ClassInvariantImpl(name, 
-				      displayName, 
+	return new ClassInvariantImpl(name,
+				      displayName,
 				      kjt,
 				      new Private(),
-				      inv, 
+				      inv,
 				      selfVar);
     }
 
-    
+
     /**
      * Creates an operation contract from an implication formula of the form
      *  "pre -> {heapAtPre := heap}
      *                [#catchAll(java.lang.Throwable exc){m();}]post",
-     * (where the update and/or the #catchAll may be omitted) and a modifies 
+     * (where the update and/or the #catchAll may be omitted) and a modifies
      * clause.
      */
-    public FunctionalOperationContract createDLOperationContract(String name, 
-	    					       Term fma, 
+    public FunctionalOperationContract createDLOperationContract(String name,
+	    					       Term fma,
 	    					       Term modifies)
 	    throws ProofInputException {
 	assert name != null;
 	assert fma != null;
 	assert modifies != null;
-	
+
 	final ContractFactory cf = new ContractFactory(services);
 
 	//extract parts of fma
 	final Term pre = extractPre(fma);
 	LocationVariable heapAtPreVar = extractHeapAtPre(fma);
-	ProgramVariable excVar = extractExcVar(fma);	
+	ProgramVariable excVar = extractExcVar(fma);
 	final UseOperationContractRule.Instantiation inst = extractInst(fma);
 	final IProgramMethod pm = extractProgramMethod(inst);
 	final Modality modality = extractModality(inst);
-	final ProgramVariable selfVar = pm.isConstructor() 
-	                                ? extractResultVar(inst) 
+	final ProgramVariable selfVar = pm.isConstructor()
+	                                ? extractResultVar(inst)
 	                                : extractSelfVar(inst);
 	final ImmutableList<ProgramVariable> paramVars = extractParamVars(inst);
-	ProgramVariable resultVar = pm.isConstructor() 
+	ProgramVariable resultVar = pm.isConstructor()
 		                    ? null
 		                    : extractResultVar(inst);
 	Term post = extractPost(fma);
-	
+
 	//heapAtPre must not occur in precondition or in modifies clause
 	if(heapAtPreVar != null) {
 	    final OpCollector oc = new OpCollector();
 	    pre.execPostOrder(oc);
-	    
+
 	    modifies.execPostOrder(oc);
-	    
+
 	    if(oc.contains(heapAtPreVar)) {
 		throw new ProofInputException(
-		    "variable \"" + heapAtPreVar + "\" used for pre-state heap" 
+		    "variable \"" + heapAtPreVar + "\" used for pre-state heap"
 		    + " must not occur in precondition or in modifies clause");
 	    }
 	}
-	
+
 	HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 	//heapAtPre variable may be omitted
 	TermBuilder tb = services.getTermBuilder();
@@ -316,7 +317,7 @@ public final class DLSpecFactory {
 
         Map<LocationVariable,Term> posts = new LinkedHashMap<LocationVariable,Term>();
         posts.put(heapLDT.getHeap(), post);
-      	
+
         Map<LocationVariable,Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
         hasMod.put(heapLDT.getHeap(), modifies.op() != tb.ff().op());
         for (LocationVariable h : heapLDT.getAllHeaps()) {
@@ -324,9 +325,9 @@ public final class DLSpecFactory {
                 hasMod.put(heapLDT.getSavedHeap(), true); // different heaps not supported yet in DL contracts
             }
         }
-        
-	final boolean isLibraryClass 
-		= ((TypeDeclaration)pm.getContainerType() 
+
+	final boolean isLibraryClass
+		= ((TypeDeclaration)pm.getContainerType()
 			              .getJavaType()).isLibraryClass();
 	return cf.func(name,
 	               pm.getContainerType(),
@@ -339,13 +340,13 @@ public final class DLSpecFactory {
 	               new LinkedHashMap<LocationVariable,Term>(),
 	               null, // TODO no model methods in DL contracts
 	               mods,
-	               new LinkedHashMap<ProgramVariable,Term>(),
-	               hasMod, // TODO strictly pure in DL contracts not supported yet
+	               Collections.emptyMap(), // TODO (DS, 2019-01-04): Check whether we have to do something else here
+	               new LinkedHashMap<ProgramVariable,Term>(), // TODO strictly pure in DL contracts not supported yet
+	               hasMod,
 	               selfVar,
 	               paramVars,
 	               resultVar,
 	               excVar,
-	               atPreVars,
-	               !isLibraryClass);
+	               atPreVars, !isLibraryClass);
     }
 }

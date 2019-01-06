@@ -9,8 +9,6 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -130,8 +128,6 @@ public class AbstractPlaceholderSpecsTypeChecker {
          * into account declared Skolem method parameters, and make sure that
          * abstract programs can only declare their own locals!
          */
-
-        System.out.println();
     }
 
     private LocationVariable heap() {
@@ -163,6 +159,10 @@ public class AbstractPlaceholderSpecsTypeChecker {
         return collectedOps;
     }
 
+    private Term declaresTerm() {
+        return clauses.declares.get(heap());
+    }
+
     private Term assignablesTerm() {
         return clauses.assignables.get(heap());
     }
@@ -182,13 +182,20 @@ public class AbstractPlaceholderSpecsTypeChecker {
 
         declaredOps.addAll(declaredSymbolsWalker.walk(method.getBody()));
         declaredOps.addAll(extractDeclaredSkolemLocSetConsts(typeConverter,
-                assignablesTerm()));
+                declaresTerm()));
         declaredOps.addAll(method.getParameters().stream()
                 .map(decl -> new Pair<>(
                         decl.getVariables().get(0).getProgramVariable(),
                         decl.isFinal()))
                 .collect(Collectors.toList()));
-        declaredOps.add(new Pair<>(heap(), false));
+
+        final List<de.uka.ilkd.key.logic.op.Operator> declaredDefaults = new ArrayList<>();
+        declaredDefaults.add(heap());
+        declaredDefaults.add(typeConverter.getLocSetLDT().getAllLocs());
+        declaredDefaults.add(typeConverter.getLocSetLDT().getEmpty());
+
+        declaredDefaults.stream().map(op -> new Pair<>(op, false))
+                .forEach(p -> declaredOps.add(p));
 
         return declaredOps;
     }
@@ -211,9 +218,16 @@ public class AbstractPlaceholderSpecsTypeChecker {
     private List<Pair<? extends Operator, Boolean>> getDeclsFromAbstrPlaceholderStmt(
             AbstractPlaceholderStatement aps) {
         final TypeConverter typeConverter = services.getTypeConverter();
-        final ImmutableSet<BlockContract> contracts = services
+        final List<BlockContract> contracts = services
                 .getSpecificationRepository()
-                .getAbstractPlaceholderStatementContracts(aps);
+                .getAbstractPlaceholderStatementContracts(aps).stream()
+                .filter(contract -> contract.getBaseName()
+                        .equals("JML block contract"))
+                /*
+                 * We exclude return_behavior etc. here, because from those
+                 * contracts we only consider the precondition.
+                 */
+                .collect(Collectors.toList());
 
         /* At this point, there should at most be one contract... */
 
@@ -225,20 +239,15 @@ public class AbstractPlaceholderSpecsTypeChecker {
 
         final BlockContract contract = contracts.iterator().next();
 
-        /*
-         * TODO (DS, 2019-01-04): Here, we should eventually switch to the
-         * *declared* specification in the contract which as of now does not
-         * exist yet.
-         */
-        final Term assignableTerm = contract.getAssignable(heap());
+        final Term declaresTerm = contract.getDeclares(heap());
 
-        return extractDeclaredSkolemLocSetConsts(typeConverter, assignableTerm);
+        return extractDeclaredSkolemLocSetConsts(typeConverter, declaresTerm);
     }
 
     private List<Pair<? extends Operator, Boolean>> extractDeclaredSkolemLocSetConsts(
-            final TypeConverter typeConverter, final Term assignableTerm) {
+            final TypeConverter typeConverter, final Term declaresTerm) {
         final OpCollector opColl = new OpCollector();
-        assignableTerm.execPostOrder(opColl);
+        declaresTerm.execPostOrder(opColl);
 
         /*
          * We only collect constants of LocSet type like localsP for the local
@@ -304,7 +313,10 @@ public class AbstractPlaceholderSpecsTypeChecker {
                  * At this point, we exit a container statement in which we did
                  * not find the searched element -> clear current result list!
                  */
-                if (node instanceof StatementContainer && !elemFound) {
+                if (node instanceof StatementContainer && !elemFound
+                        && !(((StatementContainer) node).getChildCount() == 1
+                                && ((StatementContainer) node).getChildAt(
+                                        0) instanceof AbstractPlaceholderStatement)) {
                     return Collections.emptyList();
                 }
             }

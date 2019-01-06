@@ -40,6 +40,7 @@ lexer grammar KeYJMLLexer;
     ASSIGNABLE_NOT  : 'assignable_not';
     BREAKS          : 'breaks';
     CONTINUES       : 'continues';
+    DECLARES        : 'declares';
     DECREASES       : 'decreases'; // internal translation for 'measured_by'
     DEPENDS         : 'depends';  // internal translation for 'accessible' on model fields
     DETERMINES      : 'determines';  //KeY extension, not official JML

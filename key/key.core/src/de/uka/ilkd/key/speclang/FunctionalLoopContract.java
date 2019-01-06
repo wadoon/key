@@ -144,6 +144,11 @@ public class FunctionalLoopContract implements Contract {
     }
 
     @Override
+    public Term getDeclares(LocationVariable heap) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean hasMby() {
         return contract.hasMby();
     }

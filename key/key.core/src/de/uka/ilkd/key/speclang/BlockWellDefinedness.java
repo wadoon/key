@@ -40,11 +40,11 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
 
     private BlockWellDefinedness(String name, int id, Type type, IObserverFunction target,
                                  LocationVariable heap, OriginalVariables origVars,
-                                 Condition requires, Term assignable, Term accessible,
-                                 Condition ensures, Term mby, Term rep, BlockContract block,
-                                 TermBuilder tb) {
+                                 Condition requires, Term assignable, Term declares,
+                                 Term accessible, Condition ensures, Term mby, Term rep,
+                                 BlockContract block, TermBuilder tb) {
         super(name, id, type, target, heap, origVars, requires,
-              assignable, accessible, ensures, mby, rep, tb);
+              assignable, declares, accessible, ensures, mby, rep, tb);
         this.block = block;
     }
 
@@ -79,6 +79,7 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
                                            TB.and(wdPre, imp)));
     }
 
+    @Override
     public BlockContract getStatement() {
         return this.block;
     }
@@ -92,17 +93,17 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
     public Contract setID(int newId) {
         return new BlockWellDefinedness(getName(), newId, type(), getTarget(), getHeap(),
                                         getOrigVars(), getRequires(), getAssignable(),
-                                        getAccessible(), getEnsures(), getMby(),
-                                        getRepresents(), getStatement(), TB);
+                                        getDeclares(), getAccessible(), getEnsures(),
+                                        getMby(), getRepresents(), getStatement(), TB);
     }
 
     @Override
     public Contract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         return new BlockWellDefinedness(getName(), id(), type(), newPM, getHeap(),
                                         getOrigVars(), getRequires(), getAssignable(),
-                                        getAccessible(), getEnsures(), getMby(),
-                                        getRepresents(),
-                                        getStatement().setTarget(newKJT, newPM), TB);
+                                        getDeclares(), getAccessible(), getEnsures(),
+                                        getMby(),
+                                        getRepresents(), getStatement().setTarget(newKJT, newPM), TB);
     }
 
     @Override

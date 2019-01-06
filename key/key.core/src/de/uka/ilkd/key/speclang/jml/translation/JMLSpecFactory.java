@@ -281,6 +281,7 @@ public class JMLSpecFactory {
         public Term decreases;
         public Map<LocationVariable, Term> assignables = new LinkedHashMap<LocationVariable, Term>();
         public Map<LocationVariable, Term> assignableNots = new LinkedHashMap<LocationVariable, Term>();
+        public Map<LocationVariable, Term> declares = new LinkedHashMap<LocationVariable, Term>();
         public Map<ProgramVariable, Term> accessibles = new LinkedHashMap<ProgramVariable, Term>();
         public Map<LocationVariable, Term> ensures = new LinkedHashMap<LocationVariable, Term>();
         public Map<LocationVariable, Term> ensuresFree = new LinkedHashMap<LocationVariable, Term>();
@@ -443,6 +444,9 @@ public class JMLSpecFactory {
                     clauses);
             translateAssignableNot(pm, progVars, heap, savedHeap,
                     textualSpecCase.getAssignableNot(heap.name().toString()),
+                    clauses);
+            translateDeclares(pm, progVars, heap, savedHeap,
+                    textualSpecCase.getDeclares(heap.name().toString()),
                     clauses);
             translateRequires(pm, progVars, heap, savedHeap,
                     textualSpecCase.getRequires(heap.name().toString()),
@@ -640,6 +644,37 @@ public class JMLSpecFactory {
                     translateAssignableNot(pm, progVars.selfVar,
                             progVars.paramVars, progVars.atPres,
                             progVars.atBefores, nonMod));
+        }
+    }
+
+    private void translateDeclares(IProgramMethod pm,
+            ProgramVariableCollection progVars, LocationVariable heap,
+            final LocationVariable savedHeap,
+            final ImmutableList<PositionedString> declares,
+            ContractClauses clauses) throws SLTranslationException {
+        /*
+         * TODO (DS, 2019-01-04): Check this implementation. Has been copied
+         * from translateAssignable, and semantics might have to be changed.
+         */
+        //@formatter:off
+        // clauses.hasNonMod.put(heap, !translateStrictlyPure(pm, progVars.selfVar,
+        //         progVars.paramVars, nonMod));
+        //@formatter:on
+        if (heap == savedHeap && declares.isEmpty()) {
+            clauses.declares.put(heap, null);
+        //@formatter:off
+        // } else if (!clauses.hasNonMod.get(heap)) {
+        //     final ImmutableList<PositionedString> assignableNothing = ImmutableSLList
+        //             .<PositionedString>nil().append(new PositionedString("assignable \\nothing;"));
+        //     clauses.assignables.put(heap, translateAssignable(pm, progVars.selfVar,
+        //             progVars.paramVars, progVars.atPres, progVars.atBefores, assignableNothing));
+        //@formatter:on
+        }
+        else {
+            clauses.declares.put(heap,
+                    translateAssignableNot(pm, progVars.selfVar,
+                            progVars.paramVars, progVars.atPres,
+                            progVars.atBefores, declares));
         }
     }
 
@@ -1093,7 +1128,7 @@ public class JMLSpecFactory {
             FunctionalOperationContract contract = cf.func(name, pm, true, pres,
                     clauses.requiresFree, clauses.measuredBy, posts,
                     clauses.ensuresFree, axioms, clauses.assignables,
-                    clauses.accessibles, clauses.hasMod, progVars);
+                    clauses.declares, clauses.accessibles, clauses.hasMod, progVars);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         }
@@ -1102,7 +1137,7 @@ public class JMLSpecFactory {
             FunctionalOperationContract contract = cf.func(name, pm, false,
                     pres, clauses.requiresFree, clauses.measuredBy, posts,
                     clauses.ensuresFree, axioms, clauses.assignables,
-                    clauses.accessibles, clauses.hasMod, progVars);
+                    clauses.declares, clauses.accessibles, clauses.hasMod, progVars);
             contract = cf.addGlobalDefs(contract, abbrvLhs);
             result = result.add(contract);
         }
@@ -1119,12 +1154,12 @@ public class JMLSpecFactory {
             FunctionalOperationContract contract1 = cf.func(name, pm, true,
                     pres, clauses.requiresFree, clauses.measuredBy, posts,
                     clauses.ensuresFree, axioms, clauses.assignables,
-                    clauses.accessibles, clauses.hasMod, progVars);
+                    clauses.declares, clauses.accessibles, clauses.hasMod, progVars);
             contract1 = cf.addGlobalDefs(contract1, abbrvLhs);
             FunctionalOperationContract contract2 = cf.func(name, pm, false,
                     clauses.requires, clauses.requiresFree, clauses.measuredBy,
                     posts, clauses.ensuresFree, axioms, clauses.assignables,
-                    clauses.accessibles, clauses.hasMod, progVars);
+                    clauses.declares, clauses.accessibles, clauses.hasMod, progVars);
             contract2 = cf.addGlobalDefs(contract2, abbrvLhs);
             result = result.add(contract1).add(contract2);
         }
@@ -1606,8 +1641,8 @@ public class JMLSpecFactory {
                 clauses.ensures, clauses.infFlowSpecs, clauses.breaks,
                 clauses.continues, clauses.returns, clauses.signals,
                 clauses.signalsOnly, clauses.diverges, clauses.assignables,
-                clauses.assignableNots, clauses.accessibles, clauses.hasMod,
-                clauses.hasNonMod, services).create();
+                clauses.assignableNots, clauses.declares, clauses.accessibles,
+                clauses.hasMod, clauses.hasNonMod, services).create();
     }
 
     /**
@@ -1649,8 +1684,8 @@ public class JMLSpecFactory {
                 clauses.ensures, clauses.infFlowSpecs, clauses.breaks,
                 clauses.continues, clauses.returns, clauses.signals,
                 clauses.signalsOnly, clauses.diverges, clauses.assignables,
-                clauses.assignableNots, clauses.accessibles, clauses.hasMod,
-                clauses.hasNonMod, clauses.decreases, services).create();
+                clauses.assignableNots, clauses.declares, clauses.accessibles,
+                clauses.hasMod, clauses.hasNonMod, clauses.decreases, services).create();
     }
 
     /**

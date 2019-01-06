@@ -55,6 +55,7 @@ lexer grammar KeYJMLPreLexer;
 	CONTINUE_BEHAVIOR 	: 'continue_behavior';
     CONTINUE_BEHAVIOUR 	: 'continue_behaviour';
     DEBUG   : 'debug';
+    DECLARES 			: 'declares';
     DECREASES  			: 'decreases';
     DECREASES_REDUNDANTLY  	: 'decreases_redundantly';
     DECREASING  		: 'decreasing';

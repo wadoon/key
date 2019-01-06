@@ -159,6 +159,10 @@ public final class DependencyContractImpl implements DependencyContract {
         return originalMby != null;
     }
 
+    @Override
+    public Term getDeclares(LocationVariable heap) {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public Term getPre(LocationVariable heap,
@@ -191,6 +195,7 @@ public final class DependencyContractImpl implements DependencyContract {
         return or.replace(originalPres.get(heap));
     }
 
+    @Override
     public Term getPre(List<LocationVariable> heapContext,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
@@ -243,6 +248,7 @@ public final class DependencyContractImpl implements DependencyContract {
     }
 
 
+    @Override
     public Term getPre(List<LocationVariable> heapContext,
             Map<LocationVariable,Term> heapTerms,
             Term selfTerm,
@@ -500,7 +506,7 @@ public final class DependencyContractImpl implements DependencyContract {
         return null;
     }
 
-    
+
     @Override
     public boolean transactionApplicableContract() {
         return false;
@@ -516,7 +522,7 @@ public final class DependencyContractImpl implements DependencyContract {
         }
     }
 
-    
+
     @Override
     public ProofOblInput createProofObl(InitConfig initConfig,
                                      Contract contract) {
@@ -530,7 +536,7 @@ public final class DependencyContractImpl implements DependencyContract {
         return (ContractPO)createProofObl(initConfig, this);
     }
 
-    
+
     @Override
     public ProofOblInput getProofObl(Services services) {
         return services.getSpecificationRepository().getPO(this);

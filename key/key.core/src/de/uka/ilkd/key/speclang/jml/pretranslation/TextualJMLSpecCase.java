@@ -33,92 +33,100 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     private final Behavior behavior;
     private PositionedString workingSpace = null;
-    private ImmutableList<PositionedString> measuredBy =
-            ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> signals =
-            ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> signalsOnly =
-            ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> diverges =
-            ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> depends =
-            ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> breaks =
-            ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> continues =
-            ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> returns =
-            ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> decreases =
-            ImmutableSLList.<PositionedString>nil();
-    private ImmutableList<PositionedString> contractsOfs =
-            ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> measuredBy = ImmutableSLList
+            .<PositionedString> nil();
+    private ImmutableList<PositionedString> signals = ImmutableSLList
+            .<PositionedString> nil();
+    private ImmutableList<PositionedString> signalsOnly = ImmutableSLList
+            .<PositionedString> nil();
+    private ImmutableList<PositionedString> diverges = ImmutableSLList
+            .<PositionedString> nil();
+    private ImmutableList<PositionedString> depends = ImmutableSLList
+            .<PositionedString> nil();
+    private ImmutableList<PositionedString> breaks = ImmutableSLList
+            .<PositionedString> nil();
+    private ImmutableList<PositionedString> continues = ImmutableSLList
+            .<PositionedString> nil();
+    private ImmutableList<PositionedString> returns = ImmutableSLList
+            .<PositionedString> nil();
+    private ImmutableList<PositionedString> decreases = ImmutableSLList
+            .<PositionedString> nil();
+    private ImmutableList<PositionedString> contractsOfs = ImmutableSLList
+            .<PositionedString> nil();
 
-    private ImmutableList<Triple<PositionedString,PositionedString,PositionedString>> abbreviations =
-            ImmutableSLList.<Triple<PositionedString,PositionedString,PositionedString>>nil();
+    private ImmutableList<Triple<PositionedString, PositionedString, PositionedString>> abbreviations = ImmutableSLList
+            .<Triple<PositionedString, PositionedString, PositionedString>> nil();
 
-    private ImmutableList<PositionedString> infFlowSpecs =
-            ImmutableSLList.<PositionedString>nil();
+    private ImmutableList<PositionedString> infFlowSpecs = ImmutableSLList
+            .<PositionedString> nil();
 
-    private Map<String, ImmutableList<PositionedString>>
-      accessibles = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+    private Map<String, ImmutableList<PositionedString>> accessibles = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
-    private Map<String, ImmutableList<PositionedString>>
-      assignables = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+    private Map<String, ImmutableList<PositionedString>> assignables = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
-    private Map<String, ImmutableList<PositionedString>>
-      assignableNots = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+    private Map<String, ImmutableList<PositionedString>> assignableNots = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
-    private Map<String, ImmutableList<PositionedString>>
-      requires = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+    private Map<String, ImmutableList<PositionedString>> declares = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
-    private Map<String, ImmutableList<PositionedString>>
-      requiresFree = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+    private Map<String, ImmutableList<PositionedString>> requires = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
-    private Map<String, ImmutableList<PositionedString>>
-      ensures = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+    private Map<String, ImmutableList<PositionedString>> requiresFree = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
-    private Map<String, ImmutableList<PositionedString>>
-      ensuresFree = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+    private Map<String, ImmutableList<PositionedString>> ensures = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
-    private Map<String, ImmutableList<PositionedString>>
-      axioms = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+    private Map<String, ImmutableList<PositionedString>> ensuresFree = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
-    public TextualJMLSpecCase(ImmutableList<String> mods,
-                              Behavior behavior) {
+    private Map<String, ImmutableList<PositionedString>> axioms = new LinkedHashMap<String, ImmutableList<PositionedString>>();
+
+    public TextualJMLSpecCase(ImmutableList<String> mods, Behavior behavior) {
         super(mods);
         assert behavior != null;
         this.behavior = behavior;
-        for(Name hName : HeapLDT.VALID_HEAP_NAMES) {
-          assignables.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
-          assignableNots.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
-          requires.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
-          requiresFree.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
-          ensures.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
-          ensuresFree.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
-          accessibles.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
-          accessibles.put(hName.toString()+"AtPre", ImmutableSLList.<PositionedString>nil());
-          axioms.put(hName.toString(), ImmutableSLList.<PositionedString>nil());
+        for (Name hName : HeapLDT.VALID_HEAP_NAMES) {
+            assignables.put(hName.toString(),
+                    ImmutableSLList.<PositionedString> nil());
+            assignableNots.put(hName.toString(),
+                    ImmutableSLList.<PositionedString> nil());
+            declares.put(hName.toString(),
+                    ImmutableSLList.<PositionedString> nil());
+            requires.put(hName.toString(),
+                    ImmutableSLList.<PositionedString> nil());
+            requiresFree.put(hName.toString(),
+                    ImmutableSLList.<PositionedString> nil());
+            ensures.put(hName.toString(),
+                    ImmutableSLList.<PositionedString> nil());
+            ensuresFree.put(hName.toString(),
+                    ImmutableSLList.<PositionedString> nil());
+            accessibles.put(hName.toString(),
+                    ImmutableSLList.<PositionedString> nil());
+            accessibles.put(hName.toString() + "AtPre",
+                    ImmutableSLList.<PositionedString> nil());
+            axioms.put(hName.toString(),
+                    ImmutableSLList.<PositionedString> nil());
         }
     }
 
     /**
-     * Produce a (textual) block contract from a JML assert statement.
-     * The resulting contract has an empty precondition, the assert expression
-     * as a postcondition, and strictly_nothing as frame.
+     * Produce a (textual) block contract from a JML assert statement. The
+     * resulting contract has an empty precondition, the assert expression as a
+     * postcondition, and strictly_nothing as frame.
      */
-    public static TextualJMLSpecCase assert2blockContract (ImmutableList<String> mods, PositionedString assertStm) {
-        final TextualJMLSpecCase res = new TextualJMLSpecCase(mods, Behavior.NORMAL_BEHAVIOR);
-        res.addName(new PositionedString("assert "+assertStm.text, assertStm.fileName, assertStm.pos));
+    public static TextualJMLSpecCase assert2blockContract(
+            ImmutableList<String> mods, PositionedString assertStm) {
+        final TextualJMLSpecCase res = new TextualJMLSpecCase(mods,
+                Behavior.NORMAL_BEHAVIOR);
+        res.addName(new PositionedString("assert " + assertStm.text,
+                assertStm.fileName, assertStm.pos));
         res.addEnsures(assertStm);
-        res.addAssignable(new PositionedString("assignable \\strictly_nothing;",assertStm.fileName,assertStm.pos));
+        res.addAssignable(new PositionedString("assignable \\strictly_nothing;",
+                assertStm.fileName, assertStm.pos));
         res.setPosition(assertStm);
         return res;
     }
 
     /**
-     * Merge clauses of two spec cases.
-     * Keep behavior of this one.
+     * Merge clauses of two spec cases. Keep behavior of this one.
+     *
      * @param tsc
      */
     public TextualJMLSpecCase merge(TextualJMLSpecCase tsc) {
@@ -130,6 +138,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         res.addSignals(tsc.getSignals());
         res.addSignalsOnly(tsc.getSignalsOnly());
         res.addAssignable(tsc.getAssignable());
+        res.addDeclares(tsc.getDeclares());
         res.addAccessible(tsc.getAccessible());
         res.addInfFlowSpecs(tsc.getInfFlowSpecs());
         res.addDiverges(tsc.getDiverges());
@@ -141,7 +150,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     @Override
     public TextualJMLSpecCase clone() {
-        TextualJMLSpecCase res = new TextualJMLSpecCase(getMods(), getBehavior());
+        TextualJMLSpecCase res = new TextualJMLSpecCase(getMods(),
+                getBehavior());
         res.requires = new LinkedHashMap(requires);
         res.requiresFree = new LinkedHashMap(requiresFree);
         res.ensures = new LinkedHashMap(ensures);
@@ -149,6 +159,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         res.signals = signals;
         res.signalsOnly = signalsOnly;
         res.assignables = new LinkedHashMap(assignables);
+        res.declares = new LinkedHashMap(declares);
         res.assignableNots = new LinkedHashMap(assignableNots);
         res.contractsOfs = contractsOfs;
         res.accessibles = new LinkedHashMap(accessibles);
@@ -166,7 +177,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return res;
     }
 
-
     public void addName(PositionedString n) {
         this.name = n.text;
         setPosition(n);
@@ -177,19 +187,18 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public void addRequires(ImmutableList<PositionedString> l) {
-        for(PositionedString ps : l) {
-           addRequires(ps);
+        for (PositionedString ps : l) {
+            addRequires(ps);
         }
     }
-
 
     public void addRequiresFree(PositionedString ps) {
         addGeneric(requiresFree, ps);
     }
 
     public void addRequiresFree(ImmutableList<PositionedString> l) {
-        for(PositionedString ps : l) {
-           addRequiresFree(ps);
+        for (PositionedString ps : l) {
+            addRequiresFree(ps);
         }
     }
 
@@ -197,7 +206,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         measuredBy = measuredBy.append(ps);
         setPosition(ps);
     }
-
 
     public void addMeasuredBy(ImmutableList<PositionedString> l) {
         measuredBy = measuredBy.append(l);
@@ -216,7 +224,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         decreases = decreases.append(l);
     }
 
-
     public void addAssignable(PositionedString ps) {
         addGeneric(assignables, ps);
     }
@@ -226,27 +233,36 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public void addAssignable(ImmutableList<PositionedString> l) {
-        for (PositionedString ps: l)
+        for (PositionedString ps : l)
             addAssignable(ps);
     }
 
     public void addAccessible(PositionedString ps) {
-    	addGeneric(accessibles, ps);
+        addGeneric(accessibles, ps);
     }
 
-
     public void addAccessible(ImmutableList<PositionedString> l) {
-        for(PositionedString ps : l) {
-          addAccessible(ps);
+        for (PositionedString ps : l) {
+            addAccessible(ps);
+        }
+    }
+
+    public void addDeclares(PositionedString ps) {
+        addGeneric(declares, ps);
+    }
+
+    public void addDeclares(ImmutableList<PositionedString> l) {
+        for (PositionedString ps : l) {
+            addDeclares(ps);
         }
     }
 
     public void addContractsOf(PositionedString ps) {
-    	contractsOfs = contractsOfs.append(ps);
+        contractsOfs = contractsOfs.append(ps);
     }
 
     public void addContractsOf(ImmutableList<PositionedString> ps) {
-    	contractsOfs = contractsOfs.append(ps);
+        contractsOfs = contractsOfs.append(ps);
     }
 
     public void addEnsures(PositionedString ps) {
@@ -254,50 +270,43 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public void addEnsures(ImmutableList<PositionedString> l) {
-        for(PositionedString ps : l) {
-           addEnsures(ps);
+        for (PositionedString ps : l) {
+            addEnsures(ps);
         }
     }
-
 
     public void addEnsuresFree(PositionedString ps) {
         addGeneric(ensuresFree, ps);
     }
 
     public void addEnsuresFree(ImmutableList<PositionedString> l) {
-        for(PositionedString ps : l) {
-           addEnsuresFree(ps);
+        for (PositionedString ps : l) {
+            addEnsuresFree(ps);
         }
     }
-
 
     public void addSignals(PositionedString ps) {
         signals = signals.append(ps);
         setPosition(ps);
     }
 
-
     public void addSignals(ImmutableList<PositionedString> l) {
         signals = signals.append(l);
     }
-
 
     public void addSignalsOnly(PositionedString ps) {
         signalsOnly = signalsOnly.append(ps);
         setPosition(ps);
     }
 
-
     public void addSignalsOnly(ImmutableList<PositionedString> l) {
         signalsOnly = signalsOnly.append(l);
     }
-
 
     public void setWorkingSpace(PositionedString ps) {
         workingSpace = ps;
         setPosition(ps);
     }
-
 
     public void addDiverges(PositionedString ps) {
         diverges = diverges.append(ps);
@@ -305,7 +314,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public void addDiverges(ImmutableList<PositionedString> l) {
-        for (PositionedString ps: l)
+        for (PositionedString ps : l)
             addDiverges(ps);
     }
 
@@ -314,34 +323,28 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         setPosition(ps);
     }
 
-
     public void addBreaks(PositionedString ps) {
         breaks = breaks.append(ps);
         setPosition(ps);
     }
 
-
     public void addBreaks(ImmutableList<PositionedString> l) {
         breaks = breaks.append(l);
     }
-
 
     public void addContinues(PositionedString ps) {
         continues = continues.append(ps);
         setPosition(ps);
     }
 
-
     public void addContinues(ImmutableList<PositionedString> l) {
         continues = continues.append(l);
     }
-
 
     public void addReturns(PositionedString ps) {
         returns = returns.append(ps);
         setPosition(ps);
     }
-
 
     public void addReturns(ImmutableList<PositionedString> l) {
         returns = returns.append(l);
@@ -349,7 +352,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addAbbreviation(PositionedString[] pss) {
         assert pss.length == 3;
-        final Triple<PositionedString, PositionedString, PositionedString> abbr = new Triple<PositionedString, PositionedString, PositionedString>(pss[0],pss[1],pss[2]);
+        final Triple<PositionedString, PositionedString, PositionedString> abbr = new Triple<PositionedString, PositionedString, PositionedString>(
+                pss[0], pss[1], pss[2]);
         abbreviations = abbreviations.append(abbr);
     }
 
@@ -359,8 +363,8 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public void addAxioms(ImmutableList<PositionedString> l) {
-        for(PositionedString ps : l) {
-	           addAxioms(ps);
+        for (PositionedString ps : l) {
+            addAxioms(ps);
         }
     }
 
@@ -368,16 +372,13 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         infFlowSpecs = infFlowSpecs.append(ps);
     }
 
-
     public void addInfFlowSpecs(ImmutableList<PositionedString> l) {
         infFlowSpecs = infFlowSpecs.append(l);
     }
 
-
     public Behavior getBehavior() {
         return behavior;
     }
-
 
     public ImmutableList<PositionedString> getRequires() {
         return requires.get(HeapLDT.BASE_HEAP_NAME.toString());
@@ -411,16 +412,24 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return assignables.get(hName);
     }
 
+    public ImmutableList<PositionedString> getDeclares() {
+        return declares.get(HeapLDT.BASE_HEAP_NAME.toString());
+    }
+
+    public ImmutableList<PositionedString> getDeclares(String hName) {
+        return declares.get(hName);
+    }
+
     public ImmutableList<PositionedString> getAssignableNot(String hName) {
         return assignableNots.get(hName);
     }
 
     public ImmutableList<PositionedString> getAccessible() {
-    	return accessibles.get(HeapLDT.BASE_HEAP_NAME.toString());
+        return accessibles.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
 
     public ImmutableList<PositionedString> getAccessible(String hName) {
-    	return accessibles.get(hName);
+        return accessibles.get(hName);
     }
 
     public ImmutableList<PositionedString> getEnsures() {
@@ -440,11 +449,11 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     }
 
     public ImmutableList<PositionedString> getAxioms() {
-      return axioms.get(HeapLDT.BASE_HEAP_NAME.toString());
+        return axioms.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
 
     public ImmutableList<PositionedString> getAxioms(String hName) {
-      return axioms.get(hName);
+        return axioms.get(hName);
     }
 
     public String getName() {
@@ -459,50 +468,41 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return signals;
     }
 
-
     public ImmutableList<PositionedString> getSignalsOnly() {
         return signalsOnly;
     }
-
 
     public PositionedString getWorkingSpace() {
         return workingSpace;
     }
 
-
     public ImmutableList<PositionedString> getDiverges() {
         return diverges;
     }
-
 
     public ImmutableList<PositionedString> getDepends() {
         return depends;
     }
 
-
     public ImmutableList<PositionedString> getBreaks() {
         return breaks;
     }
-
 
     public ImmutableList<PositionedString> getContinues() {
         return continues;
     }
 
-
     public ImmutableList<PositionedString> getReturns() {
         return returns;
     }
 
-    public ImmutableList<Triple<PositionedString,PositionedString,PositionedString>> getAbbreviations() {
+    public ImmutableList<Triple<PositionedString, PositionedString, PositionedString>> getAbbreviations() {
         return abbreviations;
     }
-
 
     public ImmutableList<PositionedString> getInfFlowSpecs() {
         return infFlowSpecs;
     }
-
 
     @Override
     public String toString() {
@@ -511,7 +511,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
         sb.append(behavior).append("\n");
 
-        for (Triple<PositionedString, PositionedString, PositionedString> t: abbreviations) {
+        for (Triple<PositionedString, PositionedString, PositionedString> t : abbreviations) {
             sb.append("old: ");
             sb.append(t.first.toString());
             sb.append(" ");
@@ -521,57 +521,63 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             sb.append("\n");
         }
 
-        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
-          it = requires.get(h.toString()).iterator();
-          while(it.hasNext()) {
-            sb.append("requires<"+h+">: " + it.next() + "\n");
-          }
+        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
+            it = requires.get(h.toString()).iterator();
+            while (it.hasNext()) {
+                sb.append("requires<" + h + ">: " + it.next() + "\n");
+            }
         }
-        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
             it = requiresFree.get(h.toString()).iterator();
-            while(it.hasNext()) {
-              sb.append("requires_free<"+h+">: " + it.next() + "\n");
+            while (it.hasNext()) {
+                sb.append("requires_free<" + h + ">: " + it.next() + "\n");
             }
-          }
-        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
-          it = assignables.get(h.toString()).iterator();
-          while(it.hasNext()) {
-            sb.append("assignable<"+h+">: " + it.next() + "\n");
-          }
         }
-        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
-          it = assignableNots.get(h.toString()).iterator();
-          while(it.hasNext()) {
-            sb.append("assignable_not<"+h+">: " + it.next() + "\n");
-          }
+        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
+            it = assignables.get(h.toString()).iterator();
+            while (it.hasNext()) {
+                sb.append("assignable<" + h + ">: " + it.next() + "\n");
+            }
         }
-        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
-          it = accessibles.get(h.toString()).iterator();
-          while(it.hasNext()) {
-            sb.append("accessible<"+h+">: " + it.next() + "\n");
-          }
-          it = accessibles.get(h.toString()+"AtPre").iterator();
-          while(it.hasNext()) {
-            sb.append("accessible<"+h+"AtPre>: " + it.next() + "\n");
-          }
+        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
+            it = assignableNots.get(h.toString()).iterator();
+            while (it.hasNext()) {
+                sb.append("assignable_not<" + h + ">: " + it.next() + "\n");
+            }
         }
-        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
-          it = ensures.get(h.toString()).iterator();
-          while(it.hasNext()) {
-            sb.append("ensures<"+h+">: " + it.next() + "\n");
-          }
+        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
+            it = declares.get(h.toString()).iterator();
+            while (it.hasNext()) {
+                sb.append("declares<" + h + ">: " + it.next() + "\n");
+            }
         }
-        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
+        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
+            it = accessibles.get(h.toString()).iterator();
+            while (it.hasNext()) {
+                sb.append("accessible<" + h + ">: " + it.next() + "\n");
+            }
+            it = accessibles.get(h.toString() + "AtPre").iterator();
+            while (it.hasNext()) {
+                sb.append("accessible<" + h + "AtPre>: " + it.next() + "\n");
+            }
+        }
+        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
+            it = ensures.get(h.toString()).iterator();
+            while (it.hasNext()) {
+                sb.append("ensures<" + h + ">: " + it.next() + "\n");
+            }
+        }
+        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
             it = ensuresFree.get(h.toString()).iterator();
-            while(it.hasNext()) {
-              sb.append("ensures_free<"+h+">: " + it.next() + "\n");
+            while (it.hasNext()) {
+                sb.append("ensures_free<" + h + ">: " + it.next() + "\n");
             }
-          }
-        for(Name h : HeapLDT.VALID_HEAP_NAMES) {
-          it = axioms.get(h.toString()).iterator();
-          while(it.hasNext()) {
-            sb.append("axioms<"+h+">: " + it.next() + "\n");
-          }
+        }
+        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
+            it = axioms.get(h.toString()).iterator();
+            while (it.hasNext()) {
+                sb.append("axioms<" + h + ">: " + it.next() + "\n");
+            }
         }
         it = signals.iterator();
         while (it.hasNext()) {
@@ -608,57 +614,42 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return sb.toString();
     }
 
-
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof TextualJMLSpecCase)) {
             return false;
         }
         TextualJMLSpecCase sc = (TextualJMLSpecCase) o;
-        return mods.equals(sc.mods)
-               && behavior.equals(sc.behavior)
-               && abbreviations.equals(sc.abbreviations)
-               && requires.equals(sc.requires)
-               && requiresFree.equals(sc.requiresFree)
-               && assignables.equals(sc.assignables)
-               && assignableNots.equals(sc.assignableNots)
-               && contractsOfs.equals(sc.contractsOfs)
-               && accessibles.equals(sc.accessibles)
-               && axioms.equals(sc.axioms)
-               && ensures.equals(sc.ensures)
-               && ensuresFree.equals(sc.ensuresFree)
-               && signals.equals(sc.signals)
-               && signalsOnly.equals(sc.signalsOnly)
-               && diverges.equals(sc.diverges)
-               && depends.equals(sc.depends)
-               && breaks.equals(sc.breaks)
-               && continues.equals(sc.continues)
-               && returns.equals(sc.returns)
-               && infFlowSpecs.equals(sc.infFlowSpecs);
+        return mods.equals(sc.mods) && behavior.equals(sc.behavior)
+                && abbreviations.equals(sc.abbreviations)
+                && requires.equals(sc.requires)
+                && requiresFree.equals(sc.requiresFree)
+                && declares.equals(sc.declares)
+                && assignables.equals(sc.assignables)
+                && declares.equals(sc.declares)
+                && assignableNots.equals(sc.assignableNots)
+                && contractsOfs.equals(sc.contractsOfs)
+                && accessibles.equals(sc.accessibles)
+                && axioms.equals(sc.axioms) && ensures.equals(sc.ensures)
+                && ensuresFree.equals(sc.ensuresFree)
+                && signals.equals(sc.signals)
+                && signalsOnly.equals(sc.signalsOnly)
+                && diverges.equals(sc.diverges) && depends.equals(sc.depends)
+                && breaks.equals(sc.breaks) && continues.equals(sc.continues)
+                && returns.equals(sc.returns)
+                && infFlowSpecs.equals(sc.infFlowSpecs);
     }
-
 
     @Override
     public int hashCode() {
-        return mods.hashCode()
-               + behavior.hashCode()
-               + abbreviations.hashCode()
-               + requires.hashCode()
-               + requiresFree.hashCode()
-               + assignables.hashCode()
-               + assignableNots.hashCode()
-               + contractsOfs.hashCode()
-               + accessibles.hashCode()
-               + axioms.hashCode()
-               + ensures.hashCode()
-               + ensuresFree.hashCode()
-               + signals.hashCode()
-               + signalsOnly.hashCode()
-               + diverges.hashCode()
-               + depends.hashCode()
-               + breaks.hashCode()
-               + continues.hashCode()
-               + returns.hashCode()
-               + infFlowSpecs.hashCode();
+        return mods.hashCode() + behavior.hashCode() + abbreviations.hashCode()
+                + requires.hashCode() + requiresFree.hashCode()
+                + assignables.hashCode() + assignableNots.hashCode()
+                + contractsOfs.hashCode() + accessibles.hashCode()
+                + axioms.hashCode() + ensures.hashCode()
+                + ensuresFree.hashCode() + signals.hashCode()
+                + signalsOnly.hashCode() + diverges.hashCode()
+                + depends.hashCode() + breaks.hashCode() + continues.hashCode()
+                + returns.hashCode() + infFlowSpecs.hashCode();
     }
 }

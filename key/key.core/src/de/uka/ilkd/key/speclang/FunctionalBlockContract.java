@@ -256,6 +256,11 @@ public class FunctionalBlockContract implements Contract {
     }
 
     @Override
+    public Term getDeclares(LocationVariable heap) {
+        return contract.getDeclares(heap);
+    }
+
+    @Override
     public Term getAccessible(ProgramVariable heap) {
         throw new UnsupportedOperationException();
     }

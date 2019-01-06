@@ -83,7 +83,8 @@ public abstract class WellDefinednessCheck implements Contract {
     private Term accessible;
     private Term mby;
     private Term represents;
-    
+    private Term declares;
+
     final TermBuilder TB;
 
     WellDefinednessCheck(String name, int id, IObserverFunction target,
@@ -99,8 +100,8 @@ public abstract class WellDefinednessCheck implements Contract {
 
     WellDefinednessCheck(String name, int id, Type type, IObserverFunction target,
                          LocationVariable heap, OriginalVariables origVars,
-                         Condition requires, Term assignable, Term accessible,
-                         Condition ensures, Term mby, Term represents, TermBuilder tb) {
+                         Condition requires, Term assignable, Term declares,
+                         Term accessible, Condition ensures, Term mby, Term represents, TermBuilder tb) {
         this.name = name;
         this.id = id;
         this.type = type;
@@ -109,6 +110,7 @@ public abstract class WellDefinednessCheck implements Contract {
         this.origVars = origVars;
         this.requires = requires;
         this.assignable = assignable;
+        this.declares = declares;
         this.accessible = accessible;
         this.ensures = ensures;
         this.mby = mby;
@@ -727,7 +729,7 @@ public abstract class WellDefinednessCheck implements Contract {
         tb.setName(MiscTools.toValidTacletName(name));
         tb.addRuleSet(new RuleSet(new Name("simplify")));
         tb.addGoalTerm(goal);
-        return (RewriteTaclet) tb.getTaclet();
+        return tb.getTaclet();
     }
 
     /**
@@ -756,7 +758,7 @@ public abstract class WellDefinednessCheck implements Contract {
         tb.setName(MiscTools.toValidTacletName(name));
         tb.addRuleSet(new RuleSet(new Name("simplify")));
         tb.addGoalTerm(TB.andSC(notNull, created, pre));
-        return (RewriteTaclet) tb.getTaclet();
+        return tb.getTaclet();
     }
 
     /**
@@ -777,7 +779,7 @@ public abstract class WellDefinednessCheck implements Contract {
         tb.setName(MiscTools.toValidTacletName(name));
         tb.addRuleSet(new RuleSet(new Name("simplify")));
         tb.addGoalTerm(TB.ff());
-        return (RewriteTaclet) tb.getTaclet();
+        return tb.getTaclet();
     }
 
     abstract Function generateMbyAtPreFunc(Services services);
@@ -819,6 +821,15 @@ public abstract class WellDefinednessCheck implements Contract {
             this.assignable = TB.strictlyNothing();
         } else if (TB.tt().equals(ass) || TB.TRUE().equals(ass)) {
             this.assignable = TB.allLocs();
+        }
+    }
+
+    final void setDeclares(Term ass, TermServices services) {
+        this.declares = ass;
+        if (ass == null || TB.FALSE().equals(ass)) {
+            this.declares = TB.empty();
+        } else if (TB.tt().equals(ass) || TB.TRUE().equals(ass)) {
+            this.declares = TB.allLocs();
         }
     }
 
@@ -1118,6 +1129,11 @@ public abstract class WellDefinednessCheck implements Contract {
         return this.assignable;
     }
 
+    public final Term getDeclares() {
+        assert this.declares != null;
+        return this.declares;
+    }
+
     public final Term getAccessible() {
         return this.accessible;
     }
@@ -1171,10 +1187,17 @@ public abstract class WellDefinednessCheck implements Contract {
         return TB.andSC(getRequires().implicit, getRequires().explicit);
     }
 
+    @Override
     public final Term getAssignable(LocationVariable heap) {
         return getAssignable();
     }
 
+    @Override
+    public Term getDeclares(LocationVariable heap) {
+        return getDeclares();
+    }
+
+    @Override
     public final Term getAccessible(ProgramVariable heap) {
         return getAccessible();
     }
@@ -1220,6 +1243,7 @@ public abstract class WellDefinednessCheck implements Contract {
         return (ContractPO)createProofObl(initConfig, this);
     }
 
+    @Override
     public final ProofOblInput getProofObl(Services services) {
         return services.getSpecificationRepository().getPO(this);
     }
@@ -1246,6 +1270,7 @@ public abstract class WellDefinednessCheck implements Contract {
         return false;
     }
 
+    @Override
     public final boolean hasSelfVar() {
         return origVars.self != null;
     }
@@ -1270,6 +1295,7 @@ public abstract class WellDefinednessCheck implements Contract {
         return this.name.hashCode();
     }
 
+    @Override
     @Deprecated
     public final Term getPre(LocationVariable heap, ProgramVariable selfVar,
                              ImmutableList<ProgramVariable> paramVars,
@@ -1278,6 +1304,7 @@ public abstract class WellDefinednessCheck implements Contract {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
+    @Override
     @Deprecated
     public final Term getPre(List<LocationVariable> heapContext,
                              ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
@@ -1286,6 +1313,7 @@ public abstract class WellDefinednessCheck implements Contract {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
+    @Override
     @Deprecated
     public final Term getPre(LocationVariable heap, Term heapTerm, Term selfTerm,
                              ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,
@@ -1293,6 +1321,7 @@ public abstract class WellDefinednessCheck implements Contract {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
+    @Override
     @Deprecated
     public final Term getPre(List<LocationVariable> heapContext,
                              Map<LocationVariable, Term> heapTerms, Term selfTerm,
@@ -1301,6 +1330,7 @@ public abstract class WellDefinednessCheck implements Contract {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
+    @Override
     @Deprecated
     public final Term getDep(LocationVariable heap, boolean atPre,
                              ProgramVariable selfVar, ImmutableList<ProgramVariable> paramVars,
@@ -1309,6 +1339,7 @@ public abstract class WellDefinednessCheck implements Contract {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
+    @Override
     @Deprecated
     public final Term getDep(LocationVariable heap, boolean atPre, Term heapTerm,
                              Term selfTerm, ImmutableList<Term> paramTerms,
@@ -1316,12 +1347,14 @@ public abstract class WellDefinednessCheck implements Contract {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
+    @Override
     @Deprecated
     public final Term getGlobalDefs(LocationVariable heap, Term heapTerm, Term selfTerm,
                                     ImmutableList<Term> paramTerms, Services services) {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
+    @Override
     @Deprecated
     public final Term getMby(ProgramVariable selfVar,
                              ImmutableList<ProgramVariable> paramVars,
@@ -1329,6 +1362,7 @@ public abstract class WellDefinednessCheck implements Contract {
         throw new UnsupportedOperationException("Not applicable for well-definedness checks.");
     }
 
+    @Override
     @Deprecated
     public final Term getMby(Map<LocationVariable,Term> heapTerms, Term selfTerm,
                              ImmutableList<Term> paramTerms, Map<LocationVariable, Term> atPres,

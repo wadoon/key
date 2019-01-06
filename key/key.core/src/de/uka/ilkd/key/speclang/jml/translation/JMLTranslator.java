@@ -13,7 +13,13 @@
 
 package de.uka.ilkd.key.speclang.jml.translation;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.Token;
@@ -31,8 +37,23 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.*;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermCreationException;
+import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -101,6 +122,7 @@ public final class JMLTranslator {
         // clauses
         ACCESSIBLE ("accessible"),
         ASSIGNABLE ("assignable"),
+        DECLARES ("declares"),
         ASSIGNABLE_NOT ("assignable_not"),
         DEPENDS ("depends"),
         ENSURES ("ensures"),
@@ -284,6 +306,30 @@ public final class JMLTranslator {
                         }
                         else {
                             return ensuresTerm;
+                        }
+                    }
+                });
+        /*
+         * TODO (DS, 2019-01-06): Copied this translation method from assignable
+         * and did not change anything, maybe that's not correct...
+         */
+        translationMethods.put(JMLKeyWord.DECLARES,
+                new JMLTranslationMethod() {
+                    @Override
+                    public Term translate(
+                            SLTranslationExceptionManager excManager,
+                            Object... params) throws SLTranslationException {
+                        checkParameters(params, Term.class, Services.class);
+                        Term declaresTerm = (Term) params[0];
+                        Services services = (Services) params[1];
+
+                        BooleanLDT booleanLDT =
+                                services.getTypeConverter().getBooleanLDT();
+                        if (declaresTerm.sort() == booleanLDT.targetSort()) {
+                            return tb.convertToFormula(declaresTerm);
+                        }
+                        else {
+                            return declaresTerm;
                         }
                     }
                 });

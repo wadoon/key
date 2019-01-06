@@ -72,6 +72,7 @@ public interface BlockContract extends BlockSpecificationElement {
      *            the new modifies clauses.
      * @param newModifiesNotClauses
      *            TODO
+     * @param newDeclaresClauses TODO
      * @param accessibleClauses
      *            TODO
      * @param newInfFlowSpecs
@@ -87,9 +88,9 @@ public interface BlockContract extends BlockSpecificationElement {
             Map<LocationVariable, Term> newPostconditions,
             Map<LocationVariable, Term> newModifiesClauses,
             Map<LocationVariable, Term> newModifiesNotClauses,
+            Map<LocationVariable, Term> newDeclaresClauses,
             Map<ProgramVariable, Term> accessibleClauses,
-            final ImmutableList<InfFlowSpec> newInfFlowSpecs,
-            Variables newVariables, Term newMeasuredBy);
+            final ImmutableList<InfFlowSpec> newInfFlowSpecs, Variables newVariables, Term newMeasuredBy);
 
     /**
      * @param newKJT

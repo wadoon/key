@@ -53,7 +53,7 @@ public class JavaASTCollector extends JavaASTWalker {
     @Override
     protected void doAction(ProgramElement node) {
         if (Arrays.stream(type).anyMatch(t -> t.isInstance(node))) {
-            resultList = resultList.prepend(node);
+            resultList = resultList.append(node);
         }
     }
 
