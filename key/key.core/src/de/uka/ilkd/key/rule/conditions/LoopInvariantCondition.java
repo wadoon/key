@@ -26,18 +26,11 @@ import de.uka.ilkd.key.util.MiscTools;
 
 public class LoopInvariantCondition implements VariableCondition {
 
-    private final ProgramSV inv;
+    private final SchemaVariable inv;
     private final UpdateSV u;
 
     public LoopInvariantCondition(SchemaVariable inv, UpdateSV u) {
-        if (!(inv instanceof ProgramSV)
-                || inv.sort() != ProgramSVSort.STATEMENT) {
-            throw new IllegalArgumentException("The new invariant "
-                    + "condition, must be parameterised with a "
-                    + "program schemavariable of sort STATEMENT.");
-        }
-
-        this.inv = (ProgramSV) inv;
+        this.inv = inv;
         this.u = u;
     }
 
