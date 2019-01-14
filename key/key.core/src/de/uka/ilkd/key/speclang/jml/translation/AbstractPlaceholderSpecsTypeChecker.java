@@ -177,7 +177,7 @@ public class AbstractPlaceholderSpecsTypeChecker {
                 new JavaASTFindPathWalker<>(block,
                         pe -> pe instanceof VariableDeclaration
                                 || pe instanceof AbstractPlaceholderStatement,
-                        this::extractOpsFromPE);
+                        this::extractDeclaredOpsFromPE);
 
         declaredOps.addAll(declaredSymbolsWalker.walk(method.getBody()));
         declaredOps.addAll( //
@@ -215,7 +215,7 @@ public class AbstractPlaceholderSpecsTypeChecker {
         return declaredOps;
     }
 
-    private List<Pair<? extends Operator, Boolean>> extractOpsFromPE(
+    private List<Pair<? extends Operator, Boolean>> extractDeclaredOpsFromPE(
             ProgramElement pe) {
         if (pe instanceof VariableDeclaration) {
             return getTargetsFromVarDecl((VariableDeclaration) pe);
@@ -283,23 +283,6 @@ public class AbstractPlaceholderSpecsTypeChecker {
         declaresTerm.execPreOrder(declLSVisitor);
 
         return declLSVisitor.getResult();
-
-        //@formatter:off
-        //final OpCollector opColl = new OpCollector();
-        //declaresTerm.execPostOrder(opColl);
-
-        ///*
-        // * We only collect constants of LocSet type like localsP for the local
-        // * variables of abstract program P etc.
-        // */
-        //return opColl.ops().stream().filter(op -> {
-        //    return op instanceof de.uka.ilkd.key.logic.op.Function
-        //            && ((de.uka.ilkd.key.logic.op.Function) op)
-        //                    .sort() == locSetLDT.targetSort()
-        //            && op.arity() == 0;
-        //}).filter(op -> op != locSetLDT.getEmpty()) //
-        //        .map(op -> new Pair<>(op, false)).collect(Collectors.toList());
-        //@formatter:on
     }
 
     private List<Pair<? extends Operator, Boolean>> getTargetsFromVarDecl(

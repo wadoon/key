@@ -378,6 +378,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // be lower prioritized to the other update rules, or actually
         // to most other rules.
         bindRuleSet(d, "abstrUpdLowPrioRules", 10000);
+        bindRuleSet(d, "abstrUpdLowestPrioRules", 1000000);
 
         bindRuleSet(d, "update_apply", -4500);
 

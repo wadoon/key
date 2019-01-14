@@ -17,7 +17,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
+import de.uka.ilkd.key.java.visitor.ProgVarAndLocSetsCollector;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractUpdate;
@@ -129,8 +129,8 @@ public final class DropEffectlessAbstractUpdateCondition
             }
 
             if (!t.javaBlock().isEmpty()) {
-                final ProgramVariableCollector pvc = //
-                        new ProgramVariableCollector( //
+                final ProgVarAndLocSetsCollector pvc = //
+                        new ProgVarAndLocSetsCollector( //
                                 t.javaBlock().program(), services);
                 pvc.start();
                 result.addAll(pvc.result());

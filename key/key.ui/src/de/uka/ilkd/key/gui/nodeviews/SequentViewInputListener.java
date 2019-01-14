@@ -14,7 +14,12 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
 import java.awt.Point;
-import java.awt.event.*;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -22,6 +27,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
@@ -88,8 +94,18 @@ public class SequentViewInputListener
 
     private String opStrFromTerm(Term t) {
         final String tOpClassString = t.op().getClass().toString();
-        final String operator =
+        String operator =
                 tOpClassString.substring(tOpClassString.lastIndexOf('.') + 1);
+
+        if (t.op() instanceof UpdateJunctor) {
+            if (t.op() == UpdateJunctor.PARALLEL_UPDATE) {
+                operator += " (parallel)";
+            }
+            if (t.op() == UpdateJunctor.CONCATENATED_UPDATE) {
+                operator += " (concatenated)";
+            }
+        }
+
         return operator;
     }
 

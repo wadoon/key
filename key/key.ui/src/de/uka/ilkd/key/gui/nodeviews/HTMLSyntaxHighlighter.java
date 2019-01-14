@@ -1,6 +1,16 @@
 package de.uka.ilkd.key.gui.nodeviews;
 
-import static de.uka.ilkd.key.util.UnicodeHelper.*;
+import static de.uka.ilkd.key.util.UnicodeHelper.AND;
+import static de.uka.ilkd.key.util.UnicodeHelper.BOT;
+import static de.uka.ilkd.key.util.UnicodeHelper.EMPTY;
+import static de.uka.ilkd.key.util.UnicodeHelper.EQV;
+import static de.uka.ilkd.key.util.UnicodeHelper.EXISTS;
+import static de.uka.ilkd.key.util.UnicodeHelper.FORALL;
+import static de.uka.ilkd.key.util.UnicodeHelper.IMP;
+import static de.uka.ilkd.key.util.UnicodeHelper.IN;
+import static de.uka.ilkd.key.util.UnicodeHelper.NEG;
+import static de.uka.ilkd.key.util.UnicodeHelper.OR;
+import static de.uka.ilkd.key.util.UnicodeHelper.TOP;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -97,10 +107,11 @@ public class HTMLSyntaxHighlighter {
      * encoding. One could probably do this differently ;)
      */
     private final static String[] JAVA_KEYWORDS = { "if", "else", "for", "do",
-            "while", "return", "break", "switch", "case", "continue", "try",
-            "catch", "finally", "assert", "null", "throw", "this", "true",
-            "false", "int", "char", "long", "short", "\\Qmethod&#045;frame\\E",
-            "boolean", "\\Qabstract&#045;program\\E"};
+            "final", "while", "return", "break", "switch", "case", "continue",
+            "try", "catch", "finally", "assert", "null", "throw", "this",
+            "true", "false", "int", "char", "long", "short",
+            "\\Qmethod&#045;frame\\E", "boolean",
+            "\\Qabstract&#045;program\\E" };
 
     public final static String JAVA_KEYWORDS_REGEX = concat("|",
             Arrays.asList(JAVA_KEYWORDS));
