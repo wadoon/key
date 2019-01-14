@@ -21,7 +21,11 @@ import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.EmptySetLiteral;
 import de.uka.ilkd.key.java.expression.operator.Intersect;
-import de.uka.ilkd.key.java.expression.operator.adt.*;
+import de.uka.ilkd.key.java.expression.operator.adt.AllFields;
+import de.uka.ilkd.key.java.expression.operator.adt.SetMinus;
+import de.uka.ilkd.key.java.expression.operator.adt.SetUnion;
+import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
+import de.uka.ilkd.key.java.expression.operator.adt.SingletonPV;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
@@ -36,6 +40,12 @@ public final class LocSetLDT extends LDT {
     private final Function empty;
     private final Function allLocs;
     private final Function singleton;
+    /*
+     * NOTE (DS, 2019-01-13): final is only used in the declares directive of
+     * methods or abstract placeholder statements in the context of abstract
+     * execution.
+     */
+    private final Function finalFunc;
     private final Function singletonPV;
     private final Function union;
     private final Function intersect;
@@ -61,6 +71,7 @@ public final class LocSetLDT extends LDT {
         allLocs = addFunction(services, "allLocs");
         singleton = addFunction(services, "singleton");
         singletonPV = addFunction(services, "singletonPV");
+        finalFunc = addFunction(services, "final");
         union = addFunction(services, "union");
         intersect = addFunction(services, "intersect");
         setMinus = addFunction(services, "setMinus");
@@ -74,8 +85,8 @@ public final class LocSetLDT extends LDT {
         disjoint = addFunction(services, "disjoint");
         createdInHeap = addFunction(services, "createdInHeap");
 
-        progVarSort =
-                services.getNamespaces().sorts().lookup(new Name("ProgVar"));
+        progVarSort = services.getNamespaces().sorts()
+                .lookup(new Name("ProgVar"));
 
         singletonPVFun = new Function(new Name("PV"), progVarSort, Sort.ANY);
     }
@@ -94,6 +105,10 @@ public final class LocSetLDT extends LDT {
 
     public Function getSingletonPV() {
         return singletonPV;
+    }
+
+    public Function getFinal() {
+        return finalFunc;
     }
 
     public Function getSingletonPVFun() {

@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -18,12 +20,15 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory.ContractClauses;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.Pair;
@@ -46,12 +51,6 @@ import de.uka.ilkd.key.util.Pair;
  * <li>If the heap (or a field) is specified to be accessible/assignable, the
  * containing method must not be static</li>
  * </ol>
- *
- * TODO (DS, 2019-01-04): We currently have no directive for specifying the
- * declaration of Skolem loc sets, therefore we just check whether they are
- * specified as assignable before. This can lead to situations of program that
- * type-check although they shouldn't, e.g. if a program Q assigns the locals of
- * a program P which is not in scope.
  *
  * @author Dominic Steinhoefel
  */
@@ -181,13 +180,29 @@ public class AbstractPlaceholderSpecsTypeChecker {
                         this::extractOpsFromPE);
 
         declaredOps.addAll(declaredSymbolsWalker.walk(method.getBody()));
-        declaredOps.addAll(extractDeclaredSkolemLocSetConsts(typeConverter,
-                declaresTerm()));
+        declaredOps.addAll( //
+                extractDeclaredSkolemLocSetConsts(typeConverter,
+                        declaresTerm()));
         declaredOps.addAll(method.getParameters().stream()
                 .map(decl -> new Pair<>(
                         decl.getVariables().get(0).getProgramVariable(),
                         decl.isFinal()))
                 .collect(Collectors.toList()));
+        /*
+         * TODO (DS, 2019-01-14): Check whether there can be multiple contracts
+         * with that particular base name. In this case, we might have to filter
+         * for the one that has a declares directive
+         */
+        final Optional<FunctionalOperationContract> maybeMethodContract = services
+                .getSpecificationRepository()
+                .getOperationContracts(method.getContainerType(), method)
+                .stream().filter(contr -> contr.getBaseName()
+                        .equals("JML operation contract"))
+                .findFirst();
+        maybeMethodContract
+                .map(contr -> extractDeclaredSkolemLocSetConsts(typeConverter,
+                        contr.getDeclares()))
+                .ifPresent(declaredOps::addAll);
 
         final List<de.uka.ilkd.key.logic.op.Operator> declaredDefaults = new ArrayList<>();
         declaredDefaults.add(heap());
@@ -246,19 +261,45 @@ public class AbstractPlaceholderSpecsTypeChecker {
 
     private List<Pair<? extends Operator, Boolean>> extractDeclaredSkolemLocSetConsts(
             final TypeConverter typeConverter, final Term declaresTerm) {
-        final OpCollector opColl = new OpCollector();
-        declaresTerm.execPostOrder(opColl);
-
         /*
-         * We only collect constants of LocSet type like localsP for the local
-         * variables of abstract program P etc.
+         * The declares term is a (possibly singleton) union of
+         *
+         * @formatter:off
+         * - allLocs
+         * - empty -- this is ignored, it's a default. We return the empty list
+         *            for this constant.
+         * - LocSet constants -- they are added to the result as non-final declared LocSets.
+         * - final(locset) terms, where lofset is a LocSet constant -- for those, locset
+         *     is added as a final declared LocSet.
+         * @formatter:on
          */
-        return opColl.ops().stream().filter(op -> {
-            return op instanceof de.uka.ilkd.key.logic.op.Function
-                    && ((de.uka.ilkd.key.logic.op.Function) op)
-                            .sort() == typeConverter.getLocSetLDT().targetSort()
-                    && op.arity() == 0;
-        }).map(op -> new Pair<>(op, false)).collect(Collectors.toList());
+
+        final DeclaredLocSetsVisitor declLSVisitor = //
+                new DeclaredLocSetsVisitor(typeConverter.getLocSetLDT());
+        /*
+         * NOTE (DS, 2019-01-14): Have to walk in preorder to handle the final
+         * specifier correctly.
+         */
+        declaresTerm.execPreOrder(declLSVisitor);
+
+        return declLSVisitor.getResult();
+
+        //@formatter:off
+        //final OpCollector opColl = new OpCollector();
+        //declaresTerm.execPostOrder(opColl);
+
+        ///*
+        // * We only collect constants of LocSet type like localsP for the local
+        // * variables of abstract program P etc.
+        // */
+        //return opColl.ops().stream().filter(op -> {
+        //    return op instanceof de.uka.ilkd.key.logic.op.Function
+        //            && ((de.uka.ilkd.key.logic.op.Function) op)
+        //                    .sort() == locSetLDT.targetSort()
+        //            && op.arity() == 0;
+        //}).filter(op -> op != locSetLDT.getEmpty()) //
+        //        .map(op -> new Pair<>(op, false)).collect(Collectors.toList());
+        //@formatter:on
     }
 
     private List<Pair<? extends Operator, Boolean>> getTargetsFromVarDecl(
@@ -321,6 +362,45 @@ public class AbstractPlaceholderSpecsTypeChecker {
                 }
             }
 
+            return result;
+        }
+    }
+
+    private static class DeclaredLocSetsVisitor extends DefaultVisitor {
+        private final LocSetLDT locSetLDT;
+        private final List<Pair<? extends Operator, Boolean>> result = new ArrayList<>();
+        private static final Consumer<? super Pair<? extends Operator, Boolean>> EMPTY_CONSUMER = //
+                op -> {
+                    return;
+                };
+
+        public DeclaredLocSetsVisitor(LocSetLDT locSetLDT) {
+            this.locSetLDT = locSetLDT;
+        }
+
+        @Override
+        public void visit(Term visited) {
+            if (visited.op() == locSetLDT.getFinal()) {
+                /* a "final(locSet)" term -- add the argument as final. */
+                assert visited.subs().size() == 1
+                        && visited.sub(0).subs().size() == 0;
+                result.add(new Pair<>(visited.sub(0).op(), true));
+            }
+            else if (visited.subs().size() == 0
+                    && visited.op() != locSetLDT.getEmpty()) {
+                /*
+                 * a LocSet constant -- add as non-final if not seen before
+                 * (because then, it's most likely already added as a final
+                 * LocSet, or it's redundant).
+                 */
+                result.stream().filter(pair -> pair.first == visited.op())
+                        .findAny().ifPresentOrElse(EMPTY_CONSUMER, //
+                                () -> result
+                                        .add(new Pair<>(visited.op(), false)));
+            }
+        }
+
+        public List<Pair<? extends Operator, Boolean>> getResult() {
             return result;
         }
     }
