@@ -48,7 +48,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * <pre>
  *   {U_P(..., y, ... := ...)}
  *      {... || x := y || ...}
- *        phi
+ *        phi(x)
  * </pre>
  *
  * (where phi does not contain y, and also not a Java block to be on the safe
@@ -57,7 +57,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * <pre>
  *   {U_P(..., x, ... := ...)}
  *      {... || ...}
- *        phi
+ *        phi(x)
  * </pre>
  *
  * i.e. eliminates the renaming substitution "y for x". Since phi does not
