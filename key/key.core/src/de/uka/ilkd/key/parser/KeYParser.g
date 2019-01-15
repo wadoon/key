@@ -3857,6 +3857,7 @@ varexp[TacletBuilder b]
     | varcond_sequentialUpdateSimplAbstr[b]
     | varcond_simplifyAbstractUpdateRenameSubst[b]
     | varcond_simplifyAbstractUpdateRenameSubst2[b]
+    | varcond_abstrUpdatesIndependent[b]
     | varcond_dropEffectlessElementaries[b]
     | varcond_dropEffectlessAbstractUpdate[b]
     | varcond_instantiateVarsFresh[b]
@@ -4023,6 +4024,14 @@ varcond_simplifyAbstractUpdateRenameSubst[TacletBuilder b]
                                                                             (UpdateSV)u2, 
                                                                             (SchemaVariable)x, 
                                                                             (SchemaVariable)result));
+   }
+;
+
+varcond_abstrUpdatesIndependent[TacletBuilder b]
+:
+   ABSTR_UPDATES_INDEPENDENT LPAREN u1=varId COMMA u2=varId RPAREN 
+   {
+      b.addVariableCondition(new AbstrUpdatesIndependentCondition((UpdateSV)u1, (UpdateSV)u2));
    }
 ;
 

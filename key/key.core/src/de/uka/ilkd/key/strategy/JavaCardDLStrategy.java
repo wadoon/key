@@ -1237,6 +1237,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                         instOf("commLeft"), locSetLDT),
                         NotInScopeOfModalityFeature.INSTANCE, longConst(-800)));
 
+        bindRuleSet(
+                d,
+                "abstr_upd_commute",
+                add(SetsSmallerThanFeature.create(instOf("uright"),
+                        instOf("uleft"), locSetLDT),
+                        NotInScopeOfModalityFeature.INSTANCE, longConst(-800)));
+
         bindRuleSet(d, "elimQuantifier", -1000);
         bindRuleSet(d, "elimQuantifierWithCast", 50);
 
