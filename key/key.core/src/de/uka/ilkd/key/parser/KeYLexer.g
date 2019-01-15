@@ -242,6 +242,7 @@ lexer grammar KeYLexer;
 	DISJOINTMODULONULL  : '\\disjointModuloNull';
 	SEQUENTIAL_UPDATE_SIMPL_ABSTR : '\\sequentialUpdateSimplAbstr';
 	SIMPLIFY_ABSTRACT_UPDATE_RENAME_SUBST : '\\simplifyAbstractUpdateRenameSubst';
+	SIMPLIFY_ABSTRACT_UPDATE_RENAME_SUBST_2 : '\\simplifyAbstractUpdateRenameSubst_2';
 	DROP_EFFECTLESS_ABSTRACT_UPDATE : '\\dropEffectlessAbstractUpdate';
 	DROP_EFFECTLESS_ELEMENTARIES : '\\dropEffectlessElementaries';
 	DROP_EFFECTLESS_STORES : '\\dropEffectlessStores';

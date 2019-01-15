@@ -259,7 +259,7 @@ public class AbstractPlaceholderSpecsTypeChecker {
         return extractDeclaredSkolemLocSetConsts(typeConverter, declaresTerm);
     }
 
-    private List<Pair<? extends Operator, Boolean>> extractDeclaredSkolemLocSetConsts(
+    private static List<Pair<? extends Operator, Boolean>> extractDeclaredSkolemLocSetConsts(
             final TypeConverter typeConverter, final Term declaresTerm) {
         /*
          * The declares term is a (possibly singleton) union of

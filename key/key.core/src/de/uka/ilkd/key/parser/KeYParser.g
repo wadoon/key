@@ -3856,6 +3856,7 @@ varexp[TacletBuilder b]
     | varcond_prefixContainsElement[b, negated]
     | varcond_sequentialUpdateSimplAbstr[b]
     | varcond_simplifyAbstractUpdateRenameSubst[b]
+    | varcond_simplifyAbstractUpdateRenameSubst2[b]
     | varcond_dropEffectlessElementaries[b]
     | varcond_dropEffectlessAbstractUpdate[b]
     | varcond_instantiateVarsFresh[b]
@@ -4018,10 +4019,21 @@ varcond_simplifyAbstractUpdateRenameSubst[TacletBuilder b]
 :
    SIMPLIFY_ABSTRACT_UPDATE_RENAME_SUBST LPAREN u1=varId COMMA u2=varId COMMA x=varId COMMA result=varId RPAREN 
    {
-      b.addVariableCondition(new SimplifyAbstractUpdateRenameSubstCondition((UpdateSV)u1, 
+      b.addVariableCondition(new SimplifyAbstractUpdateRenameSubstCondition((UpdateSV)u1,
                                                                             (UpdateSV)u2, 
                                                                             (SchemaVariable)x, 
                                                                             (SchemaVariable)result));
+   }
+;
+
+varcond_simplifyAbstractUpdateRenameSubst2[TacletBuilder b]
+:
+   SIMPLIFY_ABSTRACT_UPDATE_RENAME_SUBST_2 LPAREN u1=varId COMMA u2=varId COMMA x=varId COMMA result=varId RPAREN 
+   {
+      b.addVariableCondition(new SimplifyAbstractUpdateRenameSubst2Condition((UpdateSV)u1,
+                                                                             (UpdateSV)u2, 
+                                                                             (SchemaVariable)x, 
+                                                                             (SchemaVariable)result));
    }
 ;
 

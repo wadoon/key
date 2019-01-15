@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.ldt.LocSetLDT;
@@ -30,6 +32,7 @@ import de.uka.ilkd.key.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -39,6 +42,7 @@ import de.uka.ilkd.key.proof.TermProgramVariableCollector;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 public final class DropEffectlessElementariesCondition
@@ -218,12 +222,12 @@ public final class DropEffectlessElementariesCondition
      */
     private static boolean containsAbstractStatementUsingLHS(Term target,
             LocationVariable lhs, Services services) {
-        final ContainsAbstractStatementUsingLHSVisitor visitor = new ContainsAbstractStatementUsingLHSVisitor(
-                MergeRuleUtils.getJavaBlockRecursive(target).program(), lhs,
-                services);
+        final ContainsAbstractStatementUsingLHSVisitor visitor = //
+                new ContainsAbstractStatementUsingLHSVisitor(
+                        MergeRuleUtils.getJavaBlockRecursive(target).program(),
+                        lhs, services);
         visitor.start();
-        final boolean containsAbstractStatementUsingLHS = visitor.result();
-        return containsAbstractStatementUsingLHS;
+        return visitor.result();
     }
 
     private static boolean containsNonRigidFunctionSymbols(Term target) {
@@ -237,27 +241,91 @@ public final class DropEffectlessElementariesCondition
     private static class ContainsAbstractStatementUsingLHSVisitor
             extends JavaASTVisitor {
         final LocationVariable lhs;
+        final Services services;
+
         boolean result = false;
 
         public ContainsAbstractStatementUsingLHSVisitor(ProgramElement root,
                 LocationVariable lhs, Services services) {
             super(root, services);
+            this.services = services;
             this.lhs = lhs;
         }
 
         @Override
         protected void doDefaultAction(SourceElement node) {
             if (node instanceof AbstractPlaceholderStatement) {
-                result = true;
+                final List<Operator> accessibles = //
+                        getAccessiblesFromAbstrPlaceholderStmt(
+                                (AbstractPlaceholderStatement) node);
+
                 /*
-                 * TODO (DS, 2018-12-20): Check whether that statement may use
-                 * this lhs, i.e. whether it's accessible.
+                 * The result should be true if (1) the lhs is contained in the
+                 * accessibles of this abstract placeholder statement OR (2) the
+                 * accessibles contain allLocs, then lhs is contained as a
+                 * default.
                  */
+
+                /*
+                 * TODO (DS, 2019-01-14): That's a hack, having problems with
+                 * renamings again...
+                 */
+                // if (accessibles.contains(lhs)) {
+                if (accessibles.stream()
+                        .anyMatch(op -> op instanceof LocationVariable
+                                && op.name().equals(lhs.name()))) {
+                    result = true;
+                }
+
+                if (accessibles.contains(services.getTypeConverter()
+                        .getLocSetLDT().getAllLocs())) {
+                    result = true;
+                }
             }
         }
 
         public boolean result() {
             return result;
         }
+
+        private List<Operator> getAccessiblesFromAbstrPlaceholderStmt(
+                AbstractPlaceholderStatement aps) {
+            final TypeConverter typeConverter = services.getTypeConverter();
+
+            final List<BlockContract> contracts = services
+                    .getSpecificationRepository()
+                    .getAbstractPlaceholderStatementContracts(aps).stream()
+                    .filter(contract -> contract.getBaseName()
+                            .equals("JML block contract"))
+                    /*
+                     * We exclude return_behavior etc. here, because from those
+                     * contracts we only consider the precondition.
+                     */
+                    .collect(Collectors.toList());
+
+            if (contracts.isEmpty()) {
+                return Collections.singletonList(
+                        typeConverter.getLocSetLDT().getAllLocs());
+            }
+
+            final OpCollector opColl = new OpCollector();
+
+            for (BlockContract contract : contracts) {
+                /*
+                 * TODO (DS, 2019-01-14): Might not be a good idea to loop over
+                 * *all* contracts; however, it's not unsound since if we're too
+                 * broad elementaries will *not* be dropped (although they could
+                 * be), it's rather a completeness issue. Alternatively, we'd
+                 * have to find the right contract for this position.
+                 */
+                final Term accessiblesTerm = contract.getAccessibleClause(
+                        typeConverter.getHeapLDT().getHeap());
+                accessiblesTerm.execPostOrder(opColl);
+            }
+
+            return opColl.ops().stream().filter(op -> op.arity() == 0)
+                    .collect(Collectors.toList());
+        }
+
     }
 }
