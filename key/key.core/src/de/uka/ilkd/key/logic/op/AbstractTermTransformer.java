@@ -22,8 +22,35 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
-import de.uka.ilkd.key.rule.metaconstruct.*;
-import de.uka.ilkd.key.rule.metaconstruct.arith.*;
+import de.uka.ilkd.key.rule.metaconstruct.AELabel;
+import de.uka.ilkd.key.rule.metaconstruct.AddCast;
+import de.uka.ilkd.key.rule.metaconstruct.ArrayBaseInstanceOf;
+import de.uka.ilkd.key.rule.metaconstruct.ConstantValue;
+import de.uka.ilkd.key.rule.metaconstruct.EnumConstantValue;
+import de.uka.ilkd.key.rule.metaconstruct.ExcSpec;
+import de.uka.ilkd.key.rule.metaconstruct.ExpandQueriesMetaConstruct;
+import de.uka.ilkd.key.rule.metaconstruct.IntroAtPreDefsOp;
+import de.uka.ilkd.key.rule.metaconstruct.MemberPVToField;
+import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula2;
+import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula3;
+import de.uka.ilkd.key.rule.metaconstruct.ReturnSpec;
+import de.uka.ilkd.key.rule.metaconstruct.arith.DivideLCRMonomials;
+import de.uka.ilkd.key.rule.metaconstruct.arith.DivideMonomials;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaAdd;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaBinaryAnd;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaBinaryOr;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaBinaryXOr;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaDiv;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaEqual;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaGeq;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaGreater;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaLeq;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaLess;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaMul;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaPow;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaShiftLeft;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaShiftRight;
+import de.uka.ilkd.key.rule.metaconstruct.arith.MetaSub;
 import de.uka.ilkd.key.util.Debug;
 
 /**
@@ -93,6 +120,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer MUTUAL_EXCLUSION_FORMULA_3 = new MutualExclusionFormula3();
 
     public static final AbstractTermTransformer RETURN_SPEC = new ReturnSpec();
+    public static final AbstractTermTransformer EXC_SPEC = new ExcSpec();
 
     private static Sort[] createMetaSortArray(int arity) {
         Sort[] result = new Sort[arity];
