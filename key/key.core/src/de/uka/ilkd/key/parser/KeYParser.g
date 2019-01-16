@@ -3978,17 +3978,26 @@ varcond_initializeParametricSkolemPathCondition[TacletBuilder b]
      formulaSV=varId COMMA
      abstrProgramSV=varId COMMA
      excSV=varId COMMA
-     returnedSV=varId COMMA
-     resultSV=varId
+     returnedSV=varId 
+     ( COMMA resultSV=varId ) ?
    RPAREN 
    {
-      b.addVariableCondition(
-        new InitializeParametricSkolemPathCondition(
-          (SchemaVariable) formulaSV, 
-          (ProgramSV) abstrProgramSV,
-          (ProgramSV) excSV,
-          (ProgramSV) returnedSV,
-          (ProgramSV) resultSV));
+      if (resultSV != null) {
+          b.addVariableCondition(
+            new InitializeParametricSkolemPathCondition(
+              (SchemaVariable) formulaSV, 
+              (ProgramSV) abstrProgramSV,
+              (ProgramSV) excSV,
+              (ProgramSV) returnedSV,
+              (ProgramSV) resultSV));
+      } else {
+          b.addVariableCondition(
+            new InitializeParametricSkolemPathCondition(
+              (SchemaVariable) formulaSV, 
+              (ProgramSV) abstrProgramSV,
+              (ProgramSV) excSV,
+              (ProgramSV) returnedSV));
+      }
    }
 ;
 

@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.logic.InnerVariableNamer;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -128,7 +129,7 @@ public class Services implements TermServices {
      * The target of the inner map is typically either a Term or a
      * ProgramElement, depending on where it's used.
      */
-    private Map<Object, Map<SchemaVariable, Object>> freshForInstantiations = new HashMap<>();
+    private Map<Object, Map<NameEqBasedHashKey, Object>> freshForInstantiations = new HashMap<>();
 
     /**
      * creates a new Services object with a new TypeConverter and a new JavaInfo
@@ -140,13 +141,13 @@ public class Services implements TermServices {
         this.counters = new LinkedHashMap<String, Counter>();
         this.caches = new ServiceCaches();
         this.termBuilder = new TermBuilder(
-            new TermFactory(caches.getTermFactoryCache()), this);
-    	this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
+                new TermFactory(caches.getTermFactoryCache()), this);
+        this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
         this.specRepos = new SpecificationRepository(this);
         cee = new ConstantExpressionEvaluator(this);
         typeconverter = new TypeConverter(this);
         javainfo = new JavaInfo(new KeYProgModelInfo(this, typeconverter,
-            new KeYRecoderExcHandler()), this);
+                new KeYRecoderExcHandler()), this);
         nameRecorder = new NameRecorder();
     }
 
@@ -162,13 +163,13 @@ public class Services implements TermServices {
         this.counters = counters;
         this.caches = caches;
         this.termBuilder = new TermBuilder(
-            new TermFactory(caches.getTermFactoryCache()), this);
-    	this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
+                new TermFactory(caches.getTermFactoryCache()), this);
+        this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
         this.specRepos = new SpecificationRepository(this);
         cee = new ConstantExpressionEvaluator(this);
         typeconverter = new TypeConverter(this);
         javainfo = new JavaInfo(
-            new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
+                new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
         nameRecorder = new NameRecorder();
     }
 
@@ -187,7 +188,7 @@ public class Services implements TermServices {
         this.caches = s.caches;
         this.freshForInstantiations = s.freshForInstantiations;
         this.termBuilder = new TermBuilder(
-            new TermFactory(caches.getTermFactoryCache()), this);
+                new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
     }
 
@@ -281,12 +282,12 @@ public class Services implements TermServices {
     public Services copy(Profile profile, boolean shareCaches) {
         Debug.assertTrue(!(getJavaInfo().getKeYProgModelInfo()
                 .getServConf() instanceof SchemaCrossReferenceServiceConfiguration),
-            "services: tried to copy schema cross reference service config.");
+                "services: tried to copy schema cross reference service config.");
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
         Services s = new Services(profile,
-            getJavaInfo().getKeYProgModelInfo().getServConf(),
-            getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
-            copyCounters(), newCaches);
+                getJavaInfo().getKeYProgModelInfo().getServConf(),
+                getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
+                copyCounters(), newCaches);
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
@@ -327,7 +328,7 @@ public class Services implements TermServices {
     public Services copyPreservesLDTInformation() {
         Debug.assertTrue(!(javainfo.getKeYProgModelInfo()
                 .getServConf() instanceof SchemaCrossReferenceServiceConfiguration),
-            "services: tried to copy schema cross reference service config.");
+                "services: tried to copy schema cross reference service config.");
         Services s = new Services(getProfile());
         s.setTypeConverter(getTypeConverter().copy(s));
         s.setNamespaces(namespaces.copy());
@@ -351,7 +352,8 @@ public class Services implements TermServices {
     public void setProof(Proof p_proof) {
         if (this.proof != null) {
             throw new IllegalStateException(
-                "Services are already owned by another proof:" + proof.name());
+                    "Services are already owned by another proof:"
+                            + proof.name());
         }
         proof = p_proof;
     }
@@ -359,9 +361,9 @@ public class Services implements TermServices {
     public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
         final Services s = new Services(getProfile(),
-            getJavaInfo().getKeYProgModelInfo().getServConf(),
-            getJavaInfo().getKeYProgModelInfo().rec2key(), copyCounters(),
-            newCaches);
+                getJavaInfo().getKeYProgModelInfo().getServConf(),
+                getJavaInfo().getKeYProgModelInfo().rec2key(), copyCounters(),
+                newCaches);
         s.proof = p_proof;
         s.specRepos = specRepos;
         s.setTypeConverter(getTypeConverter().copy(s));
@@ -436,22 +438,23 @@ public class Services implements TermServices {
     }
 
     /**
-     * Returns either the cache backed or raw {@link TermBuilder} used to create {@link Term}s.  
-     * Usually the cache backed version is the intended one. The non-cached version is for 
-     * use cases where a lot of intermediate terms are created of which most exist only for a 
-     * very short time. To avoid polluting the cache it is then recommended to use the non-cache
-     * version
-     * 
+     * Returns either the cache backed or raw {@link TermBuilder} used to create
+     * {@link Term}s. Usually the cache backed version is the intended one. The
+     * non-cached version is for use cases where a lot of intermediate terms are
+     * created of which most exist only for a very short time. To avoid
+     * polluting the cache it is then recommended to use the non-cache version
+     *
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */
     @Override
     public TermBuilder getTermBuilder(boolean withCache) {
-       return withCache ? termBuilder : termBuilderWithoutCache;
+        return withCache ? termBuilder : termBuilderWithoutCache;
     }
-    
+
     /**
-     * Returns the {@link TermBuilder} used to create {@link Term}s.
-     * Same as {@link #getTermBuilder(true).
+     * Returns the {@link TermBuilder} used to create {@link Term}s. Same as
+     * {@link #getTermBuilder(true).
+     *
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */
     @Override
@@ -503,8 +506,9 @@ public class Services implements TermServices {
             freshForInstantiations.put(svInst, new HashMap<>());
         }
 
-        if (!freshForInstantiations.get(svInst).containsKey(skSv)) {
-            freshForInstantiations.get(svInst).put(skSv, skInst);
+        final NameEqBasedHashKey key = new NameEqBasedHashKey(skSv);
+        if (!freshForInstantiations.get(svInst).containsKey(key)) {
+            freshForInstantiations.get(svInst).put(key, skInst);
             return true;
         }
 
@@ -516,8 +520,28 @@ public class Services implements TermServices {
      */
     public Optional<Object> getFreshForInstantiation(Object svInst,
             SchemaVariable skSv) {
+        final NameEqBasedHashKey key = new NameEqBasedHashKey(skSv);
         return Optional.ofNullable(freshForInstantiations.get(svInst))
-                .map(m -> m.get(skSv));
+                .map(m -> m.get(key));
+    }
+
+    private static class NameEqBasedHashKey {
+        private final int hashCode;
+
+        public NameEqBasedHashKey(Named wrapped) {
+            this.hashCode = wrapped.name().hashCode();
+        }
+
+        @Override
+        public int hashCode() {
+            return hashCode;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof NameEqBasedHashKey
+                    && ((NameEqBasedHashKey) obj).hashCode == this.hashCode;
+        }
     }
 
 }

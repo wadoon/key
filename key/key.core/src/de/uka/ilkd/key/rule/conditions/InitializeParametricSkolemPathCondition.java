@@ -13,12 +13,21 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.SVSubstitute;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -38,7 +47,7 @@ public class InitializeParametricSkolemPathCondition extends
     private final ProgramSV abstrProgSV;
     private final ProgramSV excSV;
     private final ProgramSV returnedSV;
-    private final ProgramSV resultSV;
+    private final Optional<ProgramSV> maybeResultSV;
 
     public InitializeParametricSkolemPathCondition(SchemaVariable pathCondSV,
             ProgramSV abstrProgSV, ProgramSV excSV, ProgramSV returnedSV,
@@ -47,7 +56,16 @@ public class InitializeParametricSkolemPathCondition extends
         this.abstrProgSV = abstrProgSV;
         this.excSV = excSV;
         this.returnedSV = returnedSV;
-        this.resultSV = resultSV;
+        this.maybeResultSV = Optional.of(resultSV);
+    }
+
+    public InitializeParametricSkolemPathCondition(SchemaVariable pathCondSV,
+            ProgramSV abstrProgSV, ProgramSV excSV, ProgramSV returnedSV) {
+        this.pathCondSV = pathCondSV;
+        this.abstrProgSV = abstrProgSV;
+        this.excSV = excSV;
+        this.returnedSV = returnedSV;
+        this.maybeResultSV = Optional.empty();
     }
 
     @Override
@@ -59,27 +77,30 @@ public class InitializeParametricSkolemPathCondition extends
             return matchCond;
         }
 
-        final AbstractPlaceholderStatement abstrStmt =
-                (AbstractPlaceholderStatement) svInst
-                        .getInstantiation(abstrProgSV);
+        final AbstractPlaceholderStatement abstrStmt = (AbstractPlaceholderStatement) svInst
+                .getInstantiation(abstrProgSV);
 
         final TermBuilder tb = services.getTermBuilder();
 
         Term accessibleClause = getAccessibleAndAssignableTerms(abstrStmt,
                 svInst, services).first;
 
-        for (final ProgramSV furtherSV : new ProgramSV[] { excSV, returnedSV,
-                resultSV }) {
-            final LocationVariable furtherLV =
-                    (LocationVariable) svInst.getInstantiation(furtherSV);
+        final List<ProgramSV> varsToConsider = new ArrayList<>();
+        varsToConsider.add(excSV);
+        varsToConsider.add(returnedSV);
+        maybeResultSV.ifPresent(varsToConsider::add);
+
+        for (final ProgramSV furtherSV : varsToConsider) {
+            final LocationVariable furtherLV = (LocationVariable) svInst
+                    .getInstantiation(furtherSV);
             accessibleClause = tb.union(accessibleClause,
                     tb.singletonPV(tb.var(furtherLV)));
         }
 
         final String pathCondName = tb.newName(
                 pathCondSV.name().toString() + "_" + abstrStmt.getId());
-        final Sort locSetSort =
-                services.getTypeConverter().getLocSetLDT().targetSort();
+        final Sort locSetSort = services.getTypeConverter().getLocSetLDT()
+                .targetSort();
 
         final Term pathCond = tb.func(new Function(new Name(pathCondName),
                 Sort.FORMULA, true, false, locSetSort), accessibleClause);
@@ -90,8 +111,18 @@ public class InitializeParametricSkolemPathCondition extends
 
     @Override
     public String toString() {
+        final List<SchemaVariable> svs = new ArrayList<>();
+        svs.add(pathCondSV);
+        svs.add(abstrProgSV);
+        svs.add(excSV);
+        svs.add(returnedSV);
+        maybeResultSV.ifPresent(svs::add);
+
+        final String svsString = svs.stream().map(SchemaVariable::toString)
+                .collect(Collectors.joining(", "));
+
         return String.format(
-                "\\varcond (\\initializeParametricSkolemPathCondition(%s, %s))",
-                pathCondSV, abstrProgSV);
+                "\\varcond (\\initializeParametricSkolemPathCondition(%s))",
+                svsString);
     }
 }
