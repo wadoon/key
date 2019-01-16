@@ -78,14 +78,54 @@ public final class AbstrUpdatesIndependentCondition
         final List<Operator> abstrUpd1Accessibles = getAccessibles(u1Inst);
         final List<Operator> abstrUpd2Accessibles = getAccessibles(u2Inst);
 
+        /* U1(x, ... := ...) / U2(... := x, ...) */
         if (abstrUpd1Assignables.stream()
-                .noneMatch(abstrUpd2Accessibles::contains)
-                && abstrUpd2Assignables.stream()
-                        .noneMatch(abstrUpd1Accessibles::contains)) {
-            return mc;
+                .anyMatch(abstrUpd2Accessibles::contains)
+                || abstrUpd2Assignables.stream()
+                        .anyMatch(abstrUpd1Accessibles::contains)) {
+            return null;
         }
 
-        return null;
+        /* U1(allLocs := ...) / U2(... := x, ...) */
+        if (hasAllLocs(abstrUpd1Assignables, services)
+                && !isEmptyLocSet(abstrUpd2Accessibles, services)) {
+            return null;
+        }
+
+        /* U1(... := x, ...) / U2(allLocs := ...) */
+        if (hasAllLocs(abstrUpd2Assignables, services)
+                && !isEmptyLocSet(abstrUpd1Accessibles, services)) {
+            return null;
+        }
+
+        /* U1(... := allLocs) / U2(x, ... := ...) */
+        if (hasAllLocs(abstrUpd1Accessibles, services)
+                && !isEmptyLocSet(abstrUpd2Assignables, services)) {
+            return null;
+        }
+
+        /* U1(x, ... := ...) / U2(... := allLocs) */
+        if (hasAllLocs(abstrUpd2Accessibles, services)
+                && !isEmptyLocSet(abstrUpd1Assignables, services)) {
+            return null;
+        }
+
+        return mc;
+    }
+
+    private static boolean hasAllLocs(List<Operator> ops, Services services) {
+        final Operator allLocs = //
+                services.getTypeConverter().getLocSetLDT().getAllLocs();
+        /* allLocs is the default for empty sets */
+        return ops.isEmpty() || ops.contains(allLocs);
+    }
+
+    private static boolean isEmptyLocSet(List<Operator> ops,
+            Services services) {
+        final Operator empty = //
+                services.getTypeConverter().getLocSetLDT().getEmpty();
+        /* allLocs is the default for empty sets */
+        return ops.size() == 1 && ops.contains(empty);
     }
 
     private static List<Operator> getAccessibles(final Term t) {
