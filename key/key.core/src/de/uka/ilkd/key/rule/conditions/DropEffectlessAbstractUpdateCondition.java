@@ -108,7 +108,7 @@ public final class DropEffectlessAbstractUpdateCondition
         return String.format("\\dropEffectlessAbstractUpdate(%s, %s)", u, x);
     }
 
-    private static Set<Operator> collectNullaryOps(Term t, Services services) {
+    public static Set<Operator> collectNullaryOps(Term t, Services services) {
         TermNullaryOpCollector collector = new TermNullaryOpCollector(services);
         t.execPostOrder(collector);
         return collector.result();

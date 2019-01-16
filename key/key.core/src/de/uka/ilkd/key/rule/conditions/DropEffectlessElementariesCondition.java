@@ -111,6 +111,33 @@ public final class DropEffectlessElementariesCondition
             final AbstractUpdate oldUpdate = (AbstractUpdate) update.op();
             final List<Term> assignables = oldUpdate.getAssignables();
 
+            if (assignables.isEmpty() || assignables.size() == 1
+                    && assignables.get(0) == locSetLDT.getAllLocs()) {
+                /*
+                 * If we can assign everything, we stay on the save side and
+                 * don't allow to drop the update.
+                 */
+                return null;
+            }
+
+            if (!assignables.isEmpty() || assignables.size() == 1
+                    && assignables.get(0) == locSetLDT.getEmpty()) {
+                /*
+                 * If this update assigns anything when at the same time, there
+                 * is an allLocs accessible in the target, we may not drop it
+                 * (assignable is not relevant, but we ignore this for now --
+                 * it's "only" a completeness problem).
+                 */
+
+                final Set<Operator> opsInTarget = //
+                        DropEffectlessAbstractUpdateCondition
+                                .collectNullaryOps(target, services);
+
+                if (opsInTarget.contains(locSetLDT.getAllLocs())) {
+                    return null;
+                }
+            }
+
             /*
              * TODO (DS, 2019-01-03): There might also be fields in the loc set,
              * we might have to eventually consider this. As of now, there are
