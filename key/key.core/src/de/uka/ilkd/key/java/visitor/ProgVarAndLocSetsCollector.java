@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java.visitor;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -99,7 +100,6 @@ public class ProgVarAndLocSetsCollector extends JavaASTVisitor {
     public void performActionOnLoopInvariant(LoopSpecification x) {
         delegate.performActionOnLoopInvariant(x);
 
-        // TODO
         final Term selfTerm = x.getInternalSelfTerm();
         final ImmutableList<LocationVariable> allHeaps = //
                 services.getTypeConverter().getHeapLDT().getAllHeaps();
@@ -110,6 +110,9 @@ public class ProgVarAndLocSetsCollector extends JavaASTVisitor {
         for (LocationVariable heap : allHeaps) {
             Optional.ofNullable(x.getModifies(heap, selfTerm, atPres, services))
                     .map(this::getSkolemLocSetConstantsFromLocSetUnionTerm)
+                    /* Default is allLocs */
+                    .or(() -> Optional.of(Collections.singleton(services
+                            .getTypeConverter().getLocSetLDT().getAllLocs())))
                     .ifPresent(result::addAll);
         }
     }
@@ -124,12 +127,18 @@ public class ProgVarAndLocSetsCollector extends JavaASTVisitor {
         for (LocationVariable heap : allHeaps) {
             Optional.ofNullable(x.getModifiesClause(heap, services))
                     .map(this::getSkolemLocSetConstantsFromLocSetUnionTerm)
+                    /* Default is allLocs */
+                    .or(() -> Optional.of(Collections.singleton(services
+                            .getTypeConverter().getLocSetLDT().getAllLocs())))
                     .ifPresent(result::addAll);
         }
 
         for (LocationVariable heap : allHeaps) {
             Optional.ofNullable(x.getAccessibleClause(heap, services))
                     .map(this::getSkolemLocSetConstantsFromLocSetUnionTerm)
+                    /* Default is allLocs */
+                    .or(() -> Optional.of(Collections.singleton(services
+                            .getTypeConverter().getLocSetLDT().getAllLocs())))
                     .ifPresent(result::addAll);
         }
     }
@@ -144,12 +153,18 @@ public class ProgVarAndLocSetsCollector extends JavaASTVisitor {
         for (LocationVariable heap : allHeaps) {
             Optional.ofNullable(x.getModifiesClause(heap, services))
                     .map(this::getSkolemLocSetConstantsFromLocSetUnionTerm)
+                    /* Default is allLocs */
+                    .or(() -> Optional.of(Collections.singleton(services
+                            .getTypeConverter().getLocSetLDT().getAllLocs())))
                     .ifPresent(result::addAll);
         }
 
         for (LocationVariable heap : allHeaps) {
             Optional.ofNullable(x.getAccessibleClause(heap, services))
                     .map(this::getSkolemLocSetConstantsFromLocSetUnionTerm)
+                    /* Default is allLocs */
+                    .or(() -> Optional.of(Collections.singleton(services
+                            .getTypeConverter().getLocSetLDT().getAllLocs())))
                     .ifPresent(result::addAll);
         }
     }
