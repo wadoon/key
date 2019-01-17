@@ -1795,7 +1795,7 @@ public class JMLSpecFactory {
                 }
             }
         }
-        return null;
+        return result;
     }
 
     private LoopSpecification createJMLLoopInvariant(IProgramMethod pm,

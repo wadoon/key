@@ -3860,6 +3860,7 @@ varexp[TacletBuilder b]
     | varcond_abstrUpdatesIndependent[b]
     | varcond_dropEffectlessElementaries[b]
     | varcond_dropEffectlessAbstractUpdate[b]
+    | varcond_dropEffectlessAbstractUpdateAssignments[b]
     | varcond_instantiateVarsFresh[b]
     | varcond_newPV[b]
     | varcond_storeResultVarIn[b]
@@ -3977,12 +3978,12 @@ varcond_initializeParametricSkolemPathCondition[TacletBuilder b]
    INITIALIZE_PARAMETRIC_SKOLEM_PATH_CONDITION LPAREN
      formulaSV=varId COMMA
      abstrProgramSV=varId COMMA
-     excSV=varId COMMA
-     returnedSV=varId 
+     excSV=varId
+     ( COMMA returnedSV=varId ) ?
      ( COMMA resultSV=varId ) ?
    RPAREN 
    {
-      if (resultSV != null) {
+      if (resultSV != null && returnedSV != null) {
           b.addVariableCondition(
             new InitializeParametricSkolemPathCondition(
               (SchemaVariable) formulaSV, 
@@ -3990,13 +3991,19 @@ varcond_initializeParametricSkolemPathCondition[TacletBuilder b]
               (ProgramSV) excSV,
               (ProgramSV) returnedSV,
               (ProgramSV) resultSV));
-      } else {
+      } else if (returnedSV != null) {
           b.addVariableCondition(
             new InitializeParametricSkolemPathCondition(
               (SchemaVariable) formulaSV, 
               (ProgramSV) abstrProgramSV,
               (ProgramSV) excSV,
               (ProgramSV) returnedSV));
+      } else {
+          b.addVariableCondition(
+            new InitializeParametricSkolemPathCondition(
+              (SchemaVariable) formulaSV, 
+              (ProgramSV) abstrProgramSV,
+              (ProgramSV) excSV));
       }
    }
 ;
@@ -4070,6 +4077,16 @@ varcond_dropEffectlessAbstractUpdate[TacletBuilder b]
    DROP_EFFECTLESS_ABSTRACT_UPDATE LPAREN u=varId COMMA x=varId RPAREN 
    {
       b.addVariableCondition(new DropEffectlessAbstractUpdateCondition((UpdateSV)u, (SchemaVariable)x));
+   }
+;
+
+varcond_dropEffectlessAbstractUpdateAssignments[TacletBuilder b]
+:
+   DROP_EFFECTLESS_ABSTRACT_UPDATE_ASSIGNMENTS LPAREN u=varId COMMA target=varId COMMA result=varId RPAREN 
+   {
+      b.addVariableCondition(new DropEffectlessAbstractUpdateElementariesCondition((UpdateSV)u,
+                                                                                   (SchemaVariable)target,
+                                                                                   (SchemaVariable)result));
    }
 ;
 

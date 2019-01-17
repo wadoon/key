@@ -46,7 +46,7 @@ public class InitializeParametricSkolemPathCondition extends
     private final SchemaVariable pathCondSV;
     private final ProgramSV abstrProgSV;
     private final ProgramSV excSV;
-    private final ProgramSV returnedSV;
+    private final Optional<ProgramSV> returnedSV;
     private final Optional<ProgramSV> maybeResultSV;
 
     public InitializeParametricSkolemPathCondition(SchemaVariable pathCondSV,
@@ -55,7 +55,7 @@ public class InitializeParametricSkolemPathCondition extends
         this.pathCondSV = pathCondSV;
         this.abstrProgSV = abstrProgSV;
         this.excSV = excSV;
-        this.returnedSV = returnedSV;
+        this.returnedSV = Optional.of(returnedSV);
         this.maybeResultSV = Optional.of(resultSV);
     }
 
@@ -64,7 +64,16 @@ public class InitializeParametricSkolemPathCondition extends
         this.pathCondSV = pathCondSV;
         this.abstrProgSV = abstrProgSV;
         this.excSV = excSV;
-        this.returnedSV = returnedSV;
+        this.returnedSV = Optional.of(returnedSV);
+        this.maybeResultSV = Optional.empty();
+    }
+
+    public InitializeParametricSkolemPathCondition(SchemaVariable pathCondSV,
+            ProgramSV abstrProgSV, ProgramSV excSV) {
+        this.pathCondSV = pathCondSV;
+        this.abstrProgSV = abstrProgSV;
+        this.excSV = excSV;
+        this.returnedSV = Optional.empty();
         this.maybeResultSV = Optional.empty();
     }
 
@@ -87,7 +96,7 @@ public class InitializeParametricSkolemPathCondition extends
 
         final List<ProgramSV> varsToConsider = new ArrayList<>();
         varsToConsider.add(excSV);
-        varsToConsider.add(returnedSV);
+        returnedSV.ifPresent(varsToConsider::add);
         maybeResultSV.ifPresent(varsToConsider::add);
 
         for (final ProgramSV furtherSV : varsToConsider) {
@@ -115,7 +124,7 @@ public class InitializeParametricSkolemPathCondition extends
         svs.add(pathCondSV);
         svs.add(abstrProgSV);
         svs.add(excSV);
-        svs.add(returnedSV);
+        returnedSV.ifPresent(svs::add);
         maybeResultSV.ifPresent(svs::add);
 
         final String svsString = svs.stream().map(SchemaVariable::toString)
