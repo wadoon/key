@@ -1066,6 +1066,38 @@ public class TermBuilder {
         return parallel(updates);
     }
 
+    public Term concatenated(Term u1, Term u2) {
+        if (u1.sort() != Sort.UPDATE) {
+            throw new TermCreationException("Not an update: " + u1);
+        }
+
+        else if (u2.sort() != Sort.UPDATE) {
+            throw new TermCreationException("Not an update: " + u2);
+        }
+
+        if (u1.op() == UpdateJunctor.SKIP) {
+            return u2;
+        }
+
+        else if (u2.op() == UpdateJunctor.SKIP) {
+            return u1;
+        }
+
+        return this.tf.createTerm(UpdateJunctor.CONCATENATED_UPDATE, u1, u2);
+    }
+
+    public Term concatenated(Term... updates) {
+        Term result = skip();
+        for (int i = 0; i < updates.length; i++) {
+            result = concatenated(result, updates[i]);
+        }
+        return result;
+    }
+
+    public Term concatenated(ImmutableList<Term> updates) {
+        return concatenated(updates.toArray(new Term[updates.size()]));
+    }
+
     public Term sequential(Term u1, Term u2) {
         return parallel(u1, apply(u1, u2, null));
     }

@@ -3853,7 +3853,6 @@ varexp[TacletBuilder b]
   ( varcond_applyUpdateOnRigid[b]
     | varcond_initializeParametricSkolemUpdate[b]
     | varcond_initializeParametricSkolemPathCondition[b]
-    | varcond_prefixContainsElement[b, negated]
     | varcond_sequentialUpdateSimplAbstr[b]
     | varcond_simplifyAbstractUpdateRenameSubst[b]
     | varcond_simplifyAbstractUpdateRenameSubst2[b]
@@ -3863,11 +3862,10 @@ varexp[TacletBuilder b]
     | varcond_dropEffectlessAbstractUpdateAssignments[b]
     | varcond_instantiateVarsFresh[b]
     | varcond_newPV[b]
+    | varcond_storeTo[b]
     | varcond_storeResultVarIn[b]
     | varcond_storeContextLabelsIn[b]
     | varcond_freshAbstractProgram[b]
-    | varcond_isDefined[b, negated]
-    | varcond_abstractUpdate[b, negated]
     | varcond_dropEffectlessStores[b]
     | varcond_enum_const[b]
     | varcond_free[b]
@@ -3979,8 +3977,11 @@ varcond_initializeParametricSkolemPathCondition[TacletBuilder b]
      formulaSV=varId COMMA
      abstrProgramSV=varId COMMA
      excSV=varId
-     ( COMMA returnedSV=varId ) ?
-     ( COMMA resultSV=varId ) ?
+     ( 
+         COMMA returnedSV=varId
+       ( COMMA resultSV=varId ) ? 
+     ) ?
+     
    RPAREN 
    {
       if (resultSV != null && returnedSV != null) {
@@ -4013,6 +4014,14 @@ varcond_storeResultVarIn[TacletBuilder b]
    STORE_RESULT_VAR_IN LPAREN sv=varId RPAREN 
    {
       b.addVariableCondition(new StoreResultVarInCondition((ProgramSV) sv));
+   }
+;
+
+varcond_storeTo[TacletBuilder b]
+:
+   STORE_TO LPAREN sv=varId COMMA t=term RPAREN 
+   {
+      b.addVariableCondition(new StoreToCondition((SchemaVariable) sv, t));
    }
 ;
 

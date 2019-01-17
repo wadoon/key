@@ -13,11 +13,15 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
@@ -31,6 +35,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -57,15 +62,15 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             MatchConditions mc, Services services) {
         final SVInstantiations svInst = mc.getInstantiations();
         final Term u = (Term) svInst.getInstantiation(uSV);
-        final Term target = (Term) svInst.getInstantiation(targetSV);
-        Term result = (Term) svInst.getInstantiation(resultSV);
+        Term target = (Term) svInst.getInstantiation(targetSV);
+        final Term origResult = (Term) svInst.getInstantiation(resultSV);
+        Term newResult = origResult;
 
-        if (u == null || target == null
-                || !(u.op() instanceof AbstractUpdate)) {
+        if (u == null || target == null) {
             return null;
         }
 
-        if (result != null) {
+        if (origResult != null) {
             return mc;
         }
 
@@ -85,14 +90,58 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             return null;
         }
 
-        result = dropEffectlessAbstractUpdateElementaries( //
-                u, target, services);
+        if (u.op() == UpdateJunctor.CONCATENATED_UPDATE) {
+            final List<Term> origAbstractUpdates = //
+                    Collections.unmodifiableList(
+                            extractAbstractUpdatesFromConcatenation(u));
+            final List<Term> newElementaryAbstractUpdates = //
+                    new ArrayList<>(origAbstractUpdates);
 
-        if (result == null) {
+            for (int i = origAbstractUpdates.size() - 1; i >= 0; i--) {
+                final Term elementaryAbstrUpd = //
+                        origAbstractUpdates.get(i);
+                final Term newUpdate = Optional
+                        .ofNullable(dropEffectlessAbstractUpdateElementaries(
+                                elementaryAbstrUpd, target, services))
+                        .orElse(elementaryAbstrUpd);
+
+                newElementaryAbstractUpdates.set(i, newUpdate);
+                target = services.getTermBuilder().apply(newUpdate, target);
+            }
+
+            newResult = services.getTermBuilder().concatenated(ImmutableSLList
+                    .<Term> nil().append(newElementaryAbstractUpdates));
+
+            if (newElementaryAbstractUpdates.equals(origAbstractUpdates)) {
+                return null;
+            }
+        }
+        else {
+            newResult = dropEffectlessAbstractUpdateElementaries( //
+                    u, target, services);
+        }
+
+        if (newResult == null) {
             return null;
         }
 
-        return mc.setInstantiations(svInst.add(resultSV, result, services));
+        return mc.setInstantiations(svInst.add(resultSV, newResult, services));
+    }
+
+    private static List<Term> extractAbstractUpdatesFromConcatenation(
+            Term concatenation) {
+        final List<Term> result = new ArrayList<>();
+
+        if (concatenation.op() instanceof AbstractUpdate) {
+            result.add(concatenation);
+        }
+        else {
+            for (Term sub : concatenation.subs()) {
+                result.addAll(extractAbstractUpdatesFromConcatenation(sub));
+            }
+        }
+
+        return result;
     }
 
     private static Term dropEffectlessAbstractUpdateElementaries(Term update,
