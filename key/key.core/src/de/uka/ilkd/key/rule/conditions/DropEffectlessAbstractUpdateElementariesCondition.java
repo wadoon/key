@@ -44,6 +44,14 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
+/**
+ * Variable condition for (1) dropping assignables of abstract updates that are
+ * in the target overwritten before they are read (also works for
+ * concatenations) and (2) also dropping abstract updates in a concatenation
+ * (only) that only write to locations which are not read afterward.
+ *
+ * @author Dominic Steinhoefel
+ */
 public final class DropEffectlessAbstractUpdateElementariesCondition
         implements VariableCondition {
     private final UpdateSV uSV;
@@ -97,20 +105,31 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             final List<Term> newElementaryAbstractUpdates = //
                     new ArrayList<>(origAbstractUpdates);
 
+            final TermBuilder tb = services.getTermBuilder();
             for (int i = origAbstractUpdates.size() - 1; i >= 0; i--) {
                 final Term elementaryAbstrUpd = //
                         origAbstractUpdates.get(i);
-                final Term newUpdate = Optional
+                Term newUpdate = Optional
                         .ofNullable(dropEffectlessAbstractUpdateElementaries(
                                 elementaryAbstrUpd, target, services))
                         .orElse(elementaryAbstrUpd);
 
+                if (DropEffectlessAbstractUpdateCondition
+                        .dropEffectlessAbstractUpdate(newUpdate, target,
+                                services)) {
+                    /*
+                     * Maybe new we can drop the update entirely, if it only
+                     * writes things that are never read...
+                     */
+                    newUpdate = tb.skip();
+                }
+
                 newElementaryAbstractUpdates.set(i, newUpdate);
-                target = services.getTermBuilder().apply(newUpdate, target);
+                target = tb.apply(newUpdate, target);
             }
 
-            newResult = services.getTermBuilder().concatenated(ImmutableSLList
-                    .<Term> nil().append(newElementaryAbstractUpdates));
+            newResult = tb.concatenated(ImmutableSLList.<Term> nil()
+                    .append(newElementaryAbstractUpdates));
 
             if (newElementaryAbstractUpdates.equals(origAbstractUpdates)) {
                 return null;

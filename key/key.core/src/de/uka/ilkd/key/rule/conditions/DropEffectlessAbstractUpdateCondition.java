@@ -29,29 +29,35 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
+/**
+ * Variable condition dropping abstract updates which only write to locations
+ * that are not read afterward.
+ *
+ * @author Dominic Steinhoefel
+ */
 public final class DropEffectlessAbstractUpdateCondition
         implements VariableCondition {
-    private final UpdateSV u;
-    private final SchemaVariable x;
+    private final UpdateSV uSV;
+    private final SchemaVariable targetSV;
 
     public DropEffectlessAbstractUpdateCondition(UpdateSV u, SchemaVariable x) {
-        this.u = u;
-        this.x = x;
+        this.uSV = u;
+        this.targetSV = x;
     }
 
     @Override
     public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
             MatchConditions mc, Services services) {
         SVInstantiations svInst = mc.getInstantiations();
-        Term uInst = (Term) svInst.getInstantiation(u);
-        Term xInst = (Term) svInst.getInstantiation(x);
+        Term u = (Term) svInst.getInstantiation(uSV);
+        Term target = (Term) svInst.getInstantiation(targetSV);
 
-        if (uInst == null || xInst == null
-                || !(uInst.op() instanceof AbstractUpdate)) {
+        if (u == null || target == null
+                || !(u.op() instanceof AbstractUpdate)) {
             return null;
         }
 
-        if (xInst.isRigid()) {
+        if (target.isRigid()) {
             /*
              * TODO (DS, 2019-01-04): CHECK MATCHING FOR NONRIGID TERMS!
              * Actually, the taclets using this condition only match on nonrigid
@@ -63,11 +69,11 @@ public final class DropEffectlessAbstractUpdateCondition
             return null;
         }
 
-        return dropEffectlessAbstractUpdate(uInst, xInst, services) ? mc : null;
+        return dropEffectlessAbstractUpdate(u, target, services) ? mc : null;
     }
 
-    private static boolean dropEffectlessAbstractUpdate(Term update,
-            Term target, Services services) {
+    public static boolean dropEffectlessAbstractUpdate(Term update, Term target,
+            Services services) {
         final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
 
         final Set<Operator> opsInTarget = collectNullaryOps(target, services);
@@ -105,7 +111,8 @@ public final class DropEffectlessAbstractUpdateCondition
 
     @Override
     public String toString() {
-        return String.format("\\dropEffectlessAbstractUpdate(%s, %s)", u, x);
+        return String.format("\\dropEffectlessAbstractUpdate(%s, %s)", uSV,
+                targetSV);
     }
 
     public static Set<Operator> collectNullaryOps(Term t, Services services) {
