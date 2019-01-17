@@ -3862,7 +3862,6 @@ varexp[TacletBuilder b]
     | varcond_dropEffectlessAbstractUpdateAssignments[b]
     | varcond_instantiateVarsFresh[b]
     | varcond_newPV[b]
-    | varcond_storeTo[b]
     | varcond_storeResultVarIn[b]
     | varcond_storeContextLabelsIn[b]
     | varcond_freshAbstractProgram[b]
@@ -4014,14 +4013,6 @@ varcond_storeResultVarIn[TacletBuilder b]
    STORE_RESULT_VAR_IN LPAREN sv=varId RPAREN 
    {
       b.addVariableCondition(new StoreResultVarInCondition((ProgramSV) sv));
-   }
-;
-
-varcond_storeTo[TacletBuilder b]
-:
-   STORE_TO LPAREN sv=varId COMMA t=term RPAREN 
-   {
-      b.addVariableCondition(new StoreToCondition((SchemaVariable) sv, t));
    }
 ;
 
