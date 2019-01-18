@@ -593,6 +593,7 @@ TOKEN :
 		    | < SWITCHTOIF: "#switch-to-if" >
 		    | < UNPACK: "#unpack" >
 		    | < FORINITUNFOLDTRANSFORMER: "#forInitUnfoldTransformer" >
+		    | < LOOPSCOPEINVARIANTTRANSFORMER: "#loopScopeInvariantTransformer" >
 		    | < FOREACH: "#foreach" >
 		    | < IN: "in" >
 		    | < SET: "#set" >
@@ -4151,19 +4152,7 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
     JumpLabelSVWrapper innerLabel, outerLabel;
     ASTList<LoopInitializer> loopInit;
 }
-{ 
-  //(
-  //  "#foreach" "(" ( sv = VariableSV() ) "," ( sv1 = VariableSV() ) "," ( stat = Statement() ) ")" ";"
-  //   {
-  //     result = factory.createRKeYMetaConstruct();
-  //     setPrefixInfo(result);
-  //     result.addSV(sv);
-  //     result.addSV(sv1);
-  //     result.setChild(stat);
-  //     result.setName("#foreach");
-  //     return result;
-  //   }
-  //)
+{
   (
     "#foreach" "(" { result = factory.createRKeYMetaConstruct(); }
       ( sv = VariableSV() { result.addSV(sv); } ) ( "," sv = VariableSV() { result.addSV(sv); } ) *
@@ -4178,7 +4167,8 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
      }
   )
   |
-   ("#unwind-loop" "("
+   (
+   "#unwind-loop" "("
    (innerLabel = JumpLabelSV() "," outerLabel = JumpLabelSV() ","
       (  loopStat = WhileStatement()
        | loopStat = ForStatement()
@@ -4186,15 +4176,15 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
       )
     )
    ")" ";"
-   {
-       result = factory.createRKeYMetaConstruct();
-       setPrefixInfo(result);
-       result.setChild(loopStat);
-       result.addSV(innerLabel);
-       result.addSV(outerLabel);
-       result.setName("#unwind-loop");
-       return result;
-   }
+{
+    result = factory.createRKeYMetaConstruct();
+    setPrefixInfo(result);
+    result.setChild(loopStat);
+    result.addSV(innerLabel);
+    result.addSV(outerLabel);
+    result.setName("#unwind-loop");
+    return result;
+}
    )
      |
      (
@@ -4224,6 +4214,17 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
        setPrefixInfo(result);
        result.setChild(loopInit.get(0));  
        result.setName("#forInitUnfoldTransformer");
+       return result; 
+   }
+   )
+   |
+   (
+    <LOOPSCOPEINVARIANTTRANSFORMER> "(" ( loopStat=WhileStatement() ) ")" ";" 
+   {
+       result = factory.createRKeYMetaConstruct();
+       setPrefixInfo(result);
+       result.setChild(loopStat);  
+       result.setName("#loopScopeInvariantTransformer");
        return result; 
    }
    )
@@ -4501,9 +4502,9 @@ AbstractPlaceholderStatement AbstractPlaceholderStatement() :
   ";"
   {
     result.setId(id);
-    checkConstruction(result);
-    return result;
-  }
+	checkConstruction(result);
+	return result;
+    }
 }
 
 LoopScopeBlock LoopScopeStatement() :

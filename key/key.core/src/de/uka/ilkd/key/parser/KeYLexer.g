@@ -236,6 +236,7 @@ lexer grammar KeYLexer;
     STORE_CONTEXT_LABELS_IN : '\\storeContextLabelsIn' ;
 	IS_DEFINED : '\\isDefined';
 	VARCOND : '\\varcond';
+	GET_INVARIANT : '\\getInvariant';
 	APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';
     DEPENDINGON : '\\dependingOn';
     FRESHFOR : '\\freshFor';
