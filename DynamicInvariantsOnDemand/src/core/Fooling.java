@@ -2,11 +2,15 @@ package core;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.lang.ProcessBuilder.Redirect;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
@@ -14,24 +18,38 @@ import java.util.Scanner;
 
 public class Fooling {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		Runtime rt = Runtime.getRuntime();
 		try {
-			Process pr = rt.exec("\"D://Program Files (x86)//SageMath 8.4//runtime//bin//mintty.exe\" /bin/bash --login -c '/opt/sagemath-8.4/sage'");
-	        OutputStream stdin = pr.getOutputStream(); // <- Eh?
-	        InputStream stdout = pr.getInputStream();
-
-	        BufferedReader reader = new BufferedReader(new InputStreamReader(stdout));
-	        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(stdin));
-
-	        writer.write("Sup buddy");
-	        writer.flush();
-	        writer.close();
-
-	        Scanner scanner = new Scanner(stdout);
-	        while (scanner.hasNextLine()) {
-	            System.out.println(scanner.nextLine());
-	        }
+//			ProcessBuilder builder = new ProcessBuilder("D:\\Program Files (x86)\\SageMath 8.4\\runtime\\bin\\mintty.exe", "/bin/bash --login -c '/opt/sagemath-8.4/sage /home/sage/test.sage'");
+//			ProcessBuilder builder = new ProcessBuilder("D:\\Program Files (x86)\\SageMath 8.4\\runtime\\bin\\mintty.exe", "/bin/bash", "-s");
+			ProcessBuilder builder = new ProcessBuilder("D:\\Program Files (x86)\\SageMath 8.4\\runtime\\bin\\bash.exe");
+//			ProcessBuilder builder = new ProcessBuilder("D:\\Program Files (x86)\\SageMath 8.4\\runtime\\bin\\mintty.exe", "/bin/bash", "--login", "-c", "/opt/sagemath-8.4/sage /home/sage/test.sage");
+//			ProcessBuilder builder = new ProcessBuilder("D:\\Program Files (x86)\\SageMath 8.4\\runtime\\bin\\mintty.exe", "/bin/bash", "--login", "-c", "/opt/sagemath-8.4/sage /home/sage/test.sage", ">", "test.txt");
+//			ProcessBuilder builder = new ProcessBuilder("D:\\Program Files (x86)\\SageMath 8.4\\runtime\\bin\\mintty.exe");
+//			Process pr = rt.exec("\"D:\\Program Files (x86)\\SageMath 8.4\\runtime\\bin\\mintty.exe\" /bin/bash --login -c '/opt/sagemath-8.4/sage /home/sage/test.sage' > /home/sage/test.txt");
+			builder.redirectErrorStream(true);
+//			File output = new File("C:\\Users\\Daniel\\test.txt");
+//			builder.redirectOutput(output);
+//			builder.redirectOutput(Redirect.INHERIT);
+			Process p = builder.start();
+//			int result = p.waitFor();
+			
+			
+//			PrintStream toP = new PrintStream(p.getOutputStream());
+			BufferedWriter toP = new BufferedWriter(new OutputStreamWriter(p.getOutputStream()));
+			BufferedReader fromP = new BufferedReader(new InputStreamReader(p.getInputStream()));
+			
+			
+//		    toP.write("/bin/bash --login -c '/opt/sagemath-8.4/sage /home/sage/test.sage'"+"\n");
+//		    toP.write("ls -la" + "\n");
+			toP.write("'/opt/sagemath-8.4/sage /home/sage/test.sage'" + "\n");
+		    
+		    toP.flush();
+//		    toP.close();
+//		    //System.err.println("stdin: \""+line+"\"");
+		    while(!fromP.ready());                            // sed hangs, cat doesn't
+		    System.out.println("result: \""+fromP.readLine()+"\"");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -40,7 +58,13 @@ public class Fooling {
 //		final String generatedFileName = "gen.java";
 //		Path currentPath = Paths.get(System.getProperty("user.dir"));
 //		Path filePath = Paths.get(currentPath.toString(), generatedFolderName, generatedFileName);
-//		System.out.println(filePath.toString());
+		
+////		System.out.println(filePath.toString());
+//		
+//		 File file = new File("C:\\BachelorEclipse\\Tools\\z3-4.8.4\\bin\\z3.exe");
+//		 if (file.exists()) {
+//			 System.out.println("exists");
+//		 } else
+//			 System.out.println("not exists");
 	}
-
 }

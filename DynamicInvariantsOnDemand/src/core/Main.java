@@ -37,6 +37,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
+import de.uka.ilkd.key.smt.SMTSolverResult;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.SolverType;
@@ -129,10 +130,20 @@ public class Main {
 		    });
 		    // launcher.addListener(new SolverListener(settings));
 		    final List<SolverType> solvers = new LinkedList<SolverType>();
-		    solvers.add(SolverType.Z3_CE_SOLVER);
-		    if (SolverType.Z3_CE_SOLVER.checkForSupport()) {
+//		    solvers.add(SolverType.Z3_CE_SOLVER);
+//		    if (SolverType.Z3_CE_SOLVER.checkForSupport()) {
+	    	solvers.add(SolverType.Z3_SOLVER);
+	    	SolverType.Z3_SOLVER.isInstalled(true);	    	
+		    if (SolverType.Z3_SOLVER.checkForSupport()) {
 			    launcher.launch(solvers, problems, proof.getServices());
 				System.out.println("launcher launched");
+				
+				//Final result
+				for (SMTProblem problem : problems) {
+					SMTSolverResult result = problem.getFinalResult();
+					System.out.println("result");
+				}
+				
 		    } else {
 		    	System.out.println("Z3 not installed or wrong version");
 		    }

@@ -132,7 +132,8 @@ public interface SolverType  {
 
 
             public String getDefaultSolverCommand() {
-                return "z3";
+            	//FIXME: Windows: .exe
+                return "z3.exe";
                 }
 
             public String getDefaultSolverParameters() {
@@ -163,7 +164,7 @@ public interface SolverType  {
                 }
 
             public String[] getSupportedVersions() {
-            	return new String[] {"version 3.2","version 4.1","version 4.3.0","version 4.3.1"};
+            	return new String[] {"version 3.2","version 4.1","version 4.3.0","version 4.3.1", "version 4.8.4"};
                 }
 
             public String[] getDelimiters() {
@@ -213,7 +214,7 @@ public interface SolverType  {
 
 
 		public String getDefaultSolverCommand() {
-			return "z3";                    
+			return "z3.exe";                    
 		};
 
 		public String getDefaultSolverParameters() {
@@ -237,7 +238,7 @@ public interface SolverType  {
 		};
 
 		public String[] getSupportedVersions() {
-			return new String[] {"version 4.3.1"};
+			return new String[] {"version 4.3.1","version 4.8.4"};
 		};
 
 		public String[] getDelimiters() {
