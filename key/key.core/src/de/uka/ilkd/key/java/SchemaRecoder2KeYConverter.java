@@ -18,7 +18,6 @@ import java.util.List;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
-import recoder.list.generic.ASTList;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
@@ -43,7 +42,6 @@ import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.IGuard;
 import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
@@ -65,10 +63,12 @@ import de.uka.ilkd.key.rule.metaconstruct.DoBreak;
 import de.uka.ilkd.key.rule.metaconstruct.EnhancedForElimination;
 import de.uka.ilkd.key.rule.metaconstruct.EvaluateArgs;
 import de.uka.ilkd.key.rule.metaconstruct.ExpandMethodBody;
+import de.uka.ilkd.key.rule.metaconstruct.ForEachTransformer;
 import de.uka.ilkd.key.rule.metaconstruct.ForInitUnfoldTransformer;
 import de.uka.ilkd.key.rule.metaconstruct.ForToWhile;
 import de.uka.ilkd.key.rule.metaconstruct.InitArrayCreation;
 import de.uka.ilkd.key.rule.metaconstruct.IsStatic;
+import de.uka.ilkd.key.rule.metaconstruct.LoopScopeInvariantTransformer;
 import de.uka.ilkd.key.rule.metaconstruct.MethodCall;
 import de.uka.ilkd.key.rule.metaconstruct.MultipleVarDecl;
 import de.uka.ilkd.key.rule.metaconstruct.PostWork;
@@ -79,29 +79,30 @@ import de.uka.ilkd.key.rule.metaconstruct.SwitchToIf;
 import de.uka.ilkd.key.rule.metaconstruct.TypeOf;
 import de.uka.ilkd.key.rule.metaconstruct.Unpack;
 import de.uka.ilkd.key.rule.metaconstruct.UnwindLoop;
+import recoder.list.generic.ASTList;
 
 /**
  * This is an extension of the usual {@link Recoder2KeYConverter} that supports
  * schema variables.
- * 
+ *
  * Some entities have to be treated differently, but most conversions are
  * handled identically (via the superclass).
- * 
+ *
  * @author MU
- * 
+ *
  */
 public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
 
     /**
      * the type that is used for schema variables types.
      */
-    public static KeYJavaType typeSVType 
+    public static KeYJavaType typeSVType
     	= new KeYJavaType(PrimitiveType.PROGRAM_SV, ProgramSVSort.TYPE);
 
     /**
      * create a new schema-recoder-to-key converter. It must be associated with
      * a schema recoder2key.
-     * 
+     *
      * @param rec2key
      *            the object to associate to
      * @param namespaceSet
@@ -118,7 +119,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     /**
      * convert a program meta construct creating a new object corresponding to
      * the name.
-     * 
+     *
      * If you add a ProgramTransformer to the system you will most propably
      * have to register it here.
      */
@@ -156,8 +157,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         } else if ("#for-to-while".equals(mcName)) {
             final ProgramSV[] labels = mc.getSV();
             return new ForToWhile(labels[0], labels[1],
-                    list.get(Statement.class));      
-        }  else if ("#enhancedfor-elim".equals(mcName)){ 
+                    list.get(Statement.class));
+        }  else if ("#enhancedfor-elim".equals(mcName)){
             EnhancedFor efor = list.get(EnhancedFor.class);
             if(efor == null)
                 throw new ConvertException("#enhancedfor-elim requires an enhanced for loop as argument");
@@ -212,7 +213,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
 
     /**
      * translate schema variables to ProgramMetaConstructs.
-     * 
+     *
      * If you have an expression meta construct you will have to add it here.
      */
     public ProgramTransformer convert(
@@ -234,7 +235,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
 
     /**
      * translate schema variables to ProgramMetaConstructs.
-     * 
+     *
      * If you have a type meta construct you will have to add it here.
      */
     public ProgramTransformer convert(
@@ -305,7 +306,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     @Override
     public ExecutionContext convert(
             de.uka.ilkd.key.java.recoderext.ExecutionContext ec) {
-        return new ExecutionContext((TypeReference) callConvert(ec.getTypeReference()), 
+        return new ExecutionContext((TypeReference) callConvert(ec.getTypeReference()),
                                     (IProgramMethod) callConvert(ec.getMethodContext()),
 				                        ec.getRuntimeInstance()!=null? (ReferencePrefix)callConvert(ec.getRuntimeInstance()) : null);
     }
@@ -328,14 +329,14 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             de.uka.ilkd.key.java.recoderext.LabelSVWrapper svw) {
         return svw.getSV();
     }
-    
+
     @Override
     public MergePointStatement convert(
             de.uka.ilkd.key.java.recoderext.MergePointStatement l) {
         return new MergePointStatement(
                 (IProgramVariable) callConvert(l.getChildAt(0)));
     }
-    
+
     public SchemaVariable convert(
           de.uka.ilkd.key.java.recoderext.MethodSignatureSVWrapper svw) {
       return svw.getSV();
@@ -418,8 +419,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         .toKeY(recoderVarspec);
         if (varspec == null) {
             ExtList l = collectChildren(recoderVarspec);
-            ProgramElement pv 
-               = ProgramSVSort.VARIABLE.getSVWithSort(l, 
+            ProgramElement pv
+               = ProgramSVSort.VARIABLE.getSVWithSort(l,
             					      ProgramElementName.class);
             if (pv instanceof ProgramElementName) { // sth. like #type i;
                 KeYJavaType kjt = new KeYJavaType(typeSVType);
@@ -439,6 +440,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      * convert a recoder TypeReference to a KeY TypeReference (checks dimension
      * and hands it over)
      */
+    @Override
     public TypeReference convert(recoder.java.reference.TypeReference tr) {
         recoder.java.reference.ReferencePrefix rp = tr.getReferencePrefix();
 
@@ -550,7 +552,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
 
     /**
      * converts a For.
-     * 
+     *
      * @param f
      *            the For of recoder
      * @return the For of KeY

@@ -75,20 +75,6 @@ public final class DropEffectlessElementariesCondition
                 //@formatter:on
                 return null;
             }
-            /*
-             * TODO (DS, 2019-01-03): Dropped this since it's too restrictive;
-             * however, we have to add special treatment for the allLocs
-             * location set, which has to prevent dropping *anything*!
-             */
-            //@formatter:off
-            // else if (containsNonRigidFunctionSymbols(target)) {
-            //     /*
-            //      * (DS) Special case introduced for non-rigid abstract path
-            //      * conditions arising from abstract execution.
-            //      */
-            //     return null;
-            // }
-            //@formatter:on
             else {
                 /*
                  * In the standard case, we can drop the update here. However,
