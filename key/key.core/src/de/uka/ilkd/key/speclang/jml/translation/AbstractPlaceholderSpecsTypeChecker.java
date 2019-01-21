@@ -31,6 +31,7 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory.ContractClauses;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -233,16 +234,8 @@ public class AbstractPlaceholderSpecsTypeChecker {
     private List<Pair<? extends Operator, Boolean>> getDeclsFromAbstrPlaceholderStmt(
             AbstractPlaceholderStatement aps) {
         final TypeConverter typeConverter = services.getTypeConverter();
-        final List<BlockContract> contracts = services
-                .getSpecificationRepository()
-                .getAbstractPlaceholderStatementContracts(aps).stream()
-                .filter(contract -> contract.getBaseName()
-                        .equals("JML block contract"))
-                /*
-                 * We exclude return_behavior etc. here, because from those
-                 * contracts we only consider the precondition.
-                 */
-                .collect(Collectors.toList());
+        final List<BlockContract> contracts = //
+                AbstractExecutionUtils.getNoBehaviorContracts(aps, services);
 
         /* At this point, there should at most be one contract... */
 

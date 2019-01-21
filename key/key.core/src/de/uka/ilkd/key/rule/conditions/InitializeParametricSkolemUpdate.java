@@ -23,6 +23,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -33,8 +34,7 @@ import de.uka.ilkd.key.util.Pair;
  *
  * @author Dominic Steinhöfel
  */
-public class InitializeParametricSkolemUpdate extends
-        InitializeParametricSkolemConstructsForAE implements VariableCondition {
+public class InitializeParametricSkolemUpdate implements VariableCondition {
     private final SchemaVariable updateSV;
     private final ProgramSV abstrProgSV;
 
@@ -59,7 +59,7 @@ public class InitializeParametricSkolemUpdate extends
         final TermBuilder tb = services.getTermBuilder();
 
         final Pair<Term, Term> accessibleAndAssignableClause = //
-                getAccessibleAndAssignableTerms(abstrStmt, svInst, services);
+                AbstractExecutionUtils.getAccessibleAndAssignableTerms(abstrStmt, svInst, services);
         final Term accessibleClause = accessibleAndAssignableClause.first;
         final Term assignableClause = accessibleAndAssignableClause.second;
 

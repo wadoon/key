@@ -43,6 +43,7 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 public final class DropEffectlessElementariesCondition
@@ -305,16 +306,8 @@ public final class DropEffectlessElementariesCondition
                 AbstractPlaceholderStatement aps) {
             final TypeConverter typeConverter = services.getTypeConverter();
 
-            final List<BlockContract> contracts = services
-                    .getSpecificationRepository()
-                    .getAbstractPlaceholderStatementContracts(aps).stream()
-                    .filter(contract -> contract.getBaseName()
-                            .equals("JML block contract"))
-                    /*
-                     * We exclude return_behavior etc. here, because from those
-                     * contracts we only consider the precondition.
-                     */
-                    .collect(Collectors.toList());
+            final List<BlockContract> contracts = //
+                    AbstractExecutionUtils.getNoBehaviorContracts(aps, services);
 
             if (contracts.isEmpty()) {
                 return Collections.singletonList(

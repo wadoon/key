@@ -32,6 +32,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.util.AbstractExecutionUtils;
 
 /**
  * Instantiates a parametric skolem path condition for abstract execution. The
@@ -41,8 +42,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  *
  * @author Dominic Steinhöfel
  */
-public class InitializeParametricSkolemPathCondition extends
-        InitializeParametricSkolemConstructsForAE implements VariableCondition {
+public class InitializeParametricSkolemPathCondition implements VariableCondition {
     private final SchemaVariable pathCondSV;
     private final ProgramSV abstrProgSV;
     private final ProgramSV excSV;
@@ -91,8 +91,9 @@ public class InitializeParametricSkolemPathCondition extends
 
         final TermBuilder tb = services.getTermBuilder();
 
-        Term accessibleClause = getAccessibleAndAssignableTerms(abstrStmt,
-                svInst, services).first;
+        Term accessibleClause = AbstractExecutionUtils
+                .getAccessibleAndAssignableTerms(abstrStmt, svInst,
+                        services).first;
 
         final List<ProgramSV> varsToConsider = new ArrayList<>();
         varsToConsider.add(excSV);

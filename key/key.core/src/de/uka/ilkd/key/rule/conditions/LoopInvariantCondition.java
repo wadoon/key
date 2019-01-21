@@ -13,12 +13,10 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -59,8 +57,8 @@ public class LoopInvariantCondition implements VariableCondition {
 
     private static Term createLocalAnonUpdate(
             ImmutableSet<ProgramVariable> localOuts, Services services) {
-        Term anonUpdate = null;
         final TermBuilder tb = services.getTermBuilder();
+        Term anonUpdate = tb.skip();
         for (ProgramVariable pv : localOuts) {
             final Name anonFuncName = new Name(
                     tb.newName(pv.name().toString()));
@@ -69,12 +67,7 @@ public class LoopInvariantCondition implements VariableCondition {
             services.getNamespaces().functions().addSafely(anonFunc);
             final Term elemUpd = tb.elementary((LocationVariable) pv,
                     tb.func(anonFunc));
-            if (anonUpdate == null) {
-                anonUpdate = elemUpd;
-            }
-            else {
-                anonUpdate = tb.parallel(anonUpdate, elemUpd);
-            }
+            anonUpdate = tb.parallel(anonUpdate, elemUpd);
         }
         return anonUpdate;
     }
