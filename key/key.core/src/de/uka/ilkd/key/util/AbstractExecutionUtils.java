@@ -39,6 +39,61 @@ public class AbstractExecutionUtils {
      *            The context program (for choosing the "right" contract).
      * @param services
      *            The {@link Services} object.
+     * @return The accessible {@link Operator}s for the given
+     *         {@link AbstractPlaceholderStatement}.
+     */
+    public static List<Operator> getAccessibleOpsForNoBehaviorContract(
+            AbstractPlaceholderStatement aps, ProgramElement context,
+            Services services) {
+        final Term assignableTerm = AbstractExecutionUtils
+                .getAccessibleAndAssignableTermsForNoBehaviorContract(aps,
+                        context, services).first;
+        final Sort locSetSort = //
+                services.getTypeConverter().getLocSetLDT().targetSort();
+
+        final OpCollector opColl = new OpCollector();
+        assignableTerm.execPostOrder(opColl);
+        return opColl.ops().stream()
+                .filter(op -> op instanceof ProgramVariable
+                        || (op instanceof Function && op.arity() == 0
+                                && ((Function) op).sort() == locSetSort))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the accessible {@ProgramVariable}s of the "right" no-behavior
+     * contract for the given {@link AbstractPlaceholderStatement}.
+     *
+     * @param aps
+     *            The {@link AbstractPlaceholderStatement} for which to return
+     *            the accessible {@link ProgramVariable}s.
+     * @param context
+     *            The context program (for choosing the "right" contract).
+     * @param services
+     *            The {@link Services} object.
+     * @return The accessible {@link ProgramVariable}s for the given
+     *         {@link AbstractPlaceholderStatement}.
+     */
+    public static List<ProgramVariable> getAccessibleProgVarsForNoBehaviorContract(
+            AbstractPlaceholderStatement aps, ProgramElement context,
+            Services services) {
+        return getAccessibleOpsForNoBehaviorContract(aps, context, services)
+                .stream().filter(op -> op instanceof ProgramVariable)
+                .map(ProgramVariable.class::cast).collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the assignable {@link Operator}s (i.e. {@ProgramVariable}s and
+     * Skolem location sets) of the "right" no-behavior contract for the given
+     * {@link AbstractPlaceholderStatement}.
+     *
+     * @param aps
+     *            The {@link AbstractPlaceholderStatement} for which to return
+     *            the assignable {@link Operator}s.
+     * @param context
+     *            The context program (for choosing the "right" contract).
+     * @param services
+     *            The {@link Services} object.
      * @return The assignable {@link Operator}s for the given
      *         {@link AbstractPlaceholderStatement}.
      */

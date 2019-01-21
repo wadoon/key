@@ -657,8 +657,11 @@ public final class MiscTools {
         private ImmutableSet<ProgramVariable> declaredPVs = DefaultImmutableSet
                 .<ProgramVariable> nil();
 
+        private final ProgramElement root;
+
         public ReadPVCollector(ProgramElement root, Services services) {
             super(root, services);
+            this.root = root;
         }
 
         @Override
@@ -667,6 +670,17 @@ public final class MiscTools {
                 ProgramVariable pv = (ProgramVariable) node;
                 if (!pv.isMember() && !declaredPVs.contains(pv)) {
                     result = result.add(pv);
+                }
+            }
+            else if (node instanceof AbstractPlaceholderStatement) {
+                final AbstractPlaceholderStatement aps = (AbstractPlaceholderStatement) node;
+
+                for (final ProgramVariable pv : AbstractExecutionUtils
+                        .getAccessibleProgVarsForNoBehaviorContract(aps, root,
+                                services)) {
+                    if (!pv.isMember() && !declaredPVs.contains(pv)) {
+                        result = result.add(pv);
+                    }
                 }
             }
             else if (node instanceof VariableSpecification) {
