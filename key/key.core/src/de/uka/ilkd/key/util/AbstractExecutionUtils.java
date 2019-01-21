@@ -12,7 +12,11 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
@@ -23,6 +27,61 @@ import de.uka.ilkd.key.speclang.BlockContract;
  * @author Dominic Steinhoefel
  */
 public class AbstractExecutionUtils {
+    /**
+     * Returns the assignable {@link Operator}s (i.e. {@ProgramVariable}s and
+     * Skolem location sets) of the "right" no-behavior contract for the given
+     * {@link AbstractPlaceholderStatement}.
+     *
+     * @param aps
+     *            The {@link AbstractPlaceholderStatement} for which to return
+     *            the assignable {@link Operator}s.
+     * @param context
+     *            The context program (for choosing the "right" contract).
+     * @param services
+     *            The {@link Services} object.
+     * @return The assignable {@link Operator}s for the given
+     *         {@link AbstractPlaceholderStatement}.
+     */
+    public static List<Operator> getAssignableOpsForNoBehaviorContract(
+            AbstractPlaceholderStatement aps, ProgramElement context,
+            Services services) {
+        final Term assignableTerm = AbstractExecutionUtils
+                .getAccessibleAndAssignableTermsForNoBehaviorContract(aps,
+                        context, services).second;
+        final Sort locSetSort = //
+                services.getTypeConverter().getLocSetLDT().targetSort();
+
+        final OpCollector opColl = new OpCollector();
+        assignableTerm.execPostOrder(opColl);
+        return opColl.ops().stream()
+                .filter(op -> op instanceof ProgramVariable
+                        || (op instanceof Function && op.arity() == 0
+                                && ((Function) op).sort() == locSetSort))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the assignable {@ProgramVariable}s of the "right" no-behavior
+     * contract for the given {@link AbstractPlaceholderStatement}.
+     *
+     * @param aps
+     *            The {@link AbstractPlaceholderStatement} for which to return
+     *            the assignable {@link ProgramVariable}s.
+     * @param context
+     *            The context program (for choosing the "right" contract).
+     * @param services
+     *            The {@link Services} object.
+     * @return The assignable {@link ProgramVariable}s for the given
+     *         {@link AbstractPlaceholderStatement}.
+     */
+    public static List<ProgramVariable> getAssignableProgVarsForNoBehaviorContract(
+            AbstractPlaceholderStatement aps, ProgramElement context,
+            Services services) {
+        return getAssignableOpsForNoBehaviorContract(aps, context, services)
+                .stream().filter(op -> op instanceof ProgramVariable)
+                .map(ProgramVariable.class::cast).collect(Collectors.toList());
+    }
+
     /**
      * Selects, amongst a given list of {@link BlockContract}s, the matching one
      * for the current context. Note that the current implementation is quite
@@ -55,8 +114,8 @@ public class AbstractExecutionUtils {
      *
      * @param contracts
      *            The list of contracts for the placeholder statement.
-     * @param svInst
-     *            The {@link SVInstantiations}.
+     * @param contextProgram
+     *            The context program (for choosing the right contract).
      * @param heap
      *            The heap term.
      * @param services
@@ -123,15 +182,15 @@ public class AbstractExecutionUtils {
      *            The {@link AbstractPlaceholderStatement} for which to extract
      *            the accessible and assignable clause.
      * @param svInst
-     *            The current {@link SVInstantiations} (for the context).
+     *            The current context program (for choosing the right contract).
      * @param services
      *            The {@link Services} object.
      * @return A pair of (1) the accessible and (2) the assignable clause for
      *         the {@link AbstractPlaceholderStatement}.
      */
-    public static Pair<Term, Term> getAccessibleAndAssignableTerms(
+    public static Pair<Term, Term> getAccessibleAndAssignableTermsForNoBehaviorContract(
             final AbstractPlaceholderStatement abstrStmt,
-            final SVInstantiations svInst, final Services services) {
+            final ProgramElement contextProgram, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         Term accessibleClause;
@@ -150,8 +209,8 @@ public class AbstractExecutionUtils {
             final LocationVariable heap = services.getTypeConverter()
                     .getHeapLDT().getHeap();
 
-            final BlockContract contract = findRightContract(contracts, svInst,
-                    heap, services);
+            final BlockContract contract = findRightContract(contracts,
+                    contextProgram, heap, services);
 
             accessibleClause = contract.getAccessibleClause(heap);
             assignableClause = contract.getAssignable(heap);
@@ -163,6 +222,29 @@ public class AbstractExecutionUtils {
         }
 
         return new Pair<Term, Term>(accessibleClause, assignableClause);
+    }
+
+    /**
+     * Extracts the accessible and assignable term for the given
+     * {@link AbstractPlaceholderStatement} based on the current context from
+     * the {@link SpecificationRepository}. The default for both is allLocs
+     * (everything assignable and accessible).
+     *
+     * @param abstrStmt
+     *            The {@link AbstractPlaceholderStatement} for which to extract
+     *            the accessible and assignable clause.
+     * @param svInst
+     *            The current {@link SVInstantiations} (for the context).
+     * @param services
+     *            The {@link Services} object.
+     * @return A pair of (1) the accessible and (2) the assignable clause for
+     *         the {@link AbstractPlaceholderStatement}.
+     */
+    public static Pair<Term, Term> getAccessibleAndAssignableTermsForNoBehaviorContract(
+            final AbstractPlaceholderStatement abstrStmt,
+            final SVInstantiations svInst, final Services services) {
+        return getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt,
+                svInst.getContextInstantiation().contextProgram(), services);
     }
 
     /**

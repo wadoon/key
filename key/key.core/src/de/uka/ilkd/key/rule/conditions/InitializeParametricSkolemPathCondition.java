@@ -92,7 +92,7 @@ public class InitializeParametricSkolemPathCondition implements VariableConditio
         final TermBuilder tb = services.getTermBuilder();
 
         Term accessibleClause = AbstractExecutionUtils
-                .getAccessibleAndAssignableTerms(abstrStmt, svInst,
+                .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt, svInst,
                         services).first;
 
         final List<ProgramSV> varsToConsider = new ArrayList<>();

@@ -16,7 +16,11 @@ package de.uka.ilkd.key.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.key_project.util.collection.DefaultImmutableSet;
@@ -33,6 +37,7 @@ import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
@@ -106,8 +111,8 @@ public final class MiscTools {
 
     public static ImmutableSet<Pair<Sort, IObserverFunction>> collectObservers(
             Term t) {
-        ImmutableSet<Pair<Sort, IObserverFunction>> result =
-                DefaultImmutableSet.nil();
+        ImmutableSet<Pair<Sort, IObserverFunction>> result = DefaultImmutableSet
+                .nil();
         if (t.op() instanceof IObserverFunction) {
             final IObserverFunction obs = (IObserverFunction) t.op();
             final Sort s = obs.isStatic() ? obs.getContainerType().getSort()
@@ -256,8 +261,8 @@ public final class MiscTools {
         final List<String> origFileNameSections = disectFilename(origFilename);
         String[] a = origFileNameSections
                 .toArray(new String[origFileNameSections.size()]);
-        final List<String> destinationFilenameSections =
-                disectFilename(toFilename);
+        final List<String> destinationFilenameSections = disectFilename(
+                toFilename);
         String[] b = destinationFilenameSections
                 .toArray(new String[destinationFilenameSections.size()]);
 
@@ -625,8 +630,8 @@ public final class MiscTools {
             outer: do {
                 if (node.getRenamingTable() != null) {
                     for (RenamingTable rt : node.getRenamingTable()) {
-                        ProgramVariable renamedVar =
-                                (ProgramVariable) rt.getRenaming(actualVar);
+                        ProgramVariable renamedVar = (ProgramVariable) rt
+                                .getRenaming(actualVar);
                         if (renamedVar != null || !node.getLocalProgVars()
                                 .contains(actualVar)) {
                             actualVar = renamedVar;
@@ -646,11 +651,11 @@ public final class MiscTools {
     // -------------------------------------------------------------------------
 
     private static final class ReadPVCollector extends JavaASTVisitor {
-        private ImmutableSet<ProgramVariable> result =
-                DefaultImmutableSet.<ProgramVariable> nil();
+        private ImmutableSet<ProgramVariable> result = DefaultImmutableSet
+                .<ProgramVariable> nil();
 
-        private ImmutableSet<ProgramVariable> declaredPVs =
-                DefaultImmutableSet.<ProgramVariable> nil();
+        private ImmutableSet<ProgramVariable> declaredPVs = DefaultImmutableSet
+                .<ProgramVariable> nil();
 
         public ReadPVCollector(ProgramElement root, Services services) {
             super(root, services);
@@ -681,14 +686,17 @@ public final class MiscTools {
     }
 
     private static final class WrittenPVCollector extends JavaASTVisitor {
-        private ImmutableSet<ProgramVariable> result =
-                DefaultImmutableSet.<ProgramVariable> nil();
+        private ImmutableSet<ProgramVariable> result = //
+                DefaultImmutableSet.nil();
 
-        private ImmutableSet<ProgramVariable> declaredPVs =
-                DefaultImmutableSet.<ProgramVariable> nil();
+        private ImmutableSet<ProgramVariable> declaredPVs = //
+                DefaultImmutableSet.nil();
+
+        private final ProgramElement root;
 
         public WrittenPVCollector(ProgramElement root, Services services) {
             super(root, services);
+            this.root = root;
         }
 
         @Override
@@ -697,6 +705,17 @@ public final class MiscTools {
                 ProgramElement lhs = ((Assignment) node).getChildAt(0);
                 if (lhs instanceof ProgramVariable) {
                     ProgramVariable pv = (ProgramVariable) lhs;
+                    if (!pv.isMember() && !declaredPVs.contains(pv)) {
+                        result = result.add(pv);
+                    }
+                }
+            }
+            else if (node instanceof AbstractPlaceholderStatement) {
+                final AbstractPlaceholderStatement aps = (AbstractPlaceholderStatement) node;
+
+                for (final ProgramVariable pv : AbstractExecutionUtils
+                        .getAssignableProgVarsForNoBehaviorContract(aps, root,
+                                services)) {
                     if (!pv.isMember() && !declaredPVs.contains(pv)) {
                         result = result.add(pv);
                     }
