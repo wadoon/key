@@ -39,6 +39,7 @@ public final class StrategyProperties extends Properties {
                 "LOOP_EXPAND_BOUNDED"; //Used for test generation chrisg
     public static final String LOOP_INVARIANT = "LOOP_INVARIANT";
     public static final String LOOP_SCOPE_INVARIANT = "LOOP_SCOPE_INVARIANT";
+    public static final String LOOP_INVARIANT_TACLETS = "LOOP_INVARIANT_TACLETS";
     public static final String LOOP_NONE = "LOOP_NONE";
 
     public static final String BLOCK_OPTIONS_KEY = "BLOCK_OPTIONS_KEY";
@@ -175,7 +176,7 @@ public final class StrategyProperties extends Properties {
         SPLITTING_OPTIONS_KEY, SPLITTING_NORMAL, SPLITTING_OFF,
         SPLITTING_DELAYED,
         LOOP_OPTIONS_KEY, LOOP_EXPAND, LOOP_EXPAND_BOUNDED, LOOP_INVARIANT,
-        LOOP_SCOPE_INVARIANT, LOOP_NONE,
+        LOOP_SCOPE_INVARIANT, LOOP_INVARIANT_TACLETS, LOOP_NONE,
         BLOCK_OPTIONS_KEY, BLOCK_CONTRACT_INTERNAL, BLOCK_CONTRACT_EXTERNAL,
         BLOCK_EXPAND, BLOCK_NONE,
         METHOD_OPTIONS_KEY, METHOD_EXPAND, METHOD_CONTRACT, METHOD_NONE,
@@ -409,6 +410,7 @@ public final class StrategyProperties extends Properties {
     }
 
 
+    @Override
     public String getProperty(String key) {
         String val = super.getProperty(key);
         if (val != null) {
@@ -469,6 +471,7 @@ public final class StrategyProperties extends Properties {
     }
 
 
+    @Override
     public synchronized Object clone() {
         final Properties p = (Properties) super.clone();
         final StrategyProperties sp = new StrategyProperties();
