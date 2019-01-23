@@ -43,7 +43,6 @@ import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.IGuard;
 import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
-import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
@@ -67,6 +66,7 @@ import de.uka.ilkd.key.rule.metaconstruct.EvaluateArgs;
 import de.uka.ilkd.key.rule.metaconstruct.ExpandMethodBody;
 import de.uka.ilkd.key.rule.metaconstruct.ForInitUnfoldTransformer;
 import de.uka.ilkd.key.rule.metaconstruct.ForToWhile;
+import de.uka.ilkd.key.rule.metaconstruct.ForUpdateUnfoldTransformer;
 import de.uka.ilkd.key.rule.metaconstruct.InitArrayCreation;
 import de.uka.ilkd.key.rule.metaconstruct.IsStatic;
 import de.uka.ilkd.key.rule.metaconstruct.LoopScopeInvariantTransformer;
@@ -96,8 +96,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     /**
      * the type that is used for schema variables types.
      */
-    public static KeYJavaType typeSVType 
-    	= new KeYJavaType(PrimitiveType.PROGRAM_SV, ProgramSVSort.TYPE);
+    public static KeYJavaType typeSVType = new KeYJavaType(
+            PrimitiveType.PROGRAM_SV, ProgramSVSort.TYPE);
 
     /**
      * create a new schema-recoder-to-key converter. It must be associated with
@@ -110,7 +110,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      * @param services
      *            services to be used
      */
-    public SchemaRecoder2KeYConverter(SchemaRecoder2KeY rec2key, Services services, NamespaceSet namespaceSet) {
+    public SchemaRecoder2KeYConverter(SchemaRecoder2KeY rec2key,
+            Services services, NamespaceSet namespaceSet) {
         super(rec2key, services, namespaceSet);
     }
 
@@ -120,8 +121,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      * convert a program meta construct creating a new object corresponding to
      * the name.
      * 
-     * If you add a ProgramTransformer to the system you will most propably
-     * have to register it here.
+     * If you add a ProgramTransformer to the system you will most propably have
+     * to register it here.
      */
     public ProgramTransformer convert(
             de.uka.ilkd.key.java.recoderext.RKeYMetaConstruct mc) {
@@ -130,34 +131,45 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         String mcName = mc.getName();
         list.add(callConvert(mc.getChild()));
         if ("#switch-to-if".equals(mcName)) {
-            return new SwitchToIf(list
-                    .get(SchemaVariable.class));
-        } else if ("#unwind-loop".equals(mcName)) {
+            return new SwitchToIf(list.get(SchemaVariable.class));
+        }
+        else if ("#unwind-loop".equals(mcName)) {
             final ProgramSV[] labels = mc.getSV();
-            return new UnwindLoop(labels[0], labels[1], list
-                    .get(LoopStatement.class));
-        } else if ("#unpack".equals(mcName)) {
+            return new UnwindLoop(labels[0], labels[1],
+                    list.get(LoopStatement.class));
+        }
+        else if ("#unpack".equals(mcName)) {
             return new Unpack(list.get(For.class));
-        } else if ("#forInitUnfoldTransformer".equals(mcName)) {
+        }
+        else if ("#forInitUnfoldTransformer".equals(mcName)) {
             return new ForInitUnfoldTransformer(list.get(ProgramSV.class));
-        } else if ("#loopScopeInvariantTransformer".equals(mcName)) {
-            return new LoopScopeInvariantTransformer(list.get(LoopStatement.class));
-        } else if ("#for-to-while".equals(mcName)) {
+        }
+        else if ("#forUpdateUnfoldTransformer".equals(mcName)) {
+            return new ForUpdateUnfoldTransformer(list.get(ProgramSV.class));
+        }
+        else if ("#loopScopeInvariantTransformer".equals(mcName)) {
+            return new LoopScopeInvariantTransformer(
+                    list.get(LoopStatement.class));
+        }
+        else if ("#for-to-while".equals(mcName)) {
             final ProgramSV[] labels = mc.getSV();
             return new ForToWhile(labels[0], labels[1],
-                    list.get(Statement.class));      
-        }  else if ("#enhancedfor-elim".equals(mcName)){ 
+                    list.get(Statement.class));
+        }
+        else if ("#enhancedfor-elim".equals(mcName)) {
             EnhancedFor efor = list.get(EnhancedFor.class);
-            if(efor == null)
-                throw new ConvertException("#enhancedfor-elim requires an enhanced for loop as argument");
+            if (efor == null)
+                throw new ConvertException(
+                        "#enhancedfor-elim requires an enhanced for loop as argument");
             return new EnhancedForElimination(list.get(EnhancedFor.class));
-        } else if ("#do-break".equals(mcName)) {
-            return new DoBreak(list
-                    .get(LabeledStatement.class));
-        } else if ("#expand-method-body".equals(mcName)) {
-            return new ExpandMethodBody(list
-                    .get(SchemaVariable.class));
-        } else if ("#method-call".equals(mcName)) {
+        }
+        else if ("#do-break".equals(mcName)) {
+            return new DoBreak(list.get(LabeledStatement.class));
+        }
+        else if ("#expand-method-body".equals(mcName)) {
+            return new ExpandMethodBody(list.get(SchemaVariable.class));
+        }
+        else if ("#method-call".equals(mcName)) {
             ProgramSV[] svw = mc.getSV();
             ProgramSV execSV = null;
             ProgramSV returnSV = null;
@@ -169,33 +181,37 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
                     execSV = svw[i];
                 }
             }
-            return new MethodCall(execSV, returnSV, list
-        	    .get(Expression.class));
-        } else if ("#evaluate-arguments".equals(mcName)) {
+            return new MethodCall(execSV, returnSV, list.get(Expression.class));
+        }
+        else if ("#evaluate-arguments".equals(mcName)) {
             return new EvaluateArgs(list.get(Expression.class));
-        } else if ("#constructor-call".equals(mcName)) {
+        }
+        else if ("#constructor-call".equals(mcName)) {
             return new ConstructorCall(mc.getFirstSV().getSV(),
                     list.get(Expression.class));
-        } else if ("#special-constructor-call".equals(mcName)) {
-            return new SpecialConstructorCall(list
-                    .get(Expression.class));
-        } else if ("#post-work".equals(mcName)) {
+        }
+        else if ("#special-constructor-call".equals(mcName)) {
+            return new SpecialConstructorCall(list.get(Expression.class));
+        }
+        else if ("#post-work".equals(mcName)) {
             return new PostWork(list.get(SchemaVariable.class));
-        } else if ("#static-initialisation".equals(mcName)) {
-            return new StaticInitialisation(list
-                    .get(Expression.class));
-        } else if ("#resolve-multiple-var-decl".equals(mcName)) {
-            return new MultipleVarDecl(list
-                    .get(SchemaVariable.class));
-        } else if ("#array-post-declaration".equals(mcName)) {
-            return new ArrayPostDecl(list
-                    .get(SchemaVariable.class));
-        } else if ("#init-array-creation".equals(mcName)) {
+        }
+        else if ("#static-initialisation".equals(mcName)) {
+            return new StaticInitialisation(list.get(Expression.class));
+        }
+        else if ("#resolve-multiple-var-decl".equals(mcName)) {
+            return new MultipleVarDecl(list.get(SchemaVariable.class));
+        }
+        else if ("#array-post-declaration".equals(mcName)) {
+            return new ArrayPostDecl(list.get(SchemaVariable.class));
+        }
+        else if ("#init-array-creation".equals(mcName)) {
             return new InitArrayCreation(mc.getFirstSV().getSV(),
                     list.get(Expression.class));
-        } else {
-            throw new ConvertException("Program meta construct "
-                    + mc.toString() + " unknown.");
+        }
+        else {
+            throw new ConvertException(
+                    "Program meta construct " + mc.toString() + " unknown.");
         }
     }
 
@@ -211,13 +227,16 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         list.add(callConvert(mc.getChild()));
         if ("#create-object".equals(mcName)) {
             return new CreateObject(list.get(Expression.class));
-        } else if ("#isstatic".equals(mc.getName())) {
+        }
+        else if ("#isstatic".equals(mc.getName())) {
             return new IsStatic(list.get(Expression.class));
-        } else if ("#length-reference".equals(mcName)) {
+        }
+        else if ("#length-reference".equals(mcName)) {
             return new ArrayLength(list.get(Expression.class));
-        } else {
-            throw new ConvertException("Program meta construct "
-                    + mc.toString() + " unknown.");
+        }
+        else {
+            throw new ConvertException(
+                    "Program meta construct " + mc.toString() + " unknown.");
         }
     }
 
@@ -232,27 +251,30 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         list.add(callConvert(mc.getChild()));
         if ("#typeof".equals(mc.getName0())) {
             return new TypeOf(list.get(Expression.class));
-        } else {
-            throw new ConvertException("Program meta construct "
-                    + mc.toString() + " unknown.");
+        }
+        else {
+            throw new ConvertException(
+                    "Program meta construct " + mc.toString() + " unknown.");
         }
     }
 
     /**
      * method-call-statements are expanded to method-frames
      */
-    public MethodFrame convert(de.uka.ilkd.key.java.recoderext.RMethodCallStatement l) {
+    public MethodFrame convert(
+            de.uka.ilkd.key.java.recoderext.RMethodCallStatement l) {
         ProgramVariableSVWrapper svw = l.getVariableSV();
-        return new MethodFrame((IProgramVariable) (svw != null ? svw.getSV()
-                : null), (IExecutionContext) callConvert(l
-                        .getExecutionContext()), (StatementBlock) callConvert(l
-                                .getBody()));
+        return new MethodFrame(
+                (IProgramVariable) (svw != null ? svw.getSV() : null),
+                (IExecutionContext) callConvert(l.getExecutionContext()),
+                (StatementBlock) callConvert(l.getBody()));
     }
 
     public LoopScopeBlock convert(
             de.uka.ilkd.key.java.recoderext.LoopScopeBlock l) {
         return new LoopScopeBlock(
-                (de.uka.ilkd.key.logic.op.IProgramVariable) callConvert(l.getIndexPV()),
+                (de.uka.ilkd.key.logic.op.IProgramVariable) callConvert(
+                        l.getIndexPV()),
                 (StatementBlock) callConvert(l.getBody()));
     }
 
@@ -262,17 +284,18 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     public MethodBodyStatement convert(
             de.uka.ilkd.key.java.recoderext.RMethodBodyStatement l) {
         final IProgramVariable resVar = l.getResultVar() == null ? null
-                : (IProgramVariable)l.getResultVar().getSV();
+                : (IProgramVariable) l.getResultVar().getSV();
 
         final TypeReference tr;
         if (l.getBodySource() instanceof TypeSVWrapper) {
             tr = (TypeReference) ((TypeSVWrapper) l.getBodySource()).getSV();
-        } else {
+        }
+        else {
             tr = convert(l.getBodySource());
         }
 
-        return new MethodBodyStatement(tr, resVar, convert(l
-                .getMethodReference()));
+        return new MethodBodyStatement(tr, resVar,
+                convert(l.getMethodReference()));
     }
 
     /**
@@ -283,8 +306,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         ExtList children = collectChildren(csb);
         return new ContextStatementBlock(children,
                 csb.getExecutionContext() == null ? null
-                        : (IExecutionContext) callConvert(csb
-                                .getExecutionContext()));
+                        : (IExecutionContext) callConvert(
+                                csb.getExecutionContext()));
     }
 
     /**
@@ -292,9 +315,12 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      */
     public ExecutionContext convert(
             de.uka.ilkd.key.java.recoderext.ExecutionContext ec) {
-        return new ExecutionContext((TypeReference) callConvert(ec.getTypeReference()), 
-                                    (IProgramMethod) callConvert(ec.getMethodContext()),
-				                        ec.getRuntimeInstance()!=null? (ReferencePrefix)callConvert(ec.getRuntimeInstance()) : null);
+        return new ExecutionContext(
+                (TypeReference) callConvert(ec.getTypeReference()),
+                (IProgramMethod) callConvert(ec.getMethodContext()),
+                ec.getRuntimeInstance() != null
+                        ? (ReferencePrefix) callConvert(ec.getRuntimeInstance())
+                        : null);
     }
 
     // ----- Schema Variables
@@ -315,17 +341,17 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             de.uka.ilkd.key.java.recoderext.LabelSVWrapper svw) {
         return svw.getSV();
     }
-    
+
     public MergePointStatement convert(
             de.uka.ilkd.key.java.recoderext.MergePointStatement l) {
         return new MergePointStatement(
                 (IProgramVariable) callConvert(l.getChildAt(0)));
     }
-    
+
     public SchemaVariable convert(
-          de.uka.ilkd.key.java.recoderext.MethodSignatureSVWrapper svw) {
-      return svw.getSV();
-  }
+            de.uka.ilkd.key.java.recoderext.MethodSignatureSVWrapper svw) {
+        return svw.getSV();
+    }
 
     public SchemaVariable convert(
             de.uka.ilkd.key.java.recoderext.TypeSVWrapper svw) {
@@ -368,15 +394,15 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     public LocalVariableDeclaration convert(
             recoder.java.declaration.LocalVariableDeclaration lvd) {
         if (lvd.getTypeReference() instanceof TypeSVWrapper) {
-            List<recoder.java.declaration.VariableSpecification> rspecs = lvd.getVariables();
+            List<recoder.java.declaration.VariableSpecification> rspecs = lvd
+                    .getVariables();
             VariableSpecification[] varspecs = new VariableSpecification[rspecs
-                                                                         .size()];
+                    .size()];
             for (int i = 0; i < rspecs.size(); i++) {
-                varspecs[i] = convertVarSpecWithSVType(rspecs
-                        .get(i));
+                varspecs[i] = convertVarSpecWithSVType(rspecs.get(i));
             }
             SchemaVariable typesv = ((TypeSVWrapper) lvd.getTypeReference())
-            .getSV();
+                    .getSV();
 
             List<recoder.java.declaration.Modifier> mods = lvd.getModifiers();
             Modifier[] modifiers = new Modifier[mods == null ? 0 : mods.size()];
@@ -386,7 +412,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
 
             return new LocalVariableDeclaration(modifiers, (ProgramSV) typesv,
                     varspecs);
-        } else {
+        }
+        else {
             // otherwise use the default case
             return super.convert(lvd);
         }
@@ -398,12 +425,11 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
     protected VariableSpecification convertVarSpecWithSVType(
             recoder.java.declaration.VariableSpecification recoderVarspec) {
         VariableSpecification varspec = (VariableSpecification) getMapping()
-        .toKeY(recoderVarspec);
+                .toKeY(recoderVarspec);
         if (varspec == null) {
             ExtList l = collectChildren(recoderVarspec);
-            ProgramElement pv 
-               = ProgramSVSort.VARIABLE.getSVWithSort(l, 
-            					      ProgramElementName.class);
+            ProgramElement pv = ProgramSVSort.VARIABLE.getSVWithSort(l,
+                    ProgramElementName.class);
             if (pv instanceof ProgramElementName) { // sth. like #type i;
                 KeYJavaType kjt = new KeYJavaType(typeSVType);
                 pv = new LocationVariable((ProgramElementName) pv, kjt);
@@ -431,31 +457,34 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             if (prefix == null) {
                 result = new recoder.java.reference.PackageReference(
                         ((recoder.java.reference.UncollatedReferenceQualifier) rp)
-                        .getIdentifier());
+                                .getIdentifier());
                 prefix = result;
-            } else {
+            }
+            else {
                 recoder.java.reference.PackageReference prefix2 = new recoder.java.reference.PackageReference(
                         ((recoder.java.reference.UncollatedReferenceQualifier) rp)
-                        .getIdentifier());
+                                .getIdentifier());
                 prefix.setReferencePrefix(prefix2);
                 prefix = prefix2;
             }
 
             if (rp instanceof recoder.java.reference.ReferenceSuffix) {
                 rp = ((recoder.java.reference.ReferenceSuffix) rp)
-                .getReferencePrefix();
-            } else {
+                        .getReferencePrefix();
+            }
+            else {
                 rp = null;
             }
         }
 
         // there is no explicit PackageReference convert method
         // but the cast is safe.
-        PackageReference packref = result != null ? (PackageReference) convert(result)
+        PackageReference packref = result != null
+                ? (PackageReference) convert(result)
                 : null;
 
-        return new SchemaTypeReference(new ProgramElementName(tr.getName()), tr
-                .getDimensions(), packref);
+        return new SchemaTypeReference(new ProgramElementName(tr.getName()),
+                tr.getDimensions(), packref);
     }
 
     /**
@@ -464,16 +493,17 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
      */
     public VariableSpecification convert(
             recoder.java.declaration.VariableSpecification recoderVarspec) {
-        if (!(recoderVarspec.getIdentifier() instanceof ProgramVariableSVWrapper)) {
+        if (!(recoderVarspec
+                .getIdentifier() instanceof ProgramVariableSVWrapper)) {
             return super.convert(recoderVarspec);
         }
         VariableSpecification varSpec = (VariableSpecification) getMapping()
-        .toKeY(recoderVarspec);
+                .toKeY(recoderVarspec);
         if (varSpec == null) {
 
             ExtList children = collectChildren(recoderVarspec);
             IProgramVariable progvar = (IProgramVariable) children
-            .get(SchemaVariable.class);
+                    .get(SchemaVariable.class);
 
             children.remove(progvar);
             varSpec = new VariableSpecification(children, progvar,
@@ -489,7 +519,8 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         if (fr.getReferencePrefix() != null) {
             prefix = (ReferencePrefix) callConvert(fr.getReferencePrefix());
         }
-        SchemaVariable suffix = (SchemaVariable) callConvert(fr.getIdentifier());
+        SchemaVariable suffix = (SchemaVariable) callConvert(
+                fr.getIdentifier());
 
         return new SchematicFieldReference(suffix, prefix);
     }
@@ -500,13 +531,15 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         if (mr.getReferencePrefix() instanceof recoder.java.reference.UncollatedReferenceQualifier) {
             // type references would be allowed
             final recoder.java.reference.UncollatedReferenceQualifier uncoll = (recoder.java.reference.UncollatedReferenceQualifier) mr
-            .getReferencePrefix();
-            prefix = convert(new recoder.java.reference.TypeReference(uncoll
-                    .getReferencePrefix(), uncoll.getIdentifier()));
-        } else {
+                    .getReferencePrefix();
+            prefix = convert(new recoder.java.reference.TypeReference(
+                    uncoll.getReferencePrefix(), uncoll.getIdentifier()));
+        }
+        else {
             if (mr.getReferencePrefix() != null) {
                 prefix = (ReferencePrefix) callConvert(mr.getReferencePrefix());
-            } else {
+            }
+            else {
                 prefix = null;
             }
         }
@@ -518,14 +551,16 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         final Expression[] keyArgs;
         if (recoderArgs != null) {
             keyArgs = new Expression[recoderArgs.size()];
-        } else {
+        }
+        else {
             keyArgs = new Expression[0];
         }
         for (int i = 0, sz = keyArgs.length; i < sz; i++) {
             keyArgs[i] = (Expression) callConvert(recoderArgs.get(i));
         }
 
-        return new MethodReference(new ImmutableArray<Expression>(keyArgs), name, prefix);
+        return new MethodReference(new ImmutableArray<Expression>(keyArgs),
+                name, prefix);
     }
 
     /**
@@ -539,34 +574,32 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         ILoopInit li;
         IForUpdates ifu;
         IGuard iGuard;
-        if (f.getInitializers() != null
-                && f.getInitializers().get(0)
-                        instanceof de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) {
-            de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper esvw =
-                    (de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) f
+        if (f.getInitializers() != null && f.getInitializers().get(
+                0) instanceof de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) {
+            de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper esvw = (de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) f
                     .getInitializers().get(0); // brrrr!
             li = (ProgramSV) esvw.getSV();
-        } else {
+        }
+        else {
             li = convertLoopInitializers(f);
         }
 
         if (f.getGuard() instanceof de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) {
-            de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper esvw =
-                    (de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) f
+            de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper esvw = (de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) f
                     .getGuard();
             iGuard = (ProgramSV) esvw.getSV();
-        } else {
+        }
+        else {
             iGuard = convertGuard(f);
         }
 
-        if (f.getUpdates() != null
-                && f.getUpdates().get(0)
-                        instanceof de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) {
-            de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper esvw =
-                    (de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) f
+        if (f.getUpdates() != null && f.getUpdates().get(
+                0) instanceof de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) {
+            de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper esvw = (de.uka.ilkd.key.java.recoderext.ExpressionSVWrapper) f
                     .getUpdates().get(0);
             ifu = (ProgramSV) esvw.getSV();
-        } else {
+        }
+        else {
             ifu = convertUpdates(f);
         }
 

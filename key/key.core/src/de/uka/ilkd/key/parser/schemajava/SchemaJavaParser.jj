@@ -592,6 +592,7 @@ TOKEN :
 		    | < SWITCHTOIF: "#switch-to-if" >
 		    | < UNPACK: "#unpack" >
 		    | < FORINITUNFOLDTRANSFORMER: "#forInitUnfoldTransformer" >
+		    | < FORUPDATEUNFOLDTRANSFORMER: "#forUpdateUnfoldTransformer" >
 		    | < LOOPSCOPEINVARIANTTRANSFORMER: "#loopScopeInvariantTransformer" >
 		    | < SET: "#set" >
 		    }
@@ -4142,11 +4143,12 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
     TypeCast typeCast;
     LabeledStatement labStat;
     Statement stat;
-    Expression methRef, consRef, activeAccess;
+    Expression methRef, consRef, activeAccess, guard;
     ProgramVariableSVWrapper sv = null;
     ExecCtxtSVWrapper execsv = null;
     JumpLabelSVWrapper innerLabel, outerLabel;
     ASTList<LoopInitializer> loopInit;
+    ASTList<Expression> forUpdate;
 }
 { (
    "#unwind-loop" "("
@@ -4195,6 +4197,17 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
        setPrefixInfo(result);
        result.setChild(loopInit.get(0));  
        result.setName("#forInitUnfoldTransformer");
+       return result; 
+   }
+   )
+   |
+   (
+    <FORUPDATEUNFOLDTRANSFORMER> "(" ( forUpdate=ForUpdate() ) ")" ";" 
+   {
+       result = factory.createRKeYMetaConstruct();
+       setPrefixInfo(result);
+       result.setChild((Statement) forUpdate.get(0));  
+       result.setName("#forUpdateUnfoldTransformer");
        return result; 
    }
    )

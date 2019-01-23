@@ -3,6 +3,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.statement.ForUpdates;
 import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -22,37 +23,37 @@ import de.uka.ilkd.key.util.Debug;
  *
  * @author Benedikt Dreher
  */
-public class ForInitUnfoldTransformer extends ProgramTransformer {
+public class ForUpdateUnfoldTransformer extends ProgramTransformer {
     /**
      * @param LoopInit
      *            A {@link LoopInit} if called while parsing a taclet.
      */
-    public ForInitUnfoldTransformer(LoopInit loopinit) {
-        super("forInitUnfoldTransformer", loopinit);
+    public ForUpdateUnfoldTransformer(ForUpdates upd) {
+        super("forUpdateUnfoldTransformer", upd);
     }
 
     /**
      * @param programSV
      *            A {@link ProgramSV} if called while parsing a taclet.
      */
-    public ForInitUnfoldTransformer(ProgramSV programSV) {
-        super("forInitUnfoldTransformer", programSV);
+    public ForUpdateUnfoldTransformer(ProgramSV programSV) {
+        super("forUpdateUnfoldTransformer", programSV);
     }
 
     @Override
     public ProgramElement[] transform(ProgramElement pe, Services services,
             SVInstantiations svInst) {
-        Debug.assertTrue(pe instanceof LoopInit,
+        Debug.assertTrue(pe instanceof ForUpdates,
                 "ForInitUnfoldTransformer cannot handle ", pe);
 
-        final LoopInit astLoopInit = (LoopInit) pe;
-        final Statement[] loopInitStatementList = new Statement[astLoopInit
-                .getInits().size()];
+        final ForUpdates astUpd = (ForUpdates) pe;
+        final Statement[] updStatementList = new Statement[astUpd
+                .getExpressionCount()];
 
-        for (int i = 0; i < loopInitStatementList.length; i++) {
-            loopInitStatementList[i] = astLoopInit.getInits().get(i);
+        for (int i = 0; i < updStatementList.length; i++) {
+            updStatementList[i] = (Statement) astUpd.getExpressionAt(i);
         }
 
-        return loopInitStatementList;
+        return updStatementList;
     }
 }
