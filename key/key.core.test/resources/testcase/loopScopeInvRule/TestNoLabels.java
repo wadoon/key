@@ -41,7 +41,7 @@ public static int loopScopeRuleBenchmarkForNoLabels(int i, boolean flag) {
       @*/
     for (i = i; i > 0; i--) {
       if (i == 17) {
-        i = 0;
+        i = 1;
         continue; // have to prove the invariant
       } else if (i == 42) {
         i = -1;
