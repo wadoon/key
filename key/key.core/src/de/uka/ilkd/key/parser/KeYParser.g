@@ -3825,6 +3825,8 @@ varexp[TacletBuilder b]
 :
   ( varcond_applyUpdateOnRigid[b]
     | varcond_getInvariant[b]
+    | varcond_getAnonUpdate[b]
+    | varcond_getGuardExpr[b]
     | varcond_dropEffectlessElementaries[b]
     | varcond_dropEffectlessStores[b]
     | varcond_enum_const[b]
@@ -3876,9 +3878,25 @@ varcond_applyUpdateOnRigid [TacletBuilder b]
 
 varcond_getInvariant [TacletBuilder b]
 :
-   GET_INVARIANT LPAREN inv=varId COMMA u=varId RPAREN
+   GET_INVARIANT LPAREN inv=varId RPAREN
    { 
-      b.addVariableCondition(new LoopInvariantCondition((SchemaVariable)inv, (UpdateSV)u)); 
+      b.addVariableCondition(new LoopInvariantCondition((SchemaVariable)inv)); 
+   }
+;
+
+varcond_getAnonUpdate [TacletBuilder b]
+:
+   GET_ANON_UPDATE LPAREN u=varId RPAREN
+   { 
+      b.addVariableCondition(new AnonUpdateCondition((UpdateSV)u)); 
+   }
+;
+
+varcond_getGuardExpr [TacletBuilder b]
+:
+   GET_GUARD_EXPR LPAREN guardExpr=varId COMMA guard=varId RPAREN
+   { 
+      b.addVariableCondition(new ForGuardCondition((ProgramSV)guardExpr,(ProgramSV)guard)); 
    }
 ;
 
