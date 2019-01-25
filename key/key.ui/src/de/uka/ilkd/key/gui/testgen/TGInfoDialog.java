@@ -92,7 +92,7 @@ public class TGInfoDialog extends JDialog implements TestGenerationLog {
    @Override
 	public void writeln(String line) {
 	   //FIXME: commented for debugger
-//		textArea.append(line + "\n");
+		textArea.append(line + "\n");
 	}
 
    @Override
