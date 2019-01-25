@@ -42,6 +42,12 @@ public class SMTProblem {
         private final Goal goal;
         private Sequent sequent;
         private String name = "";
+        
+        ///FIXME: Daniel: TEMPORARY Hack
+        public void setTerm(Term term) {
+        	this.term = term;
+        }
+        //////TEMP
 
         /* ############# public interface ############# */
         /**

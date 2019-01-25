@@ -8,9 +8,9 @@ import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Operator;
 
 
-public class TermVariableNameCollectorVisitor implements Visitor{
+public class TermUpdateVisitor implements Visitor{
 	// HashMap with Key: Variable Name, Value: Update Name
-	// FIXME es können hier evtl auch mehrfache Zuweisungen zur gleichen Variable möglich sein
+	// FIXME es kï¿½nnen hier evtl auch mehrfache Zuweisungen zur gleichen Variable mï¿½glich sein
 	public HashMap<String, String> variables = new HashMap<String, String>();
 
 	@Override

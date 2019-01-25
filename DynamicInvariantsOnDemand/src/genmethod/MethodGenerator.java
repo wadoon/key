@@ -9,7 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import core.ProgramTraceInserterVisitor;
-import core.TermVariableNameCollectorVisitor;
+import core.TermUpdateVisitor;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Term;
@@ -18,9 +18,9 @@ import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 public abstract class MethodGenerator {
 	public static String generateMethodFromKeYFormat(StatementBlock program, Term update, While loop) {
 		//FIXME: sind in Update wirklich immer alle relevanten Variablen? Siehe ImmutableList<Goal> openGoals = keyAPI.prove(proof);
-		//FIXME: was passiert, wenn darüber schon autoprooft wird, und die Variablen quasi schon älter sind, wurden dann die Updates schon vorher durchgeführt und die Variablen tauchen hier nicht mehr auf?
+		//FIXME: was passiert, wenn darï¿½ber schon autoprooft wird, und die Variablen quasi schon ï¿½lter sind, wurden dann die Updates schon vorher durchgefï¿½hrt und die Variablen tauchen hier nicht mehr auf?
 		// Extrahiere Funktions-Input-Variablen (die die Zuweisung wie elem-update(_x)(x) haben) und extrahiere weitere Variablen, die relevant in der Schleife sind (elem-update(q)(Z(0(#))) & elem-update(r)(x))
-		TermVariableNameCollectorVisitor varNameCollector = new TermVariableNameCollectorVisitor();
+		TermUpdateVisitor varNameCollector = new TermUpdateVisitor();
 		update.execPreOrder(varNameCollector);
 		
 		String returnVariable = extractReturnVariableFromProgram(program);

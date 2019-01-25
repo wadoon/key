@@ -1,3 +1,4 @@
+//requires (x >= 0);
 public class EasyLoop1 {
   /*@ public normal_behavior 
     @ requires (x >= 0);

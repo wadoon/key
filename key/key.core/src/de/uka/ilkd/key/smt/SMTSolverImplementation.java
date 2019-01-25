@@ -369,6 +369,7 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
         		problemString = objTrans.translateProblem(term, services, smtSettings).toString();
         		problemTypeInformation = objTrans.getTypes();
         		ModelExtractor query = objTrans.getQuery();
+        		//FIXME: Daniel: here the query is set
         		getSocket().setQuery(query);
         		tacletTranslation = null;
         		

@@ -132,8 +132,7 @@ public interface SolverType  {
 
 
             public String getDefaultSolverCommand() {
-            	//FIXME: Windows: .exe
-                return "z3.exe";
+                return "z3";
                 }
 
             public String getDefaultSolverParameters() {
@@ -214,7 +213,7 @@ public interface SolverType  {
 
 
 		public String getDefaultSolverCommand() {
-			return "z3.exe";                    
+			return "z3";                    
 		};
 
 		public String getDefaultSolverParameters() {

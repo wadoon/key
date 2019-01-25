@@ -23,7 +23,7 @@ public class Fooling {
 		try {
 //			ProcessBuilder builder = new ProcessBuilder("D:\\Program Files (x86)\\SageMath 8.4\\runtime\\bin\\mintty.exe", "/bin/bash --login -c '/opt/sagemath-8.4/sage /home/sage/test.sage'");
 //			ProcessBuilder builder = new ProcessBuilder("D:\\Program Files (x86)\\SageMath 8.4\\runtime\\bin\\mintty.exe", "/bin/bash", "-s");
-			ProcessBuilder builder = new ProcessBuilder("D:\\Program Files (x86)\\SageMath 8.4\\runtime\\bin\\bash.exe");
+			ProcessBuilder builder = new ProcessBuilder("sage", "-python", "/home/daniel/git/dig/dig/dig.py", "/home/daniel/git/dig/traces/NLA/tcs/cohendiv.l1a.tcs");
 //			ProcessBuilder builder = new ProcessBuilder("D:\\Program Files (x86)\\SageMath 8.4\\runtime\\bin\\mintty.exe", "/bin/bash", "--login", "-c", "/opt/sagemath-8.4/sage /home/sage/test.sage");
 //			ProcessBuilder builder = new ProcessBuilder("D:\\Program Files (x86)\\SageMath 8.4\\runtime\\bin\\mintty.exe", "/bin/bash", "--login", "-c", "/opt/sagemath-8.4/sage /home/sage/test.sage", ">", "test.txt");
 //			ProcessBuilder builder = new ProcessBuilder("D:\\Program Files (x86)\\SageMath 8.4\\runtime\\bin\\mintty.exe");
@@ -43,13 +43,22 @@ public class Fooling {
 			
 //		    toP.write("/bin/bash --login -c '/opt/sagemath-8.4/sage /home/sage/test.sage'"+"\n");
 //		    toP.write("ls -la" + "\n");
-			toP.write("'/opt/sagemath-8.4/sage /home/sage/test.sage'" + "\n");
+			//toP.write("'/opt/sagemath-8.4/sage /home/sage/test.sage'" + "\n");
 		    
-		    toP.flush();
+		    //toP.flush();
 //		    toP.close();
 //		    //System.err.println("stdin: \""+line+"\"");
 		    while(!fromP.ready());                            // sed hangs, cat doesn't
-		    System.out.println("result: \""+fromP.readLine()+"\"");
+		    
+		    //System.out.println("result: \""+fromP.readLine()+"\"");
+		    String line;
+		    String lastLine = null;
+		    while((line = fromP.readLine()) != null){
+		        System.out.println(line);
+		        lastLine = line;
+		    }
+		    
+		    System.out.println("Invs: " + lastLine);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
