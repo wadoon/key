@@ -63,7 +63,8 @@ public final class AbstrUpdatesIndependentCondition
              * We can assume that both updates are abstract, but they might be
              * constructed of an update junctor. In that case, we continue here.
              */
-            assert u1Inst.op() instanceof UpdateJunctor;
+            assert u1Inst.op() instanceof UpdateJunctor
+                    || u2Inst.op() instanceof UpdateJunctor;
             return null;
         }
 
