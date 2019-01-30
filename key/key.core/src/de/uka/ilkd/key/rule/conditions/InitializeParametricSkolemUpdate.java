@@ -62,7 +62,7 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
         final Pair<Term, Term> accessibleAndAssignableClause = //
                 AbstractExecutionUtils
                         .getAccessibleAndAssignableTermsForNoBehaviorContract(
-                                abstrStmt, svInst, services);
+                                abstrStmt, matchCond, services);
         final Term accessibleClause = accessibleAndAssignableClause.first;
         final Term assignableClause = accessibleAndAssignableClause.second;
 

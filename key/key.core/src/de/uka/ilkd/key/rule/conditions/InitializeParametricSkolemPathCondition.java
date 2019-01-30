@@ -42,7 +42,8 @@ import de.uka.ilkd.key.util.AbstractExecutionUtils;
  *
  * @author Dominic Steinhöfel
  */
-public class InitializeParametricSkolemPathCondition implements VariableCondition {
+public class InitializeParametricSkolemPathCondition
+        implements VariableCondition {
     private final SchemaVariable pathCondSV;
     private final ProgramSV abstrProgSV;
     private final ProgramSV excSV;
@@ -92,8 +93,8 @@ public class InitializeParametricSkolemPathCondition implements VariableConditio
         final TermBuilder tb = services.getTermBuilder();
 
         Term accessibleClause = AbstractExecutionUtils
-                .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt, svInst,
-                        services).first;
+                .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt,
+                        matchCond, services).first;
 
         final List<ProgramSV> varsToConsider = new ArrayList<>();
         varsToConsider.add(excSV);

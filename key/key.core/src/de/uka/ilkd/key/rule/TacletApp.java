@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -132,8 +133,8 @@ public abstract class TacletApp implements RuleApp {
         this.taclet = taclet;
         this.instantiations = instantiations;
         this.ifInstantiations = ifInstantiations;
-        this.matchConditions =
-                new MatchConditions(instantiations, RenameTable.EMPTY_TABLE);
+        this.matchConditions = new MatchConditions(instantiations,
+                RenameTable.EMPTY_TABLE, Optional.empty());
     }
 
     /**
@@ -176,8 +177,8 @@ public abstract class TacletApp implements RuleApp {
             TacletPrefix prefix, SVInstantiations instantiations,
             PosInOccurrence pos) {
 
-        ImmutableSet<QuantifiableVariable> result =
-                boundAtOccurrenceSet(prefix, instantiations);
+        ImmutableSet<QuantifiableVariable> result = boundAtOccurrenceSet(prefix,
+                instantiations);
 
         if (prefix.context())
             result = result.union(collectBoundVarsAbove(pos));
@@ -200,8 +201,8 @@ public abstract class TacletApp implements RuleApp {
     private static ImmutableSet<QuantifiableVariable> collectPrefixInstantiations(
             TacletPrefix pre, SVInstantiations instantiations) {
 
-        ImmutableSet<QuantifiableVariable> instanceSet =
-                DefaultImmutableSet.<QuantifiableVariable> nil();
+        ImmutableSet<QuantifiableVariable> instanceSet = DefaultImmutableSet
+                .<QuantifiableVariable> nil();
 
         for (final SchemaVariable var : pre.prefix()) {
             instanceSet = instanceSet.add((LogicVariable) ((Term) instantiations
@@ -259,11 +260,11 @@ public abstract class TacletApp implements RuleApp {
 
         HashMap<LogicVariable, SchemaVariable> collMap = new LinkedHashMap<>();
 
-        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it =
-                insts.pairIterator();
+        final Iterator<ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>>> it = insts
+                .pairIterator();
         while (it.hasNext()) {
-            ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> pair =
-                    it.next();
+            ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> pair = it
+                    .next();
             if (pair.key() instanceof VariableSV) {
                 SchemaVariable varSV = pair.key();
                 Term value = (Term) pair.value().getInstantiation();
@@ -385,13 +386,13 @@ public abstract class TacletApp implements RuleApp {
     private static SVInstantiations replaceInstantiation(SVInstantiations insts,
             Term t, SchemaVariable u, Term y, Services services) {
         SVInstantiations result = insts;
-        LogicVariable x =
-                (LogicVariable) ((Term) insts.getInstantiation(u)).op();
+        LogicVariable x = (LogicVariable) ((Term) insts.getInstantiation(u))
+                .op();
         if (t.op() instanceof SchemaVariable) {
             if (!(t.op() instanceof VariableSV)) {
                 SchemaVariable sv = (SchemaVariable) t.op();
-                ClashFreeSubst cfSubst =
-                        new ClashFreeSubst(x, y, services.getTermBuilder());
+                ClashFreeSubst cfSubst = new ClashFreeSubst(x, y,
+                        services.getTermBuilder());
                 result = result.replace(sv,
                         cfSubst.apply((Term) insts.getInstantiation(sv)),
                         services);
@@ -446,16 +447,16 @@ public abstract class TacletApp implements RuleApp {
     public boolean isExecutable(TermServices services) {
         // bugfix #1336, see bugtracker
         if (taclet instanceof RewriteTaclet) {
-            ImmutableList<UpdateLabelPair> oldUpdCtx =
-                    matchConditions().getInstantiations().getUpdateContext();
-            MatchConditions newConditions =
-                    ((RewriteTaclet) taclet).checkPrefix(posInOccurrence(),
+            ImmutableList<UpdateLabelPair> oldUpdCtx = matchConditions()
+                    .getInstantiations().getUpdateContext();
+            MatchConditions newConditions = ((RewriteTaclet) taclet)
+                    .checkPrefix(posInOccurrence(),
                             MatchConditions.EMPTY_MATCHCONDITIONS);
             if (newConditions == null) {
                 return false;
             }
-            ImmutableList<UpdateLabelPair> newUpdCtx =
-                    newConditions.getInstantiations().getUpdateContext();
+            ImmutableList<UpdateLabelPair> newUpdCtx = newConditions
+                    .getInstantiations().getUpdateContext();
             if (!oldUpdCtx.equals(newUpdCtx)) {
                 return false;
             }
@@ -492,10 +493,10 @@ public abstract class TacletApp implements RuleApp {
      */
     protected ImmutableSet<SchemaVariable> calculateNonInstantiatedSV() {
         if (missingVars == null) {
-            ImmutableSet<SchemaVariable> localMissingVars =
-                    DefaultImmutableSet.<SchemaVariable> nil();
-            TacletSchemaVariableCollector coll =
-                    new TacletSchemaVariableCollector(instantiations());
+            ImmutableSet<SchemaVariable> localMissingVars = DefaultImmutableSet
+                    .<SchemaVariable> nil();
+            TacletSchemaVariableCollector coll = new TacletSchemaVariableCollector(
+                    instantiations());
             coll.visitWithoutAddrule(taclet());
             Iterator<SchemaVariable> it = coll.varIterator();
             while (it.hasNext()) {
@@ -586,11 +587,11 @@ public abstract class TacletApp implements RuleApp {
             }
 
             if (sv.sort() == ProgramSVSort.VARIABLE) {
-                String proposal =
-                        varNamer.getSuggestiveNameProposalForProgramVariable(sv,
-                                this, services, proposals);
-                ProgramElement pe =
-                        app.getProgramElement(proposal, sv, services);
+                String proposal = varNamer
+                        .getSuggestiveNameProposalForProgramVariable(sv, this,
+                                services, proposals);
+                ProgramElement pe = app.getProgramElement(proposal, sv,
+                        services);
                 app = app.addCheckedInstantiation(sv, pe, services, true);
                 proposals = proposals.append(proposal);
             }
@@ -599,8 +600,8 @@ public abstract class TacletApp implements RuleApp {
                 do {
                     String proposal = VariableNameProposer.DEFAULT
                             .getProposal(this, sv, services, null, proposals);
-                    ProgramElement pe =
-                            app.getProgramElement(proposal, sv, services);
+                    ProgramElement pe = app.getProgramElement(proposal, sv,
+                            services);
                     proposals = proposals.prepend(proposal);
                     try {
                         app = app.addCheckedInstantiation(sv, pe, services,
@@ -642,8 +643,8 @@ public abstract class TacletApp implements RuleApp {
                     return null;
 
                 String proposal;
-                Collection<String> conflictNames =
-                        collectClashNames(sv, services);
+                Collection<String> conflictNames = collectClashNames(sv,
+                        services);
                 do {
                     proposal = VariableNameProposer.DEFAULT.getProposal(this,
                             sv, services, null, proposals);
@@ -734,8 +735,8 @@ public abstract class TacletApp implements RuleApp {
      */
     private static TacletApp forceGenericSortInstantiation(TacletApp app,
             SchemaVariable sv, Services services) {
-        final GenericSortCondition c =
-                GenericSortCondition.forceInstantiation(sv.sort(), false);
+        final GenericSortCondition c = GenericSortCondition
+                .forceInstantiation(sv.sort(), false);
         if (c != null) {
             try {
                 app = app.setInstantiation(
@@ -1060,8 +1061,8 @@ public abstract class TacletApp implements RuleApp {
 
     private ImmutableList<SequentFormula> createSemisequentList(
             Semisequent p_ss) {
-        ImmutableList<SequentFormula> res =
-                ImmutableSLList.<SequentFormula> nil();
+        ImmutableList<SequentFormula> res = ImmutableSLList
+                .<SequentFormula> nil();
 
         for (Object p_s : p_ss)
             res = res.prepend((SequentFormula) p_s);
@@ -1173,10 +1174,10 @@ public abstract class TacletApp implements RuleApp {
      */
     public Namespace<QuantifiableVariable> extendVarNamespaceForSV(
             Namespace<QuantifiableVariable> var_ns, SchemaVariable sv) {
-        Namespace<QuantifiableVariable> ns =
-                new Namespace<QuantifiableVariable>(var_ns);
-        Iterator<SchemaVariable> it =
-                taclet().getPrefix(sv).prefix().iterator();
+        Namespace<QuantifiableVariable> ns = new Namespace<QuantifiableVariable>(
+                var_ns);
+        Iterator<SchemaVariable> it = taclet().getPrefix(sv).prefix()
+                .iterator();
         while (it.hasNext()) {
             LogicVariable var = (LogicVariable) ((Term) instantiations()
                     .getInstantiation(it.next())).op();
@@ -1292,16 +1293,16 @@ public abstract class TacletApp implements RuleApp {
                 if (o instanceof SchemaVariable) {
                     final TypeConverter tc = services.getTypeConverter();
                     final SchemaVariable peerSV = (SchemaVariable) o;
-                    final Object peerInst =
-                            instantiations().getInstantiation(peerSV);
+                    final Object peerInst = instantiations()
+                            .getInstantiation(peerSV);
                     if (peerInst instanceof TypeReference) {
                         kjt = ((TypeReference) peerInst).getKeYJavaType();
                     }
                     else {
                         Expression peerInstExpr;
                         if (peerInst instanceof Term) {
-                            peerInstExpr =
-                                    tc.convertToProgramElement((Term) peerInst);
+                            peerInstExpr = tc
+                                    .convertToProgramElement((Term) peerInst);
                         }
                         else {
                             peerInstExpr = (Expression) peerInst;
@@ -1343,7 +1344,8 @@ public abstract class TacletApp implements RuleApp {
         while (it.hasNext()) {
             SchemaVariable sv = it.next();
             if (sv instanceof TermSV || sv instanceof FormulaSV) {
-                final Term instantiation = (Term) instantiations.getInstantiation(sv);
+                final Term instantiation = (Term) instantiations
+                        .getInstantiation(sv);
                 if (!instantiation.freeVars().isEmpty()
                         && !instantiation.freeVars()
                                 .subset(boundAtOccurrenceSet(
@@ -1367,8 +1369,8 @@ public abstract class TacletApp implements RuleApp {
      */
     protected static ImmutableSet<QuantifiableVariable> collectBoundVarsAbove(
             PosInOccurrence pos) {
-        ImmutableSet<QuantifiableVariable> result =
-                DefaultImmutableSet.<QuantifiableVariable> nil();
+        ImmutableSet<QuantifiableVariable> result = DefaultImmutableSet
+                .<QuantifiableVariable> nil();
 
         PIOPathIterator it = pos.iterator();
         int i;

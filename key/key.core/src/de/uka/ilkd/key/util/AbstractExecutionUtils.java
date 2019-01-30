@@ -1,5 +1,6 @@
 package de.uka.ilkd.key.util;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
+import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 
@@ -261,8 +263,8 @@ public class AbstractExecutionUtils {
      * @param abstrStmt
      *            The {@link AbstractPlaceholderStatement} for which to extract
      *            the accessible and assignable clause.
-     * @param svInst
-     *            The current context program (for choosing the right contract).
+     * @param contextProgram
+     *            TODO
      * @param services
      *            The {@link Services} object.
      * @return A pair of (1) the accessible and (2) the assignable clause for
@@ -271,6 +273,33 @@ public class AbstractExecutionUtils {
     public static Pair<Term, Term> getAccessibleAndAssignableTermsForNoBehaviorContract(
             final AbstractPlaceholderStatement abstrStmt,
             final ProgramElement contextProgram, final Services services) {
+        final ProgramVariableCollector pvColl = //
+                new ProgramVariableCollector(contextProgram, services);
+        pvColl.start();
+        return getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt,
+                pvColl.result(), services);
+    }
+
+    /**
+     * Extracts the accessible and assignable term for the given
+     * {@link AbstractPlaceholderStatement} based on the current context from
+     * the {@link SpecificationRepository}. The default for both is allLocs
+     * (everything assignable and accessible).
+     *
+     * @param abstrStmt
+     *            The {@link AbstractPlaceholderStatement} for which to extract
+     *            the accessible and assignable clause.
+     * @param surroundingVars
+     *            TODO
+     * @param services
+     *            The {@link Services} object.
+     * @return A pair of (1) the accessible and (2) the assignable clause for
+     *         the {@link AbstractPlaceholderStatement}.
+     */
+    public static Pair<Term, Term> getAccessibleAndAssignableTermsForNoBehaviorContract(
+            final AbstractPlaceholderStatement abstrStmt,
+            final Set<LocationVariable> surroundingVars,
+            final Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         Term accessibleClause;
@@ -290,7 +319,7 @@ public class AbstractExecutionUtils {
                     .getHeapLDT().getHeap();
 
             final BlockContract contract = findRightContract(contracts,
-                    contextProgram, heap, services);
+                    surroundingVars, heap, services);
 
             accessibleClause = contract.getAccessibleClause(heap);
             assignableClause = contract.getAssignable(heap);
@@ -322,9 +351,35 @@ public class AbstractExecutionUtils {
      */
     public static Pair<Term, Term> getAccessibleAndAssignableTermsForNoBehaviorContract(
             final AbstractPlaceholderStatement abstrStmt,
-            final SVInstantiations svInst, final Services services) {
+            final MatchConditions matchCond, final Services services) {
+        final Set<LocationVariable> surroundingVars = new LinkedHashSet<>();
+        final ProgramVariableCollector pvc = //
+                new ProgramVariableCollector(matchCond.getInstantiations()
+                        .getContextInstantiation().contextProgram(), services);
+        pvc.start();
+        surroundingVars.addAll(pvc.result());
+        matchCond.getMaybeSeqFor().ifPresent(sf -> {
+            /*
+             * NOTE (DS, 2019-01-30): Here, we just could use a
+             * TermProgramVariableCollector and thus also consider PVs in the
+             * programs. However, those might arise from one of the multiple
+             * contracts with differently named versions. In those cases, we
+             * prefer, in case of name collisions, those PVs that occur in
+             * terms.
+             */
+            final OpCollector opColl = new OpCollector();
+            sf.formula().execPostOrder(opColl);
+            final Set<LocationVariable> result = opColl.ops().stream()
+                    .filter(op -> op instanceof LocationVariable)
+                    .map(LocationVariable.class::cast)
+                    .collect(Collectors.toSet());
+            surroundingVars.removeIf(lv1 -> result.stream()
+                    .anyMatch(lv2 -> lv1.toString().equals(lv2.toString())));
+            surroundingVars.addAll(result);
+        });
+
         return getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt,
-                svInst.getContextInstantiation().contextProgram(), services);
+                surroundingVars, services);
     }
 
     /**
