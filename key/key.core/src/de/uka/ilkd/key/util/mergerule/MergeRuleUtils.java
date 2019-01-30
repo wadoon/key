@@ -64,6 +64,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.KeYLexerF;
@@ -127,7 +128,8 @@ public class MergeRuleUtils {
     public static <T> Option<T> wrapOption(T obj) {
         if (obj == null) {
             return new Option.None<T>();
-        } else {
+        }
+        else {
             return new Option.Some<T>(obj);
         }
     }
@@ -144,7 +146,8 @@ public class MergeRuleUtils {
         int underscoreOccurrence = name.indexOf('_');
         if (underscoreOccurrence > -1) {
             return name.substring(0, underscoreOccurrence);
-        } else {
+        }
+        else {
             return name;
         }
     }
@@ -177,7 +180,7 @@ public class MergeRuleUtils {
 
     // /////////////////////////////////////////////////
     // //////////////// GENERAL LOGIC //////////////////
-    // //////////////// (Syntax) //////////////////
+    // ////////////////// (Syntax) /////////////////////
     // /////////////////////////////////////////////////
 
     /**
@@ -197,7 +200,8 @@ public class MergeRuleUtils {
                     services.getNamespaces());
             final Term result = parser.term();
             return result.sort() == Sort.FORMULA ? result : null;
-        } catch (Throwable e) {
+        }
+        catch (Throwable e) {
             return null;
         }
     }
@@ -209,49 +213,79 @@ public class MergeRuleUtils {
      */
     public static ImmutableSet<LocationVariable> getUpdateLeftSideLocations(
             Term u) {
-        if (u.op() instanceof ElementaryUpdate) {
-
-            ImmutableSet<LocationVariable> result = DefaultImmutableSet.nil();
-            result = result
-                    .add((LocationVariable) ((ElementaryUpdate) u.op()).lhs());
-            return result;
-
-        } else if (u.op() == UpdateJunctor.PARALLEL_UPDATE) {
-
-            ImmutableSet<LocationVariable> result = DefaultImmutableSet.nil();
-            for (Term sub : u.subs()) {
-                result = result.union(getUpdateLeftSideLocations(sub));
-            }
-            return result;
-
-        } else {
-
-            throw new IllegalStateException("Update should be in normal form!");
-
-        }
+        return getElementaryUpdates(u).stream()
+                .map(elem -> ((ElementaryUpdate) elem.op()).lhs())
+                .map(LocationVariable.class::cast)
+                .collect(DefaultImmutableSet.toImmutableSet());
     }
 
     /**
-     * Returns all elementary updates of a parallel update.
+     * Returns all elementary updates of a parallel update. Removes conflicts
+     * (later updates to the same variable win).
      *
      * @param u
      *            Parallel update to get elementary updates from.
      * @return Elementary updates of the supplied parallel update.
      */
     public static List<Term> getElementaryUpdates(Term u) {
-        LinkedList<Term> result = new LinkedList<Term>();
+        List<Term> result = new LinkedList<Term>();
 
         if (u.op() instanceof ElementaryUpdate) {
             result.add(u);
-        } else if (u.op() == UpdateJunctor.PARALLEL_UPDATE) {
+        }
+        else if (u.op() == UpdateJunctor.PARALLEL_UPDATE) {
             for (Term sub : u.subs()) {
                 result.addAll(getElementaryUpdates(sub));
             }
-        } else {
-            throw new IllegalArgumentException("Expected an update!");
+        }
+        else {
+            throw new IllegalArgumentException(
+                    "Expected an update in normal form!");
         }
 
+        /*
+         * Resolve conflicts: In case of conflicts in a parallel update, the
+         * later one wins. So we drop the earlier ones.
+         */
+        result = cleanConflictingElems(result);
+
         return result;
+    }
+
+    /**
+     * Given a list of elementary updates, removes conflicting ones; i.e., if
+     * the list looks like <code>..., x:=t1, ..., x:=t2, ...</code>, the update
+     * <code>x:=t1</code> is removed. This corresponds to the semantics of
+     * JavaDL: in cases of conflicts in parallel updates, the later update
+     * "wins".
+     *
+     * The original list is not changed.
+     *
+     * @param elementaryUpdates
+     *            A list of elementary update terms.
+     * @return A conflict-free list of elementary updates cleaned according to
+     *         JavaDL's semantics.
+     */
+    public static List<Term> cleanConflictingElems(
+            List<Term> elementaryUpdates) {
+        final LinkedList<Term> elems = new LinkedList<>(elementaryUpdates);
+        final ArrayList<Term> updatesToDrop = new ArrayList<>();
+
+        for (int i = 0; i < elems.size(); i++) {
+            for (int j = i + 1; j < elems.size(); j++) {
+                final Term upd1 = elems.get(i);
+                final UpdateableOperator upd1LHS = //
+                        ((ElementaryUpdate) upd1.op()).lhs();
+                final UpdateableOperator upd2LHS = //
+                        ((ElementaryUpdate) elems.get(j).op()).lhs();
+                if (upd1LHS.equals(upd2LHS)) {
+                    updatesToDrop.add(upd1);
+                }
+            }
+        }
+
+        elems.removeAll(updatesToDrop);
+        return elems;
     }
 
     /**
@@ -267,7 +301,8 @@ public class MergeRuleUtils {
 
         if (term.op() instanceof LocationVariable) {
             result = result.add((LocationVariable) term.op());
-        } else {
+        }
+        else {
             if (!term.javaBlock().isEmpty()) {
                 result = result.union(getProgramLocations(term, services));
             }
@@ -311,7 +346,8 @@ public class MergeRuleUtils {
 
         if (term.op() instanceof LocationVariable) {
             result.add((LocationVariable) term.op());
-        } else {
+        }
+        else {
             if (!term.javaBlock().isEmpty()) {
                 result.addAll(getProgramLocationsHashSet(term, services));
             }
@@ -337,7 +373,8 @@ public class MergeRuleUtils {
         if (term.op() instanceof Function
                 && ((Function) term.op()).isSkolemConstant()) {
             result.add((Function) term.op());
-        } else {
+        }
+        else {
             for (Term sub : term.subs()) {
                 result.addAll(getSkolemConstants(sub));
             }
@@ -375,25 +412,11 @@ public class MergeRuleUtils {
      */
     public static Term getUpdateRightSideFor(Term update,
             LocationVariable leftSide) {
-        if (update.op() instanceof ElementaryUpdate
-                && ((ElementaryUpdate) update.op()).lhs().equals(leftSide)) {
-
-            return update.sub(0);
-
-        } else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
-
-            for (Term sub : update.subs()) {
-                Term rightSide = getUpdateRightSideFor(sub, leftSide);
-                if (rightSide != null) {
-                    return rightSide;
-                }
-            }
-
-            return null;
-
-        } else {
-            return null;
-        }
+        final List<Term> elems = getElementaryUpdates(update);
+        return elems.stream()
+                .filter(elem -> ((ElementaryUpdate) elem.op()).lhs()
+                        .equals(leftSide))
+                .map(elem -> elem.sub(0)).findFirst().orElse(null);
     }
 
     /**
@@ -413,10 +436,12 @@ public class MergeRuleUtils {
                     result += countAtoms(sub);
                 }
                 return result;
-            } else {
+            }
+            else {
                 return 1;
             }
-        } else {
+        }
+        else {
             throw new IllegalArgumentException(
                     "Can only compute atoms for formulae");
         }
@@ -455,10 +480,12 @@ public class MergeRuleUtils {
                 }
 
                 return result;
-            } else {
+            }
+            else {
                 return 0;
             }
-        } else {
+        }
+        else {
             throw new IllegalArgumentException(
                     "Can only compute atoms for formulae");
         }
@@ -486,7 +513,8 @@ public class MergeRuleUtils {
             newName = services.getTermBuilder().newName(prefix);
             result = new Function(new Name(newName), sort, true);
             services.getNamespaces().functions().add(result);
-        } while (newName.equals(prefix));
+        }
+        while (newName.equals(prefix));
 
         return result;
     }
@@ -513,7 +541,8 @@ public class MergeRuleUtils {
             newName = services.getTermBuilder().newName(prefix);
             result = new LogicVariable(new Name(newName), sort);
             services.getNamespaces().variables().add(result);
-        } while (newName.equals(prefix));
+        }
+        while (newName.equals(prefix));
 
         return result;
     }
@@ -543,7 +572,8 @@ public class MergeRuleUtils {
             Namespace<IProgramVariable> variables = //
                     services.getNamespaces().programVariables();
             variables.add(result);
-        } while (newName.equals(prefix));
+        }
+        while (newName.equals(prefix));
 
         return result;
     }
@@ -589,8 +619,7 @@ public class MergeRuleUtils {
 
         if (term.op() instanceof Function
                 && ((Function) term.op()).isSkolemConstant()
-                && (restrictTo == null
-                        || restrictTo.contains(term.op()))) {
+                && (restrictTo == null || restrictTo.contains(term.op()))) {
 
             Function constant = (Function) term.op();
 
@@ -603,7 +632,8 @@ public class MergeRuleUtils {
 
             return tb.var(replMap.get(constant));
 
-        } else {
+        }
+        else {
 
             LinkedList<Term> transfSubs = new LinkedList<Term>();
             for (Term sub : term.subs()) {
@@ -665,13 +695,15 @@ public class MergeRuleUtils {
     public static boolean isUpdateNormalForm(Term u) {
         if (u.op() instanceof ElementaryUpdate) {
             return true;
-        } else if (u.op() == UpdateJunctor.PARALLEL_UPDATE) {
+        }
+        else if (u.op() == UpdateJunctor.PARALLEL_UPDATE) {
             boolean result = true;
             for (Term sub : u.subs()) {
                 result = result && isUpdateNormalForm(sub);
             }
             return result;
-        } else {
+        }
+        else {
             return false;
         }
     }
@@ -691,7 +723,8 @@ public class MergeRuleUtils {
         if (term.op().equals(Junctor.AND)) {
             result.addAll(getConjunctiveElementsFor(term.sub(0)));
             result.addAll(getConjunctiveElementsFor(term.sub(1)));
-        } else {
+        }
+        else {
             result.add(term);
         }
 
@@ -776,7 +809,8 @@ public class MergeRuleUtils {
 
         if (term.subs().size() == 0 || !term.javaBlock().isEmpty()) {
             return term.javaBlock();
-        } else {
+        }
+        else {
             for (Term sub : term.subs()) {
                 JavaBlock subJavaBlock = getJavaBlockRecursive(sub);
                 if (!subJavaBlock.isEmpty()) {
@@ -930,7 +964,8 @@ public class MergeRuleUtils {
 
                 return simplified;
             }
-        } catch (ProofInputException e) {
+        }
+        catch (ProofInputException e) {
         }
 
         return term;
@@ -1069,7 +1104,8 @@ public class MergeRuleUtils {
         if (isProvableWithSplitting(disjunctionOfSpecificParts, services,
                 simplificationTimeout)) {
             return commonElemsTerm;
-        } else {
+        }
+        else {
             return tb.and(commonElemsTerm, disjunctionOfSpecificParts);
         }
     }
@@ -1379,35 +1415,39 @@ public class MergeRuleUtils {
                 Operator newOp1;
                 Operator newOp2;
                 if (partnerStateOp instanceof Function) {
-                    newOp1 = ((Function) mergeStateOp)
-                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                    newOp1 = ((Function) mergeStateOp).rename(new Name(
+                            tb.newName(partnerStateOp.name().toString(),
                                     thisGoal.getLocalNamespaces())));
                     thisGoalNamespaces.functions().add((Function) newOp1);
                     thisGoalNamespaces.flushToParent();
 
-                    newOp2 = ((Function) partnerStateOp)
-                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                    newOp2 = ((Function) partnerStateOp).rename(new Name(
+                            tb.newName(partnerStateOp.name().toString(),
                                     thisGoal.getLocalNamespaces())));
                     thisGoalNamespaces.functions().add((Function) newOp2);
                     thisGoalNamespaces.flushToParent();
-                } else if (partnerStateOp instanceof LocationVariable) {
-                    newOp1 = ((LocationVariable) mergeStateOp)
-                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
+                }
+                else if (partnerStateOp instanceof LocationVariable) {
+                    newOp1 = ((LocationVariable) mergeStateOp).rename(new Name(
+                            tb.newName(partnerStateOp.name().toString(),
                                     thisGoal.getLocalNamespaces())));
                     thisGoalNamespaces.programVariables()
                             .add((LocationVariable) newOp1);
                     thisGoalNamespaces.flushToParent();
 
                     newOp2 = ((LocationVariable) partnerStateOp)
-                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
-                                    thisGoal.getLocalNamespaces())));
+                            .rename(new Name(
+                                    tb.newName(partnerStateOp.name().toString(),
+                                            thisGoal.getLocalNamespaces())));
                     thisGoalNamespaces.programVariables()
                             .add((LocationVariable) newOp2);
                     thisGoalNamespaces.flushToParent();
-                } else {
+                }
+                else {
                     throw new RuntimeException(
                             "MergeRule: Unexpected type of Operator involved in name clash: "
-                                    + partnerStateOp.getClass().getSimpleName());
+                                    + partnerStateOp.getClass()
+                                            .getSimpleName());
                 }
 
                 mergeState = new SymbolicExecutionState(
@@ -1602,9 +1642,11 @@ public class MergeRuleUtils {
             ImmutableList<SequentFormula> formulae, Services services) {
         if (formulae.size() == 0) {
             return services.getTermBuilder().tt();
-        } else if (formulae.size() == 1) {
+        }
+        else if (formulae.size() == 1) {
             return formulae.head().formula();
-        } else {
+        }
+        else {
             return services.getTermBuilder().and(formulae.head().formula(),
                     joinListToAndTerm(formulae.tail(), services));
         }
@@ -1708,12 +1750,11 @@ public class MergeRuleUtils {
      */
     private static ApplyStrategyInfo tryToProve(Term toProve, Services services,
             boolean doSplit, String sideProofName, int timeout) {
-        return tryToProve(
-                Sequent.createSequent(
-                        // Sequent to prove
-                        Semisequent.EMPTY_SEMISEQUENT,
-                        new Semisequent(new SequentFormula(toProve))),
-                services, doSplit, sideProofName, timeout);
+        return tryToProve(Sequent.createSequent(
+                // Sequent to prove
+                Semisequent.EMPTY_SEMISEQUENT,
+                new Semisequent(new SequentFormula(toProve))), services,
+                doSplit, sideProofName, timeout);
     }
 
     /**
@@ -1750,7 +1791,8 @@ public class MergeRuleUtils {
             proofStarter.setStrategyProperties(setupStrategy());
 
             proofResult = proofStarter.start();
-        } catch (ProofInputException e) {
+        }
+        catch (ProofInputException e) {
         }
 
         return proofResult;
@@ -1865,7 +1907,8 @@ public class MergeRuleUtils {
         final TermBuilder tb = services.getTermBuilder();
         if (openGoals.isEmpty()) {
             return tb.tt();
-        } else {
+        }
+        else {
             ImmutableList<Term> goalImplications = ImmutableSLList.nil();
             for (Goal goal : openGoals) {
                 Term goalImplication = sequentToFormula(goal.sequent(),
@@ -2142,7 +2185,8 @@ public class MergeRuleUtils {
         public T getValue() {
             if (isSome()) {
                 return ((Some<T>) this).getValue();
-            } else {
+            }
+            else {
                 throw new IllegalAccessError(
                         "Cannot otain a value from a None object.");
             }
@@ -2285,7 +2329,8 @@ public class MergeRuleUtils {
                 cache.put(var, result);
 
                 return result;
-            } else {
+            }
+            else {
                 return null;
             }
         }
