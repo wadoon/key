@@ -53,13 +53,16 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
             return matchCond;
         }
 
-        final AbstractPlaceholderStatement abstrStmt = (AbstractPlaceholderStatement) svInst
-                .getInstantiation(this.abstrProgSV);
+        final AbstractPlaceholderStatement abstrStmt = //
+                (AbstractPlaceholderStatement) svInst
+                        .getInstantiation(this.abstrProgSV);
 
         final TermBuilder tb = services.getTermBuilder();
 
         final Pair<Term, Term> accessibleAndAssignableClause = //
-                AbstractExecutionUtils.getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt, svInst, services);
+                AbstractExecutionUtils
+                        .getAccessibleAndAssignableTermsForNoBehaviorContract(
+                                abstrStmt, svInst, services);
         final Term accessibleClause = accessibleAndAssignableClause.first;
         final Term assignableClause = accessibleAndAssignableClause.second;
 

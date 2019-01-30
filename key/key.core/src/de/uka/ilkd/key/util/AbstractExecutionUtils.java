@@ -164,8 +164,8 @@ public class AbstractExecutionUtils {
 
     /**
      * Selects, amongst a given list of {@link BlockContract}s, the matching one
-     * for the current context. Note that the current implementation is quite
-     * ad-hoc (see inlined TODO).
+     * for the current program context. Note that the current implementation is
+     * quite ad-hoc.
      *
      * @param contracts
      *            The list of contracts for the placeholder statement.
@@ -182,6 +182,36 @@ public class AbstractExecutionUtils {
             final List<BlockContract> contracts,
             final ProgramElement contextProgram, final LocationVariable heap,
             Services services) {
+        final ProgramVariableCollector pvColl = //
+                new ProgramVariableCollector(contextProgram, services);
+        pvColl.start();
+        return findRightContract(contracts, pvColl.result(), heap, services);
+    }
+
+    /**
+     * Selects, amongst a given list of {@link BlockContract}s, the matching one
+     * for the current context. Note that the current implementation is quite
+     * ad-hoc (see inlined TODO). The principle is that the contract with most
+     * variables in common (that is actually, the least number of variables NOT
+     * in common) with the given set of context variables
+     * <code>surroundingVars</code> will be selected. In case of a draw, the
+     * first one wins.
+     *
+     * @param contracts
+     *            The list of contracts for the placeholder statement.
+     * @param contextProgram
+     *            The context program (for choosing the right contract).
+     * @param heap
+     *            The heap term.
+     * @param services
+     *            The services object.
+     * @return The most suitable {@link BlockContract} of the list. Will return
+     *         null iff the given contracts list is empty.
+     */
+    public static BlockContract findRightContract(
+            final List<BlockContract> contracts,
+            final Set<LocationVariable> surroundingVars,
+            final LocationVariable heap, Services services) {
         /*
          * TODO (DS, 2018-12-21): Choose the right contract! There is probably a
          * contract from the other branch with wrong renamings. We somehow have
@@ -200,23 +230,18 @@ public class AbstractExecutionUtils {
 
         BlockContract contract = null;
         if (contracts.size() > 1) {
-            final ProgramVariableCollector pvColl = new ProgramVariableCollector(
-                    contextProgram, services);
-            pvColl.start();
-            final Set<LocationVariable> varsInProg = pvColl.result();
-
-            int varsNotInProg = Integer.MAX_VALUE;
+            int varsNotInContext = Integer.MAX_VALUE;
             for (BlockContract bc : contracts) {
                 final OpCollector opColl = new OpCollector();
                 bc.getAccessibleClause(heap).execPostOrder(opColl);
                 bc.getAssignable(heap).execPostOrder(opColl);
                 bc.getAssignableNot(heap).execPostOrder(opColl);
-                final int currVarsNotInProg = (int) opColl.ops().stream()
+                final int currVarsNotInContext = (int) opColl.ops().stream()
                         .filter(op -> op instanceof LocationVariable)
                         .map(LocationVariable.class::cast)
-                        .filter(pv -> !varsInProg.contains(pv)).count();
-                if (currVarsNotInProg < varsNotInProg) {
-                    varsNotInProg = currVarsNotInProg;
+                        .filter(pv -> !surroundingVars.contains(pv)).count();
+                if (currVarsNotInContext < varsNotInContext) {
+                    varsNotInContext = currVarsNotInContext;
                     contract = bc;
                 }
             }
