@@ -575,6 +575,23 @@ public class TestJMLTranslator extends TestCase {
 
     }
 
+    // was broken due to supporting doubles: 1..x was interpreted as ((double)1.).x
+    public void testRanges() throws SLTranslationException {
+        ProgramVariable selfVar = buildSelfVarAsProgVar();
+
+        // i, array is a field in TestClass
+        // it works with spaces
+        Term reference = JMLTranslator.translate(new PositionedString("array[1 .. i]"), // .. i]"),
+                testClassType, selfVar, null, null, null, null, Term.class, services);
+
+        // but failed without
+        Term result = JMLTranslator.translate(new PositionedString("array[1..i]"), // .. i]"),
+                testClassType, selfVar, null, null, null, null, Term.class, services);
+
+        assertEquals(reference, result);
+
+    }
+
     public void testHexLiteral() {
         Term result = null;
 

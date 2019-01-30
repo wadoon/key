@@ -393,9 +393,11 @@ FLOAT_LITERAL
 
 DOUBLE_LITERAL
     :  /*  MU2018: DIGITS was removed, the following was not accessible.
-    It is strange anyway ...
-     ( (DIGIT)+ '.' '.' ) => DIGITS { $type = DIGITS; }
-    | */
+        *  It is strange anyway ...
+        *  MU2019: But necessary, since otherwise 1..x would be parsed as (1.).x
+        */
+    ( (DIGIT)+ '.' '.' ) => DECLITERAL { $type = DECLITERAL; }
+    |
     NonIntegerNumber DoubleSuffix?
     ;
     
