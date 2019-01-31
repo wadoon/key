@@ -108,13 +108,32 @@ public class InitializeParametricSkolemPathCondition
                     tb.singletonPV(tb.var(furtherLV)));
         }
 
-        final String pathCondName = tb.newName(
-                pathCondSV.name().toString() + "_" + abstrStmt.getId());
-        final Sort locSetSort = services.getTypeConverter().getLocSetLDT()
-                .targetSort();
+        /*
+         * NOTE (DS, 2019-01-31): We reuse the function symbols because
+         * otherwise, there will be different ones around which can, and will,
+         * lead to problems, since they should represent the same thing. It will
+         * however be problematic if someone decides to introduce such a
+         * function symbol elsewhere...
+         */
+        // @formatter:off;
+        //final String pathCondName = tb.newName(
+        //        pathCondSV.name().toString() + "_" + abstrStmt.getId());
+        // @formatter:on;
+        final String pathCondName = //
+                pathCondSV.name().toString() + "_" + abstrStmt.getId();
+        final Sort locSetSort = //
+                services.getTypeConverter().getLocSetLDT().targetSort();
 
-        final Term pathCond = tb.func(new Function(new Name(pathCondName),
-                Sort.FORMULA, true, false, locSetSort), accessibleClause);
+        final Name funcSymbName = new Name(pathCondName);
+        Function funcSymb = //
+                services.getNamespaces().functions().lookup(funcSymbName);
+        if (funcSymb == null) {
+            funcSymb = new Function( //
+                    funcSymbName, Sort.FORMULA, true, false, locSetSort);
+            services.getNamespaces().functions().add(funcSymb);
+        }
+
+        final Term pathCond = tb.func(funcSymb, accessibleClause);
 
         return matchCond
                 .setInstantiations(svInst.add(pathCondSV, pathCond, services));
