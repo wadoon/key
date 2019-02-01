@@ -23,6 +23,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -378,6 +379,18 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         if (instantiation == null) {
             return false;
         }
+
+        if (instantiation.block.getChildCount() == 1 && instantiation.block
+                .getChildAt(0) instanceof AbstractPlaceholderStatement) {
+            /*
+             * NOTE (DS, 2019-02-01): I'm using parts of the block contract
+             * machinery for Abstract Execution, but the normal block contract
+             * rule should *not* be applicable. Maybe at a later point, those
+             * two a little distinct things should be separated.
+             */
+            return false;
+        }
+
         final ImmutableSet<BlockContract> contracts
                 = getApplicableContracts(instantiation, goal, goal.proof().getServices());
         return !contracts.isEmpty();

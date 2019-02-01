@@ -31,6 +31,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
@@ -326,8 +327,18 @@ public final class IntroAtPreDefsOp extends AbstractTermTransformer {
             Map<LocationVariable, LocationVariable> atPreHeapVars,
             Term atPreUpdate, Services services, final TermBuilder tb) {
         for (StatementBlock block : blocks) {
-            ImmutableSet<BlockSpecificationElement> contracts = DefaultImmutableSet
-                    .nil();
+            if (block.getChildCount() == 1 && block
+                    .getChildAt(0) instanceof AbstractPlaceholderStatement) {
+                /*
+                 * NOTE (DS, 2019-02-01): We're not doing this for APSs (->
+                 * Abstract Execution). There, block contracts are just re- or
+                 * misused...
+                 */
+                continue;
+            }
+
+            ImmutableSet<BlockSpecificationElement> contracts = //
+                    DefaultImmutableSet.nil();
 
             for (BlockContract c : services.getSpecificationRepository()
                     .getBlockContracts(block)) {
