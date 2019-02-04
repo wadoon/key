@@ -80,7 +80,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
                         proof.getServices());
 
         if (assumesCandidates.size() != 1) {
-            throw new ScriptException("Not a unique \\assumes instantiation");
+            throw new ScriptException.UnuniqueAssumesInstantiations(assumesCandidates);
         }
 
         theApp = assumesCandidates.head();
@@ -89,8 +89,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
             if (theApp.isInstantiationRequired(sv)) {
                 Term inst = args.instantiations.get(sv.name().toString());
                 if (inst == null) {
-                    throw new ScriptException(
-                            "missing instantiation for " + sv);
+                    throw new ScriptException.MissingInstantiations(sv);
                 }
                 theApp = theApp
                         .addInstantiation(sv, inst, true, proof.getServices());
@@ -164,8 +163,9 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
 
         if (p.occ < 0) {
             if (matchingApps.size() > 1) {
-                throw new ScriptException(
-                        "More than one applicable occurrence");
+               throw new ScriptException.IndistinctFormula(matchingApps);
+                // throw new ScriptException(
+               //         "More than one applicable occurrence");
             }
             return matchingApps.get(0);
         } else {
@@ -252,6 +252,7 @@ public class RuleCommand extends AbstractCommand<RuleCommand.Parameters> {
         protected boolean filter(Taclet taclet) {
             return taclet.name().equals(rulename);
         }
+
     }
 
     /*
