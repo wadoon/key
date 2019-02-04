@@ -114,6 +114,7 @@ public abstract class AbstractTestGenerator {
     }
     
     log.writeln("Extracting test data constraints (path conditions).");
+    //FIXME: Daniel - Post Condition
     proofs = createProofsForTesting(settings.removeDuplicates(), ! settings.includePostCondition());
     if (stopRequest != null && stopRequest.shouldStop()) {
        return;

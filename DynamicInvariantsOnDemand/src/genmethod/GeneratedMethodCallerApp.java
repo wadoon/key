@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import dynacode.DynaCode;
@@ -17,7 +18,7 @@ public class GeneratedMethodCallerApp {
 		ArrayList<Integer> inputVars = new ArrayList<Integer>();
 		inputVars.add(5);
 
-		GeneratedMethodReturnObject o = generatedMethod.callGeneratedMethod(inputVars);
+		HashMap<String, ArrayList<Integer>> varLoopHeadTraces = generatedMethod.callGeneratedMethod(inputVars);
 		System.out.println("o");
 	}
 

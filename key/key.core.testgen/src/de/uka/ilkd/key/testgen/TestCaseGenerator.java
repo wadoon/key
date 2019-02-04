@@ -6,6 +6,9 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,6 +49,7 @@ import de.uka.ilkd.key.testgen.oracle.OracleGenerator;
 import de.uka.ilkd.key.testgen.oracle.OracleMethod;
 import de.uka.ilkd.key.testgen.oracle.OracleMethodCall;
 import de.uka.ilkd.key.util.KeYConstants;
+
 
 /**
  * @author gladisch
@@ -239,34 +243,51 @@ public class TestCaseGenerator {
 
 
     public String getMUTCall(){
+    	StringBuilder sb = new StringBuilder();
+        //FIXME schöner
+        sb.append("   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();" + 
+        		NEW_LINE + 
+        		"   ArrayList<Integer> inputVars = new ArrayList<Integer>();"
+        		+ NEW_LINE);
+    	
         IProgramMethod m = info.getMUT();		
-        String name = m.getFullName();
-        String params = "";
+//        String name = m.getFullName();
+//        String params = "";
         for(ParameterDeclaration p : m.getParameters()){
             for(VariableSpecification v : p.getVariables()){
                 IProgramVariable var = v.getProgramVariable();
-                params = params +"," +var.name();
+                sb.append("   inputVars.add(");
+                sb.append(var.name());
+                sb.append(");");
+                sb.append(NEW_LINE);
+//                params = params +"," +var.name();
             }
         }		
-        if(params.length() > 0){
-            params = params.substring(1);
-        }
+        sb.append("   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);");
+        sb.append(NEW_LINE);
+        sb.append("   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);");
+        
+        return sb.toString();
+//        if(params.length() > 0){
+//            params = params.substring(1);
+//        }
 
-        String caller;
-        if(m.isStatic()){
-            caller = info.getTypeOfClassUnderTest().getName();
-        }
-        else{
-            caller = "self";
-        }
 
-        if(m.getReturnType().equals(KeYJavaType.VOID_TYPE)){
-            return caller+"."+name+"("+params+");";
-        }
-        else{
-            String returnType = m.getReturnType().getFullName();
-            return returnType +" result = "+caller+"."+name+"("+params+");";
-        }		
+//        String caller;
+//        if(m.isStatic()){
+//            caller = info.getTypeOfClassUnderTest().getName();
+//        }
+//        else{
+//            caller = "self";
+//        }
+
+//        if(m.getReturnType().equals(KeYJavaType.VOID_TYPE)){
+//            return caller+"."+name+"("+params+");";
+//        }
+//        else{
+//            String returnType = m.getReturnType().getFullName();
+//            return returnType +" result = "+caller+"."+name+"("+params+");";
+//        }		
     }
 
     protected String buildDummyClassForAbstractSort(Sort sort) {
@@ -416,7 +437,9 @@ public class TestCaseGenerator {
             if (!targDir.exists()) {
                 targDir.mkdirs();
             }
-            final File targFile = new File(targDir, srcFile.getName());
+            //FIXME DANIEL BETTER
+            final File targFile = new File(targDir, "GeneratedTest.java");
+            //final File targFile = new File(targDir, srcFile.getName());
             if (targFile.exists()) {
                 if (!targFile.canWrite()) {
                     throw new IOException("FileCopy: "
@@ -498,7 +521,10 @@ public class TestCaseGenerator {
 
     protected void exportCodeUnderTest() throws IOException {
         // Copy the involved classes without modification
-        copyFiles(modDir, directory + modDir);
+//        copyFiles(modDir, directory + modDir);
+//    	Path current = Paths.get(modDir).getParent().getParent();
+//    	Path current2 = Paths.get(current + "/dynacode/gentest/");
+//    	copyFiles(modDir, current2.toString());
     }
 
     private boolean filterVal(String s) {
@@ -511,13 +537,14 @@ public class TestCaseGenerator {
     }
 
     public String generateJUnitTestCase(Model m, Node n) throws IOException { // TODO: Method is never used, remove
-        fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
+//        fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
+    	fileName = "GeneratedTest";
         String mut = getMUTCall();
-        if (mut == null) {
-            mut = "<method under test> //Manually write a call to the method under test, because KeY could not determine it automatically.";
-        } else {
-            fileName += "_" + MUTName;
-        }
+//        if (mut == null) {
+//            mut = "<method under test> //Manually write a call to the method under test, because KeY could not determine it automatically.";
+//        } else {
+//            fileName += "_" + MUTName;
+//        }
         final StringBuffer testCase = new StringBuffer();
         testCase.append(getFilePrefix(fileName, null) + NEW_LINE);
         testCase.append(getMainMethod(fileName, 1) + NEW_LINE + NEW_LINE);
@@ -528,7 +555,8 @@ public class TestCaseGenerator {
         }
         testCase.append("   //Test preamble: creating objects and intializing test data"
                 + generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
-        testCase.append("   //Calling the method under test   " + NEW_LINE + mut
+        testCase.append("   //Calling the method under test   " + NEW_LINE
+        		+ mut
                 + NEW_LINE);
         testCase.append("}" + NEW_LINE + "}");
         logger.writeln("Writing test file to:" + directory + modDir
@@ -588,17 +616,19 @@ public class TestCaseGenerator {
     }
 
     public void initFileName() {
-        fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
+//        fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
+    	fileName = "GeneratedTest";
         String mut = getMUTCall(); 
-        if (mut == null) {
-            mut = "<method under test> //Manually write a call to the method under test, because KeY could not determine it automatically.";
-        } else {
-            fileName += "_" + MUTName;
-        }
+//        if (mut == null) {
+//            mut = "<method under test> //Manually write a call to the method under test, because KeY could not determine it automatically.";
+//        } else {
+//            fileName += "_" + MUTName;
+//        }
     }
 
     public StringBuffer createTestCaseCotent(Collection<SMTSolver> problemSolvers) { // TODO: Include package definition (same as type containing the proof obligation)
         final StringBuffer testSuite = new StringBuffer();
+        this.setPackageName("gentest");
         testSuite.append(getFilePrefix(fileName, packageName) + NEW_LINE);
         final StringBuffer testMethods = new StringBuffer();
         int i = 0;
@@ -625,7 +655,8 @@ public class TestCaseGenerator {
                         testMethod.append(TAB+"//Other variables" + NEW_LINE + getRemainingConstants(m.getConstants().keySet(), vars) + NEW_LINE);
                         testMethod
                         .append("   //Calling the method under test   " + NEW_LINE
-                                + info.getCode() + NEW_LINE);
+//                                + info.getCode() + NEW_LINE);
+                        		+ getMUTCall() + NEW_LINE);
 
 
                         if(junitFormat){
@@ -843,6 +874,15 @@ public class TestCaseGenerator {
          */
         
         m.removeUnnecessaryObjects();
+        
+        //FIXME Daniel: cleaner
+        String classOfMUT = null;
+        for (Map.Entry<String, Sort> e : typeInfMap.entrySet()) {
+        	if (e.getKey().equals("self")) {
+        		classOfMUT = e.getValue().toString();
+        		break;
+        	}
+        }
 
         Set<String> objects = new HashSet<String>();
 
@@ -867,6 +907,9 @@ public class TestCaseGenerator {
                 }
                 final String type = getSafeType(o.getSort());
                 String right;
+                if (type.equals(classOfMUT)) {
+                	continue;
+                }
                 if (type.endsWith("[]")) {
                     right = "new " + type.substring(0, type.length() - 2) + "["
                             + o.getLength() + "]";
@@ -923,6 +966,9 @@ public class TestCaseGenerator {
                     
                 }
                 if (!type.equals("NOTYPE")) {
+                    if (type.equals(classOfMUT)) {
+                    	continue;
+                    }
                     if(isObject){
                         declType = NULLABLE +" "+type;
                     }
@@ -1096,30 +1142,46 @@ public class TestCaseGenerator {
                     + "import java.util.HashSet;" + NEW_LINE
                     + "import java.util.Map;" + NEW_LINE
                     + "import java.util.HashMap;" + NEW_LINE
-                    + " public class " + className
+                    + "import java.util.ArrayList;" + NEW_LINE
+//                    + " public class " + className + " implements IGeneratedTest"
+					+ " public class " + "GeneratedTest" + " implements IGeneratedTest"
                     + " extends junit.framework.TestCase {" + NEW_LINE + NEW_LINE
                     + " public static junit.framework.Test suite() { "
-                    + "   return new junit.framework.JUnit4TestAdapter("+className+".class);" + NEW_LINE 
+                    + "   return new junit.framework.JUnit4TestAdapter("+"GeneratedTest"+".class);" + NEW_LINE 
                     + " } " + NEW_LINE 
-                    + NEW_LINE + " public " + className + "(){}" + NEW_LINE + NEW_LINE;
+                    + NEW_LINE + " public " + "GeneratedTest" + "(){}" + NEW_LINE + NEW_LINE;
         } else {
-            res += "public class " + className + "{ " + NEW_LINE + NEW_LINE + " public "
-                    + className + "(){}" + NEW_LINE;
+            res += 	"import dynacode.DynaCode;\n" + 
+            		"import genmethod.GeneratedMethodHelper;\n" + 
+            		"import genmethod.GeneratedMethodReturnObject;\n" + 
+            		"import genmethod.IGeneratedMethod;\n" + 
+            		"import helperfunctions.HelperFunctions;\n" +
+            		"import java.util.ArrayList;\n" + 
+            		"import java.util.HashMap;\n"
+            		+ "public class " + "GeneratedTest" + " implements IGeneratedTest " + "{ " + NEW_LINE 
+            		+ "private static HashMap<String, ArrayList<Integer>> varTraces = new HashMap<String, ArrayList<Integer>>();"
+            		+ NEW_LINE
+            		+ NEW_LINE + " public "
+                    + "GeneratedTest" + "(){}" + NEW_LINE;
         }
         return res;
     }
 
     private StringBuffer getMainMethod(String className, int i) {
         final StringBuffer res = new StringBuffer();
-        res.append(" public static void  main (java.lang.String[]  arg) {" + NEW_LINE
-                + "   " + className + " testSuiteObject;" + NEW_LINE
-                + "   testSuiteObject=new " + className + " ();" + NEW_LINE + NEW_LINE);
+//        res.append(" public static void  main (java.lang.String[]  arg) {" + NEW_LINE
+        res.append("public HashMap<String, ArrayList<Integer>> callGeneratedTest(){" + NEW_LINE
+                + "   " + "GeneratedTest" + " testSuiteObject;" + NEW_LINE
+                + "   testSuiteObject=new " + "GeneratedTest" + " ();" + NEW_LINE + NEW_LINE);
         for (int j = 0; j < i; j++) {
             res.append("   testSuiteObject.testcode" + j + "();" + NEW_LINE);
         }
         if (i == 0) {
             res.append("   //Warning:no test methods were generated." + NEW_LINE);
         }
+        
+        res.append("    return varTraces;" + NEW_LINE);
+        
         res.append(" }");
         return res;
     }
@@ -1238,7 +1300,10 @@ public class TestCaseGenerator {
     }
 
     public void writeToFile(String file, StringBuffer sb) throws IOException {
-        final File dir = new File(directory + modDir);
+        
+    	Path current = Paths.get(modDir).getParent().getParent();
+    	Path current2 = Paths.get(current + "/dynacode/gentest/");
+    	final File dir = new File(current2.toString());
         if (!dir.exists()) {
             dir.mkdirs();
         }

@@ -2,6 +2,7 @@ package genmethod;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -29,19 +30,25 @@ public abstract class MethodGenerator {
 		//program.getBody().forEach(s -> s.);
 		
 		StringBuilder javaCodeBuilder = new StringBuilder();
+		StringBuilder importBuilder = new StringBuilder();
 		StringBuilder inputVariableFromParameterListBuilder = new StringBuilder();
 		StringBuilder variableAssignmentBuilder = new StringBuilder();
 		StringBuilder functionHeaderBuilder = new StringBuilder();
-		StringBuilder beginLoopAddTracesBuilder = new StringBuilder();
-		StringBuilder beginLoopArrayListVarStringBuilder = new StringBuilder();
+		StringBuilder tracesAddBuilder = new StringBuilder();
+		StringBuilder tracesArrayListVarStringBuilder = new StringBuilder();
 		StringBuilder afterLoopVarDeclarationBuilder = new StringBuilder();
 		
 		final String packageString = "package genmethod;";
-		final String importString = "import java.util.ArrayList;";
 		final String classHeader = "public class GeneratedMethod implements IGeneratedMethod {";
 		final String parameterName = "inputVariables";
-		final String functionType = "GeneratedMethodReturnObject";
-		final String returnObject = "generatedMethodReturnObject";
+		final String functionType = "HashMap<String, ArrayList<Integer>>";
+		final String returnObject = "varLoopHeadTraces";
+		
+		//imports
+		importBuilder.append("import java.util.ArrayList;");
+		importBuilder.append(System.lineSeparator());
+		importBuilder.append("import java.util.HashMap;");
+		importBuilder.append(System.lineSeparator());
 		
 		// GeneratedMethodReturnObject generatedMethodReturnObject = new GeneratedMethodReturnObject();
 		String returnObjectDeclaration = functionType + " " + returnObject + " = new " + functionType + "();";
@@ -90,38 +97,40 @@ public abstract class MethodGenerator {
 			++i;
 		}
 		
-		// Build code like ArrayList<Integer> beginLoop_x = new ArrayList<Integer>();
-		ArrayList<String> beginLoopVarNames = getVariablesNamesWithPrefix(varNameCollector.variables.keySet(), "beginLoop_");
-		ArrayList<String> beginLoopArrayListVarStrings = getArrayListVarStringsFromVars(beginLoopVarNames);
-		for (String s : beginLoopArrayListVarStrings) {
-			beginLoopArrayListVarStringBuilder.append(s);
-			beginLoopArrayListVarStringBuilder.append(System.lineSeparator());
+		// Build code like ArrayList<Integer> traces__x = new ArrayList<Integer>();
+		Set<String> traces = getVariablesNamesWithPrefix(varNameCollector.variables.keySet(), "traces_");
+		ArrayList<String> tracesArrayListsStrings = getArrayListVarStringsFromVars(traces);
+		for (String s : tracesArrayListsStrings) {
+			tracesArrayListVarStringBuilder.append(s);
+			tracesArrayListVarStringBuilder.append(System.lineSeparator());
 		}
+		
+		ArrayList<String> hashMapPuts = getHashMapPuts(returnObject, varNameCollector.variables.keySet(), traces);
 		
 		Iterator<String> varNames = varNameCollector.variables.keySet().iterator();
-		for (String s : beginLoopVarNames) {
-			beginLoopAddTracesBuilder.append(s);
-			beginLoopAddTracesBuilder.append(".add(");
-			beginLoopAddTracesBuilder.append(varNames.next());
-			beginLoopAddTracesBuilder.append(");");
-			beginLoopAddTracesBuilder.append(System.lineSeparator());
+		for (String s : traces) {
+			tracesAddBuilder.append(s);
+			tracesAddBuilder.append(".add(");
+			tracesAddBuilder.append(varNames.next());
+			tracesAddBuilder.append(");");
+			tracesAddBuilder.append(System.lineSeparator());
 		}
 		
-		ArrayList<String> afterLoopVarNames = getVariablesNamesWithPrefix(varNameCollector.variables.keySet(), "afterLoop_");
-		Iterator<String> varNames2 = varNameCollector.variables.keySet().iterator();
-		for (String s : afterLoopVarNames) {
-			afterLoopVarDeclarationBuilder.append("int ");
-			afterLoopVarDeclarationBuilder.append(s);
-			afterLoopVarDeclarationBuilder.append(" = ");
-			afterLoopVarDeclarationBuilder.append(varNames2.next());
-			afterLoopVarDeclarationBuilder.append(";");
-			afterLoopVarDeclarationBuilder.append(System.lineSeparator());
-		}
+//		ArrayList<String> afterLoopVarNames = getVariablesNamesWithPrefix(varNameCollector.variables.keySet(), "afterLoop_");
+//		Iterator<String> varNames2 = varNameCollector.variables.keySet().iterator();
+//		for (String s : afterLoopVarNames) {
+//			afterLoopVarDeclarationBuilder.append("int ");
+//			afterLoopVarDeclarationBuilder.append(s);
+//			afterLoopVarDeclarationBuilder.append(" = ");
+//			afterLoopVarDeclarationBuilder.append(varNames2.next());
+//			afterLoopVarDeclarationBuilder.append(";");
+//			afterLoopVarDeclarationBuilder.append(System.lineSeparator());
+//		}
 		
 		// Build Code
 		javaCodeBuilder.append(packageString);
 		javaCodeBuilder.append(System.lineSeparator());
-		javaCodeBuilder.append(importString);
+		javaCodeBuilder.append(importBuilder.toString());
 		javaCodeBuilder.append(System.lineSeparator());
 		javaCodeBuilder.append(classHeader);
 		javaCodeBuilder.append(System.lineSeparator());
@@ -136,7 +145,11 @@ public abstract class MethodGenerator {
 		javaCodeBuilder.append(variableAssignmentBuilder.toString());
 		//Remove leading "{" of StatementBlock to inject variable assignments (done above)
 		//javaCodeBuilder.append(program.toSource().replaceAll("^\\{+", ""));
-		for (String s : beginLoopArrayListVarStrings) {
+		for (String s : tracesArrayListsStrings) {
+			javaCodeBuilder.append(s);
+			javaCodeBuilder.append(System.lineSeparator());
+		}
+		for (String s : hashMapPuts) {
 			javaCodeBuilder.append(s);
 			javaCodeBuilder.append(System.lineSeparator());
 		}
@@ -144,7 +157,7 @@ public abstract class MethodGenerator {
 		
 		String loopString = loop.toSource();
 		Matcher m = Pattern.compile("while.*(\\{)").matcher(loopString);
-		String replacement = "{" +  beginLoopAddTracesBuilder.toString();
+		String replacement = "{" +  tracesAddBuilder.toString();
 		if (m.find()) {
 			String injectedInWhile = new StringBuilder(loopString).replace(m.start(1), m.end(1), replacement).toString();
 			javaCodeBuilder.append(injectedInWhile);
@@ -154,8 +167,8 @@ public abstract class MethodGenerator {
 		
 		
 		javaCodeBuilder.append(System.lineSeparator());
-		javaCodeBuilder.append(afterLoopVarDeclarationBuilder.toString());
-		javaCodeBuilder.append(buildCodeForReturnObject(returnObject, beginLoopVarNames, afterLoopVarNames, returnVariable));
+//		javaCodeBuilder.append(afterLoopVarDeclarationBuilder.toString());
+//		javaCodeBuilder.append(buildCodeForReturnObject(returnObject, vars, afterLoopVarNames, returnVariable));
 		javaCodeBuilder.append("return " + returnObject + ";");
 		javaCodeBuilder.append(System.lineSeparator());
 		javaCodeBuilder.append("}");
@@ -164,6 +177,26 @@ public abstract class MethodGenerator {
 		javaCodeBuilder.append("}");
 
 		return javaCodeBuilder.toString();
+	}
+	
+	private static ArrayList<String> getHashMapPuts(String hashMapVarName, Set<String> varNames, Set<String> tracesNames) {
+		ArrayList<String> hashMapPuts = new ArrayList<String>();
+		
+		StringBuilder hashMapPutsBuilder = new StringBuilder();
+		Iterator<String> tracesNamesIt = tracesNames.iterator();
+		for (String var : varNames) {
+			hashMapPutsBuilder.append(hashMapVarName);
+			hashMapPutsBuilder.append(".put(");
+			hashMapPutsBuilder.append("\"" + var + "\"");
+			hashMapPutsBuilder.append(",");
+			hashMapPutsBuilder.append(tracesNamesIt.next());
+			hashMapPutsBuilder.append(");");
+			hashMapPuts.add(hashMapPutsBuilder.toString());
+			//Clear Builder for next var
+			hashMapPutsBuilder.setLength(0);
+		}
+
+		return hashMapPuts;
 	}
 	
 	private static String buildCodeForReturnObject(String returnObject, ArrayList<String> beginLoopVarNames, ArrayList<String> afterLoopVarNames, String returnVariable) {
@@ -210,8 +243,8 @@ public abstract class MethodGenerator {
 			return null;
 	}
 	
-	public static ArrayList<String> getVariablesNamesWithPrefix(Set<String> variables, String prefix) {
-		ArrayList<String> varNames = new ArrayList<String>();
+	public static Set<String> getVariablesNamesWithPrefix(Set<String> variables, String prefix) {
+		Set<String> varNames = new HashSet<String>();
 		StringBuilder variablesNameBuilder = new StringBuilder();
 		for (String var : variables) {
 			variablesNameBuilder.append(prefix);
@@ -224,7 +257,7 @@ public abstract class MethodGenerator {
 		return varNames;
 	}
 	
-	public static ArrayList<String> getArrayListVarStringsFromVars(ArrayList<String> variables) {
+	public static ArrayList<String> getArrayListVarStringsFromVars(Set<String> variables) {
 		// Example: Returns for variables(beginLoop_x,beginLoop_y): ArrayList<Integer> beginLoop_x = new ArrayList<Integer>();
 		//										                    ArrayList<Integer> beginLoop_y = new ArrayList<Integer>();
 		ArrayList<String> arrayListVarStrings = new ArrayList<String>();

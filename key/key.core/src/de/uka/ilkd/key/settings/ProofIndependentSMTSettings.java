@@ -48,6 +48,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
         /* The following properties are used to set the bit sizes for bounded 
          * counter example generation.
          */
+        //FIXME: Daniel - more bounds relevant?
         private static final String INT_BOUND = "[SMTSettings]intBound";
         private static final String HEAP_BOUND = "[SMTSettings]heapBound";
         private static final String FIELD_BOUND = "[SMTSettings]fieldBound";

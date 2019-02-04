@@ -1,6 +1,4 @@
 package core;
-import genmethod.MethodGenerator;
-
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -49,6 +47,7 @@ import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.util.Debug;
+import genmethod.MethodGenerator;
 import prover.CounterExample;
 import prover.InvGenResult;
 import prover.Invariant;

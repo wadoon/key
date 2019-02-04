@@ -2,9 +2,10 @@
 package genmethod;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public interface IGeneratedMethod {
 	
 	// Pass a list of input Variables to make the method generic
-	GeneratedMethodReturnObject callGeneratedMethod(ArrayList<Integer> inputVariables);
+	HashMap<String, ArrayList<Integer>> callGeneratedMethod(ArrayList<Integer> inputVariables);
 }

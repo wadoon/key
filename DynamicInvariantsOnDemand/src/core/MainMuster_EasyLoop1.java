@@ -1,9 +1,8 @@
 package core;
-//FIXME 1
-import genmethod.GeneratedMethodReturnObject;
-
 import java.util.ArrayList;
 //import groovy.util.Eval
+
+import genmethod.GeneratedMethodReturnObject;
 
 
 public class MainMuster_EasyLoop1 {
@@ -24,7 +23,7 @@ public class MainMuster_EasyLoop1 {
     	//    (da ich ja implizit von der Vorrunde wieder die Endbedingung am Anfang checke)
     	
     	//FIXME 2
-	  	// Für jede Variable eine beginLoop ArrayList (auch für input Variablen, die könnten sich ja auch verändern)
+	  	// Fï¿½r jede Variable eine beginLoop ArrayList (auch fï¿½r input Variablen, die kï¿½nnten sich ja auch verï¿½ndern)
 	  	ArrayList<Integer> beginLoop_x = new ArrayList<Integer>();
 	  	ArrayList<Integer> beginLoop_y = new ArrayList<Integer>();
 	  	ArrayList<Integer> beginLoop_z = new ArrayList<Integer>();

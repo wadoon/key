@@ -108,6 +108,7 @@ public class ProblemFactory {
 		final Vector<SMTSolver> output = new Vector<SMTSolver>();
 		for (final SMTSolver solver : problemSolvers) {
 			try {
+				//FIXME: Loop1:Bei unwinds = 20 werden 20 Probleme generiert, aber auch z.B. x=3 mehrfach, und nur von x 1-3 sind counterexample, sonst valid, wodurch kein output entsteht
 				final SMTSolverResult.ThreeValuedTruth res = solver.getFinalResult().isValid();
 				if (res == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
 					if (solver.getException() != null) {
@@ -115,6 +116,7 @@ public class ProblemFactory {
 					}
 				} else if (res == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) {
 					if (solver.getSocket().getQuery() != null) {
+						//FIXME: Loop1: Bei x=19 ist counterex. x=3, bei 18 - 2, 17 - 1, 16 - 0. Bei x=11 - 3, 10 - 2, 9 - 1, 8 - 0. 3 - 3, 2-2, 1-1, 0 - 0
 						final Model m = solver.getSocket().getQuery().getModel();
 						if (TestCaseGenerator.modelIsOK(m)) {
 							output.add(solver);
