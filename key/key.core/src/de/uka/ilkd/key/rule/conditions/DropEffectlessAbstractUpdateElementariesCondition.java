@@ -24,25 +24,21 @@ import java.util.stream.Collectors;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractUpdate;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.util.Pair;
-import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * Variable condition for (1) dropping assignables of abstract updates that are
@@ -114,15 +110,16 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
                                 elementaryAbstrUpd, target, services))
                         .orElse(elementaryAbstrUpd);
 
-                if (DropEffectlessAbstractUpdateCondition
-                        .dropEffectlessAbstractUpdate(newUpdate, target,
-                                services)) {
-                    /*
-                     * Maybe new we can drop the update entirely, if it only
-                     * writes things that are never read...
-                     */
-                    newUpdate = tb.skip();
-                }
+                //// XXX Check: newUpdate can be an update junctor...
+                //if (DropEffectlessAbstractUpdateCondition
+                //        .dropEffectlessAbstractUpdate(newUpdate, target,
+                //                services)) {
+                //    /*
+                //     * Maybe new we can drop the update entirely, if it only
+                //     * writes things that are never read...
+                //     */
+                //    newUpdate = tb.skip();
+                //}
 
                 newElementaryAbstractUpdates.set(i, newUpdate);
                 target = tb.apply(newUpdate, target);
@@ -194,7 +191,8 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
         }
 
         final Pair<Set<Operator>, Set<Operator>> opsAnalysisResult = //
-                opsAssignedBeforeUsed(target, services).orElse(null);
+                AbstractExecutionUtils.opsAssignedBeforeUsed(target, services)
+                        .orElse(null);
 
         if (opsAnalysisResult == null) {
             return null;
@@ -212,7 +210,31 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
 
         final Set<Operator> newOpsInAssignable = opsInAssignable.stream()
                 .filter(op -> !opsAssignedBeforeUsed.contains(op))
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+
+        /*
+         * We can also remove all assignables that are not occurring at all in
+         * the target. Then, we also remove them from the accessibles.
+         */
+        final OpCollector opColl = new OpCollector();
+        target.execPostOrder(opColl);
+
+        Term newAccessiblesTerm = abstrUpdAccessiblesTerm;
+        final Set<Operator> newAbstrUpdAccessibles = //
+                new LinkedHashSet<>(abstrUpdAccessibles);
+        /* We create a new set to prevent concurrent modifications. */
+        for (Operator op : new LinkedHashSet<>(newOpsInAssignable)) {
+            if (!opColl.contains(op)) {
+                /*
+                 * This one we can remove. Then also delete it from the
+                 * accessibles.
+                 */
+                newOpsInAssignable.remove(op);
+                newAbstrUpdAccessibles.remove(op);
+                newAccessiblesTerm = AbstractExecutionUtils
+                        .opsToLocSetUnion(newAbstrUpdAccessibles, services);
+            }
+        }
 
         if (opsInAssignable.stream()
                 .noneMatch(op -> !newOpsInAssignable.contains(op))) {
@@ -220,179 +242,15 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             return null;
         }
 
-        return services.getTermBuilder().abstractUpdate(
-                abstrUpd.getAbstractPlaceholderStatement(),
-                opsToLocSetUnion(newOpsInAssignable, services),
-                abstrUpdAccessiblesTerm);
-    }
-
-    /**
-     * Transforms a set of operators to a union term. Each operator has to be
-     * either a {@link LocationVariable} or a {@link Function} of locset sort.
-     *
-     * @param ops
-     *            The operators for the union term.
-     * @param services
-     *            The {@link Services} object.
-     * @return A union term consisting of the operators (wraps
-     *         {@link LocationVariable}s in singletonPV(PV(...)) application.
-     */
-    private static Term opsToLocSetUnion(Set<Operator> ops, Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-        return tb.union(ops.stream()
-                .map(op -> op instanceof LocationVariable
-                        ? tb.singletonPV(tb.var((LocationVariable) op))
-                        : tb.func((Function) op))
-                .collect(Collectors.toList()));
-    }
-
-    /**
-     * Computes the sets of assigned-before-used and used-before-assigned
-     * operators in the target term. In case of a conflict, i.e. in one subterm
-     * an operator is used before assigned and in the other vice versa, used
-     * before assigned always wins. The returned pair consists of the
-     * assigned-before-used set as first and the used-before-assigned set as
-     * second element. The two sets are disjunct.
-     *
-     * @param target
-     *            The term for which to analyze the assigned-before-used
-     *            relationships.
-     * @param services
-     *            The {@link Services} object.
-     * @return (1) assigned-before-used and (2) used-before-assigned operators.
-     *         Sets are ordered. May be an empty optional if there is a
-     *         construct not (yet) supported, in this case, the condition should
-     *         not be applicable.
-     */
-    private static Optional<Pair<Set<Operator>, Set<Operator>>> opsAssignedBeforeUsed(
-            Term target, Services services) {
-        final Set<Operator> assignedBeforeUsed = new LinkedHashSet<>();
-        final Set<Operator> usedBeforeAssigned = new LinkedHashSet<>();
-
-        // Skolem location set or location variable
-        if (isProcVarOrSkolemLocSet(target, services)) {
-            usedBeforeAssigned.add(target.op());
+        if (newOpsInAssignable.isEmpty()) {
+            return services.getTermBuilder().skip();
         }
 
-        // Update applications -- those are most interesting
-        else if (target.op() == UpdateApplication.UPDATE_APPLICATION) {
-            final Term update = target.sub(0);
-            final Term updateTarget = target.sub(1);
-
-            // Update in sequential normal form
-            if (MergeRuleUtils.isUpdateNormalForm(update)) {
-                final List<Term> elems = MergeRuleUtils
-                        .getElementaryUpdates(update);
-
-                // Start from the right, because those "win"
-                for (int i = elems.size() - 1; i >= 0; i--) {
-                    final Term elem = elems.get(i);
-
-                    final UpdateableOperator lhs = //
-                            ((ElementaryUpdate) elem.op()).lhs();
-                    final Term rhs = elem.sub(0);
-
-                    if (isProcVarOrSkolemLocSet(rhs, services)) {
-                        if (!assignedBeforeUsed.contains(rhs.op())) {
-                            usedBeforeAssigned.add(rhs.op());
-                        }
-                    }
-
-                    if (!usedBeforeAssigned.contains(lhs)) {
-                        assignedBeforeUsed.add(lhs);
-                    }
-                }
-            }
-
-            // Abstract Update
-            else if (update.op() instanceof AbstractUpdate) {
-                usedBeforeAssigned.addAll(DropEffectlessAbstractUpdateCondition
-                        .collectNullaryOps(update.sub(0), services).stream()
-                        .filter(op -> !assignedBeforeUsed.contains(op))
-                        .collect(Collectors.toSet()));
-
-                assignedBeforeUsed.addAll(DropEffectlessAbstractUpdateCondition
-                        .collectNullaryOps(((AbstractUpdate) update.op()).lhs(),
-                                services)
-                        .stream().filter(op -> !usedBeforeAssigned.contains(op))
-                        .collect(Collectors.toSet()));
-            }
-
-            // Something else -- ignore for now, exit (completeness relevant)
-            else {
-                // Parallel update, concatenated update, nested application
-                return Optional.empty();
-            }
-
-            final Pair<Set<Operator>, Set<Operator>> subResult = //
-                    opsAssignedBeforeUsed(updateTarget, services).orElse(null);
-
-            if (subResult == null) {
-                return Optional.empty();
-            }
-
-            usedBeforeAssigned.addAll(subResult.second.stream()
-                    .filter(op -> !assignedBeforeUsed.contains(op))
-                    .collect(Collectors.toSet()));
-
-            assignedBeforeUsed.addAll(subResult.first.stream()
-                    .filter(op -> !usedBeforeAssigned.contains(op))
-                    .collect(Collectors.toSet()));
-        }
-
-        // Any other term
-        else {
-            for (final Term sub : target.subs()) {
-                final Pair<Set<Operator>, Set<Operator>> subResult = //
-                        opsAssignedBeforeUsed(sub, services).orElse(null);
-
-                if (subResult == null) {
-                    return Optional.empty();
-                }
-
-                /* Add all "used before assigned" */
-                usedBeforeAssigned.addAll(subResult.second);
-
-                /* Add all "assigned before used" */
-                assignedBeforeUsed.addAll(subResult.first);
-
-                /*
-                 * Now, remove those from "assigned before used" that are used
-                 * before assigned. Take that term as example:
-                 *
-                 * {U}({x:=y}phi & (psi(x)))
-                 *
-                 * Here, x should be used before assigned and not assigned
-                 * before used. Therefore the removal.
-                 */
-                assignedBeforeUsed.removeAll(usedBeforeAssigned);
-            }
-        }
-
-        /*
-         * At the end, all operators that are assigned before used should not be
-         * in the used before assigned set.
-         */
-        final boolean test1 = assignedBeforeUsed.stream()
-                .noneMatch(usedBeforeAssigned::contains);
-        assert test1;
-        // assert assignedBeforeUsed.stream()
-        // .noneMatch(usedBeforeAssigned::contains);
-
-        /* Also vice versa */
-        assert usedBeforeAssigned.isEmpty() || usedBeforeAssigned.stream()
-                .noneMatch(assignedBeforeUsed::contains);
-
-        return Optional.of(new Pair<>(assignedBeforeUsed, usedBeforeAssigned));
-    }
-
-    private static boolean isProcVarOrSkolemLocSet(Term term,
-            Services services) {
-        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        final Operator op = term.op();
-        return term.arity() == 0 && (op instanceof LocationVariable //
-                || (op instanceof Function
-                        && ((Function) op).sort() == locSetLDT.targetSort()));
+        return services.getTermBuilder()
+                .abstractUpdate(abstrUpd.getAbstractPlaceholderStatement(),
+                        AbstractExecutionUtils
+                                .opsToLocSetUnion(newOpsInAssignable, services),
+                        newAccessiblesTerm);
     }
 
     @Override

@@ -1,7 +1,9 @@
 package de.uka.ilkd.key.util;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -13,15 +15,23 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.MatchConditions;
+import de.uka.ilkd.key.rule.conditions.DropEffectlessAbstractUpdateCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * Utility functions for abtract execution.
@@ -409,4 +419,236 @@ public class AbstractExecutionUtils {
                 .collect(Collectors.toList());
     }
 
+    public static Set<Operator> getAssignablesForAbstractUpdate(Term update) {
+        final Set<Operator> result = new LinkedHashSet<>();
+
+        final Operator updateOp = update.op();
+
+        if (updateOp instanceof AbstractUpdate) {
+            ((AbstractUpdate) updateOp).getAssignables().stream().map(Term::op)
+                    .forEach(result::add);
+        }
+        else {
+            // concatenated update
+            assert updateOp == UpdateJunctor.CONCATENATED_UPDATE;
+            assert update.subs().size() == 2;
+
+            result.addAll(getAssignablesForAbstractUpdate(update.sub(0)));
+            result.addAll(getAssignablesForAbstractUpdate(update.sub(1)));
+        }
+
+        return result;
+    }
+
+    /**
+     * Computes the sets of assigned-before-used and used-before-assigned
+     * operators in the target term. In case of a conflict, i.e. in one subterm
+     * an operator is used before assigned and in the other vice versa, used
+     * before assigned always wins. The returned pair consists of the
+     * assigned-before-used set as first and the used-before-assigned set as
+     * second element. The two sets are disjunct.
+     *
+     * @param target
+     *            The term for which to analyze the assigned-before-used
+     *            relationships.
+     * @param services
+     *            The {@link Services} object.
+     * @return (1) assigned-before-used and (2) used-before-assigned operators.
+     *         Sets are ordered. May be an empty optional if there is a
+     *         construct not (yet) supported, in this case, the condition should
+     *         not be applicable.
+     */
+    public static Optional<Pair<Set<Operator>, Set<Operator>>> opsAssignedBeforeUsed(
+            Term target, Services services) {
+        final Set<Operator> assignedBeforeUsed = new LinkedHashSet<>();
+        final Set<Operator> usedBeforeAssigned = new LinkedHashSet<>();
+
+        // Skolem location set or location variable
+        if (AbstractExecutionUtils.isProcVarOrSkolemLocSet(target, services)) {
+            usedBeforeAssigned.add(target.op());
+        }
+
+        // Update applications -- those are most interesting
+        else if (target.op() == UpdateApplication.UPDATE_APPLICATION) {
+            final Term update = target.sub(0);
+            final Term updateTarget = target.sub(1);
+
+            // Update in sequential normal form
+            if (MergeRuleUtils.isUpdateNormalForm(update)) {
+                final List<Term> elems = MergeRuleUtils
+                        .getElementaryUpdates(update);
+
+                for (final Term elem : elems) {
+                    final UpdateableOperator lhs = //
+                            ((ElementaryUpdate) elem.op()).lhs();
+                    final Term rhs = elem.sub(0);
+
+                    if (AbstractExecutionUtils.isProcVarOrSkolemLocSet(rhs,
+                            services)) {
+                        if (!assignedBeforeUsed.contains(rhs.op())) {
+                            usedBeforeAssigned.add(rhs.op());
+                        }
+                    }
+
+                    if (!usedBeforeAssigned.contains(lhs)) {
+                        assignedBeforeUsed.add(lhs);
+                    }
+                }
+            }
+
+            // Abstract Update
+            else if (update.op() instanceof AbstractUpdate) {
+                opsAssignedBeforeUsedForAbstrUpd(update, assignedBeforeUsed,
+                        usedBeforeAssigned, services);
+            }
+
+            // Concatenated abstract update
+            else if (update.op() == UpdateJunctor.CONCATENATED_UPDATE) {
+                final List<Term> abstractUpdateTerms = //
+                        abstractUpdatesFromConcatenation(update);
+                for (Term abstrUpdTerm : abstractUpdateTerms) {
+                    opsAssignedBeforeUsedForAbstrUpd(abstrUpdTerm,
+                            assignedBeforeUsed, usedBeforeAssigned, services);
+                }
+            }
+
+            // Something else -- ignore for now, exit (completeness relevant)
+            else {
+                // Probably a nested application
+                return Optional.empty();
+            }
+
+            final Pair<Set<Operator>, Set<Operator>> subResult = //
+                    opsAssignedBeforeUsed(updateTarget, services).orElse(null);
+
+            if (subResult == null) {
+                return Optional.empty();
+            }
+
+            usedBeforeAssigned.addAll(subResult.second.stream()
+                    .filter(op -> !assignedBeforeUsed.contains(op))
+                    .collect(Collectors.toSet()));
+
+            assignedBeforeUsed.addAll(subResult.first.stream()
+                    .filter(op -> !usedBeforeAssigned.contains(op))
+                    .collect(Collectors.toSet()));
+        }
+
+        else if (target.op() instanceof Modality) {
+            /*
+             * TODO (DS, 2019-02-01): Use some existing collector for programs.
+             */
+            return Optional.empty();
+        }
+
+        // Any other term
+        else {
+            for (final Term sub : target.subs()) {
+                final Pair<Set<Operator>, Set<Operator>> subResult = //
+                        opsAssignedBeforeUsed(sub, services).orElse(null);
+
+                if (subResult == null) {
+                    return Optional.empty();
+                }
+
+                /* Add all "used before assigned" */
+                usedBeforeAssigned.addAll(subResult.second);
+
+                /* Add all "assigned before used" */
+                assignedBeforeUsed.addAll(subResult.first);
+
+                /*
+                 * Now, remove those from "assigned before used" that are used
+                 * before assigned. Take that term as example:
+                 *
+                 * {U}({x:=y}phi & (psi(x)))
+                 *
+                 * Here, x should be used before assigned and not assigned
+                 * before used. Therefore the removal.
+                 */
+                assignedBeforeUsed.removeAll(usedBeforeAssigned);
+            }
+        }
+
+        /*
+         * At the end, all operators that are assigned before used should not be
+         * in the used before assigned set.
+         */
+        assert assignedBeforeUsed.stream()
+                .noneMatch(usedBeforeAssigned::contains);
+
+        /* Also vice versa */
+        assert usedBeforeAssigned.isEmpty() || usedBeforeAssigned.stream()
+                .noneMatch(assignedBeforeUsed::contains);
+
+        return Optional.of(new Pair<>(assignedBeforeUsed, usedBeforeAssigned));
+    }
+
+    private static void opsAssignedBeforeUsedForAbstrUpd(final Term update,
+            final Set<Operator> assignedBeforeUsed,
+            final Set<Operator> usedBeforeAssigned, Services services) {
+        assert update.op() instanceof AbstractUpdate;
+
+        usedBeforeAssigned.addAll(DropEffectlessAbstractUpdateCondition
+                .collectNullaryOps(update.sub(0), services).stream()
+                .filter(op -> !assignedBeforeUsed.contains(op))
+                .collect(Collectors.toSet()));
+
+        assignedBeforeUsed.addAll(DropEffectlessAbstractUpdateCondition
+                .collectNullaryOps(((AbstractUpdate) update.op()).lhs(),
+                        services)
+                .stream().filter(op -> !usedBeforeAssigned.contains(op))
+                .collect(Collectors.toSet()));
+    }
+
+    public static boolean isProcVarOrSkolemLocSet(Term term,
+            Services services) {
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        final Operator op = term.op();
+        return term.arity() == 0 && (op instanceof LocationVariable //
+                || (op instanceof Function
+                        && ((Function) op).sort() == locSetLDT.targetSort()));
+    }
+
+    /**
+     * Transforms a set of operators to a union term. Each operator has to be
+     * either a {@link LocationVariable} or a {@link Function} of locset sort.
+     *
+     * @param ops
+     *            The operators for the union term.
+     * @param services
+     *            The {@link Services} object.
+     * @return A union term consisting of the operators (wraps
+     *         {@link LocationVariable}s in singletonPV(PV(...)) application.
+     */
+    public static Term opsToLocSetUnion(Set<Operator> ops, Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        return tb.union(ops.stream()
+                .map(op -> op instanceof LocationVariable
+                        ? tb.singletonPV(tb.var((LocationVariable) op))
+                        : tb.func((Function) op))
+                .collect(Collectors.toList()));
+    }
+
+    public static List<Term> abstractUpdatesFromConcatenation(
+            Term concatenation) {
+        final List<Term> result = new ArrayList<>();
+
+        if (concatenation.op() instanceof AbstractUpdate) {
+            result.add(concatenation);
+        }
+        else if (concatenation.op() == UpdateJunctor.CONCATENATED_UPDATE) {
+            result.addAll(
+                    abstractUpdatesFromConcatenation(concatenation.sub(0)));
+            result.addAll(
+                    abstractUpdatesFromConcatenation(concatenation.sub(1)));
+        }
+        else {
+            throw new RuntimeException(
+                    "Not an abstract update or concatenation: "
+                            + concatenation);
+        }
+
+        return result;
+    }
 }

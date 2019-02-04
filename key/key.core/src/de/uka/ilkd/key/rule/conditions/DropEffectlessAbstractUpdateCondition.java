@@ -14,17 +14,24 @@
 package de.uka.ilkd.key.rule.conditions;
 
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgVarAndLocSetsCollector;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateSV;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -38,19 +45,20 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 public final class DropEffectlessAbstractUpdateCondition
         implements VariableCondition {
     private final UpdateSV uSV;
-    private final SchemaVariable targetSV;
+    private final Term schematicTarget;
 
-    public DropEffectlessAbstractUpdateCondition(UpdateSV u, SchemaVariable x) {
+    public DropEffectlessAbstractUpdateCondition(UpdateSV u, Term x) {
         this.uSV = u;
-        this.targetSV = x;
+        this.schematicTarget = x;
     }
 
     @Override
     public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
             MatchConditions mc, Services services) {
-        SVInstantiations svInst = mc.getInstantiations();
-        Term u = (Term) svInst.getInstantiation(uSV);
-        Term target = (Term) svInst.getInstantiation(targetSV);
+        final SVInstantiations svInst = mc.getInstantiations();
+        final Term u = (Term) svInst.getInstantiation(uSV);
+
+        final Term target = instSchematicTerm(schematicTarget, svInst, services);
 
         if (u == null || target == null
                 || !(u.op() instanceof AbstractUpdate)) {
@@ -72,16 +80,68 @@ public final class DropEffectlessAbstractUpdateCondition
         return dropEffectlessAbstractUpdate(u, target, services) ? mc : null;
     }
 
+    /**
+     * Instantiates a {@link Term} with potentially multiple
+     * {@link SchemaVariable}s. Also works for {@link Term}s with none or only
+     * one {@link SchemaVariable}.
+     *
+     * @param schematicTerm
+     *            The {@link Term} to instantiate to a non-schematic one.
+     * @param svInst
+     *            The {@link SVInstantiations} with instantiations for the
+     *            {@link SchemaVariable}s in the {@link Term}.
+     * @param services
+     *            The {@link Services} object for
+     *            {@link TermBuilder}/{@link TermFactory}.
+     * @return An instantiated {@link Term} or null if any of the contained
+     *         {@link SchemaVariable}s does not have an instantiation.
+     */
+    private static Term instSchematicTerm(final Term schematicTerm,
+            final SVInstantiations svInst, final Services services) {
+        if (schematicTerm.op() instanceof SchemaVariable) {
+            // Performance shortcut
+            return (Term) svInst
+                    .getInstantiation((SchemaVariable) schematicTerm.op());
+        }
+
+        final TermBuilder tb = services.getTermBuilder();
+        final OpCollector opColl = new OpCollector();
+        schematicTerm.execPostOrder(opColl);
+
+        final Map<Term, Term> repls = opColl.ops().stream()
+                .filter(SchemaVariable.class::isInstance)
+                .map(SchemaVariable.class::cast)
+                .collect(Collectors.toMap(sv -> tb.var(sv),
+                        sv -> (Term) svInst.getInstantiation(sv)));
+
+        if (repls.containsValue(null)) {
+            // At least one uninstantiated SV
+            return null;
+        }
+        else {
+            final OpReplacer opRepl = //
+                    new OpReplacer(repls, services.getTermFactory());
+            return opRepl.replace(schematicTerm);
+        }
+
+    }
+
     public static boolean dropEffectlessAbstractUpdate(Term update, Term target,
             Services services) {
+        // XXX (DS, 2019-02-01): The passed update can be a junctor, careful!
         final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
 
         final Set<Operator> opsInTarget = collectNullaryOps(target, services);
         final Set<Operator> opsInAssignable = //
                 collectNullaryOps(abstrUpd.lhs(), services);
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
 
-        if (opsInAssignable.contains(
-                services.getTypeConverter().getLocSetLDT().getAllLocs())) {
+        if (opsInAssignable.size() == 1
+                && opsInAssignable.contains(locSetLDT.getEmpty())) {
+            return true;
+        }
+
+        if (opsInAssignable.contains(locSetLDT.getAllLocs())) {
             /*
              * If an abstract update may change all locations, then it is never
              * effectless...
@@ -89,8 +149,7 @@ public final class DropEffectlessAbstractUpdateCondition
             return false;
         }
 
-        if (opsInTarget.contains(
-                services.getTypeConverter().getLocSetLDT().getAllLocs())) {
+        if (opsInTarget.contains(locSetLDT.getAllLocs())) {
             /*
              * Here, there are several possibilities. One of those is that the
              * allLocs locset occurs in the accessible part of an abstract
@@ -112,7 +171,7 @@ public final class DropEffectlessAbstractUpdateCondition
     @Override
     public String toString() {
         return String.format("\\dropEffectlessAbstractUpdate(%s, %s)", uSV,
-                targetSV);
+                schematicTarget);
     }
 
     public static Set<Operator> collectNullaryOps(Term t, Services services) {

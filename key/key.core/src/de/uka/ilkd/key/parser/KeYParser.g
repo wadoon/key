@@ -3886,6 +3886,7 @@ varexp[TacletBuilder b]
   ( (NOT_ {negated = true;} )? 
     (   varcond_abstractOrInterface[b, negated]
 	    | varcond_prefixContainsElement[b, negated]
+	    | varcond_assigns[b, negated]
 	    | varcond_array[b, negated]
         | varcond_isDefined[b, negated]	
         | varcond_abstractUpdate[b, negated]
@@ -4087,9 +4088,9 @@ varcond_sequentialUpdateSimplAbstr[TacletBuilder b]
 ;
 varcond_dropEffectlessAbstractUpdate [TacletBuilder b]
 :
-   DROP_EFFECTLESS_ABSTRACT_UPDATE LPAREN u=varId COMMA x=varId RPAREN 
+   DROP_EFFECTLESS_ABSTRACT_UPDATE LPAREN u=varId COMMA x=term RPAREN 
    {
-      b.addVariableCondition(new DropEffectlessAbstractUpdateCondition((UpdateSV)u, (SchemaVariable)x));
+      b.addVariableCondition(new DropEffectlessAbstractUpdateCondition((UpdateSV)u, x));
    }
 ;
 
@@ -4117,6 +4118,14 @@ varcond_abstractUpdate[TacletBuilder b, boolean negated]
    ABSTRACT_UPDATE LPAREN u=varId RPAREN 
    {
       b.addVariableCondition(new AbstractUpdateCondition((UpdateSV)u, negated));
+   }
+;
+
+varcond_assigns[TacletBuilder b, boolean negated]
+:
+   ASSIGNS LPAREN upd=varId COMMA x=varId RPAREN 
+   {
+      b.addVariableCondition(new AssignsCondition((UpdateSV) upd, (ProgramSV) x, negated));
    }
 ;
 
