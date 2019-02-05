@@ -110,6 +110,11 @@ public final class SimplifyAbstractUpdateRenameSubstCondition
             return null;
         }
 
+        if (xInst.containsJavaBlockRecursive()) {
+            // Situation might change if there is remaining Java code
+            return null;
+        }
+
         /*
          * Find an assignable of the abstract update u1 which is a right-hand
          * side of u1 and not used in xInst.
