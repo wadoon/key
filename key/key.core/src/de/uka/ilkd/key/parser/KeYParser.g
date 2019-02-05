@@ -4046,10 +4046,11 @@ varcond_freshAbstractProgram[TacletBuilder b]
 
 varcond_simplifyAbstractUpdateRenameSubst[TacletBuilder b]
 :
-   SIMPLIFY_ABSTRACT_UPDATE_RENAME_SUBST LPAREN u1=varId COMMA u2=varId COMMA x=varId COMMA result=varId RPAREN 
+   SIMPLIFY_ABSTRACT_UPDATE_RENAME_SUBST LPAREN u1=varId COMMA u2=varId COMMA u3=varId COMMA x=varId COMMA result=varId RPAREN 
    {
       b.addVariableCondition(new SimplifyAbstractUpdateRenameSubstCondition((UpdateSV)u1,
                                                                             (UpdateSV)u2, 
+                                                                            (UpdateSV)u3, 
                                                                             (SchemaVariable)x, 
                                                                             (SchemaVariable)result));
    }

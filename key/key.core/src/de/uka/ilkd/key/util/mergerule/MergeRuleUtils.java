@@ -221,13 +221,17 @@ public class MergeRuleUtils {
 
     /**
      * Returns all elementary updates of a parallel update. Removes conflicts
-     * (later updates to the same variable win).
+     * (later updates to the same variable win) if <code>cleanConflicts</code>
+     * is set to true.
      *
      * @param u
      *            Parallel update to get elementary updates from.
+     * @param cleanConflicts
+     *            Set to true to clean conflicting updates.
      * @return Elementary updates of the supplied parallel update.
      */
-    public static List<Term> getElementaryUpdates(Term u) {
+    public static List<Term> getElementaryUpdates(Term u,
+            boolean cleanConflicts) {
         List<Term> result = new LinkedList<Term>();
 
         if (u.op() instanceof ElementaryUpdate) {
@@ -237,19 +241,35 @@ public class MergeRuleUtils {
             for (Term sub : u.subs()) {
                 result.addAll(getElementaryUpdates(sub));
             }
+        } else if (u.op() == UpdateJunctor.SKIP) {
+            return result;
         }
         else {
             throw new IllegalArgumentException(
                     "Expected an update in normal form!");
         }
 
-        /*
-         * Resolve conflicts: In case of conflicts in a parallel update, the
-         * later one wins. So we drop the earlier ones.
-         */
-        result = cleanConflictingElems(result);
+        if (cleanConflicts) {
+            /*
+             * Resolve conflicts: In case of conflicts in a parallel update, the
+             * later one wins. So we drop the earlier ones.
+             */
+            result = cleanConflictingElems(result);
+        }
 
         return result;
+    }
+
+    /**
+     * Returns all elementary updates of a parallel update. Removes conflicts
+     * (later updates to the same variable win).
+     *
+     * @param u
+     *            Parallel update to get elementary updates from.
+     * @return Elementary updates of the supplied parallel update.
+     */
+    public static List<Term> getElementaryUpdates(Term u) {
+        return getElementaryUpdates(u, true);
     }
 
     /**
