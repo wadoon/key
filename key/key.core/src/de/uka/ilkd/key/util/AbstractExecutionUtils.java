@@ -419,14 +419,62 @@ public class AbstractExecutionUtils {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Returns all nullary operators in the RHS of an {@link AbstractUpdate}
+     * term, which should be location variables or Skolem location sets.
+     *
+     * @param update
+     *            The {@link AbstractUpdate} {@link Term} for which to return
+     *            the accessibles.
+     * @return All nullary operators in the RHS of an {@link AbstractUpdate}
+     *         term.
+     */
+    public static Set<Operator> getAccessiblesForAbstractUpdate(Term update) {
+        assert update.op() instanceof AbstractUpdate;
+        assert update.arity() == 1;
+
+        final OpCollector opColl = new OpCollector();
+        update.sub(0).execPostOrder(opColl);
+        return opColl.ops().stream().filter(op -> op.arity() == 0)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+    }
+
+    /**
+     * Returns all nullary operators in the LHS of an {@link AbstractUpdate},
+     * which should be location variables or Skolem location sets.
+     *
+     * @param update
+     *            The {@link AbstractUpdate} for which to return the
+     *            assignables.
+     * @return All nullary operators in the LHS of an {@link AbstractUpdate}.
+     */
+    public static Set<Operator> getAssignablesForAbstractUpdate(
+            AbstractUpdate update) {
+        final OpCollector opColl = new OpCollector();
+        update.lhs().execPostOrder(opColl);
+        return opColl.ops().stream().filter(op -> op.arity() == 0)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+    }
+
+    /**
+     * Returns all nullary operators in the LHS of the {@link AbstractUpdate}
+     * represented by the given update {@link Term}, which also may be a
+     * concatenation. In the latter case, the assignables for all contained
+     * {@link AbstractUpdate}s are returned.
+     *
+     * @param update
+     *            The abstract update term.
+     * @return The assignables of the given (concatenation of)
+     *         {@link AbstractUpdate}s.
+     */
     public static Set<Operator> getAssignablesForAbstractUpdate(Term update) {
         final Set<Operator> result = new LinkedHashSet<>();
 
         final Operator updateOp = update.op();
 
         if (updateOp instanceof AbstractUpdate) {
-            ((AbstractUpdate) updateOp).getAssignables().stream().map(Term::op)
-                    .forEach(result::add);
+            result.addAll(
+                    getAssignablesForAbstractUpdate((AbstractUpdate) updateOp));
         }
         else {
             // concatenated update
@@ -630,6 +678,15 @@ public class AbstractExecutionUtils {
                 .collect(Collectors.toList()));
     }
 
+    /**
+     * Extracts the list of abstract updates from a concatenation of such.
+     *
+     * @param concatenation
+     *            A concatenation of abstract updates
+     *            <code>U1 ++ U2 ++ ... ++ Un</code>.
+     * @return The contained abstract updates of the concatenation in the
+     *         original order.
+     */
     public static List<Term> abstractUpdatesFromConcatenation(
             Term concatenation) {
         final List<Term> result = new ArrayList<>();
@@ -650,5 +707,40 @@ public class AbstractExecutionUtils {
         }
 
         return result;
+    }
+
+    /**
+     * Checks whether an {@link AbstractUpdate} assigns the allLocs location
+     * set.
+     *
+     * @param update
+     *            The {@link AbstractUpdate} to check.
+     * @param services
+     *            The {@link Services} object (for the {@link LocSetLDT}).
+     * @return true iff the {@link AbstractUpdate} assigns the allLocs location
+     *         set.
+     */
+    public static boolean assignsAllLocs(AbstractUpdate update,
+            Services services) {
+        final Operator allLocs = services.getTypeConverter().getLocSetLDT()
+                .getAllLocs();
+        return getAssignablesForAbstractUpdate(update).contains(allLocs);
+    }
+
+    /**
+     * Checks whether an {@link AbstractUpdate} accesses the allLocs location
+     * set.
+     *
+     * @param update
+     *            The {@link AbstractUpdate} to check.
+     * @param services
+     *            The {@link Services} object (for the {@link LocSetLDT}).
+     * @return true iff the {@link AbstractUpdate} accesseaccesses allLocs location
+     *         set.
+     */
+    public static boolean accessesAllLocs(Term update, Services services) {
+        final Operator allLocs = services.getTypeConverter().getLocSetLDT()
+                .getAllLocs();
+        return getAccessiblesForAbstractUpdate(update).contains(allLocs);
     }
 }

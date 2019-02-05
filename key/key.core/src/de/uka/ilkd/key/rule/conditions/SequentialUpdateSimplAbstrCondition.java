@@ -35,6 +35,7 @@ import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
@@ -104,8 +105,17 @@ public final class SequentialUpdateSimplAbstrCondition
             return null;
         }
 
-
         final AbstractUpdate abstrUpd = (AbstractUpdate) u2Inst.op();
+
+        if (AbstractExecutionUtils.assignsAllLocs(abstrUpd, services)
+                || AbstractExecutionUtils.accessesAllLocs(u2Inst, services)) {
+            /*
+             * For this case (U(allLocs:=...) / U(...:=allLocs)) we may not do
+             * anything.
+             */
+            return null;
+        }
+
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         final Set<LocationVariable> assgnVarsOfAbstrUpd = abstrUpd
                 .getAssignables().stream()
