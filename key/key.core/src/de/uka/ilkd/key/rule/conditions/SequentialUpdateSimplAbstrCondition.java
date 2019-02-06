@@ -130,6 +130,10 @@ public final class SequentialUpdateSimplAbstrCondition
 
         for (LocationVariable lhs : MergeRuleUtils
                 .getUpdateLeftSideLocations(u1Inst)) {
+            if (assgnVarsOfAbstrUpd.contains(lhs)) {
+                continue;
+            }
+
             final Term rhs = MergeRuleUtils.getUpdateRightSideFor(u1Inst, lhs);
 
             if (rhs.op() instanceof LocationVariable) {
@@ -152,13 +156,11 @@ public final class SequentialUpdateSimplAbstrCondition
                 }
             }
 
-            if (!assgnVarsOfAbstrUpd.contains(lhs)) {
-                currentNewConcrUpdElems.add(currentConcrUpdElems.stream()
-                        .filter(t -> ((ElementaryUpdate) t.op()).lhs() == lhs)
-                        .findFirst().orElseThrow());
-                currentConcrUpdElems.removeIf(
-                        t -> ((ElementaryUpdate) t.op()).lhs() == lhs);
-            }
+            currentNewConcrUpdElems.add(currentConcrUpdElems.stream()
+                    .filter(t -> ((ElementaryUpdate) t.op()).lhs() == lhs)
+                    .findFirst().orElseThrow());
+            currentConcrUpdElems
+                    .removeIf(t -> ((ElementaryUpdate) t.op()).lhs() == lhs);
         }
 
         final Term newAbstrUpdTerm = tb.abstractUpdate(
