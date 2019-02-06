@@ -195,7 +195,7 @@ public final class SimplifyAbstractUpdateRenameSubstCondition
             final LocationVariable substCandidate = //
                     (LocationVariable) ((ElementaryUpdate) u3elem.op()).lhs();
 
-            if (!MergeRuleUtils
+            if (phiInst.containsJavaBlockRecursive() && !MergeRuleUtils
                     .getElementaryUpdates(newSecondConcreteUpdate, false)
                     .stream()
                     .filter(elem -> ((ElementaryUpdate) elem.op())
