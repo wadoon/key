@@ -723,6 +723,9 @@ public class MergeRuleUtils {
             }
             return result;
         }
+        else if (u.op() == UpdateJunctor.SKIP) {
+            return true;
+        }
         else {
             return false;
         }
