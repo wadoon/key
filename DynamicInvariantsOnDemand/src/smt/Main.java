@@ -43,8 +43,8 @@ public class Main {
 	private static String benchmarksFile2 = "benchmarks/easyloop1/EasyLoop1.java";
 	private static String benchmarksFile3 = "benchmarks/cohen/Cohen.java";
 	
-	private static final String digPath = "/home/daniel/git/dig/dig/dig.py";
-	
+//	private static final String digPath = "/home/daniel/git/dig/dig/dig.py";
+	private static final String digRelPath = "dig/dig/dig.py";
 	//amount of testcases / method calls for the function from which the traces should be obtained
 	public static final int maxLoopUnwinds = 12;
 	
@@ -132,7 +132,8 @@ public class Main {
 		//FIXME: Daniel: better Code
 		//Call DIG with traces to get Invariants
 		System.out.println("Call DIG with traces file to get Invariants..");
-		String invariants = callDIGGetInvs(digPath, tracesFilePath.toString());
+		Path digAbsPath = Paths.get(currentPath.toString(), digRelPath);
+		String invariants = callDIGGetInvs(digAbsPath.toString(), tracesFilePath.toString());
 		
 		Term suggestedInvariant	= keyAPI.getSuggestedInvariant(loop);
 		return new Invariant(suggestedInvariant);

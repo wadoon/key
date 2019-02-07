@@ -1,1 +1,9 @@
+/api/
+/core/
+/dynacode/
+/fooling/
+/genmethod/
+/gentest/
+/helperfunctions/
+/prover/
 /smt/

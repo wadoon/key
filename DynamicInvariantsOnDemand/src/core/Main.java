@@ -45,7 +45,6 @@ import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.testgen.TestCaseGenerator;
 import de.uka.ilkd.key.util.Debug;
 import genmethod.MethodGenerator;
 import prover.CounterExample;
@@ -113,6 +112,14 @@ public class Main {
 //		    final String testRandomXTerm = "geq(Z(5(#)),Z(0(#)))"; _> valid
 		    Term gammaTerm = gamma.get(4);
 		    Term customTerm = null;
+			final String originalDIGInv = "-x^2 + x*y + z == 0";
+			String modDIGInv = "-pow(x,2) + x*y + z == 0";
+		    try {
+				Term inv = tb.parseTerm(originalDIGInv);
+			} catch (ParserException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 		    
 		    try {
 		    	customTerm = tb.not(tb.parseTerm("geq(x,Z(5(#)))"));

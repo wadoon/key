@@ -22,7 +22,6 @@ import de.uka.ilkd.key.smt.SolverLauncherListener;
 import de.uka.ilkd.key.smt.SolverType;
 import de.uka.ilkd.key.smt.model.Model;
 import de.uka.ilkd.key.smt.testgen.MemoryTestGenerationLog;
-import de.uka.ilkd.key.testgen.TestCaseGenerator;
 
 public class ProblemFactory {
 
