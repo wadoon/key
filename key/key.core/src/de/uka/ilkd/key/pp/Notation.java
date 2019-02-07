@@ -479,7 +479,7 @@ public abstract class Notation {
     }
 
     /**
-     * The standard concrete syntax for singleton sets.
+     * The standard concrete syntax for singleton location sets.
      */
     public static final class SingletonNotation extends Notation {
 
@@ -490,6 +490,21 @@ public abstract class Notation {
         @Override
         public void print(Term t, LogicPrinter sp) throws IOException {
             sp.printSingleton(t);
+        }
+    }
+
+    /**
+     * The standard concrete syntax for singleton sets.
+     */
+    public static final class SingletonSetNotation extends Notation {
+
+        public SingletonSetNotation() {
+            super(130);
+        }
+
+        @Override
+        public void print(Term t, LogicPrinter sp) throws IOException {
+            sp.printTerm(t.sub(0));
         }
     }
 

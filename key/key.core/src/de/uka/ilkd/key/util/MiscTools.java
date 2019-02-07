@@ -19,9 +19,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -44,6 +46,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -843,6 +846,37 @@ public final class MiscTools {
         if (result != null && result.startsWith("FILE:")) {
             result = result.substring("FILE:".length());
         }
+        return result;
+    }
+
+    /**
+     * Dissects a term "x1 op x2 op ... op xn" to its constituents x1, ..., xn.
+     * The result is a set, i.e., in case of double occurrences, later ones are
+     * ignored. The result is sorted (LinkedHashSet):
+     *
+     * @param s
+     *            The term to split.
+     * @param splitAt
+     *            The operation op at which to split.
+     * @return The constituents of the given set-like term.
+     */
+    public static Set<Term> dissasembleSetTerm(Term s, Function splitAt) {
+        final Set<Term> result = new LinkedHashSet<>();
+        final Set<Term> workingList = new LinkedHashSet<>();
+        workingList.add(s);
+
+        while (!workingList.isEmpty()) {
+            final Term f = workingList.iterator().next();
+            workingList.remove(f);
+            if (f.op() == splitAt) {
+                workingList.add(f.sub(1));
+                workingList.add(f.sub(0));
+            }
+            else {
+                result.add(f);
+            }
+        }
+
         return result;
     }
 }

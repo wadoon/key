@@ -549,7 +549,7 @@ public final class UseDependencyContractRule implements BuiltInRule {
             // check if helpful
             if(!useful && !changedLocs.first.op().equals(locSetLDT.getEmpty())) {
                 final ImmutableSet<Term> changed
-                	= addEqualDefs(TB.unionToSet(
+                	= addEqualDefs(TB.locsetUnionToSet(
                 				      changedLocs.first),
                 				      goal);
                 if(!changed.contains(dep)) {

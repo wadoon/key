@@ -35,6 +35,7 @@ import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
@@ -1582,10 +1583,11 @@ public class LogicPrinter {
             Term t, Term r, int assRight) throws IOException {
         boolean isKeyword = false;
         if (this.services != null) {
-            LocSetLDT loc = this.services.getTypeConverter().getLocSetLDT();
+            final LocSetLDT loc = this.services.getTypeConverter().getLocSetLDT();
+            final SetLDT set = this.services.getTypeConverter().getSetLDT();
             isKeyword = (t.op() == Junctor.AND || t.op() == Junctor.OR
                     || t.op() == Junctor.IMP || t.op() == Equality.EQV
-                    || t.op() == loc.getUnion());
+                    || t.op() == loc.getUnion() || t.op() == set.getUnion());
         }
         int indent = name.length() + 1;
         startTerm(2);

@@ -96,10 +96,10 @@ public final class DropEffectlessElementariesCondition
                     .getLocSetLDT();
 
             final AbstractUpdate oldUpdate = (AbstractUpdate) update.op();
-            final List<Term> assignables = oldUpdate.getAssignables();
+            final Set<Term> assignables = oldUpdate.getAssignables();
 
-            if (assignables.isEmpty() || assignables.size() == 1
-                    && assignables.get(0) == locSetLDT.getAllLocs()) {
+            if (assignables.isEmpty() || assignables.size() == 1 && assignables
+                    .iterator().next() == locSetLDT.getAllLocs()) {
                 /*
                  * If we can assign everything, we stay on the save side and
                  * don't allow to drop the update.
@@ -108,7 +108,7 @@ public final class DropEffectlessElementariesCondition
             }
 
             if (!assignables.isEmpty() || assignables.size() == 1
-                    && assignables.get(0) == locSetLDT.getEmpty()) {
+                    && assignables.iterator().next() == locSetLDT.getEmpty()) {
                 /*
                  * If this update assigns anything when at the same time, there
                  * is an allLocs accessible in the target, we may not drop it
@@ -117,8 +117,8 @@ public final class DropEffectlessElementariesCondition
                  */
 
                 final Set<Operator> opsInTarget = //
-                        DropEffectlessAbstractUpdateCondition
-                                .collectNullaryOps(target, services);
+                        AbstractExecutionUtils
+                                .collectNullaryPVsOrSkLocSets(target, services);
 
                 if (opsInTarget.contains(locSetLDT.getAllLocs())) {
                     return null;
@@ -307,7 +307,8 @@ public final class DropEffectlessElementariesCondition
             final TypeConverter typeConverter = services.getTypeConverter();
 
             final List<BlockContract> contracts = //
-                    AbstractExecutionUtils.getNoBehaviorContracts(aps, services);
+                    AbstractExecutionUtils.getNoBehaviorContracts(aps,
+                            services);
 
             if (contracts.isEmpty()) {
                 return Collections.singletonList(

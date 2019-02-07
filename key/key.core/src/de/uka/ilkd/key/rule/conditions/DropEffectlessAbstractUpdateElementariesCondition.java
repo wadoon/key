@@ -111,15 +111,15 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
                         .orElse(elementaryAbstrUpd);
 
                 //// XXX Check: newUpdate can be an update junctor...
-                //if (DropEffectlessAbstractUpdateCondition
-                //        .dropEffectlessAbstractUpdate(newUpdate, target,
-                //                services)) {
-                //    /*
-                //     * Maybe new we can drop the update entirely, if it only
-                //     * writes things that are never read...
-                //     */
-                //    newUpdate = tb.skip();
-                //}
+                // if (DropEffectlessAbstractUpdateCondition
+                // .dropEffectlessAbstractUpdate(newUpdate, target,
+                // services)) {
+                // /*
+                // * Maybe new we can drop the update entirely, if it only
+                // * writes things that are never read...
+                // */
+                // newUpdate = tb.skip();
+                // }
 
                 newElementaryAbstractUpdates.set(i, newUpdate);
                 target = tb.apply(newUpdate, target);
@@ -165,12 +165,14 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
         final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
 
         final Set<Operator> opsInAssignable = //
-                DropEffectlessAbstractUpdateCondition
-                        .collectNullaryOps(abstrUpd.lhs(), services);
+                AbstractExecutionUtils
+                        .collectNullaryPVsOrSkLocSets(abstrUpd.lhs(), services);
         final Term abstrUpdAccessiblesTerm = update.sub(0);
 
         final Function allLocs = //
                 services.getTypeConverter().getLocSetLDT().getAllLocs();
+        final TermBuilder tb = services.getTermBuilder();
+
         if (opsInAssignable.contains(allLocs)) {
             /*
              * If an abstract update may change all locations, then it is never
@@ -181,10 +183,9 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
              */
 
             if (opsInAssignable.size() > 1) {
-                return services.getTermBuilder().abstractUpdate(
+                return tb.abstractUpdate(
                         abstrUpd.getAbstractPlaceholderStatement(),
-                        services.getTermBuilder().allLocs(),
-                        abstrUpdAccessiblesTerm);
+                        tb.allLocs(), abstrUpdAccessiblesTerm);
             }
 
             return null;
@@ -198,14 +199,14 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             return null;
         }
 
-        final Set<Operator> abstrUpdAccessibles = //
-                DropEffectlessAbstractUpdateCondition
-                        .collectNullaryOps(abstrUpdAccessiblesTerm, services);
+        final Set<Term> abstrUpdAccessibles = //
+                tb.setUnionToSet(abstrUpdAccessiblesTerm);
 
         final Set<Operator> opsAssignedBeforeUsed = opsAnalysisResult.first
                 .stream()
                 /* We remove the accessibles of the abstract update itself. */
-                .filter(op -> !abstrUpdAccessibles.contains(op))
+                .filter(op -> !abstrUpdAccessibles.stream().map(t -> t.sub(0))
+                        .map(Term::op).anyMatch(top -> top == op))
                 .collect(Collectors.toSet());
 
         final Set<Operator> newOpsInAssignable = opsInAssignable.stream()
@@ -219,8 +220,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
         final OpCollector opColl = new OpCollector();
         target.execPostOrder(opColl);
 
-        Term newAccessiblesTerm = abstrUpdAccessiblesTerm;
-        final Set<Operator> newAbstrUpdAccessibles = //
+        final Set<Term> newAbstrUpdAccessibles = //
                 new LinkedHashSet<>(abstrUpdAccessibles);
         /* We create a new set to prevent concurrent modifications. */
         for (Operator op : new LinkedHashSet<>(newOpsInAssignable)) {
@@ -230,11 +230,14 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
                  * accessibles.
                  */
                 newOpsInAssignable.remove(op);
-                newAbstrUpdAccessibles.remove(op);
-                newAccessiblesTerm = AbstractExecutionUtils
-                        .opsToLocSetUnion(newAbstrUpdAccessibles, services);
+                newAbstrUpdAccessibles.stream().filter(t -> t.op() != op)
+                        .collect(Collectors
+                                .toCollection(() -> new LinkedHashSet<>()));
             }
         }
+
+        final Term newAccessiblesTerm = tb.setUnion(newAbstrUpdAccessibles
+                .stream().map(tb::setSingleton).collect(Collectors.toList()));
 
         if (opsInAssignable.stream()
                 .noneMatch(op -> !newOpsInAssignable.contains(op))) {
@@ -243,10 +246,10 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
         }
 
         if (newOpsInAssignable.isEmpty()) {
-            return services.getTermBuilder().skip();
+            return tb.skip();
         }
 
-        return services.getTermBuilder()
+        return tb
                 .abstractUpdate(abstrUpd.getAbstractPlaceholderStatement(),
                         AbstractExecutionUtils
                                 .opsToLocSetUnion(newOpsInAssignable, services),

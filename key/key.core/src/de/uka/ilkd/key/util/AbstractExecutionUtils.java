@@ -10,8 +10,11 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.java.visitor.ProgVarAndLocSetsCollector;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.SetLDT;
+import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -28,7 +31,6 @@ import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.conditions.DropEffectlessAbstractUpdateCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
@@ -39,37 +41,57 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * @author Dominic Steinhoefel
  */
 public class AbstractExecutionUtils {
+    public static class TermNullaryOpCollector extends DefaultVisitor {
+        private final Set<Operator> result = new LinkedHashSet<>();
+        private final Services services;
+
+        public TermNullaryOpCollector(Services services) {
+            this.services = services;
+        }
+
+        @Override
+        public void visit(Term t) {
+            if (t.op().arity() == 0) {
+                result.add(t.op());
+            }
+
+            if (!t.javaBlock().isEmpty()) {
+                final ProgVarAndLocSetsCollector pvc = //
+                        new ProgVarAndLocSetsCollector( //
+                                t.javaBlock().program(), services);
+                pvc.start();
+                result.addAll(pvc.result());
+            }
+        }
+
+        public Set<Operator> result() {
+            return result;
+        }
+    }
+
     /**
-     * Returns the assignable {@link Operator}s (i.e. {@ProgramVariable}s and
-     * Skolem location sets) of the "right" no-behavior contract for the given
-     * {@link AbstractPlaceholderStatement}.
+     * Returns the accessible {@link Term}s of the "right" no-behavior contract
+     * for the given {@link AbstractPlaceholderStatement}.
      *
      * @param aps
      *            The {@link AbstractPlaceholderStatement} for which to return
-     *            the assignable {@link Operator}s.
+     *            the accessible {@link Term}s.
      * @param context
      *            The context program (for choosing the "right" contract).
      * @param services
      *            The {@link Services} object.
-     * @return The accessible {@link Operator}s for the given
+     * @return The accessible {@link Term}s for the given
      *         {@link AbstractPlaceholderStatement}.
      */
-    public static List<Operator> getAccessibleOpsForNoBehaviorContract(
+    public static Set<Term> getAccessibleTermsForNoBehaviorContract(
             AbstractPlaceholderStatement aps, ProgramElement context,
             Services services) {
-        final Term assignableTerm = AbstractExecutionUtils
+        final Term accessibleTerm = AbstractExecutionUtils
                 .getAccessibleAndAssignableTermsForNoBehaviorContract(aps,
                         context, services).first;
-        final Sort locSetSort = //
-                services.getTypeConverter().getLocSetLDT().targetSort();
-
-        final OpCollector opColl = new OpCollector();
-        assignableTerm.execPostOrder(opColl);
-        return opColl.ops().stream()
-                .filter(op -> op instanceof ProgramVariable
-                        || (op instanceof Function && op.arity() == 0
-                                && ((Function) op).sort() == locSetSort))
-                .collect(Collectors.toList());
+        final SetLDT setLDT = //
+                services.getTypeConverter().getSetLDT();
+        return MiscTools.dissasembleSetTerm(accessibleTerm, setLDT.getUnion());
     }
 
     /**
@@ -89,8 +111,9 @@ public class AbstractExecutionUtils {
     public static List<ProgramVariable> getAccessibleProgVarsForNoBehaviorContract(
             AbstractPlaceholderStatement aps, ProgramElement context,
             Services services) {
-        return getAccessibleOpsForNoBehaviorContract(aps, context, services)
-                .stream().filter(op -> op instanceof ProgramVariable)
+        return getAccessibleTermsForNoBehaviorContract(aps, context, services)
+                .stream().map(Term::op)
+                .filter(ProgramVariable.class::isInstance)
                 .map(ProgramVariable.class::cast).collect(Collectors.toList());
     }
 
@@ -300,7 +323,8 @@ public class AbstractExecutionUtils {
      *            The {@link AbstractPlaceholderStatement} for which to extract
      *            the accessible and assignable clause.
      * @param surroundingVars
-     *            TODO
+     *            {@link LocationVariable}s in the context to distinguish
+     *            several contracts.
      * @param services
      *            The {@link Services} object.
      * @return A pair of (1) the accessible and (2) the assignable clause for
@@ -321,7 +345,8 @@ public class AbstractExecutionUtils {
                 getNoBehaviorContracts(abstrStmt, services);
 
         if (contracts.isEmpty()) {
-            accessibleClause = tb.func(locSetLDT.getAllLocs());
+            accessibleClause = locSetUnionToSetUnion(
+                    tb.func(locSetLDT.getAllLocs()), services);
             assignableClause = tb.func(locSetLDT.getAllLocs());
         }
         else {
@@ -331,16 +356,46 @@ public class AbstractExecutionUtils {
             final BlockContract contract = findRightContract(contracts,
                     surroundingVars, heap, services);
 
-            accessibleClause = contract.getAccessibleClause(heap);
+            accessibleClause = locSetUnionToSetUnion(
+                    contract.getAccessibleClause(heap), services);
             assignableClause = contract.getAssignable(heap);
-
-            /*
-             * TODO (DS, 2018-12-21): At this point, we might have to check that
-             * the accessibles are actually accessible...
-             */
         }
 
         return new Pair<Term, Term>(accessibleClause, assignableClause);
+    }
+
+    /**
+     * Converts a union {@link Term} of {@link LocSetLDT} to a corresponding
+     * union {@link Term} of {@link SetLDT};
+     *
+     * @param t
+     *            The union {@link Term} to convert.
+     * @param services
+     *            The {@link Services} project.
+     * @return The converted {@link Term}.
+     */
+    public static Term locSetUnionToSetUnion(Term t, Services services) {
+        final Set<Term> constituents = new LinkedHashSet<>();
+        final Function locSetEmpty = //
+                services.getTypeConverter().getLocSetLDT().getEmpty();
+
+        /* We remove the "PV(...)" or "singletonPV("...)" wrappers */
+        t.execPostOrder(new DefaultVisitor() {
+            @Override
+            public void visit(Term visited) {
+                if (visited.op() == locSetEmpty) {
+                    return;
+                }
+
+                if (visited.op().arity() == 0) {
+                    constituents.add(visited);
+                }
+            }
+        });
+
+        final TermBuilder tb = services.getTermBuilder();
+        return tb.setUnion(constituents.stream().map(tb::setSingleton)
+                .collect(Collectors.toList()));
     }
 
     /**
@@ -420,23 +475,22 @@ public class AbstractExecutionUtils {
     }
 
     /**
-     * Returns all nullary operators in the RHS of an {@link AbstractUpdate}
-     * term, which should be location variables or Skolem location sets.
+     * Returns {@link Term}s of the RHS of an {@link AbstractUpdate} term.
      *
      * @param update
      *            The {@link AbstractUpdate} {@link Term} for which to return
      *            the accessibles.
-     * @return All nullary operators in the RHS of an {@link AbstractUpdate}
-     *         term.
+     * @param tb
+     *            The {@link TermBuilder}, needed for disassembling the update
+     *            {@link Term}.
+     * @return All {@link Term}s in the RHS of an {@link AbstractUpdate} term.
      */
-    public static Set<Operator> getAccessiblesForAbstractUpdate(Term update) {
+    public static Set<Term> getAccessiblesForAbstractUpdate(Term update,
+            TermBuilder tb) {
         assert update.op() instanceof AbstractUpdate;
         assert update.arity() == 1;
 
-        final OpCollector opColl = new OpCollector();
-        update.sub(0).execPostOrder(opColl);
-        return opColl.ops().stream().filter(op -> op.arity() == 0)
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+        return tb.setUnionToSet(update.sub(0));
     }
 
     /**
@@ -637,14 +691,14 @@ public class AbstractExecutionUtils {
             final Set<Operator> usedBeforeAssigned, Services services) {
         assert update.op() instanceof AbstractUpdate;
 
-        usedBeforeAssigned.addAll(DropEffectlessAbstractUpdateCondition
-                .collectNullaryOps(update.sub(0), services).stream()
+        usedBeforeAssigned.addAll(AbstractExecutionUtils
+                .collectNullaryPVsOrSkLocSets(update.sub(0), services).stream()
                 .filter(op -> !assignedBeforeUsed.contains(op))
                 .collect(Collectors.toSet()));
 
-        assignedBeforeUsed.addAll(DropEffectlessAbstractUpdateCondition
-                .collectNullaryOps(((AbstractUpdate) update.op()).lhs(),
-                        services)
+        assignedBeforeUsed.addAll(AbstractExecutionUtils
+                .collectNullaryPVsOrSkLocSets(
+                        ((AbstractUpdate) update.op()).lhs(), services)
                 .stream().filter(op -> !usedBeforeAssigned.contains(op))
                 .collect(Collectors.toSet()));
     }
@@ -722,8 +776,8 @@ public class AbstractExecutionUtils {
      */
     public static boolean assignsAllLocs(AbstractUpdate update,
             Services services) {
-        final Operator allLocs = services.getTypeConverter().getLocSetLDT()
-                .getAllLocs();
+        final Operator allLocs = //
+                services.getTypeConverter().getLocSetLDT().getAllLocs();
         return getAssignablesForAbstractUpdate(update).contains(allLocs);
     }
 
@@ -735,12 +789,38 @@ public class AbstractExecutionUtils {
      *            The {@link AbstractUpdate} to check.
      * @param services
      *            The {@link Services} object (for the {@link LocSetLDT}).
-     * @return true iff the {@link AbstractUpdate} accesseaccesses allLocs location
-     *         set.
+     * @return true iff the {@link AbstractUpdate} accesseaccesses allLocs
+     *         location set.
      */
     public static boolean accessesAllLocs(Term update, Services services) {
         final Operator allLocs = services.getTypeConverter().getLocSetLDT()
                 .getAllLocs();
-        return getAccessiblesForAbstractUpdate(update).contains(allLocs);
+        return getAccessiblesForAbstractUpdate(update,
+                services.getTermBuilder()).stream()
+                        .anyMatch(t -> t.op() == allLocs);
+    }
+
+    /**
+     * Collects nullary {@link Operator}s in the given {@link Term} that are
+     * either (1) {@link ProgramVariable}s or (2) Skolem location sets
+     * ({@link LocSetLDT}).
+     *
+     * @param t
+     *            The {@link Term} from which to extract.
+     * @param services
+     *            The {@link Services} object (for {@link LocSetLDT} and op
+     *            collector in programs).
+     * @return The {@link Operator}s.
+     */
+    public static Set<Operator> collectNullaryPVsOrSkLocSets(Term t,
+            Services services) {
+        final TermNullaryOpCollector collector = //
+                new TermNullaryOpCollector(services);
+        t.execPostOrder(collector);
+        return collector.result().stream().filter(
+                op -> op instanceof ProgramVariable || (op instanceof Function
+                        && ((Function) op).sort() == services.getTypeConverter()
+                                .getLocSetLDT().targetSort()))
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 }

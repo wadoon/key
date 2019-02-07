@@ -50,8 +50,8 @@ public final class MetaDisjointCondition extends VariableConditionAdapter {
 	    return true;
 	} else if(t1.sort().equals(setLDT.targetSort()) 
 		  && t2.sort().equals(setLDT.targetSort())) {
-	    final ImmutableSet<Term> t1set = services.getTermBuilder().unionToSet(t1);
-	    final ImmutableSet<Term> t2set = services.getTermBuilder().unionToSet(t2);
+	    final ImmutableSet<Term> t1set = services.getTermBuilder().locsetUnionToSet(t1);
+	    final ImmutableSet<Term> t2set = services.getTermBuilder().locsetUnionToSet(t2);
 
 	    ImmutableSet<Operator> t1Ops 
 	    	= DefaultImmutableSet.<Operator>nil();

@@ -13,8 +13,15 @@
 
 package org.key_project.util.collection;
 
-import java.util.*;
-import java.util.function.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -438,33 +445,33 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
     }
 
-    public static <T> Collector<T, List<T>, ImmutableSet<T>> toImmutableSet() {
+    public static <T> Collector<T, Set<T>, ImmutableSet<T>> toImmutableSet() {
         return new ImmutableSetCollector<>();
     }
 
     static class ImmutableSetCollector<T>
-            implements Collector<T, List<T>, ImmutableSet<T>> {
+            implements Collector<T, Set<T>, ImmutableSet<T>> {
 
         @Override
-        public Supplier<List<T>> supplier() {
-            return () -> new ArrayList<>();
+        public Supplier<Set<T>> supplier() {
+            return () -> new LinkedHashSet<>();
         }
 
         @Override
-        public BiConsumer<List<T>, T> accumulator() {
-            return (list, entry) -> list.add(entry);
+        public BiConsumer<Set<T>, T> accumulator() {
+            return (set, entry) -> set.add(entry);
         }
 
         @Override
-        public BinaryOperator<List<T>> combiner() {
-            return (l1, l2) -> {
-                l1.addAll(l2);
-                return l1;
+        public BinaryOperator<Set<T>> combiner() {
+            return (s1, s2) -> {
+                s1.addAll(s2);
+                return s1;
             };
         }
 
         @Override
-        public Function<List<T>, ImmutableSet<T>> finisher() {
+        public Function<Set<T>, ImmutableSet<T>> finisher() {
             return list -> {
                 ImmutableSet<T> result = DefaultImmutableSet.nil();
                 for (T t : list) {
@@ -476,9 +483,7 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
 
         @Override
         public Set<Characteristics> characteristics() {
-            Set<Characteristics> result = new HashSet<>();
-            result.add(Characteristics.UNORDERED);
-            return result;
+            return Collections.emptySet();
         }
     }
 }

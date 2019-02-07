@@ -13,15 +13,12 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.visitor.ProgVarAndLocSetsCollector;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -35,6 +32,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.util.AbstractExecutionUtils;
 
 /**
  * Variable condition dropping abstract updates which only write to locations
@@ -58,7 +56,8 @@ public final class DropEffectlessAbstractUpdateCondition
         final SVInstantiations svInst = mc.getInstantiations();
         final Term u = (Term) svInst.getInstantiation(uSV);
 
-        final Term target = instSchematicTerm(schematicTarget, svInst, services);
+        final Term target = instSchematicTerm(schematicTarget, svInst,
+                services);
 
         if (u == null || target == null
                 || !(u.op() instanceof AbstractUpdate)) {
@@ -131,9 +130,10 @@ public final class DropEffectlessAbstractUpdateCondition
         // XXX (DS, 2019-02-01): The passed update can be a junctor, careful!
         final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
 
-        final Set<Operator> opsInTarget = collectNullaryOps(target, services);
+        final Set<Operator> opsInTarget = AbstractExecutionUtils.collectNullaryPVsOrSkLocSets(target,
+                services);
         final Set<Operator> opsInAssignable = //
-                collectNullaryOps(abstrUpd.lhs(), services);
+                AbstractExecutionUtils.collectNullaryPVsOrSkLocSets(abstrUpd.lhs(), services);
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
 
         if (opsInAssignable.size() == 1
@@ -172,39 +172,5 @@ public final class DropEffectlessAbstractUpdateCondition
     public String toString() {
         return String.format("\\dropEffectlessAbstractUpdate(%s, %s)", uSV,
                 schematicTarget);
-    }
-
-    public static Set<Operator> collectNullaryOps(Term t, Services services) {
-        TermNullaryOpCollector collector = new TermNullaryOpCollector(services);
-        t.execPostOrder(collector);
-        return collector.result();
-    }
-
-    private static class TermNullaryOpCollector extends DefaultVisitor {
-        private final Set<Operator> result = new LinkedHashSet<>();
-        private final Services services;
-
-        public TermNullaryOpCollector(Services services) {
-            this.services = services;
-        }
-
-        @Override
-        public void visit(Term t) {
-            if (t.op().arity() == 0) {
-                result.add(t.op());
-            }
-
-            if (!t.javaBlock().isEmpty()) {
-                final ProgVarAndLocSetsCollector pvc = //
-                        new ProgVarAndLocSetsCollector( //
-                                t.javaBlock().program(), services);
-                pvc.start();
-                result.addAll(pvc.result());
-            }
-        }
-
-        public Set<Operator> result() {
-            return result;
-        }
     }
 }

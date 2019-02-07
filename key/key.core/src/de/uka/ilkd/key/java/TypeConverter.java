@@ -21,7 +21,6 @@ import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
-import recoder.service.ConstantEvaluator;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.ClassType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -75,6 +74,7 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.MapLDT;
 import de.uka.ilkd.key.ldt.PermissionLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramInLogic;
 import de.uka.ilkd.key.logic.Term;
@@ -87,6 +87,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
+import recoder.service.ConstantEvaluator;
 
 public final class TypeConverter {
 
@@ -95,21 +96,21 @@ public final class TypeConverter {
 
     // Maps LDT names to LDT instances.
     private Map<Name,LDT> LDTs = null;
-    
+
     private ImmutableList<LDT> models = ImmutableSLList.<LDT>nil();
-    
+
     private HeapLDT heapLDT = null;
     private IntegerLDT integerLDT = null;
-    
+
     TypeConverter(Services s) {
         this.services = s;
         this.tb = services.getTermBuilder();
     }
-    
+
     public void init(){
         init(LDT.getNewLDTInstances(services));
     }
-    
+
     private void init(Map<Name, LDT> map) {
         LDTs = map;
         models = ImmutableSLList.<LDT>nil();
@@ -135,7 +136,7 @@ public final class TypeConverter {
         Debug.out("No LDT found for ", s);
         return null;
     }
-    
+
     private LDT getLDT(Name ldtName) {
         if (LDTs == null) {
             return null;
@@ -143,13 +144,17 @@ public final class TypeConverter {
             return LDTs.get(ldtName);
         }
     }
-    
+
     public IntegerLDT getIntegerLDT() {
         return (IntegerLDT) getLDT(IntegerLDT.NAME);
     }
 
     public BooleanLDT getBooleanLDT() {
         return (BooleanLDT) getLDT(BooleanLDT.NAME);
+    }
+
+    public SetLDT getSetLDT() {
+        return (SetLDT) getLDT(SetLDT.NAME);
     }
 
     public LocSetLDT getLocSetLDT() {
@@ -167,7 +172,7 @@ public final class TypeConverter {
     public SeqLDT getSeqLDT() {
 	return (SeqLDT) getLDT(SeqLDT.NAME);
     }
-    
+
     public MapLDT getMapLDT() {
 	return (MapLDT) getLDT(MapLDT.NAME);
     }
@@ -295,7 +300,7 @@ public final class TypeConverter {
     	IProgramMethod pm = mr.method(services, services.getTypeConverter().getKeYJavaType(p), ec);
     	if(pm.isModel()) {
     	  ImmutableArray<? extends Expression> args = mr.getArguments();
-    	  Term[] argTerms = new Term[args.size()+2]; // heap, self, 
+    	  Term[] argTerms = new Term[args.size()+2]; // heap, self,
     	  int index = 0;
     	  for(LocationVariable h : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
     		  if(h == services.getTypeConverter().getHeapLDT().getSavedHeap()) {
@@ -311,7 +316,7 @@ public final class TypeConverter {
     	}
     	throw new IllegalArgumentException ("TypeConverter could not handle this");
     }
- 
+
     public Term convertVariableReference(VariableReference fr,
 					 ExecutionContext ec) {
 	Debug.out("TypeConverter: FieldReference: ", fr);

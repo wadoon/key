@@ -104,8 +104,8 @@ public class InitializeParametricSkolemPathCondition
         for (final ProgramSV furtherSV : varsToConsider) {
             final LocationVariable furtherLV = (LocationVariable) svInst
                     .getInstantiation(furtherSV);
-            accessibleClause = tb.union(accessibleClause,
-                    tb.singletonPV(tb.var(furtherLV)));
+            accessibleClause = tb.setUnion(accessibleClause,
+                    tb.setSingleton(tb.var(furtherLV)));
         }
 
         /*
@@ -121,15 +121,15 @@ public class InitializeParametricSkolemPathCondition
         // @formatter:on;
         final String pathCondName = //
                 pathCondSV.name().toString() + "_" + abstrStmt.getId();
-        final Sort locSetSort = //
-                services.getTypeConverter().getLocSetLDT().targetSort();
+        final Sort setSort = //
+                services.getTypeConverter().getSetLDT().targetSort();
 
         final Name funcSymbName = new Name(pathCondName);
         Function funcSymb = //
                 services.getNamespaces().functions().lookup(funcSymbName);
         if (funcSymb == null) {
             funcSymb = new Function( //
-                    funcSymbName, Sort.FORMULA, true, false, locSetSort);
+                    funcSymbName, Sort.FORMULA, true, false, setSort);
             services.getNamespaces().functions().add(funcSymb);
         }
 

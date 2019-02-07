@@ -22,6 +22,7 @@ import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
+import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -280,15 +281,20 @@ public final class NotationInfo {
             seqLDT.getSeqSingleton(), integerLDT.getCharSymbol()));
 
 	//set operators
-	final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
-	tbl.put(setLDT.getSingleton(), new Notation.SingletonNotation());
+	final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+	tbl.put(locSetLDT.getSingleton(), new Notation.SingletonNotation());
+	tbl.put(locSetLDT.getUnion(), new Notation.Infix("\\cup", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+	tbl.put(locSetLDT.getIntersect(), new Notation.Infix("\\cap", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+	tbl.put(locSetLDT.getSetMinus(), new Notation.Infix("\\setMinus", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+	tbl.put(locSetLDT.getElementOf(), new Notation.ElementOfNotation());
+    tbl.put(locSetLDT.getSubset(), new Notation.Infix("\\subset", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+    tbl.put(locSetLDT.getEmpty(), new Notation.Constant("{}", PRIORITY_ATOM));
+    tbl.put(locSetLDT.getAllFields(), new Notation.Postfix(".*"));
+
+	final SetLDT setLDT = services.getTypeConverter().getSetLDT();
+	tbl.put(setLDT.getSingleton(), new Notation.SingletonSetNotation());
 	tbl.put(setLDT.getUnion(), new Notation.Infix("\\cup", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-	tbl.put(setLDT.getIntersect(), new Notation.Infix("\\cap", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-	tbl.put(setLDT.getSetMinus(), new Notation.Infix("\\setMinus", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-	tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation());
-        tbl.put(setLDT.getSubset(), new Notation.Infix("\\subset", PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-        tbl.put(setLDT.getEmpty(), new Notation.Constant("{}", PRIORITY_ATOM));
-        tbl.put(setLDT.getAllFields(), new Notation.Postfix(".*"));
+    tbl.put(setLDT.getEmpty(), new Notation.Constant("{}", PRIORITY_ATOM));
 
 	return tbl;
     }
@@ -302,7 +308,6 @@ public final class NotationInfo {
         HashMap<Object,Notation> tbl = createPrettyNotation(services);
 
         final IntegerLDT integerLDT = services.getTypeConverter().getIntegerLDT();
-        final LocSetLDT setLDT = services.getTypeConverter().getLocSetLDT();
 
     	tbl.put(integerLDT.getJavaCastByte(), new Notation.Prefix("(byte)", PRIORITY_CAST, PRIORITY_BOTTOM));
     	tbl.put(integerLDT.getJavaCastShort(), new Notation.Prefix("(short)", PRIORITY_CAST, PRIORITY_BOTTOM));
@@ -321,12 +326,19 @@ public final class NotationInfo {
         tbl.put(Quantifier.EX, new Notation.Quantifier(""+UnicodeHelper.EXISTS, PRIORITY_QUANTIFIER, PRIORITY_QUANTIFIER));
         tbl.put(integerLDT.getLessOrEquals(), new Notation.Infix(""+UnicodeHelper.LEQ, PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
         tbl.put(integerLDT.getGreaterOrEquals(), new Notation.Infix(""+UnicodeHelper.GEQ, PRIORITY_COMPARISON, PRIORITY_ARITH_WEAK, PRIORITY_ARITH_WEAK));
+
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        tbl.put(locSetLDT.getEmpty(), new Notation.Constant(""+UnicodeHelper.EMPTY, PRIORITY_ATOM));
+        tbl.put(locSetLDT.getUnion(), new Notation.Infix(""+UnicodeHelper.UNION, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(locSetLDT.getIntersect(), new Notation.Infix(""+UnicodeHelper.INTERSECT, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(locSetLDT.getSetMinus(), new Notation.Infix(""+UnicodeHelper.SETMINUS, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+        tbl.put(locSetLDT.getElementOf(), new Notation.ElementOfNotation(" " + UnicodeHelper.IN + " "));
+        tbl.put(locSetLDT.getSubset(), new Notation.Infix(""+UnicodeHelper.SUBSET, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+
+        final SetLDT setLDT = services.getTypeConverter().getSetLDT();
         tbl.put(setLDT.getEmpty(), new Notation.Constant(""+UnicodeHelper.EMPTY, PRIORITY_ATOM));
         tbl.put(setLDT.getUnion(), new Notation.Infix(""+UnicodeHelper.UNION, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-        tbl.put(setLDT.getIntersect(), new Notation.Infix(""+UnicodeHelper.INTERSECT, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-        tbl.put(setLDT.getSetMinus(), new Notation.Infix(""+UnicodeHelper.SETMINUS, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
-        tbl.put(setLDT.getElementOf(), new Notation.ElementOfNotation(" " + UnicodeHelper.IN + " "));
-        tbl.put(setLDT.getSubset(), new Notation.Infix(""+UnicodeHelper.SUBSET, PRIORITY_ATOM, PRIORITY_TOP, PRIORITY_TOP));
+
         tbl.put(services.getTypeConverter().getHeapLDT().getPrec(), new Notation.Infix(""+UnicodeHelper.PRECEDES, PRIORITY_ATOM,PRIORITY_TOP, PRIORITY_TOP));
 
         //seq operators

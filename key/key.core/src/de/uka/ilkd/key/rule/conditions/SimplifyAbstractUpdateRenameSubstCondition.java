@@ -248,7 +248,13 @@ public final class SimplifyAbstractUpdateRenameSubstCondition
         //@formatter:on
 
         final Set<LocationVariable> accessibles = AbstractExecutionUtils
-                .getAccessiblesForAbstractUpdate(newAbstrUpd).stream()
+                .getAccessiblesForAbstractUpdate(
+                        newAbstrUpd, services.getTermBuilder())
+                .stream().map(Term::op) /*
+                                         * TODO (DS, 2019-02-07): Has to be
+                                         * changed probably, there are Terms in
+                                         * there now
+                                         */
                 .filter(LocationVariable.class::isInstance)
                 .map(LocationVariable.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));

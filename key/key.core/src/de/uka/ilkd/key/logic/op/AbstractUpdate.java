@@ -14,16 +14,16 @@
 package de.uka.ilkd.key.logic.op;
 
 import java.lang.ref.WeakReference;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
-import de.uka.ilkd.key.ldt.LDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Class of operators for abstract updates (in the sense of Abstract Execution),
@@ -40,14 +40,15 @@ public final class AbstractUpdate extends AbstractSortedOperator {
 
     private final AbstractPlaceholderStatement phs;
     private final Term lhs;
-    private final List<Term> assignables;
+    private final Set<Term> assignables;
 
     private AbstractUpdate(AbstractPlaceholderStatement phs, Term lhs,
-            LocSetLDT locSetLDT) {
+            LocSetLDT locSetLDT, SetLDT setLDT) {
         super(new Name("U_" + phs.getId() + "(" + lhs + ")"),
-                new Sort[] { lhs.sort() }, Sort.UPDATE, false);
+                new Sort[] { setLDT.targetSort() }, Sort.UPDATE, false);
         this.lhs = lhs;
-        this.assignables = getUnionElements(lhs, locSetLDT);
+        this.assignables = MiscTools.dissasembleSetTerm(lhs,
+                locSetLDT.getUnion());
         this.phs = phs;
         assert lhs.sort() == locSetLDT.targetSort();
     }
@@ -56,7 +57,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * Returns the abstract update operator for the passed left hand side.
      */
     public static AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
-            Term lhs, LocSetLDT locSetLDT) {
+            Term lhs, LocSetLDT locSetLDT, SetLDT setLDT) {
         if (INSTANCES.get(phs) == null) {
             INSTANCES.put(phs, new WeakHashMap<>());
         }
@@ -64,7 +65,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
         WeakReference<AbstractUpdate> result = INSTANCES.get(phs).get(lhs);
         if (result == null || result.get() == null) {
             result = new WeakReference<AbstractUpdate>(
-                    new AbstractUpdate(phs, lhs, locSetLDT));
+                    new AbstractUpdate(phs, lhs, locSetLDT, setLDT));
             INSTANCES.get(phs).put(lhs, result);
         }
 
@@ -100,30 +101,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      *
      * @return The elements of the assignables union of this abstract update.
      */
-    public List<Term> getAssignables() {
+    public Set<Term> getAssignables() {
         return assignables;
-    }
-
-    /**
-     * Retrieves the elements of a union and returns them as a list.
-     *
-     * @param t
-     *            The term to disassemble.
-     * @param locSetLDT
-     *            The locset {@link LDT}.
-     * @return The elements of the given union.
-     */
-    private static List<Term> getUnionElements(Term t, LocSetLDT locSetLDT) {
-        final LinkedList<Term> result = new LinkedList<>();
-
-        if (t.op() != locSetLDT.getUnion()) {
-            result.add(t);
-            return result;
-        }
-        else {
-            result.addAll(getUnionElements(t.sub(0), locSetLDT));
-            result.addAll(getUnionElements(t.sub(1), locSetLDT));
-            return result;
-        }
     }
 }
