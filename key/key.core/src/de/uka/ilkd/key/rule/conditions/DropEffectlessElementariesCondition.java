@@ -24,10 +24,8 @@ import de.uka.ilkd.key.java.SourceElement;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
-import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
@@ -91,63 +89,64 @@ public final class DropEffectlessElementariesCondition
             }
         }
         else if (update.op() instanceof AbstractUpdate) {
-            final TermBuilder tb = services.getTermBuilder();
-            final LocSetLDT locSetLDT = services.getTypeConverter()
-                    .getLocSetLDT();
+            return null;
+            //final TermBuilder tb = services.getTermBuilder();
+            //final LocSetLDT locSetLDT = services.getTypeConverter()
+            //        .getLocSetLDT();
 
-            final AbstractUpdate oldUpdate = (AbstractUpdate) update.op();
-            final Set<Term> assignables = oldUpdate.getAssignables();
+            //final AbstractUpdate oldUpdate = (AbstractUpdate) update.op();
+            //final Set<Term> assignables = oldUpdate.getAssignables();
 
-            if (assignables.isEmpty() || assignables.size() == 1 && assignables
-                    .iterator().next() == locSetLDT.getAllLocs()) {
-                /*
-                 * If we can assign everything, we stay on the save side and
-                 * don't allow to drop the update.
-                 */
-                return null;
-            }
+            //if (assignables.isEmpty() || assignables.size() == 1 && assignables
+            //        .iterator().next() == locSetLDT.getAllLocs()) {
+            //    /*
+            //     * If we can assign everything, we stay on the save side and
+            //     * don't allow to drop the update.
+            //     */
+            //    return null;
+            //}
 
-            if (!assignables.isEmpty() || assignables.size() == 1
-                    && assignables.iterator().next() == locSetLDT.getEmpty()) {
-                /*
-                 * If this update assigns anything when at the same time, there
-                 * is an allLocs accessible in the target, we may not drop it
-                 * (assignable is not relevant, but we ignore this for now --
-                 * it's "only" a completeness problem).
-                 */
+            //if (!assignables.isEmpty() || assignables.size() == 1
+            //        && assignables.iterator().next() == locSetLDT.getEmpty()) {
+            //    /*
+            //     * If this update assigns anything when at the same time, there
+            //     * is an allLocs accessible in the target, we may not drop it
+            //     * (assignable is not relevant, but we ignore this for now --
+            //     * it's "only" a completeness problem).
+            //     */
 
-                final Set<Operator> opsInTarget = //
-                        AbstractExecutionUtils
-                                .collectNullaryPVsOrSkLocSets(target, services);
+            //    final Set<Operator> opsInTarget = //
+            //            AbstractExecutionUtils
+            //                    .collectNullaryPVsOrSkLocSets(target, services);
 
-                if (opsInTarget.contains(locSetLDT.getAllLocs())) {
-                    return null;
-                }
-            }
+            //    if (opsInTarget.contains(locSetLDT.getAllLocs())) {
+            //        return null;
+            //    }
+            //}
 
-            /*
-             * TODO (DS, 2019-01-03): There might also be fields in the loc set,
-             * we might have to eventually consider this. As of now, there are
-             * no examples for this case...
-             */
-            final List<Term> relevantAssignables = assignables.stream()
-                    .filter(t -> t.op() != locSetLDT.getSingletonPV()
-                            || relevantVars.contains(t.sub(0).sub(0).op()))
-                    .collect(Collectors.toList());
+            ///*
+            // * TODO (DS, 2019-01-03): There might also be fields in the loc set,
+            // * we might have to eventually consider this. As of now, there are
+            // * no examples for this case...
+            // */
+            //final List<Term> relevantAssignables = assignables.stream()
+            //        .filter(t -> t.op() != locSetLDT.getSingletonPV()
+            //                || relevantVars.contains(t.sub(0).sub(0).op()))
+            //        .collect(Collectors.toList());
 
-            relevantVars.removeAll(relevantAssignables.stream()
-                    .filter(t -> t.op() == locSetLDT.getSingletonPV())
-                    .map(t -> t.sub(0).sub(0)).map(Term::op)
-                    .map(LocationVariable.class::cast)
-                    .collect(Collectors.toList()));
+            //relevantVars.removeAll(relevantAssignables.stream()
+            //        .filter(t -> t.op() == locSetLDT.getSingletonPV())
+            //        .map(t -> t.sub(0).sub(0)).map(Term::op)
+            //        .map(LocationVariable.class::cast)
+            //        .collect(Collectors.toList()));
 
-            if (assignables.size() == relevantAssignables.size()) {
-                return null;
-            }
+            //if (assignables.size() == relevantAssignables.size()) {
+            //    return null;
+            //}
 
-            return services.getTermBuilder().abstractUpdate(
-                    oldUpdate.getAbstractPlaceholderStatement(),
-                    tb.union(relevantAssignables), update.sub(0));
+            //return services.getTermBuilder().abstractUpdate(
+            //        oldUpdate.getAbstractPlaceholderStatement(),
+            //        tb.union(relevantAssignables), update.sub(0));
         }
         else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
             Term sub0 = update.sub(0);

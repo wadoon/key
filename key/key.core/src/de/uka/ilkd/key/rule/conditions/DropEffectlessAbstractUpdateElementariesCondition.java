@@ -205,8 +205,10 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
         final Set<Operator> opsAssignedBeforeUsed = opsAnalysisResult.first
                 .stream()
                 /* We remove the accessibles of the abstract update itself. */
-                .filter(op -> !abstrUpdAccessibles.stream().map(t -> t.sub(0))
-                        .map(Term::op).anyMatch(top -> top == op))
+                .filter(op -> !AbstractExecutionUtils
+                        .collectNullaryPVsOrSkLocSets(abstrUpdAccessiblesTerm,
+                                services)
+                        .contains(op))
                 .collect(Collectors.toSet());
 
         final Set<Operator> newOpsInAssignable = opsInAssignable.stream()
@@ -230,7 +232,10 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
                  * accessibles.
                  */
                 newOpsInAssignable.remove(op);
-                newAbstrUpdAccessibles.stream().filter(t -> t.op() != op)
+                newAbstrUpdAccessibles.stream()
+                        .filter(t -> !AbstractExecutionUtils
+                                .collectNullaryPVsOrSkLocSets(t, services)
+                                .contains(op))
                         .collect(Collectors
                                 .toCollection(() -> new LinkedHashSet<>()));
             }

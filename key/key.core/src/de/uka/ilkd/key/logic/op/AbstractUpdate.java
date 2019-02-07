@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.logic.op;
 
 import java.lang.ref.WeakReference;
+import java.util.HashMap;
 import java.util.Set;
 import java.util.WeakHashMap;
 
@@ -103,5 +104,41 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      */
     public Set<Term> getAssignables() {
         return assignables;
+    }
+
+    private static UnionTermHashMapKey key(Term lhs, LocSetLDT locSetLDT) {
+        return new UnionTermHashMapKey(lhs, locSetLDT);
+    }
+
+    /**
+     * A key class for use in a {@link HashMap} ensuring that {@link LocSetLDT}
+     * union {@link Term}s get the same hash code whatever the order of elements
+     * in the union is -- as it should be for a set union.
+     */
+    private static class UnionTermHashMapKey {
+        private final int hashCode;
+        private final Term lhs;
+
+        public UnionTermHashMapKey(Term lhs, LocSetLDT locSetLDT) {
+            /*
+             * We also store the LHS because otherwise, these key objects are
+             * removed when put into a weak reference, and that before they
+             * should be.
+             */
+            this.lhs = lhs;
+            this.hashCode = MiscTools
+                    .dissasembleSetTerm(lhs, locSetLDT.getUnion()).hashCode();
+        }
+
+        @Override
+        public int hashCode() {
+            return hashCode;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return (obj instanceof UnionTermHashMapKey)
+                    && ((UnionTermHashMapKey) obj).hashCode == hashCode;
+        }
     }
 }

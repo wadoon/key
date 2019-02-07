@@ -17,9 +17,11 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -975,7 +977,8 @@ public class TermBuilder {
     public Term abstractUpdate(AbstractPlaceholderStatement phs, Term lhs,
             Term rhs) {
         final AbstractUpdate au = AbstractUpdate.getInstance(phs, lhs,
-                services.getTypeConverter().getLocSetLDT(), services.getTypeConverter().getSetLDT());
+                services.getTypeConverter().getLocSetLDT(),
+                services.getTypeConverter().getSetLDT());
         return tf.createTerm(au, rhs);
     }
 
@@ -1426,8 +1429,14 @@ public class TermBuilder {
     }
 
     public Term setSingleton(Term t) {
-        return func(//
-                services.getTypeConverter().getSetLDT().getSingleton(), t);
+        final Function singleton = //
+                services.getTypeConverter().getSetLDT().getSingleton();
+
+        if (t.op() == singleton) {
+            return t;
+        }
+
+        return func(singleton, t);
     }
 
     public Term setUnion(Term s1, Term s2) {
@@ -2191,7 +2200,10 @@ public class TermBuilder {
         assert s.sort().equals(setLDT.targetSort());
         final Function union = setLDT.getUnion();
 
-        return MiscTools.dissasembleSetTerm(s, union);
+        // We also remove the singletonSet functions
+        return MiscTools.dissasembleSetTerm(s, union).stream()
+                .map(t -> t.op() == setLDT.getSingleton() ? t.sub(0) : t)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 
     public ImmutableSet<Term> setUnionToImmutableSet(Term s) {

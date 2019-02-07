@@ -89,9 +89,7 @@ public class AbstractExecutionUtils {
         final Term accessibleTerm = AbstractExecutionUtils
                 .getAccessibleAndAssignableTermsForNoBehaviorContract(aps,
                         context, services).first;
-        final SetLDT setLDT = //
-                services.getTypeConverter().getSetLDT();
-        return MiscTools.dissasembleSetTerm(accessibleTerm, setLDT.getUnion());
+        return services.getTermBuilder().setUnionToSet(accessibleTerm);
     }
 
     /**

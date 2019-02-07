@@ -24,6 +24,7 @@ import java.awt.event.MouseMotionListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -77,6 +78,12 @@ public class SequentViewInputListener
                                 lhs.hashCode());
                     }
 
+                    if (t.op() instanceof AbstractUpdate) {
+                        final Operator au = t.op();
+                        info += String.format(" (Abstract Update, Hash: %d)",
+                                au.hashCode());
+                    }
+
                     Sequent seq = sequentView.getMainWindow().getMediator()
                             .getSelectedNode().sequent();
                     info += ProofSaver.posInOccurrence2Proof(seq, posInOcc);
@@ -94,8 +101,8 @@ public class SequentViewInputListener
 
     private String opStrFromTerm(Term t) {
         final String tOpClassString = t.op().getClass().toString();
-        String operator =
-                tOpClassString.substring(tOpClassString.lastIndexOf('.') + 1);
+        String operator = tOpClassString
+                .substring(tOpClassString.lastIndexOf('.') + 1);
 
         if (t.op() instanceof UpdateJunctor) {
             if (t.op() == UpdateJunctor.PARALLEL_UPDATE) {

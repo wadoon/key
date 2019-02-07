@@ -857,24 +857,18 @@ public final class MiscTools {
      * @param s
      *            The term to split.
      * @param splitAt
-     *            The operation op at which to split.
+     *            The <strong>binary</strong> operation op at which to split.
      * @return The constituents of the given set-like term.
      */
     public static Set<Term> dissasembleSetTerm(Term s, Function splitAt) {
+        assert splitAt.arity() == 2;
         final Set<Term> result = new LinkedHashSet<>();
-        final Set<Term> workingList = new LinkedHashSet<>();
-        workingList.add(s);
 
-        while (!workingList.isEmpty()) {
-            final Term f = workingList.iterator().next();
-            workingList.remove(f);
-            if (f.op() == splitAt) {
-                workingList.add(f.sub(1));
-                workingList.add(f.sub(0));
-            }
-            else {
-                result.add(f);
-            }
+        if (s.op() == splitAt) {
+            result.addAll(dissasembleSetTerm(s.sub(0), splitAt));
+            result.addAll(dissasembleSetTerm(s.sub(1), splitAt));
+        } else {
+            result.add(s);
         }
 
         return result;

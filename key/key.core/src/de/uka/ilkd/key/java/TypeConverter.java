@@ -581,12 +581,28 @@ public final class TypeConverter {
      * @return the KeYJavaType of expression <tt>e</tt>
      */
     public KeYJavaType getKeYJavaType(Expression e, ExecutionContext ec) {
-	if(e instanceof ThisReference){
-	    return ec.getTypeReference().getKeYJavaType();
-	}
-	return e.getKeYJavaType(services, ec);
-    }
+        if (e instanceof ThisReference) {
+            return ec.getTypeReference().getKeYJavaType();
+        }
 
+        KeYJavaType kjt = e.getKeYJavaType(services, ec);
+        if (kjt.getJavaType() == null && kjt.getSort() != null) {
+            /*
+             * (DS, 2019-02-07): Encountered this problem when using
+             * java.lang.Throwable in a .key file -- at that point, the JavaType
+             * is not yet initialized, so we leave it as null. Here, we have to
+             * fill it in though. There might however be a better place
+             * somewhere, so whoever reads this and knows where to better put
+             * that code, please do so :)
+             */
+            final Sort s = kjt.getSort();
+            kjt = services.getJavaInfo().getAllKeYJavaTypes().stream()
+                    .filter(kjt2 -> kjt2.getSort().equals(s))
+                    .findAny().orElse(kjt);
+        }
+
+        return kjt;
+    }
 
     /**
      * converts a logical term to an AST node if possible. If this fails
