@@ -15,22 +15,31 @@ import de.uka.ilkd.key.macros.scripts.meta.Varargs;
 public class SettingsCommand
         extends AbstractCommand<SettingsCommand.Parameters> {
 
+    /** The parameters of this command. */
     public static class Parameters {
-        @Option(value = "oss", required = false) public Boolean oneStepSimplification;
-        @Option(value = "steps", required = false) public Integer proofSteps;
-
-        @Varargs public Map<String, String> others = new LinkedHashMap<>();
+        /** OSS on/off parameter */
+        @Option(value = "oss", required = false)
+        public Boolean oneStepSimplification;
+        /** number of proof steps parameter */
+        @Option(value = "steps", required = false)
+        public Integer proofSteps;
+        /** Variable other parameters */
+        @Varargs
+        public Map<String, String> others = new LinkedHashMap<>();
     }
 
     public SettingsCommand() {
         super(Parameters.class);
     }
 
-    @Override protected void execute(Parameters args)
+    @Override
+    protected void execute(Parameters args)
             throws ScriptException, InterruptedException {
         if (args.oneStepSimplification != null) {
+            //@formatter:off
 //            proof.getProofIndependentSettings().getGeneralSettings() FIXME: non-executable code
 //                    .setOneStepSimplification(args.oneStepSimplification);
+            //@formatter:on
 
             log.info(String.format("Set oneStepSimplification to %s",
                     args.oneStepSimplification));
@@ -42,7 +51,8 @@ public class SettingsCommand
         }
     }
 
-    @Override public String getName() {
+    @Override
+    public String getName() {
         return "set";
     }
 }
