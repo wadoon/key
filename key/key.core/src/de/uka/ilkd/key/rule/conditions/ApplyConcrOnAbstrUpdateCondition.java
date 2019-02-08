@@ -15,7 +15,9 @@ package de.uka.ilkd.key.rule.conditions;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -28,12 +30,12 @@ import de.uka.ilkd.key.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.AbstractExecutionUtils;
+import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
@@ -59,6 +61,9 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * phi without a Java block (everything fully evaluated) and an update in
  * sequential normal form.
  *
+ * Works also for abstract udpate concatenations; then, the update is stepwise
+ * pushed into the concatenation.
+ *
  * @author Dominic Steinhoefel
  */
 public final class ApplyConcrOnAbstrUpdateCondition
@@ -80,18 +85,19 @@ public final class ApplyConcrOnAbstrUpdateCondition
     public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
             MatchConditions mc, Services services) {
         SVInstantiations svInst = mc.getInstantiations();
-        final Term u1 = (Term) svInst.getInstantiation(u1SV);
-        final Term u2 = (Term) svInst.getInstantiation(u2SV);
+        final Term concrUpdate = (Term) svInst.getInstantiation(u1SV);
+        final Term abstrUpdateTerm = (Term) svInst.getInstantiation(u2SV);
         final Term phi = (Term) svInst.getInstantiation(phiSV);
         final Term result = (Term) svInst.getInstantiation(resultSV);
 
-        if (u1 == null || u2 == null || phi == null || result != null) {
+        if (concrUpdate == null || abstrUpdateTerm == null || phi == null
+                || result != null) {
             return mc;
         }
 
         final TermBuilder tb = services.getTermBuilder();
 
-        if (!MergeRuleUtils.isUpdateNormalForm(u1)) {
+        if (!MergeRuleUtils.isUpdateNormalForm(concrUpdate)) {
             return null;
         }
 
@@ -99,20 +105,61 @@ public final class ApplyConcrOnAbstrUpdateCondition
             return null;
         }
 
-        if (!(u2.op() instanceof AbstractUpdate)) {
-            /*
-             * We can assume that u1Inst is abstract, but it might be
-             * constructed of an update junctor. In that case, we continue here.
-             */
-            /* TODO (DS, 2019-02-07) Should we also handle concatenations? */
-            assert u2.op() instanceof UpdateJunctor;
-            return null;
+        Term currentConcrUpdate = concrUpdate;
+        List<Term> processedAbstrUpdates = new ArrayList<>();
+        Queue<Term> abstrUpdatesToProcess = new LinkedList<>();
+
+        abstrUpdatesToProcess.addAll(AbstractExecutionUtils
+                .abstractUpdatesFromConcatenation(abstrUpdateTerm));
+
+        while (!abstrUpdatesToProcess.isEmpty()) {
+            final Term currentAbstractUpdate = abstrUpdatesToProcess.poll();
+            final Pair<Term, Term> newAbstrAndConcrUpd = pushThroughConcrUpdate(
+                    currentConcrUpdate, currentAbstractUpdate, tb, services);
+
+            if (newAbstrAndConcrUpd == null) {
+                /*
+                 * NOTE (DS, 2019-02-08): We could also consider to break and
+                 * leave a concrete update in the middle of a concatenation, but
+                 * that was not desired when implementing this.
+                 */
+                return null;
+            }
+
+            processedAbstrUpdates.add(newAbstrAndConcrUpd.first);
+            currentConcrUpdate = newAbstrAndConcrUpd.second;
         }
 
-        final AbstractUpdate abstrUpd = (AbstractUpdate) u2.op();
+        final Term newResultInst = //
+                tb.apply(tb.concatenated(processedAbstrUpdates),
+                        tb.apply(currentConcrUpdate, phi));
+
+        svInst = svInst.add(resultSV, newResultInst, services);
+        return mc.setInstantiations(svInst);
+    }
+
+    /**
+     * Performs the actual "push-through" operation for a concrete update in
+     * normal form and a single (i.e., not concatenated) abstract update.
+     *
+     * @param concrUpdate
+     *            The concrete update to push through.
+     * @param abstrUpdate
+     *            The abstract update on which to apply the concrete one.
+     * @param tb
+     * @param services
+     *            The {@link Services} object.
+     * @return The new abstract (first component) and concrete (second
+     *         component) update, or null if the operation is not allowed (if
+     *         allLocs is in the game...).
+     */
+    private Pair<Term, Term> pushThroughConcrUpdate(final Term concrUpdate,
+            final Term abstrUpdate, final TermBuilder tb, Services services) {
+        final AbstractUpdate abstrUpd = (AbstractUpdate) abstrUpdate.op();
 
         if (AbstractExecutionUtils.assignsAllLocs(abstrUpd, services)
-                || AbstractExecutionUtils.accessesAllLocs(u2, services)) {
+                || AbstractExecutionUtils.accessesAllLocs(abstrUpdate,
+                        services)) {
             /*
              * For this case (U(allLocs:=...) / U(...:=allLocs)) we won't not do
              * anything. The abstract update depends on everything changed in
@@ -127,12 +174,13 @@ public final class ApplyConcrOnAbstrUpdateCondition
                 .map(LocationVariable.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
-        Term currentAccessibles = u2.sub(0);
+        Term currentAccessibles = abstrUpdate.sub(0);
         final List<Term> currentNewConcrUpdElems = new ArrayList<>();
 
         for (LocationVariable lhs : MergeRuleUtils
-                .getUpdateLeftSideLocations(u1)) {
-            final Term rhs = MergeRuleUtils.getUpdateRightSideFor(u1, lhs);
+                .getUpdateLeftSideLocations(concrUpdate)) {
+            final Term rhs = MergeRuleUtils.getUpdateRightSideFor(concrUpdate,
+                    lhs);
 
             // First, substitute in the accessibles
             currentAccessibles = ApplyAbstrOnConcrUpdateCondition
@@ -152,11 +200,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
         final Term newConcrUpdate = tb.parallel(currentNewConcrUpdElems.stream()
                 .collect(ImmutableSLList.toImmutableList()));
 
-        final Term newResultInst = //
-                tb.apply(newAbstrUpdTerm, tb.apply(newConcrUpdate, phi));
-
-        svInst = svInst.add(resultSV, newResultInst, services);
-        return mc.setInstantiations(svInst);
+        return new Pair<>(newAbstrUpdTerm, newConcrUpdate);
     }
 
     @Override
