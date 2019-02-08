@@ -57,6 +57,7 @@ import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.SkolemUpdateSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
@@ -491,6 +492,9 @@ public class IntermediateProofReplayer {
             ourApp = NoPosTacletApp.createNoPosTacletApp(t);
         }
         Services services = proof.getServices();
+
+        ourApp = constructFreeInsts(ourApp, currGoal, currInterm.getInsts(),
+            services);
 
         if (currFormula != 0) { // otherwise we have no pos
             try {
@@ -962,8 +966,8 @@ public class IntermediateProofReplayer {
             if (sv == null) {
                 // throw new IllegalStateException(
                 // varname+" from \n"+loadedInsts+"\n is not in\n"+uninsts);
-                System.err.println(varname + " from " + app.rule().name()
-                        + " is not in uninsts");
+                // System.err.println(varname + " from " + app.rule().name()
+                //         + " is not in uninsts");
                 continue;
             }
             final String value = s.substring(eq + 1, s.length());
@@ -979,11 +983,57 @@ public class IntermediateProofReplayer {
             final String varname = s.substring(0, eq);
             final SchemaVariable sv = lookupName(uninsts, varname);
             if (sv == null) {
+                final SchemaVariable placeholderSV = SchemaVariableFactory
+                        .createSkolemTermSV(new Name(varname), Sort.ANY);
+                final Name name = new Name(s.substring(eq + 1, s.length()));
+                app = app
+                        .addInstantiation(placeholderSV,
+                                services.getTermBuilder()
+                                        .func(new Function(name, Sort.ANY)),
+                                true, services);
                 continue;
             }
 
             String value = s.substring(eq + 1, s.length());
             app = parseSV2(app, sv, value, currGoal);
+        }
+
+        return app;
+    }
+
+    /**
+     * Instantiates schema variables in the given taclet application. TODO
+     *
+     * @param app
+     *            The taclet application to instantiate.
+     * @param currGoal
+     *            The corresponding goal.
+     * @param loadedInsts
+     *            Loaded schema variable instantiations.
+     * @param services
+     *            The services object.
+     * @return The instantiated taclet.
+     */
+    private static TacletApp constructFreeInsts(TacletApp app, Goal currGoal,
+            LinkedList<String> loadedInsts, Services services) {
+        if (loadedInsts == null)
+            return app;
+        ImmutableSet<SchemaVariable> uninsts = app.uninstantiatedVars();
+
+        for (final String s : loadedInsts) {
+            int eq = s.indexOf('=');
+            final String varname = s.substring(0, eq);
+            final SchemaVariable sv = lookupName(uninsts, varname);
+            if (sv == null) {
+                final SchemaVariable placeholderSV = SchemaVariableFactory
+                        .createSkolemTermSV(new Name(varname), Sort.ANY);
+                final Name name = new Name(s.substring(eq + 1, s.length()));
+                app = app
+                        .addInstantiation(placeholderSV,
+                                services.getTermBuilder()
+                                        .func(new Function(name, Sort.ANY)),
+                                true, services);
+            }
         }
 
         return app;
