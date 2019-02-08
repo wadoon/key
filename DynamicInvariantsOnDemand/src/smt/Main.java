@@ -83,7 +83,7 @@ public class Main {
 //			ImmutableList<Goal> clonedOpenGoals = keyAPI.prove(clonedProof);
 			result = attemptProve(currentProof);
 		}
-		if(result != null) System.out.println(result);
+		if(result != null) System.out.println("Successfully closed proof.");
 	}
 	
 	private static ProofResult attemptProve(Proof proof) {
@@ -156,7 +156,8 @@ public class Main {
 		
 		//---- Convert Invariants to KeY Format ----
 		
-		List<String> convertedInvariants = convertDIGInvariantsToJMLFormat(digInvariants, true);
+		List<String> convertedInvariants = convertDIGInvariantsToJMLFormat(digInvariants, true, false);
+		System.out.println("JML Invs: " + convertedInvariants);
 		
 		// add update vars to namespace to be able to use the parser for those vars
 	    TermBuilder tb = clonedProof.getServices().getTermBuilder();
@@ -205,6 +206,8 @@ public class Main {
 				e.printStackTrace();
 			}
 		}
+		System.out.println("Full Inv-Term with User given Ineq: " + conjInvariants.toString());
+		
 		return new Invariant(conjInvariants);
 	}
 	
@@ -223,20 +226,23 @@ public class Main {
 		return new ArrayList<String>(Arrays.asList(invArray));
 	}
 	
-	private static List<String> convertDIGInvariantsToJMLFormat(List<String> digInvariants, boolean renameUnderscoreVars) {
+	private static List<String> convertDIGInvariantsToJMLFormat(List<String> digInvariants, 
+			boolean renameUnderscoreVars, boolean removeWhitespaces) {
 		//Input: -u_x^2 + u_x*y + z == 0
 		//Output: pow(_x,2)+_x*y+z=0
-		//Need to perform 1-3 transformations:
+		//Need to perform 2-4 transformations:
 		// ==   -> =
 		// -x^3 -> -pow(x,3)
-		// u_x -> _x
+		// optional: u_x -> _x
+		// optional: remove whitespaces
 		
 		final String matchBaseExponent = "(\\s*(\\w+?)\\s*\\^\\s*(\\w+))"; //matches -x^3 -> find1: group(1:x^3,2:x,3:3)
 		// in order to re-rename underscore vars: u_x -> _x
 		final String matchUnderscoreVars = "\\s*(\\w*(_+?\\w+))\\s*"; 
 		List<String> convertedInvariants = new ArrayList<>();
 		for (String inv : digInvariants) {
-			inv = inv.replaceAll(" ", "");
+			if (removeWhitespaces)
+				inv = inv.replaceAll(" ", "");
 			inv = inv.replaceAll("==", "=");
 			
 			// Exponent: -x^3 -> -pow(x,3)
@@ -365,7 +371,7 @@ public class Main {
 		        lastLine = line;
 		    }
 		    invs = lastLine;
-		    System.out.println("Invs: " + invs);
+		    System.out.println("Raw Invs: " + invs);
 	    
 		} catch (IOException e) {
 			// TODO Auto-generated catch block

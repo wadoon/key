@@ -52,8 +52,8 @@ public HashMap<String, ArrayList<Integer>> callGeneratedTest(){
 
    //Other variables
 
-   /*@ nullable */ java.lang.Throwable exc = null;
    /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
@@ -70,8 +70,8 @@ public HashMap<String, ArrayList<Integer>> callGeneratedTest(){
 
    //Other variables
 
-   /*@ nullable */ java.lang.Throwable exc = null;
    /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
@@ -88,8 +88,8 @@ public HashMap<String, ArrayList<Integer>> callGeneratedTest(){
 
    //Other variables
 
-   /*@ nullable */ java.lang.Throwable exc = null;
    /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
@@ -106,8 +106,8 @@ public HashMap<String, ArrayList<Integer>> callGeneratedTest(){
 
    //Other variables
 
-   /*@ nullable */ java.lang.Throwable exc = null;
    /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
@@ -124,8 +124,8 @@ public HashMap<String, ArrayList<Integer>> callGeneratedTest(){
 
    //Other variables
 
-   /*@ nullable */ java.lang.Throwable exc = null;
    /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
@@ -142,8 +142,8 @@ public HashMap<String, ArrayList<Integer>> callGeneratedTest(){
 
    //Other variables
 
-   /*@ nullable */ java.lang.Throwable exc = null;
    /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
@@ -160,8 +160,8 @@ public HashMap<String, ArrayList<Integer>> callGeneratedTest(){
 
    //Other variables
 
-   /*@ nullable */ java.lang.Throwable exc = null;
    /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
@@ -178,8 +178,8 @@ public HashMap<String, ArrayList<Integer>> callGeneratedTest(){
 
    //Other variables
 
-   /*@ nullable */ java.lang.Throwable exc = null;
    /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
@@ -196,8 +196,8 @@ public HashMap<String, ArrayList<Integer>> callGeneratedTest(){
 
    //Other variables
 
-   /*@ nullable */ java.lang.Throwable exc = null;
    /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
@@ -214,8 +214,8 @@ public HashMap<String, ArrayList<Integer>> callGeneratedTest(){
 
    //Other variables
 
-   /*@ nullable */ java.lang.Throwable exc = null;
    /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
@@ -232,8 +232,8 @@ public HashMap<String, ArrayList<Integer>> callGeneratedTest(){
 
    //Other variables
 
-   /*@ nullable */ java.lang.Throwable exc = null;
    /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
@@ -250,8 +250,8 @@ public HashMap<String, ArrayList<Integer>> callGeneratedTest(){
 
    //Other variables
 
-   /*@ nullable */ java.lang.Throwable exc = null;
    /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
@@ -268,8 +268,8 @@ public HashMap<String, ArrayList<Integer>> callGeneratedTest(){
 
    //Other variables
 
-   /*@ nullable */ java.lang.Throwable exc = null;
    /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
