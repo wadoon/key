@@ -285,7 +285,8 @@ public class IntermediatePresentationProofFileParser
         case MERGE_PREDICATE_ABSTRACTION_LATTICE_TYPE: // type of predicate
                                                        // abstraction lattice
             try {
-                ((BuiltinRuleInformation) ruleInfo).currPredAbstraLatticeType = (Class<? extends AbstractPredicateAbstractionLattice>) Class
+                ((BuiltinRuleInformation) ruleInfo).currPredAbstraLatticeType =
+                    (Class<? extends AbstractPredicateAbstractionLattice>) Class
                         .forName(str);
             } catch (ClassNotFoundException e) {
                 errors.add(e);
@@ -506,9 +507,13 @@ public class IntermediatePresentationProofFileParser
         /* > Method Contract */
         protected String currContract = null;
         /* > Lazy / Abstract SE Instantiations */
+        /** TODO */
         protected String currLazySEPathCPH = null;
+        /** TODO */
         protected String currLazySESymbStPH = null;
+        /** TODO */
         protected String currLazySEPathCInst = null;
+        /** TODO */
         protected String currLazySESymbStInst = null;
         /* > Merge Rule */
         protected String currMergeProc = null;
@@ -516,7 +521,9 @@ public class IntermediatePresentationProofFileParser
         protected int currCorrespondingMergeNodeId = 0;
         protected int currMergeNodeId = 0;
         protected String currDistFormula = null;
-        protected Class<? extends AbstractPredicateAbstractionLattice> currPredAbstraLatticeType = null;
+        /** TODO */
+        protected Class<? extends AbstractPredicateAbstractionLattice>
+            currPredAbstraLatticeType = null;
         protected String currAbstractionPredicates = null;
         public String currUserChoices = null;
 

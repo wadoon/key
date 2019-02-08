@@ -612,7 +612,8 @@ public class OutputStreamProofSaver {
                 .getJustifInfo()
                 .getJustification(appliedRuleApp, proof.getServices());
 
-        assert ruleJusti instanceof RuleJustificationBySpec : "Please consult bug #1111 if this fails.";
+        assert ruleJusti instanceof RuleJustificationBySpec :
+            "Please consult bug #1111 if this fails.";
 
         final RuleJustificationBySpec ruleJustiBySpec = (RuleJustificationBySpec) ruleJusti;
         output.append(" (contract \"");
@@ -799,6 +800,12 @@ public class OutputStreamProofSaver {
         ps.append(")\n");
     }
 
+    /**
+     * TODO
+     * @param seq TODO
+     * @param pos TODO
+     * @return TODO
+     */
     public static String posInOccurrence2Proof(Sequent seq,
             PosInOccurrence pos) {
         if (pos == null) {

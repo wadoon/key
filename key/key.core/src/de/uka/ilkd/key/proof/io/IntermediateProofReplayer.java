@@ -146,6 +146,7 @@ public class IntermediateProofReplayer {
     /** Maps join node IDs to previously seen join partners */
     private HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>> joinPartnerNodes = new HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>>();
 
+    /** TODO */
     private AbstractExecutionHole[] loopHoles = null;
 
     /** The current open goal */
@@ -604,7 +605,8 @@ public class IntermediateProofReplayer {
             final InstantiateLoopHoleRuleAppIntermediate ilhrai = //
                     (InstantiateLoopHoleRuleAppIntermediate) currInterm;
 
-            Term pcInst = null, symbStInst = null;
+            Term pcInst = null;
+            Term symbStInst = null;
             try {
                 DefaultTermParser parser = new DefaultTermParser();
                 pcInst = parser.parse(new StringReader(ilhrai.getPathCInst()),
@@ -843,8 +845,8 @@ public class IntermediateProofReplayer {
                                 .programVariables().lookup(ph.second);
 
                         assert pv != null && pv instanceof ProgramVariable
-                                && ((ProgramVariable) pv).sort().equals(
-                                    ph.first) : "Program variable involved in join is not known to the system";
+                                && ((ProgramVariable) pv).sort().equals(ph.first) :
+                                    "Program variable involved in join is not known to the system";
 
                         userChoices.put((ProgramVariable) pv, elem);
                     }
