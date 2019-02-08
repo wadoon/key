@@ -1,5 +1,6 @@
 //requires (x >= 0);
 //loop_invariant (((x^2 - x*y - z) == 0) && (y >= 0));
+//loop_invariant (((x*x - x*y - z) == 0) && (y >= 0));
 //loop_invariant ((z == (x - y) * x) && (y >= 0));
 public class EasyLoop1 {
   /*@ public normal_behavior 

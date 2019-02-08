@@ -114,8 +114,12 @@ public class Main {
 		    Term customTerm = null;
 			final String originalDIGInv = "-x^2 + x*y + z == 0";
 			String modDIGInv = "-pow(x,2) + x*y + z == 0";
+			//String modDIGInv2 = "-pow(x,2) + x*y + z = 0"; #should be working
+			//String modDIGInv2 = "pow(x,2)+x-2*x=0"; #working
+			String modDIGInv2 = "x+y-pow(x,2)=0";
+			Term inv = null;
 		    try {
-				Term inv = tb.parseTerm(originalDIGInv);
+		    	inv = tb.parseTerm(modDIGInv2);
 			} catch (ParserException e1) {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
