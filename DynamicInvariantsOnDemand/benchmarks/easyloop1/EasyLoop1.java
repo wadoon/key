@@ -12,7 +12,7 @@ public class EasyLoop1 {
 	    int  y = x;
     	int  z = 0;
 	
-      /*@ loop_invariant (((x*x - x*y - z) == 0) && (y >= 0));
+      /*@ loop_invariant (y >= 0);
         @ decreasing y;
         @ assignable z,y;
         @*/

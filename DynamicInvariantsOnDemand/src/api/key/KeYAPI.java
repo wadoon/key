@@ -4,19 +4,23 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
@@ -28,6 +32,7 @@ import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.KeYTypeUtil;
 import de.uka.ilkd.key.util.MiscTools;
 import prover.Invariant;
@@ -123,7 +128,29 @@ public class KeYAPI {
 		WhileInvariantRule invariantRule = WhileInvariantRule.INSTANCE;
 		PosInOccurrence poi = new PosInOccurrence(goal.sequent().succedent().get(1), PosInTerm.getTopLevel(), false);
 		TermServices services = myEnvironment.getServices();
-		LoopInvariantBuiltInRuleApp ruleApplication = new LoopInvariantBuiltInRuleApp(invariantRule, poi, services).tryToInstantiate(goal);
+		LoopInvariantBuiltInRuleApp ruleApplication = new LoopInvariantBuiltInRuleApp(invariantRule, poi, services);
+		ruleApplication = ruleApplication.tryToInstantiate(goal);
+		LoopSpecification spec = ruleApplication.getSpec();
+		Services serv = goal.proof().getServices();
+		
+		Map<LocationVariable, Term> invariants = new HashMap<>();
+		TermBuilder termBuilder = services.getTermBuilder();
+		Map<LocationVariable, Term> freeInvariants = new HashMap<>();
+		Map<LocationVariable, Term> modifies = /*new HashMap<>();//*/spec.getInternalModifies();
+		Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs = spec.getInternalInfFlowSpec();
+		Term variant = null;
+		
+		Term update = ruleApplication.posInOccurrence().sequentFormula().formula().sub(0);
+		Term termInv = invariant.getFormula();
+		Term loopInvariant = termInv;
+		
+		LocationVariable baseHeap  = serv.getTypeConverter().getHeapLDT().getHeap();
+		LocationVariable savedHeap = serv.getTypeConverter().getHeapLDT().getSavedHeap();
+		invariants.put(baseHeap, loopInvariant);
+		spec = spec.configurate(invariants, freeInvariants, modifies, infFlowSpecs, variant);
+		
+		
+		ruleApplication.setLoopInvariant(spec);
 		goal.apply(ruleApplication);
 	}
 

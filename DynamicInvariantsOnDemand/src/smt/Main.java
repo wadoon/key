@@ -252,10 +252,11 @@ public class Main {
 				String base = mExp.group(2);
 				String exponent = mExp.group(3);
 				
-				String javaPowStatement = "pow(" + base + "," + exponent + ")";
+				String multiplyTerm = base;
+				multiplyTerm += IntStream.range(0, Integer.parseInt(exponent) - 1).mapToObj(i -> "*" + base).collect(Collectors.joining(""));
 				
 				//FIXME: replace (all) is ugly here but should work
-				inv = inv.replace(baseAndExponent, javaPowStatement);
+				inv = inv.replace(baseAndExponent, multiplyTerm);
 			}
 			
 			// Re-Rename underscore vars: u_x -> _x
