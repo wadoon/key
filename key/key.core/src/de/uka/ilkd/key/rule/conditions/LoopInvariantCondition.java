@@ -35,8 +35,12 @@ public class LoopInvariantCondition implements VariableCondition {
     @Override
     public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
             MatchConditions matchCond, Services services) {
-
         SVInstantiations svInst = matchCond.getInstantiations();
+
+        if (svInst.getInstantiation(inv) != null
+                && svInst.getInstantiation(u) != null) {
+            return matchCond;
+        }
 
         MethodFrame mf = JavaTools.getInnermostMethodFrame(
                 svInst.getContextInstantiation().contextProgram(), services);
