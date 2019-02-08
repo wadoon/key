@@ -132,6 +132,7 @@ options {
          prooflabel2tag.put("contract", ProofElementID.CONTRACT);
          prooflabel2tag.put("ifInst", ProofElementID.ASSUMES_INST_BUILT_IN);     
          prooflabel2tag.put("userinteraction", ProofElementID.USER_INTERACTION);
+         prooflabel2tag.put("proofscript", ProofElementID.PROOF_SCRIPT);
          prooflabel2tag.put("notes", ProofElementID.NOTES);
          prooflabel2tag.put("newnames", ProofElementID.NEW_NAMES);
          prooflabel2tag.put("autoModeTime", ProofElementID.AUTOMODE_TIME);  
@@ -723,7 +724,7 @@ options {
     }
 
     private void schema_var_decl(String name, 
-    				 Sort s, 
+    				 Sort s,
     				 boolean makeVariableSV,
             			 boolean makeSkolemTermSV,
                                  boolean makeTermLabelSV,
@@ -3747,7 +3748,7 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
             b.setName(new Name(name.getText()));
             b.setIfSequent(ifSeq);
         }
-        ( VARCOND LPAREN varexplist[b] RPAREN ) ?
+        ( VARCOND LPAREN varexplist[b] RPAREN ) *
         goalspecs[b, find != null]
         modifiers[b]
         { 
@@ -3915,9 +3916,7 @@ varcond_dropEffectlessElementaries[TacletBuilder b]
 :
    DROP_EFFECTLESS_ELEMENTARIES LPAREN u=varId COMMA x=varId COMMA result=varId RPAREN 
    {
-      b.addVariableCondition(new DropEffectlessElementariesCondition((UpdateSV)u, 
-                                                                     (SchemaVariable)x, 
-                                                                     (SchemaVariable)result));
+      b.addVariableCondition(new DropEffectlessElementariesCondition((UpdateSV)u, (SchemaVariable) x,(SchemaVariable)result));
    }
 ;
 
@@ -3984,12 +3983,13 @@ type_resolver returns [TypeResolver tr = null]
     )
 ;
 
+
 varcond_new [TacletBuilder b]
 :
    NEW LPAREN x=varId COMMA
-      (
-          TYPEOF LPAREN y=varId RPAREN {
-	    b.addVarsNew((SchemaVariable) x, (SchemaVariable) y);
+      ( TYPEOF LPAREN y=varId RPAREN 
+      {
+       b.addVarsNew((SchemaVariable) x, (SchemaVariable) y);
 	  }
       |
          DEPENDINGON LPAREN y=varId RPAREN {
@@ -4000,7 +4000,6 @@ varcond_new [TacletBuilder b]
 	  }
       )
    RPAREN
-   
 ;
 
 varcond_newlabel [TacletBuilder b] 
