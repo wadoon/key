@@ -15,11 +15,12 @@ import de.uka.ilkd.key.macros.scripts.meta.Varargs;
 public class SettingsCommand
         extends AbstractCommand<SettingsCommand.Parameters> {
 
+    /** The parameters of this command. */
     public static class Parameters {
-        /** One Step Simplification parameter */
+        /** OSS on/off parameter */
         @Option(value = "oss", required = false)
         public Boolean oneStepSimplification;
-        /** Maximum number of proof steps parameter */
+        /** number of proof steps parameter */
         @Option(value = "steps", required = false)
         public Integer proofSteps;
         /** Variable other parameters */
@@ -35,8 +36,10 @@ public class SettingsCommand
     protected void execute(Parameters args)
             throws ScriptException, InterruptedException {
         if (args.oneStepSimplification != null) {
+            //@formatter:off
 //            proof.getProofIndependentSettings().getGeneralSettings() FIXME: non-executable code
 //                    .setOneStepSimplification(args.oneStepSimplification);
+            //@formatter:on
 
             log.info(String.format("Set oneStepSimplification to %s",
                     args.oneStepSimplification));

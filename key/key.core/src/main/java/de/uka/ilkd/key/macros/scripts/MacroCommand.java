@@ -71,13 +71,15 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
                     try {
                         macro.setParameter(macroParam.getKey(),
                                 macroParam.getValue());
-                    } catch (IllegalArgumentException e) {
+                    }
+                    catch (IllegalArgumentException e) {
                         throw new ScriptException(String.format(
                                 "Wrong format for parameter %s of macro %s: %s.\nMessage: %s",
                                 macroParam.getKey(), args.macroName,
                                 macroParam.getValue(), e.getMessage()));
                     }
-                } else {
+                }
+                else {
                     throw new ScriptException(
                             String.format("Unknown parameter %s for macro %s",
                                     macroParam.getKey(), args.macroName));
@@ -93,11 +95,10 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
                     TaskStartedInfo.TaskKind.Macro, macro.getName(), 0));
             final Sequent sequent = g.node().sequent();
             PosInOccurrence pio = null;
-
             if (args.occ > -1) {
                 pio = new PosInOccurrence(sequent.getFormulabyNr(args.occ + 1),
                         PosInTerm.getTopLevel(),
-                        args.occ + 1 <= sequent.antecedent().size());
+                        args.occ + 1 <=sequent.antecedent().size());
             }
 
             final String matchRegEx = args.matches;
@@ -108,13 +109,16 @@ public class MacroCommand extends AbstractCommand<MacroCommand.Parameters> {
             synchronized (macro) {
                 info = macro.applyTo(uiControl, g.node(), pio, uiControl);
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new ScriptException("Macro '" + args.macroName
                     + "' raised an exception: " + e.getMessage(), e);
-        } finally {
+        }
+        finally {
             uiControl.taskFinished(info);
             macro.resetParams();
         }
+
     }
 
     /**
