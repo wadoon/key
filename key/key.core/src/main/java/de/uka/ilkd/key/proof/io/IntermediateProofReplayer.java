@@ -140,7 +140,6 @@ public class IntermediateProofReplayer {
     /** Maps join node IDs to previously seen join partners */
     private HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>> joinPartnerNodes = new HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>>();
 
-
     /** The current open goal */
     private Goal currGoal = null;
 
