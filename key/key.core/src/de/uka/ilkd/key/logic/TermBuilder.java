@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
@@ -1088,6 +1089,11 @@ public class TermBuilder {
             result = concatenated(result, updates[i]);
         }
         return result;
+    }
+
+    public Term concatenated(Iterable<Term> updates) {
+        return concatenated(StreamSupport.stream(updates.spliterator(), false)
+                .collect(Collectors.toList()).toArray(new Term[0]));
     }
 
     public Term concatenated(ImmutableList<Term> updates) {
