@@ -204,6 +204,8 @@ public class IntermediateProofReplayer {
                     AppNodeIntermediate currInterm = (AppNodeIntermediate) currNodeInterm;
                     currNode.getNodeInfo().setInteractiveRuleApplication(
                         currInterm.isInteractiveRuleApplication());
+                    currNode.getNodeInfo().setScriptRuleApplication(
+                        currInterm.isScriptRuleApplication());
 
                     // Register name proposals
                     proof.getServices().getNameRecorder().setProposals(

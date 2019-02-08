@@ -777,6 +777,9 @@ public class OutputStreamProofSaver {
         if (node.getNodeInfo().getInteractiveRuleApplication()) {
             output.append(" (userinteraction)");
         }
+        if (node.getNodeInfo().getScriptRuleApplication()) {
+            output.append(" (proofscript)");
+        }
     }
 
     /**
