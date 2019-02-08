@@ -140,6 +140,7 @@ public class IntermediateProofReplayer {
     /** Maps join node IDs to previously seen join partners */
     private HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>> joinPartnerNodes = new HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>>();
 
+
     /** The current open goal */
     private Goal currGoal = null;
 
@@ -220,8 +221,10 @@ public class IntermediateProofReplayer {
 
                             addChildren(children, intermChildren);
 
-                            // Children are no longer needed, set them to null
-                             // to free memory.
+                            /*
+                             * Children are no longer needed, set them to null
+                             * to free memory.
+                             */
                             currInterm.setChildren(null);
                         } catch (Exception e) {
                             reportError(ERROR_LOADING_PROOF_LINE + "Line "
@@ -250,24 +253,25 @@ public class IntermediateProofReplayer {
 
                             if (partnerNodesInfo == null || partnerNodesInfo
                                     .size() < joinAppInterm.getNrPartners()) {
-                                // In case of an exception happening during the
-                                 // replay process, it can happen that the queue
-                                 // is
-                                // empty when reaching this point. Then, we may
-                                // not
-                                // add the join node to the end of the queue
-                                // since
-                                // this will result in non-termination.
+                                /*
+                                 * In case of an exception happening during the
+                                 * replay process, it can happen that the queue
+                                 * is empty when reaching this point. Then, we
+                                 * may not add the join node to the end of the
+                                 * queue since this will result in
+                                 * non-termination.
+                                 */
 
                                 if (queue.isEmpty()) {
                                     continue;
                                 }
 
-                                // Wait until all partners are found: Add node
-                                 // at the end of the queue. NOTE: DO NOT CHANGE
-                                 // THIS to adding the node to the front! This
-                                 // will
-                                // result in non-termination!
+                                /*
+                                 * Wait until all partners are found: Add node
+                                 * at the end of the queue. NOTE: DO NOT CHANGE
+                                 * THIS to adding the node to the front! This
+                                 * will result in non-termination!
+                                 */
                                 queue.addLast(new Pair<Node, NodeIntermediate>(
                                     currNode, currNodeInterm));
                             } else {
@@ -489,7 +493,7 @@ public class IntermediateProofReplayer {
                 ourApp = ourApp.setPosInOccurrence(pos, services);
             } catch (Exception e) {
                 throw (TacletConstructionException)new TacletConstructionException(
-                        "Wrong position information: " + pos).initCause(e);
+                    "Wrong position information: " + pos).initCause(e);
             }
         }
 
@@ -780,8 +784,8 @@ public class IntermediateProofReplayer {
                                 .programVariables().lookup(ph.second);
 
                         assert pv != null && pv instanceof ProgramVariable
-                                && ((ProgramVariable) pv).sort().equals(ph.first) :
-                                    "Program variable involved in join is not known to the system";
+                                && ((ProgramVariable) pv).sort().equals(
+                                    ph.first) : "Program variable involved in join is not known to the system";
 
                         userChoices.put((ProgramVariable) pv, elem);
                     }
