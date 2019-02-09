@@ -25,6 +25,7 @@
     <target name="compileAll"
             description="Build all subprojects needed for KeY. (Calls 'ant compile' on production subprojects.)">
         <ant antfile="${key.dir}/key.util/build.xml" target="compile" dir="${key.dir}/key.util" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.java/build.xml" target="compile" dir="${key.dir}/key.core.java" inheritall="false"/>
         <ant antfile="${key.dir}/key.core/build.xml" target="compile" dir="${key.dir}/key.core" inheritall="false"/>
         <ant antfile="${key.dir}/key.core.testgen/build.xml" target="compile" dir="${key.dir}/key.core.testgen"
              inheritall="false"/>
@@ -44,6 +45,7 @@
     <target name="jarAll" description="Create jar files for each submodule">
         <!-- Create Jar archives -->
         <ant antfile="${key.dir}/key.util/build.xml" target="deploy" dir="${key.dir}/key.util" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.java/build.xml" target="deploy" dir="${key.dir}/key.core.java" inheritall="false"/>
         <ant antfile="${key.dir}/key.core/build.xml" target="deploy" dir="${key.dir}/key.core" inheritall="false"/>
         <ant antfile="${key.dir}/key.core.testgen/build.xml" target="deploy" dir="${key.dir}/key.core.testgen"
              inheritall="false"/>
@@ -144,6 +146,7 @@
             description="Remove all generated files. (Clears deployment files and calls 'ant clean' on production subprojects.)">
         <!-- Clean components -->
         <ant antfile="${key.dir}/key.util/build.xml" target="clean" dir="${key.dir}/key.util" inheritall="false"/>
+        <ant antfile="${key.dir}/key.core.java/build.xml" target="clean" dir="${key.dir}/key.core.java" inheritall="false"/>
         <ant antfile="${key.dir}/key.core/build.xml" target="clean" dir="${key.dir}/key.core" inheritall="false"/>
         <ant antfile="${key.dir}/key.core.testgen/build.xml" target="clean" dir="${key.dir}/key.core.testgen"
              inheritall="false"/>

@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/key.core/key.core.iml" filepath="$PROJECT_DIR$/key.core/key.core.iml" />
       <module fileurl="file://$PROJECT_DIR$/key.core.example/key.core.example.iml" filepath="$PROJECT_DIR$/key.core.example/key.core.example.iml" />
+      <module fileurl="file://$PROJECT_DIR$/key.core.java/key.core.java.iml" filepath="$PROJECT_DIR$/key.core.java/key.core.java.iml" />
       <module fileurl="file://$PROJECT_DIR$/key.core.proof_references/key.core.proof_references.iml" filepath="$PROJECT_DIR$/key.core.proof_references/key.core.proof_references.iml" />
       <module fileurl="file://$PROJECT_DIR$/key.core.proof_references.test/key.core.proof_references.test.iml" filepath="$PROJECT_DIR$/key.core.proof_references.test/key.core.proof_references.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/key.core.symbolic_execution/key.core.symbolic_execution.iml" filepath="$PROJECT_DIR$/key.core.symbolic_execution/key.core.symbolic_execution.iml" />

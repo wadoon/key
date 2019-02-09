@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<project name="key.core.java" default="deploy" basedir=".">
+    <property name="src.dir" value="${basedir}/src"/>
+    <property name="gen.dir" value="${basedir}/genSrc"/>
+    <property name="build.dir" value="${basedir}/bin"/>
+    <property name="dist.dir" value="${basedir}/../deployment"/>
+    <property name="ext.dir" value="${basedir}/lib"/>
+
+    <property environment="env"/>
+    <condition property="key.version" value="${env.KEY_VERSION}" else="2.7">
+        <isset property="env.KEY_VERSION"/>
+    </condition>
+
+    <target name="deploy" depends="compile" description="Create a JAR archive in the destination directory.">
+        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${dist.dir}/components"/>
+        <mkdir dir="${dist.dir}/libs"/>
+        <jar destfile="${dist.dir}/components/key.core.java.jar"
+             basedir="${build.dir}">
+            <manifest>
+
+            </manifest>
+        </jar>
+    </target>
+
+    <target name="compile" depends="copy" description="Compile all source files into the build directory.">
+        <mkdir dir="${build.dir}"/>
+        <javac srcdir="${src.dir}:${gen.dir}"
+               destdir="${build.dir}"
+               includeantruntime="false"
+               source="1.8"
+               target="1.8"
+               deprecation="off"
+               debug="on"
+               depend="on"
+               optimize="off">
+            <classpath>
+                <!-- <pathelement location="${ext.dir}/antlr.jar"/>                -->
+                <pathelement location="${ext.dir}/recoderKey.jar"/>
+                <pathelement location="libs/lombok-1.18.4.jar"/>
+                <pathelement location="${basedir}/../key.util/bin/"/>
+            </classpath>
+        </javac>
+        <exec executable="git" outputproperty="git.revision" failifexecutionfails="false">
+            <arg value="rev-parse"/>
+            <arg value="HEAD"/>
+        </exec>
+        <exec executable="git" outputproperty="git.branch" failifexecutionfails="false">
+            <arg value="rev-parse"/>
+            <arg value="--abbrev-ref"/>
+            <arg value="HEAD"/>
+        </exec>
+        <echo file="${build.dir}/de/uka/ilkd/key/util/sha1">${git.revision}</echo>
+        <echo file="${build.dir}/de/uka/ilkd/key/util/branch">${git.branch}</echo>
+        <echo file="${build.dir}/de/uka/ilkd/key/util/version">${key.version}</echo>
+    </target>
+
+    <target name="copy" description="Copy all resources into the binary directory.">
+        <copy todir="${build.dir}">
+            <fileset dir="${basedir}/resources/"/>
+        </copy>
+        <!--<copy todir="${build.dir}/META-INF">
+            <fileset dir="${basedir}/META-INF/"/>
+        </copy>-->
+    </target>
+
+    <target name="clean" description="Deletes all generated files and folders.">
+        <delete failonerror="false" includeemptydirs="true">
+            <fileset dir="${build.dir}" includes="**/*"/>
+            <fileset dir="${gen.dir}" includes="**/*" excludes="**/readme.txt"/>
+            <fileset file="${dist.dir}/components/key.core.java.jar"/>
+        </delete>
+    </target>
+
+    <target name="build.dir" depends="copy">
+        <mkdir dir="${build.dir}"/>
+    </target>
+</project>
