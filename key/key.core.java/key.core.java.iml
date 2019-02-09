@@ -18,5 +18,7 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module" module-name="key.util" exported="" />
+    <orderEntry type="module" module-name="key.core" />
   </component>
 </module>

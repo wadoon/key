@@ -50,6 +50,7 @@
         <SOURCES />
       </library>
     </orderEntry>
-    <orderEntry type="module" module-name="key.util" exported="" />
+    <orderEntry type="module" module-name="key.util" />
+    <orderEntry type="module" module-name="key.core.java" exported="" />
   </component>
 </module>
