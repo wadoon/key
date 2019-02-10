@@ -22,26 +22,26 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
 /**
- *  Finally.
- * 
+ * Finally.
  */
 public class Finally extends BranchImp {
 
     /**
-     *      Body.
+     * Body.
      */
     protected StatementBlock body;
 
     /**
-     *      Finally.
+     * Finally.
      */
     public Finally() {
-	body=null;
+        body = null;
     }
 
     /**
-     *      Finally.
-     *      @param body a statement.
+     * Finally.
+     *
+     * @param body a statement.
      */
     public Finally(StatementBlock body) {
         this.body = body;
@@ -50,18 +50,20 @@ public class Finally extends BranchImp {
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
      * @param children the children of this AST element as KeY classes.
-     * May contain: a Body (as body of the Finally), Comments
-     */ 
+     *                 May contain: a Body (as body of the Finally), Comments
+     */
     public Finally(ExtList children) {
-	super(children);
-	body=children.get(StatementBlock.class);
+        super(children);
+        body = children.get(StatementBlock.class);
     }
 
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
-     */    
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
+     */
     public int getChildCount() {
         int result = 0;
         if (body != null) result++;
@@ -69,12 +71,13 @@ public class Finally extends BranchImp {
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (body != null) {
@@ -84,9 +87,10 @@ public class Finally extends BranchImp {
     }
 
 
-   /**
-     *      Get the number of statements in this container.
-     *      @return the number of statements.
+    /**
+     * Get the number of statements in this container.
+     *
+     * @return the number of statements.
      */
     public int getStatementCount() {
         return (body != null) ? 1 : 0;
@@ -108,8 +112,9 @@ public class Finally extends BranchImp {
     }
 
     /**
-     *        Get body.
-     *        @return the statement.
+     * Get body.
+     *
+     * @return the statement.
      */
     public Statement getBody() {
         return body;
@@ -119,12 +124,14 @@ public class Finally extends BranchImp {
         return body;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnFinally(this);
+        v.performActionOnFinally(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

@@ -23,8 +23,9 @@ import org.key_project.util.ExtList;
 import java.math.BigInteger;
 
 /**
- *  Long literal.
- *  @author <TT>AutoDoc</TT>
+ * Long literal.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
 public class LongLiteral extends AbstractIntegerLiteral {
@@ -58,6 +59,7 @@ public class LongLiteral extends AbstractIntegerLiteral {
 
     /**
      * Creates a new LongLiteral representing the given long.
+     *
      * @param value the long value represented by the literal
      */
     public LongLiteral(long value) {
@@ -73,9 +75,9 @@ public class LongLiteral extends AbstractIntegerLiteral {
      *
      * @param valStr the String that contains the literal
      * @throws NumberFormatException if the given String does not represent a syntactically valid
-     *          literal or represents a value out of long range
+     *                               literal or represents a value out of long range
      * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1">
-     *               http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
+     * http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
      */
     public LongLiteral(String valStr) {
         this.value = parseFromString(valStr);
@@ -86,9 +88,9 @@ public class LongLiteral extends AbstractIntegerLiteral {
      * Constructor for Recoder2KeY transformation.
      *
      * @param children the children of this AST element as KeY classes, may contain: Comments
-     * @param valStr the value of the literal
+     * @param valStr   the value of the literal
      * @throws NumberFormatException if the given String does not represent a syntactically valid
-     *          literal or represents a value out of long range
+     *                               literal or represents a value out of long range
      */
     public LongLiteral(ExtList children, String valStr) {
         super(children);
@@ -117,10 +119,9 @@ public class LongLiteral extends AbstractIntegerLiteral {
     }
 
     /**
-     *
      * @return the actual value of the literal converted to a decimal String. If the literal
-     *         represents a negative value, the first character is a '-' sign.
-     *         The returned String always ends with 'L' to indicate a long.
+     * represents a negative value, the first character is a '-' sign.
+     * The returned String always ends with 'L' to indicate a long.
      */
     @Override
     public String getValueString() {
@@ -139,9 +140,9 @@ public class LongLiteral extends AbstractIntegerLiteral {
      * @param sourceStr the String containing the value
      * @return the parsed value as a long
      * @throws NumberFormatException if the given String does not represent a syntactically valid
-     *          literal or represents a value out of long range
+     *                               literal or represents a value out of long range
      * @see <a href="http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1">
-     *               http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
+     * http://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.1</a>
      */
     protected long parseFromString(final String sourceStr) {
 

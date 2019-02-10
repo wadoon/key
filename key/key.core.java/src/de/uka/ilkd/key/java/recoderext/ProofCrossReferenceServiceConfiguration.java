@@ -18,15 +18,17 @@ import de.uka.ilkd.key.util.KeYRecoderExcHandler;
 import recoder.ProgramFactory;
 
 public class ProofCrossReferenceServiceConfiguration
-    extends KeYCrossReferenceServiceConfiguration {
+        extends KeYCrossReferenceServiceConfiguration {
 
     public ProofCrossReferenceServiceConfiguration(KeYRecoderExcHandler keh) {
-	super(keh);
+        super(keh);
     }
 
-    /** we need another factory for some new program elements */
+    /**
+     * we need another factory for some new program elements
+     */
     protected ProgramFactory makeProgramFactory() {
-	return ProofJavaProgramFactory.getInstance();
+        return ProofJavaProgramFactory.getInstance();
     }
 
 }

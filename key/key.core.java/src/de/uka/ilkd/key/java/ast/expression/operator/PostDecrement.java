@@ -19,15 +19,16 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
 /**
- *  Post decrement.
+ * Post decrement.
  */
 
 public class PostDecrement extends Assignment {
 
 
     /**
-     *      Post decrement.
-     *      @param children an ExtList with all children of this node
+     * Post decrement.
+     *
+     * @param children an ExtList with all children of this node
      */
 
     public PostDecrement(ExtList children) {
@@ -36,8 +37,9 @@ public class PostDecrement extends Assignment {
 
 
     /**
- *      Get arity.
- *      @return the int value.
+     * Get arity.
+     *
+     * @return the int value.
      */
 
     public int getArity() {
@@ -45,8 +47,9 @@ public class PostDecrement extends Assignment {
     }
 
     /**
- *      Get precedence.
- *      @return the int value.
+     * Get precedence.
+     *
+     * @return the int value.
      */
 
     public int getPrecedence() {
@@ -54,20 +57,23 @@ public class PostDecrement extends Assignment {
     }
 
     /**
- *      Get notation.
- *      @return the int value.
+     * Get notation.
+     *
+     * @return the int value.
      */
 
     public int getNotation() {
         return POSTFIX;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnPostDecrement(this);
+        v.performActionOnPostDecrement(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

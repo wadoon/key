@@ -18,32 +18,36 @@ import org.key_project.util.ExtList;
 
 
 /**
- *  Strict fp.
- *  @author <TT>AutoDoc</TT>
+ * Strict fp.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
 public class StrictFp extends Modifier {
 
     /**
- *      Strict fp.
+     * Strict fp.
      */
 
-    public StrictFp() {}
+    public StrictFp() {
+    }
 
     /**
-     * Strict fp.    
+     * Strict fp.
+     *
      * @param children the children of this AST element as KeY classes.
-     *  May contain: Comments
+     *                 May contain: Comments
      */
 
     public StrictFp(ExtList children) {
-	super(children);
+        super(children);
     }
 
 
     /**
- *      Get symbol.
- *      @return the string.
+     * Get symbol.
+     *
+     * @return the string.
      */
 
     protected String getSymbol() {

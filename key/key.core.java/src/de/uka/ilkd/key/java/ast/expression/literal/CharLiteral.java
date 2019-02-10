@@ -21,8 +21,9 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
 /**
- *  Char literal.
- *  @author <TT>Wolfram Pfeifer</TT>
+ * Char literal.
+ *
+ * @author <TT>Wolfram Pfeifer</TT>
  */
 public class CharLiteral extends AbstractIntegerLiteral {
 
@@ -33,6 +34,7 @@ public class CharLiteral extends AbstractIntegerLiteral {
 
     /**
      * Creates a new CharLiteral from the given char.
+     *
      * @param charVal a char value.
      */
     public CharLiteral(char charVal) {
@@ -45,7 +47,7 @@ public class CharLiteral extends AbstractIntegerLiteral {
      * chars written directly (like 'a', '0', 'Z'), Java escape chars (like '\n', '\r'), and
      * octal Unicode escapes (like '\040'). Note that unicode escapes in hexadecimal form are
      * processed earlier and don't have to be handled here.
-     *
+     * <p>
      * Note that the char must be enclosed in single-quotes.
      *
      * @param children an ExtList with all children(comments). May contain: Comments
@@ -59,6 +61,7 @@ public class CharLiteral extends AbstractIntegerLiteral {
     /**
      * Creates a new CharLiteral from the given String. The String must be of the form
      * <code>'c'</code> (with c being an arbitrary char).
+     *
      * @param valueStr a string.
      */
     public CharLiteral(String valueStr) {
@@ -67,6 +70,7 @@ public class CharLiteral extends AbstractIntegerLiteral {
 
     /**
      * Returns the decimal value of the char.
+     *
      * @return the decimal value of the char as a BigInteger
      */
     public long getValue() {
@@ -97,7 +101,7 @@ public class CharLiteral extends AbstractIntegerLiteral {
     @Override
     public String getValueString() {
         // the char value as a decimal number (without single-quotes)
-        return "" + (int)charVal;
+        return "" + (int) charVal;
     }
 
     /**
@@ -106,15 +110,15 @@ public class CharLiteral extends AbstractIntegerLiteral {
      * chars written directly (like 'a', '0', 'Z'), Java escape chars (like '\n', '\r'), and
      * octal Unicode escapes (like '\040'). Note that unicode escapes in hexadecimal form are
      * processed earlier and don't have to be handled by this method.
-     *
+     * <p>
      * This method does not check the length of the literal for validity.
      *
      * @param sourceStr the String containing the literal surrounded by single-quotes
      * @return the parsed value as a char
      * @throws NumberFormatException if the given String does not represent a syntactically valid
-     *          character literal or the literal is not surrounded by single-quotes
+     *                               character literal or the literal is not surrounded by single-quotes
      * @see <a href="https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.4">
-     *               https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.4</a>
+     * https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.4</a>
      */
     protected char parseFromString(final String sourceStr) {
         if (sourceStr.charAt(0) != '\'' || sourceStr.charAt(sourceStr.length() - 1) != '\'') {
@@ -131,33 +135,33 @@ public class CharLiteral extends AbstractIntegerLiteral {
          */
         if (valStr.charAt(0) == '\\') {
             switch (valStr.charAt(1)) {
-            case 'b':
-                return '\b';
-            case 't':
-                return '\t';
-            case 'n':
-                return '\n';
-            case 'f':
-                return '\f';
-            case 'r':
-                return '\r';
-            case '\"':
-                return '\"';
-            case '\'':
-                return '\'';
-            case '\\':
-                return '\\';
-            case '0':
-            case '1':
-            case '2':
-            case '3':
-            case '4':
-            case '5':
-            case '6':
-            case '7':
-                return (char) Integer.parseInt(valStr.substring(1, valStr.length()), 8);
-            default:
-                throw new NumberFormatException("Invalid char: " + sourceStr);
+                case 'b':
+                    return '\b';
+                case 't':
+                    return '\t';
+                case 'n':
+                    return '\n';
+                case 'f':
+                    return '\f';
+                case 'r':
+                    return '\r';
+                case '\"':
+                    return '\"';
+                case '\'':
+                    return '\'';
+                case '\\':
+                    return '\\';
+                case '0':
+                case '1':
+                case '2':
+                case '3':
+                case '4':
+                case '5':
+                case '6':
+                case '7':
+                    return (char) Integer.parseInt(valStr.substring(1), 8);
+                default:
+                    throw new NumberFormatException("Invalid char: " + sourceStr);
             }
         } else {
             return valStr.charAt(0);

@@ -13,7 +13,8 @@
 
 // This file is taken from the RECODER library, which is protected by the LGPL,
 // and modified.
-/** This class is part of the AST RECODER builds when it parses and resolves Java
+/**
+ * This class is part of the AST RECODER builds when it parses and resolves Java
  * programs with meta constructs and schema variables. It is transformed by Recoder2KeY
  * to a subclass of ...rule.metaconstruct.ProgramMetaConstruct.
  */
@@ -32,19 +33,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-public class RKeYMetaConstruct extends JavaStatement 
-    implements StatementContainer, KeYRecoderExtension {
+public class RKeYMetaConstruct extends JavaStatement
+        implements StatementContainer, KeYRecoderExtension {
 
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -2616618524631193660L;
     /**
      Child
      */
-    protected Statement child=null;
-    protected String name="";
+    protected Statement child = null;
+    protected String name = "";
 
     /** schemavariable needed by meta construct */
     private List<SVWrapper> sv = new Vector<SVWrapper>(); //of ProgramVariableSVWrapper
@@ -77,10 +78,10 @@ public class RKeYMetaConstruct extends JavaStatement
     /**
      Returns the number of children of this node.
      @return an int giving the number of children of this node
-    */
+     */
     public int getChildCount() {
         int result = 0;
-        if (child    != null) result++;
+        if (child != null) result++;
         return result;
     }
 
@@ -90,8 +91,8 @@ public class RKeYMetaConstruct extends JavaStatement
      @param index an index into this node's "virtual" child array
      @return the program element at the given position
      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-                of bounds
-    */
+     of bounds
+     */
     public ProgramElement getChildAt(int index) {
         if (child != null) {
             if (index == 0) return child;
@@ -125,7 +126,7 @@ public class RKeYMetaConstruct extends JavaStatement
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (child == p) {
-            Statement r = (Statement)q;
+            Statement r = (Statement) q;
             child = r;
             if (r != null) {
                 r.setStatementContainer(this);
@@ -135,22 +136,20 @@ public class RKeYMetaConstruct extends JavaStatement
         return false;
     }
 
+    /**
+     * returns a String name of this meta construct.
+     */
+    public String getName() {
+        return name;
+    }
 
     /**
      * sets a String name of this meta construct like 'unwind-loop'
      * @param s the String
      */
     public void setName(String s) {
-	name=s;
+        name = s;
     }
-
-    /**
-     * returns a String name of this meta construct.
-     */
-    public String getName() {
-	return name;
-    }
-
 
     /**
      Get child.
@@ -170,17 +169,8 @@ public class RKeYMetaConstruct extends JavaStatement
         child = statement;
     }
 
-    /**
-     * first schemavariable needed by the metaconstruct
-     * @param sv an SVWrapper containing the first Schemavariable
-     */
-
-    public void setSV(SVWrapper sv) {
-        this.sv.add(0,sv);
-    }
-
     public void addSV(SVWrapper svw) {
-	this.sv.add(svw);
+        this.sv.add(svw);
     }
 
     /**
@@ -192,13 +182,22 @@ public class RKeYMetaConstruct extends JavaStatement
     }
 
     public ProgramSV[] getSV() {
-	ProgramSV[] res = new ProgramSV[sv.size()];
-	Iterator<SVWrapper> it = sv.iterator();
-	int i=0;
-	while (it.hasNext()) {
-	    res[i++]=(ProgramSV)it.next().getSV();
-	}
-	return res;
+        ProgramSV[] res = new ProgramSV[sv.size()];
+        Iterator<SVWrapper> it = sv.iterator();
+        int i = 0;
+        while (it.hasNext()) {
+            res[i++] = (ProgramSV) it.next().getSV();
+        }
+        return res;
+    }
+
+    /**
+     * first schemavariable needed by the metaconstruct
+     * @param sv an SVWrapper containing the first Schemavariable
+     */
+
+    public void setSV(SVWrapper sv) {
+        this.sv.add(0, sv);
     }
 
     /**
@@ -229,10 +228,10 @@ public class RKeYMetaConstruct extends JavaStatement
     //don't think we need it
     public void accept(SourceVisitor v) {
     }
-    
+
     //???
     public JavaStatement deepClone() {
-	return null;
+        return null;
     }
 
 

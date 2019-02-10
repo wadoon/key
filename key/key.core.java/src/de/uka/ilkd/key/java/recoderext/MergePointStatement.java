@@ -21,15 +21,14 @@ import recoder.java.statement.JavaStatement;
 public class MergePointStatement extends JavaStatement
         implements ExpressionContainer {
 
-    private StatementContainer astParent;
     private final PositionedString mergeProc;
     private final PositionedString mergeParams;
-
     // The indexPV is not used when parsing JML specs, but only for taclets
     protected Expression indexPV;
+    private StatementContainer astParent;
 
     public MergePointStatement(PositionedString mergeProc,
-            PositionedString mergeParams) {
+                               PositionedString mergeParams) {
         makeParentRoleValid();
         this.mergeProc = mergeProc;
         this.mergeParams = mergeParams;
@@ -41,8 +40,7 @@ public class MergePointStatement extends JavaStatement
     }
 
     /**
-     * @param expr
-     *            The index variable of the MergePointStatement
+     * @param expr The index variable of the MergePointStatement
      */
     public MergePointStatement(Expression expr) {
         this.indexPV = expr;
@@ -73,16 +71,16 @@ public class MergePointStatement extends JavaStatement
     public PositionedString getMergeParams() {
         return mergeParams;
     }
-    
+
     public void setIndexPV(Expression indexPV) {
         this.indexPV = indexPV;
     }
 
     /**
      * Finds the source element that occurs first in the source.
-     * 
+     *
      * @return the last source element in the syntactical representation of this
-     *         element, may be equals to this element.
+     * element, may be equals to this element.
      */
     @Override
     public SourceElement getFirstElement() {
@@ -91,9 +89,9 @@ public class MergePointStatement extends JavaStatement
 
     /**
      * Finds the source element that occurs last in the source.
-     * 
+     *
      * @return the last source element in the syntactical representation of this
-     *         element, may be equals to this element.
+     * element, may be equals to this element.
      */
     @Override
     public SourceElement getLastElement() {
@@ -102,7 +100,7 @@ public class MergePointStatement extends JavaStatement
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
     @Override
@@ -113,12 +111,10 @@ public class MergePointStatement extends JavaStatement
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     @Override
     public ProgramElement getChildAt(int index) {

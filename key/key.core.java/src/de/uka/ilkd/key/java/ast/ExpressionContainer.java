@@ -14,15 +14,16 @@
 package de.uka.ilkd.key.java.ast;
 
 /**
- *  Expression container.
+ * Expression container.
  * taken from COMPOST and changed to achieve an immutable structure
  */
 
 public interface ExpressionContainer extends NonTerminalProgramElement {
 
     /**
- *      Get the number of expressions in this container.
- *      @return the number of expressions.
+     * Get the number of expressions in this container.
+     *
+     * @return the number of expressions.
      */
     int getExpressionCount();
 

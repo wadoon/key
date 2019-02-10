@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.java.ast;
 
 /**
- *  Terminal program element.
+ * Terminal program element.
  * taken from COMPOST and changed to achieve an immutable structure
  */
 

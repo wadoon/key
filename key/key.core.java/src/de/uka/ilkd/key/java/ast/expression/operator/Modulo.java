@@ -20,13 +20,13 @@ import org.key_project.util.ExtList;
 
 
 /**
- *  Modulo.
+ * Modulo.
  */
 public class Modulo extends BinaryOperator {
 
 
     /**
- *      Modulo.
+     * Modulo.
      */
 
     public Modulo(ExtList children) {
@@ -34,15 +34,14 @@ public class Modulo extends BinaryOperator {
     }
 
     public Modulo(Expression lhs, Expression rhs) {
-	super(lhs, rhs);
+        super(lhs, rhs);
     }
 
 
-
-
     /**
- *      Get precedence.
- *      @return the int value.
+     * Get precedence.
+     *
+     * @return the int value.
      */
 
     public int getPrecedence() {
@@ -50,20 +49,23 @@ public class Modulo extends BinaryOperator {
     }
 
     /**
- *      Get notation.
- *      @return the int value.
+     * Get notation.
+     *
+     * @return the int value.
      */
 
     public int getNotation() {
         return INFIX;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnModulo(this);
+        v.performActionOnModulo(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

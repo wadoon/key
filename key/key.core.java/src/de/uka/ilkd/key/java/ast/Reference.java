@@ -15,9 +15,9 @@ package de.uka.ilkd.key.java.ast;
 
 
 /**
- *  References are uses of names, variables or members.
- *  They can have a name (such as TypeReferences) or be
- *  anonymous (such as ArrayReference).
+ * References are uses of names, variables or members.
+ * They can have a name (such as TypeReferences) or be
+ * anonymous (such as ArrayReference).
  * taken from COMPOST and changed to achieve an immutable structure
  */
 

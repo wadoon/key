@@ -41,13 +41,15 @@ import org.key_project.util.collection.ImmutableSet;
  * they call the method <code> doDefaultAction(ProgramElement) </code>.
  */
 public abstract class JavaASTVisitor extends JavaASTWalker
-    implements Visitor {
+        implements Visitor {
 
     protected final Services services;
 
 
-    /** create the JavaASTVisitor
-     * @param root the ProgramElement where to begin
+    /**
+     * create the JavaASTVisitor
+     *
+     * @param root     the ProgramElement where to begin
      * @param services the Services object
      */
     public JavaASTVisitor(ProgramElement root, Services services) {
@@ -59,23 +61,23 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     @Override
     protected void walk(ProgramElement node) {
         super.walk(node);
-        if(node instanceof LoopStatement && services != null) {
+        if (node instanceof LoopStatement && services != null) {
             LoopSpecification li = services.getSpecificationRepository()
-                                       .getLoopSpec((LoopStatement) node);
-            if(li != null) {
+                    .getLoopSpec((LoopStatement) node);
+            if (li != null) {
                 performActionOnLoopInvariant(li);
             }
         } else if (node instanceof StatementBlock && services != null) {
             ImmutableSet<BlockContract> bcs =
-                services.getSpecificationRepository()
-                    .getBlockContracts((StatementBlock) node);
+                    services.getSpecificationRepository()
+                            .getBlockContracts((StatementBlock) node);
             for (BlockContract bc : bcs) {
                 performActionOnBlockContract(bc);
             }
 
             ImmutableSet<LoopContract> lcs =
-                services.getSpecificationRepository()
-                    .getLoopContracts((StatementBlock) node);
+                    services.getSpecificationRepository()
+                            .getLoopContracts((StatementBlock) node);
             for (LoopContract lc : lcs) {
                 performActionOnLoopContract(lc);
             }
@@ -97,8 +99,10 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
 
-    /** the action that is performed just before leaving the node the
+    /**
+     * the action that is performed just before leaving the node the
      * last time
+     *
      * @param node the node described above
      */
     protected abstract void doDefaultAction(SourceElement node);
@@ -707,7 +711,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker
 
     @Override
     public void performActionOnSchemaVariable(SchemaVariable x) {
-        doDefaultAction((ProgramSV)x);
+        doDefaultAction((ProgramSV) x);
     }
 
     @Override

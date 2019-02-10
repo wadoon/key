@@ -16,37 +16,41 @@ package de.uka.ilkd.key.java.ast.declaration.modifier;
 import org.key_project.util.ExtList;
 
 /**
- *  Protected.
- *  @author <TT>AutoDoc</TT>
+ * Protected.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
 public class Protected extends VisibilityModifier {
 
     /**
- *      Protected.
+     * Protected.
      */
 
-    public Protected() {}
+    public Protected() {
+    }
 
     /**
- *      Protected.
+     * Protected.
+     *
      * @param children list of children. May contain: Comments
      */
 
     public Protected(ExtList children) {
-	super(children);
+        super(children);
     }
 
 
     /**
- *      Get symbol.
- *      @return the string.
+     * Get symbol.
+     *
+     * @return the string.
      */
 
     protected String getSymbol() {
         return "protected";
     }
-    
+
     @Override
     public int compareTo(VisibilityModifier arg0) {
         if (arg0 instanceof Private) return -2;

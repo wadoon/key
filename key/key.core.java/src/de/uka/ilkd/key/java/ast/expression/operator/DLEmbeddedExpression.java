@@ -35,6 +35,27 @@ public class DLEmbeddedExpression extends Operator {
 
     private final Function functionSymbol;
 
+    public DLEmbeddedExpression(Function f, ExtList children) {
+        super(children);
+        this.functionSymbol = f;
+    }
+
+    private static Sort getHeapSort(Services javaServ) {
+        return javaServ.getTypeConverter().getHeapLDT().targetSort();
+    }
+
+    private static KeYJavaType getKeYJavaType(Services javaServ, Sort argSort) {
+        // JavaInfo returns wrong data for sort integer! We need to find it over
+        // other paths.
+        JavaInfo javaInfo = javaServ.getJavaInfo();
+        KeYJavaType intType = javaInfo.getPrimitiveKeYJavaType("int");
+        if (argSort == intType.getSort()) {
+            return intType;
+        } else {
+            return javaInfo.getKeYJavaType(argSort);
+        }
+    }
+
     /**
      * @return the functionSymbol
      */
@@ -42,15 +63,10 @@ public class DLEmbeddedExpression extends Operator {
         return functionSymbol;
     }
 
-    public DLEmbeddedExpression(Function f, ExtList children) {
-        super(children);
-        this.functionSymbol = f;
-    }
-
     /**
      * Arity of an embedded JavaDL Expression depends upon the number of
      * arguments.
-     * 
+     * <p>
      * Since the first argument may be implicitly given, we cannot use the arity
      * of {@link #functionSymbol}.
      */
@@ -65,11 +81,11 @@ public class DLEmbeddedExpression extends Operator {
      */
     @Override
     public KeYJavaType getKeYJavaType(Services javaServ, ExecutionContext ec) {
-        
+
         Sort sort = functionSymbol.sort();
-        
+
         KeYJavaType kjt = getKeYJavaType(javaServ, sort);
-        if(kjt != null) {
+        if (kjt != null) {
             return kjt;
         } else {
             // FIXME FIXME FIXME Unknown types are mapped to int.
@@ -91,52 +107,52 @@ public class DLEmbeddedExpression extends Operator {
     public void visit(Visitor v) {
         v.performActionOnDLEmbeddedExpression(this);
     }
-    
-    @Override    
+
+    @Override
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printDLEmbeddedExpression(this);
     }
 
-    public void check(Services javaServ, 
-		      KeYJavaType containingClass) throws ConvertException {
-        
-        if(functionSymbol == null)
+    public void check(Services javaServ,
+                      KeYJavaType containingClass) throws ConvertException {
+
+        if (functionSymbol == null)
             throw new ConvertException("null function symbol");
-        
+
         int expected = functionSymbol.arity();
         int actual = children.size();
         // if the first argument is the implicit heap argument, then shift everything
         // by one
         int implicitOffset = 0;
-        
-        if (actual == expected - 1 && 
+
+        if (actual == expected - 1 &&
                 functionSymbol.argSort(0) == getHeapSort(javaServ)) {
             implicitOffset = 1;
         }
-        
+
         if (expected != actual + implicitOffset) {
             throw new ConvertException("Function symbol " + functionSymbol
                     + " requires " + expected
                     + " arguments, but received only " + actual);
         }
 
-        String name = containingClass.getSort().name().toString();	    
+        String name = containingClass.getSort().name().toString();
         String qualifier = name.lastIndexOf('.') != -1 ? name.substring(0, name.lastIndexOf('.')) : "";
-        name = name.substring(name.lastIndexOf('.')+1);
-        TypeRef tr = 
-        		new TypeRef(new ProgramElementName(name, qualifier), 0, null, containingClass);
+        name = name.substring(name.lastIndexOf('.') + 1);
+        TypeRef tr =
+                new TypeRef(new ProgramElementName(name, qualifier), 0, null, containingClass);
         ExecutionContext ec = new ExecutionContext(tr, null, null);
 
         for (int i = 0; i < actual; i++) {
             Sort argSort = functionSymbol.argSort(i + implicitOffset);
             KeYJavaType kjtExpected = getKeYJavaType(javaServ, argSort);
-                
+
             Expression child = children.get(i);
 
 
             KeYJavaType kjtActual = javaServ.getTypeConverter().getKeYJavaType(child, ec);
-            
-            if(kjtExpected != null && !kjtActual.getSort().extendsTrans(kjtExpected.getSort())) {
+
+            if (kjtExpected != null && !kjtActual.getSort().extendsTrans(kjtExpected.getSort())) {
                 throw new ConvertException("Received " + child
                         + " as argument " + i + " for function "
                         + functionSymbol + ". Was expecting type "
@@ -145,29 +161,12 @@ public class DLEmbeddedExpression extends Operator {
         }
     }
 
-
-    private static Sort getHeapSort(Services javaServ) {
-        return javaServ.getTypeConverter().getHeapLDT().targetSort();
-    }
-
-    private static KeYJavaType getKeYJavaType(Services javaServ, Sort argSort) {
-        // JavaInfo returns wrong data for sort integer! We need to find it over
-        // other paths.
-        JavaInfo javaInfo = javaServ.getJavaInfo();
-        KeYJavaType intType = javaInfo.getPrimitiveKeYJavaType("int");
-        if(argSort == intType.getSort()) {
-            return intType;
-        } else {
-            return javaInfo.getKeYJavaType(argSort);
-        }
-    }
-
     public Term makeTerm(LocationVariable heap, Term[] subs, Services services) {
         Function f = getFunctionSymbol();
         // we silently assume that check has been called earlier
 
-        if(f.arity() == subs.length) {
-            return services.getTermFactory().createTerm(f, subs); 
+        if (f.arity() == subs.length) {
+            return services.getTermFactory().createTerm(f, subs);
         } else {
             Term[] extSubs = new Term[subs.length + 1];
             System.arraycopy(subs, 0, extSubs, 1, subs.length);

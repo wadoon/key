@@ -21,15 +21,14 @@ import recoder.java.CompilationUnit;
 
 /**
  * This class is used to handle source files within recoder.
- * 
+ * <p>
  * It does only overwrite one method: createDataLocation.
- * 
+ * <p>
  * The original method in {@link DefaultSourceFileRepository} creates references
  * to possibly non-existing files which we do not want. Thus, we leave the location
  * already present.
- * 
+ *
  * @author MU
- * 
  */
 
 public class KeYCrossReferenceSourceFileRepository extends
@@ -42,14 +41,13 @@ public class KeYCrossReferenceSourceFileRepository extends
     /**
      * return the data location that is already stored in the compilation unit.
      * If there is no location stored so far, create a temporary invalid one.
-     * 
+     * <p>
      * The super class would have created a location that does not represent the
      * existing sources.
-     * 
-     * @param cu
-     *                Compilation unit to create the location for.
+     *
+     * @param cu Compilation unit to create the location for.
      * @return location(cu) == null ? {@link SpecDataLocation#UNKNOWN_LOCATION} :
-     *         location(cu)
+     * location(cu)
      */
     protected DataLocation createDataLocation(CompilationUnit cu) {
         DataLocation dataLocation = cu.getDataLocation();

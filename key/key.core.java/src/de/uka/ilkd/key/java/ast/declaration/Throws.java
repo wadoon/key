@@ -24,55 +24,58 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
- *  Throws.
- *  @author <TT>AutoDoc</TT>
+ * Throws.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
 public class Throws extends JavaNonTerminalProgramElement
- implements TypeReferenceContainer {
+        implements TypeReferenceContainer {
 
 
     /**
-     *      Exceptions.
+     * Exceptions.
      */
     protected final ImmutableArray<TypeReference> exceptions;
 
     /**
-     *      Throws.
+     * Throws.
      */
     public Throws() {
-	this.exceptions=null;
+        this.exceptions = null;
     }
 
     /**
-     *      Throws.
-     *      @param exception a type reference.
+     * Throws.
+     *
+     * @param exception a type reference.
      */
     public Throws(TypeReference exception) {
-	this.exceptions=new ImmutableArray<TypeReference>(exception); 
+        this.exceptions = new ImmutableArray<TypeReference>(exception);
     }
 
     /**
-     *      Throws.
-     *      @param list a type reference array.
+     * Throws.
+     *
+     * @param list a type reference array.
      */
     public Throws(TypeReference[] list) {
-	this.exceptions = new ImmutableArray<TypeReference>(list); 
+        this.exceptions = new ImmutableArray<TypeReference>(list);
     }
-
 
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
      * @param children the children of this AST element as KeY classes.
-     * 	May contain:
-     * 		several of TypeReference (as references to thrown exceptions), 
-     * 		Comments
+     *                 May contain:
+     *                 several of TypeReference (as references to thrown exceptions),
+     *                 Comments
      */
     public Throws(ExtList children) {
-	super(children);
-	this.exceptions=new
-	    ImmutableArray<TypeReference>(children.collect(TypeReference.class));  
+        super(children);
+        this.exceptions = new
+                ImmutableArray<TypeReference>(children.collect(TypeReference.class));
     }
 
     public SourceElement getLastElement() {
@@ -83,8 +86,9 @@ public class Throws extends JavaNonTerminalProgramElement
     }
 
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
      */
     public int getChildCount() {
         int result = 0;
@@ -93,12 +97,13 @@ public class Throws extends JavaNonTerminalProgramElement
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (exceptions != null) {
@@ -106,18 +111,20 @@ public class Throws extends JavaNonTerminalProgramElement
         }
         throw new ArrayIndexOutOfBoundsException();
     }
-    
+
     /**
-     *      Get exceptions.
-     *      @return the type reference mutable list.
+     * Get exceptions.
+     *
+     * @return the type reference mutable list.
      */
     public ImmutableArray<TypeReference> getExceptions() {
         return exceptions;
     }
 
     /**
-     *      Get the number of type references in this container.
-     *      @return the number of type references.
+     * Get the number of type references in this container.
+     *
+     * @return the number of type references.
      */
     public int getTypeReferenceCount() {
         return (exceptions != null) ? exceptions.size() : 0;
@@ -139,12 +146,14 @@ public class Throws extends JavaNonTerminalProgramElement
     }
 
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnThrows(this);
+        v.performActionOnThrows(this);
     }
 
 

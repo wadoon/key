@@ -25,23 +25,23 @@ import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.Name;
 
 
-
 public class EmptySeqLiteral extends Literal {
 
     public static final EmptySeqLiteral INSTANCE = new EmptySeqLiteral();
-    
-    private EmptySeqLiteral() {}   
-    
-    
+
+    private EmptySeqLiteral() {
+    }
+
+
     @Override
-    public boolean equalsModRenaming(SourceElement o, 
+    public boolean equalsModRenaming(SourceElement o,
                                      NameAbstractionTable nat) {
-	return o == this;
+        return o == this;
     }
 
 
     public void visit(Visitor v) {
-	v.performActionOnEmptySeqLiteral(this);
+        v.performActionOnEmptySeqLiteral(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
@@ -50,7 +50,7 @@ public class EmptySeqLiteral extends Literal {
 
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_SEQ);
     }
 
     @Override

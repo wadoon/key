@@ -19,11 +19,11 @@ import recoder.java.SourceVisitor;
 import recoder.java.Statement;
 import recoder.java.statement.JavaStatement;
 
-public class StatementSVWrapper extends JavaStatement 
-    implements KeYRecoderExtension, SVWrapper{
-   
+public class StatementSVWrapper extends JavaStatement
+        implements KeYRecoderExtension, SVWrapper {
+
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -4062276649575988872L;
     protected SchemaVariable sv;
@@ -36,33 +36,35 @@ public class StatementSVWrapper extends JavaStatement
     }
 
     public StatementSVWrapper(SchemaVariable sv) {
-	this.sv=sv;
+        this.sv = sv;
     }
 
     /**
-     Make parent role valid.
+     * Make parent role valid.
      */
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
     }
 
     /**
-     Returns the number of children of this node.
-     @return an int giving the number of children of this node
-    */
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
+     */
     public int getChildCount() {
         int result = 0;
         return result;
     }
 
     /**
-     Returns the child at the specified index in this node's "virtual"
-     child array
-     @param index an index into this node's "virtual" child array
-     @return the program element at the given position
-     @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-                of bounds
-    */
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
+     */
     public ProgramElement getChildAt(int index) {
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -80,37 +82,38 @@ public class StatementSVWrapper extends JavaStatement
      * is effectively removed.
      * The parent role of the new child is validated, while the
      * parent link of the replaced child is left untouched.
+     *
      * @param p the old child.
      * @param q the new child.
      * @return true if a replacement has occured, false otherwise.
-     * @exception ClassCastException if the new child cannot take over
-     *            the role of the old one.
+     * @throws ClassCastException if the new child cannot take over
+     *                            the role of the old one.
      */
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         return false;
     }
 
-
-    /**
-     * sets the schema variable of sort statement
-     * @param sv the SchemaVariable
-     */
-    public void setSV(SchemaVariable sv) {
-	this.sv=sv;
-    }
-
     /**
      * returns a String name of this meta construct.
      */
     public SchemaVariable getSV() {
-	return sv;
+        return sv;
     }
 
+    /**
+     * sets the schema variable of sort statement
+     *
+     * @param sv the SchemaVariable
+     */
+    public void setSV(SchemaVariable sv) {
+        this.sv = sv;
+    }
 
     /**
-     Get the number of statements in this container.
-     @return the number of statements.
+     * Get the number of statements in this container.
+     *
+     * @return the number of statements.
      */
 
     public int getStatementCount() {
@@ -132,9 +135,9 @@ public class StatementSVWrapper extends JavaStatement
     //don't think we need it
     public void accept(SourceVisitor v) {
     }
-    
+
     public StatementSVWrapper deepClone() {
-	return new StatementSVWrapper(sv);
+        return new StatementSVWrapper(sv);
     }
 
 

@@ -24,13 +24,13 @@ import org.key_project.util.ExtList;
 
 
 /**
- *  Logical or.
+ * Logical or.
  */
 
 public class LogicalOr extends Operator {
 
     /**
-     *      Logical or.
+     * Logical or.
      */
 
     public LogicalOr(ExtList children) {
@@ -39,13 +39,14 @@ public class LogicalOr extends Operator {
 
 
     public LogicalOr(Expression lhs, Expression rhs) {
-	super(lhs, rhs);
+        super(lhs, rhs);
     }
 
 
     /**
- *      Get arity.
- *      @return the int value.
+     * Get arity.
+     *
+     * @return the int value.
      */
 
     public int getArity() {
@@ -53,8 +54,9 @@ public class LogicalOr extends Operator {
     }
 
     /**
-     *      Get precedence.
-     *      @return the int value.
+     * Get precedence.
+     *
+     * @return the int value.
      */
 
     public int getPrecedence() {
@@ -62,20 +64,23 @@ public class LogicalOr extends Operator {
     }
 
     /**
- *      Get notation.
- *      @return the int value.
+     * Get notation.
+     *
+     * @return the int value.
      */
 
     public int getNotation() {
         return INFIX;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnLogicalOr(this);
+        v.performActionOnLogicalOr(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
@@ -83,6 +88,6 @@ public class LogicalOr extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
-	return services.getTypeConverter().getBooleanType();
+        return services.getTypeConverter().getBooleanType();
     }
 }

@@ -13,7 +13,8 @@
 
 // This file is taken from the RECODER library, which is protected by the LGPL,
 // and modified.
-/** This class is part of the AST RECODER builds when it parses and resolves Java
+/**
+ * This class is part of the AST RECODER builds when it parses and resolves Java
  * programs with meta constructs and schema variables. It is transformed by Recoder2KeY
  * to a subclass of ...rule.metaconstruct.ProgramMetaConstruct.
  */
@@ -27,18 +28,18 @@ import recoder.java.expression.Literal;
 
 
 public class RKeYMetaConstructExpression extends Literal
-    implements ExpressionContainer, KeYRecoderExtension {
+        implements ExpressionContainer, KeYRecoderExtension {
 
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -145731902618445018L;
     /**
      Child
      */
-    protected Expression child=null;
-    protected String name="";
+    protected Expression child = null;
+    protected String name = "";
 
     protected RKeYMetaConstructExpression(RKeYMetaConstructExpression proto) {
         super(proto);
@@ -62,10 +63,10 @@ public class RKeYMetaConstructExpression extends Literal
     /**
      Returns the number of children of this node.
      @return an int giving the number of children of this node
-    */
+     */
     public int getChildCount() {
         int result = 0;
-        if (child    != null) result++;
+        if (child != null) result++;
         return result;
     }
 
@@ -75,8 +76,8 @@ public class RKeYMetaConstructExpression extends Literal
      @param index an index into this node's "virtual" child array
      @return the program element at the given position
      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-                of bounds
-    */
+     of bounds
+     */
     public ProgramElement getChildAt(int index) {
         if (child != null) {
             if (index == 0) return child;
@@ -94,35 +95,35 @@ public class RKeYMetaConstructExpression extends Literal
     }
 
     public int getIndexOfChild(ProgramElement pe) {
-	if (pe==child) {
-	    return 0;
-	}
-	return -1;
+        if (pe == child) {
+            return 0;
+        }
+        return -1;
     }
 
     @Deprecated
     public int getIndexOfChild(int posCode) {
-	if (posCode==getChildPositionCode(child)) {
-	    return 0;
-	}
-	return -1;
+        if (posCode == getChildPositionCode(child)) {
+            return 0;
+        }
+        return -1;
     }
 
     public int getRoleOfChild(int i) {
-	if (i==0) return getChildPositionCode(child);
-	return -1;
+        if (i == 0) return getChildPositionCode(child);
+        return -1;
     }
 
     public void makeAllParentRolesValid() {
-	TreeWalker tw = new TreeWalker(this);
+        TreeWalker tw = new TreeWalker(this);
         while (tw.next(NonTerminalProgramElement.class)) {
-            ((NonTerminalProgramElement)tw.getProgramElement()).makeParentRoleValid();
+            ((NonTerminalProgramElement) tw.getProgramElement()).makeParentRoleValid();
         }
     }
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (child == p) {
-            Expression r = (Expression)q;
+            Expression r = (Expression) q;
             child = r;
             if (r != null) {
                 r.setExpressionContainer(this);
@@ -132,23 +133,20 @@ public class RKeYMetaConstructExpression extends Literal
         return false;
     }
 
-
+    /**
+     * returns a String name of this meta construct.
+     */
+    public String getName() {
+        return name;
+    }
 
     /**
      * sets a String name of this meta construct like 'unwind-loop'
      * @param s the String
      */
     public void setName(String s) {
-	name=s;
+        name = s;
     }
-
-    /**
-     * returns a String name of this meta construct.
-     */
-    public String getName() {
-	return name;
-    }
-
 
     /**
      Get child.
@@ -196,22 +194,22 @@ public class RKeYMetaConstructExpression extends Literal
     //don't think we need it
     public void accept(SourceVisitor v) {
     }
-    
+
     //???
     public Literal deepClone() {
-	return null;
+        return null;
     }
 
-	public void validateAll() throws ModelException {
-		// TODO Auto-generated method stub
-		throw new Error("mulbrich: Don't know what to do - yet");
-	}
+    public void validateAll() throws ModelException {
+        // TODO Auto-generated method stub
+        throw new Error("mulbrich: Don't know what to do - yet");
+    }
 
-	@Override
-	public Object getEquivalentJavaType() {
-		// TODO Auto-generated method stub
-		throw new Error("mulbrich: Don't know what to do - yet");
-	}
+    @Override
+    public Object getEquivalentJavaType() {
+        // TODO Auto-generated method stub
+        throw new Error("mulbrich: Don't know what to do - yet");
+    }
 
 
 }

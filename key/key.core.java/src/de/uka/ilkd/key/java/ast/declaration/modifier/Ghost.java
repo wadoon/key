@@ -18,15 +18,16 @@ import org.key_project.util.ExtList;
 
 
 /**
- *  The JML modifier "ghost".
+ * The JML modifier "ghost".
  */
 public class Ghost extends Modifier {
 
-    public Ghost() {}
+    public Ghost() {
+    }
 
 
     public Ghost(ExtList children) {
-        super (children);
+        super(children);
     }
 
 

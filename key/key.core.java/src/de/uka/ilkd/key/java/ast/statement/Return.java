@@ -17,9 +17,9 @@ import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ast.Expression;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
+
 /**
- *  Return.
- *  
+ * Return.
  */
 
 public class Return extends ExpressionJumpStatement {
@@ -27,29 +27,33 @@ public class Return extends ExpressionJumpStatement {
 
     /**
      * Expression jump statement.
-     * @param expr an Expression used to jump 
+     *
+     * @param expr an Expression used to jump
      */
     public Return(Expression expr) {
-	super(expr);
+        super(expr);
     }
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
      * @param children the children of this AST element as KeY classes.
-     * May contain: 	an Expression (as expression of the
-     * 			ExpressionJumpStatement), 
-     *   		Comments
-     */ 
+     *                 May contain: 	an Expression (as expression of the
+     *                 ExpressionJumpStatement),
+     *                 Comments
+     */
     public Return(ExtList children) {
-	super(children);
+        super(children);
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnReturn(this);
+        v.performActionOnReturn(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

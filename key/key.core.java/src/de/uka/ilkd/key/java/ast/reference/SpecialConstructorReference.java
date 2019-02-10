@@ -21,84 +21,88 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
- *  Occurs in a constructor declaration as the first statement
- *  as this(...) or super(...) reference.
- *  The Reference knows the constructor declaration it refers to.
+ * Occurs in a constructor declaration as the first statement
+ * as this(...) or super(...) reference.
+ * The Reference knows the constructor declaration it refers to.
  */
 
 public abstract class SpecialConstructorReference
- extends JavaNonTerminalProgramElement implements ConstructorReference {
+        extends JavaNonTerminalProgramElement implements ConstructorReference {
 
-    
 
     protected final ImmutableArray<Expression> arguments;
-    
 
 
     public SpecialConstructorReference() {
-	this.arguments = null;
+        this.arguments = null;
     }
 
     /**
      * Special constructor reference.
+     *
      * @param arguments an expression mutable list.
      */
     public SpecialConstructorReference(Expression[] arguments) {
-	this.arguments = new ImmutableArray<Expression>(arguments);
+        this.arguments = new ImmutableArray<Expression>(arguments);
     }
 
 
     /**
      * Special constructor reference.
+     *
      * @param arguments an expression mutable list.
      */
     public SpecialConstructorReference(ImmutableArray<Expression> arguments) {
-	this.arguments = arguments;
+        this.arguments = arguments;
     }
 
-    
+
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
      * @param children the children of this AST element as KeY classes.
-     * May contain: 
-     * 	several of Expression (as initializers of the array),
-     *  Comments
-     */ 
+     *                 May contain:
+     *                 several of Expression (as initializers of the array),
+     *                 Comments
+     */
     public SpecialConstructorReference(ExtList children) {
-	super(children);	
-	this.arguments = new ImmutableArray<Expression>
-	    (children.collect(Expression.class)); 
+        super(children);
+        this.arguments = new ImmutableArray<Expression>
+                (children.collect(Expression.class));
     }
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
      * @param children the children of this AST element as KeY classes.
-     * May contain: 
-     * 	several of Expression (as initializers of the array),
-     *  Comments
-     */ 
+     *                 May contain:
+     *                 several of Expression (as initializers of the array),
+     *                 Comments
+     */
     public SpecialConstructorReference(ExtList children, PositionInfo pi) {
-	super(children, pi);	
-	this.arguments = new ImmutableArray<Expression>
-	    (children.collect(Expression.class)); 
+        super(children, pi);
+        this.arguments = new ImmutableArray<Expression>
+                (children.collect(Expression.class));
     }
 
 
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
      */
     public int getChildCount() {
         return getExpressionCount();
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (arguments != null) {
@@ -106,10 +110,11 @@ public abstract class SpecialConstructorReference
         }
         throw new ArrayIndexOutOfBoundsException();
     }
-    
+
     /**
-     *      Get the number of expressions in this container.
-     *      @return the number of expressions.
+     * Get the number of expressions in this container.
+     *
+     * @return the number of expressions.
      */
 
     public int getExpressionCount() {
@@ -132,8 +137,9 @@ public abstract class SpecialConstructorReference
     }
 
     /**
-     *      Get arguments.
-     *      @return the expression mutable list.
+     * Get arguments.
+     *
+     * @return the expression mutable list.
      */
     public ImmutableArray<Expression> getArguments() {
         return arguments;

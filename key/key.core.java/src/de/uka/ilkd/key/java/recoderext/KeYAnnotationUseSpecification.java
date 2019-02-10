@@ -21,20 +21,20 @@ import recoder.java.reference.TypeReference;
 public class KeYAnnotationUseSpecification extends AnnotationUseSpecification {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 2163251956161988258L;
 
-    public KeYAnnotationUseSpecification(){
+    public KeYAnnotationUseSpecification() {
         super();
     }
-    
-    public KeYAnnotationUseSpecification(TypeReference tr){
+
+    public KeYAnnotationUseSpecification(TypeReference tr) {
         super(tr);
     }
-    
-    public KeYAnnotationUseSpecification deepClone(){
+
+    public KeYAnnotationUseSpecification deepClone() {
         return new KeYAnnotationUseSpecification(getTypeReference());
     }
-    
+
 }

@@ -22,42 +22,44 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
 /**
- *  Do.
- *  
+ * Do.
  */
 public class Do extends LoopStatement {
 
     /**
-     *      Do.
+     * Do.
      */
     public Do() {
-	super();
+        super();
     }
 
     /**
-     *      Do.
-     *      @param guard an expression.
+     * Do.
+     *
+     * @param guard an expression.
      */
     public Do(Expression guard) {
         super(guard);
     }
 
     /**
-     *      Do.
-     *      @param guard an expression.
-     *      @param body a statement.
+     * Do.
+     *
+     * @param guard an expression.
+     * @param body  a statement.
      */
     public Do(Expression guard, Statement body, ExtList l, PositionInfo pos) {
-        super(guard, body, l, pos);	
+        super(guard, body, l, pos);
     }
 
     /**
-     *      Do.
-     *      @param guard an expression.
-     *      @param body a statement.
+     * Do.
+     *
+     * @param guard an expression.
+     * @param body  a statement.
      */
     public Do(Expression guard, Statement body, PositionInfo pos) {
-        super(guard, body, pos);	
+        super(guard, body, pos);
     }
 
     public SourceElement getLastElement() {
@@ -65,19 +67,22 @@ public class Do extends LoopStatement {
     }
 
     /**
-     *      Is checked before iteration.
-     *      @return the boolean value.
+     * Is checked before iteration.
+     *
+     * @return the boolean value.
      */
     public boolean isCheckedBeforeIteration() {
         return false;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnDo(this);
+        v.performActionOnDo(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

@@ -17,31 +17,32 @@ import de.uka.ilkd.key.java.ast.declaration.Modifier;
 import org.key_project.util.ExtList;
 
 /**
- *  Abstract.
+ * Abstract.
  */
 
 public class Abstract extends Modifier {
 
     /**
-     *      Abstract.
+     * Abstract.
      */
-    public Abstract() {}
-
-
-    /**
-     *      Abstract.
-     * @param children list of children. May contain: Comments
-     */
-    public Abstract(ExtList children) {
-	super (children);
+    public Abstract() {
     }
 
 
+    /**
+     * Abstract.
+     *
+     * @param children list of children. May contain: Comments
+     */
+    public Abstract(ExtList children) {
+        super(children);
+    }
 
 
     /**
-     *      Get symbol.
-     *      @return the string.
+     * Get symbol.
+     *
+     * @return the string.
      */
     protected String getSymbol() {
         return "abstract";

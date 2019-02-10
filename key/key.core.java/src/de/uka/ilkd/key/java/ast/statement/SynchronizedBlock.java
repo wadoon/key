@@ -28,20 +28,20 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
- *  Synchronized block.
+ * Synchronized block.
  */
 
-public class SynchronizedBlock extends JavaStatement 
-    implements StatementContainer, ExpressionContainer, ProgramPrefix {
+public class SynchronizedBlock extends JavaStatement
+        implements StatementContainer, ExpressionContainer, ProgramPrefix {
 
     /**
- *      Expression.
+     * Expression.
      */
 
     protected final Expression expression;
 
     /**
- *      Body.
+     * Body.
      */
 
     protected final StatementBlock body;
@@ -49,32 +49,17 @@ public class SynchronizedBlock extends JavaStatement
     private final MethodFrame innerMostMethodFrame;
 
     private final int prefixLength;
-    
-   
-    
+
+
     /**
- *      Synchronized block.
- *      @param body a statement block.
+     * Synchronized block.
+     *
+     * @param body a statement block.
      */
 
     public SynchronizedBlock(StatementBlock body) {
-        this.body=body;
-	this.expression=null;
-    ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
-    prefixLength = info.getLength();
-    innerMostMethodFrame = info.getInnerMostMethodFrame();
-
-    }
-
-    /**
- *      Synchronized block.
- *      @param e an expression.
- *      @param body a statement block.
-     */
-
-    public SynchronizedBlock(Expression e, StatementBlock body) {
-        expression=e;
-        this.body=body;
+        this.body = body;
+        this.expression = null;
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -82,17 +67,34 @@ public class SynchronizedBlock extends JavaStatement
     }
 
     /**
- *      Synchronized block.
- *      @param children a list with all children
+     * Synchronized block.
+     *
+     * @param e    an expression.
+     * @param body a statement block.
+     */
+
+    public SynchronizedBlock(Expression e, StatementBlock body) {
+        expression = e;
+        this.body = body;
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
+
+    }
+
+    /**
+     * Synchronized block.
+     *
+     * @param children a list with all children
      */
 
     public SynchronizedBlock(ExtList children) {
         super(children);
-	expression = children.get(Expression.class);
-	body = children.get(StatementBlock.class);
-    ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
-    prefixLength = info.getLength();
-    innerMostMethodFrame = info.getInnerMostMethodFrame();
+        expression = children.get(Expression.class);
+        body = children.get(StatementBlock.class);
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
 
     }
 
@@ -109,13 +111,13 @@ public class SynchronizedBlock extends JavaStatement
             throw new IndexOutOfBoundsException("No next prefix element " + this);
         }
     }
-    
+
     @Override
     public ProgramPrefix getLastPrefixElement() {
-        return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : 
-            this;
+        return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() :
+                this;
     }
-    
+
     @Override
     public int getPrefixLength() {
         return prefixLength;
@@ -129,7 +131,7 @@ public class SynchronizedBlock extends JavaStatement
     @Override
     public ImmutableArray<ProgramPrefix> getPrefixElements() {
         return StatementBlock.computePrefixElements(body.getBody(), this);
-    }    
+    }
 
     /**
      * The method checks whether the expression in the synchronized
@@ -137,23 +139,25 @@ public class SynchronizedBlock extends JavaStatement
      * (as local variables of this type are not supported by KeY,
      * see return value for
      * {@link MetaClassReference#getKeYJavaType(Services, ExecutionContext)}.
+     *
      * @return true iff the above stated condition holds.
      */
     private boolean expressionWithoutSideffects() {
         return (expression instanceof ProgramVariable
-                    && !((ProgramVariable)expression).isMember())
+                && !((ProgramVariable) expression).isMember())
                 || (expression instanceof MetaClassReference);
     }
 
     public PosInProgram getFirstActiveChildPos() {
         return getStatementCount() == 0 ?
                 PosInProgram.TOP : (expressionWithoutSideffects() ?
-                        PosInProgram.TOP.down(getChildCount()-1).down(0) : PosInProgram.ONE);
+                PosInProgram.TOP.down(getChildCount() - 1).down(0) : PosInProgram.ONE);
     }
-    
+
     /**
- *      Get the number of expressions in this container.
- *      @return the number of expressions.
+     * Get the number of expressions in this container.
+     *
+     * @return the number of expressions.
      */
 
     public int getExpressionCount() {
@@ -178,8 +182,9 @@ public class SynchronizedBlock extends JavaStatement
 
 
     /**
- *      Get expression.
- *      @return the expression.
+     * Get expression.
+     *
+     * @return the expression.
      */
 
     public Expression getExpression() {
@@ -187,25 +192,27 @@ public class SynchronizedBlock extends JavaStatement
     }
 
     /**
- *      Returns the number of children of this node.
- *      @return an int giving the number of children of this node
-    */
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
+     */
 
     public int getChildCount() {
         int result = 0;
         if (expression != null) result++;
-        if (body       != null) result++;
+        if (body != null) result++;
         return result;
     }
 
     /**
- *      Returns the child at the specified index in this node's "virtual"
- *      child array
- *      @param index an index into this node's "virtual" child array
- *      @return the program element at the given position
- *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
- *                 of bounds
-    */
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
+     */
 
     public ProgramElement getChildAt(int index) {
         if (expression != null) {
@@ -219,8 +226,9 @@ public class SynchronizedBlock extends JavaStatement
     }
 
     /**
- *      Get body.
- *      @return the statement block.
+     * Get body.
+     *
+     * @return the statement block.
      */
 
     public StatementBlock getBody() {
@@ -229,8 +237,9 @@ public class SynchronizedBlock extends JavaStatement
 
 
     /**
- *      Get the number of statements in this container.
- *      @return the number of statements.
+     * Get the number of statements in this container.
+     *
+     * @return the number of statements.
      */
 
     public int getStatementCount() {
@@ -252,7 +261,6 @@ public class SynchronizedBlock extends JavaStatement
         }
         throw new ArrayIndexOutOfBoundsException();
     }
-    
 
 
     public SourceElement getFirstElement() {
@@ -260,12 +268,14 @@ public class SynchronizedBlock extends JavaStatement
     }
 
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnSynchronizedBlock(this);
+        v.performActionOnSynchronizedBlock(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

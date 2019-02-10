@@ -18,8 +18,8 @@ import recoder.service.ProgramModelInfo;
 
 /**
  * RecodeR extension for JML's \bigint type.
- * @author bruns
  *
+ * @author bruns
  */
 public final class Bigint extends PrimitiveType {
 

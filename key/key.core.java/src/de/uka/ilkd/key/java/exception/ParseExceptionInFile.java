@@ -4,15 +4,14 @@ import recoder.parser.ParseException;
 
 /**
  * This exception extends recoder's {@link ParseException} by a filename.
- *
+ * <p>
  * The filename is used to display the location of an error in the sources. Line
  * and column number are not stored here explicitly but retrieved from the
  * cause.
  *
  * @author mulbrich
- *
  */
- @SuppressWarnings("serial")
+@SuppressWarnings("serial")
 public class ParseExceptionInFile extends ParseException {
 
     private final String filename;

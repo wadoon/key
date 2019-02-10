@@ -26,10 +26,10 @@ import java.util.List;
 
 /**
  * This class is used for wrapping an enum into a standard class type.
- * 
+ *
  * <p>In addition the programvariables that represent enum constants are memorized. Thus
- * this class is able to have queries on the enum constants. 
- * 
+ * this class is able to have queries on the enum constants.
+ *
  * @author mulbrich
  * @since 2006-12-10
  */
@@ -45,19 +45,15 @@ public class EnumClassDeclaration extends ClassDeclaration {
      * create a new EnumClassDeclaration that describes an enum defintion. It
      * merely wraps a ClassDeclaration but has memory about which fields have
      * been declared as enum constants.
-     * 
-     * @param children
-     *            children in the ast (members)
-     * @param fullName
-     *            of the class/enum
-     * @param isLibrary
-     *            see class constructor
-     * @param enumConstantDeclarations
-     *            the declarations for the enum constants
+     *
+     * @param children                 children in the ast (members)
+     * @param fullName                 of the class/enum
+     * @param isLibrary                see class constructor
+     * @param enumConstantDeclarations the declarations for the enum constants
      */
     public EnumClassDeclaration(ExtList children, ProgramElementName fullName,
-            boolean isLibrary,
-            List<EnumConstantDeclaration> enumConstantDeclarations) {
+                                boolean isLibrary,
+                                List<EnumConstantDeclaration> enumConstantDeclarations) {
 
         super(children, fullName, isLibrary);
 
@@ -67,13 +63,38 @@ public class EnumClassDeclaration extends ClassDeclaration {
         }
     }
 
+    /**
+     * check whether a PV is an enum constant of any enum type.
+     *
+     * @param attribute ProgramVariable to check.
+     * @return true iff attribute is an enum constant.
+     */
+    public static boolean isEnumConstant(IProgramVariable attribute) {
+        KeYJavaType kjt = attribute.getKeYJavaType();
+        Type type = kjt.getJavaType();
+        if (type instanceof EnumClassDeclaration)
+            return ((EnumClassDeclaration) type).isLocalEnumConstant(attribute);
+        else
+            return false;
+    }
+
+    // TODO DOC
+    public static int indexOf(ProgramVariable attribute) {
+        KeYJavaType kjt = attribute.getKeYJavaType();
+        Type type = kjt.getJavaType();
+        if (type instanceof EnumClassDeclaration)
+            return ((EnumClassDeclaration) type).localIndexOf(attribute);
+        else
+            return -1;
+    }
+
     /*
      * find the program variable for a constant given by name.
-     * 
+     *
      * The "<Name>::" have to be prepended to obtain the internal name.
      * Throw IllegalStateException if name is not an attribute of this.
      * This will never happen.
-     * 
+     *
      */
     private IProgramVariable findAttr(String fieldName) {
         String completeName = getFullName() + "::" + fieldName;
@@ -103,6 +124,7 @@ public class EnumClassDeclaration extends ClassDeclaration {
 
     /**
      * get the index of the program variable amongst the enumconstants of THIS enum.
+     *
      * @param pv PV to look up
      * @return -1 if not found, otherwise the 0-based index.
      */
@@ -116,34 +138,11 @@ public class EnumClassDeclaration extends ClassDeclaration {
 
     /**
      * get the number of defined enum constants in this type.
+     *
      * @return the number of defined enum constants in this type
      */
     public int getNumberOfConstants() {
         return constants.size();
-    }
-
-    /**
-     * check whether a PV is an enum constant of any enum type.
-     * @param attribute ProgramVariable to check.
-     * @return true iff attribute is an enum constant.
-     */
-    public static boolean isEnumConstant(IProgramVariable attribute) {
-        KeYJavaType kjt = attribute.getKeYJavaType();
-        Type type = kjt.getJavaType();
-        if (type instanceof EnumClassDeclaration)
-            return ((EnumClassDeclaration) type).isLocalEnumConstant(attribute);
-        else
-            return false;
-    }
-    
-    // TODO DOC
-    public static int indexOf(ProgramVariable attribute) {
-        KeYJavaType kjt = attribute.getKeYJavaType();
-        Type type = kjt.getJavaType();
-        if (type instanceof EnumClassDeclaration)
-            return ((EnumClassDeclaration) type).localIndexOf(attribute);
-        else
-            return -1;
     }
 
 }

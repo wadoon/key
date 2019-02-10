@@ -27,24 +27,24 @@ import java.util.LinkedHashSet;
 public class LabelCollector extends JavaASTVisitor {
 
     private HashSet<Label> labels;
-    
-    public LabelCollector(ProgramElement root,                           
+
+    public LabelCollector(ProgramElement root,
                           Services services) {
-        super(root, services);        
+        super(root, services);
         this.labels = new LinkedHashSet<Label>(20);
     }
-    
+
     public boolean contains(Label l) {
         return labels.contains(l);
     }
-    
-    protected void doDefaultAction(SourceElement node) {        
+
+    protected void doDefaultAction(SourceElement node) {
         if (node instanceof Label) {
-            labels.add((Label) node);           
+            labels.add((Label) node);
         }
     }
 
-    protected void doAction(ProgramElement node) {  
+    protected void doAction(ProgramElement node) {
         if (node instanceof Label) {
             labels.add((Label) node);
         }

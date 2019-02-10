@@ -180,7 +180,7 @@ public interface Visitor {
     void performActionOnFieldSpecification(FieldSpecification x);
 
     void performActionOnImplicitFieldSpecification
-        (ImplicitFieldSpecification x);
+            (ImplicitFieldSpecification x);
 
     void performActionOnBinaryAnd(BinaryAnd x);
 
@@ -215,7 +215,7 @@ public interface Visitor {
     void performActionOnTimesAssignment(TimesAssignment x);
 
     void performActionOnUnsignedShiftRightAssignment(
-        UnsignedShiftRightAssignment x);
+            UnsignedShiftRightAssignment x);
 
     void performActionOnBinaryNot(BinaryNot x);
 
@@ -351,6 +351,6 @@ public interface Visitor {
 
     void performActionOnTransactionStatement(TransactionStatement transSt);
 
-    public void performActionOnEmptyMapLiteral(EmptyMapLiteral aThis);
+    void performActionOnEmptyMapLiteral(EmptyMapLiteral aThis);
 
 }

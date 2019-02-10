@@ -17,7 +17,7 @@ import de.uka.ilkd.key.java.ast.Declaration;
 import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 
 /**
- *  Member declaration.
+ * Member declaration.
  * taken from COMPOST and changed to achieve an immutable structure
  */
 

@@ -25,15 +25,15 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 import org.key_project.util.ExtList;
 
 
-public class FieldReference extends VariableReference 
-                            implements MemberReference, ReferenceSuffix, 
-                            TypeReferenceContainer, ExpressionContainer {
+public class FieldReference extends VariableReference
+        implements MemberReference, ReferenceSuffix,
+        TypeReferenceContainer, ExpressionContainer {
 
     /**
-     *      Reference prefix.
+     * Reference prefix.
      */
     protected ReferencePrefix prefix;
-    
+
 
     protected FieldReference() {
         prefix = null;
@@ -44,6 +44,17 @@ public class FieldReference extends VariableReference
         initPrefix(pv, prefix);
     }
 
+    public FieldReference(ExtList children, ReferencePrefix prefix) {
+        super(children);
+        initPrefix(getProgramVariable(), prefix);
+    }
+
+    public FieldReference(ProgramVariable pv, ReferencePrefix prefix, PositionInfo pi) {
+        super(pv, pi);
+        initPrefix(pv, prefix);
+
+    }
+
     private void initPrefix(ProgramVariable pv, ReferencePrefix prefix) {
         if (prefix == null && !pv.isStatic() && pv.isMember()) {
             this.prefix = new ThisReference();
@@ -52,37 +63,27 @@ public class FieldReference extends VariableReference
         }
     }
 
-    public FieldReference(ExtList children, ReferencePrefix prefix) {
-        super(children);
-        initPrefix(getProgramVariable(), prefix);
-    }
-
-
-    public FieldReference(ProgramVariable pv, ReferencePrefix prefix, PositionInfo pi) {
-        super(pv, pi);
-        initPrefix(pv, prefix);
-
-    }
-
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
-    */
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
+     */
     public int getChildCount() {
         int result = 0;
         if (prefix != null) result++;
-        if (variable   != null) result++;
+        if (variable != null) result++;
         return result;
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
-    */
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
+     */
     public ProgramElement getChildAt(int index) {
         if (prefix != null) {
             if (index == 0) return prefix;
@@ -95,35 +96,38 @@ public class FieldReference extends VariableReference
     }
 
     /**
-     *      Get reference prefix.
-     *      @return the reference prefix.
+     * Get reference prefix.
+     *
+     * @return the reference prefix.
      */
     public ReferencePrefix getReferencePrefix() {
         return prefix;
     }
 
     /*
-     * returns true if the reference prefix is an explicit or implicit 
+     * returns true if the reference prefix is an explicit or implicit
      * this reference this field reference does not refer to a static field
      */
     public boolean referencesOwnInstanceField() {
         return (prefix == null || prefix instanceof ThisReference) &&
-            !getProgramVariable().isStatic();
+                !getProgramVariable().isStatic();
     }
-    
+
 
     /**
-     *      Set reference prefix.
-     *      @author VK
+     * Set reference prefix.
+     *
+     * @author VK
      */
     public ReferencePrefix setReferencePrefix(ReferencePrefix rp) {
-        return new FieldReference(variable,rp);
+        return new FieldReference(variable, rp);
     }
 
 
     /**
-     *      Get the number of type references in this container.
-     *      @return the number of type references.
+     * Get the number of type references in this container.
+     *
+     * @return the number of type references.
      */
 
     public int getTypeReferenceCount() {
@@ -140,14 +144,15 @@ public class FieldReference extends VariableReference
     */
     public TypeReference getTypeReferenceAt(int index) {
         if (prefix instanceof TypeReference && index == 0) {
-            return (TypeReference)prefix;
+            return (TypeReference) prefix;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
 
     /**
-     *      Get the number of expressions in this container.
-     *      @return the number of expressions.
+     * Get the number of expressions in this container.
+     *
+     * @return the number of expressions.
      */
     public int getExpressionCount() {
         return (prefix instanceof Expression) ? 1 : 0;
@@ -163,7 +168,7 @@ public class FieldReference extends VariableReference
     */
     public Expression getExpressionAt(int index) {
         if (prefix instanceof Expression && index == 0) {
-            return (Expression)prefix;
+            return (Expression) prefix;
         }
         throw new ArrayIndexOutOfBoundsException();
     }
@@ -174,27 +179,32 @@ public class FieldReference extends VariableReference
 
     @Override
     public SourceElement getFirstElementIncludingBlocks() {
-       return (prefix == null) ? variable : prefix.getFirstElementIncludingBlocks();
+        return (prefix == null) ? variable : prefix.getFirstElementIncludingBlocks();
     }
 
-    /** pretty print */
+    /**
+     * pretty print
+     */
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printFieldReference(this);
     }
 
 
-
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnFieldReference(this);
+        v.performActionOnFieldReference(this);
     }
-    
-    /** are there "dots" in the prefix? */
+
+    /**
+     * are there "dots" in the prefix?
+     */
     public boolean isSingleDeref() {
-        return prefix.getReferencePrefix()==null;
+        return prefix.getReferencePrefix() == null;
     }
 
 }

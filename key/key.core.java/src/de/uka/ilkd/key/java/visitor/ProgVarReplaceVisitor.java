@@ -66,15 +66,12 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * creates a visitor that replaces the program variables in the given
      * statement by new ones with the same name
      *
-     * @param st
-     *            the statement where the prog vars are replaced
-     * @param map
-     *            the HashMap with the replacements
-     * @param services
-     *            the services instance
+     * @param st       the statement where the prog vars are replaced
+     * @param map      the HashMap with the replacements
+     * @param services the services instance
      */
     public ProgVarReplaceVisitor(ProgramElement st,
-            Map<ProgramVariable, ProgramVariable> map, Services services) {
+                                 Map<ProgramVariable, ProgramVariable> map, Services services) {
         super(st, true, services);
         this.replaceMap = map;
         assert services != null;
@@ -84,18 +81,14 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
      * creates a visitor that replaces the program variables in the given
      * statement
      *
-     * @param st
-     *            the statement where the prog vars are replaced
-     * @param map
-     *            the HashMap with the replacements
-     * @param replaceall
-     *            decides if all variables are to be replaced
-     * @param services
-     *            the services instance
+     * @param st         the statement where the prog vars are replaced
+     * @param map        the HashMap with the replacements
+     * @param replaceall decides if all variables are to be replaced
+     * @param services   the services instance
      */
     public ProgVarReplaceVisitor(ProgramElement st,
-            Map<ProgramVariable, ProgramVariable> map, boolean replaceall,
-            Services services) {
+                                 Map<ProgramVariable, ProgramVariable> map, boolean replaceall,
+                                 Services services) {
         this(st, map, services);
         this.replaceallbynew = replaceall;
     }
@@ -142,13 +135,16 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     /**
      * the action that is performed just before leaving the node the last time
+     *
      * @param node the node described above
      */
     protected void doAction(ProgramElement node) {
         node.visit(this);
     }
 
-    /** starts the walker */
+    /**
+     * starts the walker
+     */
     public void start() {
         stack.push(new ExtList());
         walk(root());
@@ -187,7 +183,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             }
         } else {
             boolean changed = false;
-            Term subTerms[] = new Term[t.arity()];
+            Term[] subTerms = new Term[t.arity()];
             for (int i = 0, n = t.arity(); i < n; i++) {
                 subTerms[i] = replaceVariablesInTerm(t.sub(i));
                 changed = changed || subTerms[i] != t.sub(i);
@@ -209,7 +205,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     private ImmutableList<Term> replaceVariablesInTerms(
             ImmutableList<Term> terms) {
-        ImmutableList<Term> res = ImmutableSLList.<Term> nil();
+        ImmutableList<Term> res = ImmutableSLList.nil();
         boolean changed = false;
         for (final Term term : terms) {
             final Term newTerm = replaceVariablesInTerm(term);
@@ -221,7 +217,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     private ImmutableList<InfFlowSpec> replaceVariablesInTermListTriples(
             ImmutableList<InfFlowSpec> terms) {
-        ImmutableList<InfFlowSpec> res = ImmutableSLList.<InfFlowSpec> nil();
+        ImmutableList<InfFlowSpec> res = ImmutableSLList.nil();
         boolean changed = false;
         for (final InfFlowSpec innerTerms : terms) {
             final ImmutableList<Term> renamedPreExpressions = replaceVariablesInTerms(
@@ -251,7 +247,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     @Override
     public void performActionOnBlockContract(final StatementBlock oldBlock,
-            final StatementBlock newBlock) {
+                                             final StatementBlock newBlock) {
         ImmutableSet<BlockContract> oldContracts = services
                 .getSpecificationRepository().getBlockContracts(oldBlock);
         for (BlockContract oldContract : oldContracts) {
@@ -263,7 +259,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     @Override
     public void performActionOnLoopContract(final StatementBlock oldBlock,
-            final StatementBlock newBlock) {
+                                            final StatementBlock newBlock) {
         ImmutableSet<LoopContract> oldContracts = services
                 .getSpecificationRepository().getLoopContracts(oldBlock);
         for (LoopContract oldContract : oldContracts) {
@@ -284,7 +280,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     @Override
     protected void performActionOnMergeContract(MergePointStatement oldMps,
-            MergePointStatement newMps) {
+                                                MergePointStatement newMps) {
         ImmutableSet<MergeContract> oldContracts = services
                 .getSpecificationRepository().getMergeContracts(oldMps);
         services.getSpecificationRepository().removeMergeContracts(oldMps);
@@ -299,7 +295,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
         if (oldContract instanceof UnparameterizedMergeContract && changed) {
             return new UnparameterizedMergeContract(
-                    ((UnparameterizedMergeContract) oldContract)
+                    oldContract
                             .getInstantiatedMergeProcedure(services),
                     newMps, oldContract.getKJT());
         } else if (oldContract instanceof PredicateAbstractionMergeContract) {
@@ -331,7 +327,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                                     pred.getPredicateFormWithPlaceholder().first,
                                     services))
                             .collect(Collectors.toCollection(
-                                () -> new ArrayList<AbstractionPredicate>())));
+                                    () -> new ArrayList<AbstractionPredicate>())));
 
         } else {
             if (!changed) {
@@ -373,12 +369,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     oldPostcondition);
             final Term newModifies = replaceVariablesInTerm(oldModifies);
 
-            newPreconditions.put(heap, (newPrecondition != oldPrecondition)
-                    ? newPrecondition : oldPrecondition);
-            newPostconditions.put(heap, (newPostcondition != oldPostcondition)
-                    ? newPostcondition : oldPostcondition);
+            newPreconditions.put(heap, newPrecondition);
+            newPostconditions.put(heap, newPostcondition);
             newModifiesClauses.put(heap,
-                    (newModifies != oldModifies) ? newModifies : oldModifies);
+                    newModifies);
 
             changed |= ((newPrecondition != oldPrecondition)
                     || (newPostcondition != oldPostcondition)
@@ -422,12 +416,10 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                     oldPostcondition);
             final Term newModifies = replaceVariablesInTerm(oldModifies);
 
-            newPreconditions.put(heap, (newPrecondition != oldPrecondition)
-                    ? newPrecondition : oldPrecondition);
-            newPostconditions.put(heap, (newPostcondition != oldPostcondition)
-                    ? newPostcondition : oldPostcondition);
+            newPreconditions.put(heap, newPrecondition);
+            newPostconditions.put(heap, newPostcondition);
             newModifiesClauses.put(heap,
-                    (newModifies != oldModifies) ? newModifies : oldModifies);
+                    newModifies);
 
             changed |= ((newPrecondition != oldPrecondition)
                     || (newPostcondition != oldPostcondition)
@@ -521,7 +513,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
     }
 
     public void performActionOnLoopInvariant(LoopStatement oldLoop,
-            LoopStatement newLoop) {
+                                             LoopStatement newLoop) {
         final TermBuilder tb = services.getTermBuilder();
         LoopSpecification inv = services.getSpecificationRepository()
                 .getLoopSpec(oldLoop);

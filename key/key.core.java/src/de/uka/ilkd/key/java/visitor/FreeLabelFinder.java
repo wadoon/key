@@ -23,26 +23,24 @@ import de.uka.ilkd.key.java.ast.statement.LabeledStatement;
  */
 public class FreeLabelFinder {
 
-    public FreeLabelFinder() {            
+    public FreeLabelFinder() {
     }
 
-    public boolean findLabel(Label label, ProgramElement node) {       
-        if (!(node instanceof LabeledStatement && 
-                ((LabeledStatement)node).getLabel().equals(label))) {
+    public boolean findLabel(Label label, ProgramElement node) {
+        if (!(node instanceof LabeledStatement &&
+                ((LabeledStatement) node).getLabel().equals(label))) {
             if (node instanceof NonTerminalProgramElement) {
-                final NonTerminalProgramElement nonTerminalNode = 
-                    (NonTerminalProgramElement) node;
-                for (int i = 0; i<nonTerminalNode.getChildCount(); i++) {                
-                    if (nonTerminalNode.getChildAt(i)!=null) {                                      
+                final NonTerminalProgramElement nonTerminalNode =
+                        (NonTerminalProgramElement) node;
+                for (int i = 0; i < nonTerminalNode.getChildCount(); i++) {
+                    if (nonTerminalNode.getChildAt(i) != null) {
                         if (findLabel(label, nonTerminalNode.getChildAt(i))) {
                             return true;
                         }
                     }
-                }           
-            } else if (node instanceof Label) {
-                if (node.equals(label)) {
-                    return true;
                 }
+            } else if (node instanceof Label) {
+                return node.equals(label);
             }
         }
         return false;

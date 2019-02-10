@@ -13,7 +13,8 @@
 
 // This file is taken from the RECODER library, which is protected by the LGPL,
 // and modified.
-/** This class is part of the AST RECODER builds when it parses and resolves Java
+/**
+ * This class is part of the AST RECODER builds when it parses and resolves Java
  * programs with meta constructs and schema variables. It is transformed by Recoder2KeY
  * to a subclass of ...rule.metaconstruct.ProgramMetaConstruct.
  */
@@ -27,27 +28,24 @@ import recoder.java.StatementContainer;
 import recoder.java.statement.JavaStatement;
 
 
-public class RMethodCallStatement extends JavaStatement 
-    implements StatementContainer, KeYRecoderExtension {
+public class RMethodCallStatement extends JavaStatement
+        implements StatementContainer, KeYRecoderExtension {
 
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 6613584975256598095L;
-
-    /** schemavariable needed by meta construct */
-    private ProgramVariableSVWrapper resultVar;
-
-    /** schemavariable needed by method call */
-    private ExecutionContext ecsvw;
-
     /**
      *      Body.
      */
     protected Statement body;
+    /** schemavariable needed by meta construct */
+    private ProgramVariableSVWrapper resultVar;
+    /** schemavariable needed by method call */
+    private ExecutionContext ecsvw;
 
-        
+
     /**
      *      Labeled statement.
      *      @param resultVar the ProgramVariable the return value is assigned to
@@ -56,12 +54,12 @@ public class RMethodCallStatement extends JavaStatement
      *      the called method
      */
 
-    public RMethodCallStatement(ProgramVariableSVWrapper resultVar, 
-				ExecutionContext ecsvw,
-				Statement body) {
+    public RMethodCallStatement(ProgramVariableSVWrapper resultVar,
+                                ExecutionContext ecsvw,
+                                Statement body) {
         this.resultVar = resultVar;
-	this.ecsvw     = ecsvw;
-        this.body      = body;
+        this.ecsvw = ecsvw;
+        this.body = body;
     }
 
     /**
@@ -115,7 +113,7 @@ public class RMethodCallStatement extends JavaStatement
             return 0;
         }
         if (ecsvw == child) {
-	    return 1;
+            return 1;
         }
         if (body == child) {
             return 2;
@@ -148,7 +146,7 @@ public class RMethodCallStatement extends JavaStatement
 
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (body == p) {
-            Statement r = (Statement)q;
+            Statement r = (Statement) q;
             body = r;
             if (r != null) {
                 r.setStatementContainer(this);
@@ -158,24 +156,24 @@ public class RMethodCallStatement extends JavaStatement
         return false;
     }
 
-     /**
-      Get child.
-      @return the statement.
-      */
+    /**
+     Get child.
+     @return the statement.
+     */
 
-     public Statement getChild() {
-         return body;
-     }
+    public Statement getChild() {
+        return body;
+    }
 
 
-     /**
-      Get body.
-      @return the statement.
-      */
+    /**
+     Get body.
+     @return the statement.
+     */
 
-     public Statement getBody() {
-         return body;
-     }
+    public Statement getBody() {
+        return body;
+    }
 
 //     /**
 //      Set child.
@@ -186,20 +184,19 @@ public class RMethodCallStatement extends JavaStatement
 //         child = statement;
 //     }
 
+    public ProgramVariableSVWrapper getVariableSV() {
+        return resultVar;
+    }
+
     /**
-     * schemavariable needed by the metaconstruct (needed by method-call)   
+     * schemavariable needed by the metaconstruct (needed by method-call)
      */
     public void setVariableSV(ProgramVariableSVWrapper sv) {
         this.resultVar = sv;
     }
 
-
-    public ProgramVariableSVWrapper getVariableSV() {
-        return resultVar;
-    }
-    
     public ExecutionContext getExecutionContext() {
-	return ecsvw;
+        return ecsvw;
     }
 
 
@@ -223,10 +220,10 @@ public class RMethodCallStatement extends JavaStatement
     //don't think we need it
     public void accept(SourceVisitor v) {
     }
-    
+
     //???
     public JavaStatement deepClone() {
-	return null;
+        return null;
     }
 
 

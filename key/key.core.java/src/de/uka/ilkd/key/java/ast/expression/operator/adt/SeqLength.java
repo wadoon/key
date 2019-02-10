@@ -24,9 +24,9 @@ import org.key_project.util.ExtList;
 
 /**
  * Represents a function giving the length of  a sequence.
+ *
  * @author bruns
  * @since 1.7.2120
- *
  */
 public class SeqLength extends Operator {
 
@@ -42,7 +42,7 @@ public class SeqLength extends Operator {
 
     @Override
     public void visit(Visitor v) {
-	v.performActionOnSeqLength(this);
+        v.performActionOnSeqLength(this);
     }
 
     @Override

@@ -14,12 +14,13 @@
 package de.uka.ilkd.key.java.ast.reference;
 
 /**
- *  Constructor reference.
- *  @author <TT>AutoDoc</TT>
+ * Constructor reference.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
 public interface ConstructorReference extends MethodOrConstructorReference,
-                                              MemberReference {
+        MemberReference {
 
 
 }

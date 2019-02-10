@@ -42,10 +42,8 @@ public class ProgramVariableCollector extends JavaASTVisitor {
      * this constructor is equivalent to
      * <tt>ProggramVariableCollector(root, false)</tt>
      *
-     * @param root
-     *            the ProgramElement which is the root of the AST
-     * @param services
-     *            the Services object
+     * @param root     the ProgramElement which is the root of the AST
+     * @param services the Services object
      */
     public ProgramVariableCollector(ProgramElement root, Services services) {
         super(root, services);
@@ -86,9 +84,9 @@ public class ProgramVariableCollector extends JavaASTVisitor {
     @Override
     public void performActionOnMergeContract(MergeContract x) {
         assert (x instanceof UnparameterizedMergeContract)
-                    || (x instanceof PredicateAbstractionMergeContract)
+                || (x instanceof PredicateAbstractionMergeContract)
                 : "Unexpected type of merge contract: "
-                        + x.getClass().getSimpleName();
+                + x.getClass().getSimpleName();
 
         if (x instanceof UnparameterizedMergeContract) {
             return;
@@ -128,9 +126,9 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         }
 
         // free invariants
-        for(LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
+        for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
             Term inv = x.getFreeInvariant(heap, selfTerm, atPres, services);
-            if(inv != null) {
+            if (inv != null) {
                 inv.execPostOrder(tpvc);
             }
         }

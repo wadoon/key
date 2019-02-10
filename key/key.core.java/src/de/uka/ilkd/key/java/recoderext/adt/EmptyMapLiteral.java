@@ -18,12 +18,11 @@ import recoder.java.expression.Literal;
 
 public final class EmptyMapLiteral extends Literal {
 
+    public static final EmptyMapLiteral INSTANCE = new EmptyMapLiteral();
     /**
      * generated UID
      */
     private static final long serialVersionUID = -4665241238978552904L;
-    
-    public static final EmptyMapLiteral INSTANCE = new EmptyMapLiteral();
 
     @Override
     public Expression deepClone() {

@@ -14,7 +14,7 @@
 package de.uka.ilkd.key.java.ast;
 
 /**
- *  Loop initializer.
+ * Loop initializer.
  * taken from COMPOST and changed to achieve an immutable structure
  */
 

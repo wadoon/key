@@ -18,10 +18,9 @@ import java.util.Stack;
  * This replaces all breaks and continues in a loop with {@code break l}, where {@code l} is a
  * specified label. It is used in the transformation of a for loop to a while loop.
  *
+ * @author lanzinger
  * @see LoopContractApplyHeadRule
  * @see SimpleLoopContract
- *
- * @author lanzinger
  */
 public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
 
@@ -45,21 +44,15 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
     private StatementBlock result;
 
     /**
-     *
-     * @param block
-     *            a block that begins with a loop.
-     * @param loopLabels
-     *            all labels belonging to the loop.
-     * @param breakLabel
-     *            the label used for break statements.
-     * @param continueLabel
-     *            the label used for continue statements.
-     * @param services
-     *            services.
+     * @param block         a block that begins with a loop.
+     * @param loopLabels    all labels belonging to the loop.
+     * @param breakLabel    the label used for break statements.
+     * @param continueLabel the label used for continue statements.
+     * @param services      services.
      */
     public InnerBreakAndContinueReplacer(final StatementBlock block,
-            final Iterable<Label> loopLabels, final Label breakLabel, final Label continueLabel,
-            final Services services) {
+                                         final Iterable<Label> loopLabels, final Label breakLabel, final Label continueLabel,
+                                         final Services services) {
         super(block, services);
         for (Label label : loopLabels) {
             this.loopLabels.add(label);
@@ -102,7 +95,7 @@ public class InnerBreakAndContinueReplacer extends JavaASTVisitor {
     @Override
     protected void walk(final ProgramElement node) {
         if (node.getPositionInfo() != PositionInfo.UNDEFINED) {
-            stack.push(new ExtList(new Object[] { node.getPositionInfo() }));
+            stack.push(new ExtList(new Object[]{node.getPositionInfo()}));
         } else {
             stack.push(new ExtList());
         }

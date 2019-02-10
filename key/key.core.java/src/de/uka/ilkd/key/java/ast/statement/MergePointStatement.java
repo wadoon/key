@@ -59,7 +59,7 @@ public class MergePointStatement extends JavaStatement
 
     /**
      * Get the number of expressions in this container.
-     * 
+     *
      * @return the number of expressions.
      */
     public int getExpressionCount() {
@@ -69,14 +69,10 @@ public class MergePointStatement extends JavaStatement
     /**
      * Return the expression at the specified index in this node's "virtual"
      * expression array.
-     * 
-     * @param index
-     *            an index for an expression.
-     * 
+     *
+     * @param index an index for an expression.
      * @return the expression with the given index.
-     * 
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds.
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds.
      */
     public Expression getExpressionAt(int index) {
         if (identifier != null && index == 0) {
@@ -87,7 +83,7 @@ public class MergePointStatement extends JavaStatement
 
     /**
      * Get expression.
-     * 
+     *
      * @return the expression.
      */
     public Expression getExpression() {
@@ -96,7 +92,7 @@ public class MergePointStatement extends JavaStatement
 
     /**
      * Returns the number of children of this node.
-     * 
+     *
      * @return an int giving the number of children of this node
      */
     public int getChildCount() {
@@ -109,12 +105,10 @@ public class MergePointStatement extends JavaStatement
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     * 
-     * @param index
-     *            an index into this node's "virtual" child array
+     *
+     * @param index an index into this node's "virtual" child array
      * @return the program element at the given position
-     * @exception ArrayIndexOutOfBoundsException
-     *                if <tt>index</tt> is out of bounds
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (identifier != null) {
@@ -128,9 +122,8 @@ public class MergePointStatement extends JavaStatement
     /**
      * calls the corresponding method of a visitor in order to perform some
      * action/transformation on this element
-     * 
-     * @param v
-     *            the Visitor
+     *
+     * @param v the Visitor
      */
     public void visit(Visitor v) {
         v.performActionOnMergePointStatement(this);

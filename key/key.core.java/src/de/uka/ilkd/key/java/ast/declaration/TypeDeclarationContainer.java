@@ -16,15 +16,16 @@ package de.uka.ilkd.key.java.ast.declaration;
 import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
 
 /**
- *  Type declaration container.
+ * Type declaration container.
  * taken from COMPOST and changed to achieve an immutable structure
  */
 
 public interface TypeDeclarationContainer extends NonTerminalProgramElement {
 
     /**
- *      Get the number of type declarations in this container.
- *      @return the number of type declarations.
+     * Get the number of type declarations in this container.
+     *
+     * @return the number of type declarations.
      */
     int getTypeDeclarationCount();
 

@@ -21,65 +21,51 @@ import java.io.File;
  */
 public class PositionInfo {
 
+    public final static PositionInfo UNDEFINED = new PositionInfo();
     final Position relPos;
     final Position startPos;
     final Position endPos;
-
-    String fileName=null;
     protected String parentClass;
-
-    public final static PositionInfo UNDEFINED=new PositionInfo();
+    String fileName = null;
 
     private PositionInfo() {
-	this.relPos=Position.UNDEFINED;
-	this.startPos=Position.UNDEFINED;
-	this.endPos=Position.UNDEFINED;
+        this.relPos = Position.UNDEFINED;
+        this.startPos = Position.UNDEFINED;
+        this.endPos = Position.UNDEFINED;
     }
 
     public PositionInfo(Position relPos, Position startPos, Position endPos) {
-	this.relPos=relPos;
-	this.startPos=startPos;
-	this.endPos=endPos;
+        this.relPos = relPos;
+        this.startPos = startPos;
+        this.endPos = endPos;
     }
-    
+
     public PositionInfo(Position relPos, Position startPos, Position endPos, String fileName) {
-        this.relPos=relPos;
-        this.startPos=startPos;
-        this.endPos=endPos;
-        this.fileName=simplifyPath(fileName);//bugfix:2009.09.17
+        this.relPos = relPos;
+        this.startPos = startPos;
+        this.endPos = endPos;
+        this.fileName = simplifyPath(fileName);//bugfix:2009.09.17
     }
-    
-    /** If the path contains the substring "/../", then this method tries to 
+
+    /**
+     * If the path contains the substring "/../", then this method tries to
      * simplify the path by removing this substring and the preceeding directory name
      * to that substring. Otherwise java.io.FileReader would have a problem.
      * E.g. Input "/A/B/../D" - Output "/A/D"
-     * @author gladisch*/
+     *
+     * @author gladisch
+     */
     private static String simplifyPath(String path) {
-        if (path != null && !path.isEmpty()) { 
+        if (path != null && !path.isEmpty()) {
             path = new File(path).toURI().normalize().getPath();
         }
         return path;
     }
 
-    public Position getRelativePosition() {
-	return relPos;
-    }
-
-    public Position getStartPosition() {
-	return startPos;
-    }
-
-    public Position getEndPosition() {
-	return endPos;
-    }
-
-    public String getFileName(){
-	return fileName;
-    }
-
     /**
      * Creates a new PositionInfo from joining the intervals of the given PositionInfos.
      * The file informations have to match, otherwise null is returned.
+     *
      * @param p1 the first PositionInfo
      * @param p2 the second PositionInfo
      * @return a new PositionInfo starting at the minimum of the two start positions and
@@ -105,7 +91,7 @@ public class PositionInfo {
         Position start;
         Position end;
         if (p1.startPos != Position.UNDEFINED && !p1.startPos.isNegative()
-                &&  p1.startPos.compareTo(p2.startPos) < 0) {
+                && p1.startPos.compareTo(p2.startPos) < 0) {
             start = p1.startPos;
         } else {
             start = p2.startPos;
@@ -121,8 +107,25 @@ public class PositionInfo {
         return pi;
     }
 
+    public Position getRelativePosition() {
+        return relPos;
+    }
+
+    public Position getStartPosition() {
+        return startPos;
+    }
+
+    public Position getEndPosition() {
+        return endPos;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
     /**
      * Checks if start and end position are both defined and in valid range.
+     *
      * @return true iff start and end are valid
      */
     public boolean startEndValid() {
@@ -130,23 +133,26 @@ public class PositionInfo {
                 && endPos != Position.UNDEFINED && !endPos.isNegative();
     }
 
-    /** this violates immutability, but the method is only called
-      * right after the object is created...
-      */
-    public void setParentClass(String s) {
-        parentClass = s;
-    }
-    
-    /** get the class the statement originates from */
+    /**
+     * get the class the statement originates from
+     */
     public String getParentClass() {
         return parentClass;
     }
 
-    public String toString(){
-	if (this==PositionInfo.UNDEFINED) 
+    /**
+     * this violates immutability, but the method is only called
+     * right after the object is created...
+     */
+    public void setParentClass(String s) {
+        parentClass = s;
+    }
+
+    public String toString() {
+        if (this == PositionInfo.UNDEFINED)
             return "UNDEFINED";
-	else return (fileName+" rel. Pos: "+relPos+" start Pos: "+
-                    startPos+" end Pos: "+endPos);
+        else return (fileName + " rel. Pos: " + relPos + " start Pos: " +
+                startPos + " end Pos: " + endPos);
     }
 
 }

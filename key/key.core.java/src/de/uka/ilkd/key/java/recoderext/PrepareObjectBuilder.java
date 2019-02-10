@@ -40,25 +40,25 @@ import java.util.List;
  * Creates the preparation method for pre-initilizing the object fields
  * with their default settings.
  */
-public class PrepareObjectBuilder 
-    extends RecoderModelTransformer {
+public class PrepareObjectBuilder
+        extends RecoderModelTransformer {
 
-    public static final String 
-	IMPLICIT_OBJECT_PREPARE = "<prepare>";
+    public static final String
+            IMPLICIT_OBJECT_PREPARE = "<prepare>";
 
-    public static final String 
-	IMPLICIT_OBJECT_PREPARE_ENTER = "<prepareEnter>";
+    public static final String
+            IMPLICIT_OBJECT_PREPARE_ENTER = "<prepareEnter>";
 
     private HashMap<TypeDeclaration, ASTList<Statement>> class2fields;
 
     private ClassType javaLangObject;
-    
+
 
     public PrepareObjectBuilder
-	(CrossReferenceServiceConfiguration services, 
-	 TransformerCache cache) {	
-	super(services, cache);
-	class2fields = new LinkedHashMap<TypeDeclaration, ASTList<Statement>>(getUnits().size());
+            (CrossReferenceServiceConfiguration services,
+             TransformerCache cache) {
+        super(services, cache);
+        class2fields = new LinkedHashMap<TypeDeclaration, ASTList<Statement>>(getUnits().size());
     }
 
     /**
@@ -68,23 +68,24 @@ public class PrepareObjectBuilder
      * versions are used.
      */
     private List<Field> getFields(ClassDeclaration cd) {
-	List<Field> result = new ArrayList<Field>(cd.getChildCount());
-	outer: for (int i = 0; i<cd.getChildCount(); i++) {
-	    if (cd.getChildAt(i) instanceof FieldDeclaration) {
-		final FieldDeclaration fd = (FieldDeclaration) cd.getChildAt(i);
-		for(Modifier mod : fd.getModifiers()) {
-		    if(mod instanceof Model) {
-			continue outer;
-		    }
-		}
-		final ASTList<FieldSpecification> fields 
-			= fd.getFieldSpecifications();
-		for (int j = 0; j<fields.size(); j++) {
-		    result.add(fields.get(j));
-		}
-	    }
-	}
-	return result;	
+        List<Field> result = new ArrayList<Field>(cd.getChildCount());
+        outer:
+        for (int i = 0; i < cd.getChildCount(); i++) {
+            if (cd.getChildAt(i) instanceof FieldDeclaration) {
+                final FieldDeclaration fd = (FieldDeclaration) cd.getChildAt(i);
+                for (Modifier mod : fd.getModifiers()) {
+                    if (mod instanceof Model) {
+                        continue outer;
+                    }
+                }
+                final ASTList<FieldSpecification> fields
+                        = fd.getFieldSpecifications();
+                for (int j = 0; j < fields.size(); j++) {
+                    result.add(fields.get(j));
+                }
+            }
+        }
+        return result;
     }
 
     /**
@@ -93,12 +94,13 @@ public class PrepareObjectBuilder
      * necessary information. In this case all class declarations are
      * examined and for each found field a copy assignment to its
      * default value is added to the map "class2fields".
-     *   All actions, which may cause a recoder model update have to be
+     * All actions, which may cause a recoder model update have to be
      * done here.
+     *
      * @return status report if analyze encountered problems or not
      */
     public ProblemReport analyze() {
-	javaLangObject = services.getNameInfo().getJavaLangObject();
+        javaLangObject = services.getNameInfo().getJavaLangObject();
         if (!(javaLangObject instanceof ClassDeclaration)) {
             Debug.fail("Could not find class java.lang.Object or only as bytecode");
         }
@@ -129,23 +131,24 @@ public class PrepareObjectBuilder
 		    }
 	    }
 	}*/
-	setProblemReport(NO_PROBLEM);
-	return NO_PROBLEM;
+        setProblemReport(NO_PROBLEM);
+        return NO_PROBLEM;
     }
 
     /**
-     *  creates the assignments of the field variables to their default values
+     * creates the assignments of the field variables to their default values
      * and inserts them to the given body list
+     *
      * @return the same list body that has been handed over as parameter
      */
     private ASTList<Statement> defaultSettings(List<Field> fields) {
 
-	if (fields == null) {
-	    return new ASTArrayList<Statement>(0);
-	} 
-	ASTList<Statement> result = new ASTArrayList<Statement>(fields.size());
+        if (fields == null) {
+            return new ASTArrayList<Statement>(0);
+        }
+        ASTList<Statement> result = new ASTArrayList<Statement>(fields.size());
         for (Field field : fields) {
-	    if (!field.isStatic() ) {		
+            if (!field.isStatic()) {
                 Identifier fieldId;
                 if (field.getName().charAt(0) != '<') {
                     fieldId = new Identifier(field.getName());
@@ -157,96 +160,98 @@ public class PrepareObjectBuilder
                 }
             }
         }
-	
-	return result;
+
+        return result;
     }
 
-    /** 
+    /**
      * creates an implicit method called 'prepare', that sets all
      * attributes to their default values
      */
     protected StatementBlock createPrepareBody
-	(ReferencePrefix prefix, TypeDeclaration classType) {
+    (ReferencePrefix prefix, TypeDeclaration classType) {
 
-	ASTList<Statement> body = new ASTArrayList<Statement>(15);
+        ASTList<Statement> body = new ASTArrayList<Statement>(15);
 
-	if (classType != javaLangObject) {
-	    // we can access the implementation	    	    
-	    body.add((new MethodReference
-			 (new SuperReference(), 
-			  new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE))));
-	    body.addAll(class2fields.get(classType));
+        if (classType != javaLangObject) {
+            // we can access the implementation
+            body.add((new MethodReference
+                    (new SuperReference(),
+                            new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE))));
+            body.addAll(class2fields.get(classType));
         }
-	return new StatementBlock(body);
+        return new StatementBlock(body);
     }
-    
+
     /**
      * creates the implicit <code>&lt;prepare&gt;</code> method that
      * sets the fields of the given type to its default values
+     *
      * @param type the TypeDeclaration for which the
-     * <code>&lt;prepare&gt;</code> is created
+     *             <code>&lt;prepare&gt;</code> is created
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethod(TypeDeclaration type) {
-	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
-	modifiers.add(new Protected());	
-	//	modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
-	//                new Identifier("ExternallyConstructedScope"))));
-	//        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
-	//                new Identifier("NoLocalScope"))));
-	MethodDeclaration md =  new MethodDeclaration
-	    (modifiers, 
-	     null, 
-	     new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE), 
-	     new ASTArrayList<ParameterDeclaration>(0), 
-	     null,
-	     createPrepareBody(new ThisReference(), type));
-	md.makeAllParentRolesValid();
-	return md;
-    }    
+        ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
+        modifiers.add(new Protected());
+        //	modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+        //                new Identifier("ExternallyConstructedScope"))));
+        //        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+        //                new Identifier("NoLocalScope"))));
+        MethodDeclaration md = new MethodDeclaration
+                (modifiers,
+                        null,
+                        new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE),
+                        new ASTArrayList<ParameterDeclaration>(0),
+                        null,
+                        createPrepareBody(new ThisReference(), type));
+        md.makeAllParentRolesValid();
+        return md;
+    }
 
     /**
      * creates the implicit <code>&lt;prepareEnter&gt;</code> method that
      * sets the fields of the given type to its default values
+     *
      * @param type the TypeDeclaration for which the
-     * <code>&lt;prepare&gt;</code> is created
+     *             <code>&lt;prepare&gt;</code> is created
      * @return the implicit <code>&lt;prepare&gt;</code> method
      */
     public MethodDeclaration createMethodPrepareEnter(TypeDeclaration type) {
-	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
-	modifiers.add(new Private());	
-        
-	//        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
-  	//              new Identifier("ExternallyConstructedScope"))));
- 	//       modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
- 	//               new Identifier("NoLocalScope"))));
-        
-	MethodDeclaration md =  new MethodDeclaration
-	    (modifiers, 
-	     null, 
-	     new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE_ENTER), 
-	     new ASTArrayList<ParameterDeclaration>(0), 
-	     null,
-	     createPrepareBody(new ThisReference(), type));
-	md.makeAllParentRolesValid();
-	return md;
-    }    
+        ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(1);
+        modifiers.add(new Private());
 
+        //        modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+        //              new Identifier("ExternallyConstructedScope"))));
+        //       modifiers.add(new KeYAnnotationUseSpecification(new TypeReference(
+        //               new Identifier("NoLocalScope"))));
+
+        MethodDeclaration md = new MethodDeclaration
+                (modifiers,
+                        null,
+                        new ImplicitIdentifier(IMPLICIT_OBJECT_PREPARE_ENTER),
+                        new ASTArrayList<ParameterDeclaration>(0),
+                        null,
+                        createPrepareBody(new ThisReference(), type));
+        md.makeAllParentRolesValid();
+        return md;
+    }
 
 
     /**
      * entry method for the constructor normalform builder
-     * @param td the TypeDeclaration 
+     *
+     * @param td the TypeDeclaration
      */
     protected void makeExplicit(TypeDeclaration td) {
-	if (td instanceof ClassDeclaration) {
-	    attach(createMethod(td), td, td.getMembers().size());
-	    attach(createMethodPrepareEnter(td), td, td.getMembers().size());
+        if (td instanceof ClassDeclaration) {
+            attach(createMethod(td), td, td.getMembers().size());
+            attach(createMethodPrepareEnter(td), td, td.getMembers().size());
 // 	    java.io.StringWriter sw = new java.io.StringWriter();
 // 	    services.getProgramFactory().getPrettyPrinter(sw).visitClassDeclaration((ClassDeclaration)td);
 // 	    System.out.println(sw.toString());
 // 	    try { sw.close(); } catch (Exception e) {}		
-	}
+        }
     }
 
 }

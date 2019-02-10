@@ -26,83 +26,91 @@ import de.uka.ilkd.key.logic.Name;
 import org.key_project.util.ExtList;
 
 /**
- *  Float literal.
- *  @author <TT>AutoDoc</TT>
+ * Float literal.
+ *
+ * @author <TT>AutoDoc</TT>
  */
 
 public class FloatLiteral extends Literal {
 
     /**
- *      Textual representation of the value.
+     * Textual representation of the value.
      */
 
     protected final String value;
 
     /**
- *      Float literal.
- *      @param value a float value.
+     * Float literal.
+     *
+     * @param value a float value.
      */
 
     public FloatLiteral(float value) {
-        this.value="" + value + 'F';
+        this.value = "" + value + 'F';
     }
 
     /**
-     *      Float literal.
-     *      @param children an ExtList with all children(here:comments)
-     *      @param value a string.
+     * Float literal.
+     *
+     * @param children an ExtList with all children(here:comments)
+     * @param value    a string.
      */
 
-    public FloatLiteral(ExtList children,String value) {
-	super(children);
-        this.value=(value.endsWith("F") || value.endsWith("f")) ? value :
-              (value + 'F');
+    public FloatLiteral(ExtList children, String value) {
+        super(children);
+        this.value = (value.endsWith("F") || value.endsWith("f")) ? value :
+                (value + 'F');
     }
 
     /**
-     *      Float literal.
-     *      @param value a string.
+     * Float literal.
+     *
+     * @param value a string.
      */
 
     public FloatLiteral(String value) {
-        this.value=(value.endsWith("F") || value.endsWith("f")) ? value :
-              (value + 'F');
-    }
-
-    /** tests if equals
-     */
-    public boolean equalsModRenaming(	SourceElement o, 
-										NameAbstractionTable nat){
-		if (!(o instanceof FloatLiteral)) {
-		    return false;
-		}
-		return ((FloatLiteral)o).getValue().equals(getValue()); 
-    }
-    
-    @Override
-    protected int computeHashCode() {
-    	return 37 * super.computeHashCode() + getValue().hashCode();
-    }
-    
-    public boolean equals(Object o){
-    	return super.equals(o);
+        this.value = (value.endsWith("F") || value.endsWith("f")) ? value :
+                (value + 'F');
     }
 
     /**
- *      Get value.
- *      @return the string.
+     * tests if equals
+     */
+    public boolean equalsModRenaming(SourceElement o,
+                                     NameAbstractionTable nat) {
+        if (!(o instanceof FloatLiteral)) {
+            return false;
+        }
+        return ((FloatLiteral) o).getValue().equals(getValue());
+    }
+
+    @Override
+    protected int computeHashCode() {
+        return 37 * super.computeHashCode() + getValue().hashCode();
+    }
+
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    /**
+     * Get value.
+     *
+     * @return the string.
      */
 
     public String getValue() {
         return value;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnFloatLiteral(this);
+        v.performActionOnFloatLiteral(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
@@ -110,7 +118,7 @@ public class FloatLiteral extends Literal {
     }
 
     public KeYJavaType getKeYJavaType(Services javaServ) {
-	return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
+        return javaServ.getJavaInfo().getKeYJavaType(PrimitiveType.JAVA_FLOAT);
     }
 
     @Override

@@ -27,30 +27,31 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 public class ForUpdates extends JavaNonTerminalProgramElement
-    implements ExpressionContainer, IForUpdates{
+        implements ExpressionContainer, IForUpdates {
 
     ImmutableArray<Expression> updates;
 
     public ForUpdates(ImmutableArray<Expression> exprarr) {
-	updates = exprarr;
+        updates = exprarr;
     }
 
     public ForUpdates(ExtList ups, PositionInfo pos) {
         super(pos);
-	Expression[] exps = new Expression[ups.size()];	
-	for (int i = 0; i < exps.length; i++) {
-	    exps[i] = (Expression)ups.get(i);
-	}
-	updates = new ImmutableArray<Expression>(exps);
+        Expression[] exps = new Expression[ups.size()];
+        for (int i = 0; i < exps.length; i++) {
+            exps[i] = (Expression) ups.get(i);
+        }
+        updates = new ImmutableArray<Expression>(exps);
     }
-    
+
 
     /**
-     *      Get the number of expressions in this container.
-     *      @return the number of expressions.
+     * Get the number of expressions in this container.
+     *
+     * @return the number of expressions.
      */
     public int getExpressionCount() {
-	return updates.size();
+        return updates.size();
     }
 
     /*
@@ -62,27 +63,27 @@ public class ForUpdates extends JavaNonTerminalProgramElement
       of bounds.
     */
     public Expression getExpressionAt(int index) {
-	return updates.get(index);
+        return updates.get(index);
     }
 
     public int size() {
-	return getExpressionCount();
+        return getExpressionCount();
     }
 
     public ImmutableArray<Expression> getUpdates() {
-	return updates;
+        return updates;
     }
-    
+
     public void visit(Visitor v) {
-	v.performActionOnForUpdates(this);
+        v.performActionOnForUpdates(this);
     }
 
     public int getChildCount() {
-	return getExpressionCount();
+        return getExpressionCount();
     }
 
     public ProgramElement getChildAt(int index) {
-	return getExpressionAt(index);
+        return getExpressionAt(index);
     }
 
 }

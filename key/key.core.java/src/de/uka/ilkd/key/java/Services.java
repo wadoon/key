@@ -33,103 +33,92 @@ import java.util.Map.Entry;
  * transform Java program elements to logic (where possible) and back.
  */
 public class Services implements TermServices {
-   /**
-     * the proof
-     */
-    private Proof proof;
-
-    /**
-     * proof specific namespaces (functions, predicates, sorts, variables)
-     */
-    private NamespaceSet namespaces = new NamespaceSet();
-
-    /** used to determine whether an expression is a compile-time 
-     * constant and if so the type and result of the expression
-     */
-    private ConstantExpressionEvaluator cee;
-
-    /** used to convert types, expressions and so on to logic elements
-     * (in special into to terms or formulas)
-     */
-    private TypeConverter typeconverter;
-
     /**
      * the information object on the Java model
      */
     private final JavaInfo javainfo;
-
     /**
      * variable namer for inner renaming
      */
     private final VariableNamer innerVarNamer = new InnerVariableNamer(this);
-
+    private final Profile profile;
+    private final ServiceCaches caches;
+    private final TermBuilder termBuilder;
+    private final TermBuilder termBuilderWithoutCache;
+    /**
+     * the proof
+     */
+    private Proof proof;
+    /**
+     * proof specific namespaces (functions, predicates, sorts, variables)
+     */
+    private NamespaceSet namespaces = new NamespaceSet();
+    /**
+     * used to determine whether an expression is a compile-time
+     * constant and if so the type and result of the expression
+     */
+    private ConstantExpressionEvaluator cee;
+    /**
+     * used to convert types, expressions and so on to logic elements
+     * (in special into to terms or formulas)
+     */
+    private TypeConverter typeconverter;
     /**
      * map of names to counters
      */
     private HashMap<String, Counter> counters;
-
     /**
      * specification repository
      */
     private SpecificationRepository specRepos;
-    
     /*
      * the Java model (with all paths)
      */
     private JavaModel javaModel;
-
     private NameRecorder nameRecorder;
-    
-    private ITermProgramVariableCollectorFactory factory = new ITermProgramVariableCollectorFactory(){
-      @Override
-      public TermProgramVariableCollector create(Services services) {
-         return new TermProgramVariableCollector(services);
-      }};
-
-    private final Profile profile;
-    
-    private final ServiceCaches caches;
-    
-    private final TermBuilder termBuilder;
-
-    private final TermBuilder termBuilderWithoutCache;
+    private ITermProgramVariableCollectorFactory factory = new ITermProgramVariableCollectorFactory() {
+        @Override
+        public TermProgramVariableCollector create(Services services) {
+            return new TermProgramVariableCollector(services);
+        }
+    };
 
     /**
      * creates a new Services object with a new TypeConverter and a new
      * JavaInfo object with no information stored at none of these.
      */
-    public Services(Profile profile){
-    	assert profile != null;
-    	this.profile = profile;
-    	this.counters = new LinkedHashMap<String, Counter>();
-    	this.caches = new ServiceCaches();
-    	this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
-    	this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
-    	this.specRepos = new SpecificationRepository(this);
-    	cee = new ConstantExpressionEvaluator(this);
-    	typeconverter = new TypeConverter(this);
-    	javainfo = new JavaInfo(new KeYProgModelInfo(this, typeconverter,
-    	                                             new KeYRecoderExcHandler()), this);
-    	nameRecorder = new NameRecorder();
+    public Services(Profile profile) {
+        assert profile != null;
+        this.profile = profile;
+        this.counters = new LinkedHashMap<String, Counter>();
+        this.caches = new ServiceCaches();
+        this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
+        this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
+        this.specRepos = new SpecificationRepository(this);
+        cee = new ConstantExpressionEvaluator(this);
+        typeconverter = new TypeConverter(this);
+        javainfo = new JavaInfo(new KeYProgModelInfo(this, typeconverter,
+                new KeYRecoderExcHandler()), this);
+        nameRecorder = new NameRecorder();
     }
 
-    private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, KeYRecoderMapping rec2key, 
-    		HashMap<String, Counter> counters, ServiceCaches caches) {
-    	assert profile != null;
-    	assert counters != null;
-    	assert caches != null;
+    private Services(Profile profile, KeYCrossReferenceServiceConfiguration crsc, KeYRecoderMapping rec2key,
+                     HashMap<String, Counter> counters, ServiceCaches caches) {
+        assert profile != null;
+        assert counters != null;
+        assert caches != null;
 
-    	this.profile = profile;
-    	this.counters = counters;
-    	this.caches = caches;
-    	this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
+        this.profile = profile;
+        this.counters = counters;
+        this.caches = caches;
+        this.termBuilder = new TermBuilder(new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
-    	this.specRepos = new SpecificationRepository(this);
-    	cee = new ConstantExpressionEvaluator(this);
-    	typeconverter = new TypeConverter(this);
-    	javainfo = new JavaInfo
-    			(new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
-    	nameRecorder = new NameRecorder();
+        this.specRepos = new SpecificationRepository(this);
+        cee = new ConstantExpressionEvaluator(this);
+        typeconverter = new TypeConverter(this);
+        javainfo = new JavaInfo
+                (new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
+        nameRecorder = new NameRecorder();
     }
 
     private Services(Services s) {
@@ -159,16 +148,16 @@ public class Services implements TermServices {
     /**
      * Returns the TypeConverter associated with this Services object.
      */
-    public TypeConverter getTypeConverter(){
-    	return typeconverter;
+    public TypeConverter getTypeConverter() {
+        return typeconverter;
     }
 
 
     private void setTypeConverter(TypeConverter tc) {
-    	typeconverter = tc;
+        typeconverter = tc;
     }
 
-    
+
     /**
      * Returns the ConstantExpressionEvaluator associated with this Services object.
      */
@@ -176,78 +165,80 @@ public class Services implements TermServices {
         return cee;
     }
 
-    
+
     /**
      * Returns the JavaInfo associated with this Services object.
      */
     public JavaInfo getJavaInfo() {
         return javainfo;
     }
-    
-    
+
+
     public NameRecorder getNameRecorder() {
         return nameRecorder;
     }
 
-    
+
     public void saveNameRecorder(Node n) {
         n.setNameRecorder(nameRecorder);
         nameRecorder = new NameRecorder();
     }
 
-    
+
     public void addNameProposal(Name proposal) {
         nameRecorder.addProposal(proposal);
     }
-    
-    
+
+
     public SpecificationRepository getSpecificationRepository() {
-	return specRepos;
+        return specRepos;
     }
-    
-    
+
+
     /**
      * Returns the VariableNamer associated with this Services object.
      */
     public VariableNamer getVariableNamer() {
         return innerVarNamer;
     }
-    
+
     /**
      * creates a new services object containing a copy of the java info of
      * this object and a new TypeConverter (shallow copy)
      * The copy does not belong to a {@link Proof} object and can hence be used for a new proof.
+     *
      * @param shareCaches {@code true} The created {@link Services} will use the same {@link ServiceCaches} like this instance; {@code false} the created {@link Services} will use a new empty {@link ServiceCaches} instance.
      * @return the copy
      */
     public Services copy(boolean shareCaches) {
-       return copy(getProfile(), shareCaches);
+        return copy(getProfile(), shareCaches);
     }
 
     /**
      * Creates a copy of this {@link Services} in which the {@link Profile} is replaced.
      * The copy does not belong to a {@link Proof} object and can hence be used for a new proof.
-     * @param profile The new {@link Profile} to use in the copy of this {@link Services}.
+     *
+     * @param profile     The new {@link Profile} to use in the copy of this {@link Services}.
      * @param shareCaches {@code true} The created {@link Services} will use the same {@link ServiceCaches} like this instance; {@code false} the created {@link Services} will use a new empty {@link ServiceCaches} instance.
      * @return The created copy.
      */
     public Services copy(Profile profile, boolean shareCaches) {
-    	Debug.assertTrue
-    	(!(getJavaInfo().getKeYProgModelInfo().getServConf() 
-    			instanceof SchemaCrossReferenceServiceConfiguration),
-    			"services: tried to copy schema cross reference service config.");
-    	ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
-    	Services s = new Services
-    			(profile, getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
-    					copyCounters(), newCaches);
-    	s.specRepos = specRepos;
-    	s.setTypeConverter(getTypeConverter().copy(s));
-    	s.setNamespaces(namespaces.copy());
-    	nameRecorder = nameRecorder.copy();
-    	s.setJavaModel(getJavaModel());
-    	return s;
+        Debug.assertTrue
+                (!(getJavaInfo().getKeYProgModelInfo().getServConf()
+                                instanceof SchemaCrossReferenceServiceConfiguration),
+                        "services: tried to copy schema cross reference service config.");
+        ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
+        Services s = new Services
+                (profile, getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaInfo().getKeYProgModelInfo().rec2key().copy(),
+                        copyCounters(), newCaches);
+        s.specRepos = specRepos;
+        s.setTypeConverter(getTypeConverter().copy(s));
+        s.setNamespaces(namespaces.copy());
+        nameRecorder = nameRecorder.copy();
+        s.setJavaModel(getJavaModel());
+        return s;
     }
-    
+
     /**
      * Generate a copy of this object.
      * All references are copied w/o duplicating their content.
@@ -261,50 +252,35 @@ public class Services implements TermServices {
     /**
      * Creates a deep copy of {@link #counters} which means that a new
      * list is created with a copy of each contained {@link Counter}.
+     *
      * @return The created deep copy with new {@link Counter} instances.
      */
     private HashMap<String, Counter> copyCounters() {
-       HashMap<String, Counter> result = new LinkedHashMap<String, Counter>();
-       for (Entry<String, Counter> entry : counters.entrySet()) {
-          result.put(entry.getKey(), entry.getValue().copy());
-       }
-       return result;
+        HashMap<String, Counter> result = new LinkedHashMap<String, Counter>();
+        for (Entry<String, Counter> entry : counters.entrySet()) {
+            result.put(entry.getKey(), entry.getValue().copy());
+        }
+        return result;
     }
 
     /**
-     * creates a new service object with the same ldt information 
+     * creates a new service object with the same ldt information
      * as the actual one
      */
     public Services copyPreservesLDTInformation() {
-    	Debug.assertTrue
-    	(!(javainfo.getKeYProgModelInfo().getServConf() 
-    			instanceof SchemaCrossReferenceServiceConfiguration),
-    			"services: tried to copy schema cross reference service config.");
+        Debug.assertTrue
+                (!(javainfo.getKeYProgModelInfo().getServConf()
+                                instanceof SchemaCrossReferenceServiceConfiguration),
+                        "services: tried to copy schema cross reference service config.");
         Services s = new Services(getProfile());
-    	s.setTypeConverter(getTypeConverter().copy(s));
-    	s.setNamespaces(namespaces.copy());
-    	nameRecorder = nameRecorder.copy();
-    	s.setJavaModel(getJavaModel());
+        s.setTypeConverter(getTypeConverter().copy(s));
+        s.setNamespaces(namespaces.copy());
+        nameRecorder = nameRecorder.copy();
+        s.setJavaModel(getJavaModel());
 
-    	return s;
+        return s;
     }
-    
-    
-    /** 
-     * Marks this services as proof specific 
-     * Please make sure that the {@link Services} does not not yet belong to an existing proof 
-     * or that it is owned by a proof environment. In both cases copy the {@link InitConfig} via
-     * {@link InitConfig#deepCopy()} or one of the other copy methods first. 
-     * @param p_proof the Proof to which this {@link Services} instance belongs
-     */
-    public void setProof(Proof p_proof) {
-       if (this.proof != null) {
-          throw new IllegalStateException("Services are already owned by another proof:" + proof.name());
-       }
-       proof = p_proof;
-    }
-    
-   
+
     public Services copyProofSpecific(Proof p_proof, boolean shareCaches) {
         ServiceCaches newCaches = shareCaches ? caches : new ServiceCaches();
         final Services s = new Services(getProfile(), getJavaInfo().getKeYProgModelInfo().getServConf(), getJavaInfo().getKeYProgModelInfo().rec2key(),
@@ -319,7 +295,6 @@ public class Services implements TermServices {
         return s;
     }
 
-    
     /*
      * returns an existing named counter, creates a new one otherwise
      */
@@ -333,78 +308,92 @@ public class Services implements TermServices {
 
     /**
      * returns the namespaces for functions, predicates etc.
+     *
      * @return the proof specific namespaces
      */
     @Override
     public NamespaceSet getNamespaces() {
         return namespaces;
     }
-    
-    
+
     /**
      * sets the namespaces of known predicates, functions, variables
+     *
      * @param namespaces the NamespaceSet with the proof specific namespaces
      */
     public void setNamespaces(NamespaceSet namespaces) {
         this.namespaces = namespaces;
     }
-    
-    
+
     /**
-     * Returns the proof to which this object belongs, or null if it does not 
+     * Returns the proof to which this object belongs, or null if it does not
      * belong to any proof.
      */
     public Proof getProof() {
-	return proof;
+        return proof;
     }
 
-    public interface ITermProgramVariableCollectorFactory{
-       public TermProgramVariableCollector create(Services services);
+    /**
+     * Marks this services as proof specific
+     * Please make sure that the {@link Services} does not not yet belong to an existing proof
+     * or that it is owned by a proof environment. In both cases copy the {@link InitConfig} via
+     * {@link InitConfig#deepCopy()} or one of the other copy methods first.
+     *
+     * @param p_proof the Proof to which this {@link Services} instance belongs
+     */
+    public void setProof(Proof p_proof) {
+        if (this.proof != null) {
+            throw new IllegalStateException("Services are already owned by another proof:" + proof.name());
+        }
+        proof = p_proof;
     }
 
     /**
      * Returns the sued {@link Profile}.
+     *
      * @return The used {@link Profile}.
      */
     public Profile getProfile() {
         return profile;
     }
-    
+
     /**
      * Returns the used {@link ServiceCaches}.
+     *
      * @return The used {@link ServiceCaches}.
      */
     public ServiceCaches getCaches() {
         return caches;
     }
-    
+
     /**
-     * 
-     * Returns either the cache backed or raw {@link TermBuilder} used to create {@link Term}s.  
-     * Usually the cache backed version is the intended one. The non-cached version is for 
-     * use cases where a lot of intermediate terms are created of which most exist only for a 
+     * Returns either the cache backed or raw {@link TermBuilder} used to create {@link Term}s.
+     * Usually the cache backed version is the intended one. The non-cached version is for
+     * use cases where a lot of intermediate terms are created of which most exist only for a
      * very short time. To avoid polluting the cache it is then recommended to use the non-cache
      * version
-     * 
+     *
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */
     @Override
     public TermBuilder getTermBuilder(boolean withCache) {
-       return withCache ? termBuilder : termBuilderWithoutCache;
+        return withCache ? termBuilder : termBuilderWithoutCache;
     }
-    
+
     /**
      * Returns the {@link TermBuilder} used to create {@link Term}s.
      * Same as {@link #getTermBuilder(true).
+     *
      * @return The {@link TermBuilder} used to create {@link Term}s.
      */
     @Override
     public TermBuilder getTermBuilder() {
-       return termBuilder;
+        return termBuilder;
     }
 
     /**
      * Returns the {@link TermFactory} used to create {@link Term}s.
+     *
      * @return The {@link TermFactory} used to create {@link Term}s.
      */
     @Override
@@ -416,23 +405,26 @@ public class Services implements TermServices {
         return factory;
     }
 
-
     public void setFactory(ITermProgramVariableCollectorFactory factory) {
         this.factory = factory;
     }
 
-
     /**
      * returns the {@link JavaModel} with all path information
+     *
      * @return the {@link JavaModel} on which this services is based on
      */
-   public JavaModel getJavaModel() {
-      return javaModel;
-   }
+    public JavaModel getJavaModel() {
+        return javaModel;
+    }
+
+    public void setJavaModel(JavaModel javaModel) {
+        assert this.javaModel == null;
+        this.javaModel = javaModel;
+    }
 
 
-   public void setJavaModel(JavaModel javaModel) {
-      assert this.javaModel == null;
-      this.javaModel = javaModel;
-   }
+    public interface ITermProgramVariableCollectorFactory {
+        TermProgramVariableCollector create(Services services);
+    }
 }

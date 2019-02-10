@@ -40,16 +40,16 @@ public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
     private MethodDeclaration createAllocateMethod(ClassDeclaration type) {
         ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(2);
         modifiers.add(new Public());
-        modifiers.add(new Static());    
-        
+        modifiers.add(new Static());
+
         ASTArrayList<ParameterDeclaration> pdal = new ASTArrayList<ParameterDeclaration>(1);
-        
-        MethodDeclaration md =  new MethodDeclaration
-            (modifiers, 
-             new TypeReference(getId(type)), 
-             new ImplicitIdentifier(IMPLICIT_INSTANCE_ALLOCATE), 
-             pdal, 
-             null, null);
+
+        MethodDeclaration md = new MethodDeclaration
+                (modifiers,
+                        new TypeReference(getId(type)),
+                        new ImplicitIdentifier(IMPLICIT_INSTANCE_ALLOCATE),
+                        pdal,
+                        null, null);
         md.makeAllParentRolesValid();
         return md;
     }
@@ -57,7 +57,7 @@ public class InstanceAllocationMethodBuilder extends RecoderModelTransformer {
 
     protected void makeExplicit(TypeDeclaration td) {
         if (td instanceof ClassDeclaration) {
-            attach(createAllocateMethod((ClassDeclaration)td), td, 
+            attach(createAllocateMethod((ClassDeclaration) td), td,
                     td.getMembers().size());
 //          java.io.StringWriter sw = new java.io.StringWriter();
 //          services.getProgramFactory().getPrettyPrinter(sw).visitClassDeclaration((ClassDeclaration)td);

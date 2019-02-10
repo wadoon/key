@@ -22,17 +22,18 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
 /**
- *  Logical not.
+ * Logical not.
  */
 
 public class LogicalNot extends Operator {
 
 
     /**
-     *      Logical not.
-     *      @param children an ExtList with all children of this node
-     *      the first children in list will be the one on the left
-     *      side, the second the one on the  right side.
+     * Logical not.
+     *
+     * @param children an ExtList with all children of this node
+     *                 the first children in list will be the one on the left
+     *                 side, the second the one on the  right side.
      */
 
     public LogicalNot(ExtList children) {
@@ -41,8 +42,9 @@ public class LogicalNot extends Operator {
 
 
     /**
- *      Get arity.
- *      @return the int value.
+     * Get arity.
+     *
+     * @return the int value.
      */
 
     public int getArity() {
@@ -50,8 +52,9 @@ public class LogicalNot extends Operator {
     }
 
     /**
- *      Get precedence.
- *      @return the int value.
+     * Get precedence.
+     *
+     * @return the int value.
      */
 
     public int getPrecedence() {
@@ -59,8 +62,9 @@ public class LogicalNot extends Operator {
     }
 
     /**
- *      Get notation.
- *      @return the int value.
+     * Get notation.
+     *
+     * @return the int value.
      */
 
     public int getNotation() {
@@ -68,22 +72,25 @@ public class LogicalNot extends Operator {
     }
 
     /**
- *        Checks if this operator is left or right associative. Ordinary
- *        unary operators are right associative.
- *        @return <CODE>true</CODE>, if the operator is left associative,
- *        <CODE>false</CODE> otherwise.
+     * Checks if this operator is left or right associative. Ordinary
+     * unary operators are right associative.
+     *
+     * @return <CODE>true</CODE>, if the operator is left associative,
+     * <CODE>false</CODE> otherwise.
      */
 
     public boolean isLeftAssociative() {
         return false;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnLogicalNot(this);
+        v.performActionOnLogicalNot(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
@@ -91,7 +98,7 @@ public class LogicalNot extends Operator {
     }
 
     public KeYJavaType getKeYJavaType(Services services, ExecutionContext ec) {
-	return services.getTypeConverter().getBooleanType();
+        return services.getTypeConverter().getBooleanType();
     }
 
 }

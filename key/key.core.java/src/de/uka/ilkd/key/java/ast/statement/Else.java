@@ -21,36 +21,36 @@ import de.uka.ilkd.key.java.visitor.Visitor;
 import org.key_project.util.ExtList;
 
 /**
- *  Else.
+ * Else.
  */
 
 public class Else extends BranchImp {
 
     /**
-     *      Body.
+     * Body.
      */
     protected Statement body;
 
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
      * @param children the children of this AST element as KeY classes.
-     * May contain: a Body (as body of Else), Comments
-     */ 
+     *                 May contain: a Body (as body of Else), Comments
+     */
     public Else(ExtList children) {
-	super(children);
-	body=children.get(Statement.class);
+        super(children);
+        body = children.get(Statement.class);
     }
-
-
 
 
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
      * @param body Statement that is the body of the else part
-     */ 
+     */
     public Else(Statement body) {
-	this.body = body;
+        this.body = body;
     }
 
 
@@ -59,20 +59,22 @@ public class Else extends BranchImp {
     }
 
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
      */
     public int getChildCount() {
         return (body != null) ? 1 : 0;
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
     public ProgramElement getChildAt(int index) {
         if (body != null) {
@@ -82,8 +84,9 @@ public class Else extends BranchImp {
     }
 
     /**
-     *      Get the number of statements in this container.
-     *      @return the number of statements.
+     * Get the number of statements in this container.
+     *
+     * @return the number of statements.
      */
     public int getStatementCount() {
         return (body != null) ? 1 : 0;
@@ -105,19 +108,21 @@ public class Else extends BranchImp {
     }
 
     /**
-     *      The body may be empty (null), to define a fall-through.
-     *      Attaching an {@link EmptyStatement} would create a single ";".
+     * The body may be empty (null), to define a fall-through.
+     * Attaching an {@link EmptyStatement} would create a single ";".
      */
     public Statement getBody() {
         return body;
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnElse(this);
+        v.performActionOnElse(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {

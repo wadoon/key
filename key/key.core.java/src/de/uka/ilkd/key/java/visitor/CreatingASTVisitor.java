@@ -43,7 +43,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     protected static final Boolean CHANGED = Boolean.TRUE;
 
-    /**  */
+    /**
+     *
+     */
     protected Deque<ExtList> stack = new ArrayDeque<ExtList>();
 
     boolean preservesPositionInfo = true;
@@ -51,17 +53,31 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     /**
      * create the CreatingASTVisitor
      *
-     * @param root
-     *            the ProgramElement where to begin
-     * @param preservesPos
-     *            whether the position should be preserved
-     * @param services
-     *            the services instance
+     * @param root         the ProgramElement where to begin
+     * @param preservesPos whether the position should be preserved
+     * @param services     the services instance
      */
     public CreatingASTVisitor(ProgramElement root, boolean preservesPos,
-            Services services) {
+                              Services services) {
         super(root, services);
         this.preservesPositionInfo = preservesPos;
+    }
+
+    /**
+     * returns the position of pe2 in the virtual child array of pe1
+     *
+     * @param pe1 A {@link NonTerminalProgramElement}
+     * @param pe2 A {@link ProgramElement}
+     * @return pe2's position in pe1
+     */
+    protected static int getPosition(NonTerminalProgramElement pe1,
+                                     ProgramElement pe2) {
+        int n = pe1.getChildCount();
+        int i = 0;
+        while ((i < n) && (pe1.getChildAt(i) != pe2)) {
+            i++;
+        }
+        return (i == n) ? -1 : i;
     }
 
     public boolean preservesPositionInfo() {
@@ -81,6 +97,7 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
 
     /**
      * called if the program element x is unchanged
+     *
      * @param x The {@link SourceElement}.
      */
     protected void doDefaultAction(SourceElement x) {
@@ -126,12 +143,12 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     protected void performActionOnBlockContract(final StatementBlock oldBlock,
-            final StatementBlock newBlock) {
+                                                final StatementBlock newBlock) {
         // do nothing
     }
 
     protected void performActionOnLoopContract(final StatementBlock oldBlock,
-            final StatementBlock newBlock) {
+                                               final StatementBlock newBlock) {
         // do nothing
     }
 
@@ -148,12 +165,12 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
     }
 
     protected void performActionOnMergeContract(MergePointStatement oldLoop,
-            MergePointStatement newLoop) {
+                                                MergePointStatement newLoop) {
         // do nothing
     }
 
     protected void performActionOnLoopInvariant(LoopStatement oldLoop,
-            LoopStatement newLoop) {
+                                                LoopStatement newLoop) {
         // do nothing
     }
 
@@ -484,9 +501,9 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
             changeList.removeFirst();
             PositionInfo pi = changeList
                     .removeFirstOccurrence(PositionInfo.class); // Methodframe
-                                                                // cannot occur
-                                                                // in original
-                                                                // program
+            // cannot occur
+            // in original
+            // program
 
             if (!preservesPositionInfo()) {
                 pi = PositionInfo.UNDEFINED;
@@ -1138,20 +1155,6 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    private class ParameterDeclarationAction extends DefaultAction {
-        ParameterDeclaration x;
-
-        ParameterDeclarationAction(ParameterDeclaration x) {
-            super(x);
-            this.x = x;
-        }
-
-        ProgramElement createNewElement(ExtList changeList) {
-            return new ParameterDeclaration(changeList,
-                    x.parentIsInterfaceDeclaration(), x.isVarArg());
-        }
-    }
-
     // eee
     public void performActionOnForUpdates(final ForUpdates x) {
         DefaultAction def = new DefaultAction(x) {
@@ -1304,22 +1307,6 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         def.doAction(x);
     }
 
-    /**
-     * returns the position of pe2 in the virtual child array of pe1
-     * @param pe1 A {@link NonTerminalProgramElement}
-     * @param pe2 A {@link ProgramElement}
-     * @return pe2's position in pe1
-     */
-    protected static int getPosition(NonTerminalProgramElement pe1,
-                                     ProgramElement pe2) {
-        int n = pe1.getChildCount();
-        int i = 0;
-        while ((i < n) && (pe1.getChildAt(i) != pe2)) {
-            i++;
-        }
-        return (i == n) ? -1 : i;
-    }
-
     protected void changed() {
         ExtList list = stack.peek();
         if (list.isEmpty() || list.getFirst() != CHANGED) {
@@ -1343,6 +1330,20 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
         stack.pop();
         for (int i = 0, sz = arr.size(); i < sz; i++) {
             addToTopOfStack(arr.get(i));
+        }
+    }
+
+    private class ParameterDeclarationAction extends DefaultAction {
+        ParameterDeclaration x;
+
+        ParameterDeclarationAction(ParameterDeclaration x) {
+            super(x);
+            this.x = x;
+        }
+
+        ProgramElement createNewElement(ExtList changeList) {
+            return new ParameterDeclaration(changeList,
+                    x.parentIsInterfaceDeclaration(), x.isVarArg());
         }
     }
 

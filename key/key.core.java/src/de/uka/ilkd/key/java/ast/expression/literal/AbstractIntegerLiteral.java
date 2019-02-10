@@ -25,6 +25,7 @@ import org.key_project.util.ExtList;
  * It provides a getValue() method to receive the actual value of the literal as well as
  * getValueString() to get a String representation. Subclasses of this class perform range checks at
  * creation time. This means once a literal is created it is certainly valid.
+ *
  * @author Wolfram Pfeifer
  */
 public abstract class AbstractIntegerLiteral extends Literal {
@@ -45,52 +46,11 @@ public abstract class AbstractIntegerLiteral extends Literal {
     }
 
     /**
-     *
-     * @return the actual value of the literal as a long
-     */
-    public abstract long getValue();
-
-    /**
-     *
-     * @return the actual value of the literal converted to a decimal String. If the literal
-     *         represents a negative value, the first character is a '-' sign.
-     */
-    public abstract String getValueString();
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
-        if (!(o.getClass() == this.getClass())) {
-            return false;
-        }
-        return ((AbstractIntegerLiteral)o).getValue() == getValue();
-    }
-
-    @Override
-    public String toString() {
-        return getValueString();
-    }
-
-    @Override    
-    protected int computeHashCode(){
-        int localHash = (int) (17*super.computeHashCode() + getValue());
-        return localHash;
-    }
-
-    @Override
-    public Name getLDTName() {
-        return IntegerLDT.NAME;
-    }
-
-    /**
      * Checks if the prefix of the given String indicates a decimal literal.
      * This method does <b>not</b> check if the literal is actually valid, it just checks the
      * prefix indicating the base of the literal. The base prefix is found even if the String
      * contains a preceding sign ('+' or '-').
+     *
      * @param literalStr the given String to check
      * @return true iff the String represents a decimal literal, which means it does neither have
      * a hexadecimal ("0x"), binary ("0b"), nor octal ("0") prefix. Note that the literal "0" is
@@ -123,5 +83,45 @@ public abstract class AbstractIntegerLiteral extends Literal {
             //literalStr = literalStr.substring(1);     // cut of leading '0'
         }
         return radix == 10;
+    }
+
+    /**
+     * @return the actual value of the literal as a long
+     */
+    public abstract long getValue();
+
+    /**
+     * @return the actual value of the literal converted to a decimal String. If the literal
+     * represents a negative value, the first character is a '-' sign.
+     */
+    public abstract String getValueString();
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public boolean equalsModRenaming(SourceElement o, NameAbstractionTable nat) {
+        if (!(o.getClass() == this.getClass())) {
+            return false;
+        }
+        return ((AbstractIntegerLiteral) o).getValue() == getValue();
+    }
+
+    @Override
+    public String toString() {
+        return getValueString();
+    }
+
+    @Override
+    protected int computeHashCode() {
+        int localHash = (int) (17 * super.computeHashCode() + getValue());
+        return localHash;
+    }
+
+    @Override
+    public Name getLDTName() {
+        return IntegerLDT.NAME;
     }
 }

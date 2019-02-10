@@ -28,40 +28,41 @@ import org.key_project.util.collection.ImmutableArray;
 import java.util.ArrayList;
 
 /**
- *    Statement block.
+ * Statement block.
  * taken from COMPOST and changed to achieve an immutable structure
  */
 
 public class StatementBlock extends JavaStatement
-    implements StatementContainer, TypeDeclarationContainer,
+        implements StatementContainer, TypeDeclarationContainer,
         VariableScope, TypeScope, ProgramPrefix {
- 
+
     /**
-     *      Body.
+     * Body.
      */
     private final ImmutableArray<? extends Statement> body;
-    
-    private final int prefixLength; 
-    
-    private final MethodFrame innerMostMethodFrame; 
-    
-    
+
+    private final int prefixLength;
+
+    private final MethodFrame innerMostMethodFrame;
+
+
     public StatementBlock() {
         body = new ImmutableArray<Statement>();
         prefixLength = 1;
         innerMostMethodFrame = null;
     }
-    
+
 
     /**
-     *      Statement block.
-     *  @param children an ExtList that contains the children
+     * Statement block.
+     *
+     * @param children an ExtList that contains the children
      */
 
     public StatementBlock(ExtList children) {
         super(children);
         body = new
-            ImmutableArray<Statement>(children.collect(Statement.class));
+                ImmutableArray<Statement>(children.collect(Statement.class));
 
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
@@ -83,36 +84,37 @@ public class StatementBlock extends JavaStatement
     }
 
     public StatementBlock(Statement... body) {
-	this(new ImmutableArray<Statement>(body));
+        this(new ImmutableArray<Statement>(body));
     }
 
-    @Override
-    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
-       return super.equalsModRenaming(se, nat)
-                && (this.getStartPosition().equals(Position.UNDEFINED) ||  // why do we care here about position info and nowhere else?
-                        se.getStartPosition().equals(Position.UNDEFINED) ||
-                        this.getStartPosition().getLine() == se.getStartPosition().getLine());
-    }
-
-    /** computes the prefix elements for the given array of statment block */
+    /**
+     * computes the prefix elements for the given array of statment block
+     */
     public static ImmutableArray<ProgramPrefix> computePrefixElements(ImmutableArray<? extends Statement> b,
-            ProgramPrefix current) {
+                                                                      ProgramPrefix current) {
         final ArrayList<ProgramPrefix> prefix = new ArrayList<>();
         prefix.add(current);
-        
+
         while (current.hasNextPrefixElement()) {
             current = current.getNextPrefixElement();
             prefix.add(current);
         }
-        
+
         return new ImmutableArray<ProgramPrefix>(prefix);
     }
 
-
+    @Override
+    public boolean equalsModRenaming(SourceElement se, NameAbstractionTable nat) {
+        return super.equalsModRenaming(se, nat)
+                && (this.getStartPosition().equals(Position.UNDEFINED) ||  // why do we care here about position info and nowhere else?
+                se.getStartPosition().equals(Position.UNDEFINED) ||
+                this.getStartPosition().getLine() == se.getStartPosition().getLine());
+    }
 
     /**
-     *      Get body.
-     *      @return the statement array wrapper.
+     * Get body.
+     *
+     * @return the statement array wrapper.
      */
 
     public ImmutableArray<? extends Statement> getBody() {
@@ -120,13 +122,14 @@ public class StatementBlock extends JavaStatement
     }
 
     public final boolean isEmpty() {
-       return body.isEmpty();
+        return body.isEmpty();
     }
 
 
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
      */
 
     public int getChildCount() {
@@ -134,12 +137,13 @@ public class StatementBlock extends JavaStatement
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -150,8 +154,9 @@ public class StatementBlock extends JavaStatement
     }
 
     /**
-     *      Get the number of statements in this container.
-     *      @return the number of statements.
+     * Get the number of statements in this container.
+     *
+     * @return the number of statements.
      */
 
     public int getStatementCount() {
@@ -175,8 +180,9 @@ public class StatementBlock extends JavaStatement
     }
 
     /**
-     *      Get the number of type declarations in this container.
-     *      @return the number of type declarations.
+     * Get the number of type declarations in this container.
+     *
+     * @return the number of type declarations.
      */
 
     public int getTypeDeclarationCount() {
@@ -207,7 +213,7 @@ public class StatementBlock extends JavaStatement
                 Statement st = body.get(i);
                 if (st instanceof TypeDeclaration) {
                     if (index == 0) {
-                        return (TypeDeclaration)st;
+                        return (TypeDeclaration) st;
                     }
                     index -= 1;
                 }
@@ -216,12 +222,14 @@ public class StatementBlock extends JavaStatement
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnStatementBlock(this);
+        v.performActionOnStatementBlock(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
@@ -237,11 +245,11 @@ public class StatementBlock extends JavaStatement
 
     @Override
     public SourceElement getFirstElementIncludingBlocks() {
-       if (isEmpty()) return this;
-       else return getBody().get(0);
+        if (isEmpty()) return this;
+        else return getBody().get(0);
     }
 
-    
+
     @Override
     public boolean hasNextPrefixElement() {
         return body.size() != 0 && (body.get(0) instanceof ProgramPrefix);
@@ -255,12 +263,12 @@ public class StatementBlock extends JavaStatement
             throw new IndexOutOfBoundsException("No next prefix element " + this);
         }
     }
-    
+
     @Override
     public ProgramPrefix getLastPrefixElement() {
-        return hasNextPrefixElement() ? ((ProgramPrefix)body.get(0)).getLastPrefixElement() : this;
+        return hasNextPrefixElement() ? ((ProgramPrefix) body.get(0)).getLastPrefixElement() : this;
     }
-    
+
     @Override
     public int getPrefixLength() {
         return prefixLength;
@@ -270,10 +278,10 @@ public class StatementBlock extends JavaStatement
     public MethodFrame getInnerMostMethodFrame() {
         return innerMostMethodFrame;
     }
-    
+
     @Override
     public ImmutableArray<ProgramPrefix> getPrefixElements() {
-        return computePrefixElements(body,this);
+        return computePrefixElements(body, this);
     }
 
     @Override

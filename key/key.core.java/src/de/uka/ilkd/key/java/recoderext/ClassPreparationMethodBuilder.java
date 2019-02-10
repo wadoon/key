@@ -40,37 +40,39 @@ import java.util.List;
  * <code>&lt;clprepare&gt;</code> responsible for the class
  * preparation.
  */
-public class ClassPreparationMethodBuilder 
-    extends RecoderModelTransformer {
-    
-    public static final String 
-	CLASS_PREPARE_IDENTIFIER = "<clprepare>";
+public class ClassPreparationMethodBuilder
+        extends RecoderModelTransformer {
 
-    /** maps a class to its static NON CONSTANT fields */
+    public static final String
+            CLASS_PREPARE_IDENTIFIER = "<clprepare>";
+
+    /**
+     * maps a class to its static NON CONSTANT fields
+     */
     private HashMap<ClassDeclaration, ASTList<Statement>> class2staticFields;
 
-    /**  
+    /**
      * Creates an instance of the class preparation method model
      * transformer. Information about the current recoder model can be
      * accessed via the given service configuration. The implicit
      * preparation method is created and added for all classes,
-     * which are declared in one of the given compilation units. 
+     * which are declared in one of the given compilation units.
+     *
      * @param services the CrossReferenceServiceConfiguration with the
-     * information about the recoder model
-     * @param cache
-     *                a cache object that stores information which is needed by
-     *                and common to many transformations. it includes the
-     *                compilation units, the declared classes, and information
-     *                for local classes.
+     *                 information about the recoder model
+     * @param cache    a cache object that stores information which is needed by
+     *                 and common to many transformations. it includes the
+     *                 compilation units, the declared classes, and information
+     *                 for local classes.
      */
     public ClassPreparationMethodBuilder
-	(CrossReferenceServiceConfiguration services, 
-	 TransformerCache cache) {	
-	super(services, cache);
-	class2staticFields = new LinkedHashMap<ClassDeclaration, ASTList<Statement>>(10*getUnits().size());
+    (CrossReferenceServiceConfiguration services,
+     TransformerCache cache) {
+        super(services, cache);
+        class2staticFields = new LinkedHashMap<ClassDeclaration, ASTList<Statement>>(10 * getUnits().size());
     }
 
-    /** 
+    /**
      * returns true if the given fieldspecification denotes a constant
      * field. A constant field is declared as final and static and
      * initialised with a time constant, which is not prepared or
@@ -81,112 +83,113 @@ public class ClassPreparationMethodBuilder
      * constant fields is due to binary compatibility reasons.
      */
     private boolean isConstantField(FieldSpecification spec) {
-    	boolean result = spec.isStatic() && spec.isFinal();
-    	if (!result) {
-    		return result;
-    	}
-    	recoder.service.ConstantEvaluator ce = services.getConstantEvaluator(); 
-    	
-    	try {
-    	    result = ce.isCompileTimeConstant(spec.getInitializer()); 
-    	} catch (java.lang.ArithmeticException t) {
-    	    result = false;
+        boolean result = spec.isStatic() && spec.isFinal();
+        if (!result) {
+            return result;
+        }
+        recoder.service.ConstantEvaluator ce = services.getConstantEvaluator();
+
+        try {
+            result = ce.isCompileTimeConstant(spec.getInitializer());
+        } catch (java.lang.ArithmeticException t) {
+            result = false;
         } catch (NumberFormatException e) {
             result = false;
-    	}
-    	
-    	return result;
-    }
+        }
 
+        return result;
+    }
 
 
     /**
      * retrieves all static non constant fields and returns a list of
      * copy assignment pre-initialising them with their default values
-     *
+     * <p>
      * some special settings for implicit fields are performed here as well
-     * @param typeDeclaration the ClassDeclaration whose fields have to be prepared 
-     * @return the list of copy assignments 
+     *
+     * @param typeDeclaration the ClassDeclaration whose fields have to be prepared
+     * @return the list of copy assignments
      */
     private ASTList<Statement> prepareFields(TypeDeclaration typeDeclaration) {
 
-	ASTList<Statement> result = new ASTArrayList<Statement>(20);
+        ASTList<Statement> result = new ASTArrayList<Statement>(20);
 
-	List<FieldSpecification> fields = typeDeclaration.getFieldsInScope();
+        List<FieldSpecification> fields = typeDeclaration.getFieldsInScope();
 
         for (FieldSpecification spec : fields) {
             if (spec.isStatic() && !isConstantField(spec)) {
-		Identifier ident = spec.getIdentifier();	    
-		result.add(new CopyAssignment
-		            (new PassiveExpression
-		                    (new FieldReference(ident.deepClone())), 
-		                            getDefaultValue(spec.getType())));		    
-	    }
-	}
+                Identifier ident = spec.getIdentifier();
+                result.add(new CopyAssignment
+                        (new PassiveExpression
+                                (new FieldReference(ident.deepClone())),
+                                getDefaultValue(spec.getType())));
+            }
+        }
 
-	result.add
-	    (new CopyAssignment
-	     (new PassiveExpression(new FieldReference
-				    (new ImplicitIdentifier
-				     (ImplicitFieldAdder.IMPLICIT_CLASS_PREPARED))),
-	      new BooleanLiteral(true)));
+        result.add
+                (new CopyAssignment
+                        (new PassiveExpression(new FieldReference
+                                (new ImplicitIdentifier
+                                        (ImplicitFieldAdder.IMPLICIT_CLASS_PREPARED))),
+                                new BooleanLiteral(true)));
 
-	return result;
+        return result;
     }
-    
+
     public ProblemReport analyze() {
-	for (final CompilationUnit cu : getUnits()) {
-	    final int typeCount = cu.getTypeDeclarationCount();	    
-	    for (int i = 0; i < typeCount; i++) {
-		if (cu.getTypeDeclarationAt(i) instanceof ClassDeclaration)
-		    { 
-			ClassDeclaration cd = (ClassDeclaration) cu.getTypeDeclarationAt(i);
-			if (cd.getTypeDeclarationCount()>0) {
-			    Debug.out
-				("clPrepBuilder: Inner Class detected. " + 
-				 "Reject building class initialisation methods.");
-			}
-									
-			// collect initializers for transformation phase
-			class2staticFields.put(cd, prepareFields(cd));
-		    }
-	    }
-	}
-	setProblemReport(NO_PROBLEM);
-	return NO_PROBLEM;
+        for (final CompilationUnit cu : getUnits()) {
+            final int typeCount = cu.getTypeDeclarationCount();
+            for (int i = 0; i < typeCount; i++) {
+                if (cu.getTypeDeclarationAt(i) instanceof ClassDeclaration) {
+                    ClassDeclaration cd = (ClassDeclaration) cu.getTypeDeclarationAt(i);
+                    if (cd.getTypeDeclarationCount() > 0) {
+                        Debug.out
+                                ("clPrepBuilder: Inner Class detected. " +
+                                        "Reject building class initialisation methods.");
+                    }
+
+                    // collect initializers for transformation phase
+                    class2staticFields.put(cd, prepareFields(cd));
+                }
+            }
+        }
+        setProblemReport(NO_PROBLEM);
+        return NO_PROBLEM;
     }
 
-    /** 
+    /**
      * creates the static method <code>&lt;clprepare&gt;</code> for the
      * given type declaration
+     *
      * @param td the TypeDeclaration to which the new created method
-     * will be attached
+     *           will be attached
      * @return the created class preparation method
      */
     private MethodDeclaration createPrepareMethod(TypeDeclaration td) {
-	ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(2);
-	modifiers.add(new Static());
-	modifiers.add(new Private());
-	return new MethodDeclaration(modifiers, 
-				     null,  // return type is void
-				     new ImplicitIdentifier(CLASS_PREPARE_IDENTIFIER),
-				     new ASTArrayList<ParameterDeclaration>(0), 
-				     null, // no throws
-				     new StatementBlock(class2staticFields.get(td)));
+        ASTList<DeclarationSpecifier> modifiers = new ASTArrayList<DeclarationSpecifier>(2);
+        modifiers.add(new Static());
+        modifiers.add(new Private());
+        return new MethodDeclaration(modifiers,
+                null,  // return type is void
+                new ImplicitIdentifier(CLASS_PREPARE_IDENTIFIER),
+                new ASTArrayList<ParameterDeclaration>(0),
+                null, // no throws
+                new StatementBlock(class2staticFields.get(td)));
     }
 
 
     /**
      * entry method for the constructor normalform builder
-     * @param td the TypeDeclaration 
+     *
+     * @param td the TypeDeclaration
      */
     protected void makeExplicit(TypeDeclaration td) {
-	attach(createPrepareMethod(td), td, 0);
-	// for debug 
-	// 	    java.io.StringWriter sw = new java.io.StringWriter();
-	// 	    //	services.getProgramFactory().getPrettyPrinter(sw).visitMethodDeclaration(nf);
-	// 	    services.getProgramFactory().getPrettyPrinter(sw).visitTypeDeclaration((TypeDeclaration)td);
-	// 	    System.out.println(sw.toString());
-	// 	    try { sw.close(); } catch (Exception e) {}		
+        attach(createPrepareMethod(td), td, 0);
+        // for debug
+        // 	    java.io.StringWriter sw = new java.io.StringWriter();
+        // 	    //	services.getProgramFactory().getPrettyPrinter(sw).visitMethodDeclaration(nf);
+        // 	    services.getProgramFactory().getPrettyPrinter(sw).visitTypeDeclaration((TypeDeclaration)td);
+        // 	    System.out.println(sw.toString());
+        // 	    try { sw.close(); } catch (Exception e) {}
     }
 }

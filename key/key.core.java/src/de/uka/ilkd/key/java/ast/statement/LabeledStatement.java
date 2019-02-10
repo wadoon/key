@@ -24,46 +24,47 @@ import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
 /**
- *  Labeled statement.
+ * Labeled statement.
  */
 
-public class LabeledStatement extends JavaStatement 
-    implements StatementContainer,
+public class LabeledStatement extends JavaStatement
+        implements StatementContainer,
         NamedProgramElement,
-	       ProgramPrefix {
+        ProgramPrefix {
 
     /**
-     *      Name.
+     * Name.
      */
 
     protected final Label name;
 
     /**
-     *      Body.
+     * Body.
      */
 
     protected final Statement body;
 
-    
+
     private final PosInProgram firstActiveChildPos;
 
     private final int prefixLength;
     private final MethodFrame innerMostMethodFrame;
-    
+
     /**
      * Constructor for the transformation of COMPOST ASTs to KeY.
+     *
      * @param children the children of this AST element as KeY classes.
-     * May contain: 	a Label (as name of the label)
-     * 	        	a Statement (as body of the labeled statement)
-     * 		        Comments	
+     *                 May contain: 	a Label (as name of the label)
+     *                 a Statement (as body of the labeled statement)
+     *                 Comments
      */
     public LabeledStatement(ExtList children, Label label, PositionInfo pos) {
-	super(children, pos);
-	name=label;	        
+        super(children, pos);
+        name = label;
 
-	body=children.get(Statement.class);
-        firstActiveChildPos = body instanceof StatementBlock ? 
-                    ((StatementBlock)body).isEmpty() ? PosInProgram.TOP : 
+        body = children.get(Statement.class);
+        firstActiveChildPos = body instanceof StatementBlock ?
+                ((StatementBlock) body).isEmpty() ? PosInProgram.TOP :
                         PosInProgram.ONE_ZERO : PosInProgram.ONE;
 
         // otherwise it will crash later
@@ -76,34 +77,36 @@ public class LabeledStatement extends JavaStatement
     }
 
     /**
-     *      Labeled statement.
-     *      @param name an identifier.
+     * Labeled statement.
+     *
+     * @param name an identifier.
      */
 
     public LabeledStatement(Label name) {
-	this.name=name;
-	body=new EmptyStatement();
+        this.name = name;
+        body = new EmptyStatement();
         firstActiveChildPos = body instanceof StatementBlock ?
-                (((StatementBlock)body).isEmpty() ? PosInProgram.TOP : 
-                    PosInProgram.ONE_ZERO) : PosInProgram.ONE;
-                ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
-                prefixLength = info.getLength();
-                innerMostMethodFrame = info.getInnerMostMethodFrame();
+                (((StatementBlock) body).isEmpty() ? PosInProgram.TOP :
+                        PosInProgram.ONE_ZERO) : PosInProgram.ONE;
+        ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
+        prefixLength = info.getLength();
+        innerMostMethodFrame = info.getInnerMostMethodFrame();
     }
 
     /**
-     *      Labeled statement.
-     *      @param id a Label.
-     *      @param statement a statement.
+     * Labeled statement.
+     *
+     * @param id        a Label.
+     * @param statement a statement.
      */
 
     public LabeledStatement(Label id, Statement statement, PositionInfo pos) {
         super(pos);
-        this.name=id;
-        body=statement;
-        firstActiveChildPos = body instanceof StatementBlock ? 
-                (((StatementBlock)body).isEmpty() ? PosInProgram.TOP : 
-                    PosInProgram.ONE_ZERO) : PosInProgram.ONE;       
+        this.name = id;
+        body = statement;
+        firstActiveChildPos = body instanceof StatementBlock ?
+                (((StatementBlock) body).isEmpty() ? PosInProgram.TOP :
+                        PosInProgram.ONE_ZERO) : PosInProgram.ONE;
         ProgramPrefixUtil.ProgramPrefixInfo info = ProgramPrefixUtil.computeEssentials(this);
         prefixLength = info.getLength();
         innerMostMethodFrame = info.getInnerMostMethodFrame();
@@ -114,7 +117,7 @@ public class LabeledStatement extends JavaStatement
         if (body instanceof ProgramPrefix) {
             if (body instanceof StatementBlock) {
                 return !((StatementBlock) body).isEmpty() &&
-                    ((StatementBlock)body).getStatementAt(0) instanceof ProgramPrefix;
+                        ((StatementBlock) body).getStatementAt(0) instanceof ProgramPrefix;
             }
             return true;
         }
@@ -124,65 +127,63 @@ public class LabeledStatement extends JavaStatement
     @Override
     public ProgramPrefix getNextPrefixElement() {
         if (hasNextPrefixElement()) {
-            return (ProgramPrefix) 
+            return (ProgramPrefix)
                     (body instanceof StatementBlock ? ((StatementBlock) body).getStatementAt(0) : body);
         } else {
             throw new IndexOutOfBoundsException("No next prefix element " + this);
         }
     }
-    
+
     @Override
     public ProgramPrefix getLastPrefixElement() {
-        return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() : 
-            this;
+        return hasNextPrefixElement() ? getNextPrefixElement().getLastPrefixElement() :
+                this;
     }
-    
+
     @Override
     public ImmutableArray<ProgramPrefix> getPrefixElements() {
         if (body instanceof StatementBlock) {
             return StatementBlock.computePrefixElements
-            (((StatementBlock)body).getBody(), this);
+                    (((StatementBlock) body).getBody(), this);
         } else if (body instanceof ProgramPrefix) {
             return StatementBlock.
-                computePrefixElements(new ImmutableArray<Statement>(body), 
-                        this);
-        }        
+                    computePrefixElements(new ImmutableArray<Statement>(body),
+                            this);
+        }
         return new ImmutableArray<ProgramPrefix>(this);
     }
 
 
     public SourceElement getFirstElement() {
-       if (body instanceof StatementBlock) {
-          return body.getFirstElement();
-       }
-       else {
-          return body;
-       }
+        if (body instanceof StatementBlock) {
+            return body.getFirstElement();
+        } else {
+            return body;
+        }
     }
 
     @Override
     public SourceElement getFirstElementIncludingBlocks() {
-       if (body instanceof StatementBlock) {
-          return body.getFirstElementIncludingBlocks();
-       }
-       else {
-          return body;
-       }
+        if (body instanceof StatementBlock) {
+            return body.getFirstElementIncludingBlocks();
+        } else {
+            return body;
+        }
     }
 
     public SourceElement getLastElement() {
-       if (body instanceof StatementBlock) {
-          return body.getLastElement();
-       }
-       else {
-          return body;
-       }
+        if (body instanceof StatementBlock) {
+            return body.getLastElement();
+        } else {
+            return body;
+        }
     }
 
 
     /**
-     *      Get name.
-     *      @return the string.
+     * Get name.
+     *
+     * @return the string.
      */
 
     public final String getName() {
@@ -190,8 +191,9 @@ public class LabeledStatement extends JavaStatement
     }
 
     /**
-     *      Get identifier.
-     *      @return the identifier.
+     * Get identifier.
+     *
+     * @return the identifier.
      */
 
     public Label getLabel() {
@@ -200,28 +202,31 @@ public class LabeledStatement extends JavaStatement
 
 
     /**
-     *      Get identifier.
-     *      @return the identifier.
+     * Get identifier.
+     *
+     * @return the identifier.
      */
     public ProgramElementName getProgramElementName() {
-	if ((name instanceof ProgramElementName) || (name==null)) {
-	    return (ProgramElementName) name;
-	} 
-	Debug.out("labeledstatement: SCHEMAVARIABLE IN LABELEDSTATEMENT");
-	return null;
+        if ((name instanceof ProgramElementName) || (name == null)) {
+            return (ProgramElementName) name;
+        }
+        Debug.out("labeledstatement: SCHEMAVARIABLE IN LABELEDSTATEMENT");
+        return null;
     }
 
     /**
-     *      Get body.
-     *      @return the statement.
+     * Get body.
+     *
+     * @return the statement.
      */
     public Statement getBody() {
         return body;
     }
 
     /**
-     *      Returns the number of children of this node.
-     *      @return an int giving the number of children of this node
+     * Returns the number of children of this node.
+     *
+     * @return an int giving the number of children of this node
      */
 
     public int getChildCount() {
@@ -232,12 +237,13 @@ public class LabeledStatement extends JavaStatement
     }
 
     /**
-     *      Returns the child at the specified index in this node's "virtual"
-     *      child array
-     *      @param index an index into this node's "virtual" child array
-     *      @return the program element at the given position
-     *      @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *                 of bounds
+     * Returns the child at the specified index in this node's "virtual"
+     * child array
+     *
+     * @param index an index into this node's "virtual" child array
+     * @return the program element at the given position
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds
      */
 
     public ProgramElement getChildAt(int index) {
@@ -251,10 +257,11 @@ public class LabeledStatement extends JavaStatement
         }
         throw new ArrayIndexOutOfBoundsException();
     }
-    
+
     /**
-     *      Get the number of statements in this container.
-     *      @return the number of statements.
+     * Get the number of statements in this container.
+     *
+     * @return the number of statements.
      */
 
     public int getStatementCount() {
@@ -262,12 +269,13 @@ public class LabeledStatement extends JavaStatement
     }
 
     /**
-     *       Return the statement at the specified index in this node's
-     *       "virtual" statement array.
-     *       @param index an index for a statement.
-     *       @return the statement with the given index.
-     *       @exception ArrayIndexOutOfBoundsException if <tt>index</tt> is out
-     *       of bounds.
+     * Return the statement at the specified index in this node's
+     * "virtual" statement array.
+     *
+     * @param index an index for a statement.
+     * @return the statement with the given index.
+     * @throws ArrayIndexOutOfBoundsException if <tt>index</tt> is out
+     *                                        of bounds.
      */
 
     public Statement getStatementAt(int index) {
@@ -277,34 +285,37 @@ public class LabeledStatement extends JavaStatement
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    /** calls the corresponding method of a visitor in order to
+    /**
+     * calls the corresponding method of a visitor in order to
      * perform some action/transformation on this element
+     *
      * @param v the Visitor
      */
     public void visit(Visitor v) {
-	v.performActionOnLabeledStatement(this);
+        v.performActionOnLabeledStatement(this);
     }
 
     public void prettyPrint(PrettyPrinter p) throws java.io.IOException {
         p.printLabeledStatement(this);
     }
 
-    /** testing if programelements are equal modulo renaming abstract
+    /**
+     * testing if programelements are equal modulo renaming abstract
      * from names. Therefore declaration of label names have to be
      * mapped to the same abstract name. This is done here.
      */
-    public boolean equalsModRenaming(SourceElement se, 
-				     NameAbstractionTable nat) {
-	if (se == null || this.getClass() != se.getClass()) {
-	    return false;
-	}
-		
-	final LabeledStatement lSt = (LabeledStatement)se;	
-	
-	nat.add(name, lSt.name);
-	return super.equalsModRenaming(lSt, nat);
+    public boolean equalsModRenaming(SourceElement se,
+                                     NameAbstractionTable nat) {
+        if (se == null || this.getClass() != se.getClass()) {
+            return false;
+        }
+
+        final LabeledStatement lSt = (LabeledStatement) se;
+
+        nat.add(name, lSt.name);
+        return super.equalsModRenaming(lSt, nat);
     }
-    
+
     public PosInProgram getFirstActiveChildPos() {
         return firstActiveChildPos;
     }
@@ -318,5 +329,5 @@ public class LabeledStatement extends JavaStatement
     public MethodFrame getInnerMostMethodFrame() {
         return innerMostMethodFrame;
     }
-    
+
 }
