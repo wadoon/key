@@ -86,12 +86,12 @@ options {
   import de.uka.ilkd.key.java.Services;
   import de.uka.ilkd.key.java.JavaReader;
   import de.uka.ilkd.key.java.SchemaJavaReader;
-  import de.uka.ilkd.key.java.abstraction.*;
+  import de.uka.ilkd.key.java.ast.abstraction.*;
   import de.uka.ilkd.key.java.visitor.*;
   import de.uka.ilkd.key.java.Recoder2KeY;
   import de.uka.ilkd.key.java.SchemaRecoder2KeY;
-  import de.uka.ilkd.key.java.StatementBlock;
-  import de.uka.ilkd.key.java.declaration.VariableDeclaration;
+  import de.uka.ilkd.key.java.ast.StatementBlock;
+  import de.uka.ilkd.key.java.ast.declaration.VariableDeclaration;
   import de.uka.ilkd.key.java.recoderext.*;
   import de.uka.ilkd.key.pp.AbbrevMap;
   import de.uka.ilkd.key.pp.LogicPrinter;
@@ -1049,13 +1049,13 @@ options {
             }else{
                 sjb.javaBlock = jr.readBlockWithProgramVariables(programVariables(), s);
             }
-        } catch (de.uka.ilkd.key.java.PosConvertException e) {
+        } catch (de.uka.ilkd.key.java.exception.PosConvertException e) {
             lineOffset=e.getLine()-1;
             colOffset=e.getColumn()+1;
             throw new RecognitionException(input);
             //throw new JavaParserException(e.getMessage(), t.getText(), 
             //    getSourceName(), t.getLine(), t.getCharPositionInLine(), lineOffset, colOffset);
-        } catch (de.uka.ilkd.key.java.ConvertException e) { 
+        } catch (de.uka.ilkd.key.java.exception.ConvertException e) {
             if (e.parseException()!=null
             &&  e.parseException().currentToken != null
             &&  e.parseException().currentToken.next != null) {               
@@ -3144,7 +3144,7 @@ atom returns [Term _atom = null]
     |   literal=STRING_LITERAL
         {
             String s = unescapeString(literal.getText());
-            a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.expression.literal.StringLiteral(s));
+            a = getServices().getTypeConverter().convertToLogicElement(new de.uka.ilkd.key.java.ast.expression.literal.StringLiteral(s));
         }   
     ) (LGUILLEMETS labels = label {if (labels.size() > 0) {a = getServices().getTermBuilder().addLabel(a, labels);} } RGUILLEMETS)?
     ;

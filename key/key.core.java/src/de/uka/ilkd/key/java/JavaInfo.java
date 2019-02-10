@@ -13,12 +13,16 @@
 
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.java.declaration.*;
-import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.TypeRef;
-import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.*;
+import de.uka.ilkd.key.java.ast.declaration.*;
+import de.uka.ilkd.key.java.ast.declaration.modifier.VisibilityModifier;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.reference.TypeReference;
+import de.uka.ilkd.key.java.exception.UnknownJavaTypeException;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -77,8 +81,8 @@ public final class JavaInfo {
      * the top level. It is equivalent to a static class belonging the default
      * package. This should only be used when using KeY in academic mode, if
      * the verification conditions are generated they "must" start with a
-     * {@link de.uka.ilkd.key.java.statement.MethodBodyStatement} or a
-     * {@link de.uka.ilkd.key.java.statement.MethodFrame}, which contains a
+     * {@link de.uka.ilkd.key.java.ast.statement.MethodBodyStatement} or a
+     * {@link de.uka.ilkd.key.java.ast.statement.MethodFrame}, which contains a
      * valid execution context.
      */
     protected ExecutionContext defaultExecutionContext;
@@ -167,7 +171,7 @@ public final class JavaInfo {
 
     /**
      * returns the full name of a given {@link
-     * de.uka.ilkd.key.java.abstraction.KeYJavaType}.
+     * de.uka.ilkd.key.java.ast.abstraction.KeYJavaType}.
      * @param t the KeYJavaType including the package prefix
      * @return the full name
      */

@@ -13,9 +13,9 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import de.uka.ilkd.key.java.JavaProgramElement;
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import org.key_project.util.ExtList;
 
 public class ProgramElementReplacer extends CreatingASTVisitor {

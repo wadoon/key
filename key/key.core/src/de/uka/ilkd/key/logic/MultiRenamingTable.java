@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.java.ast.SourceElement;
+
 import java.util.HashMap;
 import java.util.Iterator;
-
-import de.uka.ilkd.key.java.SourceElement;
 
 
 

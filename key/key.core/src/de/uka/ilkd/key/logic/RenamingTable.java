@@ -13,11 +13,11 @@
 
 package de.uka.ilkd.key.logic;
 
+import de.uka.ilkd.key.java.ast.SourceElement;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
-
-import de.uka.ilkd.key.java.SourceElement;
 
 
 public abstract class RenamingTable{

@@ -13,21 +13,22 @@
 
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.Modifier;
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.expression.ArrayInitializer;
-import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.PassiveExpression;
-import de.uka.ilkd.key.java.expression.literal.BooleanLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.*;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.Modifier;
+import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.expression.ArrayInitializer;
+import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.ast.expression.PassiveExpression;
+import de.uka.ilkd.key.java.ast.expression.literal.BooleanLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.ast.statement.*;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.VariableNamer;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -216,8 +217,8 @@ public abstract class KeYJavaASTFactory {
      */
 
     public static ParameterDeclaration parameterDeclaration(JavaInfo javaInfo,
-							    KeYJavaType kjt,
-							    String name) {
+															KeYJavaType kjt,
+															String name) {
 	return new ParameterDeclaration
 	    (new Modifier[0], javaInfo.createTypeReference(kjt),
 	     new VariableSpecification(localVariable(name, kjt)), false);
@@ -2445,7 +2446,7 @@ public abstract class KeYJavaASTFactory {
      *         <code>parameters</code> and <code>label</code>
      */
     public static LabeledStatement labeledStatement(final ExtList parameters,
-	    final Label label, final PositionInfo position) {
+													final Label label, final PositionInfo position) {
 	final LabeledStatement statement = new LabeledStatement(parameters,
 		label, position);
 

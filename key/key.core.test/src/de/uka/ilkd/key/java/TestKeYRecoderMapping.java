@@ -13,13 +13,13 @@
 
 package de.uka.ilkd.key.java;
 
-import java.util.HashMap;
-
+import de.uka.ilkd.key.java.ast.ModelElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.statement.EmptyStatement;
 import junit.framework.TestCase;
-
 import org.junit.Assert;
 
-import de.uka.ilkd.key.java.statement.EmptyStatement;
+import java.util.HashMap;
 
 public class TestKeYRecoderMapping extends TestCase{
 
@@ -43,7 +43,7 @@ public class TestKeYRecoderMapping extends TestCase{
         rp = new recoder.java.declaration.ClassDeclaration();
         kp = new EmptyStatement();
         rm = new recoder.java.statement.Case();
-        km = new de.uka.ilkd.key.java.abstraction.Package("Packet");
+        km = new de.uka.ilkd.key.java.ast.abstraction.Package("Packet");
         rp2 = new recoder.java.declaration.ClassDeclaration();
         rm2 = new recoder.java.statement.Case();
         map.put(rp,kp);
@@ -65,10 +65,10 @@ public class TestKeYRecoderMapping extends TestCase{
 
 
     public void testtoRecoder(){
-       Assert.assertTrue("Fehler[1] in toRecoder(de.uka.ilkd.key.java.ProgramElement)", rp.equals(mapping.toRecoder(kp)));
-//        Assert.assertTrue("Fehler[2] in toRecoder(de.uka.ilkd.key.java.ProgramElement)", null==mapping.toRecoder(kp2));
-       Assert.assertTrue("Fehler[2] in toRecoder(de.uka.ilkd.key.java.ModelElement)", rm.equals(mapping.toRecoder(km)));
-//        Assert.assertTrue("Fehler[4] in toRecoder(de.uka.ilkd.key.java.ModelElement)", null==mapping.toRecoder(km2));
+       Assert.assertTrue("Fehler[1] in toRecoder(de.uka.ilkd.key.java.ast.ProgramElement)", rp.equals(mapping.toRecoder(kp)));
+//        Assert.assertTrue("Fehler[2] in toRecoder(de.uka.ilkd.key.java.ast.ProgramElement)", null==mapping.toRecoder(kp2));
+       Assert.assertTrue("Fehler[2] in toRecoder(de.uka.ilkd.key.java.ast.ModelElement)", rm.equals(mapping.toRecoder(km)));
+//        Assert.assertTrue("Fehler[4] in toRecoder(de.uka.ilkd.key.java.ast.ModelElement)", null==mapping.toRecoder(km2));
     }
 
 

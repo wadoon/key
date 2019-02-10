@@ -13,33 +13,21 @@
 
 package de.uka.ilkd.key.proof;
 
+import de.uka.ilkd.key.java.Position;
+import de.uka.ilkd.key.java.ast.JavaSourceElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.rule.*;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.java.ObjectUtil;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.java.ObjectUtil;
-
-import de.uka.ilkd.key.java.JavaSourceElement;
-import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.ProgramPrefix;
-import de.uka.ilkd.key.logic.SequentChangeInfo;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementBuiltInRuleApp;
-import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.PosTacletApp;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
 
 
 /**

@@ -13,14 +13,13 @@
 
 package de.uka.ilkd.key.java;
 
-import junit.framework.TestCase;
-
-import org.key_project.util.ExtList;
-
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInProgram;
 import de.uka.ilkd.key.rule.TacletForTests;
+import junit.framework.TestCase;
+import org.key_project.util.ExtList;
 
 
 public class TestContextStatementBlock extends TestCase {
@@ -58,12 +57,12 @@ public class TestContextStatementBlock extends TestCase {
 	assertTrue("Prefix should end with an assignment", 
 		   PosInProgram.getProgramAt(prefixEnd, blockOne.program()) 
 		   instanceof 
-		   de.uka.ilkd.key.java.declaration.LocalVariableDeclaration);
+		   de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration);
 	PosInProgram suffixStart = PosInProgram.TOP.down(2);
 	assertTrue("Suffix should start with an ++", 
 		   PosInProgram.getProgramAt(suffixStart, blockOne.program()) 
 		   instanceof 
-		   de.uka.ilkd.key.java.expression.operator.PostIncrement);
+		   de.uka.ilkd.key.java.ast.expression.operator.PostIncrement);
 	for (int i=size-2; i>=1; i--) {
 	    statementList.add
 		(stContainer.getChildAt(i));

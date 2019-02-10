@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.java.ConvertException;
+import de.uka.ilkd.key.java.exception.ConvertException;
 import de.uka.ilkd.key.util.Debug;
 import recoder.ParserException;
 import recoder.ProgramFactory;

@@ -13,25 +13,20 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.java.visitor.LabelCollector;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NamespaceSet;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.SkolemTermSV;
 import de.uka.ilkd.key.logic.op.VariableSV;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.rule.TacletApp;
+import org.key_project.util.collection.ImmutableList;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Proposes names for variables (except program variables).

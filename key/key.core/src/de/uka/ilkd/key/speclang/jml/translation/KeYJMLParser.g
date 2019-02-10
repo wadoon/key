@@ -14,12 +14,12 @@ options {
     import de.uka.ilkd.key.java.JavaInfo;
     import de.uka.ilkd.key.java.Position;
     import de.uka.ilkd.key.java.Services;
-    import de.uka.ilkd.key.java.abstraction.*;
-    import de.uka.ilkd.key.java.expression.literal.StringLiteral;
-    import de.uka.ilkd.key.java.expression.literal.CharLiteral;
-    import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-    import de.uka.ilkd.key.java.expression.literal.LongLiteral;
-    import de.uka.ilkd.key.java.expression.Literal;
+    import de.uka.ilkd.key.java.ast.abstraction.*;
+    import de.uka.ilkd.key.java.ast.expression.literal.StringLiteral;
+    import de.uka.ilkd.key.java.ast.expression.literal.CharLiteral;
+    import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
+    import de.uka.ilkd.key.java.ast.expression.literal.LongLiteral;
+    import de.uka.ilkd.key.java.ast.expression.Literal;
     import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
     import de.uka.ilkd.key.ldt.*;
     import de.uka.ilkd.key.logic.*;

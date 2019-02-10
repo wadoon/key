@@ -1,9 +1,7 @@
 package de.uka.ilkd.key.util;
 
-import org.antlr.runtime.RecognitionException;
-
-import de.uka.ilkd.key.java.ParseExceptionInFile;
-import de.uka.ilkd.key.java.PosConvertException;
+import de.uka.ilkd.key.java.exception.ParseExceptionInFile;
+import de.uka.ilkd.key.java.exception.PosConvertException;
 import de.uka.ilkd.key.macros.scripts.ScriptException;
 import de.uka.ilkd.key.parser.KeYSemanticException;
 import de.uka.ilkd.key.parser.Location;
@@ -12,6 +10,7 @@ import de.uka.ilkd.key.parser.proofjava.ParseException;
 import de.uka.ilkd.key.parser.proofjava.Token;
 import de.uka.ilkd.key.proof.SVInstantiationExceptionWithPosition;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import org.antlr.runtime.RecognitionException;
 import recoder.java.CompilationUnit;
 import recoder.kit.UnitKit;
 import recoder.service.UnresolvedReferenceException;

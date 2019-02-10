@@ -13,7 +13,8 @@
 
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import recoder.java.JavaProgramFactory;
 import recoder.service.ConstantEvaluator;

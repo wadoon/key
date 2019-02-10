@@ -14,6 +14,9 @@
 package de.uka.ilkd.key.java;
 
 
+import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.Statement;
+
 /**
  *  Statement container.
  * taken from COMPOST and changed to achieve an immutable structure

@@ -13,15 +13,14 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.List;
-
-import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.speclang.BlockContract;
+import org.key_project.util.collection.ImmutableList;
+
+import java.util.List;
 
 /**
  * Application of {@link BlockContractInternalRule}.

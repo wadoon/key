@@ -13,34 +13,21 @@
 
 package de.uka.ilkd.key.rule.tacletbuilder;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.VariableSV;
+import de.uka.ilkd.key.rule.*;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.logic.Choice;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.VariableSV;
-import de.uka.ilkd.key.rule.NewDependingOn;
-import de.uka.ilkd.key.rule.NewVarcond;
-import de.uka.ilkd.key.rule.NotFreeIn;
-import de.uka.ilkd.key.rule.RuleSet;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletAnnotation;
-import de.uka.ilkd.key.rule.TacletAttributes;
-import de.uka.ilkd.key.rule.Trigger;
-import de.uka.ilkd.key.rule.VariableCondition;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 /** 
  * abstract taclet builder class to be inherited from taclet builders

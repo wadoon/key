@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.java.recoderext;
 
-import de.uka.ilkd.key.java.ConvertException;
+import de.uka.ilkd.key.java.exception.ConvertException;
 import de.uka.ilkd.key.util.DirectoryFileCollection;
 import de.uka.ilkd.key.util.FileCollection;
 import de.uka.ilkd.key.util.FileCollection.Walker;

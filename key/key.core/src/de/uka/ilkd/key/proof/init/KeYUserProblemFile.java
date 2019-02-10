@@ -13,15 +13,7 @@
 
 package de.uka.ilkd.key.proof.init;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.antlr.runtime.RecognitionException;
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.parser.KeYLexerF;
 import de.uka.ilkd.key.parser.KeYParserF;
@@ -37,6 +29,13 @@ import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.SLEnvInput;
 import de.uka.ilkd.key.util.ProgressMonitor;
 import de.uka.ilkd.key.util.Triple;
+import org.antlr.runtime.RecognitionException;
+import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableSet;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 
 /** 

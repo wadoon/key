@@ -13,19 +13,18 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.speclang.HeapContext;
+import org.key_project.util.collection.ImmutableList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**

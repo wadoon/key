@@ -13,11 +13,16 @@
 
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.NullType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.declaration.FieldSpecification;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.ModelElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.NullType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.declaration.FieldSpecification;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.exception.ConvertException;
+import de.uka.ilkd.key.java.exception.ParseExceptionInFile;
+import de.uka.ilkd.key.java.exception.PosConvertException;
 import de.uka.ilkd.key.java.recoderext.*;
 import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -313,11 +318,11 @@ public class Recoder2KeY implements JavaReader {
      *             into a parse exception that contains the filename.
      */
 
-    public de.uka.ilkd.key.java.CompilationUnit[]
+    public de.uka.ilkd.key.java.ast.CompilationUnit[]
             readCompilationUnitsAsFiles(String[] cUnitStrings) throws ParseExceptionInFile {
 
         List<recoder.java.CompilationUnit> cUnits = recoderCompilationUnitsAsFiles(cUnitStrings);
-        de.uka.ilkd.key.java.CompilationUnit[] result = new de.uka.ilkd.key.java.CompilationUnit[cUnits.size()];
+        de.uka.ilkd.key.java.ast.CompilationUnit[] result = new de.uka.ilkd.key.java.ast.CompilationUnit[cUnits.size()];
         for (int i = 0, sz = cUnits.size(); i < sz; i++) {
             Debug.out("converting now " + cUnitStrings[i]);
             try {
@@ -391,9 +396,9 @@ public class Recoder2KeY implements JavaReader {
      *            a string represents a compilation unit
      * @return a KeY structured compilation unit.
      */
-    public de.uka.ilkd.key.java.CompilationUnit readCompilationUnit(String cUnitString) {
+    public de.uka.ilkd.key.java.ast.CompilationUnit readCompilationUnit(String cUnitString) {
         final recoder.java.CompilationUnit cc = recoderCompilationUnits(new String[] { cUnitString }).get(0);
-        return (de.uka.ilkd.key.java.CompilationUnit) getConverter().process(cc);
+        return (de.uka.ilkd.key.java.ast.CompilationUnit) getConverter().process(cc);
     }
 
     /**

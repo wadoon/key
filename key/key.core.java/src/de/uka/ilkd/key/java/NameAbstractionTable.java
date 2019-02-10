@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.java.ast.SourceElement;
+
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;

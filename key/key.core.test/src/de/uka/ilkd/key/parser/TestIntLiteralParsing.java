@@ -1,13 +1,12 @@
 package de.uka.ilkd.key.parser;
 
-import org.antlr.runtime.RecognitionException;
-
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.PositionedString;
 import de.uka.ilkd.key.speclang.jml.translation.KeYJMLParser;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import org.antlr.runtime.RecognitionException;
 
 /**
  * This class provides tests for parsing int, long, and char literals.

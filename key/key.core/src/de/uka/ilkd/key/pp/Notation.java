@@ -13,17 +13,16 @@
 
 package de.uka.ilkd.key.pp;
 
-import java.io.IOException;
-import java.util.Iterator;
-
-import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.java.ProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
 import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.ImmutableList;
+
+import java.io.IOException;
+import java.util.Iterator;
 
 /**
  * Encapsulate the concrete syntax used to print a term. The {@link

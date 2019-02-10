@@ -1,19 +1,11 @@
 package de.uka.ilkd.key.proof.init;
 
-import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.java.KeYJavaASTFactory;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.TypeRef;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.TypeRef;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -29,13 +21,15 @@ import de.uka.ilkd.key.rule.BlockContractBuilders.ConditionsAndClausesBuilder;
 import de.uka.ilkd.key.rule.BlockContractBuilders.GoalsConfigurator;
 import de.uka.ilkd.key.rule.BlockContractBuilders.UpdatesBuilder;
 import de.uka.ilkd.key.rule.BlockContractBuilders.VariablesCreatorAndRegistrar;
-import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
-import de.uka.ilkd.key.speclang.Contract;
-import de.uka.ilkd.key.speclang.FunctionalLoopContract;
-import de.uka.ilkd.key.speclang.HeapContext;
-import de.uka.ilkd.key.speclang.LoopContract;
+import de.uka.ilkd.key.speclang.*;
 import de.uka.ilkd.key.util.MiscTools;
+import org.key_project.util.collection.ImmutableSet;
+
+import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 /**
  * A proof obligation for a {@link FunctionalLoopContract}.

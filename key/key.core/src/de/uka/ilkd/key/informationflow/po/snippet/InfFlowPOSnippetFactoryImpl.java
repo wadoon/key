@@ -1,18 +1,18 @@
 package de.uka.ilkd.key.informationflow.po.snippet;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.EnumMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.InformationFlowContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.EnumMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**

@@ -13,6 +13,9 @@
 
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.java.ast.NonTerminalProgramElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+
 /**
  * This class keeps track of the next element to match, which is provided by  
  * calling method {@link #getSource()}. The rough idea is to store the parent ast 

@@ -13,46 +13,24 @@
 
 package de.uka.ilkd.key.ldt;
 
-import java.math.BigInteger;
-
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.literal.AbstractIntegerLiteral;
-import de.uka.ilkd.key.java.expression.literal.CharLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
-import de.uka.ilkd.key.java.expression.literal.LongLiteral;
-import de.uka.ilkd.key.java.expression.operator.BinaryAnd;
-import de.uka.ilkd.key.java.expression.operator.BinaryNot;
-import de.uka.ilkd.key.java.expression.operator.BinaryOr;
-import de.uka.ilkd.key.java.expression.operator.BinaryXOr;
-import de.uka.ilkd.key.java.expression.operator.Divide;
-import de.uka.ilkd.key.java.expression.operator.GreaterOrEquals;
-import de.uka.ilkd.key.java.expression.operator.GreaterThan;
-import de.uka.ilkd.key.java.expression.operator.LessOrEquals;
-import de.uka.ilkd.key.java.expression.operator.LessThan;
-import de.uka.ilkd.key.java.expression.operator.Minus;
-import de.uka.ilkd.key.java.expression.operator.Modulo;
-import de.uka.ilkd.key.java.expression.operator.Negative;
-import de.uka.ilkd.key.java.expression.operator.Plus;
-import de.uka.ilkd.key.java.expression.operator.ShiftLeft;
-import de.uka.ilkd.key.java.expression.operator.ShiftRight;
-import de.uka.ilkd.key.java.expression.operator.Times;
-import de.uka.ilkd.key.java.expression.operator.TypeCast;
-import de.uka.ilkd.key.java.expression.operator.UnsignedShiftRight;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Literal;
+import de.uka.ilkd.key.java.ast.expression.literal.AbstractIntegerLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.CharLiteral;
+import de.uka.ilkd.key.java.ast.expression.literal.IntLiteral;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.ExtList;
 
 
 /** 
@@ -445,7 +423,7 @@ public final class IntegerLDT extends LDT {
     */
     @Override
     public Function getFunctionFor(
-	    	de.uka.ilkd.key.java.expression.Operator op, 
+	    	de.uka.ilkd.key.java.ast.expression.Operator op,
                 Services serv, 
                 ExecutionContext ec) {
         final Type opReturnType = op.getKeYJavaType(serv, ec).getJavaType();
@@ -496,10 +474,10 @@ public final class IntegerLDT extends LDT {
     
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-	                         Term[] subs, 
-	                         Services services, 
-	                         ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op,
+                                 Term[] subs,
+                                 Services services,
+                                 ExecutionContext ec) {
         if (subs.length == 1) {
             return isResponsible(op, subs[0], services, ec);
         } else if (subs.length == 2) {
@@ -511,11 +489,11 @@ public final class IntegerLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-	                         Term left, 
-	                         Term right, 
-	                         Services services, 
-	                         ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op,
+                                 Term left,
+                                 Term right,
+                                 Services services,
+                                 ExecutionContext ec) {
         if(left != null 
            && left.sort().extendsTrans(targetSort()) 
            && right != null 
@@ -529,10 +507,10 @@ public final class IntegerLDT extends LDT {
     
     
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op, 
-	                         Term sub, 
-	                         TermServices services, 
-	                         ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op,
+                                 Term sub,
+                                 TermServices services,
+                                 ExecutionContext ec) {
         if(sub != null && sub.sort().extendsTrans(targetSort())) {
             if(op instanceof Negative) {
                 return true;

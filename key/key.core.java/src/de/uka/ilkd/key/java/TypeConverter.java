@@ -14,14 +14,16 @@
 package de.uka.ilkd.key.java;
 
 
-import de.uka.ilkd.key.java.abstraction.*;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.expression.ParenthesizedExpression;
-import de.uka.ilkd.key.java.expression.literal.NullLiteral;
-import de.uka.ilkd.key.java.expression.operator.*;
-import de.uka.ilkd.key.java.expression.operator.adt.Singleton;
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.*;
+import de.uka.ilkd.key.java.ast.expression.Literal;
+import de.uka.ilkd.key.java.ast.expression.ParenthesizedExpression;
+import de.uka.ilkd.key.java.ast.expression.literal.NullLiteral;
+import de.uka.ilkd.key.java.ast.expression.operator.*;
+import de.uka.ilkd.key.java.ast.expression.operator.adt.Singleton;
+import de.uka.ilkd.key.java.ast.reference.*;
 import de.uka.ilkd.key.java.recoderext.ImplicitFieldAdder;
-import de.uka.ilkd.key.java.reference.*;
 import de.uka.ilkd.key.ldt.*;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramInLogic;
@@ -126,7 +128,7 @@ public final class TypeConverter {
 	return (CharListLDT) getLDT(CharListLDT.NAME);
     }
 
-    private Term translateOperator(de.uka.ilkd.key.java.expression.Operator op, ExecutionContext ec) {
+    private Term translateOperator(de.uka.ilkd.key.java.ast.expression.Operator op, ExecutionContext ec) {
 
         final Term[] subs = new Term[op.getArity()];
         for (int i = 0, n = op.getArity(); i < n; i++) {
@@ -354,9 +356,9 @@ public final class TypeConverter {
                 (((ParenthesizedExpression)pe).getChildAt(0), ec);
         } else if (pe instanceof Instanceof) {
             return convertToInstanceofTerm((Instanceof)pe, ec);
-        } else if (pe instanceof de.uka.ilkd.key.java.expression.Operator) {
+        } else if (pe instanceof de.uka.ilkd.key.java.ast.expression.Operator) {
             return translateOperator
-                    ((de.uka.ilkd.key.java.expression.Operator)pe, ec);
+                    ((de.uka.ilkd.key.java.ast.expression.Operator)pe, ec);
         } else if (pe instanceof recoder.abstraction.PrimitiveType) {
             throw new IllegalArgumentException("TypeConverter could not handle"
                     + " this primitive type");
@@ -389,7 +391,7 @@ public final class TypeConverter {
     }
 
     public static boolean isArithmeticOperator
-	(de.uka.ilkd.key.java.expression.Operator op) {
+	(de.uka.ilkd.key.java.ast.expression.Operator op) {
 	if (op instanceof Divide || op instanceof Times ||
 	    op instanceof Plus || op instanceof Minus ||
 	    op instanceof Modulo || op instanceof ShiftLeft ||
@@ -982,7 +984,7 @@ public final class TypeConverter {
         return TC;
     }
 
-    private LDT getResponsibleLDT(de.uka.ilkd.key.java.expression.Operator op, Term[] subs, Services services, ExecutionContext ec) {
+    private LDT getResponsibleLDT(de.uka.ilkd.key.java.ast.expression.Operator op, Term[] subs, Services services, ExecutionContext ec) {
         for (LDT ldt : LDTs.values()) {
             if (ldt.isResponsible(op, subs, services, ec)) {
                 return ldt;

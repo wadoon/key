@@ -13,15 +13,17 @@
 
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.declaration.Modifier;
-import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.*;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.Modifier;
+import de.uka.ilkd.key.java.ast.declaration.VariableSpecification;
+import de.uka.ilkd.key.java.ast.reference.*;
+import de.uka.ilkd.key.java.ast.statement.*;
+import de.uka.ilkd.key.java.exception.ConvertException;
 import de.uka.ilkd.key.java.recoderext.ProgramVariableSVWrapper;
 import de.uka.ilkd.key.java.recoderext.TypeSVWrapper;
-import de.uka.ilkd.key.java.reference.*;
-import de.uka.ilkd.key.java.statement.*;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.op.*;
@@ -95,7 +97,7 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
         } else if ("#for-to-while".equals(mcName)) {
             final ProgramSV[] labels = mc.getSV();
             return new ForToWhile(labels[0], labels[1],
-                    list.get(Statement.class));      
+                    list.get(Statement.class));
         }  else if ("#enhancedfor-elim".equals(mcName)){ 
             EnhancedFor efor = list.get(EnhancedFor.class);
             if(efor == null)

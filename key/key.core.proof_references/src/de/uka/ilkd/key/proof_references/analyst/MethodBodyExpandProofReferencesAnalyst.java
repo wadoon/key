@@ -13,15 +13,15 @@
 
 package de.uka.ilkd.key.proof_references.analyst;
 
-import java.util.LinkedHashSet;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.NodeInfo;
 import de.uka.ilkd.key.proof_references.reference.DefaultProofReference;
 import de.uka.ilkd.key.proof_references.reference.IProofReference;
+
+import java.util.LinkedHashSet;
 
 /**
  * Extracts inlined methods.

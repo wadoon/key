@@ -13,13 +13,13 @@
 
 package de.uka.ilkd.key.logic;
 
-import java.io.IOException;
-import java.io.StringWriter;
-
-import de.uka.ilkd.key.java.JavaProgramElement;
 import de.uka.ilkd.key.java.NameAbstractionTable;
 import de.uka.ilkd.key.java.PrettyPrinter;
-import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+
+import java.io.IOException;
+import java.io.StringWriter;
 
 public class JavaBlock {
     

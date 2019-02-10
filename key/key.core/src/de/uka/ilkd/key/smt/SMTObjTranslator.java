@@ -13,47 +13,21 @@
 
 package de.uka.ilkd.key.smt;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.declaration.ClassDeclaration;
-import de.uka.ilkd.key.java.declaration.InterfaceDeclaration;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.declaration.ClassDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.InterfaceDeclaration;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SortDependingFunction;
+import de.uka.ilkd.key.logic.op.*;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.smt.hierarchy.SortNode;
 import de.uka.ilkd.key.smt.hierarchy.TypeHierarchy;
-import de.uka.ilkd.key.smt.lang.SMTFile;
-import de.uka.ilkd.key.smt.lang.SMTFunction;
-import de.uka.ilkd.key.smt.lang.SMTFunctionDef;
-import de.uka.ilkd.key.smt.lang.SMTSort;
-import de.uka.ilkd.key.smt.lang.SMTTerm;
-import de.uka.ilkd.key.smt.lang.SMTTermCall;
-import de.uka.ilkd.key.smt.lang.SMTTermITE;
-import de.uka.ilkd.key.smt.lang.SMTTermMultOp;
-import de.uka.ilkd.key.smt.lang.SMTTermNumber;
-import de.uka.ilkd.key.smt.lang.SMTTermUnaryOp;
-import de.uka.ilkd.key.smt.lang.SMTTermVariable;
-import de.uka.ilkd.key.smt.lang.Util;
+import de.uka.ilkd.key.smt.lang.*;
 import de.uka.ilkd.key.util.Debug;
+import org.key_project.util.collection.ImmutableArray;
+
+import java.util.*;
 
 public class SMTObjTranslator implements SMTTranslator {
 	public static final String CLASS_INVARIANT = "classInvariant";

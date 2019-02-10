@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.java.abstraction.Type;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 
 /**

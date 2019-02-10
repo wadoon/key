@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.java;
 
+import de.uka.ilkd.key.java.exception.ConvertException;
 import de.uka.ilkd.key.java.recoderext.ImplicitIdentifier;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaJavaProgramFactory;

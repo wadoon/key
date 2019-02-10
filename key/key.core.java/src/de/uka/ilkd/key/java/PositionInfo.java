@@ -133,7 +133,7 @@ public class PositionInfo {
     /** this violates immutability, but the method is only called
       * right after the object is created...
       */
-    protected void setParentClass(String s) {
+    public void setParentClass(String s) {
         parentClass = s;
     }
     

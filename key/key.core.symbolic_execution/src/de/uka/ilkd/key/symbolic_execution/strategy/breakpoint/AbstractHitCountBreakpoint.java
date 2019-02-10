@@ -13,13 +13,13 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.RuleApp;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Adds the hit count functionality to an {@link AbstractBreakpoint}.

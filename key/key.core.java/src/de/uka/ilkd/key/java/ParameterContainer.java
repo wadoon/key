@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.java;
 
-import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.ast.declaration.ParameterDeclaration;
 
 /**
  *    Describes program elements that contain

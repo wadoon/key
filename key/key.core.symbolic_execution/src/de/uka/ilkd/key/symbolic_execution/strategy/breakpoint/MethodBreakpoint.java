@@ -13,16 +13,14 @@
 
 package de.uka.ilkd.key.symbolic_execution.strategy.breakpoint;
 
-import org.key_project.util.java.ObjectUtil;
-
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Position;
-import de.uka.ilkd.key.java.SourceElement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.StatementContainer;
-import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;
-import de.uka.ilkd.key.java.statement.MethodBodyStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
+import de.uka.ilkd.key.java.ast.SourceElement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
+import de.uka.ilkd.key.java.ast.declaration.LocalVariableDeclaration;
+import de.uka.ilkd.key.java.ast.statement.MethodBodyStatement;
+import de.uka.ilkd.key.java.ast.statement.MethodFrame;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
@@ -35,6 +33,7 @@ import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
+import org.key_project.util.java.ObjectUtil;
 
 public class MethodBreakpoint extends AbstractConditionalBreakpoint {
    /**

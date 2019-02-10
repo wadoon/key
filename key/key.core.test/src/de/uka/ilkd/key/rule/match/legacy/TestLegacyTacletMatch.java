@@ -16,26 +16,21 @@
  */
 package de.uka.ilkd.key.rule.match.legacy;
 
-import java.io.File;
-
-import junit.framework.TestCase;
-
-import org.key_project.util.collection.ImmutableArray;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.ast.Statement;
+import de.uka.ilkd.key.java.ast.StatementBlock;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.MatchConditions;
-import de.uka.ilkd.key.rule.Taclet;
-import de.uka.ilkd.key.rule.TacletApp;
-import de.uka.ilkd.key.rule.TacletForTests;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import junit.framework.TestCase;
+import org.key_project.util.collection.ImmutableArray;
+
+import java.io.File;
 
 
 public class TestLegacyTacletMatch extends TestCase {
@@ -257,15 +252,15 @@ public class TestLegacyTacletMatch extends TestCase {
                 +" while(true) {break;}}", 
                 c2k.createEmptyContext());
 
-        de.uka.ilkd.key.java.StatementBlock sb
-        =(de.uka.ilkd.key.java.StatementBlock)jb.program();
+        StatementBlock sb
+        =(StatementBlock)jb.program();
 
         JavaBlock javaBlock = JavaBlock.createJavaBlock
-                (new de.uka.ilkd.key.java.StatementBlock
+                (new StatementBlock
                         (new ImmutableArray<Statement>
-                        (new de.uka.ilkd.key.java.Statement[]{
-                                (de.uka.ilkd.key.java.Statement)sb.getChildAt(2),
-                                (de.uka.ilkd.key.java.Statement)sb.getChildAt(3)
+                        (new Statement[]{
+                                (Statement)sb.getChildAt(2),
+                                (Statement)sb.getChildAt(3)
                         })));
 
 

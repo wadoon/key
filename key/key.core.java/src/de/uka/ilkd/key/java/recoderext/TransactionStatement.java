@@ -89,7 +89,7 @@ public class TransactionStatement extends JavaStatement {
     }
 
     public String toString() {
-        return de.uka.ilkd.key.java.statement.TransactionStatement.names[type - 1];
+        return de.uka.ilkd.key.java.ast.statement.TransactionStatement.names[type - 1];
     }
 
 }

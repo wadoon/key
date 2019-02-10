@@ -14,14 +14,10 @@
 package de.uka.ilkd.key.speclang.jml.translation;
 
 import de.uka.ilkd.key.java.JavaInfo;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
 import de.uka.ilkd.key.ldt.SeqLDT;
-import de.uka.ilkd.key.speclang.translation.SLExpression;
-import de.uka.ilkd.key.speclang.translation.SLExpressionResolver;
-import de.uka.ilkd.key.speclang.translation.SLParameters;
-import de.uka.ilkd.key.speclang.translation.SLResolverManager;
-import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.speclang.translation.*;
 
 
 /**

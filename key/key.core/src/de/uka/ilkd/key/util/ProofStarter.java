@@ -13,9 +13,7 @@
 
 package de.uka.ilkd.key.util;
 
-import org.key_project.util.collection.ImmutableList;
-
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -39,6 +37,7 @@ import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.strategy.Strategy;
 import de.uka.ilkd.key.strategy.StrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyProperties;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * This class encapsulates the registration of a proof for a given problem.

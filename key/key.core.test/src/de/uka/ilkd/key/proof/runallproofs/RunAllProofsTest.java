@@ -13,23 +13,18 @@
 
 package de.uka.ilkd.key.proof.runallproofs;
 
-import static org.junit.Assert.assertTrue;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
+import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
+import org.antlr.runtime.*;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.antlr.runtime.ANTLRFileStream;
-import org.antlr.runtime.CharStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.TokenStream;
-import org.junit.Test;
-
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollection;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionLexer;
-import de.uka.ilkd.key.proof.runallproofs.proofcollection.ProofCollectionParser;
+import static org.junit.Assert.assertTrue;
 
 /**
  * <p>
@@ -110,7 +105,7 @@ public class RunAllProofsTest {
      * parameterized test case mechanism for to create several test cases from a
      * set of data. {@link Object.#toString()} of first constructor parameter is
      * used to determine name of individual test cases, see {@link
-     * RunAllProofsTestUnit.#toString()} for further information.
+     * RunAllProofsTestUnit#toString()} for further information.
      *
      * @param proofIndex
      *            The file name of the index file which parsed to produce test

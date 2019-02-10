@@ -13,15 +13,14 @@
 
 package de.uka.ilkd.key.symbolic_execution.model;
 
-import org.key_project.util.collection.ImmutableList;
-
 import de.uka.ilkd.key.java.PositionInfo;
-import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.ast.SourceElement;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.SymbolicExecutionTreeBuilder;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicEquivalenceClass;
 import de.uka.ilkd.key.symbolic_execution.object_model.ISymbolicLayout;
+import org.key_project.util.collection.ImmutableList;
 
 /**
  * <p>

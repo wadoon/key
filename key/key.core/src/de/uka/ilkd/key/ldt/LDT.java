@@ -13,25 +13,20 @@
 
 package de.uka.ilkd.key.ldt;
 
-import java.util.Map;
-import java.util.TreeMap;
-
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Literal;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
+import org.key_project.util.ExtList;
+
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * An "LDT" or "language data type" class corresponds to a standard rule file 
@@ -175,7 +170,7 @@ public abstract class LDT implements Named {
         
     /** returns true if the LDT offers an operation for the given java
      * operator and the logic subterms 
-     * @param op the de.uka.ilkd.key.java.expression.Operator to
+     * @param op the de.uka.ilkd.key.java.ast.expression.Operator to
      * translate
      * @param subs the logic subterms of the java operator
      * @param services the Services
@@ -184,7 +179,7 @@ public abstract class LDT implements Named {
      * operator and the subterms 
      */
     public abstract boolean isResponsible(
-	    		de.uka.ilkd.key.java.expression.Operator op, 
+	    		de.uka.ilkd.key.java.ast.expression.Operator op,
                         Term[] subs, 
                         Services services, 
                         ExecutionContext ec);
@@ -192,7 +187,7 @@ public abstract class LDT implements Named {
     
     /** returns true if the LDT offers an operation for the given
      * binary java operator and the logic subterms 
-     * @param op the de.uka.ilkd.key.java.expression.Operator to
+     * @param op the de.uka.ilkd.key.java.ast.expression.Operator to
      * translate
      * @param left the left subterm of the java operator
      * @param right the right subterm of the java operator
@@ -202,7 +197,7 @@ public abstract class LDT implements Named {
      * operator and the subterms 
      */
     public abstract boolean isResponsible(
-	    		de.uka.ilkd.key.java.expression.Operator op, 
+	    		de.uka.ilkd.key.java.ast.expression.Operator op,
 	    		Term left, 
 	    		Term right, 
 	    		Services services, ExecutionContext ec);
@@ -210,7 +205,7 @@ public abstract class LDT implements Named {
     
     /** returns true if the LDT offers an operation for the given
      * unary java operator and the logic subterms 
-     * @param op the de.uka.ilkd.key.java.expression.Operator to
+     * @param op the de.uka.ilkd.key.java.ast.expression.Operator to
      * translate
      * @param sub the logic subterms of the java operator
      * @param services the Services 
@@ -219,7 +214,7 @@ public abstract class LDT implements Named {
      * operator and the subterm
      */
     public abstract boolean isResponsible(
-	    		de.uka.ilkd.key.java.expression.Operator op, 
+	    		de.uka.ilkd.key.java.ast.expression.Operator op,
 	    		Term sub, 
 	    		TermServices services, 
 	    		ExecutionContext ec);
@@ -236,7 +231,7 @@ public abstract class LDT implements Named {
      * @return  the function symbol for the given operation 
      */
     public abstract Function getFunctionFor(
-	    		de.uka.ilkd.key.java.expression.Operator op, 
+	    		de.uka.ilkd.key.java.ast.expression.Operator op,
 	    		Services services, 
 	    		ExecutionContext ec);
 

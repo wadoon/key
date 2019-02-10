@@ -13,18 +13,17 @@
 
 package de.uka.ilkd.key.ldt;
 
-import org.key_project.util.ExtList;
-
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.abstraction.Type;
-import de.uka.ilkd.key.java.expression.Literal;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.ast.Expression;
+import de.uka.ilkd.key.java.ast.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.ast.abstraction.Type;
+import de.uka.ilkd.key.java.ast.expression.Literal;
+import de.uka.ilkd.key.java.ast.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
+import org.key_project.util.ExtList;
 
 /**
  * Complete this class if you want to add support for the Java float type.
@@ -41,29 +40,29 @@ public final class FloatLDT extends LDT {
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-	    			 Term[] subs,
-	    			 Services services,
-	    			 ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op,
+                                 Term[] subs,
+                                 Services services,
+                                 ExecutionContext ec) {
 	return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-	    		         Term left,
-	    		         Term right,
-	    		         Services services,
-	    		         ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op,
+                                 Term left,
+                                 Term right,
+                                 Services services,
+                                 ExecutionContext ec) {
 	return false;
     }
 
 
     @Override
-    public boolean isResponsible(de.uka.ilkd.key.java.expression.Operator op,
-	    		         Term sub,
-	    		         TermServices services,
-	    		         ExecutionContext ec) {
+    public boolean isResponsible(de.uka.ilkd.key.java.ast.expression.Operator op,
+                                 Term sub,
+                                 TermServices services,
+                                 ExecutionContext ec) {
 	return false;
     }
 
@@ -77,9 +76,9 @@ public final class FloatLDT extends LDT {
 
 
     @Override
-    public Function getFunctionFor(de.uka.ilkd.key.java.expression.Operator op,
-	    			   Services services,
-	    			   ExecutionContext ec) {
+    public Function getFunctionFor(de.uka.ilkd.key.java.ast.expression.Operator op,
+                                   Services services,
+                                   ExecutionContext ec) {
 	assert false;
 	return null;
     }

@@ -13,38 +13,23 @@
 
 package de.uka.ilkd.key.rule;
 
-import java.util.Iterator;
-
+import de.uka.ilkd.key.java.NameAbstractionTable;
+import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.op.Quantifier;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.proof.*;
+import de.uka.ilkd.key.proof.io.ProofSaver;
+import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
+import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
 import junit.framework.TestCase;
-
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.NameAbstractionTable;
-import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.PosInTerm;
-import de.uka.ilkd.key.logic.Semisequent;
-import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
-import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.proof.BuiltInRuleAppIndex;
-import de.uka.ilkd.key.proof.BuiltInRuleIndex;
-import de.uka.ilkd.key.proof.Goal;
-import de.uka.ilkd.key.proof.Node;
-import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.RuleAppIndex;
-import de.uka.ilkd.key.proof.TacletIndex;
-import de.uka.ilkd.key.proof.TacletIndexKit;
-import de.uka.ilkd.key.proof.io.ProofSaver;
-import de.uka.ilkd.key.proof.rulefilter.IHTacletFilter;
-import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
+import java.util.Iterator;
 
 
 /**

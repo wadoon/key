@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.rule.inst;
 
-import java.io.Serializable;
-
-import de.uka.ilkd.key.java.JavaProgramElement;
+import de.uka.ilkd.key.java.ast.JavaProgramElement;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+
+import java.io.Serializable;
 /** this class encapsulates a SchemaVariable and its corresponding
  * instantiation if it is a JavaProgramElement. The class MapFrom...cannot
  * be used because of the different packages of the SchemaVariable and

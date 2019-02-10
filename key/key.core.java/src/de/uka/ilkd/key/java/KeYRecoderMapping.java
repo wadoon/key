@@ -14,7 +14,9 @@
 package de.uka.ilkd.key.java;
 
 
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.ast.ModelElement;
+import de.uka.ilkd.key.java.ast.ProgramElement;
+import de.uka.ilkd.key.java.ast.abstraction.KeYJavaType;
 import de.uka.ilkd.key.util.Debug;
 
 import java.util.HashMap;
