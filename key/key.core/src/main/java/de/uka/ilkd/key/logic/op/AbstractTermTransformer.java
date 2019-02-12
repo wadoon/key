@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.metaconstruct.AddCast;
 import de.uka.ilkd.key.rule.metaconstruct.ArrayBaseInstanceOf;
 import de.uka.ilkd.key.rule.metaconstruct.ConstantValue;
+import de.uka.ilkd.key.rule.metaconstruct.CreateAnonUpdate;
 import de.uka.ilkd.key.rule.metaconstruct.EnumConstantValue;
 import de.uka.ilkd.key.rule.metaconstruct.ExpandQueriesMetaConstruct;
 import de.uka.ilkd.key.rule.metaconstruct.IntroAtPreDefsOp;
@@ -108,6 +109,8 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer DIVIDE_LCR_MONOMIALS = new DivideLCRMonomials ();
 
     public static final AbstractTermTransformer INTRODUCE_ATPRE_DEFINITIONS = new IntroAtPreDefsOp();
+
+    public static final AbstractTermTransformer CREATE_ANON_UPDATE = new CreateAnonUpdate();
 
     public static final AbstractTermTransformer MEMBER_PV_TO_FIELD = new MemberPVToField();
 
