@@ -68,7 +68,6 @@ import de.uka.ilkd.key.rule.metaconstruct.ForInitUnfoldTransformer;
 import de.uka.ilkd.key.rule.metaconstruct.ForToWhile;
 import de.uka.ilkd.key.rule.metaconstruct.InitArrayCreation;
 import de.uka.ilkd.key.rule.metaconstruct.IsStatic;
-import de.uka.ilkd.key.rule.metaconstruct.LoopScopeInvariantTransformer;
 import de.uka.ilkd.key.rule.metaconstruct.MethodCall;
 import de.uka.ilkd.key.rule.metaconstruct.MultipleVarDecl;
 import de.uka.ilkd.key.rule.metaconstruct.PostWork;
@@ -152,8 +151,6 @@ public class SchemaRecoder2KeYConverter extends Recoder2KeYConverter {
             return new Unpack(list.get(For.class));
         } else if ("#forInitUnfoldTransformer".equals(mcName)) {
             return new ForInitUnfoldTransformer(list.get(ProgramSV.class));
-        } else if ("#loopScopeInvariantTransformer".equals(mcName)) {
-            return new LoopScopeInvariantTransformer(list.get(LoopStatement.class));
         } else if ("#for-to-while".equals(mcName)) {
             final ProgramSV[] labels = mc.getSV();
             return new ForToWhile(labels[0], labels[1],
