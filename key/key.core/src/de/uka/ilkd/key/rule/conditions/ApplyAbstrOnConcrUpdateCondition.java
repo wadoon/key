@@ -114,7 +114,7 @@ public final class ApplyAbstrOnConcrUpdateCondition
         final AbstractUpdate abstrUpd = (AbstractUpdate) abstrUpdate.op();
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         final Iterable<LocationVariable> assgnVarsOfAbstrUpd = () -> abstrUpd
-                .getAssignables().stream()
+                .getMaybeAssignables().stream()
                 .filter(t -> t.op() == locSetLDT.getSingletonPV())
                 .map(t -> t.sub(0).sub(0).op())
                 .map(LocationVariable.class::cast).iterator();

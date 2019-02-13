@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractUpdate;
@@ -35,7 +37,6 @@ import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.AbstractExecutionUtils;
-import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
@@ -57,12 +58,16 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  *
  * i.e. applies variable assignments to the accessibles of the abstract update,
  * pushes through elementaries that are not assigned by the abstract update, and
- * drops elementaries that are assigned by the abstract update. Only allowed for
- * phi without a Java block (everything fully evaluated) and an update in
- * sequential normal form.
+ * drops "have-to" elementaries that are assigned by the abstract update. Only
+ * allowed for phi without a Java block (everything fully evaluated) and an
+ * update in sequential normal form.
  *
- * Works also for abstract udpate concatenations; then, the update is stepwise
+ * Works also for abstract update concatenations; then, the update is stepwise
  * pushed into the concatenation.
+ *
+ * TODO (DS, 2019-02-13): Check whether there are problems when dropping the "no
+ * Java block"-condition. Was introduced originally due give higher priority to
+ * the ApplyAbstrOnConcrUpdateCondition rule. But maybe we don't need it???
  *
  * @author Dominic Steinhoefel
  */
@@ -105,34 +110,43 @@ public final class ApplyConcrOnAbstrUpdateCondition
             return null;
         }
 
+        /*
+         * The concrete update to apply next to the upcoming abstract one in the
+         * queue.
+         */
         Term currentConcrUpdate = concrUpdate;
-        List<Term> processedAbstrUpdates = new ArrayList<>();
-        Queue<Term> abstrUpdatesToProcess = new LinkedList<>();
+        /*
+         * Contains a sequence of concrete and abstract updates. We don't
+         * concatenate the abstract ones afterward, this can be done again by
+         * the concatenation rules.
+         */
+        final List<Term> resultingUpdates = new ArrayList<>();
+        final Queue<Term> abstrUpdatesToProcess = new LinkedList<>();
 
         abstrUpdatesToProcess.addAll(AbstractExecutionUtils
                 .abstractUpdatesFromConcatenation(abstrUpdateTerm));
 
         while (!abstrUpdatesToProcess.isEmpty()) {
             final Term currentAbstractUpdate = abstrUpdatesToProcess.poll();
-            final Pair<Term, Term> newAbstrAndConcrUpd = pushThroughConcrUpdate(
-                    currentConcrUpdate, currentAbstractUpdate, tb, services);
+            final PushThroughResult pushThroughRes = pushThroughConcrUpdate(
+                    currentConcrUpdate, currentAbstractUpdate, services);
 
-            if (newAbstrAndConcrUpd == null) {
-                /*
-                 * NOTE (DS, 2019-02-08): We could also consider to break and
-                 * leave a concrete update in the middle of a concatenation, but
-                 * that was not desired when implementing this.
-                 */
-                return null;
+            pushThroughRes.remainingConcreteUpdate
+                    .ifPresent(resultingUpdates::add);
+            resultingUpdates.add(pushThroughRes.resultingAbstractUpdate);
+
+            if (pushThroughRes.pushedThroughConcreteUpdate.isPresent()) {
+                currentConcrUpdate = //
+                        pushThroughRes.pushedThroughConcreteUpdate
+                                .orElseThrow();
+            } else {
+                /* Nothing remains to be pushed through, wrap up. */
+                resultingUpdates.addAll(abstrUpdatesToProcess);
+                break;
             }
-
-            processedAbstrUpdates.add(newAbstrAndConcrUpd.first);
-            currentConcrUpdate = newAbstrAndConcrUpd.second;
         }
 
-        final Term newResultInst = //
-                tb.apply(tb.concatenated(processedAbstrUpdates),
-                        tb.apply(currentConcrUpdate, phi));
+        final Term newResultInst = tb.apply(resultingUpdates, phi);
 
         svInst = svInst.add(resultSV, newResultInst, services);
         return mc.setInstantiations(svInst);
@@ -153,43 +167,78 @@ public final class ApplyConcrOnAbstrUpdateCondition
      *         component) update, or null if the operation is not allowed (if
      *         allLocs is in the game...).
      */
-    private Pair<Term, Term> pushThroughConcrUpdate(final Term concrUpdate,
-            final Term abstrUpdate, final TermBuilder tb, Services services) {
+    private PushThroughResult pushThroughConcrUpdate(final Term concrUpdate,
+            final Term abstrUpdate, final Services services) {
+        final TermBuilder tb = services.getTermBuilder();
         final AbstractUpdate abstrUpd = (AbstractUpdate) abstrUpdate.op();
 
-        if (AbstractExecutionUtils.assignsAllLocs(abstrUpd, services)
-                || AbstractExecutionUtils.accessesAllLocs(abstrUpdate,
-                        services)) {
-            /*
-             * For this case (U(allLocs:=...) / U(...:=allLocs)) we won't not do
-             * anything. The abstract update depends on everything changed in
-             * the concrete update...
-             */
-            return null;
-        }
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
 
-        final Set<LocationVariable> assgnVarsOfAbstrUpd = AbstractExecutionUtils
-                .collectNullaryPVsOrSkLocSets(abstrUpd.lhs(), services).stream()
-                .filter(LocationVariable.class::isInstance)
+        final Set<LocationVariable> maybeAssgnVarsOfAbstrUpd = abstrUpd
+                .getMaybeAssignables().stream()
+                .filter(t -> t.op() == locSetLDT.getSingletonPV())
+                .map(t -> t.sub(0)).map(Term::op)
+                .map(LocationVariable.class::cast)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+        final Set<LocationVariable> hasToAssgnVarsOfAbstrUpd = abstrUpd
+                .getHasToAssignables().stream()
+                .filter(t -> t.op() == locSetLDT.getSingletonPV())
+                .map(t -> t.sub(0)).map(Term::op)
                 .map(LocationVariable.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
         Term currentAccessibles = abstrUpdate.sub(0);
-        final List<Term> currentNewConcrUpdElems = new ArrayList<>();
+        final List<Term> currentRemainingConcrUpdElems = new ArrayList<>();
+        final List<Term> currentFollowingConcrUpdElems = new ArrayList<>();
 
         for (LocationVariable lhs : MergeRuleUtils
                 .getUpdateLeftSideLocations(concrUpdate)) {
-            final Term rhs = MergeRuleUtils.getUpdateRightSideFor(concrUpdate,
-                    lhs);
+            final Term rhs = //
+                    MergeRuleUtils.getUpdateRightSideFor(concrUpdate, lhs);
 
             // First, substitute in the accessibles
             currentAccessibles = ApplyAbstrOnConcrUpdateCondition
                     .replaceVarInTerm(lhs, rhs, currentAccessibles, services);
 
-            // Decide whether to push through
-            if (!assgnVarsOfAbstrUpd.contains(lhs)) {
-                // Push through
-                currentNewConcrUpdElems.add(tb.elementary(lhs, rhs));
+            /*
+             * We may push through if (1) lhs is not assigned (neither "maybe"
+             * nor "has to"), and (2) the abstract update does not assign
+             * allLocs (neither "maybe" nor "has to").
+             */
+            final boolean mayPushThrough = !maybeAssgnVarsOfAbstrUpd
+                    .contains(lhs)
+                    && !hasToAssgnVarsOfAbstrUpd.contains(lhs)
+                    && !AbstractExecutionUtils.maybeAssignsAllLocs(abstrUpd,
+                            services)
+                    && !AbstractExecutionUtils.hasToAssignAllLocs(abstrUpd,
+                            services);
+
+            /*
+             * We may drop if (1) lhs is assigned as "has to" or the abstract
+             * update assigns allLocs as "has to", and (2) the abstract updates
+             * does not access allLocs.
+             */
+            final boolean mayDrop = (hasToAssgnVarsOfAbstrUpd.contains(lhs)
+                    || AbstractExecutionUtils.hasToAssignAllLocs(abstrUpd,
+                            services))
+                    && !AbstractExecutionUtils.accessesAllLocs(abstrUpdate,
+                            services);
+
+            /*
+             * Note that there is a situation where the update may be pushed
+             * through, but not dropped (that is, it appears twice in the
+             * result): If the lhs is not assigned, but the update accesses
+             * allLocs.
+             */
+
+            final Term elem = tb.elementary(lhs, rhs);
+
+            if (mayPushThrough) {
+                currentFollowingConcrUpdElems.add(elem);
+            }
+
+            if (!mayDrop) {
+                currentRemainingConcrUpdElems.add(elem);
             }
         }
 
@@ -197,15 +246,48 @@ public final class ApplyConcrOnAbstrUpdateCondition
                 abstrUpd.getAbstractPlaceholderStatement(), abstrUpd.lhs(),
                 currentAccessibles);
 
-        final Term newConcrUpdate = tb.parallel(currentNewConcrUpdElems.stream()
-                .collect(ImmutableSLList.toImmutableList()));
+        final Optional<Term> remainingConcrUpdate = //
+                currentRemainingConcrUpdElems.isEmpty() ? Optional.empty()
+                        : Optional.of(tb.parallel(
+                                currentRemainingConcrUpdElems.stream().collect(
+                                        ImmutableSLList.toImmutableList())));
+        final Optional<Term> followingConcrUpdate = //
+                currentFollowingConcrUpdElems.isEmpty() ? Optional.empty()
+                        : Optional.of(tb.parallel(
+                                currentFollowingConcrUpdElems.stream().collect(
+                                        ImmutableSLList.toImmutableList())));
 
-        return new Pair<>(newAbstrUpdTerm, newConcrUpdate);
+        return new PushThroughResult(remainingConcrUpdate, newAbstrUpdTerm,
+                followingConcrUpdate);
     }
 
     @Override
     public String toString() {
         return String.format("\\applyConcrOnAbstrUpdate(%s, %s, %s, %s)", //
                 u1SV, u2SV, phiSV, resultSV);
+    }
+
+    private static class PushThroughResult {
+        /**
+         * The part of the concrete update that cannot be pushed through because
+         * of "maybe" assignables in the abstract update.
+         */
+        public final Optional<Term> remainingConcreteUpdate;
+        /**
+         * The resulting abstract update, maybe with replaced right-hand sides.
+         */
+        public final Term resultingAbstractUpdate;
+        /**
+         * The pushed-through update.
+         */
+        public final Optional<Term> pushedThroughConcreteUpdate;
+
+        public PushThroughResult(Optional<Term> remainingConcreteUpdate,
+                Term resultingAbstractUpdate,
+                Optional<Term> pushedThroughConcreteUpdate) {
+            this.remainingConcreteUpdate = remainingConcreteUpdate;
+            this.resultingAbstractUpdate = resultingAbstractUpdate;
+            this.pushedThroughConcreteUpdate = pushedThroughConcreteUpdate;
+        }
     }
 }

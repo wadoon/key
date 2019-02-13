@@ -278,8 +278,7 @@ public class AbstractExecutionUtils {
                     contract = bc;
                 }
             }
-        }
-        else {
+        } else {
             contract = contracts.iterator().next();
         }
         return contract;
@@ -346,8 +345,7 @@ public class AbstractExecutionUtils {
             accessibleClause = locSetUnionToSetUnion(
                     tb.func(locSetLDT.getAllLocs()), services);
             assignableClause = tb.func(locSetLDT.getAllLocs());
-        }
-        else {
+        } else {
             final LocationVariable heap = services.getTypeConverter()
                     .getHeapLDT().getHeap();
 
@@ -527,8 +525,7 @@ public class AbstractExecutionUtils {
         if (updateOp instanceof AbstractUpdate) {
             result.addAll(
                     getAssignablesForAbstractUpdate((AbstractUpdate) updateOp));
-        }
-        else {
+        } else {
             // concatenated update
             assert updateOp == UpdateJunctor.CONCATENATED_UPDATE;
             assert update.subs().size() == 2;
@@ -745,14 +742,12 @@ public class AbstractExecutionUtils {
 
         if (concatenation.op() instanceof AbstractUpdate) {
             result.add(concatenation);
-        }
-        else if (concatenation.op() == UpdateJunctor.CONCATENATED_UPDATE) {
+        } else if (concatenation.op() == UpdateJunctor.CONCATENATED_UPDATE) {
             result.addAll(
                     abstractUpdatesFromConcatenation(concatenation.sub(0)));
             result.addAll(
                     abstractUpdatesFromConcatenation(concatenation.sub(1)));
-        }
-        else {
+        } else {
             throw new RuntimeException(
                     "Not an abstract update or concatenation: "
                             + concatenation);
@@ -762,7 +757,7 @@ public class AbstractExecutionUtils {
     }
 
     /**
-     * Checks whether an {@link AbstractUpdate} assigns the allLocs location
+     * Checks whether an {@link AbstractUpdate} may assigns the allLocs location
      * set.
      *
      * @param update
@@ -772,11 +767,31 @@ public class AbstractExecutionUtils {
      * @return true iff the {@link AbstractUpdate} assigns the allLocs location
      *         set.
      */
-    public static boolean assignsAllLocs(AbstractUpdate update,
+    public static boolean maybeAssignsAllLocs(AbstractUpdate update,
             Services services) {
         final Operator allLocs = //
                 services.getTypeConverter().getLocSetLDT().getAllLocs();
-        return getAssignablesForAbstractUpdate(update).contains(allLocs);
+        return update.getMaybeAssignables().stream()
+                .anyMatch(t -> t.op() == allLocs);
+    }
+
+    /**
+     * Checks whether an {@link AbstractUpdate} may assigns the allLocs location
+     * set.
+     *
+     * @param update
+     *            The {@link AbstractUpdate} to check.
+     * @param services
+     *            The {@link Services} object (for the {@link LocSetLDT}).
+     * @return true iff the {@link AbstractUpdate} assigns the allLocs location
+     *         set.
+     */
+    public static boolean hasToAssignAllLocs(AbstractUpdate update,
+            Services services) {
+        final Operator allLocs = //
+                services.getTypeConverter().getLocSetLDT().getAllLocs();
+        return update.getHasToAssignables().stream()
+                .anyMatch(t -> t.op() == allLocs);
     }
 
     /**

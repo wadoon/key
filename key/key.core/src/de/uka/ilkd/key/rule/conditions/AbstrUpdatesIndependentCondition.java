@@ -71,9 +71,9 @@ public final class AbstrUpdatesIndependentCondition
         final AbstractUpdate abstrUpd1 = (AbstractUpdate) u1Inst.op();
         final AbstractUpdate abstrUpd2 = (AbstractUpdate) u2Inst.op();
 
-        final List<Operator> abstrUpd1Assignables = abstrUpd1.getAssignables()
+        final List<Operator> abstrUpd1Assignables = abstrUpd1.getMaybeAssignables()
                 .stream().map(Term::op).collect(Collectors.toList());
-        final List<Operator> abstrUpd2Assignables = abstrUpd2.getAssignables()
+        final List<Operator> abstrUpd2Assignables = abstrUpd2.getMaybeAssignables()
                 .stream().map(Term::op).collect(Collectors.toList());
 
         final List<Operator> abstrUpd1Accessibles = getAccessibles(u1Inst);

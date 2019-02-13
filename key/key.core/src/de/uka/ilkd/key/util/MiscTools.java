@@ -77,8 +77,7 @@ public final class MiscTools {
         ReferencePrefix rp = ec.getRuntimeInstance();
         if (!(rp instanceof TypeReference) && rp != null) {
             return (ProgramVariable) rp;
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -92,8 +91,7 @@ public final class MiscTools {
         ReferencePrefix rp = ec.getRuntimeInstance();
         if (!(rp instanceof TypeReference) && rp != null) {
             return services.getTypeConverter().convertToLogicElement(rp);
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -135,8 +133,7 @@ public final class MiscTools {
     public static <T> boolean equalsOrNull(T a, Object b) {
         if (a == null) {
             return b == null;
-        }
-        else {
+        } else {
             return a.equals(b);
         }
     }
@@ -238,8 +235,7 @@ public final class MiscTools {
                 if (i == 0)
                     // leading slash
                     res.add("");
-            }
-            else {
+            } else {
                 // contains "/./"
                 final String s = filename.substring(i, j);
                 if (!s.equals(".")) {
@@ -312,8 +308,7 @@ public final class MiscTools {
                 }
                 i++;
             }
-        }
-        else {
+        } else {
             i = 0;
         }
         while (i < a.length)
@@ -334,8 +329,7 @@ public final class MiscTools {
         for (int j = 0; j < a.length - 1; j++) {
             if (a[j].equals("..") || !a[j + 1].equals("..")) {
                 newa[k++] = a[j];
-            }
-            else
+            } else
                 j++;
         }
         if (!a[a.length - 1].equals("..")) {
@@ -479,8 +473,7 @@ public final class MiscTools {
                     || (comment.startsWith("//-")
                             && !comment.substring(3, 6).equals("KeY")
                             && comment.contains("@")));
-        }
-        catch (IndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException e) {
             return false;
         }
     }
@@ -594,8 +587,7 @@ public final class MiscTools {
                 && proof.getInitConfig() != null) {
             Profile profile = proof.getInitConfig().getProfile();
             return findOneStepSimplifier(profile);
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -611,8 +603,7 @@ public final class MiscTools {
     public static OneStepSimplifier findOneStepSimplifier(Profile profile) {
         if (profile instanceof JavaProfile) {
             return ((JavaProfile) profile).getOneStepSimpilifier();
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -674,8 +665,7 @@ public final class MiscTools {
                 if (!pv.isMember() && !declaredPVs.contains(pv)) {
                     result = result.add(pv);
                 }
-            }
-            else if (node instanceof AbstractPlaceholderStatement) {
+            } else if (node instanceof AbstractPlaceholderStatement) {
                 final AbstractPlaceholderStatement aps = (AbstractPlaceholderStatement) node;
 
                 for (final ProgramVariable pv : AbstractExecutionUtils
@@ -685,8 +675,7 @@ public final class MiscTools {
                         result = result.add(pv);
                     }
                 }
-            }
-            else if (node instanceof VariableSpecification) {
+            } else if (node instanceof VariableSpecification) {
                 VariableSpecification vs = (VariableSpecification) node;
                 ProgramVariable pv = (ProgramVariable) vs.getProgramVariable();
                 if (!pv.isMember()) {
@@ -726,8 +715,7 @@ public final class MiscTools {
                         result = result.add(pv);
                     }
                 }
-            }
-            else if (node instanceof AbstractPlaceholderStatement) {
+            } else if (node instanceof AbstractPlaceholderStatement) {
                 final AbstractPlaceholderStatement aps = (AbstractPlaceholderStatement) node;
 
                 for (final ProgramVariable pv : AbstractExecutionUtils
@@ -737,8 +725,7 @@ public final class MiscTools {
                         result = result.add(pv);
                     }
                 }
-            }
-            else if (node instanceof VariableSpecification) {
+            } else if (node instanceof VariableSpecification) {
                 VariableSpecification vs = (VariableSpecification) node;
                 ProgramVariable pv = (ProgramVariable) vs.getProgramVariable();
                 if (!pv.isMember()) {
@@ -838,8 +825,7 @@ public final class MiscTools {
         if (posInfo.getFileName() != null) {
             result = posInfo.getFileName(); // posInfo.getFileName() is a path
                                             // to a file
-        }
-        else if (posInfo.getParentClass() != null) {
+        } else if (posInfo.getParentClass() != null) {
             result = posInfo.getParentClass(); // posInfo.getParentClass() is a
                                                // path to a file
         }
@@ -862,7 +848,7 @@ public final class MiscTools {
      */
     public static Set<Term> dissasembleSetTerm(Term s, Function splitAt) {
         assert splitAt.arity() == 2;
-        final Set<Term> result = new LinkedHashSet<>();
+        final Set<Term> result = new LinkedHashSet<Term>();
 
         if (s.op() == splitAt) {
             result.addAll(dissasembleSetTerm(s.sub(0), splitAt));

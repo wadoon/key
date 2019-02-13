@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -1133,6 +1134,15 @@ public class TermBuilder {
         return apply(update, target, null);
     }
 
+    public Term apply(List<Term> updates, Term target) {
+        Term result = target;
+        final ListIterator<Term> it = updates.listIterator(updates.size());
+        while (it.hasPrevious()) {
+            result = apply(it.previous(), result);
+        }
+        return result;
+    }
+
     public ImmutableList<Term> apply(Term update, ImmutableList<Term> targets) {
         ImmutableList<Term> result = ImmutableSLList.<Term> nil();
         for (Term target : targets) {
@@ -1504,12 +1514,7 @@ public class TermBuilder {
 
     public Term singletonPV(Term pv) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-
-        if (pv.op() instanceof ProgramVariable) {
-            pv = services.getTermBuilder().func(locSetLDT.getSingletonPVFun(),
-                    pv);
-        }
-
+        assert pv.op() instanceof ProgramVariable;
         return func(locSetLDT.getSingletonPV(), pv);
     }
 

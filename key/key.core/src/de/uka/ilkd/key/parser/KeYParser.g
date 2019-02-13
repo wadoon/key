@@ -4075,14 +4075,6 @@ varcond_applyAbstrOnConcrUpdate[TacletBuilder b]
   }
 ;
 
-varcond_dropEffectlessAbstractUpdate [TacletBuilder b]
-:
-   DROP_EFFECTLESS_ABSTRACT_UPDATE LPAREN u=varId COMMA x=term RPAREN 
-   {
-      b.addVariableCondition(new DropEffectlessAbstractUpdateCondition((UpdateSV)u, x));
-   }
-;
-
 varcond_dropEffectlessAbstractUpdateAssignments[TacletBuilder b]
 :
    DROP_EFFECTLESS_ABSTRACT_UPDATE_ASSIGNMENTS LPAREN u=varId COMMA target=varId COMMA result=varId RPAREN 

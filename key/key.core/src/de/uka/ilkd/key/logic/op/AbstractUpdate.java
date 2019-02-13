@@ -14,9 +14,11 @@
 package de.uka.ilkd.key.logic.op;
 
 import java.lang.ref.WeakReference;
-import java.util.HashMap;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.WeakHashMap;
+import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.ldt.LocSetLDT;
@@ -25,6 +27,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * Class of operators for abstract updates (in the sense of Abstract Execution),
@@ -40,18 +43,70 @@ public final class AbstractUpdate extends AbstractSortedOperator {
                     new WeakHashMap<>();
 
     private final AbstractPlaceholderStatement phs;
+    //@formatter:off
+    /* Invariant: lhs is a LocSet union of
+     * - singletonPV functions applied to location variables
+     * - Skolem LocSet functions
+     * - Normal LocSet singletons (not yet supported)
+     * - Either of the above wrapped in a hasTo function
+     */
+    //@formatter:on
+    /**
+     * The left-hand side {@link Term} for this {@link AbstractUpdate}.
+     */
     private final Term lhs;
-    private final Set<Term> assignables;
+
+    /**
+     * Assignables that may be assigned. Terms of singletonPV functions applied
+     * to location variables or Skolem LocSet functions. Unmodifiable.
+     */
+    private final Set<Term> maybeAssignables;
+
+    /**
+     * Assignables that have to be assigned. Terms of singletonPV functions
+     * applied to location variables or Skolem LocSet functions. Unmodifiable.
+     */
+    private final Set<Term> haveToAssignables;
 
     private AbstractUpdate(AbstractPlaceholderStatement phs, Term lhs,
             LocSetLDT locSetLDT, SetLDT setLDT) {
         super(new Name("U_" + phs.getId() + "(" + lhs + ")"),
                 new Sort[] { setLDT.targetSort() }, Sort.UPDATE, false);
         this.lhs = lhs;
-        this.assignables = MiscTools.dissasembleSetTerm(lhs,
-                locSetLDT.getUnion());
+
+        final Pair<Set<Term>, Set<Term>> disassembledLHS = //
+                disassembleLHS(lhs, locSetLDT);
+        this.maybeAssignables = disassembledLHS.first;
+        this.haveToAssignables = disassembledLHS.second;
+
         this.phs = phs;
         assert lhs.sort() == locSetLDT.targetSort();
+    }
+
+    /**
+     * @param lhs
+     *            The left-hand side to disassemble.
+     * @param locSetLDT
+     *            The {@link LocSetLDT} theory.
+     * @return A pair of (1) the maybe assignables and (2) the have-to
+     *         assignables. Both sets are immutable.
+     */
+    private static Pair<Set<Term>, Set<Term>> disassembleLHS(Term lhs,
+            LocSetLDT locSetLDT) {
+        final Function union = locSetLDT.getUnion();
+        final Function hasToFunc = locSetLDT.getHasTo();
+
+        final Set<Term> unionElems = MiscTools.dissasembleSetTerm(lhs, union);
+
+        final Set<Term> maybeAssignables = unionElems.stream()
+                .filter(t -> t.op() != hasToFunc)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+        final Set<Term> haveToAssignables = unionElems.stream()
+                .filter(t -> t.op() == hasToFunc).map(t -> t.sub(0))
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+
+        return new Pair<>(Collections.unmodifiableSet(maybeAssignables),
+                Collections.unmodifiableSet(haveToAssignables));
     }
 
     /**
@@ -86,7 +141,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
 
     public String getUpdateName() {
         /*
-         * TODO (DS, 2019-01-03): There might be collissions here, ignoring for
+         * TODO (DS, 2019-01-03): There might be collisions here, ignoring for
          * now...
          */
         return "U_" + phs.getId();
@@ -98,47 +153,24 @@ public final class AbstractUpdate extends AbstractSortedOperator {
     }
 
     /**
-     * Retrieves the assignables of this abstract updates.
+     * Assignables that may be assigned. Terms of singletonPV functions applied
+     * to location variables or Skolem LocSet functions.
      *
-     * @return The elements of the assignables union of this abstract update.
+     * @return The elements of the assignables union of this abstract update
+     *         that may be assigned.
      */
-    public Set<Term> getAssignables() {
-        return assignables;
-    }
-
-    private static UnionTermHashMapKey key(Term lhs, LocSetLDT locSetLDT) {
-        return new UnionTermHashMapKey(lhs, locSetLDT);
+    public Set<Term> getMaybeAssignables() {
+        return maybeAssignables;
     }
 
     /**
-     * A key class for use in a {@link HashMap} ensuring that {@link LocSetLDT}
-     * union {@link Term}s get the same hash code whatever the order of elements
-     * in the union is -- as it should be for a set union.
+     * Assignables that have to be assigned. Terms of singletonPV functions
+     * applied to location variables or Skolem LocSet functions.
+     *
+     * @return The elements of the assignables union of this abstract update
+     *         that have to be assigned.
      */
-    private static class UnionTermHashMapKey {
-        private final int hashCode;
-        private final Term lhs;
-
-        public UnionTermHashMapKey(Term lhs, LocSetLDT locSetLDT) {
-            /*
-             * We also store the LHS because otherwise, these key objects are
-             * removed when put into a weak reference, and that before they
-             * should be.
-             */
-            this.lhs = lhs;
-            this.hashCode = MiscTools
-                    .dissasembleSetTerm(lhs, locSetLDT.getUnion()).hashCode();
-        }
-
-        @Override
-        public int hashCode() {
-            return hashCode;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            return (obj instanceof UnionTermHashMapKey)
-                    && ((UnionTermHashMapKey) obj).hashCode == hashCode;
-        }
+    public Set<Term> getHasToAssignables() {
+        return haveToAssignables;
     }
 }

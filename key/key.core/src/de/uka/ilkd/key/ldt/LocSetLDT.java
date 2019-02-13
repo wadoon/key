@@ -31,7 +31,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 public final class LocSetLDT extends LDT {
 
@@ -40,13 +39,6 @@ public final class LocSetLDT extends LDT {
     private final Function empty;
     private final Function allLocs;
     private final Function singleton;
-    /*
-     * NOTE (DS, 2019-01-13): final is only used in the declares directive of
-     * methods or abstract placeholder statements in the context of abstract
-     * execution.
-     */
-    private final Function finalFunc;
-    private final Function singletonPV;
     private final Function union;
     private final Function intersect;
     private final Function setMinus;
@@ -60,18 +52,16 @@ public final class LocSetLDT extends LDT {
     private final Function disjoint;
     private final Function createdInHeap;
 
-    // additional sorts
-    private final Sort progVarSort;
-
-    private final Function singletonPVFun;
+    // Abstract Execution-related symbols
+    private final Function finalFunc;
+    private final Function singletonPV;
+    private final Function hasTo;
 
     public LocSetLDT(TermServices services) {
         super(NAME, services);
         empty = addFunction(services, "empty");
         allLocs = addFunction(services, "allLocs");
         singleton = addFunction(services, "singleton");
-        singletonPV = addFunction(services, "singletonPV");
-        finalFunc = addFunction(services, "final");
         union = addFunction(services, "union");
         intersect = addFunction(services, "intersect");
         setMinus = addFunction(services, "setMinus");
@@ -85,10 +75,9 @@ public final class LocSetLDT extends LDT {
         disjoint = addFunction(services, "disjoint");
         createdInHeap = addFunction(services, "createdInHeap");
 
-        progVarSort = services.getNamespaces().sorts()
-                .lookup(new Name("ProgVar"));
-
-        singletonPVFun = new Function(new Name("PV"), progVarSort, Sort.ANY);
+        singletonPV = addFunction(services, "singletonPV");
+        finalFunc = addFunction(services, "final");
+        hasTo = addFunction(services, "hasTo");
     }
 
     public Function getEmpty() {
@@ -101,22 +90,6 @@ public final class LocSetLDT extends LDT {
 
     public Function getSingleton() {
         return singleton;
-    }
-
-    public Function getSingletonPV() {
-        return singletonPV;
-    }
-
-    public Function getFinal() {
-        return finalFunc;
-    }
-
-    public Function getSingletonPVFun() {
-        return singletonPVFun;
-    }
-
-    public Sort getProgVarSort() {
-        return progVarSort;
     }
 
     public Function getUnion() {
@@ -165,6 +138,18 @@ public final class LocSetLDT extends LDT {
 
     public Function getCreatedInHeap() {
         return createdInHeap;
+    }
+
+    public Function getSingletonPV() {
+        return singletonPV;
+    }
+
+    public Function getFinal() {
+        return finalFunc;
+    }
+
+    public Function getHasTo() {
+        return hasTo;
     }
 
     @Override
