@@ -198,7 +198,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
                     MergeRuleUtils.getUpdateRightSideFor(concrUpdate, lhs);
 
             // First, substitute in the accessibles
-            currentAccessibles = ApplyAbstrOnConcrUpdateCondition
+            currentAccessibles = AbstractExecutionUtils
                     .replaceVarInTerm(lhs, rhs, currentAccessibles, services);
 
             /*

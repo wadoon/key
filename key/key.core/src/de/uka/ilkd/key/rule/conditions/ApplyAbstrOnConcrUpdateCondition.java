@@ -13,19 +13,15 @@
 
 package de.uka.ilkd.key.rule.conditions;
 
-import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.ldt.LocSetLDT;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractUpdate;
@@ -35,10 +31,10 @@ import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateSV;
-import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
@@ -46,7 +42,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * Simplifies an update cascade like
  *
  * <pre>
- *   {U_P(..., y, ... := ... )}
+ *   {U_P(..., hasTo(y), ... := ... )}
  *      {... || x := y || ...}
  *        phi(x)
  * </pre>
@@ -113,14 +109,14 @@ public final class ApplyAbstrOnConcrUpdateCondition
 
         final AbstractUpdate abstrUpd = (AbstractUpdate) abstrUpdate.op();
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        final Iterable<LocationVariable> assgnVarsOfAbstrUpd = () -> abstrUpd
-                .getMaybeAssignables().stream()
+        final Iterable<LocationVariable> hasToAssgnVarsOfAbstrUpd = abstrUpd
+                .getHasToAssignables().stream()
                 .filter(t -> t.op() == locSetLDT.getSingletonPV())
-                .map(t -> t.sub(0).sub(0).op())
-                .map(LocationVariable.class::cast).iterator();
+                .map(t -> t.sub(0)).map(LocationVariable.class::cast)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
         final Set<LocationVariable> locVarsInPhi = //
-                collectLocVars(services, phiInst);
+                AbstractExecutionUtils.collectLocVars(services, phiInst);
 
         // Those might be changed several times
         Term newConcreteUpdate = concrUpdate;
@@ -131,7 +127,7 @@ public final class ApplyAbstrOnConcrUpdateCondition
 
         //@formatter:off
         /*
-         * Find an assignable y of the abstract update which
+         * Find a has-to assignable y of the abstract update which
          * - does not occur in phi,
          * - is no left-hand side of the concrete update.
          * - is a right-hand side of exactly one update elem
@@ -140,7 +136,7 @@ public final class ApplyAbstrOnConcrUpdateCondition
          * Then, perform the substitution of y by x, and drop elem.
          */
         //@formatter:on
-        for (final LocationVariable y : assgnVarsOfAbstrUpd) {
+        for (final LocationVariable y : hasToAssgnVarsOfAbstrUpd) {
             /* Check that y does not occur in the target. */
             if (locVarsInPhi.contains(y)) {
                 continue;
@@ -207,7 +203,7 @@ public final class ApplyAbstrOnConcrUpdateCondition
         return newConcreteUpdate;
     }
 
-    private Term substLocVarInAbstractUpdate(Term abstractUpdateTerm,
+    private static Term substLocVarInAbstractUpdate(Term abstractUpdateTerm,
             LocationVariable lhs1, LocationVariable lhs2, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final AbstractUpdate abstrUpd = //
@@ -217,47 +213,20 @@ public final class ApplyAbstrOnConcrUpdateCondition
         final Term oldAccessibles = abstractUpdateTerm.sub(0);
 
         final Term newAbstrUpdLHS = //
-                replaceVarInTerm(lhs1, tb.var(lhs2), oldAssignables, services);
+                AbstractExecutionUtils.replaceVarInTerm(lhs1, tb.var(lhs2),
+                        oldAssignables, services);
 
         final Term newAbstrUpdRHS = //
-                replaceVarInTerm(lhs1, tb.var(lhs2), oldAccessibles, services);
+                AbstractExecutionUtils.replaceVarInTerm(lhs1, tb.var(lhs2),
+                        oldAccessibles, services);
 
         return tb.abstractUpdate(abstrUpd.getAbstractPlaceholderStatement(),
                 newAbstrUpdLHS, newAbstrUpdRHS);
     }
 
-    static Term replaceVarInTerm(LocationVariable pv, Term t,
-            final Term replaceIn, Services services) {
-        final Map<Term, Term> substMap = new HashMap<>();
-        substMap.put(services.getTermBuilder().var(pv), t);
-        final OpReplacer opRepl = new OpReplacer(substMap,
-                services.getTermFactory());
-        final Term newAbstrUpdLHS = opRepl.replace(replaceIn);
-        return newAbstrUpdLHS;
-    }
-
-    private Set<LocationVariable> collectLocVars(Services services,
-            final Term xInst) {
-        final OpCollector opColl = new OpCollector();
-        xInst.execPostOrder(opColl);
-        final Set<LocationVariable> occurringLocVars = opColl.ops().stream()
-                .filter(op -> op instanceof LocationVariable)
-                .map(LocationVariable.class::cast).collect(Collectors.toSet());
-
-        if (xInst.containsJavaBlockRecursive()) {
-            final JavaBlock jb = MergeRuleUtils.getJavaBlockRecursive(xInst);
-            final ProgramVariableCollector pvc = new ProgramVariableCollector(
-                    jb.program(), services);
-            pvc.start();
-            occurringLocVars.addAll(pvc.result());
-        }
-        return occurringLocVars;
-    }
-
     @Override
     public String toString() {
-        return String.format(
-                "\\applyAbstrOnConcrUpdate(%s, %s, %s, %s)", //
+        return String.format("\\applyAbstrOnConcrUpdate(%s, %s, %s, %s)", //
                 u1SV, u2SV, phiSV, resultSV);
     }
 }

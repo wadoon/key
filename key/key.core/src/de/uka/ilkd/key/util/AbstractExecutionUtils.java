@@ -1,8 +1,10 @@
 package de.uka.ilkd.key.util;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,6 +17,7 @@ import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -29,6 +32,7 @@ import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
@@ -835,5 +839,33 @@ public class AbstractExecutionUtils {
                         && ((Function) op).sort() == services.getTypeConverter()
                                 .getLocSetLDT().targetSort()))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+    }
+
+    public static Term replaceVarInTerm(LocationVariable pv, Term t,
+            final Term replaceIn, Services services) {
+        final Map<Term, Term> substMap = new HashMap<>();
+        substMap.put(services.getTermBuilder().var(pv), t);
+        final OpReplacer opRepl = new OpReplacer(substMap,
+                services.getTermFactory());
+        final Term newAbstrUpdLHS = opRepl.replace(replaceIn);
+        return newAbstrUpdLHS;
+    }
+
+    public static Set<LocationVariable> collectLocVars(Services services,
+            final Term xInst) {
+        final OpCollector opColl = new OpCollector();
+        xInst.execPostOrder(opColl);
+        final Set<LocationVariable> occurringLocVars = opColl.ops().stream()
+                .filter(op -> op instanceof LocationVariable)
+                .map(LocationVariable.class::cast).collect(Collectors.toSet());
+    
+        if (xInst.containsJavaBlockRecursive()) {
+            final JavaBlock jb = MergeRuleUtils.getJavaBlockRecursive(xInst);
+            final ProgramVariableCollector pvc = new ProgramVariableCollector(
+                    jb.program(), services);
+            pvc.start();
+            occurringLocVars.addAll(pvc.result());
+        }
+        return occurringLocVars;
     }
 }
