@@ -43,24 +43,25 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * Simplifies an update cascade like
  *
  * <pre>
- *     {x1 := t1 || ... || x2 := y || ... || x3 := t3 || ...}
- *       {U_P(..., x1, ... := ... \cup x2 \cup ...)}
+ *     {x1 := t1 || ... || x2 := t2 || ... || x3 := t3 || ... || x4 := t4 || ...}
+ *       {U_P(..., hasTo(x1), ..., x4, ... := ... \cup x2 \cup ... \cup x4 \cup ...)}
  *         phi
  * </pre>
  *
  * to
  *
  * <pre>
- *     {U_P(..., x1, ... := ... \cup y \cup ...)}
- *       {x2 := y || x3 := t3}
- *         phi
+ *     {... || x4 := t4 || ...}
+ *       {U_P(..., hasTo(x1), ..., x4, ... := ... \cup t2 \cup ... \cup t4 \cup ...)}
+ *         {x2 := t2 || x3 := t3}
+ *           phi
  * </pre>
  *
  * i.e. applies variable assignments to the accessibles of the abstract update,
  * pushes through elementaries that are not assigned by the abstract update, and
- * drops "have-to" elementaries that are assigned by the abstract update. Only
- * allowed for phi without a Java block (everything fully evaluated) and an
- * update in sequential normal form.
+ * drops "have-to" elementaries that are assigned by the abstract update.
+ * allLocs receives special handling. Only allowed for phi without a Java block
+ * (everything fully evaluated) and an update in sequential normal form.
  *
  * Works also for abstract update concatenations; then, the update is stepwise
  * pushed into the concatenation.
