@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractUpdate;
@@ -108,11 +107,10 @@ public final class ApplyAbstrOnConcrUpdateCondition
         }
 
         final AbstractUpdate abstrUpd = (AbstractUpdate) abstrUpdate.op();
-        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         final Iterable<LocationVariable> hasToAssgnVarsOfAbstrUpd = abstrUpd
                 .getHasToAssignables().stream()
-                .filter(t -> t.op() == locSetLDT.getSingletonPV())
-                .map(t -> t.sub(0)).map(LocationVariable.class::cast)
+                .filter(LocationVariable.class::isInstance)
+                .map(LocationVariable.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
         final Set<LocationVariable> locVarsInPhi = //

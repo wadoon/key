@@ -1668,8 +1668,8 @@ public class LogicPrinter {
 
         this.layouter.print("(");
 
-        this.layouter.print(op.getMaybeAssignables().stream().map(Term::toString)
-                .collect(Collectors.joining(" \\cup ")));
+        this.layouter.print(op.getAllAssignables().stream().map(Term::toString)
+                .collect(Collectors.joining(", ")));
 
         this.layouter.print(asgn);
         this.layouter.brk(0);

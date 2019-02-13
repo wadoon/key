@@ -105,21 +105,10 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             for (int i = origAbstractUpdates.size() - 1; i >= 0; i--) {
                 final Term elementaryAbstrUpd = //
                         origAbstractUpdates.get(i);
-                Term newUpdate = Optional
+                final Term newUpdate = Optional
                         .ofNullable(dropEffectlessAbstractUpdateElementaries(
                                 elementaryAbstrUpd, target, services))
                         .orElse(elementaryAbstrUpd);
-
-                //// XXX Check: newUpdate can be an update junctor...
-                // if (DropEffectlessAbstractUpdateCondition
-                // .dropEffectlessAbstractUpdate(newUpdate, target,
-                // services)) {
-                // /*
-                // * Maybe new we can drop the update entirely, if it only
-                // * writes things that are never read...
-                // */
-                // newUpdate = tb.skip();
-                // }
 
                 newElementaryAbstractUpdates.set(i, newUpdate);
                 target = tb.apply(newUpdate, target);
@@ -131,8 +120,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             if (newElementaryAbstractUpdates.equals(origAbstractUpdates)) {
                 return null;
             }
-        }
-        else {
+        } else {
             newResult = dropEffectlessAbstractUpdateElementaries( //
                     u, target, services);
         }
@@ -150,8 +138,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
 
         if (concatenation.op() instanceof AbstractUpdate) {
             result.add(concatenation);
-        }
-        else {
+        } else {
             for (Term sub : concatenation.subs()) {
                 result.addAll(extractAbstractUpdatesFromConcatenation(sub));
             }
@@ -202,17 +189,10 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
         final Set<Term> abstrUpdAccessibles = //
                 tb.setUnionToSet(abstrUpdAccessiblesTerm);
 
-        final Set<Operator> opsAssignedBeforeUsed = opsAnalysisResult.first
-                .stream()
-                /* We remove the accessibles of the abstract update itself. */
-                .filter(op -> !AbstractExecutionUtils
-                        .collectNullaryPVsOrSkLocSets(abstrUpdAccessiblesTerm,
-                                services)
-                        .contains(op))
-                .collect(Collectors.toSet());
+        final Set<Operator> opsHaveToAssignBeforeUsed = opsAnalysisResult.first;
 
         final Set<Operator> newOpsInAssignable = opsInAssignable.stream()
-                .filter(op -> !opsAssignedBeforeUsed.contains(op))
+                .filter(op -> !opsHaveToAssignBeforeUsed.contains(op))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
         /*
@@ -227,17 +207,8 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
         /* We create a new set to prevent concurrent modifications. */
         for (Operator op : new LinkedHashSet<>(newOpsInAssignable)) {
             if (!opColl.contains(op)) {
-                /*
-                 * This one we can remove. Then also delete it from the
-                 * accessibles.
-                 */
+                /* This one we can remove. */
                 newOpsInAssignable.remove(op);
-                newAbstrUpdAccessibles.stream()
-                        .filter(t -> !AbstractExecutionUtils
-                                .collectNullaryPVsOrSkLocSets(t, services)
-                                .contains(op))
-                        .collect(Collectors
-                                .toCollection(() -> new LinkedHashSet<>()));
             }
         }
 
@@ -256,8 +227,8 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
 
         return tb
                 .abstractUpdate(abstrUpd.getAbstractPlaceholderStatement(),
-                        AbstractExecutionUtils
-                                .opsToLocSetUnion(newOpsInAssignable, services),
+                        AbstractExecutionUtils.opsToLocSetUnion(
+                                newOpsInAssignable, abstrUpd, services),
                         newAccessiblesTerm);
     }
 

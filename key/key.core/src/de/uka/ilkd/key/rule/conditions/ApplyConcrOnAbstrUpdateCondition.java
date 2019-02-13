@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractUpdate;
@@ -132,6 +131,10 @@ public final class ApplyConcrOnAbstrUpdateCondition
             final PushThroughResult pushThroughRes = pushThroughConcrUpdate(
                     currentConcrUpdate, currentAbstractUpdate, services);
 
+            if (pushThroughRes == null) {
+                return null;
+            }
+
             pushThroughRes.remainingConcreteUpdate
                     .ifPresent(resultingUpdates::add);
             resultingUpdates.add(pushThroughRes.resultingAbstractUpdate);
@@ -143,8 +146,13 @@ public final class ApplyConcrOnAbstrUpdateCondition
             } else {
                 /* Nothing remains to be pushed through, wrap up. */
                 resultingUpdates.addAll(abstrUpdatesToProcess);
+                currentConcrUpdate = null;
                 break;
             }
+        }
+
+        if (currentConcrUpdate != null) {
+            resultingUpdates.add(currentConcrUpdate);
         }
 
         final Term newResultInst = tb.apply(resultingUpdates, phi);
@@ -173,18 +181,14 @@ public final class ApplyConcrOnAbstrUpdateCondition
         final TermBuilder tb = services.getTermBuilder();
         final AbstractUpdate abstrUpd = (AbstractUpdate) abstrUpdate.op();
 
-        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-
         final Set<LocationVariable> maybeAssgnVarsOfAbstrUpd = abstrUpd
                 .getMaybeAssignables().stream()
-                .filter(t -> t.op() == locSetLDT.getSingletonPV())
-                .map(t -> t.sub(0)).map(Term::op)
+                .filter(LocationVariable.class::isInstance)
                 .map(LocationVariable.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
         final Set<LocationVariable> hasToAssgnVarsOfAbstrUpd = abstrUpd
                 .getHasToAssignables().stream()
-                .filter(t -> t.op() == locSetLDT.getSingletonPV())
-                .map(t -> t.sub(0)).map(Term::op)
+                .filter(LocationVariable.class::isInstance)
                 .map(LocationVariable.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
@@ -192,14 +196,22 @@ public final class ApplyConcrOnAbstrUpdateCondition
         final List<Term> currentRemainingConcrUpdElems = new ArrayList<>();
         final List<Term> currentFollowingConcrUpdElems = new ArrayList<>();
 
+        boolean success = false;
+
         for (LocationVariable lhs : MergeRuleUtils
                 .getUpdateLeftSideLocations(concrUpdate)) {
             final Term rhs = //
                     MergeRuleUtils.getUpdateRightSideFor(concrUpdate, lhs);
 
             // First, substitute in the accessibles
-            currentAccessibles = AbstractExecutionUtils
-                    .replaceVarInTerm(lhs, rhs, currentAccessibles, services);
+            {
+                final Term oldAccessibles = currentAccessibles;
+                currentAccessibles = AbstractExecutionUtils.replaceVarInTerm(
+                        lhs, rhs, currentAccessibles, services);
+                if (!oldAccessibles.equals(currentAccessibles)) {
+                    success = true;
+                }
+            }
 
             /*
              * We may push through if (1) lhs is not assigned (neither "maybe"
@@ -209,19 +221,25 @@ public final class ApplyConcrOnAbstrUpdateCondition
             final boolean mayPushThrough = !maybeAssgnVarsOfAbstrUpd
                     .contains(lhs)
                     && !hasToAssgnVarsOfAbstrUpd.contains(lhs)
-                    && !AbstractExecutionUtils.maybeAssignsAllLocs(abstrUpd,
+                    && !AbstractExecutionUtils.mayAssignAllLocs(abstrUpd,
                             services)
                     && !AbstractExecutionUtils.hasToAssignAllLocs(abstrUpd,
                             services);
 
             /*
-             * We may drop if (1) lhs is assigned as "has to" or the abstract
-             * update assigns allLocs as "has to", and (2) the abstract updates
-             * does not access allLocs.
+             * We may drop if (1.1) lhs is assigned as "has to" or (1.2) the
+             * abstract update assigns allLocs as "has to" or (1.3) the abstract
+             * update does not assign that variable at all and also not maybe
+             * allLocs (because then we push through), and (2) the abstract
+             * updates does not access allLocs.
              */
             final boolean mayDrop = (hasToAssgnVarsOfAbstrUpd.contains(lhs)
                     || AbstractExecutionUtils.hasToAssignAllLocs(abstrUpd,
-                            services))
+                            services)
+                    || (!hasToAssgnVarsOfAbstrUpd.contains(lhs)
+                            && !maybeAssgnVarsOfAbstrUpd.contains(lhs)
+                            && !AbstractExecutionUtils
+                                    .mayAssignAllLocs(abstrUpd, services)))
                     && !AbstractExecutionUtils.accessesAllLocs(abstrUpdate,
                             services);
 
@@ -236,11 +254,18 @@ public final class ApplyConcrOnAbstrUpdateCondition
 
             if (mayPushThrough) {
                 currentFollowingConcrUpdElems.add(elem);
+                success = true;
             }
 
             if (!mayDrop) {
                 currentRemainingConcrUpdElems.add(elem);
+            } else {
+                success = true;
             }
+        }
+
+        if (!success) {
+            return null;
         }
 
         final Term newAbstrUpdTerm = tb.abstractUpdate(

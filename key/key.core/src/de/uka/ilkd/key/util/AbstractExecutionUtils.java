@@ -379,7 +379,7 @@ public class AbstractExecutionUtils {
         final Function locSetEmpty = //
                 services.getTypeConverter().getLocSetLDT().getEmpty();
 
-        /* We remove the "PV(...)" or "singletonPV("...)" wrappers */
+        /* We remove the "singletonPV("...)" wrappers */
         t.execPostOrder(new DefaultVisitor() {
             @Override
             public void visit(Term visited) {
@@ -494,23 +494,6 @@ public class AbstractExecutionUtils {
     }
 
     /**
-     * Returns all nullary operators in the LHS of an {@link AbstractUpdate},
-     * which should be location variables or Skolem location sets.
-     *
-     * @param update
-     *            The {@link AbstractUpdate} for which to return the
-     *            assignables.
-     * @return All nullary operators in the LHS of an {@link AbstractUpdate}.
-     */
-    public static Set<Operator> getAssignablesForAbstractUpdate(
-            AbstractUpdate update) {
-        final OpCollector opColl = new OpCollector();
-        update.lhs().execPostOrder(opColl);
-        return opColl.ops().stream().filter(op -> op.arity() == 0)
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-    }
-
-    /**
      * Returns all nullary operators in the LHS of the {@link AbstractUpdate}
      * represented by the given update {@link Term}, which also may be a
      * concatenation. In the latter case, the assignables for all contained
@@ -521,21 +504,21 @@ public class AbstractExecutionUtils {
      * @return The assignables of the given (concatenation of)
      *         {@link AbstractUpdate}s.
      */
-    public static Set<Operator> getAssignablesForAbstractUpdate(Term update) {
+    public static Set<Operator> getHasToAssignablesForAbstractUpdate(
+            Term update) {
         final Set<Operator> result = new LinkedHashSet<>();
 
         final Operator updateOp = update.op();
 
         if (updateOp instanceof AbstractUpdate) {
-            result.addAll(
-                    getAssignablesForAbstractUpdate((AbstractUpdate) updateOp));
+            result.addAll(((AbstractUpdate) updateOp).getHasToAssignables());
         } else {
             // concatenated update
             assert updateOp == UpdateJunctor.CONCATENATED_UPDATE;
             assert update.subs().size() == 2;
 
-            result.addAll(getAssignablesForAbstractUpdate(update.sub(0)));
-            result.addAll(getAssignablesForAbstractUpdate(update.sub(1)));
+            result.addAll(getHasToAssignablesForAbstractUpdate(update.sub(0)));
+            result.addAll(getHasToAssignablesForAbstractUpdate(update.sub(1)));
         }
 
         return result;
@@ -599,7 +582,7 @@ public class AbstractExecutionUtils {
 
             // Abstract Update
             else if (update.op() instanceof AbstractUpdate) {
-                opsAssignedBeforeUsedForAbstrUpd(update, assignedBeforeUsed,
+                opsHaveToAssignBeforeUsedForAbstrUpd(update, assignedBeforeUsed,
                         usedBeforeAssigned, services);
             }
 
@@ -608,7 +591,7 @@ public class AbstractExecutionUtils {
                 final List<Term> abstractUpdateTerms = //
                         abstractUpdatesFromConcatenation(update);
                 for (Term abstrUpdTerm : abstractUpdateTerms) {
-                    opsAssignedBeforeUsedForAbstrUpd(abstrUpdTerm,
+                    opsHaveToAssignBeforeUsedForAbstrUpd(abstrUpdTerm,
                             assignedBeforeUsed, usedBeforeAssigned, services);
                 }
             }
@@ -685,7 +668,24 @@ public class AbstractExecutionUtils {
         return Optional.of(new Pair<>(assignedBeforeUsed, usedBeforeAssigned));
     }
 
-    private static void opsAssignedBeforeUsedForAbstrUpd(final Term update,
+    /**
+     * Calculates for an abstract update which operators in it are "have-to"
+     * assigned before used. The "maybe" assignables are ignored! The current
+     * use case is to drop assignables in prior abstract updates that are
+     * overwritten, which does not have to be the case for "maybes".
+     *
+     * @param update
+     *            The abstract update to check.
+     * @param assignedBeforeUsed
+     *            A set of assigned-before-used operators. Results are added to
+     *            the passed set.
+     * @param usedBeforeAssigned
+     *            A set of used-before-assigned operators. Results are added to
+     *            the passed set.
+     * @param services
+     *            The {@link Services} object.
+     */
+    private static void opsHaveToAssignBeforeUsedForAbstrUpd(final Term update,
             final Set<Operator> assignedBeforeUsed,
             final Set<Operator> usedBeforeAssigned, Services services) {
         assert update.op() instanceof AbstractUpdate;
@@ -695,13 +695,20 @@ public class AbstractExecutionUtils {
                 .filter(op -> !assignedBeforeUsed.contains(op))
                 .collect(Collectors.toSet()));
 
-        assignedBeforeUsed.addAll(AbstractExecutionUtils
-                .collectNullaryPVsOrSkLocSets(
-                        ((AbstractUpdate) update.op()).lhs(), services)
-                .stream().filter(op -> !usedBeforeAssigned.contains(op))
-                .collect(Collectors.toSet()));
+        final AbstractUpdate abstrUpdate = (AbstractUpdate) update.op();
+        assignedBeforeUsed.addAll(abstrUpdate.getHasToAssignables().stream()
+                .filter(op -> !usedBeforeAssigned.contains(op))
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>())));
     }
 
+    /**
+     * @param term
+     *            The {@link Term} to analyze.
+     * @param services
+     *            The {@link Services} object.
+     * @return true iff the given {@link Term} is a Skolem loc set function or a
+     *         program variable.
+     */
     public static boolean isProcVarOrSkolemLocSet(Term term,
             Services services) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
@@ -717,18 +724,33 @@ public class AbstractExecutionUtils {
      *
      * @param ops
      *            The operators for the union term.
+     * @param abstrUpd
+     *            The {@link AbstractUpdate} from which these operators
+     *            originate from. Needed to tell whether the accessibles are
+     *            "have-to" or "maybe".
      * @param services
      *            The {@link Services} object.
      * @return A union term consisting of the operators (wraps
      *         {@link LocationVariable}s in singletonPV(PV(...)) application.
      */
-    public static Term opsToLocSetUnion(Set<Operator> ops, Services services) {
+    public static Term opsToLocSetUnion(Set<Operator> ops,
+            AbstractUpdate abstrUpd, Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        return tb.union(ops.stream()
-                .map(op -> op instanceof LocationVariable
-                        ? tb.singletonPV(tb.var((LocationVariable) op))
-                        : tb.func((Function) op))
-                .collect(Collectors.toList()));
+
+        final List<Term> wrappedOps = new ArrayList<>();
+        for (final Operator op : ops) {
+            Term t = op instanceof LocationVariable
+                    ? tb.singletonPV(tb.var((LocationVariable) op))
+                    : tb.func((Function) op);
+
+            if (abstrUpd.getHasToAssignables().contains(op)) {
+                t = tb.hasTo(t);
+            }
+
+            wrappedOps.add(t);
+        }
+
+        return tb.union(wrappedOps);
     }
 
     /**
@@ -771,12 +793,12 @@ public class AbstractExecutionUtils {
      * @return true iff the {@link AbstractUpdate} assigns the allLocs location
      *         set.
      */
-    public static boolean maybeAssignsAllLocs(AbstractUpdate update,
+    public static boolean mayAssignAllLocs(AbstractUpdate update,
             Services services) {
         final Operator allLocs = //
                 services.getTypeConverter().getLocSetLDT().getAllLocs();
         return update.getMaybeAssignables().stream()
-                .anyMatch(t -> t.op() == allLocs);
+                .anyMatch(op -> op == allLocs);
     }
 
     /**
@@ -795,7 +817,7 @@ public class AbstractExecutionUtils {
         final Operator allLocs = //
                 services.getTypeConverter().getLocSetLDT().getAllLocs();
         return update.getHasToAssignables().stream()
-                .anyMatch(t -> t.op() == allLocs);
+                .anyMatch(op -> op == allLocs);
     }
 
     /**
@@ -858,7 +880,7 @@ public class AbstractExecutionUtils {
         final Set<LocationVariable> occurringLocVars = opColl.ops().stream()
                 .filter(op -> op instanceof LocationVariable)
                 .map(LocationVariable.class::cast).collect(Collectors.toSet());
-    
+
         if (xInst.containsJavaBlockRecursive()) {
             final JavaBlock jb = MergeRuleUtils.getJavaBlockRecursive(xInst);
             final ProgramVariableCollector pvc = new ProgramVariableCollector(

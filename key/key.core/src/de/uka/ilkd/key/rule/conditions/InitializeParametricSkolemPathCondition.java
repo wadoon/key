@@ -129,7 +129,7 @@ public class InitializeParametricSkolemPathCondition
                 services.getNamespaces().functions().lookup(funcSymbName);
         if (funcSymb == null) {
             funcSymb = new Function( //
-                    funcSymbName, Sort.FORMULA, true, false, setSort);
+                    funcSymbName, Sort.FORMULA, true, true, setSort);
             services.getNamespaces().functions().add(funcSymb);
         }
 

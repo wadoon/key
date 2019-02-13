@@ -27,7 +27,7 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * Class of operators for abstract updates (in the sense of Abstract Execution),
@@ -57,16 +57,25 @@ public final class AbstractUpdate extends AbstractSortedOperator {
     private final Term lhs;
 
     /**
-     * Assignables that may be assigned. Terms of singletonPV functions applied
-     * to location variables or Skolem LocSet functions. Unmodifiable.
+     * Assignables that may be assigned. Location variables or Skolem LocSet
+     * functions. Unmodifiable.
      */
-    private final Set<Term> maybeAssignables;
+    private final Set<Operator> maybeAssignables;
 
     /**
-     * Assignables that have to be assigned. Terms of singletonPV functions
-     * applied to location variables or Skolem LocSet functions. Unmodifiable.
+     * Assignables that have to be assigned. Location variables or Skolem LocSet
+     * functions. Unmodifiable.
      */
-    private final Set<Term> haveToAssignables;
+    private final Set<Operator> haveToAssignables;
+
+    /**
+     * Assignables, both "has-to" and "maybe". Location variables wrapped in the
+     * singletonPV function, or Skolem LocSet functions, where both may be
+     * wrapped in a hasTo function if they are "has-to". Unmodifiable. Use
+     * {@link #getMaybeAssignables()} or {@link #getHasToAssignables()} to get
+     * easier access to the two different sorts of assignables.
+     */
+    private final Set<Term> allAssignables;
 
     private AbstractUpdate(AbstractPlaceholderStatement phs, Term lhs,
             LocSetLDT locSetLDT, SetLDT setLDT) {
@@ -74,10 +83,11 @@ public final class AbstractUpdate extends AbstractSortedOperator {
                 new Sort[] { setLDT.targetSort() }, Sort.UPDATE, false);
         this.lhs = lhs;
 
-        final Pair<Set<Term>, Set<Term>> disassembledLHS = //
+        final Triple<Set<Term>, Set<Operator>, Set<Operator>> disassembledLHS = //
                 disassembleLHS(lhs, locSetLDT);
-        this.maybeAssignables = disassembledLHS.first;
-        this.haveToAssignables = disassembledLHS.second;
+        this.allAssignables = disassembledLHS.first;
+        this.maybeAssignables = disassembledLHS.second;
+        this.haveToAssignables = disassembledLHS.third;
 
         this.phs = phs;
         assert lhs.sort() == locSetLDT.targetSort();
@@ -88,24 +98,27 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      *            The left-hand side to disassemble.
      * @param locSetLDT
      *            The {@link LocSetLDT} theory.
-     * @return A pair of (1) the maybe assignables and (2) the have-to
-     *         assignables. Both sets are immutable.
+     * @return A pair of (1) all assignable terms, (2) the maybe assignables and
+     *         (3) the have-to assignables. Both sets are immutable.
      */
-    private static Pair<Set<Term>, Set<Term>> disassembleLHS(Term lhs,
-            LocSetLDT locSetLDT) {
+    private static Triple<Set<Term>, Set<Operator>, Set<Operator>> disassembleLHS(
+            Term lhs, LocSetLDT locSetLDT) {
         final Function union = locSetLDT.getUnion();
         final Function hasToFunc = locSetLDT.getHasTo();
 
         final Set<Term> unionElems = MiscTools.dissasembleSetTerm(lhs, union);
 
-        final Set<Term> maybeAssignables = unionElems.stream()
+        final Set<Operator> maybeAssignables = unionElems.stream()
                 .filter(t -> t.op() != hasToFunc)
+                .map(t -> t.subs().size() == 1 ? t.sub(0) : t).map(Term::op)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-        final Set<Term> haveToAssignables = unionElems.stream()
+        final Set<Operator> haveToAssignables = unionElems.stream()
                 .filter(t -> t.op() == hasToFunc).map(t -> t.sub(0))
+                .map(t -> t.subs().size() == 1 ? t.sub(0) : t).map(Term::op)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
-        return new Pair<>(Collections.unmodifiableSet(maybeAssignables),
+        return new Triple<>(Collections.unmodifiableSet(unionElems),
+                Collections.unmodifiableSet(maybeAssignables),
                 Collections.unmodifiableSet(haveToAssignables));
     }
 
@@ -153,24 +166,37 @@ public final class AbstractUpdate extends AbstractSortedOperator {
     }
 
     /**
-     * Assignables that may be assigned. Terms of singletonPV functions applied
-     * to location variables or Skolem LocSet functions.
+     * Assignables, both "has-to" and "maybe". Location variables wrapped in the
+     * singletonPV function, or Skolem LocSet functions, where both may be
+     * wrapped in a hasTo function if they are "has-to". Unmodifiable. Use
+     * {@link #getMaybeAssignables()} or {@link #getHasToAssignables()} to get
+     * easier access to the two different sorts of assignables.
+     *
+     * @return All assignables.
+     */
+    public Set<Term> getAllAssignables() {
+        return allAssignables;
+    }
+
+    /**
+     * Assignables that may be assigned. Location variables or Skolem LocSet
+     * functions. Set is immutable.
      *
      * @return The elements of the assignables union of this abstract update
      *         that may be assigned.
      */
-    public Set<Term> getMaybeAssignables() {
+    public Set<Operator> getMaybeAssignables() {
         return maybeAssignables;
     }
 
     /**
-     * Assignables that have to be assigned. Terms of singletonPV functions
-     * applied to location variables or Skolem LocSet functions.
+     * Assignables that have to be assigned. Location variables or Skolem LocSet
+     * functions. Set is immutable.
      *
      * @return The elements of the assignables union of this abstract update
      *         that have to be assigned.
      */
-    public Set<Term> getHasToAssignables() {
+    public Set<Operator> getHasToAssignables() {
         return haveToAssignables;
     }
 }

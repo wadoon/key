@@ -473,11 +473,11 @@ public class DefaultImmutableSet<T> implements ImmutableSet<T> {
         @Override
         public Function<Set<T>, ImmutableSet<T>> finisher() {
             return list -> {
-                ImmutableSet<T> result = DefaultImmutableSet.nil();
+                ImmutableList<T> result = ImmutableSLList.nil();
                 for (T t : list) {
-                    result = result.add(t);
+                    result = result.append(t);
                 }
-                return result;
+                return DefaultImmutableSet.fromImmutableList(result);
             };
         }
 

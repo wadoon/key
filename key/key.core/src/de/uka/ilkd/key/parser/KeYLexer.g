@@ -232,7 +232,6 @@ lexer grammar KeYLexer;
     INSTANTIATE_VARS_FRESH : '\\instantiateVarsFresh' ;
     NEW_PV : '\\newPV' ;
     STORE_RESULT_VAR_IN : '\\storeResultVarIn' ;
-    ASSIGNS : '\\assigns' ;
     FRESH_ABSTRACT_PROGRAM : '\\freshAbstractProgram' ;
     STORE_CONTEXT_LABELS_IN : '\\storeContextLabelsIn' ;
 	IS_DEFINED : '\\isDefined';
