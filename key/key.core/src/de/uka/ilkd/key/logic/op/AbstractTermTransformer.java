@@ -24,7 +24,9 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.logic.sort.SortImpl;
 import de.uka.ilkd.key.rule.metaconstruct.AddCast;
 import de.uka.ilkd.key.rule.metaconstruct.ArrayBaseInstanceOf;
+import de.uka.ilkd.key.rule.metaconstruct.BreaksSpec;
 import de.uka.ilkd.key.rule.metaconstruct.ConstantValue;
+import de.uka.ilkd.key.rule.metaconstruct.ContinuesSpec;
 import de.uka.ilkd.key.rule.metaconstruct.CreateAnonUpdate;
 import de.uka.ilkd.key.rule.metaconstruct.EnumConstantValue;
 import de.uka.ilkd.key.rule.metaconstruct.ExcSpec;
@@ -125,6 +127,8 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 
     public static final AbstractTermTransformer RETURN_SPEC = new ReturnSpec();
     public static final AbstractTermTransformer EXC_SPEC = new ExcSpec();
+    public static final AbstractTermTransformer BREAKS_SPEC = new BreaksSpec();
+    public static final AbstractTermTransformer CONTINUES_SPEC = new ContinuesSpec();
 
     private static Sort[] createMetaSortArray(int arity) {
         Sort[] result = new Sort[arity];

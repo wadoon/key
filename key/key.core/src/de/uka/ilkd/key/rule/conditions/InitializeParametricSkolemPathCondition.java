@@ -15,16 +15,15 @@ package de.uka.ilkd.key.rule.conditions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -46,23 +45,11 @@ public class InitializeParametricSkolemPathCondition
         implements VariableCondition {
     private final SchemaVariable pathCondSV;
     private final ProgramSV abstrProgSV;
-    private final ProgramSV excSV;
-    private final Optional<ProgramSV> returnedSV;
-    private final Optional<ProgramSV> maybeResultSV;
-    private Optional<ProgramSV> maybeBreaksSV;
-    private Optional<ProgramSV> maybeContinuesSV;
 
     public InitializeParametricSkolemPathCondition(SchemaVariable pathCondSV,
-            ProgramSV abstrProgSV, ProgramSV excSV,
-            Optional<ProgramSV> returnedSV, Optional<ProgramSV> resultSV,
-            Optional<ProgramSV> breaksSV, Optional<ProgramSV> continuesSV) {
+            ProgramSV abstrProgSV) {
         this.pathCondSV = pathCondSV;
         this.abstrProgSV = abstrProgSV;
-        this.excSV = excSV;
-        this.returnedSV = returnedSV;
-        this.maybeResultSV = resultSV;
-        this.maybeBreaksSV = breaksSV;
-        this.maybeContinuesSV = continuesSV;
     }
 
     @Override
@@ -79,24 +66,6 @@ public class InitializeParametricSkolemPathCondition
 
         final TermBuilder tb = services.getTermBuilder();
 
-        Term accessibleClause = AbstractExecutionUtils
-                .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt,
-                        matchCond, services).first;
-
-        final List<ProgramSV> varsToConsider = new ArrayList<>();
-        varsToConsider.add(excSV);
-        returnedSV.ifPresent(varsToConsider::add);
-        maybeResultSV.ifPresent(varsToConsider::add);
-        maybeBreaksSV.ifPresent(varsToConsider::add);
-        maybeContinuesSV.ifPresent(varsToConsider::add);
-
-        for (final ProgramSV furtherSV : varsToConsider) {
-            final LocationVariable furtherLV = (LocationVariable) svInst
-                    .getInstantiation(furtherSV);
-            accessibleClause = tb.setUnion(accessibleClause,
-                    tb.setSingleton(tb.var(furtherLV)));
-        }
-
         /*
          * NOTE (DS, 2019-01-31): We reuse the function symbols because
          * otherwise, there will be different ones around which can, and will,
@@ -104,23 +73,25 @@ public class InitializeParametricSkolemPathCondition
          * however be problematic if someone decides to introduce such a
          * function symbol elsewhere...
          */
-        // @formatter:off;
-        //final String pathCondName = tb.newName(
-        //        pathCondSV.name().toString() + "_" + abstrStmt.getId());
-        // @formatter:on;
         final String pathCondName = //
                 pathCondSV.name().toString() + "_" + abstrStmt.getId();
-        final Sort setSort = //
-                services.getTypeConverter().getSetLDT().targetSort();
 
         final Name funcSymbName = new Name(pathCondName);
-        Function funcSymb = //
-                services.getNamespaces().functions().lookup(funcSymbName);
+        final Namespace<Function> functions = //
+                services.getNamespaces().functions();
+
+        Function funcSymb = functions.lookup(funcSymbName);
         if (funcSymb == null) {
+            final Sort setSort = //
+                    services.getTypeConverter().getSetLDT().targetSort();
             funcSymb = new Function( //
                     funcSymbName, Sort.FORMULA, true, true, setSort);
-            services.getNamespaces().functions().add(funcSymb);
+            functions.add(funcSymb);
         }
+
+        final Term accessibleClause = AbstractExecutionUtils
+                .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt,
+                        matchCond, services).first;
 
         final Term pathCond = tb.func(funcSymb, accessibleClause);
 
@@ -133,11 +104,6 @@ public class InitializeParametricSkolemPathCondition
         final List<SchemaVariable> svs = new ArrayList<>();
         svs.add(pathCondSV);
         svs.add(abstrProgSV);
-        svs.add(excSV);
-        returnedSV.ifPresent(svs::add);
-        maybeResultSV.ifPresent(svs::add);
-        maybeBreaksSV.ifPresent(svs::add);
-        maybeContinuesSV.ifPresent(svs::add);
 
         final String svsString = svs.stream().map(SchemaVariable::toString)
                 .collect(Collectors.joining(", "));
