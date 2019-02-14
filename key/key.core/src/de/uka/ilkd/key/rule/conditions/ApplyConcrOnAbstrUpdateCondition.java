@@ -126,23 +126,35 @@ public final class ApplyConcrOnAbstrUpdateCondition
         abstrUpdatesToProcess.addAll(AbstractExecutionUtils
                 .abstractUpdatesFromConcatenation(abstrUpdateTerm));
 
+        boolean success = false;
+
         while (!abstrUpdatesToProcess.isEmpty()) {
             final Term currentAbstractUpdate = abstrUpdatesToProcess.poll();
             final PushThroughResult pushThroughRes = pushThroughConcrUpdate(
                     currentConcrUpdate, currentAbstractUpdate, services);
 
-            if (pushThroughRes == null) {
+            if (pushThroughRes == null && !success) {
                 return null;
             }
 
-            pushThroughRes.remainingConcreteUpdate
-                    .ifPresent(resultingUpdates::add);
-            resultingUpdates.add(pushThroughRes.resultingAbstractUpdate);
+            if (pushThroughRes != null) {
+                pushThroughRes.remainingConcreteUpdate
+                        .ifPresent(resultingUpdates::add);
+                success = success
+                        || !pushThroughRes.remainingConcreteUpdate.isPresent();
+                resultingUpdates.add(pushThroughRes.resultingAbstractUpdate);
+            } else {
+                resultingUpdates.add(currentConcrUpdate);
+                resultingUpdates.add(currentAbstractUpdate);
+                currentConcrUpdate = null;
+            }
 
-            if (pushThroughRes.pushedThroughConcreteUpdate.isPresent()) {
+            if (pushThroughRes != null
+                    && pushThroughRes.pushedThroughConcreteUpdate.isPresent()) {
                 currentConcrUpdate = //
                         pushThroughRes.pushedThroughConcreteUpdate
                                 .orElseThrow();
+                success = true;
             } else {
                 /* Nothing remains to be pushed through, wrap up. */
                 resultingUpdates.addAll(abstrUpdatesToProcess);
