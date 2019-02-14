@@ -53,6 +53,7 @@ options {
   import java.util.LinkedHashMap;
   import java.util.LinkedHashSet;
   import java.util.LinkedList;
+  import java.util.Optional;
   import java.util.Set;
   import java.util.Vector;
   import java.math.BigInteger;
@@ -3989,32 +3990,23 @@ varcond_initializeParametricSkolemPathCondition[TacletBuilder b]
      ( 
          COMMA returnedSV=varId
        ( COMMA resultSV=varId ) ? 
+       (
+         COMMA breaksSV=varId
+         COMMA continuesSV=varId 
+       ) ? 
      ) ?
      
    RPAREN 
    {
-      if (resultSV != null && returnedSV != null) {
-          b.addVariableCondition(
-            new InitializeParametricSkolemPathCondition(
-              (SchemaVariable) formulaSV, 
-              (ProgramSV) abstrProgramSV,
-              (ProgramSV) excSV,
-              (ProgramSV) returnedSV,
-              (ProgramSV) resultSV));
-      } else if (returnedSV != null) {
-          b.addVariableCondition(
-            new InitializeParametricSkolemPathCondition(
-              (SchemaVariable) formulaSV, 
-              (ProgramSV) abstrProgramSV,
-              (ProgramSV) excSV,
-              (ProgramSV) returnedSV));
-      } else {
-          b.addVariableCondition(
-            new InitializeParametricSkolemPathCondition(
-              (SchemaVariable) formulaSV, 
-              (ProgramSV) abstrProgramSV,
-              (ProgramSV) excSV));
-      }
+      b.addVariableCondition(
+        new InitializeParametricSkolemPathCondition(
+          (SchemaVariable) formulaSV, 
+          (ProgramSV) abstrProgramSV,
+          (ProgramSV) excSV,
+          Optional.ofNullable((ProgramSV) returnedSV),
+          Optional.ofNullable((ProgramSV) resultSV),
+          Optional.ofNullable((ProgramSV) breaksSV),
+          Optional.ofNullable((ProgramSV) continuesSV)));
    }
 ;
 

@@ -33,6 +33,8 @@ import de.uka.ilkd.key.rule.metaconstruct.IntroAtPreDefsOp;
 import de.uka.ilkd.key.rule.metaconstruct.MemberPVToField;
 import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula2;
 import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula3;
+import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula4;
+import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula5;
 import de.uka.ilkd.key.rule.metaconstruct.ReturnSpec;
 import de.uka.ilkd.key.rule.metaconstruct.arith.DivideLCRMonomials;
 import de.uka.ilkd.key.rule.metaconstruct.arith.DivideMonomials;
@@ -118,6 +120,8 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 
     public static final AbstractTermTransformer MUTUAL_EXCLUSION_FORMULA_2 = new MutualExclusionFormula2();
     public static final AbstractTermTransformer MUTUAL_EXCLUSION_FORMULA_3 = new MutualExclusionFormula3();
+    public static final AbstractTermTransformer MUTUAL_EXCLUSION_FORMULA_4 = new MutualExclusionFormula4();
+    public static final AbstractTermTransformer MUTUAL_EXCLUSION_FORMULA_5 = new MutualExclusionFormula5();
 
     public static final AbstractTermTransformer RETURN_SPEC = new ReturnSpec();
     public static final AbstractTermTransformer EXC_SPEC = new ExcSpec();

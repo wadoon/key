@@ -49,33 +49,20 @@ public class InitializeParametricSkolemPathCondition
     private final ProgramSV excSV;
     private final Optional<ProgramSV> returnedSV;
     private final Optional<ProgramSV> maybeResultSV;
+    private Optional<ProgramSV> maybeBreaksSV;
+    private Optional<ProgramSV> maybeContinuesSV;
 
     public InitializeParametricSkolemPathCondition(SchemaVariable pathCondSV,
-            ProgramSV abstrProgSV, ProgramSV excSV, ProgramSV returnedSV,
-            ProgramSV resultSV) {
+            ProgramSV abstrProgSV, ProgramSV excSV,
+            Optional<ProgramSV> returnedSV, Optional<ProgramSV> resultSV,
+            Optional<ProgramSV> breaksSV, Optional<ProgramSV> continuesSV) {
         this.pathCondSV = pathCondSV;
         this.abstrProgSV = abstrProgSV;
         this.excSV = excSV;
-        this.returnedSV = Optional.of(returnedSV);
-        this.maybeResultSV = Optional.of(resultSV);
-    }
-
-    public InitializeParametricSkolemPathCondition(SchemaVariable pathCondSV,
-            ProgramSV abstrProgSV, ProgramSV excSV, ProgramSV returnedSV) {
-        this.pathCondSV = pathCondSV;
-        this.abstrProgSV = abstrProgSV;
-        this.excSV = excSV;
-        this.returnedSV = Optional.of(returnedSV);
-        this.maybeResultSV = Optional.empty();
-    }
-
-    public InitializeParametricSkolemPathCondition(SchemaVariable pathCondSV,
-            ProgramSV abstrProgSV, ProgramSV excSV) {
-        this.pathCondSV = pathCondSV;
-        this.abstrProgSV = abstrProgSV;
-        this.excSV = excSV;
-        this.returnedSV = Optional.empty();
-        this.maybeResultSV = Optional.empty();
+        this.returnedSV = returnedSV;
+        this.maybeResultSV = resultSV;
+        this.maybeBreaksSV = breaksSV;
+        this.maybeContinuesSV = continuesSV;
     }
 
     @Override
@@ -100,6 +87,8 @@ public class InitializeParametricSkolemPathCondition
         varsToConsider.add(excSV);
         returnedSV.ifPresent(varsToConsider::add);
         maybeResultSV.ifPresent(varsToConsider::add);
+        maybeBreaksSV.ifPresent(varsToConsider::add);
+        maybeContinuesSV.ifPresent(varsToConsider::add);
 
         for (final ProgramSV furtherSV : varsToConsider) {
             final LocationVariable furtherLV = (LocationVariable) svInst
@@ -147,6 +136,8 @@ public class InitializeParametricSkolemPathCondition
         svs.add(excSV);
         returnedSV.ifPresent(svs::add);
         maybeResultSV.ifPresent(svs::add);
+        maybeBreaksSV.ifPresent(svs::add);
+        maybeContinuesSV.ifPresent(svs::add);
 
         final String svsString = svs.stream().map(SchemaVariable::toString)
                 .collect(Collectors.joining(", "));
