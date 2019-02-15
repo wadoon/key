@@ -344,12 +344,17 @@ public abstract class VariableNamer implements InstantiationProposer {
 
     /**
      * proposes a base name for a given sort
+     *
+     * @param svName
+     *            The name of the schema variable which is being instantiated.
+     *            Used as a default if we don't get nicer information from the
+     *            variable's type.
      */
-    private String getBaseNameProposal(Type type) {
+    private String getBaseNameProposal(Type type, String svName) {
         String result;
         if (type instanceof ArrayType) {
             result = getBaseNameProposal(((ArrayType) type).getBaseType()
-                    .getKeYJavaType().getJavaType());
+                    .getKeYJavaType().getJavaType(), svName);
             result += "_arr";
         } else {
             if (type instanceof KeYJavaType
@@ -362,7 +367,15 @@ public abstract class VariableNamer implements InstantiationProposer {
             if (name.length() > 0) {
                 result = name.substring(0, 1).toLowerCase();
             } else {
-                result = "x"; // use default name otherwise
+                /*
+                 * NOTE (DS, 2019-02-15): Previously, everything defaulted to
+                 * "x", but sometimes schema variable names carry a meaning
+                 * (if a taclet is not generally reusing SVs from the preamble,
+                 * but even then it might be better to use "e" for an expression
+                 * than "x").
+                 */
+                result = svName.replaceAll("#", "");
+                // result = "x"; // use default name otherwise
             }
         }
 
@@ -479,7 +492,7 @@ public abstract class VariableNamer implements InstantiationProposer {
                 type = services.getJavaInfo().getKeYJavaType(type);
             }
             if (type != null) {
-                basename = getBaseNameProposal(type);
+                basename = getBaseNameProposal(type, var.name().toString());
             } else {
                 SchemaVariable psv = nv.getPeerSchemaVariable();
                 Object inst = app.instantiations().getInstantiation(psv);
@@ -489,7 +502,7 @@ public abstract class VariableNamer implements InstantiationProposer {
                     if (ec != null) {
                         KeYJavaType kjt = ((Expression) inst)
                                 .getKeYJavaType(this.services, ec);
-                        basename = getBaseNameProposal(kjt.getJavaType());
+                        basename = getBaseNameProposal(kjt.getJavaType(), var.name().toString());
                     } else {
                         // usually this should never be entered, but because of
                         // naming issues we do not want nullpointer exceptions
