@@ -398,61 +398,69 @@ public class Main {
 	public static boolean isInvInitiallyValid(Term inv, Goal loopGoal) {
 		//TODO: testGeneration "destroyed" the proof
 		Proof proof = loopGoal.proof();
-		//invInitValidSequent generieren
-		//{ Copy from KeYAPI
-		WhileInvariantRule invariantRule = WhileInvariantRule.INSTANCE;
-		PosInOccurrence poi = new PosInOccurrence(loopGoal.sequent().succedent().get(1), PosInTerm.getTopLevel(), false);
-		TermServices services = keyAPI.myEnvironment.getServices();
-		LoopInvariantBuiltInRuleApp ruleApplication = new LoopInvariantBuiltInRuleApp(invariantRule, poi, services);
-		ruleApplication = ruleApplication.tryToInstantiate(loopGoal);
-		LoopSpecification spec = ruleApplication.getSpec();
-		Services serv = loopGoal.proof().getServices();
-		
-		Map<LocationVariable, Term> invariants = new HashMap<>();
-		TermBuilder termBuilder = services.getTermBuilder();
-		Map<LocationVariable, Term> freeInvariants = new HashMap<>();
-		Map<LocationVariable, Term> modifies = /*new HashMap<>();//*/spec.getInternalModifies();
-		Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs = spec.getInternalInfFlowSpec();
-		Term variant = null;
-		
-		Term update = ruleApplication.posInOccurrence().sequentFormula().formula().sub(0);
-		
-		LocationVariable baseHeap  = serv.getTypeConverter().getHeapLDT().getHeap();
-		LocationVariable savedHeap = serv.getTypeConverter().getHeapLDT().getSavedHeap();
-		invariants.put(baseHeap, inv);
-		spec = spec.configurate(invariants, freeInvariants, modifies, infFlowSpecs, variant);
-		
-		ruleApplication.setLoopInvariant(spec);
-		
-		//} KeYAPI
-		
-		// { Copy From Goal.apply
-        Services overlayServices = proof.getServices().getOverlay(loopGoal.getLocalNamespaces());
-        final ImmutableList<Goal> goalList = ruleApplication.execute(loopGoal, overlayServices);
-		//}
-		// { From WhileInvariantRule.apply
-        Goal initGoal = goalList.tail().tail().head();
-        Goal bodyGoal = goalList.tail().head();
-        Goal useGoal = goalList.head();
-        //}
-		
-        Sequent invInitValidSequent = initGoal.sequent();
-        
-        boolean invInitiallyValid = false;
+		boolean invInitiallyValid = false;
 		try {
-			Proof invInitValidProof = AuxiliaryFunctions.createProof(proof, "invInitValidProof", invInitValidSequent);
+			Proof onlyLoopProof = AuxiliaryFunctions.createProof(proof, "loopProof", loopGoal.sequent());
+			Goal clonedLoopGoal = onlyLoopProof.openGoals().head();
+		
+			//invInitValidSequent generieren
+			//{ Copy from KeYAPI
+			WhileInvariantRule invariantRule = WhileInvariantRule.INSTANCE;
+			PosInOccurrence poi = new PosInOccurrence(clonedLoopGoal.sequent().succedent().get(1), PosInTerm.getTopLevel(), false);
+			TermServices services = keyAPI.myEnvironment.getServices();
+			LoopInvariantBuiltInRuleApp ruleApplication = new LoopInvariantBuiltInRuleApp(invariantRule, poi, services);
+			ruleApplication = ruleApplication.tryToInstantiate(clonedLoopGoal);
+			LoopSpecification spec = ruleApplication.getSpec();
+			Services serv = clonedLoopGoal.proof().getServices();
 			
-			ImmutableList<Goal> openGoals = keyAPI.prove(invInitValidProof);
+			Map<LocationVariable, Term> invariants = new HashMap<>();
+			TermBuilder termBuilder = services.getTermBuilder();
+			Map<LocationVariable, Term> freeInvariants = new HashMap<>();
+			Map<LocationVariable, Term> modifies = /*new HashMap<>();//*/spec.getInternalModifies();
+			Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs = spec.getInternalInfFlowSpec();
+			Term variant = null;
 			
-			// Check if invInitValid Goal got closed
-			if (openGoals.isEmpty())
-				invInitiallyValid = true;
-			else
-				invInitiallyValid = false;
+			Term update = ruleApplication.posInOccurrence().sequentFormula().formula().sub(0);
 			
-		} catch (ProofInputException e) {
+			LocationVariable baseHeap  = serv.getTypeConverter().getHeapLDT().getHeap();
+			LocationVariable savedHeap = serv.getTypeConverter().getHeapLDT().getSavedHeap();
+			invariants.put(baseHeap, inv);
+			spec = spec.configurate(invariants, freeInvariants, modifies, infFlowSpecs, variant);
+			
+			ruleApplication.setLoopInvariant(spec);
+			
+			//} KeYAPI
+			
+			// { Copy From Goal.apply
+	        Services overlayServices = onlyLoopProof.getServices().getOverlay(clonedLoopGoal.getLocalNamespaces());
+	        final ImmutableList<Goal> goalList = ruleApplication.execute(clonedLoopGoal, overlayServices);
+			//}
+			// { From WhileInvariantRule.apply
+	        Goal initGoal = goalList.tail().tail().head();
+	        Goal bodyGoal = goalList.tail().head();
+	        Goal useGoal = goalList.head();
+	        //}
+			
+	        Sequent invInitValidSequent = initGoal.sequent();
+	        
+			try {
+				Proof invInitValidProof = AuxiliaryFunctions.createProof(onlyLoopProof, "invInitValidProof", invInitValidSequent);
+				
+				ImmutableList<Goal> openGoals = keyAPI.prove(invInitValidProof);
+				
+				// Check if invInitValid Goal got closed
+				if (openGoals.isEmpty())
+					invInitiallyValid = true;
+				else
+					invInitiallyValid = false;
+				
+			} catch (ProofInputException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} catch (ProofInputException e1) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+			e1.printStackTrace();
 		}
 		
 		return invInitiallyValid;
