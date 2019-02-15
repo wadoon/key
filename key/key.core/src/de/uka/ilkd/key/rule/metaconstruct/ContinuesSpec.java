@@ -59,7 +59,7 @@ public class ContinuesSpec extends AbstractTermTransformer {
         for (final BlockContract contract : contracts) {
             if (contract.getBaseName()
                     .contains(Behavior.CONTINUE_BEHAVIOR.toString())) {
-                return tb.equals(tb.var(continuesFlag),
+                return tb.equals(tb.equals(tb.var(continuesFlag), tb.TRUE()),
                         contract.getPre(services));
             }
         }

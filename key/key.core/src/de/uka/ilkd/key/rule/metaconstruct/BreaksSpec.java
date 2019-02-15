@@ -58,7 +58,8 @@ public class BreaksSpec extends AbstractTermTransformer {
         for (final BlockContract contract : contracts) {
             if (contract.getBaseName()
                     .contains(Behavior.BREAK_BEHAVIOR.toString())) {
-                return tb.equals(tb.var(breaksFlag), contract.getPre(services));
+                return tb.equals(tb.equals(tb.var(breaksFlag), tb.TRUE()),
+                        contract.getPre(services));
             }
         }
 

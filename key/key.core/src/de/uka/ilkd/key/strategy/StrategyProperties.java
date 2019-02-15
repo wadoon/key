@@ -39,7 +39,8 @@ public final class StrategyProperties extends Properties {
                 "LOOP_EXPAND_BOUNDED"; //Used for test generation chrisg
     public static final String LOOP_INVARIANT = "LOOP_INVARIANT";
     public static final String LOOP_SCOPE_INVARIANT = "LOOP_SCOPE_INVARIANT";
-    public static final String LOOP_INVARIANT_TACLETS = "LOOP_INVARIANT_TACLETS";
+    public static final String LOOP_SCOPE_INV_TACLET = "LOOP_SCOPE_INV_TACLET";
+    public static final String LOOP_SCOPE_EXPAND = "LOOP_SCOPE_EXPAND";
     public static final String LOOP_NONE = "LOOP_NONE";
 
     public static final String BLOCK_OPTIONS_KEY = "BLOCK_OPTIONS_KEY";
@@ -176,7 +177,7 @@ public final class StrategyProperties extends Properties {
         SPLITTING_OPTIONS_KEY, SPLITTING_NORMAL, SPLITTING_OFF,
         SPLITTING_DELAYED,
         LOOP_OPTIONS_KEY, LOOP_EXPAND, LOOP_EXPAND_BOUNDED, LOOP_INVARIANT,
-        LOOP_SCOPE_INVARIANT, LOOP_INVARIANT_TACLETS, LOOP_NONE,
+        LOOP_SCOPE_INVARIANT, LOOP_SCOPE_INV_TACLET, LOOP_SCOPE_EXPAND, LOOP_NONE,
         BLOCK_OPTIONS_KEY, BLOCK_CONTRACT_INTERNAL, BLOCK_CONTRACT_EXTERNAL,
         BLOCK_EXPAND, BLOCK_NONE,
         METHOD_OPTIONS_KEY, METHOD_EXPAND, METHOD_CONTRACT, METHOD_NONE,

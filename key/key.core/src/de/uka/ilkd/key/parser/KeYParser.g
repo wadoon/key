@@ -3867,6 +3867,7 @@ varexp[TacletBuilder b]
     | varcond_newPV[b]
     | varcond_storeResultVarIn[b]
     | varcond_storeContextLabelsIn[b]
+    | varcond_storeContextLoopLabelsIn[b]
     | varcond_freshAbstractProgram[b]
     | varcond_dropEffectlessStores[b]
     | varcond_enum_const[b]
@@ -4008,6 +4009,14 @@ varcond_storeContextLabelsIn[TacletBuilder b]
    STORE_CONTEXT_LABELS_IN LPAREN sv=varId RPAREN 
    {
       b.addVariableCondition(new StoreContextLabelsInCondition((ProgramSV) sv));
+   }
+;
+
+varcond_storeContextLoopLabelsIn[TacletBuilder b]
+:
+   STORE_CONTEXT_LOOP_LABELS_IN LPAREN sv=varId RPAREN 
+   {
+      b.addVariableCondition(new StoreContextLoopLabelsInCondition((ProgramSV) sv));
    }
 ;
 

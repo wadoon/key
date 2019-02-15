@@ -20,6 +20,7 @@ import org.key_project.util.collection.ImmutableArray;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.ProgramPrefix;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -30,14 +31,15 @@ import de.uka.ilkd.key.rule.inst.ProgramList;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * Stores all the labels in the current program prefix pi in the given list SV.
+ * Stores all the loop labels in the current program prefix pi in the given list
+ * SV.
  *
  * @author Dominic Steinhöfel
  */
-public class StoreContextLabelsInCondition implements VariableCondition {
+public class StoreContextLoopLabelsInCondition implements VariableCondition {
     private final ProgramSV labelsSV;
 
-    public StoreContextLabelsInCondition(ProgramSV labelsSV) {
+    public StoreContextLoopLabelsInCondition(ProgramSV labelsSV) {
         assert labelsSV.isListSV();
         this.labelsSV = labelsSV;
     }
@@ -52,22 +54,24 @@ public class StoreContextLabelsInCondition implements VariableCondition {
                 (ProgramPrefix) svInst.getContextInstantiation()
                         .contextProgram();
         do {
-            if (prefix instanceof LabeledStatement) {
+            if (prefix instanceof LabeledStatement
+                    && ((LabeledStatement) prefix)
+                            .getBody() instanceof LoopStatement) {
                 labels.add(((LabeledStatement) prefix).getLabel());
             }
         }
         while (prefix.hasNextPrefixElement()
                 && (prefix = prefix.getNextPrefixElement()) != null);
 
-        ProgramList pl =
-                new ProgramList(new ImmutableArray<ProgramElement>(labels));
+        ProgramList pl = new ProgramList(
+                new ImmutableArray<ProgramElement>(labels));
 
         return matchCond.setInstantiations(svInst.add(labelsSV, pl, services));
     }
 
     @Override
     public String toString() {
-        return String.format("\\varcond (\\storeContextLabelsIn(%s))",
+        return String.format("\\varcond (\\storeContextLoopLabelsIn(%s))",
                 labelsSV);
     }
 }

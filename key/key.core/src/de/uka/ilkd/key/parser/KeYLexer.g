@@ -234,6 +234,7 @@ lexer grammar KeYLexer;
     STORE_RESULT_VAR_IN : '\\storeResultVarIn' ;
     FRESH_ABSTRACT_PROGRAM : '\\freshAbstractProgram' ;
     STORE_CONTEXT_LABELS_IN : '\\storeContextLabelsIn' ;
+    STORE_CONTEXT_LOOP_LABELS_IN : '\\storeContextLoopLabelsIn' ;
 	IS_DEFINED : '\\isDefined';
 	VARCOND : '\\varcond';
 	GET_INVARIANT : '\\getInvariant';

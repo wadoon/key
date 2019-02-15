@@ -90,10 +90,9 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             + "the presence of<br/>"
             + "potentially exceptional program behavior.</p>"
             + "</html>";
-    public static final String TOOL_TIP_LOOP_INVARIANT_TACLETS
+    public static final String TOOL_TIP_LOOP_SCOPE_INVARIANT_TACLET
             = "<html>"
-            + "Use loop invariant taclets, i.e. not the built-in rules.<br>"
-            + "Standard is a taclet for the loop scope invariant rule."
+            + "Use the loop scope-based invariant taclet, i.e. not the built-in rules.<br>"
             + "Three properties have to be shown:<br>"
             + "<ul><li>Validity of invariant of a loop is preserved by the<br>"
             + "loop guard and loop body (initially valid).</li>"
@@ -101,8 +100,13 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             + "after arbitrarily many loop iterations (body preserves invariant).</li>"
             + "<li>Invariant holds after the loop terminates (use case).</li>"
             + "</ul>"
-            + "<p>In the loop scope invariant rule, the last two are combined "
-            + "into a single goal.</p>"
+            + "<p>The last two are combined into a single goal.</p>"
+            + "</html>";
+    public static final String TOOL_TIP_LOOP_SCOPE_EXPAND
+            = "<html>"
+            + "Unroll loop body, but with the loop scope technology.<br>"
+            + "This requires less program transformation for irregular<br>"
+            + "termination behavior."
             + "</html>";
     public static final String TOOL_TIP_LOOP_EXPAND = "<html>"
             + "Unroll loop body." + "</html>";
@@ -361,8 +365,11 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                                 StrategyProperties.LOOP_SCOPE_INVARIANT,
                                 "Loop Scope Invariant", TOOL_TIP_LOOP_SCOPE_INVARIANT),
                         new StrategyPropertyValueDefinition(
-                                StrategyProperties.LOOP_INVARIANT_TACLETS,
-                                "Loop Invariant Taclets", TOOL_TIP_LOOP_INVARIANT_TACLETS),
+                                StrategyProperties.LOOP_SCOPE_INV_TACLET,
+                                "Loop Scope Invariant Taclet", TOOL_TIP_LOOP_SCOPE_INVARIANT_TACLET),
+                        new StrategyPropertyValueDefinition(
+                                StrategyProperties.LOOP_SCOPE_EXPAND,
+                                "Loop Scope Expand", TOOL_TIP_LOOP_SCOPE_EXPAND),
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.LOOP_INVARIANT,
                                 "Invariant", TOOL_TIP_LOOP_INVARIANT),

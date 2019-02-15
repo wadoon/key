@@ -505,7 +505,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         boolean useLoopInvTaclets =
                 strategyProperties.getProperty(
                         StrategyProperties.LOOP_OPTIONS_KEY).equals(
-                        StrategyProperties.LOOP_INVARIANT_TACLETS);
+                        StrategyProperties.LOOP_SCOPE_INV_TACLET);
+        boolean useLoopScopeExpand =
+                strategyProperties.getProperty(
+                        StrategyProperties.LOOP_OPTIONS_KEY).equals(
+                        StrategyProperties.LOOP_SCOPE_EXPAND);
         /*
          * boolean useBlockExpand = strategyProperties.getProperty(
          * StrategyProperties.BLOCK_OPTIONS_KEY).
@@ -585,8 +589,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         bindRuleSet(d, "loop_expand", useLoopExpand ? longConst(0)
                 : inftyConst());
-        bindRuleSet(d, "loop_inv_taclets", useLoopInvTaclets ? longConst(0)
-                : inftyConst());
+        bindRuleSet(d, "loop_scope_inv_taclet",
+                useLoopInvTaclets ? longConst(0) : inftyConst());
+        bindRuleSet(d, "loop_scope_expand",
+                useLoopScopeExpand ? longConst(0) : inftyConst());
 
         /*
          * bindRuleSet ( d, "block_expand", useBlockExpand ? longConst ( 0 ) :
