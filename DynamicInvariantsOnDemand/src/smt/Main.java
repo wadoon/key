@@ -33,15 +33,25 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.NamespaceSet;
+import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.PosInTerm;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
+import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.util.InfFlowSpec;
 import dynacode.DynaCode;
 import genmethod.MethodGenerator;
 import gentest.IGeneratedTest;
@@ -57,6 +67,7 @@ public class Main {
 	private static String benchmarksFile1 = "benchmarks/Loop1/Loop1.java";
 	private static String benchmarksFile2 = "benchmarks/easyloop1/EasyLoop1.java";
 	private static String benchmarksFile3 = "benchmarks/cohen/Cohen.java";
+	private static String benchmarksFile4 = "benchmarks/easyloop1/EasyLoop1NoPol.java";
 	
 //	private static final String digPath = "/home/daniel/git/dig/dig/dig.py";
 	private static final String digRelPath = "dig/dig/dig.py";
@@ -69,7 +80,7 @@ public class Main {
 	
 	public static void main(String[] args) {
 		outerLoop = true;
-		keyAPI = new KeYAPI(benchmarksFile2);
+		keyAPI = new KeYAPI(benchmarksFile4);
 		ProofIndependentSettings.DEFAULT_INSTANCE
         .getTestGenerationSettings().setMaxUnwinds(maxLoopUnwinds);
 		ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = 8;
@@ -207,6 +218,9 @@ public class Main {
 			}
 		}
 		System.out.println("Full Inv-Term with User given Ineq: " + conjInvariants.toString());
+		
+		boolean invInitiallyValid = isInvInitiallyValid(conjInvariants, proof.openGoals().head());
+		System.out.println("invInitiallyValid: " + invInitiallyValid);
 		
 		return new Invariant(conjInvariants);
 	}
@@ -379,5 +393,68 @@ public class Main {
 			e.printStackTrace();
 		}
 		return invs;
+	}
+	
+	public static boolean isInvInitiallyValid(Term inv, Goal loopGoal) {
+		//TODO: testGeneration "destroyed" the proof
+		Proof proof = loopGoal.proof();
+		//invInitValidSequent generieren
+		//{ Copy from KeYAPI
+		WhileInvariantRule invariantRule = WhileInvariantRule.INSTANCE;
+		PosInOccurrence poi = new PosInOccurrence(loopGoal.sequent().succedent().get(1), PosInTerm.getTopLevel(), false);
+		TermServices services = keyAPI.myEnvironment.getServices();
+		LoopInvariantBuiltInRuleApp ruleApplication = new LoopInvariantBuiltInRuleApp(invariantRule, poi, services);
+		ruleApplication = ruleApplication.tryToInstantiate(loopGoal);
+		LoopSpecification spec = ruleApplication.getSpec();
+		Services serv = loopGoal.proof().getServices();
+		
+		Map<LocationVariable, Term> invariants = new HashMap<>();
+		TermBuilder termBuilder = services.getTermBuilder();
+		Map<LocationVariable, Term> freeInvariants = new HashMap<>();
+		Map<LocationVariable, Term> modifies = /*new HashMap<>();//*/spec.getInternalModifies();
+		Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs = spec.getInternalInfFlowSpec();
+		Term variant = null;
+		
+		Term update = ruleApplication.posInOccurrence().sequentFormula().formula().sub(0);
+		
+		LocationVariable baseHeap  = serv.getTypeConverter().getHeapLDT().getHeap();
+		LocationVariable savedHeap = serv.getTypeConverter().getHeapLDT().getSavedHeap();
+		invariants.put(baseHeap, inv);
+		spec = spec.configurate(invariants, freeInvariants, modifies, infFlowSpecs, variant);
+		
+		ruleApplication.setLoopInvariant(spec);
+		
+		//} KeYAPI
+		
+		// { Copy From Goal.apply
+        Services overlayServices = proof.getServices().getOverlay(loopGoal.getLocalNamespaces());
+        final ImmutableList<Goal> goalList = ruleApplication.execute(loopGoal, overlayServices);
+		//}
+		// { From WhileInvariantRule.apply
+        Goal initGoal = goalList.tail().tail().head();
+        Goal bodyGoal = goalList.tail().head();
+        Goal useGoal = goalList.head();
+        //}
+		
+        Sequent invInitValidSequent = initGoal.sequent();
+        
+        boolean invInitiallyValid = false;
+		try {
+			Proof invInitValidProof = AuxiliaryFunctions.createProof(proof, "invInitValidProof", invInitValidSequent);
+			
+			ImmutableList<Goal> openGoals = keyAPI.prove(invInitValidProof);
+			
+			// Check if invInitValid Goal got closed
+			if (openGoals.isEmpty())
+				invInitiallyValid = true;
+			else
+				invInitiallyValid = false;
+			
+		} catch (ProofInputException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return invInitiallyValid;
 	}
 }

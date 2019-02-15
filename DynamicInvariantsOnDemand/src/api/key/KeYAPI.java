@@ -39,8 +39,8 @@ import prover.Invariant;
 import prover.SequentWrapper;
 
 public class KeYAPI {
-
-	private KeYEnvironment<?> myEnvironment = null;
+	//TODO:Daniel private modifier
+	public KeYEnvironment<?> myEnvironment = null;
 	
 	public KeYAPI(String fileName) {
 		File location = new File(fileName);

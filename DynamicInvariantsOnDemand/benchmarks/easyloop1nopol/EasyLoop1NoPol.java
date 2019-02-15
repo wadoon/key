@@ -1,16 +1,18 @@
+//requires (x >= 0);
+//loop_invariant (((x^2 - x*y - z) == 0) && (y >= 0));
+//loop_invariant (((x*x - x*y - z) == 0) && (y >= 0));
 //loop_invariant ((z == (x - y) * x) && (y >= 0));
-//loop_invariant ((z == (x - y) * x) && (x < 0));
-public class EasyLoop1 {
+public class EasyLoop1NoPol {
   /*@ public normal_behavior 
     @ requires (x >= 0);
     @ ensures \result == x * x;
     @ diverges true;
     @*/   
-    public int method1(int x) {
+    public int method1NoPol(int x) {
 	    int  y = x;
     	int  z = 0;
 	
-      /*@ loop_invariant ((z == (x - y) * x) && (y >= 0));
+      /*@ loop_invariant (y >= 0);
         @ decreasing y;
         @ assignable z,y;
         @*/
