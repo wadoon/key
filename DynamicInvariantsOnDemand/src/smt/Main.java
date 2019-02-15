@@ -442,7 +442,6 @@ public class Main {
 	        //}
 			
 	        Sequent invInitValidSequent = initGoal.sequent();
-	        
 			try {
 				Proof invInitValidProof = AuxiliaryFunctions.createProof(onlyLoopProof, "invInitValidProof", invInitValidSequent);
 				
@@ -453,6 +452,42 @@ public class Main {
 					invInitiallyValid = true;
 				else
 					invInitiallyValid = false;
+				
+			} catch (ProofInputException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			Sequent invBodySequent = bodyGoal.sequent();
+			boolean invBody = false;
+			try {
+				Proof invBodyProof = AuxiliaryFunctions.createProof(onlyLoopProof, "invBodyProof", invBodySequent);
+				
+				ImmutableList<Goal> openGoals = keyAPI.prove(invBodyProof);
+				
+				// Check if invInitValid Goal got closed
+				if (openGoals.isEmpty())
+					invBody = true;
+				else
+					invBody = false;
+				
+			} catch (ProofInputException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			Sequent invUseCaseSequent = useGoal.sequent();
+			boolean invUseCase = false;
+			try {
+				Proof invUseCaseProof = AuxiliaryFunctions.createProof(onlyLoopProof, "invUseCaseProof", invUseCaseSequent);
+				
+				ImmutableList<Goal> openGoals = keyAPI.prove(invUseCaseProof);
+				
+				// Check if invInitValid Goal got closed
+				if (openGoals.isEmpty())
+					invUseCase = true;
+				else
+					invUseCase = false;
 				
 			} catch (ProofInputException e) {
 				// TODO Auto-generated catch block
