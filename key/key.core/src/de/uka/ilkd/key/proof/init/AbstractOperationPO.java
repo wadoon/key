@@ -475,28 +475,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
         final ProgramVariable resultVar = tb.resultVar(pm, makeNamesUnique);
         final ProgramVariable exceptionVar = tb.excVar(pm, makeNamesUnique);
 
-
-        // add ownership axioms for rep/peer fields
-        ImmutableList<Field> fields = proofServices.getJavaInfo().getAllFields(
-                (TypeDeclaration) selfVar.getKeYJavaType().getJavaType());
-        for (Field f : fields) {
-            if (f.getProgramName().startsWith("rep_")) {
-
-                Taclet t = createOwnershipAxiomTaclet(f, true, proofServices);
-
-                // register taclet as axiom
-                taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(t));
-                proofConfig.registerRule(t, AxiomJustification.INSTANCE);
-
-            } else if (f.getProgramName().startsWith("peer_")) {
-
-                Taclet t = createOwnershipAxiomTaclet(f, false, proofServices);
-
-                // register taclet as axiom
-                taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(t));
-                proofConfig.registerRule(t, AxiomJustification.INSTANCE);
-            }
-        }
+        // add ownership axioms for rep/peer fields defined in the class containing the contract
+        // TODO: what about ownership of fields in other classes?
+        createOwnershipTaclets(proofServices, selfVar);
 
         if (pm.isModel()) {
             // before resultVar
@@ -556,6 +537,27 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         // for JML annotation statements
         generateWdTaclets(proofConfig);
+    }
+
+    private void createOwnershipTaclets(Services proofServices, ProgramVariable selfVar) {
+        ImmutableList<Field> fields = proofServices.getJavaInfo().getAllFields(
+                (TypeDeclaration) selfVar.getKeYJavaType().getJavaType());
+        for (Field f : fields) {
+
+            // generate taclet for field
+            Taclet t = null;
+            if (f.getProgramName().startsWith("rep_")) {
+                t = createOwnershipAxiomTaclet(f, true, proofServices);
+            } else if (f.getProgramName().startsWith("peer_")) {
+                t = createOwnershipAxiomTaclet(f, false, proofServices);
+            }
+
+            // register taclet as axiom
+            if (t != null) {
+                taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(t));
+                proofConfig.registerRule(t, AxiomJustification.INSTANCE);
+            }
+        }
     }
 
     private RewriteTaclet createOwnershipAxiomTaclet(Field f, boolean isRep, Services services) {
