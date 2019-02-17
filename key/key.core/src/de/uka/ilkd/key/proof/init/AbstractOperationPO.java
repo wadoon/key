@@ -25,6 +25,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Set;
 
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
@@ -32,9 +33,11 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
+import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.literal.NullLiteral;
 import de.uka.ilkd.key.java.expression.operator.CopyAssignment;
@@ -44,10 +47,13 @@ import de.uka.ilkd.key.java.statement.Catch;
 import de.uka.ilkd.key.java.statement.Finally;
 import de.uka.ilkd.key.java.statement.TransactionStatement;
 import de.uka.ilkd.key.java.statement.Try;
+import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.ProgramElementName;
+import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
+import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.SymbolicExecutionTermLabel;
@@ -58,11 +64,20 @@ import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariableFactory;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.mgt.AxiomJustification;
 import de.uka.ilkd.key.rule.NoPosTacletApp;
+import de.uka.ilkd.key.rule.RewriteTaclet;
+import de.uka.ilkd.key.rule.RuleSet;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * <p>
@@ -460,6 +475,29 @@ public abstract class AbstractOperationPO extends AbstractPO {
         final ProgramVariable resultVar = tb.resultVar(pm, makeNamesUnique);
         final ProgramVariable exceptionVar = tb.excVar(pm, makeNamesUnique);
 
+
+        // add ownership axioms for rep/peer fields
+        ImmutableList<Field> fields = proofServices.getJavaInfo().getAllFields(
+                (TypeDeclaration) selfVar.getKeYJavaType().getJavaType());
+        for (Field f : fields) {
+            if (f.getProgramName().startsWith("rep_")) {
+
+                Taclet t = createOwnershipAxiomTaclet(f, true, proofServices);
+
+                // register taclet as axiom
+                taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(t));
+                proofConfig.registerRule(t, AxiomJustification.INSTANCE);
+
+            } else if (f.getProgramName().startsWith("peer_")) {
+
+                Taclet t = createOwnershipAxiomTaclet(f, false, proofServices);
+
+                // register taclet as axiom
+                taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(t));
+                proofConfig.registerRule(t, AxiomJustification.INSTANCE);
+            }
+        }
+
         if (pm.isModel()) {
             // before resultVar
             final List<LocationVariable> modHeaps =
@@ -518,6 +556,77 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         // for JML annotation statements
         generateWdTaclets(proofConfig);
+    }
+
+    private RewriteTaclet createOwnershipAxiomTaclet(Field f, boolean isRep, Services services) {
+        /* rep {
+         *   \schemaVar \term Object o;
+         *   \schemaVar \term Heap heapSV;
+         *   \find(Object::select(heapSV, o, f))
+         *   \add(Object::select(heapSV, o, f) != null -> owner(Object::select(heapSV, o, f)) == o)
+         * };
+         */
+
+        Name heapName = new Name("h");
+        Name objName = new Name("o");
+
+        Sort oSort = services.getJavaInfo().getJavaLangObject().getSort();
+        Sort fSort = f.getProgramVariable().sort();
+
+        SchemaVariable svH = SchemaVariableFactory.createTermSV(heapName,
+                services.getTypeConverter().getHeapLDT().targetSort());
+        SchemaVariable svO = SchemaVariableFactory.createTermSV(objName, oSort);
+
+        // since we have a concrete known field, we need a ProgramVariabel here
+        ProgramVariable pvF = services.getJavaInfo().getAttribute(f.getFullName());
+
+        // assert pvF instanceof LocationVariable;
+        Function fieldSymbol = services.getTypeConverter()
+                                       .getHeapLDT()
+                                       .getFieldSymbolForPV((LocationVariable)pvF, services);
+
+        // "o.f": Object::select(heapSV, o, f)
+        Term oF = tb.select(fSort, tb.var(svH), tb.var(svO), tb.func(fieldSymbol));
+
+        Function func = services.getNamespaces().functions().lookup("owner");
+        Term own = tb.func(func, oF);
+        Term right;
+        if (isRep) {
+            // owner("o.f") = o
+            right = tb.var(svO);
+        } else {
+            // owner("o.f") = owner(o)
+            right = tb.func(func, tb.var(svO));
+        }
+        Term eq = tb.equals(own, right);
+
+        // "o.f" =! null
+        Term notNull = tb.not(tb.equals(oF, tb.NULL()));
+
+        SequentFormula seqFormula = new SequentFormula(tb.imp(notNull, eq));
+        Semisequent semi = new Semisequent(seqFormula);
+        Sequent seq = Sequent.createAnteSequent(semi);
+
+        RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
+
+        // generate taclet name
+        String name = (isRep ? "rep" : "peer") + " axiom for " + f.getProgramName();
+        tacletBuilder.setName(MiscTools.toValidTacletName(name));
+
+        ImmutableSet<Choice> choices = DefaultImmutableSet.<Choice>nil()
+                .add(new Choice("Java", "programRules"));
+        tacletBuilder.setChoices(choices);
+
+        // \find("o.f")
+        tacletBuilder.setFind(oF);
+
+        // TODO: heuristics, e.g. simplify
+        tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
+
+        // \add(Object::select(heapSV, o, f) != null -> owner(Object::select(heapSV, o, f)) = o ==>)
+        tacletBuilder.addTacletGoalTemplate(
+                new TacletGoalTemplate(seq, ImmutableSLList.<Taclet>nil()));
+        return tacletBuilder.getTaclet();
     }
 
     /**
