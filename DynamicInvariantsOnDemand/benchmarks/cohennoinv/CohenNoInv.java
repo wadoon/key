@@ -1,4 +1,6 @@
-public class SimpleExamples {
+//Outer: loop_invariant (0 <= r) && (x == q*y + r);
+//Inner: loop_invariant (b <= r) && (b == a*y) && (x == q*y + r);
+public class SimpleExamplesNoInv {
 	
 	/*@
     @ public normal_behavior
@@ -11,14 +13,12 @@ public class SimpleExamples {
 		int r = x;	// remainder
 		//		  
 		/*@
-		  @ loop_invariant (0 <= r) && (x == q*y + r);
 		  @ assignable \nothing;
 		  @*/
 		while(y <= r) {
 			int a = 1;
 			int b = y;
 			/*@
-			  @ loop_invariant (b <= r) && (b == a*y);
 			  @ assignable \nothing;
 			  @*/
 			while(2*b <= r) {

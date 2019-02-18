@@ -52,7 +52,11 @@ public class SequentWrapper {
 		while( !(currentSourceElement instanceof While) ) {
 			currentSourceElement = currentSourceElement.getFirstElement();
 		}
-		While loop = (While)currentSourceElement;
+		While loop = null;
+		if (currentSourceElement instanceof While)
+			loop = (While)currentSourceElement;
+		
+		//return null, if no loop
 		return loop;
 	}
 	public Term getPhi() {

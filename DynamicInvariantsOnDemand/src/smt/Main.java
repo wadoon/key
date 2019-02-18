@@ -69,18 +69,16 @@ public class Main {
 	private static String benchmarksFile3 = "benchmarks/cohen/Cohen.java";
 	private static String benchmarksFile4 = "benchmarks/easyloop1/EasyLoop1NoPol.java";
 	
-//	private static final String digPath = "/home/daniel/git/dig/dig/dig.py";
 	private static final String digRelPath = "dig/dig/dig.py";
 	//amount of testcases / method calls for the function from which the traces should be obtained
 	public static final int maxLoopUnwinds = 12;
 	
 	private static KeYAPI keyAPI;
-	private static Proof clonedProof;
 	private static boolean outerLoop;
 	
 	public static void main(String[] args) {
 		outerLoop = true;
-		keyAPI = new KeYAPI(benchmarksFile4);
+		keyAPI = new KeYAPI(benchmarksFile3);
 		ProofIndependentSettings.DEFAULT_INSTANCE
         .getTestGenerationSettings().setMaxUnwinds(maxLoopUnwinds);
 		ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = 8;
@@ -89,9 +87,6 @@ public class Main {
 		ProofResult result = null;
 		for(Contract currentContract : proofContracts) {
 			Proof currentProof = keyAPI.createProof(currentContract);
-			//FIXME stacked loops
-			clonedProof = keyAPI.createProof(currentContract);
-//			ImmutableList<Goal> clonedOpenGoals = keyAPI.prove(clonedProof);
 			result = attemptProve(currentProof);
 		}
 		if(result != null) System.out.println("Successfully closed proof.");
@@ -102,7 +97,13 @@ public class Main {
 			ImmutableList<Goal> openGoals = keyAPI.prove(proof);
 			for(Goal currentGoal : openGoals) {
 				SequentWrapper currentSequent = keyAPI.getSequent(currentGoal);
-				InvGenResult result = attemptInvGen(currentSequent, proof);
+				InvGenResult result = null;
+				try {
+					result = attemptInvGen(currentSequent, proof);
+				} catch (ProofInputException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				if(result instanceof CounterExample) {
 					CounterExample counterexample = (CounterExample)result;
 					return counterexample;
@@ -116,20 +117,27 @@ public class Main {
 		return new ProofWrapper(proof); 
 	}
 	
-	public static InvGenResult attemptInvGen(SequentWrapper sequent, Proof proof) {
+	public static InvGenResult attemptInvGen(SequentWrapper sequent, Proof proof) throws ProofInputException {
 		//FIXME: Daniel - Fix Code for stackedloops, does not work
-		System.out.println("Start test generation, num cases/calls: " + maxLoopUnwinds);
-		if (outerLoop) {
-			ProblemFactory.create(clonedProof);
-			outerLoop = false;
-		} else
-			ProblemFactory.create(proof);
-		
 		List<Term> gamma 		= sequent.getGamma();
 		StatementBlock program 	= sequent.getProgram();
 		Term phi 				= sequent.getPhi();
 		While loop 				= sequent.getLoop();
 		Term update				= sequent.getUpdate();
+		
+		if (loop == null) {
+			//-> we have no loop here, but we only want to generate loop invariants
+			return null;
+		}
+		
+		//clone proof and work on the cloned version, since TestGenerator messes with it
+		//we only need to obtain the invariants here, no need to operate on the original proof
+		//TODO: .head()? more possibilities?
+		Goal loopGoal = proof.openGoals().head();
+		Proof onlyLoopProof = AuxiliaryFunctions.createProof(proof, "loopProof", loopGoal.sequent());
+		
+		System.out.println("Start test generation, num cases/calls: " + maxLoopUnwinds);
+		ProblemFactory.create(onlyLoopProof);
 		
 		System.out.println("Start generating modified method with traces code");
 		// Generate Program Code with Traces for dynamic execution
@@ -171,8 +179,8 @@ public class Main {
 		System.out.println("JML Invs: " + convertedInvariants);
 		
 		// add update vars to namespace to be able to use the parser for those vars
-	    TermBuilder tb = clonedProof.getServices().getTermBuilder();
-		Services services = clonedProof.getServices().copy(false);
+	    TermBuilder tb = onlyLoopProof.getServices().getTermBuilder();
+		Services services = onlyLoopProof.getServices().copy(false);
         AbbrevMap abbr = (services.getProof() == null) ? null
                 : services.getProof().abbreviations();
         NamespaceSet existingNS = services.getNamespaces();
@@ -300,7 +308,7 @@ public class Main {
 			String inequality = mIneq.group(1);
 			
 			// To this point, since the matcher is not greedy, only the first closing parenthesis ")" will be matched
-			// -> append ")" as much as open ones
+			// -> append ")" as many as open ones
 			
 			int countOpeningParenthesis = inequality.length() - inequality.replace("(", "").length();
 			final int countClosingParenthesis = 1;
