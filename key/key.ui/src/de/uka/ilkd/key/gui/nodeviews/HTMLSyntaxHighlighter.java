@@ -110,8 +110,8 @@ public class HTMLSyntaxHighlighter {
             "final", "while", "return", "break", "switch", "case", "continue",
             "try", "catch", "finally", "assert", "null", "throw", "this",
             "true", "false", "int", "char", "long", "short",
-            "\\Qmethod&#045;frame\\E", "boolean",
-            "\\Qabstract&#045;program\\E" };
+            "\\Qmethod&#045;frame\\E", "\\Qloop&#045;scope\\E", "boolean",
+            "\\Qabstract_program\\E" };
 
     public final static String JAVA_KEYWORDS_REGEX = concat("|",
             Arrays.asList(JAVA_KEYWORDS));
