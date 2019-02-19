@@ -3846,7 +3846,7 @@ varexp[TacletBuilder b]
     | varcond_simplifyIfThenElseUpdate[b]
     | varcond_differentFields[b]
     | varcond_noEventUpdate[b]
-   // | varcond_applyEventOnRigid[b]
+    | varcond_applyEventOnRigid[b]
   ) 
   | 
   ( (NOT_ {negated = true;} )? 
@@ -4291,18 +4291,15 @@ varcond_noEventUpdate [TacletBuilder b]
    }
 ;
 
-/*varcond_applyEventOnRigid [TacletBuilder b]
+varcond_applyEventOnRigid [TacletBuilder b]
 :
-   APPLY_EVENT_ON_RIGID
-   LPAREN
-     x = varId
-     y = varId
-   RPAREN
+   APPLY_EVENT_ON_RIGID LPAREN u=varId COMMA x=varId COMMA x2=varId RPAREN 
    {
-            b.addVariableCondition(new ApplyEventOnRigid((SchemaVariable)x, (SchemaVariable)y));
+      b.addVariableCondition(new ApplyEventOnRigid((UpdateSV)u, 
+                                                             (SchemaVariable)x, 
+                                                             (SchemaVariable)x2));
    }
-;*/
-
+;
 
 varcond_label [TacletBuilder b, boolean negated]
 :

@@ -1,4 +1,4 @@
 
 public class A {
-    int a, b;
+    int a, b, c;
 }
