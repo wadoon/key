@@ -9,12 +9,10 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import core.ProgramTraceInserterVisitor;
 import core.TermUpdateVisitor;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.rule.metaconstruct.ProgramTransformer;
 
 public abstract class MethodGenerator {
 	public static String generateMethodFromKeYFormat(StatementBlock program, Term update, While loop) {
@@ -26,7 +24,6 @@ public abstract class MethodGenerator {
 		
 		String returnVariable = extractReturnVariableFromProgram(program);
 		
-		ProgramTraceInserterVisitor programTraceInserterVisitor = new ProgramTraceInserterVisitor();
 		//program.getBody().forEach(s -> s.);
 		
 		StringBuilder javaCodeBuilder = new StringBuilder();

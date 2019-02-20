@@ -125,6 +125,13 @@ public class KeYAPI {
 	}
 	
 	public void applyInvariantRule(Goal goal, Invariant invariant) {
+		
+		if (goal.sequent().succedent().size() < 2) {
+			//can't apply goal.sequent().succedent().get(1)
+			System.out.println("applyInvariantRule: can't apply, return null");
+			return;
+		}
+		
 		WhileInvariantRule invariantRule = WhileInvariantRule.INSTANCE;
 		PosInOccurrence poi = new PosInOccurrence(goal.sequent().succedent().get(1), PosInTerm.getTopLevel(), false);
 		TermServices services = myEnvironment.getServices();

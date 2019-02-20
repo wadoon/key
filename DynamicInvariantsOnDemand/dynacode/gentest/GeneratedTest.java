@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 public class GeneratedTest implements IGeneratedTest { 
 private static HashMap<String, ArrayList<Integer>> varTraces = new HashMap<String, ArrayList<Integer>>();
+IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
 
  public GeneratedTest(){}
 
@@ -35,701 +36,110 @@ public HashMap<String, ArrayList<Integer>> callGeneratedTest(){
    testSuiteObject.testcode4();
    testSuiteObject.testcode5();
    testSuiteObject.testcode6();
-   testSuiteObject.testcode7();
-   testSuiteObject.testcode8();
-   testSuiteObject.testcode9();
-   testSuiteObject.testcode10();
-   testSuiteObject.testcode11();
-   testSuiteObject.testcode12();
-   testSuiteObject.testcode13();
-   testSuiteObject.testcode14();
-   testSuiteObject.testcode15();
-   testSuiteObject.testcode16();
-   testSuiteObject.testcode17();
-   testSuiteObject.testcode18();
-   testSuiteObject.testcode19();
-   testSuiteObject.testcode20();
-   testSuiteObject.testcode21();
-   testSuiteObject.testcode22();
-   testSuiteObject.testcode23();
-   testSuiteObject.testcode24();
-   testSuiteObject.testcode25();
-   testSuiteObject.testcode26();
-   testSuiteObject.testcode27();
-   testSuiteObject.testcode28();
-   testSuiteObject.testcode29();
-   testSuiteObject.testcode30();
-   testSuiteObject.testcode31();
-   testSuiteObject.testcode32();
-   testSuiteObject.testcode33();
-   testSuiteObject.testcode34();
-   testSuiteObject.testcode35();
-   testSuiteObject.testcode36();
     return varTraces;
  }
 
-  //Test Case for NodeNr: 8582
+  //Test Case for NodeNr: 348
  public void  testcode0(){
    //Test preamble: creating objects and intializing test data
    boolean measuredByEmpty = (boolean)true;
-   int x = (int)64;
-   int y = (int)1;
+   int x = (int)16;
 
    //Other variables
 
    //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
    inputVars.add(x);
-   inputVars.add(y);
    HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
    varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
  }
 
-  //Test Case for NodeNr: 8542
+  //Test Case for NodeNr: 329
  public void  testcode1(){
    //Test preamble: creating objects and intializing test data
    boolean measuredByEmpty = (boolean)true;
-   int x = (int)48;
-   int y = (int)1;
+   int x = (int)5;
 
    //Other variables
 
    //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
    inputVars.add(x);
-   inputVars.add(y);
    HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
    varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
  }
 
-  //Test Case for NodeNr: 8444
+  //Test Case for NodeNr: 272
  public void  testcode2(){
    //Test preamble: creating objects and intializing test data
    boolean measuredByEmpty = (boolean)true;
-   int x = (int)47;
-   int y = (int)1;
+   int x = (int)4;
 
    //Other variables
 
    //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
    inputVars.add(x);
-   inputVars.add(y);
    HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
    varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
  }
 
-  //Test Case for NodeNr: 8379
+  //Test Case for NodeNr: 215
  public void  testcode3(){
    //Test preamble: creating objects and intializing test data
    boolean measuredByEmpty = (boolean)true;
-   int x = (int)40;
-   int y = (int)1;
+   int x = (int)3;
 
    //Other variables
 
    //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
    inputVars.add(x);
-   inputVars.add(y);
    HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
    varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
  }
 
-  //Test Case for NodeNr: 7835
+  //Test Case for NodeNr: 158
  public void  testcode4(){
    //Test preamble: creating objects and intializing test data
    boolean measuredByEmpty = (boolean)true;
-   int x = (int)39;
-   int y = (int)1;
+   int x = (int)2;
 
    //Other variables
 
    //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
    inputVars.add(x);
-   inputVars.add(y);
    HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
    varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
  }
 
-  //Test Case for NodeNr: 7769
+  //Test Case for NodeNr: 102
  public void  testcode5(){
    //Test preamble: creating objects and intializing test data
    boolean measuredByEmpty = (boolean)true;
-   int x = (int)37;
-   int y = (int)1;
+   int x = (int)1;
 
    //Other variables
 
    //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
    inputVars.add(x);
-   inputVars.add(y);
    HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
    varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
  }
 
-  //Test Case for NodeNr: 7453
+  //Test Case for NodeNr: 55
  public void  testcode6(){
    //Test preamble: creating objects and intializing test data
    boolean measuredByEmpty = (boolean)true;
-   int x = (int)36;
-   int y = (int)1;
+   int x = (int)0;
 
    //Other variables
 
    //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
    inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 6946
- public void  testcode7(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)35;
-   int y = (int)1;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 6815
- public void  testcode8(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)34;
-   int y = (int)1;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 6356
- public void  testcode9(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)33;
-   int y = (int)1;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 6098
- public void  testcode10(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)32;
-   int y = (int)1;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 5757
- public void  testcode11(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)78;
-   int y = (int)3;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 5713
- public void  testcode12(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)75;
-   int y = (int)3;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 5419
- public void  testcode13(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)48;
-   int y = (int)2;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 5109
- public void  testcode14(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)66;
-   int y = (int)3;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 4986
- public void  testcode15(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)64;
-   int y = (int)3;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 4662
- public void  testcode16(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)40;
-   int y = (int)2;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 4199
- public void  testcode17(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)38;
-   int y = (int)2;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 4060
- public void  testcode18(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)18;
-   int y = (int)1;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 3645
- public void  testcode19(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)17;
-   int y = (int)1;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 3401
- public void  testcode20(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)32;
-   int y = (int)2;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 3101
- public void  testcode21(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)76;
-   int y = (int)5;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 3064
- public void  testcode22(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)28;
-   int y = (int)2;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 2746
- public void  testcode23(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)96;
-   int y = (int)7;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 2466
- public void  testcode24(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)64;
-   int y = (int)5;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 2188
- public void  testcode25(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)70;
-   int y = (int)6;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 2057
- public void  testcode26(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)64;
-   int y = (int)6;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 1686
- public void  testcode27(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)48;
-   int y = (int)5;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 1472
- public void  testcode28(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)16;
-   int y = (int)2;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 1213
- public void  testcode29(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)28;
-   int y = (int)4;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 1096
- public void  testcode30(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)64;
-   int y = (int)10;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 866
- public void  testcode31(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)32;
-   int y = (int)6;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 674
- public void  testcode32(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)64;
-   int y = (int)13;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 461
- public void  testcode33(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)64;
-   int y = (int)18;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 344
- public void  testcode34(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)2;
-   int y = (int)1;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 179
- public void  testcode35(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)64;
-   int y = (int)48;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
-   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
-   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
- }
-
-  //Test Case for NodeNr: 78
- public void  testcode36(){
-   //Test preamble: creating objects and intializing test data
-   boolean measuredByEmpty = (boolean)true;
-   int x = (int)44;
-   int y = (int)64;
-
-   //Other variables
-
-   //Calling the method under test   
-   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();
-   ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(x);
-   inputVars.add(y);
    HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);
    varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
  }

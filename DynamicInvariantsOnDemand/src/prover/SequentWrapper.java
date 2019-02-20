@@ -48,6 +48,8 @@ public class SequentWrapper {
 		return myProgram;
 	}
 	public While getLoop() {
+		if (myProgram == null)
+			return null;
 		SourceElement currentSourceElement = myProgram.getFirstElement();
 		while( !(currentSourceElement instanceof While) ) {
 			currentSourceElement = currentSourceElement.getFirstElement();

@@ -248,9 +248,7 @@ public class TestCaseGenerator {
     public String getMUTCall(){
     	StringBuilder sb = new StringBuilder();
         //FIXME schöner
-        sb.append("   IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();" + 
-        		NEW_LINE + 
-        		"   ArrayList<Integer> inputVars = new ArrayList<Integer>();"
+        sb.append("   ArrayList<Integer> inputVars = new ArrayList<Integer>();"
         		+ NEW_LINE);
     	
         IProgramMethod m = info.getMUT();		
@@ -539,45 +537,6 @@ public class TestCaseGenerator {
         }
     }
 
-    public String generateJUnitTestCase(Model m, Node n) throws IOException { // TODO: Method is never used, remove
-//        fileName = "TestGeneric" + TestCaseGenerator.fileCounter;
-    	fileName = "GeneratedTest";
-        String mut = getMUTCall();
-//        if (mut == null) {
-//            mut = "<method under test> //Manually write a call to the method under test, because KeY could not determine it automatically.";
-//        } else {
-//            fileName += "_" + MUTName;
-//        }
-        final StringBuffer testCase = new StringBuffer();
-        testCase.append(getFilePrefix(fileName, null) + NEW_LINE);
-        testCase.append(getMainMethod(fileName, 1) + NEW_LINE + NEW_LINE);
-        testCase.append(getTestMethodSignature(0) + "{" + NEW_LINE);
-        Map<String, Sort> typeInfMap = null;
-        if(n!=null){
-            typeInfMap = generateTypeInferenceMap(n);
-        }
-        testCase.append("   //Test preamble: creating objects and intializing test data"
-                + generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
-        testCase.append("   //Calling the method under test   " + NEW_LINE
-        		+ mut
-                + NEW_LINE);
-        testCase.append("}" + NEW_LINE + "}");
-        logger.writeln("Writing test file to:" + directory + modDir
-                + File.separator + fileName);
-        writeToFile(fileName + JAVA_FILE_EXTENSION_WITH_DOT, testCase);
-        exportCodeUnderTest();
-        createDummyClasses();
-        try{
-            if(useRFL)writeRFLFile();
-        }catch(Exception ex){
-            logger.writeln("Error: The file RFL" + JAVA_FILE_EXTENSION_WITH_DOT + " is either not generated or it has an error.");
-        }
-        createOpenJMLShellScript();
-        TestCaseGenerator.fileCounter++;
-        return testCase.toString();
-    }
-
-
 
     protected String getOracleAssertion(List<OracleMethod> oracleMethods){		
         Term postcondition = getPostCondition();
@@ -651,6 +610,7 @@ public class TestCaseGenerator {
                         testMethod.append(getTestMethodSignature(i) + "{" + NEW_LINE);
                         testMethod
                         .append("   //Test preamble: creating objects and intializing test data"
+                        //Generate Input Variable Assignments (Output of Z3) here
                                 + generateTestCase(m, typeInfMap) + NEW_LINE + NEW_LINE);
 
                         Set<Term> vars = new HashSet<Term>();
@@ -879,6 +839,7 @@ public class TestCaseGenerator {
         m.removeUnnecessaryObjects();
         
         //FIXME Daniel: cleaner
+        //get Class Name of Method under Test
         String classOfMUT = null;
         for (Map.Entry<String, Sort> e : typeInfMap.entrySet()) {
         	if (e.getKey().equals("self")) {
@@ -889,6 +850,7 @@ public class TestCaseGenerator {
 
         Set<String> objects = new HashSet<String>();
 
+        //Find Base Heap
         final List<Assignment> assignments = new LinkedList<Assignment>();
         Heap heap = null;
         for (final Heap h : m.getHeaps()) {
@@ -901,7 +863,6 @@ public class TestCaseGenerator {
         //Set<ObjectVal> prestate = getPrestateObjects(m);
         Set<ObjectVal> prestate = new HashSet<ObjectVal>();
         if (heap != null) {
-
 
             // create objects
             for (final ObjectVal o : heap.getObjects()) {
@@ -937,6 +898,8 @@ public class TestCaseGenerator {
             }
         }
         // init constants
+        //Daniel: INIT INPUT VARIABLES HERE
+        int debug = 0;
         for (final String c : m.getConstants().keySet()) {
             String val = m.getConstants().get(c);
             if (filterVal(val) && !c.equals("null")) {
@@ -1163,6 +1126,8 @@ public class TestCaseGenerator {
             		"import java.util.HashMap;\n"
             		+ "public class " + "GeneratedTest" + " implements IGeneratedTest " + "{ " + NEW_LINE 
             		+ "private static HashMap<String, ArrayList<Integer>> varTraces = new HashMap<String, ArrayList<Integer>>();"
+            		+ NEW_LINE
+            		+ "IGeneratedMethod generatedMethod = GeneratedMethodHelper.getGeneratedMethod();"
             		+ NEW_LINE
             		+ NEW_LINE + " public "
                     + "GeneratedTest" + "(){}" + NEW_LINE;

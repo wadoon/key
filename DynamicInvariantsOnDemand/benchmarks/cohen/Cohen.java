@@ -8,10 +8,11 @@ public class SimpleExamples {
     @*/
 	int cohenDivide(int x, int y) {
 		int q = 0;	// quotient
-		int r = x;	// remainder
-		//		  
+		int r = x;	// remainder	
+		
+		//orig loop_invariant (0 <= r) && (x == q*y + r);
 		/*@
-		  @ loop_invariant (0 <= r) && (x == q*y + r);
+		  @ loop_invariant (r >= 0) && (x == q*y + r);
 		  @ assignable \nothing;
 		  @*/
 		while(y <= r) {
@@ -30,5 +31,4 @@ public class SimpleExamples {
 		}
 		return q;
 	}
-	
 }

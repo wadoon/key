@@ -5,15 +5,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import org.key_project.util.collection.ImmutableList;
+
 import de.uka.ilkd.key.macros.ProofMacroFinishedInfo;
 import de.uka.ilkd.key.macros.SemanticsBlastingMacro;
 import de.uka.ilkd.key.macros.TestGenMacro;
+import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.ProofDependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSMTSettings;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.settings.TestGenerationSettings;
+import de.uka.ilkd.key.smt.ModelExtractor;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SMTSolver;
 import de.uka.ilkd.key.smt.SMTSolverResult;
@@ -35,7 +39,8 @@ public class ProblemFactory {
 	private static void applySymbolicExecution(Proof proof) {
 		try {
 			TestGenMacro macro = new TestGenMacro();
-			macro.applyTo(null, proof, proof.openEnabledGoals(), null, null);
+			ImmutableList<Goal> openEnabledGoals = proof.openEnabledGoals();
+			macro.applyTo(null, proof, openEnabledGoals, null, null);
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
@@ -107,25 +112,27 @@ public class ProblemFactory {
 		final Vector<SMTSolver> output = new Vector<SMTSolver>();
 		for (final SMTSolver solver : problemSolvers) {
 			try {
-				//FIXME: Loop1:Bei unwinds = 20 werden 20 Probleme generiert, aber auch z.B. x=3 mehrfach, und nur von x 1-3 sind counterexample, sonst valid, wodurch kein output entsteht
 				final SMTSolverResult.ThreeValuedTruth res = solver.getFinalResult().isValid();
 				if (res == SMTSolverResult.ThreeValuedTruth.UNKNOWN) {
 					if (solver.getException() != null) {
 						solver.getException().printStackTrace();
 					}
 				} else if (res == SMTSolverResult.ThreeValuedTruth.FALSIFIABLE) {
-					if (solver.getSocket().getQuery() != null) {
-						//FIXME: Loop1: Bei x=19 ist counterex. x=3, bei 18 - 2, 17 - 1, 16 - 0. Bei x=11 - 3, 10 - 2, 9 - 1, 8 - 0. 3 - 3, 2-2, 1-1, 0 - 0
-						final Model m = solver.getSocket().getQuery().getModel();
+					ModelExtractor me = solver.getSocket().getQuery();
+					if (me != null) {
+						final Model m = me.getModel();
 						if (TestCaseGenerator.modelIsOK(m)) {
 							output.add(solver);
 						}
 					}
+				} else {
+					System.out.println("Valid Model");
 				}
 			} catch (final Exception e) {
 				e.printStackTrace();
 			}
 		}
+		System.out.println("Valid Paths - Number of Generated Test Cases: " + output.size());
 		return output;
 	}
 
