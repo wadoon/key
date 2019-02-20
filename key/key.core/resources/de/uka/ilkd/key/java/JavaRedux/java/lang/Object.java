@@ -1,6 +1,22 @@
 package java.lang;
 
-public class Object {  
+public class Object {
+
+    //@ public model \locset repfp;
+    //@ public accessible repfp: repfp;
+
+    //@ public model \locset peerfp;
+    //@ public accessible peerfp: peerfp;
+
+    // has to be overwritten in subclasses
+    //@ private represents repfp = this.*;
+    //@ private represents peerfp = this.*;
+
+    //@ public accessible \inv: repfp;
+
+    //@ public model boolean relinv;
+    //@ public accessible relinv: repfp;
+    //@ private represents relinv = this.\inv;
 
     
     /*@ public normal_behavior
