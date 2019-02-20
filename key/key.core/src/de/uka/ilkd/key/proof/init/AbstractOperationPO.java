@@ -35,6 +35,7 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
@@ -74,6 +75,7 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -479,6 +481,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // TODO: what about ownership of fields in other classes?
         createOwnershipTaclets(proofServices, selfVar);
 
+        // add represents axioms for relinv
+        createRelinvRepresentsClause(proofServices, selfVar);
+
         if (pm.isModel()) {
             // before resultVar
             final List<LocationVariable> modHeaps =
@@ -496,7 +501,6 @@ public abstract class AbstractOperationPO extends AbstractPO {
                                       proofServices);
             termPOs.add(poTerm);
         } else {
-            // This should be indented, but for now I want to make diffing a bit easier
             final boolean[] transactionFlags = setTransactionFlags();
             int nameIndex = 0;
             for (boolean transactionFlag : transactionFlags) {
@@ -539,6 +543,96 @@ public abstract class AbstractOperationPO extends AbstractPO {
         generateWdTaclets(proofConfig);
     }
 
+    private void createRelinvRepresentsClause(Services services, ProgramVariable selfVar) {
+        /* relinv_self {
+         *   \schemaVar \term Heap H;
+         *   \find(relinv(H, self))
+         *   \replacewith(inv(H, self)
+         *                            // quantifier not explicit, instead we roll out for all fields
+         *      && (\forall Field f;
+         *          Object::select(h, Object::select(h, self, f), created) = TRUE
+         *          -> relinv(Object::select(h, self, f)));
+         * };
+         */
+
+        // TODO: generate represents clauses for relinv for self
+        // concrete invariant is hidden for all objects != self
+        ImmutableList<Field> fields = services.getJavaInfo().getAllFields(
+                (TypeDeclaration) selfVar.getKeYJavaType().getJavaType());
+
+        TermBuilder tb = services.getTermBuilder();
+
+        // start with invariant(self)
+        Term replace = tb.inv(tb.var(selfVar));
+
+        // for every field we add: self.f.created = TRUE -> relinv(self.f)
+        Name heapName = new Name("heap");
+        Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
+        SchemaVariable heapSV = SchemaVariableFactory.createTermSV(heapName, heapSort);
+
+        Function relinvFunc = services.getNamespaces()
+                                      .functions()
+                                      .lookup("java.lang.Object::$relinv");
+
+        Term find = tb.func(relinvFunc, tb.var(heapSV), tb.var(selfVar));
+
+        for (Field f : fields) {
+            // skip implicit fields (TODO: better way to do this?)
+            if (f instanceof ImplicitFieldSpecification) {
+                continue;
+            }
+
+            // collect terms of the form:
+            // o.f.created = TRUE -> relinv(o.f)
+
+            ProgramVariable pvF = services.getJavaInfo().getAttribute(f.getFullName());
+            Sort fSort = f.getProgramVariable().sort();
+
+            // assert pvF instanceof LocationVariable;
+            Function fieldSymbol = services.getTypeConverter()
+                                           .getHeapLDT()
+                                           .getFieldSymbolForPV((LocationVariable)pvF, services);
+
+            // "self.f": Object::select(heapSV, self, f)
+            Term oF = tb.select(fSort, tb.var(heapSV), tb.var(selfVar), tb.func(fieldSymbol));
+
+            // self.f.created = TRUE
+            Term oFCreated = tb.created(oF);
+
+            // relinv(self.f)
+            Term relinvOF = tb.func(relinvFunc, tb.var(heapSV), oF);
+
+            replace = tb.and(replace, tb.imp(oFCreated, tb.convertToFormula(relinvOF)));
+        }
+
+        // we have our terms, now create the taclet
+        RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
+
+        // generate taclet name
+        String name = "represents axiom for " + selfVar.sort() + ".relinv";
+        tacletBuilder.setName(MiscTools.toValidTacletName(name));
+
+        ImmutableSet<Choice> choices = DefaultImmutableSet.<Choice>nil()
+                .add(new Choice("Java", "programRules"));
+        tacletBuilder.setChoices(choices);
+
+        // TODO: better use another heuristic?
+        tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
+
+        // \find("o.f")
+        // TODO: boolean observer function as predicate? -> shorter syntax
+        // TODO: term labels?
+        tacletBuilder.setFind(tb.convertToFormula(find));
+
+        // \replacewith
+        tacletBuilder.addTacletGoalTemplate(
+                new RewriteTacletGoalTemplate(tb.convertToFormula(replace)));
+
+        Taclet taclet = tacletBuilder.getTaclet();
+        taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(taclet));
+        proofConfig.registerRule(taclet, AxiomJustification.INSTANCE);
+    }
+
     private void createOwnershipTaclets(Services proofServices, ProgramVariable selfVar) {
         ImmutableList<Field> fields = proofServices.getJavaInfo().getAllFields(
                 (TypeDeclaration) selfVar.getKeYJavaType().getJavaType());
@@ -579,7 +673,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 services.getTypeConverter().getHeapLDT().targetSort());
         SchemaVariable svO = SchemaVariableFactory.createTermSV(objName, oSort);
 
-        // since we have a concrete known field, we need a ProgramVariabel here
+        // since we have a concrete known field, we need a ProgramVariable here
         ProgramVariable pvF = services.getJavaInfo().getAttribute(f.getFullName());
 
         // assert pvF instanceof LocationVariable;
@@ -622,7 +716,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // \find("o.f")
         tacletBuilder.setFind(oF);
 
-        // TODO: heuristics, e.g. simplify
+        // TODO: better use another heuristic?
         tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
 
         // \add(Object::select(heapSV, o, f) != null -> owner(Object::select(heapSV, o, f)) = o ==>)

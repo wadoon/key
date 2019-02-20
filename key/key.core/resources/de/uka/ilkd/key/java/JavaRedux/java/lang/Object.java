@@ -14,13 +14,11 @@ public class Object {
 
     //@ public accessible \inv: repfp;
 
-    /*@ model_behavior
-      @ accessible repfp;
-      @ public helper model boolean relinv() {
-      @     return \invariant_for(this);
-      @ }
-      @*/
+    //@ public model boolean relinv;
+    //@ public accessible relinv: repfp;
+    //@ private represents relinv = this.\inv;
 
+    
     /*@ public normal_behavior
       @   assignable \nothing;
       @   assignable<permissions> \nothing;
