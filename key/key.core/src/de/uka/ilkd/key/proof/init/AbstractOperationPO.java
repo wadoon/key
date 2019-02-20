@@ -35,6 +35,7 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
@@ -74,6 +75,8 @@ import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
+import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -541,8 +544,94 @@ public abstract class AbstractOperationPO extends AbstractPO {
         generateWdTaclets(proofConfig);
     }
 
-    private void createRelinvRepresentsClause(Services proofServices, ProgramVariable selfVar) {
-        // TODO: generate represents clauses for relinv
+    private void createRelinvRepresentsClause(Services services, ProgramVariable selfVar) {
+        /* relinv_self {
+         *   \schemaVar \term Heap H;
+         *   \find(relinv(H, self))
+         *   \replacewith(inv(H, self)
+         *                            // quantifier not explicit, instead we roll out for all fields
+         *      && (\forall Field f;
+         *          Object::select(h, Object::select(h, self, f), created) = TRUE
+         *          -> relinv(Object::select(h, self, f)));
+         * };
+         */
+
+        // TODO: generate represents clauses for relinv for self
+        // concrete invariant is hidden for all objects != self
+        ImmutableList<Field> fields = services.getJavaInfo().getAllFields(
+                (TypeDeclaration) selfVar.getKeYJavaType().getJavaType());
+
+        TermBuilder tb = services.getTermBuilder();
+
+        // start with invariant(self)
+        Term replace = tb.inv(tb.var(selfVar));
+
+        // for every field we add: self.f.created = TRUE -> relinv(self.f)
+        Name heapName = new Name("heap");
+        Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
+        SchemaVariable heapSV = SchemaVariableFactory.createTermSV(heapName, heapSort);
+
+        Function relinvFunc = services.getNamespaces()
+                                      .functions()
+                                      .lookup("java.lang.Object::$relinv");
+
+        Term find = tb.func(relinvFunc, tb.var(heapSV), tb.var(selfVar));
+
+        for (Field f : fields) {
+            // skip implicit fields (TODO: better way to do this?)
+            if (f instanceof ImplicitFieldSpecification) {
+                continue;
+            }
+
+            // collect terms of the form:
+            // o.f.created = TRUE -> relinv(o.f)
+
+            ProgramVariable pvF = services.getJavaInfo().getAttribute(f.getFullName());
+            Sort fSort = f.getProgramVariable().sort();
+
+            // assert pvF instanceof LocationVariable;
+            Function fieldSymbol = services.getTypeConverter()
+                                           .getHeapLDT()
+                                           .getFieldSymbolForPV((LocationVariable)pvF, services);
+
+            // "self.f": Object::select(heapSV, self, f)
+            Term oF = tb.select(fSort, tb.var(heapSV), tb.var(selfVar), tb.func(fieldSymbol));
+
+            // self.f.created = TRUE
+            Term oFCreated = tb.created(oF);
+
+            // relinv(self.f)
+            Term relinvOF = tb.func(relinvFunc, tb.var(heapSV), oF);
+
+            replace = tb.and(replace, tb.imp(oFCreated, tb.convertToFormula(relinvOF)));
+        }
+
+        // we have our terms, now create the taclet
+        RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
+
+        // generate taclet name
+        String name = "represents axiom for " + selfVar.sort() + ".relinv";
+        tacletBuilder.setName(MiscTools.toValidTacletName(name));
+
+        ImmutableSet<Choice> choices = DefaultImmutableSet.<Choice>nil()
+                .add(new Choice("Java", "programRules"));
+        tacletBuilder.setChoices(choices);
+
+        // TODO: better use another heuristic?
+        tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
+
+        // \find("o.f")
+        // TODO: boolean observer function as predicate? -> shorter syntax
+        // TODO: term labels?
+        tacletBuilder.setFind(tb.convertToFormula(find));
+
+        // \replacewith
+        tacletBuilder.addTacletGoalTemplate(
+                new RewriteTacletGoalTemplate(tb.convertToFormula(replace)));
+
+        Taclet taclet = tacletBuilder.getTaclet();
+        taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(taclet));
+        proofConfig.registerRule(taclet, AxiomJustification.INSTANCE);
     }
 
     private void createOwnershipTaclets(Services proofServices, ProgramVariable selfVar) {
@@ -585,7 +674,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
                 services.getTypeConverter().getHeapLDT().targetSort());
         SchemaVariable svO = SchemaVariableFactory.createTermSV(objName, oSort);
 
-        // since we have a concrete known field, we need a ProgramVariabel here
+        // since we have a concrete known field, we need a ProgramVariable here
         ProgramVariable pvF = services.getJavaInfo().getAttribute(f.getFullName());
 
         // assert pvF instanceof LocationVariable;
@@ -816,84 +905,87 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // 2. each two rep's footprints are pairwise disjoint (if references are not the same!)
         // 3. all invariants of objects referenced in fields hold
 
-        Term universeTypePre = tb.tt();
-        ImmutableList<Field> fields = services.getJavaInfo().getAllFields((TypeDeclaration) selfVar.getKeYJavaType().getJavaType());
-        for (Field f : fields) {
-            // TODO: exclude this.footprint itself
-
-            Term heap = tb.var(heaps.get(0));
-            Term self = tb.var(selfVar);
-            Sort fSort = f.getProgramVariable().sort();
-
-            System.out.println(f.getProgramName());
-
-            if (isRep(f)) {
-                // this.fp # f.fp
-                // careful: despite the syntax, do not use select for model fields, but observer functions!!!
-
-                // this.footprint
-                ProgramVariable selfFP = services.getJavaInfo().getAttribute(selfVar.getKeYJavaType().getFullName() + "::footprint");
-                Function observer1 = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)selfFP, services);
-                Term funcTerm = tb.func(observer1, heap, self);
-
-                // this.f
-                ProgramVariable pvF = services.getJavaInfo().getAttribute(f.getFullName());
-                Function fieldSymbol = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)pvF, services);
-                Term thisF = tb.select(fSort, heap, self, tb.func(fieldSymbol));
-
-                // this.f.footprint
-                ProgramVariable fFP = services.getJavaInfo().getAttribute(f.getProgramVariable().getKeYJavaType().getFullName() + "::footprint");
-                Function observer2 = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)fFP, services);
-                Term funcTerm2 = tb.func(observer2, heap, thisF);
-
-                Term disjRepThisFP = tb.disjoint(funcTerm, funcTerm2);
-                universeTypePre = tb.and(universeTypePre, disjRepThisFP);
-
-                // footprints of reps pairwise disjoint (adds some unnecessary clauses)
-                for (Field f2 : fields) {
-                    if (f2 != f && isRep(f2)) {
-                        Sort f2Sort = f2.getProgramVariable().sort();
-
-                        // this.f2
-                        ProgramVariable pvF2 = services.getJavaInfo().getAttribute(f2.getFullName());
-                        Function field2Symbol = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)pvF2, services);
-                        Term thisF2 = tb.select(f2Sort, heap, self, tb.func(field2Symbol));
-
-                        // this.f2.footprint
-                        ProgramVariable f2FP = services.getJavaInfo().getAttribute(f2.getProgramVariable().getKeYJavaType().getFullName() + "::footprint");
-                        Function observer3 = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)f2FP, services);
-                        Term funcTerm3 = tb.func(observer3, heap, thisF2);
-
-                        Term disjRepFPs = tb.disjoint(funcTerm2, funcTerm3);
-                        universeTypePre = tb.and(universeTypePre, disjRepFPs);
-                    }
-                }
-            }
-            // for rep and peer: add invariant of the field;
-            //Term fieldInv = tb.inv(tb.var((ProgramVariable) f.getProgramVariable()));
-            //universeTypePre = tb.and(universeTypePre, fieldInv);
-
-            // TODO: check f:
-            //          - not primitive
-            //          - not static ?
-            //          - not model/ghost
-            ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
-            if (!pv.isImplicit() && !pv.isGhost() && !pv.isModel()) {
-                System.out.println("Trying to add invariant for " + f.getFullName());
-
-                // this.f
-                ProgramVariable pvF = services.getJavaInfo().getAttribute(f.getFullName());
-                Function fieldSymbol = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)pvF, services);
-                Term thisF = tb.select(fSort, heap, self, tb.func(fieldSymbol));
-
-                Term fieldInv = tb.inv(thisF);
-                universeTypePre = tb.and(universeTypePre, fieldInv);
-            }
-        }
-
-        return tb.and(universeTypePre, tb.and(wellFormed != null ? wellFormed : tb.tt(),
-                      selfNotNull, selfCreated, selfExactType,
-                      paramsOK, mbyAtPreDef));
+//        Term universeTypePre = tb.tt();
+//        ImmutableList<Field> fields = services.getJavaInfo().getAllFields((TypeDeclaration) selfVar.getKeYJavaType().getJavaType());
+//        for (Field f : fields) {
+//            // TODO: exclude this.footprint itself
+//
+//            Term heap = tb.var(heaps.get(0));
+//            Term self = tb.var(selfVar);
+//            Sort fSort = f.getProgramVariable().sort();
+//
+//            System.out.println(f.getProgramName());
+//
+//            if (isRep(f)) {
+//                // this.fp # f.fp
+//                // careful: despite the syntax, do not use select for model fields, but observer functions!!!
+//
+//                // this.footprint
+//                ProgramVariable selfFP = services.getJavaInfo().getAttribute(selfVar.getKeYJavaType().getFullName() + "::footprint");
+//                Function observer1 = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)selfFP, services);
+//                Term funcTerm = tb.func(observer1, heap, self);
+//
+//                // this.f
+//                ProgramVariable pvF = services.getJavaInfo().getAttribute(f.getFullName());
+//                Function fieldSymbol = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)pvF, services);
+//                Term thisF = tb.select(fSort, heap, self, tb.func(fieldSymbol));
+//
+//                // this.f.footprint
+//                ProgramVariable fFP = services.getJavaInfo().getAttribute(f.getProgramVariable().getKeYJavaType().getFullName() + "::footprint");
+//                Function observer2 = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)fFP, services);
+//                Term funcTerm2 = tb.func(observer2, heap, thisF);
+//
+//                Term disjRepThisFP = tb.disjoint(funcTerm, funcTerm2);
+//                universeTypePre = tb.and(universeTypePre, disjRepThisFP);
+//
+//                // footprints of reps pairwise disjoint (adds some unnecessary clauses)
+//                for (Field f2 : fields) {
+//                    if (f2 != f && isRep(f2)) {
+//                        Sort f2Sort = f2.getProgramVariable().sort();
+//
+//                        // this.f2
+//                        ProgramVariable pvF2 = services.getJavaInfo().getAttribute(f2.getFullName());
+//                        Function field2Symbol = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)pvF2, services);
+//                        Term thisF2 = tb.select(f2Sort, heap, self, tb.func(field2Symbol));
+//
+//                        // this.f2.footprint
+//                        ProgramVariable f2FP = services.getJavaInfo().getAttribute(f2.getProgramVariable().getKeYJavaType().getFullName() + "::footprint");
+//                        Function observer3 = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)f2FP, services);
+//                        Term funcTerm3 = tb.func(observer3, heap, thisF2);
+//
+//                        Term disjRepFPs = tb.disjoint(funcTerm2, funcTerm3);
+//                        universeTypePre = tb.and(universeTypePre, disjRepFPs);
+//                    }
+//                }
+//            }
+//            // for rep and peer: add invariant of the field;
+//            //Term fieldInv = tb.inv(tb.var((ProgramVariable) f.getProgramVariable()));
+//            //universeTypePre = tb.and(universeTypePre, fieldInv);
+//
+//            // TODO: check f:
+//            //          - not primitive
+//            //          - not static ?
+//            //          - not model/ghost
+//            ProgramVariable pv = (ProgramVariable) f.getProgramVariable();
+//            if (!pv.isImplicit() && !pv.isGhost() && !pv.isModel()) {
+//                System.out.println("Trying to add invariant for " + f.getFullName());
+//
+//                // this.f
+//                ProgramVariable pvF = services.getJavaInfo().getAttribute(f.getFullName());
+//                Function fieldSymbol = services.getTypeConverter().getHeapLDT().getFieldSymbolForPV((LocationVariable)pvF, services);
+//                Term thisF = tb.select(fSort, heap, self, tb.func(fieldSymbol));
+//
+//                Term fieldInv = tb.inv(thisF);
+//                universeTypePre = tb.and(universeTypePre, fieldInv);
+//            }
+//        }
+//
+//        return tb.and(universeTypePre, tb.and(wellFormed != null ? wellFormed : tb.tt(),
+//                      selfNotNull, selfCreated, selfExactType,
+//                      paramsOK, mbyAtPreDef));
+        return tb.and(wellFormed != null ? wellFormed : tb.tt(),
+                selfNotNull, selfCreated, selfExactType,
+                paramsOK, mbyAtPreDef);
     }
 
     private static boolean isRep(Field f) {
