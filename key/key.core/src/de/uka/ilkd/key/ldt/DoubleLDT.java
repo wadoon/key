@@ -253,22 +253,17 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 
     @Override
     public Expression translateTerm(Term t, ExtList children, Services services) {
-	if(!containsFunction((Function) t.op())) {
-	    return null;
-	}
+        Function f = (Function)t.op();
+        IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
 
-	Function f = (Function)t.op();
-	IntegerLDT intLDT = services.getTypeConverter().getIntegerLDT();
+        if(f == doubleLit) {
+            String str = intLDT.toString(t.sub(0));
+            long bits = Long.parseLong(str);
+            Double d1 = Double.longBitsToDouble(bits);
 
-	if(f == doubleLit) {
-	    IntLiteral il1 = (IntLiteral)intLDT.translateTerm(t.sub(0),
-		children, services);
-	    long bits = il1.getValue();
-	    Double d1 = Double.longBitsToDouble(bits);
-
-	    return new DoubleLiteral(d1.toString());
-	}
-	throw new RuntimeException("DoubleLDT: Cannot convert term to program: "+t);
+            return new DoubleLiteral(d1.toString());
+        }
+        throw new RuntimeException("DoubleLDT: Cannot convert term to program: " + t);
     }
 
 

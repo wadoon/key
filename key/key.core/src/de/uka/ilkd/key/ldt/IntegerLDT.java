@@ -562,31 +562,45 @@ public final class IntegerLDT extends LDT {
         return containsFunction(f) && (f.arity()==0 || isNumberLiteral(f));
     }
 
-    @Override
-    public Expression translateTerm(Term t, ExtList children, Services services) {
+    /**
+     * Translate a term representing an integer literal into a string.
+     *
+     * The string is the decimal representation of the value.
+     *
+     * @param t, the term must be an integer literal
+     *
+     * @return a string representation of t
+     * @throws RuntimeException if this is not a validly composed integer literal
+     */
+    public String toString(Term t) {
         if(!containsFunction((Function) t.op())) {
-            return null;
+            // return null;
+            throw new RuntimeException("This term is not a literal: " + t);
         }
         Function f = (Function)t.op();
-        if(isNumberLiteral(f) || f == numbers || f == charID) {     
+        if(isNumberLiteral(f) || f == numbers || f == charID) {
             StringBuffer sb = new StringBuffer("");
             Term it = t;
             if (f == charID || f == numbers) {
-                it = it.sub(0); 
-                f = (Function)it.op();      
+                it = it.sub(0);
+                f = (Function)it.op();
             }
             while (isNumberLiteral(f)) {
                 sb.insert(0, f.name().toString().charAt(0));
                 it=it.sub(0);
-                f = (Function)it.op();      
+                f = (Function)it.op();
             }
             // numbers must end with a sharp
             if (f == sharp) {
-                return new IntLiteral(sb.toString());     // TODO: what if number too large for int?
+                sb.toString();
             }
         }
-        throw new RuntimeException("IntegerLDT: Cannot convert term to program: "
-                                   +t);
+        throw new RuntimeException("IntegerLDT: Cannot convert term to program: " + t);
+    }
+
+    @Override
+    public IntLiteral translateTerm(Term t, ExtList children, Services services) {
+        return new IntLiteral(toString(t));
     }
     
     
