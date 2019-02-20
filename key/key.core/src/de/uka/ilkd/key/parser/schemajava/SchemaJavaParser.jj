@@ -593,7 +593,6 @@ TOKEN :
 		    | < UNPACK: "#unpack" >
 		    | < FORINITUNFOLDTRANSFORMER: "#forInitUnfoldTransformer" >
 		    | < FORUPDATEUNFOLDTRANSFORMER: "#forUpdateUnfoldTransformer" >
-		    | < LOOPSCOPEINVARIANTTRANSFORMER: "#loopScopeInvariantTransformer" >
 		    | < SET: "#set" >
 		    }
 
@@ -4212,17 +4211,6 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
    }
    )
    |
-   (
-    <LOOPSCOPEINVARIANTTRANSFORMER> "(" ( loopStat=WhileStatement() ) ")" ";" 
-   {
-       result = factory.createRKeYMetaConstruct();
-       setPrefixInfo(result);
-       result.setChild(loopStat);  
-       result.setName("#loopScopeInvariantTransformer");
-       return result; 
-   }
-   )
-     |
    (
     <UNPACK> "("
     ( loopStat=ForStatement() )
