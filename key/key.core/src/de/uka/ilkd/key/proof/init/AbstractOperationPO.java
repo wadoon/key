@@ -35,6 +35,7 @@ import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.Field;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
 import de.uka.ilkd.key.java.declaration.Modifier;
 import de.uka.ilkd.key.java.declaration.ParameterDeclaration;
@@ -74,8 +75,10 @@ import de.uka.ilkd.key.rule.NoPosTacletApp;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.tacletbuilder.NoFindTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletBuilder;
 import de.uka.ilkd.key.rule.tacletbuilder.RewriteTacletGoalTemplate;
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGenerator;
 import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.HeapContext;
@@ -484,6 +487,12 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // add represents axioms for relinv
         createRelinvRepresentsClause(proofServices, selfVar);
 
+        // add represents axioms for footprints
+        createFootprintsRepresentsClauses(proofServices, selfVar);
+
+        // for each pair of rep fields: create disjointness taclet
+        createDisjointFPTaclets(proofServices, selfVar);
+
         if (pm.isModel()) {
             // before resultVar
             final List<LocationVariable> modHeaps =
@@ -543,6 +552,248 @@ public abstract class AbstractOperationPO extends AbstractPO {
         generateWdTaclets(proofConfig);
     }
 
+    private void createDisjointFPTaclets(Services services, ProgramVariable selfVar) {
+        /* for each pair (f1, f2) of rep fields declared in this class (or a superclass!)
+         * we add a taclet of the following form
+         * disjFP {
+         *     \schemaVar \term Heap h;
+         *     \find();         // TODO: two find clauses possible? -> only if f1.repfp appears
+         *     \add(f1 != null & f2 != null -> f1.repfp # f2.repfp);
+         * };
+         */
+
+        ImmutableList<Field> fields = services.getJavaInfo().getAllFields(
+                (TypeDeclaration) selfVar.getKeYJavaType().getJavaType());
+        ImmutableList<Field> rest = fields;
+
+        for (Field f1 : fields) {
+            rest = rest.tail();
+
+            // skip implicit fields and fields with primitive type
+            if (f1 instanceof ImplicitFieldSpecification
+                    || f1.getType() instanceof PrimitiveType) {
+                continue;
+            }
+
+            // skip non-rep fields
+            if (!f1.getProgramName().startsWith("rep_")) {
+                continue;
+            }
+            for (Field f2 : rest) {
+                // skip implicit fields and fields with primitive type
+                if (f2 instanceof ImplicitFieldSpecification
+                        || f2.getType() instanceof PrimitiveType) {
+                    continue;
+                }
+
+                // skip non-rep fields
+                if (!f2.getProgramName().startsWith("rep_")) {
+                    continue;
+                }
+
+                createDisjointnessTaclet(f1, f2, services, selfVar);
+            }
+        }
+    }
+
+    // TODO: do we need the symetrical variant of the taclet as well?
+    // (may have to do with find term)
+    private void createDisjointnessTaclet(Field f1, Field f2, Services services,
+            ProgramVariable selfVar) {
+
+        TermBuilder tb = services.getTermBuilder();
+
+        Name heapName = new Name("heap");
+        Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
+        SchemaVariable heapSV = SchemaVariableFactory.createTermSV(heapName, heapSort);
+
+        Function repFP = services.getNamespaces()
+                .functions()
+                .lookup("java.lang.Object::$repfp");
+        ProgramVariable pvF1 = services.getJavaInfo().getAttribute(f1.getFullName());
+        ProgramVariable pvF2 = services.getJavaInfo().getAttribute(f2.getFullName());
+        Sort f1Sort = f1.getProgramVariable().sort();
+        Sort f2Sort = f2.getProgramVariable().sort();
+
+        Function fieldSymbol1 = services.getTypeConverter()
+                .getHeapLDT()
+                .getFieldSymbolForPV((LocationVariable)pvF1, services);
+        Function fieldSymbol2 = services.getTypeConverter()
+                .getHeapLDT()
+                .getFieldSymbolForPV((LocationVariable)pvF2, services);
+
+        Term oF1 = tb.select(f1Sort, tb.var(heapSV), tb.var(selfVar), tb.func(fieldSymbol1));
+        Term oF2 = tb.select(f2Sort, tb.var(heapSV), tb.var(selfVar), tb.func(fieldSymbol2));
+
+        Term fp1 = tb.func(repFP, tb.var(heapSV), oF1);
+        Term fp2 = tb.func(repFP, tb.var(heapSV), oF2);
+
+        Term nonNullF1 = tb.not(tb.equals(oF1, tb.NULL()));
+        Term nonNullF2 = tb.not(tb.equals(oF2, tb.NULL()));
+        Term disj = tb.disjoint(fp1, fp2);
+        Term add = tb.imp(tb.and(nonNullF1, nonNullF2), disj);
+
+        // we have our term, now create the taclet
+        RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
+
+        Name name = MiscTools.toValidTacletName("repfp disjoint " + f1 + " " + f2);
+        tacletBuilder.setName(name);
+
+        ImmutableSet<Choice> choices = DefaultImmutableSet.<Choice>nil()
+                .add(new Choice("Java", "programRules"));
+        tacletBuilder.setChoices(choices);
+
+        // TODO: better use another heuristic?
+        tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
+
+        // we search for self.f1.repfp (this makes it unnecessary to manually instantiate the heap)
+        tacletBuilder.setFind(fp1);
+
+        // \add
+        SequentFormula seqFormula = new SequentFormula(add);
+        Semisequent semi = new Semisequent(seqFormula);
+        Sequent seq = Sequent.createAnteSequent(semi);
+        tacletBuilder.addTacletGoalTemplate(
+                new TacletGoalTemplate(seq, ImmutableSLList.<Taclet>nil()));
+
+        Taclet tacletRepfp = tacletBuilder.getTaclet();
+        taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(tacletRepfp));
+
+        proofConfig.registerRule(tacletRepfp, AxiomJustification.INSTANCE);
+    }
+
+    private void createFootprintsRepresentsClauses(Services services, ProgramVariable selfVar) {
+        /* repfp_self {
+         *   \schemaVar \term Heap H;
+         *   \find(repfp(H, self))
+         *   \replacewith(allFields(H, self)
+         *      union (
+         *          if (Object::select(h, Object::select(h, self, f), created) = TRUE)
+         *          then (Object::select(h, self, f)))
+         *          else empty;
+         *      union ( ... );
+         * };
+         */
+
+        // TODO: does this include inherited fields?
+        ImmutableList<Field> fields = services.getJavaInfo().getAllFields(
+                (TypeDeclaration) selfVar.getKeYJavaType().getJavaType());
+
+        TermBuilder tb = services.getTermBuilder();
+
+        // start with allFields(self)
+        Term replaceRepfp = tb.allFields(tb.var(selfVar));
+        Term replacePeerfp = tb.allFields(tb.var(selfVar));
+
+        // for every field we add: self.f.created = TRUE ? relinv(self.f) : empty
+        Name heapName = new Name("heap");
+        Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
+        SchemaVariable heapSV = SchemaVariableFactory.createTermSV(heapName, heapSort);
+
+        Function repFP = services.getNamespaces()
+                                      .functions()
+                                      .lookup("java.lang.Object::$repfp");
+        Function peerFP = services.getNamespaces()
+                .functions()
+                .lookup("java.lang.Object::$peerfp");
+
+        Term findRepfp = tb.func(repFP, tb.var(heapSV), tb.var(selfVar));
+        Term findPeerfp = tb.func(peerFP, tb.var(heapSV), tb.var(selfVar));
+
+        for (Field f : fields) {
+            // skip implicit fields (TODO: better way to do this?)
+            if (f instanceof ImplicitFieldSpecification) {
+                continue;
+            }
+
+            // TODO: skip primitive fields
+            if (f.getType() instanceof PrimitiveType) { // untested
+                continue;
+            }
+
+            if (f.getProgramName().startsWith("rep_")) {
+                ProgramVariable pvF = services.getJavaInfo().getAttribute(f.getFullName());
+                Sort fSort = f.getProgramVariable().sort();
+
+                // assert pvF instanceof LocationVariable;
+                Function fieldSymbol = services.getTypeConverter()
+                                               .getHeapLDT()
+                                               .getFieldSymbolForPV((LocationVariable)pvF,
+                                                                    services);
+
+                // "self.f": Object::select(heapSV, self, f)
+                Term oF = tb.select(fSort, tb.var(heapSV), tb.var(selfVar), tb.func(fieldSymbol));
+
+                // self.f.created = TRUE
+                Term oFCreated = tb.created(oF);
+
+                // repfp(self.f)
+                Term repfpOF = tb.func(repFP, tb.var(heapSV), oF);
+
+                replaceRepfp = tb.union(replaceRepfp, tb.ife(oFCreated, repfpOF, tb.empty()));
+            } else if (f.getProgramName().startsWith("peer_")) {
+                ProgramVariable pvF = services.getJavaInfo().getAttribute(f.getFullName());
+                Sort fSort = f.getProgramVariable().sort();
+
+                // assert pvF instanceof LocationVariable;
+                Function fieldSymbol = services.getTypeConverter()
+                                               .getHeapLDT()
+                                               .getFieldSymbolForPV((LocationVariable)pvF,
+                                                                    services);
+
+                // "self.f": Object::select(heapSV, self, f)
+                Term oF = tb.select(fSort, tb.var(heapSV), tb.var(selfVar), tb.func(fieldSymbol));
+
+                // self.f.created = TRUE
+                Term oFCreated = tb.created(oF);
+
+                // peerfp(self.f)
+                Term peerfpOF = tb.func(peerFP, tb.var(heapSV), oF);
+
+                replacePeerfp = tb.union(replacePeerfp, tb.ife(oFCreated, peerfpOF, tb.empty()));
+            }
+        }
+
+        // we have our terms, now create the taclets
+        RewriteTacletBuilder<RewriteTaclet> tacletBuilderRepfp = new RewriteTacletBuilder<>();
+        RewriteTacletBuilder<RewriteTaclet> tacletBuilderPeerfp = new RewriteTacletBuilder<>();
+
+        // generate taclet names
+        String nameRepfp = "represents axiom for " + selfVar.sort() + ".repfp";
+        tacletBuilderRepfp.setName(MiscTools.toValidTacletName(nameRepfp));
+
+        String namePeerfp = "represents axiom for " + selfVar.sort() + ".peerfp";
+        tacletBuilderPeerfp.setName(MiscTools.toValidTacletName(namePeerfp));
+
+        ImmutableSet<Choice> choices = DefaultImmutableSet.<Choice>nil()
+                .add(new Choice("Java", "programRules"));
+        tacletBuilderRepfp.setChoices(choices);
+        tacletBuilderPeerfp.setChoices(choices);
+
+        // TODO: better use another heuristic?
+        tacletBuilderRepfp.addRuleSet(new RuleSet(new Name("simplify")));
+        tacletBuilderPeerfp.addRuleSet(new RuleSet(new Name("simplify")));
+
+        // TODO: boolean observer function as predicate? -> shorter syntax
+        // TODO: term labels?
+        tacletBuilderRepfp.setFind(findRepfp);
+        tacletBuilderPeerfp.setFind(findPeerfp);
+
+        // \replacewith
+        tacletBuilderRepfp.addTacletGoalTemplate(
+                new RewriteTacletGoalTemplate(replaceRepfp));
+        tacletBuilderPeerfp.addTacletGoalTemplate(
+                new RewriteTacletGoalTemplate(replacePeerfp));
+
+        Taclet tacletRepfp = tacletBuilderRepfp.getTaclet();
+        Taclet tacletPeerfp = tacletBuilderPeerfp.getTaclet();
+        taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(tacletRepfp));
+        taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(tacletPeerfp));
+
+        proofConfig.registerRule(tacletRepfp, AxiomJustification.INSTANCE);
+        proofConfig.registerRule(tacletPeerfp, AxiomJustification.INSTANCE);
+    }
+
     private void createRelinvRepresentsClause(Services services, ProgramVariable selfVar) {
         /* relinv_self {
          *   \schemaVar \term Heap H;
@@ -579,6 +830,11 @@ public abstract class AbstractOperationPO extends AbstractPO {
         for (Field f : fields) {
             // skip implicit fields (TODO: better way to do this?)
             if (f instanceof ImplicitFieldSpecification) {
+                continue;
+            }
+
+            // TODO: skip primitive fields
+            if (f.getType() instanceof PrimitiveType) { // untested
                 continue;
             }
 
