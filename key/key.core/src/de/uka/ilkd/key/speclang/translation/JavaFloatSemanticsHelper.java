@@ -20,8 +20,10 @@ import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 
 /**
@@ -51,6 +53,14 @@ public class JavaFloatSemanticsHelper extends SemanticsHelper {
         this.tb = services.getTermBuilder();
         this.floatLDT = services.getTypeConverter().getFloatLDT();
         this.doubleLDT = services.getTypeConverter().getDoubleLDT();
+    }
+
+    public static boolean hasFloatingPoint(SLExpression a, SLExpression b, Services services) {
+        Sort floatSort = services.getTypeConverter().getFloatLDT().targetSort();
+        Sort doubleSort = services.getTypeConverter().getDoubleLDT().targetSort();
+        Sort aSort = a.getTerm().sort();
+        Sort bSort = b.getTerm().sort();
+        return aSort == floatSort || aSort == doubleSort || bSort == floatSort || bSort == doubleSort;
     }
 
 
@@ -84,13 +94,17 @@ public class JavaFloatSemanticsHelper extends SemanticsHelper {
         return resultType.getJavaType() == PrimitiveType.JAVA_FLOAT;
     }
 
-    private boolean isDouble(KeYJavaType resultType) {
-        return resultType.getJavaType() == PrimitiveType.JAVA_DOUBLE;
-    }
-
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
+
+    private Term promote(Term term, KeYJavaType targetType) {
+        if(term.sort() == targetType.getSort()) {
+            return term;
+        } else {
+            return tb.cast(targetType.getSort(), term);
+        }
+    }
 
     public SLExpression buildAddExpression(SLExpression a, SLExpression b)
             throws SLTranslationException {
@@ -102,13 +116,34 @@ public class JavaFloatSemanticsHelper extends SemanticsHelper {
             if (isFloat(resultType))
                 add = floatLDT.getJavaAdd();
             else add = doubleLDT.getJavaAdd();
-            return new SLExpression(tb.func(add, a.getTerm(), b.getTerm()),
-                    resultType);
+            Term termA = promote(a.getTerm(), resultType);
+            Term termB = promote(b.getTerm(), resultType);
+            return new SLExpression(tb.func(add, termA, termB), resultType);
         } catch (RuntimeException e) {
             raiseError("Error in additive expression " + a + " + " + b + ":", e);
             return null; //unreachable
         }
     }
+
+    public SLExpression buildEqualityExpression(SLExpression a, SLExpression b)
+            throws SLTranslationException {
+        assert a != null;
+        assert b != null;
+        try {
+            KeYJavaType resultType = getPromotedType(a, b);
+            Function eq;
+            if (isFloat(resultType)) {
+                eq = floatLDT.getEquals();
+            } else eq = doubleLDT.getEquals();
+            Term termA = promote(a.getTerm(), resultType);
+            Term termB = promote(b.getTerm(), resultType);
+            return new SLExpression(tb.func(eq, termA, termB), resultType);
+        } catch (RuntimeException e) {
+            raiseError("Error in equality expression " + a + " == " + b + ".", e);
+            return null; //unreachable
+        }
+    }
+
 
     public SLExpression buildSubExpression(SLExpression a, SLExpression b)
             throws SLTranslationException {
@@ -120,8 +155,9 @@ public class JavaFloatSemanticsHelper extends SemanticsHelper {
             if (isFloat(resultType)) {
                 sub = floatLDT.getJavaSub();
             } else sub = doubleLDT.getJavaSub();
-            return new SLExpression(tb.func(sub, a.getTerm(), b.getTerm()),
-                    resultType);
+            Term termA = promote(a.getTerm(), resultType);
+            Term termB = promote(b.getTerm(), resultType);
+            return new SLExpression(tb.func(sub, termA, termB), resultType);
         } catch (RuntimeException e) {
             raiseError("Error in subtract expression " + a + " - " + b + ".", e);
             return null; //unreachable
@@ -155,8 +191,9 @@ public class JavaFloatSemanticsHelper extends SemanticsHelper {
             if (isFloat(resultType))
                 mul = floatLDT.getJavaMul();
             else mul = doubleLDT.getJavaMul();
-            return new SLExpression(tb.func(mul, a.getTerm(), b.getTerm()),
-                    resultType);
+            Term termA = promote(a.getTerm(), resultType);
+            Term termB = promote(b.getTerm(), resultType);
+            return new SLExpression(tb.func(mul, termA, termB), resultType);
         } catch (RuntimeException e) {
             raiseError("Error in multiplicative expression " + a + " * "
                     + b + ".", e);
@@ -192,8 +229,8 @@ public class JavaFloatSemanticsHelper extends SemanticsHelper {
                 minus = floatLDT.getJavaUnaryMinus();
             else
                 minus = doubleLDT.getJavaUnaryMinus();
-            return new SLExpression(tb.func(minus, a.getTerm()),
-                    resultType);
+            Term termA = promote(a.getTerm(), resultType);
+            return new SLExpression(tb.func(minus, termA), resultType);
         } catch (RuntimeException e) {
             raiseError("Error in unary minus expression -" + a + ".", e);
             return null; //unreachable

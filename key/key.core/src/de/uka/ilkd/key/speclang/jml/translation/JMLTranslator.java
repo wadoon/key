@@ -2331,10 +2331,16 @@ public final class JMLTranslator {
                 throws SLTranslationException {
 
             if (a.isTerm() && b.isTerm()) {
-                return new SLExpression(buildEqualityTerm(a.getTerm(),
-                                                          b.getTerm(),
-                                                          excManager,
-                                                          services));
+
+                if (JavaFloatSemanticsHelper.hasFloatingPoint(a, b, services)) {
+                    JavaFloatSemanticsHelper fh = new JavaFloatSemanticsHelper(services, excManager);
+                    return fh.buildEqualityExpression(a, b);
+                } else {
+                    return new SLExpression(buildEqualityTerm(a.getTerm(),
+                            b.getTerm(),
+                            excManager,
+                            services));
+                }
             }
 
             if (a.isType() && b.isType()) {
