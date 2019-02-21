@@ -556,6 +556,10 @@ public class TestJMLTranslator extends TestCase {
                 testClassType, selfVar, null, null, null, null, Term.class, services);
         assertEquals("javaEqFloat(float::cast(Z(0(#))),FP(0(#),0(#)))", result.toString());
 
+        result = JMLTranslator.translate(new PositionedString("1.f != 0.0f"),
+                testClassType, selfVar, null, null, null, null, Term.class, services);
+        assertEquals("not(javaEqFloat(FP(6(1(2(3(5(3(5(6(0(1(#)))))))))),0(#)),FP(0(#),0(#))))", result.toString());
+
         result = JMLTranslator.translate(new PositionedString("0.0d == 0"),
                 testClassType, selfVar, null, null, null, null, Term.class, services);
         assertEquals("javaEqDouble(DFP(0(#),0(#)),double::cast(Z(0(#))))", result.toString());
@@ -565,22 +569,21 @@ public class TestJMLTranslator extends TestCase {
         assertEquals("javaEqDouble(DFP(0(#),0(#)),double::cast(FP(0(#),0(#))))", result.toString());
     }
 
-
     public void testNumericPromotionArithmetic() throws SLTranslationException {
         Term result = null;
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         result = JMLTranslator.translate(new PositionedString("0 + 0.0f"),
                 testClassType, selfVar, null, null, null, null, Term.class, services);
-        assertEquals("javaEqFloat(float::cast(Z(0(#))),FP(0(#),0(#)))", result.toString());
+        assertEquals("javaAddFloat(float::cast(Z(0(#))),FP(0(#),0(#)))", result.toString());
 
         result = JMLTranslator.translate(new PositionedString("0.0d * 0"),
                 testClassType, selfVar, null, null, null, null, Term.class, services);
-        assertEquals("javaEqDouble(DFP(0(#),0(#)),double::cast(Z(0(#))))", result.toString());
+        assertEquals("javaMulDouble(DFP(0(#),0(#)),double::cast(Z(0(#))))", result.toString());
 
         result = JMLTranslator.translate(new PositionedString("0.0d - 0.0f"),
                 testClassType, selfVar, null, null, null, null, Term.class, services);
-        assertEquals("javaEqDouble(DFP(0(#),0(#)),double::cast(FP(0(#),0(#))))", result.toString());
+        assertEquals("javaSubDouble(DFP(0(#),0(#)),double::cast(FP(0(#),0(#))))", result.toString());
     }
 
 

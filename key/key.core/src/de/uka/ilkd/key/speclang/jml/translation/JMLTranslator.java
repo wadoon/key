@@ -2441,8 +2441,8 @@ public final class JMLTranslator {
             SLExpression e1 = (SLExpression) params[1];
             SLExpression e2 = (SLExpression) params[2];
             SLExpression result;
-            if ((e1.getType().getJavaType() == PrimitiveType.JAVA_FLOAT && e2.getType().getJavaType() == PrimitiveType.JAVA_FLOAT)
-                 || (e1.getType().getJavaType() == PrimitiveType.JAVA_DOUBLE && e2.getType().getJavaType() == PrimitiveType.JAVA_DOUBLE )  ) {
+            if (e1.getType().getJavaType() == PrimitiveType.JAVA_FLOAT  || e2.getType().getJavaType() == PrimitiveType.JAVA_FLOAT ||
+                e1.getType().getJavaType() == PrimitiveType.JAVA_DOUBLE || e2.getType().getJavaType() == PrimitiveType.JAVA_DOUBLE) {
                 checkNotType(e1, man);
                 checkNotType(e2, man);
                 JavaFloatSemanticsHelper jfsh = new JavaFloatSemanticsHelper((Services) params[0], man);
