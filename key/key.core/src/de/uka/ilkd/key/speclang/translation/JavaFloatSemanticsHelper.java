@@ -14,6 +14,7 @@
 
 package de.uka.ilkd.key.speclang.translation;
 
+import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
@@ -37,6 +38,7 @@ public class JavaFloatSemanticsHelper extends SemanticsHelper {
     private final TypeConverter tc;
     private final FloatLDT floatLDT;
     private final DoubleLDT doubleLDT;
+    private final Services services;
 
 
     //-------------------------------------------------------------------------
@@ -48,6 +50,7 @@ public class JavaFloatSemanticsHelper extends SemanticsHelper {
         assert services != null;
         assert excManager != null;
 
+        this.services = services;
         this.excManager = excManager;
         this.tc = services.getTypeConverter();
         this.tb = services.getTermBuilder();
@@ -130,14 +133,15 @@ public class JavaFloatSemanticsHelper extends SemanticsHelper {
         assert a != null;
         assert b != null;
         try {
-            KeYJavaType resultType = getPromotedType(a, b);
+            KeYJavaType promotedType = getPromotedType(a, b);
             Function eq;
-            if (isFloat(resultType)) {
+            if (isFloat(promotedType)) {
                 eq = floatLDT.getEquals();
             } else eq = doubleLDT.getEquals();
-            Term termA = promote(a.getTerm(), resultType);
-            Term termB = promote(b.getTerm(), resultType);
-            return new SLExpression(tb.func(eq, termA, termB), resultType);
+            Term termA = promote(a.getTerm(), promotedType);
+            Term termB = promote(b.getTerm(), promotedType);
+            Term result = tb.func(eq, termA, termB);
+            return new SLExpression(result);
         } catch (RuntimeException e) {
             raiseError("Error in equality expression " + a + " == " + b + ".", e);
             return null; //unreachable

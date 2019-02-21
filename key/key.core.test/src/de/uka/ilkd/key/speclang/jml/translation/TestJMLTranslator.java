@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.parser.TestTermParser;
 import junit.framework.TestCase;
 
 import org.key_project.util.collection.ImmutableList;
@@ -547,19 +548,41 @@ public class TestJMLTranslator extends TestCase {
                                       testClassType))));
     }
 
-    public void testNumericPromotion() throws SLTranslationException {
+    public void testNumericPromotionEquality() throws SLTranslationException {
         Term result = null;
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
         result = JMLTranslator.translate(new PositionedString("0 == 0.0f"),
                 testClassType, selfVar, null, null, null, null, Term.class, services);
-        assertEquals(result.sub(1), result.sub(0));
+        assertEquals("javaEqFloat(float::cast(Z(0(#))),FP(0(#),0(#)))", result.toString());
 
-        result = JMLTranslator.translate(new PositionedString("0.0f == 0"),
+        result = JMLTranslator.translate(new PositionedString("0.0d == 0"),
                 testClassType, selfVar, null, null, null, null, Term.class, services);
+        assertEquals("javaEqDouble(DFP(0(#),0(#)),double::cast(Z(0(#))))", result.toString());
 
-        assertEquals(result.sub(0), result.sub(1));
+        result = JMLTranslator.translate(new PositionedString("0.0d == 0.0f"),
+                testClassType, selfVar, null, null, null, null, Term.class, services);
+        assertEquals("javaEqDouble(DFP(0(#),0(#)),double::cast(FP(0(#),0(#))))", result.toString());
     }
+
+
+    public void testNumericPromotionArithmetic() throws SLTranslationException {
+        Term result = null;
+        ProgramVariable selfVar = buildSelfVarAsProgVar();
+
+        result = JMLTranslator.translate(new PositionedString("0 + 0.0f"),
+                testClassType, selfVar, null, null, null, null, Term.class, services);
+        assertEquals("javaEqFloat(float::cast(Z(0(#))),FP(0(#),0(#)))", result.toString());
+
+        result = JMLTranslator.translate(new PositionedString("0.0d * 0"),
+                testClassType, selfVar, null, null, null, null, Term.class, services);
+        assertEquals("javaEqDouble(DFP(0(#),0(#)),double::cast(Z(0(#))))", result.toString());
+
+        result = JMLTranslator.translate(new PositionedString("0.0d - 0.0f"),
+                testClassType, selfVar, null, null, null, null, Term.class, services);
+        assertEquals("javaEqDouble(DFP(0(#),0(#)),double::cast(FP(0(#),0(#))))", result.toString());
+    }
+
 
     public void testUnaryFloatMinus() throws SLTranslationException {
         Term result = null;
