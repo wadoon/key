@@ -226,6 +226,7 @@ lexer grammar KeYLexer;
 	PROGRAMVARIABLES : '\\programVariables';
 
         // Keywords for varcond and related stuff
+    HAS_AE_PREDICATE : '\\hasAEPredicate' ;
     INITIALIZE_PARAMETRIC_SKOLEM_UPDATE : '\\initializeParametricSkolemUpdate' ;
     INITIALIZE_PARAMETRIC_SKOLEM_PATH_CONDITION : '\\initializeParametricSkolemPathCondition' ;
     PREFIX_CONTAINS_ELEMENT : '\\prefixContainsElement' ;

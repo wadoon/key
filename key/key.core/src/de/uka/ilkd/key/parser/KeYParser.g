@@ -3855,6 +3855,7 @@ varexp[TacletBuilder b]
 }
 :
   ( varcond_applyUpdateOnRigid[b]
+    | varcond_hasAEPredicate[b]
     | varcond_getInvariant[b]
     | varcond_initializeParametricSkolemUpdate[b]
     | varcond_initializeParametricSkolemPathCondition[b]
@@ -3918,6 +3919,14 @@ varcond_applyUpdateOnRigid [TacletBuilder b]
       b.addVariableCondition(new ApplyUpdateOnRigidCondition((UpdateSV)u, 
                                                              (SchemaVariable)x, 
                                                              (SchemaVariable)x2));
+   }
+;
+
+varcond_hasAEPredicate [TacletBuilder b]
+:
+   HAS_AE_PREDICATE LPAREN phi=varId RPAREN
+   { 
+      b.addVariableCondition(new HasAEPredicateCondition((SchemaVariable) phi)); 
    }
 ;
 

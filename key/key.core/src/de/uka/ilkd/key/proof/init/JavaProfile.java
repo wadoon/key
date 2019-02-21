@@ -17,13 +17,33 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.label.*;
+import de.uka.ilkd.key.logic.label.AbstractExecutionTermLabel;
+import de.uka.ilkd.key.logic.label.AbstractExecutionTermLabelFactory;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
+import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
+import de.uka.ilkd.key.logic.label.TermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager.TermLabelConfiguration;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooserBuilder;
-import de.uka.ilkd.key.rule.*;
+import de.uka.ilkd.key.rule.AbstractBlockSpecificationElementBuiltInRuleApp;
+import de.uka.ilkd.key.rule.AbstractContractRuleApp;
+import de.uka.ilkd.key.rule.BlockContractExternalRule;
+import de.uka.ilkd.key.rule.BlockContractInternalRule;
+import de.uka.ilkd.key.rule.BuiltInRule;
+import de.uka.ilkd.key.rule.LoopContractApplyHeadRule;
+import de.uka.ilkd.key.rule.LoopContractExternalRule;
+import de.uka.ilkd.key.rule.LoopContractInternalRule;
+import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
+import de.uka.ilkd.key.rule.OneStepSimplifier;
+import de.uka.ilkd.key.rule.QueryExpand;
+import de.uka.ilkd.key.rule.Rule;
+import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.lazyse.InstantiateAbstractExecutionHoleRule;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
@@ -118,6 +138,12 @@ public class JavaProfile extends AbstractProfile {
                     ParameterlessTermLabel.POST_CONDITION_LABEL_NAME,
                     new SingletonLabelFactory<TermLabel>(
                             ParameterlessTermLabel.POST_CONDITION_LABEL)
+            ));
+        result = result.prepend(
+            new TermLabelConfiguration(
+                    ParameterlessTermLabel.AE_EQUIV_PROOF_LABEL_NAME,
+                    new SingletonLabelFactory<TermLabel>(
+                            ParameterlessTermLabel.AE_EQUIV_PROOF_LABEL)
             ));
         result = result.prepend(
             new TermLabelConfiguration(

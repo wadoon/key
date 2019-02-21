@@ -38,6 +38,7 @@ import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula3;
 import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula4;
 import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula5;
 import de.uka.ilkd.key.rule.metaconstruct.ReturnSpec;
+import de.uka.ilkd.key.rule.metaconstruct.SetLastComponentOfAEPredsToFalseTransformer;
 import de.uka.ilkd.key.rule.metaconstruct.arith.DivideLCRMonomials;
 import de.uka.ilkd.key.rule.metaconstruct.arith.DivideMonomials;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaAdd;
@@ -129,6 +130,8 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer EXC_SPEC = new ExcSpec();
     public static final AbstractTermTransformer BREAKS_SPEC = new BreaksSpec();
     public static final AbstractTermTransformer CONTINUES_SPEC = new ContinuesSpec();
+
+    public static final AbstractTermTransformer SET_SECOND_COMPONENT_TO = new SetLastComponentOfAEPredsToFalseTransformer();
 
     private static Sort[] createMetaSortArray(int arity) {
         Sort[] result = new Sort[arity];

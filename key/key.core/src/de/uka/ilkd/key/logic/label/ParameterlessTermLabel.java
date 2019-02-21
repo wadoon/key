@@ -106,7 +106,7 @@ public final class ParameterlessTermLabel implements TermLabel {
 
    public static final TermLabel POST_CONDITION_LABEL =
            new ParameterlessTermLabel(POST_CONDITION_LABEL_NAME);
-   
+
    /**
     * Name of {@link #LOOP_SCOPE_INDEX_LABEL}.
     */
@@ -117,6 +117,17 @@ public final class ParameterlessTermLabel implements TermLabel {
     */
    public static final TermLabel LOOP_SCOPE_INDEX_LABEL =
            new ParameterlessTermLabel(LOOP_SCOPE_INDEX_LABEL_NAME);
+
+   /**
+    * Name of {@link #AE_EQUIV_PROOF_LABEL}.
+    */
+   public static final Name AE_EQUIV_PROOF_LABEL_NAME = new Name("AEPred");
+
+   /**
+    * Label attached to predicates used for abstract execution equivalence proofs.
+    */
+   public static final TermLabel AE_EQUIV_PROOF_LABEL =
+           new ParameterlessTermLabel(AE_EQUIV_PROOF_LABEL_NAME);
 
     /**
      * The unique name of this label.
