@@ -571,7 +571,7 @@ public class TestJMLTranslator extends TestCase {
 
         result = JMLTranslator.translate(new PositionedString("-1.0"),
                 testClassType, selfVar, null, null, null, null, Term.class, services);
-        assertEquals("todo", result.sub(0).toString());
+        assertEquals("DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))),0(#))", result.sub(0).toString());
 
     }
 
