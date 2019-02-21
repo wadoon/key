@@ -498,7 +498,15 @@ public final class JMLSpecExtractor implements SpecExtractor {
                     && (!pm.isStatic() || addInvariant)) {
                 // for a static method translate \inv once again, otherwise use
                 // the internal symbol
-                final String invString = pm.isStatic() ? "\\inv" : "<inv>";
+                /* Changes due to Ownership Types:
+                 * - We replaced precondition inv by relinv.
+                 * - We removed the need to show inv in post.
+                 * - We added ensures_free relinv.
+                 * However, see UseOperationContractRule for further changes.
+                 * In static case, everything stays as it is.
+                 */
+                final String invString = pm.isStatic() ? "\\inv" : "relinv";
+                // final String invString = pm.isStatic() ? "\\inv" : "<inv>";
                 if (!pm.isConstructor()) {
                     specCase.addRequires(new PositionedString(invString).label(
                             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
@@ -509,9 +517,14 @@ public final class JMLSpecExtractor implements SpecExtractor {
                                     ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 }
                 if (specCase.getBehavior() != Behavior.EXCEPTIONAL_BEHAVIOR) {
-                    specCase.addEnsures(
-                            new PositionedString("ensures " + invString).label(
-                                    ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                    if (pm.isStatic()) {
+                        specCase.addEnsures(
+                                new PositionedString("ensures " + invString).label(
+                                        ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                    } else {
+                        specCase.addEnsuresFree(new PositionedString("relinv").label(
+                                ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                    }
                 }
                 if (specCase.getBehavior() != Behavior.NORMAL_BEHAVIOR
                         && !pm.isModel()) {
