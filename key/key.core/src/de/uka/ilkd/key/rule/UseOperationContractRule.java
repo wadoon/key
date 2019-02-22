@@ -763,29 +763,43 @@ public final class UseOperationContractRule implements BuiltInRule {
 
         //split goal into three/four branches
         final ImmutableList<Goal> result;
-        final Goal preGoal, postGoal, excPostGoal, nullGoal;
+        final Goal preGoal, postGoal, excPostGoal, nullGoal, peerInvGoal;
         final ReferencePrefix rp = inst.mr.getReferencePrefix();
         if(rp != null
            && !(rp instanceof ThisReference)
            && !(rp instanceof SuperReference)
            && !(rp instanceof TypeReference)
            && !(inst.pm.isStatic())) {
-            result = goal.split(4);
-            postGoal = result.tail().tail().tail().head();
-            excPostGoal = result.tail().tail().head();
+            result = goal.split(5);
+            postGoal = result.tail().tail().tail().tail().head();
+            excPostGoal = result.tail().tail().tail().head();
+            peerInvGoal = result.tail().tail().head();
             preGoal = result.tail().head();
             nullGoal = result.head();
+
+//            result = goal.split(4);
+//            postGoal = result.tail().tail().tail().head();
+//            excPostGoal = result.tail().tail().head();
+//            preGoal = result.tail().head();
+//            nullGoal = result.head();
             nullGoal.setBranchLabel("Null reference ("
         	                    + inst.actualSelf
         	                    + " = null)");
         } else {
-            result = goal.split(3);
-            postGoal = result.tail().tail().head();
-            excPostGoal = result.tail().head();
+            result = goal.split(4);
+            postGoal = result.tail().tail().tail().head();
+            excPostGoal = result.tail().tail().head();
+            peerInvGoal = result.tail().head();
             preGoal = result.head();
+
+//            result = goal.split(3);
+//            postGoal = result.tail().tail().head();
+//            excPostGoal = result.tail().head();
+//            preGoal = result.head();
             nullGoal = null;
         }
         preGoal.setBranchLabel("Pre"+ " ("+contract.getTarget().getName()+")");
+        peerInvGoal.setBranchLabel("Peer Invariant"+ " ("+contract.getTarget().getName()+")");
         postGoal.setBranchLabel("Post"+ " ("+contract.getTarget().getName()+")");
         excPostGoal.setBranchLabel("Exceptional Post"+ " ("+contract.getTarget().getName()+")");
 
@@ -904,6 +918,25 @@ public final class UseOperationContractRule implements BuiltInRule {
                               ruleApp.posInOccurrence());
 
         TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this, preGoal, null, null);
+
+        // create "Peer Invariant" branch
+
+        // TODO: does this lookup always return the correct self variable of the enclosing method?
+        ProgramVariable outerSelf = (ProgramVariable) services.getNamespaces().programVariables().lookup("self");
+        Term selfTerm = tb.var(outerSelf);
+
+        Function funcPeer = services.getNamespaces().functions().lookup("peer");
+        Function funcInv = services.getNamespaces().functions().lookup("java.lang.Object::<inv>");
+        Term finalPeerInvTerm = tb.applySequential(
+                new Term[]{inst.u, atPreUpdates},
+                tb.imp( tb.func(funcPeer, contractSelf, selfTerm),
+                        tb.func(funcInv, baseHeapTerm, selfTerm)));
+
+        finalPeerInvTerm = TermLabelManager.refactorTerm(termLabelState, services, null, finalPeerInvTerm, this, peerInvGoal, null, null);
+        peerInvGoal.changeFormula(new SequentFormula(finalPeerInvTerm),
+                ruleApp.posInOccurrence());
+
+        TermLabelManager.refactorGoal(termLabelState, services, ruleApp.posInOccurrence(), this, peerInvGoal, null, null);
 
         //create "Post" branch
 	final StatementBlock resultAssign;
