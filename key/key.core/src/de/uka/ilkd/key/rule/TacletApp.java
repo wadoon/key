@@ -572,9 +572,127 @@ public abstract class TacletApp implements RuleApp {
     }
 
     /**
+     * @return A taclet app which is more complete than the original one
+     *         (although there might still be some leftover uninstantiated
+     *         variables) or null if nothing changed.
+     */
+    public final TacletApp tryToInstantiateAsMuchAsPossible(Services services) {
+        final VariableNamer varNamer = services.getVariableNamer();
+        final TermBuilder tb = services.getTermBuilder();
+
+        TacletApp app = this;
+        ImmutableList<String> proposals = ImmutableSLList.<String> nil();
+
+        for (final SchemaVariable sv : uninstantiatedVars()) {
+            if (sv.arity() != 0) {
+                continue;
+            }
+
+            if (sv.sort() == ProgramSVSort.VARIABLE) {
+                String proposal = varNamer
+                        .getSuggestiveNameProposalForProgramVariable(sv, this,
+                                services, proposals);
+                ProgramElement pe = app.getProgramElement(proposal, sv,
+                        services);
+                app = app.addCheckedInstantiation(sv, pe, services, true);
+                proposals = proposals.append(proposal);
+            }
+            else if (sv.sort() == ProgramSVSort.LABEL) {
+                boolean nameclash;
+                do {
+                    String proposal = VariableNameProposer.DEFAULT
+                            .getProposal(this, sv, services, null, proposals);
+                    ProgramElement pe = app.getProgramElement(proposal, sv,
+                            services);
+                    proposals = proposals.prepend(proposal);
+                    try {
+                        app = app.addCheckedInstantiation(sv, pe, services,
+                                true);
+                    }
+                    catch (IllegalInstantiationException iie) {
+                        // name clash
+                        nameclash = true;
+                    }
+                    // FIXME: This loop is never executed more than once
+                    // The following line might belong to the try-block.
+                    // Leave it untouched, however, since no problems
+                    // reported with this established code. MU 10-2012
+                    nameclash = false;
+                }
+                while (nameclash);
+            }
+            else if (sv instanceof SkolemTermSV
+                    || sv instanceof SkolemUpdateSV) {
+                // if the sort of the schema variable is generic,
+                // ensure that it is instantiated
+                app = forceGenericSortInstantiation(app, sv, services);
+                if (app == null) {
+                    /*
+                     * NOTE (DS, 2019-02-22): Here we do return null since
+                     * Skolem symbols should in any case be instantiated.
+                     */
+                    return null;
+                }
+
+                final String proposal = VariableNameProposer.DEFAULT.getProposal(app,
+                        sv, services, null, proposals);
+                proposals = proposals.append(proposal);
+                app = app.createSkolemConstant(proposal, sv, true, services);
+
+            }
+            else if (sv instanceof VariableSV) {
+                // if the sort of the schema variable is generic,
+                // ensure that it is instantiated
+                app = forceGenericSortInstantiation(app, sv, services);
+                if (app == null) {
+                    continue;
+                }
+
+                String proposal;
+                Collection<String> conflictNames = collectClashNames(sv,
+                        services);
+                do {
+                    proposal = VariableNameProposer.DEFAULT.getProposal(this,
+                            sv, services, null, proposals);
+                    proposals = proposals.prepend(proposal);
+                }
+                while (conflictNames.contains(proposal));
+
+                LogicVariable v = new LogicVariable(new Name(proposal),
+                        getRealSort(sv, services));
+
+                app = app.addCheckedInstantiation(sv, tb.var(v), services,
+                        true);
+            }
+            else {
+                continue;
+            }
+        }
+
+        if (app != this) {
+            final MatchConditions appMC = app.taclet().getMatcher()
+                    .checkConditions(app.matchConditions(), services);
+            if (appMC == null) {
+                return null;
+            }
+
+            return app;
+        }
+
+        return null;
+    }
+
+    /**
      * @return A TacletApp with this.sufficientlyComplete() or null
      */
     public final TacletApp tryToInstantiate(Services services) {
+        /*
+         * TODO (DS, 2019-02-22): It should be possible to unify this with
+         * tryToInstantiateAsMuchAsPossible: Apply that method, check whether
+         * the result is complete, return it if yes and else return null.
+         * Indeed, the above method is an adapted clone of this one. I just
+         * did not dare to mess with that core element of the prover at the moment...
+         */
         final VariableNamer varNamer = services.getVariableNamer();
         final TermBuilder tb = services.getTermBuilder();
 

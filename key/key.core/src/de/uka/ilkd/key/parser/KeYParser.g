@@ -3866,6 +3866,7 @@ varexp[TacletBuilder b]
     | varcond_dropEffectlessAbstractUpdateAssignments[b]
     | varcond_instantiateVarsFresh[b]
     | varcond_newPV[b]
+    | varcond_initializeExpression[b]
     | varcond_storeResultVarIn[b]
     | varcond_storeContextLabelsIn[b]
     | varcond_storeContextLoopLabelsIn[b]
@@ -3956,6 +3957,20 @@ varcond_newPV[TacletBuilder b]
           new NewProgramVariableCondition(
             (ProgramSV) pvSV, namePattern, (ProgramSV) y, (ProgramSV) z));
       }
+   }
+;
+
+varcond_initializeExpression[TacletBuilder b]
+:
+   INITIALIZE_EXPRESSION LPAREN
+     pvSV=varId COMMA
+     kjt=keyjavatype COMMA
+     v=varId
+   RPAREN 
+   {
+      b.addVariableCondition(
+        new InitializeExpressionCondition(
+          (ProgramSV) pvSV, kjt, (SchemaVariable) v));
    }
 ;
 

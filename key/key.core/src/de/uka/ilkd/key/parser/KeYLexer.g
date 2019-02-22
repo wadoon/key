@@ -242,6 +242,7 @@ lexer grammar KeYLexer;
 	APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';
     DEPENDINGON : '\\dependingOn';
     FRESHFOR : '\\freshFor';
+    INITIALIZE_EXPRESSION : '\\initializeExpression';
 	DISJOINTMODULONULL  : '\\disjointModuloNull';
 	ABSTR_UPDATES_INDEPENDENT : '\\abstrUpdatesIndependent';
 	APPLY_ABSTR_ON_CONCR_UPDATE : '\\applyAbstrOnConcrUpdate';

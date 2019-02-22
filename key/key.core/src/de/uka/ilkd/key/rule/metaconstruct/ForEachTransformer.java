@@ -67,6 +67,7 @@ public class ForEachTransformer extends ProgramTransformer {
         final ProgramElement[] indexVarInsts = Arrays.stream(indexVariables)
                 .map(sv -> (ProgramElement) svInst.getInstantiation(sv))
                 .collect(Collectors.toList()).toArray(new ProgramElement[0]);
+        @SuppressWarnings("rawtypes")
         final ImmutableArray[] listVarInsts = Arrays.stream(listVariables)
                 .map(sv -> (ImmutableArray) svInst.getInstantiation(sv))
                 .collect(Collectors.toList()).toArray(new ImmutableArray[0]);

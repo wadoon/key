@@ -596,6 +596,7 @@ TOKEN :
 		    | < FORINITUNFOLDTRANSFORMER: "#forInitUnfoldTransformer" >
 		    | < LOOPSCOPEINVARIANTTRANSFORMER: "#loopScopeInvariantTransformer" >
 		    | < FOREACH: "#foreach" >
+		    | < REPEAT: "#repeat" >
 		    | < IN: "in" >
 		    | < SET: "#set" >
 		    }
@@ -4164,6 +4165,19 @@ RKeYMetaConstruct KeYMetaConstructStatement() :
        setPrefixInfo(result);
        result.setChild(stat);
        result.setName("#foreach");
+       return result;
+     }
+  )
+  |
+  (
+    "#repeat" "(" 
+      { result = factory.createRKeYMetaConstruct(); }
+      ( sv = VariableSV() { result.addSV(sv); } ) 
+    ")" "{" (stat = Statement()) "}"
+     {
+       setPrefixInfo(result);
+       result.setChild(stat);
+       result.setName("#repeat");
        return result;
      }
   )
