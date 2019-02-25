@@ -3878,9 +3878,9 @@ varcond_applyUpdateOnRigid [TacletBuilder b]
 
 varcond_getInvariant [TacletBuilder b]
 :
-   GET_INVARIANT LPAREN inv=varId RPAREN
+   GET_INVARIANT LPAREN inv=varId COMMA x=varId RPAREN
    { 
-      b.addVariableCondition(new LoopInvariantCondition((SchemaVariable)inv)); 
+      b.addVariableCondition(new LoopInvariantCondition((SchemaVariable)inv, (ModalOperatorSV)x)); 
    }
 ;
 
