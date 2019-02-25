@@ -35,7 +35,7 @@ import de.uka.ilkd.key.util.MiscTools;
 public class AnonUpdateTransformer extends AbstractTermTransformer {
 
     public AnonUpdateTransformer() {
-        super(new Name("#anonUpdateTransformer"), 1, Sort.UPDATE);
+        super(new Name("#anonUpdateTransformer"), 3, Sort.UPDATE);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class AnonUpdateTransformer extends AbstractTermTransformer {
                 new LinkedHashMap<LocationVariable, Map<Term, Term>>();
 
         Term beforeLoopUpdate = createBeforeLoopUpdate(services, heapContext,
-                localOuts, heapToBeforeLoop);
+                localOuts, heapToBeforeLoop, term);
 
         final TermBuilder tb = services.getTermBuilder();
         // Additional Heap Terms
@@ -84,7 +84,7 @@ public class AnonUpdateTransformer extends AbstractTermTransformer {
 
         for (LocationVariable heap : heapContext) {
             final AnonUpdateData tAnon = createAnonUpdate(heap, mods.get(heap),
-                    spec, services);
+                    spec, services, term);
             anonUpdate = tb.parallel(anonUpdate, tAnon.anonUpdate);
 
             wellFormedAnon = and(tb, wellFormedAnon,
@@ -213,7 +213,8 @@ public class AnonUpdateTransformer extends AbstractTermTransformer {
     protected static Term createBeforeLoopUpdate(Services services,
             final List<LocationVariable> heapContext,
             final ImmutableSet<ProgramVariable> localOuts,
-            final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop) {
+            final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop,
+            final Term term) {
         final TermBuilder tb = services.getTermBuilder();
         final Namespace<IProgramVariable> progVarNS = services.getNamespaces()
                 .programVariables();
@@ -221,10 +222,14 @@ public class AnonUpdateTransformer extends AbstractTermTransformer {
         Term beforeLoopUpdate = null;
         for (LocationVariable heap : heapContext) {
             heapToBeforeLoop.put(heap, new LinkedHashMap<Term, Term>());
-            final LocationVariable lv = tb.heapAtPreVar(heap + "Before_LOOP",
-                    heap.sort(), true);
+            
+            final LocationVariable lv = 
+            		//tb.heapAtPreVar(heap + "Before_LOOP", heap.sort(), true);
+            		tb.heapAtPreVar(term.sub(1).toString(), heap.sort(), false);
+            System.out.println(term.sub(1).toString()); 
             progVarNS.addSafely(lv);
-
+             
+            
             final Term u = tb.elementary(lv, tb.var(heap));
             if (beforeLoopUpdate == null) {
                 beforeLoopUpdate = u;
@@ -233,7 +238,7 @@ public class AnonUpdateTransformer extends AbstractTermTransformer {
                 beforeLoopUpdate = tb.parallel(beforeLoopUpdate, u);
             }
 
-            heapToBeforeLoop.get(heap).put(tb.var(heap), tb.var(lv));
+            heapToBeforeLoop.get(heap).put(tb.var(heap), tb.var(lv)); 
         }
 
         for (ProgramVariable pv : localOuts) {
@@ -269,7 +274,7 @@ public class AnonUpdateTransformer extends AbstractTermTransformer {
      *         update, the loop heap, the base heap, and the anonymized heap.
      */
     protected static AnonUpdateData createAnonUpdate(LocationVariable heap,
-            Term mod, LoopSpecification inv, Services services) {
+            Term mod, LoopSpecification inv, Services services, Term term) {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name loopHeapName = new Name(tb.newName(heap + "_After_LOOP"));
@@ -279,7 +284,8 @@ public class AnonUpdateTransformer extends AbstractTermTransformer {
 
         final Term loopHeap = tb.func(loopHeapFunc);
         final Name anonHeapName = new Name(
-                tb.newName("anon_" + heap + "_LOOP"));
+                //tb.newName("anon_" + heap + "_LOOP"));
+        		tb.newName(term.sub(2).toString()));
         final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
         services.getNamespaces().functions().addSafely(anonHeapFunc);
         final Term anonHeapTerm = tb.label(tb.func(anonHeapFunc),

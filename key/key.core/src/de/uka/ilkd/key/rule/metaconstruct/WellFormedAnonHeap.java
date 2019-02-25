@@ -35,7 +35,7 @@ import de.uka.ilkd.key.util.MiscTools;
 public class WellFormedAnonHeap extends AbstractTermTransformer {
 
     public WellFormedAnonHeap() {
-        super(new Name("#wellFormedAnonHeap"), 0);
+        super(new Name("#wellFormedAnonHeap"), 2); 
     }
 
     @Override
@@ -84,7 +84,7 @@ public class WellFormedAnonHeap extends AbstractTermTransformer {
 
         for (LocationVariable heap : heapContext) {
             final AnonUpdateData tAnon = createAnonUpdate(heap, mods.get(heap),
-                    spec, services);
+                    spec, services, term);
             anonUpdate = tb.parallel(anonUpdate, tAnon.anonUpdate);
 
             wellFormedAnon = and(tb, wellFormedAnon,
@@ -93,10 +93,10 @@ public class WellFormedAnonHeap extends AbstractTermTransformer {
         // anonUpdate = and(tb, anonUpdate, wellFormedAnon);
         // END Additional Heap Terms
 
-        final Term newFormula = tb.parallel(
-                tb.parallel(beforeLoopUpdate, anonUpdate), variantUpdate);
+        //final Term newFormula = tb.parallel(
+        //        tb.parallel(beforeLoopUpdate, anonUpdate), variantUpdate);
 
-        return newFormula;
+        return wellFormedAnon;
     }
 
     /**
@@ -269,7 +269,7 @@ public class WellFormedAnonHeap extends AbstractTermTransformer {
      *         update, the loop heap, the base heap, and the anonymized heap.
      */
     protected static AnonUpdateData createAnonUpdate(LocationVariable heap,
-            Term mod, LoopSpecification inv, Services services) {
+            Term mod, LoopSpecification inv, Services services, Term term) {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final Name loopHeapName = new Name(tb.newName(heap + "_After_LOOP"));
@@ -279,9 +279,11 @@ public class WellFormedAnonHeap extends AbstractTermTransformer {
 
         final Term loopHeap = tb.func(loopHeapFunc);
         final Name anonHeapName = new Name(
-                tb.newName("anon_" + heap + "_LOOP"));
+        		//tb.newName("anon_" + heap + "_LOOP"));
+        		tb.newName(term.sub(1).toString()));
+        
         final Function anonHeapFunc = new Function(anonHeapName, heap.sort());
-        services.getNamespaces().functions().addSafely(anonHeapFunc);
+        //services.getNamespaces().functions().addSafely(anonHeapFunc);
         final Term anonHeapTerm = tb.label(tb.func(anonHeapFunc),
                 ParameterlessTermLabel.ANON_HEAP_LABEL);
 
