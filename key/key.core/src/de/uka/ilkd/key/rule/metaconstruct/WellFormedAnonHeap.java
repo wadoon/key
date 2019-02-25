@@ -32,10 +32,10 @@ import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
-public class AnonUpdateTransformer extends AbstractTermTransformer {
+public class WellFormedAnonHeap extends AbstractTermTransformer {
 
-    public AnonUpdateTransformer() {
-        super(new Name("#anonUpdateTransformer"), 1, Sort.UPDATE);
+    public WellFormedAnonHeap() {
+        super(new Name("#wellFormedAnonHeap"), 0);
     }
 
     @Override

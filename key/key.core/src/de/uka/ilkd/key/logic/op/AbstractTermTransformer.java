@@ -32,6 +32,7 @@ import de.uka.ilkd.key.rule.metaconstruct.GetFrameCondition;
 import de.uka.ilkd.key.rule.metaconstruct.GetVariant;
 import de.uka.ilkd.key.rule.metaconstruct.IntroAtPreDefsOp;
 import de.uka.ilkd.key.rule.metaconstruct.MemberPVToField;
+import de.uka.ilkd.key.rule.metaconstruct.WellFormedAnonHeap;
 import de.uka.ilkd.key.rule.metaconstruct.arith.DivideLCRMonomials;
 import de.uka.ilkd.key.rule.metaconstruct.arith.DivideMonomials;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaAdd;
@@ -117,6 +118,8 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer GET_VARIANT = new GetVariant();
 
     public static final AbstractTermTransformer GET_FRAME_CONDITION = new GetFrameCondition();
+
+    public static final AbstractTermTransformer WELL_FORMED_ANON_HEAP = new WellFormedAnonHeap();
 
     private static Sort[] createMetaSortArray(int arity) {
         Sort[] result = new Sort[arity];
