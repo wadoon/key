@@ -67,7 +67,7 @@ public class UseContractCommand extends AbstractCommand<UseContractCommand.Param
 
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Parameters args, EngineState stateMap) throws ScriptException, InterruptedException {
-        Goal goal = stateMap.getFirstOpenGoal();
+        Goal goal = stateMap.getFirstOpenGoal(false);
 
         String type = args.contractType;
         //TODO adjust if more than one type possible
