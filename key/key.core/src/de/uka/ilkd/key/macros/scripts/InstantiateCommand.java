@@ -58,7 +58,7 @@ public class InstantiateCommand
             Parameters params, EngineState state)
             throws ScriptException, InterruptedException {
 
-        Goal goal = state.getFirstOpenGoal();
+        Goal goal = state.getFirstOpenAutomaticGoal();
 
         if ((params.var == null) == (params.formula == null)) {
             throw new ScriptException(
@@ -83,7 +83,7 @@ public class InstantiateCommand
 
         theApp = theApp.tryToInstantiate(state.getProof().getServices());
 
-        Goal g = state.getFirstOpenGoal();
+        Goal g = state.getFirstOpenAutomaticGoal();
         g.apply(theApp);
     }
 
@@ -113,7 +113,7 @@ public class InstantiateCommand
         Proof proof = state.getProof();
         Services services = proof.getServices();
         TacletFilter filter = new TacletNameFilter(rulename);
-        Goal g = state.getFirstOpenGoal();
+        Goal g = state.getFirstOpenAutomaticGoal();
         RuleAppIndex index = g.ruleAppIndex();
         index.autoModeStopped();
 
