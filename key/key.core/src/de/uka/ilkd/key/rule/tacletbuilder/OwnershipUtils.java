@@ -10,7 +10,9 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.Field;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.ImplicitFieldSpecification;
 import de.uka.ilkd.key.java.declaration.TypeDeclaration;
 import de.uka.ilkd.key.logic.Choice;
@@ -39,6 +41,27 @@ import de.uka.ilkd.key.util.MiscTools;
 public final class OwnershipUtils {
     private OwnershipUtils() { };
 
+    private static boolean isImplicitField(Field f) {
+        return f instanceof ImplicitFieldSpecification;
+    }
+
+    private static boolean isPrimitiveField(Field f) {
+        Type t = f.getType();
+        if (t instanceof KeYJavaType) {
+            KeYJavaType kjt = (KeYJavaType)t;
+            return kjt.getJavaType() instanceof PrimitiveType;
+        }
+        return false;
+    }
+
+    private static boolean isRep(Field f) {
+        return f.getProgramName().startsWith("rep_");
+    }
+
+    private static boolean isPeer(Field f) {
+        return f.getProgramName().startsWith("peer_");
+    }
+
     private static List<Taclet> createDisjointFPTaclets(Services services,
             ProgramVariable selfVar) {
         /* for each pair (f1, f2) of rep fields declared in this class (or a superclass!)
@@ -60,24 +83,22 @@ public final class OwnershipUtils {
             rest = rest.tail();
 
             // skip implicit fields and fields with primitive type
-            if (f1 instanceof ImplicitFieldSpecification
-                    || f1.getType() instanceof PrimitiveType) {
+            if (isImplicitField(f1) || isPrimitiveField(f1)) {
                 continue;
             }
 
             // skip non-rep fields
-            if (!f1.getProgramName().startsWith("rep_")) {
+            if (!isRep(f1)) {
                 continue;
             }
             for (Field f2 : rest) {
                 // skip implicit fields and fields with primitive type
-                if (f2 instanceof ImplicitFieldSpecification
-                        || f2.getType() instanceof PrimitiveType) {
+                if (isImplicitField(f2) || isPrimitiveField(f2)) {
                     continue;
                 }
 
                 // skip non-rep fields
-                if (!f2.getProgramName().startsWith("rep_")) {
+                if (!isRep(f2)) {
                     continue;
                 }
 
@@ -192,17 +213,16 @@ public final class OwnershipUtils {
         Term findPeerfp = tb.func(peerFP, tb.var(heapSV), tb.var(selfVar));
 
         for (Field f : fields) {
-            // skip implicit fields (TODO: better way to do this?)
-            if (f instanceof ImplicitFieldSpecification) {
+            // skip implicit fields
+            if (isImplicitField(f)) {
                 continue;
             }
 
-            // TODO: skip primitive fields
-            if (f.getType() instanceof PrimitiveType) { // untested
+            if (isPrimitiveField(f)) {
                 continue;
             }
 
-            if (f.getProgramName().startsWith("rep_")) {
+            if (isRep(f)) {
                 ProgramVariable pvF = services.getJavaInfo().getAttribute(f.getFullName());
                 Sort fSort = f.getProgramVariable().sort();
 
@@ -222,7 +242,7 @@ public final class OwnershipUtils {
                 Term repfpOF = tb.func(repFP, tb.var(heapSV), oF);
 
                 replaceRepfp = tb.union(replaceRepfp, tb.ife(oFCreated, repfpOF, tb.empty()));
-            } else if (f.getProgramName().startsWith("peer_")) {
+            } else if (isPeer(f)) {
                 ProgramVariable pvF = services.getJavaInfo().getAttribute(f.getFullName());
                 Sort fSort = f.getProgramVariable().sort();
 
@@ -296,8 +316,8 @@ public final class OwnershipUtils {
          * };
          */
 
-        // TODO: generate represents clauses for relinv for self
-        // concrete invariant is hidden for all objects != self
+        // generate represents clauses for relinv for self
+        // (concrete invariant is hidden for all objects != self)
         ImmutableList<Field> fields = services.getJavaInfo().getAllFields(
                 (TypeDeclaration) selfVar.getKeYJavaType().getJavaType());
 
@@ -318,13 +338,13 @@ public final class OwnershipUtils {
         Term find = tb.func(relinvFunc, tb.var(heapSV), tb.var(selfVar));
 
         for (Field f : fields) {
-            // skip implicit fields (TODO: better way to do this?)
-            if (f instanceof ImplicitFieldSpecification) {
+            // skip implicit fields
+            if (isImplicitField(f)) {
                 continue;
             }
 
-            // TODO: skip primitive fields
-            if (f.getType() instanceof PrimitiveType) { // untested
+            // skip primitive fields
+            if (isPrimitiveField(f)) {
                 continue;
             }
 
@@ -386,9 +406,9 @@ public final class OwnershipUtils {
         for (Field f : fields) {
 
             // generate taclets for rep and peer fields
-            if (f.getProgramName().startsWith("rep_")) {
+            if (isRep(f)) {
                 result.add(createOwnershipAxiomTaclet(f, true, proofServices));
-            } else if (f.getProgramName().startsWith("peer_")) {
+            } else if (isPeer(f)) {
                 result.add(createOwnershipAxiomTaclet(f, false, proofServices));
             }
         }
