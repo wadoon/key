@@ -2,6 +2,7 @@ package de.uka.ilkd.key.rule.tacletbuilder;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -62,6 +63,31 @@ public final class OwnershipUtils {
         return f.getProgramName().startsWith("peer_");
     }
 
+    private static ImmutableList<Field> collectAllExplicitReferenceMembers(ProgramVariable selfVar,
+            Services services) {
+        KeYJavaType kjt = selfVar.getKeYJavaType();
+        ImmutableList<Field> fields = ImmutableSLList.<Field>nil();
+
+        ImmutableList<KeYJavaType> superTypes = services.getJavaInfo().getAllSupertypes(kjt);
+
+        for (KeYJavaType st : superTypes) {
+            Type t = st.getJavaType();
+            if (t instanceof TypeDeclaration) {
+                // TODO: respect visibility!
+                fields = fields.prepend(services.getJavaInfo().getAllFields((TypeDeclaration)t));
+            }
+        }
+
+        // filter implicit and primitive type fields
+        List<Field> tmp = fields.stream()
+                .filter(x -> !isImplicitField(x))
+                .filter(x -> !isPrimitiveField(x))
+                .collect(Collectors.toList());
+        ImmutableList<Field> filtered = ImmutableSLList.<Field>nil().prepend(tmp);
+
+        return filtered;
+    }
+
     private static List<Taclet> createDisjointFPTaclets(Services services,
             ProgramVariable selfVar) {
         /* for each pair (f1, f2) of rep fields declared in this class (or a superclass!)
@@ -75,33 +101,22 @@ public final class OwnershipUtils {
 
         List<Taclet> taclets = new ArrayList<>();
 
-        ImmutableList<Field> fields = services.getJavaInfo().getAllFields(
-                (TypeDeclaration) selfVar.getKeYJavaType().getJavaType());
+        ImmutableList<Field> fields = collectAllExplicitReferenceMembers(selfVar, services);
         ImmutableList<Field> rest = fields;
 
         for (Field f1 : fields) {
             rest = rest.tail();
-
-            // skip implicit fields and fields with primitive type
-            if (isImplicitField(f1) || isPrimitiveField(f1)) {
-                continue;
-            }
 
             // skip non-rep fields
             if (!isRep(f1)) {
                 continue;
             }
             for (Field f2 : rest) {
-                // skip implicit fields and fields with primitive type
-                if (isImplicitField(f2) || isPrimitiveField(f2)) {
-                    continue;
-                }
 
                 // skip non-rep fields
                 if (!isRep(f2)) {
                     continue;
                 }
-
                 taclets.add(createDisjointnessTaclet(f1, f2, services, selfVar));
             }
         }
@@ -187,9 +202,7 @@ public final class OwnershipUtils {
 
         List<Taclet> result = new ArrayList<>();
 
-        // TODO: does this include inherited fields?
-        ImmutableList<Field> fields = services.getJavaInfo().getAllFields(
-                (TypeDeclaration) selfVar.getKeYJavaType().getJavaType());
+        ImmutableList<Field> fields = collectAllExplicitReferenceMembers(selfVar, services);
 
         TermBuilder tb = services.getTermBuilder();
 
@@ -213,14 +226,6 @@ public final class OwnershipUtils {
         Term findPeerfp = tb.func(peerFP, tb.var(heapSV), tb.var(selfVar));
 
         for (Field f : fields) {
-            // skip implicit fields
-            if (isImplicitField(f)) {
-                continue;
-            }
-
-            if (isPrimitiveField(f)) {
-                continue;
-            }
 
             if (isRep(f)) {
                 ProgramVariable pvF = services.getJavaInfo().getAttribute(f.getFullName());
@@ -318,8 +323,7 @@ public final class OwnershipUtils {
 
         // generate represents clauses for relinv for self
         // (concrete invariant is hidden for all objects != self)
-        ImmutableList<Field> fields = services.getJavaInfo().getAllFields(
-                (TypeDeclaration) selfVar.getKeYJavaType().getJavaType());
+        ImmutableList<Field> fields = collectAllExplicitReferenceMembers(selfVar, services);
 
         TermBuilder tb = services.getTermBuilder();
 
@@ -338,15 +342,6 @@ public final class OwnershipUtils {
         Term find = tb.func(relinvFunc, tb.var(heapSV), tb.var(selfVar));
 
         for (Field f : fields) {
-            // skip implicit fields
-            if (isImplicitField(f)) {
-                continue;
-            }
-
-            // skip primitive fields
-            if (isPrimitiveField(f)) {
-                continue;
-            }
 
             // collect terms of the form:
             // o.f.created = TRUE -> relinv(o.f)
@@ -398,25 +393,22 @@ public final class OwnershipUtils {
         return taclet;
     }
 
-    private static List<Taclet> createOwnershipTaclets(Services proofServices,
-            ProgramVariable selfVar) {
-        ImmutableList<Field> fields = proofServices.getJavaInfo().getAllFields(
-                (TypeDeclaration) selfVar.getKeYJavaType().getJavaType());
+    private static List<Taclet> createOwnershipTaclets(Services services, ProgramVariable selfVar) {
+        ImmutableList<Field> fields = collectAllExplicitReferenceMembers(selfVar, services);
         List<Taclet> result = new ArrayList<>();
         for (Field f : fields) {
 
             // generate taclets for rep and peer fields
             if (isRep(f)) {
-                result.add(createOwnershipAxiomTaclet(f, true, proofServices));
+                result.add(createOwnershipAxiomTaclet(f, true, services));
             } else if (isPeer(f)) {
-                result.add(createOwnershipAxiomTaclet(f, false, proofServices));
+                result.add(createOwnershipAxiomTaclet(f, false, services));
             }
         }
         return result;
     }
 
-    private static Taclet createOwnershipAxiomTaclet(Field f, boolean isRep,
-            Services services) {
+    private static Taclet createOwnershipAxiomTaclet(Field f, boolean isRep, Services services) {
         /* rep {
          *   \schemaVar \term Object o;
          *   \schemaVar \term Heap heapSV;
