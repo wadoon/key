@@ -22,9 +22,14 @@ import java.util.Set;
  * @author Sarah Grebing.
  */
 public class ProofManagementApi {
+    public KeYEnvironment<?> getCurrentEnv() {
+        return currentEnv;
+    }
+
     private KeYEnvironment<?> currentEnv;
     private final List<Contract> proofContracts = new ArrayList<>();
     private HashSet<String> ruleNames;
+
 
     public ProofManagementApi(KeYEnvironment<?> env) {
         currentEnv = env;
