@@ -979,8 +979,7 @@ public class TermBuilder {
     public Term abstractUpdate(AbstractPlaceholderStatement phs, Term lhs,
             Term rhs) {
         final AbstractUpdate au = AbstractUpdate.getInstance(phs, lhs,
-                services.getTypeConverter().getLocSetLDT(),
-                services.getTypeConverter().getSetLDT());
+                services);
         return tf.createTerm(au, rhs);
     }
 

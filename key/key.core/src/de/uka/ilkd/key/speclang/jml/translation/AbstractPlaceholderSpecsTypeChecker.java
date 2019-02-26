@@ -158,7 +158,8 @@ public class AbstractPlaceholderSpecsTypeChecker {
     }
 
     private Set<Operator> collectElemsOfLocSetUnionTerm(Term t) {
-        return AbstractExecutionUtils.collectElementsOfLocSetTerm(t, services);
+        return AbstractExecutionUtils.collectElementsOfLocSetTerm(t,
+                typeConverter.getLocSetLDT().getUnion(), services);
     }
 
     private Term declaresTerm() {

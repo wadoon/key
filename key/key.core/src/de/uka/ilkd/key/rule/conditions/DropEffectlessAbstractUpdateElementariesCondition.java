@@ -152,8 +152,10 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
         final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
 
         final Set<Operator> opsInAssignable = //
-                AbstractExecutionUtils
-                        .collectNullaryPVsOrSkLocSets(abstrUpd.lhs(), services);
+                AbstractExecutionUtils.collectElementsOfLocSetTerm(
+                        abstrUpd.lhs(),
+                        services.getTypeConverter().getLocSetLDT().getUnion(),
+                        services);
         final Term abstrUpdAccessiblesTerm = update.sub(0);
 
         final Function allLocs = //

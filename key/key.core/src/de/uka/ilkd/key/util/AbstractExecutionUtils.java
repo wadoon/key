@@ -15,6 +15,7 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.java.visitor.ProgVarAndLocSetsCollector;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
@@ -376,27 +377,37 @@ public class AbstractExecutionUtils {
      * @return The converted {@link Term}.
      */
     public static Term locSetUnionToSetUnion(Term t, Services services) {
-        final Set<Term> constituents = new LinkedHashSet<>();
-        final Function locSetEmpty = //
-                services.getTypeConverter().getLocSetLDT().getEmpty();
-
-        /* We remove the "singletonPV("...)" wrappers */
-        t.execPostOrder(new DefaultVisitor() {
-            @Override
-            public void visit(Term visited) {
-                if (visited.op() == locSetEmpty) {
-                    return;
-                }
-
-                if (visited.op().arity() == 0) {
-                    constituents.add(visited);
-                }
-            }
-        });
-
         final TermBuilder tb = services.getTermBuilder();
-        return tb.setUnion(constituents.stream().map(tb::setSingleton)
-                .collect(Collectors.toList()));
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        return collectElementsOfLocSetTerm(t, locSetLDT.getUnion(), services)
+                .stream()
+                .map(op -> op instanceof Function ? tb.func((Function) op)
+                        : tb.var((ProgramVariable) op))
+                .map(tb::setSingleton)
+                .reduce(tb.setEmpty(), (t1, t2) -> tb.setUnion(t1, t2));
+        // @formatter:off
+        // final Set<Term> constituents = new LinkedHashSet<>();
+        // final Function locSetEmpty = //
+        //         services.getTypeConverter().getLocSetLDT().getEmpty();
+
+        // /* We remove the "singletonPV("...)" wrappers */
+        // t.execPostOrder(new DefaultVisitor() {
+        //     @Override
+        //     public void visit(Term visited) {
+        //         if (visited.op() == locSetEmpty) {
+        //             return;
+        //         }
+
+        //         if (visited.op().arity() == 0) {
+        //             constituents.add(visited);
+        //         }
+        //     }
+        // });
+
+        // final TermBuilder tb = services.getTermBuilder();
+        // return tb.setUnion(constituents.stream().map(tb::setSingleton)
+        //         .collect(Collectors.toList()));
+        // @formatter:on
     }
 
     /**
@@ -691,10 +702,14 @@ public class AbstractExecutionUtils {
             final Set<Operator> usedBeforeAssigned, Services services) {
         assert update.op() instanceof AbstractUpdate;
 
-        usedBeforeAssigned.addAll(AbstractExecutionUtils
-                .collectNullaryPVsOrSkLocSets(update.sub(0), services).stream()
-                .filter(op -> !assignedBeforeUsed.contains(op))
-                .collect(Collectors.toSet()));
+        usedBeforeAssigned
+                .addAll(AbstractExecutionUtils
+                        .collectElementsOfLocSetTerm(update.sub(0),
+                                services.getTypeConverter().getSetLDT()
+                                        .getUnion(),
+                                services)
+                        .stream().filter(op -> !assignedBeforeUsed.contains(op))
+                        .collect(Collectors.toSet()));
 
         final AbstractUpdate abstrUpdate = (AbstractUpdate) update.op();
         assignedBeforeUsed.addAll(abstrUpdate.getHasToAssignables().stream()
@@ -743,6 +758,23 @@ public class AbstractExecutionUtils {
             Term t = op instanceof LocationVariable
                     ? tb.singletonPV(tb.var((LocationVariable) op))
                     : tb.func((Function) op);
+
+            if (op instanceof Function && ((Function) op).sort() == services
+                    .getTypeConverter().getHeapLDT().getFieldSort()) {
+                final LocSetLDT locSetLDT = //
+                        services.getTypeConverter().getLocSetLDT();
+                final Optional<LocationVariable> selfVar = abstrUpd
+                        .getAllAssignables().stream()
+                        .map(term -> term.op() == locSetLDT.getHasTo()
+                                ? term.sub(0)
+                                : term)
+                        .filter(term -> term.op() == locSetLDT.getSingleton())
+                        .filter(term -> term.sub(1).op() == op)
+                        .map(term -> term.sub(0).op())
+                        .map(LocationVariable.class::cast).findFirst();
+
+                t = tb.singleton(tb.var(selfVar.get()), t);
+            }
 
             if (abstrUpd.getHasToAssignables().contains(op)) {
                 t = tb.hasTo(t);
@@ -841,31 +873,7 @@ public class AbstractExecutionUtils {
     }
 
     /**
-     * Collects nullary {@link Operator}s in the given {@link Term} that are
-     * either (1) {@link ProgramVariable}s or (2) Skolem location sets
-     * ({@link LocSetLDT}).
-     *
-     * @param t
-     *            The {@link Term} from which to extract.
-     * @param services
-     *            The {@link Services} object (for {@link LocSetLDT} and op
-     *            collector in programs).
-     * @return The {@link Operator}s.
-     */
-    public static Set<Operator> collectNullaryPVsOrSkLocSets(Term t,
-            Services services) {
-        final TermNullaryOpCollector collector = //
-                new TermNullaryOpCollector(services);
-        t.execPostOrder(collector);
-        return collector.result().stream().filter(
-                op -> op instanceof ProgramVariable || (op instanceof Function
-                        && ((Function) op).sort() == services.getTypeConverter()
-                                .getLocSetLDT().targetSort()))
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-    }
-
-    /**
-     * Returns the target operators in a loc set union term. Expects a union
+     * Returns the target operators in a set-like union term. Expects a union
      * term consisting of (1) Skolem loc set functions (result will contain that
      * function), (2) singletonPV(...) applications on location variables
      * (result will contain the variable), and (3) singleton(...) applications
@@ -874,33 +882,109 @@ public class AbstractExecutionUtils {
      *
      * @param t
      *            The loc set union term to dissect.
+     * @param t
+     *            The union function symbol, for instance of the LocSet theory.
      * @param services
      *            The {@link Services} object (for {@link TypeConverter}.
      * @return The {@link Operator}s in the {@link Term} (location variables,
      *         field function symbols, and Skolem location set functions).
      */
     public static Set<Operator> collectElementsOfLocSetTerm(Term t,
+            Function union, Services services) {
+        return MiscTools.dissasembleSetTerm(t, union).stream()
+                .map(locSetElemTermsToOpMapper(services))
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+    }
+
+    /**
+     * A mapper that can be applied to the elements of a loc set union to
+     * extract the relevant operator.
+     *
+     * @param services
+     *            The {@link Services} object.
+     *
+     * @return A mapper to apply on the element {@link Term}s of a loc set
+     *         union.
+     * @see #locSetElemTermsToOp(Term, Services)
+     */
+    public static java.util.function.Function<? super Term, ? extends Operator> locSetElemTermsToOpMapper(
+            Services services) {
+        return elemTerm -> locSetElemTermsToOp(elemTerm, services);
+    }
+
+    /**
+     * Extracts the relevant operator for an element of a set / loc set union.
+     * E.g., for a singleton(self, someField) returns someField.
+     *
+     * @param elemTerm
+     *            The element of the (loc) set union.
+     * @param services
+     *            The {@link Services} object.
+     * @return The relevant {@link Operator} of the (loc) set union.
+     */
+    public static Operator locSetElemTermsToOp(Term elemTerm,
             Services services) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        final Set<Term> elemTerms = MiscTools.dissasembleSetTerm(t,
-                locSetLDT.getUnion());
-        final Set<Operator> result = new LinkedHashSet<>();
+        final SetLDT setLDT = services.getTypeConverter().getSetLDT();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
-        for (final Term elemTerm : elemTerms) {
-            final Operator op = elemTerm.op();
-            if (op == locSetLDT.getSingletonPV()) {
-                result.add(elemTerm.sub(0).op());
-            } else if (op == locSetLDT.getSingleton()) {
-                result.add(elemTerm.sub(1).op());
-            } else if (op instanceof Function
-                    && ((Function) op).sort() == locSetLDT.targetSort()) {
-                result.add(elemTerm.op());
-            } else {
-                assert false : "Unexpected element of loc set union.";
-            }
+        final Operator op = elemTerm.op();
+        if (op instanceof ProgramVariable) {
+            return op;
+        } else if (op instanceof Function && op.arity() == 0) {
+            return elemTerm.op();
+        } else if (op == locSetLDT.getSingletonPV()) {
+            return locSetElemTermsToOp(elemTerm.sub(0), services);
+        } else if (op == locSetLDT.getSingleton()) {
+            return locSetElemTermsToOp(elemTerm.sub(1), services);
+        } else if (op == setLDT.getSingleton()) {
+            return locSetElemTermsToOp(elemTerm.sub(0), services);
+        } else if (op == locSetLDT.getHasTo()) {
+            return locSetElemTermsToOp(elemTerm.sub(0), services);
+        } else if (heapLDT.isSelectOp(op)) {
+            return locSetElemTermsToOp(elemTerm.sub(2), services);
+        } else {
+            assert false : "Unexpected element of (loc) set union.";
+            return null;
         }
+    }
 
-        return result;
+    /**
+     * Removes some strange things from (loc) set union terms, e.g., select
+     * applications (which should not be there). Returns null for unexpected
+     * inputs (or asserts false, when run with assertions).
+     *
+     * @param t
+     *            The element of the (loc) set union.
+     * @param services
+     *            The {@link Services} object.
+     * @return The relevant sub {@link Term}s of the (loc) set union.
+     */
+    public static Term preprocessLocSetElemTerms(Term t, Services services) {
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        final SetLDT setLDT = services.getTypeConverter().getSetLDT();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+
+        final Operator op = t.op();
+        if (op instanceof Function && op.arity() == 0
+                && ((Function) op).sort() == locSetLDT.targetSort()) {
+            return t;
+        } else if (op == locSetLDT.getSingletonPV()) {
+            return t;
+        } else if (op == locSetLDT.getSingleton()) {
+            return t;
+        } else if (op == setLDT.getSingleton()) {
+            return preprocessLocSetElemTerms(t.sub(0), services);
+        } else if (op == locSetLDT.getHasTo()) {
+            return services.getTermBuilder()
+                    .hasTo(preprocessLocSetElemTerms(t.sub(0), services));
+        } else if (heapLDT.isSelectOp(op)) {
+            final TermBuilder tb = services.getTermBuilder();
+            return tb.singleton(t.sub(1), t.sub(2));
+        } else {
+            assert false : "Unexpected element of (loc) set union.";
+            return null;
+        }
     }
 
     public static Term replaceVarInTerm(LocationVariable pv, Term t,

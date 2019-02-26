@@ -238,7 +238,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                         services);
                 op = AbstractUpdate.getInstance(
                         uop.getAbstractPlaceholderStatement(), replacedLhs,
-                        services.getTypeConverter().getLocSetLDT(), services.getTypeConverter().getSetLDT());
+                        services);
                 changed = changed || uop != op;
             }
             return changed
