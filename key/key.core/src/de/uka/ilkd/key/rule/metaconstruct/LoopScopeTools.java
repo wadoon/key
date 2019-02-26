@@ -27,7 +27,7 @@ public class LoopScopeTools {
     /**
      * Creates a conjunction of t1 and t2 if both are not null, and returns t2
      * only if t1 is null.
-     * 
+     *
      * @param tb
      *            The {@link TermBuilder} object.
      * @param t1
@@ -46,7 +46,7 @@ public class LoopScopeTools {
      * Creates a conjunction of {@link Term}s that are produced by fct from the
      * elements in listOfT. fct may return null when applied to a T object; in
      * this case, the result is ignored when constructing the conjunction.
-     * 
+     *
      * @param services
      *            The {@link Services} object.
      * @param fct
@@ -69,7 +69,7 @@ public class LoopScopeTools {
 
     /**
      * Creates the variant proof obligation and update.
-     * 
+     *
      * @param inst
      *            The {@link Instantiation} for this rule application.
      * @param variant
@@ -101,7 +101,7 @@ public class LoopScopeTools {
     /**
      * Creates an update for the anonymization of all {@link ProgramVariable}s
      * in localOuts.
-     * 
+     *
      * @param localOuts
      *            The {@link ProgramVariable}s to anonymize.
      * @param services
@@ -124,7 +124,7 @@ public class LoopScopeTools {
 
     /**
      * Creates the "...Before_LOOP" update needed for the variant.
-     * 
+     *
      * @param services
      *            The {@link Services} object.
      * @param heapContext
@@ -148,9 +148,10 @@ public class LoopScopeTools {
         for (LocationVariable heap : heapContext) {
             heapToBeforeLoop.put(heap, new LinkedHashMap<Term, Term>());
 
-            final LocationVariable lv =
+//            final LocationVariable lv =
                     // tb.heapAtPreVar(heap + "Before_LOOP", heap.sort(), true);
-                    tb.heapAtPreVar(term.toString(), heap.sort(), false);
+//                    tb.heapAtPreVar(term.toString(), heap.sort(), false);
+            final LocationVariable lv = (LocationVariable) term.op();
             // progVarNS.addSafely(lv);
 
             final Term u = tb.elementary(lv, tb.var(heap));
@@ -184,7 +185,7 @@ public class LoopScopeTools {
     /**
      * Computes the anonymizing update, the loop heap, the base heap, and the
      * anonymized heap.
-     * 
+     *
      * @param heap
      *            The original heap {@link LocationVariable}.
      * @param mod
