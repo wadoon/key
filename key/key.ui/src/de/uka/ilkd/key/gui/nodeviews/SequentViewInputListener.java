@@ -62,6 +62,10 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
                     // equal string representation are still different.
                     info = operator + ", Sort: " + t.sort() + ", Hash:" + t.hashCode();
 
+                    if (t.op() instanceof LocationVariable) {
+                        info += ", Op Hash: " + t.op().hashCode();
+                    }
+
                     if (t.op() instanceof ElementaryUpdate) {
                         final Operator lhs = ((ElementaryUpdate) t.op()).lhs();
                         info += String.format(" (LHS: Sort: %s, Hash: %d)",
