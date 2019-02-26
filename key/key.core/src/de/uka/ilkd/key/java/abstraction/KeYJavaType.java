@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.java.abstraction;
 
 import java.util.Comparator;
+import java.util.Optional;
 
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.reference.PackageReference;
@@ -23,9 +24,9 @@ import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * The KeY java type realises a tuple (sort, type) of a logic sort and
- * the java type (for example a class declaration). 
+ * the java type (for example a class declaration).
  * In contrast to other classes the KeYJavaType is <emph>not</emph>
- * immutable, so use it with care. 
+ * immutable, so use it with care.
  */
 public class KeYJavaType implements Type {
 
@@ -36,7 +37,7 @@ public class KeYJavaType implements Type {
     private Type javaType=null;
     /** the logic sort */
     private Sort sort=null;
-    
+
     /** creates a new KeYJavaType */
     public KeYJavaType() {
     }
@@ -56,11 +57,11 @@ public class KeYJavaType implements Type {
     public KeYJavaType(Type type) {
 	this.javaType = type;
     }
-    
+
     public void setJavaType(Type type) {
 	javaType = type;
     }
-    
+
     public void setSort(Sort s) {
  	sort = s;
     }
@@ -73,43 +74,49 @@ public class KeYJavaType implements Type {
 	return sort;
     }
 
-    /** 
-     * Returns the default value of the given type 
+    /**
+     * Returns the default value of the given type
      * according to JLS Sect. 4.5.5;
-     * returns null if this is not a real Java type. 
-     * @return the default value of the given type 
+     * returns null if this is not a real Java type.
+     * @return the default value of the given type
      * according to JLS Sect. 4.5.5
      */
+    @Override
     public Literal getDefaultValue() {
         if (javaType == null) return null;
         return javaType.getDefaultValue();
     }
-    
+
+    @Override
     public String toString() {
         if (this == VOID_TYPE)
             return "KeYJavaType:void";
 	if (javaType == null) return "KeYJavaType:null,"+sort;
-	return "(type, sort): ("+javaType.getName()+","+sort+")"; 
+	return "(type, sort): ("+javaType.getName()+","+sort+")";
     }
 
-    public String getFullName() {
-	return getJavaType().getFullName();
-    }
-
-    public String getName() {
-	return getJavaType().getName();
-    }
-    
     @Override
-    public boolean equals(Object o){       
+    public String getFullName() {
+        return Optional.ofNullable(getJavaType()).map(Type::getFullName)
+                .orElse(getSort().name().toString());
+    }
+
+    @Override
+    public String getName() {
+        return Optional.ofNullable(getJavaType()).map(Type::getName)
+                .orElse(getSort().name().toString());
+    }
+
+    @Override
+    public boolean equals(Object o){
        if (o == this) {
           return true;
-       }       
+       }
        if (o == null || o.getClass() != this.getClass()) {
           return false;
        }
        try {
-            return MiscTools.equalsOrNull(javaType,((KeYJavaType)o).javaType) && 
+            return MiscTools.equalsOrNull(javaType,((KeYJavaType)o).javaType) &&
                     MiscTools.equalsOrNull(sort,((KeYJavaType)o).sort);
         } catch (Exception e) {
         return false;
@@ -120,8 +127,8 @@ public class KeYJavaType implements Type {
     public int hashCode() {
        return 0;
     }
-    
-    
+
+
     public PackageReference createPackagePrefix() {
 	PackageReference ref = null;
 	String rest = getFullName();
@@ -136,8 +143,9 @@ public class KeYJavaType implements Type {
 	return ref;
     }
 
-    public static final class LexicographicalKeYJavaTypeOrder<T extends KeYJavaType> 
+    public static final class LexicographicalKeYJavaTypeOrder<T extends KeYJavaType>
     implements Comparator<T> {
+        @Override
         public int compare(T arg0, T arg1) {
             return arg0.getFullName().compareTo(arg1.getFullName());
         }
