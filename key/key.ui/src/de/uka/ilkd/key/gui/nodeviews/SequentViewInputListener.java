@@ -24,6 +24,9 @@ import java.awt.event.MouseMotionListener;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
@@ -36,7 +39,7 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
 
     private final SequentView sequentView;
     private boolean showTermInfo = false;
-    
+
     //do not refresh when set to false
     private static boolean refresh = true;
 
@@ -59,6 +62,14 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
                     // equal string representation are still different.
                     info = operator + ", Sort: " + t.sort() + ", Hash:" + t.hashCode();
 
+                    if (t.op() instanceof ElementaryUpdate) {
+                        final Operator lhs = ((ElementaryUpdate) t.op()).lhs();
+                        info += String.format(" (LHS: Sort: %s, Hash: %d)",
+                                ((LocationVariable) lhs).sort(),
+                                lhs.hashCode());
+                    }
+
+
                     Sequent seq = sequentView.getMainWindow().getMediator().getSelectedNode().sequent();
                     info += ProofSaver.posInOccurrence2Proof(seq, posInOcc);
                 }
@@ -71,8 +82,8 @@ public class SequentViewInputListener implements KeyListener, MouseMotionListene
             }
         }
     }
-    
-    
+
+
 
     public static boolean isRefresh() {
 		return refresh;
