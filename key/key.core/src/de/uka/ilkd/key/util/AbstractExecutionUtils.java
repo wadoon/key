@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.java.visitor.ProgVarAndLocSetsCollector;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
@@ -861,6 +862,45 @@ public class AbstractExecutionUtils {
                         && ((Function) op).sort() == services.getTypeConverter()
                                 .getLocSetLDT().targetSort()))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+    }
+
+    /**
+     * Returns the target operators in a loc set union term. Expects a union
+     * term consisting of (1) Skolem loc set functions (result will contain that
+     * function), (2) singletonPV(...) applications on location variables
+     * (result will contain the variable), and (3) singleton(...) applications
+     * on an object and a function symbol representing a field (result will
+     * contain the function symbol).
+     *
+     * @param t
+     *            The loc set union term to dissect.
+     * @param services
+     *            The {@link Services} object (for {@link TypeConverter}.
+     * @return The {@link Operator}s in the {@link Term} (location variables,
+     *         field function symbols, and Skolem location set functions).
+     */
+    public static Set<Operator> collectElementsOfLocSetTerm(Term t,
+            Services services) {
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        final Set<Term> elemTerms = MiscTools.dissasembleSetTerm(t,
+                locSetLDT.getUnion());
+        final Set<Operator> result = new LinkedHashSet<>();
+
+        for (final Term elemTerm : elemTerms) {
+            final Operator op = elemTerm.op();
+            if (op == locSetLDT.getSingletonPV()) {
+                result.add(elemTerm.sub(0).op());
+            } else if (op == locSetLDT.getSingleton()) {
+                result.add(elemTerm.sub(1).op());
+            } else if (op instanceof Function
+                    && ((Function) op).sort() == locSetLDT.targetSort()) {
+                result.add(elemTerm.op());
+            } else {
+                assert false : "Unexpected element of loc set union.";
+            }
+        }
+
+        return result;
     }
 
     public static Term replaceVarInTerm(LocationVariable pv, Term t,
