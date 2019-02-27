@@ -85,6 +85,20 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      */
     private final Set<Term> allAssignables;
 
+    /**
+     * Private constructor since there should be exactly one abstract update per
+     * left-hand side, similarly as for {@link ElementaryUpdate}. Use
+     * {@link #getInstance(AbstractPlaceholderStatement, Term, Services)}.
+     *
+     * @param phs
+     *            The {@link AbstractPlaceholderStatement} for which this
+     *            {@link AbstractUpdate} should be created.
+     * @param lhs
+     *            The update's left-hand side. Should be a {@link LocSetLDT}
+     *            term.
+     * @param services
+     *            The {@link Services} object.
+     */
     private AbstractUpdate(final AbstractPlaceholderStatement phs,
             final Term lhs, final Services services) {
         super(new Name("U_" + phs.getId() + "(" + lhs + ")"),
@@ -103,6 +117,36 @@ public final class AbstractUpdate extends AbstractSortedOperator {
         this.phs = phs;
         assert lhs.sort() == services.getTypeConverter().getLocSetLDT()
                 .targetSort();
+    }
+
+    /**
+     * Returns the abstract update operator for the passed left hand side.
+     *
+     * @param phs
+     *            The {@link AbstractPlaceholderStatement} for which this
+     *            {@link AbstractUpdate} should be created.
+     * @param lhs
+     *            The update's left-hand side. Should be a {@link LocSetLDT}
+     *            term.
+     * @param services
+     *            The {@link Services} object.
+     * @return The {@link AbstractUpdate} for the given
+     *         {@link AbstractPlaceholderStatement} and left-hand side.
+     */
+    public static AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
+            Term lhs, Services services) {
+        if (INSTANCES.get(phs) == null) {
+            INSTANCES.put(phs, new WeakHashMap<>());
+        }
+
+        WeakReference<AbstractUpdate> result = INSTANCES.get(phs).get(lhs);
+        if (result == null || result.get() == null) {
+            result = new WeakReference<AbstractUpdate>(
+                    new AbstractUpdate(phs, lhs, services));
+            INSTANCES.get(phs).put(lhs, result);
+        }
+
+        return result.get();
     }
 
     private static Term normalizeLHSSelfTerms(final Term lhs,
@@ -164,25 +208,6 @@ public final class AbstractUpdate extends AbstractSortedOperator {
                                 .toCollection(() -> new LinkedHashSet<>()))),
                 Collections.unmodifiableSet(maybeAssignables),
                 Collections.unmodifiableSet(haveToAssignables));
-    }
-
-    /**
-     * Returns the abstract update operator for the passed left hand side.
-     */
-    public static AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
-            Term lhs, Services services) {
-        if (INSTANCES.get(phs) == null) {
-            INSTANCES.put(phs, new WeakHashMap<>());
-        }
-
-        WeakReference<AbstractUpdate> result = INSTANCES.get(phs).get(lhs);
-        if (result == null || result.get() == null) {
-            result = new WeakReference<AbstractUpdate>(
-                    new AbstractUpdate(phs, lhs, services));
-            INSTANCES.get(phs).put(lhs, result);
-        }
-
-        return result.get();
     }
 
     public AbstractPlaceholderStatement getAbstractPlaceholderStatement() {
