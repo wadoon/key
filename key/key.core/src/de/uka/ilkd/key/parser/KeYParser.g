@@ -100,7 +100,7 @@ options {
   import de.uka.ilkd.key.ldt.SeqLDT;
   import de.uka.ilkd.key.ldt.IntegerLDT;
   
-  
+  import de.uka.ilkd.key.abstractexecution.rule.conditions.*;
 }
 
 @annotateclass{ @SuppressWarnings("all") } 
