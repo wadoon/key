@@ -391,6 +391,7 @@ public class AbstractExecutionUtils {
                     .anyMatch(lv2 -> lv1.toString().equals(lv2.toString())));
             surroundingVars.addAll(result);
         });
+//        services.getJavaInfo().getKeYJavaType(fullName) abstrStmt.getParentClass()
 
         return getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt,
                 surroundingVars,

@@ -221,7 +221,7 @@ public final class TypeConverter {
     }
 
 
-    private Term convertReferencePrefix(ReferencePrefix prefix,
+    public Term convertReferencePrefix(ReferencePrefix prefix,
 					ExecutionContext ec) {
 	Debug.out("typeconverter: (prefix, class)", prefix,
 		  (prefix != null ? prefix.getClass() : null));
