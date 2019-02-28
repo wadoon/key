@@ -16,6 +16,7 @@ package de.uka.ilkd.key.abstractexecution.rule.conditions;
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -48,6 +49,7 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
     public MatchConditions check(SchemaVariable sv, SVSubstitute instCandidate,
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
+        final ExecutionContext ec = svInst.getExecutionContext();
 
         if (svInst.isInstantiated(this.updateSV)) {
             return matchCond;
@@ -68,7 +70,7 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
 
         final Term update = //
                 tb.abstractUpdate(abstrStmt, assignableClause,
-                        accessibleClause);
+                        accessibleClause, ec);
 
         return matchCond
                 .setInstantiations(svInst.add(this.updateSV, update, services));

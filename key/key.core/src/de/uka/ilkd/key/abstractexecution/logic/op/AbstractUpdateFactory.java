@@ -24,6 +24,7 @@ import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderState
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.FieldLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
@@ -179,6 +180,7 @@ public class AbstractUpdateFactory {
 
         return set.stream()
                 .map(sub -> abstractUpdateLocFromTerm(sub, ec, services))
+                .filter(loc -> !(loc instanceof EmptyLoc))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 
@@ -202,6 +204,8 @@ public class AbstractUpdateFactory {
             return new PVLoc((LocationVariable) op);
         } else if (t.op() == locSetLDT.getAllLocs()) {
             return new AllLocsLoc(locSetLDT.getAllLocs());
+        } else if (t.op() == locSetLDT.getEmpty()) {
+            return new EmptyLoc(locSetLDT.getEmpty());
         } else if (op instanceof Function && op.arity() == 0
                 && ((Function) op).sort() == locSetLDT.targetSort()) {
             return new SkolemLoc((Function) op);

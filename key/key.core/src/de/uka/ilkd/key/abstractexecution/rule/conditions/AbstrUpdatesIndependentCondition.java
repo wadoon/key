@@ -18,10 +18,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.OpCollector;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
@@ -51,8 +53,8 @@ public final class AbstrUpdatesIndependentCondition
     public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
             MatchConditions mc, Services services) {
         final SVInstantiations svInst = mc.getInstantiations();
-        final Operator allLocs = //
-                services.getTypeConverter().getLocSetLDT().getAllLocs();
+        final ExecutionContext ec = svInst.getExecutionContext();
+
         final Term u1Inst = (Term) svInst.getInstantiation(u1);
         final Term u2Inst = (Term) svInst.getInstantiation(u2);
 
@@ -74,16 +76,22 @@ public final class AbstrUpdatesIndependentCondition
         final AbstractUpdate abstrUpd1 = (AbstractUpdate) u1Inst.op();
         final AbstractUpdate abstrUpd2 = (AbstractUpdate) u2Inst.op();
 
-        final Set<Operator> abstrUpd1Assignables = new LinkedHashSet<>(
+        final Set<AbstrUpdateRHS> abstrUpd1Assignables = new LinkedHashSet<>(
                 abstrUpd1.getMaybeAssignables());
         abstrUpd1Assignables.addAll(abstrUpd1.getHasToAssignables());
 
-        final Set<Operator> abstrUpd2Assignables = new LinkedHashSet<>(
+        final Set<AbstrUpdateRHS> abstrUpd2Assignables = new LinkedHashSet<>(
                 abstrUpd2.getMaybeAssignables());
         abstrUpd2Assignables.addAll(abstrUpd2.getHasToAssignables());
 
-        final Set<Operator> abstrUpd1Accessibles = getAccessibles(u1Inst);
-        final Set<Operator> abstrUpd2Accessibles = getAccessibles(u2Inst);
+        final Set<AbstrUpdateRHS> abstrUpd1Accessibles = AbstractUpdateFactory.INSTANCE
+                .abstractUpdateLocsFromUnionTerm(u1Inst.sub(0), ec, services)
+                .stream().map(AbstrUpdateRHS.class::cast)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+        final Set<AbstrUpdateRHS> abstrUpd2Accessibles = AbstractUpdateFactory.INSTANCE
+                .abstractUpdateLocsFromUnionTerm(u2Inst.sub(0), ec, services)
+                .stream().map(AbstrUpdateRHS.class::cast)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
         /* U1(x, ... := ...) / U2(... := x, ...) */
         if (abstrUpd1Assignables.stream()
@@ -94,43 +102,32 @@ public final class AbstrUpdatesIndependentCondition
         }
 
         /* U1(allLocs := ...) / U2(... := x, ...) */
-        if (abstrUpd1Assignables.contains(allLocs)
-                && !isEmptyLocSet(abstrUpd2Accessibles, services)) {
+        if (abstrUpd1.assignsAllLocs() && !abstrUpd2Accessibles.isEmpty()) {
             return null;
         }
 
         /* U1(... := x, ...) / U2(allLocs := ...) */
-        if (abstrUpd2Assignables.contains(allLocs)
-                && !isEmptyLocSet(abstrUpd1Accessibles, services)) {
+        if (abstrUpd2.assignsAllLocs() && !abstrUpd1Accessibles.isEmpty()) {
             return null;
         }
 
         /* U1(... := allLocs) / U2(x, ... := ...) */
-        if (abstrUpd1Accessibles.contains(allLocs)
-                && !isEmptyLocSet(abstrUpd2Assignables, services)) {
+        if (containsAllLocs(abstrUpd1Accessibles)
+                && !abstrUpd2Assignables.isEmpty()) {
             return null;
         }
 
         /* U1(x, ... := ...) / U2(... := allLocs) */
-        if (abstrUpd2Accessibles.contains(allLocs)
-                && !isEmptyLocSet(abstrUpd1Assignables, services)) {
+        if (containsAllLocs(abstrUpd2Accessibles)
+                && !abstrUpd1Assignables.isEmpty()) {
             return null;
         }
 
         return mc;
     }
 
-    private static boolean isEmptyLocSet(Set<Operator> ops, Services services) {
-        final Operator empty = //
-                services.getTypeConverter().getLocSetLDT().getEmpty();
-        return ops.isEmpty() || (ops.size() == 1 && ops.contains(empty));
-    }
-
-    private static Set<Operator> getAccessibles(final Term t) {
-        final OpCollector opColl = new OpCollector();
-        t.sub(0).execPostOrder(opColl);
-        return opColl.ops().stream().filter(op -> op.arity() == 0)
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+    private boolean containsAllLocs(Set<AbstrUpdateRHS> accessibles) {
+        return accessibles.stream().anyMatch(AllLocsLoc.class::isInstance);
     }
 
     @Override

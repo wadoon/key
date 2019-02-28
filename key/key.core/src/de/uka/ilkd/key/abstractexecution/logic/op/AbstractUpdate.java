@@ -179,8 +179,9 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @return The elements of the assignables union of this abstract update
      *         that may be assigned.
      */
-    public Set<AbstrUpdateLHS> getMaybeAssignables() {
+    public Set<AbstrUpdateRHS> getMaybeAssignables() {
         return assignables.stream().filter(lhs -> !(lhs instanceof HasToLoc))
+                .map(AbstrUpdateRHS.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 
@@ -191,9 +192,10 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @return The elements of the assignables union of this abstract update
      *         that have to be assigned.
      */
-    public Set<AbstrUpdateLHS> getHasToAssignables() {
+    public Set<AbstrUpdateRHS> getHasToAssignables() {
         return assignables.stream().filter(HasToLoc.class::isInstance)
                 .map(HasToLoc.class::cast).map(HasToLoc::child)
+                .map(AbstrUpdateRHS.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 

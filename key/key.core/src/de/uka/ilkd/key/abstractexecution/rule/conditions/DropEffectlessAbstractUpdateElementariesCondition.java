@@ -26,6 +26,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -65,6 +66,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
     public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
             MatchConditions mc, Services services) {
         final SVInstantiations svInst = mc.getInstantiations();
+        final ExecutionContext ec = svInst.getExecutionContext();
         final Term u = (Term) svInst.getInstantiation(uSV);
         Term target = (Term) svInst.getInstantiation(targetSV);
         final Term origResult = (Term) svInst.getInstantiation(resultSV);
@@ -107,7 +109,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
                         origAbstractUpdates.get(i);
                 final Term newUpdate = Optional
                         .ofNullable(dropEffectlessAbstractUpdateElementaries(
-                                elementaryAbstrUpd, target, services))
+                                elementaryAbstrUpd, target, ec, services))
                         .orElse(elementaryAbstrUpd);
 
                 newElementaryAbstractUpdates.set(i, newUpdate);
@@ -122,7 +124,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             }
         } else {
             newResult = dropEffectlessAbstractUpdateElementaries( //
-                    u, target, services);
+                    u, target, ec, services);
         }
 
         if (newResult == null) {
@@ -148,7 +150,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
     }
 
     private static Term dropEffectlessAbstractUpdateElementaries(Term update,
-            Term target, Services services) {
+            Term target, ExecutionContext ec, Services services) {
         final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
 
         final Set<Operator> opsInAssignable = new LinkedHashSet<>();
@@ -173,7 +175,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             if (opsInAssignable.size() > 1) {
                 return tb.abstractUpdate(
                         abstrUpd.getAbstractPlaceholderStatement(),
-                        tb.allLocs(), abstrUpdAccessiblesTerm);
+                        tb.allLocs(), abstrUpdAccessiblesTerm, ec);
             }
 
             return null;
@@ -230,7 +232,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
                 .abstractUpdate(abstrUpd.getAbstractPlaceholderStatement(),
                         AbstractExecutionUtils.opsToSetUnion(
                                 newOpsInAssignable, abstrUpd, services),
-                        newAccessiblesTerm);
+                        newAccessiblesTerm, ec);
     }
 
     @Override

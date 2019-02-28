@@ -38,6 +38,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -978,7 +979,7 @@ public class TermBuilder {
     }
 
     public Term abstractUpdate(AbstractPlaceholderStatement phs, Term lhs,
-            Term rhs) {
+            Term rhs, ExecutionContext ec) {
         final AbstractUpdate au = AbstractUpdateFactory.INSTANCE
                 .getInstance(phs, lhs, ec, services);
         return tf.createTerm(au, rhs);
