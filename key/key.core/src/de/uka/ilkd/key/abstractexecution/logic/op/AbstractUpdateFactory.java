@@ -12,10 +12,15 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op;
 
+import java.lang.ref.WeakReference;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 
+import org.key_project.util.collection.ImmutableSet;
+
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
@@ -29,6 +34,7 @@ import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -45,10 +51,105 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 public class AbstractUpdateFactory {
     public static final AbstractUpdateFactory INSTANCE = new AbstractUpdateFactory();
 
+    private final WeakHashMap<AbstractPlaceholderStatement, //
+            WeakHashMap<Integer, WeakReference<AbstractUpdate>>> abstractUpdateInstances = //
+                    new WeakHashMap<>();
+
     /**
      * Singleton constructor.
      */
     private AbstractUpdateFactory() {
+    }
+
+    /**
+     * Returns abstract update operator for the passed
+     * {@link AbstractPlaceholderStatement} and left-hand side.
+     *
+     * @param phs
+     *            The {@link AbstractPlaceholderStatement} for which this
+     *            {@link AbstractUpdate} should be created.
+     * @param lhs
+     *            The update's left-hand side. Should be a {@link SetLDT} term.
+     * @param ec
+     *            The {@link ExecutionContext} for the
+     *            {@link AbstractPlaceholderStatement}.
+     * @param services
+     *            The {@link Services} object.
+     * @return The {@link AbstractUpdate} for the given
+     *         {@link AbstractPlaceholderStatement} and left-hand side.
+     */
+    public AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
+            Term lhs, ExecutionContext ec, Services services) {
+        final LinkedHashSet<AbstrUpdateLHS> assignables = //
+                abstractUpdateLocsFromUnionTerm(lhs, ec, services).stream()
+                        .map(AbstrUpdateLHS.class::cast).collect(Collectors
+                                .toCollection(() -> new LinkedHashSet<>()));
+
+        return getInstance(phs, assignables, services);
+    }
+
+    /**
+     * Returns abstract update operator for the passed
+     * {@link AbstractPlaceholderStatement} and left-hand side.
+     *
+     * @param phs
+     *            The {@link AbstractPlaceholderStatement} for which this
+     *            {@link AbstractUpdate} should be created.
+     * @param assignables
+     *            The update's left-hand side.
+     * @param services
+     *            The {@link Services} object.
+     * @return The {@link AbstractUpdate} for the given
+     *         {@link AbstractPlaceholderStatement} and left-hand side.
+     */
+    public AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
+            Set<AbstrUpdateLHS> assignables, Services services) {
+        if (abstractUpdateInstances.get(phs) == null) {
+            abstractUpdateInstances.put(phs, new WeakHashMap<>());
+        }
+
+        final int assgnHashCode = assignables.hashCode();
+        WeakReference<AbstractUpdate> result = //
+                abstractUpdateInstances.get(phs).get(assgnHashCode);
+        if (result == null || result.get() == null) {
+            result = new WeakReference<AbstractUpdate>(
+                    new AbstractUpdate(phs, assignables, services));
+            abstractUpdateInstances.get(phs).put(assgnHashCode, result);
+        }
+
+        return result.get();
+    }
+
+    /**
+     * Returns a new abstract update for the same
+     * {@link AbstractPlaceholderStatement}, but with the supplied assignables.
+     *
+     * @param abstrUpd
+     *            The original {@link AbstractUpdate}.
+     * @param newAssignables
+     *            The new assignables (left-hand sides).
+     * @return A new {@link AbstractUpdate} for the same
+     *         {@link AbstractPlaceholderStatement}, but with the supplied
+     *         assignables.
+     */
+    public AbstractUpdate changeAssignables(AbstractUpdate abstrUpd,
+            Set<AbstrUpdateLHS> assignables) {
+        final AbstractPlaceholderStatement phs = abstrUpd
+                .getAbstractPlaceholderStatement();
+        if (abstractUpdateInstances.get(phs) == null) {
+            abstractUpdateInstances.put(phs, new WeakHashMap<>());
+        }
+
+        final int assgnHashCode = assignables.hashCode();
+        WeakReference<AbstractUpdate> result = //
+                abstractUpdateInstances.get(phs).get(assgnHashCode);
+        if (result == null || result.get() == null) {
+            result = new WeakReference<AbstractUpdate>(
+                    abstrUpd.changeAssignables(assignables));
+            abstractUpdateInstances.get(phs).put(assgnHashCode, result);
+        }
+
+        return result.get();
     }
 
     /**
@@ -59,11 +160,24 @@ public class AbstractUpdateFactory {
      * @param services
      * @return
      */
-    public Set<AbstractUpdateLoc> abstractUpdateLocsFromLocSetUnionTerm(Term t,
+    public Set<AbstractUpdateLoc> abstractUpdateLocsFromUnionTerm(Term t,
             ExecutionContext ec, Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
-        return tb.locsetUnionToSet(t).stream()
+        final ImmutableSet<Term> set;
+
+        if (t.sort() == services.getTypeConverter().getLocSetLDT()
+                .targetSort()) {
+            set = tb.locsetUnionToSet(t);
+        } else if (t.sort() == services.getTypeConverter().getLocSetLDT()
+                .targetSort()) {
+            set = tb.setUnionToImmutableSet(t);
+        } else {
+            assert false;
+            return null;
+        }
+
+        return set.stream()
                 .map(sub -> abstractUpdateLocFromTerm(sub, ec, services))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }

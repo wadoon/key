@@ -26,6 +26,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -1669,7 +1670,7 @@ public class LogicPrinter {
         this.layouter.print("(");
 
         this.layouter.print(op.getAllAssignables().stream()
-                .map(Term::toString).collect(Collectors.joining(", ")));
+                .map(AbstrUpdateLHS::toString).collect(Collectors.joining(", ")));
 
         this.layouter.print(asgn);
         this.layouter.brk(0);

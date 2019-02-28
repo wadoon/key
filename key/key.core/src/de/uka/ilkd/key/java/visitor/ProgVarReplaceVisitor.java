@@ -233,13 +233,9 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
                 }
             }
             if (op instanceof AbstractUpdate) {
-                AbstractUpdate uop = (AbstractUpdate) t.op();
-                Term replacedLhs = replaceVariablesInTerm(uop.lhs(), replaceMap,
-                        services);
-                op = AbstractUpdate.getInstance(
-                        uop.getAbstractPlaceholderStatement(), replacedLhs,
-                        services);
-                changed = changed || uop != op;
+                final AbstractUpdate origOp = (AbstractUpdate) op;
+                op = origOp.replaceVariables(replaceMap);
+                changed = changed || origOp != op;
             }
             return changed
                     ? services.getTermFactory().createTerm(op, subTerms,

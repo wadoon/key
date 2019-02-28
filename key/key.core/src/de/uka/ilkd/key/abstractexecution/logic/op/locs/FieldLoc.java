@@ -12,6 +12,8 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
@@ -25,6 +27,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -67,6 +71,23 @@ public class FieldLoc extends AbstractSortedOperator
         return tb.singleton(
                 typeConverter.convertReferencePrefix(prefix, executionContext),
                 tb.func(fieldSymbol));
+    }
+
+    @Override
+    public AbstractUpdateLoc replaceVariables(
+            Map<ProgramVariable, ProgramVariable> replMap) {
+        /*
+         * TODO (DS, 2019-02-28): Check whether we have to do something with the
+         * field reference, i.e., whether a given program variable in the map
+         * can represent a field.
+         */
+        return this;
+    }
+
+    @Override
+    public Operator childOp() {
+        /* TODO (DS, 2019-02-28): Check that this is the right thing to do. */
+        return fieldReference.getProgramVariable();
     }
 
     @Override

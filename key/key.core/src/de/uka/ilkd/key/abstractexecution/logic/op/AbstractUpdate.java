@@ -13,26 +13,28 @@
 
 package de.uka.ilkd.key.abstractexecution.logic.op;
 
-import java.lang.ref.WeakReference;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.TypeConverter;
-import de.uka.ilkd.key.ldt.SetLDT;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.Triple;
 
 /**
  * Class of operators for abstract updates (in the sense of Abstract Execution),
@@ -43,155 +45,75 @@ import de.uka.ilkd.key.util.Triple;
  */
 public final class AbstractUpdate extends AbstractSortedOperator {
 
-    private static final WeakHashMap<AbstractPlaceholderStatement, //
-            WeakHashMap<Term, WeakReference<AbstractUpdate>>> INSTANCES = //
-                    new WeakHashMap<>();
-
     private final AbstractPlaceholderStatement phs;
-    //@formatter:off
-    /* Invariant: lhs is a LocSet union of
-     * - singletonPV functions applied to location variables
-     * - Skolem LocSet functions
-     * - Normal LocSet singletons
-     * - Either of the above wrapped in a hasTo function
-     */
-    //@formatter:on
-    /**
-     * The left-hand side {@link Term} for this {@link AbstractUpdate}.
-     */
-    private final Term lhs;
 
     /**
-     * Assignables that may be assigned. Location variables, Field functions or
-     * LocSet functions. Unmodifiable.
+     * Assignables, both "has-to" and "maybe". Use
+     * {@link #getMaybeAssignables()} or {@link #getHasToAssignables()} to get
+     * easier access to the two different sorts of assignables.
      */
-    private final Set<Operator> maybeAssignables;
+    private final Set<AbstrUpdateLHS> assignables;
 
     /**
-     * Assignables that have to be assigned. Location variables, Field functions
-     * or LocSet functions. Unmodifiable.
+     * The hash code of this {@link AbstractUpdate}; computed of the
+     * {@link AbstractPlaceholderStatement} identifier and the left-hand side
+     * (assignables).
      */
-    private final Set<Operator> haveToAssignables;
+    private final int hashCode;
 
     /**
-     * Assignables, both "has-to" and "maybe". Location variables, Field
-     * functions or LocSet functions. May be wrapped in a hasTo function if they
-     * are "has-to". Unmodifiable. Use {@link #getMaybeAssignables()} or
-     * {@link #getHasToAssignables()} to get easier access to the two different
-     * sorts of assignables.
+     * "Backup" of the Services object, s.t. it not always has to be provided
+     * when only replacing program variables etc.
      */
-    private final Set<Term> allAssignables;
+    private final Services services;
 
     /**
      * Private constructor since there should be exactly one abstract update per
      * left-hand side, similarly as for {@link ElementaryUpdate}. Use
-     * {@link #getInstance(AbstractPlaceholderStatement, Term, Services)}.
+     * {@link #getInstance(AbstractPlaceholderStatement, Term, ExecutionContext, Services)}.
      *
      * @param phs
      *            The {@link AbstractPlaceholderStatement} for which this
      *            {@link AbstractUpdate} should be created.
-     * @param lhs
-     *            The update's left-hand side. Should be a {@link SetLDT} term.
+     * @param assignables
+     *            The update's left-hand side (assignables).
      * @param services
      *            The {@link Services} object.
      */
-    private AbstractUpdate(final AbstractPlaceholderStatement phs,
-            final Term lhs, final Services services) {
-        super(new Name("U_" + phs.getId() + "(" + lhs + ")"),
+    AbstractUpdate(final AbstractPlaceholderStatement phs,
+            final Set<AbstrUpdateLHS> assignables, final Services services) {
+        super(new Name("U_" + phs.getId() + "("
+                + assignables.stream().map(lhs -> lhs.toString())
+                        .collect(Collectors.joining(","))
+                + ")"),
                 new Sort[] {
                         services.getTypeConverter().getSetLDT().targetSort() },
                 Sort.UPDATE, false);
 
-        assert lhs.sort() == services.getTypeConverter().getSetLDT()
-                .targetSort();
-
-        this.lhs = lhs;
+        this.services = services;
         this.phs = phs;
-
-        final Triple<Set<Term>, Set<Operator>, Set<Operator>> disassembledLHS = //
-                disassembleLHS(lhs, services);
-        this.allAssignables = disassembledLHS.first;
-        this.maybeAssignables = disassembledLHS.second;
-        this.haveToAssignables = disassembledLHS.third;
+        this.assignables = Collections.unmodifiableSet(assignables);
+        this.hashCode = 5 + 17 * phs.getId().hashCode()
+                + 27 * assignables.hashCode();
     }
 
     /**
-     * Returns the abstract update operator for the passed left hand side.
+     * Returns a new {@link AbstractUpdate} for the same
+     * {@link AbstractPlaceholderStatement}, but with the given assignables set.
+     * Should only be used by {@link AbstractUpdateFactory}, since
+     * {@link AbstractUpdate}s are cached (otherwise, you get multiple instances
+     * that look the same, but aren't, which can lead to problems in KeY).
      *
-     * @param phs
-     *            The {@link AbstractPlaceholderStatement} for which this
-     *            {@link AbstractUpdate} should be created.
-     * @param lhs
-     *            The update's left-hand side. Should be a {@link SetLDT} term.
-     * @param services
-     *            The {@link Services} object.
-     * @return The {@link AbstractUpdate} for the given
-     *         {@link AbstractPlaceholderStatement} and left-hand side.
+     * @param newAssignables
+     *            The new left-hand side for the {@link AbstractUpdate}.
+     * @return A new {@link AbstractUpdate} with the given left-hand side.
      */
-    public static AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
-            Term lhs, Services services) {
-        if (INSTANCES.get(phs) == null) {
-            INSTANCES.put(phs, new WeakHashMap<>());
-        }
-
-        WeakReference<AbstractUpdate> result = INSTANCES.get(phs).get(lhs);
-        if (result == null || result.get() == null) {
-            result = new WeakReference<AbstractUpdate>(
-                    new AbstractUpdate(phs, lhs, services));
-            INSTANCES.get(phs).put(lhs, result);
-        }
-
-        return result.get();
-    }
-
-    /**
-     * @param lhs
-     *            The left-hand side to disassemble.
-     * @param services
-     *            The {@link Services} object.
-     * @return A pair of (1) all assignable terms, (2) the maybe assignables and
-     *         (3) the have-to assignables. Both sets are immutable.
-     */
-    private static Triple<Set<Term>, Set<Operator>, Set<Operator>> disassembleLHS(
-            Term lhs, Services services) {
-        final TypeConverter typeConverter = services.getTypeConverter();
-
-        assert lhs.sort() == typeConverter.getSetLDT().targetSort();
-
-        final Function union = typeConverter.getSetLDT().getUnion();
-        final Function hasTo = typeConverter.getLocSetLDT().getHasTo();
-
-        /*
-         * Result of disassembling is a set of setSingleton(...) terms, where
-         * the constituents may be wrapped in hasTo(...) applications. The atoms
-         * are either program variables or nullary functions.
-         */
-        final java.util.function.Function<? super Term, ? extends Term> firstSub = //
-                t -> t.sub(0);
-        final Set<Term> unionElems = MiscTools.disasembleSetTerm(lhs, union)
-                .stream().map(firstSub)
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-        final Set<Operator> maybeAssignables = unionElems.stream()
-                .filter(t -> t.op() != hasTo).map(Term::op)
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-        final Set<Operator> haveToAssignables = unionElems.stream()
-                .filter(t -> t.op() == hasTo).map(firstSub).map(Term::op)
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-
-        return new Triple<>(Collections.unmodifiableSet(unionElems),
-                Collections.unmodifiableSet(maybeAssignables),
-                Collections.unmodifiableSet(haveToAssignables));
+    AbstractUpdate changeAssignables(final Set<AbstrUpdateLHS> newAssignables) {
+        return new AbstractUpdate(phs, newAssignables, services);
     }
 
     public AbstractPlaceholderStatement getAbstractPlaceholderStatement() {
         return this.phs;
-    }
-
-    /**
-     * Returns the left hand side of this abstract update operator.
-     */
-    public Term lhs() {
-        return this.lhs;
     }
 
     public String getUpdateName() {
@@ -202,43 +124,126 @@ public final class AbstractUpdate extends AbstractSortedOperator {
         return "U_" + phs.getId();
     }
 
+    /**
+     * Returns a new {@link AbstractUpdate} of this one with the
+     * {@link ProgramVariable}s in the assignables replaced according to the
+     * supplied map.
+     *
+     * @param replMap
+     *            The replace map.
+     * @return A new {@link AbstractUpdate} of this one with the
+     *         {@link ProgramVariable}s in the assignables replaced according to
+     *         the supplied map.
+     */
+    public AbstractUpdate replaceVariables(
+            Map<ProgramVariable, ProgramVariable> replMap) {
+        return new AbstractUpdate(phs,
+                assignables.stream().map(lhs -> lhs.replaceVariables(replMap))
+                        .map(AbstrUpdateLHS.class::cast)
+                        .collect(Collectors
+                                .toCollection(() -> new LinkedHashSet<>())),
+                services);
+    }
+
     @Override
     public int hashCode() {
-        return 5 + 17 * this.lhs.hashCode() + 27 * this.phs.hashCode();
+        return hashCode;
     }
 
     /**
-     * Assignables, both "has-to" and "maybe". Location variables wrapped in the
-     * singletonPV function, or Skolem LocSet functions, where both may be
-     * wrapped in a hasTo function if they are "has-to". Unmodifiable. Use
+     * @return The left-hand side (assignables) as a {@link Term} (Set LDT).
+     *         Prefer to work with the safer data structures in
+     *         {@link #getAllAssignables()} etc. whenever possible.
+     */
+    public Term getLHSTerm() {
+        final TermBuilder tb = services.getTermBuilder();
+        return tb.setUnion(assignables.stream()
+                .map(lhs -> lhs.toLHSTerm(services)).map(tb::setSingleton)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>())));
+    }
+
+    /**
+     * Assignables, both "has-to" and "maybe". Unmodifiable. Use
      * {@link #getMaybeAssignables()} or {@link #getHasToAssignables()} to get
      * easier access to the two different sorts of assignables.
      *
      * @return All assignables.
      */
-    public Set<Term> getAllAssignables() {
-        return allAssignables;
+    public Set<AbstrUpdateLHS> getAllAssignables() {
+        return assignables;
     }
 
     /**
-     * Assignables that may be assigned. Location variables or Skolem LocSet
-     * functions. Set is immutable.
+     * Assignables that may be assigned.
      *
      * @return The elements of the assignables union of this abstract update
      *         that may be assigned.
      */
-    public Set<Operator> getMaybeAssignables() {
-        return maybeAssignables;
+    public Set<AbstrUpdateLHS> getMaybeAssignables() {
+        return assignables.stream().filter(lhs -> !(lhs instanceof HasToLoc))
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 
     /**
-     * Assignables that have to be assigned. Location variables or Skolem LocSet
-     * functions. Set is immutable.
+     * Assignables that have to be assigned. Removes the {@link HasToLoc}
+     * wrappers.
      *
      * @return The elements of the assignables union of this abstract update
      *         that have to be assigned.
      */
-    public Set<Operator> getHasToAssignables() {
-        return haveToAssignables;
+    public Set<AbstrUpdateLHS> getHasToAssignables() {
+        return assignables.stream().filter(HasToLoc.class::isInstance)
+                .map(HasToLoc.class::cast).map(HasToLoc::child)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+    }
+
+    /**
+     * @return true iff this abstract update assigns allLocs (i.e., all
+     *         locations).
+     */
+    public boolean assignsAllLocs() {
+        return assignables.stream().anyMatch(AllLocsLoc.class::isInstance);
+    }
+
+    /**
+     * @param loc
+     *            The {@link AbstractUpdateLoc}s to check.
+     * @return true iff this {@link AbstractUpdate} may assign any of the given
+     *         locations (includes "have-to"s).
+     */
+    public boolean mayAssignAny(Collection<AbstrUpdateRHS> loc) {
+        return loc.stream().anyMatch(this::mayAssign);
+    }
+
+    /**
+     * @param loc
+     *            The {@link AbstractUpdateLoc} to check.
+     * @return true iff this {@link AbstractUpdate} may assign the given
+     *         location (includes "have-to"s).
+     */
+    public boolean mayAssign(AbstrUpdateRHS loc) {
+        return getMaybeAssignables().stream().anyMatch(loc::equals)
+                || getHasToAssignables().stream().anyMatch(loc::equals);
+    }
+
+    /**
+     * @param loc
+     *            The {@link AbstractUpdateLoc}s to check.
+     * @return true iff this {@link AbstractUpdate} has to assign any of the
+     *         given locations (includes "have-to"s).
+     */
+    public boolean hasToAssignAny(Collection<AbstrUpdateRHS> loc) {
+        return loc.stream().anyMatch(this::hasToAssign);
+    }
+
+    /**
+     * True if the given {@link AbstractUpdate} has to assign the given
+     * location.
+     *
+     * @param loc
+     * @return
+     */
+    public boolean hasToAssign(AbstrUpdateRHS loc) {
+        return getHasToAssignables().stream().anyMatch(loc::equals);
     }
 }

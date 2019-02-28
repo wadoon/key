@@ -40,7 +40,7 @@ public class OpCollector extends DefaultVisitor {
             ops.add(((ElementaryUpdate) t.op()).lhs());
         }
         if (t.op() instanceof AbstractUpdate) {
-            ((AbstractUpdate) t.op()).lhs().execPostOrder(this);
+            ((AbstractUpdate) t.op()).getLHSTerm().execPostOrder(this);
         }
     }
 

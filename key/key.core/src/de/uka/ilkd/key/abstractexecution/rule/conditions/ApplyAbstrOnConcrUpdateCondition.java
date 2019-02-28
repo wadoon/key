@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,6 +26,7 @@ import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermFactory;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -204,22 +206,18 @@ public final class ApplyAbstrOnConcrUpdateCondition
     private static Term substLocVarInAbstractUpdate(Term abstractUpdateTerm,
             LocationVariable lhs1, LocationVariable lhs2, Services services) {
         final TermBuilder tb = services.getTermBuilder();
+        final TermFactory tf = services.getTermFactory();
         final AbstractUpdate abstrUpd = //
                 (AbstractUpdate) abstractUpdateTerm.op();
 
-        final Term oldAssignables = abstrUpd.lhs();
-        final Term oldAccessibles = abstractUpdateTerm.sub(0);
-
-        final Term newAbstrUpdLHS = //
-                AbstractExecutionUtils.replaceVarInTerm(lhs1, tb.var(lhs2),
-                        oldAssignables, services);
+        final AbstractUpdate newAbstrUpd = abstrUpd
+                .replaceVariables(Collections.singletonMap(lhs1, lhs2));
 
         final Term newAbstrUpdRHS = //
                 AbstractExecutionUtils.replaceVarInTerm(lhs1, tb.var(lhs2),
-                        oldAccessibles, services);
+                        abstractUpdateTerm.sub(0), services);
 
-        return tb.abstractUpdate(abstrUpd.getAbstractPlaceholderStatement(),
-                newAbstrUpdLHS, newAbstrUpdRHS);
+        return tf.createTerm(newAbstrUpd, newAbstrUpdRHS);
     }
 
     @Override

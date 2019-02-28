@@ -12,11 +12,15 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
+import java.util.Map;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -42,6 +46,17 @@ public class AllLocsLoc extends AbstractSortedOperator
     @Override
     public Term toLHSTerm(Services services) {
         return toRHSTerm(services);
+    }
+
+    @Override
+    public AbstractUpdateLoc replaceVariables(
+            Map<ProgramVariable, ProgramVariable> replMap) {
+        return this;
+    }
+
+    @Override
+    public Operator childOp() {
+        return allLocs;
     }
 
     @Override

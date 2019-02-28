@@ -33,6 +33,7 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -978,8 +979,8 @@ public class TermBuilder {
 
     public Term abstractUpdate(AbstractPlaceholderStatement phs, Term lhs,
             Term rhs) {
-        final AbstractUpdate au = AbstractUpdate.getInstance(phs, lhs,
-                services);
+        final AbstractUpdate au = AbstractUpdateFactory.INSTANCE
+                .getInstance(phs, lhs, ec, services);
         return tf.createTerm(au, rhs);
     }
 

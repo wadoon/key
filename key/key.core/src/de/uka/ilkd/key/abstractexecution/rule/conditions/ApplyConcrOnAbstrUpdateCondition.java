@@ -280,8 +280,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
             return null;
         }
 
-        final Term newAbstrUpdTerm = tb.abstractUpdate(
-                abstrUpd.getAbstractPlaceholderStatement(), abstrUpd.lhs(),
+        final Term newAbstrUpdTerm = tb.tf().createTerm(abstrUpd,
                 currentAccessibles);
 
         final Optional<Term> remainingConcrUpdate = //
