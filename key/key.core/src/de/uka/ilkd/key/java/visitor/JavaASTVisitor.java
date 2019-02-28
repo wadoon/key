@@ -15,6 +15,7 @@ package de.uka.ilkd.key.java.visitor;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.expression.ArrayInitializer;

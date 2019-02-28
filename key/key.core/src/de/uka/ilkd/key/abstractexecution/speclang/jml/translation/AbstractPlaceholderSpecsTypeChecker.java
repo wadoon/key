@@ -1,4 +1,4 @@
-package de.uka.ilkd.key.speclang.jml.translation;
+package de.uka.ilkd.key.abstractexecution.speclang.jml.translation;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,6 +11,8 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.logic.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -22,7 +24,6 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
-import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
@@ -33,7 +34,6 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory.ContractClauses;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
-import de.uka.ilkd.key.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -110,7 +110,9 @@ public class AbstractPlaceholderSpecsTypeChecker {
         if (method.isStatic()) {
             /* For static methods, the heap may not be assigned or accessed! */
 
-            if (collectElemsOfLocSetUnionTerm(assignablesTerm())
+            if (AbstractExecutionUtils
+                    .collectElementsOfLocSetTerm(assignablesTerm(),
+                            typeConverter.getLocSetLDT().getUnion(), services)
                     .contains(heap())) {
                 throw new SLTranslationException(String.format(
                         "Abstract program %s is specified to assign the heap, "
@@ -118,7 +120,9 @@ public class AbstractPlaceholderSpecsTypeChecker {
                         aps.getId(), method.name()));
             }
 
-            if (collectElemsOfLocSetUnionTerm(accessiblesTerm())
+            if (AbstractExecutionUtils
+                    .collectElementsOfLocSetTerm(accessiblesTerm(),
+                            typeConverter.getLocSetLDT().getUnion(), services)
                     .contains(heap())) {
                 throw new SLTranslationException(String.format(
                         "Abstract program %s is specified to access the heap, "
@@ -140,8 +144,9 @@ public class AbstractPlaceholderSpecsTypeChecker {
 
     private List<Operator> getUndeclaredAccessedOps(
             List<Pair<? extends Operator, Boolean>> declaredOps) {
-        final Set<Operator> collectedOps = collectElemsOfLocSetUnionTerm(
-                accessiblesTerm());
+        final Set<Operator> collectedOps = AbstractExecutionUtils
+                .collectElementsOfLocSetTerm(accessiblesTerm(),
+                        typeConverter.getLocSetLDT().getUnion(), services);
         return collectedOps.stream().filter(op -> op.arity() == 0).filter(
                 op -> !declaredOps.stream().anyMatch(p -> p.first.equals(op)))
                 .collect(Collectors.toList());
@@ -149,17 +154,13 @@ public class AbstractPlaceholderSpecsTypeChecker {
 
     private List<Operator> getAssignedFinalOps(
             List<Pair<? extends Operator, Boolean>> declaredOps) {
-        final Set<Operator> collectedOps = collectElemsOfLocSetUnionTerm(
-                assignablesTerm());
+        final Set<Operator> collectedOps = AbstractExecutionUtils
+                .collectElementsOfLocSetTerm(assignablesTerm(),
+                        typeConverter.getLocSetLDT().getUnion(), services);
         return collectedOps.stream().filter(op -> op.arity() == 0)
                 .filter(op -> declaredOps.stream()
                         .anyMatch(p -> p.first.equals(op) && p.second))
                 .collect(Collectors.toList());
-    }
-
-    private Set<Operator> collectElemsOfLocSetUnionTerm(Term t) {
-        return AbstractExecutionUtils.collectElementsOfLocSetTerm(t,
-                typeConverter.getLocSetLDT().getUnion(), services);
     }
 
     private Term declaresTerm() {

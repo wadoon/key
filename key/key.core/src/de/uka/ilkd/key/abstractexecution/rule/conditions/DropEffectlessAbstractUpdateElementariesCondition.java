@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.conditions;
+package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,11 +23,12 @@ import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.abstractexecution.logic.AbstractExecutionUtils;
+import de.uka.ilkd.key.abstractexecution.logic.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -37,7 +38,6 @@ import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -151,11 +151,10 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             Term target, Services services) {
         final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
 
-        final Set<Operator> opsInAssignable = //
-                AbstractExecutionUtils.collectElementsOfLocSetTerm(
-                        abstrUpd.lhs(),
-                        services.getTypeConverter().getLocSetLDT().getUnion(),
-                        services);
+        final Set<Operator> opsInAssignable = new LinkedHashSet<>();
+        opsInAssignable.addAll(abstrUpd.getHasToAssignables());
+        opsInAssignable.addAll(abstrUpd.getMaybeAssignables());
+
         final Term abstrUpdAccessiblesTerm = update.sub(0);
 
         final Function allLocs = //
@@ -229,7 +228,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
 
         return tb
                 .abstractUpdate(abstrUpd.getAbstractPlaceholderStatement(),
-                        AbstractExecutionUtils.opsToLocSetUnion(
+                        AbstractExecutionUtils.opsToSetUnion(
                                 newOpsInAssignable, abstrUpd, services),
                         newAccessiblesTerm);
     }

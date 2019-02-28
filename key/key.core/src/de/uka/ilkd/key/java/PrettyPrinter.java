@@ -19,6 +19,7 @@ import java.util.*;
 
 import org.key_project.util.collection.ImmutableArray;
 
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.*;
 import de.uka.ilkd.key.java.declaration.modifier.Final;

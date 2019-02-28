@@ -13,10 +13,10 @@
 
 package de.uka.ilkd.key.java.visitor;
 
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 
 /**

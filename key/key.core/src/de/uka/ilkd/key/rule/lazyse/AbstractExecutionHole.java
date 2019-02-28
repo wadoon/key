@@ -13,7 +13,7 @@
 
 package de.uka.ilkd.key.rule.lazyse;
 
-import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.proof.Node;
 
 /**

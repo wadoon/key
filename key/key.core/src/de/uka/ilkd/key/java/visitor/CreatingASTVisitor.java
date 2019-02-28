@@ -19,6 +19,7 @@ import java.util.Deque;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.java.*;
 import de.uka.ilkd.key.java.declaration.ClassInitializer;
 import de.uka.ilkd.key.java.declaration.LocalVariableDeclaration;

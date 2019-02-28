@@ -30,6 +30,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.logic.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -39,7 +41,6 @@ import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
-import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.Name;
@@ -846,13 +847,13 @@ public final class MiscTools {
      *            The <strong>binary</strong> operation op at which to split.
      * @return The constituents of the given set-like term.
      */
-    public static Set<Term> dissasembleSetTerm(Term s, Function splitAt) {
+    public static Set<Term> disasembleSetTerm(Term s, Function splitAt) {
         assert splitAt.arity() == 2;
         final Set<Term> result = new LinkedHashSet<Term>();
 
         if (s.op() == splitAt) {
-            result.addAll(dissasembleSetTerm(s.sub(0), splitAt));
-            result.addAll(dissasembleSetTerm(s.sub(1), splitAt));
+            result.addAll(disasembleSetTerm(s.sub(0), splitAt));
+            result.addAll(disasembleSetTerm(s.sub(1), splitAt));
         } else {
             result.add(s);
         }

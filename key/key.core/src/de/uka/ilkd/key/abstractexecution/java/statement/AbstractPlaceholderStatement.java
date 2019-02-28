@@ -11,11 +11,12 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.java.statement;
+package de.uka.ilkd.key.abstractexecution.java.statement;
 
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.*;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.java.visitor.Visitor;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Named;

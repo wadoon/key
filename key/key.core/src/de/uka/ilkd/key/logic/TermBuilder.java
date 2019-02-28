@@ -31,11 +31,12 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.logic.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.abstraction.PrimitiveType;
-import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.ldt.BooleanLDT;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.IntegerLDT;
@@ -43,7 +44,6 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
@@ -1519,7 +1519,7 @@ public class TermBuilder {
 
     public Term hasTo(Term locSetTerm) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        assert locSetTerm.sort() == locSetLDT.targetSort();
+//        assert locSetTerm.sort() == locSetLDT.targetSort();
         return func(locSetLDT.getHasTo(), locSetTerm);
     }
 
@@ -2217,7 +2217,7 @@ public class TermBuilder {
         final Function union = setLDT.getUnion();
 
         // We also remove the singletonSet functions
-        return MiscTools.dissasembleSetTerm(s, union).stream()
+        return MiscTools.disasembleSetTerm(s, union).stream()
                 .map(t -> t.op() == setLDT.getSingleton() ? t.sub(0) : t)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }

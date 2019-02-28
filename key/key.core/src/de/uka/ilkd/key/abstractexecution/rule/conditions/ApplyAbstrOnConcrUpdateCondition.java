@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.conditions;
+package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -20,10 +20,11 @@ import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.abstractexecution.logic.AbstractExecutionUtils;
+import de.uka.ilkd.key.abstractexecution.logic.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -33,7 +34,6 @@ import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**

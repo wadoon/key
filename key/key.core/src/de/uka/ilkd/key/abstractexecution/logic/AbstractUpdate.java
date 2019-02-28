@@ -11,28 +11,26 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.logic.op;
+package de.uka.ilkd.key.abstractexecution.logic;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
-import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.ProgVarReplacer;
-import de.uka.ilkd.key.util.AbstractExecutionUtils;
-import de.uka.ilkd.key.util.LinkedHashMap;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Triple;
 
@@ -48,7 +46,6 @@ public final class AbstractUpdate extends AbstractSortedOperator {
     private static final WeakHashMap<AbstractPlaceholderStatement, //
             WeakHashMap<Term, WeakReference<AbstractUpdate>>> INSTANCES = //
                     new WeakHashMap<>();
-    private static final Map<KeYJavaType, LocationVariable> SELF_VAR_MAP = new LinkedHashMap<>();
 
     private final AbstractPlaceholderStatement phs;
     //@formatter:off
@@ -65,23 +62,23 @@ public final class AbstractUpdate extends AbstractSortedOperator {
     private final Term lhs;
 
     /**
-     * Assignables that may be assigned. Location variables or Skolem LocSet
-     * functions. Unmodifiable.
+     * Assignables that may be assigned. Location variables, Field functions or
+     * LocSet functions. Unmodifiable.
      */
     private final Set<Operator> maybeAssignables;
 
     /**
-     * Assignables that have to be assigned. Location variables or Skolem LocSet
-     * functions. Unmodifiable.
+     * Assignables that have to be assigned. Location variables, Field functions
+     * or LocSet functions. Unmodifiable.
      */
     private final Set<Operator> haveToAssignables;
 
     /**
-     * Assignables, both "has-to" and "maybe". Location variables wrapped in the
-     * singletonPV function, or Skolem LocSet functions, where both may be
-     * wrapped in a hasTo function if they are "has-to". Unmodifiable. Use
-     * {@link #getMaybeAssignables()} or {@link #getHasToAssignables()} to get
-     * easier access to the two different sorts of assignables.
+     * Assignables, both "has-to" and "maybe". Location variables, Field
+     * functions or LocSet functions. May be wrapped in a hasTo function if they
+     * are "has-to". Unmodifiable. Use {@link #getMaybeAssignables()} or
+     * {@link #getHasToAssignables()} to get easier access to the two different
+     * sorts of assignables.
      */
     private final Set<Term> allAssignables;
 
@@ -94,8 +91,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      *            The {@link AbstractPlaceholderStatement} for which this
      *            {@link AbstractUpdate} should be created.
      * @param lhs
-     *            The update's left-hand side. Should be a {@link LocSetLDT}
-     *            term.
+     *            The update's left-hand side. Should be a {@link SetLDT} term.
      * @param services
      *            The {@link Services} object.
      */
@@ -106,17 +102,17 @@ public final class AbstractUpdate extends AbstractSortedOperator {
                         services.getTypeConverter().getSetLDT().targetSort() },
                 Sort.UPDATE, false);
 
-        this.lhs = normalizeLHSSelfTerms(lhs, services);
+        assert lhs.sort() == services.getTypeConverter().getSetLDT()
+                .targetSort();
+
+        this.lhs = lhs;
+        this.phs = phs;
 
         final Triple<Set<Term>, Set<Operator>, Set<Operator>> disassembledLHS = //
                 disassembleLHS(lhs, services);
         this.allAssignables = disassembledLHS.first;
         this.maybeAssignables = disassembledLHS.second;
         this.haveToAssignables = disassembledLHS.third;
-
-        this.phs = phs;
-        assert lhs.sort() == services.getTypeConverter().getLocSetLDT()
-                .targetSort();
     }
 
     /**
@@ -126,8 +122,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      *            The {@link AbstractPlaceholderStatement} for which this
      *            {@link AbstractUpdate} should be created.
      * @param lhs
-     *            The update's left-hand side. Should be a {@link LocSetLDT}
-     *            term.
+     *            The update's left-hand side. Should be a {@link SetLDT} term.
      * @param services
      *            The {@link Services} object.
      * @return The {@link AbstractUpdate} for the given
@@ -149,33 +144,6 @@ public final class AbstractUpdate extends AbstractSortedOperator {
         return result.get();
     }
 
-    private static Term normalizeLHSSelfTerms(final Term lhs,
-            final Services services) {
-        final Optional<LocationVariable> maybeSelfVar = extractSelfVar(lhs);
-        if (maybeSelfVar.isPresent()) {
-            final LocationVariable selfVar = maybeSelfVar.get();
-            final KeYJavaType kjt = selfVar.getKeYJavaType();
-            if (!SELF_VAR_MAP.containsKey(kjt)) {
-                SELF_VAR_MAP.put(kjt, selfVar);
-            } else {
-                final Map<ProgramVariable, ProgramVariable> map = new LinkedHashMap<>();
-                map.put(selfVar, SELF_VAR_MAP.get(kjt));
-                final ProgVarReplacer pvr = new ProgVarReplacer(map, services);
-                return pvr.replace(lhs);
-            }
-        }
-
-        return lhs;
-    }
-
-    private static Optional<LocationVariable> extractSelfVar(Term lhs) {
-        final OpCollector opColl = new OpCollector();
-        lhs.execPostOrder(opColl);
-        return opColl.ops().stream().filter(LocationVariable.class::isInstance)
-                .map(LocationVariable.class::cast)
-                .filter(lv -> lv.name().equals(new Name("self"))).findFirst();
-    }
-
     /**
      * @param lhs
      *            The left-hand side to disassemble.
@@ -186,26 +154,31 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      */
     private static Triple<Set<Term>, Set<Operator>, Set<Operator>> disassembleLHS(
             Term lhs, Services services) {
-        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        final Function union = locSetLDT.getUnion();
-        final Function hasToFunc = locSetLDT.getHasTo();
-        final java.util.function.Function<? super Term, ? extends Operator> mapper = //
-                AbstractExecutionUtils.locSetElemTermsToOpMapper(services);
+        final TypeConverter typeConverter = services.getTypeConverter();
 
-        final Set<Term> unionElems = MiscTools.dissasembleSetTerm(lhs, union);
+        assert lhs.sort() == typeConverter.getSetLDT().targetSort();
+
+        final Function union = typeConverter.getSetLDT().getUnion();
+        final Function hasTo = typeConverter.getLocSetLDT().getHasTo();
+
+        /*
+         * Result of disassembling is a set of setSingleton(...) terms, where
+         * the constituents may be wrapped in hasTo(...) applications. The atoms
+         * are either program variables or nullary functions.
+         */
+        final java.util.function.Function<? super Term, ? extends Term> firstSub = //
+                t -> t.sub(0);
+        final Set<Term> unionElems = MiscTools.disasembleSetTerm(lhs, union)
+                .stream().map(firstSub)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
         final Set<Operator> maybeAssignables = unionElems.stream()
-                .filter(t -> t.op() != hasToFunc).map(mapper)
+                .filter(t -> t.op() != hasTo).map(Term::op)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
         final Set<Operator> haveToAssignables = unionElems.stream()
-                .filter(t -> t.op() == hasToFunc).map(t -> t.sub(0)).map(mapper)
+                .filter(t -> t.op() == hasTo).map(firstSub).map(Term::op)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
-        return new Triple<>(
-                Collections.unmodifiableSet(unionElems.stream()
-                        .map(t -> AbstractExecutionUtils
-                                .preprocessLocSetElemTerms(t, services))
-                        .collect(Collectors
-                                .toCollection(() -> new LinkedHashSet<>()))),
+        return new Triple<>(Collections.unmodifiableSet(unionElems),
                 Collections.unmodifiableSet(maybeAssignables),
                 Collections.unmodifiableSet(haveToAssignables));
     }

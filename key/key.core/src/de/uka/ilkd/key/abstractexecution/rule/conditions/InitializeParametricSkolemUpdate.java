@@ -11,27 +11,19 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.rule.conditions;
+package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.logic.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
-import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.util.AbstractExecutionUtils;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -72,8 +64,7 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
                         .getAccessibleAndAssignableTermsForNoBehaviorContract(
                                 abstrStmt, matchCond, services);
         final Term accessibleClause = accessibleAndAssignableClause.first;
-        final Term assignableClause = //
-                fixPVsInHasTo(accessibleAndAssignableClause.second, services);
+        final Term assignableClause = accessibleAndAssignableClause.second;
 
         final Term update = //
                 tb.abstractUpdate(abstrStmt, assignableClause,
@@ -81,42 +72,6 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
 
         return matchCond
                 .setInstantiations(svInst.add(this.updateSV, update, services));
-    }
-
-    /**
-     * After reading in the specs, there are "hasTo(someProgramVariable)"
-     * {@link Term}s in the assignable clauses, which should be
-     * "hasTo(singletonPV(someProgramVariable))", but we don't want to bother
-     * users with also having to add that. So we here perform the normalization
-     * that at the end, the hasTo always contains a LocSet parameter and not
-     * only a program variable.
-     *
-     * @param originalAssignable
-     *            The original assignable {@link Term}.
-     * @param services
-     *            The {@link Services} object.
-     * @return The normalized {@link Term}.
-     */
-    private static Term fixPVsInHasTo(Term originalAssignable,
-            Services services) {
-        final List<Term> resultElems = new ArrayList<>();
-        final TermBuilder tb = services.getTermBuilder();
-        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        final Function union = locSetLDT.getUnion();
-        final Function hasTo = locSetLDT.getHasTo();
-
-        final Set<Term> constituents = MiscTools
-                .dissasembleSetTerm(originalAssignable, union);
-
-        for (Term t : constituents) {
-            if (t.op() == hasTo && t.sub(0).op() instanceof ProgramVariable) {
-                resultElems.add(tb.hasTo(tb.singletonPV(t.sub(0))));
-            } else {
-                resultElems.add(t);
-            }
-        }
-
-        return tb.union(resultElems);
     }
 
     @Override

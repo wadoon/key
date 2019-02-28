@@ -30,6 +30,8 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.speclang.jml.translation.AbstractPlaceholderSpecsTypeChecker;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.Services;
@@ -45,7 +47,6 @@ import de.uka.ilkd.key.java.declaration.modifier.Private;
 import de.uka.ilkd.key.java.declaration.modifier.Protected;
 import de.uka.ilkd.key.java.declaration.modifier.Public;
 import de.uka.ilkd.key.java.declaration.modifier.VisibilityModifier;
-import de.uka.ilkd.key.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.java.statement.BranchStatement;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
@@ -273,7 +274,10 @@ public class JMLSpecFactory {
     // -------------------------------------------------------------------------
     // internal classes
     // -------------------------------------------------------------------------
-    static class ContractClauses {
+    /* NOTE (DS, 2019-02-28): Made public to enable access for AbstractPlaceholderSpecsTypeChecker,
+     * which I wanted to move into the de.uka.ilkd.key.abstractexecution package to have all the
+     * abstract execution stuff at one place. */
+    public static class ContractClauses {
         public ImmutableList<Term> abbreviations = ImmutableSLList.<Term> nil();
         public Map<LocationVariable, Term> requires = new LinkedHashMap<LocationVariable, Term>();
         public Map<LocationVariable, Term> requiresFree = new LinkedHashMap<LocationVariable, Term>();
