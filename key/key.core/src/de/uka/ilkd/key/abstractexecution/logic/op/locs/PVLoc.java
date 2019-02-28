@@ -14,18 +14,24 @@ package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * A program variable location for use in an {@link AbstractUpdate}.
  *
  * @author Dominic Steinhoefel
  */
-public class PVLoc implements AbstrUpdateLHS, AbstrUpdateRHS {
+public class PVLoc extends AbstractSortedOperator
+        implements AbstrUpdateLHS, AbstrUpdateRHS {
     private final LocationVariable locVar;
 
     public PVLoc(LocationVariable locVar) {
+        super(new Name("pvLoc"), new Sort[] { locVar.sort() }, locVar.sort(),
+                false);
         this.locVar = locVar;
     }
 
@@ -39,4 +45,8 @@ public class PVLoc implements AbstrUpdateLHS, AbstrUpdateRHS {
         return toRHSTerm(services);
     }
 
+    @Override
+    public String toString() {
+        return locVar.toString();
+    }
 }

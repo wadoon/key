@@ -13,22 +13,39 @@
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
+import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * The special "allLocs" location.
  *
  * @author Dominic Steinhoefel
  */
-public class AllLocsLoc implements AbstrUpdateLHS, AbstrUpdateRHS {
+public class AllLocsLoc extends AbstractSortedOperator
+        implements AbstrUpdateLHS, AbstrUpdateRHS {
+    private final Function allLocs;
+
+    public AllLocsLoc(Function allLocs) {
+        super(new Name("allLocsLoc"), new Sort[] { allLocs.sort() },
+                allLocs.sort(), true);
+        this.allLocs = allLocs;
+    }
 
     @Override
     public Term toRHSTerm(Services services) {
-        return services.getTermBuilder().allLocs();
+        return services.getTermBuilder().func(allLocs);
     }
 
     @Override
     public Term toLHSTerm(Services services) {
         return toRHSTerm(services);
+    }
+
+    @Override
+    public String toString() {
+        return "allLocs";
     }
 }

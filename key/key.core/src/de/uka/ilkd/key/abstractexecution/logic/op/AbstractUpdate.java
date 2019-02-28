@@ -52,7 +52,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
     /* Invariant: lhs is a LocSet union of
      * - singletonPV functions applied to location variables
      * - Skolem LocSet functions
-     * - Normal LocSet singletons (not yet supported)
+     * - Normal LocSet singletons
      * - Either of the above wrapped in a hasTo function
      */
     //@formatter:on

@@ -10,9 +10,19 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.logic.op.locs;
+package de.uka.ilkd.key.abstractexecution.logic.op;
 
-import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.FieldLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
@@ -41,6 +51,31 @@ public class AbstractUpdateFactory {
     private AbstractUpdateFactory() {
     }
 
+    /**
+     * TODO
+     *
+     * @param t
+     * @param ec
+     * @param services
+     * @return
+     */
+    public Set<AbstractUpdateLoc> abstractUpdateLocsFromLocSetUnionTerm(Term t,
+            ExecutionContext ec, Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+
+        return tb.locsetUnionToSet(t).stream()
+                .map(sub -> abstractUpdateLocFromTerm(sub, ec, services))
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+    }
+
+    /**
+     * TODO
+     *
+     * @param t
+     * @param ec
+     * @param services
+     * @return
+     */
     public AbstractUpdateLoc abstractUpdateLocFromTerm(Term t,
             ExecutionContext ec, Services services) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
@@ -51,11 +86,18 @@ public class AbstractUpdateFactory {
 
         if (op instanceof LocationVariable) {
             return new PVLoc((LocationVariable) op);
+        } else if (t.op() == locSetLDT.getAllLocs()) {
+            return new AllLocsLoc(locSetLDT.getAllLocs());
         } else if (op instanceof Function && op.arity() == 0
                 && ((Function) op).sort() == locSetLDT.targetSort()) {
             return new SkolemLoc((Function) op);
         } else if (op == locSetLDT.getSingletonPV()) {
             return abstractUpdateLocFromTerm(t.sub(0), ec, services);
+        } else if (op == locSetLDT.getHasTo()) {
+            final AbstractUpdateLoc subResult = abstractUpdateLocFromTerm(
+                    t.sub(0), ec, services);
+            assert subResult instanceof AbstrUpdateLHS;
+            return new HasToLoc((AbstrUpdateLHS) subResult);
         } else if (op == locSetLDT.getSingleton()) {
             Term obj = t.sub(0);
             final Term field = t.sub(1);
@@ -66,11 +108,6 @@ public class AbstractUpdateFactory {
                     services.getJavaInfo().objectSort(), tb.getBaseHeap(), obj,
                     field);
             return fieldLocFromSelectTerm(selectTerm, tc, ec);
-        } else if (op == locSetLDT.getHasTo()) {
-            final AbstractUpdateLoc subResult = abstractUpdateLocFromTerm(
-                    t.sub(0), ec, services);
-            assert subResult instanceof AbstrUpdateLHS;
-            return new HasToLoc((AbstrUpdateLHS) subResult);
         } else if (services.getTypeConverter().getHeapLDT().isSelectOp(op)) {
             return fieldLocFromSelectTerm(t, tc, ec);
         } else {
@@ -79,6 +116,14 @@ public class AbstractUpdateFactory {
         }
     }
 
+    /**
+     * TODO
+     *
+     * @param selectTerm
+     * @param tc
+     * @param ec
+     * @return
+     */
     private AbstractUpdateLoc fieldLocFromSelectTerm(final Term selectTerm,
             final TypeConverter tc, ExecutionContext ec) {
         final Expression pe = tc.convertToProgramElement(selectTerm);

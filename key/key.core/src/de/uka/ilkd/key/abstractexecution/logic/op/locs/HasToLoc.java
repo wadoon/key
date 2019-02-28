@@ -13,24 +13,36 @@
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * A has-to location for use in an abstract update.
  *
  * @author Dominic Steinhoefel
  */
-public class HasToLoc implements AbstrUpdateLHS {
+public class HasToLoc extends AbstractSortedOperator implements AbstrUpdateLHS {
     private final AbstrUpdateLHS child;
 
     public HasToLoc(AbstrUpdateLHS child) {
+        super(new Name("hasTo"), new Sort[] { child.sort() }, child.sort(),
+                child.isRigid());
+
         assert !(child instanceof HasToLoc);
         assert !(child instanceof AllLocsLoc);
+
         this.child = child;
     }
 
     @Override
     public Term toLHSTerm(Services services) {
         return services.getTermBuilder().hasTo(child.toLHSTerm(services));
+    }
+
+    @Override
+    public String toString() {
+        return String.format("hasTo(%s)", child.toString());
     }
 }

@@ -12,11 +12,13 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
+import de.uka.ilkd.key.logic.op.SortedOperator;
+
 /**
  * A left-hand side or right-hand side location of an abstract update.
  *
  * @author Dominic Steinhoefel
  */
-public interface AbstractUpdateLoc {
+public interface AbstractUpdateLoc extends SortedOperator {
 
 }
