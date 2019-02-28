@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-package de.uka.ilkd.key.abstractexecution.logic;
+package de.uka.ilkd.key.abstractexecution.logic.op;
 
 import java.lang.ref.WeakReference;
 import java.util.Collections;

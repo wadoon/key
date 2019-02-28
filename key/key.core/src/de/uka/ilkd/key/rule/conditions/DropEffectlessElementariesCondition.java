@@ -19,8 +19,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
-import de.uka.ilkd.key.abstractexecution.logic.AbstractExecutionUtils;
-import de.uka.ilkd.key.abstractexecution.logic.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;

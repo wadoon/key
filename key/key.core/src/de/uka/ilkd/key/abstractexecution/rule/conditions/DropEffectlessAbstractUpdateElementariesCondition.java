@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.abstractexecution.logic.AbstractExecutionUtils;
-import de.uka.ilkd.key.abstractexecution.logic.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
