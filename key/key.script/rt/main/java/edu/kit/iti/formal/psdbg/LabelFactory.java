@@ -4,11 +4,8 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import lombok.val;
-import org.apache.commons.lang.ArrayUtils;
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
@@ -114,10 +111,17 @@ public class LabelFactory {
                 .map(func)
                 .map(s -> s.split(SEPARATOR))
                 .map(a -> {
-                    ArrayUtils.reverse(a);
+                    reverse(a);
                     return a;
                 })
                 .collect(Collectors.toList());
     }
 
+    private static void reverse(String[] a) {
+        for (int i = 0; i < a.length / 2; i++) {
+            String tmp = a[i];
+            a[i] = a[a.length - 1 - i];
+            a[a.length - 1 - i] = tmp;
+        }
+    }
 }

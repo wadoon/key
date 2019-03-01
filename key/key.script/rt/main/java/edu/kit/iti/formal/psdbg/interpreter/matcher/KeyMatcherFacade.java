@@ -72,10 +72,12 @@ public class KeyMatcherFacade {
     }
 
     private Matchings matchesSequent(String pattern) {
-
         Sequent seq = null;
         try {
-            seq = dtp.parseSeq(createReader(pattern), environment.getServices(), environment.getServices().getNamespaces(), null,true);
+            seq = dtp.parseSeq(createReader(pattern),
+                    environment.getServices(),
+                    environment.getServices().getNamespaces(),
+                    null,true);
         } catch (ParserException e) {
             e.printStackTrace();
         }

@@ -9,7 +9,6 @@ import edu.kit.iti.formal.psdbg.parser.data.Value;
 import edu.kit.iti.formal.psdbg.parser.types.SimpleType;
 import edu.kit.iti.formal.psdbg.parser.types.TypeFacade;
 import lombok.Getter;
-import org.apache.commons.lang.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -98,7 +97,7 @@ public class MatchEvaluator extends DefaultASTVisitor<List<VariableAssignment>> 
             case NEQ:
                 return null;
             default:
-                throw new NotImplementedException("Need to be implemented");
+                throw new IllegalStateException("Need to be implemented");
         }
     }
 

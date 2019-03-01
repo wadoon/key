@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
  * @author S. Grebing
  * @author A. Weigl
  */
+@Deprecated
 public class KeYProofFacade {
     private static final Logger LOGGER = LogManager.getLogger(KeYProofFacade.class);
 

@@ -5,14 +5,10 @@ import de.uka.ilkd.key.api.ProjectedNode;
 import de.uka.ilkd.key.api.ProofApi;
 import de.uka.ilkd.key.api.ProofManagementApi;
 import de.uka.ilkd.key.proof.io.ProblemLoaderException;
-import edu.kit.iti.formal.psdbg.interpreter.data.GoalNode;
 import edu.kit.iti.formal.psdbg.interpreter.data.KeyData;
 import edu.kit.iti.formal.psdbg.parser.Facade;
 import edu.kit.iti.formal.psdbg.parser.ast.ProofScript;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.apache.commons.cli.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,10 +31,10 @@ public class Execute {
 
     public static Options argparse() {
         Options options = new Options();
-        options.addOption("h", "--help", false, "print help text");
-        options.addOption("p", "--script-path", true, "include folder for scripts");
-        options.addOption("l", "--linter", false, "run linter before execute");
-        options.addOption("s", "--script", true, "script sourceName");
+        options.addOption("h", "help", false, "print help text");
+        options.addOption("p", "script-path", true, "include folder for scripts");
+        options.addOption("l", "linter", false, "run linter before execute");
+        options.addOption("s", "script", true, "script sourceName");
         return options;
     }
 
@@ -65,11 +61,17 @@ public class Execute {
         return null;
     }
 
-    public void init(String[] args) throws ParseException, IOException {
+    public void init(String[] args) throws ParseException {
         Options o = argparse();
         DefaultParser parser = new DefaultParser();
         CommandLine cli = parser.parse(o, args);
         keyFiles = cli.getArgList();
+        if (cli.getOptionValue("s") == null) {
+            HelpFormatter formatter = new HelpFormatter();
+            System.err.println("No script supplied: -s <script>");
+            formatter.printHelp("ant", o);
+            System.exit(1);
+        }
         scriptFile = new File(cli.getOptionValue("s"));
         if (cli.getOptionValue('p') != null)
             interpreterBuilder.scriptSearchPath(new File(cli.getOptionValue('p')));
