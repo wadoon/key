@@ -48,7 +48,7 @@
         <ivy:report todir='build/ivy-reports' graph='false' xml='false'/>
     </target>
 
-    <target name="-classpath,resolve">
+    <target name="-classpath" depends="resolve">
         <ivy:cachepath pathid="compile.path" conf="compile"/>
         <ivy:cachepath pathid="runtime.path" conf="runtime"/>
         <ivy:cachepath pathid="test.path" conf="test"/>
