@@ -12,11 +12,11 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op;
 
-import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableSet;
@@ -54,9 +54,9 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 public class AbstractUpdateFactory {
     public static final AbstractUpdateFactory INSTANCE = new AbstractUpdateFactory();
 
-    private final WeakHashMap<AbstractPlaceholderStatement, //
-            WeakHashMap<Integer, WeakReference<AbstractUpdate>>> abstractUpdateInstances = //
-                    new WeakHashMap<>();
+    private final HashMap<AbstractPlaceholderStatement, //
+            HashMap<Integer, AbstractUpdate>> abstractUpdateInstances = //
+                    new LinkedHashMap<>();
 
     /**
      * Singleton constructor.
@@ -112,19 +112,18 @@ public class AbstractUpdateFactory {
             Set<AbstrUpdateLHS> assignables, ExecutionContext ec,
             Services services) {
         if (abstractUpdateInstances.get(phs) == null) {
-            abstractUpdateInstances.put(phs, new WeakHashMap<>());
+            abstractUpdateInstances.put(phs, new LinkedHashMap<>());
         }
 
         final int assgnHashCode = assignables.hashCode();
-        WeakReference<AbstractUpdate> result = //
+        AbstractUpdate result = //
                 abstractUpdateInstances.get(phs).get(assgnHashCode);
-        if (result == null || result.get() == null) {
-            result = new WeakReference<AbstractUpdate>(
-                    new AbstractUpdate(phs, assignables, ec, services));
+        if (result == null) {
+            result = new AbstractUpdate(phs, assignables, ec, services);
             abstractUpdateInstances.get(phs).put(assgnHashCode, result);
         }
 
-        return result.get();
+        return result;
     }
 
     /**
@@ -144,19 +143,20 @@ public class AbstractUpdateFactory {
         final AbstractPlaceholderStatement phs = abstrUpd
                 .getAbstractPlaceholderStatement();
         if (abstractUpdateInstances.get(phs) == null) {
-            abstractUpdateInstances.put(phs, new WeakHashMap<>());
+//            abstractUpdateInstances.put(phs, new WeakHashMap<>());
+            abstractUpdateInstances.put(phs, new LinkedHashMap<>());
         }
 
         final int assgnHashCode = assignables.hashCode();
-        WeakReference<AbstractUpdate> result = //
+//        WeakReference<AbstractUpdate> result = //
+        AbstractUpdate result = //
                 abstractUpdateInstances.get(phs).get(assgnHashCode);
-        if (result == null || result.get() == null) {
-            result = new WeakReference<AbstractUpdate>(
-                    abstrUpd.changeAssignables(assignables));
+        if (result == null) {
+            result = abstrUpd.changeAssignables(assignables);
             abstractUpdateInstances.get(phs).put(assgnHashCode, result);
         }
 
-        return result.get();
+        return result;
     }
 
     /**

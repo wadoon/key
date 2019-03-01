@@ -58,6 +58,9 @@ public class SequentViewInputListener
                 final PosInOccurrence posInOcc = mousePos.getPosInOccurrence();
                 if (posInOcc != null) {
                     t = posInOcc.subTerm();
+
+                    System.out.println(t);
+
                     String operator = opStrFromTerm(t);
                     /*
                      * The hash code is displayed here since sometimes terms
