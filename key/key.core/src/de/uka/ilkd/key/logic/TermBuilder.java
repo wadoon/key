@@ -34,6 +34,8 @@ import org.key_project.util.collection.ImmutableSet;
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
@@ -976,6 +978,26 @@ public class TermBuilder {
     public Term elementary(UpdateableOperator lhs, Term rhs) {
         ElementaryUpdate eu = ElementaryUpdate.getInstance(lhs);
         return tf.createTerm(eu, rhs);
+    }
+
+    public Term abstractUpdate(AbstractPlaceholderStatement phs,
+            Set<AbstrUpdateLHS> assignables, Set<AbstrUpdateRHS> accessibles) {
+        final AbstractUpdate au = AbstractUpdateFactory.INSTANCE
+                .getInstance(phs, assignables, services);
+        final Term rhs = AbstractUpdateFactory.INSTANCE
+                .accessiblesToSetUnion(accessibles, services);
+        return tf.createTerm(au, rhs);
+    }
+
+    public Term abstractUpdate(AbstractPlaceholderStatement phs,
+            Set<AbstrUpdateLHS> assignables, Term rhs) {
+        final AbstractUpdate au = AbstractUpdateFactory.INSTANCE
+                .getInstance(phs, assignables, services);
+        return tf.createTerm(au, rhs);
+    }
+
+    public Term abstractUpdate(AbstractUpdate abstrUpd, Term rhs) {
+        return tf.createTerm(abstrUpd, rhs);
     }
 
     public Term abstractUpdate(AbstractPlaceholderStatement phs, Term lhs,

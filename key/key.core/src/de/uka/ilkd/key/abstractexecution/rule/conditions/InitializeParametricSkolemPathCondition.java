@@ -15,9 +15,12 @@ package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
@@ -89,11 +92,12 @@ public class InitializeParametricSkolemPathCondition
             functions.add(funcSymb);
         }
 
-        final Term accessibleClause = AbstractExecutionUtils
+        final Set<AbstrUpdateRHS> accessibleClause = AbstractExecutionUtils
                 .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt,
                         matchCond, services).first;
 
-        final Term pathCond = tb.func(funcSymb, accessibleClause);
+        final Term pathCond = tb.func(funcSymb, AbstractUpdateFactory.INSTANCE
+                .accessiblesToSetUnion(accessibleClause, services));
 
         return matchCond
                 .setInstantiations(svInst.add(pathCondSV, pathCond, services));

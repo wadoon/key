@@ -179,7 +179,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
      *
      * @param concrUpdate
      *            The concrete update to push through.
-     * @param abstrUpdate
+     * @param abstrUpdateTerm
      *            The abstract update on which to apply the concrete one.
      * @param tb
      * @param services
@@ -189,9 +189,9 @@ public final class ApplyConcrOnAbstrUpdateCondition
      *         allLocs is in the game...).
      */
     private PushThroughResult pushThroughConcrUpdate(final Term concrUpdate,
-            final Term abstrUpdate, final Services services) {
+            final Term abstrUpdateTerm, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        final AbstractUpdate abstrUpd = (AbstractUpdate) abstrUpdate.op();
+        final AbstractUpdate abstrUpd = (AbstractUpdate) abstrUpdateTerm.op();
 
         final Set<LocationVariable> maybeAssgnVarsOfAbstrUpd = abstrUpd
                 .getMaybeAssignables().stream()
@@ -204,7 +204,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
                 .map(LocationVariable.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
-        Term currentAccessibles = abstrUpdate.sub(0);
+        Term currentAccessibles = abstrUpdateTerm.sub(0);
         final List<Term> currentRemainingConcrUpdElems = new ArrayList<>();
         final List<Term> currentFollowingConcrUpdElems = new ArrayList<>();
 
@@ -228,15 +228,11 @@ public final class ApplyConcrOnAbstrUpdateCondition
             /*
              * We may push through if (1) lhs is not assigned (neither "maybe"
              * nor "has to"), and (2) the abstract update does not assign
-             * allLocs (neither "maybe" nor "has to").
+             * allLocs.
              */
             final boolean mayPushThrough = !maybeAssgnVarsOfAbstrUpd
-                    .contains(lhs)
-                    && !hasToAssgnVarsOfAbstrUpd.contains(lhs)
-                    && !AbstractExecutionUtils.mayAssignAllLocs(abstrUpd,
-                            services)
-                    && !AbstractExecutionUtils.hasToAssignAllLocs(abstrUpd,
-                            services);
+                    .contains(lhs) && !hasToAssgnVarsOfAbstrUpd.contains(lhs)
+                    && !abstrUpd.assignsAllLocs();
 
             /*
              * We may drop if (1.1) lhs is assigned as "has to" or (1.2) the
@@ -250,9 +246,8 @@ public final class ApplyConcrOnAbstrUpdateCondition
                             services)
                     || (!hasToAssgnVarsOfAbstrUpd.contains(lhs)
                             && !maybeAssgnVarsOfAbstrUpd.contains(lhs)
-                            && !AbstractExecutionUtils
-                                    .mayAssignAllLocs(abstrUpd, services)))
-                    && !AbstractExecutionUtils.accessesAllLocs(abstrUpdate,
+                            && !abstrUpd.assignsAllLocs()))
+                    && !AbstractExecutionUtils.accessesAllLocs(abstrUpdateTerm,
                             services);
 
             /*

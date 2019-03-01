@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.abstractexecution.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -11,6 +12,12 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
@@ -32,7 +39,6 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -49,26 +55,25 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  */
 public class AbstractExecutionUtils {
     /**
-     * Returns the accessible {@link Term}s of the "right" no-behavior contract
-     * for the given {@link AbstractPlaceholderStatement}.
+     * Returns the accessible locations of the "right" no-behavior contract for
+     * the given {@link AbstractPlaceholderStatement}.
      *
      * @param aps
      *            The {@link AbstractPlaceholderStatement} for which to return
-     *            the accessible {@link Term}s.
+     *            the accessible locations.
      * @param context
      *            The context program (for choosing the "right" contract).
      * @param services
      *            The {@link Services} object.
-     * @return The accessible {@link Term}s for the given
+     * @return The accessible locations for the given
      *         {@link AbstractPlaceholderStatement}.
      */
-    public static Set<Term> getAccessibleTermsForNoBehaviorContract(
+    public static Set<AbstrUpdateRHS> getAccessibleTermsForNoBehaviorContract(
             AbstractPlaceholderStatement aps, ProgramElement context,
             Services services) {
-        final Term accessibleTerm = AbstractExecutionUtils
+        return AbstractExecutionUtils
                 .getAccessibleAndAssignableTermsForNoBehaviorContract(aps,
                         context, services).first;
-        return services.getTermBuilder().setUnionToSet(accessibleTerm);
     }
 
     /**
@@ -89,38 +94,31 @@ public class AbstractExecutionUtils {
             AbstractPlaceholderStatement aps, ProgramElement context,
             Services services) {
         return getAccessibleTermsForNoBehaviorContract(aps, context, services)
-                .stream().map(Term::op)
-                .filter(ProgramVariable.class::isInstance)
-                .map(ProgramVariable.class::cast).collect(Collectors.toList());
+                .stream().filter(PVLoc.class::isInstance).map(PVLoc.class::cast)
+                .map(PVLoc::childOp).map(ProgramVariable.class::cast)
+                .collect(Collectors.toList());
     }
 
     /**
-     * Returns the assignable {@link Operator}s (i.e. {@ProgramVariable}s and
-     * Skolem location sets) of the "right" no-behavior contract for the given
-     * {@link AbstractPlaceholderStatement}.
+     * Returns the assignable locations of the "right" no-behavior contract for
+     * the given {@link AbstractPlaceholderStatement}.
      *
      * @param aps
      *            The {@link AbstractPlaceholderStatement} for which to return
-     *            the assignable {@link Operator}s.
+     *            the assignable locations.
      * @param context
      *            The context program (for choosing the "right" contract).
      * @param services
      *            The {@link Services} object.
-     * @return The assignable {@link Operator}s for the given
+     * @return The assignable locations for the given
      *         {@link AbstractPlaceholderStatement}.
      */
-    public static List<Operator> getAssignableOpsForNoBehaviorContract(
+    public static Set<AbstrUpdateLHS> getAssignableOpsForNoBehaviorContract(
             AbstractPlaceholderStatement aps, ProgramElement context,
             Services services) {
-        final Term assignableTerm = AbstractExecutionUtils
+        return AbstractExecutionUtils
                 .getAccessibleAndAssignableTermsForNoBehaviorContract(aps,
                         context, services).second;
-
-        return MiscTools
-                .disasembleSetTerm(assignableTerm,
-                        services.getTypeConverter().getLocSetLDT().getUnion())
-                .stream().map(locSetElemTermsToOpMapper(services))
-                .collect(Collectors.toList());
     }
 
     /**
@@ -260,7 +258,7 @@ public class AbstractExecutionUtils {
     }
 
     /**
-     * Extracts the accessible and assignable term for the given
+     * Extracts the accessible and assignable locations for the given
      * {@link AbstractPlaceholderStatement} based on the current context from
      * the {@link SpecificationRepository}. The default for both is allLocs
      * (everything assignable and accessible).
@@ -269,13 +267,14 @@ public class AbstractExecutionUtils {
      *            The {@link AbstractPlaceholderStatement} for which to extract
      *            the accessible and assignable clause.
      * @param contextProgram
-     *            TODO
+     *            The context program to determine the right contract (after
+     *            renamings).
      * @param services
      *            The {@link Services} object.
-     * @return A pair of (1) the accessible and (2) the assignable clause for
+     * @return A pair of (1) the accessible and (2) the assignable locations for
      *         the {@link AbstractPlaceholderStatement}.
      */
-    public static Pair<Term, Term> getAccessibleAndAssignableTermsForNoBehaviorContract(
+    public static Pair<Set<AbstrUpdateRHS>, Set<AbstrUpdateLHS>> getAccessibleAndAssignableTermsForNoBehaviorContract(
             final AbstractPlaceholderStatement abstrStmt,
             final ProgramElement contextProgram, final Services services) {
         final ProgramVariableCollector pvColl = //
@@ -286,12 +285,10 @@ public class AbstractExecutionUtils {
     }
 
     /**
-     * Extracts the accessible and assignable term for the given
+     * Extracts the accessible and assignable locations for the given
      * {@link AbstractPlaceholderStatement} based on the current context from
      * the {@link SpecificationRepository}. The default for both is allLocs
-     * (everything assignable and accessible). The returned {@link Term}s are
-     * SetLDT unions (not LocSets!). Field accesses are transformed to LocSet
-     * singletons for assignable terms and select terms for accessible terms.
+     * (everything assignable and accessible).
      *
      * @param abstrStmt
      *            The {@link AbstractPlaceholderStatement} for which to extract
@@ -301,24 +298,20 @@ public class AbstractExecutionUtils {
      *            several contracts.
      * @param executionContext
      *            An {@link Optional} {@link ExecutionContext} -- make sure to
-     *            actually pass one if the generated {@link Term}s should be
-     *            used for creating abstract updates. The contained runtime
-     *            instance {@link ReferencePrefix} is used to replace "self"
-     *            variable occurrences.
+     *            actually pass one if you are interested in fields. Otherwise,
+     *            only Skolem functions and program variables are considered.
      * @param services
      *            The {@link Services} object.
-     * @return A pair of (1) the accessible and (2) the assignable clause for
+     * @return A pair of (1) the accessible and (2) the assignable locations for
      *         the {@link AbstractPlaceholderStatement}.
      */
-    public static Pair<Term, Term> getAccessibleAndAssignableTermsForNoBehaviorContract(
+    public static Pair<Set<AbstrUpdateRHS>, Set<AbstrUpdateLHS>> getAccessibleAndAssignableTermsForNoBehaviorContract(
             final AbstractPlaceholderStatement abstrStmt,
             final Set<LocationVariable> surroundingVars,
             Optional<ExecutionContext> executionContext,
             final Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-
-        Term accessibleClause;
-        Term assignableClause;
+        Set<AbstrUpdateRHS> accessibleClause;
+        Set<AbstrUpdateLHS> assignableClause;
 
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
 
@@ -326,10 +319,10 @@ public class AbstractExecutionUtils {
                 getNoBehaviorContracts(abstrStmt, services);
 
         if (contracts.isEmpty()) {
-            accessibleClause = locSetRHSToSetRHS(
-                    tb.func(locSetLDT.getAllLocs()), executionContext,
-                    services);
-            assignableClause = tb.setSingleton(tb.func(locSetLDT.getAllLocs()));
+            accessibleClause = Collections
+                    .singleton(new AllLocsLoc(locSetLDT.getAllLocs()));
+            assignableClause = Collections
+                    .singleton(new AllLocsLoc(locSetLDT.getAllLocs()));
         } else {
             final LocationVariable heap = services.getTypeConverter()
                     .getHeapLDT().getHeap();
@@ -337,33 +330,41 @@ public class AbstractExecutionUtils {
             final BlockContract contract = findRightContract(contracts,
                     surroundingVars, heap, services);
 
-            accessibleClause = locSetRHSToSetRHS(
-                    contract.getAccessibleClause(heap), executionContext,
-                    services);
-            assignableClause = locSetLHSToSetLHS(contract.getAssignable(heap),
-                    executionContext, services);
+            accessibleClause = AbstractUpdateFactory.INSTANCE
+                    .abstractUpdateLocsFromUnionTerm(
+                            contract.getAccessibleClause(heap),
+                            executionContext, services)
+                    .stream().map(AbstrUpdateRHS.class::cast).collect(Collectors
+                            .toCollection(() -> new LinkedHashSet<>()));
+            assignableClause = AbstractUpdateFactory.INSTANCE
+                    .abstractUpdateLocsFromUnionTerm(
+                            contract.getAssignable(heap), executionContext,
+                            services)
+                    .stream().map(AbstrUpdateLHS.class::cast).collect(Collectors
+                            .toCollection(() -> new LinkedHashSet<>()));
         }
 
-        return new Pair<Term, Term>(accessibleClause, assignableClause);
+        return new Pair<Set<AbstrUpdateRHS>, Set<AbstrUpdateLHS>>(
+                accessibleClause, assignableClause);
     }
 
     /**
-     * Extracts the accessible and assignable term for the given
+     * Extracts the accessible and assignable locations for the given
      * {@link AbstractPlaceholderStatement} based on the current context from
      * the {@link SpecificationRepository}. The default for both is allLocs
      * (everything assignable and accessible).
      *
      * @param abstrStmt
      *            The {@link AbstractPlaceholderStatement} for which to extract
-     *            the accessible and assignable clause.
+     *            the accessible and assignable locations.
      * @param svInst
      *            The current {@link SVInstantiations} (for the context).
      * @param services
      *            The {@link Services} object.
-     * @return A pair of (1) the accessible and (2) the assignable clause for
+     * @return A pair of (1) the accessible and (2) the assignable locations for
      *         the {@link AbstractPlaceholderStatement}.
      */
-    public static Pair<Term, Term> getAccessibleAndAssignableTermsForNoBehaviorContract(
+    public static Pair<Set<AbstrUpdateRHS>, Set<AbstrUpdateLHS>> getAccessibleAndAssignableTermsForNoBehaviorContract(
             final AbstractPlaceholderStatement abstrStmt,
             final MatchConditions matchCond, final Services services) {
         final Set<LocationVariable> surroundingVars = new LinkedHashSet<>();
@@ -391,7 +392,6 @@ public class AbstractExecutionUtils {
                     .anyMatch(lv2 -> lv1.toString().equals(lv2.toString())));
             surroundingVars.addAll(result);
         });
-//        services.getJavaInfo().getKeYJavaType(fullName) abstrStmt.getParentClass()
 
         return getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt,
                 surroundingVars,
@@ -509,6 +509,8 @@ public class AbstractExecutionUtils {
      * @param target
      *            The term for which to analyze the assigned-before-used
      *            relationships.
+     * @param ec
+     *            The {@link ExecutionContext}, for handling fields.
      * @param services
      *            The {@link Services} object.
      * @return (1) assigned-before-used and (2) used-before-assigned operators.
@@ -516,15 +518,16 @@ public class AbstractExecutionUtils {
      *         construct not (yet) supported, in this case, the condition should
      *         not be applicable.
      */
-    public static Optional<Pair<Set<Operator>, Set<Operator>>> opsAssignedBeforeUsed(
-            Term target, Services services) {
-        final Set<Operator> assignedBeforeUsed = new LinkedHashSet<>();
-        final Set<Operator> usedBeforeAssigned = new LinkedHashSet<>();
+    public static Optional<Pair<Set<AbstrUpdateRHS>, Set<AbstrUpdateRHS>>> opsAssignedBeforeUsed(
+            Term target, ExecutionContext ec, Services services) {
+        final Set<AbstrUpdateRHS> assignedBeforeUsed = new LinkedHashSet<>();
+        final Set<AbstrUpdateRHS> usedBeforeAssigned = new LinkedHashSet<>();
+        final AbstractUpdateFactory factory = AbstractUpdateFactory.INSTANCE;
 
-        // Skolem location set or location variable
-        /* XXX (DS, 2019-02-27): Now we also have fields! */
-        if (AbstractExecutionUtils.isProcVarOrSkolemLocSet(target, services)) {
-            usedBeforeAssigned.add(target.op());
+        Optional<AbstractUpdateLoc> loc = factory
+                .tryExtractAbstrUpdateLocFromTerm(target, ec, services);
+        if (loc.isPresent()) {
+            usedBeforeAssigned.add((AbstrUpdateRHS) loc.get());
         }
 
         // Update applications -- those are most interesting
@@ -538,14 +541,15 @@ public class AbstractExecutionUtils {
                         .getElementaryUpdates(update);
 
                 for (final Term elem : elems) {
-                    final UpdateableOperator lhs = //
-                            ((ElementaryUpdate) elem.op()).lhs();
+                    final AbstrUpdateRHS lhs = new PVLoc(
+                            (LocationVariable) ((ElementaryUpdate) elem.op())
+                                    .lhs());
                     final Term rhs = elem.sub(0);
-
-                    if (AbstractExecutionUtils.isProcVarOrSkolemLocSet(rhs,
-                            services)) {
-                        if (!assignedBeforeUsed.contains(rhs.op())) {
-                            usedBeforeAssigned.add(rhs.op());
+                    loc = factory.tryExtractAbstrUpdateLocFromTerm( //
+                            rhs, ec, services);
+                    if (loc.isPresent()) {
+                        if (!assignedBeforeUsed.contains(loc.get())) {
+                            usedBeforeAssigned.add((AbstrUpdateRHS) loc.get());
                         }
                     }
 
@@ -558,7 +562,7 @@ public class AbstractExecutionUtils {
             // Abstract Update
             else if (update.op() instanceof AbstractUpdate) {
                 opsHaveToAssignBeforeUsedForAbstrUpd(update, assignedBeforeUsed,
-                        usedBeforeAssigned, services);
+                        usedBeforeAssigned, ec, services);
             }
 
             // Concatenated abstract update
@@ -567,7 +571,8 @@ public class AbstractExecutionUtils {
                         abstractUpdatesFromConcatenation(update);
                 for (Term abstrUpdTerm : abstractUpdateTerms) {
                     opsHaveToAssignBeforeUsedForAbstrUpd(abstrUpdTerm,
-                            assignedBeforeUsed, usedBeforeAssigned, services);
+                            assignedBeforeUsed, usedBeforeAssigned, ec,
+                            services);
                 }
             }
 
@@ -577,8 +582,9 @@ public class AbstractExecutionUtils {
                 return Optional.empty();
             }
 
-            final Pair<Set<Operator>, Set<Operator>> subResult = //
-                    opsAssignedBeforeUsed(updateTarget, services).orElse(null);
+            final Pair<Set<AbstrUpdateRHS>, Set<AbstrUpdateRHS>> subResult = //
+                    opsAssignedBeforeUsed(updateTarget, ec, services)
+                            .orElse(null);
 
             if (subResult == null) {
                 return Optional.empty();
@@ -603,8 +609,8 @@ public class AbstractExecutionUtils {
         // Any other term
         else {
             for (final Term sub : target.subs()) {
-                final Pair<Set<Operator>, Set<Operator>> subResult = //
-                        opsAssignedBeforeUsed(sub, services).orElse(null);
+                final Pair<Set<AbstrUpdateRHS>, Set<AbstrUpdateRHS>> subResult = //
+                        opsAssignedBeforeUsed(sub, ec, services).orElse(null);
 
                 if (subResult == null) {
                     return Optional.empty();
@@ -657,77 +663,27 @@ public class AbstractExecutionUtils {
      * @param usedBeforeAssigned
      *            A set of used-before-assigned operators. Results are added to
      *            the passed set.
+     * @param ec
+     *            The {@link ExecutionContext} for handling fields.
      * @param services
      *            The {@link Services} object.
      */
     private static void opsHaveToAssignBeforeUsedForAbstrUpd(final Term update,
-            final Set<Operator> assignedBeforeUsed,
-            final Set<Operator> usedBeforeAssigned, Services services) {
+            final Set<AbstrUpdateRHS> assignedBeforeUsed,
+            final Set<AbstrUpdateRHS> usedBeforeAssigned, ExecutionContext ec,
+            Services services) {
         assert update.op() instanceof AbstractUpdate;
 
-        usedBeforeAssigned
-                .addAll(MiscTools
-                        .disasembleSetTerm(update.sub(0),
-                                services.getTypeConverter().getSetLDT()
-                                        .getUnion())
-                        .stream().map(t -> t.sub(0)).map(Term::op)
-                        .filter(op -> !assignedBeforeUsed.contains(op))
-                        .collect(Collectors.toSet()));
+        usedBeforeAssigned.addAll(AbstractUpdateFactory.INSTANCE
+                .abstractUpdateLocsFromUnionTerm(update.sub(0), ec, services)
+                .stream().filter(op -> !assignedBeforeUsed.contains(op))
+                .map(AbstrUpdateRHS.class::cast)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>())));
 
         final AbstractUpdate abstrUpdate = (AbstractUpdate) update.op();
         assignedBeforeUsed.addAll(abstrUpdate.getHasToAssignables().stream()
                 .filter(op -> !usedBeforeAssigned.contains(op))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>())));
-    }
-
-    /**
-     * @param term
-     *            The {@link Term} to analyze.
-     * @param services
-     *            The {@link Services} object.
-     * @return true iff the given {@link Term} is a Skolem loc set function or a
-     *         program variable.
-     */
-    public static boolean isProcVarOrSkolemLocSet(Term term,
-            Services services) {
-        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        final Operator op = term.op();
-        return term.arity() == 0 && (op instanceof LocationVariable //
-                || (op instanceof Function
-                        && ((Function) op).sort() == locSetLDT.targetSort()));
-    }
-
-    /**
-     * Transforms a set of operators to a set union term. Each operator has to
-     * be either a {@link LocationVariable} or a {@link Function}.
-     *
-     * @param ops
-     *            The operators for the union term.
-     * @param abstrUpd
-     *            The {@link AbstractUpdate} from which these operators
-     *            originate from. Needed to tell whether the accessibles are
-     *            "have-to" or "maybe".
-     * @param services
-     *            The {@link Services} object.
-     * @return A union term consisting of the operators.
-     */
-    public static Term opsToSetUnion(Set<Operator> ops, AbstractUpdate abstrUpd,
-            Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-
-        final List<Term> wrappedOps = new ArrayList<>();
-        for (final Operator op : ops) {
-            Term t = op instanceof Function ? tb.func((Function) op)
-                    : tb.var((LocationVariable) op);
-
-            if (abstrUpd.getHasToAssignables().contains(op)) {
-                t = tb.hasTo(t);
-            }
-
-            wrappedOps.add(tb.setSingleton(t));
-        }
-
-        return tb.setUnion(wrappedOps);
     }
 
     /**

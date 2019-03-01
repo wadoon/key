@@ -24,14 +24,18 @@ import java.util.stream.Collectors;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
+import de.uka.ilkd.key.abstractexecution.util.AbstractUpdateLocationsVisitor;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
@@ -153,17 +157,17 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             Term target, ExecutionContext ec, Services services) {
         final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
 
-        final Set<Operator> opsInAssignable = new LinkedHashSet<>();
-        opsInAssignable.addAll(abstrUpd.getHasToAssignables());
-        opsInAssignable.addAll(abstrUpd.getMaybeAssignables());
+        final Set<AbstrUpdateRHS> assignables = new LinkedHashSet<>();
+        assignables.addAll(abstrUpd.getHasToAssignables());
+        assignables.addAll(abstrUpd.getMaybeAssignables());
 
-        final Term abstrUpdAccessiblesTerm = update.sub(0);
+        final Term accessiblesTerm = update.sub(0);
 
         final Function allLocs = //
                 services.getTypeConverter().getLocSetLDT().getAllLocs();
         final TermBuilder tb = services.getTermBuilder();
 
-        if (opsInAssignable.contains(allLocs)) {
+        if (abstrUpd.assignsAllLocs()) {
             /*
              * If an abstract update may change all locations, then it is never
              * effectless. However, we can simplify this to allLocs alone if
@@ -171,68 +175,67 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
              * don't apply here since the lhs is built into the operator
              * itself).
              */
-
-            if (opsInAssignable.size() > 1) {
+            if (assignables.size() > 1) {
                 return tb.abstractUpdate(
-                        abstrUpd.getAbstractPlaceholderStatement(),
-                        tb.allLocs(), abstrUpdAccessiblesTerm, ec);
+                        AbstractUpdateFactory.INSTANCE.changeAssignables(
+                                abstrUpd,
+                                Collections.singleton(new AllLocsLoc(allLocs))),
+                        accessiblesTerm);
             }
 
             return null;
         }
 
-        final Pair<Set<Operator>, Set<Operator>> opsAnalysisResult = //
-                AbstractExecutionUtils.opsAssignedBeforeUsed(target, services)
+        // TODO from here
+        final Pair<Set<AbstrUpdateRHS>, Set<AbstrUpdateRHS>> opsAnalysisResult = //
+                AbstractExecutionUtils
+                        .opsAssignedBeforeUsed(target, ec, services)
                         .orElse(null);
 
         if (opsAnalysisResult == null) {
             return null;
         }
 
-        final Set<Term> abstrUpdAccessibles = //
-                tb.setUnionToSet(abstrUpdAccessiblesTerm);
-
-        final Set<Operator> opsHaveToAssignBeforeUsed = opsAnalysisResult.first;
-
-        final Set<Operator> newOpsInAssignable = opsInAssignable.stream()
-                .filter(op -> !opsHaveToAssignBeforeUsed.contains(op))
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+        final Set<AbstrUpdateRHS> opsHaveToAssignBeforeUsed = opsAnalysisResult.first;
 
         /*
          * We can also remove all assignables that are not occurring at all in
-         * the target. Then, we also remove them from the accessibles.
+         * the target. Then, we also remove them from the accessibles. TODO (DS,
+         * 2019-03-01): It does not make sense to remove them from the
+         * accessibles when I think about it now. Deactivated that. Maybe plug
+         * it in if I'm wrong...
          */
-        final OpCollector opColl = new OpCollector();
-        target.execPostOrder(opColl);
+        final AbstractUpdateLocationsVisitor visitor = //
+                new AbstractUpdateLocationsVisitor(ec, services);
+        target.execPostOrder(visitor);
 
-        final Set<Term> newAbstrUpdAccessibles = //
-                new LinkedHashSet<>(abstrUpdAccessibles);
-        /* We create a new set to prevent concurrent modifications. */
-        for (Operator op : new LinkedHashSet<>(newOpsInAssignable)) {
-            if (!opColl.contains(op)) {
-                /* This one we can remove. */
-                newOpsInAssignable.remove(op);
-            }
-        }
+        final Set<AbstrUpdateLHS> newAssignables = assignables.stream()
+                .filter(op -> !opsHaveToAssignBeforeUsed.contains(op))
+                .filter(loc -> !visitor.getResult().contains(loc))
+                .map(loc -> abstrUpd.hasToAssign(loc) ? new HasToLoc(loc) : loc)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
-        final Term newAccessiblesTerm = tb.setUnion(newAbstrUpdAccessibles
-                .stream().map(tb::setSingleton).collect(Collectors.toList()));
+        final Set<AbstrUpdateRHS> newAccessibles = //
+                AbstractUpdateFactory.INSTANCE
+                        .abstractUpdateLocsFromUnionTerm(accessiblesTerm, ec,
+                                services)
+                        .stream().map(AbstrUpdateRHS.class::cast)
+                        // .filter(loc -> visitor.getResult().contains(loc))
+                        .collect(Collectors
+                                .toCollection(() -> new LinkedHashSet<>()));
 
-        if (opsInAssignable.stream()
-                .noneMatch(op -> !newOpsInAssignable.contains(op))) {
+        if (assignables.stream()
+                .noneMatch(op -> !newAssignables.contains(op))) {
             // No change.
             return null;
         }
 
-        if (newOpsInAssignable.isEmpty()) {
+        if (newAssignables.isEmpty()) {
             return tb.skip();
         }
 
-        return tb
-                .abstractUpdate(abstrUpd.getAbstractPlaceholderStatement(),
-                        AbstractExecutionUtils.opsToSetUnion(
-                                newOpsInAssignable, abstrUpd, services),
-                        newAccessiblesTerm, ec);
+        return tb.abstractUpdate(abstrUpd.getAbstractPlaceholderStatement(),
+                newAssignables, newAccessibles);
     }
 
     @Override

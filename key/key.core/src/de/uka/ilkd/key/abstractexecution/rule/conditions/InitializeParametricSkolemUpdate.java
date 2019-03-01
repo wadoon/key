@@ -13,10 +13,13 @@
 
 package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
+import java.util.Set;
+
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ProgramSV;
@@ -49,7 +52,6 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
     public MatchConditions check(SchemaVariable sv, SVSubstitute instCandidate,
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
-        final ExecutionContext ec = svInst.getExecutionContext();
 
         if (svInst.isInstantiated(this.updateSV)) {
             return matchCond;
@@ -61,16 +63,15 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
 
         final TermBuilder tb = services.getTermBuilder();
 
-        final Pair<Term, Term> accessibleAndAssignableClause = //
+        final Pair<Set<AbstrUpdateRHS>, Set<AbstrUpdateLHS>> accessibleAndAssignableClause = //
                 AbstractExecutionUtils
                         .getAccessibleAndAssignableTermsForNoBehaviorContract(
                                 abstrStmt, matchCond, services);
-        final Term accessibleClause = accessibleAndAssignableClause.first;
-        final Term assignableClause = accessibleAndAssignableClause.second;
 
         final Term update = //
-                tb.abstractUpdate(abstrStmt, assignableClause,
-                        accessibleClause, ec);
+                tb.abstractUpdate(abstrStmt,
+                        accessibleAndAssignableClause.second,
+                        accessibleAndAssignableClause.first);
 
         return matchCond
                 .setInstantiations(svInst.add(this.updateSV, update, services));
