@@ -69,6 +69,11 @@ public class FieldLoc extends AbstractSortedOperator
     }
 
     @Override
+    public AbstrUpdateUpdatableLoc toUpdatableRHS() {
+        return this;
+    }
+
+    @Override
     public String toString() {
         // TODO (DS, 2019-02-28): Maybe not what one wants, check
         return String.format("(%s, %s)",

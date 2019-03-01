@@ -60,6 +60,11 @@ public class AllLocsLoc extends AbstractSortedOperator
     }
 
     @Override
+    public AbstrUpdateUpdatableLoc toUpdatableRHS() {
+        return this;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         return obj instanceof AllLocsLoc && obj.hashCode() == hashCode();
     }

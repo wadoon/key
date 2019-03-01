@@ -18,4 +18,9 @@ package de.uka.ilkd.key.abstractexecution.logic.op.locs;
  * @author Dominic Steinhoefel
  */
 public interface AbstrUpdateLHS extends AbstractUpdateLoc {
+    /**
+     * @return This {@link AbstrUpdateLHS} as an {@link AbstrUpdateUpdatableLoc}
+     *         (RHS). Principle use case is to unwrap hasTo-s.
+     */
+    AbstrUpdateUpdatableLoc toUpdatableRHS();
 }

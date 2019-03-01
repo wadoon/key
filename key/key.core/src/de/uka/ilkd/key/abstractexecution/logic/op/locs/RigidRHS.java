@@ -45,17 +45,6 @@ public class RigidRHS extends AbstractSortedOperator implements AbstrUpdateRHS {
     }
 
     @Override
-    public AbstractUpdateLoc replaceVariables(
-            Map<ProgramVariable, ProgramVariable> replMap) {
-        return this;
-    }
-
-    @Override
-    public Operator childOp() {
-        return t.op();
-    }
-
-    @Override
     public String toString() {
         return t.toString();
     }
@@ -68,5 +57,16 @@ public class RigidRHS extends AbstractSortedOperator implements AbstrUpdateRHS {
     @Override
     public int hashCode() {
         return 5 + 17 * t.hashCode();
+    }
+
+    @Override
+    public AbstractUpdateLoc replaceVariables(
+            Map<ProgramVariable, ProgramVariable> replMap) {
+        return this;
+    }
+
+    @Override
+    public Operator childOp() {
+        return t.op();
     }
 }

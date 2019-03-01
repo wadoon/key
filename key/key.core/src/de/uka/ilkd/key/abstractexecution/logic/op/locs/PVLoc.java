@@ -65,6 +65,11 @@ public class PVLoc extends AbstractSortedOperator
     }
 
     @Override
+    public AbstrUpdateUpdatableLoc toUpdatableRHS() {
+        return this;
+    }
+
+    @Override
     public boolean equals(Object obj) {
         return obj instanceof PVLoc && obj.hashCode() == hashCode();
     }

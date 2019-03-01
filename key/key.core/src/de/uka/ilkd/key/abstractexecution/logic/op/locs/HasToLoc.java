@@ -59,6 +59,11 @@ public class HasToLoc extends AbstractSortedOperator implements AbstrUpdateLHS {
     }
 
     @Override
+    public AbstrUpdateUpdatableLoc toUpdatableRHS() {
+        return child.toUpdatableRHS();
+    }
+
+    @Override
     public boolean equals(Object obj) {
         return obj instanceof HasToLoc && obj.hashCode() == hashCode();
     }

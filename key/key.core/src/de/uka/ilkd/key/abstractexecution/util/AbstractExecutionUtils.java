@@ -134,8 +134,11 @@ public class AbstractExecutionUtils {
             AbstractPlaceholderStatement aps, ProgramElement context,
             Services services) {
         return getAssignableOpsForNoBehaviorContract(aps, context, services)
-                .stream().filter(op -> op instanceof ProgramVariable)
-                .map(ProgramVariable.class::cast).collect(Collectors.toList());
+                .stream()
+                .map(AbstrUpdateLHS::toUpdatableRHS)
+                .filter(PVLoc.class::isInstance).map(PVLoc.class::cast)
+                .map(PVLoc::childOp).map(LocationVariable.class::cast)
+                .collect(Collectors.toList());
     }
 
     /**

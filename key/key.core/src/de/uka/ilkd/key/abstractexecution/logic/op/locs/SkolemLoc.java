@@ -66,6 +66,11 @@ public class SkolemLoc extends AbstractSortedOperator
     }
 
     @Override
+    public AbstrUpdateUpdatableLoc toUpdatableRHS() {
+        return this;
+    }
+
+    @Override
     public int hashCode() {
         return 5 + 17 * skLoc.hashCode();
     }

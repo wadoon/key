@@ -21,7 +21,7 @@ import de.uka.ilkd.key.logic.Term;
  *
  * @author Dominic Steinhoefel
  */
-public interface AbstrUpdateRHS extends AbstrUpdateLHS {
+public interface AbstrUpdateRHS extends AbstractUpdateLoc {
     /**
      * @param services
      *            The {@link Services} object.
