@@ -28,9 +28,9 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.FieldLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.FuncRHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.RigidRHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.Services;
@@ -266,9 +266,8 @@ public class AbstractUpdateFactory {
         } else if (op instanceof Function && op.arity() == 0
                 && ((Function) op).sort() == locSetLDT.targetSort()) {
             return Optional.of(new SkolemLoc((Function) op));
-        } else if (op instanceof Function && op.arity() == 0
-                && ((Function) op).sort() != locSetLDT.targetSort()) {
-            return Optional.of(new FuncRHS((Function) op));
+        } else if (t.isRigid() && t.sort() != locSetLDT.targetSort()) {
+            return Optional.of(new RigidRHS(t));
         } else if (op == locSetLDT.getSingletonPV()) {
             return Optional
                     .of(abstractUpdateLocFromTerm(t.sub(0), ec, services));

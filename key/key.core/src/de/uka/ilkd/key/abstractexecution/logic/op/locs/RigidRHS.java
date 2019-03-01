@@ -18,31 +18,30 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
- * Represents a function (i.e., a constant of some concrete, non-locset type).
- * Can appear after substituting locations on right-hand sides of abstract
- * updates with some symbols.
+ * Represents a rigid RHG of non-locset type (e.g., some constant). Can appear
+ * after substituting locations on right-hand sides of abstract updates with
+ * some symbols.
  *
  * @author Dominic Steinhoefel
  */
-public class FuncRHS extends AbstractSortedOperator implements AbstrUpdateRHS {
-    private final Function func;
+public class RigidRHS extends AbstractSortedOperator implements AbstrUpdateRHS {
+    private final Term t;
 
-    public FuncRHS(Function func) {
-        super(new Name("funcRHS"), new Sort[] { func.sort() }, func.sort(),
+    public RigidRHS(Term t) {
+        super(new Name("rigidRHS"), new Sort[] { t.sort() }, t.sort(),
                 true);
-        assert !func.name().toString().equals("LocSet");
-        this.func = func;
+        assert !t.sort().name().toString().equals("LocSet");
+        this.t = t;
     }
 
     @Override
     public Term toTerm(Services services) {
-        return services.getTermBuilder().func(func);
+        return t;
     }
 
     @Override
@@ -53,21 +52,21 @@ public class FuncRHS extends AbstractSortedOperator implements AbstrUpdateRHS {
 
     @Override
     public Operator childOp() {
-        return func;
+        return t.op();
     }
 
     @Override
     public String toString() {
-        return func.toString();
+        return t.toString();
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof FuncRHS && obj.hashCode() == hashCode();
+        return obj instanceof RigidRHS && obj.hashCode() == hashCode();
     }
 
     @Override
     public int hashCode() {
-        return 5 + 17 * func.hashCode();
+        return 5 + 17 * t.hashCode();
     }
 }
