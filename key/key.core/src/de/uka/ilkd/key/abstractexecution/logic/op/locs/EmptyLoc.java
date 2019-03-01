@@ -63,4 +63,9 @@ public class EmptyLoc extends AbstractSortedOperator
     public String toString() {
         return "empty";
     }
+
+    @Override
+    public int hashCode() {
+        return 5 + 17 * emptyLocSet.hashCode();
+    }
 }

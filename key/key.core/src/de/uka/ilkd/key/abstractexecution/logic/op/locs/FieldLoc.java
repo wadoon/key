@@ -98,4 +98,10 @@ public class FieldLoc extends AbstractSortedOperator
                 fieldReference.getIdentifier().toString());
     }
 
+    @Override
+    public int hashCode() {
+        return 5 + 7 * executionContext.hashCode()
+                + 27 * fieldReference.hashCode();
+    }
+
 }

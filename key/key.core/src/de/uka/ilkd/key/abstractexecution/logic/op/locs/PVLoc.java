@@ -68,4 +68,9 @@ public class PVLoc extends AbstractSortedOperator
     public String toString() {
         return locVar.toString();
     }
+
+    @Override
+    public int hashCode() {
+        return 5 + 17 * locVar.hashCode();
+    }
 }

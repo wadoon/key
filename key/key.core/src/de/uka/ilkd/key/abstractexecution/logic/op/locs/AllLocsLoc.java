@@ -63,4 +63,9 @@ public class AllLocsLoc extends AbstractSortedOperator
     public String toString() {
         return "allLocs";
     }
+
+    @Override
+    public int hashCode() {
+        return 5 + 17 * allLocs.hashCode();
+    }
 }

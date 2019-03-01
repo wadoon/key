@@ -65,4 +65,8 @@ public class HasToLoc extends AbstractSortedOperator implements AbstrUpdateLHS {
         return String.format("hasTo(%s)", child.toString());
     }
 
+    @Override
+    public int hashCode() {
+        return 5 + 17 * child.hashCode();
+    }
 }

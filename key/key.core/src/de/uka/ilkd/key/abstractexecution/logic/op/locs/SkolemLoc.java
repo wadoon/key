@@ -64,4 +64,9 @@ public class SkolemLoc extends AbstractSortedOperator
     public String toString() {
         return skLoc.toString();
     }
+
+    @Override
+    public int hashCode() {
+        return 5 + 17 * skLoc.hashCode();
+    }
 }
