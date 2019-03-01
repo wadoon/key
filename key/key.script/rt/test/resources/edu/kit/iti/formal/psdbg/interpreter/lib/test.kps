@@ -1,0 +1,5 @@
+script test() {
+    print_state;
+}
+
+script abc(i:int,j:int){j:=1;print_state;}

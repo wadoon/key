@@ -1,0 +1,38 @@
+ 
+script prove_transitive(){
+ symbex;  			
+ cases{
+   case match
+    'seqPerm(?Res0Copy, ?Arr), 
+    seqPerm(?Res0Sort, ?Res0Copy), 
+    seqPerm(?Res1Copy0, ?Res0Sort), 
+    seqPerm(?Res2Copy1, ?Res0Sort) ==> 
+        seqPerm(?Res2Copy1, ?Arr)' using [ ?Res0Copy: Seq, ?Arr: Seq,?Res0Sort: Seq, ?Res1Copy0: Seq, ?Res2Copy1: Seq, ?Res0Sort: Seq  ]:
+   {SeqPermSym on='seqPerm(?Res0Copy, ?Arr) ==>';     
+    SeqPermSym on='seqPerm(?Res0Sort, ?Res0Copy) ==>'; 
+    SeqPermSym on='seqPerm(?Res1Copy0, ?Res0Sort)==>'; 
+    SeqPermSym on='seqPerm(?Res2Copy1, ?Res0Sort) ==>';
+    SeqPermTrans on='seqPerm(?Res0Copy, ?Arr) ==>';    
+    SeqPermTrans on='seqPerm(?Arr, ?Res0Sort) ==>'     
+                 with='seqPerm(?Arr,?Res2Copy1)';      
+    SeqPermSym on='seqPerm(?Arr,?Res2Copy1)';
+    auto; 
+   }
+   case match
+    'seqPerm(?Res0Copy, ?Arr),
+    seqPerm(?Res0Sort, ?Res0Copy), 
+    seqPerm(?Res1Copy0, ?Res0Sort) ==> 
+             seqPerm(?Res1Copy0, ?Arr)'  using [ ?Res0Copy: Seq, ?Arr: Seq,?Res0Sort: Seq, ?Res1Copy0: Seq, ?Res0Sort: Seq ]:
+    {SeqPermSym on='seqPerm(?Res0Copy, ?Arr)'; 
+     SeqPermSym on='seqPerm(?Res0Sort, ?Res0Copy)';
+     SeqPermSym on='seqPerm(?Res1Copy0, ?Res0Sort)';
+     SeqPermTrans on='seqPerm(?Res0Copy, ?Arr)';
+     SeqPermTrans on='seqPerm(?Arr, ?Res0Sort)'
+     SeqPermSym on='==> seqPerm(?Res1Copy0, ?Arr)';
+     auto;
+     }
+     default:{ 
+        auto;
+    }
+  } 
+}

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+https://logging.apache.org/log4j/2.x/manual/configuration.html
+-->
+<Configuration status="error">
+    <Appenders>
+        <Console name="ConsoleErr" target="SYSTEM_ERR">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </Console>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout>
+                <!--                <pattern>%d %highlight{%p} %style{%C{1.} [%t] %m}{bold,green}%n</pattern>-->
+                <pattern>%r %highlight{%p} %style{[%t] %m}{bold,green} \n\t\tfrom %l%n</pattern>
+            </PatternLayout>
+        </Console>
+
+        <File name="F" fileName="debug.log" bufferSize="0" bufferedIO="false" append="false">
+            <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+        </File>
+    </Appenders>
+    <Loggers>
+        <Root level="trace">
+            <AppenderRef ref="ConsoleErr" level="error"/>
+            <AppenderRef ref="F"/>
+        </Root>
+
+        <Logger name="console">
+            <AppenderRef ref="Console" level="info"/>
+        </Logger>
+    </Loggers>
+</Configuration>

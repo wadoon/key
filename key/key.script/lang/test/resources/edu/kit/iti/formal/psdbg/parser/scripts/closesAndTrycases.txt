@@ -1,0 +1,22 @@
+script ruRg ()
+{   cases
+    {   case abc :
+        {   aM:TERM:=not ka&bi;
+            dsL f5=90;
+        }
+        try :
+        {   last;
+        }
+
+        case closes {body;}:{
+            last;
+            last;
+        }
+    }
+
+}
+
+script body()
+{
+    foo;
+}

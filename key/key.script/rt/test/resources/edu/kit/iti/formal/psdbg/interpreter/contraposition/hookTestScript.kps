@@ -1,0 +1,6 @@
+script hookTest(){
+    __STRICT_MODE:= true;
+    impRight;
+
+
+}

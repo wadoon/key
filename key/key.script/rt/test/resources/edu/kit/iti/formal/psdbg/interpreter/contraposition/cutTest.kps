@@ -1,0 +1,9 @@
+script cutTest(){
+  //cut `p <->q`;
+  cases{
+    //X:TERM :=`p`;
+    case match `==>?X -> ?Y`:
+        cut `?X`[?X \ Y];
+
+  }
+}

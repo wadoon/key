@@ -1,0 +1,19 @@
+script test(i:int, b: bool){
+j:int;
+foreach{
+      j := 0;
+}
+
+cases{
+    case j = 0:{
+        split 2;
+    }
+}
+cases{
+    case match '.*a':{
+        print_state;
+    }
+}
+
+
+}

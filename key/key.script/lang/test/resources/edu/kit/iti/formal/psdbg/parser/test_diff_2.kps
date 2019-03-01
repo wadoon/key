@@ -1,0 +1,21 @@
+script A() {
+    A;
+    B;
+    C;
+    cases {
+        case x=2:
+            a;
+
+    }
+}
+
+script A() {
+    A;
+    B;
+    C;
+    F;
+}
+
+script A() {
+    E;F;
+}

@@ -1,0 +1,17 @@
+
+script t1(){
+    symbex;
+    cases{
+	    case match `a[i] >= 0 ==> ` using[a:int[], i:int]:{
+            auto;
+	    }
+	    default{
+	        auto;
+	    }
+    }
+}
+
+script t(){
+    auto;
+}
+

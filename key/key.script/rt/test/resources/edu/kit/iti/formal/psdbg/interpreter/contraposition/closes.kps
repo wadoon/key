@@ -1,0 +1,10 @@
+script t1(){
+    impRight;
+    impLeft;
+    cases{
+        case closes {impRight; } :
+            impRight; //should not close proof
+
+    }
+
+}

@@ -1,0 +1,26 @@
+script Simple1(i:int, j:int) {
+    i := 1;
+    j := 2;
+
+    theonly {
+        i := 4;
+        j := i+i;
+    }
+
+    split 5;
+
+    foreach {
+        i := 4;
+        j := i+i;
+    }
+
+    cases {
+        case match '.*a' {
+              i:=100;
+        }
+    }
+
+    repeat {
+        foreach { i := i + 1; split;}
+    }
+}

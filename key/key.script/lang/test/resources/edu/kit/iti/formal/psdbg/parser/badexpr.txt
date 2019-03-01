@@ -1,0 +1,16 @@
+)i*j
+not (match `d5'` using [ pi:int, isLess :bool, khar:term] -> false | k < b3o ) - (-k-p*2)
+?2bA
+? f-d4
+?true
+(p->q) | k==s
+case p:=true :{x:=x+1;}case p=false :{x:=x-1;}
+case q=(r&s) :{   y:=2*x-d;}case q!=(r&s) {   y:=3*x+d;}
+case p=(q|b) :b:=p<=>q;	s:=true;case p=not(q|b) :{   b:=r<=>d;    s:=false;}
+repeat{   k:=k+1; auto;
+repeat{   theonly{   puD:int := ie4+41-iZ;}cmd1;} //linter?
+case{   cases a>gh :{   repeat{   a := a*b+1;df:= 5*fd-df;}}default :{   cf:=a>df;}}
+cases{   case dl=true:{   ft:=true;}case dl=false:{   ft:=sp&rd; }};
+call sCmd5;;
+script test(aX:int; aY:int){}
+;

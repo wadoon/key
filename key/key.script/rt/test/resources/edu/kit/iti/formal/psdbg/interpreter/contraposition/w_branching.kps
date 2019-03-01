@@ -1,0 +1,12 @@
+script cpwb () {
+    impRight;
+    impLeft;
+    cases{
+        case match `==> ?X`:{
+          auto;
+        }
+        default:{
+            auto;
+        }
+    }
+}
