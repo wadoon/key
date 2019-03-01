@@ -29,7 +29,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * @author Dominic Steinhoefel
  */
 public class AllLocsLoc extends AbstractSortedOperator
-        implements AbstrUpdateLHS, AbstrUpdateRHS {
+        implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
     private final Function allLocs;
 
     public AllLocsLoc(Function allLocs) {
@@ -39,13 +39,8 @@ public class AllLocsLoc extends AbstractSortedOperator
     }
 
     @Override
-    public Term toRHSTerm(Services services) {
+    public Term toTerm(Services services) {
         return services.getTermBuilder().func(allLocs);
-    }
-
-    @Override
-    public Term toLHSTerm(Services services) {
-        return toRHSTerm(services);
     }
 
     @Override
@@ -62,6 +57,11 @@ public class AllLocsLoc extends AbstractSortedOperator
     @Override
     public String toString() {
         return "allLocs";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof AllLocsLoc && obj.hashCode() == hashCode();
     }
 
     @Override

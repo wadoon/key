@@ -28,6 +28,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateUpdatableLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
@@ -70,7 +71,6 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
     public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
             MatchConditions mc, Services services) {
         final SVInstantiations svInst = mc.getInstantiations();
-        final ExecutionContext ec = svInst.getExecutionContext();
         final Term u = (Term) svInst.getInstantiation(uSV);
         Term target = (Term) svInst.getInstantiation(targetSV);
         final Term origResult = (Term) svInst.getInstantiation(resultSV);
@@ -113,7 +113,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
                         origAbstractUpdates.get(i);
                 final Term newUpdate = Optional
                         .ofNullable(dropEffectlessAbstractUpdateElementaries(
-                                elementaryAbstrUpd, target, ec, services))
+                                elementaryAbstrUpd, target, services))
                         .orElse(elementaryAbstrUpd);
 
                 newElementaryAbstractUpdates.set(i, newUpdate);
@@ -128,7 +128,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             }
         } else {
             newResult = dropEffectlessAbstractUpdateElementaries( //
-                    u, target, ec, services);
+                    u, target, services);
         }
 
         if (newResult == null) {
@@ -154,10 +154,11 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
     }
 
     private static Term dropEffectlessAbstractUpdateElementaries(Term update,
-            Term target, ExecutionContext ec, Services services) {
+            Term target, Services services) {
         final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
+        final ExecutionContext ec = abstrUpd.getExecutionContext();
 
-        final Set<AbstrUpdateRHS> assignables = new LinkedHashSet<>();
+        final Set<AbstrUpdateUpdatableLoc> assignables = new LinkedHashSet<>();
         assignables.addAll(abstrUpd.getHasToAssignables());
         assignables.addAll(abstrUpd.getMaybeAssignables());
 
@@ -186,8 +187,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             return null;
         }
 
-        // TODO from here
-        final Pair<Set<AbstrUpdateRHS>, Set<AbstrUpdateRHS>> opsAnalysisResult = //
+        final Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>> opsAnalysisResult = //
                 AbstractExecutionUtils
                         .opsAssignedBeforeUsed(target, ec, services)
                         .orElse(null);
@@ -196,7 +196,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             return null;
         }
 
-        final Set<AbstrUpdateRHS> opsHaveToAssignBeforeUsed = opsAnalysisResult.first;
+        final Set<AbstrUpdateUpdatableLoc> opsHaveToAssignBeforeUsed = opsAnalysisResult.first;
 
         /*
          * We can also remove all assignables that are not occurring at all in
@@ -211,7 +211,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
 
         final Set<AbstrUpdateLHS> newAssignables = assignables.stream()
                 .filter(op -> !opsHaveToAssignBeforeUsed.contains(op))
-                .filter(loc -> !visitor.getResult().contains(loc))
+                .filter(loc -> visitor.getResult().contains(loc))
                 .map(loc -> abstrUpd.hasToAssign(loc) ? new HasToLoc(loc) : loc)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
@@ -224,7 +224,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
                         .collect(Collectors
                                 .toCollection(() -> new LinkedHashSet<>()));
 
-        if (assignables.stream()
+        if (abstrUpd.getAllAssignables().stream()
                 .noneMatch(op -> !newAssignables.contains(op))) {
             // No change.
             return null;

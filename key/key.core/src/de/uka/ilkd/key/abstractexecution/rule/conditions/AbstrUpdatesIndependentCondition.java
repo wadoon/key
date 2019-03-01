@@ -16,7 +16,7 @@ package de.uka.ilkd.key.abstractexecution.rule.conditions;
 import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateUpdatableLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -71,10 +71,11 @@ public final class AbstrUpdatesIndependentCondition
         final AbstractUpdate abstrUpd1 = (AbstractUpdate) u1Inst.op();
         final AbstractUpdate abstrUpd2 = (AbstractUpdate) u2Inst.op();
 
-        final Set<AbstrUpdateRHS> abstrUpd1Accessibles = abstrUpd1
-                .transformRHS(u1Inst.sub(0));
-        final Set<AbstrUpdateRHS> abstrUpd2Accessibles = abstrUpd2
-                .transformRHS(u2Inst.sub(0));
+        final Set<AbstrUpdateUpdatableLoc> abstrUpd1Accessibles = abstrUpd1
+                .getUpdatableRHSs(u1Inst.sub(0));
+        final Set<AbstrUpdateUpdatableLoc> abstrUpd2Accessibles = abstrUpd2
+                .getUpdatableRHSs(u2Inst.sub(0));
+        ;
 
         /* U1(x, ... := ...) / U2(... := x, ...) */
         if (abstrUpd1.mayAssignAny(abstrUpd2Accessibles)
@@ -107,7 +108,7 @@ public final class AbstrUpdatesIndependentCondition
         return mc;
     }
 
-    private boolean containsAllLocs(Set<AbstrUpdateRHS> accessibles) {
+    private boolean containsAllLocs(Set<AbstrUpdateUpdatableLoc> accessibles) {
         return accessibles.stream().anyMatch(AllLocsLoc.class::isInstance);
     }
 

@@ -16,17 +16,11 @@ import java.util.Map;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -37,7 +31,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * @author Dominic Steinhoefel
  */
 public class FieldLoc extends AbstractSortedOperator
-        implements AbstrUpdateLHS, AbstrUpdateRHS {
+        implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
     private final FieldReference fieldReference;
     private final ExecutionContext executionContext;
 
@@ -52,25 +46,9 @@ public class FieldLoc extends AbstractSortedOperator
     }
 
     @Override
-    public Term toRHSTerm(Services services) {
+    public Term toTerm(Services services) {
         return services.getTypeConverter()
                 .convertVariableReference(fieldReference, executionContext);
-    }
-
-    @Override
-    public Term toLHSTerm(Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-        final TypeConverter typeConverter = services.getTypeConverter();
-        final HeapLDT heapLDT = typeConverter.getHeapLDT();
-
-        final ReferencePrefix prefix = fieldReference.getReferencePrefix();
-        final LocationVariable var = (LocationVariable) fieldReference
-                .getProgramVariable();
-
-        final Function fieldSymbol = heapLDT.getFieldSymbolForPV(var, services);
-        return tb.singleton(
-                typeConverter.convertReferencePrefix(prefix, executionContext),
-                tb.func(fieldSymbol));
     }
 
     @Override
@@ -96,6 +74,11 @@ public class FieldLoc extends AbstractSortedOperator
         return String.format("(%s, %s)",
                 fieldReference.getReferencePrefix().toString(),
                 fieldReference.getIdentifier().toString());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof FieldLoc && obj.hashCode() == hashCode();
     }
 
     @Override

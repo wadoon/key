@@ -92,12 +92,12 @@ public class InitializeParametricSkolemPathCondition
             functions.add(funcSymb);
         }
 
-        final Set<AbstrUpdateRHS> accessibleClause = AbstractExecutionUtils
+        final Set<AbstrUpdateRHS> accessibles = AbstractExecutionUtils
                 .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt,
                         matchCond, services).first;
 
         final Term pathCond = tb.func(funcSymb, AbstractUpdateFactory.INSTANCE
-                .accessiblesToSetUnion(accessibleClause, services));
+                .accessiblesToSetUnion(accessibles, services));
 
         return matchCond
                 .setInstantiations(svInst.add(pathCondSV, pathCond, services));

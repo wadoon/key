@@ -29,5 +29,5 @@ public interface AbstrUpdateRHS extends AbstrUpdateLHS {
      *         side of an abstract update (but not yet wrapped in a setSingleton
      *         or the like).
      */
-    Term toRHSTerm(Services services);
+    Term toTerm(Services services);
 }

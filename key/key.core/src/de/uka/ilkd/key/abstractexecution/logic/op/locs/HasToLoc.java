@@ -14,9 +14,7 @@ package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -45,11 +43,6 @@ public class HasToLoc extends AbstractSortedOperator implements AbstrUpdateLHS {
     }
 
     @Override
-    public Term toLHSTerm(Services services) {
-        return services.getTermBuilder().hasTo(child.toLHSTerm(services));
-    }
-
-    @Override
     public AbstractUpdateLoc replaceVariables(
             Map<ProgramVariable, ProgramVariable> replMap) {
         return new HasToLoc((AbstrUpdateLHS) child.replaceVariables(replMap));
@@ -63,6 +56,11 @@ public class HasToLoc extends AbstractSortedOperator implements AbstrUpdateLHS {
     @Override
     public String toString() {
         return String.format("hasTo(%s)", child.toString());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof HasToLoc && obj.hashCode() == hashCode();
     }
 
     @Override

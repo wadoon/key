@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateUpdatableLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
@@ -32,7 +33,6 @@ import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -164,18 +164,6 @@ public final class AbstractUpdate extends AbstractSortedOperator {
     }
 
     /**
-     * @return The left-hand side (assignables) as a {@link Term} (Set LDT).
-     *         Prefer to work with the safer data structures in
-     *         {@link #getAllAssignables()} etc. whenever possible.
-     */
-    public Term getLHSTerm() {
-        final TermBuilder tb = services.getTermBuilder();
-        return tb.setUnion(assignables.stream()
-                .map(lhs -> lhs.toLHSTerm(services)).map(tb::setSingleton)
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>())));
-    }
-
-    /**
      * Assignables, both "has-to" and "maybe". Unmodifiable. Use
      * {@link #getMaybeAssignables()} or {@link #getHasToAssignables()} to get
      * easier access to the two different sorts of assignables.
@@ -192,9 +180,9 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @return The elements of the assignables union of this abstract update
      *         that may be assigned.
      */
-    public Set<AbstrUpdateRHS> getMaybeAssignables() {
+    public Set<AbstrUpdateUpdatableLoc> getMaybeAssignables() {
         return assignables.stream().filter(lhs -> !(lhs instanceof HasToLoc))
-                .map(AbstrUpdateRHS.class::cast)
+                .map(AbstrUpdateUpdatableLoc.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 
@@ -205,10 +193,10 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @return The elements of the assignables union of this abstract update
      *         that have to be assigned.
      */
-    public Set<AbstrUpdateRHS> getHasToAssignables() {
+    public Set<AbstrUpdateUpdatableLoc> getHasToAssignables() {
         return assignables.stream().filter(HasToLoc.class::isInstance)
                 .map(HasToLoc.class::cast).map(HasToLoc::child)
-                .map(AbstrUpdateRHS.class::cast)
+                .map(AbstrUpdateUpdatableLoc.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 
@@ -226,7 +214,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @return true iff this {@link AbstractUpdate} may assign any of the given
      *         locations (includes "have-to"s).
      */
-    public boolean mayAssignAny(Collection<AbstrUpdateRHS> loc) {
+    public boolean mayAssignAny(Collection<AbstrUpdateUpdatableLoc> loc) {
         return loc.stream().anyMatch(this::mayAssign);
     }
 
@@ -236,7 +224,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @return true iff this {@link AbstractUpdate} may assign the given
      *         location (includes "have-to"s).
      */
-    public boolean mayAssign(AbstrUpdateRHS loc) {
+    public boolean mayAssign(AbstrUpdateUpdatableLoc loc) {
         return getMaybeAssignables().stream().anyMatch(loc::equals)
                 || getHasToAssignables().stream().anyMatch(loc::equals);
     }
@@ -247,7 +235,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @return true iff this {@link AbstractUpdate} has to assign any of the
      *         given locations (includes "have-to"s).
      */
-    public boolean hasToAssignAny(Collection<AbstrUpdateRHS> loc) {
+    public boolean hasToAssignAny(Collection<AbstrUpdateUpdatableLoc> loc) {
         return loc.stream().anyMatch(this::hasToAssign);
     }
 
@@ -258,7 +246,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @param loc
      * @return
      */
-    public boolean hasToAssign(AbstrUpdateRHS loc) {
+    public boolean hasToAssign(AbstrUpdateUpdatableLoc loc) {
         return getHasToAssignables().stream().anyMatch(loc::equals);
     }
 
@@ -272,8 +260,16 @@ public final class AbstractUpdate extends AbstractSortedOperator {
     }
 
     /**
-     * Extracts a set of {@link AbstrUpdateRHS}s from a set union which is the
-     * right-hand side of an {@link AbstractUpdate} {@link Term}.
+     * @return The {@link ExecutionContext} in which this {@link AbstractUpdate}
+     *         has been generated.
+     */
+    public ExecutionContext getExecutionContext() {
+        return ec;
+    }
+
+    /**
+     * Extracts a set of {@link AbstrUpdateUpdatableLoc}s from a set union which
+     * is the right-hand side of an {@link AbstractUpdate} {@link Term}.
      *
      * NOTE / TODO (DS, 2019-03-01): This is problematic if this abstract update
      * is created in a different {@link ExecutionContext} than the one the
@@ -284,7 +280,32 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      *
      * @param t
      *            The right-hand side to transform.
-     * @return The {@link Set} of {@link AbstrUpdateRHS}s represented by t.
+     * @return The {@link Set} of {@link AbstrUpdateUpdatableLoc}s represented
+     *         by t.
+     */
+    public Set<AbstrUpdateUpdatableLoc> getUpdatableRHSs(Term t) {
+        return AbstractUpdateFactory.INSTANCE
+                .abstractUpdateLocsFromUnionTerm(t, ec, services).stream()
+                .filter(AbstrUpdateUpdatableLoc.class::isInstance)
+                .map(AbstrUpdateUpdatableLoc.class::cast)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+    }
+
+    /**
+     * Extracts a set of {@link AbstrUpdateUpdatableLoc}s from a set union which
+     * is the right-hand side of an {@link AbstractUpdate} {@link Term}.
+     *
+     * NOTE / TODO (DS, 2019-03-01): This is problematic if this abstract update
+     * is created in a different {@link ExecutionContext} than the one the
+     * supplied right-hand side belongs to. Should really only be used if no
+     * {@link ExecutionContext} can be obtained. Maybe we also find a different
+     * way to extract {@link FieldReference}s than using the
+     * {@link ExecutionContext}s?
+     *
+     * @param t
+     *            The right-hand side to transform.
+     * @return The {@link Set} of {@link AbstrUpdateUpdatableLoc}s represented
+     *         by t.
      */
     public Set<AbstrUpdateRHS> transformRHS(Term t) {
         return AbstractUpdateFactory.INSTANCE

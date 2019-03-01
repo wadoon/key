@@ -28,6 +28,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.FieldLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.FuncRHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
@@ -143,12 +144,12 @@ public class AbstractUpdateFactory {
         final AbstractPlaceholderStatement phs = abstrUpd
                 .getAbstractPlaceholderStatement();
         if (abstractUpdateInstances.get(phs) == null) {
-//            abstractUpdateInstances.put(phs, new WeakHashMap<>());
+            // abstractUpdateInstances.put(phs, new WeakHashMap<>());
             abstractUpdateInstances.put(phs, new LinkedHashMap<>());
         }
 
         final int assgnHashCode = assignables.hashCode();
-//        WeakReference<AbstractUpdate> result = //
+        // WeakReference<AbstractUpdate> result = //
         AbstractUpdate result = //
                 abstractUpdateInstances.get(phs).get(assgnHashCode);
         if (result == null) {
@@ -265,6 +266,9 @@ public class AbstractUpdateFactory {
         } else if (op instanceof Function && op.arity() == 0
                 && ((Function) op).sort() == locSetLDT.targetSort()) {
             return Optional.of(new SkolemLoc((Function) op));
+        } else if (op instanceof Function && op.arity() == 0
+                && ((Function) op).sort() != locSetLDT.targetSort()) {
+            return Optional.of(new FuncRHS((Function) op));
         } else if (op == locSetLDT.getSingletonPV()) {
             return Optional
                     .of(abstractUpdateLocFromTerm(t.sub(0), ec, services));
@@ -373,8 +377,7 @@ public class AbstractUpdateFactory {
     public Term accessiblesToSetUnion(Set<AbstrUpdateRHS> accessibles,
             Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        return tb.setUnion(
-                accessibles.stream().map(loc -> loc.toRHSTerm(services))
-                        .map(tb::setSingleton).collect(Collectors.toList()));
+        return tb.setUnion(accessibles.stream().map(loc -> loc.toTerm(services))
+                .map(tb::setSingleton).collect(Collectors.toList()));
     }
 }

@@ -13,9 +13,11 @@
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
 /**
- * A left-hand side of an abstract update.
+ * A right-hand side of an abstract update which can also appear on a left-hand
+ * side.
  *
  * @author Dominic Steinhoefel
  */
-public interface AbstrUpdateLHS extends AbstractUpdateLoc {
+public interface AbstrUpdateUpdatableLoc
+        extends AbstrUpdateLHS, AbstrUpdateRHS {
 }

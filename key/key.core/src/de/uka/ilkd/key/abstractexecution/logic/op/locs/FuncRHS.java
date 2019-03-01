@@ -14,63 +14,60 @@ package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
 import java.util.Map;
 
-import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
-import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
- * A program variable location for use in an {@link AbstractUpdate}.
+ * Represents a function (i.e., a constant of some concrete, non-locset type).
+ * Can appear after substituting locations on right-hand sides of abstract
+ * updates with some symbols.
  *
  * @author Dominic Steinhoefel
  */
-public class PVLoc extends AbstractSortedOperator
-        implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
-    private final LocationVariable locVar;
+public class FuncRHS extends AbstractSortedOperator implements AbstrUpdateRHS {
+    private final Function func;
 
-    public PVLoc(LocationVariable locVar) {
-        super(new Name("pvLoc"), new Sort[] { locVar.sort() }, locVar.sort(),
-                false);
-        this.locVar = locVar;
+    public FuncRHS(Function func) {
+        super(new Name("funcRHS"), new Sort[] { func.sort() }, func.sort(),
+                true);
+        assert !func.name().toString().equals("LocSet");
+        this.func = func;
     }
 
     @Override
     public Term toTerm(Services services) {
-        return services.getTermBuilder().var(locVar);
+        return services.getTermBuilder().func(func);
     }
 
     @Override
     public AbstractUpdateLoc replaceVariables(
             Map<ProgramVariable, ProgramVariable> replMap) {
-        if (replMap.containsKey(locVar)) {
-            return new PVLoc((LocationVariable) replMap.get(locVar));
-        } else {
-            return this;
-        }
+        return this;
     }
 
     @Override
     public Operator childOp() {
-        return locVar;
+        return func;
     }
 
     @Override
     public String toString() {
-        return locVar.toString();
+        return func.toString();
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof PVLoc && obj.hashCode() == hashCode();
+        return obj instanceof FuncRHS && obj.hashCode() == hashCode();
     }
 
     @Override
     public int hashCode() {
-        return 5 + 17 * locVar.hashCode();
+        return 5 + 17 * func.hashCode();
     }
 }

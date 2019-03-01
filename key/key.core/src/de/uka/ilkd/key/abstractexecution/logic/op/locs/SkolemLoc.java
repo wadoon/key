@@ -30,7 +30,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * @author Dominic Steinhoefel
  */
 public class SkolemLoc extends AbstractSortedOperator
-        implements AbstrUpdateLHS, AbstrUpdateRHS {
+        implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
     private final Function skLoc;
 
     public SkolemLoc(Function skLoc) {
@@ -40,13 +40,8 @@ public class SkolemLoc extends AbstractSortedOperator
     }
 
     @Override
-    public Term toRHSTerm(Services services) {
+    public Term toTerm(Services services) {
         return services.getTermBuilder().func(skLoc);
-    }
-
-    @Override
-    public Term toLHSTerm(Services services) {
-        return toRHSTerm(services);
     }
 
     @Override
@@ -63,6 +58,11 @@ public class SkolemLoc extends AbstractSortedOperator
     @Override
     public String toString() {
         return skLoc.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof SkolemLoc && obj.hashCode() == hashCode();
     }
 
     @Override
