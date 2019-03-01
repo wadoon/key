@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -30,6 +29,7 @@ import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -209,7 +209,7 @@ public class AbstractPlaceholderSpecsTypeChecker {
 
     private void addDeclaredDefaults(
             final List<Pair<? extends Operator, Boolean>> declaredOps) {
-        final List<de.uka.ilkd.key.logic.op.Operator> declaredDefaults = new ArrayList<>();
+        final List<Operator> declaredDefaults = new ArrayList<>();
         declaredDefaults.add(heap());
         declaredDefaults.add(typeConverter.getLocSetLDT().getAllLocs());
         declaredDefaults.add(typeConverter.getLocSetLDT().getEmpty());
@@ -376,11 +376,13 @@ public class AbstractPlaceholderSpecsTypeChecker {
      *
      * @return A mapper to apply on the element {@link Term}s of a loc set
      *         union.
-     * @see AbstractPlaceholderSpecsTypeChecker#locSetElemTermsToOp(Term, Services)
+     * @see AbstractPlaceholderSpecsTypeChecker#locSetElemTermsToOp(Term,
+     *      Services)
      */
     private static java.util.function.Function<? super Term, ? extends Operator> locSetElemTermsToOpMapper(
             Services services) {
-        return elemTerm -> AbstractPlaceholderSpecsTypeChecker.locSetElemTermsToOp(elemTerm, services);
+        return elemTerm -> AbstractPlaceholderSpecsTypeChecker
+                .locSetElemTermsToOp(elemTerm, services);
     }
 
     /**
@@ -401,7 +403,7 @@ public class AbstractPlaceholderSpecsTypeChecker {
      *         field function symbols, and Skolem location set functions).
      */
     private static Set<Operator> collectElementsOfLocSetTerm(Term t,
-            de.uka.ilkd.key.logic.op.Function union, Services services) {
+            Function union, Services services) {
         return MiscTools.disasembleSetTerm(t, union).stream()
                 .map(locSetElemTermsToOpMapper(services))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
@@ -410,13 +412,13 @@ public class AbstractPlaceholderSpecsTypeChecker {
     private static class JavaASTFindPathWalker<C> {
         private final ProgramElement searched;
         private final Predicate<ProgramElement> filter;
-        private final Function<ProgramElement, ? extends Collection<C>> mapper;
+        private final java.util.function.Function<ProgramElement, ? extends Collection<C>> mapper;
 
         private boolean elemFound = false;
 
         public JavaASTFindPathWalker(ProgramElement searched,
                 Predicate<ProgramElement> filter,
-                Function<ProgramElement, ? extends Collection<C>> mapper) {
+                java.util.function.Function<ProgramElement, ? extends Collection<C>> mapper) {
             this.searched = searched;
             this.filter = filter;
             this.mapper = mapper;
