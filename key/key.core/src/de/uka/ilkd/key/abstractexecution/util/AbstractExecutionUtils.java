@@ -20,7 +20,6 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
@@ -44,7 +43,6 @@ import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
@@ -401,27 +399,6 @@ public class AbstractExecutionUtils {
     }
 
     /**
-     * Converts a union {@link Term} of {@link LocSetLDT} to a corresponding
-     * union {@link Term} of {@link SetLDT};
-     *
-     * @param t
-     *            The union {@link Term} to convert.
-     * @param services
-     *            The {@link Services} project.
-     * @return The converted {@link Term}.
-     */
-    public static Term locSetUnionToSetUnion(Term t, Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        return collectElementsOfLocSetTerm(t, locSetLDT.getUnion(), services)
-                .stream()
-                .map(op -> op instanceof Function ? tb.func((Function) op)
-                        : tb.var((ProgramVariable) op))
-                .map(tb::setSingleton)
-                .reduce(tb.setEmpty(), (t1, t2) -> tb.setUnion(t1, t2));
-    }
-
-    /**
      * Returns the contracts for the given {@link AbstractPlaceholderStatement}.
      * This refers to the "standard" contracts, i.e. without any specific
      * behavior (like "exceptional_behavior" etc.).
@@ -770,30 +747,6 @@ public class AbstractExecutionUtils {
         return getAccessiblesForAbstractUpdate(update,
                 services.getTermBuilder()).stream()
                         .anyMatch(t -> t.op() == allLocs);
-    }
-
-    /**
-     * Returns the target operators in a set-like union term. Expects a union
-     * term consisting of (1) Skolem loc set functions (result will contain that
-     * function), (2) singletonPV(...) applications on location variables
-     * (result will contain the variable), and (3) singleton(...) applications
-     * on an object and a function symbol representing a field (result will
-     * contain the function symbol).
-     *
-     * @param t
-     *            The loc set union term to dissect.
-     * @param t
-     *            The union function symbol, for instance of the LocSet theory.
-     * @param services
-     *            The {@link Services} object (for {@link TypeConverter}.
-     * @return The {@link Operator}s in the {@link Term} (location variables,
-     *         field function symbols, and Skolem location set functions).
-     */
-    public static Set<Operator> collectElementsOfLocSetTerm(Term t,
-            Function union, Services services) {
-        return MiscTools.disasembleSetTerm(t, union).stream()
-                .map(locSetElemTermsToOpMapper(services))
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 
     /**

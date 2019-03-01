@@ -3,6 +3,7 @@ package de.uka.ilkd.key.abstractexecution.speclang.jml.translation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -34,6 +35,7 @@ import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory.ContractClauses;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 
 /**
@@ -110,20 +112,18 @@ public class AbstractPlaceholderSpecsTypeChecker {
         if (method.isStatic()) {
             /* For static methods, the heap may not be assigned or accessed! */
 
-            if (AbstractExecutionUtils
-                    .collectElementsOfLocSetTerm(assignablesTerm(),
-                            typeConverter.getLocSetLDT().getUnion(), services)
-                    .contains(heap())) {
+            if (collectElementsOfLocSetTerm(assignablesTerm(),
+                    typeConverter.getLocSetLDT().getUnion(), services)
+                            .contains(heap())) {
                 throw new SLTranslationException(String.format(
                         "Abstract program %s is specified to assign the heap, "
                                 + "but containing method %s is declared static.",
                         aps.getId(), method.name()));
             }
 
-            if (AbstractExecutionUtils
-                    .collectElementsOfLocSetTerm(accessiblesTerm(),
-                            typeConverter.getLocSetLDT().getUnion(), services)
-                    .contains(heap())) {
+            if (collectElementsOfLocSetTerm(accessiblesTerm(),
+                    typeConverter.getLocSetLDT().getUnion(), services)
+                            .contains(heap())) {
                 throw new SLTranslationException(String.format(
                         "Abstract program %s is specified to access the heap, "
                                 + "but containing method %s is declared static.",
@@ -144,9 +144,9 @@ public class AbstractPlaceholderSpecsTypeChecker {
 
     private List<Operator> getUndeclaredAccessedOps(
             List<Pair<? extends Operator, Boolean>> declaredOps) {
-        final Set<Operator> collectedOps = AbstractExecutionUtils
-                .collectElementsOfLocSetTerm(accessiblesTerm(),
-                        typeConverter.getLocSetLDT().getUnion(), services);
+        final Set<Operator> collectedOps = collectElementsOfLocSetTerm(
+                accessiblesTerm(), typeConverter.getLocSetLDT().getUnion(),
+                services);
         return collectedOps.stream().filter(op -> op.arity() == 0).filter(
                 op -> !declaredOps.stream().anyMatch(p -> p.first.equals(op)))
                 .collect(Collectors.toList());
@@ -154,9 +154,9 @@ public class AbstractPlaceholderSpecsTypeChecker {
 
     private List<Operator> getAssignedFinalOps(
             List<Pair<? extends Operator, Boolean>> declaredOps) {
-        final Set<Operator> collectedOps = AbstractExecutionUtils
-                .collectElementsOfLocSetTerm(assignablesTerm(),
-                        typeConverter.getLocSetLDT().getUnion(), services);
+        final Set<Operator> collectedOps = collectElementsOfLocSetTerm(
+                assignablesTerm(), typeConverter.getLocSetLDT().getUnion(),
+                services);
         return collectedOps.stream().filter(op -> op.arity() == 0)
                 .filter(op -> declaredOps.stream()
                         .anyMatch(p -> p.first.equals(op) && p.second))
@@ -325,6 +325,30 @@ public class AbstractPlaceholderSpecsTypeChecker {
                 .map(VariableSpecification::getProgramVariable)
                 .map(pv -> new Pair<>(pv, decl.isFinal()))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Returns the target operators in a set-like union term. Expects a union
+     * term consisting of (1) Skolem loc set functions (result will contain that
+     * function), (2) singletonPV(...) applications on location variables
+     * (result will contain the variable), and (3) singleton(...) applications
+     * on an object and a function symbol representing a field (result will
+     * contain the function symbol).
+     *
+     * @param t
+     *            The loc set union term to dissect.
+     * @param t
+     *            The union function symbol, for instance of the LocSet theory.
+     * @param services
+     *            The {@link Services} object (for {@link TypeConverter}.
+     * @return The {@link Operator}s in the {@link Term} (location variables,
+     *         field function symbols, and Skolem location set functions).
+     */
+    private static Set<Operator> collectElementsOfLocSetTerm(Term t,
+            de.uka.ilkd.key.logic.op.Function union, Services services) {
+        return MiscTools.disasembleSetTerm(t, union).stream()
+                .map(AbstractExecutionUtils.locSetElemTermsToOpMapper(services))
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 
     private static class JavaASTFindPathWalker<C> {

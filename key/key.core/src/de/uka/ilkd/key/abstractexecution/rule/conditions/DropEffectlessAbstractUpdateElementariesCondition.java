@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableSLList;
 
+import de.uka.ilkd.key.abstractexecution.logic.AbstractUpdateLocationsVisitor;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
@@ -30,7 +31,6 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
-import de.uka.ilkd.key.abstractexecution.util.AbstractUpdateLocationsVisitor;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
