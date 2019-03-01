@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:noNamespaceSchemaLocation=
+                    "http://ant.apache.org/ivy/schemas/ivy.xsd">
+    <info organisation="key-project" module="key.ui.script">
+        <extends organisation="key-project" module="key.script" revision="1.0"
+                 location="../key.script/ivy.xml"/>
+    </info>
+
+    
+    <configurations>
+        <conf name="sources"  description="Source jars"/>
+        <conf name="runtime" description="binary jars"/>
+        <conf name="compile" description="compile time"/>
+        <conf name="test" description="test time"/>
+        <conf name="antlr4" description=""/>
+    </configurations>
+    <dependencies>
+        <dependency org="com.fifesoft" name="rsyntaxtextarea" rev="3.0.2" conf="runtime->default"/>
+        <dependency org="com.fifesoft" name="rsyntaxtextarea" rev="3.0.2" conf="sources->sources"/>
+
+        <dependency org="org.projectlombok" name="lombok" rev="1.18.6" conf="sources->sources"/>
+        <dependency org="org.projectlombok" name="lombok" rev="1.18.6" conf="compile->default"/>
+    </dependencies>
+</ivy-module>

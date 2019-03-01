@@ -27,5 +27,6 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="commonmark-ext-gfm-tables-0.12.1" level="project" />
+    <orderEntry type="module" module-name="key.ui.script" scope="RUNTIME" />
   </component>
 </module>

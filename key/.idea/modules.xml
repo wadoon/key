@@ -16,6 +16,7 @@
       <module fileurl="file://$PROJECT_DIR$/key.removegenerics.test/key.removegenerics.test.iml" filepath="$PROJECT_DIR$/key.removegenerics.test/key.removegenerics.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/key.script/key.script.iml" filepath="$PROJECT_DIR$/key.script/key.script.iml" />
       <module fileurl="file://$PROJECT_DIR$/key.ui/key.ui.iml" filepath="$PROJECT_DIR$/key.ui/key.ui.iml" />
+      <module fileurl="file://$PROJECT_DIR$/key.ui.script/key.ui.script.iml" filepath="$PROJECT_DIR$/key.ui.script/key.ui.script.iml" />
       <module fileurl="file://$PROJECT_DIR$/key.util/key.util.iml" filepath="$PROJECT_DIR$/key.util/key.util.iml" />
       <module fileurl="file://$PROJECT_DIR$/key.util.test/key.util.test.iml" filepath="$PROJECT_DIR$/key.util.test/key.util.test.iml" />
     </modules>

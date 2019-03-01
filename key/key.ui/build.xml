@@ -12,6 +12,15 @@
         <pathelement location="${basedir}/../key.core/lib/recoderKey.jar"/>
         <pathelement location="${basedir}/libs/commonmark-0.12.1.jar"/>
         <pathelement location="${basedir}/libs/commonmark-ext-gfm-tables-0.12.1.jar"/>
+
+        <pathelement location="${basedir}/../key.script/build/classes"/>
+        <pathelement location="${basedir}/../key.ui.script/build/classes"/>
+        <pathelement location="${basedir}/../libs/runtime/rsyntaxtextarea-3.0.2.jar"/>
+        <pathelement location="${basedir}/../libs/runtime/antlr4-runtime-4.7.2.jar"/>
+        <pathelement location="${basedir}/../libs/runtime/commons-io-2.6.jar"/>
+        <pathelement location="${basedir}/../libs/runtime/commons-lang3-3.8.1.jar"/>
+        <pathelement location="${basedir}/../libs/runtime/commons-cli-1.4.jar"/>
+        <pathelement location="${basedir}/../libs/runtime/guava-27.0.1-jre.jar"/>
     </path>
 
     <path id="key.ui.run.class.path">

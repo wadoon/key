@@ -154,7 +154,9 @@ public class KeyMatcherFacadeTest {
 
     private Matchings shouldMatch(String keysequent, String pattern) throws ParserException {
         Sequent seq = parseKeySeq(keysequent);
-        KeyMatcherFacade.KeyMatcherFacadeBuilder builder = KeyMatcherFacade.builder().environment(keyenv);
+        KeyMatcherFacade.KeyMatcherFacadeBuilder builder =
+                KeyMatcherFacade.builder().services(keyenv.getServices());
+
         KeyMatcherFacade kfm = builder.sequent(seq).build();
         return kfm.matches(pattern);
 

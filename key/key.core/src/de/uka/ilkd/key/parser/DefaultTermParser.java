@@ -84,6 +84,7 @@ public final class DefaultTermParser {
             throws ParserException {
         return parse(in, sort, services, nss, scm, false);
     }
+
     public Term parse(Reader in, Sort sort, Services services,
                       NamespaceSet nss, AbbrevMap scm, boolean matchingEnabled)
             throws ParserException {

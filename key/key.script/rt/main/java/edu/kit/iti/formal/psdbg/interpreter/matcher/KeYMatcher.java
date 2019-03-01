@@ -182,7 +182,8 @@ public class KeYMatcher implements MatcherApi<KeyData> {
 
     @Override
     public List<VariableAssignment> matchSeq(GoalNode<KeyData> currentState, String pattern) {
-        KeyMatcherFacade kmf = new KeyMatcherFacade(currentState.getData().getEnv(), currentState.getData().getNode().sequent());
+        KeyMatcherFacade kmf = new KeyMatcherFacade(currentState.getData().getProof().getServices(),
+                currentState.getData().getNode().sequent());
         //System.out.println("State that will be matched " + currentState.getData().getNode().sequent() + " with pattern " + pattern);
         //System.out.println("Signature " + sig.toString());
         Matchings m = kmf.matches(pattern);
@@ -225,7 +226,7 @@ public class KeYMatcher implements MatcherApi<KeyData> {
                 //LOGGER.info("Variables to match " + s + " : " + value);
                 //}
             }
-            List<VariableAssignment> retList = new LinkedList();
+            List<VariableAssignment> retList = new LinkedList<>();
             LOGGER.info("Matched Variables " + va.toString());
             retList.add(va);
             return retList;

@@ -114,8 +114,8 @@ public class InterpreterBuilder {
         return this;
     }
 
-    public InterpreterBuilder addKeyMatcher(ProofApi api) {
-        interpreter.setMatcherApi(new KeYMatcher(api.getEnv().getServices()));
+    public InterpreterBuilder addKeyMatcher(Proof api) {
+        interpreter.setMatcherApi(new KeYMatcher(api.getServices()));
         return this;
     }
 
@@ -150,7 +150,8 @@ public class InterpreterBuilder {
     }
 
     public InterpreterBuilder proof(ProofApi pa) {
-        addKeyMatcher(pa);
+        setProblemPath(pa.getProof().getProofFile());
+        addKeyMatcher(pa.getProof());
         pa.getRules().forEach(s -> pmr.getRules().put(s, null));
         keyEnvironment = pa.getEnv();
         proof = pa.getProof();
@@ -200,7 +201,7 @@ public class InterpreterBuilder {
     }
 
     public InterpreterBuilder startState() {
-        if (proof == null || keyEnvironment == null)
+        if (proof == null || false && keyEnvironment == null) //TODO
             throw new IllegalStateException("Call proof(..) before startState");
 
 

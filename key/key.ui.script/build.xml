@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="key.script" default="deploy" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+<project name="key.ui.script" default="deploy" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
     <property name="dist.dir" value="${basedir}/../deployment"/>
     <property name="lib.dir" value="libs"/>
     <property name="gen.src" value="build/generated"/>
@@ -9,6 +9,8 @@
     <path id="runtimeKey.path">
         <pathelement path="../key.util/bin"/>
         <pathelement path="../key.core/bin"/>
+        <pathelement path="../key.ui/bin"/>
+        <pathelement path="../key.script/build/classes"/>
         <pathelement path="../key.core/lib/antlr.jar"/>
         <pathelement path="../key.core/lib/recoderKey.jar"/>
         <pathelement path="../key.core/lib/javacc.jar"/>
@@ -43,7 +45,6 @@
     </target>
 
     <target name="resolve" depends="init-ivy">
-        <mkdir dir="${lib.dir}"/>
         <ivy:retrieve conf="sources,compile,antlr4,runtime,test"
                       pattern="../libs/[conf]/[artifact]-[revision](-[classifier]).[ext]"/>
         <ivy:report todir='build/ivy-reports' graph='false' xml='false'/>
@@ -65,7 +66,7 @@
         <delete dir="libs"/>
     </target>
 
-    <target name="antlr" depends="-classpath">
+    <!--<target name="antlr" depends="-classpath">
         <mkdir dir="${gen.src}"/>
         <java fork="true" classname="org.antlr.v4.Tool" classpathref="antlr4.path">
             <arg value="-listener"/>
@@ -77,9 +78,9 @@
             <arg value="${gen.src}/edu/kit/iti/formal/psdbg/parser"/>
             <arg value="lang/main/antlr/ScriptLanguage.g4"/>
         </java>
-    </target>
+    </target>-->
 
-    <target name="compile" depends="prepare,antlr">
+    <target name="compile" depends="prepare,-classpath">
         <mkdir dir="${compile.dir}"/>
         <pathconvert property="classpathProp" refid="compile.path"/>
         <echo>Classpath is ${classpathProp}</echo>
@@ -87,7 +88,7 @@
         <javac destdir="${compile.dir}"
                nowarn="on"
                source="1.8"
-               srcdir="${gen.src}:lang/main/java:rt/main/java"
+               srcdir="main/java"
                optimize="on" debug="on">
             <classpath refid="compile.path"/>
             <classpath refid="runtime.path"/>
@@ -97,8 +98,7 @@
 
     <target name="prepare">
         <copy todir="${compile.dir}">
-            <fileset dir="lang/main/resources"/>
-            <fileset dir="rt/main/resources"/>
+            <fileset dir="main/resources"/>
         </copy>
     </target>
 
@@ -114,8 +114,7 @@
 
     <target name="prepareTest">
         <copy todir="${compileTest.dir}">
-            <fileset dir="lang/test/resources"/>
-            <fileset dir="rt/test/resources"/>
+            <fileset dir="test/resources"/>
         </copy>
     </target>
 

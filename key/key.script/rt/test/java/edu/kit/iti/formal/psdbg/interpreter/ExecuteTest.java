@@ -74,8 +74,12 @@ public class ExecuteTest {
         Assert.assertTrue(goal1_data.getRuleLabel().contains("cut"));
         DefaultTermParser dp = new DefaultTermParser();
 
-        Term s = dp.parse(new StringReader(y.getData().toString()), Sort.FORMULA, goal0_data.getEnv().getServices(), goal0_data.getProof().getNamespaces(), null);
-        Assert.assertEquals("Antecedent should contain the cut formula", s, goal0_data.getNode().sequent().antecedent().get(0).formula());
+        Term s = dp.parse(new StringReader(y.getData().toString()), Sort.FORMULA,
+                goal0_data.getProof().getServices(),
+                goal0_data.getProof().getNamespaces(), null);
+
+        Assert.assertEquals("Antecedent should contain the cut formula", s,
+                goal0_data.getNode().sequent().antecedent().get(0).formula());
 
 
     }

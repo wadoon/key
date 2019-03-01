@@ -11,5 +11,6 @@
     <buildFile url="file://$PROJECT_DIR$/key.ui/build.xml" />
     <buildFile url="file://$PROJECT_DIR$/key.util/build.xml" />
     <buildFile url="file://$PROJECT_DIR$/key.script/build.xml" />
+    <buildFile url="file://$PROJECT_DIR$/key.ui.script/build.xml" />
   </component>
 </project>

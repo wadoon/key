@@ -22,7 +22,7 @@ import java.util.Set;
 @EqualsAndHashCode
 @RequiredArgsConstructor
 public class KeyData {
-    private final KeYEnvironment env;
+    //private final KeYEnvironment env;
     private final Proof proof;
     private Node node;
 
@@ -35,7 +35,7 @@ public class KeyData {
     private boolean closedNode;
 
     public KeyData(KeyData data, Goal node) {
-        env = data.env;
+        //env = data.env;
         //proofApi = data.proofApi;
         //scriptApi = data.scriptApi;
         this.proof = data.proof;
@@ -48,20 +48,20 @@ public class KeyData {
     public KeyData(Goal g, KeYEnvironment environment, Proof proof) {
         goal = g;
         node = goal.node();
-        env = environment;
+        //env = environment;
         this.proof = proof;
         //weigl: does not work -> closedNode = proof.closed();
         node = g.node();
     }
 
     public KeyData(Node root, KeYEnvironment environment, Proof proof) {
-        this(proof.getGoal(root), environment, proof);
+        this(proof.getGoal(root), null, proof);
         node = root;
         closedNode = root.isClosed();
     }
 
     public KeyData(KeyData kd, Node node) {
-        this(node, kd.getEnv(),  kd.getProof());
+        this(node, null,  kd.getProof());
     }
 
     /**
