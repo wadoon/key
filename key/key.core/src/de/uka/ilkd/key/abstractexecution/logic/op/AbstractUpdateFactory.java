@@ -156,12 +156,17 @@ public class AbstractUpdateFactory {
     }
 
     /**
-     * TODO
+     * Extracts all {@link AbstractUpdateLoc}s from the given union (set or
+     * locset) {@link Term}.
      *
      * @param t
+     *            The {@link Term} to extract all {@link AbstractUpdateLoc}s
+     *            from.
      * @param ec
+     *            The {@link ExecutionContext}, for handling fields.
      * @param services
-     * @return
+     *            The {@link Services} object.
+     * @return All {@link AbstractUpdateLoc}s from the given {@link Term}.
      */
     public Set<AbstractUpdateLoc> abstractUpdateLocsFromUnionTerm(Term t,
             ExecutionContext ec, Services services) {
@@ -169,12 +174,18 @@ public class AbstractUpdateFactory {
     }
 
     /**
-     * TODO
+     * Extracts all {@link AbstractUpdateLoc}s from the given union (set or
+     * locset) {@link Term}.
      *
      * @param t
+     *            The {@link Term} to extract all {@link AbstractUpdateLoc}s
+     *            from.
      * @param ec
+     *            The {@link ExecutionContext}, for handling fields. If an empty
+     *            {@link Optional} is supplied, fields are ignored.
      * @param services
-     * @return
+     *            The {@link Services} object.
+     * @return All {@link AbstractUpdateLoc}s from the given {@link Term}.
      */
     public Set<AbstractUpdateLoc> abstractUpdateLocsFromUnionTerm(Term t,
             Optional<ExecutionContext> ec, Services services) {
@@ -200,12 +211,18 @@ public class AbstractUpdateFactory {
     }
 
     /**
-     * TODO
+     * Extracts the {@link AbstractUpdateLoc} represented by the given
+     * {@link Term}. May fail; in this case, an empty {@link Optional} is
+     * returned.
      *
      * @param t
+     *            The {@link Term} to extract all {@link AbstractUpdateLoc}s
+     *            from.
      * @param ec
+     *            The {@link ExecutionContext}, for handling fields.
      * @param services
-     * @return
+     *            The {@link Services} object.
+     * @return All {@link AbstractUpdateLoc}s from the given {@link Term}.
      */
     public Optional<AbstractUpdateLoc> tryExtractAbstrUpdateLocFromTerm(Term t,
             ExecutionContext ec, Services services) {
@@ -213,12 +230,19 @@ public class AbstractUpdateFactory {
     }
 
     /**
-     * TODO
+     * Extracts the {@link AbstractUpdateLoc} represented by the given
+     * {@link Term}. May fail; in this case, an empty {@link Optional} is
+     * returned.
      *
      * @param t
+     *            The {@link Term} to extract all {@link AbstractUpdateLoc}s
+     *            from.
      * @param ec
+     *            The {@link ExecutionContext}, for handling fields. If an empty
+     *            {@link Optional} is supplied, fields are ignored.
      * @param services
-     * @return
+     *            The {@link Services} object.
+     * @return All {@link AbstractUpdateLoc}s from the given {@link Term}.
      */
     public Optional<AbstractUpdateLoc> tryExtractAbstrUpdateLocFromTerm(Term t,
             Optional<ExecutionContext> ec, Services services) {
@@ -280,12 +304,20 @@ public class AbstractUpdateFactory {
     }
 
     /**
-     * TODO
+     * Extracts the {@link AbstractUpdateLoc} represented by the given
+     * {@link Term}. Returns null in case of failure. Call
+     * {@link #tryExtractAbstrUpdateLocFromTerm(Term, Optional, Services)} if
+     * failure is expected.
      *
      * @param t
+     *            The {@link Term} to extract all {@link AbstractUpdateLoc}s
+     *            from.
      * @param ec
+     *            The {@link ExecutionContext}, for handling fields. If an empty
+     *            {@link Optional} is supplied, fields are ignored.
      * @param services
-     * @return
+     *            The {@link Services} object.
+     * @return All {@link AbstractUpdateLoc}s from the given {@link Term}.
      */
     public AbstractUpdateLoc abstractUpdateLocFromTerm(Term t,
             Optional<ExecutionContext> ec, Services services) {
@@ -299,14 +331,18 @@ public class AbstractUpdateFactory {
     }
 
     /**
-     * TODO
+     * Extracts a {@link FieldLoc} from a select {@link Term}.
      *
      * @param selectTerm
+     *            The select {@link Term}.
      * @param tc
+     *            The {@link TypeConverter} for converting the select term to an
+     *            program {@link Expression}.
      * @param ec
-     * @return
+     *            The {@link ExecutionContext} for creating the field.
+     * @return A {@link FieldLoc} from the {@link Term}.
      */
-    private AbstractUpdateLoc fieldLocFromSelectTerm(final Term selectTerm,
+    private FieldLoc fieldLocFromSelectTerm(final Term selectTerm,
             final TypeConverter tc, ExecutionContext ec) {
         final Expression pe = tc.convertToProgramElement(selectTerm);
         if (pe instanceof FieldReference) {
