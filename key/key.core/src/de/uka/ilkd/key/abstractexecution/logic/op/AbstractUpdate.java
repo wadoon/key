@@ -29,6 +29,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -69,6 +70,12 @@ public final class AbstractUpdate extends AbstractSortedOperator {
     private final Services services;
 
     /**
+     * The {@link ExecutionContext} in which this {@link AbstractUpdate} is
+     * created. Needed for handling fields.
+     */
+    private final ExecutionContext ec;
+
+    /**
      * Private constructor since there should be exactly one abstract update per
      * left-hand side, similarly as for {@link ElementaryUpdate}. Use
      * {@link #getInstance(AbstractPlaceholderStatement, Term, ExecutionContext, Services)}.
@@ -78,11 +85,15 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      *            {@link AbstractUpdate} should be created.
      * @param assignables
      *            The update's left-hand side (assignables).
+     * @param ec
+     *            The {@link ExecutionContext} in which this
+     *            {@link AbstractUpdate} is created. Needed for handling fields.
      * @param services
      *            The {@link Services} object.
      */
     AbstractUpdate(final AbstractPlaceholderStatement phs,
-            final Set<AbstrUpdateLHS> assignables, final Services services) {
+            final Set<AbstrUpdateLHS> assignables, ExecutionContext ec,
+            final Services services) {
         super(new Name("U_" + phs.getId() + "("
                 + assignables.stream().map(lhs -> lhs.toString())
                         .collect(Collectors.joining(","))
@@ -91,6 +102,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
                         services.getTypeConverter().getSetLDT().targetSort() },
                 Sort.UPDATE, false);
 
+        this.ec = ec;
         this.services = services;
         this.phs = phs;
         this.assignables = Collections.unmodifiableSet(assignables);
@@ -110,7 +122,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @return A new {@link AbstractUpdate} with the given left-hand side.
      */
     AbstractUpdate changeAssignables(final Set<AbstrUpdateLHS> newAssignables) {
-        return new AbstractUpdate(phs, newAssignables, services);
+        return new AbstractUpdate(phs, newAssignables, ec, services);
     }
 
     public AbstractPlaceholderStatement getAbstractPlaceholderStatement() {
@@ -143,7 +155,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
                         .map(AbstrUpdateLHS.class::cast)
                         .collect(Collectors
                                 .toCollection(() -> new LinkedHashSet<>())),
-                services);
+                ec, services);
     }
 
     @Override
@@ -257,5 +269,27 @@ public final class AbstractUpdate extends AbstractSortedOperator {
         // NOTE (DS, 2019-03-01): Second case shouldn't occur...
         return assignables.isEmpty()
                 || assignables.stream().allMatch(EmptyLoc.class::isInstance);
+    }
+
+    /**
+     * Extracts a set of {@link AbstrUpdateRHS}s from a set union which is the
+     * right-hand side of an {@link AbstractUpdate} {@link Term}.
+     *
+     * NOTE / TODO (DS, 2019-03-01): This is problematic if this abstract update
+     * is created in a different {@link ExecutionContext} than the one the
+     * supplied right-hand side belongs to. Should really only be used if no
+     * {@link ExecutionContext} can be obtained. Maybe we also find a different
+     * way to extract {@link FieldReference}s than using the
+     * {@link ExecutionContext}s?
+     *
+     * @param t
+     *            The right-hand side to transform.
+     * @return The {@link Set} of {@link AbstrUpdateRHS}s represented by t.
+     */
+    public Set<AbstrUpdateRHS> transformRHS(Term t) {
+        return AbstractUpdateFactory.INSTANCE
+                .abstractUpdateLocsFromUnionTerm(t, ec, services).stream()
+                .map(AbstrUpdateRHS.class::cast)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 }

@@ -71,7 +71,8 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
         final Term update = //
                 tb.abstractUpdate(abstrStmt,
                         accessibleAndAssignableClause.second,
-                        accessibleAndAssignableClause.first);
+                        accessibleAndAssignableClause.first,
+                        svInst.getExecutionContext());
 
         return matchCond
                 .setInstantiations(svInst.add(this.updateSV, update, services));

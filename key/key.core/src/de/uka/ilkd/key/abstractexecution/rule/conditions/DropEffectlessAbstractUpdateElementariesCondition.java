@@ -235,7 +235,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
         }
 
         return tb.abstractUpdate(abstrUpd.getAbstractPlaceholderStatement(),
-                newAssignables, newAccessibles);
+                newAssignables, newAccessibles, ec);
     }
 
     @Override

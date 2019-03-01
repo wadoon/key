@@ -13,16 +13,12 @@
 
 package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
-import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
-import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -53,7 +49,6 @@ public final class AbstrUpdatesIndependentCondition
     public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
             MatchConditions mc, Services services) {
         final SVInstantiations svInst = mc.getInstantiations();
-        final ExecutionContext ec = svInst.getExecutionContext();
 
         final Term u1Inst = (Term) svInst.getInstantiation(u1);
         final Term u2Inst = (Term) svInst.getInstantiation(u2);
@@ -76,14 +71,10 @@ public final class AbstrUpdatesIndependentCondition
         final AbstractUpdate abstrUpd1 = (AbstractUpdate) u1Inst.op();
         final AbstractUpdate abstrUpd2 = (AbstractUpdate) u2Inst.op();
 
-        final Set<AbstrUpdateRHS> abstrUpd1Accessibles = AbstractUpdateFactory.INSTANCE
-                .abstractUpdateLocsFromUnionTerm(u1Inst.sub(0), ec, services)
-                .stream().map(AbstrUpdateRHS.class::cast)
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-        final Set<AbstrUpdateRHS> abstrUpd2Accessibles = AbstractUpdateFactory.INSTANCE
-                .abstractUpdateLocsFromUnionTerm(u2Inst.sub(0), ec, services)
-                .stream().map(AbstrUpdateRHS.class::cast)
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+        final Set<AbstrUpdateRHS> abstrUpd1Accessibles = abstrUpd1
+                .transformRHS(u1Inst.sub(0));
+        final Set<AbstrUpdateRHS> abstrUpd2Accessibles = abstrUpd2
+                .transformRHS(u2Inst.sub(0));
 
         /* U1(x, ... := ...) / U2(... := x, ...) */
         if (abstrUpd1.mayAssignAny(abstrUpd2Accessibles)

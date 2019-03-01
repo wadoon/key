@@ -981,18 +981,19 @@ public class TermBuilder {
     }
 
     public Term abstractUpdate(AbstractPlaceholderStatement phs,
-            Set<AbstrUpdateLHS> assignables, Set<AbstrUpdateRHS> accessibles) {
+            Set<AbstrUpdateLHS> assignables, Set<AbstrUpdateRHS> accessibles,
+            ExecutionContext ec) {
         final AbstractUpdate au = AbstractUpdateFactory.INSTANCE
-                .getInstance(phs, assignables, services);
+                .getInstance(phs, assignables, ec, services);
         final Term rhs = AbstractUpdateFactory.INSTANCE
                 .accessiblesToSetUnion(accessibles, services);
         return tf.createTerm(au, rhs);
     }
 
     public Term abstractUpdate(AbstractPlaceholderStatement phs,
-            Set<AbstrUpdateLHS> assignables, Term rhs) {
+            Set<AbstrUpdateLHS> assignables, Term rhs, ExecutionContext ec) {
         final AbstractUpdate au = AbstractUpdateFactory.INSTANCE
-                .getInstance(phs, assignables, services);
+                .getInstance(phs, assignables, ec, services);
         return tf.createTerm(au, rhs);
     }
 

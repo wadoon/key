@@ -88,7 +88,7 @@ public class AbstractUpdateFactory {
                         .map(AbstrUpdateLHS.class::cast).collect(Collectors
                                 .toCollection(() -> new LinkedHashSet<>()));
 
-        return getInstance(phs, assignables, services);
+        return getInstance(phs, assignables, ec, services);
     }
 
     /**
@@ -100,13 +100,17 @@ public class AbstractUpdateFactory {
      *            {@link AbstractUpdate} should be created.
      * @param assignables
      *            The update's left-hand side.
+     * @param ec
+     *            The {@link ExecutionContext} in which the
+     *            {@link AbstractUpdate} is generated.
      * @param services
      *            The {@link Services} object.
      * @return The {@link AbstractUpdate} for the given
      *         {@link AbstractPlaceholderStatement} and left-hand side.
      */
     public AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
-            Set<AbstrUpdateLHS> assignables, Services services) {
+            Set<AbstrUpdateLHS> assignables, ExecutionContext ec,
+            Services services) {
         if (abstractUpdateInstances.get(phs) == null) {
             abstractUpdateInstances.put(phs, new WeakHashMap<>());
         }
@@ -116,7 +120,7 @@ public class AbstractUpdateFactory {
                 abstractUpdateInstances.get(phs).get(assgnHashCode);
         if (result == null || result.get() == null) {
             result = new WeakReference<AbstractUpdate>(
-                    new AbstractUpdate(phs, assignables, services));
+                    new AbstractUpdate(phs, assignables, ec, services));
             abstractUpdateInstances.get(phs).put(assgnHashCode, result);
         }
 
@@ -196,7 +200,7 @@ public class AbstractUpdateFactory {
         if (t.sort() == services.getTypeConverter().getLocSetLDT()
                 .targetSort()) {
             set = tb.locsetUnionToSet(t);
-        } else if (t.sort() == services.getTypeConverter().getLocSetLDT()
+        } else if (t.sort() == services.getTypeConverter().getSetLDT()
                 .targetSort()) {
             set = tb.setUnionToImmutableSet(t);
         } else {
