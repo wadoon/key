@@ -25,6 +25,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -247,5 +248,14 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      */
     public boolean hasToAssign(AbstrUpdateRHS loc) {
         return getHasToAssignables().stream().anyMatch(loc::equals);
+    }
+
+    /**
+     * @return True iff this {@link AbstractUpdate} assigns no location at all.
+     */
+    public boolean assignsNothing() {
+        // NOTE (DS, 2019-03-01): Second case shouldn't occur...
+        return assignables.isEmpty()
+                || assignables.stream().allMatch(EmptyLoc.class::isInstance);
     }
 }

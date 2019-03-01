@@ -76,14 +76,6 @@ public final class AbstrUpdatesIndependentCondition
         final AbstractUpdate abstrUpd1 = (AbstractUpdate) u1Inst.op();
         final AbstractUpdate abstrUpd2 = (AbstractUpdate) u2Inst.op();
 
-        final Set<AbstrUpdateRHS> abstrUpd1Assignables = new LinkedHashSet<>(
-                abstrUpd1.getMaybeAssignables());
-        abstrUpd1Assignables.addAll(abstrUpd1.getHasToAssignables());
-
-        final Set<AbstrUpdateRHS> abstrUpd2Assignables = new LinkedHashSet<>(
-                abstrUpd2.getMaybeAssignables());
-        abstrUpd2Assignables.addAll(abstrUpd2.getHasToAssignables());
-
         final Set<AbstrUpdateRHS> abstrUpd1Accessibles = AbstractUpdateFactory.INSTANCE
                 .abstractUpdateLocsFromUnionTerm(u1Inst.sub(0), ec, services)
                 .stream().map(AbstrUpdateRHS.class::cast)
@@ -94,10 +86,8 @@ public final class AbstrUpdatesIndependentCondition
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
         /* U1(x, ... := ...) / U2(... := x, ...) */
-        if (abstrUpd1Assignables.stream()
-                .anyMatch(abstrUpd2Accessibles::contains)
-                || abstrUpd2Assignables.stream()
-                        .anyMatch(abstrUpd1Accessibles::contains)) {
+        if (abstrUpd1.mayAssignAny(abstrUpd2Accessibles)
+                || abstrUpd2.mayAssignAny(abstrUpd1Accessibles)) {
             return null;
         }
 
@@ -113,13 +103,13 @@ public final class AbstrUpdatesIndependentCondition
 
         /* U1(... := allLocs) / U2(x, ... := ...) */
         if (containsAllLocs(abstrUpd1Accessibles)
-                && !abstrUpd2Assignables.isEmpty()) {
+                && abstrUpd2.assignsNothing()) {
             return null;
         }
 
         /* U1(x, ... := ...) / U2(... := allLocs) */
         if (containsAllLocs(abstrUpd2Accessibles)
-                && !abstrUpd1Assignables.isEmpty()) {
+                && abstrUpd1.assignsNothing()) {
             return null;
         }
 

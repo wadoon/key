@@ -25,12 +25,15 @@ import de.uka.ilkd.key.java.declaration.ClassDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
 import de.uka.ilkd.key.java.declaration.VariableDeclaration;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.speclang.BlockContract;
 import de.uka.ilkd.key.speclang.FunctionalOperationContract;
 import de.uka.ilkd.key.speclang.jml.translation.JMLSpecFactory.ContractClauses;
@@ -328,6 +331,59 @@ public class AbstractPlaceholderSpecsTypeChecker {
     }
 
     /**
+     * Extracts the relevant operator for an element of a set / loc set union.
+     * E.g., for a singleton(self, someField) returns someField.
+     *
+     * @param elemTerm
+     *            The element of the (loc) set union.
+     * @param services
+     *            The {@link Services} object.
+     * @return The relevant {@link Operator} of the (loc) set union.
+     */
+    private static Operator locSetElemTermsToOp(Term elemTerm,
+            Services services) {
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        final SetLDT setLDT = services.getTypeConverter().getSetLDT();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+
+        final Operator op = elemTerm.op();
+        if (op instanceof ProgramVariable) {
+            return op;
+        } else if (op instanceof Function && op.arity() == 0) {
+            return elemTerm.op();
+        } else if (op == locSetLDT.getSingletonPV()) {
+            return locSetElemTermsToOp(elemTerm.sub(0), services);
+        } else if (op == locSetLDT.getSingleton()) {
+            return locSetElemTermsToOp(elemTerm.sub(1), services);
+        } else if (op == setLDT.getSingleton()) {
+            return locSetElemTermsToOp(elemTerm.sub(0), services);
+        } else if (op == locSetLDT.getHasTo()) {
+            return locSetElemTermsToOp(elemTerm.sub(0), services);
+        } else if (heapLDT.isSelectOp(op)) {
+            return locSetElemTermsToOp(elemTerm.sub(2), services);
+        } else {
+            assert false : "Unexpected element of (loc) set union.";
+            return null;
+        }
+    }
+
+    /**
+     * A mapper that can be applied to the elements of a loc set union to
+     * extract the relevant operator.
+     *
+     * @param services
+     *            The {@link Services} object.
+     *
+     * @return A mapper to apply on the element {@link Term}s of a loc set
+     *         union.
+     * @see AbstractPlaceholderSpecsTypeChecker#locSetElemTermsToOp(Term, Services)
+     */
+    private static java.util.function.Function<? super Term, ? extends Operator> locSetElemTermsToOpMapper(
+            Services services) {
+        return elemTerm -> AbstractPlaceholderSpecsTypeChecker.locSetElemTermsToOp(elemTerm, services);
+    }
+
+    /**
      * Returns the target operators in a set-like union term. Expects a union
      * term consisting of (1) Skolem loc set functions (result will contain that
      * function), (2) singletonPV(...) applications on location variables
@@ -347,7 +403,7 @@ public class AbstractPlaceholderSpecsTypeChecker {
     private static Set<Operator> collectElementsOfLocSetTerm(Term t,
             de.uka.ilkd.key.logic.op.Function union, Services services) {
         return MiscTools.disasembleSetTerm(t, union).stream()
-                .map(AbstractExecutionUtils.locSetElemTermsToOpMapper(services))
+                .map(locSetElemTermsToOpMapper(services))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 
