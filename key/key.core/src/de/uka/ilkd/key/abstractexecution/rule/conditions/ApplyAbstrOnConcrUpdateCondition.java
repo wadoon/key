@@ -14,7 +14,6 @@
 package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -22,6 +21,7 @@ import java.util.stream.Collectors;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
@@ -81,14 +81,14 @@ public final class ApplyAbstrOnConcrUpdateCondition
     public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
             MatchConditions mc, Services services) {
         SVInstantiations svInst = mc.getInstantiations();
-        final Term abstrUpdate = (Term) svInst.getInstantiation(u1SV);
+        final Term abstrUpdateTerm = (Term) svInst.getInstantiation(u1SV);
         final Term concrUpdate = (Term) svInst.getInstantiation(u2SV);
         final Term phiInst = (Term) svInst.getInstantiation(phiSV);
         final Term resultInst = (Term) svInst.getInstantiation(resultSV);
 
         final TermBuilder tb = services.getTermBuilder();
 
-        if (abstrUpdate == null || concrUpdate == null || phiInst == null
+        if (abstrUpdateTerm == null || concrUpdate == null || phiInst == null
                 || resultInst != null) {
             return mc;
         }
@@ -97,33 +97,36 @@ public final class ApplyAbstrOnConcrUpdateCondition
             return null;
         }
 
-        if (!(abstrUpdate.op() instanceof AbstractUpdate)) {
+        if (!(abstrUpdateTerm.op() instanceof AbstractUpdate)) {
             /*
              * We can assume that u2Inst is abstract, but it might be
              * constructed of an update junctor. In that case, we continue here.
              * TODO (DS, 2019-05-02): We could probably generalize this to
              * concatenations, maybe do this eventually.
              */
-            assert abstrUpdate.op() instanceof UpdateJunctor;
+            assert abstrUpdateTerm.op() instanceof UpdateJunctor;
             return null;
         }
-
-        final AbstractUpdate abstrUpd = (AbstractUpdate) abstrUpdate.op();
-        final Iterable<LocationVariable> hasToAssgnVarsOfAbstrUpd = abstrUpd
-                .getHasToAssignables().stream()
-                .filter(LocationVariable.class::isInstance)
-                .map(LocationVariable.class::cast)
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
         final Set<LocationVariable> locVarsInPhi = //
                 AbstractExecutionUtils.collectLocVars(services, phiInst);
 
         // Those might be changed several times
         Term newConcreteUpdate = concrUpdate;
-        Term newAbstrUpd = abstrUpdate;
+        Term newAbstrUpd = abstrUpdateTerm;
 
         // Signals that we did perform a change
         boolean success = false;
+
+        /*
+         * TODO (DS, 2019-03-01): Check whether special heap handling is
+         * necessary.
+         */
+        final AbstractUpdate abstrUpd = (AbstractUpdate) abstrUpdateTerm.op();
+        final List<LocationVariable> hasToAssignableLocVars = abstrUpd
+                .getHasToAssignables().stream().filter(PVLoc.class::isInstance)
+                .map(PVLoc.class::cast).map(PVLoc::childOp)
+                .map(LocationVariable.class::cast).collect(Collectors.toList());
 
         //@formatter:off
         /*
@@ -136,7 +139,7 @@ public final class ApplyAbstrOnConcrUpdateCondition
          * Then, perform the substitution of y by x, and drop elem.
          */
         //@formatter:on
-        for (final LocationVariable y : hasToAssgnVarsOfAbstrUpd) {
+        for (final LocationVariable y : hasToAssignableLocVars) {
             /* Check that y does not occur in the target. */
             if (locVarsInPhi.contains(y)) {
                 continue;
