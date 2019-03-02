@@ -3,6 +3,8 @@ package edu.key_project.script.ui;
 import com.google.common.base.Strings;
 import de.uka.ilkd.key.api.KeYApi;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
@@ -47,7 +49,6 @@ import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 /**
  * @author Alexander Weigl
@@ -62,19 +63,19 @@ public class ScriptPanel extends JPanel {
 
 
     @Getter
-    private final ToggleCommentAction actionToggleAction = new ToggleCommentAction();
+    private final ToggleCommentAction actionToggleAction;
     @Getter
-    private final SaveAction actionSave = new SaveAction();
+    private final SaveAction actionSave;
     @Getter
-    private final SaveAsAction actionSaveAs = new SaveAsAction();
+    private final SaveAsAction actionSaveAs;
     @Getter
-    private final LoadAction actionLoad = new LoadAction();
+    private final LoadAction actionLoad;
     @Getter
-    private final ExecuteAction actionExecute = new ExecuteAction();
+    private final ExecuteAction actionExecute;
     @Getter
-    private final SimpleReformatAction actionSimpleReformat = new SimpleReformatAction();
+    private final SimpleReformatAction actionSimpleReformat;
     @Getter
-    private final CreateCasesFromOpenGoalsAction actionCasesFromGoals = new CreateCasesFromOpenGoalsAction();
+    private final CreateCasesFromOpenGoalsAction actionCasesFromGoals;
 
     private DefaultComboBoxModel<ScriptFile> openFiles = new DefaultComboBoxModel<>();
     private JComboBox<ScriptFile> fileJComboBox = new JComboBox<>(openFiles);
@@ -86,6 +87,13 @@ public class ScriptPanel extends JPanel {
     public ScriptPanel(MainWindow window, KeYMediator mediator) {
         this.window = window;
         this.mediator = mediator;
+        actionToggleAction = new ToggleCommentAction();
+        actionSave = new SaveAction();
+        actionSaveAs = new SaveAsAction();
+        actionLoad = new LoadAction();
+        actionExecute = new ExecuteAction();
+        actionSimpleReformat = new SimpleReformatAction();
+        actionCasesFromGoals = new CreateCasesFromOpenGoalsAction();
         init();
     }
 
@@ -299,30 +307,23 @@ public class ScriptPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (editor.getSelectionStart() == editor.getSelectionEnd()) {
-                //no selection
+                //expand to line start and end.
                 String s = editor.getText();
-                int start = s.lastIndexOf('\n', editor.getCaretPosition()) + 1;
-                int stop = s.indexOf('\n', editor.getCaretPosition()) - 1;
+                int start = s.lastIndexOf('\n', editor.getSelectionStart()) + 1;
+                int stop = s.indexOf('\n', editor.getSelectionEnd());
                 editor.select(start, stop);
             }
-            if (isCommented()) {
-                String text = editor.getSelectedText();
-                text = text.replaceAll("^//\\s?", "");
-                editor.replaceSelection(text);
+            String selected = editor.getSelectedText();
+            String newText;
+            if (ScriptUtils.isCommented(selected)) {
+                newText = ScriptUtils.removeComments(selected);
             } else {
-                String[] text = editor.getSelectedText().split("\n");
-                String newText = Arrays.stream(text).map(s -> "// " + s).collect(Collectors.joining("\n"));
-                System.out.println(newText);
-                editor.replaceSelection(newText);
+                newText = ScriptUtils.comment(selected);
             }
-            getCurrentScript().setContent(editor.getText());
+            editor.replaceSelection(newText); // TODO does not work!
+            //getCurrentScript().setContent(editor.getText());
         }
 
-        private boolean isCommented() {
-            String text = editor.getSelectedText().trim();
-            String[] lines = text.split("\n");
-            return Arrays.stream(lines).allMatch(l -> l.trim().startsWith("//"));
-        }
     }
 
     class SaveAsAction extends KeyAction {
@@ -393,6 +394,19 @@ public class ScriptPanel extends JPanel {
             setName("Execute Script");
             setMenuPath(MENU_PROOF_SCRIPTS);
             setIcon(IconFontSwing.buildIcon(FontAwesomeBold.PLAY_CIRCLE, ICON_SIZE));
+
+            setEnabled(mediator.getSelectedProof() != null);
+            mediator.addKeYSelectionListener(new KeYSelectionListener() {
+                @Override
+                public void selectedNodeChanged(KeYSelectionEvent e) {
+
+                }
+
+                @Override
+                public void selectedProofChanged(KeYSelectionEvent e) {
+                    setEnabled(mediator.getSelectedProof() != null);
+                }
+            });
         }
 
         @Override

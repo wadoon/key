@@ -39,10 +39,10 @@ public class Actions {
 
 
     private void saveToClipboard(String label) {
+        System.err.println(label);
         Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(new StringSelection(label), null);
     }
-
     class CopyNodePathBranchLabelsAction extends KeyAction {
         public CopyNodePathBranchLabelsAction() {
             setName("Branch labels");
@@ -52,6 +52,7 @@ public class Actions {
         @Override
         public void actionPerformed(ActionEvent e) {
             saveToClipboard(LabelFactory.getBranchingLabel(mediator.getSelectedNode()));
+            window.setStatusLine("Branch label copied");
         }
     }
 
@@ -64,10 +65,9 @@ public class Actions {
         @Override
         public void actionPerformed(ActionEvent e) {
             saveToClipboard(LabelFactory.getProgramLines(mediator.getSelectedNode()));
-
+            window.setStatusLine("Line numbers copied");
         }
     }
-
 
     class CopyNodePathRuleNamesAction extends KeyAction {
         public CopyNodePathRuleNamesAction() {
@@ -78,6 +78,7 @@ public class Actions {
         @Override
         public void actionPerformed(ActionEvent e) {
             saveToClipboard(LabelFactory.getRuleLabel(mediator.getSelectedNode()));
+            window.setStatusLine("Rule names copied");
         }
     }
 
@@ -91,7 +92,7 @@ public class Actions {
         public void actionPerformed(ActionEvent e) {
             saveToClipboard(
                     LabelFactory.getProgramStatmentLabel(mediator.getSelectionModel().getSelectedNode()));
+            window.setStatusLine("Program statements copied");
         }
     }
-
 }
