@@ -25,14 +25,12 @@ import org.fife.ui.autocomplete.AutoCompletion;
 import org.fife.ui.autocomplete.BasicCompletion;
 import org.fife.ui.autocomplete.CompletionProvider;
 import org.fife.ui.autocomplete.DefaultCompletionProvider;
-import org.fife.ui.rsyntaxtextarea.AbstractTokenMakerFactory;
-import org.fife.ui.rsyntaxtextarea.CodeTemplateManager;
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
-import org.fife.ui.rsyntaxtextarea.TokenMakerFactory;
+import org.fife.ui.rsyntaxtextarea.*;
 import org.fife.ui.rsyntaxtextarea.folding.CurlyFoldParser;
 import org.fife.ui.rsyntaxtextarea.folding.FoldParserManager;
 import org.fife.ui.rsyntaxtextarea.templates.CodeTemplate;
 import org.fife.ui.rsyntaxtextarea.templates.StaticCodeTemplate;
+import org.fife.ui.rtextarea.Gutter;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.key_project.util.RandomName;
 
@@ -40,6 +38,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -82,6 +81,7 @@ public class ScriptPanel extends JPanel {
     private JToolBar toolbar;
     private RSyntaxTextArea editor;
     private JFileChooser fileChooser;
+    private Gutter gutter;
 
     public ScriptPanel(MainWindow window, KeYMediator mediator) {
         this.window = window;
@@ -101,8 +101,9 @@ public class ScriptPanel extends JPanel {
 
         add(toolbar, BorderLayout.NORTH);
         editor = new RSyntaxTextArea();
-        add(new RTextScrollPane(editor));
-
+        RTextScrollPane editorView = new RTextScrollPane(editor);
+        gutter = RSyntaxUtilities.getGutter(editor);
+        add(editorView);
 
         AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory) TokenMakerFactory.getDefaultInstance();
         atmf.putMapping("text/kps", ProofScriptHighlighter.class.getName());
@@ -130,6 +131,18 @@ public class ScriptPanel extends JPanel {
         editor.setSyntaxEditingStyle("text/kps");
         newScriptFile().setContent("script main() {auto;}\n");
         editor.setText(getCurrentScript().getContent());
+
+        try {
+            gutter.setBookmarkIcon(
+                    IconFontSwing.buildIcon(FontAwesomeBold.CIRCLE, 12, Color.red)
+            );
+
+            gutter.setBookmarkingEnabled(true);
+            gutter.addLineTrackingIcon(0, gutter.getBookmarkIcon(), "Bookmark");
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
+
 
         fileJComboBox.addActionListener(e -> {
             editor.setText(getCurrentScript().getContent());
@@ -290,7 +303,7 @@ public class ScriptPanel extends JPanel {
                 String s = editor.getText();
                 int start = s.lastIndexOf('\n', editor.getCaretPosition()) + 1;
                 int stop = s.indexOf('\n', editor.getCaretPosition()) - 1;
-                editor.select(start,stop);
+                editor.select(start, stop);
             }
             if (isCommented()) {
                 String text = editor.getSelectedText();
