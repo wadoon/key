@@ -223,3 +223,5 @@ QUESTION_MARK: '?';
 DIGITS : DIGIT+ ;
 fragment DIGIT : [0-9] ;
 ID : ([a-zA-Z]|'#'|'_') ([_a-zA-Z0-9] | '.' | '\\'| '#'|'<'|'>')*;
+
+ERROR_CHAR: .;
