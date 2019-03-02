@@ -1,0 +1,2 @@
+# <id> "|" <beforeCaret> "|" <afterCaret>
+cc | cases { \n case | {\n\n}

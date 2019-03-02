@@ -1,7 +1,7 @@
 package edu.key_project.script.ui;
 
 import com.google.common.base.Strings;
-import de.uka.ilkd.key.api.KeYApi;
+import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -10,6 +10,7 @@ import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.proof.Proof;
+import de.uka.ilkd.key.proof.ProofEvent;
 import edu.kit.iti.formal.psdbg.LabelFactory;
 import edu.kit.iti.formal.psdbg.interpreter.InterpreterBuilder;
 import edu.kit.iti.formal.psdbg.interpreter.KeyInterpreter;
@@ -28,15 +29,8 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.Token;
 import org.apache.commons.io.FileUtils;
-import org.fife.ui.autocomplete.AutoCompletion;
-import org.fife.ui.autocomplete.BasicCompletion;
-import org.fife.ui.autocomplete.CompletionProvider;
-import org.fife.ui.autocomplete.DefaultCompletionProvider;
-import org.fife.ui.rsyntaxtextarea.*;
-import org.fife.ui.rsyntaxtextarea.folding.CurlyFoldParser;
-import org.fife.ui.rsyntaxtextarea.folding.FoldParserManager;
-import org.fife.ui.rsyntaxtextarea.templates.CodeTemplate;
-import org.fife.ui.rsyntaxtextarea.templates.StaticCodeTemplate;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.RSyntaxUtilities;
 import org.fife.ui.rtextarea.Gutter;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.key_project.util.RandomName;
@@ -64,8 +58,8 @@ import java.util.regex.Pattern;
 @AllArgsConstructor
 public class ScriptPanel extends JPanel {
     public static final String MENU_PROOF_SCRIPTS = "Proof Scripts";
-    private static final float ICON_SIZE = 12;
-    private static final String MENU_PROOF_SCRIPTS_EXEC = MENU_PROOF_SCRIPTS + ".Run";
+    public static final float ICON_SIZE = 12;
+    public static final String MENU_PROOF_SCRIPTS_EXEC = MENU_PROOF_SCRIPTS + ".Run";
     private final MainWindow window;
     private final KeYMediator mediator;
 
@@ -84,7 +78,6 @@ public class ScriptPanel extends JPanel {
     private final StepOverAction actionStepOver;
     @Getter
     private final StopAction actionStop;
-
 
     @Getter
     private final SimpleReformatAction actionSimpleReformat;
@@ -112,6 +105,32 @@ public class ScriptPanel extends JPanel {
         actionCasesFromGoals = new CreateCasesFromOpenGoalsAction();
         actionStepOver = new StepOverAction();
         actionStop = new StopAction();
+
+        mediator.getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
+            @Override
+            public void autoModeStarted(ProofEvent e) {
+                setActionEnable();
+            }
+
+            @Override
+            public void autoModeStopped(ProofEvent e) {
+                setActionEnable();
+            }
+        });
+        addPropertyChangeListener(evt -> setActionEnable());
+        mediator.addKeYSelectionListener(new KeYSelectionListener() {
+            @Override
+            public void selectedNodeChanged(KeYSelectionEvent e) {
+                setActionEnable();
+            }
+
+            @Override
+            public void selectedProofChanged(KeYSelectionEvent e) {
+                setActionEnable();
+            }
+        });
+        mediator.addInterruptedListener(this::setActionEnable);
+
         init();
     }
 
@@ -132,44 +151,28 @@ public class ScriptPanel extends JPanel {
         gutter = RSyntaxUtilities.getGutter(editor);
         add(editorView);
 
-        AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory) TokenMakerFactory.getDefaultInstance();
-        atmf.putMapping("text/kps", ProofScriptHighlighter.class.getName());
-
-        FoldParserManager.get().addFoldParserMapping("text/kps", new CurlyFoldParser());
+        ScriptUtils.registerKPSLanguage();
 
         editor.setAntiAliasingEnabled(true);
         editor.setCloseCurlyBraces(true);
         editor.setCloseMarkupTags(true);
         editor.setCodeFoldingEnabled(true);
+        ScriptUtils.registerCodeTemplates();
+        ScriptUtils.createAutoCompletion().install(editor);
         RSyntaxTextArea.setTemplatesEnabled(true);
 
-        CodeTemplateManager ctm = RSyntaxTextArea.getCodeTemplateManager();
-        CodeTemplate ct = new StaticCodeTemplate("cc",
-                "cases {\n", "\n}");
-        ctm.addTemplate(ct);
-        ct = new StaticCodeTemplate("fb", "for (int i=0; i<", "; i++) {\n\t\n}\n");
-        ctm.addTemplate(ct);
-
-        CompletionProvider provider = createCompletionProvider();
-        AutoCompletion ac = new AutoCompletion(provider);
-        ac.install(editor);
-
-
-        editor.setSyntaxEditingStyle("text/kps");
+        editor.setSyntaxEditingStyle(ScriptUtils.KPS_LANGUAGE_ID);
         newScriptFile().setContent("script main() {auto;}\n");
         editor.setText(getCurrentScript().getContent());
 
         try {
             gutter.setBookmarkIcon(
-                    IconFontSwing.buildIcon(FontAwesomeBold.CIRCLE, 12, Color.red)
-            );
-
+                    IconFontSwing.buildIcon(FontAwesomeBold.CIRCLE, 12, Color.red));
             gutter.setBookmarkingEnabled(true);
-            gutter.addLineTrackingIcon(0, gutter.getBookmarkIcon(), "Bookmark");
+            gutter.addLineTrackingIcon(0, gutter.getBookmarkIcon());
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
-
 
         fileJComboBox.addActionListener(e -> {
             editor.setText(getCurrentScript().getContent());
@@ -284,38 +287,6 @@ public class ScriptPanel extends JPanel {
         openFiles.setSelectedItem(sf);
     }
 
-    /**
-     * Create a simple provider that adds some Java-related completions.
-     */
-    private CompletionProvider createCompletionProvider() {
-        DefaultCompletionProvider provider = new DefaultCompletionProvider();
-
-        // Add completions for all Java keywords. A BasicCompletion is just
-        // a straightforward word completion.
-        String[] words = new String[]{"cases", "case", "try", "closes", "derivable", "default",
-                "using", "match", "script", "true", "false", "call", "repeat", "foreach",
-                "theonly", "strict", "relax", "while", "if"};
-        for (String word : words)
-            provider.addCompletion(new BasicCompletion(provider, word));
-
-        KeYApi.getMacroApi().getMacros().forEach(e ->
-                provider.addCompletion(new BasicCompletion(provider, e.getScriptCommandName(), "Macro: " + e.getName(),
-                        e.getDescription())));
-
-        KeYApi.getScriptCommandApi().getScriptCommands().forEach(e ->
-                provider.addCompletion(new BasicCompletion(provider, e.getName(), "Command: " + e.getName(),
-                        e.getDocumentation())));
-
-        /*
-        provider.addCompletion(new ShorthandCompletion(provider, "sysout",
-                "System.out.println(", "System.out.println("));
-        provider.addCompletion(new ShorthandCompletion(provider, "syserr",
-                "System.err.println(", "System.err.println("));
-        */
-
-        return provider;
-    }
-
     @Override
     public void addPropertyChangeListener(PropertyChangeListener listener) {
         changeListeners.addPropertyChangeListener(listener);
@@ -337,10 +308,27 @@ public class ScriptPanel extends JPanel {
 
     private void onRunSucceed(DebuggerFramework<KeyData> keyDataDebuggerFramework, Throwable throwable) {
         window.setStatusLine("Interpreting finished");
+        enableGui();
     }
 
     private void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework, Throwable throwable) {
         window.popupWarning(throwable.getMessage(), "Interpreting Error");
+        enableGui();
+    }
+
+    private void disableGui() {
+        mediator.stopInterface(true);
+    }
+
+    private void enableGui() {
+        mediator.startInterface(true);
+    }
+
+    public void setActionEnable() {
+        getActionExecute().setEnabled();
+        getActionStepOver().setEnabled();
+        getActionStop().setEnabled();
+        getActionCasesFromGoals().setEnabled();
     }
 
     class ToggleCommentAction extends KeyAction {
@@ -440,8 +428,7 @@ public class ScriptPanel extends JPanel {
             setName("Stop interpreter");
             setMenuPath(MENU_PROOF_SCRIPTS_EXEC);
             setIcon(IconFontSwing.buildIcon(FontAwesomeBold.STOP_CIRCLE, ICON_SIZE));
-            setEnabled(getDebuggerFramework() != null);
-            addPropertyChangeListener(evt -> setEnabled(getDebuggerFramework() != null));
+            setEnabled();
         }
 
         @Override
@@ -455,6 +442,10 @@ public class ScriptPanel extends JPanel {
                 debuggerFramework.hardStop();
                 setDebuggerFramework(null);
             }
+        }
+
+        public void setEnabled() {
+            setEnabled(getDebuggerFramework() != null);
         }
     }
 
@@ -499,21 +490,13 @@ public class ScriptPanel extends JPanel {
             setIcon(IconFontSwing.buildIcon(FontAwesomeBold.PLAY_CIRCLE, ICON_SIZE));
 
             setEnabled();
-            addPropertyChangeListener(evt -> setEnabled());
-            mediator.addKeYSelectionListener(new KeYSelectionListener() {
-                @Override
-                public void selectedNodeChanged(KeYSelectionEvent e) {
-                }
-
-                @Override
-                public void selectedProofChanged(KeYSelectionEvent e) {
-                    setEnabled();
-                }
-            });
         }
 
         private void setEnabled() {
-            setEnabled(mediator.getSelectedProof() != null && getDebuggerFramework() == null);
+            setEnabled(mediator.getSelectedProof() != null
+                    && getDebuggerFramework() == null
+                    && !mediator.isInAutoMode() &&
+                    !mediator.getSelectedProof().closed());
         }
 
         @Override
@@ -547,13 +530,13 @@ public class ScriptPanel extends JPanel {
                     }
                 });
                 setDebuggerFramework(df);
+                disableGui();
                 df.start();
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
         }
     }
-
 
     class SimpleReformatAction extends KeyAction {
         public SimpleReformatAction() {
@@ -609,6 +592,13 @@ public class ScriptPanel extends JPanel {
 
             String s = "cases {\n" + text + "\n}";
             editor.insert(s, editor.getCaretPosition());
+        }
+
+        public void setEnabled() {
+            setEnabled(
+                    mediator.getSelectedProof() != null &&
+                            !mediator.getSelectedProof().closed()
+            );
         }
     }
 }
