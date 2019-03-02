@@ -109,7 +109,7 @@
         <copy todir="${dist.dir}/libs" flatten="true">
             <path refid="runtime.path"/>
         </copy>
-        <jar destfile="${dist.dir}/components/key.script.jar" basedir="${compile.dir}"/>
+        <jar destfile="${dist.dir}/components/key.ui.script.jar" basedir="${compile.dir}"/>
     </target>
 
     <target name="prepareTest">

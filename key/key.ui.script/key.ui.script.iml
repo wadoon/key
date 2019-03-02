@@ -18,13 +18,24 @@
           <root url="jar://$MODULE_DIR$/../libs/runtime/rsyntaxtextarea-3.0.2.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/../libs/sources/rsyntaxtextarea-3.0.2-sources.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../libs/compile/lombok-1.18.6.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../libs/runtime/autocomplete-3.0.0.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

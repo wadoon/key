@@ -153,6 +153,8 @@ public class ProofScriptHighlighter extends AbstractTokenMaker {
             case ScriptLanguageLexer.LBRACKET:
             case ScriptLanguageLexer.RPAREN:
             case ScriptLanguageLexer.LPAREN:
+            case ScriptLanguageLexer.INDENT:
+            case ScriptLanguageLexer.DEDENT:
                 return Token.SEPARATOR;
             default:
                 return 2;
