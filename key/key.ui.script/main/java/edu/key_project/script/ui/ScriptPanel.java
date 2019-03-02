@@ -13,14 +13,19 @@ import de.uka.ilkd.key.proof.Proof;
 import edu.kit.iti.formal.psdbg.LabelFactory;
 import edu.kit.iti.formal.psdbg.interpreter.InterpreterBuilder;
 import edu.kit.iti.formal.psdbg.interpreter.KeyInterpreter;
+import edu.kit.iti.formal.psdbg.interpreter.data.KeyData;
+import edu.kit.iti.formal.psdbg.interpreter.dbg.Breakpoint;
+import edu.kit.iti.formal.psdbg.interpreter.dbg.DebuggerException;
+import edu.kit.iti.formal.psdbg.interpreter.dbg.DebuggerFramework;
+import edu.kit.iti.formal.psdbg.interpreter.dbg.StepIntoCommand;
 import edu.kit.iti.formal.psdbg.parser.Facade;
 import edu.kit.iti.formal.psdbg.parser.ScriptLanguageLexer;
 import edu.kit.iti.formal.psdbg.parser.ast.ProofScript;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NonNull;
 import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.Token;
 import org.apache.commons.io.FileUtils;
 import org.fife.ui.autocomplete.AutoCompletion;
@@ -43,6 +48,8 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -58,6 +65,7 @@ import java.util.regex.Pattern;
 public class ScriptPanel extends JPanel {
     public static final String MENU_PROOF_SCRIPTS = "Proof Scripts";
     private static final float ICON_SIZE = 12;
+    private static final String MENU_PROOF_SCRIPTS_EXEC = MENU_PROOF_SCRIPTS + ".Run";
     private final MainWindow window;
     private final KeYMediator mediator;
 
@@ -73,16 +81,24 @@ public class ScriptPanel extends JPanel {
     @Getter
     private final ExecuteAction actionExecute;
     @Getter
+    private final StepOverAction actionStepOver;
+    @Getter
+    private final StopAction actionStop;
+
+
+    @Getter
     private final SimpleReformatAction actionSimpleReformat;
     @Getter
     private final CreateCasesFromOpenGoalsAction actionCasesFromGoals;
-
+    private final PropertyChangeSupport changeListeners = new PropertyChangeSupport(this);
     private DefaultComboBoxModel<ScriptFile> openFiles = new DefaultComboBoxModel<>();
     private JComboBox<ScriptFile> fileJComboBox = new JComboBox<>(openFiles);
     private JToolBar toolbar;
     private RSyntaxTextArea editor;
     private JFileChooser fileChooser;
     private Gutter gutter;
+    @Getter
+    private DebuggerFramework<KeyData> debuggerFramework;
 
     public ScriptPanel(MainWindow window, KeYMediator mediator) {
         this.window = window;
@@ -94,6 +110,8 @@ public class ScriptPanel extends JPanel {
         actionExecute = new ExecuteAction();
         actionSimpleReformat = new SimpleReformatAction();
         actionCasesFromGoals = new CreateCasesFromOpenGoalsAction();
+        actionStepOver = new StepOverAction();
+        actionStop = new StopAction();
         init();
     }
 
@@ -105,7 +123,8 @@ public class ScriptPanel extends JPanel {
         toolbar.add(fileJComboBox);
         toolbar.addSeparator();
         toolbar.add(actionExecute);
-
+        toolbar.add(actionStepOver);
+        toolbar.add(actionStop);
 
         add(toolbar, BorderLayout.NORTH);
         editor = new RSyntaxTextArea();
@@ -297,6 +316,33 @@ public class ScriptPanel extends JPanel {
         return provider;
     }
 
+    @Override
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        changeListeners.addPropertyChangeListener(listener);
+    }
+
+    @Override
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        changeListeners.removePropertyChangeListener(listener);
+    }
+
+    private void setDebuggerFramework(DebuggerFramework<KeyData> df) {
+        DebuggerFramework<KeyData> old = debuggerFramework;
+        debuggerFramework = df;
+        changeListeners.firePropertyChange("debuggerFramework", old, df);
+
+        df.setErrorListener(this::onRuntimeError);
+        df.setErrorListener(this::onRunSucceed);
+    }
+
+    private void onRunSucceed(DebuggerFramework<KeyData> keyDataDebuggerFramework, Throwable throwable) {
+        window.setStatusLine("Interpreting finished");
+    }
+
+    private void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework, Throwable throwable) {
+        window.popupWarning(throwable.getMessage(), "Interpreting Error");
+    }
+
     class ToggleCommentAction extends KeyAction {
         public ToggleCommentAction() {
             setName("Toogle Comment");
@@ -389,31 +435,93 @@ public class ScriptPanel extends JPanel {
         }
     }
 
+    class StopAction extends KeyAction {
+        public StopAction() {
+            setName("Stop interpreter");
+            setMenuPath(MENU_PROOF_SCRIPTS_EXEC);
+            setIcon(IconFontSwing.buildIcon(FontAwesomeBold.STOP_CIRCLE, ICON_SIZE));
+            setEnabled(getDebuggerFramework() != null);
+            addPropertyChangeListener(evt -> setEnabled(getDebuggerFramework() != null));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            debuggerFramework.stop();
+            try {
+                debuggerFramework.getInterpreterThread().wait(1000);
+            } catch (InterruptedException e1) {
+
+            } finally {
+                debuggerFramework.hardStop();
+                setDebuggerFramework(null);
+            }
+        }
+    }
+
+    class StepOverAction extends KeyAction {
+        public StepOverAction() {
+            setName("Step Over");
+            setMenuPath(MENU_PROOF_SCRIPTS_EXEC);
+            setIcon(IconFontSwing.buildIcon(FontAwesomeBold.STEP_FORWARD, ICON_SIZE));
+
+            setEnabled();
+            addPropertyChangeListener(evt -> setEnabled());
+            Timer timer = new Timer(100, e -> setEnabled());
+            timer.setRepeats(true);
+            timer.start();
+        }
+
+        private void setEnabled() {
+            setEnabled(getDebuggerFramework() != null &&
+                    getDebuggerFramework().getInterpreterThread() != null &&
+                    (getDebuggerFramework().getInterpreterThread().getState() == Thread.State.WAITING
+                            || getDebuggerFramework().getInterpreterThread().getState() == Thread.State.BLOCKED
+                    ));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                if (getDebuggerFramework() != null && debuggerFramework.getInterpreterThread() != null) {
+                    window.setStatusLine("Step over");
+                    debuggerFramework.execute(new StepIntoCommand<>());
+                }
+            } catch (DebuggerException e1) {
+                window.setStatusLine(e1.getMessage());
+            }
+        }
+    }
+
     class ExecuteAction extends KeyAction {
         public ExecuteAction() {
             setName("Execute Script");
-            setMenuPath(MENU_PROOF_SCRIPTS);
+            setMenuPath(MENU_PROOF_SCRIPTS_EXEC);
             setIcon(IconFontSwing.buildIcon(FontAwesomeBold.PLAY_CIRCLE, ICON_SIZE));
 
-            setEnabled(mediator.getSelectedProof() != null);
+            setEnabled();
+            addPropertyChangeListener(evt -> setEnabled());
             mediator.addKeYSelectionListener(new KeYSelectionListener() {
                 @Override
                 public void selectedNodeChanged(KeYSelectionEvent e) {
-
                 }
 
                 @Override
                 public void selectedProofChanged(KeYSelectionEvent e) {
-                    setEnabled(mediator.getSelectedProof() != null);
+                    setEnabled();
                 }
             });
+        }
+
+        private void setEnabled() {
+            setEnabled(mediator.getSelectedProof() != null && getDebuggerFramework() == null);
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             InterpreterBuilder ib = new InterpreterBuilder();
             try {
-                List<ProofScript> ast = Facade.getAST(editor.getText());
+                CodePointCharStream stream = CharStreams.fromString(editor.getText(), getCurrentScript().getName());
+                List<ProofScript> ast = Facade.getAST(stream);
 
                 ib.addProofScripts(ast)
                         .proof(null,
@@ -424,12 +532,28 @@ public class ScriptPanel extends JPanel {
                         .startState();
 
                 KeyInterpreter keyInterpreter = ib.build();
-                keyInterpreter.interpret(ib.getEntryPoint());
+                DebuggerFramework<KeyData> df = new DebuggerFramework<>(
+                        keyInterpreter, ib.getEntryPoint(), null
+                );
+                df.unregister();
+                Arrays.stream(gutter.getBookmarks()).forEach(it -> {
+                    try {
+                        int line = 1 + editor.getLineOfOffset(it.getMarkedOffset());
+                        Breakpoint brk = new Breakpoint(getCurrentScript().getName(), line);
+                        System.out.println(brk);
+                        df.getBreakpoints().add(brk);
+                    } catch (BadLocationException e1) {
+                        e1.printStackTrace();
+                    }
+                });
+                setDebuggerFramework(df);
+                df.start();
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
         }
     }
+
 
     class SimpleReformatAction extends KeyAction {
         public SimpleReformatAction() {
@@ -489,11 +613,3 @@ public class ScriptPanel extends JPanel {
     }
 }
 
-@Data
-class ScriptFile {
-    @NonNull
-    private String name;
-    private File file;
-    private String content;
-    private boolean dirty;
-}
