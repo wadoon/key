@@ -214,7 +214,9 @@ public class LoopScopeTools {
                 // new Function(anonHeapName, heap.sort());
                 services.getNamespaces().functions().lookup(term.toString());
         // services.getNamespaces().functions().addSafely(anonHeapFunc);
-        final Term anonHeapTerm = tb.label(tb.func(anonHeapFunc),
+        final Term anonHeapTerm = 
+        		tb.label(tb.func(anonHeapFunc),
+        		//tb.label(term,
                 ParameterlessTermLabel.ANON_HEAP_LABEL);
 
         // check for strictly pure loops

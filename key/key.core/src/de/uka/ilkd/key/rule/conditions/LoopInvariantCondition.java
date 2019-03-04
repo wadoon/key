@@ -50,6 +50,7 @@ public class LoopInvariantCondition implements VariableCondition {
                 .getActiveStatement(JavaBlock.createJavaBlock(mf.getBody()));
         ;
         LoopStatement loop = (LoopStatement) activeStmt;
+
         LoopSpecification spec = services.getSpecificationRepository()
                 .getLoopSpec(loop);
         final Map<LocationVariable, Term> atPres = spec.getInternalAtPres();
