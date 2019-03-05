@@ -18,9 +18,9 @@ import java.util.List;
  */
 public class UIScriptExtension implements KeYPaneExtension, KeYMainMenuExtension {
     @Getter
-    private ScriptPanel panel;
+    private static ScriptPanel panel;
     @Getter
-    private Actions actions;
+    private static Actions actions;
 
     @Override
     public void init(MainWindow window, KeYMediator mediator) {

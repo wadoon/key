@@ -11,6 +11,8 @@ import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.ProofEvent;
+import de.uka.ilkd.key.proof.ProofTreeEvent;
+import de.uka.ilkd.key.proof.ProofTreeListener;
 import edu.kit.iti.formal.psdbg.LabelFactory;
 import edu.kit.iti.formal.psdbg.interpreter.InterpreterBuilder;
 import edu.kit.iti.formal.psdbg.interpreter.KeyInterpreter;
@@ -84,12 +86,13 @@ public class ScriptPanel extends JPanel {
     @Getter
     private final CreateCasesFromOpenGoalsAction actionCasesFromGoals;
     private final PropertyChangeSupport changeListeners = new PropertyChangeSupport(this);
-    private DefaultComboBoxModel<ScriptFile> openFiles = new DefaultComboBoxModel<>();
-    private JComboBox<ScriptFile> fileJComboBox = new JComboBox<>(openFiles);
-    private JToolBar toolbar;
-    private RSyntaxTextArea editor;
+    private final DefaultComboBoxModel<ScriptFile> openFiles = new DefaultComboBoxModel<>();
+    private final JComboBox<ScriptFile> fileJComboBox = new JComboBox<>(openFiles);
+    private final JToolBar toolbar;
+    private final RSyntaxTextArea editor;
+    private final Gutter gutter;
+    private final RTextScrollPane editorView;
     private JFileChooser fileChooser;
-    private Gutter gutter;
     @Getter
     private DebuggerFramework<KeyData> debuggerFramework;
 
@@ -106,6 +109,7 @@ public class ScriptPanel extends JPanel {
         actionStepOver = new StepOverAction();
         actionStop = new StopAction();
 
+        setActionEnable();
         mediator.getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
             @Override
             public void autoModeStarted(ProofEvent e) {
@@ -127,16 +131,75 @@ public class ScriptPanel extends JPanel {
             @Override
             public void selectedProofChanged(KeYSelectionEvent e) {
                 setActionEnable();
+                e.getSource().getSelectedProof().addProofTreeListener(new ProofTreeListener() {
+                    @Override
+                    public void proofExpanded(ProofTreeEvent e) {
+                        setActionEnable();
+                    }
+
+                    @Override
+                    public void proofIsBeingPruned(ProofTreeEvent e) {
+                        setActionEnable();
+                    }
+
+                    @Override
+                    public void proofPruned(ProofTreeEvent e) {
+                        setActionEnable();
+                    }
+
+                    @Override
+                    public void proofStructureChanged(ProofTreeEvent e) {
+                        setActionEnable();
+
+                    }
+
+                    @Override
+                    public void proofClosed(ProofTreeEvent e) {
+                        setActionEnable();
+
+                    }
+
+                    @Override
+                    public void proofGoalRemoved(ProofTreeEvent e) {
+                        setActionEnable();
+
+                    }
+
+                    @Override
+                    public void proofGoalsAdded(ProofTreeEvent e) {
+                        setActionEnable();
+
+                    }
+
+                    @Override
+                    public void proofGoalsChanged(ProofTreeEvent e) {
+                        setActionEnable();
+
+                    }
+
+                    @Override
+                    public void smtDataUpdate(ProofTreeEvent e) {
+                        setActionEnable();
+
+                    }
+
+                    @Override
+                    public void notesChanged(ProofTreeEvent e) {
+                        setActionEnable();
+                    }
+                });
             }
         });
         mediator.addInterruptedListener(this::setActionEnable);
-
+        toolbar = new JToolBar();
+        editor = new RSyntaxTextArea();
+        editorView = new RTextScrollPane(editor);
+        gutter = RSyntaxUtilities.getGutter(editor);
         init();
     }
 
     private void init() {
         setLayout(new BorderLayout());
-        toolbar = new JToolBar();
         toolbar.add(actionLoad);
         toolbar.add(actionSave);
         toolbar.add(fileJComboBox);
@@ -146,13 +209,10 @@ public class ScriptPanel extends JPanel {
         toolbar.add(actionStop);
 
         add(toolbar, BorderLayout.NORTH);
-        editor = new RSyntaxTextArea();
-        RTextScrollPane editorView = new RTextScrollPane(editor);
-        gutter = RSyntaxUtilities.getGutter(editor);
         add(editorView);
+        editor.setText("def");
 
         ScriptUtils.registerKPSLanguage();
-
         editor.setAntiAliasingEnabled(true);
         editor.setCloseCurlyBraces(true);
         editor.setCloseMarkupTags(true);
@@ -174,9 +234,7 @@ public class ScriptPanel extends JPanel {
             e.printStackTrace();
         }
 
-        fileJComboBox.addActionListener(e -> {
-            editor.setText(getCurrentScript().getContent());
-        });
+        fileJComboBox.addActionListener(e -> editor.setText(getCurrentScript().getContent()));
 
         editor.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -200,6 +258,7 @@ public class ScriptPanel extends JPanel {
                 update();
             }
         });
+
         fileJComboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -570,15 +629,14 @@ public class ScriptPanel extends JPanel {
                 /* trying to find the common suffix*/
                 try {
                     String[] ref = labels.get(0);
-                    for (; true; upperLimit++) {
+                    for (; upperLimit <= ref.length; upperLimit++) {
                         for (String[] lbl : labels) {
                             if (!lbl[upperLimit].equals(ref[upperLimit])) {
                                 break;
                             }
                         }
-                        upperLimit++;
                     }
-                } catch (ArrayIndexOutOfBoundsException ex) {
+                } catch (ArrayIndexOutOfBoundsException ignored) {
                 }
 
                 int finalUpperLimit = upperLimit;
