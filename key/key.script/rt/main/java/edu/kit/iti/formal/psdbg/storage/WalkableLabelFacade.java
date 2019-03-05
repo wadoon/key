@@ -2,7 +2,7 @@ package edu.kit.iti.formal.psdbg.storage;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import javafx.util.Pair;
+import de.uka.ilkd.key.util.Pair;
 import lombok.val;
 
 import java.util.*;
@@ -27,7 +27,7 @@ public class WalkableLabelFacade {
         ArrayList<Integer> walk = getWalkForNode(node);
         Collection<Pair<Integer, Integer>> cwalk = compress(walk.iterator());
         return cwalk.stream()
-                .map(p -> p.getKey() + LENGTH_DELIMITER + p.getValue())
+                .map(p -> p.first + LENGTH_DELIMITER + p.second)
                 .collect(Collectors.joining(ENTRY_DELIMITER, PREFIX_COMPRESSED_LABEL, SUFFIX_COMPRESSED_LABEL));
     }
 
@@ -104,8 +104,8 @@ public class WalkableLabelFacade {
         List<T> seq = new ArrayList<>();
         while (iter.hasNext()) {
             Pair<Integer, T> p = iter.next();
-            int length = p.getKey();
-            T obj = p.getValue();
+            int length = p.first;
+            T obj = p.second;
             for (int i = 0; i < length; i++)
                 seq.add(obj);
         }

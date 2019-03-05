@@ -1,6 +1,6 @@
 package edu.kit.iti.formal.psdbg.storage;
 
-import javafx.util.Pair;
+import de.uka.ilkd.key.util.Pair;
 import org.junit.Assert;
 import org.junit.Test;
 
