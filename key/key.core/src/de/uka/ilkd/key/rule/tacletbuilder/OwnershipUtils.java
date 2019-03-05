@@ -93,45 +93,19 @@ public final class OwnershipUtils {
         return filtered;
     }
 
-    private static List<Taclet> createDisjointFPTaclets(Services services,
-            ProgramVariable selfVar) {
-        /* for each pair (f1, f2) of rep fields declared in this class (or a superclass!)
-         * we add a taclet of the following form
-         * disjFP {
-         *     \schemaVar \term Heap h;
-         *     \find();         // TODO: two find clauses possible? -> only if f1.repfp appears
-         *     \add(f1 != null & f2 != null -> f1.repfp # f2.repfp);
+    private static Taclet createDisjointnessTaclet(Services services, ProgramVariable selfVar) {
+        // more generic than first version: can be used for objects which are not stored in fields
+        // TODO: maybe use varcond differentFields here?
+        /* disjFP {
+         *     \schemaVariable \term Object o, r1, r2;
+         *     \schemaVariable \term Heap h;
+         *     \assumes(owner(r1) = o)
+         *     \assumes(owner(r2) = o)
+         *     \find(r1.repfp@h)
+         *     \add (r1 != null & r2 != null & r1 != r2
+         *     -> \disjoint(r1.repfp@h, r2.repfp@h) ==>)
          * };
          */
-
-        List<Taclet> taclets = new ArrayList<>();
-
-        ImmutableList<Field> fields = collectAllExplicitReferenceMembers(selfVar, services);
-        ImmutableList<Field> rest = fields;
-
-        for (Field f1 : fields) {
-            rest = rest.tail();
-
-            // skip non-rep fields
-            if (!isRep(f1)) {
-                continue;
-            }
-            for (Field f2 : rest) {
-
-                // skip non-rep fields
-                if (!isRep(f2)) {
-                    continue;
-                }
-                taclets.add(createDisjointnessTaclet(f1, f2, services, selfVar));
-            }
-        }
-        return taclets;
-    }
-
-    // TODO: do we need the symmetrical variant of the taclet as well?
-    // (may have to do with find term)
-    private static Taclet createDisjointnessTaclet(Field f1, Field f2, Services services,
-            ProgramVariable selfVar) {
 
         TermBuilder tb = services.getTermBuilder();
 
@@ -139,36 +113,36 @@ public final class OwnershipUtils {
         Sort heapSort = services.getTypeConverter().getHeapLDT().targetSort();
         SchemaVariable heapSV = SchemaVariableFactory.createTermSV(heapName, heapSort);
 
-        Function repFP = services.getNamespaces()
-                .functions()
-                .lookup("java.lang.Object::$repfp");
-        ProgramVariable pvF1 = services.getJavaInfo().getAttribute(f1.getFullName());
-        ProgramVariable pvF2 = services.getJavaInfo().getAttribute(f2.getFullName());
-        Sort f1Sort = f1.getProgramVariable().sort();
-        Sort f2Sort = f2.getProgramVariable().sort();
+        Name oName = new Name("o");
+        Name r1Name = new Name("r1");
+        Name r2Name = new Name("r2");
+        Sort objectSort = services.getJavaInfo().getJavaLangObject().getSort();
+        SchemaVariable oSV = SchemaVariableFactory.createTermSV(oName, objectSort);
+        SchemaVariable r1SV = SchemaVariableFactory.createTermSV(r1Name, objectSort);
+        SchemaVariable r2SV = SchemaVariableFactory.createTermSV(r2Name, objectSort);
 
-        Function fieldSymbol1 = services.getTypeConverter()
-                .getHeapLDT()
-                .getFieldSymbolForPV((LocationVariable)pvF1, services);
-        Function fieldSymbol2 = services.getTypeConverter()
-                .getHeapLDT()
-                .getFieldSymbolForPV((LocationVariable)pvF2, services);
+        Function repFP = services.getNamespaces().functions().lookup("java.lang.Object::$repfp");
+        Function owner = services.getNamespaces().functions().lookup("owner");
 
-        Term oF1 = tb.select(f1Sort, tb.var(heapSV), tb.var(selfVar), tb.func(fieldSymbol1));
-        Term oF2 = tb.select(f2Sort, tb.var(heapSV), tb.var(selfVar), tb.func(fieldSymbol2));
+        Term assume1 = tb.equals(tb.func(owner, tb.var(r1SV)), tb.var(oSV));
+        Term assume2 = tb.equals(tb.func(owner, tb.var(r2SV)), tb.var(oSV));
 
-        Term fp1 = tb.func(repFP, tb.var(heapSV), oF1);
-        Term fp2 = tb.func(repFP, tb.var(heapSV), oF2);
+        // accumulate precondition, i.e. left side of implication
+        Term pre = tb.not(tb.equals(tb.var(r1SV), tb.NULL()));              // r1 != null
+        pre = tb.and(pre, tb.not(tb.equals(tb.var(r2SV), tb.NULL())));      // r2 != null
+        pre = tb.and(pre, tb.not(tb.equals(tb.var(r1SV), tb.var(r2SV))));   // r1 != r2
 
-        Term nonNullF1 = tb.not(tb.equals(oF1, tb.NULL()));
-        Term nonNullF2 = tb.not(tb.equals(oF2, tb.NULL()));
-        Term disj = tb.disjoint(fp1, fp2);
-        Term add = tb.imp(tb.and(nonNullF1, nonNullF2), disj);
+        Term fp1 = tb.func(repFP, tb.var(heapSV), tb.var(r1SV));            // r1.repfp
+        Term fp2 = tb.func(repFP, tb.var(heapSV), tb.var(r2SV));            // r2.repfp
+
+        Term disj = tb.disjoint(fp1, fp2);                                  // r1.repfp # r2.repfp
+        Term add = tb.imp(pre, disj);
 
         // we have our term, now create the taclet
         RewriteTacletBuilder<RewriteTaclet> tacletBuilder = new RewriteTacletBuilder<>();
+        //NoFindTacletBuilder tacletBuilder = new NoFindTacletBuilder();
 
-        Name name = MiscTools.toValidTacletName("repfp disjoint " + f1 + " " + f2);
+        Name name = MiscTools.toValidTacletName("rep footprints disjoint");
         tacletBuilder.setName(name);
 
         ImmutableSet<Choice> choices = DefaultImmutableSet.<Choice>nil()
@@ -177,8 +151,16 @@ public final class OwnershipUtils {
 
         tacletBuilder.addRuleSet(HEURISTICS);
 
-        // we search for self.f1.repfp (this makes it unnecessary to manually instantiate the heap)
+        // we search for r1.repfp (this makes it unnecessary to manually instantiate the heap)
         tacletBuilder.setFind(fp1);
+
+        // \assume
+        SequentFormula sf1 = new SequentFormula(assume1);
+        SequentFormula sf2 = new SequentFormula(assume2);
+        Semisequent semiAssume = Semisequent.EMPTY_SEMISEQUENT
+                                            .insertFirst(sf1).semisequent()
+                                            .insertFirst(sf2).semisequent();
+        tacletBuilder.setIfSequent(Sequent.createAnteSequent(semiAssume));
 
         // \add
         SequentFormula seqFormula = new SequentFormula(add);
@@ -508,10 +490,8 @@ public final class OwnershipUtils {
             result = result.add(t);
         }
 
-        // for each pair of rep fields: create disjointness taclet
-        for (Taclet t : createDisjointFPTaclets(proofServices, selfVar)) {
-            result = result.add(t);
-        }
+        // add disjointness taclet for rep footprints
+        result = result.add(createDisjointnessTaclet(proofServices, selfVar));
 
         return result;
     }
