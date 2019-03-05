@@ -17,16 +17,14 @@ import edu.kit.iti.formal.psdbg.LabelFactory;
 import edu.kit.iti.formal.psdbg.interpreter.InterpreterBuilder;
 import edu.kit.iti.formal.psdbg.interpreter.KeyInterpreter;
 import edu.kit.iti.formal.psdbg.interpreter.data.KeyData;
-import edu.kit.iti.formal.psdbg.interpreter.dbg.Breakpoint;
-import edu.kit.iti.formal.psdbg.interpreter.dbg.DebuggerException;
-import edu.kit.iti.formal.psdbg.interpreter.dbg.DebuggerFramework;
-import edu.kit.iti.formal.psdbg.interpreter.dbg.StepIntoCommand;
+import edu.kit.iti.formal.psdbg.interpreter.dbg.*;
 import edu.kit.iti.formal.psdbg.parser.Facade;
 import edu.kit.iti.formal.psdbg.parser.ScriptLanguageLexer;
 import edu.kit.iti.formal.psdbg.parser.ast.ProofScript;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.Token;
@@ -45,7 +43,6 @@ import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -60,7 +57,7 @@ import java.util.regex.Pattern;
 @AllArgsConstructor
 public class ScriptPanel extends JPanel {
     public static final String MENU_PROOF_SCRIPTS = "Proof Scripts";
-    public static final float ICON_SIZE = 12;
+    public static final float ICON_SIZE = 16;
     public static final String MENU_PROOF_SCRIPTS_EXEC = MENU_PROOF_SCRIPTS + ".Run";
     private final MainWindow window;
     private final KeYMediator mediator;
@@ -85,16 +82,20 @@ public class ScriptPanel extends JPanel {
     private final SimpleReformatAction actionSimpleReformat;
     @Getter
     private final CreateCasesFromOpenGoalsAction actionCasesFromGoals;
-    private final PropertyChangeSupport changeListeners = new PropertyChangeSupport(this);
-    private final DefaultComboBoxModel<ScriptFile> openFiles = new DefaultComboBoxModel<>();
-    private final JComboBox<ScriptFile> fileJComboBox = new JComboBox<>(openFiles);
+    @Getter
+    private final ContinueAction actionContinue;
+
     private final JToolBar toolbar;
-    private final RSyntaxTextArea editor;
-    private final Gutter gutter;
-    private final RTextScrollPane editorView;
+    @Getter
+    private final JTabbedPane tabbedEditors = new JTabbedPane(
+            JTabbedPane.BOTTOM,
+            JTabbedPane.SCROLL_TAB_LAYOUT);
+
+
     private JFileChooser fileChooser;
     @Getter
     private DebuggerFramework<KeyData> debuggerFramework;
+    private PropertyChangeListener updateTitlesListener = evt -> updateTitles();
 
     public ScriptPanel(MainWindow window, KeYMediator mediator) {
         this.window = window;
@@ -104,12 +105,15 @@ public class ScriptPanel extends JPanel {
         actionSaveAs = new SaveAsAction();
         actionLoad = new LoadAction();
         actionExecute = new ExecuteAction();
+        actionContinue = new ContinueAction();
+
         actionSimpleReformat = new SimpleReformatAction();
         actionCasesFromGoals = new CreateCasesFromOpenGoalsAction();
         actionStepOver = new StepOverAction();
         actionStop = new StopAction();
 
         setActionEnable();
+
         mediator.getUI().getProofControl().addAutoModeListener(new AutoModeListener() {
             @Override
             public void autoModeStarted(ProofEvent e) {
@@ -192,9 +196,6 @@ public class ScriptPanel extends JPanel {
         });
         mediator.addInterruptedListener(this::setActionEnable);
         toolbar = new JToolBar();
-        editor = new RSyntaxTextArea();
-        editorView = new RTextScrollPane(editor);
-        gutter = RSyntaxUtilities.getGutter(editor);
         init();
     }
 
@@ -202,64 +203,24 @@ public class ScriptPanel extends JPanel {
         setLayout(new BorderLayout());
         toolbar.add(actionLoad);
         toolbar.add(actionSave);
-        toolbar.add(fileJComboBox);
+        //toolbar.add(fileJComboBox);
         toolbar.addSeparator();
         toolbar.add(actionExecute);
-        toolbar.add(actionStepOver);
         toolbar.add(actionStop);
+        toolbar.add(actionContinue);
+        toolbar.add(actionStepOver);
 
         add(toolbar, BorderLayout.NORTH);
-        add(editorView);
-        editor.setText("def");
+        add(tabbedEditors);
 
         ScriptUtils.registerKPSLanguage();
-        editor.setAntiAliasingEnabled(true);
-        editor.setCloseCurlyBraces(true);
-        editor.setCloseMarkupTags(true);
-        editor.setCodeFoldingEnabled(true);
         ScriptUtils.registerCodeTemplates();
-        ScriptUtils.createAutoCompletion().install(editor);
         RSyntaxTextArea.setTemplatesEnabled(true);
 
-        editor.setSyntaxEditingStyle(ScriptUtils.KPS_LANGUAGE_ID);
-        newScriptFile().setContent("script main() {auto;}\n");
-        editor.setText(getCurrentScript().getContent());
+        newEditor();
 
-        try {
-            gutter.setBookmarkIcon(
-                    IconFontSwing.buildIcon(FontAwesomeBold.CIRCLE, 12, Color.red));
-            gutter.setBookmarkingEnabled(true);
-            gutter.addLineTrackingIcon(0, gutter.getBookmarkIcon());
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        }
-
-        fileJComboBox.addActionListener(e -> editor.setText(getCurrentScript().getContent()));
-
-        editor.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                update();
-            }
-
-            private void update() {
-                getCurrentScript().setDirty(true);
-                getCurrentScript().setContent(editor.getText());
-                fileJComboBox.updateUI();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                update();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                update();
-            }
-        });
-
-        fileJComboBox.setRenderer(new DefaultListCellRenderer() {
+        //fileJComboBox.addActionListener(e -> editor.setText(getCurrentScript().getContent()));
+        /*fileJComboBox.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
                 ScriptFile sf = (ScriptFile) value;
@@ -267,12 +228,12 @@ public class ScriptPanel extends JPanel {
                 Component lbl = super.getListCellRendererComponent(list, sf.getName() + sfx, index, isSelected, cellHasFocus);
                 return lbl;
             }
-        });
+        });*/
     }
 
     private void simpleReformat() {
         Pattern spacesAtLineEnd = Pattern.compile("[\t ]+\n", Pattern.MULTILINE);
-        String text = editor.getText();
+        String text = getCurrentEditor().getText();
         text = spacesAtLineEnd.matcher(text).replaceAll("\n");
 
         ScriptLanguageLexer lexer = new ScriptLanguageLexer(CharStreams.fromString(text));
@@ -298,9 +259,13 @@ public class ScriptPanel extends JPanel {
             }
         }
 
-        int pos = editor.getCaretPosition();
-        editor.setText(builder.toString());
-        editor.setCaretPosition(pos);
+        int pos = getCurrentEditor().getEditor().getCaretPosition();
+        getCurrentEditor().getEditor().setText(builder.toString());
+        getCurrentEditor().getEditor().setCaretPosition(pos);
+    }
+
+    private ScriptEditorPane getCurrentEditor() {
+        return (ScriptEditorPane) tabbedEditors.getSelectedComponent();
     }
 
     private @NonNull JFileChooser getFileChooser() {
@@ -319,47 +284,45 @@ public class ScriptPanel extends JPanel {
 
     private void storeInto(File f) {
         try {
-            ScriptFile sf = getCurrentScript();
-            sf.setContent(editor.getText());
+            ScriptEditorPane sf = getCurrentEditor();
             sf.setFile(f);
-            sf.setName(f.getName());
             sf.setDirty(false);
-            FileUtils.write(f, editor.getText(), Charset.defaultCharset());
-            fileJComboBox.updateUI();
+            FileUtils.write(f, sf.getEditor().getText(), Charset.defaultCharset());
+            updateTitles();
         } catch (IOException e1) {
             window.popupWarning("Could not save to file " + f + ". " + e1.getMessage(),
                     "I/O Error.");
         }
     }
 
-    private ScriptFile getCurrentScript() {
-        return (ScriptFile) openFiles.getSelectedItem();
+    private void updateTitles() {
+        for (int i = 0; i < tabbedEditors.getTabCount(); i++) {
+            ScriptEditorPane sf = (ScriptEditorPane) tabbedEditors.getComponentAt(i);
+            tabbedEditors.setTitleAt(i, sf.getTitle());
+        }
     }
 
-    private ScriptFile newScriptFile() {
-        ScriptFile sf = new ScriptFile(RandomName.getRandomName("-"));
-        openFiles.addElement(sf);
-        return sf;
+    private ScriptEditorPane newEditor() {
+        ScriptEditorPane sep = new ScriptEditorPane();
+        tabbedEditors.addTab(sep.getTitle(), sep);
+        sep.addPropertyChangeListener(ScriptEditorPane.PROP_DIRTY, updateTitlesListener);
+        sep.addPropertyChangeListener(ScriptEditorPane.PROP_FILE, updateTitlesListener);
+        return sep;
     }
 
-    private void select(ScriptFile sf) {
-        openFiles.setSelectedItem(sf);
-    }
-
-    @Override
-    public void addPropertyChangeListener(PropertyChangeListener listener) {
-        changeListeners.addPropertyChangeListener(listener);
-    }
-
-    @Override
-    public void removePropertyChangeListener(PropertyChangeListener listener) {
-        changeListeners.removePropertyChangeListener(listener);
+    private void select(File f) {
+        for (int i = 0; i < tabbedEditors.getTabCount(); i++) {
+            ScriptEditorPane sf = (ScriptEditorPane) tabbedEditors.getComponentAt(i);
+            if (sf.getFile().equals(f)) {
+                tabbedEditors.setSelectedComponent(sf);
+            }
+        }
     }
 
     private void setDebuggerFramework(DebuggerFramework<KeyData> df) {
         DebuggerFramework<KeyData> old = debuggerFramework;
         debuggerFramework = df;
-        changeListeners.firePropertyChange("debuggerFramework", old, df);
+        firePropertyChange("debuggerFramework", old, df);
 
         df.setErrorListener(this::onRuntimeError);
         df.setErrorListener(this::onRunSucceed);
@@ -387,6 +350,7 @@ public class ScriptPanel extends JPanel {
         getActionExecute().setEnabled();
         getActionStepOver().setEnabled();
         getActionStop().setEnabled();
+        getActionContinue().setEnabled();
         getActionCasesFromGoals().setEnabled();
     }
 
@@ -399,6 +363,7 @@ public class ScriptPanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            RSyntaxTextArea editor = getCurrentEditor().getEditor();
             if (editor.getSelectionStart() == editor.getSelectionEnd()) {
                 //expand to line start and end.
                 String s = editor.getText();
@@ -416,7 +381,6 @@ public class ScriptPanel extends JPanel {
             editor.replaceSelection(newText); // TODO does not work!
             //getCurrentScript().setContent(editor.getText());
         }
-
     }
 
     class SaveAsAction extends KeyAction {
@@ -447,8 +411,8 @@ public class ScriptPanel extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (getCurrentScript().getFile() != null) {
-                storeInto(getCurrentScript().getFile());
+            if (getCurrentEditor().getFile() != null) {
+                storeInto(getCurrentEditor().getFile());
             } else {
                 getActionSaveAs().actionPerformed(e);
             }
@@ -469,12 +433,11 @@ public class ScriptPanel extends JPanel {
                 try {
                     File file = getFileChooser().getSelectedFile();
                     String s = FileUtils.readFileToString(file, Charset.defaultCharset());
-                    ScriptFile sf = newScriptFile();
-                    sf.setContent(s);
-                    sf.setFile(file);
-                    sf.setName(file.getName());
-                    sf.setDirty(false);
-                    select(sf);
+                    ScriptEditorPane editor = newEditor();
+                    editor.getEditor().setText(s);
+                    editor.setFile(file);
+                    editor.setDirty(false);
+                    tabbedEditors.setSelectedComponent(editor);
                 } catch (IOException e1) {
                     window.popupWarning("Could not load file: " + getFileChooser().getSelectedFile() + ". " + e1.getMessage(), "I/O Error");
                 }
@@ -486,6 +449,7 @@ public class ScriptPanel extends JPanel {
         public StopAction() {
             setName("Stop interpreter");
             setMenuPath(MENU_PROOF_SCRIPTS_EXEC);
+            setPriority(10);
             setIcon(IconFontSwing.buildIcon(FontAwesomeBold.STOP_CIRCLE, ICON_SIZE));
             setEnabled();
         }
@@ -510,12 +474,12 @@ public class ScriptPanel extends JPanel {
 
     class StepOverAction extends KeyAction {
         public StepOverAction() {
-            setName("Step Over");
+            setName("Single Step");
             setMenuPath(MENU_PROOF_SCRIPTS_EXEC);
+            setPriority(40);
             setIcon(IconFontSwing.buildIcon(FontAwesomeBold.STEP_FORWARD, ICON_SIZE));
 
             setEnabled();
-            addPropertyChangeListener(evt -> setEnabled());
             Timer timer = new Timer(100, e -> setEnabled());
             timer.setRepeats(true);
             timer.start();
@@ -546,8 +510,8 @@ public class ScriptPanel extends JPanel {
         public ExecuteAction() {
             setName("Execute Script");
             setMenuPath(MENU_PROOF_SCRIPTS_EXEC);
+            setPriority(0);
             setIcon(IconFontSwing.buildIcon(FontAwesomeBold.PLAY_CIRCLE, ICON_SIZE));
-
             setEnabled();
         }
 
@@ -562,8 +526,10 @@ public class ScriptPanel extends JPanel {
         public void actionPerformed(ActionEvent e) {
             InterpreterBuilder ib = new InterpreterBuilder();
             try {
-                CodePointCharStream stream = CharStreams.fromString(editor.getText(), getCurrentScript().getName());
-                List<ProofScript> ast = Facade.getAST(stream);
+                final ScriptEditorPane f = getCurrentEditor();
+                final RSyntaxTextArea editor = getCurrentEditor().getEditor();
+                final CodePointCharStream stream = CharStreams.fromString(editor.getText(), f.getName());
+                final List<ProofScript> ast = Facade.getAST(stream);
 
                 ib.addProofScripts(ast)
                         .proof(null,
@@ -578,10 +544,10 @@ public class ScriptPanel extends JPanel {
                         keyInterpreter, ib.getEntryPoint(), null
                 );
                 df.unregister();
-                Arrays.stream(gutter.getBookmarks()).forEach(it -> {
+                Arrays.stream(f.getGutter().getBookmarks()).forEach(it -> {
                     try {
                         int line = 1 + editor.getLineOfOffset(it.getMarkedOffset());
-                        Breakpoint brk = new Breakpoint(getCurrentScript().getName(), line);
+                        Breakpoint brk = new Breakpoint(f.getName(), line);
                         System.out.println(brk);
                         df.getBreakpoints().add(brk);
                     } catch (BadLocationException e1) {
@@ -593,6 +559,31 @@ public class ScriptPanel extends JPanel {
                 df.start();
             } catch (Exception e1) {
                 e1.printStackTrace();
+            }
+        }
+    }
+
+    class ContinueAction extends KeyAction {
+        public ContinueAction() {
+            setName("Continue");
+            setMenuPath(MENU_PROOF_SCRIPTS_EXEC);
+            setPriority(30);
+            setIcon(IconFontSwing.buildIcon(FontAwesomeBold.FAST_FORWARD, ICON_SIZE));
+        }
+
+        public void setEnabled() {
+            setEnabled(mediator.getSelectedProof() != null && debuggerFramework != null);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            try {
+                if (getDebuggerFramework() != null && debuggerFramework.getInterpreterThread() != null) {
+                    window.setStatusLine("Continue");
+                    debuggerFramework.execute(new ContinueCommand<>());
+                }
+            } catch (DebuggerException e1) {
+                window.setStatusLine(e1.getMessage());
             }
         }
     }
@@ -649,6 +640,7 @@ public class ScriptPanel extends JPanel {
             }
 
             String s = "cases {\n" + text + "\n}";
+            RSyntaxTextArea editor = getCurrentEditor().getEditor();
             editor.insert(s, editor.getCaretPosition());
         }
 
@@ -659,5 +651,83 @@ public class ScriptPanel extends JPanel {
             );
         }
     }
+
+
 }
 
+class ScriptEditorPane extends JPanel {
+    public static final String PROP_DIRTY = "dirty";
+    public static final String PROP_FILE = "file";
+    public static final Icon BOOKMARK_ICON = IconFontSwing.buildIcon(FontAwesomeBold.CIRCLE, 12, Color.red);
+
+    @Getter
+    private final RSyntaxTextArea editor;
+    @Getter
+    private final Gutter gutter;
+    @Getter
+    private final RTextScrollPane editorView;
+    private final String name = RandomName.getRandomName("-") + ".kps";
+    @Getter
+    @Setter
+    private File file;
+    @Getter
+    @Setter
+    private boolean dirty;
+
+    public ScriptEditorPane() {
+        super(new BorderLayout(5, 5));
+        editor = new RSyntaxTextArea();
+        editorView = new RTextScrollPane(editor);
+        gutter = RSyntaxUtilities.getGutter(editor);
+        editor.setAntiAliasingEnabled(true);
+        editor.setCloseCurlyBraces(true);
+        editor.setCloseMarkupTags(true);
+        editor.setCodeFoldingEnabled(true);
+        editor.setSyntaxEditingStyle(ScriptUtils.KPS_LANGUAGE_ID);
+        editor.setText("script main() {auto;}\n");
+        ScriptUtils.createAutoCompletion().install(editor);
+        editor.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                update();
+            }
+
+            private void update() {
+                setDirty(true);
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                update();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                update();
+            }
+        });
+        gutter.setBookmarkIcon(BOOKMARK_ICON);
+        gutter.setBookmarkingEnabled(true);
+        add(editorView);
+    }
+
+    public String getTitle() {
+        return (file != null ? file.getName() : name) + (dirty ? "*" : "");
+    }
+
+    public String getText() {
+        return editor.getText();
+    }
+
+    public void setDirty(boolean dirty) {
+        boolean oldDirty = isDirty();
+        this.dirty = dirty;
+        firePropertyChange(PROP_DIRTY, oldDirty, dirty);
+    }
+
+    public void setFile(File f) {
+        File oldFile = file;
+        file = f;
+        firePropertyChange(PROP_FILE, oldFile, f);
+    }
+}

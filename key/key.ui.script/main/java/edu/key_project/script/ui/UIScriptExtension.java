@@ -63,6 +63,7 @@ public class UIScriptExtension implements KeYPaneExtension, KeYMainMenuExtension
                 panel.getActionToggleAction(),
                 panel.getActionStop(),
                 panel.getActionStepOver(),
+                panel.getActionContinue(),
                 actions.getCopyNodePathBranchLabelsAction(),
                 actions.getCopyNodePathLineNumbersAction(),
                 actions.getCopyNodePathProgramStatementsAction(),
