@@ -19,14 +19,7 @@ import java.util.List;
  * Created by sarah on 8/2/17.
  */
 public class KeYInterpreterTest {
-    KeYProofFacade facade;
-
-    @Before
-    public void init() {
-        facade = new KeYProofFacade();
-    }
-
-    public Interpreter<KeyData> execute(InputStream is) throws IOException {
+/*    public Interpreter<KeyData> execute(InputStream is) throws IOException {
         List<ProofScript> scripts = Facade.getAST(CharStreams.fromStream(is));
         InterpreterBuilder ib = facade.buildInterpreter();
         Interpreter<KeyData> i = ib.build();
@@ -80,6 +73,5 @@ public class KeYInterpreterTest {
         Assert.assertTrue(i.isStrictMode());
 
     }
-
-
+    */
 }

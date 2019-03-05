@@ -16,7 +16,7 @@ import java.io.File;
  * Created by weigl on 15.07.2017.
  */
 public class KeyMatcherDerivableTest {
-    @Test
+    /*@Test
     public void derivable_test_1() throws Exception {
         KeYProofFacade f = new KeYProofFacade();
         String file = getClass().getResource("derivable_test_1.key").toExternalForm().substring(5);
@@ -38,5 +38,5 @@ public class KeyMatcherDerivableTest {
 
         Assert.assertEquals(1, proof.getSubtreeGoals(proof.root()).size());
     }
-
+    */
 }
