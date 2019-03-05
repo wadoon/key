@@ -3848,6 +3848,7 @@ varexp[TacletBuilder b]
         | varcond_enumtype[b, negated]
         | varcond_freeLabelIn[b,negated]         
         | varcond_localvariable[b, negated]        
+        | varcond_isrepfield[b, negated]
         | varcond_thisreference[b, negated]        
         | varcond_reference[b, negated]        
         | varcond_referencearray[b, negated]
@@ -4078,6 +4079,22 @@ varcond_fieldtype [TacletBuilder b]
         }
     }
 ;    
+
+varcond_isrepfield [TacletBuilder b, boolean negated]
+:
+    ISREPFIELD
+    LPAREN
+    x=varId
+    RPAREN
+    {
+//        if(!IsRepFieldCondition.checkSortedSV((SchemaVariable)x)) {
+//            semanticError("Expected schema variable of kind EXPRESSION or TYPE, "
+//                          + "but is " + x);
+//        } else {
+            b.addVariableCondition(new IsRepFieldCondition((SchemaVariable)x, negated));
+//        }
+    }
+;
 
 varcond_containsAssignment[TacletBuilder b, boolean negated]
 :

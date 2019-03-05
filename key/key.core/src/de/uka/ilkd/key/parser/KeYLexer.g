@@ -236,6 +236,7 @@ lexer grammar KeYLexer;
         FREELABELIN : '\\freeLabelIn';
 	HASSORT : '\\hasSort';
 	FIELDTYPE : '\\fieldType';
+	ISREPFIELD : '\\isRepField';
 	FINAL : '\\final';
 	ELEMSORT : '\\elemSort';
 	HASLABEL : '\\hasLabel';
