@@ -36,18 +36,12 @@ public class IsRepFieldCondition extends VariableConditionAdapter {
     public boolean check(SchemaVariable var, SVSubstitute instCandidate, SVInstantiations instMap,
             Services services) {
 
-        boolean result = checkInternal(var, instCandidate, services);
-        return negated ? !result : result;
-    }
-
-    // this method performs the actual check for rep field
-    private boolean checkInternal(SchemaVariable var, SVSubstitute instCand, Services services) {
         if (var != f) {
             return true;
         }
 
-        if (instCand instanceof Term) {
-            Operator op = ((Term) instCand).op();
+        if (instCandidate instanceof Term) {
+            Operator op = ((Term) instCandidate).op();
             if (op instanceof Function) {
                 String name = op.name().toString();
 
@@ -78,7 +72,8 @@ public class IsRepFieldCondition extends VariableConditionAdapter {
                     return false;
                 }
 
-                return attributeName.startsWith("rep_");
+                boolean repField = attributeName.startsWith("rep_");
+                return negated ? !repField : repField;
             }
         }
         return false;
