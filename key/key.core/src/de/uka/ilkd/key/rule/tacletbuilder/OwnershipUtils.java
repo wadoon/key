@@ -40,6 +40,11 @@ import de.uka.ilkd.key.util.MiscTools;
  * @author Wolfram Pfeifer
  */
 public final class OwnershipUtils {
+    // TODO: better use another heuristic?
+    /* inReachableStateImplication seems to be a good choice:
+     * It is ensured that the resulting formula does not occur on the sequence. */
+    private static final RuleSet HEURISTICS = new RuleSet(new Name("inReachableStateImplication"));
+
     private OwnershipUtils() { };
 
     private static boolean isImplicitField(Field f) {
@@ -170,8 +175,7 @@ public final class OwnershipUtils {
                 .add(new Choice("Java", "programRules"));
         tacletBuilder.setChoices(choices);
 
-        // TODO: better use another heuristic?
-        tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
+        tacletBuilder.addRuleSet(HEURISTICS);
 
         // we search for self.f1.repfp (this makes it unnecessary to manually instantiate the heap)
         tacletBuilder.setFind(fp1);
@@ -286,9 +290,8 @@ public final class OwnershipUtils {
         tacletBuilderRepfp.setChoices(choices);
         tacletBuilderPeerfp.setChoices(choices);
 
-        // TODO: better use another heuristic?
-        tacletBuilderRepfp.addRuleSet(new RuleSet(new Name("simplify")));
-        tacletBuilderPeerfp.addRuleSet(new RuleSet(new Name("simplify")));
+        tacletBuilderRepfp.addRuleSet(HEURISTICS);
+        tacletBuilderPeerfp.addRuleSet(HEURISTICS);
 
         // TODO: boolean observer function as predicate? -> shorter syntax
         // TODO: term labels?
@@ -377,8 +380,7 @@ public final class OwnershipUtils {
                 .add(new Choice("Java", "programRules"));
         tacletBuilder.setChoices(choices);
 
-        // TODO: better use another heuristic?
-        tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
+        tacletBuilder.addRuleSet(HEURISTICS);
 
         // \find("o.f")
         // TODO: boolean observer function as predicate? -> shorter syntax
@@ -472,8 +474,7 @@ public final class OwnershipUtils {
         // \find("o.f")
         tacletBuilder.setFind(oF);
 
-        // TODO: better use another heuristic?
-        tacletBuilder.addRuleSet(new RuleSet(new Name("simplify")));
+        tacletBuilder.addRuleSet(HEURISTICS);
 
         // \add(Object::select(heapSV, o, f) != null -> owner(Object::select(heapSV, o, f)) = o ==>)
         tacletBuilder.addTacletGoalTemplate(
