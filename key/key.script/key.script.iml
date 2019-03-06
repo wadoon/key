@@ -22,6 +22,10 @@
       <sourceFolder url="file://$MODULE_DIR$/rt/test/resources" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/rt/main/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/rt/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lint/main/resources" type="java-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/lint/main/java" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/lint/test/resources" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/lint/test/java" isTestSource="true" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -166,6 +170,15 @@
       <library>
         <CLASSES>
           <root url="jar://$MODULE_DIR$/../libs/test/junit-4.12.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../libs/runtime/compiler-0.9.6.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

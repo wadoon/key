@@ -22,6 +22,7 @@
         <dependency org="org.apache.logging.log4j" name="log4j-api"  rev="2.11.0" conf="sources->sources"/>
         <dependency org="org.apache.logging.log4j" name="log4j-core"  rev="2.11.0" conf="sources->sources"/>
         <dependency org="commons-cli" name="commons-cli" rev="1.4" conf="sources->sources"/>
+        <dependency org="com.github.spullara.mustache.java" name="compiler" rev="0.9.6" conf="sources->sources"/>
 
 
         <dependency org="org.apache.commons" name="commons-lang3" rev="3.8.1" conf="runtime->default"/>
@@ -31,6 +32,7 @@
         <dependency org="org.apache.logging.log4j" name="log4j-api"  rev="2.11.0" conf="runtime->default"/>
         <dependency org="org.apache.logging.log4j" name="log4j-core"  rev="2.11.0" conf="runtime->default"/>
         <dependency org="commons-cli" name="commons-cli" rev="1.4" conf="runtime->default"/>
+        <dependency org="com.github.spullara.mustache.java" name="compiler" rev="0.9.6" conf="runtime->default"/>
 
 
         <dependency org="org.projectlombok" name="lombok" rev="1.18.6" conf="compile->default"/>

@@ -87,7 +87,7 @@
         <javac destdir="${compile.dir}"
                nowarn="on"
                source="1.8"
-               srcdir="${gen.src}:lang/main/java:rt/main/java"
+               srcdir="${gen.src}:lang/main/java:rt/main/java:lint/main/java"
                optimize="on" debug="on">
             <classpath refid="compile.path"/>
             <classpath refid="runtime.path"/>
@@ -125,7 +125,7 @@
         <javac destdir="${compileTest.dir}"
                nowarn="on"
                source="1.8"
-               srcdir="lang/test/java:rt/test/java"
+               srcdir="lang/test/java:rt/test/java:lint/test/java"
                optimize="on" debug="on">
             <classpath>
                 <pathelement path="${compile.dir}"/>

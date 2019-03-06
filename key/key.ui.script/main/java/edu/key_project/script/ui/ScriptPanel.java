@@ -24,20 +24,13 @@ import edu.kit.iti.formal.psdbg.parser.ast.ProofScript;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NonNull;
-import lombok.Setter;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.Token;
 import org.apache.commons.io.FileUtils;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
-import org.fife.ui.rsyntaxtextarea.RSyntaxUtilities;
-import org.fife.ui.rtextarea.Gutter;
-import org.fife.ui.rtextarea.RTextScrollPane;
-import org.key_project.util.RandomName;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
@@ -95,6 +88,14 @@ public class ScriptPanel extends JPanel {
     private JFileChooser fileChooser;
     @Getter
     private DebuggerFramework<KeyData> debuggerFramework;
+    Timer timer = new Timer(100, e -> {
+        boolean flag = getDebuggerFramework() != null &&
+                getDebuggerFramework().getInterpreterThread() != null &&
+                (getDebuggerFramework().getInterpreterThread().getState() == Thread.State.WAITING
+                        || getDebuggerFramework().getInterpreterThread().getState() == Thread.State.BLOCKED
+                );
+        if (flag) enableGui();
+    });
     private PropertyChangeListener updateTitlesListener = evt -> updateTitles();
 
     public ScriptPanel(MainWindow window, KeYMediator mediator) {
@@ -202,16 +203,6 @@ public class ScriptPanel extends JPanel {
 
     }
 
-    Timer timer = new Timer( 100, e -> {
-        boolean flag = getDebuggerFramework() != null &&
-                getDebuggerFramework().getInterpreterThread() != null &&
-                (getDebuggerFramework().getInterpreterThread().getState() == Thread.State.WAITING
-                        || getDebuggerFramework().getInterpreterThread().getState() == Thread.State.BLOCKED
-                );
-        if(flag) enableGui();
-    });
-
-
     private void init() {
         setLayout(new BorderLayout());
         toolbar.add(actionLoad);
@@ -231,17 +222,6 @@ public class ScriptPanel extends JPanel {
         RSyntaxTextArea.setTemplatesEnabled(true);
 
         newEditor();
-
-        //fileJComboBox.addActionListener(e -> editor.setText(getCurrentScript().getContent()));
-        /*fileJComboBox.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                ScriptFile sf = (ScriptFile) value;
-                String sfx = sf.isDirty() ? "*" : "";
-                Component lbl = super.getListCellRendererComponent(list, sf.getName() + sfx, index, isSelected, cellHasFocus);
-                return lbl;
-            }
-        });*/
     }
 
     private void simpleReformat() {
@@ -336,11 +316,11 @@ public class ScriptPanel extends JPanel {
         DebuggerFramework<KeyData> old = debuggerFramework;
         debuggerFramework = df;
         firePropertyChange("debuggerFramework", old, df);
-        if(old!=null){
+        if (old != null) {
             old.removeErrorListener();
             old.removeSucceedListener();
         }
-        if(df!=null) {
+        if (df != null) {
             df.setErrorListener(this::onRuntimeError);
             df.setSucceedListener(this::onRunSucceed);
         }
@@ -469,7 +449,7 @@ public class ScriptPanel extends JPanel {
             setName("Stop interpreter");
             setMenuPath(MENU_PROOF_SCRIPTS_EXEC);
             setPriority(10);
-            setIcon(IconFontSwing.buildIcon(FontAwesomeBold.STOP_CIRCLE, ICON_SIZE));
+            setIcon(IconFontSwing.buildIcon(FontAwesomeBold.STOP_CIRCLE, ICON_SIZE, Color.RED));
             setEnabled();
         }
 
@@ -532,7 +512,8 @@ public class ScriptPanel extends JPanel {
             setName("Execute Script");
             setMenuPath(MENU_PROOF_SCRIPTS_EXEC);
             setPriority(0);
-            setIcon(IconFontSwing.buildIcon(FontAwesomeBold.PLAY_CIRCLE, ICON_SIZE));
+            setIcon(IconFontSwing.buildIcon(FontAwesomeBold.PLAY_CIRCLE, ICON_SIZE,
+                    new Color(140, 182, 60)));
             setEnabled();
         }
 
@@ -677,79 +658,3 @@ public class ScriptPanel extends JPanel {
 
 }
 
-class ScriptEditorPane extends JPanel {
-    public static final String PROP_DIRTY = "dirty";
-    public static final String PROP_FILE = "file";
-    public static final Icon BOOKMARK_ICON = IconFontSwing.buildIcon(FontAwesomeBold.CIRCLE, 12, Color.red);
-
-    @Getter
-    private final RSyntaxTextArea editor;
-    @Getter
-    private final Gutter gutter;
-    @Getter
-    private final RTextScrollPane editorView;
-    private final String name = RandomName.getRandomName("-") + ".kps";
-    @Getter
-    @Setter
-    private File file;
-    @Getter
-    @Setter
-    private boolean dirty;
-
-    public ScriptEditorPane() {
-        super(new BorderLayout(5, 5));
-        editor = new RSyntaxTextArea();
-        editorView = new RTextScrollPane(editor);
-        gutter = RSyntaxUtilities.getGutter(editor);
-        editor.setAntiAliasingEnabled(true);
-        editor.setCloseCurlyBraces(true);
-        editor.setCloseMarkupTags(true);
-        editor.setCodeFoldingEnabled(true);
-        editor.setSyntaxEditingStyle(ScriptUtils.KPS_LANGUAGE_ID);
-        editor.setText("script main() {auto;}\n");
-        ScriptUtils.createAutoCompletion().install(editor);
-        editor.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                update();
-            }
-
-            private void update() {
-                setDirty(true);
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                update();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                update();
-            }
-        });
-        gutter.setBookmarkIcon(BOOKMARK_ICON);
-        gutter.setBookmarkingEnabled(true);
-        add(editorView);
-    }
-
-    public String getTitle() {
-        return (file != null ? file.getName() : name) + (dirty ? "*" : "");
-    }
-
-    public String getText() {
-        return editor.getText();
-    }
-
-    public void setDirty(boolean dirty) {
-        boolean oldDirty = isDirty();
-        this.dirty = dirty;
-        firePropertyChange(PROP_DIRTY, oldDirty, dirty);
-    }
-
-    public void setFile(File f) {
-        File oldFile = file;
-        file = f;
-        firePropertyChange(PROP_FILE, oldFile, f);
-    }
-}

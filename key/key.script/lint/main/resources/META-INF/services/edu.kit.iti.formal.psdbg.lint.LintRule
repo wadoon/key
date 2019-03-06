@@ -1,0 +1,5 @@
+edu.kit.iti.formal.psdbg.lint.checkers.EmptyBlocks
+edu.kit.iti.formal.psdbg.lint.checkers.SuccessiveGoalSelector
+edu.kit.iti.formal.psdbg.lint.checkers.NegatedMatchWithUsing
+edu.kit.iti.formal.psdbg.lint.checkers.EqualScriptNames
+edu.kit.iti.formal.psdbg.lint.checkers.VariableDeclarationCheck
