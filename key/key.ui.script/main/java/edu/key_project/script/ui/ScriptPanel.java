@@ -325,10 +325,10 @@ public class ScriptPanel extends JPanel {
         firePropertyChange("debuggerFramework", old, df);
 
         df.setErrorListener(this::onRuntimeError);
-        df.setErrorListener(this::onRunSucceed);
+        df.setSucceedListener(this::onRunSucceed);
     }
 
-    private void onRunSucceed(DebuggerFramework<KeyData> keyDataDebuggerFramework, Throwable throwable) {
+    private void onRunSucceed(DebuggerFramework<KeyData> keyDataDebuggerFramework) {
         window.setStatusLine("Interpreting finished");
         enableGui();
     }

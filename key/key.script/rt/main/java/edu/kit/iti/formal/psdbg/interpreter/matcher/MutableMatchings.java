@@ -1,12 +1,11 @@
 package edu.kit.iti.formal.psdbg.interpreter.matcher;
 
 import com.google.common.collect.Sets;
-import com.sun.media.jfxmedia.logging.Logger;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.*;
 
@@ -166,7 +165,7 @@ public class MutableMatchings implements Matchings {
         }
         newMatch.putAll(h2);
 
-        Logger.logMsg(Logger.INFO, String.format("reduce: %20s :: %20s = %s%n", h1, h2, newMatch));
+        LOGGER.info(String.format("reduce: %20s :: %20s = %s%n", h1, h2, newMatch));
         return newMatch;
     }
 
