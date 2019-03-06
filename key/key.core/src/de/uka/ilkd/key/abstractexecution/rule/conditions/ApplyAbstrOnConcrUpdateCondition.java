@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -126,7 +127,8 @@ public final class ApplyAbstrOnConcrUpdateCondition
         final List<LocationVariable> hasToAssignableLocVars = abstrUpd
                 .getHasToAssignables().stream().filter(PVLoc.class::isInstance)
                 .map(PVLoc.class::cast).map(PVLoc::childOps)
-                .map(LocationVariable.class::cast).collect(Collectors.toList());
+                .flatMap(Collection::stream).map(LocationVariable.class::cast)
+                .collect(Collectors.toList());
 
         //@formatter:off
         /*

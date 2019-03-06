@@ -59,8 +59,6 @@ public class SequentViewInputListener
                 if (posInOcc != null) {
                     t = posInOcc.subTerm();
 
-                    System.out.println(t);
-
                     String operator = opStrFromTerm(t);
                     /*
                      * The hash code is displayed here since sometimes terms
@@ -83,8 +81,8 @@ public class SequentViewInputListener
 
                     if (t.op() instanceof AbstractUpdate) {
                         final Operator au = t.op();
-                        info += String.format(" (Abstract Update, Hash: %d)",
-                                au.hashCode());
+                        info += String.format(" (Abstract Update, Hash: %d, ID Hash: %d)",
+                                au.hashCode(), System.identityHashCode(t.op()));
                     }
 
                     Sequent seq = sequentView.getMainWindow().getMediator()
