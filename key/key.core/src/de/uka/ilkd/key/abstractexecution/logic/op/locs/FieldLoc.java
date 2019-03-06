@@ -77,10 +77,7 @@ public class FieldLoc extends AbstractSortedOperator
 
     @Override
     public String toString() {
-        // TODO (DS, 2019-02-28): Maybe not what one wants, check
-        return String.format("(%s, %s)",
-                fieldReference.getReferencePrefix().toString(),
-                fieldReference.getIdentifier().toString());
+        return fieldReference.toString();
     }
 
     @Override

@@ -39,9 +39,11 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SetLDT;
+import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -311,16 +313,13 @@ public class AbstractUpdateFactory {
                 return Optional.of(new EmptyLoc(locSetLDT.getEmpty()));
             }
 
-            Term obj = t.sub(0);
+            final Term obj = t.sub(0);
             final Term field = t.sub(1);
-            if (obj.toString().equals("self")) {
-                obj = tc.findThisForSort(obj.sort(), ec.get());
-            }
             final Term selectTerm = tb.select(
                     services.getJavaInfo().objectSort(), tb.getBaseHeap(), obj,
                     field);
-            return Optional
-                    .of(fieldLocFromSelectTerm(selectTerm, tc, ec.get()));
+            return Optional.of(
+                    fieldLocFromSelectTerm(selectTerm, tc, ec.get(), services));
         } else if (heapLDT.isSelectOp(op) && t.subs().size() == 3
                 && t.sub(2).op() == heapLDT.getArr()) {
             return Optional.of(new ArrayLoc(t.sub(1), t.sub(2).sub(0)));
@@ -338,7 +337,8 @@ public class AbstractUpdateFactory {
              * optional), e.g. for strange select terms with update applications
              * inside.
              */
-            return Optional.ofNullable(fieldLocFromSelectTerm(t, tc, ec.get()));
+            return Optional.ofNullable(
+                    fieldLocFromSelectTerm(t, tc, ec.get(), services));
         } else {
             return Optional.empty();
         }
@@ -382,10 +382,33 @@ public class AbstractUpdateFactory {
      *            program {@link Expression}.
      * @param ec
      *            The {@link ExecutionContext} for creating the field.
+     * @param services
+     *            The {@link Services} object.
      * @return A {@link FieldLoc} from the {@link Term}.
      */
-    private static FieldLoc fieldLocFromSelectTerm(final Term selectTerm,
-            final TypeConverter tc, ExecutionContext ec) {
+    private static FieldLoc fieldLocFromSelectTerm(Term selectTerm,
+            final TypeConverter tc, ExecutionContext ec, Services services) {
+        final ReferencePrefix rtInst = ec.getRuntimeInstance();
+        final TermBuilder tb = services.getTermBuilder();
+        if (rtInst instanceof LocationVariable) {
+            final LocationVariable rtInstVar = (LocationVariable) rtInst;
+            selectTerm = GenericTermReplacer.replace(selectTerm,
+                    t -> t.op() instanceof LocationVariable
+                            && t.op().toString().equals("self")
+                            && ((LocationVariable) t.op()).sort() == rtInstVar
+                                    .sort(),
+                    t -> tb.var((LocationVariable) rtInst), services);
+        }
+
+        /*
+         * NOTE (DS, 2019-03-06): We currently don't distinguish different
+         * heaps; either the abstract statement can or cannot assign a field,
+         * this is independent of the used heap. Maybe we will have to
+         * reconsider this, I might not have thought it through totally...
+         */
+        selectTerm = tb.select(selectTerm.sort(), tb.getBaseHeap(),
+                selectTerm.sub(1), selectTerm.sub(2));
+
         final Expression pe;
         try {
             pe = tc.convertToProgramElement(selectTerm);
