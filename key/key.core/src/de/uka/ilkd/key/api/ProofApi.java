@@ -33,13 +33,6 @@ public class ProofApi {
         return new ScriptApi(this);
     }
 
-    /**
-     * Save current Proof-> ProofApi
-     */
-    public void saveProof() throws IOException {
-        //TODO
-    }
-
     public KeYEnvironment<?> getEnv() {
         return env;
     }

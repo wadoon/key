@@ -226,4 +226,12 @@ public class DebuggerFramework<T> {
     public boolean hasError() {
         return error != null;
     }
+
+    public void removeErrorListener() {
+        errorListener = null;
+    }
+
+    public void removeSucceedListener() {
+        succeedListener = null;
+    }
 }

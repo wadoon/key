@@ -10,7 +10,7 @@ import org.apache.logging.log4j.Logger;
 import java.util.*;
 
 public class MutableMatchings implements Matchings {
-    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(MutableMatchings.class);
+    private static final Logger LOGGER = LogManager.getLogger(MutableMatchings.class);
     public Set<Match> inner = new TreeSet<>(new VariableAssignmentComparator());
 
     public static Matchings singleton(String name, MatchPath term) {

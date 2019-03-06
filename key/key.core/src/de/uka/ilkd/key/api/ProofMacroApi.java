@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.api;
 
 import de.uka.ilkd.key.macros.ProofMacro;
+import org.key_project.util.reflection.ClassLoaderUtil;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -22,10 +23,14 @@ public class ProofMacroApi {
 
     private void initialize() {
         ServiceLoader<ProofMacro> loader = ServiceLoader.load(ProofMacro.class);
-        loader.forEach(psc -> {
-            if (psc.getScriptCommandName() != null)
-                commandMap.put(psc.getScriptCommandName(), psc);
-        });
+        if(!loader.iterator().hasNext()) {
+            System.out.println("Could not load Macros");
+        } else {
+            loader.forEach(psc -> {
+                if (psc.getScriptCommandName() != null)
+                    commandMap.put(psc.getScriptCommandName(), psc);
+            });
+        }
     }
 
     /**

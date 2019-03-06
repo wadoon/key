@@ -197,7 +197,20 @@ public class ScriptPanel extends JPanel {
         mediator.addInterruptedListener(this::setActionEnable);
         toolbar = new JToolBar();
         init();
+        timer.setRepeats(true);
+        timer.start();
+
     }
+
+    Timer timer = new Timer( 100, e -> {
+        boolean flag = getDebuggerFramework() != null &&
+                getDebuggerFramework().getInterpreterThread() != null &&
+                (getDebuggerFramework().getInterpreterThread().getState() == Thread.State.WAITING
+                        || getDebuggerFramework().getInterpreterThread().getState() == Thread.State.BLOCKED
+                );
+        if(flag) enableGui();
+    });
+
 
     private void init() {
         setLayout(new BorderLayout());
@@ -323,9 +336,14 @@ public class ScriptPanel extends JPanel {
         DebuggerFramework<KeyData> old = debuggerFramework;
         debuggerFramework = df;
         firePropertyChange("debuggerFramework", old, df);
-
-        df.setErrorListener(this::onRuntimeError);
-        df.setSucceedListener(this::onRunSucceed);
+        if(old!=null){
+            old.removeErrorListener();
+            old.removeSucceedListener();
+        }
+        if(df!=null) {
+            df.setErrorListener(this::onRuntimeError);
+            df.setSucceedListener(this::onRunSucceed);
+        }
     }
 
     private void onRunSucceed(DebuggerFramework<KeyData> keyDataDebuggerFramework) {
@@ -335,6 +353,7 @@ public class ScriptPanel extends JPanel {
 
     private void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework, Throwable throwable) {
         window.popupWarning(throwable.getMessage(), "Interpreting Error");
+        throwable.printStackTrace();
         enableGui();
     }
 
@@ -480,17 +499,18 @@ public class ScriptPanel extends JPanel {
             setIcon(IconFontSwing.buildIcon(FontAwesomeBold.STEP_FORWARD, ICON_SIZE));
 
             setEnabled();
-            Timer timer = new Timer(100, e -> setEnabled());
+            Timer timer = new Timer(250, e -> setEnabled());
             timer.setRepeats(true);
             timer.start();
         }
 
         private void setEnabled() {
-            setEnabled(getDebuggerFramework() != null &&
+            boolean flag = getDebuggerFramework() != null &&
                     getDebuggerFramework().getInterpreterThread() != null &&
                     (getDebuggerFramework().getInterpreterThread().getState() == Thread.State.WAITING
                             || getDebuggerFramework().getInterpreterThread().getState() == Thread.State.BLOCKED
-                    ));
+                    );
+            setEnabled(flag);
         }
 
         @Override
@@ -498,6 +518,7 @@ public class ScriptPanel extends JPanel {
             try {
                 if (getDebuggerFramework() != null && debuggerFramework.getInterpreterThread() != null) {
                     window.setStatusLine("Step over");
+                    disableGui();
                     debuggerFramework.execute(new StepIntoCommand<>());
                 }
             } catch (DebuggerException e1) {
@@ -528,7 +549,7 @@ public class ScriptPanel extends JPanel {
             try {
                 final ScriptEditorPane f = getCurrentEditor();
                 final RSyntaxTextArea editor = getCurrentEditor().getEditor();
-                final CodePointCharStream stream = CharStreams.fromString(editor.getText(), f.getName());
+                final CodePointCharStream stream = CharStreams.fromString(editor.getText(), f.getTitle());
                 final List<ProofScript> ast = Facade.getAST(stream);
 
                 ib.addProofScripts(ast)
@@ -547,7 +568,7 @@ public class ScriptPanel extends JPanel {
                 Arrays.stream(f.getGutter().getBookmarks()).forEach(it -> {
                     try {
                         int line = 1 + editor.getLineOfOffset(it.getMarkedOffset());
-                        Breakpoint brk = new Breakpoint(f.getName(), line);
+                        Breakpoint brk = new Breakpoint(f.getTitle(), line);
                         System.out.println(brk);
                         df.getBreakpoints().add(brk);
                     } catch (BadLocationException e1) {
@@ -580,6 +601,7 @@ public class ScriptPanel extends JPanel {
             try {
                 if (getDebuggerFramework() != null && debuggerFramework.getInterpreterThread() != null) {
                     window.setStatusLine("Continue");
+                    disableGui();
                     debuggerFramework.execute(new ContinueCommand<>());
                 }
             } catch (DebuggerException e1) {

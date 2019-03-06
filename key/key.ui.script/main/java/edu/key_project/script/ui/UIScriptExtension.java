@@ -4,6 +4,7 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ext.KeYMainMenuExtension;
 import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
+import de.uka.ilkd.key.gui.ext.KeYToolbarExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import lombok.Getter;
@@ -16,7 +17,7 @@ import java.util.List;
  * @author Alexander Weigl
  * @version 1 (01.03.19)
  */
-public class UIScriptExtension implements KeYPaneExtension, KeYMainMenuExtension {
+public class UIScriptExtension implements KeYPaneExtension, KeYMainMenuExtension, KeYToolbarExtension {
     @Getter
     private static ScriptPanel panel;
     @Getter
@@ -71,4 +72,22 @@ public class UIScriptExtension implements KeYPaneExtension, KeYMainMenuExtension
         );
     }
 
+    @Override
+    public int getPriority() {
+        return 0;
+    }
+
+    @Override
+    public JToolBar getToolbar(MainWindow mainWindow) {
+        JToolBar toolbar = new JToolBar("Script Execution");
+        toolbar.add(panel.getActionLoad());
+        toolbar.add(panel.getActionSave());
+        toolbar.addSeparator();
+        toolbar.add(panel.getActionExecute());
+        toolbar.add(panel.getActionStop());
+        toolbar.add(panel.getActionContinue());
+        toolbar.add(panel.getActionStepOver());
+        return toolbar;
+
+    }
 }

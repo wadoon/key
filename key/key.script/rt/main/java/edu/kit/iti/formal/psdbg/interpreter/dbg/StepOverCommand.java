@@ -34,8 +34,6 @@ public class StepOverCommand<T> extends DebuggerCommand<T> {
             Blocker.SmallerContext predicate = new Blocker.SmallerContext(
                     currenDepth.get(), currenDepth);
             dbg.releaseUntil(predicate);
-        } else {
-
         }
     }
 }
