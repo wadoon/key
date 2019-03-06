@@ -90,7 +90,7 @@ public class AbstractExecutionUtils {
             Services services) {
         return getAccessibleTermsForNoBehaviorContract(aps, context, services)
                 .stream().filter(PVLoc.class::isInstance).map(PVLoc.class::cast)
-                .map(PVLoc::childOp).map(ProgramVariable.class::cast)
+                .map(PVLoc::childOps).map(ProgramVariable.class::cast)
                 .collect(Collectors.toList());
     }
 
@@ -137,7 +137,7 @@ public class AbstractExecutionUtils {
                 .stream()
                 .map(AbstrUpdateLHS::toUpdatableRHS)
                 .filter(PVLoc.class::isInstance).map(PVLoc.class::cast)
-                .map(PVLoc::childOp).map(LocationVariable.class::cast)
+                .map(PVLoc::childOps).map(LocationVariable.class::cast)
                 .collect(Collectors.toList());
     }
 

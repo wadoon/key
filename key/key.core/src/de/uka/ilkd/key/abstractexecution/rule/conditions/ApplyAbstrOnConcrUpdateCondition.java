@@ -125,7 +125,7 @@ public final class ApplyAbstrOnConcrUpdateCondition
         final AbstractUpdate abstrUpd = (AbstractUpdate) abstrUpdateTerm.op();
         final List<LocationVariable> hasToAssignableLocVars = abstrUpd
                 .getHasToAssignables().stream().filter(PVLoc.class::isInstance)
-                .map(PVLoc.class::cast).map(PVLoc::childOp)
+                .map(PVLoc.class::cast).map(PVLoc::childOps)
                 .map(LocationVariable.class::cast).collect(Collectors.toList());
 
         //@formatter:off

@@ -12,7 +12,9 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
@@ -51,8 +53,8 @@ public class SkolemLoc extends AbstractSortedOperator
     }
 
     @Override
-    public Operator childOp() {
-        return skLoc;
+    public Set<Operator> childOps() {
+        return Collections.singleton(skLoc);
     }
 
     @Override

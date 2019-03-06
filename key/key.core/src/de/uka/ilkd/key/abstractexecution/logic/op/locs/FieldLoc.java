@@ -12,7 +12,9 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
@@ -63,9 +65,9 @@ public class FieldLoc extends AbstractSortedOperator
     }
 
     @Override
-    public Operator childOp() {
+    public Set<Operator> childOps() {
         /* TODO (DS, 2019-02-28): Check that this is the right thing to do. */
-        return fieldReference.getProgramVariable();
+        return Collections.singleton(fieldReference.getProgramVariable());
     }
 
     @Override

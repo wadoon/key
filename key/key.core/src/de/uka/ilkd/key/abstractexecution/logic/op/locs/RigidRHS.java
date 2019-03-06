@@ -13,9 +13,11 @@
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
 import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -66,7 +68,10 @@ public class RigidRHS extends AbstractSortedOperator implements AbstrUpdateRHS {
     }
 
     @Override
-    public Operator childOp() {
-        return t.op();
+    public Set<Operator> childOps() {
+        final OpCollector opColl = new OpCollector();
+        t.execPostOrder(opColl);
+        return opColl.ops();
     }
+
 }

@@ -42,7 +42,7 @@ public class OpCollector extends DefaultVisitor {
         }
         if (t.op() instanceof AbstractUpdate) {
             ((AbstractUpdate) t.op()).getAllAssignables().stream()
-                    .map(AbstractUpdateLoc::childOp).forEach(ops::add);
+                    .map(AbstractUpdateLoc::childOps).forEach(ops::addAll);
         }
     }
 

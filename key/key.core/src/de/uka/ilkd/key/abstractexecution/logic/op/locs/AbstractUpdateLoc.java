@@ -13,6 +13,7 @@
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
 import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
@@ -38,10 +39,10 @@ public interface AbstractUpdateLoc extends SortedOperator {
 
     /**
      * All {@link AbstractUpdateLoc}s are containers. This method returns the
-     * "real" KeY {@link Operator} which they represent.
+     * "real" KeY {@link Operator}s which they represent.
      *
-     * @return The KeY {@link Operator} that this {@link AbstractUpdateLoc}
+     * @return The KeY {@link Operator}s that this {@link AbstractUpdateLoc}
      *         container represents.
      */
-    Operator childOp();
+    Set<Operator> childOps();
 }

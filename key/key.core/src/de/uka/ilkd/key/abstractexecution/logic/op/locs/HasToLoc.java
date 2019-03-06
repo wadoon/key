@@ -13,6 +13,7 @@
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
 import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
@@ -49,8 +50,8 @@ public class HasToLoc extends AbstractSortedOperator implements AbstrUpdateLHS {
     }
 
     @Override
-    public Operator childOp() {
-        return child.childOp();
+    public Set<Operator> childOps() {
+        return child.childOps();
     }
 
     @Override

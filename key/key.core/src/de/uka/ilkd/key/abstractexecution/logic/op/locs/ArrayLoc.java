@@ -13,10 +13,12 @@
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
 import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
@@ -60,11 +62,13 @@ public class ArrayLoc extends AbstractSortedOperator implements AbstrUpdateUpdat
     }
 
     @Override
-    public Operator childOp() {
-        // TODO (DS, 2019-03-06): Really???
-        return array.op();
+    public Set<Operator> childOps() {
+        final OpCollector opColl = new OpCollector();
+        array.execPostOrder(opColl);
+        index.execPostOrder(opColl);
+        return opColl.ops();
     }
-    
+
     @Override
     public AbstrUpdateUpdatableLoc toUpdatableRHS() {
         return this;

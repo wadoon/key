@@ -12,7 +12,9 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
@@ -55,8 +57,8 @@ public class PVLoc extends AbstractSortedOperator
     }
 
     @Override
-    public Operator childOp() {
-        return locVar;
+    public Set<Operator> childOps() {
+        return Collections.singleton(locVar);
     }
 
     @Override
