@@ -26,6 +26,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.ArrayLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.FieldLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
@@ -37,6 +38,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.Term;
@@ -237,7 +239,10 @@ public class AbstractUpdateFactory {
     /**
      * Extracts the {@link AbstractUpdateLoc} represented by the given
      * {@link Term}. May fail; in this case, an empty {@link Optional} is
-     * returned.
+     * returned. Make sure you don't rely on a result being present in
+     * soundness-critical applications. It's safe to use this method, e.g., for
+     * checking whether an update may be dropped, where in the empty case,
+     * nothing happens (at most completeness issue).
      *
      * @param t
      *            The {@link Term} to extract all {@link AbstractUpdateLoc}s
@@ -252,6 +257,7 @@ public class AbstractUpdateFactory {
     public Optional<AbstractUpdateLoc> tryExtractAbstrUpdateLocFromTerm(Term t,
             Optional<ExecutionContext> ec, Services services) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final TermBuilder tb = services.getTermBuilder();
         final TypeConverter tc = services.getTypeConverter();
 
@@ -295,20 +301,29 @@ public class AbstractUpdateFactory {
                     field);
             return Optional
                     .of(fieldLocFromSelectTerm(selectTerm, tc, ec.get()));
-        } else if (services.getTypeConverter().getHeapLDT().isSelectOp(op)) {
+        } else if (heapLDT.isSelectOp(op) && t.subs().size() == 3
+                && t.sub(2).op() == heapLDT.getArr()) {
+            return Optional.of(new ArrayLoc(t.sub(1), t.sub(2).sub(0)));
+        } else if (heapLDT.isSelectOp(op)) {
             if (!ec.isPresent()) {
                 /*
                  * In this case, the caller is not interested in fields (or
                  * otherwise, should have supplied an ExecutionContext).
                  */
-                return Optional.of(new EmptyLoc(locSetLDT.getEmpty()));
+                return Optional.ofNullable(new EmptyLoc(locSetLDT.getEmpty()));
             }
 
-            return Optional.of(fieldLocFromSelectTerm(t, tc, ec.get()));
+            /*
+             * NOTE (DS, 2019-03-06): This may fail (and we return an empty
+             * optional), e.g. for strange select terms with update applications
+             * inside.
+             */
+            return Optional.ofNullable(fieldLocFromSelectTerm(t, tc, ec.get()));
         } else {
             return Optional.empty();
         }
-        // TODO (DS, 2019-03-01): Handle "java.lang.Object::select(heap,loopArgs,arr(i_0))"
+        // TODO (DS, 2019-03-01): Handle
+        // "java.lang.Object::select(heap,loopArgs,arr(i_0))"
     }
 
     /**
@@ -339,7 +354,8 @@ public class AbstractUpdateFactory {
     }
 
     /**
-     * Extracts a {@link FieldLoc} from a select {@link Term}.
+     * Extracts a {@link FieldLoc} from a select {@link Term}. Returns null if
+     * this is not possible.
      *
      * @param selectTerm
      *            The select {@link Term}.
@@ -352,7 +368,13 @@ public class AbstractUpdateFactory {
      */
     private FieldLoc fieldLocFromSelectTerm(final Term selectTerm,
             final TypeConverter tc, ExecutionContext ec) {
-        final Expression pe = tc.convertToProgramElement(selectTerm);
+        final Expression pe;
+        try {
+            pe = tc.convertToProgramElement(selectTerm);
+        } catch (Exception e) {
+            return null;
+        }
+
         if (pe instanceof FieldReference) {
             return new FieldLoc((FieldReference) pe, ec);
         } else if (pe instanceof ProgramVariable) {
