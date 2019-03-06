@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.abstractexecution.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -90,8 +91,8 @@ public class AbstractExecutionUtils {
             Services services) {
         return getAccessibleTermsForNoBehaviorContract(aps, context, services)
                 .stream().filter(PVLoc.class::isInstance).map(PVLoc.class::cast)
-                .map(PVLoc::childOps).map(ProgramVariable.class::cast)
-                .collect(Collectors.toList());
+                .map(PVLoc::childOps).flatMap(Collection::stream)
+                .map(ProgramVariable.class::cast).collect(Collectors.toList());
     }
 
     /**
@@ -134,11 +135,10 @@ public class AbstractExecutionUtils {
             AbstractPlaceholderStatement aps, ProgramElement context,
             Services services) {
         return getAssignableOpsForNoBehaviorContract(aps, context, services)
-                .stream()
-                .map(AbstrUpdateLHS::toUpdatableRHS)
+                .stream().map(AbstrUpdateLHS::toUpdatableRHS)
                 .filter(PVLoc.class::isInstance).map(PVLoc.class::cast)
-                .map(PVLoc::childOps).map(LocationVariable.class::cast)
-                .collect(Collectors.toList());
+                .map(PVLoc::childOps).flatMap(Collection::stream)
+                .map(LocationVariable.class::cast).collect(Collectors.toList());
     }
 
     /**
