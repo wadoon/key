@@ -33,9 +33,13 @@ public class GetVariant extends AbstractTermTransformer {
         LoopSpecification spec = services.getSpecificationRepository()
                 .getLoopSpec(loop);
 
+        final TermBuilder tb = services.getTermBuilder();
         Term variantTerm = spec.getVariant(spec.getInternalSelfTerm(),
                 spec.getInternalAtPres(), services);
-        final TermBuilder tb = services.getTermBuilder();
+        if (variantTerm == null) {
+            return tb.TRUE();
+        }
+
         LocationVariable variantPV2 = (LocationVariable) services
                 .getNamespaces().programVariables().lookup("variant");
 

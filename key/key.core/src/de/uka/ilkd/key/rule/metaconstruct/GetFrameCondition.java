@@ -81,6 +81,15 @@ public class GetFrameCondition extends AbstractTermTransformer {
         }
         // END Additional Heap Terms
 
-        return frameCondition;
+        Term variantTerm = spec.getVariant(spec.getInternalSelfTerm(),
+                spec.getInternalAtPres(), services);
+        LocationVariable variantPV2 = (LocationVariable) services
+                .getNamespaces().programVariables().lookup("variant");
+
+        if (variantTerm == null) {
+            return frameCondition;
+        }
+
+        return tb.and(frameCondition, tb.prec(variantTerm, tb.var(variantPV2)));
     }
 }
