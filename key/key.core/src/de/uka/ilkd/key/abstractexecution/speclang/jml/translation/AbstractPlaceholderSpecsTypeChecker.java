@@ -12,7 +12,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
-import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.NonTerminalProgramElement;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -279,7 +279,7 @@ public class AbstractPlaceholderSpecsTypeChecker {
     private List<Pair<? extends Operator, Boolean>> getDeclsFromAbstrPlaceholderStmt(
             AbstractPlaceholderStatement aps) {
         final List<BlockContract> contracts = //
-                AbstractExecutionUtils.getNoBehaviorContracts(aps, services);
+                AbstractExecutionContractUtils.getNoBehaviorContracts(aps, services);
 
         /* At this point, there should at most be one contract... */
 

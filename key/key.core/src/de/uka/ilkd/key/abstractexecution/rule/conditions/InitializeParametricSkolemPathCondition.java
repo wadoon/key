@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
-import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
@@ -91,7 +91,7 @@ public class InitializeParametricSkolemPathCondition
             functions.add(funcSymb);
         }
 
-        final Set<AbstrUpdateRHS> accessibles = AbstractExecutionUtils
+        final Set<AbstrUpdateRHS> accessibles = AbstractExecutionContractUtils
                 .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt,
                         matchCond, services).first;
 

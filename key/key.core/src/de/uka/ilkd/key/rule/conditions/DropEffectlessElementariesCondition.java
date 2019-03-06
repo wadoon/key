@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
-import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
@@ -306,7 +306,7 @@ public final class DropEffectlessElementariesCondition
             final TypeConverter typeConverter = services.getTypeConverter();
 
             final List<BlockContract> contracts = //
-                    AbstractExecutionUtils.getNoBehaviorContracts(aps,
+                    AbstractExecutionContractUtils.getNoBehaviorContracts(aps,
                             services);
 
             if (contracts.isEmpty()) {

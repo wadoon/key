@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableList;
@@ -31,7 +32,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
-import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
@@ -43,21 +44,27 @@ import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
+import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
+import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.JavaProfile;
 import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * Collection of some common, stateless functionality. Stolen from the
@@ -669,7 +676,7 @@ public final class MiscTools {
             } else if (node instanceof AbstractPlaceholderStatement) {
                 final AbstractPlaceholderStatement aps = (AbstractPlaceholderStatement) node;
 
-                for (final ProgramVariable pv : AbstractExecutionUtils
+                for (final ProgramVariable pv : AbstractExecutionContractUtils
                         .getAccessibleProgVarsForNoBehaviorContract(aps, root,
                                 services)) {
                     if (!pv.isMember() && !declaredPVs.contains(pv)) {
@@ -719,7 +726,7 @@ public final class MiscTools {
             } else if (node instanceof AbstractPlaceholderStatement) {
                 final AbstractPlaceholderStatement aps = (AbstractPlaceholderStatement) node;
 
-                for (final ProgramVariable pv : AbstractExecutionUtils
+                for (final ProgramVariable pv : AbstractExecutionContractUtils
                         .getAssignableProgVarsForNoBehaviorContract(aps, root,
                                 services)) {
                     if (!pv.isMember() && !declaredPVs.contains(pv)) {
@@ -859,5 +866,60 @@ public final class MiscTools {
         }
 
         return result;
+    }
+
+    /**
+     * Collects all {@link LocationVariable}s in the given {@link Term}, thereby
+     * also considering {@link JavaBlock}s.
+     *
+     * @param t
+     *            The {@link Term} from which to collect.
+     * @param services
+     *            The {@link Services} object, for the
+     *            {@link ProgramVariableCollector}.
+     *
+     * @return All {@link LocationVariable}s in the given {@link Term}.
+     */
+    public static Set<LocationVariable> collectLocVars(final Term t,
+            Services services) {
+        final OpCollector opColl = new OpCollector();
+        t.execPostOrder(opColl);
+        final Set<LocationVariable> occurringLocVars = opColl.ops().stream()
+                .filter(op -> op instanceof LocationVariable)
+                .map(LocationVariable.class::cast).collect(Collectors.toSet());
+    
+        if (t.containsJavaBlockRecursive()) {
+            final JavaBlock jb = MergeRuleUtils.getJavaBlockRecursive(t);
+            final ProgramVariableCollector pvc = new ProgramVariableCollector(
+                    jb.program(), services);
+            pvc.start();
+            occurringLocVars.addAll(pvc.result());
+        }
+    
+        return occurringLocVars;
+    }
+
+    /**
+     * Replaces all occurrences of pv by t in replaceIn.
+     *
+     * @param pv
+     *            The {@link LocationVariable} to replace.
+     * @param with
+     *            The {@link Term} by which to replace pv.
+     * @param replaceIn
+     *            The {@link Term} in which to replace pv by t.
+     * @param services
+     *            The {@link Services} object, for the {@link TermBuilder}.
+     * @return The {@link Term} replaceIn with all occurrences of pv replaced by
+     *         t.
+     */
+    public static Term replaceVarInTerm(LocationVariable pv, Term with,
+            final Term replaceIn, Services services) {
+        final Map<Term, Term> substMap = new HashMap<>();
+        substMap.put(services.getTermBuilder().var(pv), with);
+        final OpReplacer opRepl = new OpReplacer(substMap,
+                services.getTermFactory());
+        final Term newAbstrUpdLHS = opRepl.replace(replaceIn);
+        return newAbstrUpdLHS;
     }
 }

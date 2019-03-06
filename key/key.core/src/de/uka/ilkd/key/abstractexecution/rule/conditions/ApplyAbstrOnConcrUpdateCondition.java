@@ -23,7 +23,6 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
-import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -37,6 +36,7 @@ import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
@@ -110,7 +110,7 @@ public final class ApplyAbstrOnConcrUpdateCondition
         }
 
         final Set<LocationVariable> locVarsInPhi = //
-                AbstractExecutionUtils.collectLocVars(services, phiInst);
+                MiscTools.collectLocVars(phiInst, services);
 
         // Those might be changed several times
         Term newConcreteUpdate = concrUpdate;
@@ -220,7 +220,7 @@ public final class ApplyAbstrOnConcrUpdateCondition
                         Collections.singletonMap(lhs1, lhs2));
 
         final Term newAbstrUpdRHS = //
-                AbstractExecutionUtils.replaceVarInTerm(lhs1, tb.var(lhs2),
+                MiscTools.replaceVarInTerm(lhs1, tb.var(lhs2),
                         abstractUpdateTerm.sub(0), services);
 
         return tf.createTerm(newAbstrUpd, newAbstrUpdRHS);

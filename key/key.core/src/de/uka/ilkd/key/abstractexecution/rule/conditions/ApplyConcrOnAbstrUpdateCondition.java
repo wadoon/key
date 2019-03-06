@@ -34,6 +34,7 @@ import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
@@ -206,7 +207,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
             // First, substitute in the accessibles
             {
                 final Term oldAccessibles = currentAccessibles;
-                currentAccessibles = AbstractExecutionUtils.replaceVarInTerm(
+                currentAccessibles = MiscTools.replaceVarInTerm(
                         lhs, rhs, currentAccessibles, services);
                 if (!oldAccessibles.equals(currentAccessibles)) {
                     success = true;

@@ -18,7 +18,7 @@ import java.util.Set;
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
-import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -64,7 +64,7 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
         final TermBuilder tb = services.getTermBuilder();
 
         final Pair<Set<AbstrUpdateRHS>, Set<AbstrUpdateLHS>> accessibleAndAssignableClause = //
-                AbstractExecutionUtils
+                AbstractExecutionContractUtils
                         .getAccessibleAndAssignableTermsForNoBehaviorContract(
                                 abstrStmt, matchCond, services);
 
