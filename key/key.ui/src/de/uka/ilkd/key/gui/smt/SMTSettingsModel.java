@@ -556,7 +556,11 @@ class SolverOptions extends TablePanel{
                     String info = installed? "yes": "no";
                     if (installed) {
                         final String versionString = solverType.getRawVersion();
-                        info = info + (versionString.startsWith("version")? " (": " (version ")+ versionString + ")";
+                        if (versionString != null) {
+                        	info = info + (versionString.startsWith("version")? " (": " (version ")+ versionString + ")";
+						} else {
+                        	info = "version unavailable";
+						}
                     }
                     solverInstalled = addTextField("Installed",minWidthOfTitle,info,"",null);
 			solverInstalled.setBackground(this.getBackground());
