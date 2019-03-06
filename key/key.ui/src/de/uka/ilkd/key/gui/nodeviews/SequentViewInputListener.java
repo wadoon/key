@@ -81,8 +81,8 @@ public class SequentViewInputListener
 
                     if (t.op() instanceof AbstractUpdate) {
                         final Operator au = t.op();
-                        info += String.format(" (Abstract Update, Hash: %d, ID Hash: %d)",
-                                au.hashCode(), System.identityHashCode(t.op()));
+                        info += String.format(" (Abstract Update, Hash: %d)",
+                                au.hashCode());
                     }
 
                     Sequent seq = sequentView.getMainWindow().getMediator()

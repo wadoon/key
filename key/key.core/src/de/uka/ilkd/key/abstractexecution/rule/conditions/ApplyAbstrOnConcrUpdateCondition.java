@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
@@ -215,8 +216,9 @@ public final class ApplyAbstrOnConcrUpdateCondition
         final AbstractUpdate abstrUpd = //
                 (AbstractUpdate) abstractUpdateTerm.op();
 
-        final AbstractUpdate newAbstrUpd = abstrUpd
-                .replaceVariables(Collections.singletonMap(lhs1, lhs2));
+        final AbstractUpdate newAbstrUpd = AbstractUpdateFactory.INSTANCE
+                .changeAssignables(abstrUpd,
+                        Collections.singletonMap(lhs1, lhs2));
 
         final Term newAbstrUpdRHS = //
                 AbstractExecutionUtils.replaceVarInTerm(lhs1, tb.var(lhs2),

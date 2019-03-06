@@ -15,6 +15,7 @@ package de.uka.ilkd.key.abstractexecution.logic.op;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -57,7 +58,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
 public class AbstractUpdateFactory {
     public static final AbstractUpdateFactory INSTANCE = new AbstractUpdateFactory();
 
-    private final HashMap<AbstractPlaceholderStatement, //
+    private final HashMap<String, //
             HashMap<Integer, AbstractUpdate>> abstractUpdateInstances = //
                     new LinkedHashMap<>();
 
@@ -114,16 +115,17 @@ public class AbstractUpdateFactory {
     public AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
             Set<AbstrUpdateLHS> assignables, ExecutionContext ec,
             Services services) {
-        if (abstractUpdateInstances.get(phs) == null) {
-            abstractUpdateInstances.put(phs, new LinkedHashMap<>());
+        final String phsID = phs.getId();
+        if (abstractUpdateInstances.get(phsID) == null) {
+            abstractUpdateInstances.put(phsID, new LinkedHashMap<>());
         }
 
         final int assgnHashCode = assignables.hashCode();
         AbstractUpdate result = //
-                abstractUpdateInstances.get(phs).get(assgnHashCode);
+                abstractUpdateInstances.get(phsID).get(assgnHashCode);
         if (result == null) {
             result = new AbstractUpdate(phs, assignables, ec, services);
-            abstractUpdateInstances.get(phs).put(assgnHashCode, result);
+            abstractUpdateInstances.get(phsID).put(assgnHashCode, result);
         }
 
         return result;
@@ -143,23 +145,40 @@ public class AbstractUpdateFactory {
      */
     public AbstractUpdate changeAssignables(AbstractUpdate abstrUpd,
             Set<AbstrUpdateLHS> assignables) {
-        final AbstractPlaceholderStatement phs = abstrUpd
-                .getAbstractPlaceholderStatement();
-        if (abstractUpdateInstances.get(phs) == null) {
-            // abstractUpdateInstances.put(phs, new WeakHashMap<>());
-            abstractUpdateInstances.put(phs, new LinkedHashMap<>());
+        final String phsID = abstrUpd.getAbstractPlaceholderStatement().getId();
+        if (abstractUpdateInstances.get(phsID) == null) {
+            abstractUpdateInstances.put(phsID, new LinkedHashMap<>());
         }
 
         final int assgnHashCode = assignables.hashCode();
-        // WeakReference<AbstractUpdate> result = //
         AbstractUpdate result = //
-                abstractUpdateInstances.get(phs).get(assgnHashCode);
+                abstractUpdateInstances.get(phsID).get(assgnHashCode);
         if (result == null) {
             result = abstrUpd.changeAssignables(assignables);
-            abstractUpdateInstances.get(phs).put(assgnHashCode, result);
+            abstractUpdateInstances.get(phsID).put(assgnHashCode, result);
         }
 
         return result;
+    }
+
+    /**
+     * Returns a new {@link AbstractUpdate} of the supplied one with the
+     * {@link ProgramVariable}s in the assignables replaced according to the
+     * supplied map.
+     *
+     * @param replMap
+     *            The replace map.
+     * @return A new {@link AbstractUpdate} of this one with the
+     *         {@link ProgramVariable}s in the assignables replaced according to
+     *         the supplied map.
+     */
+    public AbstractUpdate changeAssignables(AbstractUpdate abstrUpd,
+            Map<ProgramVariable, ProgramVariable> replMap) {
+        final Set<AbstrUpdateLHS> newAssignables = abstrUpd.getAllAssignables()
+                .stream().map(lhs -> lhs.replaceVariables(replMap))
+                .map(AbstrUpdateLHS.class::cast)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+        return changeAssignables(abstrUpd, newAssignables);
     }
 
     /**

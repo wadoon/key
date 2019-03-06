@@ -16,7 +16,6 @@ package de.uka.ilkd.key.abstractexecution.logic.op;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,7 +34,6 @@ import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
@@ -135,27 +133,6 @@ public final class AbstractUpdate extends AbstractSortedOperator {
          * now...
          */
         return "U_" + phs.getId();
-    }
-
-    /**
-     * Returns a new {@link AbstractUpdate} of this one with the
-     * {@link ProgramVariable}s in the assignables replaced according to the
-     * supplied map.
-     *
-     * @param replMap
-     *            The replace map.
-     * @return A new {@link AbstractUpdate} of this one with the
-     *         {@link ProgramVariable}s in the assignables replaced according to
-     *         the supplied map.
-     */
-    public AbstractUpdate replaceVariables(
-            Map<ProgramVariable, ProgramVariable> replMap) {
-        return new AbstractUpdate(phs,
-                assignables.stream().map(lhs -> lhs.replaceVariables(replMap))
-                        .map(AbstrUpdateLHS.class::cast)
-                        .collect(Collectors
-                                .toCollection(() -> new LinkedHashSet<>())),
-                ec, services);
     }
 
     @Override
