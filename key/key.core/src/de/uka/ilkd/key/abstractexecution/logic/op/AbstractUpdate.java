@@ -41,7 +41,8 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * i.e., updates of the form "U(LOCSET1 := LOCSET2)", where LOCSET1/2 are
  * location sets. There is one such operator for every left hand side "LOCSET1".
  * Each of these operator is unary, accepting a single argument "LOCSET2".
- * Comparable to an {@link ElementaryUpdate}.
+ * Comparable to an {@link ElementaryUpdate}. {@link AbstractUpdate}s are
+ * immutable.
  */
 public final class AbstractUpdate extends AbstractSortedOperator {
 
