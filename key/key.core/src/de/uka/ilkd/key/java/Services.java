@@ -20,6 +20,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.java.recoderext.KeYCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.java.recoderext.SchemaCrossReferenceServiceConfiguration;
 import de.uka.ilkd.key.logic.InnerVariableNamer;
@@ -115,6 +117,15 @@ public class Services implements TermServices {
     private final TermBuilder termBuilderWithoutCache;
 
     /**
+     * The {@link AbstractUpdateFactory} for creating {@link AbstractUpdate}s
+     * and related constructs. Put into the {@link Services} since it maintains
+     * a map from {@link AbstractPlaceholderStatement}s and left-hand sides to
+     * {@link AbstractUpdate}s for reusing {@link AbstractUpdate}s; when
+     * discarding the {@link Services} object, this can also be removed from memory.
+     */
+    private final AbstractUpdateFactory abstractUpdateFactory;
+
+    /**
      * Stores associations from SchemaVariable instantiations to SkolemSV
      * instantiations. The reason is the "\freshFor" instantiation concept: A
      * SkolemSV is generated "\freshFor" a Schema Variable if the first time it
@@ -149,6 +160,7 @@ public class Services implements TermServices {
         javainfo = new JavaInfo(new KeYProgModelInfo(this, typeconverter,
                 new KeYRecoderExcHandler()), this);
         nameRecorder = new NameRecorder();
+        this.abstractUpdateFactory = new AbstractUpdateFactory();
     }
 
     private Services(Profile profile,
@@ -171,6 +183,7 @@ public class Services implements TermServices {
         javainfo = new JavaInfo(
                 new KeYProgModelInfo(this, crsc, rec2key, typeconverter), this);
         nameRecorder = new NameRecorder();
+        this.abstractUpdateFactory = new AbstractUpdateFactory();
     }
 
     private Services(Services s) {
@@ -190,6 +203,7 @@ public class Services implements TermServices {
         this.termBuilder = new TermBuilder(
                 new TermFactory(caches.getTermFactoryCache()), this);
         this.termBuilderWithoutCache = new TermBuilder(new TermFactory(), this);
+        this.abstractUpdateFactory = s.abstractUpdateFactory;
     }
 
     public Services getOverlay(NamespaceSet namespaces) {
@@ -246,6 +260,15 @@ public class Services implements TermServices {
      */
     public VariableNamer getVariableNamer() {
         return innerVarNamer;
+    }
+
+    /**
+     * @return The {@link AbstractUpdateFactory} object for creating
+     *         {@link AbstractUpdate}s and related constructs (Abstract
+     *         Execution).
+     */
+    public AbstractUpdateFactory abstractUpdateFactory() {
+        return abstractUpdateFactory;
     }
 
     /**

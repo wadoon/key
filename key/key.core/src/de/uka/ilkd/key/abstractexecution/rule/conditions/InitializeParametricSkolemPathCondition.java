@@ -19,7 +19,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
-import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
@@ -96,7 +95,7 @@ public class InitializeParametricSkolemPathCondition
                 .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt,
                         matchCond, services).first;
 
-        final Term pathCond = tb.func(funcSymb, AbstractUpdateFactory.INSTANCE
+        final Term pathCond = tb.func(funcSymb, services.abstractUpdateFactory()
                 .accessiblesToSetUnion(accessibles, services));
 
         return matchCond

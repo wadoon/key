@@ -33,7 +33,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
-import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
 import de.uka.ilkd.key.java.Services;
@@ -983,16 +982,16 @@ public class TermBuilder {
     public Term abstractUpdate(AbstractPlaceholderStatement phs,
             Set<AbstrUpdateLHS> assignables, Set<AbstrUpdateRHS> accessibles,
             ExecutionContext ec) {
-        final AbstractUpdate au = AbstractUpdateFactory.INSTANCE
+        final AbstractUpdate au = services.abstractUpdateFactory()
                 .getInstance(phs, assignables, ec, services);
-        final Term rhs = AbstractUpdateFactory.INSTANCE
+        final Term rhs = services.abstractUpdateFactory()
                 .accessiblesToSetUnion(accessibles, services);
         return tf.createTerm(au, rhs);
     }
 
     public Term abstractUpdate(AbstractPlaceholderStatement phs,
             Set<AbstrUpdateLHS> assignables, Term rhs, ExecutionContext ec) {
-        final AbstractUpdate au = AbstractUpdateFactory.INSTANCE
+        final AbstractUpdate au = services.abstractUpdateFactory()
                 .getInstance(phs, assignables, ec, services);
         return tf.createTerm(au, rhs);
     }
@@ -1003,7 +1002,7 @@ public class TermBuilder {
 
     public Term abstractUpdate(AbstractPlaceholderStatement phs, Term lhs,
             Term rhs, ExecutionContext ec) {
-        final AbstractUpdate au = AbstractUpdateFactory.INSTANCE
+        final AbstractUpdate au = services.abstractUpdateFactory()
                 .getInstance(phs, lhs, ec, services);
         return tf.createTerm(au, rhs);
     }

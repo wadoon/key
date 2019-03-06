@@ -328,14 +328,14 @@ public class AbstractExecutionUtils {
             final BlockContract contract = findRightContract(contracts,
                     surroundingVars, heap, services);
 
-            accessibleClause = AbstractUpdateFactory.INSTANCE
+            accessibleClause = AbstractUpdateFactory
                     .abstractUpdateLocsFromUnionTerm(
                             contract.getAccessibleClause(heap),
                             executionContext, services)
                     .stream().map(AbstrUpdateUpdatableLoc.class::cast)
                     .collect(Collectors
                             .toCollection(() -> new LinkedHashSet<>()));
-            assignableClause = AbstractUpdateFactory.INSTANCE
+            assignableClause = AbstractUpdateFactory
                     .abstractUpdateLocsFromUnionTerm(
                             contract.getAssignable(heap), executionContext,
                             services)
@@ -469,7 +469,7 @@ public class AbstractExecutionUtils {
             Term target, ExecutionContext ec, Services services) {
         final Set<AbstrUpdateUpdatableLoc> assignedBeforeUsed = new LinkedHashSet<>();
         final Set<AbstrUpdateUpdatableLoc> usedBeforeAssigned = new LinkedHashSet<>();
-        final AbstractUpdateFactory factory = AbstractUpdateFactory.INSTANCE;
+        final AbstractUpdateFactory factory = services.abstractUpdateFactory();
 
         Optional<AbstractUpdateLoc> loc = factory
                 .tryExtractAbstrUpdateLocFromTerm(target, ec, services);
@@ -623,7 +623,7 @@ public class AbstractExecutionUtils {
             ExecutionContext ec, Services services) {
         assert update.op() instanceof AbstractUpdate;
 
-        usedBeforeAssigned.addAll(AbstractUpdateFactory.INSTANCE
+        usedBeforeAssigned.addAll(AbstractUpdateFactory
                 .abstractUpdateLocsFromUnionTerm(update.sub(0), ec, services)
                 .stream().filter(AbstrUpdateUpdatableLoc.class::isInstance)
                 .filter(op -> !assignedBeforeUsed.contains(op))

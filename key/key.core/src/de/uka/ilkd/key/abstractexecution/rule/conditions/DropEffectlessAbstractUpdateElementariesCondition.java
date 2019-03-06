@@ -178,7 +178,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
              */
             if (assignables.size() > 1) {
                 return tb.abstractUpdate(
-                        AbstractUpdateFactory.INSTANCE.changeAssignables(
+                        services.abstractUpdateFactory().changeAssignables(
                                 abstrUpd,
                                 Collections.singleton(new AllLocsLoc(allLocs))),
                         accessiblesTerm);
@@ -216,7 +216,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
         final Set<AbstrUpdateRHS> newAccessibles = //
-                AbstractUpdateFactory.INSTANCE
+                AbstractUpdateFactory
                         .abstractUpdateLocsFromUnionTerm(accessiblesTerm, ec,
                                 services)
                         .stream().map(AbstrUpdateRHS.class::cast)

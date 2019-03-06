@@ -262,7 +262,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      *         by t.
      */
     public Set<AbstrUpdateUpdatableLoc> getUpdatableRHSs(Term t) {
-        return AbstractUpdateFactory.INSTANCE
+        return AbstractUpdateFactory
                 .abstractUpdateLocsFromUnionTerm(t, ec, services).stream()
                 .filter(AbstrUpdateUpdatableLoc.class::isInstance)
                 .map(AbstrUpdateUpdatableLoc.class::cast)
@@ -286,7 +286,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      *         by t.
      */
     public Set<AbstrUpdateRHS> transformRHS(Term t) {
-        return AbstractUpdateFactory.INSTANCE
+        return AbstractUpdateFactory
                 .abstractUpdateLocsFromUnionTerm(t, ec, services).stream()
                 .map(AbstrUpdateRHS.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));

@@ -28,7 +28,6 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
-import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.axiom_abstraction.predicateabstraction.AbstractionPredicate;
 import de.uka.ilkd.key.java.Label;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -235,7 +234,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             }
             if (op instanceof AbstractUpdate) {
                 final AbstractUpdate origOp = (AbstractUpdate) op;
-                op = AbstractUpdateFactory.INSTANCE.changeAssignables(origOp,
+                op = services.abstractUpdateFactory().changeAssignables(origOp,
                         replaceMap);
                 changed = changed || origOp != op;
             }

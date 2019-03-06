@@ -29,7 +29,7 @@ import de.uka.ilkd.key.logic.Term;
  */
 public class AbstractUpdateLocationsVisitor extends DefaultVisitor {
     private final Set<AbstractUpdateLoc> result = new LinkedHashSet<>();
-    private final AbstractUpdateFactory factory = AbstractUpdateFactory.INSTANCE;
+    private final AbstractUpdateFactory factory;
 
     private final ExecutionContext ec;
     private final Services services;
@@ -38,6 +38,7 @@ public class AbstractUpdateLocationsVisitor extends DefaultVisitor {
             Services services) {
         this.ec = ec;
         this.services = services;
+        this.factory = services.abstractUpdateFactory();
     }
 
     @Override

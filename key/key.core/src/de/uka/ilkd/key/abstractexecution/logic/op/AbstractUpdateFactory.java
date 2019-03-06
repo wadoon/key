@@ -56,16 +56,17 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  * @author Dominic Steinhoefel
  */
 public class AbstractUpdateFactory {
-    public static final AbstractUpdateFactory INSTANCE = new AbstractUpdateFactory();
-
     private final HashMap<String, //
             HashMap<Integer, AbstractUpdate>> abstractUpdateInstances = //
                     new LinkedHashMap<>();
 
     /**
-     * Singleton constructor.
+     * Constructor. NOTE: You should not use this constructor, but instead
+     * access {@link Services#abstractUpdateFactory()}, since this factory
+     * caches {@link AbstractUpdate}s. You'll probably face incompleteness
+     * issues if you don't follow this rule.
      */
-    private AbstractUpdateFactory() {
+    public AbstractUpdateFactory() {
     }
 
     /**
@@ -194,7 +195,7 @@ public class AbstractUpdateFactory {
      *            The {@link Services} object.
      * @return All {@link AbstractUpdateLoc}s from the given {@link Term}.
      */
-    public Set<AbstractUpdateLoc> abstractUpdateLocsFromUnionTerm(Term t,
+    public static Set<AbstractUpdateLoc> abstractUpdateLocsFromUnionTerm(Term t,
             ExecutionContext ec, Services services) {
         return abstractUpdateLocsFromUnionTerm(t, Optional.of(ec), services);
     }
@@ -213,7 +214,7 @@ public class AbstractUpdateFactory {
      *            The {@link Services} object.
      * @return All {@link AbstractUpdateLoc}s from the given {@link Term}.
      */
-    public Set<AbstractUpdateLoc> abstractUpdateLocsFromUnionTerm(Term t,
+    public static Set<AbstractUpdateLoc> abstractUpdateLocsFromUnionTerm(Term t,
             Optional<ExecutionContext> ec, Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
@@ -273,8 +274,8 @@ public class AbstractUpdateFactory {
      *            The {@link Services} object.
      * @return All {@link AbstractUpdateLoc}s from the given {@link Term}.
      */
-    public Optional<AbstractUpdateLoc> tryExtractAbstrUpdateLocFromTerm(Term t,
-            Optional<ExecutionContext> ec, Services services) {
+    public static Optional<AbstractUpdateLoc> tryExtractAbstrUpdateLocFromTerm(
+            Term t, Optional<ExecutionContext> ec, Services services) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final TermBuilder tb = services.getTermBuilder();
@@ -359,7 +360,7 @@ public class AbstractUpdateFactory {
      *            The {@link Services} object.
      * @return All {@link AbstractUpdateLoc}s from the given {@link Term}.
      */
-    public AbstractUpdateLoc abstractUpdateLocFromTerm(Term t,
+    public static AbstractUpdateLoc abstractUpdateLocFromTerm(Term t,
             Optional<ExecutionContext> ec, Services services) {
         Optional<AbstractUpdateLoc> result = tryExtractAbstrUpdateLocFromTerm(t,
                 ec, services);
@@ -383,7 +384,7 @@ public class AbstractUpdateFactory {
      *            The {@link ExecutionContext} for creating the field.
      * @return A {@link FieldLoc} from the {@link Term}.
      */
-    private FieldLoc fieldLocFromSelectTerm(final Term selectTerm,
+    private static FieldLoc fieldLocFromSelectTerm(final Term selectTerm,
             final TypeConverter tc, ExecutionContext ec) {
         final Expression pe;
         try {
