@@ -3154,8 +3154,13 @@ atom returns [Term _atom = null]
        { if(si != null) { a = getServices().getTermBuilder().createMatchBinder(a, si); } }
     |   TRUE  { a = getTermFactory().createTerm(Junctor.TRUE); }
     |   FALSE { a = getTermFactory().createTerm(Junctor.FALSE); }
-    ( {isEnabledSchemaMatching()}? => COLON si=match_ident )?
-    { if(si != null) { a = getServices().getTermBuilder().createMatchBinder(a, si); } }
+    |   {isEnabledSchemaMatching()}? => ELLIPSIS a = term  ELLIPSIS {
+            //TODO Term createn?
+            a = getServices().getTermBuilder().createEllipsisTerm(a);
+        }
+    |   {isEnabledSchemaMatching()}? => a=match_ident {
+
+       }
     |   a = ifThenElseTerm
     |   a = ifExThenElseTerm
     |   literal=STRING_LITERAL
