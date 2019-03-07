@@ -3170,6 +3170,20 @@ atom returns [Term _atom = null]
 		(new KeYSemanticException(input, getSourceName(), ex));
         }
 
+match_ident returns [Term a = null]
+:
+id=MATCH_ID ((COLON IDENT) => COLON sort=sortId_check[true])?
+{
+    if(id.getText().equals("?")){
+        a = getServices().getTermBuilder().createMatchIdentifier(sort);
+    } else {
+        a = getServices().getTermBuilder().createMatchIdentifier(id.getText(), sort);
+    }
+//TODO Spezialfall ? als _ hier abfangen?
+//TODO a = tb.matchIdentifier(id.text, nullable sort);
+}
+;
+
 label returns [ImmutableArray<TermLabel> labels = new ImmutableArray<TermLabel>()]
 @init {
   ArrayList<TermLabel> labelList = new ArrayList<TermLabel>();
@@ -3443,6 +3457,9 @@ one_logic_bound_variable returns[QuantifiableVariable v=null]
 :
   s=sortId id=simple_ident {
     v = bindVar(id, s);
+  }
+  | {isEnabledSchemaMatching()}? mv=match_ident {
+           v = (QuantifiableVariable)mv.op();
   }
 ;
 
