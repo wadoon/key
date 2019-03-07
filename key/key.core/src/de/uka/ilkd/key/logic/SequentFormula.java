@@ -36,11 +36,15 @@ public class SequentFormula {
      * @param term a Term of sort Sort.FORMULA
      */ 
     public SequentFormula(Term term) {
-	if (term.sort() != Sort.FORMULA) {
-	    throw new RuntimeException("A Term instead of a formula: " + term);
-	}
-	this.term = term;	
-	this.hashCode = term.hashCode () * 13;
+        // weigl: fix FORMULA is extendable, e.g. by BottomSort
+        if (!term.sort().extendsTrans(Sort.FORMULA)) {
+            throw new RuntimeException("A Term instead of a formula: " + term);
+        }
+    	/*if (term.sort() != Sort.FORMULA) {
+	        throw new RuntimeException("A Term instead of a formula: " + term);
+	    }*/
+	    this.term = term;
+	    this.hashCode = term.hashCode () * 13;
     }
 
     /** @return the stored Term */

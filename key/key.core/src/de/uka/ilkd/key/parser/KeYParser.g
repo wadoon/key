@@ -106,6 +106,19 @@ options {
 
 @members{
 
+    /**
+     *   To enable parsing of schematerms from the proof script debugger
+     */
+    private boolean enabledSchemaMatching = false;
+
+    public boolean isEnabledSchemaMatching(){
+        return enabledSchemaMatching;
+    }
+
+    public void setEnabledSchemaMatching(boolean flag){
+        enabledSchemaMatching = flag;
+    }
+
     private static final Sort[] AN_ARRAY_OF_SORTS = new Sort[0];
     private static final Term[] AN_ARRAY_OF_TERMS = new Term[0];
 
@@ -3137,9 +3150,12 @@ atom returns [Term _atom = null]
     :
 (        {isTermTransformer()}? a = specialTerm
     |   a = funcpredvarterm
-    |   LPAREN a = term RPAREN
+    |   LPAREN a = term RPAREN ( {isEnabledSchemaMatching()}? => COLON si=match_ident )?
+       { if(si != null) { a = getServices().getTermBuilder().createMatchBinder(a, si); } }
     |   TRUE  { a = getTermFactory().createTerm(Junctor.TRUE); }
     |   FALSE { a = getTermFactory().createTerm(Junctor.FALSE); }
+    ( {isEnabledSchemaMatching()}? => COLON si=match_ident )?
+    { if(si != null) { a = getServices().getTermBuilder().createMatchBinder(a, si); } }
     |   a = ifThenElseTerm
     |   a = ifExThenElseTerm
     |   literal=STRING_LITERAL

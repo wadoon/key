@@ -20,6 +20,7 @@ import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
+import de.uka.ilkd.key.logic.sort.BottomSort;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.rule.RuleSet;
@@ -86,18 +87,23 @@ public final class DefaultTermParser {
     }
 
     public Term parse(Reader in, Sort sort, Services services,
-                      NamespaceSet nss, AbbrevMap scm, boolean matchingEnabled)
+                      NamespaceSet nss, AbbrevMap scm, boolean enableMatching)
             throws ParserException {
-        if(matchingEnabled) throw new IllegalStateException("Not implemented yet, waiting for merge of PSDBG branch.");
+
         KeYParserF parser = null;
         try {
+            KeYLexerF lexer = new KeYLexerF(in, "");
+            lexer.setEnabledSchemaMatching(enableMatching);
+            if (enableMatching) {
+                nss.sorts().add(new BottomSort());
+            }
             parser
-                    = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""),
+                    = new KeYParserF(ParserMode.TERM, lexer,
                     new Recoder2KeY(services, nss),
                     services,
                     nss,
                     scm);
-
+            parser.setEnabledSchemaMatching(enableMatching);
             final Term result = parser.termEOF();
             if (sort != null && !result.sort().extendsTrans(sort))
                 throw new ParserException("Expected sort " + sort + ", but parser returns sort " + result.sort() + ".", null);
@@ -123,12 +129,19 @@ public final class DefaultTermParser {
         return parseSeq(in,services,nss,scm,false);
     }
 
-    public Sequent parseSeq(Reader in, Services services, NamespaceSet nss, AbbrevMap scm, boolean matchingEnabled) throws ParserException {
-        if(matchingEnabled) throw new IllegalStateException("Not implemented yet, waiting for merge of PSDBG branch.");
+    public Sequent parseSeq(Reader in, Services services, NamespaceSet nss, AbbrevMap scm, boolean enableMatching) throws ParserException {
 
         KeYParserF p = null;
         try {
-            p = new KeYParserF(ParserMode.TERM, new KeYLexerF(in, ""), new Recoder2KeY(services, nss), services, nss, scm);
+            KeYLexerF keYLexerF = new KeYLexerF(in, "");
+            keYLexerF.setEnabledSchemaMatching(enableMatching);
+            p = new KeYParserF(ParserMode.TERM, keYLexerF, new Recoder2KeY(services, nss), services, nss, scm);
+            p.setEnabledSchemaMatching(enableMatching);
+            if (enableMatching) {
+                nss.sorts().add(new BottomSort());
+                nss.sorts().add(Sort.FORMULA);
+
+            }
             final Sequent seq = p.seqEOF();
             return seq;
         } catch (RecognitionException re) {
