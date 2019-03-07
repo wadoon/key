@@ -1,6 +1,8 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import java.util.Map;
+import java.util.Observer;
+import java.util.Optional;
 
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.macros.scripts.meta.Option;
@@ -29,7 +31,9 @@ public class EchoCommand extends AbstractCommand<EchoCommand.Parameters> {
     @Override
     public void execute(AbstractUserInterfaceControl uiControl, Parameters args,
             EngineState state) throws ScriptException, InterruptedException {
-        state.getObserver().update(null, args.message);
+        final Optional<Observer> observer = Optional
+                .ofNullable(state.getObserver());
+        observer.ifPresent(obs -> obs.update(null, args.message));
     }
 
     public static class Parameters {
