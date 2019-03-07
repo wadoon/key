@@ -18,7 +18,7 @@ public final class BottomSort implements Sort  {
     public static final Name NAME = new Name("Bottom");
     public static final BottomSort INSTANCE = new BottomSort();
 
-    private BottomSort() {}
+    public BottomSort() {}
 
     @Override
     public Name name() {
