@@ -89,7 +89,7 @@ public class ProofScriptCommandBuilder implements CommandHandler<KeyData> {
                 Iterator<Node> nodeIterator = start.leavesIterator();
                 while (nodeIterator.hasNext()) {
                     Node n = nodeIterator.next();
-                    LOGGER.error("Node " + n.serialNr() + " was closed " + n.isClosed());
+                    //LOGGER.info("Node " + n.serialNr() + " was closed " + n.isClosed());
                 }
 
             } else {
