@@ -130,8 +130,10 @@ class ScriptEditorPane extends JPanel {
                 }
 
                 //TODO result.setParsedLines();
-            } catch (IOException e) {
+            } catch (IOException e ) {
                 result.setError(e);
+            } catch (NullPointerException npe){
+                result.setError(npe);
             }
 
 
