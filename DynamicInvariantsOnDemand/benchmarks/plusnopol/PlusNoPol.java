@@ -15,9 +15,9 @@ class Plus {
 			i = i + 1;
 		}
 		int j = 0;
+		//j<=b && r==a+j
+		//j<=b && a = 0 && j - r = 0
 		/*@ loop_invariant j<=b && r==a+j; @*/
-		//loop_invariant j<=b && a==0 && j-r==0;
-		/*@ loop_invariant j<=b && a==0 && r==a+j; @*/
 		while(j < b) {
 			r = r + 1;
 			j = j + 1;

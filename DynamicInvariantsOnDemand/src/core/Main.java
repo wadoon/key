@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSet;
 
 import api.key.KeYAPI;
 import de.uka.ilkd.key.java.Services;
@@ -35,6 +36,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -47,6 +49,7 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
+import de.uka.ilkd.key.util.MiscTools;
 import dynacode.DynaCode;
 import genmethod.MethodGenerator;
 import gentest.IGeneratedTest;
@@ -60,8 +63,10 @@ import smt.AuxiliaryFunctions;
 import smt.ProblemFactory;
 
 public class Main {
+	private static final boolean useGeneratedInvariant = true;
 	private static final boolean mockFirstLoopInvariant = false;
-	private static final String mockFirstLoopInvariantString = "-q*_y - r + _x = 0";
+	//private static final String mockFirstLoopInvariantString = "-q*_y - r + _x = 0";
+	private static final String mockFirstLoopInvariantString = "i - r = 0";
 	private static int loopDepthCounter = 0;
 
 	private static final String benchmarksFile1 = "benchmarks/Loop1/Loop1.java";
@@ -69,9 +74,16 @@ public class Main {
 	private static final String benchmarksFile3 = "benchmarks/cohen/Cohen.java";
 	private static final String benchmarksFile4 = "benchmarks/easyloop1/EasyLoop1NoPol.java";
 	
+	private static final String benchmarksFile5 = "benchmarks/plus/Plus.java";
+	private static final String benchmarksFile6 = "benchmarks/square/Square.java";
+	private static final String benchmarksFile7 = "benchmarks/times/Times.java";
+	private static final String benchmarksFile8 = "benchmarks/timestwo/TimesTwo.java";
+	
+	private static final String benchmarksFile9 = "benchmarks/squarenozero/SquareNoZero.java";
+	
 	private static final String digRelPath = "dig/dig/dig.py";
 	//amount of testcases / method calls for the function from which the traces should be obtained
-	public static final int maxLoopUnwinds = 5;
+	public static final int maxLoopUnwinds = 10;
 	
 	private static KeYAPI keyAPI;
 	
@@ -79,7 +91,8 @@ public class Main {
 		keyAPI = new KeYAPI(benchmarksFile3);
 		ProofIndependentSettings.DEFAULT_INSTANCE
         .getTestGenerationSettings().setMaxUnwinds(maxLoopUnwinds);
-		ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = 8;
+		//2^(intBound-2) == max possible values of smt (so 2^(6-2))=16 max possible input var value)
+		ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = 10;
 		//ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = 20;
 		
 		List<Contract> proofContracts = keyAPI.getContracts();
@@ -110,7 +123,7 @@ public class Main {
 					return counterexample;
 				} else {
 					Invariant invariant = (Invariant)result;
-					keyAPI.applyInvariantRule(currentGoal, invariant);
+					keyAPI.applyInvariantRule(currentGoal, invariant, useGeneratedInvariant);
 					attemptProve(proof);
 				}
 			}
@@ -119,6 +132,8 @@ public class Main {
 	}
 	
 	public static InvGenResult attemptInvGen(SequentWrapper sequent, Proof proof) throws ProofInputException {
+		if (!useGeneratedInvariant)
+			return null;
 		//FIXME: Daniel - Fix Code for stackedloops, does not work
 		List<Term> gamma 		= sequent.getGamma();
 		StatementBlock program 	= sequent.getProgram();
@@ -144,6 +159,10 @@ public class Main {
 		// add update vars to namespace to be able to use the parser for those vars
 	    TermBuilder tb = onlyLoopProof.getServices().getTermBuilder();
 		Services services = onlyLoopProof.getServices().copy(false);
+		//[TEEMP
+		ImmutableSet<ProgramVariable> localins = MiscTools.getLocalIns(program, services);
+		ImmutableSet<ProgramVariable> localouts = MiscTools.getLocalOuts(program, services);
+		//]TEMP
         AbbrevMap abbr = (services.getProof() == null) ? null
                 : services.getProof().abbreviations();
         NamespaceSet existingNS = services.getNamespaces();
@@ -241,8 +260,8 @@ public class Main {
 		}
 		System.out.println("Full Inv-Term with User given Ineq: " + conjInvariants.toString());
 		
-		boolean invInitiallyValid = isInvInitiallyValid(conjInvariants, proof.openGoals().head());
-		System.out.println("invInitiallyValid: " + invInitiallyValid);
+		//boolean invInitiallyValid = isInvInitiallyValid(conjInvariants, loopGoal);
+		//System.out.println("invInitiallyValid: " + invInitiallyValid);
 		
 		return new Invariant(conjInvariants);
 	}
@@ -255,11 +274,16 @@ public class Main {
 			//DIG Array Format: [p*x + q*y - a == 0, q*r - p*s + 1 == 0, r*x + s*y - b == 0]
 			return null;
 		
-		String[] invArray;
-		String modDIGInvariantArray = rawDIGInvariantArray.replace("[", "").replace("]", "");
-		invArray = modDIGInvariantArray.split("^,");
 		
-		return new ArrayList<String>(Arrays.asList(invArray));
+		String modDIGInvariantArray = rawDIGInvariantArray.replace("[", "").replace("]", "");
+		//remove leading spaces (space after each ,)
+		String lspacesRegex = "^\\s+";
+		List<String> invArrayList = new ArrayList<String>();
+		for (String inv : modDIGInvariantArray.split(",")) {
+			invArrayList.add(inv.replaceAll(lspacesRegex, ""));
+		}
+
+		return invArrayList;
 	}
 	
 	private static List<String> convertDIGInvariantsToJMLFormat(List<String> digInvariants, 
@@ -423,6 +447,7 @@ public class Main {
 	
 	public static boolean isInvInitiallyValid(Term inv, Goal loopGoal) {
 		//TODO: testGeneration "destroyed" the proof
+		//FIXME: WICHTIG: Obwohl hier auf der copy gearbeitet wird, werden die richtigen Invarianten ersetzt
 		Proof proof = loopGoal.proof();
 		boolean invInitiallyValid = false;
 		try {

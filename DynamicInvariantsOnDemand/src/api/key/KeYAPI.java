@@ -124,7 +124,7 @@ public class KeYAPI {
 		return loopInvariant;
 	}
 	
-	public void applyInvariantRule(Goal goal, Invariant invariant) {
+	public void applyInvariantRule(Goal goal, Invariant invariant, boolean useGeneratedInvariant) {
 		
 		if (goal.sequent().succedent().size() < 2) {
 			//can't apply goal.sequent().succedent().get(1)
@@ -132,32 +132,40 @@ public class KeYAPI {
 			return;
 		}
 		
+		if (!useGeneratedInvariant) {
+			System.out.println("!!!!WARNING: DO NOT USE GENERATED INVARIANTS");
+		}
+		
 		WhileInvariantRule invariantRule = WhileInvariantRule.INSTANCE;
 		PosInOccurrence poi = new PosInOccurrence(goal.sequent().succedent().get(1), PosInTerm.getTopLevel(), false);
 		TermServices services = myEnvironment.getServices();
 		LoopInvariantBuiltInRuleApp ruleApplication = new LoopInvariantBuiltInRuleApp(invariantRule, poi, services);
 		ruleApplication = ruleApplication.tryToInstantiate(goal);
-		LoopSpecification spec = ruleApplication.getSpec();
-		Services serv = goal.proof().getServices();
 		
-		Map<LocationVariable, Term> invariants = new HashMap<>();
-		TermBuilder termBuilder = services.getTermBuilder();
-		Map<LocationVariable, Term> freeInvariants = new HashMap<>();
-		Map<LocationVariable, Term> modifies = /*new HashMap<>();//*/spec.getInternalModifies();
-		Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs = spec.getInternalInfFlowSpec();
-		Term variant = null;
+		if (useGeneratedInvariant) {
+			LoopSpecification spec = ruleApplication.getSpec();
+			Services serv = goal.proof().getServices();
+			
+			Map<LocationVariable, Term> invariants = new HashMap<>();
+			TermBuilder termBuilder = services.getTermBuilder();
+			Map<LocationVariable, Term> freeInvariants = new HashMap<>();
+			Map<LocationVariable, Term> modifies = /*new HashMap<>();//*/spec.getInternalModifies();
+			Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs = spec.getInternalInfFlowSpec();
+			Term variant = null;
+			
+			Term update = ruleApplication.posInOccurrence().sequentFormula().formula().sub(0);
+			Term termInv = invariant.getFormula();
+			Term loopInvariant = termInv;
+			
+			LocationVariable baseHeap  = serv.getTypeConverter().getHeapLDT().getHeap();
+			LocationVariable savedHeap = serv.getTypeConverter().getHeapLDT().getSavedHeap();
+			invariants.put(baseHeap, loopInvariant);
+			spec = spec.configurate(invariants, freeInvariants, modifies, infFlowSpecs, variant);
+			
+			//overwrite old Invariant / set new Invariant
+			ruleApplication.setLoopInvariant(spec);
+		}
 		
-		Term update = ruleApplication.posInOccurrence().sequentFormula().formula().sub(0);
-		Term termInv = invariant.getFormula();
-		Term loopInvariant = termInv;
-		
-		LocationVariable baseHeap  = serv.getTypeConverter().getHeapLDT().getHeap();
-		LocationVariable savedHeap = serv.getTypeConverter().getHeapLDT().getSavedHeap();
-		invariants.put(baseHeap, loopInvariant);
-		spec = spec.configurate(invariants, freeInvariants, modifies, infFlowSpecs, variant);
-		
-		
-		ruleApplication.setLoopInvariant(spec);
 		goal.apply(ruleApplication);
 	}
 

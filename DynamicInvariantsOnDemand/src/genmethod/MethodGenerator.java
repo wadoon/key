@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -22,7 +23,7 @@ public abstract class MethodGenerator {
 		TermUpdateVisitor varNameCollector = new TermUpdateVisitor();
 		update.execPreOrder(varNameCollector);
 		
-		String returnVariable = extractReturnVariableFromProgram(program);
+		//String returnVariable = extractReturnVariableFromProgram(program);
 		
 		//program.getBody().forEach(s -> s.);
 		
@@ -95,7 +96,7 @@ public abstract class MethodGenerator {
 		}
 		
 		// Build code like ArrayList<Integer> traces__x = new ArrayList<Integer>();
-		Set<String> traces = getVariablesNamesWithPrefix(varNameCollector.variables.keySet(), "traces_");
+		ArrayList<String> traces = getVariablesNamesWithPrefix(varNameCollector.variables.keySet(), "traces_");
 		ArrayList<String> tracesArrayListsStrings = getArrayListVarStringsFromVars(traces);
 		for (String s : tracesArrayListsStrings) {
 			tracesArrayListVarStringBuilder.append(s);
@@ -176,7 +177,7 @@ public abstract class MethodGenerator {
 		return javaCodeBuilder.toString();
 	}
 	
-	private static ArrayList<String> getHashMapPuts(String hashMapVarName, Set<String> varNames, Set<String> tracesNames) {
+	private static ArrayList<String> getHashMapPuts(String hashMapVarName, Set<String> varNames, ArrayList<String> tracesNames) {
 		ArrayList<String> hashMapPuts = new ArrayList<String>();
 		
 		StringBuilder hashMapPutsBuilder = new StringBuilder();
@@ -240,8 +241,8 @@ public abstract class MethodGenerator {
 			return null;
 	}
 	
-	public static Set<String> getVariablesNamesWithPrefix(Set<String> variables, String prefix) {
-		Set<String> varNames = new HashSet<String>();
+	public static ArrayList<String> getVariablesNamesWithPrefix(Set<String> variables, String prefix) {
+		ArrayList<String> varNames = new ArrayList<String>();
 		StringBuilder variablesNameBuilder = new StringBuilder();
 		for (String var : variables) {
 			variablesNameBuilder.append(prefix);
@@ -254,7 +255,7 @@ public abstract class MethodGenerator {
 		return varNames;
 	}
 	
-	public static ArrayList<String> getArrayListVarStringsFromVars(Set<String> variables) {
+	public static ArrayList<String> getArrayListVarStringsFromVars(ArrayList<String> variables) {
 		// Example: Returns for variables(beginLoop_x,beginLoop_y): ArrayList<Integer> beginLoop_x = new ArrayList<Integer>();
 		//										                    ArrayList<Integer> beginLoop_y = new ArrayList<Integer>();
 		ArrayList<String> arrayListVarStrings = new ArrayList<String>();

@@ -1,6 +1,7 @@
 package core;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.Visitor;
@@ -11,7 +12,7 @@ import de.uka.ilkd.key.logic.op.Operator;
 public class TermUpdateVisitor implements Visitor{
 	// HashMap with Key: Variable Name, Value: Update Name
 	// FIXME es k�nnen hier evtl auch mehrfache Zuweisungen zur gleichen Variable m�glich sein
-	public HashMap<String, String> variables = new HashMap<String, String>();
+	public LinkedHashMap<String, String> variables = new LinkedHashMap<String, String>();
 
 	@Override
 	public boolean visitSubtree(Term visited) {
@@ -53,7 +54,9 @@ public class TermUpdateVisitor implements Visitor{
 				getsUpdatedWithName = visited.sub(0).op().name().toString();
 			}
 			//FIXME better logic. Ignore the exception variable exc
-			if (!variableName.equals("exc"))
+			// FIXME: wie mit member (heap) variablen umgehen? Feature einbauen?
+			// ignoriere heap
+			if (!variableName.contains("exc") && !variableName.contains("heap"))
 				variables.put(variableName, getsUpdatedWithName);
 		}
 	}

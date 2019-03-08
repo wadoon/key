@@ -1,0 +1,12 @@
+- isInvInitiallyValid: arbeitet zwar auf proof copy, aber die originale invariante wird trotzdem geändert. Nur schlimm, wenn ich noch die originale inv brauche
+- extractInequalitiesFromTerm: kann nicht mit 0<=a umgehen, wegen der regex (Z klammer ist das problem
+- stacked loops: cohen funktioniert nicht, vermutlich weil die zahlen zu groß werden für den SMT mit bounded int. Problem: schon bei intBound 10
+  wird eine PipeClosed(SMT) exception geworfen.
+ -MethodGenerator: Cohen inner loop: q = q_0, r = r_0: wie damit umgehen? in dem Fall könnte ich die aller ersten belegungen für q und r merken,
+  aber das funktioniert halt nicht i.A: oder?
+(- testgen zerstört proof - cloned proof nehmen)
+- nicht wegen mir, auch in gui, invariante angeben: use case goal wird nicht geschlossen. (bei mir in isInvInitiallyValid. wie kann den überhaupt dann
+  mit autopilot in der main der proof geschlossen werden? da entsteht ja auch das usecase goal?!
+ -testgen: siehe Plus beispiel: generiert für a immer für zweite loop, vermutlich weil a nicht mehr relevant ist. Dadurch wird falsche Invariante a = 0 und r==j erzeugt
+ -traces Problem stacked loops: siehe square. Da i erst nach der innerloop incrementiert wird, ist i innerhalb der innerloop beim 0. lauf = 0.
+  -> äußere invariante kann nicht gefunden werden
