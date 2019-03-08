@@ -34,6 +34,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -73,9 +74,15 @@ public abstract class Facade {
      */
     public static List<ProofScript> getAST(CharStream stream) {
         TransformAst astt = new TransformAst();
-        ScriptLanguageParser.StartContext ctx = parseStream(stream);
-        if (ctx.exception != null) throw ctx.exception;
+        val parser = getParser(stream);
+        ScriptLanguageParser.StartContext ctx =parser.start();
+        if (0 != parser.getNumberOfSyntaxErrors()) {
+            return Collections.emptyList();
+        }
 
+        if (ctx.exception != null) {
+            throw ctx.exception;
+        }
         ctx.accept(astt);
         return astt.getScripts();
     }
