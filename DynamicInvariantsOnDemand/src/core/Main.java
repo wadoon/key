@@ -76,7 +76,7 @@ public class Main {
 	private static KeYAPI keyAPI;
 	
 	public static void main(String[] args) {
-		keyAPI = new KeYAPI(benchmarksFile2);
+		keyAPI = new KeYAPI(benchmarksFile3);
 		ProofIndependentSettings.DEFAULT_INSTANCE
         .getTestGenerationSettings().setMaxUnwinds(maxLoopUnwinds);
 		ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = 8;
