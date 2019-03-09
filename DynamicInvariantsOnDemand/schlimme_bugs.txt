@@ -1,4 +1,14 @@
-- isInvInitiallyValid: arbeitet zwar auf proof copy, aber die originale invariante wird trotzdem geändert. Nur schlimm, wenn ich noch die originale inv brauche
+- invariante für loop setzen und resetten:
+	BUG: alte wird nicht mehr resettet: wegen WhileInvariantRule l. 218
+- plus & cohen benchmark: wenn die 2. pol invariante mit a fehlt, ist _a zu dem zeitpunkt nicht mehr als variable bekannt (in updates fehlt _a=a
+	-> mögliche unsaubere lösung: in proof.getServices().namespaces.progVarNS stehen anscheinend immer die input vars:
+	Namespace: [local:{heap=heap, savedHeap=savedHeap, permissions=permissions, a=a, b=b, self=self, result=result, exc=exc, heapAtPre=heapAtPre, _a=_a, _b=_b}]
+	-> extrahieren, und dem methodGenerator immer separat (nicht in normalen updates) übergeben. Dann IMMER die assignments
+	int a = inputVariables.get(0); int b = inputVariables.get(0); int _a = a, int _b = b am anfang schreiben
+   !ABER:ich denke selbe ursache wie bei cohen inner loop q = q_0, r = r_0, dass q_0.. nicht bekannt ist, aber bei TimesTwo geht es mit i_0
+   -> ja: ich denke es liegt an simplifyUpdate (siehe KeYBook pg. 525 und siehe gui). Ich müsste das quasi ausschalten denke ich
+  und misc_tools.getLocalIns / Outs liefert nicht _a -> deswegen fehlt in genmethod int a = _a. int r = a -> fehler, a unbekannt
+- cloneProof ist buggy: proof.initConfig.specRepos wird nicht gecloned, (initConfig schon)- liegt an Services.copy: s.specRepos = specRepos; - isInvInitiallyValid: arbeitet zwar auf proof copy, aber die originale invariante wird trotzdem geändert. Nur schlimm, wenn ich noch die originale inv brauche
 - stacked loops: cohen funktioniert nicht, vermutlich weil die zahlen zu groß werden für den SMT mit bounded int. Problem: schon bei intBound 10
   wird eine PipeClosed(SMT) exception geworfen.
  -MethodGenerator: Cohen inner loop: q = q_0, r = r_0: wie damit umgehen? in dem Fall könnte ich die aller ersten belegungen für q und r merken,
@@ -13,3 +23,4 @@
   solved:
   - extractInequalitiesFromTerm: kann nicht mit 0<=a umgehen, wegen der regex (Z klammer ist das problem
   
+  -replace inv: es wird nur für _a und nicht für a die invariante replaced (es gibt noch while(a<i) mit alter inv) -> macht aber nichts wahrscheinlich

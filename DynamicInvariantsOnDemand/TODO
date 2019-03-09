@@ -1,5 +1,6 @@
 -siehe bugs
 
+-TestGen: remove invariant (still user given ineq in java file) before calling, changes testcases (since symbolic execution can simplify more with invariant)
 -backtracking (simple): wie weit implementiert aktuell? wie sieht/sollte dieser konkret überhaupt aus?
 -ich brauche einen stackedloop algorithmus der funktioniert!!! -> für backtracking (extended)
 	-> evtl gucken bei dig: welche programme mit welchen inv loops? tabelle in paper

@@ -9,7 +9,7 @@ class Plus {
 	int plus(int a, int b) {
 		int r = 0;
 		int i = 0;
-		/*@ loop_invariant i<=a && r==i; @*/
+		/*@ loop_invariant i<=a; @*/
 		while(i < a) {
 			r = r + 1;
 			i = i + 1;
@@ -17,7 +17,7 @@ class Plus {
 		int j = 0;
 		//j<=b && r==a+j
 		//j<=b && a = 0 && j - r = 0
-		/*@ loop_invariant j<=b && r==a+j; @*/
+		/*@ loop_invariant j<=b; @*/
 		while(j < b) {
 			r = r + 1;
 			j = j + 1;

@@ -1,6 +1,4 @@
-//Outer: loop_invariant (0 <= r) && (x == q*y + r);
-//Inner: loop_invariant (b <= r) && (b == a*y) && (x == q*y + r);
-public class SimpleExamplesNoInv {
+public class SimpleExamples {
 	
 	/*@
     @ public normal_behavior
@@ -10,15 +8,18 @@ public class SimpleExamplesNoInv {
     @*/
 	int cohenDivide(int x, int y) {
 		int q = 0;	// quotient
-		int r = x;	// remainder
-		//		  
+		int r = x;	// remainder	
+		
+		//loop_invariant (0 <= r);
 		/*@
+		  @ loop_invariant (0 <= r);
 		  @ assignable \nothing;
 		  @*/
 		while(y <= r) {
 			int a = 1;
 			int b = y;
-			/*@
+			//loop_invariant (b <= r);
+			/*@ loop_invariant (b <= r);
 			  @ assignable \nothing;
 			  @*/
 			while(2*b <= r) {
@@ -30,5 +31,4 @@ public class SimpleExamplesNoInv {
 		}
 		return q;
 	}
-	
 }

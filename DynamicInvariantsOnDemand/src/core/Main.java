@@ -25,8 +25,11 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import api.key.KeYAPI;
+import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.NamespaceSet;
 import de.uka.ilkd.key.logic.PosInOccurrence;
@@ -36,7 +39,9 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
@@ -44,12 +49,14 @@ import de.uka.ilkd.key.proof.Goal;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
+import de.uka.ilkd.key.rule.RuleAbortException;
 import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 import de.uka.ilkd.key.speclang.Contract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
+import de.uka.ilkd.key.util.Pair;
 import dynacode.DynaCode;
 import genmethod.MethodGenerator;
 import gentest.IGeneratedTest;
@@ -72,7 +79,7 @@ public class Main {
 	private static final String benchmarksFile1 = "benchmarks/Loop1/Loop1.java";
 	private static final String benchmarksFile2 = "benchmarks/easyloop1/EasyLoop1.java";
 	private static final String benchmarksFile3 = "benchmarks/cohen/Cohen.java";
-	private static final String benchmarksFile4 = "benchmarks/easyloop1nopol/EasyLoop1NoPol.java";
+	private static final String benchmarksFile4 = "benchmarks/easyloop1nopol/EasyLoop1NoPol.java"; //works
 	
 	private static final String benchmarksFile5 = "benchmarks/plus/Plus.java";
 	private static final String benchmarksFile6 = "benchmarks/square/Square.java";
@@ -81,6 +88,11 @@ public class Main {
 	
 	private static final String benchmarksFile9 = "benchmarks/squarenozero/SquareNoZero.java";
 	
+	private static final String benchmarksFile10 = "benchmarks/plusnopol/PlusNoPol.java";
+	
+	private static final String benchmarksFile11 = "benchmarks/timestwonopol/TimesTwoNoPol.java"; //works
+	private static final String benchmarksFile12 = "benchmarks/cohennopol/CohenNoPol.java";
+	
 	private static final String digRelPath = "dig/dig/dig.py";
 	//amount of testcases / method calls for the function from which the traces should be obtained
 	public static final int maxLoopUnwinds = 5;
@@ -88,12 +100,13 @@ public class Main {
 	private static KeYAPI keyAPI;
 	
 	public static void main(String[] args) {
-		keyAPI = new KeYAPI(benchmarksFile4);
+		keyAPI = new KeYAPI(benchmarksFile12);
+		
 		ProofIndependentSettings.DEFAULT_INSTANCE
         .getTestGenerationSettings().setMaxUnwinds(maxLoopUnwinds);
-		//2^(intBound-2) == max possible values of smt (so 2^(6-2))=16 max possible input var value)
+		//2^(intBound-2) == max possible values of smt (so 2^(6-2))=16 max possible input var value) 
+		//int.bound = 8 is max for my system setup
 		ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = 8;
-		//ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = 20;
 		
 		List<Contract> proofContracts = keyAPI.getContracts();
 		ProofResult result = null;
@@ -191,7 +204,18 @@ public class Main {
 			writeStringToFile(javaCode, filePath.toString());
 			
 			System.out.println("Start test generation, num cases/calls: " + maxLoopUnwinds);
+			Term uselessInv = null;
+			try {
+				uselessInv = tb.parseTerm("0=0");
+			} catch (ParserException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			//delete invariant (for user given Ineq.);
+			Term oldLoopInv = setNewLoopInvariantOverwriteOld(loopGoal, uselessInv);
 			ProblemFactory.create(onlyLoopProof);
+			//restore old inv (user given ineq)
+			setNewLoopInvariantOverwriteOld(loopGoal, oldLoopInv);
 			
 			IGeneratedTest generatedTest = getGeneratedTest();
 			
@@ -260,8 +284,8 @@ public class Main {
 		}
 		System.out.println("Full Inv-Term with User given Ineq: " + conjInvariants.toString());
 		
-		//boolean invInitiallyValid = isInvInitiallyValid(conjInvariants, loopGoal);
-		//System.out.println("invInitiallyValid: " + invInitiallyValid);
+		boolean invInitiallyValid = isInvInitiallyValid(conjInvariants, loopGoal);
+		System.out.println("invInitiallyValid: " + invInitiallyValid);
 		
 		return new Invariant(conjInvariants);
 	}
@@ -339,31 +363,6 @@ public class Main {
 //	    |  LESSEQUAL    { op_name = "leq"; }
 //	    |  GREATER      { op_name = "gt"; }
 //	    |  GREATEREQUAL { op_name = "geq"; }
-		//TODO: Bug: and(leq(Z(0(#)),r),equals(_x,javaAddInt(javaMulInt(q,_y),r)))<<SC>>
-		//-> non greedy matching: stops at Z closing paranthesis. No Problem, if Z is the second operator of leq
-		// greedy matching does not work. We will stop at the last parantheses of the whole expression
-		// maybe regex recursion to find () groups and then analyze manually in java
-//		final String matchInequality = "\\s*((?:geq|leq|lt|gt)\\(.*?\\))\\s*";
-//		List<String> inequalities = new ArrayList<>();
-//		Matcher mIneq = Pattern.compile(matchInequality).matcher(userGivenInvariant.toString());
-//		while (mIneq.find()) {
-//			String inequality = mIneq.group(1);
-//			
-//			// To this point, since the matcher is not greedy, only the first closing parenthesis ")" will be matched
-//			// -> append ")" as many as open ones
-//			
-//			int countOpeningParenthesis = inequality.length() - inequality.replace("(", "").length();
-//			final int countClosingParenthesis = 1;
-//			
-//			assert countOpeningParenthesis >= countClosingParenthesis;
-//			int diff = countOpeningParenthesis - countClosingParenthesis;
-//			
-//			String closingParDiffTimes = IntStream.range(0, diff).mapToObj(i -> ")").collect(Collectors.joining(""));
-//			inequality += closingParDiffTimes;
-//			
-//			inequalities.add(inequality);
-//		}
-		
 		List<String> inequalities = new ArrayList<>();
 		final String matchInequality = "\\s*(geq|leq|lt|gt)\\s*";
 		
@@ -374,11 +373,7 @@ public class Main {
 	    StringBuilder ineqBuilder = new StringBuilder();
 	    // Check all occurrences of ineq
 	    while (matcher.find()) {
-	        System.out.print("Start index: " + matcher.start());
-	        //System.out.print(" End index: " + matcher.end());
-	        System.out.println(" Found: " + matcher.group());
-	        
-	        //append ineq keyword like leq
+	        //append ineq keyword like "leq"
 	        ineqBuilder.append(matcher.group(1));
 	        
 	        //append whole content inside leq(..) balanced paranthesis
@@ -463,7 +458,7 @@ public class Main {
 	public static String callDIGGetPolInvs(final String digPath, final String tracesPath) {
 		String invs = null;
 		try {
-			//call with polinv or ineqinv
+			//call with polinv or ineqinv -> polinv
 			ProcessBuilder builder = new ProcessBuilder("sage", "-python", digPath, "polinv",tracesPath);
 			builder.redirectErrorStream(true);
 			Process p;
@@ -490,110 +485,209 @@ public class Main {
 		return invs;
 	}
 	
+	public static Term setNewLoopInvariantOverwriteOld(Goal loopGoal, Term newLoopInv) {
+		//create loop spec
+		WhileInvariantRule invariantRule = WhileInvariantRule.INSTANCE;
+		PosInOccurrence poi = new PosInOccurrence(loopGoal.sequent().succedent().get(1), PosInTerm.getTopLevel(), false);
+		Services services = loopGoal.proof().getServices();
+		LoopInvariantBuiltInRuleApp ruleApplication = new LoopInvariantBuiltInRuleApp(invariantRule, poi, services);
+		ruleApplication = ruleApplication.tryToInstantiate(loopGoal);
+		LoopSpecification spec = ruleApplication.getSpec();
+		
+		//retrieve old inv for loop
+		Term oldLoopInv = spec.getInvariant(services);
+		
+		Map<LocationVariable, Term> invariants = new HashMap<>();
+		LocationVariable baseHeap  = services.getTypeConverter().getHeapLDT().getHeap();
+		invariants.put(baseHeap, newLoopInv);
+		
+		spec = spec.configurate(invariants, new HashMap<>(), spec.getInternalModifies(), spec.getInternalInfFlowSpec(), null);
+		ruleApplication.setLoopInvariant(spec);
+		services.getSpecificationRepository().addLoopInvariant(spec);
+		
+		return oldLoopInv;
+	}
+	
+	//returns Pair<oldInv, GoalList(useCase,Body, InitValid Goals)>
+	public static Pair<Term, ImmutableList<Goal>> setNewLoopInvariantOverwriteOldAndApplyToCopy(Goal loopGoal, Term newLoopInv) {
+		//We want to update the loopGoal.proof().initConfig.services.specRepo.loopInvs(for this loop)
+		Term oldLoopInv;
+		
+		Proof onlyLoopProof = null;
+		try {
+			onlyLoopProof = AuxiliaryFunctions.createProof(loopGoal.proof(), "loopProof", loopGoal.sequent());
+		} catch (ProofInputException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Goal clonedLoopGoal = onlyLoopProof.openGoals().head();
+		
+		WhileInvariantRule invariantRule = WhileInvariantRule.INSTANCE;
+		PosInOccurrence poi = new PosInOccurrence(clonedLoopGoal.sequent().succedent().get(1), PosInTerm.getTopLevel(), false);
+//		TermServices services = keyAPI.myEnvironment.getServices();
+//		LoopInvariantBuiltInRuleApp ruleApplication = new LoopInvariantBuiltInRuleApp(invariantRule, poi, services);
+//		ruleApplication = ruleApplication.tryToInstantiate(clonedLoopGoal);
+//		LoopSpecification spec = ruleApplication.getSpec();
+//		Services serv = clonedLoopGoal.proof().getServices();
+		Services services = clonedLoopGoal.proof().getServices();
+		LoopInvariantBuiltInRuleApp ruleApplication = new LoopInvariantBuiltInRuleApp(invariantRule, poi, services);
+		ruleApplication = ruleApplication.tryToInstantiate(clonedLoopGoal);
+		LoopSpecification spec = ruleApplication.getSpec();
+		
+		Map<LocationVariable, Term> invariants = new HashMap<>();
+		TermBuilder termBuilder = services.getTermBuilder();
+		Map<LocationVariable, Term> freeInvariants = new HashMap<>();
+		Map<LocationVariable, Term> modifies = /*new HashMap<>();//*/spec.getInternalModifies();
+		Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs = spec.getInternalInfFlowSpec();
+		Term variant = null;
+		
+		Term update = ruleApplication.posInOccurrence().sequentFormula().formula().sub(0);
+		
+		LocationVariable baseHeap  = services.getTypeConverter().getHeapLDT().getHeap();
+		LocationVariable savedHeap = services.getTypeConverter().getHeapLDT().getSavedHeap();
+		invariants.put(baseHeap, newLoopInv);
+		
+		oldLoopInv = spec.getInvariant(services);
+		spec = spec.configurate(invariants, freeInvariants, modifies, infFlowSpecs, variant);
+		
+		ruleApplication.setLoopInvariant(spec);
+		
+//		//apply updates WhileInvariantRule:
+//        final Term focusTerm = ruleApplication.posInOccurrence().subTerm();
+//        Pair<Term, Term> updates = null;
+//        if (focusTerm.op() instanceof UpdateApplication) {
+//        	updates = new Pair<Term, Term>(UpdateApplication.getUpdate(focusTerm),
+//                    UpdateApplication.getTarget(focusTerm));
+//        } else {
+//        	updates = new Pair<Term, Term>(services.getTermBuilder().skip(), focusTerm);
+//        }
+//
+//    	final Term u        = updates.first;
+//    	final Term progPost = updates.second;
+//
+//    	//focus (below update) must be modality term
+//            if (!(progPost.op() instanceof Modality)) {
+//                try {
+//					throw new Exception();
+//				} catch (Exception e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//            }
+//
+//    	//active statement must be while loop
+//    	final While loop = ruleApplication.getLoopStatement();
+//
+//    	if (spec == null)
+//			try {
+//				throw new RuleAbortException("no invariant found");
+//			} catch (RuleAbortException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+//
+//    	//collect self, execution context
+//    	final MethodFrame innermostMethodFrame =
+//    	        JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services);
+//    	if (innermostMethodFrame != null) {
+//    	    spec = spec.setTarget(innermostMethodFrame.getProgramMethod());
+//    	}
+//
+//    	final Term selfTerm = innermostMethodFrame == null
+//    	                      ? null
+//    	                      : MiscTools.getSelfTerm(innermostMethodFrame, services);
+//
+//    	final ExecutionContext innermostExecutionContext =
+//    	        innermostMethodFrame == null
+//    	        ? null
+//    	        : (ExecutionContext) innermostMethodFrame.getExecutionContext();
+//    	services.getSpecificationRepository().addLoopInvariant(spec);
+        
+		services.getSpecificationRepository().addLoopInvariant(spec);
+		
+		//NOTE: ab hier ist die Invariante schon proofübergreifend gesetzt (im SpecRepo)
+		//D.H die folgenden Schritte sind nicht nötig hier
+		Services overlayServices = services.getOverlay(clonedLoopGoal.getLocalNamespaces());
+		//Needs to be executed (creates initValid, body and usecase branch), else the
+		//loopGoal.proof().initConfig.services.specRepo.loopInvs(for this loop) does not get updated
+        final ImmutableList<Goal> goalList = ruleApplication.execute(clonedLoopGoal, overlayServices);
+		
+        Pair<Term, ImmutableList<Goal>> ret = new Pair<Term, ImmutableList<Goal>>(oldLoopInv, goalList);
+        
+		return ret;
+	}
+	
 	public static boolean isInvInitiallyValid(Term inv, Goal loopGoal) {
 		//TODO: testGeneration "destroyed" the proof
 		//FIXME: WICHTIG: Obwohl hier auf der copy gearbeitet wird, werden die richtigen Invarianten ersetzt
-		Proof proof = loopGoal.proof();
+		Pair<Term, ImmutableList<Goal>> oldInvAndGoalList = setNewLoopInvariantOverwriteOldAndApplyToCopy(loopGoal, inv);
+		Term oldLoopInv = oldInvAndGoalList.first;
+		final ImmutableList<Goal> goalList = oldInvAndGoalList.second;
+		//}
+		// { From WhileInvariantRule.apply
+        Goal initGoal = goalList.tail().tail().head();
+        Goal bodyGoal = goalList.tail().head();
+        Goal useGoal = goalList.head();
+        //}
+		
+        Sequent invInitValidSequent = initGoal.sequent();
 		boolean invInitiallyValid = false;
 		try {
-			Proof onlyLoopProof = AuxiliaryFunctions.createProof(proof, "loopProof", loopGoal.sequent());
-			Goal clonedLoopGoal = onlyLoopProof.openGoals().head();
-		
-			//invInitValidSequent generieren
-			//{ Copy from KeYAPI
-			WhileInvariantRule invariantRule = WhileInvariantRule.INSTANCE;
-			PosInOccurrence poi = new PosInOccurrence(clonedLoopGoal.sequent().succedent().get(1), PosInTerm.getTopLevel(), false);
-			TermServices services = keyAPI.myEnvironment.getServices();
-			LoopInvariantBuiltInRuleApp ruleApplication = new LoopInvariantBuiltInRuleApp(invariantRule, poi, services);
-			ruleApplication = ruleApplication.tryToInstantiate(clonedLoopGoal);
-			LoopSpecification spec = ruleApplication.getSpec();
-			Services serv = clonedLoopGoal.proof().getServices();
+			Proof invInitValidProof = AuxiliaryFunctions.createProof(loopGoal.proof(), "invInitValidProof", invInitValidSequent);
 			
-			Map<LocationVariable, Term> invariants = new HashMap<>();
-			TermBuilder termBuilder = services.getTermBuilder();
-			Map<LocationVariable, Term> freeInvariants = new HashMap<>();
-			Map<LocationVariable, Term> modifies = /*new HashMap<>();//*/spec.getInternalModifies();
-			Map<LocationVariable, ImmutableList<InfFlowSpec>> infFlowSpecs = spec.getInternalInfFlowSpec();
-			Term variant = null;
+			ImmutableList<Goal> openGoals = keyAPI.prove(invInitValidProof);
 			
-			Term update = ruleApplication.posInOccurrence().sequentFormula().formula().sub(0);
+			// Check if invInitValid Goal got closed
+			if (openGoals.isEmpty())
+				invInitiallyValid = true;
+			else
+				invInitiallyValid = false;
 			
-			LocationVariable baseHeap  = serv.getTypeConverter().getHeapLDT().getHeap();
-			LocationVariable savedHeap = serv.getTypeConverter().getHeapLDT().getSavedHeap();
-			invariants.put(baseHeap, inv);
-			spec = spec.configurate(invariants, freeInvariants, modifies, infFlowSpecs, variant);
-			
-			ruleApplication.setLoopInvariant(spec);
-			
-			//} KeYAPI
-			
-			// { Copy From Goal.apply
-	        Services overlayServices = onlyLoopProof.getServices().getOverlay(clonedLoopGoal.getLocalNamespaces());
-	        final ImmutableList<Goal> goalList = ruleApplication.execute(clonedLoopGoal, overlayServices);
-			//}
-			// { From WhileInvariantRule.apply
-	        Goal initGoal = goalList.tail().tail().head();
-	        Goal bodyGoal = goalList.tail().head();
-	        Goal useGoal = goalList.head();
-	        //}
-			
-	        Sequent invInitValidSequent = initGoal.sequent();
-			try {
-				Proof invInitValidProof = AuxiliaryFunctions.createProof(onlyLoopProof, "invInitValidProof", invInitValidSequent);
-				
-				ImmutableList<Goal> openGoals = keyAPI.prove(invInitValidProof);
-				
-				// Check if invInitValid Goal got closed
-				if (openGoals.isEmpty())
-					invInitiallyValid = true;
-				else
-					invInitiallyValid = false;
-				
-			} catch (ProofInputException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			Sequent invBodySequent = bodyGoal.sequent();
-			boolean invBody = false;
-			try {
-				Proof invBodyProof = AuxiliaryFunctions.createProof(onlyLoopProof, "invBodyProof", invBodySequent);
-				
-				ImmutableList<Goal> openGoals = keyAPI.prove(invBodyProof);
-				
-				// Check if invInitValid Goal got closed
-				if (openGoals.isEmpty())
-					invBody = true;
-				else
-					invBody = false;
-				
-			} catch (ProofInputException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			Sequent invUseCaseSequent = useGoal.sequent();
-			boolean invUseCase = false;
-			try {
-				Proof invUseCaseProof = AuxiliaryFunctions.createProof(onlyLoopProof, "invUseCaseProof", invUseCaseSequent);
-				
-				ImmutableList<Goal> openGoals = keyAPI.prove(invUseCaseProof);
-				
-				// Check if invInitValid Goal got closed
-				if (openGoals.isEmpty())
-					invUseCase = true;
-				else
-					invUseCase = false;
-				
-			} catch (ProofInputException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		} catch (ProofInputException e1) {
+		} catch (ProofInputException e) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e.printStackTrace();
 		}
+		
+		Sequent invBodySequent = bodyGoal.sequent();
+		boolean invBody = false;
+		try {
+			Proof invBodyProof = AuxiliaryFunctions.createProof(loopGoal.proof(), "invBodyProof", invBodySequent);
+			
+			ImmutableList<Goal> openGoals = keyAPI.prove(invBodyProof);
+			
+			// Check if invInitValid Goal got closed
+			if (openGoals.isEmpty())
+				invBody = true;
+			else
+				invBody = false;
+			
+		} catch (ProofInputException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		Sequent invUseCaseSequent = useGoal.sequent();
+		boolean invUseCase = false;
+		try {
+			Proof invUseCaseProof = AuxiliaryFunctions.createProof(loopGoal.proof(), "invUseCaseProof", invUseCaseSequent);
+			
+			ImmutableList<Goal> openGoals = keyAPI.prove(invUseCaseProof);
+			
+			// Check if invInitValid Goal got closed
+			if (openGoals.isEmpty())
+				invUseCase = true;
+			else
+				invUseCase = false;
+			
+		} catch (ProofInputException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//reset to old invariant
+		setNewLoopInvariantOverwriteOld(loopGoal, oldLoopInv);
 		
 		return invInitiallyValid;
 	}
+
 }
