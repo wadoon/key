@@ -72,7 +72,7 @@ public class Main {
 	private static final String benchmarksFile1 = "benchmarks/Loop1/Loop1.java";
 	private static final String benchmarksFile2 = "benchmarks/easyloop1/EasyLoop1.java";
 	private static final String benchmarksFile3 = "benchmarks/cohen/Cohen.java";
-	private static final String benchmarksFile4 = "benchmarks/easyloop1/EasyLoop1NoPol.java";
+	private static final String benchmarksFile4 = "benchmarks/easyloop1nopol/EasyLoop1NoPol.java";
 	
 	private static final String benchmarksFile5 = "benchmarks/plus/Plus.java";
 	private static final String benchmarksFile6 = "benchmarks/square/Square.java";
@@ -83,16 +83,16 @@ public class Main {
 	
 	private static final String digRelPath = "dig/dig/dig.py";
 	//amount of testcases / method calls for the function from which the traces should be obtained
-	public static final int maxLoopUnwinds = 10;
+	public static final int maxLoopUnwinds = 5;
 	
 	private static KeYAPI keyAPI;
 	
 	public static void main(String[] args) {
-		keyAPI = new KeYAPI(benchmarksFile3);
+		keyAPI = new KeYAPI(benchmarksFile4);
 		ProofIndependentSettings.DEFAULT_INSTANCE
         .getTestGenerationSettings().setMaxUnwinds(maxLoopUnwinds);
 		//2^(intBound-2) == max possible values of smt (so 2^(6-2))=16 max possible input var value)
-		ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = 10;
+		ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = 8;
 		//ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = 20;
 		
 		List<Contract> proofContracts = keyAPI.getContracts();
@@ -213,7 +213,7 @@ public class Main {
 			//Call DIG with traces to get Invariants
 			System.out.println("Call DIG with traces file to get Invariants..");
 			Path digAbsPath = Paths.get(currentPath.toString(), digRelPath);
-			String rawDIGInvariants = callDIGGetInvs(digAbsPath.toString(), tracesFilePath.toString());
+			String rawDIGInvariants = callDIGGetPolInvs(digAbsPath.toString(), tracesFilePath.toString());
 			
 			//TODO: Currently I assume that I get Invariants, but maybe call with more unwinds if no invariant
 			List<String> digInvariants = parseDIGInvariantArray(rawDIGInvariants);
@@ -343,26 +343,70 @@ public class Main {
 		//-> non greedy matching: stops at Z closing paranthesis. No Problem, if Z is the second operator of leq
 		// greedy matching does not work. We will stop at the last parantheses of the whole expression
 		// maybe regex recursion to find () groups and then analyze manually in java
-		final String matchInequality = "\\s*((?:geq|leq|lt|gt)\\(.*?\\))\\s*";
+//		final String matchInequality = "\\s*((?:geq|leq|lt|gt)\\(.*?\\))\\s*";
+//		List<String> inequalities = new ArrayList<>();
+//		Matcher mIneq = Pattern.compile(matchInequality).matcher(userGivenInvariant.toString());
+//		while (mIneq.find()) {
+//			String inequality = mIneq.group(1);
+//			
+//			// To this point, since the matcher is not greedy, only the first closing parenthesis ")" will be matched
+//			// -> append ")" as many as open ones
+//			
+//			int countOpeningParenthesis = inequality.length() - inequality.replace("(", "").length();
+//			final int countClosingParenthesis = 1;
+//			
+//			assert countOpeningParenthesis >= countClosingParenthesis;
+//			int diff = countOpeningParenthesis - countClosingParenthesis;
+//			
+//			String closingParDiffTimes = IntStream.range(0, diff).mapToObj(i -> ")").collect(Collectors.joining(""));
+//			inequality += closingParDiffTimes;
+//			
+//			inequalities.add(inequality);
+//		}
+		
 		List<String> inequalities = new ArrayList<>();
-		Matcher mIneq = Pattern.compile(matchInequality).matcher(userGivenInvariant.toString());
-		while (mIneq.find()) {
-			String inequality = mIneq.group(1);
-			
-			// To this point, since the matcher is not greedy, only the first closing parenthesis ")" will be matched
-			// -> append ")" as many as open ones
-			
-			int countOpeningParenthesis = inequality.length() - inequality.replace("(", "").length();
-			final int countClosingParenthesis = 1;
-			
-			assert countOpeningParenthesis >= countClosingParenthesis;
-			int diff = countOpeningParenthesis - countClosingParenthesis;
-			
-			String closingParDiffTimes = IntStream.range(0, diff).mapToObj(i -> ")").collect(Collectors.joining(""));
-			inequality += closingParDiffTimes;
-			
-			inequalities.add(inequality);
-		}
+		final String matchInequality = "\\s*(geq|leq|lt|gt)\\s*";
+		
+	    Pattern pattern = Pattern.compile(matchInequality);
+	    String userInvStr = userGivenInvariant.toString();
+	    Matcher matcher = pattern.matcher(userInvStr);
+	    
+	    StringBuilder ineqBuilder = new StringBuilder();
+	    // Check all occurrences of ineq
+	    while (matcher.find()) {
+	        System.out.print("Start index: " + matcher.start());
+	        //System.out.print(" End index: " + matcher.end());
+	        System.out.println(" Found: " + matcher.group());
+	        
+	        //append ineq keyword like leq
+	        ineqBuilder.append(matcher.group(1));
+	        
+	        //append whole content inside leq(..) balanced paranthesis
+	        int numOpenParanthesis = 0;
+	        int numClosedParanthesis = 0;
+	        int i;
+	        for (i = matcher.end(); i < userInvStr.length(); i++) {
+	        	char c = userInvStr.charAt(i);        
+	           	
+	        	if (c == '(')
+	        		numOpenParanthesis++;
+	        	else if (c == ')')
+	        		numClosedParanthesis++;
+	        	
+	        	// First char will be a '('. If we have a matching amount, i is at the index of the matching closing paranthesis leq(..')' <-
+	        	if (numOpenParanthesis == numClosedParanthesis) {
+	        		break;
+	        	}
+	        }
+	        
+	        ineqBuilder.append(userInvStr.substring(matcher.end(), i + 1));
+	        
+	        //add ineq to list
+	        inequalities.add(ineqBuilder.toString());
+	        
+	        //reset builder
+	        ineqBuilder.setLength(0);
+	    }
 		
 		return inequalities;
 	}
@@ -416,10 +460,11 @@ public class Main {
 		}
 	}
 	
-	public static String callDIGGetInvs(final String digPath, final String tracesPath) {
+	public static String callDIGGetPolInvs(final String digPath, final String tracesPath) {
 		String invs = null;
 		try {
-			ProcessBuilder builder = new ProcessBuilder("sage", "-python", digPath, tracesPath);
+			//call with polinv or ineqinv
+			ProcessBuilder builder = new ProcessBuilder("sage", "-python", digPath, "polinv",tracesPath);
 			builder.redirectErrorStream(true);
 			Process p;
 			p = builder.start();

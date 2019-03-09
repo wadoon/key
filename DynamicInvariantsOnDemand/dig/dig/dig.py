@@ -354,11 +354,12 @@ class Solver(object):
 # Daniel neu
 if __name__ == "__main__":
     logger.info('*** started as Main ***')
-    print "dig main"
 
     import argparse
 
     parser = argparse.ArgumentParser(description='Invariant and Inequality generation from program traces.')
+    parser.add_argument('polinv_or_ineqinv', metavar='polinv_or_ineqinv', type=str,
+                        help='polinv or ineqinv as option, one must be chosen')
     parser.add_argument('filepath', metavar='filepath', type=str,
                         help='filepath to the traces file')
     parser.add_argument("--debug", action='store_true', help="output debug messages")
@@ -371,4 +372,8 @@ if __name__ == "__main__":
         dig = DIG(filename=args.filepath)
     else:
         dig =  DIG(filename=args.filepath, verbose=args.debug)
-    dig.get_invs()
+
+    if args.polinv_or_ineqinv == 'polinv':
+        dig.get_invs()
+    elif args.polinv_or_ineqinv == 'ineqinv':
+        dig.get_ieqs_cl_gen()

@@ -7,24 +7,19 @@ public HashMap<String, ArrayList<Integer>> callGeneratedMethod(ArrayList<Integer
 {
 HashMap<String, ArrayList<Integer>> varLoopHeadTraces = new HashMap<String, ArrayList<Integer>>();
 int x = inputVariables.get(0);
-int y = inputVariables.get(1);
 int _x = x;
-int _y = y;
-int q = 0;
-int r = x;
+int y = x;
+int z = 0;
 ArrayList<Integer> traces__x = new ArrayList<Integer>();
-ArrayList<Integer> traces__y = new ArrayList<Integer>();
-ArrayList<Integer> traces_q = new ArrayList<Integer>();
-ArrayList<Integer> traces_r = new ArrayList<Integer>();
+ArrayList<Integer> traces_y = new ArrayList<Integer>();
+ArrayList<Integer> traces_z = new ArrayList<Integer>();
 varLoopHeadTraces.put("_x",traces__x);
-varLoopHeadTraces.put("_y",traces__y);
-varLoopHeadTraces.put("q",traces_q);
-varLoopHeadTraces.put("r",traces_r);
-while ( _y<=r ) {   int a = 1;   int b = _y;                         while ( 2*b<=r ) {traces__x.add(_x);
-traces__y.add(_y);
-traces_q.add(q);
-traces_r.add(r);
-     a=2*a;     b=2*b;   }   r=r-b;   q=q+a; }
+varLoopHeadTraces.put("y",traces_y);
+varLoopHeadTraces.put("z",traces_z);
+while ( y>0 ) {traces__x.add(_x);
+traces_y.add(y);
+traces_z.add(z);
+   z=z+_x;   y=y-1; }
 return varLoopHeadTraces;
 }
 }
