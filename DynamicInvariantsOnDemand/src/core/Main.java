@@ -95,7 +95,7 @@ public class Main {
 	
 	private static final String digRelPath = "dig/dig/dig.py";
 	//amount of testcases / method calls for the function from which the traces should be obtained
-	public static final int maxLoopUnwinds = 5;
+	public static final int maxLoopUnwinds = 13;
 	
 	private static KeYAPI keyAPI;
 	
@@ -106,7 +106,7 @@ public class Main {
         .getTestGenerationSettings().setMaxUnwinds(maxLoopUnwinds);
 		//2^(intBound-2) == max possible values of smt (so 2^(6-2))=16 max possible input var value) 
 		//int.bound = 8 is max for my system setup
-		ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = 8;
+		ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = 4;
 		
 		List<Contract> proofContracts = keyAPI.getContracts();
 		ProofResult result = null;
@@ -162,7 +162,6 @@ public class Main {
 		
 		//clone proof and work on the cloned version, since TestGenerator messes with it
 		//we only need to obtain the invariants here, no need to operate on the original proof
-		//TODO: .head()? more possibilities?
 		Goal loopGoal = proof.openGoals().head();
 		Proof onlyLoopProof = AuxiliaryFunctions.createProof(proof, "loopProof", loopGoal.sequent());
 		
@@ -195,6 +194,7 @@ public class Main {
     		}
         } else {
 			System.out.println("Start generating modified method with traces code");
+			//FIXME: NOTE: Method Generator knows the user spezified Invariants atm
 			// Generate Program Code with Traces for dynamic execution
 			String javaCode = MethodGenerator.generateMethodFromKeYFormat(program, update, loop);
 			
@@ -211,7 +211,7 @@ public class Main {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			//delete invariant (for user given Ineq.);
+			//delete invariant (the user given Ineq.);
 			Term oldLoopInv = setNewLoopInvariantOverwriteOld(loopGoal, uselessInv);
 			ProblemFactory.create(onlyLoopProof);
 			//restore old inv (user given ineq)

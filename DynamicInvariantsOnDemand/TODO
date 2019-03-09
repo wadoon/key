@@ -9,3 +9,5 @@
 -initValidTest: Statt clonedProofs subtrees benutzen, prune makro
 -thesis schreiben: mit komplettem ansatz anfangen (siehe notizen)
 -präsentation machen
+
+-int r=x -> siehe Testcase Generator z.250 & jede unbekannte RHS Variable als Input nehmen. Problem: die Invarianten werden verwirrend, da diese erst nach update vereinfachungen erkennbar sind für den Menschen

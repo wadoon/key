@@ -247,7 +247,8 @@ public class TestCaseGenerator {
 
     public String getMUTCall(){
     	StringBuilder sb = new StringBuilder();
-        //FIXME schöner
+        //FIXME um das umzusetzen mit den Input Variablen (wegen den Updates - z.B: int q = q_0 -> q_0 als input.
+    	//müsste ich die information was input ist von extern übergeben
         sb.append("   ArrayList<Integer> inputVars = new ArrayList<Integer>();"
         		+ NEW_LINE);
     	

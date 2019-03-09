@@ -1,5 +1,4 @@
-- invariante für loop setzen und resetten:
-	BUG: alte wird nicht mehr resettet: wegen WhileInvariantRule l. 218
+- testgen: bei zu viel unwinds und zu wenig intbound können die requires bedingungen verletzt werden (a>0 -> a=-8)
 - plus & cohen benchmark: wenn die 2. pol invariante mit a fehlt, ist _a zu dem zeitpunkt nicht mehr als variable bekannt (in updates fehlt _a=a
 	-> mögliche unsaubere lösung: in proof.getServices().namespaces.progVarNS stehen anscheinend immer die input vars:
 	Namespace: [local:{heap=heap, savedHeap=savedHeap, permissions=permissions, a=a, b=b, self=self, result=result, exc=exc, heapAtPre=heapAtPre, _a=_a, _b=_b}]
@@ -8,19 +7,23 @@
    !ABER:ich denke selbe ursache wie bei cohen inner loop q = q_0, r = r_0, dass q_0.. nicht bekannt ist, aber bei TimesTwo geht es mit i_0
    -> ja: ich denke es liegt an simplifyUpdate (siehe KeYBook pg. 525 und siehe gui). Ich müsste das quasi ausschalten denke ich
   und misc_tools.getLocalIns / Outs liefert nicht _a -> deswegen fehlt in genmethod int a = _a. int r = a -> fehler, a unbekannt
-- cloneProof ist buggy: proof.initConfig.specRepos wird nicht gecloned, (initConfig schon)- liegt an Services.copy: s.specRepos = specRepos; - isInvInitiallyValid: arbeitet zwar auf proof copy, aber die originale invariante wird trotzdem geändert. Nur schlimm, wenn ich noch die originale inv brauche
+  _> Bessere Lösung: jede var auf der echten seite einer zuweisung, die unbekannt ist, als input var nehmen (i.A., auch bei _y = y)
+
 - stacked loops: cohen funktioniert nicht, vermutlich weil die zahlen zu groß werden für den SMT mit bounded int. Problem: schon bei intBound 10
   wird eine PipeClosed(SMT) exception geworfen.
  -MethodGenerator: Cohen inner loop: q = q_0, r = r_0: wie damit umgehen? in dem Fall könnte ich die aller ersten belegungen für q und r merken,
-  aber das funktioniert halt nicht i.A: oder?
+  aber das funktioniert halt nicht i.A: oder? -> Nein.
 (- testgen zerstört proof - cloned proof nehmen)
 - nicht wegen mir, auch in gui, invariante angeben: use case goal wird nicht geschlossen. (bei mir in isInvInitiallyValid. wie kann den überhaupt dann
   mit autopilot in der main der proof geschlossen werden? da entsteht ja auch das usecase goal?!
- -testgen: siehe Plus beispiel: generiert für a immer für zweite loop, vermutlich weil a nicht mehr relevant ist. Dadurch wird falsche Invariante a = 0 und r==j erzeugt
+ -testgen: siehe Plus beispiel: generiert für a=0 immer für zweite loop, vermutlich weil a nicht mehr relevant ist. Dadurch wird falsche Invariante a = 0 und r==j erzeugt
  -traces Problem stacked loops: siehe square. Da i erst nach der innerloop incrementiert wird, ist i innerhalb der innerloop beim 0. lauf = 0.
   -> äußere invariante kann nicht gefunden werden
   
   solved:
   - extractInequalitiesFromTerm: kann nicht mit 0<=a umgehen, wegen der regex (Z klammer ist das problem
   
-  -replace inv: es wird nur für _a und nicht für a die invariante replaced (es gibt noch while(a<i) mit alter inv) -> macht aber nichts wahrscheinlich
+  //-replace inv: es wird nur für _a und nicht für a die invariante replaced (es gibt noch while(a<i) mit alter inv) -> macht aber nichts wahrscheinlich
+  - invariante für loop setzen und resetten:
+	BUG: alte wird nicht mehr resettet: wegen WhileInvariantRule l. 218
+  -indirekt fixed: cloneProof ist buggy: proof.initConfig.specRepos wird nicht gecloned, (initConfig schon)- liegt an Services.copy: s.specRepos = specRepos; - isInvInitiallyValid: arbeitet zwar auf proof copy, aber die originale invariante wird trotzdem geändert. Nur schlimm, wenn ich noch die originale inv brauche
