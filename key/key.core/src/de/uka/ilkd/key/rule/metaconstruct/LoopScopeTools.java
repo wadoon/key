@@ -148,9 +148,9 @@ public class LoopScopeTools {
         for (LocationVariable heap : heapContext) {
             heapToBeforeLoop.put(heap, new LinkedHashMap<Term, Term>());
 
-//            final LocationVariable lv =
-                    // tb.heapAtPreVar(heap + "Before_LOOP", heap.sort(), true);
-//                    tb.heapAtPreVar(term.toString(), heap.sort(), false);
+            // final LocationVariable lv =
+            // tb.heapAtPreVar(heap + "Before_LOOP", heap.sort(), true);
+            // tb.heapAtPreVar(term.toString(), heap.sort(), false);
             final LocationVariable lv = (LocationVariable) term.op();
             // progVarNS.addSafely(lv);
 
@@ -214,9 +214,8 @@ public class LoopScopeTools {
                 // new Function(anonHeapName, heap.sort());
                 services.getNamespaces().functions().lookup(term.toString());
         // services.getNamespaces().functions().addSafely(anonHeapFunc);
-        final Term anonHeapTerm = 
-        		tb.label(tb.func(anonHeapFunc),
-        		//tb.label(term,
+        final Term anonHeapTerm = tb.label(tb.func(anonHeapFunc),
+                // tb.label(term,
                 ParameterlessTermLabel.ANON_HEAP_LABEL);
 
         // check for strictly pure loops

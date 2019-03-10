@@ -37,7 +37,7 @@ public class GetVariant extends AbstractTermTransformer {
         Term variantTerm = spec.getVariant(spec.getInternalSelfTerm(),
                 spec.getInternalAtPres(), services);
         if (variantTerm == null) {
-            return tb.TRUE();
+            return tb.tt();
         }
 
         LocationVariable variantPV2 = (LocationVariable) services

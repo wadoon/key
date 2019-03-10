@@ -55,8 +55,8 @@ public class GetFrameCondition extends AbstractTermTransformer {
         final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoop = //
                 new LinkedHashMap<LocationVariable, Map<Term, Term>>();
         // Changes heapContext!
-        Term beforeLoopUpdate = LoopScopeTools.createBeforeLoopUpdate(services,
-                heapContext, localOuts, heapToBeforeLoop, term.sub(1));
+        LoopScopeTools.createBeforeLoopUpdate(services, heapContext, localOuts,
+                heapToBeforeLoop, term.sub(1));
 
         // Additional Heap Terms
         final Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();
@@ -81,15 +81,6 @@ public class GetFrameCondition extends AbstractTermTransformer {
         }
         // END Additional Heap Terms
 
-        Term variantTerm = spec.getVariant(spec.getInternalSelfTerm(),
-                spec.getInternalAtPres(), services);
-        LocationVariable variantPV2 = (LocationVariable) services
-                .getNamespaces().programVariables().lookup("variant");
-
-        if (variantTerm == null) {
-            return frameCondition;
-        }
-
-        return tb.and(frameCondition, tb.prec(variantTerm, tb.var(variantPV2)));
+        return frameCondition;
     }
 }
