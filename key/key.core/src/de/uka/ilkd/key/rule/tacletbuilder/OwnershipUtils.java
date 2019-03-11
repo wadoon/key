@@ -51,13 +51,24 @@ public final class OwnershipUtils {
         return f instanceof ImplicitFieldSpecification;
     }
 
-    private static boolean isPrimitiveField(Field f) {
-        Type t = f.getType();
+    private static boolean isPrimitiveType(Type t) {
         if (t instanceof KeYJavaType) {
             KeYJavaType kjt = (KeYJavaType)t;
             return kjt.getJavaType() instanceof PrimitiveType;
         }
         return false;
+    }
+
+    private static boolean isPrimitiveField(Field f) {
+        return isPrimitiveType(f.getType());
+    }
+
+    private static boolean isRep(ProgramVariable pv) {
+        return pv.getProgramElementName().getProgramName().startsWith("rep_");
+    }
+
+    private static boolean isPeer(ProgramVariable pv) {
+        return pv.getProgramElementName().getProgramName().startsWith("peer_");
     }
 
     private static boolean isRep(Field f) {
@@ -471,28 +482,60 @@ public final class OwnershipUtils {
      *          (needed for determining which taclets to generate)
      * @return the immutable set of all created taclets (those taclets have to be registered!)
      */
-    public static ImmutableSet<Taclet> createTaclets(Services proofServices,
+    public static ImmutableList<Taclet> createTaclets(Services proofServices,
             ProgramVariable selfVar) {
 
-        ImmutableSet<Taclet> result = DefaultImmutableSet.<Taclet>nil();
+        ImmutableList<Taclet> result = ImmutableSLList.<Taclet>nil();
 
         // add ownership axioms for rep/peer fields defined in the class containing the contract
         // TODO: what about ownership of fields in other classes?
         for (Taclet t : createOwnershipTaclets(proofServices, selfVar)) {
-            result = result.add(t);
+            result = result.prepend(t);
         }
 
         // add represents axioms for relinv
-        result = result.add(createRelinvRepresentsClause(proofServices, selfVar));
+        result = result.prepend(createRelinvRepresentsClause(proofServices, selfVar));
 
         // add represents axioms for footprints
         for (Taclet t : createFootprintsRepresentsClauses(proofServices, selfVar)) {
-            result = result.add(t);
+            result = result.prepend(t);
         }
 
         // add disjointness taclet for rep footprints
-        result = result.add(createDisjointnessTaclet(proofServices, selfVar));
+        result = result.prepend(createDisjointnessTaclet(proofServices, selfVar));
 
+        return result;
+    }
+
+    /**
+     * Creates ownership statements for the parameters. Rep and peer parameters are allowed:
+     * For rep parameters the owner is self, while for peers the owner is the same as for self.
+     * @param services the Services of the Proof
+     * @param selfVar the current "self" of the PO
+     * @param paramVars the parameters of the PO
+     * @return a term which contains statements about the owners of parameters
+     */
+    public static Term paramTerms(Services services, ProgramVariable selfVar,
+            ImmutableList<ProgramVariable> paramVars) {
+        TermBuilder tb = services.getTermBuilder();
+        Term result = tb.tt();
+        Function owner = services.getNamespaces().functions().lookup("owner");
+
+        for (ProgramVariable p : paramVars) {
+            // skip primitive types
+            if (isPrimitiveType(p.getKeYJavaType())) {
+                continue;
+            }
+
+            if (isRep(p)) {
+                // owner(p) = self
+                result = tb.and(result, tb.equals(tb.func(owner, tb.var(p)), tb.var(selfVar)));
+            } else if (isPeer(p)) {
+                // owner(p) = owner(self)
+                result = tb.and(result, tb.equals(tb.func(owner, tb.var(p)),
+                                                  tb.func(owner, tb.var(selfVar))));
+            }
+        }
         return result;
     }
 }

@@ -464,7 +464,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
         final ProgramVariable exceptionVar = tb.excVar(pm, makeNamesUnique);
 
         // create and register all taclets relevant for Ownership
-        ImmutableSet<Taclet> ownershipTaclets = 
+        ImmutableList<Taclet> ownershipTaclets =
                 OwnershipUtils.createTaclets(proofServices, selfVar);
         for (Taclet t : ownershipTaclets) {
             taclets = taclets.add(NoPosTacletApp.createNoPosTacletApp(t));
@@ -691,6 +691,9 @@ public abstract class AbstractOperationPO extends AbstractPO {
         // - "inBounds(p_i)" for integer parameters
         Term paramsOK = generateParamsOK(paramVars);
 
+        // ownership of params
+        Term paramOwner = OwnershipUtils.paramTerms(services, selfVar, paramVars);
+
         // initial value of measured_by clause
         final Term mbyAtPreDef = generateMbyAtPreDef(selfVar, paramVars, services);
         Term wellFormed = null;
@@ -705,7 +708,7 @@ public abstract class AbstractOperationPO extends AbstractPO {
 
         return tb.and(wellFormed != null ? wellFormed : tb.tt(),
                       selfNotNull, selfCreated, selfExactType,
-                      paramsOK, mbyAtPreDef);
+                      paramsOK, paramOwner, mbyAtPreDef);
     }
 
     /**
