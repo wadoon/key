@@ -25,6 +25,12 @@ public class Object {
       @*/
     public /*@ pure @*/ Object() {}
     
+    /*@ public normal_behavior
+      @ requires true;
+      @ ensures \dl_owner(this) == o;
+      @ assignable \strictly_nothing;
+      @*/
+    public void assumeOwner(Object o);
 
     public /*@ pure @*/ boolean equals(java.lang.Object o);
     public int hashCode();
