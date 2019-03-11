@@ -15,6 +15,7 @@ package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 import java.util.Map;
 import java.util.Set;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -30,11 +31,13 @@ public interface AbstractUpdateLoc {
      *
      * @param replMap
      *            The replace map.
+     * @param services
+     *            The {@link Services} object.
      * @return A new {@link AbstractUpdateLoc} of this one with the
      *         {@link ProgramVariable}s replaced according to the supplied map.
      */
     AbstractUpdateLoc replaceVariables(
-            Map<ProgramVariable, ProgramVariable> replMap);
+            Map<ProgramVariable, ProgramVariable> replMap, Services services);
 
     /**
      * All {@link AbstractUpdateLoc}s are containers. This method returns the

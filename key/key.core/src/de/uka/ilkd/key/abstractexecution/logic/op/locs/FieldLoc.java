@@ -14,16 +14,19 @@ package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
+import de.uka.ilkd.key.logic.OpCollector;
+import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.proof.ProgVarReplacer;
 
 /**
  * A field location for use in an {@link AbstractUpdate}.
@@ -31,45 +34,57 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  * @author Dominic Steinhoefel
  */
 public class FieldLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
-    private final FieldReference fieldReference;
-    private final ExecutionContext executionContext;
+    private final Sort sort;
+    private final Optional<Term> heapTerm;
+    private final Term objTerm;
+    private final LocationVariable fieldPV;
     private final LocationVariable heapVar;
 
-    public FieldLoc(FieldReference fieldReference,
-            ExecutionContext executionContext, LocationVariable heapVar) {
-        this.fieldReference = fieldReference;
-        this.executionContext = executionContext;
+    public FieldLoc(Optional<Sort> sort, Optional<Term> heapTerm, Term objTerm,
+            LocationVariable fieldPV, LocationVariable heapVar) {
+        this.sort = sort.orElse(fieldPV.sort());
+        this.heapTerm = heapTerm;
+        this.objTerm = objTerm;
+        this.fieldPV = fieldPV;
         this.heapVar = heapVar;
     }
 
     @Override
     public Term toTerm(Services services) {
-        return services.getTypeConverter()
-                .convertVariableReference(fieldReference, executionContext);
+        return services.getTermBuilder().select(sort,
+                heapTerm.orElse(services.getTermBuilder().getBaseHeap()),
+                objTerm, fieldPV);
     }
 
     @Override
     public AbstractUpdateLoc replaceVariables(
-            Map<ProgramVariable, ProgramVariable> replMap) {
-        /*
-         * TODO (DS, 2019-02-28): Check whether we have to do something with the
-         * field reference, i.e., whether a given program variable in the map
-         * can represent a field.
-         */
+            Map<ProgramVariable, ProgramVariable> replMap, Services services) {
+        final ProgVarReplacer pvr = new ProgVarReplacer(replMap, services);
 
-        if (replMap.containsKey(heapVar)) {
-            return new FieldLoc(fieldReference, executionContext,
-                    (LocationVariable) replMap.get(heapVar));
-        }
+        final LocationVariable lHeapVar = Optional
+                .ofNullable(replMap.get(heapVar))
+                .map(LocationVariable.class::cast).orElse(heapVar);
+        final LocationVariable lFieldPV = Optional
+                .ofNullable(replMap.get(fieldPV))
+                .map(LocationVariable.class::cast).orElse(fieldPV);
+        final Optional<Term> lHeapTerm = heapTerm.map(t -> pvr.replace(t));
+        final Term lObjTerm = pvr.replace(objTerm);
 
-        return this;
+        return new FieldLoc(Optional.of(sort), lHeapTerm, lObjTerm, lFieldPV,
+                lHeapVar);
     }
 
     @Override
     public Set<Operator> childOps() {
         final Set<Operator> result = new LinkedHashSet<>();
         result.add(heapVar);
-        result.add(fieldReference.getProgramVariable());
+        result.add(fieldPV);
+
+        final OpCollector opColl = new OpCollector();
+        heapTerm.ifPresent(t -> t.execPostOrder(opColl));
+        objTerm.execPostOrder(opColl);
+        result.addAll(opColl.ops());
+
         return result;
     }
 
@@ -80,7 +95,8 @@ public class FieldLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
 
     @Override
     public String toString() {
-        return fieldReference.toString();
+        return String.format("(%s, %s)", objTerm,
+                ((ProgramElementName) fieldPV.name()).getProgramName());
     }
 
     @Override
@@ -90,8 +106,7 @@ public class FieldLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
 
     @Override
     public int hashCode() {
-        return 5 + 7 * executionContext.hashCode()
-                + 27 * fieldReference.hashCode();
+        return 5 + 7 * objTerm.hashCode() + 11 * fieldPV.hashCode();
     }
 
 }

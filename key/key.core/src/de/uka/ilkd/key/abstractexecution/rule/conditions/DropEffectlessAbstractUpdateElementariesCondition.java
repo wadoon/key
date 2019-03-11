@@ -23,17 +23,17 @@ import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableSLList;
 
-import de.uka.ilkd.key.abstractexecution.logic.AbstractUpdateLocationsVisitor;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateUpdatableLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.FieldLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
@@ -156,7 +156,6 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
     private static Term dropEffectlessAbstractUpdateElementaries(Term update,
             Term target, Services services) {
         final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
-        final ExecutionContext ec = abstrUpd.getExecutionContext();
 
         final Set<AbstrUpdateUpdatableLoc> assignables = new LinkedHashSet<>();
         assignables.addAll(abstrUpd.getHasToAssignables());
@@ -188,8 +187,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
         }
 
         final Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>> opsAnalysisResult = //
-                AbstractExecutionUtils
-                        .opsAssignedBeforeUsed(target, ec, services)
+                AbstractExecutionUtils.opsAssignedBeforeUsed(target, services)
                         .orElse(null);
 
         if (opsAnalysisResult == null) {
@@ -205,19 +203,23 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
          * accessibles when I think about it now. Deactivated that. Maybe plug
          * it in if I'm wrong...
          */
-        final AbstractUpdateLocationsVisitor visitor = //
-                new AbstractUpdateLocationsVisitor(ec, services);
-        target.execPostOrder(visitor);
+        final Set<AbstractUpdateLoc> locsInTarget = AbstractUpdateFactory
+                .extractAbstrUpdateLocsFromTerm(target, services);
+
+        // XXX Normalize "self" variables, they're different...!!!
+        FieldLoc field1Loc1 = (FieldLoc) assignables.iterator().next();
+        FieldLoc field1Loc2 = (FieldLoc) locsInTarget.iterator().next();
+        field1Loc1.equals(field1Loc2);
 
         final Set<AbstrUpdateLHS> newAssignables = assignables.stream()
                 .filter(op -> !opsHaveToAssignBeforeUsed.contains(op))
-                .filter(loc -> visitor.getResult().contains(loc))
+                .filter(loc -> locsInTarget.contains(loc))
                 .map(loc -> abstrUpd.hasToAssign(loc) ? new HasToLoc(loc) : loc)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
         final Set<AbstrUpdateRHS> newAccessibles = //
                 AbstractUpdateFactory
-                        .abstractUpdateLocsFromUnionTerm(accessiblesTerm, ec,
+                        .abstractUpdateLocsFromUnionTerm(accessiblesTerm,
                                 services)
                         .stream().map(AbstrUpdateRHS.class::cast)
                         // .filter(loc -> visitor.getResult().contains(loc))
@@ -235,7 +237,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
         }
 
         return tb.abstractUpdate(abstrUpd.getAbstractPlaceholderStatement(),
-                newAssignables, newAccessibles, ec);
+                newAssignables, newAccessibles);
     }
 
     @Override

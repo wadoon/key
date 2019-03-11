@@ -235,7 +235,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
             if (op instanceof AbstractUpdate) {
                 final AbstractUpdate origOp = (AbstractUpdate) op;
                 op = services.abstractUpdateFactory().changeAssignables(origOp,
-                        replaceMap);
+                        replaceMap, services);
                 changed = changed || origOp != op;
             }
             return changed

@@ -69,30 +69,20 @@ public final class AbstractUpdate extends AbstractSortedOperator {
     private final Services services;
 
     /**
-     * The {@link ExecutionContext} in which this {@link AbstractUpdate} is
-     * created. Needed for handling fields.
-     */
-    private final ExecutionContext ec;
-
-    /**
      * Private constructor since there should be exactly one abstract update per
      * left-hand side, similarly as for {@link ElementaryUpdate}. Use
-     * {@link #getInstance(AbstractPlaceholderStatement, Term, ExecutionContext, Services)}.
+     * {@link #getInstance(AbstractPlaceholderStatement, Term, Services)}.
      *
      * @param phs
      *            The {@link AbstractPlaceholderStatement} for which this
      *            {@link AbstractUpdate} should be created.
      * @param assignables
      *            The update's left-hand side (assignables).
-     * @param ec
-     *            The {@link ExecutionContext} in which this
-     *            {@link AbstractUpdate} is created. Needed for handling fields.
      * @param services
      *            The {@link Services} object.
      */
     AbstractUpdate(final AbstractPlaceholderStatement phs,
-            final Set<AbstrUpdateLHS> assignables, ExecutionContext ec,
-            final Services services) {
+            final Set<AbstrUpdateLHS> assignables, final Services services) {
         super(new Name("U_" + phs.getId() + "("
                 + assignables.stream().map(lhs -> lhs.toString())
                         .collect(Collectors.joining(","))
@@ -101,7 +91,6 @@ public final class AbstractUpdate extends AbstractSortedOperator {
                         services.getTypeConverter().getSetLDT().targetSort() },
                 Sort.UPDATE, false);
 
-        this.ec = ec;
         this.services = services;
         this.phs = phs;
         this.assignables = Collections.unmodifiableSet(assignables);
@@ -121,7 +110,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @return A new {@link AbstractUpdate} with the given left-hand side.
      */
     AbstractUpdate changeAssignables(final Set<AbstrUpdateLHS> newAssignables) {
-        return new AbstractUpdate(phs, newAssignables, ec, services);
+        return new AbstractUpdate(phs, newAssignables, services);
     }
 
     public AbstractPlaceholderStatement getAbstractPlaceholderStatement() {
@@ -238,14 +227,6 @@ public final class AbstractUpdate extends AbstractSortedOperator {
     }
 
     /**
-     * @return The {@link ExecutionContext} in which this {@link AbstractUpdate}
-     *         has been generated.
-     */
-    public ExecutionContext getExecutionContext() {
-        return ec;
-    }
-
-    /**
      * Extracts a set of {@link AbstrUpdateUpdatableLoc}s from a set union which
      * is the right-hand side of an {@link AbstractUpdate} {@link Term}.
      *
@@ -263,7 +244,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      */
     public Set<AbstrUpdateUpdatableLoc> getUpdatableRHSs(Term t) {
         return AbstractUpdateFactory
-                .abstractUpdateLocsFromUnionTerm(t, ec, services).stream()
+                .abstractUpdateLocsFromUnionTerm(t, services).stream()
                 .filter(AbstrUpdateUpdatableLoc.class::isInstance)
                 .map(AbstrUpdateUpdatableLoc.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
@@ -287,7 +268,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      */
     public Set<AbstrUpdateRHS> transformRHS(Term t) {
         return AbstractUpdateFactory
-                .abstractUpdateLocsFromUnionTerm(t, ec, services).stream()
+                .abstractUpdateLocsFromUnionTerm(t, services).stream()
                 .map(AbstrUpdateRHS.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }

@@ -41,7 +41,7 @@ public class EmptyLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
 
     @Override
     public AbstractUpdateLoc replaceVariables(
-            Map<ProgramVariable, ProgramVariable> replMap) {
+            Map<ProgramVariable, ProgramVariable> replMap, Services services) {
         return this;
     }
 

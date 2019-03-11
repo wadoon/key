@@ -15,6 +15,7 @@ package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 import java.util.Map;
 import java.util.Set;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -39,8 +40,9 @@ public class HasToLoc implements AbstrUpdateLHS {
 
     @Override
     public AbstractUpdateLoc replaceVariables(
-            Map<ProgramVariable, ProgramVariable> replMap) {
-        return new HasToLoc((AbstrUpdateLHS) child.replaceVariables(replMap));
+            Map<ProgramVariable, ProgramVariable> replMap, Services services) {
+        return new HasToLoc(
+                (AbstrUpdateLHS) child.replaceVariables(replMap, services));
     }
 
     @Override

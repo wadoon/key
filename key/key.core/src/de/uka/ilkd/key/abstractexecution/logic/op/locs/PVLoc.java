@@ -42,7 +42,7 @@ public class PVLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
 
     @Override
     public AbstractUpdateLoc replaceVariables(
-            Map<ProgramVariable, ProgramVariable> replMap) {
+            Map<ProgramVariable, ProgramVariable> replMap, Services services) {
         if (replMap.containsKey(locVar)) {
             return new PVLoc((LocationVariable) replMap.get(locVar));
         } else {

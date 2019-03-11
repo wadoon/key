@@ -18,7 +18,6 @@ import java.util.Set;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.logic.DefaultVisitor;
 import de.uka.ilkd.key.logic.Term;
 
@@ -29,22 +28,22 @@ import de.uka.ilkd.key.logic.Term;
  */
 public class AbstractUpdateLocationsVisitor extends DefaultVisitor {
     private final Set<AbstractUpdateLoc> result = new LinkedHashSet<>();
-    private final AbstractUpdateFactory factory;
 
-    private final ExecutionContext ec;
     private final Services services;
 
-    public AbstractUpdateLocationsVisitor(ExecutionContext ec,
-            Services services) {
-        this.ec = ec;
+    public AbstractUpdateLocationsVisitor(Services services) {
         this.services = services;
-        this.factory = services.abstractUpdateFactory();
     }
 
     @Override
     public void visit(Term visited) {
-        factory.tryExtractAbstrUpdateLocFromTerm(visited, ec, services)
-                .ifPresent(this.result::add);
+        /*
+         * XXX (DS, 2019-03-11): Instead of a FieldLoc, sometimes adds a
+         * RigidRHS for a select expression...
+         */
+        this.result.addAll( //
+                AbstractUpdateFactory.abstrUpdateLocsFromTerm(visited,
+                        services));
     }
 
     /**

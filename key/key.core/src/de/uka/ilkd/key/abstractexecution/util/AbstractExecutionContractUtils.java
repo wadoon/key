@@ -328,14 +328,13 @@ public class AbstractExecutionContractUtils {
             accessibleClause = AbstractUpdateFactory
                     .abstractUpdateLocsFromUnionTerm(
                             contract.getAccessibleClause(heap),
-                            executionContext, services)
+                            services)
                     .stream().map(AbstrUpdateUpdatableLoc.class::cast)
                     .collect(Collectors
                             .toCollection(() -> new LinkedHashSet<>()));
             assignableClause = AbstractUpdateFactory
                     .abstractUpdateLocsFromUnionTerm(
-                            contract.getAssignable(heap), executionContext,
-                            services)
+                            contract.getAssignable(heap), services)
                     .stream().map(AbstrUpdateLHS.class::cast).collect(Collectors
                             .toCollection(() -> new LinkedHashSet<>()));
         }

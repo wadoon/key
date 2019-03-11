@@ -12,6 +12,7 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -20,6 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
@@ -34,24 +36,20 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.RigidRHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
-import de.uka.ilkd.key.java.Expression;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SetLDT;
-import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * Factory class for {@link AbstractUpdate}s and {@link AbstractUpdate} LHSs /
@@ -93,11 +91,11 @@ public class AbstractUpdateFactory {
     public AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
             Term lhs, ExecutionContext ec, Services services) {
         final LinkedHashSet<AbstrUpdateLHS> assignables = //
-                abstractUpdateLocsFromUnionTerm(lhs, ec, services).stream()
+                abstractUpdateLocsFromUnionTerm(lhs, services).stream()
                         .map(AbstrUpdateLHS.class::cast).collect(Collectors
                                 .toCollection(() -> new LinkedHashSet<>()));
 
-        return getInstance(phs, assignables, ec, services);
+        return getInstance(phs, assignables, services);
     }
 
     /**
@@ -109,17 +107,13 @@ public class AbstractUpdateFactory {
      *            {@link AbstractUpdate} should be created.
      * @param assignables
      *            The update's left-hand side.
-     * @param ec
-     *            The {@link ExecutionContext} in which the
-     *            {@link AbstractUpdate} is generated.
      * @param services
      *            The {@link Services} object.
      * @return The {@link AbstractUpdate} for the given
      *         {@link AbstractPlaceholderStatement} and left-hand side.
      */
     public AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
-            Set<AbstrUpdateLHS> assignables, ExecutionContext ec,
-            Services services) {
+            Set<AbstrUpdateLHS> assignables, Services services) {
         final String phsID = phs.getId();
         if (abstractUpdateInstances.get(phsID) == null) {
             abstractUpdateInstances.put(phsID, new LinkedHashMap<>());
@@ -129,7 +123,7 @@ public class AbstractUpdateFactory {
         AbstractUpdate result = //
                 abstractUpdateInstances.get(phsID).get(assgnHashCode);
         if (result == null) {
-            result = new AbstractUpdate(phs, assignables, ec, services);
+            result = new AbstractUpdate(phs, assignables, services);
             abstractUpdateInstances.get(phsID).put(assgnHashCode, result);
         }
 
@@ -173,14 +167,17 @@ public class AbstractUpdateFactory {
      *
      * @param replMap
      *            The replace map.
+     * @param services
+     *            The {@link Services} object.
+     *
      * @return A new {@link AbstractUpdate} of this one with the
      *         {@link ProgramVariable}s in the assignables replaced according to
      *         the supplied map.
      */
     public AbstractUpdate changeAssignables(AbstractUpdate abstrUpd,
-            Map<ProgramVariable, ProgramVariable> replMap) {
+            Map<ProgramVariable, ProgramVariable> replMap, Services services) {
         final Set<AbstrUpdateLHS> newAssignables = abstrUpd.getAllAssignables()
-                .stream().map(lhs -> lhs.replaceVariables(replMap))
+                .stream().map(lhs -> lhs.replaceVariables(replMap, services))
                 .map(AbstrUpdateLHS.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
         return changeAssignables(abstrUpd, newAssignables);
@@ -193,33 +190,12 @@ public class AbstractUpdateFactory {
      * @param t
      *            The {@link Term} to extract all {@link AbstractUpdateLoc}s
      *            from.
-     * @param ec
-     *            The {@link ExecutionContext}, for handling fields.
      * @param services
      *            The {@link Services} object.
      * @return All {@link AbstractUpdateLoc}s from the given {@link Term}.
      */
     public static Set<AbstractUpdateLoc> abstractUpdateLocsFromUnionTerm(Term t,
-            ExecutionContext ec, Services services) {
-        return abstractUpdateLocsFromUnionTerm(t, Optional.of(ec), services);
-    }
-
-    /**
-     * Extracts all {@link AbstractUpdateLoc}s from the given union (set or
-     * locset) {@link Term}.
-     *
-     * @param t
-     *            The {@link Term} to extract all {@link AbstractUpdateLoc}s
-     *            from.
-     * @param ec
-     *            The {@link ExecutionContext}, for handling fields. If an empty
-     *            {@link Optional} is supplied, fields are ignored.
-     * @param services
-     *            The {@link Services} object.
-     * @return All {@link AbstractUpdateLoc}s from the given {@link Term}.
-     */
-    public static Set<AbstractUpdateLoc> abstractUpdateLocsFromUnionTerm(Term t,
-            Optional<ExecutionContext> ec, Services services) {
+            Services services) {
         final TermBuilder tb = services.getTermBuilder();
 
         final ImmutableSet<Term> set;
@@ -231,146 +207,128 @@ public class AbstractUpdateFactory {
                 .targetSort()) {
             set = tb.setUnionToImmutableSet(t);
         } else {
-            assert false;
-            return null;
+            set = DefaultImmutableSet.<Term> nil().add(t);
         }
 
-        return set.stream()
-                .map(sub -> abstractUpdateLocFromTerm(sub, ec, services))
+        return set.stream().map(sub -> abstrUpdateLocsFromTerm(sub, services))
+                .flatMap(Collection::stream)
                 .filter(loc -> !(loc instanceof EmptyLoc))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 
     /**
-     * Extracts the {@link AbstractUpdateLoc} represented by the given
-     * {@link Term}. May fail; in this case, an empty {@link Optional} is
-     * returned.
+     * Extracts from the given {@link Term} to the {@link AbstractUpdateLoc}s
+     * contained in it.
      *
      * @param t
      *            The {@link Term} to extract all {@link AbstractUpdateLoc}s
      *            from.
-     * @param ec
-     *            The {@link ExecutionContext}, for handling fields.
      * @param services
      *            The {@link Services} object.
-     * @return All {@link AbstractUpdateLoc}s from the given {@link Term}.
+     * @return All {@link AbstractUpdateLoc}s in the given {@link Term}.
      */
-    public Optional<AbstractUpdateLoc> tryExtractAbstrUpdateLocFromTerm(Term t,
-            ExecutionContext ec, Services services) {
-        return tryExtractAbstrUpdateLocFromTerm(t, Optional.of(ec), services);
+    public static Set<AbstractUpdateLoc> extractAbstrUpdateLocsFromTerm(Term t,
+            Services services) {
+        final Set<AbstractUpdateLoc> subResult = //
+                abstrUpdateLocsFromTerm(t, services);
+        if (!subResult.isEmpty()) {
+            // We've found an atom
+            return subResult;
+        }
+
+        final Set<AbstractUpdateLoc> result = new LinkedHashSet<>();
+        for (Term sub : t.subs()) {
+            result.addAll(extractAbstrUpdateLocsFromTerm(sub, services));
+        }
+        return result;
     }
 
     /**
-     * Extracts the {@link AbstractUpdateLoc} represented by the given
-     * {@link Term}. May fail; in this case, an empty {@link Optional} is
-     * returned. Make sure you don't rely on a result being present in
-     * soundness-critical applications. It's safe to use this method, e.g., for
-     * checking whether an update may be dropped, where in the empty case,
-     * nothing happens (at most completeness issue).
+     * Converts the given {@link Term} to the {@link AbstractUpdateLoc}s it is
+     * representing.
      *
      * @param t
      *            The {@link Term} to extract all {@link AbstractUpdateLoc}s
      *            from.
-     * @param ec
-     *            The {@link ExecutionContext}, for handling fields. If an empty
-     *            {@link Optional} is supplied, fields are ignored.
      * @param services
      *            The {@link Services} object.
      * @return All {@link AbstractUpdateLoc}s from the given {@link Term}.
      */
-    public static Optional<AbstractUpdateLoc> tryExtractAbstrUpdateLocFromTerm(
-            Term t, Optional<ExecutionContext> ec, Services services) {
+    public static Set<AbstractUpdateLoc> abstrUpdateLocsFromTerm(Term t,
+            Services services) {
+        final Set<AbstractUpdateLoc> result = new LinkedHashSet<>();
+
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        final SetLDT setLDT = services.getTypeConverter().getSetLDT();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final TermBuilder tb = services.getTermBuilder();
-        final TypeConverter tc = services.getTypeConverter();
 
         final Operator op = t.op();
 
         if (op instanceof LocationVariable) {
-            return Optional.of(new PVLoc((LocationVariable) op));
+            result.add(new PVLoc((LocationVariable) op));
         } else if (t.op() == locSetLDT.getAllLocs()) {
-            return Optional.of(new AllLocsLoc(locSetLDT.getAllLocs()));
+            result.add(new AllLocsLoc(locSetLDT.getAllLocs()));
         } else if (t.op() == locSetLDT.getEmpty()) {
-            return Optional.of(new EmptyLoc(locSetLDT.getEmpty()));
+            result.add(new EmptyLoc(locSetLDT.getEmpty()));
         } else if (op instanceof Function && op.arity() == 0
                 && ((Function) op).sort() == locSetLDT.targetSort()) {
-            return Optional.of(new SkolemLoc((Function) op));
-        } else if (t.isRigid() && t.sort() != locSetLDT.targetSort()) {
-            return Optional.of(new RigidRHS(t));
+            result.add(new SkolemLoc((Function) op));
+        } else if (t.isRigid() && t.sort() != locSetLDT.targetSort()
+                && t.sort() != heapLDT.getFieldSort()) {
+            result.add(new RigidRHS(t));
         } else if (op == locSetLDT.getSingletonPV()) {
-            return Optional
-                    .of(abstractUpdateLocFromTerm(t.sub(0), ec, services));
+            result.addAll(abstrUpdateLocsFromTerm(t.sub(0), services));
         } else if (op == locSetLDT.getHasTo()) {
-            final AbstractUpdateLoc subResult = abstractUpdateLocFromTerm(
-                    t.sub(0), ec, services);
+            // There is exactly one location inside a hasTo
+            final AbstractUpdateLoc subResult = abstrUpdateLocsFromTerm(
+                    t.sub(0), services).iterator().next();
             assert subResult instanceof AbstrUpdateLHS;
-            return Optional.of(new HasToLoc((AbstrUpdateLHS) subResult));
+            result.add(new HasToLoc((AbstrUpdateLHS) subResult));
+        } else if (op == setLDT.getSingleton()) {
+            result.addAll(abstrUpdateLocsFromTerm(t.sub(0), services));
         } else if (op == locSetLDT.getSingleton()) {
-            if (!ec.isPresent()) {
-                /*
-                 * In this case, the caller is not interested in fields (or
-                 * otherwise, should have supplied an ExecutionContext).
-                 */
-                return Optional.of(new EmptyLoc(locSetLDT.getEmpty()));
-            }
-
             final Term obj = t.sub(0);
             final Term field = t.sub(1);
-            final Term selectTerm = tb.select(
-                    services.getJavaInfo().objectSort(), tb.getBaseHeap(), obj,
-                    field);
-            return Optional.of(
-                    fieldLocFromSelectTerm(selectTerm, tc, ec.get(), services));
+            result.add(new FieldLoc(Optional.empty(), Optional.empty(), obj,
+                    fieldPVFromFieldFunc(field, services),
+                    (LocationVariable) tb.getBaseHeap().op()));
+        } else if (op == locSetLDT.getUnion() || op == setLDT.getUnion()) {
+            result.addAll(abstrUpdateLocsFromTerm(t.sub(0), services));
+            result.addAll(abstrUpdateLocsFromTerm(t.sub(1), services));
         } else if (heapLDT.isSelectOp(op) && t.subs().size() == 3
                 && t.sub(2).op() == heapLDT.getArr()) {
-            return Optional.of(new ArrayLoc(t.sub(1), t.sub(2).sub(0)));
+            final Term heapTerm = t.sub(0);
+            result.add(new ArrayLoc(t.sub(1), t.sub(2).sub(0)));
+            result.addAll(abstrUpdateLocsFromTerm(heapTerm, services));
         } else if (heapLDT.isSelectOp(op)) {
-            if (!ec.isPresent()) {
-                /*
-                 * In this case, the caller is not interested in fields (or
-                 * otherwise, should have supplied an ExecutionContext).
-                 */
-                return Optional.ofNullable(new EmptyLoc(locSetLDT.getEmpty()));
-            }
-
-            /*
-             * NOTE (DS, 2019-03-06): This may fail (and we return an empty
-             * optional), e.g. for strange select terms with update applications
-             * inside.
-             */
-            return Optional.ofNullable(
-                    fieldLocFromSelectTerm(t, tc, ec.get(), services));
+            final Sort sort = heapLDT.getSortOfSelect(op);
+            final Term heapTerm = t.sub(0);
+            final Term obj = t.sub(1);
+            final Term field = t.sub(2);
+            result.add(new FieldLoc(Optional.of(sort), Optional.of(heapTerm),
+                    obj, fieldPVFromFieldFunc(field, services),
+                    (LocationVariable) tb.getBaseHeap().op()));
+            result.addAll(abstrUpdateLocsFromTerm(heapTerm, services));
+        } else if (op == heapLDT.getStore()) {
+            final Term heapTerm = t.sub(0);
+            final Term obj = t.sub(1);
+            final Term field = t.sub(2);
+            result.add(new FieldLoc(Optional.empty(), Optional.empty(), obj,
+                    fieldPVFromFieldFunc(field, services),
+                    (LocationVariable) tb.getBaseHeap().op()));
+            result.addAll(abstrUpdateLocsFromTerm(heapTerm, services));
         } else {
-            return Optional.empty();
+            /*
+             * TODO (DS, 2019-03-11): Debug code, remove when we're sure that
+             * everything's covered.
+             */
+            System.out.printf(
+                    "Unexpected operator \"%s\" in term \"%s\", cannot convert to AbstrUpdateLoc%n",
+                    op.name(), t);
         }
-    }
 
-    /**
-     * Extracts the {@link AbstractUpdateLoc} represented by the given
-     * {@link Term}. Returns null in case of failure. Call
-     * {@link #tryExtractAbstrUpdateLocFromTerm(Term, Optional, Services)} if
-     * failure is expected.
-     *
-     * @param t
-     *            The {@link Term} to extract all {@link AbstractUpdateLoc}s
-     *            from.
-     * @param ec
-     *            The {@link ExecutionContext}, for handling fields. If an empty
-     *            {@link Optional} is supplied, fields are ignored.
-     * @param services
-     *            The {@link Services} object.
-     * @return All {@link AbstractUpdateLoc}s from the given {@link Term}.
-     */
-    public static AbstractUpdateLoc abstractUpdateLocFromTerm(Term t,
-            Optional<ExecutionContext> ec, Services services) {
-        Optional<AbstractUpdateLoc> result = tryExtractAbstrUpdateLocFromTerm(t,
-                ec, services);
-        if (!result.isPresent()) {
-            assert false : "Unexpected element of loc set union.";
-            return null;
-        }
-        return result.get();
+        return result;
     }
 
     /**
@@ -385,7 +343,7 @@ public class AbstractUpdateFactory {
      *            {@link HeapLDT}).
      * @return The canonical program variable representing the field.
      */
-    private static ProgramVariable fieldPVFromFieldFunc(Term field,
+    private static LocationVariable fieldPVFromFieldFunc(Term field,
             Services services) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final JavaInfo javaInfo = services.getJavaInfo();
@@ -398,64 +356,8 @@ public class AbstractUpdateFactory {
         final String fieldStr = field.toString().substring(sepIdx + 3);
 
         final KeYJavaType kjt = javaInfo.getKeYJavaType(typeStr);
-        return javaInfo.getCanonicalFieldProgramVariable(fieldStr, kjt);
-    }
-
-    /**
-     * Extracts a {@link FieldLoc} from a select {@link Term}. Returns null if
-     * this is not possible.
-     *
-     * @param selectTerm
-     *            The select {@link Term}.
-     * @param tc
-     *            The {@link TypeConverter} for converting the select term to an
-     *            program {@link Expression}.
-     * @param ec
-     *            The {@link ExecutionContext} for creating the field.
-     * @param services
-     *            The {@link Services} object.
-     * @return A {@link FieldLoc} from the {@link Term}.
-     */
-    private static FieldLoc fieldLocFromSelectTerm(Term selectTerm,
-            final TypeConverter tc, ExecutionContext ec, Services services) {
-        final ReferencePrefix rtInst = ec.getRuntimeInstance();
-        final TermBuilder tb = services.getTermBuilder();
-        if (rtInst instanceof LocationVariable) {
-            final LocationVariable rtInstVar = (LocationVariable) rtInst;
-            selectTerm = GenericTermReplacer.replace(selectTerm,
-                    t -> t.op() instanceof LocationVariable
-                            && t.op().toString().equals("self")
-                            && ((LocationVariable) t.op()).sort() == rtInstVar
-                                    .sort(),
-                    t -> tb.var((LocationVariable) rtInst), services);
-        }
-
-        /*
-         * NOTE (DS, 2019-03-06): We currently don't distinguish different
-         * heaps; either the abstract statement can or cannot assign a field,
-         * this is independent of the used heap. Maybe we will have to
-         * reconsider this, I might not have thought it through totally...
-         */
-        selectTerm = tb.select(selectTerm.sort(), tb.getBaseHeap(),
-                selectTerm.sub(1), selectTerm.sub(2));
-
-        final Expression pe;
-        try {
-            pe = tc.convertToProgramElement(selectTerm);
-        } catch (Exception e) {
-            return null;
-        }
-
-        if (pe instanceof FieldReference) {
-            return new FieldLoc((FieldReference) pe, ec,
-                    services.getTypeConverter().getHeapLDT().getHeap());
-        } else if (pe instanceof ProgramVariable) {
-            return new FieldLoc(new FieldReference((ProgramVariable) pe, null),
-                    ec, services.getTypeConverter().getHeapLDT().getHeap());
-        } else {
-            assert false : "Unexpected Expression type as result of field conversion";
-            return null;
-        }
+        return (LocationVariable) javaInfo
+                .getCanonicalFieldProgramVariable(fieldStr, kjt);
     }
 
     /**
@@ -464,8 +366,10 @@ public class AbstractUpdateFactory {
      * @param accessibles
      *            The accessibles (right-hand sides) to construct the union term
      *            of.
+     *
      * @param services
      *            The services object.
+     *
      * @return A set union term from the given accessibles.
      */
     public Term accessiblesToSetUnion(Set<AbstrUpdateRHS> accessibles,

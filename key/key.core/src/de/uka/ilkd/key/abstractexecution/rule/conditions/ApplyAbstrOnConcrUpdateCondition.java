@@ -217,7 +217,7 @@ public final class ApplyAbstrOnConcrUpdateCondition
 
         final AbstractUpdate newAbstrUpd = services.abstractUpdateFactory()
                 .changeAssignables(abstrUpd,
-                        Collections.singletonMap(lhs1, lhs2));
+                        Collections.singletonMap(lhs1, lhs2), services);
 
         final Term newAbstrUpdRHS = //
                 MiscTools.replaceVarInTerm(lhs1, tb.var(lhs2),

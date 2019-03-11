@@ -22,10 +22,8 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateUpdatableLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -55,8 +53,6 @@ public class AbstractExecutionUtils {
      * @param target
      *            The term for which to analyze the assigned-before-used
      *            relationships.
-     * @param ec
-     *            The {@link ExecutionContext}, for handling fields.
      * @param services
      *            The {@link Services} object.
      * @return (1) assigned-before-used and (2) used-before-assigned operators.
@@ -65,19 +61,17 @@ public class AbstractExecutionUtils {
      *         not be applicable.
      */
     public static Optional<Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>>> opsAssignedBeforeUsed(
-            Term target, ExecutionContext ec, Services services) {
+            Term target, Services services) {
         final Set<AbstrUpdateUpdatableLoc> assignedBeforeUsed = new LinkedHashSet<>();
         final Set<AbstrUpdateUpdatableLoc> usedBeforeAssigned = new LinkedHashSet<>();
-        final AbstractUpdateFactory factory = services.abstractUpdateFactory();
 
-        Optional<AbstractUpdateLoc> loc = factory
-                .tryExtractAbstrUpdateLocFromTerm(target, ec, services);
-        if (loc.isPresent() && loc.get() instanceof AbstrUpdateUpdatableLoc) {
-            usedBeforeAssigned.add((AbstrUpdateUpdatableLoc) loc.get());
-        }
+        AbstractUpdateFactory.abstrUpdateLocsFromTerm(target, services).stream()
+                .filter(AbstrUpdateUpdatableLoc.class::isInstance)
+                .map(AbstrUpdateUpdatableLoc.class::cast)
+                .forEach(usedBeforeAssigned::add);
 
         // Update applications -- those are most interesting
-        else if (target.op() == UpdateApplication.UPDATE_APPLICATION) {
+        if (target.op() == UpdateApplication.UPDATE_APPLICATION) {
             final Term update = target.sub(0);
             final Term updateTarget = target.sub(1);
 
@@ -91,15 +85,13 @@ public class AbstractExecutionUtils {
                             (LocationVariable) ((ElementaryUpdate) elem.op())
                                     .lhs());
                     final Term rhs = elem.sub(0);
-                    loc = factory.tryExtractAbstrUpdateLocFromTerm( //
-                            rhs, ec, services);
-                    if (loc.isPresent()
-                            && loc.get() instanceof AbstrUpdateUpdatableLoc) {
-                        if (!assignedBeforeUsed.contains(loc.get())) {
-                            usedBeforeAssigned
-                                    .add((AbstrUpdateUpdatableLoc) loc.get());
-                        }
-                    }
+
+                    AbstractUpdateFactory.abstrUpdateLocsFromTerm(rhs, services)
+                            .stream()
+                            .filter(AbstrUpdateUpdatableLoc.class::isInstance)
+                            .map(AbstrUpdateUpdatableLoc.class::cast)
+                            .filter(loc -> !assignedBeforeUsed.contains(loc))
+                            .forEach(usedBeforeAssigned::add);
 
                     if (!usedBeforeAssigned.contains(lhs)) {
                         assignedBeforeUsed.add(lhs);
@@ -110,7 +102,7 @@ public class AbstractExecutionUtils {
             // Abstract Update
             else if (update.op() instanceof AbstractUpdate) {
                 opsHaveToAssignBeforeUsedForAbstrUpd(update, assignedBeforeUsed,
-                        usedBeforeAssigned, ec, services);
+                        usedBeforeAssigned, services);
             }
 
             // Concatenated abstract update
@@ -119,8 +111,7 @@ public class AbstractExecutionUtils {
                         abstractUpdatesFromConcatenation(update);
                 for (Term abstrUpdTerm : abstractUpdateTerms) {
                     opsHaveToAssignBeforeUsedForAbstrUpd(abstrUpdTerm,
-                            assignedBeforeUsed, usedBeforeAssigned, ec,
-                            services);
+                            assignedBeforeUsed, usedBeforeAssigned, services);
                 }
             }
 
@@ -131,8 +122,7 @@ public class AbstractExecutionUtils {
             }
 
             final Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>> subResult = //
-                    opsAssignedBeforeUsed(updateTarget, ec, services)
-                            .orElse(null);
+                    opsAssignedBeforeUsed(updateTarget, services).orElse(null);
 
             if (subResult == null) {
                 return Optional.empty();
@@ -158,7 +148,7 @@ public class AbstractExecutionUtils {
         else {
             for (final Term sub : target.subs()) {
                 final Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>> subResult = //
-                        opsAssignedBeforeUsed(sub, ec, services).orElse(null);
+                        opsAssignedBeforeUsed(sub, services).orElse(null);
 
                 if (subResult == null) {
                     return Optional.empty();
@@ -211,19 +201,17 @@ public class AbstractExecutionUtils {
      * @param usedBeforeAssigned
      *            A set of used-before-assigned operators. Results are added to
      *            the passed set.
-     * @param ec
-     *            The {@link ExecutionContext} for handling fields.
      * @param services
      *            The {@link Services} object.
      */
     private static void opsHaveToAssignBeforeUsedForAbstrUpd(final Term update,
             final Set<AbstrUpdateUpdatableLoc> assignedBeforeUsed,
             final Set<AbstrUpdateUpdatableLoc> usedBeforeAssigned,
-            ExecutionContext ec, Services services) {
+            Services services) {
         assert update.op() instanceof AbstractUpdate;
 
         usedBeforeAssigned.addAll(AbstractUpdateFactory
-                .abstractUpdateLocsFromUnionTerm(update.sub(0), ec, services)
+                .abstractUpdateLocsFromUnionTerm(update.sub(0), services)
                 .stream().filter(AbstrUpdateUpdatableLoc.class::isInstance)
                 .filter(op -> !assignedBeforeUsed.contains(op))
                 .map(AbstrUpdateUpdatableLoc.class::cast)
