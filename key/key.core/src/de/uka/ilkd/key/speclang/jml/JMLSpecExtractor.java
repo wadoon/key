@@ -499,7 +499,8 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 // for a static method translate \inv once again, otherwise use
                 // the internal symbol
                 /* Changes due to Ownership Types:
-                 * - We replaced precondition inv by relinv.
+                 * - We removed inv from precondition.
+                 * - We added relinv as free precondition.
                  * - We removed the need to show inv in post.
                  * - We added ensures_free relinv.
                  * However, see UseOperationContractRule for further changes.
@@ -508,7 +509,7 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 final String invString = pm.isStatic() ? "\\inv" : "relinv";
                 // final String invString = pm.isStatic() ? "\\inv" : "<inv>";
                 if (!pm.isConstructor()) {
-                    specCase.addRequires(new PositionedString(invString).label(
+                    specCase.addRequiresFree(new PositionedString(invString).label(     // free!
                             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
                 } else if (addInvariant) {
                     // add static invariant to constructor's precondition
