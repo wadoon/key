@@ -36,6 +36,7 @@ import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.TypeConverter;
 import de.uka.ilkd.key.java.abstraction.ArrayType;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
+import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.declaration.FieldDeclaration;
 import de.uka.ilkd.key.java.declaration.FieldSpecification;
@@ -566,6 +567,20 @@ public final class JMLSpecExtractor implements SpecExtractor {
                 for (PositionedString nonNull : resultNonNull) {
                     specCase.addEnsures(nonNull.prepend("ensures ").label(
                             ParameterlessTermLabel.IMPLICIT_SPECIFICATION_LABEL));
+                }
+            }
+
+            // add owner of result
+            if (!pm.isStatic() && !pm.isVoid() && !pm.isConstructor()) {
+                if (!(resultType.getJavaType() instanceof PrimitiveType)) {
+                    String name = pm.getProgramElementName().getProgramName();
+                    if (name.startsWith("rep_")) {
+                        specCase.addEnsuresFree(
+                                new PositionedString("\\dl_owner(\\result) == this"));
+                    } else if (name.startsWith("peer_")) {
+                        specCase.addEnsuresFree(
+                                new PositionedString("\\dl_owner(\\result) == \\dl_owner(this)"));
+                    }
                 }
             }
 
