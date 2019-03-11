@@ -448,6 +448,18 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 strategyProperties.getProperty(
                         StrategyProperties.LOOP_OPTIONS_KEY).equals(
                         StrategyProperties.LOOP_INVARIANT_TACLETS);
+
+        /*
+         * NOTE (DS, 2019-03-11): The new loop scope invariant taclets comprise
+         * a rule specially designed for for-loops. Therefore, we deactivate the
+         * for-to-while transforming rule if the loop inv taclets option is chosen.
+         * Also, we deactivate it when no loop treatment at all is chosen --
+         * transforming fors to whiles is a kind of loop treatment.
+         */
+        boolean useForToWhileTransf = !useLoopInvTaclets && !strategyProperties
+                .getProperty(StrategyProperties.LOOP_OPTIONS_KEY)
+                .equals(StrategyProperties.LOOP_NONE);
+
         /*
          * boolean useBlockExpand = strategyProperties.getProperty(
          * StrategyProperties.BLOCK_OPTIONS_KEY).
@@ -529,6 +541,8 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 : inftyConst());
         bindRuleSet(d, "loop_inv_taclets", useLoopInvTaclets ? longConst(0)
                 : inftyConst());
+        bindRuleSet(d, "for_to_while",
+            useForToWhileTransf ? longConst(0) : inftyConst());
 
         /*
          * bindRuleSet ( d, "block_expand", useBlockExpand ? longConst ( 0 ) :
