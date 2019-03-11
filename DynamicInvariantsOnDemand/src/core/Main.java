@@ -58,6 +58,7 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
 import dynacode.DynaCode;
+import genmethod.GenMethodData;
 import genmethod.MethodGenerator;
 import gentest.IGeneratedTest;
 import prover.CounterExample;
@@ -95,18 +96,18 @@ public class Main {
 	
 	private static final String digRelPath = "dig/dig/dig.py";
 	//amount of testcases / method calls for the function from which the traces should be obtained
-	public static final int maxLoopUnwinds = 13;
+	public static final int maxLoopUnwinds = 8;
 	
 	private static KeYAPI keyAPI;
 	
 	public static void main(String[] args) {
-		keyAPI = new KeYAPI(benchmarksFile12);
+		keyAPI = new KeYAPI(benchmarksFile10);
 		
 		ProofIndependentSettings.DEFAULT_INSTANCE
         .getTestGenerationSettings().setMaxUnwinds(maxLoopUnwinds);
 		//2^(intBound-2) == max possible values of smt (so 2^(6-2))=16 max possible input var value) 
 		//int.bound = 8 is max for my system setup
-		ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = 4;
+		ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = 8;
 		
 		List<Contract> proofContracts = keyAPI.getContracts();
 		ProofResult result = null;
@@ -197,6 +198,8 @@ public class Main {
 			//FIXME: NOTE: Method Generator knows the user spezified Invariants atm
 			// Generate Program Code with Traces for dynamic execution
 			String javaCode = MethodGenerator.generateMethodFromKeYFormat(program, update, loop);
+			
+			System.out.println("inputVars: " + GenMethodData.getInstance().inputVars);
 			
 			//Write Code to file in workspace
 			Path currentPath = Paths.get(System.getProperty("user.dir"));

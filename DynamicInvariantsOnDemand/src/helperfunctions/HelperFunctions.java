@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public final class HelperFunctions {
+	private HelperFunctions() {}
+	
 	public static HashMap<String, ArrayList<Integer>> mergeMapsKeyWise(HashMap<String, ArrayList<Integer>> map1, HashMap<String, ArrayList<Integer>> map2) {
 		HashMap<String, ArrayList<Integer>> mergedMap = new HashMap<String, ArrayList<Integer>>(map1);
 		
@@ -23,5 +25,14 @@ public final class HelperFunctions {
 			}
 		}
 		return mergedMap;
+	}
+	
+	public static boolean isInteger(String strInt) {
+	    try {
+	        int i = Integer.parseInt(strInt);
+	    } catch (NumberFormatException | NullPointerException nfe) {
+	        return false;
+	    }
+	    return true;
 	}
 }

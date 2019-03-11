@@ -1,5 +1,4 @@
 class Plus {
-	
 	/*@
       	  @ public normal_behavior
     	  @ requires 0 <= a && 0 <= b;

@@ -7,8 +7,8 @@
    !ABER:ich denke selbe ursache wie bei cohen inner loop q = q_0, r = r_0, dass q_0.. nicht bekannt ist, aber bei TimesTwo geht es mit i_0
    -> ja: ich denke es liegt an simplifyUpdate (siehe KeYBook pg. 525 und siehe gui). Ich müsste das quasi ausschalten denke ich
   und misc_tools.getLocalIns / Outs liefert nicht _a -> deswegen fehlt in genmethod int a = _a. int r = a -> fehler, a unbekannt
-  _> Bessere Lösung: jede var auf der echten seite einer zuweisung, die unbekannt ist, als input var nehmen (i.A., auch bei _y = y)
-
+  -> Bessere Lösung: jede var auf der echten seite einer zuweisung, die unbekannt ist, als input var nehmen (i.A., auch bei _y = y)
+!!!-> immer noch Problem: da r=a, aber weder a noch r in if verzweigung auftreten, werden vom TestGen keine Belegungen generiert. wie lösen?
 - stacked loops: cohen funktioniert nicht, vermutlich weil die zahlen zu groß werden für den SMT mit bounded int. Problem: schon bei intBound 10
   wird eine PipeClosed(SMT) exception geworfen.
  -MethodGenerator: Cohen inner loop: q = q_0, r = r_0: wie damit umgehen? in dem Fall könnte ich die aller ersten belegungen für q und r merken,
@@ -17,7 +17,7 @@
 - nicht wegen mir, auch in gui, invariante angeben: use case goal wird nicht geschlossen. (bei mir in isInvInitiallyValid. wie kann den überhaupt dann
   mit autopilot in der main der proof geschlossen werden? da entsteht ja auch das usecase goal?!
  -testgen: siehe Plus beispiel: generiert für a=0 immer für zweite loop, vermutlich weil a nicht mehr relevant ist. Dadurch wird falsche Invariante a = 0 und r==j erzeugt
- -traces Problem stacked loops: siehe square. Da i erst nach der innerloop incrementiert wird, ist i innerhalb der innerloop beim 0. lauf = 0.
+!!!-traces Problem stacked loops: siehe square. Da i erst nach der innerloop incrementiert wird, ist i innerhalb der innerloop beim 0. lauf = 0.
   -> äußere invariante kann nicht gefunden werden
   
   solved:

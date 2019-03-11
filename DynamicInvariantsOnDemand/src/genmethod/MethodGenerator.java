@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -14,6 +16,7 @@ import core.TermUpdateVisitor;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.While;
 import de.uka.ilkd.key.logic.Term;
+import helperfunctions.HelperFunctions;
 
 public abstract class MethodGenerator {
 	public static String generateMethodFromKeYFormat(StatementBlock program, Term update, While loop) {
@@ -25,7 +28,7 @@ public abstract class MethodGenerator {
 		
 		//String returnVariable = extractReturnVariableFromProgram(program);
 		
-		//program.getBody().forEach(s -> s.);
+		GenMethodData.getInstance().isInitialized = false;
 		
 		StringBuilder javaCodeBuilder = new StringBuilder();
 		StringBuilder importBuilder = new StringBuilder();
@@ -58,34 +61,35 @@ public abstract class MethodGenerator {
 		functionHeaderBuilder.append(parameterName);
 		functionHeaderBuilder.append(")");
 		
-		// Extrahiere input Variables vom visitor
-		// und local Variables
-		HashMap<String, String> assignmentAndinputVars = new HashMap<String, String>(); // int _x = x
-		HashMap<String, String> localVarsAndAssignment = new HashMap<String, String>();
-		for (Entry<String, String> e : varNameCollector.variables.entrySet()) {
+		// Extrahiere input Variables vom visitor & build assignments
+		LinkedHashSet<String> inputVars = new LinkedHashSet<String>(); // int _x = x
+		LinkedHashSet<String> allVars = new LinkedHashSet<String>();
+		for (Entry<String, String> e : varNameCollector.assignmentsLHS_RHS.entrySet()) {
+			String lhs = e.getKey();
+			String rhs = e.getValue();
+			
+			allVars.add(lhs);
+			
 			// Build Assignments
 			variableAssignmentBuilder.append("int ");
-			variableAssignmentBuilder.append(e.getKey());
+			variableAssignmentBuilder.append(lhs);
 			variableAssignmentBuilder.append(" = ");
-			variableAssignmentBuilder.append(e.getValue());
+			variableAssignmentBuilder.append(rhs);
 			variableAssignmentBuilder.append(";");
 			variableAssignmentBuilder.append(System.lineSeparator());
 			
-			// Function input Variables start with underscore _
-			String variableName = e.getKey().toString();
-			if (variableName.startsWith("_")) {
-				assignmentAndinputVars.put(e.getKey(), e.getValue()); //care: e.getKey() is _x, not x
+			// Right hand side must be on a Left hand side assignment, else it is an input Var
+			if (!HelperFunctions.isInteger(rhs) && !varNameCollector.assignmentsLHS_RHS.containsKey(rhs)) {
+				inputVars.add(rhs);
+				allVars.add(rhs);
 			} 
-			else {
-				localVarsAndAssignment.put(e.getKey(), e.getValue());
-			}
 		}
 		
-		// Build assignments like x = inputVariables.get(0) from generic parameter
+		// Build assignments like int x = inputVariables.get(0)
 		int i = 0;
-		for (Entry<String, String> e : assignmentAndinputVars.entrySet()) {
+		for (String inputVar : inputVars) {
 			inputVariableFromParameterListBuilder.append("int ");
-			inputVariableFromParameterListBuilder.append(e.getValue()); //x
+			inputVariableFromParameterListBuilder.append(inputVar); //x
 			inputVariableFromParameterListBuilder.append(" = ");
 			inputVariableFromParameterListBuilder.append(parameterName);
 			inputVariableFromParameterListBuilder.append(".get(");
@@ -96,16 +100,16 @@ public abstract class MethodGenerator {
 		}
 		
 		// Build code like ArrayList<Integer> traces__x = new ArrayList<Integer>();
-		ArrayList<String> traces = getVariablesNamesWithPrefix(varNameCollector.variables.keySet(), "traces_");
+		ArrayList<String> traces = getVariablesNamesWithPrefix(allVars, "traces_");
 		ArrayList<String> tracesArrayListsStrings = getArrayListVarStringsFromVars(traces);
 		for (String s : tracesArrayListsStrings) {
 			tracesArrayListVarStringBuilder.append(s);
 			tracesArrayListVarStringBuilder.append(System.lineSeparator());
 		}
 		
-		ArrayList<String> hashMapPuts = getHashMapPuts(returnObject, varNameCollector.variables.keySet(), traces);
+		ArrayList<String> hashMapPuts = getHashMapPuts(returnObject, allVars, traces);
 		
-		Iterator<String> varNames = varNameCollector.variables.keySet().iterator();
+		Iterator<String> varNames = allVars.iterator();
 		for (String s : traces) {
 			tracesAddBuilder.append(s);
 			tracesAddBuilder.append(".add(");
@@ -173,11 +177,15 @@ public abstract class MethodGenerator {
 		// Close Class declaration
 		javaCodeBuilder.append(System.lineSeparator());
 		javaCodeBuilder.append("}");
+		
+		// Store information about the generated method (e.g. for testgen)
+		GenMethodData.getInstance().inputVars = inputVars;
+		GenMethodData.getInstance().isInitialized = true;
 
 		return javaCodeBuilder.toString();
 	}
 	
-	private static ArrayList<String> getHashMapPuts(String hashMapVarName, Set<String> varNames, ArrayList<String> tracesNames) {
+	private static ArrayList<String> getHashMapPuts(String hashMapVarName, LinkedHashSet<String> varNames, ArrayList<String> tracesNames) {
 		ArrayList<String> hashMapPuts = new ArrayList<String>();
 		
 		StringBuilder hashMapPutsBuilder = new StringBuilder();
@@ -241,7 +249,7 @@ public abstract class MethodGenerator {
 			return null;
 	}
 	
-	public static ArrayList<String> getVariablesNamesWithPrefix(Set<String> variables, String prefix) {
+	public static ArrayList<String> getVariablesNamesWithPrefix(LinkedHashSet<String> variables, String prefix) {
 		ArrayList<String> varNames = new ArrayList<String>();
 		StringBuilder variablesNameBuilder = new StringBuilder();
 		for (String var : variables) {

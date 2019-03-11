@@ -52,6 +52,7 @@ import de.uka.ilkd.key.testgen.oracle.OracleGenerator;
 import de.uka.ilkd.key.testgen.oracle.OracleMethod;
 import de.uka.ilkd.key.testgen.oracle.OracleMethodCall;
 import de.uka.ilkd.key.util.KeYConstants;
+import genmethod.GenMethodData;
 
 
 /**
@@ -247,24 +248,32 @@ public class TestCaseGenerator {
 
     public String getMUTCall(){
     	StringBuilder sb = new StringBuilder();
-        //FIXME um das umzusetzen mit den Input Variablen (wegen den Updates - z.B: int q = q_0 -> q_0 als input.
-    	//müsste ich die information was input ist von extern übergeben
         sb.append("   ArrayList<Integer> inputVars = new ArrayList<Integer>();"
         		+ NEW_LINE);
     	
-        IProgramMethod m = info.getMUT();		
+        //IProgramMethod m = info.getMUT();		
 //        String name = m.getFullName();
 //        String params = "";
-        for(ParameterDeclaration p : m.getParameters()){
-            for(VariableSpecification v : p.getVariables()){
-                IProgramVariable var = v.getProgramVariable();
-                sb.append("   inputVars.add(");
-                sb.append(var.name());
-                sb.append(");");
-                sb.append(NEW_LINE);
-//                params = params +"," +var.name();
-            }
-        }		
+//        for(ParameterDeclaration p : m.getParameters()){
+//            for(VariableSpecification v : p.getVariables()){
+//                IProgramVariable var = v.getProgramVariable();
+//                sb.append("   inputVars.add(");
+//                sb.append(var.name());
+//                sb.append(");");
+//                sb.append(NEW_LINE);
+////                params = params +"," +var.name();
+//            }
+//        }		
+        
+        assert GenMethodData.getInstance().isInitialized;
+        
+        for (String inputVar : GenMethodData.getInstance().inputVars) {
+        	sb.append("   inputVars.add(");
+            sb.append(inputVar);
+            sb.append(");");
+            sb.append(NEW_LINE);
+        }
+        
         sb.append("   HashMap<String, ArrayList<Integer>> traces = generatedMethod.callGeneratedMethod(inputVars);");
         sb.append(NEW_LINE);
         sb.append("   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);");

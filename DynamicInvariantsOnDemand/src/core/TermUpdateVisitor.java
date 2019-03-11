@@ -10,9 +10,9 @@ import de.uka.ilkd.key.logic.op.Operator;
 
 
 public class TermUpdateVisitor implements Visitor{
-	// HashMap with Key: Variable Name, Value: Update Name
+	// HashMap with Key: LHS, RHS: Variable Name, Value: Update Name
 	// FIXME es k�nnen hier evtl auch mehrfache Zuweisungen zur gleichen Variable m�glich sein
-	public LinkedHashMap<String, String> variables = new LinkedHashMap<String, String>();
+	public LinkedHashMap<String, String> assignmentsLHS_RHS = new LinkedHashMap<String, String>();
 
 	@Override
 	public boolean visitSubtree(Term visited) {
@@ -44,20 +44,20 @@ public class TermUpdateVisitor implements Visitor{
 			ElementaryUpdate elemOp = (ElementaryUpdate) visited.op();
 			// Variable
 			String variableName = elemOp.lhs().name().toString();
-			String getsUpdatedWithName;
+			
+			if (variableName.contains("exc") || variableName.contains("heap"))
+				return;
+			
+			String getsUpdatedWith;
 			// Assignments like q = 0 | elem-update(q)(Z(0(#)))
 			if (visited.sub(0).subs().size() > 0) {
-				getsUpdatedWithName = visited.sub(0).sub(0).op().name().toString();
+				getsUpdatedWith = visited.sub(0).sub(0).op().name().toString();
 			}
 			// Assignments like _x = x | elem-update(_x)(x)
 			else {
-				getsUpdatedWithName = visited.sub(0).op().name().toString();
-			}
-			//FIXME better logic. Ignore the exception variable exc
-			// FIXME: wie mit member (heap) variablen umgehen? Feature einbauen?
-			// ignoriere heap
-			if (!variableName.contains("exc") && !variableName.contains("heap"))
-				variables.put(variableName, getsUpdatedWithName);
+				getsUpdatedWith = visited.sub(0).op().name().toString();
+			}	
+			assignmentsLHS_RHS.put(variableName, getsUpdatedWith);
 		}
 	}
 

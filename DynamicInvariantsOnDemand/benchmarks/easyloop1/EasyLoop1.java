@@ -1,5 +1,3 @@
-//loop_invariant ((z == (x - y) * x) && (y >= 0));
-//loop_invariant ((z == (x - y) * x) && (x < 0));
 public class EasyLoop1 {
   /*@ public normal_behavior 
     @ requires (x >= 0);
