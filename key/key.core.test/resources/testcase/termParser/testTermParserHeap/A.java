@@ -3,6 +3,7 @@ package testTermParserHeap;
 class A {
 
 private int f;
+private int f1;
 A next;
 int[] array;
 

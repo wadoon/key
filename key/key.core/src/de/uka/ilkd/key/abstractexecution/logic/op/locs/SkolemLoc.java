@@ -18,26 +18,20 @@ import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * A Skolem location set suitable for use in an {@link AbstractUpdate}.
  *
  * @author Dominic Steinhoefel
  */
-public class SkolemLoc extends AbstractSortedOperator
-        implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
+public class SkolemLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
     private final Function skLoc;
 
     public SkolemLoc(Function skLoc) {
-        super(new Name("skLoc"), new Sort[] { skLoc.sort() }, skLoc.sort(),
-                true);
         this.skLoc = skLoc;
     }
 

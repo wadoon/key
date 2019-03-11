@@ -35,8 +35,10 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.RigidRHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.java.Expression;
+import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.TypeConverter;
+import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
@@ -372,6 +374,34 @@ public class AbstractUpdateFactory {
     }
 
     /**
+     * Returns, for a term representing a field, the "canonical" field program
+     * variable.
+     *
+     * @param field
+     *            The field term, something like "my.package.Type::$field", of
+     *            Sort "Field" (of {@link HeapLDT}).
+     * @param services
+     *            The {@link Services} object (for {@link JavaInfo} and
+     *            {@link HeapLDT}).
+     * @return The canonical program variable representing the field.
+     */
+    private static ProgramVariable fieldPVFromFieldFunc(Term field,
+            Services services) {
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final JavaInfo javaInfo = services.getJavaInfo();
+        assert field.sort() == heapLDT.getFieldSort();
+
+        final int sepIdx = field.toString().indexOf("::$");
+        assert sepIdx > 0;
+
+        final String typeStr = field.toString().substring(0, sepIdx);
+        final String fieldStr = field.toString().substring(sepIdx + 3);
+
+        final KeYJavaType kjt = javaInfo.getKeYJavaType(typeStr);
+        return javaInfo.getCanonicalFieldProgramVariable(fieldStr, kjt);
+    }
+
+    /**
      * Extracts a {@link FieldLoc} from a select {@link Term}. Returns null if
      * this is not possible.
      *
@@ -417,10 +447,11 @@ public class AbstractUpdateFactory {
         }
 
         if (pe instanceof FieldReference) {
-            return new FieldLoc((FieldReference) pe, ec);
+            return new FieldLoc((FieldReference) pe, ec,
+                    services.getTypeConverter().getHeapLDT().getHeap());
         } else if (pe instanceof ProgramVariable) {
             return new FieldLoc(new FieldReference((ProgramVariable) pe, null),
-                    ec);
+                    ec, services.getTypeConverter().getHeapLDT().getHeap());
         } else {
             assert false : "Unexpected Expression type as result of field conversion";
             return null;

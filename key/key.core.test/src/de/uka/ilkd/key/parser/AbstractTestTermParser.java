@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import junit.framework.TestCase;
-
 import org.antlr.runtime.RecognitionException;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -26,6 +24,7 @@ import de.uka.ilkd.key.pp.ProgramPrinter;
 import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletForTests;
 import de.uka.ilkd.key.util.HelperClassForTests;
+import junit.framework.TestCase;
 
 /**
  * Class providing methods for parser tests.
@@ -39,7 +38,7 @@ public class AbstractTestTermParser extends TestCase {
     protected final NamespaceSet nss;
     protected final Services services;
 
-    AbstractTestTermParser(String name) {
+    protected AbstractTestTermParser(String name) {
         super(name);
         services = getServices();
         tb = services.getTermBuilder();
@@ -48,11 +47,11 @@ public class AbstractTestTermParser extends TestCase {
     }
 
     Sort lookup_sort(String name) {
-        return (Sort) nss.sorts().lookup(new Name(name));
+        return nss.sorts().lookup(new Name(name));
     }
 
     Function lookup_func(String name) {
-        return (Function) nss.functions().lookup(new Name(name));
+        return nss.functions().lookup(new Name(name));
     }
 
     LogicVariable declareVar(String name, Sort sort) {
@@ -62,7 +61,7 @@ public class AbstractTestTermParser extends TestCase {
     }
 
     private KeYParserF stringDeclParser(String s) {
-        // fills namespaces 
+        // fills namespaces
         new Recoder2KeY(services, nss).parseSpecialClasses();
         return new KeYParserF(ParserMode.DECLARATION,
                 new KeYLexerF(s,

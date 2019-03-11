@@ -17,26 +17,20 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * The special "allLocs" location.
  *
  * @author Dominic Steinhoefel
  */
-public class AllLocsLoc extends AbstractSortedOperator
-        implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
+public class AllLocsLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
     private final Function allLocs;
 
     public AllLocsLoc(Function allLocs) {
-        super(new Name("allLocsLoc"), new Sort[] { allLocs.sort() },
-                allLocs.sort(), true);
         this.allLocs = allLocs;
     }
 

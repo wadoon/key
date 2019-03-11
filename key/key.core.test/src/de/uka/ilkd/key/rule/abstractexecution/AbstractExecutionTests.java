@@ -16,15 +16,9 @@ package de.uka.ilkd.key.rule.abstractexecution;
 import static de.uka.ilkd.key.rule.merge.MergeRuleTests.loadProof;
 import static de.uka.ilkd.key.rule.merge.MergeRuleTests.startAutomaticStrategy;
 
-import java.util.Iterator;
-
 import org.junit.Test;
 
-import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.rule.FindTaclet;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.Taclet;
 import junit.framework.TestCase;
 
 /**
@@ -33,118 +27,20 @@ import junit.framework.TestCase;
  * @author Dominic Steinhoefel
  */
 public class AbstractExecutionTests extends TestCase {
-    private static final String TEST_RESOURCES_DIR_PREFIX =
-            "resources/testcase/abstractexecution/";
+    private static final String TEST_RESOURCES_DIR_PREFIX = "resources/testcase/abstractexecution/";
 
     @Test
-    public void testProofCorrectIfThenElseCommonPrefixRefactoringWithJMLNotAssignableSpec() {
+    public void test() {
         final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX,
                 "correct-refactoring-ite-pullout-prefix-with-notassgn-spec/pulloutITEPrefixRef.key");
         startAutomaticStrategy(proof);
 
         assertTrue(proof.closed());
-
-        /*
-         * TODO (DS, 2018-12-18): Add some more checks.
-         */
     }
 
     @Test
-    public void testProofCorrectIfThenElseCommonPostfixRefactoringInJavaFile() {
-        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX,
-                "correct-refactoring-ite-pullout-postfix/pulloutITEPostfixRef.key");
-        startAutomaticStrategy(proof);
+    public void testFieldExtraction() {
+        final String heapExpr = "store(store(heap, self, TestAEHeap::$field1, Z(7(1(#)))), self, TestAEHeap::$field2, Z(2(4(#))))";
 
-        assertTrue(proof.closed());
-
-        final Iterator<Node> it = proof.root().subtreeIterator();
-        int abstractExecAppsCnt = 0;
-        while (it.hasNext()) {
-            final Node nextNode = it.next();
-            if (nextNode.getAppliedRuleApp() == null) {
-                continue;
-            }
-
-            final Rule rule = nextNode.getAppliedRuleApp().rule();
-            if (rule instanceof FindTaclet
-                    && ((Taclet) rule).getRuleSets().stream().anyMatch(rs -> rs
-                            .name().toString().equals("abstractExecution"))) {
-                abstractExecAppsCnt++;
-            }
-        }
-
-        final int expectedNumAEApps = 16;
-        assertEquals(
-                String.format("There should be %d abstract execution apps.",
-                        expectedNumAEApps),
-                expectedNumAEApps, abstractExecAppsCnt);
-    }
-
-    @Test
-    public void testProofCorrectIfThenElseCommonPostfixRefactoring() {
-        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX,
-                "correct-refactoring-ite-pullout-postfix.key");
-        startAutomaticStrategy(proof);
-
-        assertTrue(proof.closed());
-
-        final Iterator<Node> it = proof.root().subtreeIterator();
-        int abstractExecAppsCnt = 0;
-        while (it.hasNext()) {
-            final Node nextNode = it.next();
-            if (nextNode.getAppliedRuleApp() == null) {
-                continue;
-            }
-
-            final Rule rule = nextNode.getAppliedRuleApp().rule();
-            if (rule instanceof FindTaclet
-                    && ((Taclet) rule).getRuleSets().stream().anyMatch(rs -> rs
-                            .name().toString().equals("abstractExecution"))) {
-                abstractExecAppsCnt++;
-            }
-        }
-
-        final int expectedNumAEApps = 16;
-        assertEquals(
-                String.format("There should be %d abstract execution apps.",
-                        expectedNumAEApps),
-                expectedNumAEApps, abstractExecAppsCnt);
-    }
-
-    @Test
-    public void testProofIncorrectIfThenElseCommonPrefixRefactoring() {
-        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX,
-                "incorrect-refactoring-ite-pullout-prefix.key");
-        startAutomaticStrategy(proof);
-
-        assertFalse(proof.closed());
-        assertEquals(4, proof.openGoals().size());
-
-        final Iterator<Node> it = proof.root().subtreeIterator();
-        int abstractExecAppsCnt = 0;
-        while (it.hasNext()) {
-            final Node nextNode = it.next();
-            if (nextNode.getAppliedRuleApp() == null) {
-                continue;
-            }
-
-            final Rule rule = nextNode.getAppliedRuleApp().rule();
-            if (rule instanceof FindTaclet
-                    && ((Taclet) rule).getRuleSets().stream().anyMatch(rs -> rs
-                            .name().toString().equals("abstractExecution"))) {
-                abstractExecAppsCnt++;
-            }
-        }
-
-        final int expectedNumAEApps = 22;
-        assertEquals(
-                String.format("There should be %d abstract execution apps.",
-                        expectedNumAEApps),
-                expectedNumAEApps, abstractExecAppsCnt);
-
-        /*
-         * TODO (DS, 2018-12-14): Maybe check that this proof can be closed if
-         * we substitute all the {U_sk_0} by SKIP...
-         */
     }
 }

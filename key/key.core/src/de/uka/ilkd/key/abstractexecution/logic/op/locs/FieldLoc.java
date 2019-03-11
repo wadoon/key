@@ -12,7 +12,7 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
-import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,31 +20,26 @@ import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.FieldReference;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * A field location for use in an {@link AbstractUpdate}.
  *
  * @author Dominic Steinhoefel
  */
-public class FieldLoc extends AbstractSortedOperator
-        implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
+public class FieldLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
     private final FieldReference fieldReference;
     private final ExecutionContext executionContext;
+    private final LocationVariable heapVar;
 
     public FieldLoc(FieldReference fieldReference,
-            ExecutionContext executionContext) {
-        // TODO (DS, 2019-02-28): Check that this is the right sort
-        super(new Name("fieldsLoc"),
-                new Sort[] { fieldReference.getKeYJavaType().getSort() },
-                fieldReference.getKeYJavaType().getSort(), false);
+            ExecutionContext executionContext, LocationVariable heapVar) {
         this.fieldReference = fieldReference;
         this.executionContext = executionContext;
+        this.heapVar = heapVar;
     }
 
     @Override
@@ -61,13 +56,21 @@ public class FieldLoc extends AbstractSortedOperator
          * field reference, i.e., whether a given program variable in the map
          * can represent a field.
          */
+
+        if (replMap.containsKey(heapVar)) {
+            return new FieldLoc(fieldReference, executionContext,
+                    (LocationVariable) replMap.get(heapVar));
+        }
+
         return this;
     }
 
     @Override
     public Set<Operator> childOps() {
-        /* TODO (DS, 2019-02-28): Check that this is the right thing to do. */
-        return Collections.singleton(fieldReference.getProgramVariable());
+        final Set<Operator> result = new LinkedHashSet<>();
+        result.add(heapVar);
+        result.add(fieldReference.getProgramVariable());
+        return result;
     }
 
     @Override

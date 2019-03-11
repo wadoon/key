@@ -15,24 +15,18 @@ package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 import java.util.Map;
 import java.util.Set;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * A has-to location for use in an abstract update.
  *
  * @author Dominic Steinhoefel
  */
-public class HasToLoc extends AbstractSortedOperator implements AbstrUpdateLHS {
+public class HasToLoc implements AbstrUpdateLHS {
     private final AbstrUpdateLHS child;
 
     public HasToLoc(AbstrUpdateLHS child) {
-        super(new Name("hasTo"), new Sort[] { child.sort() }, child.sort(),
-                child.isRigid());
-
         assert !(child instanceof HasToLoc);
         assert !(child instanceof AllLocsLoc);
 

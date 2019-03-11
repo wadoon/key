@@ -16,13 +16,10 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * Represents a rigid RHG of non-locset type (e.g., some constant). Can appear
@@ -31,12 +28,10 @@ import de.uka.ilkd.key.logic.sort.Sort;
  *
  * @author Dominic Steinhoefel
  */
-public class RigidRHS extends AbstractSortedOperator implements AbstrUpdateRHS {
+public class RigidRHS implements AbstrUpdateRHS {
     private final Term t;
 
     public RigidRHS(Term t) {
-        super(new Name("rigidRHS"), new Sort[] { t.sort() }, t.sort(),
-                true);
         assert !t.sort().name().toString().equals("LocSet");
         this.t = t;
     }

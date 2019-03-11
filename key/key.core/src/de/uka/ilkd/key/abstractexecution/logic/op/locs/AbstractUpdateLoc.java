@@ -17,14 +17,13 @@ import java.util.Set;
 
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.SortedOperator;
 
 /**
  * A left-hand side or right-hand side location of an abstract update.
  *
  * @author Dominic Steinhoefel
  */
-public interface AbstractUpdateLoc extends SortedOperator {
+public interface AbstractUpdateLoc {
     /**
      * Returns a new {@link AbstractUpdateLoc} of this one with the
      * {@link ProgramVariable}s replaced according to the supplied map.

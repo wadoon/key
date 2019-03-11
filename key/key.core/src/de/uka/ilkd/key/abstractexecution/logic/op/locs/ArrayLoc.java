@@ -17,34 +17,22 @@ import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * An array location for use in an {@link AbstractUpdate} left-hand side.
  *
  * @author Dominic Steinhoefel
  */
-public class ArrayLoc extends AbstractSortedOperator implements AbstrUpdateUpdatableLoc {
+public class ArrayLoc implements AbstrUpdateUpdatableLoc {
     private final Term array;
     private final Term index;
 
     public ArrayLoc(Term array, Term index) {
-        /*
-         * TODO (DS, 2019-03-06): Not exactly the right sorts, but does it
-         * matter?
-         *
-         * TODO (DS, 2019-03-06): Do we need the concrete heap term, or is base
-         * heap sufficient?
-         */
-        super(new Name("arrayLoc"), new Sort[] { array.sort() }, array.sort(),
-                false);
         this.array = array;
         this.index = index;
     }
