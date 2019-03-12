@@ -12,6 +12,7 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -200,22 +201,28 @@ public class AbstractUpdateFactory {
             Optional<LocationVariable> runtimeInstance, Services services) {
         final Set<AbstractUpdateLoc> subResult = //
                 abstrUpdateLocsFromTerm(t, runtimeInstance, services);
-        if (!subResult.isEmpty()) {
+        if (subResult != null) {
             // We've found an atom
             return subResult;
         }
 
         final Set<AbstractUpdateLoc> result = new LinkedHashSet<>();
         for (Term sub : t.subs()) {
-            result.addAll(extractAbstrUpdateLocsFromTerm(sub, runtimeInstance,
-                    services));
+            result.addAll(Optional
+                    .ofNullable(extractAbstrUpdateLocsFromTerm(sub,
+                            runtimeInstance, services))
+                    .orElse(Collections.emptySet()));
         }
         return result;
     }
 
     /**
      * Converts the given {@link Term} to the {@link AbstractUpdateLoc}s it is
-     * representing.
+     * representing. Returns null if the given {@link Term} is not directly
+     * representing any locations; use
+     * {@link #extractAbstrUpdateLocsFromTerm(Term, Optional, Services)} for
+     * extraction if the passed {@link Term} does not have to represent
+     * locations.
      *
      * @param t
      *            The {@link Term} to extract all {@link AbstractUpdateLoc}s
@@ -226,7 +233,9 @@ public class AbstractUpdateFactory {
      *            different such terms around).
      * @param services
      *            The {@link Services} object.
-     * @return All {@link AbstractUpdateLoc}s from the given {@link Term}.
+     * @return All {@link AbstractUpdateLoc}s from the given {@link Term} or
+     *         null if the {@link Term} does not represent
+     *         {@link AbstractUpdateLoc}s.
      */
     public static Set<AbstractUpdateLoc> abstrUpdateLocsFromTerm(Term t,
             Optional<LocationVariable> runtimeInstance, Services services) {
@@ -260,30 +269,35 @@ public class AbstractUpdateFactory {
                     t.sub(0), runtimeInstance, services).iterator().next();
             assert subResult instanceof AbstrUpdateLHS;
             result.add(new HasToLoc((AbstrUpdateLHS) subResult));
-        } else if (op == setLDT.getSingleton()) {
-            result.addAll(abstrUpdateLocsFromTerm(t.sub(0), runtimeInstance,
-                    services));
-        } else if (op == locSetLDT.getSingleton()) {
-            final Term obj = t.sub(0);
-            final Term field = t.sub(1);
-            result.add(new FieldLoc(Optional.empty(), Optional.empty(), obj,
-                    fieldPVFromFieldFunc(field, services),
-                    (LocationVariable) tb.getBaseHeap().op()));
         } else if (op == locSetLDT.getUnion() || op == setLDT.getUnion()) {
             result.addAll(abstrUpdateLocsFromTerm(t.sub(0), runtimeInstance,
                     services));
             result.addAll(abstrUpdateLocsFromTerm(t.sub(1), runtimeInstance,
                     services));
+        } else if (op == setLDT.getSingleton()) {
+            result.addAll(abstrUpdateLocsFromTerm(t.sub(0), runtimeInstance,
+                    services));
+        } else if (op == locSetLDT.getSingleton()) {
+            final Term obj = //
+                    normalizeSelfVar(t.sub(1), runtimeInstance, services);
+            final Term field = t.sub(1);
+            result.add(new FieldLoc(Optional.empty(), Optional.empty(), obj,
+                    fieldPVFromFieldFunc(field, services),
+                    (LocationVariable) tb.getBaseHeap().op()));
         } else if (heapLDT.isSelectOp(op) && t.subs().size() == 3
                 && t.sub(2).op() == heapLDT.getArr()) {
             final Term heapTerm = t.sub(0);
-            result.add(new ArrayLoc(t.sub(1), t.sub(2).sub(0)));
+            final Term obj = //
+                    normalizeSelfVar(t.sub(1), runtimeInstance, services);
+            final Term array = t.sub(2).sub(0);
+            result.add(new ArrayLoc(obj, array));
             result.addAll(abstrUpdateLocsFromTerm(heapTerm, runtimeInstance,
                     services));
         } else if (heapLDT.isSelectOp(op)) {
             final Sort sort = heapLDT.getSortOfSelect(op);
             final Term heapTerm = t.sub(0);
-            final Term obj = t.sub(1);
+            final Term obj = //
+                    normalizeSelfVar(t.sub(1), runtimeInstance, services);
             final Term field = t.sub(2);
             result.add(new FieldLoc(Optional.of(sort), Optional.of(heapTerm),
                     obj, fieldPVFromFieldFunc(field, services),
@@ -292,7 +306,8 @@ public class AbstractUpdateFactory {
                     services));
         } else if (op == heapLDT.getStore()) {
             final Term heapTerm = t.sub(0);
-            final Term obj = t.sub(1);
+            final Term obj = //
+                    normalizeSelfVar(t.sub(1), runtimeInstance, services);
             final Term field = t.sub(2);
             result.add(new FieldLoc(Optional.empty(), Optional.empty(), obj,
                     fieldPVFromFieldFunc(field, services),
@@ -300,13 +315,42 @@ public class AbstractUpdateFactory {
             result.addAll(abstrUpdateLocsFromTerm(heapTerm, runtimeInstance,
                     services));
         } else {
-            throw new RuntimeException(String.format(
-                    "Unexpected operator \"%s\" in term \"%s\", "
-                            + "cannot convert to AbstrUpdateLoc%n",
-                    op.name(), t));
+            return null;
         }
 
         return result;
+    }
+
+    /**
+     * If the operator of the given {@link Term} is a "self" variable, we
+     * normalize it to the given runtimeInstance if the {@link KeYJavaType}s of
+     * the variable and the instance are the same.
+     *
+     * @param objTerm
+     *            The objTerm to normalize.
+     * @param runtimeInstance
+     *            An optional runtime instance {@link LocationVariable} to
+     *            normalize self terms (because otherwise, there might be
+     *            different such terms around). For an empty optional, we return
+     *            objTerm.
+     * @param services
+     *            The {@link Services} object (for the {@link TermBuilder}).
+     * @return The original objTemr if runtimeInstance if empty, the objTerm is
+     *         not a "self" term, or the types of the objTerm and the
+     *         runtimeInstance are different, or otherwise a {@link Term} with
+     *         the runtime instance.
+     */
+    private static Term normalizeSelfVar(Term objTerm,
+            Optional<LocationVariable> runtimeInstance, Services services) {
+        if (!runtimeInstance.isPresent()
+                || !(objTerm.op() instanceof LocationVariable)
+                || !objTerm.op().toString().equals("self")
+                || !((LocationVariable) objTerm.op()).sort()
+                        .equals(runtimeInstance.get().sort())) {
+            return objTerm;
+        }
+
+        return services.getTermBuilder().var(runtimeInstance.get());
     }
 
     /**

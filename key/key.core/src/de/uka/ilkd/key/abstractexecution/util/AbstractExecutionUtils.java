@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateUpdatableLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
@@ -65,17 +66,22 @@ public class AbstractExecutionUtils {
      *         not be applicable.
      */
     public static Optional<Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>>> opsAssignedBeforeUsed(
-            Term target, Optional<LocationVariable> runtimeInstance, Services services) {
+            Term target, Optional<LocationVariable> runtimeInstance,
+            Services services) {
         final Set<AbstrUpdateUpdatableLoc> assignedBeforeUsed = new LinkedHashSet<>();
         final Set<AbstrUpdateUpdatableLoc> usedBeforeAssigned = new LinkedHashSet<>();
 
-        AbstractUpdateFactory.abstrUpdateLocsFromTerm(target, runtimeInstance, services).stream()
-                .filter(AbstrUpdateUpdatableLoc.class::isInstance)
-                .map(AbstrUpdateUpdatableLoc.class::cast)
-                .forEach(usedBeforeAssigned::add);
+        final Set<AbstractUpdateLoc> locs = AbstractUpdateFactory
+                .abstrUpdateLocsFromTerm(target, runtimeInstance, services);
+
+        if (locs != null) {
+            locs.stream().filter(AbstrUpdateUpdatableLoc.class::isInstance)
+                    .map(AbstrUpdateUpdatableLoc.class::cast)
+                    .forEach(usedBeforeAssigned::add);
+        }
 
         // Update applications -- those are most interesting
-        if (target.op() == UpdateApplication.UPDATE_APPLICATION) {
+        else if (target.op() == UpdateApplication.UPDATE_APPLICATION) {
             final Term update = target.sub(0);
             final Term updateTarget = target.sub(1);
 
@@ -90,7 +96,9 @@ public class AbstractExecutionUtils {
                                     .lhs());
                     final Term rhs = elem.sub(0);
 
-                    AbstractUpdateFactory.abstrUpdateLocsFromTerm(rhs, runtimeInstance, services)
+                    AbstractUpdateFactory
+                            .abstrUpdateLocsFromTerm(rhs, runtimeInstance,
+                                    services)
                             .stream()
                             .filter(AbstrUpdateUpdatableLoc.class::isInstance)
                             .map(AbstrUpdateUpdatableLoc.class::cast)
@@ -115,7 +123,8 @@ public class AbstractExecutionUtils {
                         abstractUpdatesFromConcatenation(update);
                 for (Term abstrUpdTerm : abstractUpdateTerms) {
                     opsHaveToAssignBeforeUsedForAbstrUpd(abstrUpdTerm,
-                            assignedBeforeUsed, usedBeforeAssigned, runtimeInstance, services);
+                            assignedBeforeUsed, usedBeforeAssigned,
+                            runtimeInstance, services);
                 }
             }
 
@@ -126,7 +135,8 @@ public class AbstractExecutionUtils {
             }
 
             final Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>> subResult = //
-                    opsAssignedBeforeUsed(updateTarget, runtimeInstance, services).orElse(null);
+                    opsAssignedBeforeUsed(updateTarget, runtimeInstance,
+                            services).orElse(null);
 
             if (subResult == null) {
                 return Optional.empty();
@@ -152,7 +162,8 @@ public class AbstractExecutionUtils {
         else {
             for (final Term sub : target.subs()) {
                 final Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>> subResult = //
-                        opsAssignedBeforeUsed(sub, runtimeInstance, services).orElse(null);
+                        opsAssignedBeforeUsed(sub, runtimeInstance, services)
+                                .orElse(null);
 
                 if (subResult == null) {
                     return Optional.empty();
@@ -219,7 +230,8 @@ public class AbstractExecutionUtils {
         assert update.op() instanceof AbstractUpdate;
 
         usedBeforeAssigned.addAll(AbstractUpdateFactory
-                .abstrUpdateLocsFromTerm(update.sub(0), runtimeInstance, services)
+                .abstrUpdateLocsFromTerm(update.sub(0), runtimeInstance,
+                        services)
                 .stream().filter(AbstrUpdateUpdatableLoc.class::isInstance)
                 .filter(op -> !assignedBeforeUsed.contains(op))
                 .map(AbstrUpdateUpdatableLoc.class::cast)
