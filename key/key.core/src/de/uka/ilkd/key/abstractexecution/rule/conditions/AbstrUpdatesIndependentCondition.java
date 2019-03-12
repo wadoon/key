@@ -53,10 +53,11 @@ public final class AbstrUpdatesIndependentCondition
             MatchConditions mc, Services services) {
         final SVInstantiations svInst = mc.getInstantiations();
 
-        final Optional<LocationVariable> runtimeInstance = Optional
-                .ofNullable(svInst.getExecutionContext().getRuntimeInstance())
-                .filter(LocationVariable.class::isInstance)
-                .map(LocationVariable.class::cast);
+//        final Optional<LocationVariable> runtimeInstance = Optional
+//                .ofNullable(svInst.getExecutionContext().getRuntimeInstance())
+//                .filter(LocationVariable.class::isInstance)
+//                .map(LocationVariable.class::cast);
+        final Optional<LocationVariable> runtimeInstance = Optional.empty();
 
         final Term u1Inst = (Term) svInst.getInstantiation(u1);
         final Term u2Inst = (Term) svInst.getInstantiation(u2);

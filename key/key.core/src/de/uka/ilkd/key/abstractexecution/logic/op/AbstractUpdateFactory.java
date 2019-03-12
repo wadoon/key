@@ -46,7 +46,9 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Factory class for {@link AbstractUpdate}s and {@link AbstractUpdate} LHSs /
@@ -240,11 +242,11 @@ public class AbstractUpdateFactory {
     public static Set<AbstractUpdateLoc> abstrUpdateLocsFromTerm(Term t,
             Optional<LocationVariable> runtimeInstance, Services services) {
         final Set<AbstractUpdateLoc> result = new LinkedHashSet<>();
+        t = MiscTools.simplifyUpdatesInTerm(t, services);
 
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         final SetLDT setLDT = services.getTypeConverter().getSetLDT();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final TermBuilder tb = services.getTermBuilder();
 
         final Operator op = t.op();
 
@@ -261,25 +263,85 @@ public class AbstractUpdateFactory {
                 && t.sort() != heapLDT.getFieldSort()) {
             result.add(new RigidRHS(t));
         } else if (op == locSetLDT.getSingletonPV()) {
-            result.addAll(abstrUpdateLocsFromTerm(t.sub(0), runtimeInstance,
-                    services));
+            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTerm(
+                    t.sub(0), runtimeInstance, services);
+            if (subResult == null) {
+                return null;
+            }
+
+            result.addAll(subResult);
         } else if (op == locSetLDT.getHasTo()) {
             // There is exactly one location inside a hasTo
             final AbstractUpdateLoc subResult = abstrUpdateLocsFromTerm(
                     t.sub(0), runtimeInstance, services).iterator().next();
+            if (subResult == null) {
+                return null;
+            }
+
             assert subResult instanceof AbstrUpdateLHS;
             result.add(new HasToLoc((AbstrUpdateLHS) subResult));
         } else if (op == locSetLDT.getUnion() || op == setLDT.getUnion()) {
-            result.addAll(abstrUpdateLocsFromTerm(t.sub(0), runtimeInstance,
-                    services));
-            result.addAll(abstrUpdateLocsFromTerm(t.sub(1), runtimeInstance,
-                    services));
+            final Set<AbstractUpdateLoc> subResult1 = abstrUpdateLocsFromTerm(
+                    t.sub(0), runtimeInstance, services);
+            final Set<AbstractUpdateLoc> subResult2 = abstrUpdateLocsFromTerm(
+                    t.sub(1), runtimeInstance, services);
+            if (subResult1 == null || subResult2 == null) {
+                return null;
+            }
+
+            result.addAll(subResult1);
+            result.addAll(subResult2);
         } else if (op == setLDT.getSingleton()) {
-            result.addAll(abstrUpdateLocsFromTerm(t.sub(0), runtimeInstance,
-                    services));
-        } else if (op == locSetLDT.getSingleton()) {
+            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTerm(
+                    t.sub(0), runtimeInstance, services);
+            if (subResult == null) {
+                return null;
+            }
+
+            result.addAll(subResult);
+        } else if (isHeapOp(op, locSetLDT, heapLDT)) {
+            final Set<AbstractUpdateLoc> subResult = //
+                    abstrUpdateLocsFromHeapTerm(t, runtimeInstance, services);
+            if (subResult == null) {
+                return null;
+            }
+
+            result.addAll(subResult);
+        } else {
+            return null;
+        }
+
+        return result;
+    }
+
+    /**
+     * Transforms the given heap term (for which
+     * {@link #isHeapOp(Operator, LocSetLDT, HeapLDT)} has to be true) to the
+     * represented set of {@link AbstractUpdateLoc}s. Returns null if it
+     * {@link Term} operator is unexpected.
+     *
+     * @param t
+     *            The {@link Term} to transform.
+     * @param runtimeInstance
+     *            The optional runtime instance for self variable
+     *            transformation.
+     * @param services
+     *            The {@link Services} object.
+     * @return The contained {@link AbstractUpdateLoc}s.
+     */
+    private static Set<AbstractUpdateLoc> abstrUpdateLocsFromHeapTerm(Term t,
+            Optional<LocationVariable> runtimeInstance, Services services) {
+        final Set<AbstractUpdateLoc> result = new LinkedHashSet<>();
+
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        final TermBuilder tb = services.getTermBuilder();
+
+        final Operator op = t.op();
+
+        if (op == locSetLDT.getSingleton()) {
             final Term obj = //
-                    normalizeSelfVar(t.sub(1), runtimeInstance, services);
+                    normalizeSelfVar(t.sub(0), runtimeInstance, services);
             final Term field = t.sub(1);
             result.add(new FieldLoc(Optional.empty(), Optional.empty(), obj,
                     fieldPVFromFieldFunc(field, services),
@@ -291,8 +353,14 @@ public class AbstractUpdateFactory {
                     normalizeSelfVar(t.sub(1), runtimeInstance, services);
             final Term array = t.sub(2).sub(0);
             result.add(new ArrayLoc(obj, array));
-            result.addAll(abstrUpdateLocsFromTerm(heapTerm, runtimeInstance,
-                    services));
+
+            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTerm(
+                    heapTerm, runtimeInstance, services);
+            if (subResult == null) {
+                return null;
+            }
+
+            result.addAll(subResult);
         } else if (heapLDT.isSelectOp(op)) {
             final Sort sort = heapLDT.getSortOfSelect(op);
             final Term heapTerm = t.sub(0);
@@ -302,8 +370,12 @@ public class AbstractUpdateFactory {
             result.add(new FieldLoc(Optional.of(sort), Optional.of(heapTerm),
                     obj, fieldPVFromFieldFunc(field, services),
                     (LocationVariable) tb.getBaseHeap().op()));
-            result.addAll(abstrUpdateLocsFromTerm(heapTerm, runtimeInstance,
-                    services));
+
+            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTerm(
+                    heapTerm, runtimeInstance, services);
+            if (subResult != null) {
+                result.addAll(subResult);
+            }
         } else if (op == heapLDT.getStore()) {
             final Term heapTerm = t.sub(0);
             final Term obj = //
@@ -312,13 +384,25 @@ public class AbstractUpdateFactory {
             result.add(new FieldLoc(Optional.empty(), Optional.empty(), obj,
                     fieldPVFromFieldFunc(field, services),
                     (LocationVariable) tb.getBaseHeap().op()));
-            result.addAll(abstrUpdateLocsFromTerm(heapTerm, runtimeInstance,
-                    services));
+
+            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTerm(
+                    heapTerm, runtimeInstance, services);
+            if (subResult == null) {
+                return null;
+            }
+
+            result.addAll(subResult);
         } else {
             return null;
         }
 
         return result;
+    }
+
+    private static boolean isHeapOp(final Operator op,
+            final LocSetLDT locSetLDT, final HeapLDT heapLDT) {
+        return op == locSetLDT.getSingleton() || heapLDT.isSelectOp(op)
+                || op == heapLDT.getStore();
     }
 
     /**
@@ -342,6 +426,8 @@ public class AbstractUpdateFactory {
      */
     private static Term normalizeSelfVar(Term objTerm,
             Optional<LocationVariable> runtimeInstance, Services services) {
+//        objTerm = MiscTools.simplifyUpdateApplication(objTerm, services);
+
         if (!runtimeInstance.isPresent()
                 || !(objTerm.op() instanceof LocationVariable)
                 || !objTerm.op().toString().equals("self")
@@ -370,6 +456,15 @@ public class AbstractUpdateFactory {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final JavaInfo javaInfo = services.getJavaInfo();
         assert field.sort() == heapLDT.getFieldSort();
+
+        /*
+         * NOTE (DS, 2019-03-12): It sometimes happens that we get passed an
+         * update application here. In this case, the target is the field.
+         */
+        if (field.op() == UpdateApplication.UPDATE_APPLICATION) {
+            field = UpdateApplication.getTarget(field);
+            assert field.sort() == heapLDT.getFieldSort();
+        }
 
         final int sepIdx = field.toString().indexOf("::$");
         assert sepIdx > 0;

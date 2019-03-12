@@ -197,9 +197,9 @@ public class CloseAfterMerge implements BuiltInRule {
 
         ImmutableSet<LocationVariable> allLocs = DefaultImmutableSet.nil();
         allLocs = allLocs.union(getUpdateLeftSideLocations(
-                closeApp.getPartnerSEState().getSymbolicState()));
+                closeApp.getPartnerSEState().getSymbolicState(), services.getTermBuilder()));
         allLocs = allLocs.union(getUpdateLeftSideLocations(
-                closeApp.getMergeState().getSymbolicState()));
+                closeApp.getMergeState().getSymbolicState(), services.getTermBuilder()));
         allLocs = allLocs.union(getLocationVariables(
                 closeApp.getPartnerSEState().getPathCondition(), services));
         allLocs = allLocs.union(getLocationVariables(

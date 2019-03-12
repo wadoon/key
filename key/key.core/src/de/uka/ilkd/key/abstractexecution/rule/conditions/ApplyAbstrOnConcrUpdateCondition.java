@@ -148,7 +148,7 @@ public final class ApplyAbstrOnConcrUpdateCondition
             }
 
             /* Check that y is no left-hand side of the concrete update */
-            if (MergeRuleUtils.getUpdateLeftSideLocations(newConcreteUpdate)
+            if (MergeRuleUtils.getUpdateLeftSideLocations(newConcreteUpdate, services.getTermBuilder())
                     .contains(y)) {
                 continue;
             }
@@ -158,8 +158,9 @@ public final class ApplyAbstrOnConcrUpdateCondition
              * "x := y" in the concrete update.
              */
             final List<Term> concrUpdateElems = MergeRuleUtils
-                    .getElementaryUpdates(newConcreteUpdate).stream()
-                    .filter(elem -> elem.sub(0).op() == y)
+                    .getElementaryUpdates(newConcreteUpdate,
+                            services.getTermBuilder())
+                    .stream().filter(elem -> elem.sub(0).op() == y)
                     .collect(Collectors.toList());
             if (concrUpdateElems.size() != 1) {
                 continue;
@@ -201,8 +202,8 @@ public final class ApplyAbstrOnConcrUpdateCondition
      */
     private Term removeElementaryWithLHS(final Term update,
             final LocationVariable lhs, final TermBuilder tb) {
-        final Term newConcreteUpdate = tb
-                .parallel(MergeRuleUtils.getElementaryUpdates(update).stream()
+        final Term newConcreteUpdate = tb.parallel(
+                MergeRuleUtils.getElementaryUpdates(update, tb).stream()
                         .filter(t -> ((ElementaryUpdate) t.op()).lhs() != lhs)
                         .collect(ImmutableSLList.toImmutableList()));
         return newConcreteUpdate;

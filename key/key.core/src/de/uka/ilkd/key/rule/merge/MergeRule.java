@@ -366,8 +366,8 @@ public class MergeRule implements BuiltInRule {
         progVars = progVars
                 .union(getLocationVariables(programCounter, services));
         // Collect program variables in update
-        progVars = progVars.union(getUpdateLeftSideLocations(state1.first));
-        progVars = progVars.union(getUpdateLeftSideLocations(state2.first));
+        progVars = progVars.union(getUpdateLeftSideLocations(state1.first, services.getTermBuilder()));
+        progVars = progVars.union(getUpdateLeftSideLocations(state2.first, services.getTermBuilder()));
 
         ImmutableList<Term> newElementaryUpdates = ImmutableSLList.nil();
 
@@ -376,8 +376,8 @@ public class MergeRule implements BuiltInRule {
 
         for (LocationVariable v : progVars) {
 
-            Term rightSide1 = getUpdateRightSideFor(state1.first, v);
-            Term rightSide2 = getUpdateRightSideFor(state2.first, v);
+            Term rightSide1 = getUpdateRightSideFor(state1.first, v, services.getTermBuilder());
+            Term rightSide2 = getUpdateRightSideFor(state2.first, v, services.getTermBuilder());
 
             if (rightSide1 == null) {
                 rightSide1 = tb.var(v);

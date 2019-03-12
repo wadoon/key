@@ -74,7 +74,8 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.rule.metaconstruct.TestProgramMetaConstructs.class,
         de.uka.ilkd.key.rule.conditions.TestDropEffectlessElementary.class,
         de.uka.ilkd.key.rule.merge.MergeRuleTests.class,
-        de.uka.ilkd.key.rule.abstractexecution.AbstractExecutionTests.class,
+        de.uka.ilkd.key.rule.abstractexecution.TestLocExtr.class,
+        de.uka.ilkd.key.rule.abstractexecution.AEHeapTests.class,
     };
 
 

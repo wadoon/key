@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.rule.abstractexecution;
 
+import java.util.Optional;
+
 import org.antlr.runtime.RecognitionException;
 import org.junit.Test;
 
@@ -22,6 +24,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.FieldLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
 
 /**
@@ -59,15 +62,24 @@ public class TestLocExtr extends AbstractTestTermParser {
         final String locSetHeapExpr = "singleton(self,testTermParserHeap.A::$f)";
         final Term parsedLocSetExpr = parseTerm(locSetHeapExpr);
 
-        final AbstractUpdateLoc[] storeTermLocs = AbstractUpdateFactory
-                .abstractUpdateLocsFromUnionTerm(parsedStoreHeapExpr, services)
-                .toArray(new AbstractUpdateLoc[0]);
-        final AbstractUpdateLoc[] selectTermLocs = AbstractUpdateFactory
-                .abstractUpdateLocsFromUnionTerm(parsedSelectHeapExpr, services)
-                .toArray(new AbstractUpdateLoc[0]);
-        final AbstractUpdateLoc[] locSetTermLocs = AbstractUpdateFactory
-                .abstractUpdateLocsFromUnionTerm(parsedLocSetExpr, services)
-                .toArray(new AbstractUpdateLoc[0]);
+        final Optional<LocationVariable> runtimeInstance = Optional
+                .of((LocationVariable) parsedLocSetExpr.sub(0).op());
+
+        final AbstractUpdateLoc[] storeTermLocs = //
+                AbstractUpdateFactory
+                        .abstrUpdateLocsFromTerm(parsedStoreHeapExpr,
+                                runtimeInstance, services)
+                        .toArray(new AbstractUpdateLoc[0]);
+        final AbstractUpdateLoc[] selectTermLocs = //
+                AbstractUpdateFactory
+                        .abstrUpdateLocsFromTerm(parsedSelectHeapExpr,
+                                runtimeInstance, services)
+                        .toArray(new AbstractUpdateLoc[0]);
+        final AbstractUpdateLoc[] locSetTermLocs = //
+                AbstractUpdateFactory
+                        .abstrUpdateLocsFromTerm(parsedLocSetExpr,
+                                runtimeInstance, services)
+                        .toArray(new AbstractUpdateLoc[0]);
 
         assertEquals(3, storeTermLocs.length);
         assertEquals(FieldLoc.class, storeTermLocs[0].getClass());
@@ -80,11 +92,13 @@ public class TestLocExtr extends AbstractTestTermParser {
         assertEquals(2, selectTermLocs.length);
         assertEquals(FieldLoc.class, selectTermLocs[0].getClass());
         assertEquals("(self, f)", selectTermLocs[0].toString());
+        assertEquals(selectTermLocs[0], storeTermLocs[1]);
         assertEquals(PVLoc.class, selectTermLocs[1].getClass());
         assertEquals("heap", selectTermLocs[1].toString());
 
         assertEquals(1, locSetTermLocs.length);
         assertEquals(FieldLoc.class, locSetTermLocs[0].getClass());
         assertEquals("(self, f)", locSetTermLocs[0].toString());
+        assertEquals(selectTermLocs[0], locSetTermLocs[0]);
     }
 }

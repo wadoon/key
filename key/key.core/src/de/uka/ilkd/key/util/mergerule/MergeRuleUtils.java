@@ -128,8 +128,7 @@ public class MergeRuleUtils {
     public static <T> Option<T> wrapOption(T obj) {
         if (obj == null) {
             return new Option.None<T>();
-        }
-        else {
+        } else {
             return new Option.Some<T>(obj);
         }
     }
@@ -146,8 +145,7 @@ public class MergeRuleUtils {
         int underscoreOccurrence = name.indexOf('_');
         if (underscoreOccurrence > -1) {
             return name.substring(0, underscoreOccurrence);
-        }
-        else {
+        } else {
             return name;
         }
     }
@@ -200,8 +198,7 @@ public class MergeRuleUtils {
                     services.getNamespaces());
             final Term result = parser.term();
             return result.sort() == Sort.FORMULA ? result : null;
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             return null;
         }
     }
@@ -209,11 +206,13 @@ public class MergeRuleUtils {
     /**
      * @param u
      *            The update (in normal form) to extract program locations from.
+     * @param tb
+     *            A {@link TermBuilder} (for extracting elementary updates).
      * @return All program locations (left sides) in the given update.
      */
     public static ImmutableSet<LocationVariable> getUpdateLeftSideLocations(
-            Term u) {
-        return getElementaryUpdates(u).stream()
+            Term u, TermBuilder tb) {
+        return getElementaryUpdates(u, tb).stream()
                 .map(elem -> ((ElementaryUpdate) elem.op()).lhs())
                 .map(LocationVariable.class::cast)
                 .collect(DefaultImmutableSet.toImmutableSet());
@@ -228,23 +227,40 @@ public class MergeRuleUtils {
      *            Parallel update to get elementary updates from.
      * @param cleanConflicts
      *            Set to true to clean conflicting updates.
+     * @param tb
+     *            TermBuilder for handling update applications on elementary
+     *            updates.
      * @return Elementary updates of the supplied parallel update.
      */
     public static List<Term> getElementaryUpdates(Term u,
-            boolean cleanConflicts) {
+            boolean cleanConflicts, TermBuilder tb) {
         List<Term> result = new LinkedList<Term>();
 
         if (u.op() instanceof ElementaryUpdate) {
             result.add(u);
-        }
-        else if (u.op() == UpdateJunctor.PARALLEL_UPDATE) {
+        } else if (u.op() == UpdateJunctor.PARALLEL_UPDATE) {
             for (Term sub : u.subs()) {
-                result.addAll(getElementaryUpdates(sub));
+                result.addAll(getElementaryUpdates(sub, tb));
             }
         } else if (u.op() == UpdateJunctor.SKIP) {
             return result;
-        }
-        else {
+        } else if (u.op() == UpdateApplication.UPDATE_APPLICATION) {
+            /*
+             * Get update for target term, has to be a single elementary update.
+             */
+            final Term update = UpdateApplication.getUpdate(u);
+            final List<Term> targetUpdates = getElementaryUpdates(
+                    UpdateApplication.getTarget(u), cleanConflicts, tb);
+            assert targetUpdates.size() == 1;
+            final Term target = targetUpdates.get(0);
+            assert target.op() instanceof ElementaryUpdate;
+
+            final LocationVariable lhs = //
+                    (LocationVariable) ((ElementaryUpdate) target.op()).lhs();
+            final Term rhs = tb.apply(update, target.sub(0));
+
+            result.add(tb.elementary(tb.var(lhs), rhs));
+        } else {
             throw new IllegalArgumentException(
                     "Expected an update in normal form!");
         }
@@ -266,10 +282,12 @@ public class MergeRuleUtils {
      *
      * @param u
      *            Parallel update to get elementary updates from.
+     * @param tb
+     *            TODO
      * @return Elementary updates of the supplied parallel update.
      */
-    public static List<Term> getElementaryUpdates(Term u) {
-        return getElementaryUpdates(u, true);
+    public static List<Term> getElementaryUpdates(Term u, TermBuilder tb) {
+        return getElementaryUpdates(u, true, tb);
     }
 
     /**
@@ -321,8 +339,7 @@ public class MergeRuleUtils {
 
         if (term.op() instanceof LocationVariable) {
             result = result.add((LocationVariable) term.op());
-        }
-        else {
+        } else {
             if (!term.javaBlock().isEmpty()) {
                 result = result.union(getProgramLocations(term, services));
             }
@@ -366,8 +383,7 @@ public class MergeRuleUtils {
 
         if (term.op() instanceof LocationVariable) {
             result.add((LocationVariable) term.op());
-        }
-        else {
+        } else {
             if (!term.javaBlock().isEmpty()) {
                 result.addAll(getProgramLocationsHashSet(term, services));
             }
@@ -393,8 +409,7 @@ public class MergeRuleUtils {
         if (term.op() instanceof Function
                 && ((Function) term.op()).isSkolemConstant()) {
             result.add((Function) term.op());
-        }
-        else {
+        } else {
             for (Term sub : term.subs()) {
                 result.addAll(getSkolemConstants(sub));
             }
@@ -411,12 +426,14 @@ public class MergeRuleUtils {
      *            Update term to search.
      * @param leftSide
      *            Left side to find the right side for.
+     * @param tb
+     *            A {@link TermBuilder} for extracting elementaries.
      * @return The right side in the update for the given left side. Returns a
      *         None value if the right side could not be determined.
      */
     public static Option<Term> getUpdateRightSideForSafe(Term update,
-            LocationVariable leftSide) {
-        return wrapOption(getUpdateRightSideFor(update, leftSide));
+            LocationVariable leftSide, TermBuilder tb) {
+        return wrapOption(getUpdateRightSideFor(update, leftSide, tb));
     }
 
     /**
@@ -427,12 +444,14 @@ public class MergeRuleUtils {
      *            Update term to search.
      * @param leftSide
      *            Left side to find the right side for.
+     * @param tb
+     *            A {@link TermBuilder} for extracting elementaries.
      * @return The right side in the update for the given left side, or null if
      *         the right side could not be determined.
      */
     public static Term getUpdateRightSideFor(Term update,
-            LocationVariable leftSide) {
-        final List<Term> elems = getElementaryUpdates(update);
+            LocationVariable leftSide, TermBuilder tb) {
+        final List<Term> elems = getElementaryUpdates(update, tb);
         return elems.stream()
                 .filter(elem -> ((ElementaryUpdate) elem.op()).lhs()
                         .equals(leftSide))
@@ -456,12 +475,10 @@ public class MergeRuleUtils {
                     result += countAtoms(sub);
                 }
                 return result;
-            }
-            else {
+            } else {
                 return 1;
             }
-        }
-        else {
+        } else {
             throw new IllegalArgumentException(
                     "Can only compute atoms for formulae");
         }
@@ -500,12 +517,10 @@ public class MergeRuleUtils {
                 }
 
                 return result;
-            }
-            else {
+            } else {
                 return 0;
             }
-        }
-        else {
+        } else {
             throw new IllegalArgumentException(
                     "Can only compute atoms for formulae");
         }
@@ -652,8 +667,7 @@ public class MergeRuleUtils {
 
             return tb.var(replMap.get(constant));
 
-        }
-        else {
+        } else {
 
             LinkedList<Term> transfSubs = new LinkedList<Term>();
             for (Term sub : term.subs()) {
@@ -715,18 +729,15 @@ public class MergeRuleUtils {
     public static boolean isUpdateNormalForm(Term u) {
         if (u.op() instanceof ElementaryUpdate) {
             return true;
-        }
-        else if (u.op() == UpdateJunctor.PARALLEL_UPDATE) {
+        } else if (u.op() == UpdateJunctor.PARALLEL_UPDATE) {
             boolean result = true;
             for (Term sub : u.subs()) {
                 result = result && isUpdateNormalForm(sub);
             }
             return result;
-        }
-        else if (u.op() == UpdateJunctor.SKIP) {
+        } else if (u.op() == UpdateJunctor.SKIP) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
@@ -746,8 +757,7 @@ public class MergeRuleUtils {
         if (term.op().equals(Junctor.AND)) {
             result.addAll(getConjunctiveElementsFor(term.sub(0)));
             result.addAll(getConjunctiveElementsFor(term.sub(1)));
-        }
-        else {
+        } else {
             result.add(term);
         }
 
@@ -832,8 +842,7 @@ public class MergeRuleUtils {
 
         if (term.subs().size() == 0 || !term.javaBlock().isEmpty()) {
             return term.javaBlock();
-        }
-        else {
+        } else {
             for (Term sub : term.subs()) {
                 JavaBlock subJavaBlock = getJavaBlockRecursive(sub);
                 if (!subJavaBlock.isEmpty()) {
@@ -987,12 +996,53 @@ public class MergeRuleUtils {
 
                 return simplified;
             }
-        }
-        catch (ProofInputException e) {
+        } catch (ProofInputException e) {
         }
 
         return term;
 
+    }
+
+    /**
+     * Simplifies the given {@link Term} in a side proof with splits. This code
+     * has been copied from {@link SymbolicExecutionUtil} and only been slightly
+     * modified (to allow for splitting the proof).
+     *
+     * @param parentProof
+     *            The parent {@link Proof}.
+     * @param term
+     *            The {@link Term} to simplify.
+     * @param timeout
+     *            Time in milliseconds after which the side proof is aborted.
+     * @return The simplified {@link Term}.
+     * @throws ProofInputException
+     *             Occurred Exception.
+     *
+     * @see SymbolicExecutionUtil#simplify(Proof, Term)
+     */
+    public static Term simplify(Proof parentProof, Term term, int timeout)
+            throws ProofInputException {
+
+        final Services services = parentProof.getServices();
+
+        final ApplyStrategyInfo info = tryToProve(term, services, true,
+                "Term simplification", timeout);
+
+        // The simplified formula is the conjunction of all open goals
+        ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
+        final TermBuilder tb = services.getTermBuilder();
+        if (openGoals.isEmpty()) {
+            return tb.tt();
+        } else {
+            ImmutableList<Term> goalImplications = ImmutableSLList.nil();
+            for (Goal goal : openGoals) {
+                Term goalImplication = sequentToFormula(goal.sequent(),
+                        services);
+                goalImplications = goalImplications.append(goalImplication);
+            }
+
+            return tb.and(goalImplications);
+        }
     }
 
     // //////////////////////////////////////////////
@@ -1127,8 +1177,7 @@ public class MergeRuleUtils {
         if (isProvableWithSplitting(disjunctionOfSpecificParts, services,
                 simplificationTimeout)) {
             return commonElemsTerm;
-        }
-        else {
+        } else {
             return tb.and(commonElemsTerm, disjunctionOfSpecificParts);
         }
     }
@@ -1449,8 +1498,7 @@ public class MergeRuleUtils {
                                     thisGoal.getLocalNamespaces())));
                     thisGoalNamespaces.functions().add((Function) newOp2);
                     thisGoalNamespaces.flushToParent();
-                }
-                else if (partnerStateOp instanceof LocationVariable) {
+                } else if (partnerStateOp instanceof LocationVariable) {
                     newOp1 = ((LocationVariable) mergeStateOp).rename(new Name(
                             tb.newName(partnerStateOp.name().toString(),
                                     thisGoal.getLocalNamespaces())));
@@ -1465,8 +1513,7 @@ public class MergeRuleUtils {
                     thisGoalNamespaces.programVariables()
                             .add((LocationVariable) newOp2);
                     thisGoalNamespaces.flushToParent();
-                }
-                else {
+                } else {
                     throw new RuntimeException(
                             "MergeRule: Unexpected type of Operator involved in name clash: "
                                     + partnerStateOp.getClass()
@@ -1665,11 +1712,9 @@ public class MergeRuleUtils {
             ImmutableList<SequentFormula> formulae, Services services) {
         if (formulae.size() == 0) {
             return services.getTermBuilder().tt();
-        }
-        else if (formulae.size() == 1) {
+        } else if (formulae.size() == 1) {
             return formulae.head().formula();
-        }
-        else {
+        } else {
             return services.getTermBuilder().and(formulae.head().formula(),
                     joinListToAndTerm(formulae.tail(), services));
         }
@@ -1814,8 +1859,7 @@ public class MergeRuleUtils {
             proofStarter.setStrategyProperties(setupStrategy());
 
             proofResult = proofStarter.start();
-        }
-        catch (ProofInputException e) {
+        } catch (ProofInputException e) {
         }
 
         return proofResult;
@@ -1898,49 +1942,6 @@ public class MergeRuleUtils {
 
         return result;
 
-    }
-
-    /**
-     * Simplifies the given {@link Term} in a side proof with splits. This code
-     * has been copied from {@link SymbolicExecutionUtil} and only been slightly
-     * modified (to allow for splitting the proof).
-     *
-     * @param parentProof
-     *            The parent {@link Proof}.
-     * @param term
-     *            The {@link Term} to simplify.
-     * @param timeout
-     *            Time in milliseconds after which the side proof is aborted.
-     * @return The simplified {@link Term}.
-     * @throws ProofInputException
-     *             Occurred Exception.
-     *
-     * @see SymbolicExecutionUtil#simplify(Proof, Term)
-     */
-    private static Term simplify(Proof parentProof, Term term, int timeout)
-            throws ProofInputException {
-
-        final Services services = parentProof.getServices();
-
-        final ApplyStrategyInfo info = tryToProve(term, services, true,
-                "Term simplification", timeout);
-
-        // The simplified formula is the conjunction of all open goals
-        ImmutableList<Goal> openGoals = info.getProof().openEnabledGoals();
-        final TermBuilder tb = services.getTermBuilder();
-        if (openGoals.isEmpty()) {
-            return tb.tt();
-        }
-        else {
-            ImmutableList<Term> goalImplications = ImmutableSLList.nil();
-            for (Goal goal : openGoals) {
-                Term goalImplication = sequentToFormula(goal.sequent(),
-                        services);
-                goalImplications = goalImplications.append(goalImplication);
-            }
-
-            return tb.and(goalImplications);
-        }
     }
 
     /**
@@ -2208,8 +2209,7 @@ public class MergeRuleUtils {
         public T getValue() {
             if (isSome()) {
                 return ((Some<T>) this).getValue();
-            }
-            else {
+            } else {
                 throw new IllegalAccessError(
                         "Cannot otain a value from a None object.");
             }
@@ -2352,8 +2352,7 @@ public class MergeRuleUtils {
                 cache.put(var, result);
 
                 return result;
-            }
-            else {
+            } else {
                 return null;
             }
         }

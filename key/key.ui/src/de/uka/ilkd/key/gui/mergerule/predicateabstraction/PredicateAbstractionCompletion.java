@@ -68,7 +68,7 @@ public class PredicateAbstractionCompletion extends
             new ArrayList<LocationVariable>();
 
       MergeRuleUtils
-            .getUpdateLeftSideLocations(joinState.first)
+            .getUpdateLeftSideLocations(joinState.first, services.getTermBuilder())
             .forEach(v -> {
                // The meaning of the following statement corresponds to
                // partnerStates.fold("right value for v differs", false)
@@ -83,13 +83,13 @@ public class PredicateAbstractionCompletion extends
                                                       .getUpdateRightSideForSafe(
                                                             partner
                                                                   .getSymbolicState(),
-                                                            v)
+                                                            v, services.getTermBuilder())
                                                       .equals(
                                                             MergeRuleUtils
                                                                   .getUpdateRightSideForSafe(
                                                                         joinState
                                                                               .getSymbolicState(),
-                                                                        v)), (
+                                                                        v, services.getTermBuilder())), (
                                                       b1, b2) -> (b1 || b2)));
 
                   if (isDifferent) {

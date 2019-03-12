@@ -88,7 +88,7 @@ public class AbstractExecutionUtils {
             // Update in sequential normal form
             if (MergeRuleUtils.isUpdateNormalForm(update)) {
                 final List<Term> elems = MergeRuleUtils
-                        .getElementaryUpdates(update);
+                        .getElementaryUpdates(update, services.getTermBuilder());
 
                 for (final Term elem : elems) {
                     final AbstrUpdateUpdatableLoc lhs = new PVLoc(

@@ -32,6 +32,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -45,16 +46,21 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
+import de.uka.ilkd.key.logic.FilterVisitor;
+import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.RenamingTable;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.UpdateApplication;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.OpReplacer;
@@ -887,7 +893,7 @@ public final class MiscTools {
         final Set<LocationVariable> occurringLocVars = opColl.ops().stream()
                 .filter(op -> op instanceof LocationVariable)
                 .map(LocationVariable.class::cast).collect(Collectors.toSet());
-    
+
         if (t.containsJavaBlockRecursive()) {
             final JavaBlock jb = MergeRuleUtils.getJavaBlockRecursive(t);
             final ProgramVariableCollector pvc = new ProgramVariableCollector(
@@ -895,7 +901,7 @@ public final class MiscTools {
             pvc.start();
             occurringLocVars.addAll(pvc.result());
         }
-    
+
         return occurringLocVars;
     }
 
@@ -921,5 +927,124 @@ public final class MiscTools {
                 services.getTermFactory());
         final Term newAbstrUpdLHS = opRepl.replace(replaceIn);
         return newAbstrUpdLHS;
+    }
+
+    /**
+     * Simplifies, as much as safely possible, update / update applications
+     * inside the given {@link Term}.
+     *
+     * @param t
+     *            The {@link Term} in which to simplify updates.
+     * @param services
+     *            The {@link Services} object.
+     * @return The simplified {@link Term}.
+     */
+    public static Term simplifyUpdatesInTerm(Term t, Services services) {
+        if (t.op() instanceof ElementaryUpdate
+                || t.op() == UpdateJunctor.PARALLEL_UPDATE) {
+            t = simplifyUpdate(t, services);
+        }
+
+        return GenericTermReplacer.replace(t,
+                term -> term.op() == UpdateApplication.UPDATE_APPLICATION,
+                term -> simplifyUpdateApplication(term, services), services);
+    }
+
+    /**
+     * Simplifies an update term (an empty, elementary, or parallel update):
+     * Removes duplicates (later-one-wins rule) and applies update applications
+     * in the right-hand sides, if possible. The result is a parallel update in
+     * normal form (no duplicates, no nested update applications).
+     *
+     * @param t
+     *            The update term to simplify.
+     * @param services
+     *            The {@link Services} object (for the {@link TermBuilder}).
+     * @return The simplified update {@link Term}.
+     */
+    public static Term simplifyUpdate(Term t, Services services) {
+        assert t.op() instanceof ElementaryUpdate
+                || t.op() instanceof UpdateJunctor;
+        if (t.op() == UpdateJunctor.SKIP) {
+            return t;
+        }
+
+        final TermBuilder tb = services.getTermBuilder();
+        // This already removes duplicates, later elems win
+        final List<Term> elems = MergeRuleUtils.getElementaryUpdates(t,
+                services.getTermBuilder());
+        return tb.parallel(elems.stream()
+                .map(elem -> tb.elementary(((ElementaryUpdate) elem.op()).lhs(),
+                        simplifyUpdateApplication(elem.sub(0), services)))
+                .collect(ImmutableSLList.toImmutableList()));
+    }
+
+    /**
+     * This is a programmatic procedure to "execute" update applications, i.e.,
+     * to apply in an update application term the update to the target. The
+     * result will not contain update applications and is logically equivalent.
+     * If the target contains a modality or update application, returns the
+     * original term, because otherwise the method would either be unsound or we
+     * would have to think way more for doing it correctly.
+     *
+     * @param t
+     *            The update application term to simplify. If not an update
+     *            application term, the original term is directly returned.
+     * @param services
+     *            The {@link Services} object.
+     * @return The simplified term.
+     */
+    public static Term simplifyUpdateApplication(Term t, Services services) {
+        if (t.op() != UpdateApplication.UPDATE_APPLICATION) {
+            // We only apply update applications
+            return t;
+        }
+
+        Term update = UpdateApplication.getUpdate(t);
+        if (update.op() == UpdateApplication.UPDATE_APPLICATION) {
+            // update not in normal form -- recursively simplify
+            update = simplifyUpdateApplication(update, services);
+        } else if (update.op() instanceof AbstractUpdate
+                || update.op() == UpdateJunctor.CONCATENATED_UPDATE) {
+            // Simplification of abstract updates is not what we do here
+            return t;
+        }
+
+        final Term target = UpdateApplication.getTarget(t);
+
+        if (target.containsJavaBlockRecursive()
+                || containsUpdateApplications(target)) {
+            /*
+             * We don't apply the update if there's still a modal operator, way
+             * more complicated then.
+             */
+            return t;
+        }
+
+        // This already removes duplicates, later elems win
+        final List<Term> elems = MergeRuleUtils.getElementaryUpdates(
+                simplifyUpdate(update, services), services.getTermBuilder());
+
+        // Now apply the update to the target, step by step
+        Term result = target;
+        for (final Term elem : elems) {
+            final LocationVariable lhs = //
+                    (LocationVariable) ((ElementaryUpdate) elem.op()).lhs();
+            result = replaceVarInTerm(lhs, elem.sub(0), result, services);
+        }
+
+        return result;
+    }
+
+    /**
+     * @param t
+     *            The Term to check.
+     * @return true iff t contains an update application.
+     */
+    private static boolean containsUpdateApplications(Term t) {
+        final FilterVisitor fv = new FilterVisitor(
+                term -> term.op() == UpdateApplication.UPDATE_APPLICATION);
+        t.execPostOrder(fv);
+        return !fv.result().isEmpty();
     }
 }

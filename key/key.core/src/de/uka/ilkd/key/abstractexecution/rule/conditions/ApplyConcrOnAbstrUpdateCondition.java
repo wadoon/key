@@ -14,17 +14,25 @@
 package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Queue;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateUpdatableLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.FieldLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -190,6 +198,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
     private PushThroughResult pushThroughConcrUpdate(final Term concrUpdate,
             final Term abstrUpdateTerm, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final AbstractUpdate abstrUpd = (AbstractUpdate) abstrUpdateTerm.op();
 
         Term currentAccessibles = abstrUpdateTerm.sub(0);
@@ -199,59 +208,107 @@ public final class ApplyConcrOnAbstrUpdateCondition
         boolean success = false;
 
         for (LocationVariable lhs : MergeRuleUtils
-                .getUpdateLeftSideLocations(concrUpdate)) {
-            final PVLoc lhsLoc = new PVLoc(lhs);
+                .getUpdateLeftSideLocations(concrUpdate, services.getTermBuilder())) {
             final Term rhs = //
-                    MergeRuleUtils.getUpdateRightSideFor(concrUpdate, lhs);
+                    MergeRuleUtils.getUpdateRightSideFor(concrUpdate, lhs, services.getTermBuilder());
+            final boolean isHeapVar = //
+                    lhs.sort() == heapLDT.targetSort();
 
             // First, substitute in the accessibles
             {
                 final Term oldAccessibles = currentAccessibles;
-                currentAccessibles = MiscTools.replaceVarInTerm(
-                        lhs, rhs, currentAccessibles, services);
-                if (!oldAccessibles.equals(currentAccessibles)) {
+                currentAccessibles = MiscTools.replaceVarInTerm(lhs, rhs,
+                        currentAccessibles, services);
+                if (!oldAccessibles.equals(currentAccessibles) && !isHeapVar) {
+                    /*
+                     * NOTE (DS, 2019-03-12): For heaps, it is easy to create
+                     * syntactically different, but equivalent terms, which can
+                     * lead to an endless circle of applying this rule and
+                     * simplifying the term back to the original state,
+                     * therefore we don't register it as a success if the
+                     * accessibles changed.
+                     */
                     success = true;
                 }
             }
 
-            /*
-             * We may push through if (1) lhs is not assigned (neither "maybe"
-             * nor "has to"), and (2) the abstract update does not assign
-             * allLocs.
-             */
-            final boolean mayPushThrough = !abstrUpd.mayAssign(lhsLoc)
-                    && !abstrUpd.assignsAllLocs();
+            final Set<AbstrUpdateUpdatableLoc> locs = isHeapVar
+                    ? AbstractUpdateFactory
+                            .abstrUpdateLocsFromTerm(rhs, Optional.empty(),
+                                    services)
+                            .stream().filter(FieldLoc.class::isInstance)
+                            .map(FieldLoc.class::cast)
+                            .collect(Collectors
+                                    .toCollection(() -> new LinkedHashSet<>()))
+                    : Collections.singleton(new PVLoc(lhs));
 
-            /*
-             * We may drop if (1.1) lhs is assigned as "has to" or (1.2) the
-             * abstract update does not assign that variable at all and also not
-             * allLocs (because then we push through), and (2) the abstract
-             * update does not access allLocs.
-             */
-            final boolean mayDrop = (abstrUpd.hasToAssign(lhsLoc)
-                    || (!abstrUpd.mayAssign(lhsLoc)
-                            && !abstrUpd.assignsAllLocs()))
-                    && !AbstractExecutionUtils.accessesAllLocs(abstrUpdateTerm,
-                            services);
+            final Set<FieldLoc> pushThroughFields = new LinkedHashSet<>();
+            final Set<FieldLoc> dropFields = new LinkedHashSet<>();
 
-            /*
-             * Note that there is a situation where the update may be pushed
-             * through, but not dropped (that is, it appears twice in the
-             * result): If the lhs is not assigned, but the update accesses
-             * allLocs.
-             */
+            for (AbstrUpdateUpdatableLoc lhsLoc : locs) {
+                /*
+                 * We may push through if (1) lhs is not assigned (neither
+                 * "maybe" nor "has to"), and (2) the abstract update does not
+                 * assign allLocs.
+                 */
+                final boolean mayPushThrough = !abstrUpd.mayAssign(lhsLoc)
+                        && !abstrUpd.assignsAllLocs();
 
-            final Term elem = tb.elementary(lhs, rhs);
+                /*
+                 * We may drop if (1.1) lhs is assigned as "has to" or (1.2) the
+                 * abstract update does not assign that variable at all and also
+                 * not allLocs (because then we push through), and (2) the
+                 * abstract update does not access allLocs.
+                 */
+                final boolean mayDrop = (abstrUpd.hasToAssign(lhsLoc)
+                        || (!abstrUpd.mayAssign(lhsLoc)
+                                && !abstrUpd.assignsAllLocs()))
+                        && !AbstractExecutionUtils
+                                .accessesAllLocs(abstrUpdateTerm, services);
 
-            if (mayPushThrough) {
-                currentFollowingConcrUpdElems.add(elem);
-                success = true;
+                /*
+                 * Note that there is a situation where the update may be pushed
+                 * through, but not dropped (that is, it appears twice in the
+                 * result): If the lhs is not assigned, but the update accesses
+                 * allLocs.
+                 */
+
+                if (mayPushThrough) {
+                    success = true;
+
+                    if (!isHeapVar) {
+                        currentFollowingConcrUpdElems
+                                .add(tb.elementary(lhs, rhs));
+                    } else {
+                        pushThroughFields.add((FieldLoc) lhsLoc);
+                    }
+                }
+
+                if (!mayDrop) {
+                    if (!isHeapVar) {
+                        currentRemainingConcrUpdElems
+                                .add(tb.elementary(lhs, rhs));
+                    }
+                } else {
+                    success = true;
+                    if (isHeapVar) {
+                        dropFields.add((FieldLoc) lhsLoc);
+                    }
+                }
             }
 
-            if (!mayDrop) {
-                currentRemainingConcrUpdElems.add(elem);
-            } else {
-                success = true;
+            if (isHeapVar && success) {
+                /*
+                 * Now create the remaining and pushed through parts of the
+                 * heap.
+                 */
+                currentRemainingConcrUpdElems.add(
+                        tb.elementary(lhs, removeFieldLocsFromStoreExpr(rhs,
+                                dropFields, services)));
+
+                currentFollowingConcrUpdElems.add(
+                        tb.elementary(lhs, filterFieldLocsFromStoreExpr(rhs,
+                                pushThroughFields, services)));
             }
         }
 
@@ -275,6 +332,54 @@ public final class ApplyConcrOnAbstrUpdateCondition
 
         return new PushThroughResult(remainingConcrUpdate, newAbstrUpdTerm,
                 followingConcrUpdate);
+    }
+
+    private Term filterFieldLocsFromStoreExpr(Term t,
+            Set<FieldLoc> fieldsToKeep, Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+
+        if (t.op() != heapLDT.getStore()) {
+            return t;
+        }
+
+        final FieldLoc reprLoc = (FieldLoc) AbstractUpdateFactory
+                .abstrUpdateLocsFromTerm(t, Optional.empty(), services)
+                .iterator().next();
+
+        final Term subResult = //
+                filterFieldLocsFromStoreExpr(t.sub(0), fieldsToKeep, services);
+        if (!fieldsToKeep.contains(reprLoc)) {
+            return subResult;
+        } else {
+            return tb.store(subResult, t.sub(1), t.sub(2), t.sub(3));
+        }
+    }
+
+    private Term removeFieldLocsFromStoreExpr(Term t,
+            Set<FieldLoc> fieldsToDrop, Services services) {
+        if (fieldsToDrop.isEmpty()) {
+            return t;
+        }
+
+        final TermBuilder tb = services.getTermBuilder();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+
+        if (t.op() != heapLDT.getStore()) {
+            return t;
+        }
+
+        final FieldLoc reprLoc = (FieldLoc) AbstractUpdateFactory
+                .abstrUpdateLocsFromTerm(t, Optional.empty(), services)
+                .iterator().next();
+
+        final Term subResult = //
+                removeFieldLocsFromStoreExpr(t.sub(0), fieldsToDrop, services);
+        if (fieldsToDrop.contains(reprLoc)) {
+            return subResult;
+        } else {
+            return tb.store(subResult, t.sub(1), t.sub(2), t.sub(3));
+        }
     }
 
     @Override

@@ -185,8 +185,8 @@ public class MergeByIfThenElse extends MergeProcedure implements UnparametricMer
 
         TermBuilder tb = services.getTermBuilder();
 
-        Term rightSide1 = getUpdateRightSideFor(state1.first, v);
-        Term rightSide2 = getUpdateRightSideFor(state2.first, v);
+        Term rightSide1 = getUpdateRightSideFor(state1.first, v, services.getTermBuilder());
+        Term rightSide2 = getUpdateRightSideFor(state2.first, v, services.getTermBuilder());
 
         if (rightSide1 == null) {
             rightSide1 = tb.var(v);
