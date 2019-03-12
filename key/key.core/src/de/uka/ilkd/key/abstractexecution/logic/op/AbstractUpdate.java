@@ -16,20 +16,18 @@ package de.uka.ilkd.key.abstractexecution.logic.op;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateUpdatableLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
-import de.uka.ilkd.key.java.reference.FieldReference;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.AbstractSortedOperator;
@@ -71,7 +69,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
     /**
      * Private constructor since there should be exactly one abstract update per
      * left-hand side, similarly as for {@link ElementaryUpdate}. Use
-     * {@link #getInstance(AbstractPlaceholderStatement, Term, Services)}.
+     * {@link #getInstance(AbstractPlaceholderStatement, Term, Optional, Services)}.
      *
      * @param phs
      *            The {@link AbstractPlaceholderStatement} for which this
@@ -224,52 +222,5 @@ public final class AbstractUpdate extends AbstractSortedOperator {
         // NOTE (DS, 2019-03-01): Second case shouldn't occur...
         return assignables.isEmpty()
                 || assignables.stream().allMatch(EmptyLoc.class::isInstance);
-    }
-
-    /**
-     * Extracts a set of {@link AbstrUpdateUpdatableLoc}s from a set union which
-     * is the right-hand side of an {@link AbstractUpdate} {@link Term}.
-     *
-     * NOTE / TODO (DS, 2019-03-01): This is problematic if this abstract update
-     * is created in a different {@link ExecutionContext} than the one the
-     * supplied right-hand side belongs to. Should really only be used if no
-     * {@link ExecutionContext} can be obtained. Maybe we also find a different
-     * way to extract {@link FieldReference}s than using the
-     * {@link ExecutionContext}s?
-     *
-     * @param t
-     *            The right-hand side to transform.
-     * @return The {@link Set} of {@link AbstrUpdateUpdatableLoc}s represented
-     *         by t.
-     */
-    public Set<AbstrUpdateUpdatableLoc> getUpdatableRHSs(Term t) {
-        return AbstractUpdateFactory
-                .abstractUpdateLocsFromUnionTerm(t, services).stream()
-                .filter(AbstrUpdateUpdatableLoc.class::isInstance)
-                .map(AbstrUpdateUpdatableLoc.class::cast)
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-    }
-
-    /**
-     * Extracts a set of {@link AbstrUpdateUpdatableLoc}s from a set union which
-     * is the right-hand side of an {@link AbstractUpdate} {@link Term}.
-     *
-     * NOTE / TODO (DS, 2019-03-01): This is problematic if this abstract update
-     * is created in a different {@link ExecutionContext} than the one the
-     * supplied right-hand side belongs to. Should really only be used if no
-     * {@link ExecutionContext} can be obtained. Maybe we also find a different
-     * way to extract {@link FieldReference}s than using the
-     * {@link ExecutionContext}s?
-     *
-     * @param t
-     *            The right-hand side to transform.
-     * @return The {@link Set} of {@link AbstrUpdateUpdatableLoc}s represented
-     *         by t.
-     */
-    public Set<AbstrUpdateRHS> transformRHS(Term t) {
-        return AbstractUpdateFactory
-                .abstractUpdateLocsFromUnionTerm(t, services).stream()
-                .map(AbstrUpdateRHS.class::cast)
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 }

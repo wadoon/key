@@ -53,6 +53,10 @@ public class AbstractExecutionUtils {
      * @param target
      *            The term for which to analyze the assigned-before-used
      *            relationships.
+     * @param runtimeInstance
+     *            An optional runtime instance {@link LocationVariable} to
+     *            normalize self terms (because otherwise, there might be
+     *            different such terms around).
      * @param services
      *            The {@link Services} object.
      * @return (1) assigned-before-used and (2) used-before-assigned operators.
@@ -61,11 +65,11 @@ public class AbstractExecutionUtils {
      *         not be applicable.
      */
     public static Optional<Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>>> opsAssignedBeforeUsed(
-            Term target, Services services) {
+            Term target, Optional<LocationVariable> runtimeInstance, Services services) {
         final Set<AbstrUpdateUpdatableLoc> assignedBeforeUsed = new LinkedHashSet<>();
         final Set<AbstrUpdateUpdatableLoc> usedBeforeAssigned = new LinkedHashSet<>();
 
-        AbstractUpdateFactory.abstrUpdateLocsFromTerm(target, services).stream()
+        AbstractUpdateFactory.abstrUpdateLocsFromTerm(target, runtimeInstance, services).stream()
                 .filter(AbstrUpdateUpdatableLoc.class::isInstance)
                 .map(AbstrUpdateUpdatableLoc.class::cast)
                 .forEach(usedBeforeAssigned::add);
@@ -86,7 +90,7 @@ public class AbstractExecutionUtils {
                                     .lhs());
                     final Term rhs = elem.sub(0);
 
-                    AbstractUpdateFactory.abstrUpdateLocsFromTerm(rhs, services)
+                    AbstractUpdateFactory.abstrUpdateLocsFromTerm(rhs, runtimeInstance, services)
                             .stream()
                             .filter(AbstrUpdateUpdatableLoc.class::isInstance)
                             .map(AbstrUpdateUpdatableLoc.class::cast)
@@ -102,7 +106,7 @@ public class AbstractExecutionUtils {
             // Abstract Update
             else if (update.op() instanceof AbstractUpdate) {
                 opsHaveToAssignBeforeUsedForAbstrUpd(update, assignedBeforeUsed,
-                        usedBeforeAssigned, services);
+                        usedBeforeAssigned, runtimeInstance, services);
             }
 
             // Concatenated abstract update
@@ -111,7 +115,7 @@ public class AbstractExecutionUtils {
                         abstractUpdatesFromConcatenation(update);
                 for (Term abstrUpdTerm : abstractUpdateTerms) {
                     opsHaveToAssignBeforeUsedForAbstrUpd(abstrUpdTerm,
-                            assignedBeforeUsed, usedBeforeAssigned, services);
+                            assignedBeforeUsed, usedBeforeAssigned, runtimeInstance, services);
                 }
             }
 
@@ -122,7 +126,7 @@ public class AbstractExecutionUtils {
             }
 
             final Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>> subResult = //
-                    opsAssignedBeforeUsed(updateTarget, services).orElse(null);
+                    opsAssignedBeforeUsed(updateTarget, runtimeInstance, services).orElse(null);
 
             if (subResult == null) {
                 return Optional.empty();
@@ -148,7 +152,7 @@ public class AbstractExecutionUtils {
         else {
             for (final Term sub : target.subs()) {
                 final Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>> subResult = //
-                        opsAssignedBeforeUsed(sub, services).orElse(null);
+                        opsAssignedBeforeUsed(sub, runtimeInstance, services).orElse(null);
 
                 if (subResult == null) {
                     return Optional.empty();
@@ -201,17 +205,21 @@ public class AbstractExecutionUtils {
      * @param usedBeforeAssigned
      *            A set of used-before-assigned operators. Results are added to
      *            the passed set.
+     * @param runtimeInstance
+     *            An optional runtime instance {@link LocationVariable} to
+     *            normalize self terms (because otherwise, there might be
+     *            different such terms around).
      * @param services
      *            The {@link Services} object.
      */
     private static void opsHaveToAssignBeforeUsedForAbstrUpd(final Term update,
             final Set<AbstrUpdateUpdatableLoc> assignedBeforeUsed,
             final Set<AbstrUpdateUpdatableLoc> usedBeforeAssigned,
-            Services services) {
+            Optional<LocationVariable> runtimeInstance, Services services) {
         assert update.op() instanceof AbstractUpdate;
 
         usedBeforeAssigned.addAll(AbstractUpdateFactory
-                .abstractUpdateLocsFromUnionTerm(update.sub(0), services)
+                .abstrUpdateLocsFromTerm(update.sub(0), runtimeInstance, services)
                 .stream().filter(AbstrUpdateUpdatableLoc.class::isInstance)
                 .filter(op -> !assignedBeforeUsed.contains(op))
                 .map(AbstrUpdateUpdatableLoc.class::cast)

@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
+import java.util.Optional;
 import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
@@ -22,6 +23,7 @@ import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionContractUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -53,6 +55,11 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
+        final Optional<LocationVariable> runtimeInstance = Optional
+                .ofNullable(svInst.getExecutionContext().getRuntimeInstance())
+                .filter(LocationVariable.class::isInstance)
+                .map(LocationVariable.class::cast);
+
         if (svInst.isInstantiated(this.updateSV)) {
             return matchCond;
         }
@@ -66,7 +73,8 @@ public class InitializeParametricSkolemUpdate implements VariableCondition {
         final Pair<Set<AbstrUpdateRHS>, Set<AbstrUpdateLHS>> accessibleAndAssignableClause = //
                 AbstractExecutionContractUtils
                         .getAccessibleAndAssignableTermsForNoBehaviorContract(
-                                abstrStmt, matchCond, services);
+                                abstrStmt, matchCond, services,
+                                runtimeInstance);
 
         final Term update = //
                 tb.abstractUpdate(abstrStmt,

@@ -13,13 +13,16 @@
 
 package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
+import java.util.Optional;
 import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateUpdatableLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
@@ -50,6 +53,11 @@ public final class AbstrUpdatesIndependentCondition
             MatchConditions mc, Services services) {
         final SVInstantiations svInst = mc.getInstantiations();
 
+        final Optional<LocationVariable> runtimeInstance = Optional
+                .ofNullable(svInst.getExecutionContext().getRuntimeInstance())
+                .filter(LocationVariable.class::isInstance)
+                .map(LocationVariable.class::cast);
+
         final Term u1Inst = (Term) svInst.getInstantiation(u1);
         final Term u2Inst = (Term) svInst.getInstantiation(u2);
 
@@ -71,11 +79,10 @@ public final class AbstrUpdatesIndependentCondition
         final AbstractUpdate abstrUpd1 = (AbstractUpdate) u1Inst.op();
         final AbstractUpdate abstrUpd2 = (AbstractUpdate) u2Inst.op();
 
-        final Set<AbstrUpdateUpdatableLoc> abstrUpd1Accessibles = abstrUpd1
-                .getUpdatableRHSs(u1Inst.sub(0));
-        final Set<AbstrUpdateUpdatableLoc> abstrUpd2Accessibles = abstrUpd2
-                .getUpdatableRHSs(u2Inst.sub(0));
-        ;
+        final Set<AbstrUpdateUpdatableLoc> abstrUpd1Accessibles = AbstractUpdateFactory
+                .getUpdatableRHSs(u1Inst.sub(0), runtimeInstance, services);
+        final Set<AbstrUpdateUpdatableLoc> abstrUpd2Accessibles = AbstractUpdateFactory
+                .getUpdatableRHSs(u2Inst.sub(0), runtimeInstance, services);
 
         /* U1(x, ... := ...) / U2(... := x, ...) */
         if (abstrUpd1.mayAssignAny(abstrUpd2Accessibles)

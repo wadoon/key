@@ -15,6 +15,7 @@ package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -27,6 +28,7 @@ import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -58,6 +60,11 @@ public class InitializeParametricSkolemPathCondition
     public MatchConditions check(SchemaVariable sv, SVSubstitute instCandidate,
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
+
+        final Optional<LocationVariable> runtimeInstance = Optional
+                .ofNullable(svInst.getExecutionContext().getRuntimeInstance())
+                .filter(LocationVariable.class::isInstance)
+                .map(LocationVariable.class::cast);
 
         if (svInst.isInstantiated(pathCondSV)) {
             return matchCond;
@@ -93,7 +100,7 @@ public class InitializeParametricSkolemPathCondition
 
         final Set<AbstrUpdateRHS> accessibles = AbstractExecutionContractUtils
                 .getAccessibleAndAssignableTermsForNoBehaviorContract(abstrStmt,
-                        matchCond, services).first;
+                        matchCond, services, runtimeInstance).first;
 
         final Term pathCond = tb.func(funcSymb, services.abstractUpdateFactory()
                 .accessiblesToSetUnion(accessibles, services));

@@ -12,7 +12,6 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -21,12 +20,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.key_project.util.collection.DefaultImmutableSet;
-import org.key_project.util.collection.ImmutableSet;
-
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateUpdatableLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.ArrayLoc;
@@ -39,7 +36,6 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
-import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SetLDT;
@@ -80,18 +76,20 @@ public class AbstractUpdateFactory {
      *            {@link AbstractUpdate} should be created.
      * @param lhs
      *            The update's left-hand side. Should be a {@link SetLDT} term.
-     * @param ec
-     *            The {@link ExecutionContext} for the
-     *            {@link AbstractPlaceholderStatement}.
+     * @param runtimeInstance
+     *            An optional runtime instance {@link LocationVariable} to
+     *            normalize self terms (because otherwise, there might be
+     *            different such terms around).
      * @param services
      *            The {@link Services} object.
      * @return The {@link AbstractUpdate} for the given
      *         {@link AbstractPlaceholderStatement} and left-hand side.
      */
     public AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
-            Term lhs, ExecutionContext ec, Services services) {
+            Term lhs, Optional<LocationVariable> runtimeInstance,
+            Services services) {
         final LinkedHashSet<AbstrUpdateLHS> assignables = //
-                abstractUpdateLocsFromUnionTerm(lhs, services).stream()
+                abstrUpdateLocsFromTerm(lhs, runtimeInstance, services).stream()
                         .map(AbstrUpdateLHS.class::cast).collect(Collectors
                                 .toCollection(() -> new LinkedHashSet<>()));
 
@@ -184,53 +182,24 @@ public class AbstractUpdateFactory {
     }
 
     /**
-     * Extracts all {@link AbstractUpdateLoc}s from the given union (set or
-     * locset) {@link Term}.
-     *
-     * @param t
-     *            The {@link Term} to extract all {@link AbstractUpdateLoc}s
-     *            from.
-     * @param services
-     *            The {@link Services} object.
-     * @return All {@link AbstractUpdateLoc}s from the given {@link Term}.
-     */
-    public static Set<AbstractUpdateLoc> abstractUpdateLocsFromUnionTerm(Term t,
-            Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-
-        final ImmutableSet<Term> set;
-
-        if (t.sort() == services.getTypeConverter().getLocSetLDT()
-                .targetSort()) {
-            set = tb.locsetUnionToSet(t);
-        } else if (t.sort() == services.getTypeConverter().getSetLDT()
-                .targetSort()) {
-            set = tb.setUnionToImmutableSet(t);
-        } else {
-            set = DefaultImmutableSet.<Term> nil().add(t);
-        }
-
-        return set.stream().map(sub -> abstrUpdateLocsFromTerm(sub, services))
-                .flatMap(Collection::stream)
-                .filter(loc -> !(loc instanceof EmptyLoc))
-                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
-    }
-
-    /**
      * Extracts from the given {@link Term} to the {@link AbstractUpdateLoc}s
      * contained in it.
      *
      * @param t
      *            The {@link Term} to extract all {@link AbstractUpdateLoc}s
      *            from.
+     * @param runtimeInstance
+     *            An optional runtime instance {@link LocationVariable} to
+     *            normalize self terms (because otherwise, there might be
+     *            different such terms around).
      * @param services
      *            The {@link Services} object.
      * @return All {@link AbstractUpdateLoc}s in the given {@link Term}.
      */
     public static Set<AbstractUpdateLoc> extractAbstrUpdateLocsFromTerm(Term t,
-            Services services) {
+            Optional<LocationVariable> runtimeInstance, Services services) {
         final Set<AbstractUpdateLoc> subResult = //
-                abstrUpdateLocsFromTerm(t, services);
+                abstrUpdateLocsFromTerm(t, runtimeInstance, services);
         if (!subResult.isEmpty()) {
             // We've found an atom
             return subResult;
@@ -238,7 +207,8 @@ public class AbstractUpdateFactory {
 
         final Set<AbstractUpdateLoc> result = new LinkedHashSet<>();
         for (Term sub : t.subs()) {
-            result.addAll(extractAbstrUpdateLocsFromTerm(sub, services));
+            result.addAll(extractAbstrUpdateLocsFromTerm(sub, runtimeInstance,
+                    services));
         }
         return result;
     }
@@ -250,12 +220,16 @@ public class AbstractUpdateFactory {
      * @param t
      *            The {@link Term} to extract all {@link AbstractUpdateLoc}s
      *            from.
+     * @param runtimeInstance
+     *            An optional runtime instance {@link LocationVariable} to
+     *            normalize self terms (because otherwise, there might be
+     *            different such terms around).
      * @param services
      *            The {@link Services} object.
      * @return All {@link AbstractUpdateLoc}s from the given {@link Term}.
      */
     public static Set<AbstractUpdateLoc> abstrUpdateLocsFromTerm(Term t,
-            Services services) {
+            Optional<LocationVariable> runtimeInstance, Services services) {
         final Set<AbstractUpdateLoc> result = new LinkedHashSet<>();
 
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
@@ -278,15 +252,17 @@ public class AbstractUpdateFactory {
                 && t.sort() != heapLDT.getFieldSort()) {
             result.add(new RigidRHS(t));
         } else if (op == locSetLDT.getSingletonPV()) {
-            result.addAll(abstrUpdateLocsFromTerm(t.sub(0), services));
+            result.addAll(abstrUpdateLocsFromTerm(t.sub(0), runtimeInstance,
+                    services));
         } else if (op == locSetLDT.getHasTo()) {
             // There is exactly one location inside a hasTo
             final AbstractUpdateLoc subResult = abstrUpdateLocsFromTerm(
-                    t.sub(0), services).iterator().next();
+                    t.sub(0), runtimeInstance, services).iterator().next();
             assert subResult instanceof AbstrUpdateLHS;
             result.add(new HasToLoc((AbstrUpdateLHS) subResult));
         } else if (op == setLDT.getSingleton()) {
-            result.addAll(abstrUpdateLocsFromTerm(t.sub(0), services));
+            result.addAll(abstrUpdateLocsFromTerm(t.sub(0), runtimeInstance,
+                    services));
         } else if (op == locSetLDT.getSingleton()) {
             final Term obj = t.sub(0);
             final Term field = t.sub(1);
@@ -294,13 +270,16 @@ public class AbstractUpdateFactory {
                     fieldPVFromFieldFunc(field, services),
                     (LocationVariable) tb.getBaseHeap().op()));
         } else if (op == locSetLDT.getUnion() || op == setLDT.getUnion()) {
-            result.addAll(abstrUpdateLocsFromTerm(t.sub(0), services));
-            result.addAll(abstrUpdateLocsFromTerm(t.sub(1), services));
+            result.addAll(abstrUpdateLocsFromTerm(t.sub(0), runtimeInstance,
+                    services));
+            result.addAll(abstrUpdateLocsFromTerm(t.sub(1), runtimeInstance,
+                    services));
         } else if (heapLDT.isSelectOp(op) && t.subs().size() == 3
                 && t.sub(2).op() == heapLDT.getArr()) {
             final Term heapTerm = t.sub(0);
             result.add(new ArrayLoc(t.sub(1), t.sub(2).sub(0)));
-            result.addAll(abstrUpdateLocsFromTerm(heapTerm, services));
+            result.addAll(abstrUpdateLocsFromTerm(heapTerm, runtimeInstance,
+                    services));
         } else if (heapLDT.isSelectOp(op)) {
             final Sort sort = heapLDT.getSortOfSelect(op);
             final Term heapTerm = t.sub(0);
@@ -309,7 +288,8 @@ public class AbstractUpdateFactory {
             result.add(new FieldLoc(Optional.of(sort), Optional.of(heapTerm),
                     obj, fieldPVFromFieldFunc(field, services),
                     (LocationVariable) tb.getBaseHeap().op()));
-            result.addAll(abstrUpdateLocsFromTerm(heapTerm, services));
+            result.addAll(abstrUpdateLocsFromTerm(heapTerm, runtimeInstance,
+                    services));
         } else if (op == heapLDT.getStore()) {
             final Term heapTerm = t.sub(0);
             final Term obj = t.sub(1);
@@ -317,15 +297,13 @@ public class AbstractUpdateFactory {
             result.add(new FieldLoc(Optional.empty(), Optional.empty(), obj,
                     fieldPVFromFieldFunc(field, services),
                     (LocationVariable) tb.getBaseHeap().op()));
-            result.addAll(abstrUpdateLocsFromTerm(heapTerm, services));
+            result.addAll(abstrUpdateLocsFromTerm(heapTerm, runtimeInstance,
+                    services));
         } else {
-            /*
-             * TODO (DS, 2019-03-11): Debug code, remove when we're sure that
-             * everything's covered.
-             */
-            System.out.printf(
-                    "Unexpected operator \"%s\" in term \"%s\", cannot convert to AbstrUpdateLoc%n",
-                    op.name(), t);
+            throw new RuntimeException(String.format(
+                    "Unexpected operator \"%s\" in term \"%s\", "
+                            + "cannot convert to AbstrUpdateLoc%n",
+                    op.name(), t));
         }
 
         return result;
@@ -377,5 +355,28 @@ public class AbstractUpdateFactory {
         final TermBuilder tb = services.getTermBuilder();
         return tb.setUnion(accessibles.stream().map(loc -> loc.toTerm(services))
                 .map(tb::setSingleton).collect(Collectors.toList()));
+    }
+
+    /**
+     * Extracts a set of {@link AbstrUpdateUpdatableLoc}s from a set union which
+     * is the right-hand side of an {@link AbstractUpdate} {@link Term}.
+     *
+     * @param t
+     *            The right-hand side to transform.
+     * @param runtimeInstance
+     *            An optional runtime instance {@link LocationVariable} to
+     *            normalize self terms (because otherwise, there might be
+     *            different such terms around).
+     * @param services
+     *            The {@link Services} object.
+     * @return The {@link Set} of {@link AbstrUpdateUpdatableLoc}s represented
+     *         by t.
+     */
+    public static Set<AbstrUpdateUpdatableLoc> getUpdatableRHSs(Term t,
+            Optional<LocationVariable> runtimeInstance, Services services) {
+        return abstrUpdateLocsFromTerm(t, runtimeInstance, services).stream()
+                .filter(AbstrUpdateUpdatableLoc.class::isInstance)
+                .map(AbstrUpdateUpdatableLoc.class::cast)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 }

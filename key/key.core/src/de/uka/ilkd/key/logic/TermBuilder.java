@@ -21,6 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -999,10 +1000,26 @@ public class TermBuilder {
         return tf.createTerm(abstrUpd, rhs);
     }
 
+    /**
+     * Creates an {@link AbstractUpdate} term.
+     *
+     * @param phs
+     *            The {@link AbstractPlaceholderStatement} for which to create
+     *            an {@link AbstractUpdate}.
+     * @param lhs
+     *            The {@link AbstractUpdate}'s left-hand side.
+     * @param rhs
+     *            The {@link AbstractUpdate}'s left-hand side.
+     * @param runtimeInstance
+     *            An optional runtime instance {@link LocationVariable} to
+     *            normalize self terms (because otherwise, there might be
+     *            different such terms around).
+     * @return the {@link AbstractUpdate} term.
+     */
     public Term abstractUpdate(AbstractPlaceholderStatement phs, Term lhs,
-            Term rhs, ExecutionContext ec) {
+            Term rhs, Optional<LocationVariable> runtimeInstance) {
         final AbstractUpdate au = services.abstractUpdateFactory()
-                .getInstance(phs, lhs, ec, services);
+                .getInstance(phs, lhs, runtimeInstance, services);
         return tf.createTerm(au, rhs);
     }
 

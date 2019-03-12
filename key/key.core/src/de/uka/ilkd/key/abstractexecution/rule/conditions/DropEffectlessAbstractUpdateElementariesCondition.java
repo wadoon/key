@@ -37,6 +37,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
@@ -71,6 +72,12 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
     public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
             MatchConditions mc, Services services) {
         final SVInstantiations svInst = mc.getInstantiations();
+
+        final Optional<LocationVariable> runtimeInstance = Optional
+                .ofNullable(svInst.getExecutionContext().getRuntimeInstance())
+                .filter(LocationVariable.class::isInstance)
+                .map(LocationVariable.class::cast);
+
         final Term u = (Term) svInst.getInstantiation(uSV);
         Term target = (Term) svInst.getInstantiation(targetSV);
         final Term origResult = (Term) svInst.getInstantiation(resultSV);
@@ -113,7 +120,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
                         origAbstractUpdates.get(i);
                 final Term newUpdate = Optional
                         .ofNullable(dropEffectlessAbstractUpdateElementaries(
-                                elementaryAbstrUpd, target, services))
+                                elementaryAbstrUpd, target, runtimeInstance, services))
                         .orElse(elementaryAbstrUpd);
 
                 newElementaryAbstractUpdates.set(i, newUpdate);
@@ -128,7 +135,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             }
         } else {
             newResult = dropEffectlessAbstractUpdateElementaries( //
-                    u, target, services);
+                    u, target, runtimeInstance, services);
         }
 
         if (newResult == null) {
@@ -154,7 +161,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
     }
 
     private static Term dropEffectlessAbstractUpdateElementaries(Term update,
-            Term target, Services services) {
+            Term target, Optional<LocationVariable> runtimeInstance, Services services) {
         final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
 
         final Set<AbstrUpdateUpdatableLoc> assignables = new LinkedHashSet<>();
@@ -187,8 +194,8 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
         }
 
         final Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>> opsAnalysisResult = //
-                AbstractExecutionUtils.opsAssignedBeforeUsed(target, services)
-                        .orElse(null);
+                AbstractExecutionUtils.opsAssignedBeforeUsed(target,
+                        runtimeInstance, services).orElse(null);
 
         if (opsAnalysisResult == null) {
             return null;
@@ -204,7 +211,8 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
          * it in if I'm wrong...
          */
         final Set<AbstractUpdateLoc> locsInTarget = AbstractUpdateFactory
-                .extractAbstrUpdateLocsFromTerm(target, services);
+                .extractAbstrUpdateLocsFromTerm(target, runtimeInstance,
+                        services);
 
         // XXX Normalize "self" variables, they're different...!!!
         FieldLoc field1Loc1 = (FieldLoc) assignables.iterator().next();
@@ -219,8 +227,8 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
 
         final Set<AbstrUpdateRHS> newAccessibles = //
                 AbstractUpdateFactory
-                        .abstractUpdateLocsFromUnionTerm(accessiblesTerm,
-                                services)
+                        .abstrUpdateLocsFromTerm(accessiblesTerm,
+                                runtimeInstance, services)
                         .stream().map(AbstrUpdateRHS.class::cast)
                         // .filter(loc -> visitor.getResult().contains(loc))
                         .collect(Collectors
