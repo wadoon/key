@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -64,6 +65,7 @@ import gentest.IGeneratedTest;
 import prover.CounterExample;
 import prover.InvGenResult;
 import prover.Invariant;
+import prover.NotValidInvariant;
 import prover.ProofResult;
 import prover.ProofWrapper;
 import prover.SequentWrapper;
@@ -86,17 +88,23 @@ public class Main {
 	private static final String benchmarksFile6 = "benchmarks/square/Square.java";
 	private static final String benchmarksFile7 = "benchmarks/times/Times.java";
 	private static final String benchmarksFile8 = "benchmarks/timestwo/TimesTwo.java";
-	
 	private static final String benchmarksFile9 = "benchmarks/squarenozero/SquareNoZero.java";
-	
 	private static final String benchmarksFile10 = "benchmarks/plusnopol/PlusNoPol.java";
-	
 	private static final String benchmarksFile11 = "benchmarks/timestwonopol/TimesTwoNoPol.java"; //works
 	private static final String benchmarksFile12 = "benchmarks/cohennopol/CohenNoPol.java";
+	private static final String benchmarksFile13 = "benchmarks/squarenopol/SquareNoPol.java";
 	
 	private static final String digRelPath = "dig/dig/dig.py";
 	//amount of testcases / method calls for the function from which the traces should be obtained
-	public static final int maxLoopUnwinds = 8;
+	public static final int maxLoopUnwinds = 3;
+	
+	public static final int startPolDegree = 2;
+	public static int polDegree = 2;
+	
+	//goal stack for backtracking
+	public static LinkedList<Goal> lastGoals = new LinkedList<Goal>();
+	
+	//currently valid Invariant Stack
 	
 	private static KeYAPI keyAPI;
 	
@@ -122,29 +130,62 @@ public class Main {
 		while(!keyAPI.isClosed(proof)) {
 			ImmutableList<Goal> openGoals = keyAPI.prove(proof);
 			for(Goal currentGoal : openGoals) {
-				//Iterator it = openGoals.iterator();
-				//Goal test = (Goal) it.next();
-				//currentGoal = (Goal) it.next();
 				SequentWrapper currentSequent = keyAPI.getSequent(currentGoal);
 				InvGenResult result = null;
+				
+				// we need to be able to backtrack to a goal
+				if (lastGoals.isEmpty())
+					lastGoals.push(currentGoal);
+				
 				try {
+					// try to generate potential invariant
 					result = attemptInvGen(currentSequent, proof);
 				} catch (ProofInputException e) {
 					e.printStackTrace();
 				}
-				if(result instanceof CounterExample) {
-					CounterExample counterexample = (CounterExample)result;
-					return counterexample;
-				} else {
+				if (result instanceof NotValidInvariant) {
+					//--- Backtrack ----
+					//prunes proof tree to last successfully proven outermost loop goal
+					//or first tried
+					proof.pruneProof(lastGoals.peek());
+						
+					//Increase pol. degree by 1
+					addToPolDegree(1);
+				}
+				else {
+					//only save if the last loop is successfully proven
+					if (allSubGoalsInitBodyUseCaseProven(lastGoals.peek())) {
+						resetToPolDegree(startPolDegree);
+						//Saves current (loop) goal for possible backtracking (new outermost loop)
+						lastGoals.push(currentGoal);
+					}
+					
 					Invariant invariant = (Invariant)result;
 					keyAPI.applyInvariantRule(currentGoal, invariant, useGeneratedInvariant);
-					attemptProve(proof);
 				}
+				
+				//----- Call recursively ----
+				attemptProve(proof);
 			}
 		}
 		return new ProofWrapper(proof); 
 	}
 	
+	private static void resetToPolDegree(int startpoldegree2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private static boolean allSubGoalsInitBodyUseCaseProven(Goal peek) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	private static void addToPolDegree(int i) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	public static InvGenResult attemptInvGen(SequentWrapper sequent, Proof proof) throws ProofInputException {
 		if (!useGeneratedInvariant)
 			return null;
@@ -157,7 +198,7 @@ public class Main {
 		
 		if (loop == null) {
 			//-> we have no loop here, but we only want to generate loop invariants
-			return null;
+			return new NotValidInvariant();
 		}
 		loopDepthCounter++;
 		
@@ -240,16 +281,19 @@ public class Main {
 			//Call DIG with traces to get Invariants
 			System.out.println("Call DIG with traces file to get Invariants..");
 			Path digAbsPath = Paths.get(currentPath.toString(), digRelPath);
-			String rawDIGInvariants = callDIGGetPolInvs(digAbsPath.toString(), tracesFilePath.toString());
+			String rawDIGInvariants = callDIGGetInvs(digAbsPath.toString(), tracesFilePath.toString(), true);
+			
+			String rawDIGIneq = callDIGGetInvs(digAbsPath.toString(), tracesFilePath.toString(), false);
+			System.out.println("Raw DIG Ineq: " + rawDIGIneq);
 			
 			//TODO: Currently I assume that I get Invariants, but maybe call with more unwinds if no invariant
 			List<String> digInvariants = parseDIGInvariantArray(rawDIGInvariants);
 			
 			
 			//---- Convert Invariants to KeY Format ----
-			
 			List<String> convertedInvariants = convertDIGInvariantsToJMLFormat(digInvariants, true, false);
 			System.out.println("JML Invs: " + convertedInvariants);
+
 	        
 	        // finally, parse pol. "JML Syntax" Invariants to KeY Format using the KeY Parser
 	    	int index = 0;
@@ -280,26 +324,34 @@ public class Main {
 			try {
 				Term ineqTerm = dtp.parse(new StringReader(ineq), null,
 				        services, existingNS, abbr);
-				conjInvariants = tb.and(conjInvariants, ineqTerm);
+				if (conjInvariants != null)
+					conjInvariants = tb.and(conjInvariants, ineqTerm);
+				else
+					conjInvariants = ineqTerm;
 			} catch (ParserException e) {
 				e.printStackTrace();
 			}
 		}
-		System.out.println("Full Inv-Term with User given Ineq: " + conjInvariants.toString());
 		
-		boolean invInitiallyValid = isInvInitiallyValid(conjInvariants, loopGoal);
-		System.out.println("invInitiallyValid: " + invInitiallyValid);
-		
-		return new Invariant(conjInvariants);
+		if (conjInvariants != null) {
+			System.out.println("Full Inv-Term with User given Ineq: " + conjInvariants.toString());
+			
+			boolean invInitiallyValid = isInvInitiallyValid(conjInvariants, loopGoal);
+			System.out.println("invInitiallyValid: " + invInitiallyValid);
+			
+			return new Invariant(conjInvariants);
+		}
+		else
+			return new NotValidInvariant();
 	}
 	
 	private static List<String> parseDIGInvariantArray(String rawDIGInvariantArray) {
 		if (rawDIGInvariantArray == null || rawDIGInvariantArray.equals(""))
-			return null;
+			return new LinkedList<String>();
 		
 		if (!rawDIGInvariantArray.substring(0, 1).equals("["))
 			//DIG Array Format: [p*x + q*y - a == 0, q*r - p*s + 1 == 0, r*x + s*y - b == 0]
-			return null;
+			return new LinkedList<String>();
 		
 		
 		String modDIGInvariantArray = rawDIGInvariantArray.replace("[", "").replace("]", "");
@@ -325,7 +377,9 @@ public class Main {
 		
 		final String matchBaseExponent = "(\\s*(\\w+?)\\s*\\^\\s*(\\w+))"; //matches -x^3 -> find1: group(1:x^3,2:x,3:3)
 		// in order to re-rename underscore vars: u_x -> _x
-		final String matchUnderscoreVars = "\\s*(\\w*(_+?\\w+))\\s*"; 
+		//final String matchUnderscoreVars = "\\s*(\\w*(_+?\\w+))\\s*"; 
+		final String matchUnderscoreVars = "\\s*u(_\\w+)\\s*"; 
+		
 		List<String> convertedInvariants = new ArrayList<>();
 		for (String inv : digInvariants) {
 			if (removeWhitespaces)
@@ -349,8 +403,8 @@ public class Main {
 			// Re-Rename underscore vars: u_x -> _x
 			Matcher mUscVar = Pattern.compile(matchUnderscoreVars).matcher(inv);
 			while (mUscVar.find()) {
-				String prevVar = mUscVar.group(1);
-				String newVar = mUscVar.group(2);
+				String prevVar = mUscVar.group(0);
+				String newVar = mUscVar.group(1);
 				
 				//FIXME: replace (all) is ugly here but should work
 				inv = inv.replace(prevVar, newVar);
@@ -458,11 +512,17 @@ public class Main {
 		}
 	}
 	
-	public static String callDIGGetPolInvs(final String digPath, final String tracesPath) {
+	public static String callDIGGetInvs(final String digPath, final String tracesPath, boolean eqinv) {
+		final String eq_or_ineq;
+		if (eqinv)
+			eq_or_ineq = "eqinv";
+		else
+			eq_or_ineq = "ineqinv";
+		
 		String invs = null;
 		try {
 			//call with polinv or ineqinv -> polinv
-			ProcessBuilder builder = new ProcessBuilder("sage", "-python", digPath, "polinv",tracesPath);
+			ProcessBuilder builder = new ProcessBuilder("sage", "-python", digPath, eq_or_ineq, tracesPath);
 			builder.redirectErrorStream(true);
 			Process p;
 			p = builder.start();

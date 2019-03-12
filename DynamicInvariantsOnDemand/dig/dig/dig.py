@@ -358,8 +358,8 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description='Invariant and Inequality generation from program traces.')
-    parser.add_argument('polinv_or_ineqinv', metavar='polinv_or_ineqinv', type=str,
-                        help='polinv or ineqinv as option, one must be chosen')
+    parser.add_argument('eqinv_or_ineqinv', metavar='eqinv_or_ineqinv', type=str,
+                        help='eqinv or ineqinv as option, one must be chosen')
     parser.add_argument('filepath', metavar='filepath', type=str,
                         help='filepath to the traces file')
     parser.add_argument("--debug", action='store_true', help="output debug messages")
@@ -373,7 +373,7 @@ if __name__ == "__main__":
     else:
         dig =  DIG(filename=args.filepath, verbose=args.debug)
 
-    if args.polinv_or_ineqinv == 'polinv':
+    if args.eqinv_or_ineqinv == 'eqinv':
         dig.get_invs()
-    elif args.polinv_or_ineqinv == 'ineqinv':
+    elif args.eqinv_or_ineqinv == 'ineqinv':
         dig.get_ieqs_cl_gen()

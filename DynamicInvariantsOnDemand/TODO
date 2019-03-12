@@ -1,13 +1,24 @@
 -siehe bugs
+-klären, warum useCase in GUI nie geschlossen wird, wenn man Inv manuell angibt (habe das Prob auch im Code, aber komischerweise nur wenn ich useCase im eigenen proof schließen möchte -> nicht in der mainSchleife
 
--TestGen: remove invariant (still user given ineq in java file) before calling, changes testcases (since symbolic execution can simplify more with invariant)
--backtracking (simple): wie weit implementiert aktuell? wie sieht/sollte dieser konkret überhaupt aus?
+
 -ich brauche einen stackedloop algorithmus der funktioniert!!! -> für backtracking (extended)
 	-> evtl gucken bei dig: welche programme mit welchen inv loops? tabelle in paper
 
--gucken, wie ich alte Invariante vom proof (cloned proofs haben die gleiche Referenz aus irgendeinem Grund) speicher, ändern und wiederherstellen kann
--initValidTest: Statt clonedProofs subtrees benutzen, prune makro
+
+-initValidTest: Statt clonedProofs subtrees benutzen & prune makro -> wie subtree? Habe nichts bei TestGen dergleichen gefunden, syntactic execution erzeugt irgendwie ein neues open Goal
+                aber new Goal( finde ich im gesamten KeyCode nur 1x beim Proof anlegen 
 -thesis schreiben: mit komplettem ansatz anfangen (siehe notizen)
 -präsentation machen
 
+
+
+
+
+done:
+-gucken, wie ich alte Invariante vom proof (cloned proofs haben die gleiche Referenz aus irgendeinem Grund) speicher, ändern und wiederherstellen kann
+-TestGen: remove invariant (still user given ineq in java file) before calling, changes testcases (since symbolic execution can simplify more with invariant)
 -int r=x -> siehe Testcase Generator z.250 & jede unbekannte RHS Variable als Input nehmen. Problem: die Invarianten werden verwirrend, da diese erst nach update vereinfachungen erkennbar sind für den Menschen
+ -> ABER: wahrscheinlich sinnlos gewesen, da ich doch mein komplettes verfahren bei mehreren loops wahrscheinlich wie in der EMail beschrieben ändern muss, weil keine InputBelegungen für die nachfolgenden Schleifen
+          vom TestGen generiert werden (da diese in keine IF-Verzweigung mehr auftauchen)
+-backtracking (simple): wie weit implementiert aktuell? wie sieht/sollte dieser konkret überhaupt aus?

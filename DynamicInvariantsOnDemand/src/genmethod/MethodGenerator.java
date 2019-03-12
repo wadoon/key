@@ -145,7 +145,7 @@ public abstract class MethodGenerator {
 		javaCodeBuilder.append(System.lineSeparator());
 		javaCodeBuilder.append(inputVariableFromParameterListBuilder.toString());
 		javaCodeBuilder.append(variableAssignmentBuilder.toString());
-		//Remove leading "{" of StatementBlock to inject variable assignments (done above)
+		//Remove leading "{" (done above) of StatementBlock to inject variable assignments 
 		//javaCodeBuilder.append(program.toSource().replaceAll("^\\{+", ""));
 		for (String s : tracesArrayListsStrings) {
 			javaCodeBuilder.append(s);
@@ -158,9 +158,13 @@ public abstract class MethodGenerator {
 		
 		
 		String loopString = loop.toSource();
-		Matcher m = Pattern.compile("while.*(\\{)").matcher(loopString);
+		//Pattern: match non greedy (first loop), { is group 1, rest 0
+		Matcher m = Pattern.compile("while\\s*\\((?:.+?)(?=\\{)(\\{)").matcher(loopString);
+		//Matcher m = Pattern.compile("while.*(\\{)").matcher(loopString);
+		// Replace { with { and injected code
 		String replacement = "{" +  tracesAddBuilder.toString();
 		if (m.find()) {
+			//replace { with injected code
 			String injectedInWhile = new StringBuilder(loopString).replace(m.start(1), m.end(1), replacement).toString();
 			javaCodeBuilder.append(injectedInWhile);
 		} else
