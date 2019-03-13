@@ -422,6 +422,9 @@ public class LogicPrinter {
         if ((applicationRestriction & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
             this.layouter.brk().print("\\sameUpdateLevel");
         }
+        if ((applicationRestriction & RewriteTaclet.NOT_IN_ABSTRACT_UPDATE_SCOPE) != 0) {
+            this.layouter.brk().print("\\notInAbstractUpdateScope");
+        }
         if ((applicationRestriction & RewriteTaclet.IN_SEQUENT_STATE) != 0) {
             this.layouter.brk().print("\\inSequentState");
         }

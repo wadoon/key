@@ -13,9 +13,8 @@
 
 package de.uka.ilkd.key.abstractexecution.rule.conditions;
 
-import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -39,24 +38,12 @@ public class AbstractUpdateCondition implements VariableCondition {
         this.negated = negated;
     }
 
-    /**
-     * @param updateTerm
-     *            The term to check.
-     * @return true iff target is an update with a function symbol as operator,
-     *         i.e., an abstract update.
-     */
-    public static boolean isAbstractUpdate(Term updateTerm) {
-        final OpCollector opColl = new OpCollector();
-        updateTerm.execPostOrder(opColl);
-        return opColl.ops().stream().anyMatch(op -> op instanceof AbstractUpdate);
-    }
-
     @Override
     public MatchConditions check(SchemaVariable sv, SVSubstitute instCandidate,
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
         final Term uInst = (Term) svInst.getInstantiation(u);
-        if (negated ^ isAbstractUpdate(uInst)) {
+        if (negated ^ AbstractExecutionUtils.containsAbstractUpdate(uInst)) {
             return matchCond;
         }
         else {

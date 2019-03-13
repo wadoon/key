@@ -92,8 +92,9 @@ public class AbstractUpdateFactory {
             Term lhs, Optional<LocationVariable> runtimeInstance,
             Services services) {
         final LinkedHashSet<AbstrUpdateLHS> assignables = //
-                abstrUpdateLocsFromTerm(lhs, runtimeInstance, services).stream()
-                        .map(AbstrUpdateLHS.class::cast).collect(Collectors
+                abstrUpdateLocsFromTermSafe(lhs, runtimeInstance, services)
+                        .stream().map(AbstrUpdateLHS.class::cast)
+                        .collect(Collectors
                                 .toCollection(() -> new LinkedHashSet<>()));
 
         return getInstance(phs, assignables, services);
@@ -202,7 +203,7 @@ public class AbstractUpdateFactory {
     public static Set<AbstractUpdateLoc> extractAbstrUpdateLocsFromTerm(Term t,
             Optional<LocationVariable> runtimeInstance, Services services) {
         final Set<AbstractUpdateLoc> subResult = //
-                abstrUpdateLocsFromTerm(t, runtimeInstance, services);
+                abstrUpdateLocsFromTermUnsafe(t, runtimeInstance, services);
         if (subResult != null) {
             // We've found an atom
             return subResult;
@@ -220,8 +221,8 @@ public class AbstractUpdateFactory {
 
     /**
      * Converts the given {@link Term} to the {@link AbstractUpdateLoc}s it is
-     * representing. Returns null if the given {@link Term} is not directly
-     * representing any locations; use
+     * representing. Throws a {@link RuntimeException} if the given {@link Term}
+     * is not directly representing any locations; use
      * {@link #extractAbstrUpdateLocsFromTerm(Term, Optional, Services)} for
      * extraction if the passed {@link Term} does not have to represent
      * locations.
@@ -239,7 +240,40 @@ public class AbstractUpdateFactory {
      *         null if the {@link Term} does not represent
      *         {@link AbstractUpdateLoc}s.
      */
-    public static Set<AbstractUpdateLoc> abstrUpdateLocsFromTerm(Term t,
+    public static Set<AbstractUpdateLoc> abstrUpdateLocsFromTermSafe(Term t,
+            Optional<LocationVariable> runtimeInstance, Services services) {
+        return Optional
+                .ofNullable(abstrUpdateLocsFromTermUnsafe(t, runtimeInstance,
+                        services))
+                .orElseThrow(() -> new RuntimeException(String.format(
+                        "Unsupported term %s, cannot extract locs", t)));
+    }
+
+    /**
+     * Converts the given {@link Term} to the {@link AbstractUpdateLoc}s it is
+     * representing. Returns null if the given {@link Term} is not directly
+     * representing any locations; use
+     * {@link #extractAbstrUpdateLocsFromTerm(Term, Optional, Services)} for
+     * extraction if the passed {@link Term} does not have to represent
+     * locations, or
+     * {@link #abstrUpdateLocsFromTermSafe(Term, Optional, Services)} for a
+     * variant ensuring that the result is non-null by throwing an exception
+     * (fail early).
+     *
+     * @param t
+     *            The {@link Term} to extract all {@link AbstractUpdateLoc}s
+     *            from.
+     * @param runtimeInstance
+     *            An optional runtime instance {@link LocationVariable} to
+     *            normalize self terms (because otherwise, there might be
+     *            different such terms around).
+     * @param services
+     *            The {@link Services} object.
+     * @return All {@link AbstractUpdateLoc}s from the given {@link Term} or
+     *         null if the {@link Term} does not represent
+     *         {@link AbstractUpdateLoc}s.
+     */
+    public static Set<AbstractUpdateLoc> abstrUpdateLocsFromTermUnsafe(Term t,
             Optional<LocationVariable> runtimeInstance, Services services) {
         final Set<AbstractUpdateLoc> result = new LinkedHashSet<>();
         t = MiscTools.simplifyUpdatesInTerm(t, services);
@@ -252,24 +286,29 @@ public class AbstractUpdateFactory {
 
         if (op instanceof LocationVariable) {
             result.add(new PVLoc((LocationVariable) op));
-        } else if (t.op() == locSetLDT.getAllLocs()) {
+        }
+        else if (t.op() == locSetLDT.getAllLocs()) {
             result.add(new AllLocsLoc(locSetLDT.getAllLocs()));
-        } else if (t.op() == locSetLDT.getEmpty()) {
+        }
+        else if (t.op() == locSetLDT.getEmpty()) {
             result.add(new EmptyLoc(locSetLDT.getEmpty()));
-        } else if (op instanceof Function && op.arity() == 0
+        }
+        else if (op instanceof Function && op.arity() == 0
                 && ((Function) op).sort() == locSetLDT.targetSort()) {
             result.add(new SkolemLoc((Function) op));
-        } else if (op == locSetLDT.getSingletonPV()) {
-            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTerm(
+        }
+        else if (op == locSetLDT.getSingletonPV()) {
+            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTermUnsafe(
                     t.sub(0), runtimeInstance, services);
             if (subResult == null) {
                 return null;
             }
 
             result.addAll(subResult);
-        } else if (op == locSetLDT.getHasTo()) {
+        }
+        else if (op == locSetLDT.getHasTo()) {
             // There is exactly one location inside a hasTo
-            final AbstractUpdateLoc subResult = abstrUpdateLocsFromTerm(
+            final AbstractUpdateLoc subResult = abstrUpdateLocsFromTermUnsafe(
                     t.sub(0), runtimeInstance, services).iterator().next();
             if (subResult == null) {
                 return null;
@@ -277,10 +316,11 @@ public class AbstractUpdateFactory {
 
             assert subResult instanceof AbstrUpdateLHS;
             result.add(new HasToLoc((AbstrUpdateLHS) subResult));
-        } else if (op == locSetLDT.getUnion() || op == setLDT.getUnion()) {
-            final Set<AbstractUpdateLoc> subResult1 = abstrUpdateLocsFromTerm(
+        }
+        else if (op == locSetLDT.getUnion() || op == setLDT.getUnion()) {
+            final Set<AbstractUpdateLoc> subResult1 = abstrUpdateLocsFromTermUnsafe(
                     t.sub(0), runtimeInstance, services);
-            final Set<AbstractUpdateLoc> subResult2 = abstrUpdateLocsFromTerm(
+            final Set<AbstractUpdateLoc> subResult2 = abstrUpdateLocsFromTermUnsafe(
                     t.sub(1), runtimeInstance, services);
             if (subResult1 == null || subResult2 == null) {
                 return null;
@@ -288,15 +328,17 @@ public class AbstractUpdateFactory {
 
             result.addAll(subResult1);
             result.addAll(subResult2);
-        } else if (op == setLDT.getSingleton()) {
-            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTerm(
+        }
+        else if (op == setLDT.getSingleton()) {
+            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTermUnsafe(
                     t.sub(0), runtimeInstance, services);
             if (subResult == null) {
                 return null;
             }
 
             result.addAll(subResult);
-        } else if (isHeapOp(op, locSetLDT, heapLDT)) {
+        }
+        else if (isHeapOp(op, locSetLDT, heapLDT)) {
             final Set<AbstractUpdateLoc> subResult = //
                     abstrUpdateLocsFromHeapTerm(t, runtimeInstance, services);
             if (subResult == null) {
@@ -304,10 +346,12 @@ public class AbstractUpdateFactory {
             }
 
             result.addAll(subResult);
-        } else if (t.isRigid() && t.sort() != locSetLDT.targetSort()
+        }
+        else if (t.isRigid() && t.sort() != locSetLDT.targetSort()
                 && t.sort() != heapLDT.getFieldSort()) {
             result.add(new RigidRHS(t));
-        } else {
+        }
+        else {
             return null;
         }
 
@@ -341,14 +385,16 @@ public class AbstractUpdateFactory {
 
         if (op instanceof LocationVariable) {
             /* This is the heap LV, in which we are not interested here. */
-        } else if (op == locSetLDT.getSingleton()) {
+        }
+        else if (op == locSetLDT.getSingleton()) {
             final Term obj = //
                     normalizeSelfVar(t.sub(0), runtimeInstance, services);
             final Term field = t.sub(1);
             result.add(new FieldLoc(Optional.empty(), Optional.empty(), obj,
                     fieldPVFromFieldFunc(field, services),
                     (LocationVariable) tb.getBaseHeap().op()));
-        } else if (heapLDT.isSelectOp(op) && t.subs().size() == 3
+        }
+        else if (heapLDT.isSelectOp(op) && t.subs().size() == 3
                 && t.sub(2).op() == heapLDT.getArr()) {
             final Term heapTerm = t.sub(0);
             final Term obj = //
@@ -363,7 +409,8 @@ public class AbstractUpdateFactory {
             }
 
             result.addAll(subResult);
-        } else if (heapLDT.isSelectOp(op)) {
+        }
+        else if (heapLDT.isSelectOp(op)) {
             final Sort sort = heapLDT.getSortOfSelect(op);
             final Term heapTerm = t.sub(0);
             final Term obj = //
@@ -378,7 +425,8 @@ public class AbstractUpdateFactory {
             if (subResult != null) {
                 result.addAll(subResult);
             }
-        } else if (op == heapLDT.getStore()) {
+        }
+        else if (op == heapLDT.getStore()) {
             final Term heapTerm = t.sub(0);
             final Term obj = //
                     normalizeSelfVar(t.sub(1), runtimeInstance, services);
@@ -394,7 +442,8 @@ public class AbstractUpdateFactory {
             }
 
             result.addAll(subResult);
-        } else {
+        }
+        else {
             return null;
         }
 
@@ -500,6 +549,36 @@ public class AbstractUpdateFactory {
 
     /**
      * Extracts a set of {@link AbstrUpdateUpdatableLoc}s from a set union which
+     * is the right-hand side of an {@link AbstractUpdate} {@link Term}. Returns
+     * null if there is an unexpected operator in the term (might happen for
+     * intermediate stages in heap simplification, etc.).
+     *
+     * @param t
+     *            The right-hand side to transform.
+     * @param runtimeInstance
+     *            An optional runtime instance {@link LocationVariable} to
+     *            normalize self terms (because otherwise, there might be
+     *            different such terms around).
+     * @param services
+     *            The {@link Services} object.
+     * @return The {@link Set} of {@link AbstrUpdateUpdatableLoc}s represented
+     *         by t.
+     */
+    public static Set<AbstrUpdateUpdatableLoc> getUpdatableRHSsUnsafe(Term t,
+            Optional<LocationVariable> runtimeInstance, Services services) {
+        final Set<AbstractUpdateLoc> locs = //
+                abstrUpdateLocsFromTermUnsafe(t, runtimeInstance, services);
+        if (locs == null) {
+            return null;
+        }
+
+        return locs.stream().filter(AbstrUpdateUpdatableLoc.class::isInstance)
+                .map(AbstrUpdateUpdatableLoc.class::cast)
+                .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
+    }
+
+    /**
+     * Extracts a set of {@link AbstrUpdateUpdatableLoc}s from a set union which
      * is the right-hand side of an {@link AbstractUpdate} {@link Term}.
      *
      * @param t
@@ -513,10 +592,10 @@ public class AbstractUpdateFactory {
      * @return The {@link Set} of {@link AbstrUpdateUpdatableLoc}s represented
      *         by t.
      */
-    public static Set<AbstrUpdateUpdatableLoc> getUpdatableRHSs(Term t,
+    public static Set<AbstrUpdateUpdatableLoc> getUpdatableRHSsSafe(Term t,
             Optional<LocationVariable> runtimeInstance, Services services) {
-        return abstrUpdateLocsFromTerm(t, runtimeInstance, services).stream()
-                .filter(AbstrUpdateUpdatableLoc.class::isInstance)
+        return abstrUpdateLocsFromTermSafe(t, runtimeInstance, services)
+                .stream().filter(AbstrUpdateUpdatableLoc.class::isInstance)
                 .map(AbstrUpdateUpdatableLoc.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }

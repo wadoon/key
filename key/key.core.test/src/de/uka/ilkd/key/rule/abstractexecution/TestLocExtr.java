@@ -67,17 +67,17 @@ public class TestLocExtr extends AbstractTestTermParser {
 
         final AbstractUpdateLoc[] storeTermLocs = //
                 AbstractUpdateFactory
-                        .abstrUpdateLocsFromTerm(parsedStoreHeapExpr,
+                        .abstrUpdateLocsFromTermSafe(parsedStoreHeapExpr,
                                 runtimeInstance, services)
                         .toArray(new AbstractUpdateLoc[0]);
         final AbstractUpdateLoc[] selectTermLocs = //
                 AbstractUpdateFactory
-                        .abstrUpdateLocsFromTerm(parsedSelectHeapExpr,
+                        .abstrUpdateLocsFromTermSafe(parsedSelectHeapExpr,
                                 runtimeInstance, services)
                         .toArray(new AbstractUpdateLoc[0]);
         final AbstractUpdateLoc[] locSetTermLocs = //
                 AbstractUpdateFactory
-                        .abstrUpdateLocsFromTerm(parsedLocSetExpr,
+                        .abstrUpdateLocsFromTermSafe(parsedLocSetExpr,
                                 runtimeInstance, services)
                         .toArray(new AbstractUpdateLoc[0]);
 

@@ -17,6 +17,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Choice;
 import de.uka.ilkd.key.logic.Name;
@@ -79,6 +80,25 @@ public class RewriteTaclet extends FindTaclet {
      * wellformed(h2) ==>" has NO succedent polarity.
      */
     public static final int SUCCEDENT_POLARITY = 8;
+
+    /**
+     * If this flag is set, the taclet may not be applied if the focus term is
+     * in the scope of an abstract update. This, for instance, is relevant for
+     * pull out rules, because there, updates cannot always be completely removed
+     * and re-substituting pulled out terms is not allowed in an update scope.
+     * This can lead to situations where proofs cannot be closed although they
+     * theoretically should be.
+     */
+    public static final int NOT_IN_ABSTRACT_UPDATE_SCOPE = 16;
+
+    /**
+     * If this flag is set, the taclet must be applied only if the focus term is
+     * in the scope of an abstract update. This, for instance, is relevant for
+     * heap simplification rules, because we forbid pulling out heap expressions
+     * in abstract update scope and therefore have to allow their in-place
+     * simplifications, which in general, however, would blow up the proof.
+     */
+    public static final int IN_ABSTRACT_UPDATE_SCOPE = 32;
 
     /**
      * encodes restrictions on the state where a rewrite taclet is applicable If
@@ -205,10 +225,21 @@ public class RewriteTaclet extends FindTaclet {
 
         PIOPathIterator it = p_pos.iterator();
         Operator op;
+        boolean inAbstractUpdateScope = false;
         while (it.next() != -1) {
             final Term t = it.getSubTerm();
             op = t.op();
+
+            inAbstractUpdateScope |= op instanceof UpdateApplication
+                    && AbstractExecutionUtils.containsAbstractUpdate(
+                            UpdateApplication.getUpdate(t));
+
             if (op instanceof Transformer) {
+                return null;
+            }
+            else if (((getApplicationRestriction()
+                    & NOT_IN_ABSTRACT_UPDATE_SCOPE) != 0
+                    && inAbstractUpdateScope)) {
                 return null;
             } else if (op instanceof UpdateApplication
                     && it.getChild() == UpdateApplication.targetPos()
@@ -229,6 +260,12 @@ public class RewriteTaclet extends FindTaclet {
             if (polarity != 0) {
                 polarity = polarity(op, it, polarity);
             }
+        }
+
+        if (((getApplicationRestriction()
+                    & IN_ABSTRACT_UPDATE_SCOPE) != 0
+                    && !inAbstractUpdateScope)) {
+            return null;
         }
 
         if (getApplicationRestriction() == NONE)
@@ -278,6 +315,14 @@ public class RewriteTaclet extends FindTaclet {
     @Override
     protected StringBuffer toStringFind(StringBuffer sb) {
         StringBuffer res = super.toStringFind(sb);
+        if ((getApplicationRestriction()
+                & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
+            res.append("\\sameUpdateLevel");
+        }
+        if ((getApplicationRestriction()
+                & RewriteTaclet.NOT_IN_ABSTRACT_UPDATE_SCOPE) != 0) {
+            res.append("\\notInAbstractUpdateScope");
+        }
         if ((getApplicationRestriction()
                 & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
             res.append("\\sameUpdateLevel");

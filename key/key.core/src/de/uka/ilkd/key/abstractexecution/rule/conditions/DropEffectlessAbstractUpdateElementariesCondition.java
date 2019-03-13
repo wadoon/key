@@ -116,7 +116,8 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
                         origAbstractUpdates.get(i);
                 final Term newUpdate = Optional
                         .ofNullable(dropEffectlessAbstractUpdateElementaries(
-                                elementaryAbstrUpd, target, runtimeInstance, services))
+                                elementaryAbstrUpd, target, runtimeInstance,
+                                services))
                         .orElse(elementaryAbstrUpd);
 
                 newElementaryAbstractUpdates.set(i, newUpdate);
@@ -129,7 +130,8 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             if (newElementaryAbstractUpdates.equals(origAbstractUpdates)) {
                 return null;
             }
-        } else {
+        }
+        else {
             newResult = dropEffectlessAbstractUpdateElementaries( //
                     u, target, runtimeInstance, services);
         }
@@ -147,7 +149,8 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
 
         if (concatenation.op() instanceof AbstractUpdate) {
             result.add(concatenation);
-        } else {
+        }
+        else {
             for (Term sub : concatenation.subs()) {
                 result.addAll(extractAbstractUpdatesFromConcatenation(sub));
             }
@@ -157,7 +160,8 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
     }
 
     private static Term dropEffectlessAbstractUpdateElementaries(Term update,
-            Term target, Optional<LocationVariable> runtimeInstance, Services services) {
+            Term target, Optional<LocationVariable> runtimeInstance,
+            Services services) {
         final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
 
         final Set<AbstrUpdateUpdatableLoc> assignables = new LinkedHashSet<>();
@@ -216,11 +220,22 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
                 .map(loc -> abstrUpd.hasToAssign(loc) ? new HasToLoc(loc) : loc)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
+        final Set<AbstractUpdateLoc> accessibleLocs = //
+                AbstractUpdateFactory.abstrUpdateLocsFromTermUnsafe(
+                        accessiblesTerm, runtimeInstance, services);
+        if (accessibleLocs == null) {
+            /*
+             * There are funny operators in the accessibles term, which might
+             * happen from time to time (like in heap simplification). We won't
+             * apply this simplification and wait until the problem got
+             * simplified.
+             */
+            return null;
+        }
+
         final Set<AbstrUpdateRHS> newAccessibles = //
-                AbstractUpdateFactory
-                        .abstrUpdateLocsFromTerm(accessiblesTerm,
-                                runtimeInstance, services)
-                        .stream().map(AbstrUpdateRHS.class::cast)
+                accessibleLocs.stream()
+                        .map(AbstrUpdateRHS.class::cast)
                         // .filter(loc -> visitor.getResult().contains(loc))
                         .collect(Collectors
                                 .toCollection(() -> new LinkedHashSet<>()));

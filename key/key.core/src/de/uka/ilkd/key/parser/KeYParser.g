@@ -1295,6 +1295,12 @@ options {
             if ((applicationRestriction & RewriteTaclet.SAME_UPDATE_LEVEL) != 0) {
                 mod = "\"\\sameUpdateLevel\"";
             }
+            if ((applicationRestriction & RewriteTaclet.NOT_IN_ABSTRACT_UPDATE_SCOPE) != 0) {
+                mod = "\"\\notInAbstractUpdateScope\"";
+            }
+            if ((applicationRestriction & RewriteTaclet.IN_ABSTRACT_UPDATE_SCOPE) != 0) {
+                mod = "\"\\inAbstractUpdateScope\"";
+            }
             if ((applicationRestriction & RewriteTaclet.ANTECEDENT_POLARITY) != 0) {
                 if (mod != "") mod += " and ";
                 mod += "\"\\antecedentPolarity\""; 
@@ -3750,6 +3756,8 @@ taclet[ImmutableSet<Choice> choices, boolean axiomMode] returns [Taclet r]
         ( FIND LPAREN find = termorseq RPAREN 
             (   SAMEUPDATELEVEL { applicationRestriction |= RewriteTaclet.SAME_UPDATE_LEVEL; }
               | INSEQUENTSTATE { applicationRestriction |= RewriteTaclet.IN_SEQUENT_STATE; }
+              | INABSTRACTUPDATESCOPE { applicationRestriction |= RewriteTaclet.IN_ABSTRACT_UPDATE_SCOPE; }
+              | NOTINABSTRACTUPDATESCOPE { applicationRestriction |= RewriteTaclet.NOT_IN_ABSTRACT_UPDATE_SCOPE; }
               | ANTECEDENTPOLARITY { applicationRestriction |= RewriteTaclet.ANTECEDENT_POLARITY; }
               | SUCCEDENTPOLARITY { applicationRestriction |= RewriteTaclet.SUCCEDENT_POLARITY; }
             )*

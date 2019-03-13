@@ -234,7 +234,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
 
             final Set<AbstrUpdateUpdatableLoc> locs = isHeapVar
                     ? AbstractUpdateFactory
-                            .abstrUpdateLocsFromTerm(rhs, Optional.empty(),
+                            .abstrUpdateLocsFromTermSafe(rhs, Optional.empty(),
                                     services)
                             .stream().filter(FieldLoc.class::isInstance)
                             .map(FieldLoc.class::cast)
@@ -344,7 +344,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
         }
 
         final FieldLoc reprLoc = (FieldLoc) AbstractUpdateFactory
-                .abstrUpdateLocsFromTerm(t, Optional.empty(), services)
+                .abstrUpdateLocsFromTermSafe(t, Optional.empty(), services)
                 .iterator().next();
 
         final Term subResult = //
@@ -370,7 +370,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
         }
 
         final FieldLoc reprLoc = (FieldLoc) AbstractUpdateFactory
-                .abstrUpdateLocsFromTerm(t, Optional.empty(), services)
+                .abstrUpdateLocsFromTermSafe(t, Optional.empty(), services)
                 .iterator().next();
 
         final Term subResult = //

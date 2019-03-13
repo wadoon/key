@@ -53,10 +53,10 @@ public final class AbstrUpdatesIndependentCondition
             MatchConditions mc, Services services) {
         final SVInstantiations svInst = mc.getInstantiations();
 
-//        final Optional<LocationVariable> runtimeInstance = Optional
-//                .ofNullable(svInst.getExecutionContext().getRuntimeInstance())
-//                .filter(LocationVariable.class::isInstance)
-//                .map(LocationVariable.class::cast);
+        // final Optional<LocationVariable> runtimeInstance = Optional
+        // .ofNullable(svInst.getExecutionContext().getRuntimeInstance())
+        // .filter(LocationVariable.class::isInstance)
+        // .map(LocationVariable.class::cast);
         final Optional<LocationVariable> runtimeInstance = Optional.empty();
 
         final Term u1Inst = (Term) svInst.getInstantiation(u1);
@@ -80,10 +80,16 @@ public final class AbstrUpdatesIndependentCondition
         final AbstractUpdate abstrUpd1 = (AbstractUpdate) u1Inst.op();
         final AbstractUpdate abstrUpd2 = (AbstractUpdate) u2Inst.op();
 
-        final Set<AbstrUpdateUpdatableLoc> abstrUpd1Accessibles = AbstractUpdateFactory
-                .getUpdatableRHSs(u1Inst.sub(0), runtimeInstance, services);
-        final Set<AbstrUpdateUpdatableLoc> abstrUpd2Accessibles = AbstractUpdateFactory
-                .getUpdatableRHSs(u2Inst.sub(0), runtimeInstance, services);
+        final Set<AbstrUpdateUpdatableLoc> abstrUpd1Accessibles = //
+                AbstractUpdateFactory.getUpdatableRHSsUnsafe(u1Inst.sub(0),
+                        runtimeInstance, services);
+        final Set<AbstrUpdateUpdatableLoc> abstrUpd2Accessibles = //
+                AbstractUpdateFactory.getUpdatableRHSsUnsafe(u2Inst.sub(0),
+                        runtimeInstance, services);
+
+        if (abstrUpd1Accessibles == null || abstrUpd2Accessibles == null) {
+            return null;
+        }
 
         /* U1(x, ... := ...) / U2(... := x, ...) */
         if (abstrUpd1.mayAssignAny(abstrUpd2Accessibles)

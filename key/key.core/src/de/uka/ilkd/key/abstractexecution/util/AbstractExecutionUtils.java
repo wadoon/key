@@ -26,6 +26,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
@@ -72,7 +73,8 @@ public class AbstractExecutionUtils {
         final Set<AbstrUpdateUpdatableLoc> usedBeforeAssigned = new LinkedHashSet<>();
 
         final Set<AbstractUpdateLoc> locs = AbstractUpdateFactory
-                .abstrUpdateLocsFromTerm(target, runtimeInstance, services);
+                .abstrUpdateLocsFromTermUnsafe(target, runtimeInstance,
+                        services);
 
         if (locs != null) {
             locs.stream().filter(AbstrUpdateUpdatableLoc.class::isInstance)
@@ -96,11 +98,10 @@ public class AbstractExecutionUtils {
                                     .lhs());
                     final Term rhs = elem.sub(0);
 
-                    final Set<AbstractUpdateLoc> rhsLocs = AbstractUpdateFactory
-                            .extractAbstrUpdateLocsFromTerm(rhs,
-                                    runtimeInstance, services);
-
-                    rhsLocs.stream()
+                    AbstractUpdateFactory
+                            .abstrUpdateLocsFromTermSafe(rhs, runtimeInstance,
+                                    services)
+                            .stream()
                             .filter(AbstrUpdateUpdatableLoc.class::isInstance)
                             .map(AbstrUpdateUpdatableLoc.class::cast)
                             .filter(loc -> !assignedBeforeUsed.contains(loc))
@@ -231,7 +232,7 @@ public class AbstractExecutionUtils {
         assert update.op() instanceof AbstractUpdate;
 
         usedBeforeAssigned.addAll(AbstractUpdateFactory
-                .abstrUpdateLocsFromTerm(update.sub(0), runtimeInstance,
+                .extractAbstrUpdateLocsFromTerm(update.sub(0), runtimeInstance,
                         services)
                 .stream().filter(AbstrUpdateUpdatableLoc.class::isInstance)
                 .filter(op -> !assignedBeforeUsed.contains(op))
@@ -311,5 +312,16 @@ public class AbstractExecutionUtils {
         return getAccessiblesForAbstractUpdate(update,
                 services.getTermBuilder()).stream()
                         .anyMatch(t -> t.op() == allLocs);
+    }
+
+    /**
+     * @param updateTerm
+     *            The term to check.
+     * @return true iff the given {@link Term} contains an abstract update.
+     */
+    public static boolean containsAbstractUpdate(Term updateTerm) {
+        final OpCollector opColl = new OpCollector();
+        updateTerm.execPostOrder(opColl);
+        return opColl.ops().stream().anyMatch(AbstractUpdate.class::isInstance);
     }
 }
