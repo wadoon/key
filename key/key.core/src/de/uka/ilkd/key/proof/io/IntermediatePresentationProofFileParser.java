@@ -28,12 +28,10 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.InstantiateLoopHoleRuleAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.TacletAppIntermediate;
-import de.uka.ilkd.key.rule.lazyse.InstantiateAbstractExecutionHoleRule;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.util.Pair;
 
@@ -243,22 +241,6 @@ public class IntermediatePresentationProofFileParser
             }
             break;
 
-        case LAZYSE_PATHC_PH:
-            ((BuiltinRuleInformation) ruleInfo).currLazySEPathCPH = str;
-            break;
-
-        case LAZYSE_SYST_PH:
-            ((BuiltinRuleInformation) ruleInfo).currLazySESymbStPH = str;
-            break;
-
-        case LAZYSE_PATHC_INST:
-            ((BuiltinRuleInformation) ruleInfo).currLazySEPathCInst = str;
-            break;
-
-        case LAZYSE_SYST_INST:
-            ((BuiltinRuleInformation) ruleInfo).currLazySESymbStInst = str;
-            break;
-
         case MERGE_PROCEDURE: // merge procedure
             ((BuiltinRuleInformation) ruleInfo).currMergeProc = str;
             break;
@@ -401,14 +383,7 @@ public class IntermediatePresentationProofFileParser
         BuiltInAppIntermediate result = null;
 
         if (builtinInfo.currRuleName
-                .equals(InstantiateAbstractExecutionHoleRule.INSTANCE.displayName())) {
-            result = new InstantiateLoopHoleRuleAppIntermediate(
-                new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
-                    builtinInfo.currPosInTerm),
-                ImmutableSLList.nil(), builtinInfo.currLazySEPathCPH,
-                builtinInfo.currLazySEPathCInst, builtinInfo.currLazySESymbStPH,
-                builtinInfo.currLazySESymbStInst);
-        } else if (builtinInfo.currRuleName.equals("MergeRule")) {
+                .equals("MergeRule")) {
             result = new MergeAppIntermediate(builtinInfo.currRuleName,
                 new Pair<Integer, PosInTerm>(builtinInfo.currFormula,
                     builtinInfo.currPosInTerm),
@@ -468,7 +443,7 @@ public class IntermediatePresentationProofFileParser
         protected ImmutableList<Name> currNewNames = null;
 
         public RuleInformation(String ruleName) {
-            this.currRuleName = ruleName;
+            this.currRuleName = ruleName.trim();
         }
 
         public boolean isBuiltinInfo() {
@@ -506,22 +481,12 @@ public class IntermediatePresentationProofFileParser
         protected PosInTerm currIfInstPosInTerm;
         /* > Method Contract */
         protected String currContract = null;
-        /* > Lazy / Abstract SE Instantiations */
-        /** TODO */
-        protected String currLazySEPathCPH = null;
-        /** TODO */
-        protected String currLazySESymbStPH = null;
-        /** TODO */
-        protected String currLazySEPathCInst = null;
-        /** TODO */
-        protected String currLazySESymbStInst = null;
         /* > Merge Rule */
         protected String currMergeProc = null;
         protected int currNrPartners = 0;
         protected int currCorrespondingMergeNodeId = 0;
         protected int currMergeNodeId = 0;
         protected String currDistFormula = null;
-        /** TODO */
         protected Class<? extends AbstractPredicateAbstractionLattice>
             currPredAbstraLatticeType = null;
         protected String currAbstractionPredicates = null;

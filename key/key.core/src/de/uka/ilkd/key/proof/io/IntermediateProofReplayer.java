@@ -70,7 +70,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.io.intermediate.AppNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BranchNodeIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.BuiltInAppIntermediate;
-import de.uka.ilkd.key.proof.io.intermediate.InstantiateLoopHoleRuleAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.MergeAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.MergePartnerAppIntermediate;
 import de.uka.ilkd.key.proof.io.intermediate.NodeIntermediate;
@@ -86,10 +85,6 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
 import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.rule.lazyse.AbstractExecutionHole;
-import de.uka.ilkd.key.rule.lazyse.AbstractExecutionHoleInstantiation;
-import de.uka.ilkd.key.rule.lazyse.InstantiateAbstractExecutionHoleRule;
-import de.uka.ilkd.key.rule.lazyse.InstantiateAbstractExecutionHoleRuleApp;
 import de.uka.ilkd.key.rule.merge.MergePartner;
 import de.uka.ilkd.key.rule.merge.MergeProcedure;
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp;
@@ -145,9 +140,6 @@ public class IntermediateProofReplayer {
 
     /** Maps join node IDs to previously seen join partners */
     private HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>> joinPartnerNodes = new HashMap<Integer, HashSet<Triple<Node, PosInOccurrence, NodeIntermediate>>>();
-
-    /** TODO */
-    private AbstractExecutionHole[] loopHoles = null;
 
     /** The current open goal */
     private Goal currGoal = null;
@@ -228,10 +220,8 @@ public class IntermediateProofReplayer {
 
                             addChildren(children, intermChildren);
 
-                            /*
-                             * Children are no longer needed, set them to null
-                             * to free memory.
-                             */
+                            // Children are no longer needed, set them to null
+                             // to free memory.
                             currInterm.setChildren(null);
                         } catch (Exception e) {
                             reportError(ERROR_LOADING_PROOF_LINE + "Line "
@@ -260,25 +250,24 @@ public class IntermediateProofReplayer {
 
                             if (partnerNodesInfo == null || partnerNodesInfo
                                     .size() < joinAppInterm.getNrPartners()) {
-                                /*
-                                 * In case of an exception happening during the
-                                 * replay process, it can happen that the queue
-                                 * is empty when reaching this point. Then, we
-                                 * may not add the join node to the end of the
-                                 * queue since this will result in
-                                 * non-termination.
-                                 */
+                                // In case of an exception happening during the
+                                 // replay process, it can happen that the queue
+                                 // is
+                                // empty when reaching this point. Then, we may
+                                // not
+                                // add the join node to the end of the queue
+                                // since
+                                // this will result in non-termination.
 
                                 if (queue.isEmpty()) {
                                     continue;
                                 }
 
-                                /*
-                                 * Wait until all partners are found: Add node
-                                 * at the end of the queue. NOTE: DO NOT CHANGE
-                                 * THIS to adding the node to the front! This
-                                 * will result in non-termination!
-                                 */
+                                // Wait until all partners are found: Add node
+                                 // at the end of the queue. NOTE: DO NOT CHANGE
+                                 // THIS to adding the node to the front! This
+                                 // will
+                                // result in non-termination!
                                 queue.addLast(new Pair<Node, NodeIntermediate>(
                                     currNode, currNodeInterm));
                             } else {
@@ -514,8 +503,13 @@ public class IntermediateProofReplayer {
                 new IfFormulaInstSeq(seq, Integer.parseInt(ifFormulaStr)));
         }
         for (String ifFormulaStr : currInterm.getIfDirectFormulaList()) {
+            // MU 2019: #1487. We have to use the right namespaces to not
+            // ignore branch-local functions
+            NamespaceSet nss = currGoal.getLocalNamespaces();
+            Term term = parseTerm(ifFormulaStr, proof, nss.variables(),
+                    nss.programVariables(), nss.functions());
             ifFormulaList = ifFormulaList.append(new IfFormulaInstDirect(
-                new SequentFormula(parseTerm(ifFormulaStr, proof))));
+                new SequentFormula(term)));
         }
 
         // TODO: In certain cases, the below method call returns null and
@@ -598,46 +592,6 @@ public class IntermediateProofReplayer {
                             + NOT_APPLICABLE,
                         e);
                 }
-            }
-        }
-
-        if (InstantiateAbstractExecutionHoleRule.INSTANCE.displayName().equals(ruleName)) {
-            final InstantiateLoopHoleRuleAppIntermediate ilhrai = //
-                    (InstantiateLoopHoleRuleAppIntermediate) currInterm;
-
-            Term pcInst = null;
-            Term symbStInst = null;
-            try {
-                DefaultTermParser parser = new DefaultTermParser();
-                pcInst = parser.parse(new StringReader(ilhrai.getPathCInst()),
-                    Sort.FORMULA, proof.getServices(),
-                    proof.getServices().getNamespaces(), proof.abbreviations());
-
-                parser = new DefaultTermParser();
-                symbStInst = parser.parse(
-                    new StringReader(ilhrai.getSymbStInst()), Sort.UPDATE,
-                    proof.getServices(), proof.getServices().getNamespaces(),
-                    proof.abbreviations());
-
-                int lhIdx = findLoopHole(ilhrai.getPathCPH(),
-                    ilhrai.getSymbStPH());
-                if (lhIdx == -1) {
-                    refreshLoopHoles();
-                    lhIdx = findLoopHole(ilhrai.getPathCPH(),
-                        ilhrai.getSymbStPH());
-                }
-
-                assert lhIdx > -1;
-
-                final AbstractExecutionHole currLH = loopHoles[lhIdx];
-                return new InstantiateAbstractExecutionHoleRuleApp(
-                    new AbstractExecutionHoleInstantiation(currLH, pcInst, symbStInst));
-            } catch (ParserException e) {
-                reportError(
-                    ERROR_LOADING_PROOF_LINE + "Line " + currInterm.getLineNr()
-                            + ", goal " + currGoal.node().serialNr() + ", rule "
-                            + ruleName + NOT_APPLICABLE,
-                    e);
             }
         }
 
@@ -729,25 +683,6 @@ public class IntermediateProofReplayer {
         ourApp = ruleApps.iterator().next();
         builtinIfInsts = null;
         return ourApp;
-    }
-
-    private void refreshLoopHoles() {
-        loopHoles = InstantiateAbstractExecutionHoleRule.retrieveLoopHoles(proof);
-    }
-
-    private int findLoopHole(String pathCPH, String symbStPH) {
-        if (loopHoles == null) {
-            refreshLoopHoles();
-        }
-        for (int i = 0; i < loopHoles.length; i++) {
-            final AbstractExecutionHole currLH = loopHoles[i];
-            if (currLH.getPathCondPlaceholder().equals(pathCPH)
-                    && currLH.getSymbStorePlaceholder().equals(symbStPH)) {
-                return i;
-            }
-        }
-
-        return -1;
     }
 
     /**
