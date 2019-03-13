@@ -237,6 +237,7 @@ lexer grammar KeYLexer;
 	HASSORT : '\\hasSort';
 	FIELDTYPE : '\\fieldType';
 	ISREPFIELD : '\\isRepField';
+  ISPEERFIELD : '\\isPeerField';
 	FINAL : '\\final';
 	ELEMSORT : '\\elemSort';
 	HASLABEL : '\\hasLabel';

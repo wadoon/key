@@ -3850,6 +3850,7 @@ varexp[TacletBuilder b]
         | varcond_freeLabelIn[b,negated]         
         | varcond_localvariable[b, negated]        
         | varcond_isrepfield[b, negated]
+        | varcond_ispeerfield[b, negated]
         | varcond_thisreference[b, negated]        
         | varcond_reference[b, negated]        
         | varcond_referencearray[b, negated]
@@ -4094,6 +4095,17 @@ varcond_isrepfield [TacletBuilder b, boolean negated]
 //        } else {
             b.addVariableCondition(new IsRepFieldCondition((SchemaVariable)x, negated));
 //        }
+    }
+;
+
+varcond_ispeerfield [TacletBuilder b, boolean negated]
+:
+    ISPEERFIELD
+    LPAREN
+    x=varId
+    RPAREN
+    {
+      b.addVariableCondition(new IsPeerFieldCondition((SchemaVariable)x, negated));
     }
 ;
 
