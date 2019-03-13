@@ -95,7 +95,7 @@ public class FieldLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
 
     @Override
     public String toString() {
-        return String.format("(%s, %s)", objTerm,
+        return String.format("%s.%s", objTerm,
                 ((ProgramElementName) fieldPV.name()).getProgramName());
     }
 
