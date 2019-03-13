@@ -21,7 +21,6 @@ import org.junit.Test;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.FieldLoc;
-import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
@@ -44,8 +43,6 @@ public class TestLocExtr extends AbstractTestTermParser {
 
     @Test
     public void testFieldExtraction() throws Exception {
-        final Services services = getServices();
-
         final String storeHeapExpr = "store(" + //
                 "store(heap, self, testTermParserHeap.A::$f, Z(7(1(#))))," + //
                 "self," + //
