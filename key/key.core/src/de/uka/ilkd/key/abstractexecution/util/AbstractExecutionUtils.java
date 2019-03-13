@@ -87,8 +87,8 @@ public class AbstractExecutionUtils {
 
             // Update in sequential normal form
             if (MergeRuleUtils.isUpdateNormalForm(update)) {
-                final List<Term> elems = MergeRuleUtils
-                        .getElementaryUpdates(update, services.getTermBuilder());
+                final List<Term> elems = MergeRuleUtils.getElementaryUpdates(
+                        update, services.getTermBuilder());
 
                 for (final Term elem : elems) {
                     final AbstrUpdateUpdatableLoc lhs = new PVLoc(
@@ -96,10 +96,11 @@ public class AbstractExecutionUtils {
                                     .lhs());
                     final Term rhs = elem.sub(0);
 
-                    AbstractUpdateFactory
-                            .abstrUpdateLocsFromTerm(rhs, runtimeInstance,
-                                    services)
-                            .stream()
+                    final Set<AbstractUpdateLoc> rhsLocs = AbstractUpdateFactory
+                            .extractAbstrUpdateLocsFromTerm(rhs,
+                                    runtimeInstance, services);
+
+                    rhsLocs.stream()
                             .filter(AbstrUpdateUpdatableLoc.class::isInstance)
                             .map(AbstrUpdateUpdatableLoc.class::cast)
                             .filter(loc -> !assignedBeforeUsed.contains(loc))
@@ -258,12 +259,14 @@ public class AbstractExecutionUtils {
 
         if (concatenation.op() instanceof AbstractUpdate) {
             result.add(concatenation);
-        } else if (concatenation.op() == UpdateJunctor.CONCATENATED_UPDATE) {
+        }
+        else if (concatenation.op() == UpdateJunctor.CONCATENATED_UPDATE) {
             result.addAll(
                     abstractUpdatesFromConcatenation(concatenation.sub(0)));
             result.addAll(
                     abstractUpdatesFromConcatenation(concatenation.sub(1)));
-        } else {
+        }
+        else {
             throw new RuntimeException(
                     "Not an abstract update or concatenation: "
                             + concatenation);
