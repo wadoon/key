@@ -79,9 +79,8 @@ public final class OwnershipUtils {
         return f.getProgramName().startsWith("peer_");
     }
 
-    private static ImmutableList<Field> collectAllExplicitReferenceMembers(ProgramVariable selfVar,
+    private static ImmutableList<Field> collectAllExplicitReferenceMembers(KeYJavaType kjt,
             Services services) {
-        KeYJavaType kjt = selfVar.getKeYJavaType();
         ImmutableList<Field> fields = ImmutableSLList.<Field>nil();
 
         ImmutableList<KeYJavaType> superTypes = services.getJavaInfo().getAllSupertypes(kjt);
@@ -104,6 +103,11 @@ public final class OwnershipUtils {
         return filtered;
     }
 
+    private static ImmutableList<Field> collectAllExplicitReferenceMembers(ProgramVariable selfVar,
+            Services services) {
+        return collectAllExplicitReferenceMembers(selfVar.getKeYJavaType(), services);
+    }
+
     private static Taclet createDisjointnessTaclet(Services services, ProgramVariable selfVar) {
         // more generic than first version: can be used for objects which are not stored in fields
         // TODO: maybe use varcond differentFields here?
@@ -113,7 +117,7 @@ public final class OwnershipUtils {
          *     \assumes(owner(r1) = o)
          *     \assumes(owner(r2) = o)
          *     \find(r1.repfp@h)
-         *     \add (r1 != null & r2 != null & r1 != r2
+         *     \add (r1 != null & r2 != null & r1 != r2 & wellFormed(h)
          *     -> \disjoint(r1.repfp@h, r2.repfp@h) ==>)
          * };
          */
@@ -142,6 +146,7 @@ public final class OwnershipUtils {
         Term pre = tb.not(tb.equals(tb.var(r1SV), tb.NULL()));              // r1 != null
         pre = tb.and(pre, tb.not(tb.equals(tb.var(r2SV), tb.NULL())));      // r2 != null
         pre = tb.and(pre, tb.not(tb.equals(tb.var(r1SV), tb.var(r2SV))));   // r1 != r2
+        pre = tb.and(pre, tb.wellFormed(tb.var(heapSV)));
 
         Term fp1 = tb.func(repFP, tb.var(heapSV), tb.var(r1SV));            // r1.repfp
         Term fp2 = tb.func(repFP, tb.var(heapSV), tb.var(r2SV));            // r2.repfp
@@ -408,7 +413,8 @@ public final class OwnershipUtils {
          *   \schemaVar \term Object o;
          *   \schemaVar \term Heap heapSV;
          *   \find(Object::select(heapSV, o, f))
-         *   \add(Object::select(heapSV, o, f) != null -> owner(Object::select(heapSV, o, f)) == o)
+         *   \add(Object::select(heapSV, o, f) != null & wellFormed(h)
+         *              -> owner(Object::select(heapSV, o, f)) == o)
          * };
          */
 
@@ -447,10 +453,13 @@ public final class OwnershipUtils {
         }
         Term eq = tb.equals(own, right);
 
-        // "o.f" =! null
+        // "o.f" != null
         Term notNull = tb.not(tb.equals(oF, tb.NULL()));
 
-        SequentFormula seqFormula = new SequentFormula(tb.imp(notNull, eq));
+        // "o.f" != null & wellFormed(h)
+        Term pre = tb.and(notNull, tb.wellFormed(tb.var(svH)));
+
+        SequentFormula seqFormula = new SequentFormula(tb.imp(pre, eq));
         Semisequent semi = new Semisequent(seqFormula);
         Sequent seq = Sequent.createAnteSequent(semi);
 
