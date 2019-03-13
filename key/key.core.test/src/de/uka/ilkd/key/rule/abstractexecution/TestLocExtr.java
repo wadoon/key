@@ -21,7 +21,6 @@ import org.junit.Test;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.FieldLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -81,24 +80,20 @@ public class TestLocExtr extends AbstractTestTermParser {
                                 runtimeInstance, services)
                         .toArray(new AbstractUpdateLoc[0]);
 
-        assertEquals(3, storeTermLocs.length);
+        assertEquals(2, storeTermLocs.length);
         assertEquals(FieldLoc.class, storeTermLocs[0].getClass());
-        assertEquals("(self, f1)", storeTermLocs[0].toString());
+        assertEquals("self.f1", storeTermLocs[0].toString());
         assertEquals(FieldLoc.class, storeTermLocs[1].getClass());
-        assertEquals("(self, f)", storeTermLocs[1].toString());
-        assertEquals(PVLoc.class, storeTermLocs[2].getClass());
-        assertEquals("heap", storeTermLocs[2].toString());
+        assertEquals("self.f", storeTermLocs[1].toString());
 
-        assertEquals(2, selectTermLocs.length);
+        assertEquals(1, selectTermLocs.length);
         assertEquals(FieldLoc.class, selectTermLocs[0].getClass());
-        assertEquals("(self, f)", selectTermLocs[0].toString());
+        assertEquals("self.f", selectTermLocs[0].toString());
         assertEquals(selectTermLocs[0], storeTermLocs[1]);
-        assertEquals(PVLoc.class, selectTermLocs[1].getClass());
-        assertEquals("heap", selectTermLocs[1].toString());
 
         assertEquals(1, locSetTermLocs.length);
         assertEquals(FieldLoc.class, locSetTermLocs[0].getClass());
-        assertEquals("(self, f)", locSetTermLocs[0].toString());
+        assertEquals("self.f", locSetTermLocs[0].toString());
         assertEquals(selectTermLocs[0], locSetTermLocs[0]);
     }
 }
