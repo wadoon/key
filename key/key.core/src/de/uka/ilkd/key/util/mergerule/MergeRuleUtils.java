@@ -245,21 +245,19 @@ public class MergeRuleUtils {
         } else if (u.op() == UpdateJunctor.SKIP) {
             return result;
         } else if (u.op() == UpdateApplication.UPDATE_APPLICATION) {
-            /*
-             * Get update for target term, has to be a single elementary update.
-             */
             final Term update = UpdateApplication.getUpdate(u);
             final List<Term> targetUpdates = getElementaryUpdates(
                     UpdateApplication.getTarget(u), cleanConflicts, tb);
-            assert targetUpdates.size() == 1;
-            final Term target = targetUpdates.get(0);
-            assert target.op() instanceof ElementaryUpdate;
+            for (final Term target : targetUpdates) {
+                assert target.op() instanceof ElementaryUpdate;
 
-            final LocationVariable lhs = //
-                    (LocationVariable) ((ElementaryUpdate) target.op()).lhs();
-            final Term rhs = tb.apply(update, target.sub(0));
+                final LocationVariable lhs = //
+                        (LocationVariable) ((ElementaryUpdate) target.op())
+                                .lhs();
+                final Term rhs = tb.apply(update, target.sub(0));
 
-            result.add(tb.elementary(tb.var(lhs), rhs));
+                result.add(tb.elementary(tb.var(lhs), rhs));
+            }
         } else {
             throw new IllegalArgumentException(
                     "Expected an update in normal form!");
