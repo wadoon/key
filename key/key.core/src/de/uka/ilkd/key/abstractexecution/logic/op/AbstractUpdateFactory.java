@@ -259,9 +259,6 @@ public class AbstractUpdateFactory {
         } else if (op instanceof Function && op.arity() == 0
                 && ((Function) op).sort() == locSetLDT.targetSort()) {
             result.add(new SkolemLoc((Function) op));
-        } else if (t.isRigid() && t.sort() != locSetLDT.targetSort()
-                && t.sort() != heapLDT.getFieldSort()) {
-            result.add(new RigidRHS(t));
         } else if (op == locSetLDT.getSingletonPV()) {
             final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTerm(
                     t.sub(0), runtimeInstance, services);
@@ -307,6 +304,9 @@ public class AbstractUpdateFactory {
             }
 
             result.addAll(subResult);
+        } else if (t.isRigid() && t.sort() != locSetLDT.targetSort()
+                && t.sort() != heapLDT.getFieldSort()) {
+            result.add(new RigidRHS(t));
         } else {
             return null;
         }
