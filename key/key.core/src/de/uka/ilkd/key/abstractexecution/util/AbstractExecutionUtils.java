@@ -35,6 +35,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
+import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.util.Pair;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
@@ -93,22 +94,27 @@ public class AbstractExecutionUtils {
                         update, services.getTermBuilder());
 
                 for (final Term elem : elems) {
-                    final AbstrUpdateUpdatableLoc lhs = new PVLoc(
-                            (LocationVariable) ((ElementaryUpdate) elem.op())
-                                    .lhs());
+                    assert elem.op() instanceof ElementaryUpdate;
+                    assert ((ElementaryUpdate) elem.op())
+                            .lhs() instanceof LocationVariable;
+
+                    final UpdateableOperator lhs = //
+                            ((ElementaryUpdate) elem.op()).lhs();
+                    final AbstrUpdateUpdatableLoc lhsLoc = //
+                            new PVLoc((LocationVariable) lhs);
                     final Term rhs = elem.sub(0);
 
                     AbstractUpdateFactory
-                            .abstrUpdateLocsFromTermSafe(rhs, runtimeInstance,
-                                    services)
+                            .extractAbstrUpdateLocsFromTerm(rhs,
+                                    runtimeInstance, services)
                             .stream()
                             .filter(AbstrUpdateUpdatableLoc.class::isInstance)
                             .map(AbstrUpdateUpdatableLoc.class::cast)
                             .filter(loc -> !assignedBeforeUsed.contains(loc))
                             .forEach(usedBeforeAssigned::add);
 
-                    if (!usedBeforeAssigned.contains(lhs)) {
-                        assignedBeforeUsed.add(lhs);
+                    if (!usedBeforeAssigned.contains(lhsLoc)) {
+                        assignedBeforeUsed.add(lhsLoc);
                     }
                 }
             }
