@@ -266,8 +266,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             mergeRuleF = mergeRuleFeature(inftyConst());
         }
 
-        final Feature instLoopHolesF =  instLoopHoleFeature(inftyConst());
-
         final Feature ifElseTacletF = StaticFeatureCollection.ifElseFeature(longConst(10000));
 
         // final Feature smtF = smtFeature(inftyConst());
@@ -277,7 +275,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 NonDuplicateAppFeature.INSTANCE,
                 // splitF,
                 // strengthenConstraints,
-                AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF, instLoopHolesF, ifElseTacletF,
+                AgeFeature.INSTANCE, oneStepSimplificationF, mergeRuleF, ifElseTacletF,
                 // smtF,
                 methodSpecF, queryF, depSpecF, loopInvF, blockFeature, loopBlockFeature,
                 loopBlockApplyHeadFeature,

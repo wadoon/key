@@ -8,13 +8,52 @@ import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.rulefilter.RuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.proof.rulefilter.TacletFilter;
-import de.uka.ilkd.key.rule.*;
-import de.uka.ilkd.key.rule.lazyse.InstantiateAbstractExecutionHoleRule;
+import de.uka.ilkd.key.rule.BlockContractExternalRule;
+import de.uka.ilkd.key.rule.BlockContractInternalRule;
+import de.uka.ilkd.key.rule.LoopContractApplyHeadRule;
+import de.uka.ilkd.key.rule.LoopContractExternalRule;
+import de.uka.ilkd.key.rule.LoopContractInternalRule;
+import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
+import de.uka.ilkd.key.rule.QueryExpand;
+import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.rule.UseOperationContractRule;
+import de.uka.ilkd.key.rule.WhileInvariantRule;
 import de.uka.ilkd.key.rule.merge.MergeRule;
-import de.uka.ilkd.key.strategy.feature.*;
+import de.uka.ilkd.key.strategy.feature.ApplyTFFeature;
+import de.uka.ilkd.key.strategy.feature.AtomsSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.CompareCostsFeature;
+import de.uka.ilkd.key.strategy.feature.ComprehendedSumFeature;
+import de.uka.ilkd.key.strategy.feature.ConditionalFeature;
+import de.uka.ilkd.key.strategy.feature.ConstFeature;
+import de.uka.ilkd.key.strategy.feature.Feature;
+import de.uka.ilkd.key.strategy.feature.ImplicitCastNecessary;
+import de.uka.ilkd.key.strategy.feature.InstantiatedSVFeature;
+import de.uka.ilkd.key.strategy.feature.LetFeature;
+import de.uka.ilkd.key.strategy.feature.MergeRuleFeature;
+import de.uka.ilkd.key.strategy.feature.MonomialsSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.SeqContainsExecutableCodeFeature;
+import de.uka.ilkd.key.strategy.feature.ShannonFeature;
+import de.uka.ilkd.key.strategy.feature.SortComparisonFeature;
+import de.uka.ilkd.key.strategy.feature.SumFeature;
+import de.uka.ilkd.key.strategy.feature.TermSmallerThanFeature;
+import de.uka.ilkd.key.strategy.feature.TriggerVarInstantiatedFeature;
 import de.uka.ilkd.key.strategy.quantifierHeuristics.LiteralsSmallerThanFeature;
-import de.uka.ilkd.key.strategy.termProjection.*;
-import de.uka.ilkd.key.strategy.termfeature.*;
+import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
+import de.uka.ilkd.key.strategy.termProjection.SVInstantiationProjection;
+import de.uka.ilkd.key.strategy.termProjection.SubtermProjection;
+import de.uka.ilkd.key.strategy.termProjection.TermBuffer;
+import de.uka.ilkd.key.strategy.termProjection.TermConstructionProjection;
+import de.uka.ilkd.key.strategy.termProjection.TriggerVariableInstantiationProjection;
+import de.uka.ilkd.key.strategy.termfeature.BinarySumTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.ConstTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.EqTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.OperatorTF;
+import de.uka.ilkd.key.strategy.termfeature.PrintTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.RecSubTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.ShannonTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.SortExtendsTransTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.SubTermFeature;
+import de.uka.ilkd.key.strategy.termfeature.TermFeature;
 import de.uka.ilkd.key.strategy.termgenerator.SequentFormulasGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.SubtermGenerator;
 import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
@@ -135,12 +174,6 @@ public abstract class StaticFeatureCollection {
         filter.addRuleToSet(MergeRule.INSTANCE);
         return ConditionalFeature.createConditional(filter,
                 SumFeature.createSum(cost, MergeRuleFeature.INSTANCE));
-    }
-
-    protected static Feature instLoopHoleFeature(Feature cost) {
-        SetRuleFilter filter = new SetRuleFilter();
-        filter.addRuleToSet(InstantiateAbstractExecutionHoleRule.INSTANCE);
-        return ConditionalFeature.createConditional(filter, cost);
     }
 
     protected static Feature sequentContainsNoPrograms() {
