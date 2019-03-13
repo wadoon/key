@@ -339,7 +339,9 @@ public class AbstractUpdateFactory {
 
         final Operator op = t.op();
 
-        if (op == locSetLDT.getSingleton()) {
+        if (op instanceof LocationVariable) {
+            /* This is the heap LV, in which we are not interested here. */
+        } else if (op == locSetLDT.getSingleton()) {
             final Term obj = //
                     normalizeSelfVar(t.sub(0), runtimeInstance, services);
             final Term field = t.sub(1);
@@ -354,7 +356,7 @@ public class AbstractUpdateFactory {
             final Term array = t.sub(2).sub(0);
             result.add(new ArrayLoc(obj, array));
 
-            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTerm(
+            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromHeapTerm(
                     heapTerm, runtimeInstance, services);
             if (subResult == null) {
                 return null;
@@ -371,7 +373,7 @@ public class AbstractUpdateFactory {
                     obj, fieldPVFromFieldFunc(field, services),
                     (LocationVariable) tb.getBaseHeap().op()));
 
-            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTerm(
+            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromHeapTerm(
                     heapTerm, runtimeInstance, services);
             if (subResult != null) {
                 result.addAll(subResult);
@@ -385,7 +387,7 @@ public class AbstractUpdateFactory {
                     fieldPVFromFieldFunc(field, services),
                     (LocationVariable) tb.getBaseHeap().op()));
 
-            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTerm(
+            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromHeapTerm(
                     heapTerm, runtimeInstance, services);
             if (subResult == null) {
                 return null;
@@ -426,7 +428,7 @@ public class AbstractUpdateFactory {
      */
     private static Term normalizeSelfVar(Term objTerm,
             Optional<LocationVariable> runtimeInstance, Services services) {
-//        objTerm = MiscTools.simplifyUpdateApplication(objTerm, services);
+        // objTerm = MiscTools.simplifyUpdateApplication(objTerm, services);
 
         if (!runtimeInstance.isPresent()
                 || !(objTerm.op() instanceof LocationVariable)

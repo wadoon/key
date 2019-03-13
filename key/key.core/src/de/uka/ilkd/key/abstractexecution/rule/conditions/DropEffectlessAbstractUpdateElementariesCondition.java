@@ -72,10 +72,6 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             MatchConditions mc, Services services) {
         final SVInstantiations svInst = mc.getInstantiations();
 
-//        final Optional<LocationVariable> runtimeInstance = Optional
-//                .ofNullable(svInst.getExecutionContext().getRuntimeInstance())
-//                .filter(LocationVariable.class::isInstance)
-//                .map(LocationVariable.class::cast);
         final Optional<LocationVariable> runtimeInstance = Optional.empty();
 
         final Term u = (Term) svInst.getInstantiation(uSV);
@@ -213,11 +209,6 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
         final Set<AbstractUpdateLoc> locsInTarget = AbstractUpdateFactory
                 .extractAbstrUpdateLocsFromTerm(target, runtimeInstance,
                         services);
-
-        // XXX Normalize "self" variables, they're different...!!!
-        //FieldLoc field1Loc1 = (FieldLoc) assignables.iterator().next();
-        //FieldLoc field1Loc2 = (FieldLoc) locsInTarget.iterator().next();
-        //field1Loc1.equals(field1Loc2);
 
         final Set<AbstrUpdateLHS> newAssignables = assignables.stream()
                 .filter(op -> !opsHaveToAssignBeforeUsed.contains(op))
