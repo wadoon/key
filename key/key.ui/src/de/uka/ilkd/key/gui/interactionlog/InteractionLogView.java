@@ -1,5 +1,63 @@
 package de.uka.ilkd.key.gui.interactionlog;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import java.awt.MouseInfo;
+import java.awt.PointerInfo;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Optional;
+
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListModel;
+import javax.swing.Icon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
+import javax.swing.ListCellRenderer;
+import javax.swing.ListModel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.border.Border;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
@@ -11,26 +69,13 @@ import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.interactionlog.algo.MUProofScriptExport;
 import de.uka.ilkd.key.gui.interactionlog.algo.MarkdownExport;
 import de.uka.ilkd.key.gui.interactionlog.algo.Reapplication;
-import de.uka.ilkd.key.gui.interactionlog.model.*;
+import de.uka.ilkd.key.gui.interactionlog.model.Interaction;
+import de.uka.ilkd.key.gui.interactionlog.model.InteractionLog;
+import de.uka.ilkd.key.gui.interactionlog.model.InteractionRecorderListener;
+import de.uka.ilkd.key.gui.interactionlog.model.NodeInteraction;
+import de.uka.ilkd.key.gui.interactionlog.model.UserNoteInteraction;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
-
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
-import java.awt.datatransfer.*;
-import java.awt.dnd.DropTarget;
-import java.awt.dnd.DropTargetAdapter;
-import java.awt.dnd.DropTargetDropEvent;
-import java.awt.event.*;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Optional;
 
 public class InteractionLogView extends JPanel implements InteractionRecorderListener {
     private static final float SMALL_ICON_SIZE = 16f;
@@ -493,12 +538,13 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
     private class ExportKPSAction extends AbstractFileSaveAction {
         public ExportKPSAction() {
-            setName("Export as KPS …");
+            setName("Export as KPS ...");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into the KPS format.");
             putValue(Action.SMALL_ICON, IconFontSwing.buildIcon(FontAwesomeBold.CODE, SMALL_ICON_SIZE));
             setMenuPath(MENU_ILOG_EXPORT);
         }
 
+        @Override
         void save(File selectedFile) {
             try (FileWriter fw = new FileWriter(selectedFile)) {
                 MarkdownExport.writeTo(getSelectedItem(), new PrintWriter(fw));
@@ -510,12 +556,13 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
     private class ExportMarkdownAction extends AbstractFileSaveAction {
         public ExportMarkdownAction() {
-            setName("Export as markdown …");
+            setName("Export as markdown ...");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into a markdown file.");
             putValue(Action.SMALL_ICON, IconFontSwing.buildIcon(FontAwesomeBold.MARKDOWN, SMALL_ICON_SIZE));
             setMenuPath(MENU_ILOG_EXPORT);
         }
 
+        @Override
         void save(File selectedFile) {
             try (FileWriter fw = new FileWriter(selectedFile)) {
                 MarkdownExport.writeTo(getSelectedItem(), new PrintWriter(fw));
@@ -527,7 +574,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
     private class ShowExtendedActionsAction extends KeyAction {
         public ShowExtendedActionsAction() {
-            setName("More …");
+            setName("More ...");
             putValue(Action.SHORT_DESCRIPTION, "Shows further options");
             putValue(Action.SMALL_ICON, IconFontSwing.buildIcon(FontAwesomeBold.WRENCH, SMALL_ICON_SIZE));
         }
