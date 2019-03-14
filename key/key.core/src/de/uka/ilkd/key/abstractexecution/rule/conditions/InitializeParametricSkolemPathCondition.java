@@ -43,7 +43,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * obtained from the block contracts of the {@link AbstractPlaceholderStatement}
  * it is generated for.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class InitializeParametricSkolemPathCondition
         implements VariableCondition {

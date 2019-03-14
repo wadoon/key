@@ -24,7 +24,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  * Stores all the labels in the current program prefix pi in the given list SV.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class PrefixContainsElementCondition implements VariableCondition {
     private final String className;

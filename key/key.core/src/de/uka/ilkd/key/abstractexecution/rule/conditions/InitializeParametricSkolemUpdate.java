@@ -38,7 +38,7 @@ import de.uka.ilkd.key.util.Pair;
  * obtained from the block contracts of the {@link AbstractPlaceholderStatement}
  * it is generated for.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class InitializeParametricSkolemUpdate implements VariableCondition {
     private final SchemaVariable updateSV;

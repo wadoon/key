@@ -32,7 +32,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
  * return flag of an {@link AbstractPlaceholderStatement} with a potentially
  * existing return_behavior precondition.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class ReturnSpec extends AbstractTermTransformer {
 

@@ -24,7 +24,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * Checks whether the instantiation for a given schema variable is set (its
  * instantiation is not null) or not.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class IsDefinedCondition implements VariableCondition {
     private final SchemaVariable svToCheck;

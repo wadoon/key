@@ -33,7 +33,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
  * existing breaks_behavior precondition. More precisely, it creates the formula
  * "breaks <-> PRECONDITION".
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class BreaksSpec extends AbstractTermTransformer {
 

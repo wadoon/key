@@ -33,7 +33,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
  * existing exceptional_behavior precondition. More precisely, it creates the
  * formula "!(exc = null) <-> PRECONDITION".
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class ExcSpec extends AbstractTermTransformer {
 

@@ -22,7 +22,7 @@ import recoder.java.statement.JavaStatement;
  * exception, and access all accessible variables / fields. Abstract statements
  * are the core of Abstract Execution and Lazy Symbolic Execution.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class AbstractPlaceholderStatement extends JavaStatement {
     private static final long serialVersionUID = 1L;

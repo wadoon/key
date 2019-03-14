@@ -28,7 +28,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  * Checks whether a given term contains a predicate labeled with "<<AEPred>>".
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class HasAEPredicateCondition implements VariableCondition {
     private final SchemaVariable phiSV;

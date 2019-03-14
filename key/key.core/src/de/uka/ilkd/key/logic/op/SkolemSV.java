@@ -20,7 +20,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  * A "Skolem" Schema Variable, i.e. one that should always be instantiated
  * freshly.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public abstract class SkolemSV extends AbstractSV {
     /**

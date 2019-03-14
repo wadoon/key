@@ -15,7 +15,7 @@ package de.uka.ilkd.key.rule.metaconstruct;
 
 /**
  * @see MutualExclusionFormula
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class MutualExclusionFormula2 extends MutualExclusionFormula {
 

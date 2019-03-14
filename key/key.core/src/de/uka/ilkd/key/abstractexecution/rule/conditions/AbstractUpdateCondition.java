@@ -27,7 +27,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * Variable condition which applies to updates that are abstract updates, i.e.,
  * their operator is a Function.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class AbstractUpdateCondition implements VariableCondition {
     private final UpdateSV u;

@@ -31,7 +31,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 /**
  * Instantiates a {@link ProgramSV} with a fresh variable of the given type.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class NewProgramVariableCondition implements VariableCondition {
     private final ProgramSV newSV;

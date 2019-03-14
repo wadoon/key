@@ -37,7 +37,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * beforehand; therefore, we create several such transformers for different
  * argument sizes.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public abstract class MutualExclusionFormula extends AbstractTermTransformer {
 

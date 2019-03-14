@@ -30,7 +30,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * Sets the second component of a binary predicate, which may be preceded by a
  * negation operator, to the given term.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class SetLastComponentOfAEPredsToFalseTransformer
         extends AbstractTermTransformer {

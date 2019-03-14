@@ -33,7 +33,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * schema variables or a numeric constant. The base name for the new variables
  * can be set via a parameter.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class InstantiateVarsFreshCondition implements VariableCondition {
     private final ProgramSV varsList;

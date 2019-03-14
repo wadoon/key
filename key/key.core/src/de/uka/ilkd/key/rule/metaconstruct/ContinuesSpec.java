@@ -33,7 +33,7 @@ import de.uka.ilkd.key.speclang.jml.pretranslation.Behavior;
  * existing continues behavior precondition. More precisely, it creates the
  * formula "continues <-> PRECONDITION".
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class ContinuesSpec extends AbstractTermTransformer {
 

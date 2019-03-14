@@ -31,7 +31,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * prefix elements (the exact type of which can not be known). Also, taclet find
  * expressions can get smaller that way.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class StoreResultVarInCondition implements VariableCondition {
     private final ProgramSV resultVarSV;

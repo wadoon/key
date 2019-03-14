@@ -28,7 +28,7 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
  * Instantiates a {@link SchemaVariable} for an
  * {@link AbstractPlaceholderStatement} with a new abstract program.
  *
- * @author Dominic Steinhöfel
+ * @author Dominic Steinhoefel
  */
 public class FreshAbstractProgramCondition implements VariableCondition {
     private final ProgramSV abstractProgSV;
