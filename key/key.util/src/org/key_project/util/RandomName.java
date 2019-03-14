@@ -247,7 +247,7 @@ public class RandomName {
             "rhinoceros", "rook", "salamander", "salmon", "sandpiper", "sardine", "sea-lion", "sea-urchin", "seahorse",
             "seal", "shark", "sheep", "ram", "shrew", "skunk", "sloth", "snail", "snake", "spider", "squirrel",
             "starling", "stegosaurus", "swan", "tapir", "tarsier", "termite", "tiger", "toad", "turkey", "turtle",
-            "vicuna", "wallaby", "walrus", "wasp", "water", "buffalo", "weasel", "whale", "wolf", "wolverine", "wombat",
+            "vicuña", "wallaby", "walrus", "wasp", "water", "buffalo", "weasel", "whale", "wolf", "wolverine", "wombat",
             "wren", "yak", "zebra"
     };
 
