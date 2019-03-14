@@ -7,7 +7,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -267,10 +266,12 @@ public class AbstractPlaceholderSpecsTypeChecker {
             ProgramElement pe) {
         if (pe instanceof VariableDeclaration) {
             return getTargetsFromVarDecl((VariableDeclaration) pe);
-        } else if (pe instanceof AbstractPlaceholderStatement) {
+        }
+        else if (pe instanceof AbstractPlaceholderStatement) {
             return getDeclsFromAbstrPlaceholderStmt(
                     (AbstractPlaceholderStatement) pe);
-        } else {
+        }
+        else {
             // impossible since not called then...
             throw new RuntimeException();
         }
@@ -279,7 +280,8 @@ public class AbstractPlaceholderSpecsTypeChecker {
     private List<Pair<? extends Operator, Boolean>> getDeclsFromAbstrPlaceholderStmt(
             AbstractPlaceholderStatement aps) {
         final List<BlockContract> contracts = //
-                AbstractExecutionContractUtils.getNoBehaviorContracts(aps, services);
+                AbstractExecutionContractUtils.getNoBehaviorContracts(aps,
+                        services);
 
         /* At this point, there should at most be one contract... */
 
@@ -349,19 +351,26 @@ public class AbstractPlaceholderSpecsTypeChecker {
         final Operator op = elemTerm.op();
         if (op instanceof ProgramVariable) {
             return op;
-        } else if (op instanceof Function && op.arity() == 0) {
+        }
+        else if (op instanceof Function && op.arity() == 0) {
             return elemTerm.op();
-        } else if (op == locSetLDT.getSingletonPV()) {
+        }
+        else if (op == locSetLDT.getSingletonPV()) {
             return locSetElemTermsToOp(elemTerm.sub(0), services);
-        } else if (op == locSetLDT.getSingleton()) {
+        }
+        else if (op == locSetLDT.getSingleton()) {
             return locSetElemTermsToOp(elemTerm.sub(1), services);
-        } else if (op == setLDT.getSingleton()) {
+        }
+        else if (op == setLDT.getSingleton()) {
             return locSetElemTermsToOp(elemTerm.sub(0), services);
-        } else if (op == locSetLDT.getHasTo()) {
+        }
+        else if (op == locSetLDT.getHasTo()) {
             return locSetElemTermsToOp(elemTerm.sub(0), services);
-        } else if (heapLDT.isSelectOp(op)) {
+        }
+        else if (heapLDT.isSelectOp(op)) {
             return locSetElemTermsToOp(elemTerm.sub(2), services);
-        } else {
+        }
+        else {
             assert false : "Unexpected element of (loc) set union.";
             return null;
         }
@@ -468,10 +477,6 @@ public class AbstractPlaceholderSpecsTypeChecker {
     private static class DeclaredLocSetsVisitor extends DefaultVisitor {
         private final LocSetLDT locSetLDT;
         private final List<Pair<? extends Operator, Boolean>> result = new ArrayList<>();
-        private static final Consumer<? super Pair<? extends Operator, Boolean>> EMPTY_CONSUMER = //
-                op -> {
-                    return;
-                };
 
         public DeclaredLocSetsVisitor(LocSetLDT locSetLDT) {
             this.locSetLDT = locSetLDT;
@@ -484,17 +489,21 @@ public class AbstractPlaceholderSpecsTypeChecker {
                 assert visited.subs().size() == 1
                         && visited.sub(0).subs().size() == 0;
                 result.add(new Pair<>(visited.sub(0).op(), true));
-            } else if (visited.subs().size() == 0
+            }
+            else if (visited.subs().size() == 0
                     && visited.op() != locSetLDT.getEmpty()) {
                 /*
                  * a LocSet constant -- add as non-final if not seen before
                  * (because then, it's most likely already added as a final
                  * LocSet, or it's redundant).
                  */
-                result.stream().filter(pair -> pair.first == visited.op())
-                        .findAny().ifPresentOrElse(EMPTY_CONSUMER, //
-                                () -> result
-                                        .add(new Pair<>(visited.op(), false)));
+                final Optional<Pair<? extends Operator, Boolean>> maybeConst = //
+                        result.stream()
+                                .filter(pair -> pair.first == visited.op())
+                                .findAny();
+                if (!maybeConst.isPresent()) {
+                    result.add(new Pair<>(visited.op(), false));
+                }
             }
         }
 

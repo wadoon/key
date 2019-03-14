@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.java.visitor;
 
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -108,12 +107,8 @@ public class ProgVarAndLocSetsCollector extends JavaASTVisitor {
 
         // modifies
         for (LocationVariable heap : allHeaps) {
-            Optional.ofNullable(x.getModifies(heap, selfTerm, atPres, services))
-                    .map(this::getSkolemLocSetConstantsFromLocSetUnionTerm)
-                    /* Default is allLocs */
-                    .or(() -> Optional.of(Collections.singleton(services
-                            .getTypeConverter().getLocSetLDT().getAllLocs())))
-                    .ifPresent(result::addAll);
+            addSkolemLocsFromTermToResultDefaultAllLocs(
+                    x.getModifies(heap, selfTerm, atPres, services));
         }
     }
 
@@ -125,21 +120,13 @@ public class ProgVarAndLocSetsCollector extends JavaASTVisitor {
                 services.getTypeConverter().getHeapLDT().getAllHeaps();
 
         for (LocationVariable heap : allHeaps) {
-            Optional.ofNullable(x.getModifiesClause(heap, services))
-                    .map(this::getSkolemLocSetConstantsFromLocSetUnionTerm)
-                    /* Default is allLocs */
-                    .or(() -> Optional.of(Collections.singleton(services
-                            .getTypeConverter().getLocSetLDT().getAllLocs())))
-                    .ifPresent(result::addAll);
+            addSkolemLocsFromTermToResultDefaultAllLocs(
+                    x.getModifiesClause(heap, services));
         }
 
         for (LocationVariable heap : allHeaps) {
-            Optional.ofNullable(x.getAccessibleClause(heap, services))
-                    .map(this::getSkolemLocSetConstantsFromLocSetUnionTerm)
-                    /* Default is allLocs */
-                    .or(() -> Optional.of(Collections.singleton(services
-                            .getTypeConverter().getLocSetLDT().getAllLocs())))
-                    .ifPresent(result::addAll);
+            addSkolemLocsFromTermToResultDefaultAllLocs(
+                    x.getAccessibleClause(heap, services));
         }
     }
 
@@ -151,21 +138,31 @@ public class ProgVarAndLocSetsCollector extends JavaASTVisitor {
                 services.getTypeConverter().getHeapLDT().getAllHeaps();
 
         for (LocationVariable heap : allHeaps) {
-            Optional.ofNullable(x.getModifiesClause(heap, services))
-                    .map(this::getSkolemLocSetConstantsFromLocSetUnionTerm)
-                    /* Default is allLocs */
-                    .or(() -> Optional.of(Collections.singleton(services
-                            .getTypeConverter().getLocSetLDT().getAllLocs())))
-                    .ifPresent(result::addAll);
+            addSkolemLocsFromTermToResultDefaultAllLocs(
+                    x.getModifiesClause(heap, services));
         }
 
         for (LocationVariable heap : allHeaps) {
-            Optional.ofNullable(x.getAccessibleClause(heap, services))
-                    .map(this::getSkolemLocSetConstantsFromLocSetUnionTerm)
-                    /* Default is allLocs */
-                    .or(() -> Optional.of(Collections.singleton(services
-                            .getTypeConverter().getLocSetLDT().getAllLocs())))
-                    .ifPresent(result::addAll);
+            addSkolemLocsFromTermToResultDefaultAllLocs(
+                    x.getAccessibleClause(heap, services));
+        }
+    }
+
+    /**
+     * Adds all Skolem loc set constants from the given term to result if any,
+     * otherwise, adds the allLocs location.
+     *
+     * @param extractFrom
+     *            The {@link Term} from which to extract.
+     */
+    private void addSkolemLocsFromTermToResultDefaultAllLocs(
+            final Term extractFrom) {
+        final Optional<Set<Operator>> maybeLocSetConsts = //
+                Optional.ofNullable(extractFrom)
+                        .map(this::getSkolemLocSetConstantsFromLocSetUnionTerm);
+        maybeLocSetConsts.ifPresent(result::addAll);
+        if (!maybeLocSetConsts.isPresent()) {
+            result.add(services.getTypeConverter().getLocSetLDT().getAllLocs());
         }
     }
 

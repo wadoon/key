@@ -150,7 +150,8 @@ public final class ApplyConcrOnAbstrUpdateCondition
                 success = success
                         || !pushThroughRes.remainingConcreteUpdate.isPresent();
                 resultingUpdates.add(pushThroughRes.resultingAbstractUpdate);
-            } else {
+            }
+            else {
                 resultingUpdates.add(currentConcrUpdate);
                 resultingUpdates.add(currentAbstractUpdate);
                 currentConcrUpdate = null;
@@ -160,9 +161,11 @@ public final class ApplyConcrOnAbstrUpdateCondition
                     && pushThroughRes.pushedThroughConcreteUpdate.isPresent()) {
                 currentConcrUpdate = //
                         pushThroughRes.pushedThroughConcreteUpdate
-                                .orElseThrow();
+                                .orElseThrow(() -> new RuntimeException(
+                                        "Access to empty Optional, check for isPresent before!"));
                 success = true;
-            } else {
+            }
+            else {
                 /* Nothing remains to be pushed through, wrap up. */
                 resultingUpdates.addAll(abstrUpdatesToProcess);
                 currentConcrUpdate = null;
@@ -207,10 +210,11 @@ public final class ApplyConcrOnAbstrUpdateCondition
 
         boolean success = false;
 
-        for (LocationVariable lhs : MergeRuleUtils
-                .getUpdateLeftSideLocations(concrUpdate, services.getTermBuilder())) {
+        for (LocationVariable lhs : MergeRuleUtils.getUpdateLeftSideLocations(
+                concrUpdate, services.getTermBuilder())) {
             final Term rhs = //
-                    MergeRuleUtils.getUpdateRightSideFor(concrUpdate, lhs, services.getTermBuilder());
+                    MergeRuleUtils.getUpdateRightSideFor(concrUpdate, lhs,
+                            services.getTermBuilder());
             final boolean isHeapVar = //
                     lhs.sort() == heapLDT.targetSort();
 
@@ -279,7 +283,8 @@ public final class ApplyConcrOnAbstrUpdateCondition
                     if (!isHeapVar) {
                         currentFollowingConcrUpdElems
                                 .add(tb.elementary(lhs, rhs));
-                    } else {
+                    }
+                    else {
                         pushThroughFields.add((FieldLoc) lhsLoc);
                     }
                 }
@@ -289,7 +294,8 @@ public final class ApplyConcrOnAbstrUpdateCondition
                         currentRemainingConcrUpdElems
                                 .add(tb.elementary(lhs, rhs));
                     }
-                } else {
+                }
+                else {
                     success = true;
                     if (isHeapVar) {
                         dropFields.add((FieldLoc) lhsLoc);
@@ -351,7 +357,8 @@ public final class ApplyConcrOnAbstrUpdateCondition
                 filterFieldLocsFromStoreExpr(t.sub(0), fieldsToKeep, services);
         if (!fieldsToKeep.contains(reprLoc)) {
             return subResult;
-        } else {
+        }
+        else {
             return tb.store(subResult, t.sub(1), t.sub(2), t.sub(3));
         }
     }
@@ -377,7 +384,8 @@ public final class ApplyConcrOnAbstrUpdateCondition
                 removeFieldLocsFromStoreExpr(t.sub(0), fieldsToDrop, services);
         if (fieldsToDrop.contains(reprLoc)) {
             return subResult;
-        } else {
+        }
+        else {
             return tb.store(subResult, t.sub(1), t.sub(2), t.sub(3));
         }
     }

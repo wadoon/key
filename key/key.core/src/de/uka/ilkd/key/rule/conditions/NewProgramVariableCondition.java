@@ -83,7 +83,9 @@ public class NewProgramVariableCondition implements VariableCondition {
 
         final KeYJavaType type = this.type.orElseGet(() -> maybePeerSV
                 .map(svInst::getInstantiation).map(ProgramVariable.class::cast)
-                .map(ProgramVariable::getKeYJavaType).orElseThrow());
+                .map(ProgramVariable::getKeYJavaType)
+                .orElseThrow(() -> new RuntimeException(
+                        "You have to supply either a type or a peer SV")));
 
         final String newName = services.getTermBuilder().newName(namePattern);
         final LocationVariable result =

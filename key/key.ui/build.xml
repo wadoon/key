@@ -10,6 +10,7 @@
         <pathelement path="${basedir}/../key.core.testgen/bin"/>
         <pathelement location="${basedir}/../key.core/lib/antlr.jar"/>
         <pathelement location="${basedir}/../key.core/lib/recoderKey.jar"/>
+        <pathelement location="${basedir}/libs/jaxb-api-2.4.0-b180830.0359.jar"/>
         <pathelement location="${basedir}/libs/commonmark-0.12.1.jar"/>
         <pathelement location="${basedir}/libs/commonmark-ext-gfm-tables-0.12.1.jar"/>
     </path>
