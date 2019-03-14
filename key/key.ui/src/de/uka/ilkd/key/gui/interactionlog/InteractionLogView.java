@@ -493,7 +493,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
     private class ExportKPSAction extends AbstractFileSaveAction {
         public ExportKPSAction() {
-            setName("Export as KPS …");
+            setName("Export as KPS \u2026");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into the KPS format.");
             putValue(Action.SMALL_ICON, IconFontSwing.buildIcon(FontAwesomeBold.CODE, SMALL_ICON_SIZE));
             setMenuPath(MENU_ILOG_EXPORT);
@@ -510,7 +510,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
     private class ExportMarkdownAction extends AbstractFileSaveAction {
         public ExportMarkdownAction() {
-            setName("Export as markdown …");
+            setName("Export as markdown \u2026");
             putValue(Action.SHORT_DESCRIPTION, "Export the current log into a markdown file.");
             putValue(Action.SMALL_ICON, IconFontSwing.buildIcon(FontAwesomeBold.MARKDOWN, SMALL_ICON_SIZE));
             setMenuPath(MENU_ILOG_EXPORT);
@@ -527,7 +527,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
     private class ShowExtendedActionsAction extends KeyAction {
         public ShowExtendedActionsAction() {
-            setName("More …");
+            setName("More \u2026");
             putValue(Action.SHORT_DESCRIPTION, "Shows further options");
             putValue(Action.SMALL_ICON, IconFontSwing.buildIcon(FontAwesomeBold.WRENCH, SMALL_ICON_SIZE));
         }
