@@ -41,6 +41,14 @@ public interface FunctionalOperationContract extends OperationContract {
 
     public boolean isReadOnlyContract(Services services);
 
+    Map<Term, Term> getReplaceMap(Map<LocationVariable, Term> heapTerms,
+                                  Term selfTerm,
+                                  ImmutableList<Term> paramTerms,
+                                  Term resultTerm,
+                                  Term excTerm,
+                                  Map<LocationVariable, Term> atPres,
+                                  Services services);
+
     public Term getEnsures(LocationVariable heap);
 
     /**

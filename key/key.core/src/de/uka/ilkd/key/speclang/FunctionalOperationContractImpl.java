@@ -283,13 +283,14 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return getReplaceMap(heapTerms, selfTerm, paramTerms, resultTerm, excTerm, atPres, services);
     }
 
-    protected Map<Term, Term> getReplaceMap(Map<LocationVariable,Term> heapTerms,
-                                            Term selfTerm,
-                                            ImmutableList<Term> paramTerms,
-                                            Term resultTerm,
-                                            Term excTerm,
-                                            Map<LocationVariable, Term> atPres,
-                                            Services services) {
+    @Override
+    public Map<Term, Term> getReplaceMap(Map<LocationVariable, Term> heapTerms,
+                                         Term selfTerm,
+                                         ImmutableList<Term> paramTerms,
+                                         Term resultTerm,
+                                         Term excTerm,
+                                         Map<LocationVariable, Term> atPres,
+                                         Services services) {
         final Map<Term,Term> result = new LinkedHashMap<Term,Term>();
 
         //heaps

@@ -144,6 +144,7 @@ public class JavaProfile extends AbstractProfile {
                                    .prepend(UseDependencyContractRule.INSTANCE)
                                    .prepend(getOneStepSimpilifier())
                                    .prepend(QueryExpand.INSTANCE)
+                                    .prepend(QueryContract.INSTANCE)
                                    .prepend(MergeRule.INSTANCE)
                                    .prepend(LoopContractApplyHeadRule.INSTANCE);
 
