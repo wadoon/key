@@ -3,7 +3,7 @@
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 //
-// The KeY system is protected by the GNU General Public License.
+// The KeY system is protected by the GNU General Public License. 
 // See LICENSE.TXT for details.
 //
 //
@@ -41,39 +41,51 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
 
+
 public class InfFlowContractAppFeature implements Feature {
 
     public static final Feature INSTANCE = new InfFlowContractAppFeature();
 
+
     protected InfFlowContractAppFeature() {
     }
 
+
     /**
-     * Compare whether two <code>PosInOccurrence</code>s are equal. This can be
-     * done using <code>equals</code> or <code>eqEquals</code> (checking for
-     * same or equal formulas), which has to be decided by the subclasses
+     * Compare whether two
+     * <code>PosInOccurrence</code>s are equal. This can be done using
+     * <code>equals</code> or
+     * <code>eqEquals</code> (checking for same or equal formulas), which has to
+     * be decided by the subclasses
      */
-    protected boolean comparePio(TacletApp newApp, TacletApp oldApp,
-            PosInOccurrence newPio, PosInOccurrence oldPio) {
+    protected boolean comparePio(TacletApp newApp,
+                                 TacletApp oldApp,
+                                 PosInOccurrence newPio,
+                                 PosInOccurrence oldPio) {
         return oldPio.eqEquals(newPio);
     }
+
 
     /**
      * Check whether a semisequent contains a formula. Again, one can either
      * search for the same or an equal formula
      */
     protected boolean semiSequentContains(Semisequent semisequent,
-            SequentFormula cfma) {
+                                          SequentFormula cfma) {
         return semisequent.containsEqual(cfma);
     }
 
+
     /**
-     * Check whether the old rule application <code>ruleCmp</code> is a
-     * duplicate of the new application <code>newApp</code> at position
-     * <code>newPio</code>.<code>newPio</code> can be <code>null</code>
+     * Check whether the old rule application
+     * <code>ruleCmp</code> is a duplicate of the new application
+     * <code>newApp</code> at position
+     * <code>newPio</code>.<code>newPio</code> can be
+     * <code>null</code>
      */
-    protected boolean sameApplication(RuleApp ruleCmp, TacletApp newApp,
-            PosInOccurrence newPio) {
+    protected boolean sameApplication(RuleApp ruleCmp,
+                                      TacletApp newApp,
+                                      PosInOccurrence newPio) {
         // compare the rules
         if (newApp.rule() != ruleCmp.rule()) {
             return false;
@@ -86,68 +98,71 @@ public class InfFlowContractAppFeature implements Feature {
             if (!(cmp instanceof PosTacletApp)) {
                 return false;
             }
-            final PosInOccurrence oldPio = ((PosTacletApp) cmp)
-                    .posInOccurrence();
+            final PosInOccurrence oldPio =
+                    ((PosTacletApp) cmp).posInOccurrence();
             if (!comparePio(newApp, cmp, newPio, oldPio)) {
                 return false;
             }
         }
 
+
         // compare the if-sequent instantiations
-        if (newApp.ifFormulaInstantiations() == null
-                || cmp.ifFormulaInstantiations() == null) {
-            if (newApp.ifFormulaInstantiations() != null
-                    || cmp.ifFormulaInstantiations() != null) {
+        if (newApp.ifFormulaInstantiations() == null ||
+            cmp.ifFormulaInstantiations() == null) {
+            if (newApp.ifFormulaInstantiations() != null ||
+                cmp.ifFormulaInstantiations() != null) {
                 return false;
             }
         } else {
-            final Iterator<IfFormulaInstantiation> it0 = newApp
-                    .ifFormulaInstantiations().iterator();
-            final Iterator<IfFormulaInstantiation> it1 = cmp
-                    .ifFormulaInstantiations().iterator();
+            final Iterator<IfFormulaInstantiation> it0 =
+                    newApp.ifFormulaInstantiations().iterator();
+            final Iterator<IfFormulaInstantiation> it1 =
+                    cmp.ifFormulaInstantiations().iterator();
 
             while (it0.hasNext()) {
                 // this test should be improved
-                if (it0.next().getConstrainedFormula() != it1.next()
-                        .getConstrainedFormula()) {
+                if (it0.next().getConstrainedFormula() !=
+                    it1.next().getConstrainedFormula()) {
                     return false;
                 }
             }
         }
 
         return equalInterestingInsts(newApp.instantiations(),
-            cmp.instantiations());
+                                     cmp.instantiations());
     }
 
+
     private boolean equalInterestingInsts(SVInstantiations inst0,
-            SVInstantiations inst1) {
+                                          SVInstantiations inst1) {
         if (!inst0.getUpdateContext().equals(inst1.getUpdateContext())) {
             return false;
         }
 
-        final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting0 = inst0
-                .interesting();
-        final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting1 = inst1
-                .interesting();
-        return subset(interesting0, interesting1)
-                && subset(interesting1, interesting0);
+        final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting0 =
+                inst0.interesting();
+        final ImmutableMap<SchemaVariable, InstantiationEntry<?>> interesting1 =
+                inst1.interesting();
+        return subset(interesting0, interesting1) &&
+               subset(interesting1, interesting0);
     }
+
 
     private boolean subset(
             ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts0,
             ImmutableMap<SchemaVariable, InstantiationEntry<?>> insts1) {
 
         for (final ImmutableMapEntry<SchemaVariable, InstantiationEntry<?>> entry0 : insts0) {
-            if (entry0.key() instanceof SkolemTermSV
-                    || entry0.key() instanceof SkolemUpdateSV
-                    || entry0.key() instanceof VariableSV) {
+            if (entry0.key() instanceof SkolemTermSV ||
+                entry0.key() instanceof SkolemUpdateSV ||
+                entry0.key() instanceof VariableSV) {
                 continue;
             }
 
             final InstantiationEntry<?> instEntry1 = insts1.get(entry0.key());
 
-            if (instEntry1 == null || !entry0.value().getInstantiation()
-                    .equals(instEntry1.getInstantiation())) {
+            if (instEntry1 == null ||
+                !entry0.value().getInstantiation().equals(instEntry1.getInstantiation())) {
                 return false;
             }
         }
@@ -155,30 +170,33 @@ public class InfFlowContractAppFeature implements Feature {
         return true;
     }
 
+
     /**
-     * Search for a duplicate of the application <code>app</code> by walking
-     * upwards in the proof tree. Here, we assume that <code>pos</code> is
-     * non-null, and as an optimisation we stop as soon as we have reached a
-     * point where the formula containing the focus no longer occurs in the
-     * sequent
+     * Search for a duplicate of the application
+     * <code>app</code> by walking upwards in the proof tree. Here, we assume
+     * that
+     * <code>pos</code> is non-null, and as an optimisation we stop as soon as
+     * we have reached a point where the formula containing the focus no longer
+     * occurs in the sequent
      */
-    protected boolean duplicateFindTaclet(TacletApp app, PosInOccurrence pos,
-            Goal goal) {
+    protected boolean duplicateFindTaclet(TacletApp app,
+                                          PosInOccurrence pos,
+                                          Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
-        assert app.ifFormulaInstantiations()
-                .size() >= 1 : "Featureis only applicable to rules with at least one assumes.";
+        assert app.ifFormulaInstantiations().size() >= 1 :
+                "Featureis only applicable to rules with at least one assumes.";
 
         final SequentFormula focusFor = pos.sequentFormula();
         final boolean antec = pos.isInAntec();
-        final SequentFormula assumesFor = app.ifFormulaInstantiations()
-                .iterator().next().getConstrainedFormula();
+        final SequentFormula assumesFor =
+                app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
 
         // assumtion has to occour before the find-term in the sequent in order
         // to avoid duplicated applications
-        int focusPos = goal.node().sequent().formulaNumberInSequent(antec,
-            focusFor);
-        int assumesPos = goal.node().sequent().formulaNumberInSequent(antec,
-            assumesFor);
+        int focusPos =
+                goal.node().sequent().formulaNumberInSequent(antec, focusFor);
+        int assumesPos =
+                goal.node().sequent().formulaNumberInSequent(antec, assumesFor);
         if (focusPos <= assumesPos) {
             return true;
         }
@@ -215,12 +233,14 @@ public class InfFlowContractAppFeature implements Feature {
         return false;
     }
 
+
     @Override
-    public RuleAppCost computeCost(RuleApp ruleApp, PosInOccurrence pos,
-            Goal goal) {
+    public RuleAppCost computeCost(RuleApp ruleApp,
+                               PosInOccurrence pos,
+                               Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find.";
-        assert ruleApp instanceof TacletApp : "Feature is only applicable "
-                + "to Taclets.";
+        assert ruleApp instanceof TacletApp : "Feature is only applicable " +
+                                              "to Taclets.";
         TacletApp app = (TacletApp) ruleApp;
 
         if (!app.ifInstsComplete()) {
@@ -237,8 +257,8 @@ public class InfFlowContractAppFeature implements Feature {
         // only relate the n-th called method in execution A with the n-th
         // called method in execution B automatically
         final SequentFormula focusFor = pos.sequentFormula();
-        final SequentFormula assumesFor = app.ifFormulaInstantiations()
-                .iterator().next().getConstrainedFormula();
+        final SequentFormula assumesFor =
+                app.ifFormulaInstantiations().iterator().next().getConstrainedFormula();
 
         ArrayList<SequentFormula> relatesTerms = getRelatesTerms(goal);
         final int numOfContractAppls = relatesTerms.size() / 2;
@@ -257,14 +277,16 @@ public class InfFlowContractAppFeature implements Feature {
         return NumberRuleAppCost.create(assumesApplNumber);
     }
 
+
     private boolean isInfFlowProof(Proof proof) {
-        ProofOblInput po = proof.getServices().getSpecificationRepository()
-                .getProofOblInput(proof);
-        return po instanceof InfFlowContractPO
-                || po instanceof SymbolicExecutionPO
-                || po instanceof BlockExecutionPO
-                || po instanceof LoopInvExecutionPO;
+        ProofOblInput po =
+                proof.getServices().getSpecificationRepository().getProofOblInput(proof);
+        return po instanceof InfFlowContractPO ||
+               po instanceof SymbolicExecutionPO ||
+               po instanceof BlockExecutionPO ||
+               po instanceof LoopInvExecutionPO;
     }
+
 
     private ArrayList<SequentFormula> getRelatesTerms(Goal goal) {
         ArrayList<SequentFormula> list = new ArrayList<SequentFormula>();

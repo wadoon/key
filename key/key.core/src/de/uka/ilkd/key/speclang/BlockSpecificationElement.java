@@ -114,8 +114,6 @@ public interface BlockSpecificationElement extends SpecificationElement {
      */
     public boolean hasModifiesClause(LocationVariable heap);
 
-    boolean hasModifiesNotClause(LocationVariable heap);
-
     Term getAccessibleClause(LocationVariable heap);
 
     /**
@@ -247,6 +245,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
     public Term getModifiesClause(LocationVariable heap, ProgramVariable self, Services services);
 
     /**
+     *
      * @param heapVariable
      *            the heap to use.
      * @param heap
@@ -261,6 +260,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
             Services services);
 
     /**
+     *
      * @param heap
      *            the heap to use.
      * @param services
@@ -281,46 +281,9 @@ public interface BlockSpecificationElement extends SpecificationElement {
      *            the heap to use.
      * @param services
      *            services.
-     * @return this contract's modifies not clause on the specified heap.
-     */
-    public Term getModifiesNotClause(LocationVariable heap, Services services);
-
-    /**
-     * @param heap
-     *            the heap to use.
-     * @param services
-     *            services.
      * @return this contract's declares clause on the specified heap.
      */
     public Term getDeclaresClause(LocationVariable heap, Services services);
-
-    /**
-     * @param heapVariable
-     *            the heap to use.
-     * @param heap
-     *            the heap to use.
-     * @param self
-     *            the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
-     * @param services
-     *            services.
-     * @return this contract's modifies not clause on the specified heap.
-     */
-    public Term getModifiesNotClause(LocationVariable heapVariable, Term heap,
-            Term self, Services services);
-
-    /**
-     * @param heapVariable
-     *            the heap to use.
-     * @param heap
-     *            the heap to use.
-     * @param self
-     *            the {@code self} variable to use instead of {@link #getPlaceholderVariables()}.
-     * @param services
-     *            services.
-     * @return this contract's modifies not clause on the specified heap.
-     */
-    Term getModifiesNotClause(LocationVariable heap, ProgramVariable self,
-            Services services);
 
     /**
      * @param heapVariable
@@ -353,6 +316,7 @@ public interface BlockSpecificationElement extends SpecificationElement {
     public Term getEnsures(LocationVariable heap);
 
     /**
+     *
      * @param heap
      *            the heap to use.
      * @return this contract's assignable term on the specified heap.
@@ -365,14 +329,6 @@ public interface BlockSpecificationElement extends SpecificationElement {
      * @return this contract's declares term on the specified heap.
      */
     public Term getDeclares(LocationVariable heap);
-
-
-    /**
-     * @param heap
-     *            the heap to use.
-     * @return this contract's assignable not term on the specified heap.
-     */
-    public Term getAssignableNot(LocationVariable heap);
 
     /**
      * Accepts a visitor.
@@ -505,12 +461,6 @@ public interface BlockSpecificationElement extends SpecificationElement {
      */
     Term getMod(Services services);
 
-    /**
-     * @param services
-     *            services.
-     * @return the original modifies not clause of the contract.
-     */
-    Term getNonMod(Services services);
 
     /**
      * @return the original information flow specification clause of the contract.

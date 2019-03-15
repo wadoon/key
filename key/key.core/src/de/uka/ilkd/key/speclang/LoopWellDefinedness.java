@@ -68,7 +68,6 @@ public class LoopWellDefinedness extends StatementWellDefinedness {
                                            TB.and(wdPre, imp)));
     }
 
-    @Override
     public LoopSpecification getStatement() {
         return this.inv;
     }

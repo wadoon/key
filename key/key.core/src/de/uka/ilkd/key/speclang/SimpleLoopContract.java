@@ -113,8 +113,6 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
      *            this contract's postconditions on every heap.
      * @param modifiesClauses
      *            this contract's modifies clauses on every heap.
-     * @param modifiesNotClauses
-     *            TODO
      * @param infFlowSpecs
      *            this contract's information flow specifications.
      * @param variables
@@ -122,10 +120,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
      * @param transactionApplicable
      *            whether or not this contract is applicable for transactions.
      * @param hasMod
-     *            a map specifying on which heaps this contract has a modified
-     *            clause.
-     * @param hasNonMod
-     *            TODO
+     *            a map specifying on which heaps this contract has a modified clause.
      * @param decreases
      *            the contract's decreases clause.
      * @param functionalContracts
@@ -134,24 +129,18 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
      *            services.
      */
     public SimpleLoopContract(final String baseName, final StatementBlock block,
-            final List<Label> labels, final IProgramMethod method,
-            final Modality modality,
-            final Map<LocationVariable, Term> preconditions,
-            final Term measuredBy,
+            final List<Label> labels, final IProgramMethod method, final Modality modality,
+            final Map<LocationVariable, Term> preconditions, final Term measuredBy,
             final Map<LocationVariable, Term> postconditions,
             final Map<LocationVariable, Term> modifiesClauses,
-            final Map<LocationVariable, Term> modifiesNotClauses,
             final Map<ProgramVariable, Term> accessibleClauses,
-            final ImmutableList<InfFlowSpec> infFlowSpecs,
-            final Variables variables, final boolean transactionApplicable,
-            final Map<LocationVariable, Boolean> hasMod,
-            Map<LocationVariable, Boolean> hasNonMod, final Term decreases,
-            ImmutableSet<FunctionalLoopContract> functionalContracts,
+            final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
+            final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
+            final Term decreases, ImmutableSet<FunctionalLoopContract> functionalContracts,
             Services services) {
-        super(baseName, block, labels, method, modality, preconditions,
-                measuredBy, postconditions, modifiesClauses, modifiesNotClauses,
-                Collections.emptyMap(), accessibleClauses, infFlowSpecs,
-                variables, transactionApplicable, hasMod, hasNonMod);
+        super(baseName, block, labels, method, modality, preconditions, measuredBy, postconditions,
+                modifiesClauses, Collections.emptyMap(), accessibleClauses, infFlowSpecs, 
+                variables, transactionApplicable, hasMod);
 
         this.decreases = decreases;
         this.functionalContracts = functionalContracts;
@@ -172,23 +161,18 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
         final LoopStatement loop;
         if (first != null && first instanceof While) {
             loop = (While) first;
-        }
-        else if (first != null && first instanceof For) {
+        } else if (first != null && first instanceof For) {
             loop = (For) first;
-        }
-        else {
+        } else {
             loop = null;
-            throw new IllegalArgumentException(
-                    "Only blocks that begin with a while or a for "
-                            + "loop may have a loop contract! \n"
-                            + "This block begins with "
-                            + block.getFirstElement());
+            throw new IllegalArgumentException("Only blocks that begin with a while or a for "
+                    + "loop may have a loop contract! \n" + "This block begins with "
+                    + block.getFirstElement());
         }
 
         head = getHeadStatement(loop, block);
         guard = loop.getGuardExpression();
-        body = getBodyStatement(loop, block, outerLabel, innerLabel, loopLabels,
-                services);
+        body = getBodyStatement(loop, block, outerLabel, innerLabel, loopLabels, services);
         this.loop = new While(guard, body);
         tail = getTailStatement(loop, block);
     }
@@ -201,11 +185,9 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
      *            services.
      * @return the combination of the specified loop contracts.
      */
-    public static LoopContract combine(ImmutableSet<LoopContract> contracts,
-            Services services) {
-        return new Combinator(
-                contracts.toArray(new LoopContract[contracts.size()]), services)
-                        .combine();
+    public static LoopContract combine(ImmutableSet<LoopContract> contracts, Services services) {
+        return new Combinator(contracts.toArray(new LoopContract[contracts.size()]), services)
+                .combine();
     }
 
     /**
@@ -214,11 +196,9 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
      *            a loop.
      * @param block
      *            the block containing the loop.
-     * @return the initializers if the loop is a for-loop, {@code null}
-     *         otherwise.
+     * @return the initializers if the loop is a for-loop, {@code null} otherwise.
      */
-    private static StatementBlock getHeadStatement(LoopStatement loop,
-            StatementBlock block) {
+    private static StatementBlock getHeadStatement(LoopStatement loop, StatementBlock block) {
         final StatementBlock sb;
         if (loop != null && loop instanceof For) {
             ExtList headStatements = new ExtList();
@@ -226,16 +206,12 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
                 headStatements.add(statement);
             }
             sb = new StatementBlock(headStatements);
-        }
-        else if (loop != null && loop instanceof While) {
+        } else if (loop != null && loop instanceof While) {
             sb = null;
-        }
-        else {
-            throw new IllegalArgumentException(
-                    "Only blocks that begin with a while or a for "
-                            + "loop may have a loop contract! \n"
-                            + "This block begins with "
-                            + block.getFirstElement());
+        } else {
+            throw new IllegalArgumentException("Only blocks that begin with a while or a for "
+                    + "loop may have a loop contract! \n" + "This block begins with "
+                    + block.getFirstElement());
         }
         return sb;
     }
@@ -254,28 +230,24 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
      *            all labels belonging to the loop.
      * @param services
      *            services.
-     * @return the loop's body. If the loop is a for-loop, it is transformed to
-     *         a while-loop.
+     * @return the loop's body. If the loop is a for-loop, it is transformed to a while-loop.
      * @see InnerBreakAndContinueReplacer
      */
-    private static StatementBlock getBodyStatement(LoopStatement loop,
-            StatementBlock block, Label outerLabel, Label innerLabel,
-            List<Label> loopLabels, Services services) {
+    private static StatementBlock getBodyStatement(LoopStatement loop, StatementBlock block,
+            Label outerLabel, Label innerLabel, List<Label> loopLabels, Services services) {
         final StatementBlock sb;
         if (loop != null && loop instanceof While) {
             if (loop.getBody() instanceof StatementBlock) {
                 sb = (StatementBlock) loop.getBody();
-            }
-            else {
+            } else {
                 sb = new StatementBlock(loop.getBody());
             }
-        }
-        else if (loop != null && loop instanceof For) {
+        } else if (loop != null && loop instanceof For) {
             ExtList bodyStatements = new ExtList();
             bodyStatements.add(loop.getBody());
             StatementBlock innerBody = new InnerBreakAndContinueReplacer(
-                    new StatementBlock(bodyStatements), loopLabels, outerLabel,
-                    innerLabel, services).replace();
+                    new StatementBlock(bodyStatements), loopLabels, outerLabel, innerLabel,
+                    services).replace();
 
             ExtList updateStatements = new ExtList();
             for (Expression statement : loop.getUpdates()) {
@@ -283,16 +255,12 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             }
 
             sb = new StatementBlock(new StatementBlock(
-                    new LabeledStatement(innerLabel, innerBody,
-                            PositionInfo.UNDEFINED),
+                    new LabeledStatement(innerLabel, innerBody, PositionInfo.UNDEFINED),
                     new StatementBlock(updateStatements)));
-        }
-        else {
-            throw new IllegalArgumentException(
-                    "Only blocks that begin with a while or a for "
-                            + "loop may have a loop contract! \n"
-                            + "This block begins with "
-                            + block.getFirstElement());
+        } else {
+            throw new IllegalArgumentException("Only blocks that begin with a while or a for "
+                    + "loop may have a loop contract! \n" + "This block begins with "
+                    + block.getFirstElement());
         }
         return sb;
     }
@@ -305,8 +273,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
      *            the block containing the loop.
      * @return all statements in the block after the loop.
      */
-    private static StatementBlock getTailStatement(LoopStatement loop,
-            StatementBlock block) {
+    private static StatementBlock getTailStatement(LoopStatement loop, StatementBlock block) {
         final StatementBlock sb;
         if (loop != null && (loop instanceof For || loop instanceof While)) {
             ExtList tailStatements = new ExtList();
@@ -314,13 +281,10 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
                 tailStatements.add(block.getStatementAt(i));
             }
             sb = new StatementBlock(tailStatements);
-        }
-        else {
-            throw new IllegalArgumentException(
-                    "Only blocks that begin with a while or a for "
-                            + "loop may have a loop contract! \n"
-                            + "This block begins with "
-                            + block.getFirstElement());
+        } else {
+            throw new IllegalArgumentException("Only blocks that begin with a while or a for "
+                    + "loop may have a loop contract! \n" + "This block begins with "
+                    + block.getFirstElement());
         }
         return sb;
     }
@@ -363,20 +327,15 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
     @Override
     public Term getDecreases(Term heap, Term self, Services services) {
         final Map<Term, Term> replacementMap = createReplacementMap(heap,
-                new Terms(self, null, null, null, null, null, null, null, null,
-                        null),
-                services);
-        final OpReplacer replacer = new OpReplacer(replacementMap,
-                services.getTermFactory());
+                new Terms(self, null, null, null, null, null, null, null, null, null), services);
+        final OpReplacer replacer = new OpReplacer(replacementMap, services.getTermFactory());
         return replacer.replace(decreases);
     }
 
     @Override
     public Term getDecreases(Variables variables, Services services) {
-        Map<ProgramVariable, ProgramVariable> map = createReplacementMap(
-                variables, services);
-        return new OpReplacer(map, services.getTermFactory())
-                .replace(decreases);
+        Map<ProgramVariable, ProgramVariable> map = createReplacementMap(variables, services);
+        return new OpReplacer(map, services.getTermFactory()).replace(decreases);
     }
 
     @Override
@@ -389,8 +348,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
         assert contract.id() != Contract.INVALID_ID;
         assert contract.getLoopContract().equals(this);
 
-        functionalContracts = DefaultImmutableSet.<FunctionalLoopContract> nil()
-                .add(contract);
+        functionalContracts = DefaultImmutableSet.<FunctionalLoopContract> nil().add(contract);
     }
 
     @Override
@@ -407,12 +365,11 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
     @Override
     public String getUniqueName() {
         if (getTarget() != null) {
-            return "Loop Contract " + getBlock().getStartPosition().getLine()
-                    + " " + getTarget().getUniqueName();
-        }
-        else {
-            return "Loop Contract " + getBlock().getStartPosition().getLine()
-                    + " " + Math.abs(getBlock().hashCode());
+            return "Loop Contract " + getBlock().getStartPosition().getLine() + " "
+                    + getTarget().getUniqueName();
+        } else {
+            return "Loop Contract " + getBlock().getStartPosition().getLine() + " "
+                    + Math.abs(getBlock().hashCode());
         }
     }
 
@@ -426,47 +383,37 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             final Map<LocationVariable, Term> newPreconditions,
             final Map<LocationVariable, Term> newPostconditions,
             final Map<LocationVariable, Term> newModifiesClauses,
-            final Map<LocationVariable, Term> newModifiesNotClauses,
             Map<ProgramVariable, Term> accessibleClauses,
-            final ImmutableList<InfFlowSpec> newinfFlowSpecs,
-            final Variables newVariables, final Term newMeasuredBy,
-            final Term newDecreases) {
-        return new SimpleLoopContract(baseName, newBlock, labels, method,
-                modality, newPreconditions, newMeasuredBy, newPostconditions,
-                newModifiesClauses, modifiesNotClauses, accessibleClauses,
-                newinfFlowSpecs, newVariables, transactionApplicable, hasMod,
-                hasNonMod, newDecreases, functionalContracts, services);
+            final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
+            final Term newMeasuredBy, final Term newDecreases) {
+        return new SimpleLoopContract(baseName, newBlock, labels, method, modality,
+                newPreconditions, newMeasuredBy, newPostconditions, newModifiesClauses,
+                accessibleClauses, newinfFlowSpecs, newVariables, transactionApplicable, hasMod, newDecreases,
+                functionalContracts, services);
     }
 
     @Override
     public LoopContract setBlock(StatementBlock newBlock) {
-        return update(newBlock, preconditions, postconditions, modifiesClauses,
-                modifiesNotClauses, accessibleClauses, infFlowSpecs, variables,
-                measuredBy, decreases);
+        return update(newBlock, preconditions, postconditions, modifiesClauses, accessibleClauses, infFlowSpecs,
+                variables, measuredBy, decreases);
     }
 
     @Override
     public LoopContract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         assert newPM instanceof IProgramMethod;
         assert newKJT.equals(newPM.getContainerType());
-        return new SimpleLoopContract(baseName, block, labels,
-                (IProgramMethod) newPM, modality, preconditions, measuredBy,
-                postconditions, modifiesClauses, modifiesNotClauses,
-                accessibleClauses, infFlowSpecs, variables,
-                transactionApplicable, hasMod, hasNonMod, decreases,
-                functionalContracts, services);
+        return new SimpleLoopContract(baseName, block, labels, (IProgramMethod) newPM, modality,
+                preconditions, measuredBy, postconditions, modifiesClauses, accessibleClauses, infFlowSpecs, variables,
+                transactionApplicable, hasMod, decreases, functionalContracts, services);
     }
 
     @Override
     public String toString() {
-        return "SimpleLoopContract [block=" + block + ", labels=" + labels
-                + ", method=" + method + ", modality=" + modality
-                + ", instantiationSelf=" + instantiationSelf
-                + ", preconditions=" + preconditions + ", postconditions="
-                + postconditions + ", modifiesClauses=" + modifiesClauses
-                + ", modifiesNotClauses=" + modifiesNotClauses
-                + ", infFlowSpecs=" + infFlowSpecs + ", variables=" + variables
-                + ", transactionApplicable=" + transactionApplicable
+        return "SimpleLoopContract [block=" + block + ", labels=" + labels + ", method=" + method
+                + ", modality=" + modality + ", instantiationSelf=" + instantiationSelf
+                + ", preconditions=" + preconditions + ", postconditions=" + postconditions
+                + ", modifiesClauses=" + modifiesClauses + ", infFlowSpecs=" + infFlowSpecs
+                + ", variables=" + variables + ", transactionApplicable=" + transactionApplicable
                 + ", hasMod=" + hasMod + "]";
     }
 
@@ -475,8 +422,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
      *
      * @see Creator#create()
      */
-    public static class Creator
-            extends AbstractBlockSpecificationElement.Creator<LoopContract> {
+    public static class Creator extends AbstractBlockSpecificationElement.Creator<LoopContract> {
 
         /**
          * @see LoopContract#getDecreases()
@@ -506,80 +452,57 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
          * @param infFlowSpecs
          *            the contract's information flow specifications.
          * @param breaks
-         *            the contract's postconditions for abrupt termination with
-         *            {@code break} statements.
+         *            the contract's postconditions for abrupt termination with {@code break}
+         *            statements.
          * @param continues
-         *            the contract's postconditions for abrupt termination with
-         *            {@code continue} statements.
+         *            the contract's postconditions for abrupt termination with {@code continue}
+         *            statements.
          * @param returns
-         *            the contract's postcondition for abrupt termination with
-         *            {@code return} statements.
+         *            the contract's postcondition for abrupt termination with {@code return}
+         *            statements.
          * @param signals
-         *            the contract's postcondition for abrupt termination due to
-         *            abrupt termination.
+         *            the contract's postcondition for abrupt termination due to abrupt termination.
          * @param signalsOnly
          *            a term specifying which uncaught exceptions may occur.
          * @param diverges
          *            a diverges clause.
          * @param assignables
          *            map from every heap to an assignable term.
-         * @param assignableNots
-         *            TODO
-         * @param declares
-         *            TODO
-         * @param accessibles
-         *            TODO
          * @param hasMod
-         *            map specifying on which heaps this contract has a modifies
-         *            clause.
-         * @param hasNonMod
-         *            TODO
+         *            map specifying on which heaps this contract has a modifies clause.
          * @param decreases
          *            the decreases term.
          * @param services
          *            services.
          */
-        public Creator(String baseName, StatementBlock block,
-                List<Label> labels, IProgramMethod method, Behavior behavior,
-                Variables variables, Map<LocationVariable, Term> requires,
-                Term measuredBy, Map<LocationVariable, Term> ensures,
-                ImmutableList<InfFlowSpec> infFlowSpecs,
-                Map<Label, Term> breaks, Map<Label, Term> continues,
-                Term returns, Term signals, Term signalsOnly, Term diverges,
-                Map<LocationVariable, Term> assignables,
-                Map<LocationVariable, Term> assignableNots,
+        public Creator(String baseName, StatementBlock block, List<Label> labels,
+                IProgramMethod method, Behavior behavior, Variables variables,
+                Map<LocationVariable, Term> requires, Term measuredBy,
+                Map<LocationVariable, Term> ensures, ImmutableList<InfFlowSpec> infFlowSpecs,
+                Map<Label, Term> breaks, Map<Label, Term> continues, Term returns, Term signals,
+                Term signalsOnly, Term diverges, Map<LocationVariable, Term> assignables,
                 Map<LocationVariable, Term> declares,
                 Map<ProgramVariable, Term> accessibles,
-                Map<LocationVariable, Boolean> hasMod,
-                Map<LocationVariable, Boolean> hasNonMod, Term decreases,
-                Services services) {
-            super(baseName, block, labels, method, behavior, variables,
-                    requires, measuredBy, ensures, infFlowSpecs, breaks,
-                    continues, returns, signals, signalsOnly, diverges,
-                    assignables, assignableNots, declares, accessibles, hasMod,
-                    hasNonMod, services);
+                Map<LocationVariable, Boolean> hasMod, Term decreases, Services services) {
+            super(baseName, block, labels, method, behavior, variables, requires, measuredBy,
+                    ensures, infFlowSpecs, breaks, continues, returns, signals, signalsOnly,
+                    diverges, assignables, declares, accessibles, hasMod, services);
 
             this.decreases = decreases;
         }
 
         @Override
-        protected LoopContract build(String baseName, StatementBlock block,
-                List<Label> labels, IProgramMethod method, Modality modality,
-                Map<LocationVariable, Term> preconditions, Term measuredBy,
-                Map<LocationVariable, Term> postconditions,
+        protected LoopContract build(String baseName, StatementBlock block, List<Label> labels,
+                IProgramMethod method, Modality modality, Map<LocationVariable, Term> preconditions,
+                Term measuredBy, Map<LocationVariable, Term> postconditions,
                 Map<LocationVariable, Term> modifiesClauses,
-                Map<LocationVariable, Term> modifiesNotClauses,
                 Map<LocationVariable, Term> declaresClauses,
                 Map<ProgramVariable, Term> accessibleClauses,
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
-                boolean transactionApplicable,
-                Map<LocationVariable, Boolean> hasMod,
-                Map<LocationVariable, Boolean> hasNonMod) {
-            return new SimpleLoopContract(baseName, block, labels, method,
-                    modality, preconditions, measuredBy, postconditions,
-                    modifiesClauses, modifiesNotClauses, accessibleClauses,
-                    infFlowSpecs, variables, transactionApplicable, hasMod,
-                    hasNonMod, decreases, null, services);
+                boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod) {
+            return new SimpleLoopContract(baseName, block, labels, method, modality, preconditions,
+                    measuredBy, postconditions, modifiesClauses, accessibleClauses, infFlowSpecs, variables,
+                    transactionApplicable, hasMod, decreases, null, services);
         }
 
         @Override
@@ -588,8 +511,7 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
 
             if (decreases != null) {
                 for (Entry<LocationVariable, Term> entry : result.entrySet()) {
-                    result.put(entry.getKey(),
-                            and(entry.getValue(), geq(decreases, zero())));
+                    result.put(entry.getKey(), and(entry.getValue(), geq(decreases, zero())));
                 }
             }
 
@@ -598,8 +520,8 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
     }
 
     /**
-     * This class is used to to combine multiple contracts for the same block
-     * and apply them simultaneously.
+     * This class is used to to combine multiple contracts for the same block and apply them
+     * simultaneously.
      */
     protected static class Combinator
             extends AbstractBlockSpecificationElement.Combinator<LoopContract> {
@@ -633,21 +555,17 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
             }
 
             placeholderVariables = head.getPlaceholderVariables();
-            remembranceVariables = placeholderVariables
-                    .combineRemembranceVariables();
+            remembranceVariables = placeholderVariables.combineRemembranceVariables();
 
-            ImmutableSet<FunctionalLoopContract> functionalContracts = DefaultImmutableSet
-                    .nil();
+            ImmutableSet<FunctionalLoopContract> functionalContracts = DefaultImmutableSet.nil();
 
             for (LoopContract contract : contracts) {
                 addConditionsFrom(contract);
-                functionalContracts = functionalContracts
-                        .union(contract.getFunctionalContracts());
+                functionalContracts = functionalContracts.union(contract.getFunctionalContracts());
             }
 
             Map<LocationVariable, Boolean> hasMod = new LinkedHashMap<LocationVariable, Boolean>();
-            for (LocationVariable heap : services.getTypeConverter()
-                    .getHeapLDT().getAllHeaps()) {
+            for (LocationVariable heap : services.getTypeConverter().getHeapLDT().getAllHeaps()) {
                 boolean hm = false;
 
                 for (int i = 1; i < contracts.length && !hm; i++) {
@@ -656,25 +574,11 @@ public final class SimpleLoopContract extends AbstractBlockSpecificationElement
                 hasMod.put(heap, hm);
             }
 
-            Map<LocationVariable, Boolean> hasNonMod = new LinkedHashMap<LocationVariable, Boolean>();
-            for (LocationVariable heap : services.getTypeConverter()
-                    .getHeapLDT().getAllHeaps()) {
-                boolean hm = false;
-
-                for (int i = 1; i < contracts.length && !hm; i++) {
-                    hm = contracts[i].hasModifiesNotClause(heap);
-                }
-                hasNonMod.put(heap, hm);
-            }
-
-            SimpleLoopContract result = new SimpleLoopContract(baseName,
-                    head.getBlock(), head.getLabels(), head.getMethod(),
-                    head.getModality(), preconditions, contracts[0].getMby(),
-                    postconditions, modifiesClauses, modifiesNotClauses,
-                    accessibleClauses, head.getInfFlowSpecs(),
-                    placeholderVariables, head.isTransactionApplicable(),
-                    hasMod, hasNonMod, contracts[0].getDecreases(),
-                    functionalContracts, services);
+            SimpleLoopContract result = new SimpleLoopContract(baseName, head.getBlock(),
+                    head.getLabels(), head.getMethod(), head.getModality(), preconditions,
+                    contracts[0].getMby(), postconditions, modifiesClauses, accessibleClauses, head.getInfFlowSpecs(),
+                    placeholderVariables, head.isTransactionApplicable(), hasMod,
+                    contracts[0].getDecreases(), functionalContracts, services);
 
             return result;
         }

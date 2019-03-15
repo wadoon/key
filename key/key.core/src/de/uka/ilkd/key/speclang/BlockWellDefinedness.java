@@ -79,7 +79,6 @@ public class BlockWellDefinedness extends StatementWellDefinedness {
                                            TB.and(wdPre, imp)));
     }
 
-    @Override
     public BlockContract getStatement() {
         return this.block;
     }

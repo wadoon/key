@@ -11,7 +11,7 @@
 // Public License. See LICENSE.TXT for details.
 //
 
-// This file is partially taken from the RECODER library, which is protected by
+// This file is partially taken from the RECODER library, which is protected by 
 // the LGPL, and modified.
 
 package de.uka.ilkd.key.java.recoderext;
@@ -20,18 +20,19 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.List;
 
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Named;
-import de.uka.ilkd.key.logic.Namespace;
-import de.uka.ilkd.key.logic.op.ProgramSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.sort.ProgramSVSort;
-import de.uka.ilkd.key.parser.schemajava.ParseException;
-import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 import recoder.ParserException;
 import recoder.convenience.TreeWalker;
-import recoder.java.*;
+import recoder.java.Comment;
+import recoder.java.CompilationUnit;
+import recoder.java.Expression;
+import recoder.java.Identifier;
+import recoder.java.JavaProgramFactory;
+import recoder.java.NonTerminalProgramElement;
+import recoder.java.ProgramElement;
+import recoder.java.SingleLineComment;
 import recoder.java.SourceElement.Position;
+import recoder.java.Statement;
+import recoder.java.StatementBlock;
 import recoder.java.declaration.ConstructorDeclaration;
 import recoder.java.declaration.FieldDeclaration;
 import recoder.java.declaration.MemberDeclaration;
@@ -43,6 +44,14 @@ import recoder.java.reference.ReferencePrefix;
 import recoder.java.reference.TypeReference;
 import recoder.list.generic.ASTArrayList;
 import recoder.list.generic.ASTList;
+import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Named;
+import de.uka.ilkd.key.logic.Namespace;
+import de.uka.ilkd.key.logic.op.ProgramSV;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.sort.ProgramSVSort;
+import de.uka.ilkd.key.parser.schemajava.ParseException;
+import de.uka.ilkd.key.parser.schemajava.SchemaJavaParser;
 
 public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
@@ -53,13 +62,13 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
      */
     protected SchemaJavaProgramFactory() {}
 
-    /**
+    /** 
      The singleton instance of the program factory.
      */
-    private static SchemaJavaProgramFactory theFactory
+    private static SchemaJavaProgramFactory theFactory 
 	= new SchemaJavaProgramFactory();
 
-    /**
+    /** 
      Returns the single instance of this class.
      */
     public static JavaProgramFactory getInstance() {
@@ -72,8 +81,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     public ImplicitIdentifier createImplicitIdentifier(String text) {
         return new ImplicitIdentifier(text);
     }
-
-    @Override
+    
     public Identifier createIdentifier (String text){
         return new ExtendedIdentifier(text);
     }
@@ -89,7 +97,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 							   Statement st) {
 	return new RMethodCallStatement(resVar, esvw, st);
     }
-
+    
     public LoopScopeBlock createLoopScopeBlock() {
         return new LoopScopeBlock();
     }
@@ -97,8 +105,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     public AbstractPlaceholderStatement createAbstractPlaceholderStatement() {
         return new AbstractPlaceholderStatement();
     }
-
-
+    
     public RMethodBodyStatement createRMethodBodyStatement
             (TypeReference typeRef,
              ProgramVariableSVWrapper resVar,
@@ -151,7 +158,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 	return new PassiveExpression();
     }
 
-    public static void throwSortInvalid(SchemaVariable sv, String s)
+    public static void throwSortInvalid(SchemaVariable sv, String s) 
 	throws ParseException {
 	throw new ParseException("Sort of declared schema variable "
 				  +sv.name().toString()+" "
@@ -166,7 +173,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 	Named n=svns.lookup(new Name(s));
 	if (n!=null && n instanceof SchemaVariable) {
 	    return ((SchemaVariable) n).sort()==sort;
-	}
+	} 
 	return false;
     }
 
@@ -184,7 +191,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
     public StatementSVWrapper getStatementSV(String s) throws ParseException {
 	SchemaVariable sv=lookupSchemaVariable(s);
-	if (!(sv instanceof ProgramSV)) {
+	if (!(sv instanceof ProgramSV)) {   
 	    throwSortInvalid(sv, "Statement");
 	}
 
@@ -193,7 +200,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
     public ExpressionSVWrapper getExpressionSV(String s) throws ParseException {
 	SchemaVariable sv=lookupSchemaVariable(s);
-	if (!(sv instanceof ProgramSV)) {
+	if (!(sv instanceof ProgramSV)) {   
 	    throwSortInvalid(sv, "Expression");
 	}
 	return new ExpressionSVWrapper(sv);
@@ -202,24 +209,24 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
     public LabelSVWrapper getLabelSV(String s) throws ParseException{
 	SchemaVariable sv=lookupSchemaVariable(s);
-	if (!(sv instanceof ProgramSV)) {
+	if (!(sv instanceof ProgramSV)) {   
 	    throwSortInvalid(sv, "Label");
 	}
 	return new LabelSVWrapper(sv);
     }
-
+    
     public MethodSignatureSVWrapper getMethodSignatureSVWrapper(String s) throws ParseException{
        SchemaVariable sv=lookupSchemaVariable(s);
-       if (!(sv instanceof ProgramSV)) {
+       if (!(sv instanceof ProgramSV)) {   
            throwSortInvalid(sv, "MethodSignature");
        }
        return new MethodSignatureSVWrapper(sv);
         }
-
+    
     public JumpLabelSVWrapper getJumpLabelSV(String s) throws ParseException {
         SchemaVariable sv=lookupSchemaVariable(s);
         if (!(sv instanceof ProgramSV) ||
-                sv.sort()!=ProgramSVSort.LABEL) {
+                sv.sort()!=ProgramSVSort.LABEL) {   
             throwSortInvalid(sv, "Label");
         }
         return new JumpLabelSVWrapper(sv);
@@ -227,7 +234,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
     public TypeSVWrapper getTypeSV(String s) throws ParseException{
 	SchemaVariable sv=lookupSchemaVariable(s);
-	if (!(sv instanceof ProgramSV)) {
+	if (!(sv instanceof ProgramSV)) {   
 	    throwSortInvalid(sv, "Type");
 	}
 	return new TypeSVWrapper(sv);
@@ -235,31 +242,31 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
 
     public ExecCtxtSVWrapper getExecutionContextSV(String s) throws ParseException {
 	SchemaVariable sv=lookupSchemaVariable(s);
-	if (!(sv instanceof ProgramSV)) {
+	if (!(sv instanceof ProgramSV)) {   
 	    throwSortInvalid(sv, "Type");
 	}
 	return new ExecCtxtSVWrapper(sv);
     }
 
-    public ProgramVariableSVWrapper getProgramVariableSV(String s)
+    public ProgramVariableSVWrapper getProgramVariableSV(String s) 
 	throws ParseException{
 	SchemaVariable sv=lookupSchemaVariable(s);
-	if (!(sv instanceof ProgramSV)) {
+	if (!(sv instanceof ProgramSV)) {   
 	    throwSortInvalid(sv, "Program Variable");
 	}
 	return new ProgramVariableSVWrapper(sv);
     }
 
-    public CatchSVWrapper getCatchSV(String s)
+    public CatchSVWrapper getCatchSV(String s) 
 	throws ParseException {
 	SchemaVariable sv=lookupSchemaVariable(s);
-	if (!(sv instanceof ProgramSV)) {
+	if (!(sv instanceof ProgramSV)) {   
 	    throwSortInvalid(sv, "Catch");
 	}
 	return new CatchSVWrapper(sv);
     }
 
-    /**
+    /** 
      For internal reuse and synchronization.
      */
     private static final SchemaJavaParser parser = new SchemaJavaParser(System.in);
@@ -306,7 +313,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
        Perform post work on the created element. Creates parent links
        and assigns comments.
      */
-    private static void postWork(ProgramElement pe) {
+    private static void postWork(ProgramElement pe) {     
         List<Comment> comments = SchemaJavaParser.getComments();
         int commentIndex = 0;
         int commentCount = comments.size();
@@ -324,7 +331,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
             }
 	    if (pe.getFirstElement()!=null) {
 		Position pos = pe.getFirstElement().getStartPosition();
-		while ((commentIndex < commentCount)
+		while ((commentIndex < commentCount) 
 		       && pos.compareTo(cpos) > 0) {
 		    attachComment(current, pe);
 		    commentIndex += 1;
@@ -355,7 +362,6 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse a {@link CompilationUnit} from the given reader.
      */
-    @Override
     public CompilationUnit parseCompilationUnit(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try {
@@ -374,7 +380,6 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse a {@link TypeDeclaration} from the given reader.
      */
-    @Override
     public TypeDeclaration parseTypeDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
@@ -394,7 +399,6 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse a {@link FieldDeclaration} from the given reader.
      */
-    @Override
     public FieldDeclaration parseFieldDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
@@ -414,7 +418,6 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse a {@link MethodDeclaration} from the given reader.
      */
-    @Override
     public MethodDeclaration parseMethodDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
@@ -434,7 +437,6 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse a {@link MemberDeclaration} from the given reader.
      */
-    @Override
     public MemberDeclaration parseMemberDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
@@ -454,7 +456,6 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse a {@link ParameterDeclaration} from the given reader.
      */
-    @Override
     public ParameterDeclaration parseParameterDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
@@ -474,7 +475,6 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse a {@link ConstructorDeclaration} from the given reader.
      */
-    @Override
     public ConstructorDeclaration parseConstructorDeclaration(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
@@ -494,7 +494,6 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse a {@link TypeReference} from the given reader.
      */
-    @Override
     public TypeReference parseTypeReference(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
@@ -514,7 +513,6 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse an {@link Expression} from the given reader.
      */
-    @Override
     public Expression parseExpression(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
@@ -534,7 +532,6 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     /**
      Parse some {@link Statement}s from the given reader.
      */
-    @Override
     public ASTList<Statement> parseStatements(Reader in) throws IOException, ParserException {
         synchronized(parser) {
 	    try{
@@ -556,8 +553,7 @@ public class SchemaJavaProgramFactory extends JavaProgramFactory {
     /**
      * Parse a {@link StatementBlock} from the given string.
      */
-    @Override
-    public StatementBlock parseStatementBlock(Reader in)
+    public StatementBlock parseStatementBlock(Reader in) 
 	throws IOException, ParserException {
 	synchronized(parser) {
 	    try{

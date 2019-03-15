@@ -1485,28 +1485,27 @@ public class MergeRuleUtils {
                 Operator newOp1;
                 Operator newOp2;
                 if (partnerStateOp instanceof Function) {
-                    newOp1 = ((Function) mergeStateOp).rename(new Name(
-                            tb.newName(partnerStateOp.name().toString(),
+                    newOp1 = ((Function) mergeStateOp)
+                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
                                     thisGoal.getLocalNamespaces())));
                     thisGoalNamespaces.functions().add((Function) newOp1);
                     thisGoalNamespaces.flushToParent();
 
-                    newOp2 = ((Function) partnerStateOp).rename(new Name(
-                            tb.newName(partnerStateOp.name().toString(),
+                    newOp2 = ((Function) partnerStateOp)
+                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
                                     thisGoal.getLocalNamespaces())));
                     thisGoalNamespaces.functions().add((Function) newOp2);
                     thisGoalNamespaces.flushToParent();
                 } else if (partnerStateOp instanceof LocationVariable) {
-                    newOp1 = ((LocationVariable) mergeStateOp).rename(new Name(
-                            tb.newName(partnerStateOp.name().toString(),
+                    newOp1 = ((LocationVariable) mergeStateOp)
+                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
                                     thisGoal.getLocalNamespaces())));
                     thisGoalNamespaces.programVariables()
                             .add((LocationVariable) newOp1);
                     thisGoalNamespaces.flushToParent();
 
                     newOp2 = ((LocationVariable) partnerStateOp)
-                            .rename(new Name(
-                                    tb.newName(partnerStateOp.name().toString(),
+                            .rename(new Name(tb.newName(partnerStateOp.name().toString(),
                                             thisGoal.getLocalNamespaces())));
                     thisGoalNamespaces.programVariables()
                             .add((LocationVariable) newOp2);
@@ -1514,8 +1513,7 @@ public class MergeRuleUtils {
                 } else {
                     throw new RuntimeException(
                             "MergeRule: Unexpected type of Operator involved in name clash: "
-                                    + partnerStateOp.getClass()
-                                            .getSimpleName());
+                                    + partnerStateOp.getClass().getSimpleName());
                 }
 
                 mergeState = new SymbolicExecutionState(
@@ -1587,7 +1585,7 @@ public class MergeRuleUtils {
                     "Expecting an input of type &lt;SORT&gt; &lt;NAME&gt;");
         }
 
-        Sort sort = services.getNamespaces().sorts().lookup(chunks[0]);
+        Sort sort = (Sort) services.getNamespaces().sorts().lookup(chunks[0]);
 
         if (sort == null) {
             throw new SortNotKnownException(
@@ -1816,11 +1814,12 @@ public class MergeRuleUtils {
      */
     private static ApplyStrategyInfo tryToProve(Term toProve, Services services,
             boolean doSplit, String sideProofName, int timeout) {
-        return tryToProve(Sequent.createSequent(
+        return tryToProve(
+                Sequent.createSequent(
                 // Sequent to prove
                 Semisequent.EMPTY_SEMISEQUENT,
-                new Semisequent(new SequentFormula(toProve))), services,
-                doSplit, sideProofName, timeout);
+                        new Semisequent(new SequentFormula(toProve))),
+                services, doSplit, sideProofName, timeout);
     }
 
     /**
@@ -2183,7 +2182,6 @@ public class MergeRuleUtils {
                 this.value = value;
             }
 
-            @Override
             public T getValue() {
                 return value;
             }

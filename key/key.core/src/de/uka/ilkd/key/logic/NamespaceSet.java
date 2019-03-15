@@ -34,16 +34,18 @@ public class NamespaceSet {
     }
 
     public NamespaceSet(Namespace<QuantifiableVariable> varNS,
-            Namespace<Function> funcNS, Namespace<Sort> sortNS,
-            Namespace<RuleSet> ruleSetNS, Namespace<Choice> choiceNS,
-            Namespace<IProgramVariable> programVarNS,
+	    		Namespace<Function> funcNS,
+                        Namespace<Sort> sortNS,
+                        Namespace<RuleSet> ruleSetNS,
+			Namespace<Choice> choiceNS,
+			Namespace<IProgramVariable> programVarNS,
             Namespace<AbstractPlaceholderStatement> abstractProgramSymbolsNS) {
-        this.varNS = varNS;
-        this.progVarNS = programVarNS;
-        this.funcNS = funcNS;
-        this.sortNS = sortNS;
-        this.ruleSetNS = ruleSetNS;
-        this.choiceNS = choiceNS;
+	this.varNS     = varNS;
+	this.progVarNS = programVarNS;
+	this.funcNS    = funcNS;
+	this.sortNS    = sortNS;
+	this.ruleSetNS = ruleSetNS;
+	this.choiceNS  = choiceNS;
         this.abstractProgramSymbolsNS = abstractProgramSymbolsNS;
     }
 
@@ -61,73 +63,74 @@ public class NamespaceSet {
     // TODO MU: Rename into sth with wrap or similar
     public NamespaceSet copyWithParent() {
         return new NamespaceSet(
-            new Namespace<QuantifiableVariable>(variables()),
-            new Namespace<Function>(functions()), new Namespace<Sort>(sorts()),
-            new Namespace<RuleSet>(ruleSets()),
-            new Namespace<Choice>(choices()),
-            new Namespace<IProgramVariable>(programVariables()),
-            new Namespace<>(abstractProgramSymbols()));
+                new Namespace<QuantifiableVariable>(variables()),
+                new Namespace<Function>(functions()),
+                new Namespace<Sort>(sorts()),
+                new Namespace<RuleSet>(ruleSets()),
+                new Namespace<Choice>(choices()),
+                new Namespace<IProgramVariable>(programVariables()),
+            new Namespace<>(abstractProgramSymbols())
+                );
     }
 
     public Namespace<QuantifiableVariable> variables() {
-        return varNS;
+	return varNS;
     }
 
     public void setVariables(Namespace<QuantifiableVariable> varNS) {
-        this.varNS = varNS;
+	this.varNS = varNS;
     }
 
     public Namespace<IProgramVariable> programVariables() {
-        return progVarNS;
+	return progVarNS;
     }
 
     public Namespace<AbstractPlaceholderStatement> abstractProgramSymbols() {
         return abstractProgramSymbolsNS;
     }
-
     public void setProgramVariables(Namespace<IProgramVariable> progVarNS) {
-        this.progVarNS = progVarNS;
+	this.progVarNS = progVarNS;
     }
 
     public Namespace<Function> functions() {
-        return funcNS;
+	return funcNS;
     }
 
     public void setFunctions(Namespace<Function> funcNS) {
-        this.funcNS = funcNS;
+	this.funcNS = funcNS;
     }
 
     public Namespace<RuleSet> ruleSets() {
-        return ruleSetNS;
+	return ruleSetNS;
     }
 
     public void setRuleSets(Namespace<RuleSet> ruleSetNS) {
-        this.ruleSetNS = ruleSetNS;
+	this.ruleSetNS = ruleSetNS;
     }
 
     public Namespace<Sort> sorts() {
-        return sortNS;
+	return sortNS;
     }
 
     public void setSorts(Namespace<Sort> sortNS) {
-        this.sortNS = sortNS;
+	this.sortNS = sortNS;
     }
 
     public Namespace<Choice> choices() {
-        return choiceNS;
+	return choiceNS;
     }
 
     public void setChoices(Namespace<Choice> choiceNS) {
-        this.choiceNS = choiceNS;
+	this.choiceNS = choiceNS;
     }
 
     public void add(NamespaceSet ns) {
-        variables().add(ns.variables());
-        programVariables().add(ns.programVariables());
-        sorts().add(ns.sorts());
-        ruleSets().add(ns.ruleSets());
-        functions().add(ns.functions());
-        choices().add(ns.choices());
+	variables().add(ns.variables());
+	programVariables().add(ns.programVariables());
+	sorts().add(ns.sorts());
+	ruleSets().add(ns.ruleSets());
+	functions().add(ns.functions());
+	choices().add(ns.choices());
         abstractProgramSymbols().add(ns.abstractProgramSymbols());
     }
 
@@ -140,8 +143,9 @@ public class NamespaceSet {
     }
 
     /**
-     * returns all namespaces with symbols that may occur in a real sequent
-     * (this means all namespaces without variables, choices and ruleSets)
+     * returns all namespaces with symbols that may occur
+     * in a real sequent (this means all namespaces without
+     * variables, choices and ruleSets)
      */
     private Namespace<?>[] logicAsArray() {
         return new Namespace[] { programVariables(), sorts(), functions(),
@@ -149,20 +153,19 @@ public class NamespaceSet {
     }
 
     /**
-     * looks up if the given name is found in one of the namespaces and returns
-     * the named object or null if no object with the same name has been found
+     * looks up if the given name is found in one of the namespaces
+     * and returns the named object or null if no object with the same name
+     * has been found
      */
     public Named lookup(Name name) {
-        final Namespace<?>[] spaces = asArray();
-        return lookup(name, spaces);
+	final Namespace<?>[] spaces = asArray();
+	return lookup(name, spaces);
     }
 
     /**
      * looks up for the symbol in the namespaces sort, functions and
      * programVariables
-     *
-     * @param name
-     *            the Name to look up
+     * @param name the Name to look up
      * @return the element of the given name or null
      */
     public Named lookupLogicSymbol(Name name) {
@@ -172,26 +175,29 @@ public class NamespaceSet {
     /**
      * @param name
      * @param spaces
-     * @return the element with the given name if found in the given namespaces,
-     *         otherwise <tt>null</tt>
+     * @return the element with the given name if found in the
+     * given namespaces, otherwise <tt>null</tt>
      */
     private Named lookup(Name name, final Namespace<?>[] spaces) {
         for (Namespace<?> space : spaces) {
             final Named n = space.lookup(name);
-            if (n != null)
-                return n;
+            if (n != null) return n;
         }
         return null;
     }
 
+
     @Override
     public String toString() {
-        return "Sorts: " + sorts() + "\n" + "Functions: " + functions() + "\n"
-                + "Variables: " + variables() + "\n" + "ProgramVariables: "
-                + programVariables() + "\n" + "Heuristics: " + ruleSets() + "\n"
-                + "Taclet Options: " + choices() + "\n"
-                + "Abstract Program Symbols" + abstractProgramSymbols() + "\n";
+	return "Sorts: " + sorts() + "\n" +
+	    "Functions: " + functions() + "\n" +
+	    "Variables: " + variables() + "\n" +
+	    "ProgramVariables: " + programVariables() + "\n" +
+	    "Heuristics: " + ruleSets() + "\n" +
+	    "Taclet Options: " + choices() + "\n" +
+        "Abstract Program Symbols" + abstractProgramSymbols() + "\n";
     }
+
 
     public <T extends Name> boolean containsAll(Iterable<T> names) {
         for (Name name : names) {
@@ -217,6 +223,7 @@ public class NamespaceSet {
                 && funcNS.isEmpty() && ruleSetNS.isEmpty() && sortNS.isEmpty()
                 && choiceNS.isEmpty() && abstractProgramSymbolsNS.isEmpty();
     }
+
 
     // create a namespace
     public NamespaceSet simplify() {

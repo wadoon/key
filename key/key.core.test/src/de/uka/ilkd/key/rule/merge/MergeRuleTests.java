@@ -68,8 +68,7 @@ public class MergeRuleTests extends TestCase {
      */
     @Test
     public void testLoadGcdProofWithPredAbstr() {
-        Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX,
-                "gcd.closed.predicateabstraction.proof");
+        Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX, "gcd.closed.predicateabstraction.proof");
         assertTrue(proof.closed());
     }
 
@@ -83,8 +82,8 @@ public class MergeRuleTests extends TestCase {
      */
     @Test
     public void testLoadGcdProofWithPredAbstrAndUserChoices() {
-        Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX,
-                "gcd.closed.predicateAbstractionWithUserChoices.proof");
+        Proof proof = loadProof(
+                TEST_RESOURCES_DIR_PREFIX, "gcd.closed.predicateAbstractionWithUserChoices.proof");
         assertTrue(proof.closed());
     }
 
@@ -94,8 +93,7 @@ public class MergeRuleTests extends TestCase {
      */
     @Test
     public void testDoAutomaticGcdProofWithMergePointStatements() {
-        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX,
-                "gcd.mergePointStatements.key");
+        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX, "gcd.mergePointStatements.key");
         startAutomaticStrategy(proof);
 
         assertTrue(proof.closed());
@@ -118,8 +116,7 @@ public class MergeRuleTests extends TestCase {
      */
     @Test
     public void testLoadClosedGcdProofWithMergePointStatements() {
-        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX,
-                "gcd.mergePointStatements.closed.proof");
+        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX, "gcd.mergePointStatements.closed.proof");
 
         assertTrue(proof.closed());
 
@@ -176,8 +173,8 @@ public class MergeRuleTests extends TestCase {
      */
     @Test
     public void testLoadProofWithDiffVarsWithSameNameAndMPS() {
-        Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX,
-                "A.differentVarsWithSameName.MPS.cut.closed.proof");
+        Proof proof = loadProof(
+                TEST_RESOURCES_DIR_PREFIX, "A.differentVarsWithSameName.MPS.cut.closed.proof");
         assertTrue(proof.closed());
     }
 
@@ -224,14 +221,12 @@ public class MergeRuleTests extends TestCase {
      */
     @Test
     public void testMergeIndistinguishablePathConditionsWithITE() {
-        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX,
-                "IndistinguishablePathConditions.proof");
+        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX, "IndistinguishablePathConditions.proof");
 
         try {
             mergeFirstGoal(proof, MergeIfThenElseAntecedent.instance());
             fail("The merge operation should not be applicable.");
-        }
-        catch (IncompleteRuleAppException e) {
+        } catch (IncompleteRuleAppException e) {
         }
     }
 
@@ -241,14 +236,13 @@ public class MergeRuleTests extends TestCase {
      */
     @Test
     public void testMergeThreeIndistinguishablePathConditionsWithITE() {
-        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX,
-                "IndistinguishablePathConditions.twoJoins.proof");
+        final Proof proof = loadProof(
+                TEST_RESOURCES_DIR_PREFIX, "IndistinguishablePathConditions.twoJoins.proof");
 
         try {
             mergeFirstGoal(proof, MergeIfThenElseAntecedent.instance());
             fail("The merge operation should not be applicable.");
-        }
-        catch (IncompleteRuleAppException e) {
+        } catch (IncompleteRuleAppException e) {
         }
     }
 
@@ -259,8 +253,7 @@ public class MergeRuleTests extends TestCase {
      */
     @Test
     public void testMergeIndistinguishablePathConditionsWithFullAnonymization() {
-        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX,
-                "IndistinguishablePathConditions.proof");
+        final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX, "IndistinguishablePathConditions.proof");
 
         mergeFirstGoal(proof, MergeTotalWeakening.instance());
         startAutomaticStrategy(proof);

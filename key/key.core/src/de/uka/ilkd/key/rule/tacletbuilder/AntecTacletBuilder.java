@@ -42,7 +42,6 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet>{
      * the TacletGoalTemplate must not be a RewriteTacletGoalTemplate,
      * otherwise an illegal argument exception is thrown.
      */
-    @Override
     public void addTacletGoalTemplate(TacletGoalTemplate goal) {
 	if (goal instanceof RewriteTacletGoalTemplate) {
 	    throw new TacletBuilderException(this, "Tried to add a RewriteTaclet"+
@@ -63,7 +62,6 @@ public class AntecTacletBuilder extends FindTacletBuilder<AntecTaclet>{
      * recursive flags imply that the flags are not set.
      * No specified find part causes an IllegalStateException.
      */
-    @Override
     public AntecTaclet getTaclet(){
 	return getAntecTaclet();
     }

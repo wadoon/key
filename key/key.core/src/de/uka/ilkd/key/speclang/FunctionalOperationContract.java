@@ -133,7 +133,6 @@ public interface FunctionalOperationContract extends OperationContract {
     public Term getPost();
     public Term getMod();
     public Term getDeclares();
-    @Override
     public Term getMby();
     public Term getSelf();
     public ImmutableList<Term> getParams();

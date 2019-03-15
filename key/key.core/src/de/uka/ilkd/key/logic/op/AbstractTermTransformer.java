@@ -65,8 +65,8 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class AbstractTermTransformer extends AbstractSortedOperator
         implements TermTransformer {
 
-    private static final Map<String, AbstractTermTransformer> name2metaop = new LinkedHashMap<String, AbstractTermTransformer>(
-        70);
+    private static final Map<String, AbstractTermTransformer> name2metaop 
+    	= new LinkedHashMap<String, AbstractTermTransformer>(70);
 
     // must be first
     public static final Sort METASORT = new SortImpl(new Name("Meta"));
@@ -154,9 +154,8 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
         return name2metaop.get(s);
     }
 
-    /**
-     * @return String representing a logical integer literal in decimal
-     *         representation
+    /** @return String representing a logical integer literal 
+     *  in decimal representation
      */
     public static String convertToDecimalString(Term term, Services services) {
         StringBuilder result = new StringBuilder();

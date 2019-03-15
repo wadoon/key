@@ -123,7 +123,6 @@ public final class JMLTranslator {
         ACCESSIBLE ("accessible"),
         ASSIGNABLE ("assignable"),
         DECLARES ("declares"),
-        ASSIGNABLE_NOT ("assignable_not"),
         DEPENDS ("depends"),
         ENSURES ("ensures"),
         ENSURES_FREE ("ensures_free"),
@@ -285,30 +284,6 @@ public final class JMLTranslator {
                 }
             }
         });
-        /*
-         * TODO (DS, 2018-12-14): Copied this translation method from assignable
-         * and did not change anything, maybe that's not correct...
-         */
-        translationMethods.put(JMLKeyWord.ASSIGNABLE_NOT,
-                new JMLTranslationMethod() {
-                    @Override
-                    public Term translate(
-                            SLTranslationExceptionManager excManager,
-                            Object... params) throws SLTranslationException {
-                        checkParameters(params, Term.class, Services.class);
-                        Term ensuresTerm = (Term) params[0];
-                        Services services = (Services) params[1];
-
-                        BooleanLDT booleanLDT =
-                                services.getTypeConverter().getBooleanLDT();
-                        if (ensuresTerm.sort() == booleanLDT.targetSort()) {
-                            return tb.convertToFormula(ensuresTerm);
-                        }
-                        else {
-                            return ensuresTerm;
-                        }
-                    }
-                });
         /*
          * TODO (DS, 2019-01-06): Copied this translation method from assignable
          * and did not change anything, maybe that's not correct...
@@ -1704,10 +1679,8 @@ public final class JMLTranslator {
                                 Debug.out("Can't create a locset from local variable "+ t + ".\n" +
                                         "In this version of KeY, you do not need to put them in assignable clauses.");
                                 /*
-                                 * XXX (DS, 2018-12-14): This is a hack
-                                 * for assignable_not clauses. For
-                                 * assignable, we still want to ignore
-                                 * them...
+                                 * XXX (DS, 2018-12-14): This is a hack for AbstractExecution.
+                                 * we might want to ignore ProgramVariables not in AE specs...
                                  */
                                 singletons = singletons.append(tb.singletonPV(t));
                             } else {

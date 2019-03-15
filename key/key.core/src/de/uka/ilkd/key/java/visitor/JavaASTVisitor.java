@@ -12,7 +12,6 @@
 //
 
 package de.uka.ilkd.key.java.visitor;
-
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
@@ -36,56 +35,53 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
 
 /**
- * Extends the JavaASTWalker to use the visitor mechanism. The methods inherited
- * by the Visitor interface are all implemented that they call the method
- * <code> doDefaultAction(ProgramElement) </code>.
+ * Extends the JavaASTWalker to use the visitor mechanism. The
+ * methods inherited by the Visitor interface are all implemented that
+ * they call the method <code> doDefaultAction(ProgramElement) </code>.
  */
-public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
+public abstract class JavaASTVisitor extends JavaASTWalker
+    implements Visitor {
 
     protected final Services services;
 
-    /**
-     * create the JavaASTVisitor
-     *
-     * @param root
-     *            the ProgramElement where to begin
-     * @param services
-     *            the Services object
+
+    /** create the JavaASTVisitor
+     * @param root the ProgramElement where to begin
+     * @param services the Services object
      */
     public JavaASTVisitor(ProgramElement root, Services services) {
         super(root);
         this.services = services;
     }
 
+
     @Override
     protected void walk(ProgramElement node) {
         super.walk(node);
-        if (node instanceof LoopStatement && services != null) {
+        if(node instanceof LoopStatement && services != null) {
             LoopSpecification li = services.getSpecificationRepository()
-                    .getLoopSpec((LoopStatement) node);
-            if (li != null) {
+                                       .getLoopSpec((LoopStatement) node);
+            if(li != null) {
                 performActionOnLoopInvariant(li);
             }
-        }
-        else if (node instanceof StatementBlock && services != null) {
+        } else if (node instanceof StatementBlock && services != null) {
             ImmutableSet<BlockContract> bcs =
-                    services.getSpecificationRepository()
-                            .getBlockContracts((StatementBlock) node);
+                services.getSpecificationRepository()
+                    .getBlockContracts((StatementBlock) node);
             for (BlockContract bc : bcs) {
                 performActionOnBlockContract(bc);
             }
 
             ImmutableSet<LoopContract> lcs =
-                    services.getSpecificationRepository()
-                            .getLoopContracts((StatementBlock) node);
+                services.getSpecificationRepository()
+                    .getLoopContracts((StatementBlock) node);
             for (LoopContract lc : lcs) {
                 performActionOnLoopContract(lc);
             }
-        }
-        else if (node instanceof MergePointStatement && services != null) {
-            ImmutableSet<MergeContract> mcs =
-                    services.getSpecificationRepository()
-                            .getMergeContracts((MergePointStatement) node);
+        } else if (node instanceof MergePointStatement && services != null) {
+            ImmutableSet<MergeContract> mcs = services
+                    .getSpecificationRepository()
+                    .getMergeContracts((MergePointStatement) node);
             mcs.forEach(mc -> performActionOnMergeContract(mc));
         }
         else if (node instanceof AbstractPlaceholderStatement
@@ -96,7 +92,8 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
                                     (AbstractPlaceholderStatement) node);
             contracts.forEach(
                     this::performActionOnAbstractPlaceholderStatementContract);
-        }
+    }
+
     }
 
     /**
@@ -107,17 +104,15 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         node.visit(this);
     }
 
-    /**
-     * the action that is performed just before leaving the node the last time
-     *
-     * @param node
-     *            the node described above
+
+    /** the action that is performed just before leaving the node the
+     * last time
+     * @param node the node described above
      */
     protected abstract void doDefaultAction(SourceElement node);
 
     @Override
-    public void performActionOnAbstractProgramElement(
-            AbstractProgramElement x) {
+    public void performActionOnAbstractProgramElement(AbstractProgramElement x) {
         doDefaultAction(x);
     }
 
@@ -261,6 +256,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
         doDefaultAction(x);
     }
 
+
     @Override
     public void performActionOnSeqIndexOf(SeqIndexOf x) {
         doDefaultAction(x);
@@ -327,8 +323,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
-    public void performActionOnConstructorDeclaration(
-            ConstructorDeclaration x) {
+    public void performActionOnConstructorDeclaration(ConstructorDeclaration x) {
         doDefaultAction(x);
     }
 
@@ -468,8 +463,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
-    public void performActionOnImplicitFieldSpecification(
-            ImplicitFieldSpecification x) {
+    public void performActionOnImplicitFieldSpecification(ImplicitFieldSpecification x) {
         doDefaultAction(x);
     }
 
@@ -509,8 +503,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
-    public void performActionOnLocalVariableDeclaration(
-            LocalVariableDeclaration x) {
+    public void performActionOnLocalVariableDeclaration(LocalVariableDeclaration x) {
         doDefaultAction(x);
     }
 
@@ -518,7 +511,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     public void performActionOnLocationVariable(LocationVariable x) {
         // TODO: uncomment line below after KeY 1.0 and remove the call
         // to performActionOnProgramVariable
-        // doDefaultAction(x);
+        //doDefaultAction(x);
         performActionOnProgramVariable(x);
     }
 
@@ -643,8 +636,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
-    public void performActionOnParenthesizedExpression(
-            ParenthesizedExpression x) {
+    public void performActionOnParenthesizedExpression(ParenthesizedExpression x) {
         doDefaultAction(x);
     }
 
@@ -692,7 +684,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     public void performActionOnProgramConstant(ProgramConstant x) {
         // TODO: uncomment line below after KeY 1.0 and remove the call
         // to performActionOnProgramVariable
-        // doDefaultAction(x);
+        //doDefaultAction(x);
         performActionOnProgramVariable(x);
     }
 
@@ -727,14 +719,13 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
-    public void performActionOnSchematicFieldReference(
-            SchematicFieldReference x) {
+    public void performActionOnSchematicFieldReference(SchematicFieldReference x) {
         doDefaultAction(x);
     }
 
     @Override
     public void performActionOnSchemaVariable(SchemaVariable x) {
-        doDefaultAction((ProgramSV) x);
+        doDefaultAction((ProgramSV)x);
     }
 
     @Override
@@ -773,8 +764,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
-    public void performActionOnSuperConstructorReference(
-            SuperConstructorReference x) {
+    public void performActionOnSuperConstructorReference(SuperConstructorReference x) {
         doDefaultAction(x);
     }
 
@@ -804,8 +794,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
-    public void performActionOnThisConstructorReference(
-            ThisConstructorReference x) {
+    public void performActionOnThisConstructorReference(ThisConstructorReference x) {
         doDefaultAction(x);
     }
 
@@ -855,8 +844,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
     }
 
     @Override
-    public void performActionOnUnsignedShiftRightAssignment(
-            UnsignedShiftRightAssignment x) {
+    public void performActionOnUnsignedShiftRightAssignment(UnsignedShiftRightAssignment x) {
         doDefaultAction(x);
     }
 
@@ -887,7 +875,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     public void performActionOnLoopInvariant(LoopSpecification x) {
-        // do nothing
+        //do nothing
     }
 
     @Override
@@ -902,7 +890,7 @@ public abstract class JavaASTVisitor extends JavaASTWalker implements Visitor {
 
     @Override
     public void performActionOnMergeContract(MergeContract x) {
-        // do nothing
+        //do nothing
     }
 
     @Override

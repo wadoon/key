@@ -60,7 +60,6 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
      * @param goal the TacletGoalTemplate specifying all the changes to be made
      * to achieve one of the resulting goals
      */
-    @Override
     public void addTacletGoalTemplate(TacletGoalTemplate goal) {
 	goals = goals.prepend(goal);
     }
@@ -94,7 +93,6 @@ public class NoFindTacletBuilder extends TacletBuilder<NoFindTaclet> {
      * TacletBuilderException if a bound SchemaVariable occurs more than once in if
      * and find.
      */
-    @Override
     public NoFindTaclet getTaclet(){
 	checkBoundInIfAndFind();
 	return getNoFindTaclet();

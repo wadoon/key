@@ -212,13 +212,6 @@ public class ProgramVariableCollector extends JavaASTVisitor {
         }
         for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
                 .getAllHeaps()) {
-            Term modifiesNotClause = x.getModifiesNotClause(heap, services);
-            if (modifiesNotClause != null) {
-                modifiesNotClause.execPostOrder(collector);
-            }
-        }
-        for (LocationVariable heap : services.getTypeConverter().getHeapLDT()
-                .getAllHeaps()) {
             Term accessibleClause = x.getAccessibleClause(heap, services);
             if (accessibleClause != null) {
                 accessibleClause.execPostOrder(collector);

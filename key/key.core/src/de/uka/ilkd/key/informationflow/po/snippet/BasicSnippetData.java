@@ -87,7 +87,6 @@ class BasicSnippetData {
         LOOP_INVARIANT(LoopSpecification.class),
         LOOP_INVARIANT_TERM(Term.class),
         MODIFIES(Term.class),
-        MODIFIES_NOT(Term.class),
         DEPENDENS(Term.class),
         MEASURED_BY(Term.class),
         MODALITY(Modality.class),
@@ -225,7 +224,6 @@ class BasicSnippetData {
         contractContents.put(Key.PRECONDITION, contract.getPre(services));
         contractContents.put(Key.POSTCONDITION, contract.getPost(services));
         contractContents.put(Key.MODIFIES, contract.getMod(services));
-        contractContents.put(Key.MODIFIES_NOT, contract.getNonMod(services));
         contractContents.put(Key.MODALITY, contract.getModality());
         contractContents.put(Key.INF_FLOW_SPECS, contract.getInfFlowSpecs());
         List<Label> labels = contract.getLabels();

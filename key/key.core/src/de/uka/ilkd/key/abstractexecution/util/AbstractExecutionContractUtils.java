@@ -236,7 +236,6 @@ public class AbstractExecutionContractUtils {
                 final OpCollector opColl = new OpCollector();
                 bc.getAccessibleClause(heap).execPostOrder(opColl);
                 bc.getAssignable(heap).execPostOrder(opColl);
-                bc.getAssignableNot(heap).execPostOrder(opColl);
                 final int currVarsNotInContext = (int) opColl.ops().stream()
                         .filter(op -> op instanceof LocationVariable)
                         .map(LocationVariable.class::cast)

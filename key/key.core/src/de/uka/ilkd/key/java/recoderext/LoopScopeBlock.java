@@ -19,6 +19,7 @@ import recoder.java.ProgramElement;
 import recoder.java.SourceElement;
 import recoder.java.SourceVisitor;
 import recoder.java.Statement;
+import recoder.java.StatementBlock;
 import recoder.java.StatementContainer;
 import recoder.java.statement.JavaStatement;
 
@@ -44,6 +45,17 @@ public class LoopScopeBlock extends JavaStatement
         this.body = null;
     }
 
+    /**
+     * 
+     * @param resultVar
+     * @param body
+     */
+    public LoopScopeBlock(Expression resultVar, StatementBlock body) {
+        this.indexPV = resultVar;
+        this.body = body;
+        makeParentRoleValid();
+    }
+
     protected LoopScopeBlock(LoopScopeBlock proto) {
         super(proto);
         if (proto.indexPV != null) {
@@ -65,7 +77,7 @@ public class LoopScopeBlock extends JavaStatement
 
     /**
      * Set body.
-     *
+     * 
      * @param body
      *            the Statement
      */
@@ -75,7 +87,7 @@ public class LoopScopeBlock extends JavaStatement
 
     /**
      * Get body.
-     *
+     * 
      * @return the Statement
      */
     public Statement getBody() {
@@ -85,12 +97,11 @@ public class LoopScopeBlock extends JavaStatement
     /**
      * Finds the source element that occurs first in the source. Returns the
      * first element of the first child.
-     *
+     * 
      * @return the last source element in the syntactical representation of this
      *         element, may be equals to this element.
      */
 
-    @Override
     public SourceElement getFirstElement() {
         return getChildAt(0).getFirstElement();
     }
@@ -98,23 +109,21 @@ public class LoopScopeBlock extends JavaStatement
     /**
      * Finds the source element that occurs last in the source. Returns the last
      * element of the body.
-     *
+     * 
      * @return the last source element in the syntactical representation of this
      *         element, may be equals to this element.
      */
 
-    @Override
     public SourceElement getLastElement() {
         return body.getLastElement();
     }
 
     /**
      * Returns the number of children of this node.
-     *
+     * 
      * @return an int giving the number of children of this node
      */
 
-    @Override
     public int getChildCount() {
         int result = 0;
         if (indexPV != null)
@@ -127,7 +136,7 @@ public class LoopScopeBlock extends JavaStatement
     /**
      * Returns the child at the specified index in this node's "virtual" child
      * array
-     *
+     * 
      * @param index
      *            an index into this node's "virtual" child array
      * @return the program element at the given position
@@ -135,7 +144,6 @@ public class LoopScopeBlock extends JavaStatement
      *                if <tt>index</tt> is out of bounds
      */
 
-    @Override
     public ProgramElement getChildAt(int index) {
         if (indexPV != null) {
             if (index == 0)
@@ -150,7 +158,6 @@ public class LoopScopeBlock extends JavaStatement
         throw new ArrayIndexOutOfBoundsException();
     }
 
-    @Override
     public int getChildPositionCode(ProgramElement child) {
         // role -/0: indexPV
         // role 2/1: body
@@ -166,10 +173,9 @@ public class LoopScopeBlock extends JavaStatement
 
     /**
      * Get the number of statements in this container.
-     *
+     * 
      * @return the number of statements.
      */
-    @Override
     public int getStatementCount() {
         int result = (body != null) ? 1 : 0;
         return result;
@@ -178,14 +184,13 @@ public class LoopScopeBlock extends JavaStatement
     /**
      * Return the statement at the specified index in this node's "virtual"
      * statement array.
-     *
+     * 
      * @param index
      *            an index for a statement.
      * @return the statement with the given index.
      * @exception ArrayIndexOutOfBoundsException
      *                if <tt>index</tt> is out of bounds.
      */
-    @Override
     public Statement getStatementAt(int index) {
         if (body != null && index == 0) {
             return body;
@@ -195,10 +200,9 @@ public class LoopScopeBlock extends JavaStatement
 
     /**
      * Get the number of expressions in this container.
-     *
+     * 
      * @return the number of expressions.
      */
-    @Override
     public int getExpressionCount() {
         return (indexPV != null) ? 1 : 0;
     }
@@ -206,7 +210,7 @@ public class LoopScopeBlock extends JavaStatement
     /**
      * Return the expression at the specified index in this node's "virtual"
      * expression array.
-     *
+     * 
      * @param index
      *            an index for a expression.
      * @return the expression with the given index.
@@ -214,7 +218,6 @@ public class LoopScopeBlock extends JavaStatement
      *                if <tt>index</tt> is out of bounds.
      */
 
-    @Override
     public Expression getExpressionAt(int index) {
         if (indexPV != null && index == 0) {
             return indexPV;
@@ -228,7 +231,7 @@ public class LoopScopeBlock extends JavaStatement
      * element can be null - in that case, the child is effectively removed. The
      * parent role of the new child is validated, while the parent link of the
      * replaced child is left untouched.
-     *
+     * 
      * @param p
      *            the old child.
      * @param q
@@ -237,7 +240,6 @@ public class LoopScopeBlock extends JavaStatement
      * @exception ClassCastException
      *                if the new child cannot take over the role of the old one.
      */
-    @Override
     public boolean replaceChild(ProgramElement p, ProgramElement q) {
         if (indexPV == p) {
             Expression r = (Expression) q;
@@ -260,7 +262,6 @@ public class LoopScopeBlock extends JavaStatement
     /**
      * Ensures that each child has "this" as syntactical parent.
      */
-    @Override
     public void makeParentRoleValid() {
         super.makeParentRoleValid();
         if (indexPV != null) {
@@ -272,16 +273,14 @@ public class LoopScopeBlock extends JavaStatement
     }
 
     // don't think we need it
-    @Override
     public void accept(SourceVisitor v) {
     }
 
     /**
      * Deep clone.
-     *
+     * 
      * @return the object
      */
-    @Override
     public LoopScopeBlock deepClone() {
         return new LoopScopeBlock(this);
     }
