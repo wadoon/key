@@ -44,6 +44,10 @@ public class LoopInvariantCondition implements VariableCondition {
         }
         
         final Term properInvInst = loopSpec.getInvariant(services);
+        
+        if (properInvInst == null) {
+            return null;
+        }
 
         return matchCond.setInstantiations( //
                 svInst.add(inv, properInvInst, services));
