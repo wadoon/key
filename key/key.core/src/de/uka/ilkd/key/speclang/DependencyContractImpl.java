@@ -195,7 +195,6 @@ public final class DependencyContractImpl implements DependencyContract {
         return or.replace(originalPres.get(heap));
     }
 
-    @Override
     public Term getPre(List<LocationVariable> heapContext,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
@@ -248,7 +247,6 @@ public final class DependencyContractImpl implements DependencyContract {
     }
 
 
-    @Override
     public Term getPre(List<LocationVariable> heapContext,
             Map<LocationVariable,Term> heapTerms,
             Term selfTerm,

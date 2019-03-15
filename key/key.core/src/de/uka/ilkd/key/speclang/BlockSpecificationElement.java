@@ -114,8 +114,6 @@ public interface BlockSpecificationElement extends SpecificationElement {
      */
     public boolean hasModifiesClause(LocationVariable heap);
 
-    Term getAccessibleClause(LocationVariable heap);
-
     /**
      *
      * @return the {@code self} variable as a term.
@@ -269,6 +267,8 @@ public interface BlockSpecificationElement extends SpecificationElement {
      */
     public Term getModifiesClause(LocationVariable heap, Services services);
 
+    public Term getAccessibleClause(LocationVariable heap);
+
     public Term getAccessibleClause(LocationVariable heap, ProgramVariable self, Services services);
 
     public Term getAccessibleClause(LocationVariable heapVariable, Term heap, Term self,
@@ -296,8 +296,15 @@ public interface BlockSpecificationElement extends SpecificationElement {
      *            services.
      * @return this contract's declares clause on the specified heap.
      */
-    Term getDeclaresClause(LocationVariable heap, ProgramVariable self,
+    public Term getDeclaresClause(LocationVariable heap, ProgramVariable self,
             Services services);
+
+    /**
+     * @param heap
+     *            the heap to use.
+     * @return this contract's declares term on the specified heap.
+     */
+    public Term getDeclares(LocationVariable heap);
 
     /**
      *
@@ -322,13 +329,6 @@ public interface BlockSpecificationElement extends SpecificationElement {
      * @return this contract's assignable term on the specified heap.
      */
     public Term getAssignable(LocationVariable heap);
-
-    /**
-     * @param heap
-     *            the heap to use.
-     * @return this contract's declares term on the specified heap.
-     */
-    public Term getDeclares(LocationVariable heap);
 
     /**
      * Accepts a visitor.

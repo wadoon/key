@@ -64,8 +64,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     private Map<String, ImmutableList<PositionedString>> assignables = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
-    private Map<String, ImmutableList<PositionedString>> assignableNots = new LinkedHashMap<String, ImmutableList<PositionedString>>();
-
     private Map<String, ImmutableList<PositionedString>> declares = new LinkedHashMap<String, ImmutableList<PositionedString>>();
 
     private Map<String, ImmutableList<PositionedString>> requires = new LinkedHashMap<String, ImmutableList<PositionedString>>();
@@ -84,8 +82,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         this.behavior = behavior;
         for (Name hName : HeapLDT.VALID_HEAP_NAMES) {
             assignables.put(hName.toString(),
-                    ImmutableSLList.<PositionedString> nil());
-            assignableNots.put(hName.toString(),
                     ImmutableSLList.<PositionedString> nil());
             declares.put(hName.toString(),
                     ImmutableSLList.<PositionedString> nil());
@@ -160,7 +156,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         res.signalsOnly = signalsOnly;
         res.assignables = new LinkedHashMap(assignables);
         res.declares = new LinkedHashMap(declares);
-        res.assignableNots = new LinkedHashMap(assignableNots);
         res.contractsOfs = contractsOfs;
         res.accessibles = new LinkedHashMap(accessibles);
         res.infFlowSpecs = infFlowSpecs;
@@ -226,10 +221,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
 
     public void addAssignable(PositionedString ps) {
         addGeneric(assignables, ps);
-    }
-
-    public void addAssignableNot(PositionedString ps) {
-        addGeneric(assignableNots, ps);
     }
 
     public void addAssignable(ImmutableList<PositionedString> l) {
@@ -420,10 +411,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
         return declares.get(hName);
     }
 
-    public ImmutableList<PositionedString> getAssignableNot(String hName) {
-        return assignableNots.get(hName);
-    }
-
     public ImmutableList<PositionedString> getAccessible() {
         return accessibles.get(HeapLDT.BASE_HEAP_NAME.toString());
     }
@@ -540,12 +527,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
             }
         }
         for (Name h : HeapLDT.VALID_HEAP_NAMES) {
-            it = assignableNots.get(h.toString()).iterator();
-            while (it.hasNext()) {
-                sb.append("assignable_not<" + h + ">: " + it.next() + "\n");
-            }
-        }
-        for (Name h : HeapLDT.VALID_HEAP_NAMES) {
             it = declares.get(h.toString()).iterator();
             while (it.hasNext()) {
                 sb.append("declares<" + h + ">: " + it.next() + "\n");
@@ -626,8 +607,6 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
                 && requiresFree.equals(sc.requiresFree)
                 && declares.equals(sc.declares)
                 && assignables.equals(sc.assignables)
-                && declares.equals(sc.declares)
-                && assignableNots.equals(sc.assignableNots)
                 && contractsOfs.equals(sc.contractsOfs)
                 && accessibles.equals(sc.accessibles)
                 && axioms.equals(sc.axioms) && ensures.equals(sc.ensures)
@@ -644,7 +623,7 @@ public final class TextualJMLSpecCase extends TextualJMLConstruct {
     public int hashCode() {
         return mods.hashCode() + behavior.hashCode() + abbreviations.hashCode()
                 + requires.hashCode() + requiresFree.hashCode()
-                + assignables.hashCode() + assignableNots.hashCode()
+                + assignables.hashCode()
                 + contractsOfs.hashCode() + accessibles.hashCode()
                 + axioms.hashCode() + ensures.hashCode()
                 + ensuresFree.hashCode() + signals.hashCode()

@@ -18,6 +18,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1434,7 +1435,9 @@ public class JMLSpecFactory {
                             .append(collectLocalVariablesVisibleTo(block, method));
         } else {
             vars = append(ImmutableSLList.nil(), method.collectParameters())
-                    .append(collectLocalVariablesVisibleTo(block, method));
+                    .append(Optional.ofNullable(
+                            collectLocalVariablesVisibleTo(block, method))
+                            .orElse(ImmutableSLList.nil()));
         }
 
         return new ProgramVariableCollection(variables.self, vars, variables.result,
@@ -1500,7 +1503,7 @@ public class JMLSpecFactory {
                 }
             }
         }
-        return result;
+        return null;
     }
 
     private LoopSpecification createJMLLoopInvariant(IProgramMethod pm, LoopStatement loop,

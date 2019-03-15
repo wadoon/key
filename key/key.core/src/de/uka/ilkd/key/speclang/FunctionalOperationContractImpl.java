@@ -432,7 +432,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
 
-    @Override
     public Term getPre(List<LocationVariable> heapContext,
                        ProgramVariable selfVar,
                        ImmutableList<ProgramVariable> paramVars,
@@ -480,7 +479,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
 
-    @Override
     public Term getPre(List<LocationVariable> heapContext,
                        Map<LocationVariable,Term> heapTerms,
                        Term selfTerm,
@@ -503,7 +501,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
 
-    @Override
     public Term getFreePre(LocationVariable heap,
                            ProgramVariable selfVar,
                            ImmutableList<ProgramVariable> paramVars,
@@ -523,7 +520,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
 
-    @Override
     public Term getFreePre(List<LocationVariable> heapContext,
                            ProgramVariable selfVar,
                            ImmutableList<ProgramVariable> paramVars,
@@ -542,7 +538,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
     }
 
 
-    @Override
     public Term getFreePre(LocationVariable heap,
                            Term heapTerm,
                            Term selfTerm,
@@ -1104,7 +1099,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return or.replace(originalPosts.get(heap));
     }
 
-    @Override
     public Term getPost(List<LocationVariable> heapContext,
             ProgramVariable selfVar,
             ImmutableList<ProgramVariable> paramVars,
@@ -1157,7 +1151,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return or.replace(originalPosts.get(heap));
     }
 
-    @Override
     public Term getPost(List<LocationVariable> heapContext,
                         Map<LocationVariable,Term> heapTerms,
                         Term selfTerm,
@@ -1181,7 +1174,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return result;
     }
 
-    @Override
     public Term getFreePost(LocationVariable heap,
                             ProgramVariable selfVar,
                             ImmutableList<ProgramVariable> paramVars,
@@ -1203,7 +1195,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return or.replace(originalFreePosts.get(heap));
     }
 
-    @Override
     public Term getFreePost(LocationVariable heap,
                             Term heapTerm,
                             Term selfTerm,
@@ -1235,7 +1226,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return or.replace(originalFreePosts.get(heap));
     }
 
-    @Override
     public Term getFreePost(List<LocationVariable> heapContext,
                             Map<LocationVariable,Term> heapTerms,
                             Term selfTerm,
@@ -1321,7 +1311,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
        return or.replace(originalAxioms.get(heap));
     }
 
-    @Override
     public boolean isReadOnlyContract(Services services) {
         return originalMods.get(services.getTypeConverter().getHeapLDT().getHeap()).op() ==
                 services.getTypeConverter().getLocSetLDT().getEmpty();
@@ -1547,7 +1536,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return null;
     }
 
-    @Override
     public boolean transactionApplicableContract() {
         return transaction;
     }
@@ -1704,7 +1692,6 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return TB.var(originalExcVar);
     }
 
-    @Override
     public KeYJavaType getSpecifiedIn() {
 	    return specifiedIn;
     }
