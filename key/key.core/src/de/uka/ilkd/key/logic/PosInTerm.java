@@ -211,6 +211,7 @@ public final class PosInTerm {
      * @throws an {@link IndexOutOfBoundsException} if no subterm exists at this position
      */
     public Term getSubTerm(Term t) {
+        assert positions.length == size;
         Term sub = t;
         for (int i = 0; i<size; i++) {  
             sub = sub.sub(positions[i]);

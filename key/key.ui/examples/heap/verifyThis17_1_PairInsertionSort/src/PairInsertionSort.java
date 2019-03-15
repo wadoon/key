@@ -30,7 +30,7 @@ public class PairInsertionSort {
 	  @ loop_invariant (\old(right) + 2 - left) % 2 == (\old(right) - \old(left)) % 2;
 	  @ loop_invariant (\forall int i; \old(left) - 1 <= i && i <= \old(right); a[\old(left) - 1] <= a[i]);
 	  @ loop_invariant (\forall int i; \old(left) - 1 <= i && i < left - 1; a[i] <= a[i + 1]);
-	  @ assignable a[left..(right - 1 + (right - left) % 2)], left, k;
+	  @ assignable a[left..(right - 1 + (right - left) % 2)];
 	  @ decreases \old(right) + 1 - left;
 	  @*/
 	for (int k = left; ++left <= right; k = ++left) {
@@ -63,7 +63,7 @@ public class PairInsertionSort {
 	      @ loop_invariant (\forall int i; k + 2 <= i && i < left; a[i] <= a[i + 1]);
 	      @ loop_invariant (\forall int i; k <= i && i < left - 1; a1 < a[i]);
 	      @ loop_invariant (\forall int i; k + 2 <= i && i <= left; a1 < a[i]);
-	      @ assignable a[(\old(left))+2..left], k;
+	      @ assignable a[(\old(left))+2..left];
 	      @ decreases k;
 	      @*/
 	    while (a1 < a[--k]) {
@@ -84,7 +84,7 @@ public class PairInsertionSort {
 	      @ loop_invariant (\forall int i; k <= i && i < left - 1; a2 <= a[i]);
 	      @ loop_invariant (\forall int i; k + 1 <= i && i <= left; a2 <= a[i]);
 	      @ loop_invariant (\forall int i; k + 2 <= i && i <= left; a2 < a[i]);
-	      @ assignable a[(\old(left)+1)..left-1], k;
+	      @ assignable a[(\old(left)+1)..left-1];
 	      @ decreases k;
 	      @*/
 	    while (a2 < a[--k]) {
@@ -105,7 +105,7 @@ public class PairInsertionSort {
 	  @ loop_invariant (\forall int i; right + 1 <= i && i < \old(right); a[i] <= a[i + 1]);
 	  @ loop_invariant (\forall int i; right <= i && i < \old(right); last < a[i]);
 	  @ loop_invariant right < \old(right) ==> a[right] <= a[right + 1];
-	  @ assignable a[(\old(left))+1..(\old(right))], right;
+	  @ assignable a[(\old(left))+1..(\old(right))];
 	  @ decreases right;
 	  @*/
 	while (last < a[--right]) {
