@@ -1426,7 +1426,7 @@ public abstract class TacletApp implements RuleApp {
                         			instantiations().getContextInstantiation().activeStatementContext());
                     }
         	} else {
-        	    kjt = javaInfo.getKeYJavaType((Type)o);
+        	    kjt =(KeYJavaType)o;
         	}
                 assert kjt != null : "could not find kjt for: " + o;
         	return new LocationVariable

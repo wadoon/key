@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -372,8 +373,12 @@ public abstract class VariableNamer implements InstantiationProposer {
         } else {
             if (type instanceof KeYJavaType
                     && ((KeYJavaType) type).getJavaType() == null) {
-                type = services.getJavaInfo()
+                final KeYJavaType maybeFullType = services.getJavaInfo()
                         .getKeYJavaType(((KeYJavaType) type).getSort());
+                if (Optional.ofNullable(maybeFullType)
+                        .map(KeYJavaType::getJavaType).isPresent()) {
+                    type = maybeFullType;
+                }
             }
             String name = type.getName();
             name = MiscTools.filterAlphabetic(name);

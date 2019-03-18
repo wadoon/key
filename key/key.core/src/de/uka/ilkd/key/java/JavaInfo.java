@@ -500,12 +500,9 @@ public final class JavaInfo {
 	}
 	if(t instanceof PrimitiveType) {
 	    return getPrimitiveKeYJavaType((PrimitiveType)t);
-        } else if (type2KJTCache.get(t) != null) {
+        } else {
 	    return type2KJTCache.get(t);
-        } else if (t instanceof KeYJavaType) {
-            return getKeYJavaType(((KeYJavaType) t).getSort());
 	}
-        return null;
     }
 
     /**
