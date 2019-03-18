@@ -59,7 +59,7 @@ public class AbstractExecutionContractUtils {
      * @param context
      *            The context program (for choosing the "right" contract).
      * @param services
-     *            The {@link Services} object.
+     *            The {@link Services} object. 
      * @return The accessible locations for the given
      *         {@link AbstractPlaceholderStatement}.
      */
