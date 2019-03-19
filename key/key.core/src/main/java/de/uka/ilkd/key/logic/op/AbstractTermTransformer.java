@@ -50,13 +50,12 @@ import de.uka.ilkd.key.rule.metaconstruct.arith.MetaShiftRight;
 import de.uka.ilkd.key.rule.metaconstruct.arith.MetaSub;
 import de.uka.ilkd.key.util.Debug;
 
-
 /**
  * Abstract class factoring out commonalities of typical term transformer implementations.
  * The available singletons of term transformers are kept here.
  */
 public abstract class AbstractTermTransformer extends AbstractSortedOperator
-                                           implements TermTransformer {
+        implements TermTransformer {
 
     // must be first
     /** The metasort sort **/
@@ -104,13 +103,14 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
 
     public static final AbstractTermTransformer ENUM_CONSTANT_VALUE = new EnumConstantValue();
 
-    public static final AbstractTermTransformer DIVIDE_MONOMIALS = new DivideMonomials ();
+    public static final AbstractTermTransformer DIVIDE_MONOMIALS = new DivideMonomials();
 
-    public static final AbstractTermTransformer DIVIDE_LCR_MONOMIALS = new DivideLCRMonomials ();
+    public static final AbstractTermTransformer DIVIDE_LCR_MONOMIALS = new DivideLCRMonomials();
 
     public static final AbstractTermTransformer INTRODUCE_ATPRE_DEFINITIONS = new IntroAtPreDefsOp();
 
-    public static final AbstractTermTransformer CREATE_ANON_UPDATE = new CreateAnonUpdate();
+    public static final AbstractTermTransformer CREATE_LOCAL_ANON_UPDATE = new CreateLocalAnonUpdate();
+    public static final AbstractTermTransformer CREATE_HEAP_ANON_UPDATE = new CreateHeapAnonUpdate();
 
     public static final AbstractTermTransformer MEMBER_PV_TO_FIELD = new MemberPVToField();
 
@@ -120,35 +120,30 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer EXPAND_QUERIES = new ExpandQueriesMetaConstruct();
 
     /** Transformer producing condition for equality of observer terms */
-    public static final AbstractTermTransformer OBSERVER_EQUALITY =
-            new ObserverEqualityMetaConstruct();
+    public static final AbstractTermTransformer OBSERVER_EQUALITY = new ObserverEqualityMetaConstruct();
 
     private static Sort[] createMetaSortArray(int arity) {
-	Sort[] result = new Sort[arity];
-	for(int i = 0; i < arity; i++) {
-	    result[i] = METASORT;
-	}
-	return result;
+        Sort[] result = new Sort[arity];
+        for (int i = 0; i < arity; i++) {
+            result[i] = METASORT;
+        }
+        return result;
     }
-
 
     protected AbstractTermTransformer(Name name, int arity, Sort sort) {
         super(name, createMetaSortArray(arity), sort, false);
         NAME_TO_META_OP.put(name.toString(), this);
     }
 
-
-   protected AbstractTermTransformer(Name name, int arity) {
-	this(name, arity, METASORT);
+    protected AbstractTermTransformer(Name name, int arity) {
+        this(name, arity, METASORT);
     }
-
 
     public static TermTransformer name2metaop(String s) {
         return NAME_TO_META_OP.get(s);
     }
 
-
-    /** @return String representing a logical integer literal
+    /** @return String representing a logical integer literal 
      *  in decimal representation
      */
     public static String convertToDecimalString(Term term, Services services) {
@@ -158,58 +153,58 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
         Operator top = term.op();
         IntegerLDT intModel = services.getTypeConverter().getIntegerLDT();
         final Operator numbers = intModel.getNumberSymbol();
-        final Operator base    = intModel.getNumberTerminator();
-        final Operator minus   = intModel.getNegativeNumberSign();
+        final Operator base = intModel.getNumberTerminator();
+        final Operator minus = intModel.getNegativeNumberSign();
         // check whether term is really a "literal"
 
-        //skip any updates that have snuck in (int lits are rigid)
-        while (top==UpdateApplication.UPDATE_APPLICATION) {
+        // skip any updates that have snuck in (int lits are rigid)
+        while (top == UpdateApplication.UPDATE_APPLICATION) {
             term = term.sub(1);
             top = term.op();
         }
 
-	if (top != numbers) {
-	    Debug.out("abstractmetaoperator: Cannot convert to number:", term);
-	    throw (new NumberFormatException());
-	}
+        if (top != numbers) {
+            Debug.out("abstractmetaoperator: Cannot convert to number:", term);
+            throw (new NumberFormatException());
+        }
 
-	term = term.sub(0);
-	top = term.op();
+        term = term.sub(0);
+        top = term.op();
 
-        //skip any updates that have snuck in (int lits are rigid)
-        while (top==UpdateApplication.UPDATE_APPLICATION) {
+        // skip any updates that have snuck in (int lits are rigid)
+        while (top == UpdateApplication.UPDATE_APPLICATION) {
             term = term.sub(1);
             top = term.op();
         }
 
-	while (top == minus) {
-	    neg=!neg;
-	    term = term.sub(0);
-	    top = term.op();
+        while (top == minus) {
+            neg = !neg;
+            term = term.sub(0);
+            top = term.op();
 
-            //skip any updates that have snuck in (int lits are rigid)
-            while (top==UpdateApplication.UPDATE_APPLICATION) {
+            // skip any updates that have snuck in (int lits are rigid)
+            while (top == UpdateApplication.UPDATE_APPLICATION) {
                 term = term.sub(1);
                 top = term.op();
             }
-	}
+        }
 
-	while (top != base) {
-	    result.insert(0, top.name());
-	    term = term.sub(0);
-	    top = term.op();
+        while (top != base) {
+            result.insert(0, top.name());
+            term = term.sub(0);
+            top = term.op();
 
-            //skip any updates that have snuck in (int lits are rigid)
-            while (top==UpdateApplication.UPDATE_APPLICATION) {
+            // skip any updates that have snuck in (int lits are rigid)
+            while (top == UpdateApplication.UPDATE_APPLICATION) {
                 term = term.sub(1);
                 top = term.op();
             }
-	}
+        }
 
-	if (neg) {
-	    result.insert(0,"-");
-	}
+        if (neg) {
+            result.insert(0, "-");
+        }
 
-	return result.toString();
+        return result.toString();
     }
 }

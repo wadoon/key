@@ -98,8 +98,6 @@ options {
   
   import de.uka.ilkd.key.ldt.SeqLDT;
   import de.uka.ilkd.key.ldt.IntegerLDT;
-  
-  
 }
 
 @annotateclass{ @SuppressWarnings("all") } 
@@ -1976,21 +1974,21 @@ one_schema_var_decl
     { mods = new SchemaVariableModifierSet.FormulaSV (); }
     ( schema_modifiers[mods] ) ?    
     {s = Sort.FORMULA;}
-    ids = simple_ident_comma_list  
+    ids = simple_ident_comma_list
   | (    TERM
          { mods = new SchemaVariableModifierSet.TermSV (); }
          ( schema_modifiers[mods] ) ?
       | ( (VARIABLES | VARIABLE)
          { makeVariableSV = true; }
          { mods = new SchemaVariableModifierSet.VariableSV (); }
-         ( schema_modifiers[mods] ) ?)
+         ( schema_modifiers[mods] ) ?) 
       | (SKOLEMTERM 
          { makeSkolemTermSV = true; }
          { mods = new SchemaVariableModifierSet.SkolemTermSV (); }
          ( schema_modifiers[mods] ) ?)    	
     )
     s = any_sortId_check[true]
-    ids = simple_ident_comma_list 
+    ids = simple_ident_comma_list
   ) SEMI
    { 
      Iterator<String> it = ids.iterator();
@@ -3845,6 +3843,7 @@ varexp[TacletBuilder b]
 :
   ( varcond_applyUpdateOnRigid[b]
     | varcond_getInvariant[b]
+    | varcond_getVariant[b]
     | varcond_dropEffectlessElementaries[b]
     | varcond_dropEffectlessStores[b]
     | varcond_enum_const[b]
@@ -3908,7 +3907,15 @@ varcond_getInvariant [TacletBuilder b]
 :
    GET_INVARIANT LPAREN inv=varId RPAREN
    { 
-      b.addVariableCondition(new LoopInvariantCondition((SchemaVariable)inv)); 
+      b.addVariableCondition(new LoopInvariantCondition((SchemaVariable)inv));
+   }
+;
+
+varcond_getVariant [TacletBuilder b]
+:
+   GET_VARIANT LPAREN variant=varId RPAREN
+   { 
+      b.addVariableCondition(new LoopVariantCondition((SchemaVariable)variant)); 
    }
 ;
 
@@ -3916,7 +3923,9 @@ varcond_dropEffectlessElementaries[TacletBuilder b]
 :
    DROP_EFFECTLESS_ELEMENTARIES LPAREN u=varId COMMA x=varId COMMA result=varId RPAREN 
    {
-      b.addVariableCondition(new DropEffectlessElementariesCondition((UpdateSV)u, (SchemaVariable) x,(SchemaVariable)result));
+      b.addVariableCondition(new DropEffectlessElementariesCondition((UpdateSV)u, 
+                                                                     (SchemaVariable)x, 
+                                                                     (SchemaVariable)result));
    }
 ;
 
