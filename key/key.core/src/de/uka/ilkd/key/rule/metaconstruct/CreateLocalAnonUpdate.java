@@ -17,20 +17,30 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.StatementBlock;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.util.MiscTools;
 
-public final class CreateAnonUpdate extends AbstractTermTransformer {
+/**
+ * Expects a loop body and creates the anonymizing update
+ * <code>out_1:=anon_1||...||out_n:=anon_n</code>, where anon_1, ..., anon_n are
+ * the written variables in the loop body visible to the outside.
+ * 
+ * @author Dominic Steinhoefel
+ */
+public final class CreateLocalAnonUpdate extends AbstractTermTransformer {
 
-    public CreateAnonUpdate() {
-        super(new Name("#createAnonUpdate"), 1);
+    public CreateLocalAnonUpdate() {
+        super(new Name("#createLocalAnonUpdate"), 1);
     }
 
     @Override
@@ -39,11 +49,19 @@ public final class CreateAnonUpdate extends AbstractTermTransformer {
         final Term target = term.sub(0);
 
         // the target term should have a Java block
-        final ProgramElement pe = target.javaBlock().program();
-        assert pe != null;
+        if (target.javaBlock() == JavaBlock.EMPTY_JAVABLOCK) {
+            return null;
+        }
 
-        final ImmutableSet<ProgramVariable> localOuts = MiscTools
-                .getLocalOuts(pe, services);
+        assert target.op() instanceof Modality;
+
+        final ProgramElement pe = target.javaBlock().program();
+
+        assert pe != null;
+        assert pe instanceof StatementBlock;
+
+        final ImmutableSet<ProgramVariable> localOuts = //
+                MiscTools.getLocalOuts(pe, services);
         return createLocalAnonUpdate(localOuts, services);
     }
 
@@ -53,7 +71,7 @@ public final class CreateAnonUpdate extends AbstractTermTransformer {
 
         Term anonUpdate = tb.skip();
         for (ProgramVariable pv : localOuts) {
-            Function anonFunc = anonConstForPV(pv, services);
+            final Function anonFunc = anonConstForPV(pv, services);
             final Term elemUpd = //
                     tb.elementary((LocationVariable) pv, tb.func(anonFunc));
             anonUpdate = tb.parallel(anonUpdate, elemUpd);

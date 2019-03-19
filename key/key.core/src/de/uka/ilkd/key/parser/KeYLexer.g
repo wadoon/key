@@ -239,6 +239,7 @@ lexer grammar KeYLexer;
 	IS_DEFINED : '\\isDefined';
 	VARCOND : '\\varcond';
 	GET_INVARIANT : '\\getInvariant';
+	GET_VARIANT : '\\getVariant';
 	APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';
     DEPENDINGON : '\\dependingOn';
     FRESHFOR : '\\freshFor';

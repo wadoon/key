@@ -19,12 +19,12 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
  * 
  * @author Dominic Steinhoefel
  */
-public class LoopInvariantCondition implements VariableCondition {
+public class LoopVariantCondition implements VariableCondition {
 
-    private final SchemaVariable inv;
+    private final SchemaVariable variantSV;
 
-    public LoopInvariantCondition(SchemaVariable inv) {
-        this.inv = inv;
+    public LoopVariantCondition(SchemaVariable variantSV) {
+        this.variantSV = variantSV;
     }
 
     @Override
@@ -32,34 +32,34 @@ public class LoopInvariantCondition implements VariableCondition {
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
-        if (svInst.getInstantiation(inv) != null) {
+        if (svInst.getInstantiation(variantSV) != null) {
             return matchCond;
         }
 
-        final Statement activeStmt = (Statement) JavaTools
-                .getActiveStatement(
-                        JavaBlock.createJavaBlock((StatementBlock) svInst
-                                .getContextInstantiation().contextProgram()));
+        final Statement activeStmt = (Statement) JavaTools.getActiveStatement(
+                JavaBlock.createJavaBlock((StatementBlock) svInst
+                        .getContextInstantiation().contextProgram()));
         final LoopStatement loop = (LoopStatement) activeStmt;
         final LoopSpecification loopSpec = //
                 services.getSpecificationRepository().getLoopSpec(loop);
-        
+
         if (loopSpec == null) {
             return null;
         }
-        
-        final Term properInvInst = loopSpec.getInvariant(services);
-        
-        if (properInvInst == null) {
+
+        final Term variant = loopSpec.getVariant(loopSpec.getInternalSelfTerm(),
+                loopSpec.getInternalAtPres(), services);
+
+        if (variant == null) {
             return null;
         }
 
         return matchCond.setInstantiations( //
-                svInst.add(inv, properInvInst, services));
+                svInst.add(variantSV, variant, services));
     }
 
     @Override
     public String toString() {
-        return "\\getInvariant(" + inv + ")";
+        return "\\getVariant(" + variantSV + ")";
     }
 }

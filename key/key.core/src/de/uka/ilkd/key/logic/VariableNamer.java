@@ -371,15 +371,15 @@ public abstract class VariableNamer implements InstantiationProposer {
                     .getKeYJavaType().getJavaType(), svName);
             result += "_arr";
         } else {
-            if (type instanceof KeYJavaType
-                    && ((KeYJavaType) type).getJavaType() == null) {
-                final KeYJavaType maybeFullType = services.getJavaInfo()
-                        .getKeYJavaType(((KeYJavaType) type).getSort());
-                if (Optional.ofNullable(maybeFullType)
-                        .map(KeYJavaType::getJavaType).isPresent()) {
-                    type = maybeFullType;
-                }
-            }
+            //if (type instanceof KeYJavaType
+            //        && ((KeYJavaType) type).getJavaType() == null) {
+            //    final KeYJavaType maybeFullType = services.getJavaInfo()
+            //            .getKeYJavaType(((KeYJavaType) type).getSort());
+            //    if (Optional.ofNullable(maybeFullType)
+            //            .map(KeYJavaType::getJavaType).isPresent()) {
+            //        type = maybeFullType;
+            //    }
+            //}
             String name = type.getName();
             name = MiscTools.filterAlphabetic(name);
             if (name.length() > 0) {
