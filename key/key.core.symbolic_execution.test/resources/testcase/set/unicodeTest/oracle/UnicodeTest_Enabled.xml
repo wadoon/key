@@ -36,8 +36,8 @@
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <variable name="x_1" isArrayIndex="false">
-               <value name="x_1 {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            <variable name="boolv" isArrayIndex="false">
+               <value name="boolv {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <callStackEntry path="/0"/>
@@ -118,8 +118,8 @@
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <variable name="x_1" isArrayIndex="false">
-               <value name="x_1 {true}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            <variable name="boolv" isArrayIndex="false">
+               <value name="boolv {true}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <callStackEntry path="/0"/>

@@ -8,6 +8,6 @@
    <object xml:id="o1" name="obj" type="EmptyArrayCreationTest">
       <association name="array" programVariable="array" isArrayIndex="false" target="o2" condition="true"/>
    </object>
-   <object xml:id="o2" name="x_arr_3" type="int[]">
+   <object xml:id="o2" name="v0_arr_2" type="int[]">
    </object>
 </model>

@@ -6,7 +6,7 @@
       <association name="array {and(geq(*,Z(0(#))),leq(*,Z(1(#))))}" programVariable="array" isArrayIndex="false" target="o1" condition="and(geq(*,Z(0(#))),leq(*,Z(1(#))))"/>
       <association name="array {or(lt(*,Z(0(#))),gt(*,Z(1(#))))}" programVariable="array" isArrayIndex="false" target="o1" condition="or(lt(*,Z(0(#))),gt(*,Z(1(#))))"/>
    </state>
-   <object xml:id="o1" name="x_arr_3" type="int[]">
+   <object xml:id="o1" name="v0_arr_3" type="int[]">
       <value name="[Z(1(#))] {and(geq(*,Z(0(#))),leq(*,Z(1(#))))}" isArrayIndex="true" arrayIndex="Z(1(#))" value="Z(2(#))" type="int" condition="and(geq(*,Z(0(#))),leq(*,Z(1(#))))"/>
       <value name="[Z(1(#))] {or(lt(*,Z(0(#))),gt(*,Z(1(#))))}" isArrayIndex="true" arrayIndex="Z(1(#))" value="Z(2(#))" type="int" condition="or(lt(*,Z(0(#))),gt(*,Z(1(#))))"/>
       <value name="[Z(0(#))] {and(geq(*,Z(0(#))),leq(*,Z(1(#))))}" isArrayIndex="true" arrayIndex="Z(0(#))" value="Z(1(#))" type="int" condition="and(geq(*,Z(0(#))),leq(*,Z(1(#))))"/>

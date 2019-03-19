@@ -54,8 +54,8 @@
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <variable name="x" isArrayIndex="false">
-               <value name="x {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            <variable name="boolv" isArrayIndex="false">
+               <value name="boolv {true}" typeString="boolean" valueString="TRUE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <callStackEntry path="/0"/>
@@ -246,10 +246,10 @@ termination: diamond" pathCondition="not(equals(array,null))" pathConditionChang
                            <value name="heap {true}" typeString="Heap" valueString="heapAfter_sum" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
                         </variable>
-                        <variable name="x_1" isArrayIndex="false">
-                           <value name="x_1 {gt(result_0,Z(neglit(1(#))))}" typeString="int" valueString="quotient_1" isValueAnObject="false" isValueUnknown="false" conditionString="gt(result_0,Z(neglit(1(#))))">
+                        <variable name="v0" isArrayIndex="false">
+                           <value name="v0 {gt(result_0,Z(neglit(1(#))))}" typeString="int" valueString="quotient_1" isValueAnObject="false" isValueUnknown="false" conditionString="gt(result_0,Z(neglit(1(#))))">
                            </value>
-                           <value name="x_1 {lt(result_0,Z(0(#)))}" typeString="int" valueString="mul(quotient_0,Z(neglit(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="lt(result_0,Z(0(#)))">
+                           <value name="v0 {lt(result_0,Z(0(#)))}" typeString="int" valueString="mul(quotient_0,Z(neglit(1(#))))" isValueAnObject="false" isValueUnknown="false" conditionString="lt(result_0,Z(0(#)))">
                            </value>
                         </variable>
                         <methodReturn name="&lt;return of average&gt;" signature="&lt;return of self.average(array)&gt;" pathCondition="imp(geq(length(array),Z(0(#))),and(not(equals(array,null)),not(equals(length(array),Z(0(#))))))" pathConditionChanged="false" nameIncludingReturnValue="&lt;return 
@@ -346,8 +346,8 @@ as result of self.average(array)&gt;" isReturnValueComputed="true" methodReturnC
                <value name="exc {true}" typeString="Null" valueString="null" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
-            <variable name="x" isArrayIndex="false">
-               <value name="x {true}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
+            <variable name="boolv" isArrayIndex="false">
+               <value name="boolv {true}" typeString="boolean" valueString="FALSE" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                </value>
             </variable>
             <callStackEntry path="/0"/>

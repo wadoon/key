@@ -12,7 +12,7 @@
                   <blockContract name="main()) catch(exc_0)
 pre measuredByEmpty &amp; x_2 = 2
 post exc_0 = null &amp; x_2 = -2
-mod {}termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true">
+mod singletonPV(x_2)termination diamond" pathCondition="true" pathConditionChanged="false" preconditionComplied="true">
                      <callStackEntry path="/0"/>
                      <branchCondition name="true" pathCondition="true" pathConditionChanged="true" branchCondition="true" mergedBranchCondition="false" isBranchConditionComputed="true" additionalBranchLabel="Validity">
                         <callStackEntry path="/0"/>
