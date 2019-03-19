@@ -154,6 +154,10 @@ group comprehensions {
    notprovable ./heap/comprehensions/bsumSplitInvalid.key
 }
 
+group conflictBasedInstantiation {
+	provable ./standard_key/BookExamples/02FirstOrderLogic/Ex2.53.key
+} 
+
 # Performance tests
 group performance {
    provable ./performance-test/Disjoint(Disjoint__disjoint_08()).JML_operation_contract.0.key

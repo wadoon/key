@@ -16,41 +16,41 @@ import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
  */
 public class ConflictBasedIstantiation implements TermGenerator {
 
-	/*
-	 * Singleton behavior
-	 */
+    /*
+     * Singleton behavior
+     */
 
-	// This objects singleton instance
-	private static ConflictBasedIstantiation instance;
+    // This objects singleton instance
+    private static ConflictBasedIstantiation instance;
 
-	// Prevent creation by other methods
-	private ConflictBasedIstantiation() {
-	}
+    // Prevent creation by other classes
+    private ConflictBasedIstantiation() {}
 
-	/**
-	 * Returns the instance of this {@link ConflictBasedIstantiation} in a
-	 * singleton-way.
-	 * <p>
-	 * Returns an instance of {@link ConflictBasedIstantiation} if one has been
-	 * created. Otherwise a new instance will be created and returned.
-	 *
-	 * @return The instance of this {@link ConflictBasedIstantiation}
-	 */
-	public static ConflictBasedIstantiation getInstance() {
-		if (ConflictBasedIstantiation.instance == null) {
-			ConflictBasedIstantiation.instance = new ConflictBasedIstantiation();
-		}
-		return ConflictBasedIstantiation.instance;
-	}
+    /**
+     * Returns the instance of this {@link ConflictBasedIstantiation} in a
+     * singleton-way.
+     * <p>
+     * Returns an instance of {@link ConflictBasedIstantiation} if one has been
+     * created. Otherwise a new instance will be created and returned.
+     *
+     * @return The instance of this {@link ConflictBasedIstantiation}
+     */
+    public static ConflictBasedIstantiation getInstance() {
+        if (ConflictBasedIstantiation.instance == null) {
+            ConflictBasedIstantiation.instance = new ConflictBasedIstantiation();
+            System.out.println("I am alive!!!!");
+        }
+        return ConflictBasedIstantiation.instance;
+    }
 
-	/*
-	 * TermGenerator behavior
-	 */
+    /*
+     * TermGenerator behavior
+     */
 
-	@Override
-	public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
+        assert pos != null : "Feature is only applicable to rules with find";
+        return new CBIIterator(Confli, qv, services);
+    }
 
 }
