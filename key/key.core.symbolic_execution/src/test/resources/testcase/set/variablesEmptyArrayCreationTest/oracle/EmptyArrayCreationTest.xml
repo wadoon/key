@@ -30,7 +30,7 @@
             <variable name="obj" isArrayIndex="false">
                <value name="obj {true}" typeString="EmptyArrayCreationTest" valueString="obj" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                   <variable name="array" isArrayIndex="false">
-                     <value name="array {true}" typeString="int[]" valueString="x_arr_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                     <value name="array {true}" typeString="int[]" valueString="v0_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                         <variable name="length" isArrayIndex="false">
                            <value name="length {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                            </value>
@@ -51,7 +51,7 @@
                <variable name="obj" isArrayIndex="false">
                   <value name="obj {true}" typeString="EmptyArrayCreationTest" valueString="obj" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                      <variable name="array" isArrayIndex="false">
-                        <value name="array {true}" typeString="int[]" valueString="x_arr_3" isValueAnObject="true" isValueUnknown="false" conditionString="true">
+                        <value name="array {true}" typeString="int[]" valueString="v0_arr_2" isValueAnObject="true" isValueUnknown="false" conditionString="true">
                            <variable name="length" isArrayIndex="false">
                               <value name="length {true}" typeString="int" valueString="Z(0(#))" isValueAnObject="false" isValueUnknown="false" conditionString="true">
                               </value>
