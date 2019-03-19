@@ -65,11 +65,11 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     }
 
     protected Feature ifHeuristics (String[] heuristics,
-                                    Feature thenFeature,
-                                    Feature elseFeature) {
+            Feature thenFeature,
+            Feature elseFeature) {
         return ConditionalFeature.createConditional ( getFilterFor ( heuristics ),
-                                                      thenFeature,
-                                                      elseFeature );
+                thenFeature,
+                elseFeature );
     }
 
     protected Feature ifHeuristics (String[] names, int priority) {
@@ -86,53 +86,53 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
 
     protected RuleSet getHeuristic (String p_name) {
         final NamespaceSet nss = getProof ().getNamespaces ();
-        
-        assert nss != null : "Rule set namespace not available."; 
-        
+
+        assert nss != null : "Rule set namespace not available.";
+
         final Namespace<RuleSet> ns = nss.ruleSets ();
         final Named h = ns.lookup ( new Name ( p_name ) );
-    
+
         assert h != null : "Did not find the rule set " + p_name;
-    
+
         return (RuleSet)h;
     }
 
     protected void bindRuleSet(RuleSetDispatchFeature d,
-                               RuleSet ruleSet, Feature f) {
+            RuleSet ruleSet, Feature f) {
         d.add ( ruleSet, f );
     }
 
     protected void bindRuleSet(RuleSetDispatchFeature d,
-                               RuleSet ruleSet, long cost) {
+            RuleSet ruleSet, long cost) {
         bindRuleSet ( d, ruleSet, longConst ( cost ) );
     }
 
     protected void bindRuleSet(RuleSetDispatchFeature d,
-                               String ruleSet, Feature f) {
+            String ruleSet, Feature f) {
         bindRuleSet ( d, getHeuristic ( ruleSet ), f );
     }
 
     protected void bindRuleSet(RuleSetDispatchFeature d,
-                               String ruleSet, long cost) {
+            String ruleSet, long cost) {
         bindRuleSet ( d, getHeuristic ( ruleSet ), longConst ( cost ) );
     }
 
     protected void clearRuleSetBindings(RuleSetDispatchFeature d,
-                                        RuleSet ruleSet) {
+            RuleSet ruleSet) {
         d.clear ( ruleSet );
     }
 
     protected void clearRuleSetBindings(RuleSetDispatchFeature d,
-                                        String ruleSet) {
+            String ruleSet) {
         d.clear ( getHeuristic ( ruleSet ) );
     }
-    
+
     private final BackTrackingManager btManager = new BackTrackingManager ();
 
     public void instantiateApp ( RuleApp              app,
-                                       PosInOccurrence      pio,
-                                       Goal                 goal,
-                                       RuleAppCostCollector collector ) {
+            PosInOccurrence      pio,
+            Goal                 goal,
+            RuleAppCostCollector collector ) {
         btManager.setup ( app );
         do {
             final RuleAppCost cost = instantiateApp ( app, pio, goal );
@@ -142,11 +142,11 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
             collector.collect ( res, cost );
         } while ( btManager.backtrack () );
     }
- 
+
     protected abstract RuleAppCost instantiateApp (RuleApp              app,
-                                                   PosInOccurrence      pio,
-                                                   Goal                 goal);
-    
+            PosInOccurrence      pio,
+            Goal                 goal);
+
     protected Feature forEach(TermBuffer x, TermGenerator gen, Feature body) {
         return ForEachCP.create ( x, gen, body, btManager );
     }
@@ -154,15 +154,15 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     protected Feature oneOf(Feature[] features) {
         return OneOfCP.create ( features, btManager );
     }
-    
+
     protected Feature oneOf(Feature feature0, Feature feature1) {
         return oneOf ( new Feature[] { feature0, feature1 } );
     }
-    
+
     // it is possible to turn off the method <code>instantiate</code>,
     // which can be useful in order to use the same feature definitions both for
     // cost computation and instantiation
-    
+
     private boolean instantiateActive = false;
     protected void enableInstantiate() {
         instantiateActive = true;
@@ -170,7 +170,7 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
     protected void disableInstantiate() {
         instantiateActive = false;
     }
-    
+
     protected Feature instantiate(Name sv, ProjectionToTerm value) {
         if ( instantiateActive )
             return SVInstantiationCP.create ( sv, value, btManager);
@@ -184,9 +184,9 @@ public abstract class AbstractFeatureStrategy extends StaticFeatureCollection im
         else
             return longConst ( 0 );
     }
-    
+
     protected Feature instantiate(String sv, ProjectionToTerm value) {
         return instantiate ( new Name ( sv ), value );
     }
-    
+
 }
