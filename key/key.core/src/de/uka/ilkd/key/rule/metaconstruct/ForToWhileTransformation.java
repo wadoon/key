@@ -20,16 +20,13 @@ import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.expression.ExpressionStatement;
 import de.uka.ilkd.key.java.statement.For;
 import de.uka.ilkd.key.java.statement.Guard;
 import de.uka.ilkd.key.java.statement.IForUpdates;
 import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 /**
@@ -47,9 +44,9 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
  */
 
 public class ForToWhileTransformation extends WhileLoopTransformation {
-    
+
     public ForToWhileTransformation(ProgramElement root,
-            ProgramElementName outerLabel, ProgramElementName innerLabel, 
+            ProgramElementName outerLabel, ProgramElementName innerLabel,
             Services services) {
         super(root, outerLabel, innerLabel, services);
     }
@@ -74,14 +71,15 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
                 inits = (ILoopInit) changeList.removeFirst();
             }
 
-            Guard guard;            
-            if (x.getGuard() != null) {            
+            Guard guard;
+            if (x.getGuard() != null) {
                 guard = (Guard) changeList.removeFirst();
                 if (guard.getExpression() == null) {
-		    guard = KeYJavaASTFactory.trueGuard();
+                    guard = KeYJavaASTFactory.trueGuard();
                 }
-            } else {
-		guard = KeYJavaASTFactory.trueGuard();
+            }
+            else {
+                guard = KeYJavaASTFactory.trueGuard();
             }
 
             if (changeList.get(0) instanceof IForUpdates) {
@@ -91,18 +89,20 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
             body = (Statement) changeList.removeFirst();
 
             if (innerLabelNeeded() && breakInnerLabel != null) {
-		body = KeYJavaASTFactory.labeledStatement(
-			breakInnerLabel.getLabel(), body, PositionInfo.UNDEFINED);
+                body = KeYJavaASTFactory.labeledStatement(
+                        breakInnerLabel.getLabel(), body,
+                        PositionInfo.UNDEFINED);
             }
 
             final int updateSize = (updates == null ? 0 : updates.size());
-            
+
             Statement innerBlockStatements[] = new Statement[updateSize + 1];
             innerBlockStatements[0] = body;
             if (updates != null) {
                 for (int copyStatements = 0; copyStatements < updateSize; copyStatements++) {
-                    innerBlockStatements[copyStatements + 1] = (ExpressionStatement) updates
-                            .getExpressionAt(copyStatements);
+                    innerBlockStatements[copyStatements
+                            + 1] = (ExpressionStatement) updates
+                                    .getExpressionAt(copyStatements);
                 }
             }
 
@@ -115,30 +115,32 @@ public class ForToWhileTransformation extends WhileLoopTransformation {
                             .get(copyStatements);
                 }
             }
-            
-	    outerBlockStatements[initSize] = KeYJavaASTFactory.whileLoop(
-		    guard.getExpression(),
-		    KeYJavaASTFactory.block(innerBlockStatements), null);
 
-	    Statement outerBlock = KeYJavaASTFactory
-		    .block(outerBlockStatements);
+            outerBlockStatements[initSize] = KeYJavaASTFactory.whileLoop(
+                    guard.getExpression(),
+                    KeYJavaASTFactory.block(innerBlockStatements), null);
+
+            Statement outerBlock = KeYJavaASTFactory
+                    .block(outerBlockStatements);
 
             if (outerLabelNeeded() && breakOuterLabel != null) {
-		outerBlock = KeYJavaASTFactory.labeledStatement(
-			breakOuterLabel.getLabel(), outerBlock, PositionInfo.UNDEFINED);
+                outerBlock = KeYJavaASTFactory.labeledStatement(
+                        breakOuterLabel.getLabel(), outerBlock,
+                        PositionInfo.UNDEFINED);
             }
-            
+
             // copy loop invariant to the created while loop
-            LoopSpecification li 
-                = services.getSpecificationRepository().getLoopSpec(x);
+            LoopSpecification li = services.getSpecificationRepository()
+                    .getLoopSpec(x);
             if (li != null) {
-                li = li.setLoop((While)outerBlockStatements[initSize]);
+                li = li.setLoop((While) outerBlockStatements[initSize]);
                 services.getSpecificationRepository().addLoopInvariant(li);
             }
 
             addChild(outerBlock);
             changed();
-        } else {
+        }
+        else {
             super.performActionOnFor(x);
         }
     }

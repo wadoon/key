@@ -6,8 +6,13 @@ import java.util.Map;
 
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.statement.LoopStatement;
+import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.ldt.HeapLDT;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -18,9 +23,9 @@ import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
 import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 public class LoopScopeTools {
@@ -56,7 +61,7 @@ public class LoopScopeTools {
      * @return A conjunction of Terms produced by fct for all elements in
      *         listOfT.
      */
-    protected static <T> Term mapAndConjunct(Services services,
+    public static <T> Term mapAndConjunct(Services services,
             java.util.function.Function<T, Term> fct, final List<T> listOfT) {
         final TermBuilder tb = services.getTermBuilder();
 
@@ -88,12 +93,9 @@ public class LoopScopeTools {
                 Sort.ANY);
         services.getNamespaces().programVariables().addSafely(variantPV);
 
-        final boolean dia = ((Modality) term.sub(0).op())
-                .terminationSensitive();
+        final boolean dia = term.sub(3).equals(tb.tt());
         final Term variantUpdate = dia ? tb.elementary(variantPV, variant)
                 : tb.skip();
-        // final Term variantPO = dia ? tb.prec(variant, tb.var(variantPV))
-        // : tb.tt();
 
         return variantUpdate;
     }
@@ -148,11 +150,7 @@ public class LoopScopeTools {
         for (LocationVariable heap : heapContext) {
             heapToBeforeLoop.put(heap, new LinkedHashMap<Term, Term>());
 
-            // final LocationVariable lv =
-            // tb.heapAtPreVar(heap + "Before_LOOP", heap.sort(), true);
-            // tb.heapAtPreVar(term.toString(), heap.sort(), false);
             final LocationVariable lv = (LocationVariable) term.op();
-            // progVarNS.addSafely(lv);
 
             final Term u = tb.elementary(lv, tb.var(heap));
             if (beforeLoopUpdate == null) {
@@ -207,15 +205,9 @@ public class LoopScopeTools {
         services.getNamespaces().functions().addSafely(loopHeapFunc);
 
         final Term loopHeap = tb.func(loopHeapFunc);
-        // final Name anonHeapName = new Name(
-        // tb.newName("anon_" + heap + "_LOOP"));
-        // tb.newName(term.sub(2).toString()));
-        final Function anonHeapFunc =
-                // new Function(anonHeapName, heap.sort());
-                services.getNamespaces().functions().lookup(term.toString());
-        // services.getNamespaces().functions().addSafely(anonHeapFunc);
+        final Function anonHeapFunc = services.getNamespaces().functions()
+                .lookup(term.toString());
         final Term anonHeapTerm = tb.label(tb.func(anonHeapFunc),
-                // tb.label(term,
                 ParameterlessTermLabel.ANON_HEAP_LABEL);
 
         // check for strictly pure loops
@@ -246,5 +238,14 @@ public class LoopScopeTools {
             this.loopHeapAtPre = loopHeapAtPre;
             this.anonHeap = anonHeap;
         }
+    }
+
+    public static LoopStatement getLoopFromActiveStatement(
+            SVInstantiations svInst, Services services) {
+        MethodFrame mf = JavaTools.getInnermostMethodFrame(
+                svInst.getContextInstantiation().contextProgram(), services);
+        Statement activeStmt = (Statement) JavaTools
+                .getActiveStatement(JavaBlock.createJavaBlock(mf.getBody()));
+        return (LoopStatement) activeStmt;
     }
 }

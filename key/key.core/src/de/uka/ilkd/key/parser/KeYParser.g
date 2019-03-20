@@ -3827,6 +3827,7 @@ varexp[TacletBuilder b]
     | varcond_getInvariant[b]
     | varcond_getAnonUpdate[b]
     | varcond_getGuardExpr[b]
+    | varcond_terminationSensitive[b]
     | varcond_dropEffectlessElementaries[b]
     | varcond_dropEffectlessStores[b]
     | varcond_enum_const[b]
@@ -3881,6 +3882,14 @@ varcond_getInvariant [TacletBuilder b]
    GET_INVARIANT LPAREN inv=varId COMMA x=varId RPAREN
    { 
       b.addVariableCondition(new LoopInvariantCondition((SchemaVariable)inv, (ModalOperatorSV)x)); 
+   }
+;
+
+varcond_terminationSensitive [TacletBuilder b]
+:
+   TERMINATION_SENSITIVE LPAREN ts=varId COMMA x=varId RPAREN
+   { 
+      b.addVariableCondition(new TerminationSensitive((SchemaVariable)ts, (ModalOperatorSV)x)); 
    }
 ;
 

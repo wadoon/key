@@ -5,12 +5,8 @@ import java.util.Map;
 
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -22,6 +18,7 @@ import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.rule.metaconstruct.LoopScopeTools;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
@@ -40,17 +37,10 @@ public class LoopInvariantCondition implements VariableCondition {
     public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
             MatchConditions matchCond, Services services) {
 
-        SVInstantiations svInst = matchCond.getInstantiations();
-
         final TermBuilder tb = services.getTermBuilder();
-        MethodFrame mf = JavaTools.getInnermostMethodFrame(
-                svInst.getContextInstantiation().contextProgram(), services);
-
-        Statement activeStmt = (Statement) JavaTools
-                .getActiveStatement(JavaBlock.createJavaBlock(mf.getBody()));
-        ;
-        LoopStatement loop = (LoopStatement) activeStmt;
-
+        SVInstantiations svInst = matchCond.getInstantiations();
+        LoopStatement loop = LoopScopeTools.getLoopFromActiveStatement(svInst,
+                services);
         LoopSpecification spec = services.getSpecificationRepository()
                 .getLoopSpec(loop);
         final Map<LocationVariable, Term> atPres = spec.getInternalAtPres();
@@ -61,11 +51,11 @@ public class LoopInvariantCondition implements VariableCondition {
         final List<LocationVariable> heapContext = HeapContext
                 .getModHeaps(services, transaction);
 
-        final Term invTerm = mapAndConjunct(
+        final Term invTerm = LoopScopeTools.mapAndConjunct(
                 services, (pv -> spec.getInvariant(pv,
                         spec.getInternalSelfTerm(), atPres, services)),
                 heapContext);
-        final Term invFreeTerm = mapAndConjunct(
+        final Term invFreeTerm = LoopScopeTools.mapAndConjunct(
                 services, (pv -> spec.getFreeInvariant(pv,
                         spec.getInternalSelfTerm(), atPres, services)),
                 heapContext);
@@ -81,31 +71,6 @@ public class LoopInvariantCondition implements VariableCondition {
 
         svInst = svInst.add(inv, t, services);
         return matchCond.setInstantiations(svInst);
-    }
-
-    /**
-     * Creates a conjunction of {@link Term}s that are produced by fct from the
-     * elements in listOfT. fct may return null when applied to a T object; in
-     * this case, the result is ignored when constructing the conjunction.
-     * 
-     * @param services
-     *            The {@link Services} object.
-     * @param fct
-     *            A mapping from T objects to {@link Term}s (formulas!).
-     * @param listOfT
-     *            A list of T objects.
-     * @return A conjunction of Terms produced by fct for all elements in
-     *         listOfT.
-     */
-    protected static <T> Term mapAndConjunct(Services services,
-            java.util.function.Function<T, Term> fct, final List<T> listOfT) {
-        final TermBuilder tb = services.getTermBuilder();
-
-        // @formatter:off
-        return listOfT.stream().map(t -> fct.apply(t))
-                .filter(term -> term != null)
-                .reduce(tb.tt(), (acc, term) -> tb.and(acc, term));
-        // @formatter:on
     }
 
     @Override

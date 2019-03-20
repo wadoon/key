@@ -1,11 +1,7 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -24,12 +20,8 @@ public class GetVariant extends AbstractTermTransformer {
     public Term transform(Term term, SVInstantiations svInst,
             Services services) {
 
-        MethodFrame mf = JavaTools.getInnermostMethodFrame(
-                svInst.getContextInstantiation().contextProgram(), services);
-        Statement activeStmt = (Statement) JavaTools
-                .getActiveStatement(JavaBlock.createJavaBlock(mf.getBody()));
-        LoopStatement loop = (LoopStatement) activeStmt;
-
+        LoopStatement loop = LoopScopeTools.getLoopFromActiveStatement(svInst,
+                services);
         LoopSpecification spec = services.getSpecificationRepository()
                 .getLoopSpec(loop);
 
