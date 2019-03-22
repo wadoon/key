@@ -3863,6 +3863,7 @@ varexp[TacletBuilder b]
   | 
   ( (NOT_ {negated = true;} )? 
     (   varcond_abstractOrInterface[b, negated]
+	    | varcond_hasLoopLabel[b, negated]
 	    | varcond_array[b, negated]
         | varcond_array_length[b, negated]	
         | varcond_enumtype[b, negated]
@@ -3925,6 +3926,14 @@ varcond_dropEffectlessElementaries[TacletBuilder b]
       b.addVariableCondition(new DropEffectlessElementariesCondition((UpdateSV)u, 
                                                                      (SchemaVariable)x, 
                                                                      (SchemaVariable)result));
+   }
+;
+
+varcond_hasLoopLabel[TacletBuilder b, boolean negated]
+:
+   HAS_LOOP_LABEL
+   {
+      b.addVariableCondition(new HasLoopLabelCondition(negated));
    }
 ;
 
