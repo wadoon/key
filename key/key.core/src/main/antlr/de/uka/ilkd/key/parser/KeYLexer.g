@@ -225,12 +225,12 @@ lexer grammar KeYLexer;
 	PROGRAMVARIABLES : '\\programVariables';
 
         // Keywords for varcond and related stuff
-	SAME_OBSERVER : '\\sameObserver';
+    SAME_OBSERVER : '\\sameObserver';
 	VARCOND : '\\varcond';
 	GET_INVARIANT : '\\getInvariant';
 	GET_VARIANT : '\\getVariant';
 	APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';
-        DEPENDINGON : '\\dependingOn';
+    DEPENDINGON : '\\dependingOn';
 	DISJOINTMODULONULL  : '\\disjointModuloNull';
 	DROP_EFFECTLESS_ELEMENTARIES : '\\dropEffectlessElementaries';
 	DROP_EFFECTLESS_STORES : '\\dropEffectlessStores';

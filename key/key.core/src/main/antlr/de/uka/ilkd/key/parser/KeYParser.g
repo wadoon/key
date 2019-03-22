@@ -3907,7 +3907,7 @@ varcond_getInvariant [TacletBuilder b]
 :
    GET_INVARIANT LPAREN inv=varId RPAREN
    { 
-      b.addVariableCondition(new LoopInvariantCondition((SchemaVariable)inv));
+      b.addVariableCondition(new LoopInvariantCondition((SchemaVariable)inv)); 
    }
 ;
 
@@ -3915,10 +3915,9 @@ varcond_getVariant [TacletBuilder b]
 :
    GET_VARIANT LPAREN variant=varId RPAREN
    { 
-      b.addVariableCondition(new LoopVariantCondition((SchemaVariable)variant)); 
+      b.addVariableCondition(new LoopVariantCondition((SchemaVariable)variant));
    }
 ;
-
 varcond_dropEffectlessElementaries[TacletBuilder b]
 :
    DROP_EFFECTLESS_ELEMENTARIES LPAREN u=varId COMMA x=varId COMMA result=varId RPAREN 
