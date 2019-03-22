@@ -1,10 +1,13 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.java.Statement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.While;
-import de.uka.ilkd.key.logic.PosInProgram;
+import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
@@ -12,6 +15,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
  * Construct for re-attaching a loop invariant that otherwise would get lost
  * after a transformation, for instance, the loop scope-based unwinding rule.
  * Copied from the 2015 TimSort tweaks branch (by DS), original work by Richard.
+ * Changed extraction of active statement to also work with labeled loops.
  *
  * @author Richard Bubel
  */
@@ -27,14 +31,14 @@ public class ReattachLoopInvariant extends ProgramTransformer {
                 svInst.getContextInstantiation().contextProgram();
 
         if (context != null) {
-            final PosInProgram prefix = svInst.getContextInstantiation()
-                    .getInstantiation().prefix();
+            final Statement activeStmt = (Statement) JavaTools
+                    .getActiveStatement(JavaBlock.createJavaBlock(
+                            (StatementBlock) svInst.getContextInstantiation()
+                                    .contextProgram()));
+            assert activeStmt instanceof LoopStatement;
 
-            assert PosInProgram.getProgramAt(prefix,
-                    context) instanceof LoopStatement;
+            final LoopStatement loop = (LoopStatement) activeStmt;
 
-            final LoopStatement loop = (LoopStatement) PosInProgram
-                    .getProgramAt(prefix, context);
             LoopSpecification li = //
                     services.getSpecificationRepository().getLoopSpec(loop);
 
