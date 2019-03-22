@@ -809,34 +809,6 @@ public final class WhileInvariantRule implements BuiltInRule {
         goal.changeFormula(wdInv, pio);
     }
    
-    /**
-     * Abstract Execution added program variables to assignable terms. They
-     * appear as "singletonPV(x)" terms in the modifies clause. For loop
-     * invariant applications, they have to be ignored (we obtain the modified
-     * visible locals by static analysis). Therefore, we filter them from the
-     * modifies term by this method.
-     * 
-     * @param modTerm
-     *            The original modifies term, maybe with singletonPV functions.
-     * @param services
-     *            The {@link Services} object (for {@link TermBuilder} and
-     *            {@link LocSetLDT}).
-     * @return The modTerm without singletonPV subterms.
-     */
-    private static Term removeSingletonPVs(Term modTerm, Services services) {
-        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
-        final TermBuilder tb = services.getTermBuilder();
-        
-        if (modTerm.op() == locSetLDT.getSingletonPV()) {
-            return tb.empty();
-        } else if (modTerm.op() == locSetLDT.getUnion()) {
-            return tb.union(removeSingletonPVs(modTerm.sub(0), services),
-                    removeSingletonPVs(modTerm.sub(1), services));
-        } else {
-            return modTerm;
-        }
-    }
-
     @Override
     public ImmutableList<Goal> apply(Goal goal, Services services, final RuleApp ruleApp)
             throws RuleAbortException {
@@ -858,7 +830,7 @@ public final class WhileInvariantRule implements BuiltInRule {
 
         final Map<LocationVariable,Term> mods = new LinkedHashMap<LocationVariable,Term>();
         for(LocationVariable heap : heapContext) {
-            final Term m = removeSingletonPVs(
+            final Term m = MiscTools.removeSingletonPVs(
                     inst.inv.getModifies(heap, inst.selfTerm, atPres, services),
                     services);
             mods.put(heap, m);

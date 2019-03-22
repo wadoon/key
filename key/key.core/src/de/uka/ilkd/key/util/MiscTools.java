@@ -46,6 +46,7 @@ import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
+import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.FilterVisitor;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.JavaBlock;
@@ -1004,5 +1005,36 @@ public final class MiscTools {
                 term -> term.op() == UpdateApplication.UPDATE_APPLICATION);
         t.execPostOrder(fv);
         return !fv.result().isEmpty();
+    }
+
+
+    /**
+     * Abstract Execution added program variables to assignable terms. They
+     * appear as "singletonPV(x)" terms in the modifies clause. For loop
+     * invariant applications, they have to be ignored (we obtain the modified
+     * visible locals by static analysis). Therefore, we filter them from the
+     * modifies term by this method.
+     * 
+     * @param modTerm
+     *            The original modifies term, maybe with singletonPV functions.
+     * @param services
+     *            The {@link Services} object (for {@link TermBuilder} and
+     *            {@link LocSetLDT}).
+     * @return The modTerm without singletonPV subterms.
+     */
+    public static Term removeSingletonPVs(Term modTerm, Services services) {
+        final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        final TermBuilder tb = services.getTermBuilder();
+    
+        if (modTerm.op() == locSetLDT.getSingletonPV()) {
+            return tb.empty();
+        }
+        else if (modTerm.op() == locSetLDT.getUnion()) {
+            return tb.union(removeSingletonPVs(modTerm.sub(0), services),
+                    removeSingletonPVs(modTerm.sub(1), services));
+        }
+        else {
+            return modTerm;
+        }
     }
 }

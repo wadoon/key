@@ -34,6 +34,7 @@ import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Expects a loop body and a Skolem constant "anon_heap_LOOP" for the anonymized
@@ -104,7 +105,8 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
 
         Term anonHeapUpdate = tb.skip();
         for (LocationVariable heap : heapContext) {
-            final Term mod = mods.get(heap);
+            final Term mod = //
+                    MiscTools.removeSingletonPVs(mods.get(heap), services);
             anonHeapUpdate = tb.parallel(anonHeapUpdate,
                     tb.strictlyNothing().equals(mod) ? tb.skip()
                             : tb.anonUpd(heap, mod, anonHeapTerm));

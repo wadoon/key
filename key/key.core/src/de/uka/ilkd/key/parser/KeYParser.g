@@ -3873,8 +3873,10 @@ varexp[TacletBuilder b]
     | varcond_newPV[b]
     | varcond_initializeExpression[b]
     | varcond_storeResultVarIn[b]
+    | varcond_storeTermIn[b]
     | varcond_storeContextLabelsIn[b]
     | varcond_storeContextLoopLabelsIn[b]
+    | varcond_initBeforeLoopUpdate[b]
     | varcond_freshAbstractProgram[b]
     | varcond_dropEffectlessStores[b]
     | varcond_enum_const[b]
@@ -4041,6 +4043,14 @@ varcond_storeResultVarIn[TacletBuilder b]
    }
 ;
 
+varcond_storeTermIn[TacletBuilder b]
+:
+   STORE_TERM_IN LPAREN sv=varId COMMA t=term RPAREN 
+   {
+      b.addVariableCondition(new StoreTermInCondition((SchemaVariable) sv, t));
+   }
+;
+
 varcond_storeContextLabelsIn[TacletBuilder b]
 :
    STORE_CONTEXT_LABELS_IN LPAREN sv=varId RPAREN 
@@ -4054,6 +4064,14 @@ varcond_storeContextLoopLabelsIn[TacletBuilder b]
    STORE_CONTEXT_LOOP_LABELS_IN LPAREN sv=varId RPAREN 
    {
       b.addVariableCondition(new StoreContextLoopLabelsInCondition((ProgramSV) sv));
+   }
+;
+
+varcond_initBeforeLoopUpdate[TacletBuilder b]
+:
+   INIT_BEFORE_LOOP_UPDATE LPAREN sv=varId COMMA termSV=varId RPAREN 
+   {
+      b.addVariableCondition(new InitBeforeLoopUpdate((SchemaVariable) sv, (SchemaVariable) termSV));
    }
 ;
 
