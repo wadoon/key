@@ -3897,6 +3897,7 @@ varexp[TacletBuilder b]
   ( (NOT_ {negated = true;} )? 
     (   varcond_abstractOrInterface[b, negated]
 	    | varcond_prefixContainsElement[b, negated]
+	    | varcond_hasLoopLabel[b, negated]
 	    | varcond_array[b, negated]
         | varcond_isDefined[b, negated]	
         | varcond_abstractUpdate[b, negated]
@@ -4156,6 +4157,14 @@ varcond_prefixContainsElement[TacletBuilder b, boolean negated]
    PREFIX_CONTAINS_ELEMENT LPAREN className=string_literal RPAREN 
    {
       b.addVariableCondition(new PrefixContainsElementCondition(className, negated));
+   }
+;
+
+varcond_hasLoopLabel[TacletBuilder b, boolean negated]
+:
+   HAS_LOOP_LABEL
+   {
+      b.addVariableCondition(new HasLoopLabelCondition(negated));
    }
 ;
 
