@@ -151,7 +151,7 @@ public class InitBeforeLoopUpdate implements VariableCondition {
     @Override
     public String toString() {
         return String.format( //
-                "\\varcond (\\initBeforeLoopSymbols(%s, %s))", storeInSV, termSV);
+                "\\varcond (\\initBeforeLoopUpdate(%s, %s))", storeInSV, termSV);
     }
 
 }
