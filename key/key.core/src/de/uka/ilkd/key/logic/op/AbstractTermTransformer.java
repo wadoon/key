@@ -28,8 +28,8 @@ import de.uka.ilkd.key.rule.metaconstruct.BreaksSpec;
 import de.uka.ilkd.key.rule.metaconstruct.ConstantValue;
 import de.uka.ilkd.key.rule.metaconstruct.ContinuesSpec;
 import de.uka.ilkd.key.rule.metaconstruct.CreateFrameCond;
-import de.uka.ilkd.key.rule.metaconstruct.CreateHeapAnonUpdate;
 import de.uka.ilkd.key.rule.metaconstruct.CreateLocalAnonUpdate;
+import de.uka.ilkd.key.rule.metaconstruct.CreateWellformedCond;
 import de.uka.ilkd.key.rule.metaconstruct.EnumConstantValue;
 import de.uka.ilkd.key.rule.metaconstruct.ExcSpec;
 import de.uka.ilkd.key.rule.metaconstruct.ExpandQueriesMetaConstruct;
@@ -116,8 +116,8 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer INTRODUCE_ATPRE_DEFINITIONS = new IntroAtPreDefsOp();
 
     public static final AbstractTermTransformer CREATE_LOCAL_ANON_UPDATE = new CreateLocalAnonUpdate();
-    public static final AbstractTermTransformer CREATE_HEAP_ANON_UPDATE = new CreateHeapAnonUpdate();
     public static final AbstractTermTransformer CREATE_FRAME_COND = new CreateFrameCond();
+    public static final AbstractTermTransformer CREATE_WELLFORMED_COND = new CreateWellformedCond();
 
     public static final AbstractTermTransformer MEMBER_PV_TO_FIELD = new MemberPVToField();
 
