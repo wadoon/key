@@ -60,6 +60,7 @@ import java.util.*;
  */
 public class TacletMenu extends JMenu {
 
+    private static final String INTRODUCE_AXIOM_TACLET_NAME = "introduceAxiom";
     private static final String MORE_RULES = "More rules";
     private static final String COPY_TO_CLIPBOARD = "Copy to clipboard";
     private static final String CREATE_ABBREVIATION = "Create abbreviation";
@@ -142,7 +143,23 @@ public class TacletMenu extends JMenu {
         // delete RewriteTaclet from findList because they will be in
         // the rewrite list and concatenate both lists
         createTacletMenu(removeRewrites(findList).prepend(rewriteList),
-                noFindList, builtInList, new MenuControl());
+                removeIntroduceAxiomTaclet(noFindList), builtInList, new MenuControl());
+    }
+
+    /**
+     * Removes the unsound "introduceAxiom" taclet from the list of displayed
+     * taclets.
+     * 
+     * @param list
+     *            The list from which to filter.
+     * @return The original list, without the "introduceAxiom" taclet.
+     */
+    private static ImmutableList<TacletApp>
+            removeIntroduceAxiomTaclet(ImmutableList<TacletApp> list) {
+        return list.stream().filter(
+                app -> !app.rule().name().toString()
+                        .equals(INTRODUCE_AXIOM_TACLET_NAME))
+                .collect(ImmutableSLList.toImmutableList());
     }
 
 
