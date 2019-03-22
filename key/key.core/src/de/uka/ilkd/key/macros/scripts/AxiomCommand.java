@@ -11,14 +11,14 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.rule.TacletApp;
 
 /**
- * The assume command takes one argument: * a formula to which the command is
+ * The assume command takes one argument: a formula to which the command is
  * applied
  */
-public class AssumeCommand
-        extends AbstractCommand<AssumeCommand.FormulaParameter> {
+public class AxiomCommand
+        extends AbstractCommand<AxiomCommand.FormulaParameter> {
     private static final Name TACLET_NAME = new Name("introduceAxiom");
 
-    public AssumeCommand() {
+    public AxiomCommand() {
         super(FormulaParameter.class);
     }
 
@@ -31,7 +31,7 @@ public class AssumeCommand
 
     @Override
     public String getName() {
-        return "assume";
+        return "axiom";
     }
 
     @Override
