@@ -16,7 +16,7 @@ import de.uka.ilkd.key.rule.TacletApp;
  */
 public class AssumeCommand
         extends AbstractCommand<AssumeCommand.FormulaParameter> {
-    private static final Name TACLET_NAME = new Name("UNSOUND_ASSUME");
+    private static final Name TACLET_NAME = new Name("introduceAxiom");
 
     public AssumeCommand() {
         super(FormulaParameter.class);
