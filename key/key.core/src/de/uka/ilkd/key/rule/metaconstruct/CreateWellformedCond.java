@@ -13,70 +13,76 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
-import java.util.List;
-
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
-import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
+import de.uka.ilkd.key.util.MiscTools;
 
 /**
- * Creates the wellformedness condition for anonymizing function symbols in the
- * given anonymizing heap update. New symbols in the anonymizing update (like
- * "anon_heap_LOOP") are added to the namespaces. This is because the update is,
- * for the loop scope invariant taclet, created by a variable condition; new
- * symbols created there are not automatically stored in the proof, or will be
- * generated/stored multiple times.
+ * Creates the wellformedness condition for the given anonymizing heap terms if
+ * they apply for the current profile and modality type. At least generates the
+ * "wellFormed(anon_heap_LOOP)" condition for the anonymized standard heap.
  * 
  * @author Dominic Steinhoefel
  */
 public final class CreateWellformedCond extends AbstractTermTransformer {
 
     public CreateWellformedCond() {
-        super(new Name("#wellFormedCond"), 1);
+        super(new Name("#wellFormedCond"), 4);
     }
 
     @Override
     public Term transform(Term term, SVInstantiations svInst,
             Services services) {
-        final Term anonHeapUpdate = term.sub(0);
-        return createWellformedCond(anonHeapUpdate, services);
+        final Term anonHeapTerm = term.sub(1);
+        final Term anonSavedHeapTerm = term.sub(2);
+        final Term anonPermissionsHeapTerm = term.sub(3);
+
+        final Operator op = term.sub(0).op();
+        assert op instanceof Modality;
+
+        return createWellformedCond(MiscTools.isTransaction((Modality) op),
+                MiscTools.isPermissions(services), anonHeapTerm,
+                anonSavedHeapTerm, anonPermissionsHeapTerm, services);
     }
 
     /**
-     * Extracts from the anonymizing heap update the anonymizing functions and
-     * creates a wellformedness condition. Thereby, saves the new functions in
-     * the namespaces (which should not have occurred before!).
+     * Creates a wellformedness condition containing the applicable heaps.
      * 
-     * @param heapAnonUpdate
-     *            The anonymizing heap update.
+     * @param isTransaction
+     *            Signals a transaction modality.
+     * @param isPermissions
+     *            Signals the permission profile.
+     * @param anonHeapTerm
+     *            The Skolem term for the standard heap.
+     * @param anonSavedHeapTerm
+     *            The Skolem term for the saved (transaction) heap.
+     * @param anonPermissionsHeapTerm
+     *            The Skolem term for the permissions heap.
      * @param services
      *            The {@link Services} object.
      * @return The wellformedness condition.
      */
-    private Term createWellformedCond(Term heapAnonUpdate, Services services) {
+    private Term createWellformedCond(boolean isTransaction,
+            boolean isPermissions, Term anonHeapTerm, Term anonSavedHeapTerm,
+            Term anonPermissionsHeapTerm, Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        final List<Term> elems = MergeRuleUtils
-                .getElementaryUpdates(heapAnonUpdate, tb);
 
-        Term result = null;
-        for (final Term elem : elems) {
-            final Operator op = elem.sub(0).op();
-            assert op == services.getTypeConverter().getHeapLDT().getAnon();
-            final Term anonFunTerm = elem.sub(0).sub(2);
+        Term result = tb.label(tb.wellFormed(anonHeapTerm),
+                ParameterlessTermLabel.ANON_HEAP_LABEL);
 
-            services.getNamespaces().functions()
-                    .addSafely((Function) anonFunTerm.op());
-            services.getNameRecorder().addProposal(anonFunTerm.op().name());
+        if (isTransaction) {
+            result = tb.and(result, tb.wellFormed(anonSavedHeapTerm));
+        }
 
-            final Term singleWfTerm = tb.wellFormed(anonFunTerm);
-            result = result == null ? singleWfTerm
-                    : tb.and(result, singleWfTerm);
+        if (isPermissions) {
+            result = tb.and(result, tb.wellFormed(anonPermissionsHeapTerm));
         }
 
         return result;

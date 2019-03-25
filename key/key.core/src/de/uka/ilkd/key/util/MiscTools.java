@@ -23,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -38,11 +39,13 @@ import de.uka.ilkd.key.java.PositionInfo;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.SourceElement;
+import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.declaration.VariableSpecification;
 import de.uka.ilkd.key.java.expression.Assignment;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
 import de.uka.ilkd.key.java.reference.ReferencePrefix;
 import de.uka.ilkd.key.java.reference.TypeReference;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
@@ -59,6 +62,7 @@ import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
 import de.uka.ilkd.key.logic.op.UpdateJunctor;
@@ -71,6 +75,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.rule.OneStepSimplifier;
 import de.uka.ilkd.key.rule.Rule;
 import de.uka.ilkd.key.rule.RuleApp;
+import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 
@@ -1036,5 +1041,65 @@ public final class MiscTools {
         else {
             return modTerm;
         }
+    }
+
+
+    /**
+     * Returns the {@link LoopSpecification} for the program in the given term,
+     * the active statement of which has to be a loop statement. Returns an
+     * empty {@link Optional} if there is no specification for that statement.
+     * Asserts that there is indeed a Java block in the term which has as active
+     * statement a loop statement, thus throws an {@link AssertionError} if not
+     * or otherwise results in undefined behavior in that case.
+     * 
+     * @param loopTerm
+     *            The term for which to return the {@link LoopSpecification}.
+     * @param services
+     *            The {@link Services} object.
+     * 
+     * @return The {@link LoopSpecification} for the loop statement in the given
+     *         term or an empty optional if there is no specified invariant for
+     *         the loop.
+     */
+    public static Optional<LoopSpecification>
+            getSpecForTermWithLoopStmt(final Term loopTerm, Services services) {
+        assert loopTerm.op() instanceof Modality;
+        assert loopTerm.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
+    
+        final ProgramElement pe = loopTerm.javaBlock().program();
+        assert pe != null;
+        assert pe instanceof StatementBlock;
+        assert ((StatementBlock) pe).getFirstElement() instanceof LoopStatement;
+    
+        final LoopStatement loop = //
+                (LoopStatement) ((StatementBlock) pe).getFirstElement();
+    
+        return Optional.ofNullable(
+                services.getSpecificationRepository().getLoopSpec(loop));
+    }
+
+
+    /**
+     * @param services
+     *            The {@link Services} object.
+     * @return true iff the given {@link Services} object is associated to a
+     *         {@link Profile} with permissions.
+     */
+    public static boolean isPermissions(Services services) {
+        return services.getProfile() instanceof JavaProfile
+                && ((JavaProfile) services.getProfile()).withPermissions();
+    }
+
+
+    /**
+     * Checks whether the given {@link Modality} is a transaction modality.
+     * 
+     * @param modality
+     *            The modality to check.
+     * @return true iff the given {@link Modality} is a transaction modality.
+     */
+    public static boolean isTransaction(final Modality modality) {
+        return modality == Modality.BOX_TRANSACTION
+                || modality == Modality.DIA_TRANSACTION;
     }
 }
