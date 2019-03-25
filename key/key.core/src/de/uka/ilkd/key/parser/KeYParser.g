@@ -3876,8 +3876,6 @@ varexp[TacletBuilder b]
     | varcond_storeTermIn[b]
     | varcond_storeContextLabelsIn[b]
     | varcond_storeContextLoopLabelsIn[b]
-    | varcond_initBeforeLoopUpdate[b]
-    | varcond_initHeapAnonUpdate[b]
     | varcond_freshAbstractProgram[b]
     | varcond_dropEffectlessStores[b]
     | varcond_enum_const[b]
@@ -4066,22 +4064,6 @@ varcond_storeContextLoopLabelsIn[TacletBuilder b]
    STORE_CONTEXT_LOOP_LABELS_IN LPAREN sv=varId RPAREN 
    {
       b.addVariableCondition(new StoreContextLoopLabelsInCondition((ProgramSV) sv));
-   }
-;
-
-varcond_initBeforeLoopUpdate[TacletBuilder b]
-:
-   INIT_BEFORE_LOOP_UPDATE LPAREN sv=varId COMMA termSV=varId RPAREN 
-   {
-      b.addVariableCondition(new InitBeforeLoopUpdate((SchemaVariable) sv, (SchemaVariable) termSV));
-   }
-;
-
-varcond_initHeapAnonUpdate[TacletBuilder b]
-:
-   INIT_HEAP_ANON_UPDATE LPAREN sv=varId COMMA termSV=varId RPAREN 
-   {
-      b.addVariableCondition(new InitHeapAnonUpdate((SchemaVariable) sv, (SchemaVariable) termSV));
    }
 ;
 

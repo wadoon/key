@@ -234,8 +234,6 @@ lexer grammar KeYLexer;
     NEW_PV : '\\newPV' ;
     STORE_RESULT_VAR_IN : '\\storeResultVarIn' ;
     STORE_TERM_IN : '\\storeTermIn' ;
-    INIT_BEFORE_LOOP_UPDATE : '\\initBeforeLoopUpdate' ;
-    INIT_HEAP_ANON_UPDATE : '\\initHeapAnonUpdate' ;
     FRESH_ABSTRACT_PROGRAM : '\\freshAbstractProgram' ;
     STORE_CONTEXT_LABELS_IN : '\\storeContextLabelsIn' ;
     STORE_CONTEXT_LOOP_LABELS_IN : '\\storeContextLoopLabelsIn' ;
