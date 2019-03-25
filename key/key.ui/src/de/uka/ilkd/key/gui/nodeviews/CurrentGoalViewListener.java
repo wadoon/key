@@ -22,6 +22,19 @@ import java.awt.dnd.DragSourceDropEvent;
 import java.awt.dnd.InvalidDnDOperationException;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
+import java.awt.PointerInfo;
+import java.awt.MouseInfo;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import de.uka.ilkd.key.rule.TacletApp;
+import java.util.*;
+import de.uka.ilkd.key.gui.nodeviews.TacletMenu;
+import de.uka.ilkd.key.gui.nodeviews.TacletMenu.TacletAppComparator;
+
 
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
@@ -30,6 +43,7 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import org.key_project.util.collection.ImmutableList;
+import de.uka.ilkd.key.control.ProofControl;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
@@ -47,11 +61,16 @@ import de.uka.ilkd.key.settings.ProofIndependentSettings;
  * instantiation dialog)
  */
 class CurrentGoalViewListener
-        implements MouseListener, DragGestureListener {
+        implements MouseListener, DragGestureListener, KeyListener, MouseMotionListener {
 
     private static final int POPUP_DELAY = 400;
     private final KeYMediator mediator;
     private final CurrentGoalView currentGoalView;
+
+    /** stores last mouse position for Keyboard-Shortcuts; changes on each mouseMove */
+    private Point lastMousePoint;
+
+    private final TacletAppComparator comp = new TacletAppComparator();
 
     private TacletMenu menu;
     private boolean modalDragNDropEnabled;
@@ -66,6 +85,74 @@ class CurrentGoalViewListener
         this.currentGoalView = currentGoalView;
         menu = new TacletMenu();
         setModalDragNDropEnabled(false);
+    }
+
+    @Override
+    public void keyPressed(KeyEvent ke) {
+        PosInSequent mousePos = currentGoalView.getPosInSequent(lastMousePoint);
+
+        final ImmutableList<BuiltInRule> builtInRules
+            = mediator.getUI().getProofControl().getBuiltInRule
+                (mediator.getSelectedGoal(), mousePos.getPosInOccurrence());
+        
+        System.out.print("find taclet " );
+        builtInRules.forEach(item -> System.out.println(item));
+
+        final ProofControl proofControl = mediator
+            .getUI()
+            .getProofControl();
+
+        final ImmutableList<TacletApp> tacletRules = TacletMenu.sort(proofControl
+            .getFindTaclet(mediator.getSelectedGoal(), mousePos.getPosInOccurrence()), comp);
+            // .append(
+            //     proofControl.getNoFindTaclet(mediator.getSelectedGoal())
+            // );
+
+        final Optional<TacletApp> rule = tacletRules.stream()
+            .filter(item -> item.taclet().name().toString().toLowerCase().startsWith(""+ke.getKeyChar()))
+            .findFirst();
+        
+        if (rule.isPresent()) {
+            System.out.println("run taclet: "+ rule.get().taclet().name());
+            currentGoalView.selectedTaclet(rule.get(), mousePos);
+            currentGoalView.grabFocus();
+        } else {
+            Optional<BuiltInRule> builtInRule = builtInRules.stream()
+                .filter(item -> item.toString().toLowerCase().startsWith(""+ke.getKeyChar()))
+                .findFirst();
+
+            if (builtInRule.isPresent()) {
+                System.out.println("run builtin: "+ builtInRule.get());
+                
+                mediator.getUI()
+                    .getProofControl()
+                    .selectedBuiltInRule(
+                        mediator.getSelectedGoal(),
+                        builtInRule.get(),
+                        mousePos.getPosInOccurrence(),
+                        false
+                    );
+            }
+
+        }
+        
+    }
+
+    @Override
+    public void mouseMoved(MouseEvent me) {
+        lastMousePoint = me.getPoint();
+    }
+
+    @Override
+    public void keyReleased(KeyEvent ke) {
+    }
+
+    @Override
+    public void keyTyped(KeyEvent ke) { 
+    }
+
+    @Override 
+    public void mouseDragged(MouseEvent me) {
     }
 
     @Override

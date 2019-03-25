@@ -146,6 +146,8 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
         };
 
         addMouseListener(listener);
+        addKeyListener(listener);
+        addMouseMotionListener(listener);
 
         // and here comes the drag'n'drop stuff that allows the user to copy
         // the currently highlighted subterm/formula by mere drag'n'dop actions
