@@ -16,26 +16,21 @@ package de.uka.ilkd.key.rule.metaconstruct;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.StatementBlock;
-import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.ldt.HeapLDT;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
-import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
  * Creates the frame condition (aka "assignable clause") for the given loop.
@@ -51,41 +46,33 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 public final class CreateFrameCond extends AbstractTermTransformer {
 
     public CreateFrameCond() {
-        super(new Name("#createFrameCond"), 2);
+        super(new Name("#createFrameCond"), 4);
     }
 
     @Override
     public Term transform(Term term, SVInstantiations svInst,
             Services services) {
         final Term loopFormula = term.sub(0);
-        final Term beforeLoopUpdate = term.sub(1);
+        final ProgramVariable heapBeforePV = //
+                (ProgramVariable) term.sub(1).op();
+        final ProgramVariable savedHeapBeforePV = //
+                (ProgramVariable) term.sub(2).op();
+        final ProgramVariable permissionsHeapBeforePV = //
+                (ProgramVariable) term.sub(3).op();
 
-        // the target term should have a Java block
-        if (loopFormula.javaBlock() == JavaBlock.EMPTY_JAVABLOCK) {
-            return null;
-        }
+        final Optional<LoopSpecification> loopSpec = //
+                MiscTools.getSpecForTermWithLoopStmt(loopFormula, services);
 
-        assert loopFormula.op() instanceof Modality;
-        final boolean isTransaction = loopFormula
-                .op() == Modality.BOX_TRANSACTION
-                || loopFormula.op() == Modality.DIA_TRANSACTION;
-
-        final ProgramElement pe = loopFormula.javaBlock().program();
-
-        assert pe != null;
-        assert pe instanceof StatementBlock;
-        assert ((StatementBlock) pe).getFirstElement() instanceof LoopStatement;
-
-        final LoopStatement loop = //
-                (LoopStatement) ((StatementBlock) pe).getFirstElement();
-
-        final LoopSpecification loopSpec = //
-                services.getSpecificationRepository().getLoopSpec(loop);
+        final boolean isTransaction = MiscTools
+                .isTransaction((Modality) loopFormula.op());
+        final boolean isPermissions = MiscTools.isPermissions(services);
 
         final Map<LocationVariable, Map<Term, Term>> heapToBeforeLoopMap = //
-                createHeapToBeforeLoopMap(beforeLoopUpdate, services);
+                createHeapToBeforeLoopMap(isTransaction, isPermissions,
+                        heapBeforePV, savedHeapBeforePV,
+                        permissionsHeapBeforePV, services);
 
-        final Term frameCondition = createFrameCondition(loopSpec,
+        final Term frameCondition = createFrameCondition(loopSpec.get(),
                 isTransaction, heapToBeforeLoopMap, services);
 
         return frameCondition;
@@ -141,43 +128,47 @@ public final class CreateFrameCond extends AbstractTermTransformer {
     }
 
     /**
-     * Extracts from the update saving the pre-state values the map from heap
-     * variables to a map from original terms to the pre-state terms. Thereby,
-     * saves the new variables in the namespaces (which should not have occurred
-     * before!).
+     * Creates the map from heap variables to a map from original terms to the
+     * pre-state terms. Thereby, saves the new variables in the namespaces
+     * (which should not have occurred before!).
      * 
-     * @param beforeLoopUpdate
-     *            The update from new "before loop" PVs to the previous values.
+     * @param isTransaction
+     *            Signals that the current modality is a transaction modality.
+     * @param isPermissions
+     *            Signals that the current profile is one with permissions.
+     * @param heapBeforePV
+     *            The fresh PV for saving the standard heap.
+     * @param savedHeapBeforePV
+     *            The fresh PV for saving the transaction heap.
+     * @param permissionsHeapBeforePV
+     *            The fresh PV for saving the permissions heap.
      * @param services
      *            The {@link Services} object.
+     * 
      * @return A map from heap variables to a map from original terms to the
      *         pre-state terms.
      */
     private Map<LocationVariable, Map<Term, Term>> createHeapToBeforeLoopMap(
-            Term beforeLoopUpdate, Services services) {
+            boolean isTransaction, boolean isPermissions,
+            ProgramVariable heapBeforePV, ProgramVariable savedHeapBeforePV,
+            ProgramVariable permissionsHeapBeforePV, Services services) {
         final Map<LocationVariable, Map<Term, Term>> result = //
                 new LinkedHashMap<LocationVariable, Map<Term, Term>>();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final TermBuilder tb = services.getTermBuilder();
 
-        final List<Term> elems = MergeRuleUtils
-                .getElementaryUpdates(beforeLoopUpdate, tb);
+        put(result, heapLDT.getHeap(), tb.var(heapLDT.getHeap()),
+                tb.var(heapBeforePV));
 
-        for (final Term elem : elems) {
-            final LocationVariable lhs = //
-                    (LocationVariable) ((ElementaryUpdate) elem.op()).lhs();
-            final Operator op = elem.sub(0).op();
-            assert op instanceof LocationVariable;
-            final LocationVariable rhs = (LocationVariable) op;
+        if (isTransaction) {
+            put(result, heapLDT.getSavedHeap(), tb.var(heapLDT.getSavedHeap()),
+                    tb.var(savedHeapBeforePV));
+        }
 
-            services.getNamespaces().programVariables().addSafely(lhs);
-
-            final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-            if (rhs.sort() == heapLDT.targetSort()) {
-                put(result, rhs, elem.sub(0), tb.var(lhs));
-            }
-            else {
-                put(result, heapLDT.getHeap(), elem.sub(0), tb.var(lhs));
-            }
+        if (isPermissions) {
+            put(result, heapLDT.getPermissionHeap(),
+                    tb.var(heapLDT.getPermissionHeap()),
+                    tb.var(permissionsHeapBeforePV));
         }
 
         return result;
