@@ -72,6 +72,7 @@ public final class CreateWellformedCond extends AbstractTermTransformer {
 
             services.getNamespaces().functions()
                     .addSafely((Function) anonFunTerm.op());
+            services.getNameRecorder().addProposal(anonFunTerm.op().name());
 
             final Term singleWfTerm = tb.wellFormed(anonFunTerm);
             result = result == null ? singleWfTerm
