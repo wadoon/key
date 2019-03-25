@@ -32,7 +32,6 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.strategy.conflictbasedinst.ConflictBasedIstantiation;
 import de.uka.ilkd.key.strategy.feature.AgeFeature;
 import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
 import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
@@ -974,14 +973,14 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private boolean classAxiomDelayedApplication() {
         String classAxiomSetting =
-                (String) strategyProperties
+                strategyProperties
                 .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
         return StrategyProperties.CLASS_AXIOM_DELAYED.equals(classAxiomSetting);
     }
 
     private boolean classAxiomApplicationEnabled() {
         String classAxiomSetting =
-                (String) strategyProperties
+                strategyProperties
                 .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
         return !StrategyProperties.CLASS_AXIOM_OFF.equals(classAxiomSetting);
     }
@@ -1382,26 +1381,26 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             InstantiationCost.create(varInst),
                             allowQuantifierSplitting());
 
-            //            bindRuleSet(
-            //                    d,
-            //                    "gamma",
-            //                    SumFeature.createSum(
-            //                            new Feature[] {
-            //                                    FocusInAntecFeature.INSTANCE,
-            //                                    applyTF(FocusProjection.create(0),
-            //                                            add(ff.quantifiedClauseSet,
-            //                                                    instQuantifiersWithQueries() ?
-            //                                                            longTermConst(0)
-            //                                                            : ff.notContainsExecutable)),
-            //                                    forEach(varInst,
-            //                                            HeuristicInstantiation.INSTANCE,
-            //                                            add(instantiate("t", varInst),
-            //                                                    branchPrediction,
-            //                                                    longConst(10)))}));
-            bindRuleSet(d, "gamma",
-                    forEach(varInst, ConflictBasedIstantiation.getInstance(),
-                            add(instantiate("t", varInst), branchPrediction,
-                                    longConst(10))));
+            bindRuleSet(
+                    d,
+                    "gamma",
+                    SumFeature.createSum(
+                            new Feature[] {
+                                    FocusInAntecFeature.INSTANCE,
+                                    applyTF(FocusProjection.create(0),
+                                            add(ff.quantifiedClauseSet,
+                                                    instQuantifiersWithQueries() ?
+                                                            longTermConst(0)
+                                                            : ff.notContainsExecutable)),
+                                    forEach(varInst,
+                                            HeuristicInstantiation.INSTANCE,
+                                            add(instantiate("t", varInst),
+                                                    branchPrediction,
+                                                    longConst(10)))}));
+            //            bindRuleSet(d, "gamma",
+            //                    forEach(varInst, ConflictBasedIstantiation.getInstance(),
+            //                            add(instantiate("t", varInst), branchPrediction,
+            //                                    longConst(11))));
 
             final TermBuffer splitInst = new TermBuffer();
 
@@ -2774,6 +2773,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupInEqSimpInstantiationWithoutRetry(d);
     }
 
+    @Override
     public Name name() {
         return new Name(JAVA_CARD_DL_STRATEGY);
     }
@@ -2788,6 +2788,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule
      *         shall not be applied at all (it is discarded by the strategy).
      */
+    @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
             Goal goal) {
         return costComputationF.computeCost(app, pio, goal);
@@ -2801,11 +2802,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      * @param goal the goal
      * @return true iff the rule should be applied, false otherwise
      */
+    @Override
     public final boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
             Goal goal) {
         return !(approvalF.computeCost(app, pio, goal) instanceof TopRuleAppCost);
     }
 
+    @Override
     protected RuleAppCost instantiateApp(RuleApp app,
             PosInOccurrence pio, Goal goal) {
         return instantiationF.computeCost(app, pio, goal);

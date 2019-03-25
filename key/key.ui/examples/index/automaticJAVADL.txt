@@ -155,7 +155,7 @@ group comprehensions {
 }
 
 group conflictBasedInstantiation {
-	provable ./standard_key/BookExamples/02FirstOrderLogic/Ex2.53.key
+	provable ./conflictbased/simple.key
 } 
 
 # Performance tests

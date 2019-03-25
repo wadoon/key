@@ -84,7 +84,7 @@ public final class Goal  {
 
     /** a goal has been excluded from automatic rule application iff automatic == false */
     private boolean automatic = true;
-    
+
     /** Marks this goal as linked (-> {@link MergeRule}) */
     private Goal linkedGoal   = null;
 
@@ -101,10 +101,10 @@ public final class Goal  {
      * creates a new goal referencing the given node.
      */
     private Goal(Node node,
-                 RuleAppIndex ruleAppIndex,
-                 ImmutableList<RuleApp> appliedRuleApps,
-                 FormulaTagManager tagManager,
-                 AutomatedRuleApplicationManager ruleAppManager,
+            RuleAppIndex ruleAppIndex,
+            ImmutableList<RuleApp> appliedRuleApps,
+            FormulaTagManager tagManager,
+            AutomatedRuleApplicationManager ruleAppManager,
             Properties strategyInfos,
             NamespaceSet localNamespace) {
         this.node = node;
@@ -119,32 +119,32 @@ public final class Goal  {
     }
 
     private Goal(Node node,
-                 RuleAppIndex ruleAppIndex,
-                 ImmutableList<RuleApp> appliedRuleApps,
-                 AutomatedRuleApplicationManager ruleAppManager,
+            RuleAppIndex ruleAppIndex,
+            ImmutableList<RuleApp> appliedRuleApps,
+            AutomatedRuleApplicationManager ruleAppManager,
             Properties strategyInfos,
             NamespaceSet localNamespace) {
-      this.node            = node;
-      this.ruleAppIndex    = ruleAppIndex;
-      this.appliedRuleApps = appliedRuleApps;
-      this.goalStrategy    = null;
+        this.node            = node;
+        this.ruleAppIndex    = ruleAppIndex;
+        this.appliedRuleApps = appliedRuleApps;
+        this.goalStrategy    = null;
         this.ruleAppIndex.setup(this);
-      this.strategyInfos = strategyInfos;
+        this.strategyInfos = strategyInfos;
         setRuleAppManager(ruleAppManager);
         this.tagManager      = new FormulaTagManager(this);
         this.localNamespaces = localNamespace;
-      }
-    
+    }
+
     /**
      * creates a new goal referencing the given node
      * @param namespaceSet
      */
     public Goal (Node node, RuleAppIndex ruleAppIndex) {
         this ( node,
-               ruleAppIndex,
-               ImmutableSLList.<RuleApp>nil(),
-               null,
-               new QueueRuleApplicationManager (),
+                ruleAppIndex,
+                ImmutableSLList.<RuleApp>nil(),
+                null,
+                new QueueRuleApplicationManager (),
                 new MapProperties(),
                 node.proof().getServices().getNamespaces().copyWithParent().copyWithParent());
         tagManager = new FormulaTagManager ( this );
@@ -152,7 +152,7 @@ public final class Goal  {
 
     /** this object manages the tags for all formulas of the sequent */
     public FormulaTagManager getFormulaTagManager () {
-    	return tagManager;
+        return tagManager;
     }
 
     /**
@@ -171,7 +171,7 @@ public final class Goal  {
     }
 
     public AutomatedRuleApplicationManager getRuleAppManager () {
-    	return ruleAppManager;
+        return ruleAppManager;
     }
 
     public void setRuleAppManager(AutomatedRuleApplicationManager manager) {
@@ -192,7 +192,7 @@ public final class Goal  {
      * returns the referenced node
      */
     public Node node() {
-	return node;
+        return node;
     }
 
     /**
@@ -210,7 +210,7 @@ public final class Goal  {
      * @param l the GoalListener to be added
      */
     public void addGoalListener(GoalListener l) {
-	listeners.add(l);
+        listeners.add(l);
     }
 
     /**
@@ -220,7 +220,7 @@ public final class Goal  {
      * @param l the GoalListener to be removed
      */
     public void removeGoalListener(GoalListener l) {
-       listeners.remove(l);
+        listeners.remove(l);
     }
 
     /**
@@ -229,26 +229,26 @@ public final class Goal  {
      * to the listener as parameters and not through an event object.
      */
     protected void fireSequentChanged(SequentChangeInfo sci) {
-	getFormulaTagManager().sequentChanged(this, sci);
-	ruleAppIndex()        .sequentChanged(this, sci);
-	for (GoalListener listener : listeners) {
-	    listener.sequentChanged(this, sci);
-	}
+        getFormulaTagManager().sequentChanged(this, sci);
+        ruleAppIndex()        .sequentChanged(this, sci);
+        for (GoalListener listener : listeners) {
+            listener.sequentChanged(this, sci);
+        }
     }
 
     protected void fireGoalReplaced(Goal       goal,
-				    Node       parent,
-				    ImmutableList<Goal> newGoals) {
-	for (GoalListener listener : listeners) {
-	    listener.goalReplaced(goal, parent, newGoals);
-	}
+            Node       parent,
+            ImmutableList<Goal> newGoals) {
+        for (GoalListener listener : listeners) {
+            listener.goalReplaced(goal, parent, newGoals);
+        }
     }
 
-   protected void fireAautomaticStateChanged(boolean oldAutomatic, boolean newAutomatic) {
-      for (GoalListener listener : listeners) {
-         listener.automaticStateChanged(this, oldAutomatic, newAutomatic);
-      }
-   }
+    protected void fireAautomaticStateChanged(boolean oldAutomatic, boolean newAutomatic) {
+        for (GoalListener listener : listeners) {
+            listener.automaticStateChanged(this, oldAutomatic, newAutomatic);
+        }
+    }
 
     /**
      * set the node the goal is related to
@@ -256,20 +256,20 @@ public final class Goal  {
      * refers to
      */
     private void setNode(Node p_node) {
-	if ( node ().sequent () != p_node.sequent () ) {
-	    node = p_node;
-	    resetTagManager();
-	} else {
-	    node = p_node;
-	}
-	ruleAppIndex.setup ( this );
+        if ( node ().sequent () != p_node.sequent () ) {
+            node = p_node;
+            resetTagManager();
+        } else {
+            node = p_node;
+        }
+        ruleAppIndex.setup ( this );
     }
 
     /**
      * returns the index of possible rule applications at this node
      */
     public RuleAppIndex ruleAppIndex() {
-	return ruleAppIndex;
+        return ruleAppIndex;
     }
 
     /**
@@ -278,7 +278,7 @@ public final class Goal  {
      * @return the Taclet index assigned to this goal
      */
     public TacletIndex indexOfTaclets() {
-	return ruleAppIndex.tacletIndex();
+        return ruleAppIndex.tacletIndex();
     }
 
 
@@ -286,7 +286,7 @@ public final class Goal  {
      * @return IList<RuleApp> applied rule applications
      */
     public ImmutableList<RuleApp> appliedRuleApps() {
-	return appliedRuleApps;
+        return appliedRuleApps;
     }
 
 
@@ -295,7 +295,7 @@ public final class Goal  {
      * applied rules)
      */
     public long getTime () {
-    	return appliedRuleApps().size();
+        return appliedRuleApps().size();
     }
 
     /** returns the proof the goal belongs to
@@ -309,7 +309,7 @@ public final class Goal  {
      * @return the Sequent to be proved
      */
     public Sequent sequent() {
-	return node().sequent();
+        return node().sequent();
     }
 
     /**
@@ -356,11 +356,11 @@ public final class Goal  {
     /**
      * Sets the node that this goal is linked to; also sets this for
      * all parents.
-     * 
+     *
      * TODO: Check whether it is problematic when multiple child nodes
      * of a node are linked; in this case, the linkedNode field would
      * be overwritten.
-     * 
+     *
      * @param linkedGoal The goal that this goal is linked to.
      */
     public void setLinkedGoal(final Goal linkedGoal) {
@@ -376,7 +376,7 @@ public final class Goal  {
         node().setSequent(sci.sequent());
         node().getNodeInfo().setSequentChangeInfo(sci);
         //VK reminder: now update the index
-       	fireSequentChanged(sci);
+        fireSequentChanged(sci);
     }
 
 
@@ -386,7 +386,7 @@ public final class Goal  {
      * @param p PosInOccurrence encodes the position
      */
     public void addFormula(SequentFormula cf, PosInOccurrence p) {
-       setSequent(sequent().addFormula(cf, p));
+        setSequent(sequent().addFormula(cf, p));
     }
 
 
@@ -400,8 +400,8 @@ public final class Goal  {
      * added at the back
      */
     public void addFormula ( SequentFormula cf, boolean inAntec,
-          boolean first ) {
-       setSequent(sequent().addFormula(cf, inAntec, first));
+            boolean first ) {
+        setSequent(sequent().addFormula(cf, inAntec, first));
     }
 
     /**
@@ -411,7 +411,7 @@ public final class Goal  {
      * @param p the PosInOccurrence encoding the position
      */
     public void changeFormula(SequentFormula cf, PosInOccurrence p) {
-       setSequent(sequent().changeFormula(cf, p));
+        setSequent(sequent().changeFormula(cf, p));
     }
 
 
@@ -420,7 +420,7 @@ public final class Goal  {
      * @param p PosInOccurrence encodes the position
      */
     public void removeFormula(PosInOccurrence p) {
-       setSequent(sequent().removeFormula(p));
+        setSequent(sequent().removeFormula(p));
     }
 
     /**
@@ -429,8 +429,8 @@ public final class Goal  {
      * @param app the TacletApp
      */
     public void addNoPosTacletApp(NoPosTacletApp app) {
-	node().addNoPosTacletApp(app);
-	ruleAppIndex.addNoPosTacletApp(app);
+        node().addNoPosTacletApp(app);
+        ruleAppIndex.addNoPosTacletApp(app);
     }
 
     /**
@@ -440,22 +440,22 @@ public final class Goal  {
      * @param insts the given instantiations of the TacletApp to be created
      */
     public void addTaclet(Taclet           rule,
-          SVInstantiations insts,
-          boolean          isAxiom) {
-       NoPosTacletApp tacletApp =
-             NoPosTacletApp.createFixedNoPosTacletApp(rule,
-                   insts,
-                   proof().getServices());
-       if (tacletApp != null) {
-          addNoPosTacletApp(tacletApp);
-          if (proof().getInitConfig() != null) { // do not break everything
-             // because of ProofMgt
-             proof().getInitConfig().registerRuleIntroducedAtNode(
-                   tacletApp,
-                   node.parent() != null ? node.parent() : node,
-                         isAxiom);
-          }
-       }
+            SVInstantiations insts,
+            boolean          isAxiom) {
+        NoPosTacletApp tacletApp =
+                NoPosTacletApp.createFixedNoPosTacletApp(rule,
+                        insts,
+                        proof().getServices());
+        if (tacletApp != null) {
+            addNoPosTacletApp(tacletApp);
+            if (proof().getInitConfig() != null) { // do not break everything
+                // because of ProofMgt
+                proof().getInitConfig().registerRuleIntroducedAtNode(
+                        tacletApp,
+                        node.parent() != null ? node.parent() : node,
+                                isAxiom);
+            }
+        }
     }
 
     /**
@@ -478,17 +478,17 @@ public final class Goal  {
         localNamespaces.programVariables().addSafely(pv);
     }
 
-//    @Deprecated
-//    public void setProgramVariables(Namespace ns) {
-//        //        final Iterator<Named> it=ns.elements().iterator();
-//        //        ImmutableSet<ProgramVariable> s = DefaultImmutableSet.<ProgramVariable>nil();
-//        //        while (it.hasNext()) {
-//        //            s = s.add((ProgramVariable)it.next());
-//        //        }
-//        //        node().setGlobalProgVars(DefaultImmutableSet.<ProgramVariable>nil());
-//        //        proof().getNamespaces().programVariables().set(s);
-//        //        setGlobalProgVars(s);
-//        }
+    //    @Deprecated
+    //    public void setProgramVariables(Namespace ns) {
+    //        //        final Iterator<Named> it=ns.elements().iterator();
+    //        //        ImmutableSet<ProgramVariable> s = DefaultImmutableSet.<ProgramVariable>nil();
+    //        //        while (it.hasNext()) {
+    //        //            s = s.add((ProgramVariable)it.next());
+    //        //        }
+    //        //        node().setGlobalProgVars(DefaultImmutableSet.<ProgramVariable>nil());
+    //        //        proof().getNamespaces().programVariables().set(s);
+    //        //        setGlobalProgVars(s);
+    //        }
 
     /**
      * clones the goal (with copy of tacletindex and ruleAppIndex).
@@ -525,30 +525,30 @@ public final class Goal  {
 
     /** like the clone method but returns right type
      * @return Goal clone of this Goal
-     * @throws CloneNotSupportedException 
+     * @throws CloneNotSupportedException
      */
     public Goal copy() throws CloneNotSupportedException {
         return (Goal)clone();
     }
 
-    
+
     /**
      * puts a RuleApp to the list of the applied rule apps at this goal
      * and stores it in the node of the goal
      * @param app the applied rule app
      */
     public void addAppliedRuleApp(RuleApp app) {
-	// Last app first makes inserting and searching faster
-	appliedRuleApps = appliedRuleApps.prepend(app);
-	node().setAppliedRuleApp(app);
+        // Last app first makes inserting and searching faster
+        appliedRuleApps = appliedRuleApps.prepend(app);
+        node().setAppliedRuleApp(app);
     }
 
     /**
      * PRECONDITION: appliedRuleApps.size () > 0
      */
     public void removeLastAppliedRuleApp () {
-	appliedRuleApps = appliedRuleApps.tail ();
-	//node ().setAppliedRuleApp ( null );
+        appliedRuleApps = appliedRuleApps.tail ();
+        //node ().setAppliedRuleApp ( null );
     }
 
 
@@ -560,41 +560,41 @@ public final class Goal  {
      */
     public ImmutableList<Goal> split(int n) {
         ImmutableList<Goal> goalList = ImmutableSLList.<Goal>nil();
-	
-	final Node parent = node; // has to be stored because the node
-	// of this goal will be replaced
-	
-	if (n == 1) {
-	    Node newNode = new Node(parent.proof(),
-                parent.sequent(),
-                parent);
 
-        parent.add(newNode);
-        this.setNode(newNode);
-        goalList = goalList.prepend(this);  
-	} else if (n > 1) { // this would also work for n ==1 but the above avoids unnecessary creation of arrays
-	    Node[] newNode = new Node[n];
+        final Node parent = node; // has to be stored because the node
+        // of this goal will be replaced
 
-	    for (int i = 0; i<n; i++) {
-	        // create new node and add to tree
-	        newNode[i] = new Node(parent.proof(),
-	                parent.sequent(),
-	                parent);
-	    }
+        if (n == 1) {
+            Node newNode = new Node(parent.proof(),
+                    parent.sequent(),
+                    parent);
 
-        parent.addAll(newNode);
+            parent.add(newNode);
+            this.setNode(newNode);
+            goalList = goalList.prepend(this);
+        } else if (n > 1) { // this would also work for n ==1 but the above avoids unnecessary creation of arrays
+            Node[] newNode = new Node[n];
 
-        this.setNode(newNode[0]);
-        goalList = goalList.prepend(this);      
-	    
-        for (int i = 1; i<n; i++) {
-            goalList = goalList.prepend(clone(newNode[i]));	    
-        }	    
-	}
+            for (int i = 0; i<n; i++) {
+                // create new node and add to tree
+                newNode[i] = new Node(parent.proof(),
+                        parent.sequent(),
+                        parent);
+            }
 
-	fireGoalReplaced ( this, parent, goalList );
+            parent.addAll(newNode);
 
-	return goalList;
+            this.setNode(newNode[0]);
+            goalList = goalList.prepend(this);
+
+            for (int i = 1; i<n; i++) {
+                goalList = goalList.prepend(clone(newNode[i]));
+            }
+        }
+
+        fireGoalReplaced ( this, parent, goalList );
+
+        return goalList;
     }
 
     private void resetTagManager() {
@@ -606,9 +606,9 @@ public final class Goal  {
     }
 
     void pruneToParent(){
-            setNode(node().parent());
-            removeLastAppliedRuleApp();
-            resetLocalSymbols();
+        setNode(node().parent());
+        removeLastAppliedRuleApp();
+        resetLocalSymbols();
     }
 
     /*
@@ -632,7 +632,7 @@ public final class Goal  {
 
         final NodeChangeJournal journal = new NodeChangeJournal(proof, this);
         addGoalListener(journal);
-      
+
 
         final Node n = node;
 
@@ -697,13 +697,14 @@ public final class Goal  {
         }
     }
 
+    @Override
     public String toString() {
         de.uka.ilkd.key.pp.LogicPrinter lp = (new de.uka.ilkd.key.pp.LogicPrinter
                 (new de.uka.ilkd.key.pp.ProgramPrinter(null),
                         new NotationInfo(),
                         proof().getServices()));
         lp.printSequent(node.sequent());
-	return lp.toString();
+        return lp.toString();
     }
 
 
@@ -713,8 +714,8 @@ public final class Goal  {
 
 
     public <T> void addStrategyInfo(Property<T> property,
-                                    T info,
-                                    StrategyInfoUndoMethod undoMethod) {
+            T info,
+            StrategyInfoUndoMethod undoMethod) {
         strategyInfos.put(property, info);
         node.addStrategyInfoUndoMethod(undoMethod);
     }
@@ -730,7 +731,7 @@ public final class Goal  {
      * @return {@code true} has applicable rules, {@code false} no rules are applicable.
      */
     public static boolean hasApplicableRules(Goal goal) {
-       return goal.getRuleAppManager().peekNext() != null;
+        return goal.getRuleAppManager().peekNext() != null;
     }
 
     /**

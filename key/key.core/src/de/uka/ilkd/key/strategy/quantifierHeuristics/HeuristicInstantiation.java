@@ -27,22 +27,35 @@ import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
 
 
 public class HeuristicInstantiation implements TermGenerator {
-	
+
     public final static TermGenerator INSTANCE = new HeuristicInstantiation ();
-        
+
     private HeuristicInstantiation() {}
-    
+
+    @Override
     public Iterator<Term> generate(RuleApp app,
-                                   PosInOccurrence pos,
-                                   Goal goal) {
+            PosInOccurrence pos,
+            Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final Term qf = pos.sequentFormula ().formula ();
-        final Instantiation ia = Instantiation.create ( qf, goal.sequent(), 
+        final Instantiation ia = Instantiation.create ( qf, goal.sequent(),
                 goal.proof().getServices() );
         final QuantifiableVariable var =
-            qf.varsBoundHere ( 0 ).last ();
-        return new HIIterator ( ia.getSubstitution ().iterator (), var, goal.proof().getServices() );
+                qf.varsBoundHere ( 0 ).last ();
+        HIIterator hiit = new HIIterator ( ia.getSubstitution ().iterator (), var, goal.proof().getServices() );
+
+        //        for(Iterator<Term> it = hiit; it.hasNext(); ) {
+        //            Term t = it.next();
+        //            System.out.println("Term: " + t.toString());
+        //            System.out.println("Arity: " + t.arity());
+        //            System.out.println("Depth: " + t.depth());
+        //            System.out.println("OP: " + t.op());
+        //            System.out.println("bound vars: " + t.boundVars());
+        //            System.out.println("free vars: " + t.freeVars());
+        //        }
+
+        return hiit;
     }
 
 
@@ -57,9 +70,9 @@ public class HeuristicInstantiation implements TermGenerator {
         private Term                       nextInst = null;
         private final TermServices services;
 
-        private HIIterator(Iterator<Term> it, 
-					 QuantifiableVariable var, 
-        	         TermServices services) {
+        private HIIterator(Iterator<Term> it,
+                QuantifiableVariable var,
+                TermServices services) {
             this.instances = it;
             this.quantifiedVar = var;
             this.services = services;
@@ -81,17 +94,20 @@ public class HeuristicInstantiation implements TermGenerator {
             }
         }
 
+        @Override
         public boolean hasNext() {
             return nextInst != null;
         }
 
+        @Override
         public Term next() {
             final Term res = nextInst;
             nextInst = null;
             findNextInst ();
             return res;
         }
-        
+
+        @Override
         public void remove() {
             throw new UnsupportedOperationException();
         }

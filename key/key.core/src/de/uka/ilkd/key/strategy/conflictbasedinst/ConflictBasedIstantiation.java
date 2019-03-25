@@ -50,7 +50,12 @@ public class ConflictBasedIstantiation implements TermGenerator {
     @Override
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
-        return new CBIIterator(Confli, qv, services);
+        System.out.println("Ruleapp: " + app.toString() + "\n Pos: " + pos + "\n Goal: " + goal.toString());
+        return new CBIIterator(
+                CBInstantiation.create(pos.sequentFormula().formula(), goal.sequent(), goal.proof().getServices()).getSubstitution(),
+                pos.sequentFormula().formula().varsBoundHere(0).last(),
+                goal.proof().getServices()
+                );
     }
 
 }
