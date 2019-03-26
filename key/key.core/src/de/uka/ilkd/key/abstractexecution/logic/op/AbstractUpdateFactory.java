@@ -44,6 +44,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.UpdateApplication;
@@ -413,17 +414,25 @@ public class AbstractUpdateFactory {
         else if (heapLDT.isSelectOp(op)) {
             final Sort sort = heapLDT.getSortOfSelect(op);
             final Term heapTerm = t.sub(0);
-            final Term obj = //
-                    normalizeSelfVar(t.sub(1), runtimeInstance, services);
             final Term field = t.sub(2);
-            result.add(new FieldLoc(Optional.of(sort), Optional.of(heapTerm),
-                    obj, fieldPVFromFieldFunc(field, services),
-                    (LocationVariable) tb.getBaseHeap().op()));
+           
+            /*
+             * If the field is a logic variable, it's part of the assignable
+             * clause or something that we're not interested in, since it has to
+             * be in the scope of a quantifier.
+             */
+            if (!(field.op() instanceof LogicVariable)) {
+                final Term obj = //
+                        normalizeSelfVar(t.sub(1), runtimeInstance, services);
+                result.add(new FieldLoc(Optional.of(sort), Optional.of(heapTerm),
+                        obj, fieldPVFromFieldFunc(field, services),
+                        (LocationVariable) tb.getBaseHeap().op()));
 
-            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromHeapTerm(
-                    heapTerm, runtimeInstance, services);
-            if (subResult != null) {
-                result.addAll(subResult);
+                final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromHeapTerm(
+                        heapTerm, runtimeInstance, services);
+                if (subResult != null) {
+                    result.addAll(subResult);
+                }
             }
         }
         else if (op == heapLDT.getStore()) {
@@ -443,6 +452,30 @@ public class AbstractUpdateFactory {
 
             result.addAll(subResult);
         }
+        else if (op == heapLDT.getAnon()) {
+            final Term heapTerm = t.sub(0);
+            final Term anonLocsTerm = t.sub(1);
+
+            Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTermUnsafe(
+                    anonLocsTerm, runtimeInstance, services);
+            if (subResult == null) {
+                return null;
+            }
+
+            if (subResult.stream().anyMatch(loc -> loc instanceof AllLocsLoc)) {
+                /*
+                 * All of this heap is anonymized -> return the elements of the
+                 * heap, since all those are assigned.
+                 */
+                subResult = abstrUpdateLocsFromTermUnsafe(heapTerm,
+                        runtimeInstance, services);
+                if (subResult == null) {
+                    return null;
+                }
+            }
+
+            result.addAll(subResult);
+        }
         else {
             return null;
         }
@@ -453,7 +486,7 @@ public class AbstractUpdateFactory {
     private static boolean isHeapOp(final Operator op,
             final LocSetLDT locSetLDT, final HeapLDT heapLDT) {
         return op == locSetLDT.getSingleton() || heapLDT.isSelectOp(op)
-                || op == heapLDT.getStore();
+                || op == heapLDT.getStore() || op == heapLDT.getAnon();
     }
 
     /**
@@ -517,11 +550,17 @@ public class AbstractUpdateFactory {
             assert field.sort() == heapLDT.getFieldSort();
         }
 
-        final int sepIdx = field.toString().indexOf("::$");
+        int sepIdx = field.toString().indexOf("::$");
+        int sepSize = 3;
+        if (sepIdx < 0) {
+            sepIdx = field.toString().indexOf("::<");
+            sepSize = 2;
+        }
+        
         assert sepIdx > 0;
 
         final String typeStr = field.toString().substring(0, sepIdx);
-        final String fieldStr = field.toString().substring(sepIdx + 3);
+        final String fieldStr = field.toString().substring(sepIdx + sepSize);
 
         final KeYJavaType kjt = javaInfo.getKeYJavaType(typeStr);
         return (LocationVariable) javaInfo
