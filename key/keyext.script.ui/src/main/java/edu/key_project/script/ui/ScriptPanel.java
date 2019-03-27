@@ -431,7 +431,7 @@ public class ScriptPanel extends JPanel {
             if (c == JFileChooser.APPROVE_OPTION) {
                 try {
                     File file = getFileChooser().getSelectedFile();
-                    String s = java.nio.file.Files.readString(file.toPath());
+                    String s = Files.asCharSource(file, Charsets.UTF_8).read();
                     ScriptEditorPane editor = newEditor();
                     editor.getEditor().setText(s);
                     editor.setFile(file);
