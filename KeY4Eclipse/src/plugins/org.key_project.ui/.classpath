@@ -3,7 +3,6 @@
 	<classpathentry exported="true" kind="lib" path="key.lib/jaxb-api-2.4.0-b180830.0359.jar"/>
 	<classpathentry exported="true" kind="lib" path="key.lib/commonmark-0.12.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="key.lib/commonmark-ext-gfm-tables-0.12.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="key.lib/jackson-core-2.9.7.jar"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="key.src"/>

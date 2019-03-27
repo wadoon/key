@@ -12,7 +12,6 @@
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="libs/commonmark-0.12.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="libs/commonmark-ext-gfm-tables-0.12.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="libs/jackson-core-2.9.7.jar"/>
 	<classpathentry kind="lib" path="libs/jaxb-api-2.4.0-b180830.0359.jar">
 		<attributes>
 			<attribute name="javadoc_location" value="jar:platform:/resource/key.ui/libs/jaxb-api-2.4.0-b180830.0359-javadoc.jar!/"/>
