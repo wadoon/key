@@ -87,60 +87,77 @@ class CurrentGoalViewListener
         setModalDragNDropEnabled(false);
     }
 
-    @Override
-    public void keyPressed(KeyEvent ke) {
-        PosInSequent mousePos = currentGoalView.getPosInSequent(lastMousePoint);
-
-        final ImmutableList<BuiltInRule> builtInRules
-            = mediator.getUI().getProofControl().getBuiltInRule
-                (mediator.getSelectedGoal(), mousePos.getPosInOccurrence());
-        
-        System.out.print("find taclet " );
-        builtInRules.forEach(item -> System.out.println(item));
-
+    private boolean runTaclet(String search, PosInSequent mousePos) {
         final ProofControl proofControl = mediator
             .getUI()
             .getProofControl();
+        
+        if (proofControl == null) {
+            return false;
+        }
 
-        final ImmutableList<TacletApp> tacletRules = TacletMenu.sort(proofControl
-            .getFindTaclet(mediator.getSelectedGoal(), mousePos.getPosInOccurrence()), comp);
-            // .append(
-            //     proofControl.getNoFindTaclet(mediator.getSelectedGoal())
-            // );
-
+        final ImmutableList<TacletApp> tacletRules = 
+            TacletMenu.sort(
+                proofControl.getFindTaclet(mediator.getSelectedGoal(), mousePos.getPosInOccurrence())
+            , comp)
+            .append(
+                proofControl.getNoFindTaclet(mediator.getSelectedGoal())
+            );
         final Optional<TacletApp> rule = tacletRules.stream()
-            .filter(item -> item.taclet().name().toString().toLowerCase().startsWith(""+ke.getKeyChar()))
+            .filter(item -> item.taclet().name().toString().toLowerCase().startsWith(search))
             .findFirst();
         
         if (rule.isPresent()) {
             System.out.println("run taclet: "+ rule.get().taclet().name());
             currentGoalView.selectedTaclet(rule.get(), mousePos);
             currentGoalView.grabFocus();
-        } else {
-            Optional<BuiltInRule> builtInRule = builtInRules.stream()
-                .filter(item -> item.toString().toLowerCase().startsWith(""+ke.getKeyChar()))
-                .findFirst();
-
-            if (builtInRule.isPresent()) {
-                System.out.println("run builtin: "+ builtInRule.get());
-                
-                mediator.getUI()
-                    .getProofControl()
-                    .selectedBuiltInRule(
-                        mediator.getSelectedGoal(),
-                        builtInRule.get(),
-                        mousePos.getPosInOccurrence(),
-                        false
-                    );
-            }
-
+            return true;
         }
+        return false;
+    }
+
+    private boolean runBuiltIn(String search, PosInSequent mousePos) {
+        final ImmutableList<BuiltInRule> builtInRules
+            = mediator.getUI().getProofControl().getBuiltInRule
+                (mediator.getSelectedGoal(), mousePos.getPosInOccurrence());
+           
+        System.out.print("find taclet " );
+        builtInRules.forEach(item -> System.out.println(item));
         
+        Optional<BuiltInRule> builtInRule = builtInRules.stream()
+            .filter(item -> item.toString().toLowerCase().startsWith(search.toLowerCase()))
+            .findFirst();
+
+        if (builtInRule.isPresent()) {
+            System.out.println("run builtin: "+ builtInRule.get());
+            
+            mediator.getUI()
+                .getProofControl()
+                .selectedBuiltInRule(
+                    mediator.getSelectedGoal(),
+                    builtInRule.get(),
+                    mousePos.getPosInOccurrence(),
+                    false
+                );
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void keyPressed(KeyEvent ke) {
+        PosInSequent mousePos = currentGoalView.getPosInSequent(lastMousePoint);
+        if (ke.isShiftDown()) {
+            runBuiltIn(""+ke.getKeyChar(), mousePos);
+        } else {
+            runTaclet(""+ke.getKeyChar(), mousePos);
+        }
     }
 
     @Override
     public void mouseMoved(MouseEvent me) {
         lastMousePoint = me.getPoint();
+        currentGoalView.grabFocus();
     }
 
     @Override
