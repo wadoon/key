@@ -149,6 +149,6 @@ class MainStatusLine extends JPanel {
      * anything else
      */
     public void setStatusText(String s) {
-        text.setText(s);
+        text.setText("<html>"+s+"</html>");
     }
 }
