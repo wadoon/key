@@ -19,5 +19,8 @@
       <module name="org.key_project.key.util.main" target="1.8" />
       <module name="org.key_project.key.util.test" target="1.8" />
     </bytecodeTargetLevel>
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+    </annotationProcessing>
   </component>
 </project>

@@ -1,0 +1,5 @@
+script A () {
+    print_state;
+    lib\test;
+    lib\test.abc i=2;
+}

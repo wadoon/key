@@ -1,0 +1,26 @@
+script t(i:int, j:int){
+    f;
+    g;
+}
+
+script f(){
+ impRight;
+}
+
+script g(){
+ impLeft;
+
+}
+
+script t(i:int, j:int){
+    symbex;
+    cases{
+	case match `x > 0 ==> `:{
+
+	}
+	case match `x <= 0 ==> `:{
+
+	}
+     }
+}
+

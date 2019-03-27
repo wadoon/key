@@ -1,0 +1,18 @@
+true+1
+1 | 2 & a
+a ==> i
+6*true+i
+a==>3
+sd | f -> d < 5 + qw = p & rt <=> k2
+(a + b) / d * 8 - 2 & ( true -> `az` ) | "ava" > ?diva
+-(-n-69) & not (match `d5'` using [ pi:int, isLess :bool, khar:term] -> false | k < b3o )
+(a>b) + 1
+match `h(X)->q` using [q:bool] * 2
+p->`f(c,d)==>q`
+p&q->term|tV
+k2=ds-wr*x;
+m>n := t|p;
+isLess:bool := a*b+6;
+bool := cl|cr;
+term T2
+bool:bool

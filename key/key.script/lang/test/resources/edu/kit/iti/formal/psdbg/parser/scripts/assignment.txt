@@ -1,0 +1,4 @@
+//this is a bad example, should be rejected from linter
+script aB5()
+{   jD4:int := -a7*Sk;
+}

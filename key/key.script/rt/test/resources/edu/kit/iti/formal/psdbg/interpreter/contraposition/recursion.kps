@@ -1,0 +1,12 @@
+script t(){
+    f;
+    impRight;
+}
+
+script f(){
+ g;
+}
+
+script g(){
+ f;
+}

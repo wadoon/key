@@ -1,0 +1,11 @@
+script fc() {
+    cases {
+        case x = y :
+            print a;
+
+
+        default :
+            print `blubb`;
+
+    }
+}

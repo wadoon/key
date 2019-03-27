@@ -1,0 +1,18 @@
+
+script test(){
+    impRight;
+    impRight;
+    cases{
+        case match isCloseable:{
+            notLeft;
+            notRight;
+            replace_known_left occ='2';
+            concrete_impl_1;
+            close;
+        }
+
+        default:{
+            auto;
+        }
+    }
+}

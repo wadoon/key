@@ -1,0 +1,11 @@
+script t1(){
+    impRight;
+    impLeft;
+    cases{
+        try :
+            impRight; //should not close proof
+
+
+    }
+
+}

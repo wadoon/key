@@ -20,6 +20,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import de.uka.ilkd.key.logic.op.*;
+import de.uka.ilkd.key.logic.sort.BottomSort;
 import org.key_project.util.collection.DefaultImmutableSet;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -36,28 +38,6 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabel;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Function;
-import de.uka.ilkd.key.logic.op.IObserverFunction;
-import de.uka.ilkd.key.logic.op.IProgramMethod;
-import de.uka.ilkd.key.logic.op.IfExThenElse;
-import de.uka.ilkd.key.logic.op.IfThenElse;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Modality;
-import de.uka.ilkd.key.logic.op.ParsableVariable;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.op.QuantifiableVariable;
-import de.uka.ilkd.key.logic.op.Quantifier;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SubstOp;
-import de.uka.ilkd.key.logic.op.Transformer;
-import de.uka.ilkd.key.logic.op.UpdateApplication;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
-import de.uka.ilkd.key.logic.op.UpdateableOperator;
-import de.uka.ilkd.key.logic.op.WarySubstOp;
 import de.uka.ilkd.key.logic.sort.ArraySort;
 import de.uka.ilkd.key.logic.sort.ProgramSVSort;
 import de.uka.ilkd.key.logic.sort.Sort;
@@ -2213,4 +2193,69 @@ public class TermBuilder {
             return tf.createTerm(Junctor.OR, t1, t2);
         }
     }
+
+    // -------------------------------------------------------------------------
+    // Matching operators
+    // -------------------------------------------------------------------------
+
+    /**
+     * Cretae named MatchIdentifier
+     * @param idText
+     * @param sort
+     * @return
+     */
+    public Term createMatchIdentifier(String idText, Sort sort){
+        if(sort == null){
+            sort = new BottomSort();
+        }
+        Term t =  tf.createTerm(new MatchIdentifierOp(new Name(idText), sort));
+        return t;
+    }
+
+    /**
+     * Create Anonymous Identifer
+     * @param sort
+     * @return
+     */
+    public Term createMatchIdentifier(Sort sort){
+        if(sort == null){
+            sort = new BottomSort();
+        }
+        Term t =  tf.createTerm(new MatchIdentifierOp(new Name("?"),sort));
+        return t;
+    }
+
+    /**
+     * Cretae Ellipsis Term '..'Term'..'
+     * @param a
+     * @return
+     */
+    public Term createEllipsisTerm(Term a) {
+        Term t = tf.createTerm(new EllipsisOp(a.sort()), a);
+        return t;
+    }
+
+    /**
+     * Create matchbinder Term (Term ):(?Variable :int)
+     * @param inner
+     * @param matchBinder
+     * @return
+     * TODO rethink the decision to double matchbinder infos
+     */
+    public Term createMatchBinder(Term inner, Term matchBinder){
+        MatchBinderOp mbo = new MatchBinderOp(matchBinder.op().name(), matchBinder.sort(), new ImmutableArray<>(matchBinder.sort(), inner.sort()));
+       /* if(matchBinder.sort() instanceof BottomSort){
+            mbo = new MatchBinderOp(matchBinder.op().name(), new ImmutableArray<>(inner.sort()));
+
+        } else {
+            mbo = new MatchBinderOp(matchBinder.op().name(), matchBinder.sort(), new ImmutableArray<>(inner.sort()));
+
+        }*/
+        Term[] subTerms = new Term[2];
+        subTerms[0] = matchBinder;
+        subTerms[1] = inner;
+        return tf.createTerm(mbo, subTerms);
+
+    }
+
 }

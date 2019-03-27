@@ -504,7 +504,10 @@ public class KeYMediator {
 	goalsClosedByAutoMode=0;
     }
 
-
+    /**
+     * weigl: FIXME please add a description to this method!
+     * @param fullStop
+     */
    public void stopInterface(boolean fullStop) {
       final boolean b = fullStop;
       Runnable interfaceSignaller = new Runnable() {
@@ -520,6 +523,10 @@ public class KeYMediator {
       ThreadUtilities.invokeAndWait(interfaceSignaller);
    }
 
+    /**
+     * weigl: FIXME please add a description to this method!
+     * @param fullStop
+     */
    public void startInterface(boolean fullStop) {
       final boolean b = fullStop;
       Runnable interfaceSignaller = new Runnable() {

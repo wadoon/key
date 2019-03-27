@@ -1,0 +1,17 @@
+script ruRg ()
+{   cases
+    {   case abc :
+        {   aM:TERM:=not ka&bi;
+            dsL f5=90;
+        }
+        case 85 :
+        {   last;
+        }
+    }
+    foreach
+    {   theonly
+        {   hz := false;
+        }
+        black;
+    }
+}

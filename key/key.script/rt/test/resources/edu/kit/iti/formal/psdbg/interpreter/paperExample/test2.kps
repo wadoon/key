@@ -1,0 +1,27 @@
+script prove_transitive(){
+ symbex;
+ simp-heap;
+ simp-upd;
+ cases{
+   case match
+    `seqPerm(Res0Copy, Arr),
+    seqPerm(Res0Sort, Res0Copy),
+    seqPerm(Res1Copy0, Res0Sort),
+    seqPerm(Res2Copy1, Res0Sort) ==>
+        seqPerm(Res2Copy1, Arr)` using [ ?Res0Copy: Seq, ?Arr: Seq,?Res0Sort: Seq, ?Res1Copy0: Seq, ?Res2Copy1: Seq, ?Res0Sort: Seq  ]:
+   {
+        assume `self==null`;
+   }
+   case match
+    `seqPerm(Res0Copy, Arr),
+    seqPerm(Res0Sort, Res0Copy),
+    seqPerm(Res1Copy0, Res0Sort) ==>
+             seqPerm(Res1Copy0, Arr)`  using [ ?Res0Copy: Seq, ?Arr: Seq,?Res0Sort: Seq, ?Res1Copy0: Seq, ?Res0Sort: Seq ]:
+    {
+        assume `self==null`;
+     }
+     default:{
+        assume `self != null`;
+    }
+  }
+}

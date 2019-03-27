@@ -1,0 +1,10 @@
+script t1(){
+    symbex;
+    cases{
+        case isCloseable:{
+            andRight; //should not close proof
+        }
+
+    }
+
+}

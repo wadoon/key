@@ -1,0 +1,165 @@
+<?xml version="1.0"?>
+<project name="key.script" default="deploy" basedir="." xmlns:ivy="antlib:org.apache.ivy.ant">
+    <property name="dist.dir" value="${basedir}/../deployment"/>
+    <property name="lib.dir" value="libs"/>
+    <property name="gen.src" value="build/generated"/>
+    <property name="compile.dir" value="build/classes"/>
+    <property name="compileTest.dir" value="build/classesTest"/>
+
+    <path id="runtimeKey.path">
+        <pathelement path="../key.util/bin"/>
+        <pathelement path="../key.core/bin"/>
+        <pathelement path="../key.core/lib/antlr.jar"/>
+        <pathelement path="../key.core/lib/recoderKey.jar"/>
+        <pathelement path="../key.core/lib/javacc.jar"/>
+    </path>
+
+    <!-- region ivy -->
+    <property name="ivy.install.version" value="2.5.0-rc1"/>
+    <condition property="ivy.home" value="${env.IVY_HOME}">
+        <isset property="env.IVY_HOME"/>
+    </condition>
+    <property name="ivy.home" value="${user.home}/.ant"/>
+    <property name="ivy.jar.dir" value="${ivy.home}/lib"/>
+    <property name="ivy.jar.file" value="${ivy.jar.dir}/ivy.jar"/>
+
+    <target name="download-ivy" unless="offline">
+        <mkdir dir="${ivy.jar.dir}"/>
+        <!-- download Ivy from web site so that it can be used even without any special installation -->
+        <get src="http://repo2.maven.org/maven2/org/apache/ivy/ivy/${ivy.install.version}/ivy-${ivy.install.version}.jar"
+             dest="${ivy.jar.file}" usetimestamp="true"/>
+    </target>
+
+    <target name="init-ivy" depends="download-ivy">
+        <!-- try to load ivy here from ivy home, in case the user has not already dropped
+                it into ant's lib dir (note that the latter copy will always take precedence).
+                We will not fail as long as local lib dir exists (it may be empty) and
+                ivy is in at least one of ant's lib dir or the local lib dir. -->
+        <path id="ivy.lib.path">
+            <fileset dir="${ivy.jar.dir}" includes="*.jar"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml"
+                 uri="antlib:org.apache.ivy.ant" classpathref="ivy.lib.path"/>
+    </target>
+
+    <target name="resolve" depends="init-ivy">
+        <mkdir dir="${lib.dir}"/>
+        <ivy:retrieve conf="sources,compile,antlr4,runtime,test"
+                      pattern="../libs/[conf]/[artifact]-[revision](-[classifier]).[ext]"/>
+        <ivy:report todir='build/ivy-reports' graph='false' xml='false'/>
+    </target>
+
+    <target name="-classpath" depends="resolve">
+        <ivy:cachepath pathid="compile.path" conf="compile"/>
+        <ivy:cachepath pathid="runtime.path" conf="runtime"/>
+        <ivy:cachepath pathid="test.path" conf="test"/>
+        <ivy:cachepath pathid="antlr4.path" conf="antlr4"/>
+    </target>
+    <!-- endregion  -->
+
+    <target name="clean">
+        <delete dir="build"/>
+    </target>
+
+    <target name="fresh" depends="clean">
+        <delete dir="libs"/>
+    </target>
+
+    <target name="antlr" depends="-classpath">
+        <mkdir dir="${gen.src}"/>
+        <java fork="true" classname="org.antlr.v4.Tool" classpathref="antlr4.path">
+            <arg value="-listener"/>
+            <arg value="-visitor"/>
+            <arg value="-Xexact-output-dir"/>
+            <arg value="-package"/>
+            <arg value="edu.kit.iti.formal.psdbg.parser"/>
+            <arg value="-o"/>
+            <arg value="${gen.src}/edu/kit/iti/formal/psdbg/parser"/>
+            <arg value="lang/main/antlr/ScriptLanguage.g4"/>
+        </java>
+    </target>
+
+    <target name="compile" depends="prepare,antlr">
+        <mkdir dir="${compile.dir}"/>
+        <pathconvert property="classpathProp" refid="compile.path"/>
+        <echo>Classpath is ${classpathProp}</echo>
+
+        <javac destdir="${compile.dir}"
+               nowarn="on"
+               source="1.8"
+               srcdir="${gen.src}:lang/main/java:rt/main/java:lint/main/java"
+               optimize="on" debug="on">
+            <classpath refid="compile.path"/>
+            <classpath refid="runtime.path"/>
+            <classpath refid="runtimeKey.path"/>
+        </javac>
+    </target>
+
+    <target name="prepare">
+        <copy todir="${compile.dir}">
+            <fileset dir="lang/main/resources"/>
+            <fileset dir="rt/main/resources"/>
+        </copy>
+    </target>
+
+    <target name="deploy" depends="-classpath,compile" description="Create a JAR archive in the destination directory.">
+        <mkdir dir="${dist.dir}"/>
+        <mkdir dir="${dist.dir}/components"/>
+        <mkdir dir="${dist.dir}/libs"/>
+        <copy todir="${dist.dir}/libs" flatten="true">
+            <path refid="runtime.path"/>
+        </copy>
+        <jar destfile="${dist.dir}/components/key.script.jar" basedir="${compile.dir}"/>
+    </target>
+
+    <target name="prepareTest">
+        <copy todir="${compileTest.dir}">
+            <fileset dir="lang/test/resources"/>
+            <fileset dir="rt/test/resources"/>
+        </copy>
+    </target>
+
+    <target name="compileTest" depends="compile,prepareTest">
+        <mkdir dir="${compileTest.dir}"/>
+
+        <javac destdir="${compileTest.dir}"
+               nowarn="on"
+               source="1.8"
+               srcdir="lang/test/java:rt/test/java:lint/test/java"
+               optimize="on" debug="on">
+            <classpath>
+                <pathelement path="${compile.dir}"/>
+            </classpath>
+            <classpath refid="compile.path"/>
+            <classpath refid="runtime.path"/>
+            <classpath refid="test.path"/>
+            <classpath refid="runtimeKey.path"/>
+        </javac>
+    </target>
+
+    <target name="test" depends="compileTest">
+        <junit printsummary="withOutAndErr" haltonfailure="no"
+               fork="yes" forkMode="once" haltonerror="no"
+               enableTestListenerEvents="false"
+               showoutput="yes" dir="${basedir}">
+            <jvmarg value="-Xmx3072m"/>
+            <jvmarg value="-XX:MaxPermSize=256m"/>
+            <jvmarg value="-Dkey.disregardSettings=true"/>
+            <jvmarg value="-ea"/>
+            <classpath>
+                <pathelement path="${compile.dir}"/>
+                <pathelement path="${compileTest.dir}"/>
+            </classpath>
+            <classpath refid="compile.path"/>
+            <classpath refid="runtime.path"/>
+            <classpath refid="test.path"/>
+            <classpath refid="runtimeKey.path"/>
+            <formatter type="brief" usefile="false"/>
+            <batchtest>
+                <fileset dir="${compileTest.dir}">
+                    <include name="**/*Test*.class" />
+                </fileset>
+            </batchtest>
+        </junit>
+    </target>
+</project>

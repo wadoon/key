@@ -1,5 +1,15 @@
 package de.uka.ilkd.key.parser;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
+import junit.framework.TestCase;
+
+import org.antlr.runtime.RecognitionException;
+import org.key_project.util.collection.ImmutableSLList;
+
 import de.uka.ilkd.key.java.Recoder2KeY;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.*;
@@ -96,6 +106,17 @@ public class AbstractTestTermParser {
 
     protected KeYParserF getParser(String s) {
         return new KeYParserF(ParserMode.TERM, getLexer(s), services, nss);
+    }
+
+    protected KeYParserF getMatchParser(String s){
+        KeYLexerF kl = new KeYLexerF(s,
+                "No file. Call of parser from parser/" + getClass().getSimpleName());
+        kl.setEnabledSchemaMatching(true);
+        nss.sorts().add(new BottomSort());
+        nss.sorts().add(Sort.FORMULA);
+        KeYParserF kp = new KeYParserF(ParserMode.TERM, kl, services, nss);
+        kp.setEnabledSchemaMatching(true);
+        return kp;
     }
 
     public Term parseTerm(String s) throws Exception {

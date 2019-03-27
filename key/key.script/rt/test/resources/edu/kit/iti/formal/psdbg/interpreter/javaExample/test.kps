@@ -1,0 +1,17 @@
+script t1(){
+    symbex;
+    cases{
+        case match '.*x.*':{
+            auto;
+        }
+	   // case match `T >= 0 ==> ` using[ ?T:int]:{
+       //     auto;
+	   // }
+	   default{
+	       auto;
+	   }
+    }
+
+}
+
+

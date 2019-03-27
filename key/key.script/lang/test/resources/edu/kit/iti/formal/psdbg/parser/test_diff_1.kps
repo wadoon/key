@@ -1,0 +1,18 @@
+script A() {
+    A;
+    B;
+    C;
+    D;
+}
+
+script A() {
+    A;
+    B;
+    C;
+    D;
+    E;F;
+}
+
+script A() {
+    E;F;
+}

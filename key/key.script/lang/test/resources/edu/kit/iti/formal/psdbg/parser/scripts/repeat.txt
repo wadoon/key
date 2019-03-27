@@ -1,0 +1,7 @@
+script Da9B (man:bool, zo3:term)
+{   b3g;
+    repeat
+    {   k:=match `ks&jg` using [w5:int];
+        big2;
+    }
+}
