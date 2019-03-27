@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import de.uka.ilkd.key.logic.sort.BottomSort;
 import junit.framework.TestCase;
 
 import org.antlr.runtime.RecognitionException;

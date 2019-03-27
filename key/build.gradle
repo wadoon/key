@@ -29,7 +29,7 @@ try {
     ext.gitRevision = ""
 }
 
-configure(allprojects - project(':keyext') - rootProject) {
+subprojects {
     apply plugin: "java"
     apply plugin: "java-library"
     apply plugin: "maven-publish"
@@ -297,7 +297,8 @@ project(":key.ui") {
         compile(project(":key.core.testgen"))
         compile(project(":key.removegenerics"))
 
-        runtimeOnly project(":keyext:interactionlog")
+        runtimeOnly project(":keyext.interactionlog")
+        runtimeOnly project(":keyext.script.ui")
     }
 
     task createExamplesZip(type: Zip) {
@@ -321,7 +322,7 @@ project(":key.ui") {
 
 }
 
-project(":keyext:interactionlog") {
+project(":keyext.interactionlog") {
     dependencies {
         compile project(":key.ui")
         compile group: 'com.atlassian.commonmark', name: 'commonmark', version: '0.12.1'
@@ -336,7 +337,7 @@ task start {
 
 task alldoc(type: Javadoc) {
     group "documentation"
-    def projects = allprojects - project(':keyext') - rootProject
+    def projects = allprojects - rootProject
     //key.ui javadoc is broken
     source projects.collect { it.sourceSets.main.allJava }
     classpath = files(projects.collect { it.sourceSets.main.compileClasspath })
@@ -360,12 +361,12 @@ task alldoc(type: Javadoc) {
 
 task fatJar(type: Jar) {
     dependsOn project(":key.ui").jar
-    dependsOn project(":keyext:interactionlog").jar
+    dependsOn project(":keyext.interactionlog").jar
+    dependsOn project(":keyext.script.ui").jar
 
     def jarFiles = //[project(":key.ui").jar.archivePath] +
             project(":key.ui").configurations.runtimeClasspath
     def names = jarFiles.collect { "./${it.name}" }.join(", ")
-    println names
 
     manifest {
         attributes 'Main-Class': "de.uka.ilkd.key.core.Main",
