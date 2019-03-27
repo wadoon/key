@@ -32,6 +32,8 @@ import java.awt.event.*;
 import javax.swing.*;
 import de.uka.ilkd.key.rule.TacletApp;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import de.uka.ilkd.key.gui.nodeviews.TacletMenu;
 import de.uka.ilkd.key.gui.nodeviews.TacletMenu.TacletAppComparator;
 
@@ -43,11 +45,13 @@ import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 
 import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.control.ProofControl;
 
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.pp.PosInSequent;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.rule.BuiltInRule;
 import de.uka.ilkd.key.settings.ProofIndependentSettings;
 
@@ -87,39 +91,62 @@ class CurrentGoalViewListener
         setModalDragNDropEnabled(false);
     }
 
-    private boolean runTaclet(String search, PosInSequent mousePos) {
+    private Map<String, TacletApp> findTaclets(String search, PosInSequent mousePos) {
         final ProofControl proofControl = mediator
             .getUI()
             .getProofControl();
         
         if (proofControl == null) {
-            return false;
+            return Collections.emptyMap();
         }
 
-        final ImmutableList<TacletApp> tacletRules = 
+        final Stream<TacletApp> tacletRules = 
             TacletMenu.sort(
                 proofControl.getFindTaclet(mediator.getSelectedGoal(), mousePos.getPosInOccurrence())
             , comp)
             .append(
                 proofControl.getNoFindTaclet(mediator.getSelectedGoal())
-            );
-        final Optional<TacletApp> rule = tacletRules.stream()
-            .filter(item -> item.taclet().name().toString().toLowerCase().startsWith(search))
-            .findFirst();
+            )
+            .stream();
+
+        final Map<String, TacletApp> mapped = new LinkedHashMap<>();
+        tacletRules.forEach(it -> {
+            String prefix = it.taclet().name().toString().substring(0, 1);
+            if(mapped.get(prefix) == null) {
+                mapped.put(prefix, it);
+            }
+        });
+        return mapped;
+    }
+
+    private boolean runTaclet(String search, PosInSequent mousePos) {
+        Map<String, TacletApp> tacletRules = findTaclets(search, mousePos);
+
+        final TacletApp rule = tacletRules.get(search);
         
-        if (rule.isPresent()) {
-            System.out.println("run taclet: "+ rule.get().taclet().name());
-            currentGoalView.selectedTaclet(rule.get(), mousePos);
+        if (rule != null) {
+            System.out.println("run taclet: "+ rule.taclet().name());
+            currentGoalView.selectedTaclet(rule, mousePos);
             currentGoalView.grabFocus();
             return true;
         }
         return false;
     }
 
-    private boolean runBuiltIn(String search, PosInSequent mousePos) {
-        final ImmutableList<BuiltInRule> builtInRules
-            = mediator.getUI().getProofControl().getBuiltInRule
+    private ImmutableList<BuiltInRule> findBuiltIn(String search, PosInSequent mousePos) {
+        final ProofControl proofControl = mediator
+            .getUI()
+            .getProofControl();
+        
+        if (proofControl == null) {
+            return ImmutableSLList.nil();
+        }
+        return proofControl.getBuiltInRule
                 (mediator.getSelectedGoal(), mousePos.getPosInOccurrence());
+    }
+
+    private boolean runBuiltIn(String search, PosInSequent mousePos) {
+        final ImmutableList<BuiltInRule> builtInRules = findBuiltIn(search, mousePos);
            
         System.out.print("find taclet " );
         builtInRules.forEach(item -> System.out.println(item));
@@ -147,6 +174,11 @@ class CurrentGoalViewListener
     @Override
     public void keyPressed(KeyEvent ke) {
         PosInSequent mousePos = currentGoalView.getPosInSequent(lastMousePoint);
+        try {
+            mousePos.getPosInOccurrence();
+        } catch(NullPointerException e) {
+            return;
+        }
         if (ke.isShiftDown()) {
             runBuiltIn(""+ke.getKeyChar(), mousePos);
         } else {
@@ -158,6 +190,21 @@ class CurrentGoalViewListener
     public void mouseMoved(MouseEvent me) {
         lastMousePoint = me.getPoint();
         currentGoalView.grabFocus();
+
+        PosInSequent mousePos = currentGoalView.getPosInSequent(lastMousePoint);
+        try {
+            mousePos.getPosInOccurrence();
+        } catch(NullPointerException e) {
+            return;
+        }
+
+        ImmutableList<BuiltInRule> buildins = findBuiltIn("", mousePos);
+        java.util.List<String> taclets = findTaclets("", mousePos)
+            .entrySet()
+            .stream()
+            .map(it -> "<u>"+it.getKey()+"</u>"+it.getValue().taclet().name().toString().substring(1))
+            .collect(Collectors.toList());
+        currentGoalView.getMainWindow().setStatusLine("buildIns: "+buildins+"   taclets: "+taclets);
     }
 
     @Override
