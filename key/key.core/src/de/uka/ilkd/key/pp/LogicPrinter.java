@@ -163,6 +163,9 @@ public class LogicPrinter {
                 ni, services,
                 new TermLabelVisibilityManager());
 
+        if (services != null) {
+            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
+        }
         try {
             p.printTerm(t);
         } catch (IOException ioe) {

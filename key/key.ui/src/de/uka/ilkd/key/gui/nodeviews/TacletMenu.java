@@ -13,46 +13,19 @@
 
 package de.uka.ilkd.key.gui.nodeviews;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-
-import org.key_project.util.collection.ImmutableList;
-import org.key_project.util.collection.ImmutableSLList;
-
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ProofMacroMenu;
 import de.uka.ilkd.key.gui.actions.exploration.ShowOriginAction;
+import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.join.JoinMenuItem;
 import de.uka.ilkd.key.gui.mergerule.MergeRuleMenuItem;
 import de.uka.ilkd.key.gui.smt.SMTMenuItem;
 import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.ProgramElement;
-import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.NameCreationInfo;
-import de.uka.ilkd.key.logic.PosInOccurrence;
-import de.uka.ilkd.key.logic.ProgramElementName;
-import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.*;
 import de.uka.ilkd.key.logic.op.FormulaSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -84,6 +57,13 @@ import de.uka.ilkd.key.settings.SMTSettings;
 import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
+import org.key_project.util.collection.ImmutableList;
+import org.key_project.util.collection.ImmutableSLList;
+
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.*;
 
 
 /**
@@ -205,19 +185,14 @@ public class TacletMenu extends JMenu {
      */
     public static ImmutableList<TacletApp> sort(ImmutableList<TacletApp> finds, TacletAppComparator comp) {
         ImmutableList<TacletApp> result = ImmutableSLList.<TacletApp>nil();
-
         List<TacletApp> list = new ArrayList<TacletApp>(finds.size());
-
         for (final TacletApp app : finds) {
             list.add(app);
         }
-
         Collections.sort(list, comp);
-
         for (final TacletApp app : list) {
             result = result.prepend(app);
         }
-
         return result;
     }
 
@@ -258,18 +233,19 @@ public class TacletMenu extends JMenu {
         }
         createFocussedAutoModeMenu(control);
         addMacroMenu();
-        
+
         addSeparator();
         add(new ShowOriginAction(pos));
 
+        //        addPopFrameItem(control);
+        MenuElement[] ms = KeYGuiExtensionFacade.createTermMenu(sequentView.getMainWindow()).getSubElements();
+        for (MenuElement me : ms) add(me.getComponent());
         addClipboardItem(control);
-
         if (pos != null) {
             PosInOccurrence occ = pos.getPosInOccurrence();
             if (occ != null && occ.posInTerm() != null) {
                 Term t = occ.subTerm();
                 createAbbrevSection(t, control);
-
                 if (t.op() instanceof ProgramVariable) {
                     ProgramVariable var = (ProgramVariable) t.op();
                     if (var.getProgramElementName().getCreationInfo() != null) {
@@ -549,6 +525,170 @@ public class TacletMenu extends JMenu {
         }
     }
 
+    /**
+     * ActionListener
+     */
+    class MenuControl implements ActionListener {
+
+        private boolean validabbreviation(String s) {
+            if (s == null || s.length() == 0) return false;
+            for (int i = 0; i < s.length(); i++) {
+                if (!((s.charAt(i) <= '9' && s.charAt(i) >= '0') ||
+                        (s.charAt(i) <= 'z' && s.charAt(i) >= 'a') ||
+                        (s.charAt(i) <= 'Z' && s.charAt(i) >= 'A') ||
+                        s.charAt(i) == '_')) return false;
+            }
+            return true;
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            if (e.getSource() instanceof TacletMenuItem) {
+                ((CurrentGoalView) (getPopupMenu().getInvoker()))
+                        .selectedTaclet(((TacletMenuItem) e.getSource()).connectedTo(),
+                                pos);
+            } else if (e.getSource() instanceof SMTMenuItem) {
+                final SMTMenuItem item = (SMTMenuItem) e.getSource();
+                final SolverTypeCollection solverUnion = item.getSolverUnion();
+                final Goal goal = mediator.getSelectedGoal();
+                assert goal != null;
+
+                Thread thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        SMTSettings settings = new SMTSettings(goal.proof().getSettings().getSMTSettings(),
+                                ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings(), goal.proof());
+                        SolverLauncher launcher = new SolverLauncher(settings);
+                        launcher.addListener(new SolverListener(settings, goal.proof()));
+                        Collection<SMTProblem> list = new LinkedList<SMTProblem>();
+                        list.add(new SMTProblem(goal));
+                        launcher.launch(solverUnion.getTypes(),
+                                list,
+                                goal.proof().getServices());
+
+
+                    }
+                }, "SMTRunner");
+                thread.start();
+            } else if (e.getSource() instanceof BuiltInRuleMenuItem) {
+
+                final BuiltInRuleMenuItem birmi = (BuiltInRuleMenuItem) e
+                        .getSource();
+                // This method delegates the request only to the UserInterfaceControl which implements the functionality.
+                // No functionality is allowed in this method body!
+                mediator.getUI().getProofControl().selectedBuiltInRule(mediator.getSelectedGoal(), birmi.connectedTo(), pos.getPosInOccurrence(), birmi.forcedApplication());
+
+            } else if (e.getSource() instanceof FocussedRuleApplicationMenuItem) {
+                mediator.getUI().getProofControl()
+                        .startFocussedAutoMode(pos.getPosInOccurrence(),
+                                mediator.getSelectedGoal());
+            } else {
+                // TODO: change to switch statement once development switches to Java7
+                if (((JMenuItem) e.getSource()).getText()
+                        .startsWith(COPY_TO_CLIPBOARD)) {
+                    GuiUtilities.copyHighlightToClipboard(sequentView, pos);
+                } else if (((JMenuItem) e.getSource()).getText().
+                        startsWith(DISABLE_ABBREVIATION)) {
+                    PosInOccurrence occ = pos.getPosInOccurrence();
+                    if (occ != null && occ.posInTerm() != null) {
+                        mediator.getNotationInfo().getAbbrevMap().setEnabled(occ.subTerm(), false);
+                        sequentView.printSequent();
+                    }
+                } else if (((JMenuItem) e.getSource()).getText().
+                        startsWith(ENABLE_ABBREVIATION)) {
+                    PosInOccurrence occ = pos.getPosInOccurrence();
+                    if (occ != null && occ.posInTerm() != null) {
+                        mediator.getNotationInfo().
+                                getAbbrevMap().setEnabled(occ.subTerm(), true);
+                        sequentView.printSequent();
+                    }
+                } else if (((JMenuItem) e.getSource()).getText().
+                        startsWith(CREATE_ABBREVIATION)) {
+                    PosInOccurrence occ = pos.getPosInOccurrence();
+                    if (occ != null && occ.posInTerm() != null) {
+                        // trim string, otherwise window gets too large (bug #1430)
+                        final String oldTerm = occ.subTerm().toString();
+                        final String term = oldTerm.length() > 200 ? oldTerm.substring(0, 200) : oldTerm;
+                        String abbreviation = (String) JOptionPane.showInputDialog
+                                (new JFrame(),
+                                        "Enter abbreviation for term: \n" + term,
+                                        "New Abbreviation",
+                                        JOptionPane.QUESTION_MESSAGE,
+                                        null,
+                                        null,
+                                        "");
+
+                        try {
+                            if (abbreviation != null) {
+                                if (!validabbreviation(abbreviation)) {
+                                    JOptionPane.showMessageDialog(new JFrame(),
+                                            "Only letters, numbers and '_' are allowed for Abbreviations",
+                                            "Sorry",
+                                            JOptionPane.INFORMATION_MESSAGE);
+                                } else {
+                                    mediator.getNotationInfo().
+                                            getAbbrevMap().put(occ.subTerm(), abbreviation, true);
+                                    sequentView.printSequent();
+                                }
+                            }
+                        } catch (AbbrevException sce) {
+                            JOptionPane.showMessageDialog(new JFrame(), sce.getMessage(), "Sorry",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    }
+
+                } else if (((JMenuItem) e.getSource()).getText().
+                        startsWith(CHANGE_ABBREVIATION)) {
+                    PosInOccurrence occ = pos.getPosInOccurrence();
+                    if (occ != null && occ.posInTerm() != null) {
+                        String abbreviation = (String) JOptionPane.showInputDialog
+                                (new JFrame(),
+                                        "Enter abbreviation for term: \n" + occ.subTerm().toString(),
+                                        "Change Abbreviation",
+                                        JOptionPane.QUESTION_MESSAGE,
+                                        null,
+                                        null,
+                                        mediator.getNotationInfo().
+                                                getAbbrevMap().getAbbrev(occ.subTerm()).substring(1));
+                        try {
+                            if (abbreviation != null) {
+                                if (!validabbreviation(abbreviation)) {
+                                    JOptionPane.showMessageDialog(new JFrame(),
+                                            "Only letters, numbers and '_' are allowed for Abbreviations",
+                                            "Sorry",
+                                            JOptionPane.INFORMATION_MESSAGE);
+                                } else {
+                                    mediator.getNotationInfo().
+                                            getAbbrevMap().changeAbbrev(occ.subTerm(), abbreviation);
+                                    sequentView.printSequent();
+                                }
+                            }
+                        } catch (AbbrevException sce) {
+                            JOptionPane.showMessageDialog(new JFrame(), sce.getMessage(), "Sorry",
+                                    JOptionPane.INFORMATION_MESSAGE);
+                        }
+                    }
+                } else if (((JMenuItem) e.getSource()).getText().
+                        startsWith("View name creation info")) {
+                    Term t = pos.getPosInOccurrence().subTerm();
+                    ProgramVariable var = (ProgramVariable) t.op();
+                    ProgramElementName name = var.getProgramElementName();
+                    NameCreationInfo info = name.getCreationInfo();
+                    String message;
+                    if (info != null) {
+                        message = info.infoAsString();
+                    } else {
+                        message = "No information available.";
+                    }
+                    JOptionPane.showMessageDialog(null,
+                            message,
+                            "Name creation info",
+                            JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        }
+    }
+
     static class FocussedRuleApplicationMenuItem extends JMenuItem {
         private static final String APPLY_RULES_AUTOMATICALLY_HERE = "Apply rules automatically here";
         /**
@@ -577,7 +717,6 @@ public class TacletMenu extends JMenu {
                     formulaSV++;
                 }
             }
-
             return formulaSV;
         }
 
@@ -603,7 +742,6 @@ public class TacletMenu extends JMenu {
             }
             return result;
         }
-
 
         /**
          * rough approximation of the program complexity
@@ -707,8 +845,6 @@ public class TacletMenu extends JMenu {
 
             return map;
         }
-
-
     }
 
     /**
@@ -758,7 +894,6 @@ public class TacletMenu extends JMenu {
                 }, "SMTRunner");
                 thread.start();
             } else if (e.getSource() instanceof BuiltInRuleMenuItem) {
-
                 final BuiltInRuleMenuItem birmi = (BuiltInRuleMenuItem) e
                         .getSource();
                 // This method delegates the request only to the UserInterfaceControl which implements the functionality.
