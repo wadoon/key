@@ -815,7 +815,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
               sig.append(named.name()).append(", ");
            }
            else if (subst instanceof Term) {
-              sig.append(LogicPrinter.quickPrintTerm((Term)subst, services, usePrettyPrinting, useUnicodeSymbols).trim()).append(", ");
+              sig.append(LogicPrinter.quickPrintTerm((Term)subst, services, usePrettyPrinting, useUnicodeSymbols, false).trim()).append(", ");
            }
            else {
               sig.append(subst).append(", ");
@@ -831,12 +831,12 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             sig.append(")");
         }
 
-        final String mby = hasMby ? LogicPrinter.quickPrintTerm(originalMby, services, usePrettyPrinting, useUnicodeSymbols) : null;
+        final String mby = hasMby ? LogicPrinter.quickPrintTerm(originalMby, services, usePrettyPrinting, useUnicodeSymbols, false) : null;
 
         String mods = "";
         for (LocationVariable h : heapLDT.getAllHeaps()) {
             if (originalMods.get(h) != null) {
-                String printMods = LogicPrinter.quickPrintTerm(originalMods.get(h), services, usePrettyPrinting, useUnicodeSymbols);
+                String printMods = LogicPrinter.quickPrintTerm(originalMods.get(h), services, usePrettyPrinting, useUnicodeSymbols, false);
                 mods = mods
                         + (includeHtmlMarkup ? "<br><b>" : "\n")
                         + "mod"
@@ -854,7 +854,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
 
         String globalUpdates = "";
         if (globalDefs!=null){
-            final String printUpdates = LogicPrinter.quickPrintTerm(globalDefs, services, usePrettyPrinting, useUnicodeSymbols);
+            final String printUpdates = LogicPrinter.quickPrintTerm(globalDefs, services, usePrettyPrinting, useUnicodeSymbols, false);
             globalUpdates = (includeHtmlMarkup? "<br><b>": "\n")
                     + "defs" + (includeHtmlMarkup? "</b> " : ": ")
                     + (includeHtmlMarkup ? LogicPrinter.escapeHTML(printUpdates,false) : printUpdates.trim());
@@ -863,7 +863,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         String pres = "";
         for (LocationVariable h : heapLDT.getAllHeaps()) {
             if (originalPres.get(h) != null) {
-                String printPres = LogicPrinter.quickPrintTerm(originalPres.get(h), services, usePrettyPrinting, useUnicodeSymbols);
+                String printPres = LogicPrinter.quickPrintTerm(originalPres.get(h), services, usePrettyPrinting, useUnicodeSymbols, false);
                 pres = pres
                         + (includeHtmlMarkup ? "<br><b>" : "\n")
                         + "pre"
@@ -878,7 +878,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             Term freePre = originalFreePres.get(h);
             if (freePre != null && !freePre.equals(tb.tt())) {
                 String printFreePres = LogicPrinter.quickPrintTerm(freePre, services,
-                                                                   usePrettyPrinting, useUnicodeSymbols);
+                                                                   usePrettyPrinting, useUnicodeSymbols, false);
                 freePres = freePres
                         + (includeHtmlMarkup ? "<br><b>" : "\n")
                         + "free pre"
@@ -891,7 +891,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         String posts = "";
         for (LocationVariable h : heapLDT.getAllHeaps()) {
             if (originalPosts.get(h) != null) {
-                String printPosts = LogicPrinter.quickPrintTerm(originalPosts.get(h), services, usePrettyPrinting, useUnicodeSymbols);
+                String printPosts = LogicPrinter.quickPrintTerm(originalPosts.get(h), services, usePrettyPrinting, useUnicodeSymbols, false);
                 posts = posts
                         + (includeHtmlMarkup ? "<br><b>" : "\n")
                         + "post"
@@ -906,7 +906,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             Term freePost = originalFreePosts.get(h);
             if (freePost != null && !freePost.equals(tb.tt())) {
                 String printFreePosts = LogicPrinter.quickPrintTerm(freePost, services,
-                                                                    usePrettyPrinting, useUnicodeSymbols);
+                                                                    usePrettyPrinting, useUnicodeSymbols, false);
                 freePosts = freePosts
                         + (includeHtmlMarkup ? "<br><b>" : "\n")
                         + "free post"
@@ -921,7 +921,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         if (originalAxioms != null) {
             for(LocationVariable h : heapLDT.getAllHeaps()) {
                 if(originalAxioms.get(h) != null) {
-                    String printAxioms = LogicPrinter.quickPrintTerm(originalAxioms.get(h), services, usePrettyPrinting, useUnicodeSymbols);
+                    String printAxioms = LogicPrinter.quickPrintTerm(originalAxioms.get(h), services, usePrettyPrinting, useUnicodeSymbols, false);
                     posts = posts
                             + (includeHtmlMarkup ? "<br><b>" : "\n")
                             + "axiom"

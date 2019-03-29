@@ -150,11 +150,27 @@ public class LogicPrinter {
     }
 
     public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
+        return quickPrintTerm(t, services, usePrettyPrinting, useUnicodeSymbols, true);
+    }
+
+    public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols, boolean printLabels) {
         final NotationInfo ni = new NotationInfo();
 
-        LogicPrinter p = new LogicPrinter(new ProgramPrinter(),
-                                          ni,
-                                          services);
+        LogicPrinter p;
+        if(printLabels) {
+            p = new LogicPrinter(new ProgramPrinter(), ni, services);
+        } else {
+            // if printLabels is false use a locally overriden class
+            // that disables term label printing.
+            ImmutableArray<TermLabel> noLables = new ImmutableArray<>();
+            p = new LogicPrinter(new ProgramPrinter(), ni, services) {
+                @Override
+                protected ImmutableArray<TermLabel> getVisibleTermLabels(Term t) {
+                    return noLables;
+                }
+            };
+        }
+
         if (services != null) {
             ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
         }
