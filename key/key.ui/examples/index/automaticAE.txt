@@ -134,7 +134,6 @@ group aepaper {
    notprovable ./abstract_execution/ExtractMethod/WithoutReturnSpec/extractMethodRefactoring.key
    notprovable ./abstract_execution/ExtractMethod/WrongAssignable/extractMethodRefactoring.key
    provable ./abstract_execution/ExtractMethod/CorrectSpecified/extractMethodRefactoring.key
-   notprovable ./abstract_execution/ExtractMethod/IncorrectAccessible/extractMethodRefactoring.key
    provable ./abstract_execution/ExtractMethod/Heap/extractMethodRefactoring.key
    provable ./abstract_execution/LoopUnrolling/Correct/loopUnrolling.key
    provable ./abstract_execution/DecomposeConditional/Correct/decomposeConditional.key
