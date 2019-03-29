@@ -25,6 +25,8 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.AbstractTermTransformer;
 import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
@@ -49,44 +51,65 @@ public abstract class MutualExclusionFormula extends AbstractTermTransformer {
     public Term transform(Term term, SVInstantiations svInst,
             Services services) {
         final TermBuilder tb = services.getTermBuilder();
+        final Sort booleanSort = //
+                services.getTypeConverter().getBooleanLDT().targetSort();
 
-        final ArrayList<ProgramVariable> participatingVars = new ArrayList<>();
+        final ArrayList<Term> participatingTerms = new ArrayList<>();
         for (Term t : term.subs()) {
             if (t.op() instanceof ProgramVariable) {
-                participatingVars.add((ProgramVariable) t.op());
-            } else if (t.op() instanceof ProgramSV) {
+                participatingTerms.add(t);
+            }
+            else if (t.op() instanceof ProgramSV) {
                 if (((ProgramSV) t.op()).isListSV()) {
                     @SuppressWarnings({ "rawtypes", "unchecked" })
                     final ImmutableArray<ProgramVariable> instantiation = //
                             (ImmutableArray) svInst
                                     .getInstantiation((ProgramSV) t.op());
                     assert instantiation != null;
-                    participatingVars.addAll(
-                        instantiation.stream().collect(Collectors.toList()));
-                } else {
+                    participatingTerms.addAll(instantiation.stream()
+                            .map(tb::var).collect(Collectors.toList()));
+                }
+                else {
                     final ProgramVariable instantiation = (ProgramVariable) svInst
                             .getInstantiation((ProgramSV) t.op());
                     assert instantiation != null;
-                    participatingVars.add(instantiation);
+                    participatingTerms.add(tb.var(instantiation));
                 }
+            }
+            else if (t.op() instanceof SchemaVariable) {
+                final Object instantiation = svInst
+                        .getInstantiation((ProgramSV) t.op());
+                assert instantiation != null;
+                if (instantiation instanceof Term
+                        && ((Term) instantiation).sort() == booleanSort) {
+                    participatingTerms.add(((Term) instantiation));
+                }
+            }
+            else if (t.sort() == booleanSort) {
+                participatingTerms.add(t);
+            }
+            else {
+                // Unsupported type of operator
+                return null;
             }
         }
 
         Term result = tb.tt();
 
-        for (ProgramVariable pv : participatingVars) {
-            result = tb.and(result, falseTerm(pv, services));
+        for (final Term t : participatingTerms) {
+            result = tb.and(result, falseTerm(t, services));
         }
 
-        for (int i = 0; i < participatingVars.size(); i++) {
+        for (int i = 0; i < participatingTerms.size(); i++) {
             Term subResult = tb.tt();
-            for (int j = 0; j < participatingVars.size(); j++) {
+            for (int j = 0; j < participatingTerms.size(); j++) {
                 if (i == j) {
                     subResult = tb.and(subResult,
-                        trueTerm(participatingVars.get(j), services));
-                } else {
+                            trueTerm(participatingTerms.get(j), services));
+                }
+                else {
                     subResult = tb.and(subResult,
-                        falseTerm(participatingVars.get(j), services));
+                            falseTerm(participatingTerms.get(j), services));
                 }
             }
             result = tb.or(result, subResult);
@@ -95,31 +118,30 @@ public abstract class MutualExclusionFormula extends AbstractTermTransformer {
         return result;
     }
 
-    private Term trueTerm(ProgramVariable var, Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-        if (var.sort().extendsTrans(services.getJavaInfo().objectSort())) {
-            return tb.not(tb.equals(tb.var(var), tb.NULL()));
-        } else if (var.sort().equals(
-            services.getTypeConverter().getBooleanLDT().targetSort())) {
-            return tb.equals(tb.var(var), tb.TRUE());
-        } else {
-            throw new RuntimeException(String.format(
-                "Unexpected type %s, expected an Object type or boolean",
-                var.sort().name()));
-        }
+    private Term trueTerm(Term term, Services services) {
+        return elementaryTruthTerm(term, false, services);
     }
 
-    private Term falseTerm(ProgramVariable var, Services services) {
+    private Term falseTerm(Term term, Services services) {
+        return elementaryTruthTerm(term, true, services);
+    }
+
+    private Term elementaryTruthTerm(Term term, boolean negate,
+            Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        if (var.sort().extendsTrans(services.getJavaInfo().objectSort())) {
-            return tb.equals(tb.var(var), tb.NULL());
-        } else if (var.sort().equals(
-            services.getTypeConverter().getBooleanLDT().targetSort())) {
-            return tb.equals(tb.var(var), tb.FALSE());
-        } else {
+        if (term.sort().extendsTrans(services.getJavaInfo().objectSort())) {
+            final Term result = tb.equals(term, tb.NULL());
+            return negate ? result : tb.not(result); // that's correct!
+        }
+        else if (term.sort().equals(
+                services.getTypeConverter().getBooleanLDT().targetSort())) {
+            final Term result = tb.equals(term, tb.TRUE());
+            return negate ? tb.not(result) : result;
+        }
+        else {
             throw new RuntimeException(String.format(
-                "Unexpected type %s, expected an Object type or boolean",
-                var.sort().name()));
+                    "Unexpected type %s, expected an Object type or boolean",
+                    term.sort().name()));
         }
     }
 
