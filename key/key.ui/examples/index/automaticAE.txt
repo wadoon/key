@@ -151,7 +151,6 @@ group aepaper {
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrect/consolidateDuplicateConditionalFragmentsPrefixCorrect.key
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfix/consolidateDuplicateConditionalFragmentsPostfix.key
    loadable ./abstract_execution/ExtractMethod/CorrectSpecified/extractMethodRefactoring.proof
-   loadable ./abstract_execution/LoopUnrolling/Correct/loopUnrolling.proof
    loadable ./abstract_execution/RemoveControlFlag/CorrectWithUnrollingInvRule/removeControlFlag.proof
    loadable ./abstract_execution/RemoveControlFlag/Correct/removeControlFlag.proof
 }
