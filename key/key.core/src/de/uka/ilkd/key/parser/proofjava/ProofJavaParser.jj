@@ -426,7 +426,7 @@ MORE :
 TOKEN :
 {
   < ABSTRACT: "abstract" >
-| < ABSTRACT_PROGRAM: "abstract_program" >
+| < ABSTRACT_PROGRAM: "abstract_statement" >
 | < ASSERT: "assert" >  {
       if (!ProofJavaParser.jdk1_4) {
           matchedToken.kind = IDENTIFIER;
