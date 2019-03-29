@@ -1,0 +1,78 @@
+@echo off;
+rule "impRight";
+rule "andRight";
+select number="0";
+
+###################
+
+echo "Case 'before <-> between'";
+auto;
+
+select branch="Case '->'";
+
+rule "loopScopeInvBoxAEEquivUnrollSplit" matches="\\\[.*!Post" inst_i=2;
+saveNewName @i1 matches="i_[0-9]";
+saveNewName @done1 matches="done_[0-9]+";
+saveNewName @result1 matches="result_[0-9]+";
+tryclose branch assertClosed="true";
+
+rule "loopScopeInvDiaAEEquiv" matches="\\<\{.*Post";
+saveNewName @i2 matches="i_[0-9]";
+saveNewName @done2 matches="done_[0-9]+";
+saveNewName @result2 matches="result_[0-9]+";
+tryclose branch assertClosed="true";
+
+axiom "@i1=@i2 & @done1=@done2 & @result1=@result2";
+tryclose branch assertClosed="true";
+
+select branch="Case '<-'";
+
+rule "loopScopeInvDiaAEEquivUnrollSplit" matches="\\<\{.*Post" inst_i=2;
+saveNewName @i1 matches="i_[0-9]";
+saveNewName @done1 matches="done_[0-9]+";
+saveNewName @result1 matches="result_[0-9]+";
+tryclose branch assertClosed="true";
+
+rule "loopScopeInvBoxAEEquiv" matches="\\\[.*!Post";
+saveNewName @i2 matches="i_[0-9]";
+saveNewName @done2 matches="done_[0-9]+";
+saveNewName @result2 matches="result_[0-9]+";
+tryclose branch assertClosed="true";
+
+axiom "@i1=@i2 & @done1=@done2 & @result1=@result2";
+tryclose branch assertClosed="true";
+
+###################
+
+echo "Case 'between <-> after'";
+auto;
+
+select branch="Case '->'";
+
+rule "loopScopeInvDiaAEEquiv" matches="\\<\{.*Post";
+saveNewName @i1 matches="i_[0-9]";
+saveNewName @result1 matches="result_[0-9]+";
+tryclose branch assertClosed="true";
+
+rule "loopScopeInvBoxAEEquiv" matches="\\\[.*!Post";
+saveNewName @i2 matches="i_[0-9]";
+saveNewName @result2 matches="result_[0-9]+";
+tryclose branch assertClosed="true";
+
+axiom "@i1=@i2 & @result1=@result2";
+tryclose branch assertClosed="true";
+
+select branch="Case '<-'";
+
+rule "loopScopeInvDiaAEEquiv" matches="\\<\{.*Post";
+saveNewName @i1 matches="i_[0-9]";
+saveNewName @result1 matches="result_[0-9]+";
+tryclose branch assertClosed="true";
+
+rule "loopScopeInvBoxAEEquiv" matches="\\\[.*!Post";
+saveNewName @i2 matches="i_[0-9]";
+saveNewName @result2 matches="result_[0-9]+";
+tryclose branch assertClosed="true";
+
+axiom "@i1=@i2 & @result1=@result2";
+tryclose branch assertClosed="true";

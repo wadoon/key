@@ -1,0 +1,82 @@
+@echo off;
+set steps=20000;
+echo "Preparing.";
+
+macro "nosplit-prop";
+rule "equiv_right";
+
+select branch="Case '<-'";
+leave;
+
+# Note: Until SE is finished, the formula matching
+# `````   "\\\[.*!Post\(result\)"
+#       represents the assumption program, and
+#         "\\<\{.*Post\(result\)"
+#       the conclusion program. Most of the time, at least
+#       one of them is present in the sequent.
+
+##############
+## Case "->" #
+##############
+  echo "Case '->'";
+  select branch="Case '->'";
+  auto; 
+ 
+  rule "loopScopeInvDiaAEEquiv" matches="\\<\{.*Post";
+  saveNewName @i1 matches="i_[0-9]";
+  saveNewName @o1 matches="obj_[0-9]+";
+  tryclose branch assertClosed="true";
+  
+  rule "loopScopeInvBoxAEEquiv" matches="\\\[.*!Post";
+  saveNewName @i2 matches="i_[0-9]";
+  saveNewName @o2 matches="obj_[0-9]+";
+  tryclose branch assertClosed="true";
+
+  echo "Coupling loops";
+  axiom "@i1=@i2 & @o1=@o2";
+ 
+  auto matches="\\<\{.*Post"; 
+  tryclose;
+  
+  rule "loopScopeInvDiaAEEquiv" matches="\\<\{.*Post";
+  saveNewName @i3 matches="i_[0-9]";
+  saveNewName @o3 matches="obj_[0-9]+";
+  tryclose branch assertClosed="true";
+
+  echo "Coupling loops";
+  axiom "@i1=@i3 & @o1=@o3";
+  tryclose branch assertClosed="true";
+  
+##############
+## Case "<-" #
+##############
+  activate;
+  
+  echo "Case '<-'";
+  select branch="Case '<-'";
+  auto; 
+ 
+  rule "loopScopeInvDiaAEEquiv" matches="\\<\{.*Post";
+  saveNewName @i4 matches="i_[0-9]";
+  saveNewName @o4 matches="obj_[0-9]+";
+  tryclose branch assertClosed="true";
+  
+  rule "loopScopeInvBoxAEEquiv" matches="\\\[.*!Post";
+  saveNewName @i5 matches="i_[0-9]";
+  saveNewName @o5 matches="obj_[0-9]+";
+  tryclose branch assertClosed="true";
+
+  echo "Coupling loops";
+  axiom "@i4=@i5 & @o4=@o5";
+ 
+  auto matches="\\\[.*!Post"; 
+  tryclose;
+  
+  rule "loopScopeInvBoxAEEquiv" matches="\\\[.*!Post";
+  saveNewName @i6 matches="i_[0-9]";
+  saveNewName @o6 matches="obj_[0-9]+";
+  tryclose branch assertClosed="true";
+
+  echo "Coupling loops";
+  axiom "@i4=@i6 & @o4=@o6";
+  tryclose branch assertClosed="true";

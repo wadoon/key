@@ -29,6 +29,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({ RunAllProofsInfFlow.class,
+                RunAllProofsAbstractExecution.class,
                 RunAllProofsFunctional.class})
 public class RunAllProofsTestSuite {
     // no members

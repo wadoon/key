@@ -1,0 +1,38 @@
+macro "nosplit-prop";
+rule "equiv_right";
+
+select branch="Case '->'";
+auto;
+
+rule "loopScopeInvBoxAEEquivUnroll" matches="\\\[.*!Post" inst_i=2;
+saveNewName @i1 matches="i_[0-9]";
+saveNewName @b1 matches="b_[0-9]+";
+saveNewName @result1 matches="result_[0-9]+";
+tryclose branch assertClosed="true";
+
+rule "loopScopeInvDiaAEEquiv" matches="\\<\{.*Post";
+saveNewName @i2 matches="i_[0-9]";
+saveNewName @b2 matches="b_[0-9]+";
+saveNewName @result2 matches="result_[0-9]+";
+tryclose branch assertClosed="true";
+
+axiom "@i1=@i2 & @b1=@b2 & @result1=@result2";
+tryclose branch assertClosed="true";
+
+select branch="Case '<-'";
+auto;
+
+rule "loopScopeInvDiaAEEquivUnroll" matches="\\<\{.*Post" inst_i=2;
+saveNewName @i1 matches="i_[0-9]";
+saveNewName @b1 matches="b_[0-9]+";
+saveNewName @result1 matches="result_[0-9]+";
+tryclose branch assertClosed="true";
+
+rule "loopScopeInvBoxAEEquiv" matches="\\\[.*!Post";
+saveNewName @i2 matches="i_[0-9]";
+saveNewName @b2 matches="b_[0-9]+";
+saveNewName @result2 matches="result_[0-9]+";
+tryclose branch assertClosed="true";
+
+axiom "@i1=@i2 & @b1=@b2 & @result1=@result2";
+tryclose branch assertClosed="true";
