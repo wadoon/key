@@ -58,14 +58,14 @@ public class AnonUpdateTransformer extends AbstractTermTransformer {
                 services);
 
         final Map<LocationVariable, Term> mods = new LinkedHashMap<LocationVariable, Term>();
+
         heapContext.forEach(heap -> mods.put(heap, spec.getModifies(heap,
                 spec.getInternalSelfTerm(), atPres, services)));
 
         for (LocationVariable heap : heapContext) {
-            final LoopScopeTools.AnonUpdateData tAnon = LoopScopeTools
-                    .createAnonUpdate(heap, mods.get(heap), spec, services,
-                            term.sub(2));
-            anonUpdate = tb.parallel(anonUpdate, tAnon.anonUpdate);
+            final Term heapAnonUpdate = LoopScopeTools.createAnonUpdate(heap,
+                    mods.get(heap), spec, services, term.sub(2));
+            anonUpdate = tb.parallel(anonUpdate, heapAnonUpdate);
         }
         // END Additional Heap Terms
 

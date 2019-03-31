@@ -11,7 +11,6 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.Statement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
-import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Namespace;
@@ -192,19 +191,13 @@ public class LoopScopeTools {
      *            The loop invariant.
      * @param services
      *            The {@link Services} object.
-     * @return An {@link AnonUpdateData} object encapsulating the anonymizing
-     *         update, the loop heap, the base heap, and the anonymized heap.
+     * @param term
+     *            The anonymous heap.
+     * @return An anonymizing update
      */
-    protected static AnonUpdateData createAnonUpdate(LocationVariable heap,
-            Term mod, LoopSpecification inv, Services services, Term term) {
+    protected static Term createAnonUpdate(LocationVariable heap, Term mod,
+            LoopSpecification inv, Services services, Term term) {
         final TermBuilder tb = services.getTermBuilder();
-        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final Name loopHeapName = new Name(tb.newName(heap + "_After_LOOP"));
-        final Function loopHeapFunc = new Function(loopHeapName,
-                heapLDT.targetSort(), true);
-        services.getNamespaces().functions().addSafely(loopHeapFunc);
-
-        final Term loopHeap = tb.func(loopHeapFunc);
         final Function anonHeapFunc = services.getNamespaces().functions()
                 .lookup(term.toString());
         final Term anonHeapTerm = tb.label(tb.func(anonHeapFunc),
@@ -219,25 +212,7 @@ public class LoopScopeTools {
             anonUpdate = tb.anonUpd(heap, mod, anonHeapTerm);
         }
 
-        return new AnonUpdateData( //
-                anonUpdate, loopHeap, //
-                tb.getBaseHeap(), anonHeapTerm);
-    }
-
-    /**
-     * A container containing data for the anonymizing update, that is the
-     * actual update and the anonymized heap.
-     */
-    protected static class AnonUpdateData {
-        public final Term anonUpdate, anonHeap, loopHeap, loopHeapAtPre;
-
-        public AnonUpdateData(Term anonUpdate, Term loopHeap,
-                Term loopHeapAtPre, Term anonHeap) {
-            this.anonUpdate = anonUpdate;
-            this.loopHeap = loopHeap;
-            this.loopHeapAtPre = loopHeapAtPre;
-            this.anonHeap = anonHeap;
-        }
+        return anonUpdate;
     }
 
     public static LoopStatement getLoopFromActiveStatement(
