@@ -152,8 +152,10 @@ public class TestNoLabels {
         @ decreases i;
         @*/
         for (i = i; i > 0; i--) {
+            a=b;b=c;a=c;c=b;a=c;b=a;a=c;a=c;b=a;a=c; // 20 steps
             if (i == 17) {
                 i = 1;
+                //a=b;b=c;a=c;c=b;a=c;b=a;a=c;a=c;b=a;a=c; // 20 steps
                 continue; // have to prove the invariant
             }
             else if (i == 42) {
