@@ -51,6 +51,21 @@ subprojects {
         options.verbose()
     }
 
+    tasks.withType(Test) {//Configure all tests
+        //Please take a look at: org.key_project.util.helper.FindResources
+        //How to obtain the different test resources
+
+        systemProperty "KEY_EXAMPLES_DIR", file("${project(":key.ui").projectDir}/examples")
+        systemProperty "KEY_TESTRESULT_RUNALLPROOFS", "$projectDir/reports/runallproofs"
+        systemProperty "TEST_RESOURCES", "src/test/resources"
+        systemProperty "TEST_CASES", "src/test/resources/testcase"
+        systemProperty "TACLET_PROOFS", "${project(":key.core").projectDir}/tacletProofs"
+
+        systemProperty "key.disregardSettings", "true"
+        maxHeapSize = "4g"
+    }
+
+
     repositories {
         mavenCentral()
         flatDir { dirs "lib", "$rootDir/key.core/lib" }
@@ -198,13 +213,6 @@ project(":key.core") {
                 into "$javaCCOutputDirMain/de/uka/ilkd/key/parser/proofjava/"
             }
         }
-    }
-
-    tasks.withType(Test) {//Configure all tests
-        systemProperty "testcases", "src/test/resources/testcase"
-        systemProperty "TACLET_PROOFS", "tacletProofs"
-        systemProperty "key.disregardSettings", "true"
-        maxHeapSize = "4g"
     }
 
     test {

@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.key_project.util.helper.FindResources;
 import org.key_project.util.java.IOUtil;
 
 import de.uka.ilkd.key.control.DefaultUserInterfaceControl;
@@ -50,23 +51,9 @@ public class ProveRulesTest {
 
 
    static {
-       File file = null;
-       if(System.getProperty("TACLET_PROOFS") != null)
-           file = new File(System.getProperty("TACLET_PROOFS"));
-       else {
-           String[] candidates = new String[]{
-                   "./tacletProofs",
-                   "key.core/tacletProofs",
-                   "../key.core/tacletProofs",
-                   "../tacletProofs"};
-           for (String candidate: candidates) {
-               file = new File(candidate);
-               if(file.exists()) break;
-           }
-       }
+       PROOF_DIRECTORY = FindResources.getTacletProofsDirectory();
        assertTrue("Directory containing taclet proofs cannot be found at location: "
-               + file, file.exists());
-       PROOF_DIRECTORY = file;
+               + PROOF_DIRECTORY, PROOF_DIRECTORY.exists());
    }
 
    private final String tacletName;
