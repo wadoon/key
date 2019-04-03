@@ -40,10 +40,8 @@ public final class GoalSelectAboveAction extends MainWindowAction {
     private static final long serialVersionUID = 4574670781882014092L;
 
     /**
-     * Creates a new GoalBackAction.
+     * Creates a new GoalSelectBelowAction.
      * @param mainWindow the main window this action belongs to
-     * @param longName true iff long names (including the name of the rule to undo)
-     * shall be displayed (e.g. in menu items)
      */
     public GoalSelectAboveAction(MainWindow mainWindow) {
         super(mainWindow);

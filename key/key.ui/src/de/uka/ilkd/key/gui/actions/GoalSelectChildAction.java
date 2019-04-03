@@ -30,28 +30,29 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
-/**
+/** Selects the child of the currently selected element in proof-tree 
  */
-public final class GoalSelectBelowAction extends MainWindowAction {
+public final class GoalSelectChildAction extends MainWindowAction {
 
     /**
      *
      */
-    private static final long serialVersionUID = 4574670781882014092L;
+    private static final long serialVersionUID = 4574270781882014092L;
 
     /**
      * Creates a new GoalSelectBelowAction.
      * @param mainWindow the main window this action belongs to
      */
-    public GoalSelectBelowAction(MainWindow mainWindow) {
+    public GoalSelectChildAction(MainWindow mainWindow) {
         super(mainWindow);
-        setAcceleratorLetter(KeyEvent.VK_J);
-        setName("Select Goal Below");
-        setTooltip("Changes selected goal in the proof-tree to the next item below the current one");
+        setAcceleratorLetter(KeyEvent.VK_L);
+        setName("Select Child Goal");
+        setTooltip("Changes selected goal in the proof-tree to the child element. If not available: to parent's next child element");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-            getMediator().getProofTreeSelectionControls().selectBelow();
+
+            getMediator().getSelectionModel().selectChild();
     }
 }
