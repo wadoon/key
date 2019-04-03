@@ -108,11 +108,13 @@ public class KeYSelectionModel {
 	}
 
 	public void selectChild() {
-		if (selectedNode == null || selectedNode.root()) {
-
-		}else if (selectedNode.childrenCount() != 0){
+		if (selectedNode == null) {
+			return;
+		} else if (selectedNode.childrenCount() != 0){
 			Node firstChild = selectedNode.child(0);
 			setSelectedNode(firstChild);
+		} else if(selectedNode.root()) {
+			return;
 		} else {
 			Node currentNode = selectedNode;
 			Node nextNodeInParent = selectedNode.nextNodeInParent();

@@ -52,7 +52,6 @@ public final class GoalSelectChildAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
-            getMediator().getSelectionModel().selectChild();
+        getMediator().getSelectionModel().selectChild();
     }
 }

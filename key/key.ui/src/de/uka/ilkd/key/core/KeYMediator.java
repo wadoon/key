@@ -107,6 +107,9 @@ public class KeYMediator {
      */
     private boolean inAutoMode = false;
 
+    /**
+     * actions for changing the selection in the proof-tree using the JTree selection
+     */
     private ProofTreeView.ProofTreeSelectionControls proofTreeSelectionControls; 
     
 
@@ -247,6 +250,7 @@ public class KeYMediator {
     public ProofTreeView.ProofTreeSelectionControls getProofTreeSelectionControls() {
         return this.proofTreeSelectionControls;
     }
+
     public void setProofTreeSelectionControls(ProofTreeView.ProofTreeSelectionControls proofTreeSelectionControls) {
         this.proofTreeSelectionControls = proofTreeSelectionControls;
     }
