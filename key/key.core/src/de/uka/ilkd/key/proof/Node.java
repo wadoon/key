@@ -435,15 +435,15 @@ public class Node  {
     }
 
     /**
-    * returns the next node after `this` in parent
+    * @return the next node after `this` in parent; null if none is found
     */
     public Node nextNodeInParent() {
         Node nodeParent = parent();
         if (parent == null) {
             return null;
-        };
+        }
         int indexInParent = nodeParent.getChildNr(this);
-        int indexOfNext = indexInParent+1;
+        int indexOfNext = indexInParent + 1;
         if (indexOfNext < nodeParent.childrenCount()) {
             return parent.child(indexOfNext);
         }
