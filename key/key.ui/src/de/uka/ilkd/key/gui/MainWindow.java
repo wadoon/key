@@ -715,6 +715,7 @@ public final class MainWindow extends JFrame {
             goalSelection.add(new GoalSelectAboveAction(this));
             goalSelection.add(new GoalSelectBelowAction(this));
             goalSelection.add(new GoalSelectParentAction(this));
+            goalSelection.add(new GoalSelectChildAction(this));
             view.add(goalSelection);
         }
 

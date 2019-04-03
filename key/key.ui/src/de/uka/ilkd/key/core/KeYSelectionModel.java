@@ -99,6 +99,33 @@ public class KeYSelectionModel {
 	fireSelectedNodeChanged();
     }
 
+	public void selectParent() {
+		Node parent = selectedNode.parent();
+		if (parent == null) { 
+			return;
+		};
+		setSelectedNode(parent);
+	}
+
+	public void selectChild() {
+		if (selectedNode == null || selectedNode.root()) {
+
+		}else if (selectedNode.childrenCount() != 0){
+			Node firstChild = selectedNode.child(0);
+			setSelectedNode(firstChild);
+		} else {
+			Node currentNode = selectedNode;
+			Node nextNodeInParent = selectedNode.nextNodeInParent();
+			while(nextNodeInParent == null && currentNode.parent() != null) {
+				currentNode = currentNode.parent();
+				nextNodeInParent = currentNode.nextNodeInParent();
+			}
+			if (nextNodeInParent != null) {
+				setSelectedNode(nextNodeInParent);
+			}
+		}
+	}
+
     /** sets the node that is focused by the user
      * @param g the Goal that contains the selected node
      */

@@ -54,7 +54,6 @@ public final class GoalSelectBelowAction extends MainWindowAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
             getMediator().getProofTreeSelectionControls().selectBelow();
     }
 }

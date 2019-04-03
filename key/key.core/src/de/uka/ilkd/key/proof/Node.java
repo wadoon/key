@@ -435,6 +435,22 @@ public class Node  {
     }
 
     /**
+    * returns the next node after `this` in parent
+    */
+    public Node nextNodeInParent() {
+        Node nodeParent = parent();
+        if (parent == null) {
+            return null;
+        };
+        int indexInParent = nodeParent.getChildNr(this);
+        int indexOfNext = indexInParent+1;
+        if (indexOfNext < nodeParent.childrenCount()) {
+            return parent.child(indexOfNext);
+        }
+        return null;
+    }
+
+    /**
      * @return the number of the node <code>p_node</code>, if it is a
      * child of this node (starting with <code>0</code>),
      * <code>-1</code> otherwise

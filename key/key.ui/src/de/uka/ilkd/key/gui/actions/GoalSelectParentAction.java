@@ -55,6 +55,6 @@ public final class GoalSelectParentAction extends MainWindowAction {
     @Override
     public void actionPerformed(ActionEvent e) {
 
-            getMediator().getProofTreeSelectionControls().selectParent();
+            getMediator().getSelectionModel().selectParent();
     }
 }
