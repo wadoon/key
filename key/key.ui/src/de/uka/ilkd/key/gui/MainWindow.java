@@ -690,7 +690,7 @@ public final class MainWindow extends JFrame {
         });
 //        view.add(laf); // uncomment this line to include the option in the menu
 
-
+        
         view.add(new JCheckBoxMenuItem(new PrettyPrintToggleAction(this)));
         view.add(new JCheckBoxMenuItem(unicodeToggleAction));
         view.add(new JCheckBoxMenuItem(new SyntaxHighlightingToggleAction(this)));
@@ -709,6 +709,14 @@ public final class MainWindow extends JFrame {
         view.add(new ProofDiffFrame.Action(this));
 
         view.addSeparator();
+
+        {
+            JMenu goalSelection = new JMenu("Select Goal ...");
+            goalSelection.add(new GoalSelectAboveAction(this));
+            goalSelection.add(new GoalSelectBelowAction(this));
+            goalSelection.add(new GoalSelectParentAction(this));
+            view.add(goalSelection);
+        }
 
         JMenuItem hmItem = new JMenuItem("Heatmap Options");
         hmItem.addActionListener(new HeatmapSettingsAction(this));

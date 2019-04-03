@@ -36,6 +36,8 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import javax.swing.*;
 import javax.swing.event.TreeSelectionEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.KeyEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.plaf.TreeUI;
 import javax.swing.plaf.basic.BasicTreeUI;
@@ -256,8 +258,39 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
         }
     }
 
+    public class ProofTreeSelectionControls {
+        public boolean selectParent() {
+            TreePath path = delegateView.getSelectionPath();
+            System.out.println("path: "+path);
+            TreePath parent = path.getParentPath();
+            if (parent != null) {
+                delegateView.setSelectionPath(parent);
+                return true;
+            }
+            return false;
+        }
+        public boolean selectAbove() {
+            return selectRelative(+1);
+        }
+        public boolean selectBelow() {
+            return selectRelative(-1);
+        }
+
+        public boolean selectRelative(int i) {
+            TreePath path = delegateView.getSelectionPath();
+            int row = delegateView.getRowForPath(path);
+            TreePath newPath = delegateView.getPathForRow(row-i);
+            if (newPath != null) {
+                delegateView.setSelectionPath(newPath);
+                return true;
+            }
+            return false;
+        }
+    }  
+
     private void register() {
         mediator.addKeYSelectionListener(proofListener);
+        mediator.setProofTreeSelectionControls(new ProofTreeSelectionControls());
         // This method delegates the request only to the UserInterfaceControl which implements the functionality.
         // No functionality is allowed in this method body!
         mediator.getUI().getProofControl().addAutoModeListener(proofListener);

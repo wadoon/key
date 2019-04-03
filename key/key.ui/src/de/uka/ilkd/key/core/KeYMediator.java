@@ -28,6 +28,7 @@ import de.uka.ilkd.key.gui.InspectorForDecisionPredicates;
 import de.uka.ilkd.key.gui.notification.events.ExceptionFailureEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
 import de.uka.ilkd.key.gui.notification.events.ProofClosedNotificationEvent;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.utilities.CheckedUserInput;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.ServiceCaches;
@@ -105,6 +106,8 @@ public class KeYMediator {
      * boolean flag indicating if the GUI is in auto mode
      */
     private boolean inAutoMode = false;
+
+    private ProofTreeView.ProofTreeSelectionControls proofTreeSelectionControls; 
     
 
     /** creates the KeYMediator with a reference to the application's
@@ -239,6 +242,13 @@ public class KeYMediator {
             getUI().getProofControl().pruneTo(goal);
             finishSetBack(goal.proof());
     	}
+    }
+
+    public ProofTreeView.ProofTreeSelectionControls getProofTreeSelectionControls() {
+        return this.proofTreeSelectionControls;
+    }
+    public void setProofTreeSelectionControls(ProofTreeView.ProofTreeSelectionControls proofTreeSelectionControls) {
+        this.proofTreeSelectionControls = proofTreeSelectionControls;
     }
 
 
