@@ -100,6 +100,9 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
             setProofTreeFont();
         }
     };
+
+    private final ProofTreeSelectionControls proofTreeSelectionControls;
+
     /**
      * Roots of subtrees containing all nodes to which rules have been
      * applied; this is used when auto mode is active
@@ -125,6 +128,8 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
     public ProofTreeView() {
         proofListener = new GUIProofTreeProofListener();
         guiListener = new GUIProofTreeGUIListener();
+        proofTreeSelectionControls = new ProofTreeSelectionControls();
+        
         delegateView = new JTree(
                 new DefaultMutableTreeNode("No proof loaded")) {
             private static final long serialVersionUID = 6555955929759162324L;
@@ -290,7 +295,7 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
 
     private void register() {
         mediator.addKeYSelectionListener(proofListener);
-        mediator.setProofTreeSelectionControls(new ProofTreeSelectionControls());
+        mediator.setProofTreeSelectionControls(proofTreeSelectionControls);
         // This method delegates the request only to the UserInterfaceControl which implements the functionality.
         // No functionality is allowed in this method body!
         mediator.getUI().getProofControl().addAutoModeListener(proofListener);
