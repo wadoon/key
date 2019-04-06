@@ -94,9 +94,11 @@ public class Main {
 	private static final String benchmarksFile12 = "benchmarks/cohennopol/CohenNoPol.java";
 	private static final String benchmarksFile13 = "benchmarks/squarenopol/SquareNoPol.java";
 	
+	private static final String benchmarksFile14 = "benchmarks/cohennoinv/CohenNoInv.java";
+	
 	private static final String digRelPath = "dig/dig/dig.py";
 	//amount of testcases / method calls for the function from which the traces should be obtained
-	public static final int maxLoopUnwinds = 3;
+	public static final int maxLoopUnwinds = 8;
 	
 	public static final int startPolDegree = 2;
 	public static int polDegree = 2;
@@ -109,13 +111,13 @@ public class Main {
 	private static KeYAPI keyAPI;
 	
 	public static void main(String[] args) {
-		keyAPI = new KeYAPI(benchmarksFile10);
+		keyAPI = new KeYAPI(benchmarksFile12);
 		
 		ProofIndependentSettings.DEFAULT_INSTANCE
         .getTestGenerationSettings().setMaxUnwinds(maxLoopUnwinds);
 		//2^(intBound-2) == max possible values of smt (so 2^(6-2))=16 max possible input var value) 
 		//int.bound = 8 is max for my system setup
-		ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = 8;
+		ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = 9;
 		
 		List<Contract> proofContracts = keyAPI.getContracts();
 		ProofResult result = null;
@@ -206,6 +208,7 @@ public class Main {
 		//we only need to obtain the invariants here, no need to operate on the original proof
 		Goal loopGoal = proof.openGoals().head();
 		Proof onlyLoopProof = AuxiliaryFunctions.createProof(proof, "loopProof", loopGoal.sequent());
+		Goal clonedLoopGoal = onlyLoopProof.openEnabledGoals().head();
 		
 		DefaultTermParser dtp = new DefaultTermParser();
 		Term conjInvariants = null;
@@ -217,7 +220,8 @@ public class Main {
 		ImmutableSet<ProgramVariable> localins = MiscTools.getLocalIns(program, services);
 		ImmutableSet<ProgramVariable> localouts = MiscTools.getLocalOuts(program, services);
 		//]TEMP
-        AbbrevMap abbr = (services.getProof() == null) ? null
+
+		AbbrevMap abbr = (services.getProof() == null) ? null
                 : services.getProof().abbreviations();
         NamespaceSet existingNS = services.getNamespaces();
         UpdateLHSCollectorVisitor updateVisitor = new UpdateLHSCollectorVisitor();
@@ -256,11 +260,13 @@ public class Main {
 				e1.printStackTrace();
 			}
 			//delete invariant (the user given Ineq.);
-			Term oldLoopInv = setNewLoopInvariantOverwriteOld(loopGoal, uselessInv);
+			Term oldLoopInv = setNewLoopInvariantOverwriteOld(clonedLoopGoal, uselessInv);
 			ProblemFactory.create(onlyLoopProof);
 			//restore old inv (user given ineq)
-			setNewLoopInvariantOverwriteOld(loopGoal, oldLoopInv);
-			
+			if (oldLoopInv != null) {
+				setNewLoopInvariantOverwriteOld(clonedLoopGoal, oldLoopInv);
+				setNewLoopInvariantOverwriteOld(loopGoal, oldLoopInv);
+			}
 			IGeneratedTest generatedTest = getGeneratedTest();
 			
 			System.out.println("Call generated test / obtain traces..");
@@ -556,6 +562,9 @@ public class Main {
 		LoopInvariantBuiltInRuleApp ruleApplication = new LoopInvariantBuiltInRuleApp(invariantRule, poi, services);
 		ruleApplication = ruleApplication.tryToInstantiate(loopGoal);
 		LoopSpecification spec = ruleApplication.getSpec();
+		
+		if (spec == null)
+			return null;
 		
 		//retrieve old inv for loop
 		Term oldLoopInv = spec.getInvariant(services);
