@@ -25,6 +25,8 @@ import java.util.stream.IntStream;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
+import com.sun.tools.internal.ws.wsdl.document.jaxws.Exception;
+
 import api.key.KeYAPI;
 import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
@@ -47,6 +49,7 @@ import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import de.uka.ilkd.key.pp.AbbrevMap;
 import de.uka.ilkd.key.proof.Goal;
+import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
@@ -58,6 +61,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.InfFlowSpec;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 import dynacode.DynaCode;
 import genmethod.GenMethodData;
 import genmethod.MethodGenerator;
@@ -74,16 +78,11 @@ import smt.ProblemFactory;
 
 public class Main {
 	private static final boolean useGeneratedInvariant = true;
-	private static final boolean mockFirstLoopInvariant = false;
-	//private static final String mockFirstLoopInvariantString = "-q*_y - r + _x = 0";
-	private static final String mockFirstLoopInvariantString = "i - r = 0";
-	private static int loopDepthCounter = 0;
-
+	
 	private static final String benchmarksFile1 = "benchmarks/Loop1/Loop1.java";
 	private static final String benchmarksFile2 = "benchmarks/easyloop1/EasyLoop1.java";
 	private static final String benchmarksFile3 = "benchmarks/cohen/Cohen.java";
 	private static final String benchmarksFile4 = "benchmarks/easyloop1nopol/EasyLoop1NoPol.java"; //works
-	
 	private static final String benchmarksFile5 = "benchmarks/plus/Plus.java";
 	private static final String benchmarksFile6 = "benchmarks/square/Square.java";
 	private static final String benchmarksFile7 = "benchmarks/times/Times.java";
@@ -93,31 +92,39 @@ public class Main {
 	private static final String benchmarksFile11 = "benchmarks/timestwonopol/TimesTwoNoPol.java"; //works
 	private static final String benchmarksFile12 = "benchmarks/cohennopol/CohenNoPol.java";
 	private static final String benchmarksFile13 = "benchmarks/squarenopol/SquareNoPol.java";
-	
 	private static final String benchmarksFile14 = "benchmarks/cohennoinv/CohenNoInv.java";
 	
+	private static final String useBenchmark = benchmarksFile12;
+	
 	private static final String digRelPath = "dig/dig/dig.py";
-	//amount of testcases / method calls for the function from which the traces should be obtained
-	public static final int maxLoopUnwinds = 8;
 	
+	// --- TestGen Parameters ---
+	// Amount of testcases / method calls for the function from which the traces should be obtained
+	public static final int startMaxLoopUnwinds = 4;
+	public static int maxLoopUnwinds = startMaxLoopUnwinds;
+	public static int SMTintBound = 9;
+	
+	// --- DIG Parameters ---
+	// Polynomial Degree
 	public static final int startPolDegree = 2;
-	public static int polDegree = 2;
+	public static int polDegree = startPolDegree;
 	
-	//goal stack for backtracking
-	public static LinkedList<Goal> lastGoals = new LinkedList<Goal>();
-	
-	//currently valid Invariant Stack
+	// goal stack for backtracking, implemented or future logic, currently the first loop goal is the only element
+	public static LinkedList<Node> lastValidNodes = new LinkedList<Node>();
+	// we need to restore the old user specified inequality invariants at backtracking
+	public static LinkedList<Triple<LoopInvariantBuiltInRuleApp, Services, Term>> loopsWithSpecInequalityInv = new LinkedList<Triple<LoopInvariantBuiltInRuleApp, Services, Term>>();
 	
 	private static KeYAPI keyAPI;
 	
+	
 	public static void main(String[] args) {
-		keyAPI = new KeYAPI(benchmarksFile12);
+		keyAPI = new KeYAPI(useBenchmark);
 		
 		ProofIndependentSettings.DEFAULT_INSTANCE
         .getTestGenerationSettings().setMaxUnwinds(maxLoopUnwinds);
 		//2^(intBound-2) == max possible values of smt (so 2^(6-2))=16 max possible input var value) 
 		//int.bound = 8 is max for my system setup
-		ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = 9;
+		ProofIndependentSettings.DEFAULT_INSTANCE.getSMTSettings().intBound = SMTintBound;
 		
 		List<Contract> proofContracts = keyAPI.getContracts();
 		ProofResult result = null;
@@ -130,68 +137,128 @@ public class Main {
 	
 	private static ProofResult attemptProve(Proof proof) {
 		while(!keyAPI.isClosed(proof)) {
+			// --- KeY - AutoPilot ---
 			ImmutableList<Goal> openGoals = keyAPI.prove(proof);
-			for(Goal currentGoal : openGoals) {
-				SequentWrapper currentSequent = keyAPI.getSequent(currentGoal);
-				InvGenResult result = null;
+			
+			//--- Check if Backtracking is needed ----
+			if (isInMinOneGoalNoLoopContained(openGoals)) {
+				System.out.println("---- Backtrack - Invalid Inv ----");
+				// currently, always backtrack to the very first loop goal
+				// & reset all loop invariants to the spec ones, since they
+				// got overwritten by the potential invariants
+				backtrack(proof, lastValidNodes.peek(), loopsWithSpecInequalityInv);
 				
-				// we need to be able to backtrack to a goal
-				if (lastGoals.isEmpty())
-					lastGoals.push(currentGoal);
+				//--- Change Parameters to be more successful next time -----
+				// DIG: Increase pol. degree by 1
+				polDegree += 1;
+				// TestGen: Generate more test cases
+				maxLoopUnwinds += 2;
+				ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings().setMaxUnwinds(maxLoopUnwinds);
 				
-				try {
-					// try to generate potential invariant
-					result = attemptInvGen(currentSequent, proof);
-				} catch (ProofInputException e) {
-					e.printStackTrace();
-				}
-				if (result instanceof NotValidInvariant) {
-					//--- Backtrack ----
-					//prunes proof tree to last successfully proven outermost loop goal
-					//or first tried
-					proof.pruneProof(lastGoals.peek());
-						
-					//Increase pol. degree by 1
-					addToPolDegree(1);
-				}
-				else {
-					//only save if the last loop is successfully proven
-					if (allSubGoalsInitBodyUseCaseProven(lastGoals.peek())) {
-						resetToPolDegree(startPolDegree);
-						//Saves current (loop) goal for possible backtracking (new outermost loop)
-						lastGoals.push(currentGoal);
-					}
-					
-					Invariant invariant = (Invariant)result;
-					keyAPI.applyInvariantRule(currentGoal, invariant, useGeneratedInvariant);
-				}
-				
-				//----- Call recursively ----
+				//--- Call recursively -> retry with new parameters ---
 				attemptProve(proof);
 			}
+			
+			// --- else Generate Potential Invariant ---
+			else {
+				for(Goal currentGoal : openGoals) {
+					// --- Get Sequent from Goal ---
+					SequentWrapper currentSequent = keyAPI.getSequent(currentGoal);
+					
+					// --- Save Loop with User specified Inequality Invariant ---
+					// get user given inequality invariant part
+					While loop = currentSequent.getLoop();
+					// we got a loop, else we would have backtracked
+					assert(loop != null);
+					Term suggestedInvariant	= keyAPI.getSuggestedInvariant(loop);
+					// save the inequality invariant for the loop to restore it at backtracking
+					addLoopWithSpecInvToList(loopsWithSpecInequalityInv, currentGoal, suggestedInvariant);
+					
+					InvGenResult result = null;
+					
+					// push first loop goal, we always backtrack there, since it is not possible to
+					// know at which loop its applied invariant was invalid
+					if (lastValidNodes.isEmpty())
+						lastValidNodes.push(currentGoal.node());
+					
+					// --- Generate Potential Invariant & Filter Kandidates ---
+					try {
+						result = attemptInvGen(currentSequent, proof, suggestedInvariant);
+					} catch (ProofInputException e) {
+						e.printStackTrace();
+					}
+					
+					// --- Backtrack, if no potential Invariant was found ---
+					if (result == null) {
+						System.out.println("---- Backtrack - No Inv found ----");
+						backtrack(proof, lastValidNodes.peek(), loopsWithSpecInequalityInv);
+						
+						//--- Change Parameters to be more successful next time -----
+						// DIG: Increase pol. degree by 1
+						polDegree += 1;
+						// TestGen: Generate more test cases
+						maxLoopUnwinds += 3;
+						ProofIndependentSettings.DEFAULT_INSTANCE.getTestGenerationSettings().setMaxUnwinds(maxLoopUnwinds);
+					}
+					// --- Else Apply Potential Invariant -> Create InitiallyValid, BodyPreserves, UseCase Goal ---
+					else {
+						Invariant invariant = (Invariant)result;
+						keyAPI.applyInvariantRule(currentGoal, invariant, useGeneratedInvariant);
+					}
+					
+					//--- Call recursively ---
+					attemptProve(proof);
+				}
+			}
 		}
+		// --- Proof closed ---
 		return new ProofWrapper(proof); 
 	}
 	
-	private static void resetToPolDegree(int startpoldegree2) {
-		// TODO Auto-generated method stub
+	private static void backtrack(Proof proof, Node pruneToNode,
+			LinkedList<Triple<LoopInvariantBuiltInRuleApp, Services, Term>> loopsWithSpecInequalityInv) {
+		proof.pruneProof(pruneToNode);
+		// reset the invariants of the loops to the user specified inequalities, since they were overwritten
+		for (Triple<LoopInvariantBuiltInRuleApp, Services, Term> loopAndIneqInv : loopsWithSpecInequalityInv) {
+			setNewLoopInvariantOverwriteOld(loopAndIneqInv.first, loopAndIneqInv.second ,loopAndIneqInv.third);
+		}
+	}
+
+	private static void addLoopWithSpecInvToList(
+			LinkedList<Triple<LoopInvariantBuiltInRuleApp, Services, Term>> loopsWithSpecInequalityInv,
+			Goal loopGoal, Term suggestedInvariant) {
+		
+		Pair<LoopInvariantBuiltInRuleApp, Services> p = createLoopInvariantBuiltInRuleApp(loopGoal);
+		LoopInvariantBuiltInRuleApp ruleApplication = p.first;
+		Services services = p.second;
+		
+		loopsWithSpecInequalityInv.add(
+				new Triple<LoopInvariantBuiltInRuleApp, Services, Term>(ruleApplication, services, suggestedInvariant));
 		
 	}
 
-	private static boolean allSubGoalsInitBodyUseCaseProven(Goal peek) {
-		// TODO Auto-generated method stub
+	private static boolean isInMinOneGoalNoLoopContained(ImmutableList<Goal> openGoals) {
+		SequentWrapper goalSequent;
+		for(Goal goal : openGoals) {
+			goalSequent = keyAPI.getSequent(goal);
+			// try to retrieve the loop of the goal sequent
+			While loop = goalSequent.getLoop();
+			
+			// return true if no loop was found
+			if (loop == null)
+				return true;
+		}
+		
+		// in every goal a loop was found
 		return false;
 	}
 
 	private static void addToPolDegree(int i) {
 		// TODO Auto-generated method stub
-		
+		polDegree++;
 	}
 
-	public static InvGenResult attemptInvGen(SequentWrapper sequent, Proof proof) throws ProofInputException {
-		if (!useGeneratedInvariant)
-			return null;
-		//FIXME: Daniel - Fix Code for stackedloops, does not work
+	public static InvGenResult attemptInvGen(SequentWrapper sequent, Proof proof, Term suggestedInvariant) throws ProofInputException {
 		List<Term> gamma 		= sequent.getGamma();
 		StatementBlock program 	= sequent.getProgram();
 		Term phi 				= sequent.getPhi();
@@ -199,28 +266,24 @@ public class Main {
 		Term update				= sequent.getUpdate();
 		
 		if (loop == null) {
-			//-> we have no loop here, but we only want to generate loop invariants
-			return new NotValidInvariant();
+			// This should not happen, since we would already have backtracked otherwise
+			throw new IllegalArgumentException("attemptInvGen got a sequent with no loop.");
 		}
-		loopDepthCounter++;
 		
+		
+		//--- Clone Proof ---
 		//clone proof and work on the cloned version, since TestGenerator messes with it
 		//we only need to obtain the invariants here, no need to operate on the original proof
 		Goal loopGoal = proof.openGoals().head();
 		Proof onlyLoopProof = AuxiliaryFunctions.createProof(proof, "loopProof", loopGoal.sequent());
 		Goal clonedLoopGoal = onlyLoopProof.openEnabledGoals().head();
 		
-		DefaultTermParser dtp = new DefaultTermParser();
-		Term conjInvariants = null;
 		
+		//--- SetUp TermBuilder, Services and Namespaces for Parsing Terms ---
+		DefaultTermParser dtp = new DefaultTermParser();
 		// add update vars to namespace to be able to use the parser for those vars
 	    TermBuilder tb = onlyLoopProof.getServices().getTermBuilder();
 		Services services = onlyLoopProof.getServices().copy(false);
-		//[TEEMP
-		ImmutableSet<ProgramVariable> localins = MiscTools.getLocalIns(program, services);
-		ImmutableSet<ProgramVariable> localouts = MiscTools.getLocalOuts(program, services);
-		//]TEMP
-
 		AbbrevMap abbr = (services.getProof() == null) ? null
                 : services.getProof().abbreviations();
         NamespaceSet existingNS = services.getNamespaces();
@@ -230,127 +293,185 @@ public class Main {
         // only in updates specified. Need to add those to namespace, else the parser throws a "do not know variable" Exc.
         existingNS.programVariables().add(updateVisitor.leftHandVariables);
         
-        if (mockFirstLoopInvariant && loopDepthCounter == 1) {
-        	System.out.println("Mock First Loop Invariant with Invariant: " + mockFirstLoopInvariantString);
-        	try {
-	        	conjInvariants = dtp.parse(new StringReader(mockFirstLoopInvariantString), null,
+        
+        //--- Generate Instrumented Java Code for recording Traces out of Sequent ---
+		System.out.println("Start generating modified method with traces code");
+		//FIXME: NOTE: Method Generator knows the user spezified Invariants atm
+		// Generate Program Code with Traces for dynamic execution
+		String javaCode = MethodGenerator.generateMethodFromKeYFormat(program, update, loop);
+		
+		System.out.println("inputVars: " + GenMethodData.getInstance().inputVars);
+		
+		
+		//--- Save Instrument - TracesMethod Java Code to Workspace .java file ---
+		Path currentPath = Paths.get(System.getProperty("user.dir"));
+		Path filePath = Paths.get(currentPath.toString(), "dynacode", "genmethod", "GeneratedMethod.java");
+		writeStringToFile(javaCode, filePath.toString());
+		
+		
+		//--- Generate TestCases ---
+		System.out.println("Start test generation, num cases/calls: " + maxLoopUnwinds);
+		Term uselessInv = null;
+		try {
+			uselessInv = tb.parseTerm("0=0");
+		} catch (ParserException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		//delete invariant (the user given Ineq.) -> else the TestGen simplifies too much with the given ineq inv
+		Term oldLoopInv = setNewLoopInvariantOverwriteOld(clonedLoopGoal, uselessInv);
+		ProblemFactory.create(onlyLoopProof);
+		//restore old inv (user given ineq)
+		if (oldLoopInv != null) {
+			setNewLoopInvariantOverwriteOld(clonedLoopGoal, oldLoopInv);
+			setNewLoopInvariantOverwriteOld(loopGoal, oldLoopInv);
+		}
+		
+		
+		//--- Call Generated TestCases and Obtain Traces ---
+		System.out.println("Call generated test / obtain traces..");
+		IGeneratedTest generatedTest = getGeneratedTest();
+		HashMap<String, ArrayList<Integer>> varTraces = generatedTest.callGeneratedTest();
+		
+		
+		//--- Format Traces to DIG Format ---
+		int numTraces = 0;
+		if (varTraces.values().iterator().hasNext())
+			numTraces = varTraces.values().iterator().next().size();
+		System.out.println("Write " + numTraces + " traces in DIG format to file..");
+		String tracesDIG = formatTracesToDIG(varTraces);
+		
+		
+		//--- Write Traces to file in workspace ---
+		Path tracesFilePath = Paths.get(currentPath.toString(), "traces.tcs");
+		writeStringToFile(tracesDIG, tracesFilePath.toString());
+		
+		
+		//--- Call DIG with traces to get Invariants ---
+		System.out.println("Call DIG with traces file to get Invariants..");
+		Path digAbsPath = Paths.get(currentPath.toString(), digRelPath);
+		String rawDIGInvariants = callDIGGetInvs(digAbsPath.toString(), tracesFilePath.toString(), true);
+		String rawDIGIneq = callDIGGetInvs(digAbsPath.toString(), tracesFilePath.toString(), false);
+		System.out.println("Raw DIG Ineq: " + rawDIGIneq);
+		
+		
+		//--- Parse DIG Invariant Array TO String Array ----
+		List<String> digInvariants = parseDIGInvariantArray(rawDIGInvariants);
+		
+		
+		//--- Convert DIG Invariants to KeY Parseable Format ----
+		List<String> convertedInvariantStrings = convertDIGInvariantsToJMLFormat(digInvariants, true, false);
+		System.out.println("JML Invs: " + convertedInvariantStrings);
+
+		
+        //--- Convert Invariant Strings to KeY Terms ---
+		List<Term> invariantCandidateTerms = parseInvariantStringsAsTerm(convertedInvariantStrings, dtp, services, existingNS, abbr);
+        
+		
+		//--- Pre Filter for Initially Valid ---
+		List<Term> initValidCandidates = filterCandidatesInitiallyValid(invariantCandidateTerms, loopGoal);
+		
+		
+		//--- To implement: Filter Candidates with Advanced Body Filter ---
+		List<Term> bodyPreservesCandidates = filterCandidatesBodyPreserves(initValidCandidates);
+		
+		
+		//--- Extract User Specified Inequality Invariant Terms ----
+		List<String> inequalitiesStrings = extractInequalitiesFromTerm(suggestedInvariant);
+		List<Term> inequalitiesTerms = parseInvariantStringsAsTerm(inequalitiesStrings, dtp, services, existingNS, abbr);
+		
+		
+		//--- If no Candidate is left, return null ---
+		if (initValidCandidates.isEmpty()) {
+			return null;
+		}
+		System.out.println("InitValid Candidates: " + initValidCandidates);
+		
+		//--- Build KeY Invariant Conjunction out of Candidates and specified inequalities ---
+		Term conjInvariant = buildConjunction(initValidCandidates, inequalitiesTerms, tb);
+		
+		System.out.println("Full Inv-Term with User given Ineq: " + conjInvariant.toString());
+		return new Invariant(conjInvariant);
+	}
+	
+	private static Term buildConjunction(List<Term> candidates, List<Term> inequalityInvs, TermBuilder tb) {
+		Term conjInvariant = null;
+		for (Term candidate : candidates) {
+			if (conjInvariant != null)
+				conjInvariant = tb.and(conjInvariant, candidate);
+			else
+				conjInvariant = candidate;
+		}
+		for (Term ineq : inequalityInvs) {
+				if (conjInvariant != null)
+					conjInvariant = tb.and(conjInvariant, ineq);
+				else
+					conjInvariant = ineq;
+		}
+		return conjInvariant;
+	}
+
+	private static List<Term> filterCandidatesBodyPreserves(List<Term> initValidCandidates) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private static List<Term> filterCandidatesInitiallyValid(List<Term> invariantCandidateTerms, Goal loopGoal) {
+		List<Term> initiallyValidCandidates = new LinkedList<Term>();
+		
+		for(Term cand : invariantCandidateTerms) {
+			Pair<Term, ImmutableList<Goal>> oldInvAndGoalList = setNewLoopInvariantOverwriteOldAndApplyToCopy(loopGoal, cand);
+			Term oldLoopInv = oldInvAndGoalList.first;
+			final ImmutableList<Goal> goalList = oldInvAndGoalList.second;
+			//}
+			// { From WhileInvariantRule.apply
+	        Goal initGoal = goalList.tail().tail().head();
+	        Goal bodyGoal = goalList.tail().head();
+	        Goal useGoal = goalList.head();
+	        //}
+			
+	        Sequent invInitValidSequent = initGoal.sequent();
+			boolean invInitiallyValid = false;
+			try {
+				Proof invInitValidProof = AuxiliaryFunctions.createProof(loopGoal.proof(), "invInitValidProof", invInitValidSequent);
+				
+				ImmutableList<Goal> openGoals = keyAPI.prove(invInitValidProof);
+				
+				// Check if invInitValid Goal got closed
+				if (openGoals.isEmpty())
+					invInitiallyValid = true;
+				else
+					invInitiallyValid = false;
+				
+			} catch (ProofInputException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			//reset to old invariant
+			setNewLoopInvariantOverwriteOld(loopGoal, oldLoopInv);
+			
+			if (invInitiallyValid)
+				initiallyValidCandidates.add(cand);
+		}
+		return initiallyValidCandidates;
+	}
+
+	private static List<Term> parseInvariantStringsAsTerm(List<String> convertedInvariantStrings, DefaultTermParser dtp,
+			Services services, NamespaceSet existingNS, AbbrevMap abbr) {
+		List<Term> parsedInvariants = new LinkedList<Term>();
+    	for (String inv : convertedInvariantStrings) {
+    		try {
+	        	Term genInvTerm = dtp.parse(new StringReader(inv), null,
 				        services, existingNS, abbr);
+	        	parsedInvariants.add(genInvTerm);
     		} catch (ParserException e) {
     			e.printStackTrace();
     		}
-        } else {
-			System.out.println("Start generating modified method with traces code");
-			//FIXME: NOTE: Method Generator knows the user spezified Invariants atm
-			// Generate Program Code with Traces for dynamic execution
-			String javaCode = MethodGenerator.generateMethodFromKeYFormat(program, update, loop);
 			
-			System.out.println("inputVars: " + GenMethodData.getInstance().inputVars);
-			
-			//Write Code to file in workspace
-			Path currentPath = Paths.get(System.getProperty("user.dir"));
-			Path filePath = Paths.get(currentPath.toString(), "dynacode", "genmethod", "GeneratedMethod.java");
-			writeStringToFile(javaCode, filePath.toString());
-			
-			System.out.println("Start test generation, num cases/calls: " + maxLoopUnwinds);
-			Term uselessInv = null;
-			try {
-				uselessInv = tb.parseTerm("0=0");
-			} catch (ParserException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			//delete invariant (the user given Ineq.);
-			Term oldLoopInv = setNewLoopInvariantOverwriteOld(clonedLoopGoal, uselessInv);
-			ProblemFactory.create(onlyLoopProof);
-			//restore old inv (user given ineq)
-			if (oldLoopInv != null) {
-				setNewLoopInvariantOverwriteOld(clonedLoopGoal, oldLoopInv);
-				setNewLoopInvariantOverwriteOld(loopGoal, oldLoopInv);
-			}
-			IGeneratedTest generatedTest = getGeneratedTest();
-			
-			System.out.println("Call generated test / obtain traces..");
-			HashMap<String, ArrayList<Integer>> varTraces = generatedTest.callGeneratedTest();
-			
-			int numTraces = 0;
-			for (ArrayList<Integer> v : varTraces.values()) {
-				numTraces = v.size();
-			}
-			
-			System.out.println("Write " + numTraces + " traces in DIG format to file..");
-			String tracesDIG = formatTracesToDIG(varTraces);
-			//Write Traces to file in workspace
-			Path tracesFilePath = Paths.get(currentPath.toString(), "traces.tcs");
-			writeStringToFile(tracesDIG, tracesFilePath.toString());
-			
-			//FIXME: Daniel: better Code
-			//Call DIG with traces to get Invariants
-			System.out.println("Call DIG with traces file to get Invariants..");
-			Path digAbsPath = Paths.get(currentPath.toString(), digRelPath);
-			String rawDIGInvariants = callDIGGetInvs(digAbsPath.toString(), tracesFilePath.toString(), true);
-			
-			String rawDIGIneq = callDIGGetInvs(digAbsPath.toString(), tracesFilePath.toString(), false);
-			System.out.println("Raw DIG Ineq: " + rawDIGIneq);
-			
-			//TODO: Currently I assume that I get Invariants, but maybe call with more unwinds if no invariant
-			List<String> digInvariants = parseDIGInvariantArray(rawDIGInvariants);
-			
-			
-			//---- Convert Invariants to KeY Format ----
-			List<String> convertedInvariants = convertDIGInvariantsToJMLFormat(digInvariants, true, false);
-			System.out.println("JML Invs: " + convertedInvariants);
-
-	        
-	        // finally, parse pol. "JML Syntax" Invariants to KeY Format using the KeY Parser
-	    	int index = 0;
-	    	for (String inv : convertedInvariants) {
-	    		try {
-		        	Term genInvTerm = dtp.parse(new StringReader(inv), null,
-					        services, existingNS, abbr);
-					// append to invariant "list"
-		        	if (index == 0)
-		        		conjInvariants = genInvTerm;
-		        	else
-		        		conjInvariants = tb.and(conjInvariants, genInvTerm);
-		        	
-		        	index++;
-	    		} catch (ParserException e) {
-	    			e.printStackTrace();
-	    		}
-				
-	    	}
-        }
-        
-    	// get user given invariants to extract the inequalities
-		Term suggestedInvariant	= keyAPI.getSuggestedInvariant(loop);
-		
-		// append user given inequalities to DIG obtained polynomial invariant equations
-		List<String> inequalities = extractInequalitiesFromTerm(suggestedInvariant);
-		for (String ineq : inequalities) {
-			try {
-				Term ineqTerm = dtp.parse(new StringReader(ineq), null,
-				        services, existingNS, abbr);
-				if (conjInvariants != null)
-					conjInvariants = tb.and(conjInvariants, ineqTerm);
-				else
-					conjInvariants = ineqTerm;
-			} catch (ParserException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		if (conjInvariants != null) {
-			System.out.println("Full Inv-Term with User given Ineq: " + conjInvariants.toString());
-			
-			boolean invInitiallyValid = isInvInitiallyValid(conjInvariants, loopGoal);
-			System.out.println("invInitiallyValid: " + invInitiallyValid);
-			
-			return new Invariant(conjInvariants);
-		}
-		else
-			return new NotValidInvariant();
+    	}
+		return parsedInvariants;
 	}
-	
+
 	private static List<String> parseDIGInvariantArray(String rawDIGInvariantArray) {
 		if (rawDIGInvariantArray == null || rawDIGInvariantArray.equals(""))
 			return new LinkedList<String>();
@@ -556,11 +677,18 @@ public class Main {
 	
 	public static Term setNewLoopInvariantOverwriteOld(Goal loopGoal, Term newLoopInv) {
 		//create loop spec
-		WhileInvariantRule invariantRule = WhileInvariantRule.INSTANCE;
-		PosInOccurrence poi = new PosInOccurrence(loopGoal.sequent().succedent().get(1), PosInTerm.getTopLevel(), false);
-		Services services = loopGoal.proof().getServices();
-		LoopInvariantBuiltInRuleApp ruleApplication = new LoopInvariantBuiltInRuleApp(invariantRule, poi, services);
-		ruleApplication = ruleApplication.tryToInstantiate(loopGoal);
+		Pair<LoopInvariantBuiltInRuleApp, Services> p = createLoopInvariantBuiltInRuleApp(loopGoal);
+		LoopInvariantBuiltInRuleApp ruleApplication = p.first;
+		Services services = p.second;
+		
+		Term oldLoopInv = setNewLoopInvariantOverwriteOld(ruleApplication, services, newLoopInv);
+		
+		return oldLoopInv;
+	}
+	
+	public static Term setNewLoopInvariantOverwriteOld(
+			LoopInvariantBuiltInRuleApp ruleApplication, Services services, Term newLoopInv) {
+		
 		LoopSpecification spec = ruleApplication.getSpec();
 		
 		if (spec == null)
@@ -580,6 +708,17 @@ public class Main {
 		return oldLoopInv;
 	}
 	
+	public static Pair<LoopInvariantBuiltInRuleApp, Services> createLoopInvariantBuiltInRuleApp(Goal loopGoal) {
+		WhileInvariantRule invariantRule = WhileInvariantRule.INSTANCE;
+		PosInOccurrence poi = new PosInOccurrence(loopGoal.sequent().succedent().get(1), PosInTerm.getTopLevel(), false);
+		Services services = loopGoal.proof().getServices();
+		LoopInvariantBuiltInRuleApp ruleApplication = new LoopInvariantBuiltInRuleApp(invariantRule, poi, services);
+		ruleApplication = ruleApplication.tryToInstantiate(loopGoal);
+		LoopSpecification spec = ruleApplication.getSpec();
+		
+		return new Pair<LoopInvariantBuiltInRuleApp, Services>(ruleApplication, services);
+	}
+	
 	//returns Pair<oldInv, GoalList(useCase,Body, InitValid Goals)>
 	public static Pair<Term, ImmutableList<Goal>> setNewLoopInvariantOverwriteOldAndApplyToCopy(Goal loopGoal, Term newLoopInv) {
 		//We want to update the loopGoal.proof().initConfig.services.specRepo.loopInvs(for this loop)
@@ -594,16 +733,9 @@ public class Main {
 		}
 		Goal clonedLoopGoal = onlyLoopProof.openGoals().head();
 		
-		WhileInvariantRule invariantRule = WhileInvariantRule.INSTANCE;
-		PosInOccurrence poi = new PosInOccurrence(clonedLoopGoal.sequent().succedent().get(1), PosInTerm.getTopLevel(), false);
-//		TermServices services = keyAPI.myEnvironment.getServices();
-//		LoopInvariantBuiltInRuleApp ruleApplication = new LoopInvariantBuiltInRuleApp(invariantRule, poi, services);
-//		ruleApplication = ruleApplication.tryToInstantiate(clonedLoopGoal);
-//		LoopSpecification spec = ruleApplication.getSpec();
-//		Services serv = clonedLoopGoal.proof().getServices();
-		Services services = clonedLoopGoal.proof().getServices();
-		LoopInvariantBuiltInRuleApp ruleApplication = new LoopInvariantBuiltInRuleApp(invariantRule, poi, services);
-		ruleApplication = ruleApplication.tryToInstantiate(clonedLoopGoal);
+		Pair<LoopInvariantBuiltInRuleApp, Services> p = createLoopInvariantBuiltInRuleApp(clonedLoopGoal);
+		LoopInvariantBuiltInRuleApp ruleApplication = p.first;
+		Services services = p.second;
 		LoopSpecification spec = ruleApplication.getSpec();
 		
 		Map<LocationVariable, Term> invariants = new HashMap<>();
@@ -623,57 +755,6 @@ public class Main {
 		spec = spec.configurate(invariants, freeInvariants, modifies, infFlowSpecs, variant);
 		
 		ruleApplication.setLoopInvariant(spec);
-		
-//		//apply updates WhileInvariantRule:
-//        final Term focusTerm = ruleApplication.posInOccurrence().subTerm();
-//        Pair<Term, Term> updates = null;
-//        if (focusTerm.op() instanceof UpdateApplication) {
-//        	updates = new Pair<Term, Term>(UpdateApplication.getUpdate(focusTerm),
-//                    UpdateApplication.getTarget(focusTerm));
-//        } else {
-//        	updates = new Pair<Term, Term>(services.getTermBuilder().skip(), focusTerm);
-//        }
-//
-//    	final Term u        = updates.first;
-//    	final Term progPost = updates.second;
-//
-//    	//focus (below update) must be modality term
-//            if (!(progPost.op() instanceof Modality)) {
-//                try {
-//					throw new Exception();
-//				} catch (Exception e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//            }
-//
-//    	//active statement must be while loop
-//    	final While loop = ruleApplication.getLoopStatement();
-//
-//    	if (spec == null)
-//			try {
-//				throw new RuleAbortException("no invariant found");
-//			} catch (RuleAbortException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
-//
-//    	//collect self, execution context
-//    	final MethodFrame innermostMethodFrame =
-//    	        JavaTools.getInnermostMethodFrame(progPost.javaBlock(), services);
-//    	if (innermostMethodFrame != null) {
-//    	    spec = spec.setTarget(innermostMethodFrame.getProgramMethod());
-//    	}
-//
-//    	final Term selfTerm = innermostMethodFrame == null
-//    	                      ? null
-//    	                      : MiscTools.getSelfTerm(innermostMethodFrame, services);
-//
-//    	final ExecutionContext innermostExecutionContext =
-//    	        innermostMethodFrame == null
-//    	        ? null
-//    	        : (ExecutionContext) innermostMethodFrame.getExecutionContext();
-//    	services.getSpecificationRepository().addLoopInvariant(spec);
         
 		services.getSpecificationRepository().addLoopInvariant(spec);
 		
@@ -689,7 +770,7 @@ public class Main {
 		return ret;
 	}
 	
-	public static boolean isInvInitiallyValid(Term inv, Goal loopGoal) {
+	public static boolean getInitiallyValidCandidates(Term inv, Goal loopGoal) {
 		//TODO: testGeneration "destroyed" the proof
 		//FIXME: WICHTIG: Obwohl hier auf der copy gearbeitet wird, werden die richtigen Invarianten ersetzt
 		Pair<Term, ImmutableList<Goal>> oldInvAndGoalList = setNewLoopInvariantOverwriteOldAndApplyToCopy(loopGoal, inv);

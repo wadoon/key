@@ -14,7 +14,8 @@ public class UpdateLHSCollectorVisitor implements Visitor{
 	// Collects LocationVariables to which sth gets assigned to in an update (left hand side)
 	// e.g elem-update(y)(x) -> y
 	public List<LocationVariable> leftHandVariables = new ArrayList<LocationVariable>();
-
+	public List<LocationVariable> rightHandVariables = new ArrayList<LocationVariable>();
+	
 	@Override
 	public boolean visitSubtree(Term visited) {
 		// TODO Auto-generated method stub
@@ -31,6 +32,9 @@ public class UpdateLHSCollectorVisitor implements Visitor{
 			if (update.lhs() instanceof LocationVariable) {
 				leftHandVariables.add((LocationVariable) update.lhs());
 			}
+//			if (update. instanceof LocationVariable) {
+//				leftHandVariables.add((LocationVariable) update.lhs());
+//			}
 		}
 	}
 

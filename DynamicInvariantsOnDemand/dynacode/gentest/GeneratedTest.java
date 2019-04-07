@@ -33,13 +33,13 @@ public HashMap<String, ArrayList<Integer>> callGeneratedTest(){
     return varTraces;
  }
 
-  //Test Case for NodeNr: 1515
+  //Test Case for NodeNr: 2258
  public void  testcode0(){
    //Test preamble: creating objects and intializing test data
-   int r_0 = (int)200;
-   int q_0 = (int)-128;
+   int r_0 = (int)136;
+   int q_0 = (int)-72;
    boolean measuredByEmpty = (boolean)true;
-   int x = (int)72;
+   int x = (int)64;
    int y = (int)1;
 
    //Other variables
