@@ -1,7 +1,6 @@
 package de.uka.ilkd.key.rule.metaconstruct;
 
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -20,21 +19,15 @@ public class GetVariant extends AbstractTermTransformer {
     public Term transform(Term term, SVInstantiations svInst,
             Services services) {
 
-        LoopStatement loop = LoopScopeTools.getLoopFromActiveStatement(svInst,
-                services);
         LoopSpecification spec = services.getSpecificationRepository()
-                .getLoopSpec(loop);
-
+                .getLoopSpec(LoopScopeTools.getLoopFromActiveStatement(svInst,
+                        services));
         final TermBuilder tb = services.getTermBuilder();
         Term variantTerm = spec.getVariant(spec.getInternalSelfTerm(),
                 spec.getInternalAtPres(), services);
-        if (variantTerm == null) {
-            return tb.tt();
-        }
-
-        LocationVariable variantPV2 = (LocationVariable) services
-                .getNamespaces().programVariables().lookup("variant");
-
-        return tb.prec(variantTerm, tb.var(variantPV2));
+        LocationVariable variantPV = (LocationVariable) services.getNamespaces()
+                .programVariables().lookup("variant");
+        final boolean dia = term.sub(0).equals(tb.tt());
+        return dia ? tb.prec(variantTerm, tb.var(variantPV)) : tb.tt();
     }
 }

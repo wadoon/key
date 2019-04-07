@@ -230,6 +230,7 @@ lexer grammar KeYLexer;
 	GET_ANON_UPDATE : '\\getAnonUpdate';
 	GET_GUARD_EXPR : '\\getGuardExpr';
 	TERMINATION_SENSITIVE : '\\terminationSensitive';
+	TRANSACTIONAL : '\\transactional';
 	APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';
         DEPENDINGON : '\\dependingOn';
 	DISJOINTMODULONULL  : '\\disjointModuloNull';

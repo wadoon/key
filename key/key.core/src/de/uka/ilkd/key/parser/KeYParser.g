@@ -3828,6 +3828,7 @@ varexp[TacletBuilder b]
     | varcond_getAnonUpdate[b]
     | varcond_getGuardExpr[b]
     | varcond_terminationSensitive[b]
+    | varcond_transactional[b]
     | varcond_dropEffectlessElementaries[b]
     | varcond_dropEffectlessStores[b]
     | varcond_enum_const[b]
@@ -3890,6 +3891,14 @@ varcond_terminationSensitive [TacletBuilder b]
    TERMINATION_SENSITIVE LPAREN ts=varId COMMA x=varId RPAREN
    { 
       b.addVariableCondition(new TerminationSensitive((SchemaVariable)ts, (ModalOperatorSV)x)); 
+   }
+;
+
+varcond_transactional [TacletBuilder b]
+:
+   TRANSACTIONAL LPAREN u=varId COMMA x=varId RPAREN
+   { 
+      b.addVariableCondition(new TransactionalCondition((SchemaVariable)u, (ModalOperatorSV)x)); 
    }
 ;
 

@@ -103,6 +103,7 @@ public class KeYLexerTokens {
         names[KeYParser.GET_ANON_UPDATE] = "'\\getAnonUpdate'";
         names[KeYParser.GET_GUARD_EXPR] = "'\\getGuardExpr'";
         names[KeYParser.TERMINATION_SENSITIVE] = "'\\terminationSensitive'";
+        names[KeYParser.TRANSACTIONAL] = "'\\transactional'";
         names[KeYParser.APPLY_UPDATE_ON_RIGID] = "'\\applyUpdateOnRigid'";
         names[KeYParser.DEPENDINGON] = "'\\dependingOn'";
         names[KeYParser.DISJOINTMODULONULL] = "'\\disjointModuloNull'";
