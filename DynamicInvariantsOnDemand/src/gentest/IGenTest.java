@@ -4,7 +4,7 @@ package gentest;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public interface IGeneratedTest {
-	//FIXME: Documentation of Format
-	HashMap<String, ArrayList<Integer>> callGeneratedTest();
+public interface IGenTest {
+	// FIXME: Documentation of Format
+	HashMap<String, ArrayList<Integer>> callGenTest();
 }

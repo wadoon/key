@@ -1,5 +1,5 @@
 //Code from https://www.javaworld.com/article/2071777/design-patterns/add-dynamic-java-code-to-your-application.html
-package genmethod;
+package geninstrument;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,22 +10,22 @@ import java.util.List;
 
 import dynacode.DynaCode;
 
-public class GeneratedMethodCallerApp {
+public class ExampleInstrumentCallerApp {
 
 	public static void main(String[] args) throws Exception {
-		IGeneratedMethod generatedMethod = getGeneratedMethod();
+		IGenInstrument generatedMethod = getGeneratedMethod();
 
 		ArrayList<Integer> inputVars = new ArrayList<Integer>();
 		inputVars.add(5);
 
-		HashMap<String, ArrayList<Integer>> varLoopHeadTraces = generatedMethod.callGeneratedMethod(inputVars);
+		HashMap<String, ArrayList<Integer>> varLoopHeadTraces = generatedMethod.callGenInstrument(inputVars);
 		System.out.println("o");
 	}
 
-	private static IGeneratedMethod getGeneratedMethod() {
+	private static IGenInstrument getGeneratedMethod() {
 		DynaCode dynacode = new DynaCode();
 		dynacode.addSourceDir(new File("dynacode"));
-		return (IGeneratedMethod) dynacode.newProxyInstance(IGeneratedMethod.class,
+		return (IGenInstrument) dynacode.newProxyInstance(IGenInstrument.class,
 				"genmethod.GeneratedMethod");
 	}
 

@@ -10,20 +10,20 @@ import java.util.List;
 
 import dynacode.DynaCode;
 
-public class GeneratedTestCallerApp {
+public class ExampleGenTestCallerApp {
 
 	public static void main(String[] args) throws Exception {
-		IGeneratedTest generatedTest = getGeneratedTest();
+		IGenTest generatedTest = getGeneratedTest();
 
-		HashMap<String, ArrayList<Integer>> varTraces = generatedTest.callGeneratedTest();
+		HashMap<String, ArrayList<Integer>> varTraces = generatedTest.callGenTest();
 		System.out.println("gentest");
 	}
 
-	private static IGeneratedTest getGeneratedTest() {
+	private static IGenTest getGeneratedTest() {
 		DynaCode dynacode = new DynaCode();
 		dynacode.addSourceDir(new File("dynacode"));
-		return (IGeneratedTest) dynacode.newProxyInstance(IGeneratedTest.class,
-				"gentest.GeneratedTest");
+		return (IGenTest) dynacode.newProxyInstance(IGenTest.class,
+				"gentest.GenTest");
 	}
 
 }
