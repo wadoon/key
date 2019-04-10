@@ -192,8 +192,8 @@ public final class MainWindow extends JFrame {
      */
     private GoalSelectAboveAction goalSelectAboveAction;
     private GoalSelectBelowAction goalSelectBelowAction;
-    private GoalSelectParentAction goalSelectParentAction;
-    private GoalSelectChildAction goalSelectChildAction;
+    private SelectNextOpenGoalAction selectNextOpenGoalAction;
+    private SelectPrevOpenGoalAction selectPrevOpenGoalAction;
 
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
 
@@ -388,8 +388,8 @@ public final class MainWindow extends JFrame {
         lemmaGenerationBatchModeAction = new LemmaGenerationBatchModeAction(this);
         goalSelectAboveAction = new GoalSelectAboveAction(this);
         goalSelectBelowAction = new GoalSelectBelowAction(this);
-        goalSelectParentAction = new GoalSelectParentAction(this);
-        goalSelectChildAction = new GoalSelectChildAction(this);
+        selectPrevOpenGoalAction = new SelectPrevOpenGoalAction(this);
+        selectNextOpenGoalAction = new SelectNextOpenGoalAction(this);
         unicodeToggleAction = new UnicodeToggleAction(this);
 
         Config.DEFAULT.setDefaultFonts();
@@ -735,8 +735,8 @@ public final class MainWindow extends JFrame {
         JMenu goalSelection = new JMenu("Select Goal ...");
         goalSelection.add(goalSelectAboveAction);
         goalSelection.add(goalSelectBelowAction);
-        goalSelection.add(goalSelectParentAction);
-        goalSelection.add(goalSelectChildAction);
+        goalSelection.add(selectPrevOpenGoalAction);
+        goalSelection.add(selectNextOpenGoalAction);
         return goalSelection;
     }
 

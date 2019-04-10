@@ -128,6 +128,93 @@ public class KeYSelectionModel {
 		}
 	}
 
+	public void selectNextOpenGoal() {
+		selectNextOpenGoal(selectedNode);
+	}
+
+
+	public void selectPrevOpenGoal() {
+		selectPrevOpenGoal(selectedNode);
+	}
+
+	public boolean selectFirstOpenChildNode(Node current) {
+		Node n;
+		Iterator<Node> it = current.leavesIterator();
+		while(it.hasNext()) {
+			n = it.next();
+			if (!n.isClosed()) {
+				setSelectedNode(n);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean selectLastOpenChildNode(Node current) {
+		Node n;
+		Iterator<Node> it = current.leavesIterator();
+		Node lastOpenGoal = null;
+		while(it.hasNext()) {
+			n = it.next();
+			if (!n.isClosed()) {
+				lastOpenGoal = n;
+			}
+		}
+		if (lastOpenGoal == null) {
+			return false;
+		}
+		setSelectedNode(lastOpenGoal);
+		return true;
+	}
+
+	private void selectPrevOpenGoal(Node current) {
+		if (current == null) {
+			return;
+		}
+
+		Node prev = current.prevNodeInParent();
+		if (prev == null) {
+			selectPrevOpenGoal(current.parent());
+			return;
+		}
+
+		//try select open child node
+		if(selectLastOpenChildNode(prev)) {
+			return;
+		}
+		// no open child node in children
+
+		if (!prev.isClosed()) {
+			setSelectedNode(prev);
+			return;
+		}
+		selectPrevOpenGoal(prev);
+	}
+
+	private void selectNextOpenGoal(Node current) {
+		if (current == null) {
+			return;
+		}
+
+		Node next = current.nextNodeInParent();
+		if (next == null) {
+			selectNextOpenGoal(current.parent());
+			return;
+		}
+
+		//try select open child node
+		if(selectFirstOpenChildNode(next)) {
+			return;
+		}
+		// no open child node in children
+
+		if (!next.isClosed()) {
+			setSelectedNode(next);
+			return;
+		}
+		selectNextOpenGoal(next);
+	}
+
     /** sets the node that is focused by the user
      * @param g the Goal that contains the selected node
      */

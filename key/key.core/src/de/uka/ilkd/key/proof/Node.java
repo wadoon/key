@@ -438,13 +438,21 @@ public class Node  {
     * @return the next node after `this` in parent; null if none is found
     */
     public Node nextNodeInParent() {
+        return relNodeInParent(1);
+    }
+
+    public Node prevNodeInParent() {
+        return relNodeInParent(-1);
+    }
+
+    private Node relNodeInParent(int n) {
         Node nodeParent = parent();
         if (parent == null) {
             return null;
         }
         int indexInParent = nodeParent.getChildNr(this);
-        int indexOfNext = indexInParent + 1;
-        if (indexOfNext < nodeParent.childrenCount()) {
+        int indexOfNext = indexInParent + n;
+        if (0 <= indexOfNext && indexOfNext < nodeParent.childrenCount()) {
             return parent.child(indexOfNext);
         }
         return null;

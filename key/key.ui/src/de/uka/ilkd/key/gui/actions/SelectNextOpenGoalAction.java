@@ -32,7 +32,7 @@ import de.uka.ilkd.key.settings.GeneralSettings;
 
 /** Selects the child of the currently selected element in proof-tree 
  */
-public final class GoalSelectChildAction extends MainWindowAction {
+public final class SelectNextOpenGoalAction extends MainWindowAction {
 
     /**
      *
@@ -43,15 +43,15 @@ public final class GoalSelectChildAction extends MainWindowAction {
      * Creates a new GoalSelectBelowAction.
      * @param mainWindow the main window this action belongs to
      */
-    public GoalSelectChildAction(MainWindow mainWindow) {
+    public SelectNextOpenGoalAction(MainWindow mainWindow) {
         super(mainWindow);
-        setAcceleratorLetter(KeyEvent.VK_L);
-        setName("Select Child Goal");
-        setTooltip("Changes selected goal in the proof-tree to the child element. If not available: to parent's next child element");
+        setAcceleratorLetter(KeyEvent.VK_DOWN);
+        setName("Select next Open Goal");
+        setTooltip("Changes selected goal in the proof-tree to the previous open goal");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        getMediator().getSelectionModel().selectChild();
+        getMediator().getSelectionModel().selectNextOpenGoal();
     }
 }

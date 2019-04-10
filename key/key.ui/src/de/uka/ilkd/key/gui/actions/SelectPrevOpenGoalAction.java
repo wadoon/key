@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.gui.actions;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
@@ -30,9 +31,11 @@ import de.uka.ilkd.key.proof.ProofEvent;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.settings.GeneralSettings;
 
+import javax.swing.*;
+
 /**
  */
-public final class GoalSelectParentAction extends MainWindowAction {
+public final class SelectPrevOpenGoalAction extends MainWindowAction {
 
     /**
      *
@@ -42,19 +45,20 @@ public final class GoalSelectParentAction extends MainWindowAction {
     /**
      * Creates a new GoalBackAction.
      * @param mainWindow the main window this action belongs to
-     * @param longName true iff long names (including the name of the rule to undo)
      * shall be displayed (e.g. in menu items)
      */
-    public GoalSelectParentAction(MainWindow mainWindow) {
+    public SelectPrevOpenGoalAction(MainWindow mainWindow) {
         super(mainWindow);
-        setAcceleratorLetter(KeyEvent.VK_H);
-        setName("Select Parent Goal");
-        setTooltip("Changes selected goal in the proof-tree to the parent element");
+
+        setAcceleratorLetter(KeyEvent.VK_UP);
+
+        setName("Select previous Open Goal");
+        setTooltip("Changes selected goal in the proof-tree to the previous open goal");
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
 
-            getMediator().getSelectionModel().selectParent();
+            getMediator().getSelectionModel().selectPrevOpenGoal();
     }
 }
