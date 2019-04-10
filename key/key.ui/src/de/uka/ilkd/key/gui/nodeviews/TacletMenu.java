@@ -314,18 +314,23 @@ public class TacletMenu extends JMenu {
      */
     private void addBuiltInRuleItem(BuiltInRule builtInRule, MenuControl control) {
         JMenuItem item;
-        if (builtInRule == WhileInvariantRule.INSTANCE ||
-                builtInRule == LoopScopeInvariantRule.INSTANCE) {
-            // we add two items in this case: one for auto one for interactive
-            item = new MenuItemForTwoModeRules(
-                    builtInRule.displayName(),
-                    APPLY_RULE,
-                    "Applies a known and complete loop specification immediately.",
-                    ENTER_LOOP_SPECIFICATION,
-                    "Allows to modify an existing or to enter a new loop specification.",
-                    builtInRule);
-            item.addActionListener(control);
-            add(item);
+        if (builtInRule == LoopScopeInvariantRule.INSTANCE) {
+             // NOTE (DS, 2019-04-10): Removed the built-in loop scope invariant
+             //   rule, we now use the taclets. Note that this removes the
+             //   possibility to enter loop specifications manually! We could
+             //   probably change the taclets such that also there, (in)variants
+             //   can be entered by the standard taclet completion dialog.
+        } else if (builtInRule == WhileInvariantRule.INSTANCE) {
+             // we add two items in this case: one for auto one for interactive
+             item = new MenuItemForTwoModeRules(
+                     builtInRule.displayName(),
+                     APPLY_RULE,
+                     "Applies a known and complete loop specification immediately.",
+                     ENTER_LOOP_SPECIFICATION,
+                     "Allows to modify an existing or to enter a new loop specification.",
+                     builtInRule);
+             item.addActionListener(control);
+             add(item);
         } else if (builtInRule == BlockContractInternalRule.INSTANCE) {
             // we add two items in this case: one for auto one for interactive
             item = new MenuItemForTwoModeRules(

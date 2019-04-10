@@ -221,19 +221,22 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             inftyConst());
         }
 
-        final Feature loopInvF;
+        // NOTE (DS, 2019-04-10): The new loop-scope based rules are realized
+        // as taclets. The strategy settings for those are handled further
+        // down in this class.
+        Feature loopInvF;
         final String loopProp =
                 strategyProperties
                         .getProperty(StrategyProperties.LOOP_OPTIONS_KEY);
         if (loopProp.equals(StrategyProperties.LOOP_INVARIANT)) {
-            loopInvF = loopInvFeature(longConst(0), inftyConst());
+            loopInvF = loopInvFeature(longConst(0));
         /* NOTE (DS, 2019-04-10): Deactivated the built-in loop scope rule
          * since we now have the loop scope taclets which are based on the
          * same theory, but offer several advantages. */
         //} else if (loopProp.equals(StrategyProperties.LOOP_SCOPE_INVARIANT)) {
         //    loopInvF = loopInvFeature(inftyConst(), longConst(0));
         } else {
-            loopInvF = loopInvFeature(inftyConst(), inftyConst());
+            loopInvF = loopInvFeature(inftyConst());
         }
 
         final Feature blockFeature;
