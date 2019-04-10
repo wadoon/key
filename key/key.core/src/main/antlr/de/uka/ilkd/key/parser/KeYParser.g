@@ -3843,6 +3843,7 @@ varexp[TacletBuilder b]
 :
   ( varcond_applyUpdateOnRigid[b]
     | varcond_getInvariant[b]
+    | varcond_getFreeInvariant[b]
     | varcond_getVariant[b]
     | varcond_dropEffectlessElementaries[b]
     | varcond_dropEffectlessStores[b]
@@ -3906,9 +3907,17 @@ varcond_applyUpdateOnRigid [TacletBuilder b]
 
 varcond_getInvariant [TacletBuilder b]
 :
-   GET_INVARIANT LPAREN inv=varId RPAREN
+   GET_INVARIANT LPAREN inv=varId COMMA modality=varId RPAREN
    { 
-      b.addVariableCondition(new LoopInvariantCondition((SchemaVariable)inv)); 
+      b.addVariableCondition(new LoopInvariantCondition((SchemaVariable)inv, (SchemaVariable) modality)); 
+   }
+;
+
+varcond_getFreeInvariant [TacletBuilder b]
+:
+   GET_FREE_INVARIANT LPAREN inv=varId COMMA modality=varId RPAREN
+   { 
+      b.addVariableCondition(new LoopFreeInvariantCondition((SchemaVariable)inv, (SchemaVariable) modality)); 
    }
 ;
 

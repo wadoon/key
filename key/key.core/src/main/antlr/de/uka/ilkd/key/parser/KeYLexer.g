@@ -228,6 +228,7 @@ lexer grammar KeYLexer;
     SAME_OBSERVER : '\\sameObserver';
 	VARCOND : '\\varcond';
 	GET_INVARIANT : '\\getInvariant';
+	GET_FREE_INVARIANT : '\\getFreeInvariant';
 	GET_VARIANT : '\\getVariant';
 	APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';
     DEPENDINGON : '\\dependingOn';

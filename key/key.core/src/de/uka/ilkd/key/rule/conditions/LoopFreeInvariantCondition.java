@@ -27,11 +27,12 @@ import de.uka.ilkd.key.util.MiscTools;
  * 
  * @author Dominic Steinhoefel
  */
-public class LoopInvariantCondition implements VariableCondition {
+public class LoopFreeInvariantCondition implements VariableCondition {
     private final SchemaVariable inv;
     private final SchemaVariable modalitySV;
 
-    public LoopInvariantCondition(SchemaVariable inv, SchemaVariable modality) {
+    public LoopFreeInvariantCondition(SchemaVariable inv,
+            SchemaVariable modality) {
         this.inv = inv;
         this.modalitySV = modality;
     }
@@ -68,20 +69,21 @@ public class LoopInvariantCondition implements VariableCondition {
             return null;
         }
 
-        Term invInst = tb.tt();
+        Term freeInvInst = tb.tt();
         for (final LocationVariable heap : heapContexts(modality, services)) {
-            final Term currentInvInst = invInst;
+            final Term currentFreeInvInst = freeInvInst;
 
-            final Optional<Term> maybeInvInst = Optional
-                    .ofNullable(loopSpec.getInvariant(heap, selfTerm,
+            final Optional<Term> maybeFreeInvInst = Optional
+                    .ofNullable(loopSpec.getFreeInvariant(heap, selfTerm,
                             loopSpec.getInternalAtPres(), services));
 
-            invInst = maybeInvInst.map(inv -> tb.and(currentInvInst, inv))
-                    .orElse(invInst);
+            freeInvInst = maybeFreeInvInst
+                    .map(inv -> tb.and(currentFreeInvInst, inv))
+                    .orElse(freeInvInst);
         }
 
         return matchCond.setInstantiations( //
-                svInst.add(inv, invInst, services));
+                svInst.add(inv, freeInvInst, services));
     }
 
     private static List<LocationVariable> heapContexts(Modality modality,
@@ -104,6 +106,6 @@ public class LoopInvariantCondition implements VariableCondition {
 
     @Override
     public String toString() {
-        return "\\getInvariant(" + inv + ", " + modalitySV +  ")";
+        return "\\getFreeInvariant(" + inv + ", " + modalitySV +  ")";
     }
 }
