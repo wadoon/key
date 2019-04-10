@@ -187,6 +187,14 @@ public final class MainWindow extends JFrame {
     private LemmaGenerationAction loadKeYTaclets;
     private LemmaGenerationBatchModeAction lemmaGenerationBatchModeAction;
 
+    /**
+     * actions for changing the selection on the goal tree
+     */
+    private GoalSelectAboveAction goalSelectAboveAction;
+    private GoalSelectBelowAction goalSelectBelowAction;
+    private GoalSelectParentAction goalSelectParentAction;
+    private GoalSelectChildAction goalSelectChildAction;
+
     public static final String AUTO_MODE_TEXT = "Start/stop automated proof search";
 
     private final NotificationManager notificationManager;
@@ -378,6 +386,10 @@ public final class MainWindow extends JFrame {
                 new LemmaGenerationAction.ProveUserDefinedTaclets(this);
         loadKeYTaclets = new LemmaGenerationAction.ProveKeYTaclets(this);
         lemmaGenerationBatchModeAction = new LemmaGenerationBatchModeAction(this);
+        goalSelectAboveAction = new GoalSelectAboveAction(this);
+        goalSelectBelowAction = new GoalSelectBelowAction(this);
+        goalSelectParentAction = new GoalSelectParentAction(this);
+        goalSelectChildAction = new GoalSelectChildAction(this);
         unicodeToggleAction = new UnicodeToggleAction(this);
 
         Config.DEFAULT.setDefaultFonts();
@@ -721,10 +733,10 @@ public final class MainWindow extends JFrame {
 
     private JMenu createSelectionMenu() {
         JMenu goalSelection = new JMenu("Select Goal ...");
-        goalSelection.add(new GoalSelectAboveAction(this));
-        goalSelection.add(new GoalSelectBelowAction(this));
-        goalSelection.add(new GoalSelectParentAction(this));
-        goalSelection.add(new GoalSelectChildAction(this));
+        goalSelection.add(goalSelectAboveAction);
+        goalSelection.add(goalSelectBelowAction);
+        goalSelection.add(goalSelectParentAction);
+        goalSelection.add(goalSelectChildAction);
         return goalSelection;
     }
 
