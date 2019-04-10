@@ -710,20 +710,22 @@ public final class MainWindow extends JFrame {
 
         view.addSeparator();
 
-        {
-            JMenu goalSelection = new JMenu("Select Goal ...");
-            goalSelection.add(new GoalSelectAboveAction(this));
-            goalSelection.add(new GoalSelectBelowAction(this));
-            goalSelection.add(new GoalSelectParentAction(this));
-            goalSelection.add(new GoalSelectChildAction(this));
-            view.add(goalSelection);
-        }
+        view.add(createSelectionMenu());
 
         JMenuItem hmItem = new JMenuItem("Heatmap Options");
         hmItem.addActionListener(new HeatmapSettingsAction(this));
         view.add(hmItem);
 
         return view;
+    }
+
+    private JMenu createSelectionMenu() {
+        JMenu goalSelection = new JMenu("Select Goal ...");
+        goalSelection.add(new GoalSelectAboveAction(this));
+        goalSelection.add(new GoalSelectBelowAction(this));
+        goalSelection.add(new GoalSelectParentAction(this));
+        goalSelection.add(new GoalSelectChildAction(this));
+        return goalSelection;
     }
 
     private JMenu createProofMenu() {
