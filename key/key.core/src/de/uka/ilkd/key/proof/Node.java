@@ -1,4 +1,4 @@
-// This file is part of KeY - Integrated Deductive Software Design
+ // This file is part of KeY - Integrated Deductive Software Design
 //
 // Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
@@ -441,6 +441,9 @@ public class Node  {
         return relNodeInParent(1);
     }
 
+    /**
+    * @return the previous node before `this` in parent; null if none is found
+    */
     public Node prevNodeInParent() {
         return relNodeInParent(-1);
     }
