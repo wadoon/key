@@ -13,6 +13,10 @@
 
 package de.uka.ilkd.key.rule.metaconstruct;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Optional;
+
 import org.key_project.util.ExtList;
 
 import de.uka.ilkd.key.java.Expression;
@@ -41,10 +45,15 @@ import de.uka.ilkd.key.java.statement.IGuard;
 import de.uka.ilkd.key.java.statement.ILoopInit;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.While;
+import de.uka.ilkd.key.logic.GenericTermReplacer;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
+import de.uka.ilkd.key.util.Pair;
 
 /**
  * 
@@ -185,7 +194,7 @@ public class EnhancedForElimination extends ProgramTransformer {
         final For forLoop = KeYJavaASTFactory.forLoop(inits, guard,
                 updates, declArrayElemVar, getNextElement, body);
 
-        setInvariant(enhancedFor, forLoop, services);
+        setInvariant(enhancedFor, forLoop, itVar, Optional.empty(), services);
 
         // arr = exp; for(...) body
         StatementBlock composition = KeYJavaASTFactory.block(arrAssignment, forLoop);
@@ -230,7 +239,7 @@ public class EnhancedForElimination extends ProgramTransformer {
 
         // block
         final StatementBlock outerBlock = KeYJavaASTFactory.block(itinit, valuesInit, whileGuard);
-        setInvariant(enhancedFor, whileGuard, services);
+        setInvariant(enhancedFor, whileGuard, itVar, Optional.of(valuesVar), services);
         return outerBlock;
 
     }
@@ -273,11 +282,97 @@ public class EnhancedForElimination extends ProgramTransformer {
      * <code>transformed</code> while or for loop.
      * @param services
      */
-    private void setInvariant (EnhancedFor original, LoopStatement transformed, Services services) {
+    private void setInvariant (EnhancedFor original, LoopStatement transformed,
+            ProgramVariable loopIdxVar, Optional<ProgramVariable> valuesVar, Services services) {
         LoopSpecification li = services.getSpecificationRepository().getLoopSpec(original);
         if (li != null) {
             li = li.setLoop(transformed);
+            li = instantiateIndexValues(li, loopIdxVar, valuesVar, services);
             services.getSpecificationRepository().addLoopInvariant(li);
         }
+    }
+ 
+    /**
+     * Replaces the function symbols "index" and "values" by actual program
+     * entities. The index function symbol is a placeholder which stems from
+     * translating the <code>\index</code> keyword from JML. The values function
+     * symbol is a placeholder which stems from translating the
+     * <code>\values</code> keyword from JML.
+     * 
+     * @param rawInv
+     *            The "raw" invariant.
+     * @param loopIdxVar
+     *            The actual program variable for the index placeholder.
+     * @param maybeValuesVar
+     *            Optional actual program variable for the values placeholder.
+     * @param services
+     *            The {@link Services} object.
+     * 
+     * @return The updated {@link LoopSpecification}, or null if the supplied
+     *         invariant is null.
+     */
+    private LoopSpecification instantiateIndexValues(LoopSpecification rawInv,
+            ProgramVariable loopIdxVar,
+            Optional<ProgramVariable> maybeValuesVar, Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+
+        if (rawInv == null) {
+            return null;
+        }
+
+        Optional<Term> maybeVariant = Optional
+                .ofNullable(rawInv.getInternalVariant());
+        final Map<LocationVariable, Term> newInvs = //
+                new LinkedHashMap<LocationVariable, Term>(
+                        rawInv.getInternalInvariants());
+        final Map<LocationVariable, Term> newFreeInvs = //
+                new LinkedHashMap<LocationVariable, Term>(
+                        rawInv.getInternalFreeInvariants());
+
+        // replace index
+        updateInvs(newInvs, tb.index(), loopIdxVar, services);
+        updateInvs(newFreeInvs, tb.index(), loopIdxVar, services);
+
+        maybeVariant = maybeVariant.map(v -> GenericTermReplacer.replace(v,
+                t -> t.equals(tb.index()), t -> tb.var(loopIdxVar), services));
+
+        // replace values
+        maybeValuesVar
+                .ifPresent(v -> updateInvs(newInvs, tb.values(), v, services));
+        if (maybeValuesVar.isPresent()) {
+            maybeVariant = maybeVariant
+                    .map(variant -> GenericTermReplacer.replace(variant,
+                            t -> t.equals(tb.values()),
+                            t -> tb.var(maybeValuesVar.get()), services));
+        }
+
+        return rawInv.instantiate(newInvs, newFreeInvs,
+                maybeVariant.orElse(null));
+    }
+
+    /**
+     * Updates the given invariants (map from heap to a single invariant) by
+     * replacing in them termToReplace by a term containing replaceWith.
+     * 
+     * @param invs
+     *            The invariants in which to replace.
+     * @param termToReplace
+     *            The term to replace.
+     * @param replaceWith
+     *            The program variable from which to create the replacement
+     *            term.
+     * @param services
+     *            The {@link Services} object.
+     */
+    private void updateInvs(final Map<LocationVariable, Term> invs,
+            final Term termToReplace, final ProgramVariable replaceWith,
+            final Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        invs.entrySet().stream().filter(entry -> entry.getValue() != null)
+                .map(entry -> new Pair<LocationVariable, Term>(entry.getKey(),
+                        GenericTermReplacer.replace(entry.getValue(),
+                                termToReplace::equals, t -> tb.var(replaceWith),
+                                services)))
+                .forEach(p -> invs.put(p.first, p.second));
     }
 }
