@@ -100,7 +100,8 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
             + "after arbitrarily many loop iterations (body preserves invariant).</li>"
             + "<li>Invariant holds after the loop terminates (use case).</li>"
             + "</ul>"
-            + "<p>The last two are combined into a single goal.</p>"
+            + "<p>The last two are combined into a single goal or split into two<br>"
+            + "goals based on the 'javaLoopTreatment' strategy option.</p>"
             + "</html>";
     public static final String TOOL_TIP_LOOP_SCOPE_EXPAND
             = "<html>"
@@ -361,20 +362,23 @@ public class JavaCardDLStrategyFactory implements StrategyFactory {
                         StrategyProperties.LOOP_OPTIONS_KEY,
                         "Loop treatment",
                         2,
-                        new StrategyPropertyValueDefinition(
-                                StrategyProperties.LOOP_SCOPE_INVARIANT,
-                                "Loop Scope Invariant", TOOL_TIP_LOOP_SCOPE_INVARIANT),
+                        /* NOTE (DS, 2019-04-10): Deactivated the built-in loop scope rule
+                         * since we now have the loop scope taclets which are based on the
+                         * same theory, but offer several advantages. */
+                        // new StrategyPropertyValueDefinition(
+                        //         StrategyProperties.LOOP_SCOPE_INVARIANT,
+                        //         "Loop Scope Invariant", TOOL_TIP_LOOP_SCOPE_INVARIANT),
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.LOOP_SCOPE_INV_TACLET,
-                                "Loop Scope Invariant Taclet", TOOL_TIP_LOOP_SCOPE_INVARIANT_TACLET),
+                                "Invariant (Loop Scope)", TOOL_TIP_LOOP_SCOPE_INVARIANT_TACLET),
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.LOOP_SCOPE_EXPAND,
-                                "Loop Scope Expand", TOOL_TIP_LOOP_SCOPE_EXPAND),
+                                "Expand (Loop Scope)", TOOL_TIP_LOOP_SCOPE_EXPAND),
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.LOOP_INVARIANT,
-                                "Invariant", TOOL_TIP_LOOP_INVARIANT),
+                                "Invariant (Transformation)", TOOL_TIP_LOOP_INVARIANT),
                         new StrategyPropertyValueDefinition(
-                                StrategyProperties.LOOP_EXPAND, "Expand",
+                                StrategyProperties.LOOP_EXPAND, "Expand (Transformation)",
                                 TOOL_TIP_LOOP_EXPAND),
                         new StrategyPropertyValueDefinition(
                                 StrategyProperties.LOOP_NONE, "None",

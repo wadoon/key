@@ -38,10 +38,10 @@ public final class StrategyProperties extends Properties {
     public static final String LOOP_EXPAND_BOUNDED =
                 "LOOP_EXPAND_BOUNDED"; //Used for test generation chrisg
     public static final String LOOP_INVARIANT = "LOOP_INVARIANT";
-    public static final String LOOP_SCOPE_INVARIANT = "LOOP_SCOPE_INVARIANT";
     public static final String LOOP_SCOPE_INV_TACLET = "LOOP_SCOPE_INV_TACLET";
     public static final String LOOP_SCOPE_EXPAND = "LOOP_SCOPE_EXPAND";
     public static final String LOOP_NONE = "LOOP_NONE";
+    public static final String LOOP_SCOPE_INVARIANT = "LOOP_SCOPE_INVARIANT";
 
     public static final String BLOCK_OPTIONS_KEY = "BLOCK_OPTIONS_KEY";
     public static final String BLOCK_CONTRACT_INTERNAL = "BLOCK_CONTRACT_INTERNAL";
@@ -210,7 +210,7 @@ public final class StrategyProperties extends Properties {
 
     static {
         DEFAULT_MAP.setProperty(SPLITTING_OPTIONS_KEY, SPLITTING_DELAYED);
-        DEFAULT_MAP.setProperty(LOOP_OPTIONS_KEY, LOOP_INVARIANT);
+        DEFAULT_MAP.setProperty(LOOP_OPTIONS_KEY, LOOP_SCOPE_INV_TACLET);
         DEFAULT_MAP.setProperty(BLOCK_OPTIONS_KEY, BLOCK_CONTRACT_INTERNAL);
         DEFAULT_MAP.setProperty(METHOD_OPTIONS_KEY, METHOD_CONTRACT);
         DEFAULT_MAP.setProperty(MPS_OPTIONS_KEY, MPS_MERGE);
@@ -322,7 +322,7 @@ public final class StrategyProperties extends Properties {
         //                        implementation and to update the tests.
         sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
                        loopTreatmentInvariant ?
-                           StrategyProperties.LOOP_INVARIANT
+                           StrategyProperties.LOOP_SCOPE_INV_TACLET
                            : StrategyProperties.LOOP_EXPAND);
         sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY,
                        blockTreatmentContract ?
