@@ -227,6 +227,7 @@ lexer grammar KeYLexer;
         // Keywords for varcond and related stuff
     SAME_OBSERVER : '\\sameObserver';
 	VARCOND : '\\varcond';
+	HAS_INVARIANT : '\\hasInvariant';
 	GET_INVARIANT : '\\getInvariant';
 	GET_FREE_INVARIANT : '\\getFreeInvariant';
 	GET_VARIANT : '\\getVariant';

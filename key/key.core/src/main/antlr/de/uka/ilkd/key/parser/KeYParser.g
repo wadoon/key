@@ -3842,6 +3842,7 @@ varexp[TacletBuilder b]
 }
 :
   ( varcond_applyUpdateOnRigid[b]
+    | varcond_hasInvariant[b]
     | varcond_getInvariant[b]
     | varcond_getFreeInvariant[b]
     | varcond_getVariant[b]
@@ -3902,6 +3903,14 @@ varcond_applyUpdateOnRigid [TacletBuilder b]
       b.addVariableCondition(new ApplyUpdateOnRigidCondition((UpdateSV)u, 
                                                              (SchemaVariable)x, 
                                                              (SchemaVariable)x2));
+   }
+;
+
+varcond_hasInvariant [TacletBuilder b]
+:
+   HAS_INVARIANT LPAREN modality=varId RPAREN
+   { 
+      b.addVariableCondition(new HasLoopInvariantCondition((SchemaVariable) modality)); 
    }
 ;
 
