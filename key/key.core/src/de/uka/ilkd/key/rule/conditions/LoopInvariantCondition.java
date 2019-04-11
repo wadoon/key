@@ -12,6 +12,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -21,17 +22,21 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
- * TODO
+ * Extracts the loop invariants for a loop term (for all applicable heap
+ * contexts).
  * 
  * @author Dominic Steinhoefel
  */
 public class LoopInvariantCondition implements VariableCondition {
-    private final SchemaVariable inv;
+    private final ProgramSV loopStmtSV;
     private final SchemaVariable modalitySV;
+    private final SchemaVariable invSV;
 
-    public LoopInvariantCondition(SchemaVariable inv, SchemaVariable modality) {
-        this.inv = inv;
-        this.modalitySV = modality;
+    public LoopInvariantCondition(ProgramSV loopStmtSV,
+            SchemaVariable modalitySV, SchemaVariable invSV) {
+        this.loopStmtSV = loopStmtSV;
+        this.modalitySV = modalitySV;
+        this.invSV = invSV;
     }
 
     @Override
@@ -40,12 +45,18 @@ public class LoopInvariantCondition implements VariableCondition {
         final SVInstantiations svInst = matchCond.getInstantiations();
         final TermBuilder tb = services.getTermBuilder();
 
-        if (svInst.getInstantiation(inv) != null) {
+        if (svInst.getInstantiation(invSV) != null) {
             return matchCond;
         }
 
-        final Modality modality = (Modality) svInst
-                .getInstantiation(modalitySV);
+        final LoopStatement loop = (LoopStatement) svInst
+                .getInstantiation(loopStmtSV);
+        final LoopSpecification loopSpec = //
+                services.getSpecificationRepository().getLoopSpec(loop);
+
+        if (loopSpec == null) {
+            return null;
+        }
 
         final JavaBlock javaBlock = JavaBlock
                 .createJavaBlock((StatementBlock) svInst
@@ -57,14 +68,8 @@ public class LoopInvariantCondition implements VariableCondition {
                 methodFrame -> MiscTools.getSelfTerm(methodFrame, services))
                 .orElse(null);
 
-        final LoopStatement loop = (LoopStatement) JavaTools
-                .getActiveStatement(javaBlock);
-        final LoopSpecification loopSpec = //
-                services.getSpecificationRepository().getLoopSpec(loop);
-
-        if (loopSpec == null) {
-            return null;
-        }
+        final Modality modality = (Modality) svInst
+                .getInstantiation(modalitySV);
 
         Term invInst = tb.tt();
         for (final LocationVariable heap : MiscTools
@@ -80,11 +85,12 @@ public class LoopInvariantCondition implements VariableCondition {
         }
 
         return matchCond.setInstantiations( //
-                svInst.add(inv, invInst, services));
+                svInst.add(invSV, invInst, services));
     }
 
     @Override
     public String toString() {
-        return "\\getInvariant(" + inv + ", " + modalitySV + ")";
+        return "\\getInvariant(" + loopStmtSV + ", " + modalitySV + ", " + invSV
+                + ")";
     }
 }

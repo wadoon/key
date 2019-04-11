@@ -11,6 +11,7 @@ import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -20,15 +21,18 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
- * TODO
+ * Checks whether a loop has an invariant (either normal or "free").
  * 
  * @author Dominic Steinhoefel
  */
 public class HasLoopInvariantCondition implements VariableCondition {
+    private final ProgramSV loopStmtSV;
     private final SchemaVariable modalitySV;
 
-    public HasLoopInvariantCondition(SchemaVariable modality) {
-        this.modalitySV = modality;
+    public HasLoopInvariantCondition(ProgramSV loopStmtSV,
+            SchemaVariable modalitySV) {
+        this.loopStmtSV = loopStmtSV;
+        this.modalitySV = modalitySV;
     }
 
     @Override
@@ -36,8 +40,14 @@ public class HasLoopInvariantCondition implements VariableCondition {
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
-        final Modality modality = (Modality) svInst
-                .getInstantiation(modalitySV);
+        final LoopStatement loop = (LoopStatement) svInst
+                .getInstantiation(loopStmtSV);
+        final LoopSpecification loopSpec = //
+                services.getSpecificationRepository().getLoopSpec(loop);
+
+        if (loopSpec == null) {
+            return null;
+        }
 
         final JavaBlock javaBlock = JavaBlock
                 .createJavaBlock((StatementBlock) svInst
@@ -49,14 +59,8 @@ public class HasLoopInvariantCondition implements VariableCondition {
                 methodFrame -> MiscTools.getSelfTerm(methodFrame, services))
                 .orElse(null);
 
-        final LoopStatement loop = (LoopStatement) JavaTools
-                .getActiveStatement(javaBlock);
-        final LoopSpecification loopSpec = //
-                services.getSpecificationRepository().getLoopSpec(loop);
-
-        if (loopSpec == null) {
-            return null;
-        }
+        final Modality modality = (Modality) svInst
+                .getInstantiation(modalitySV);
 
         boolean hasInv = false;
         for (final LocationVariable heap : MiscTools
@@ -77,6 +81,6 @@ public class HasLoopInvariantCondition implements VariableCondition {
 
     @Override
     public String toString() {
-        return "\\hasInvariant(" + modalitySV + ")";
+        return "\\hasInvariant(" + loopStmtSV + ")";
     }
 }
