@@ -1,7 +1,5 @@
 package de.uka.ilkd.key.rule.conditions;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import de.uka.ilkd.key.java.JavaTools;
@@ -70,7 +68,8 @@ public class LoopFreeInvariantCondition implements VariableCondition {
         }
 
         Term freeInvInst = tb.tt();
-        for (final LocationVariable heap : heapContexts(modality, services)) {
+        for (final LocationVariable heap : MiscTools
+                .applicableHeapContexts(modality, services)) {
             final Term currentFreeInvInst = freeInvInst;
 
             final Optional<Term> maybeFreeInvInst = Optional
@@ -86,26 +85,8 @@ public class LoopFreeInvariantCondition implements VariableCondition {
                 svInst.add(inv, freeInvInst, services));
     }
 
-    private static List<LocationVariable> heapContexts(Modality modality,
-            Services services) {
-        final List<LocationVariable> result = new ArrayList<>();
-
-        result.add(services.getTypeConverter().getHeapLDT().getHeap());
-
-        if (MiscTools.isTransaction(modality)) {
-            result.add(services.getTypeConverter().getHeapLDT().getSavedHeap());
-        }
-
-        if (MiscTools.isPermissions(services)) {
-            result.add(services.getTypeConverter().getHeapLDT()
-                    .getPermissionHeap());
-        }
-
-        return result;
-    }
-
     @Override
     public String toString() {
-        return "\\getFreeInvariant(" + inv + ", " + modalitySV +  ")";
+        return "\\getFreeInvariant(" + inv + ", " + modalitySV + ")";
     }
 }

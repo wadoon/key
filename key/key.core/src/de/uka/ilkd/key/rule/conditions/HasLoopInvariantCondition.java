@@ -9,7 +9,6 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -25,12 +24,10 @@ import de.uka.ilkd.key.util.MiscTools;
  * 
  * @author Dominic Steinhoefel
  */
-public class LoopInvariantCondition implements VariableCondition {
-    private final SchemaVariable inv;
+public class HasLoopInvariantCondition implements VariableCondition {
     private final SchemaVariable modalitySV;
 
-    public LoopInvariantCondition(SchemaVariable inv, SchemaVariable modality) {
-        this.inv = inv;
+    public HasLoopInvariantCondition(SchemaVariable modality) {
         this.modalitySV = modality;
     }
 
@@ -38,11 +35,6 @@ public class LoopInvariantCondition implements VariableCondition {
     public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
-        final TermBuilder tb = services.getTermBuilder();
-
-        if (svInst.getInstantiation(inv) != null) {
-            return matchCond;
-        }
 
         final Modality modality = (Modality) svInst
                 .getInstantiation(modalitySV);
@@ -66,25 +58,25 @@ public class LoopInvariantCondition implements VariableCondition {
             return null;
         }
 
-        Term invInst = tb.tt();
+        boolean hasInv = false;
         for (final LocationVariable heap : MiscTools
                 .applicableHeapContexts(modality, services)) {
-            final Term currentInvInst = invInst;
-
             final Optional<Term> maybeInvInst = Optional
                     .ofNullable(loopSpec.getInvariant(heap, selfTerm,
                             loopSpec.getInternalAtPres(), services));
+            final Optional<Term> maybeFreeInvInst = Optional
+                    .ofNullable(loopSpec.getFreeInvariant(heap, selfTerm,
+                            loopSpec.getInternalAtPres(), services));
 
-            invInst = maybeInvInst.map(inv -> tb.and(currentInvInst, inv))
-                    .orElse(invInst);
+            hasInv |= maybeInvInst.isPresent();
+            hasInv |= maybeFreeInvInst.isPresent();
         }
 
-        return matchCond.setInstantiations( //
-                svInst.add(inv, invInst, services));
+        return hasInv ? matchCond : null;
     }
 
     @Override
     public String toString() {
-        return "\\getInvariant(" + inv + ", " + modalitySV + ")";
+        return "\\hasInvariant(" + modalitySV + ")";
     }
 }

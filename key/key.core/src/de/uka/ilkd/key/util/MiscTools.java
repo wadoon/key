@@ -49,6 +49,7 @@ import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.FilterVisitor;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
@@ -1101,5 +1102,35 @@ public final class MiscTools {
     public static boolean isTransaction(final Modality modality) {
         return modality == Modality.BOX_TRANSACTION
                 || modality == Modality.DIA_TRANSACTION;
+    }
+
+    /**
+     * Returns the applicable heap contexts out of the currently available set
+     * of three contexts: The normal heap, the saved heap (transaction), and the
+     * permission heap.
+     * 
+     * @param modality
+     *            The current modality (checked for transaction).
+     * @param services
+     *            The {@link Services} object (for {@link HeapLDT} and for
+     *            checking whether we're in the permissions profile).
+     * @return The list of the applicable heaps for the given scenario.
+     */
+    public static List<LocationVariable> applicableHeapContexts(Modality modality,
+            Services services) {
+        final List<LocationVariable> result = new ArrayList<>();
+    
+        result.add(services.getTypeConverter().getHeapLDT().getHeap());
+    
+        if (isTransaction(modality)) {
+            result.add(services.getTypeConverter().getHeapLDT().getSavedHeap());
+        }
+    
+        if (isPermissions(services)) {
+            result.add(services.getTypeConverter().getHeapLDT()
+                    .getPermissionHeap());
+        }
+    
+        return result;
     }
 }

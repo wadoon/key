@@ -3860,6 +3860,7 @@ varexp[TacletBuilder b]
 :
   ( varcond_applyUpdateOnRigid[b]
     | varcond_hasAEPredicate[b]
+    | varcond_hasInvariant[b]
     | varcond_getInvariant[b]
     | varcond_getFreeInvariant[b]
     | varcond_getVariant[b]
@@ -3936,6 +3937,14 @@ varcond_hasAEPredicate [TacletBuilder b]
    HAS_AE_PREDICATE LPAREN phi=varId RPAREN
    { 
       b.addVariableCondition(new HasAEPredicateCondition((SchemaVariable) phi)); 
+   }
+;
+
+varcond_hasInvariant [TacletBuilder b]
+:
+   HAS_INVARIANT LPAREN modality=varId RPAREN
+   { 
+      b.addVariableCondition(new HasLoopInvariantCondition((SchemaVariable) modality)); 
    }
 ;
 

@@ -239,6 +239,7 @@ lexer grammar KeYLexer;
     STORE_CONTEXT_LOOP_LABELS_IN : '\\storeContextLoopLabelsIn' ;
 	IS_DEFINED : '\\isDefined';
 	VARCOND : '\\varcond';
+	HAS_INVARIANT : '\\hasInvariant';
 	GET_INVARIANT : '\\getInvariant';
 	GET_FREE_INVARIANT : '\\getFreeInvariant';
 	GET_VARIANT : '\\getVariant';
