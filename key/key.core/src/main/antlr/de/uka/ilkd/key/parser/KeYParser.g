@@ -3847,6 +3847,7 @@ varexp[TacletBuilder b]
     | varcond_getFreeInvariant[b]
     | varcond_getVariant[b]
     | varcond_dropEffectlessElementaries[b]
+    | varcond_storeActiveStmtIn[b]
     | varcond_dropEffectlessStores[b]
     | varcond_enum_const[b]
     | varcond_free[b]
@@ -3908,35 +3909,44 @@ varcond_applyUpdateOnRigid [TacletBuilder b]
 
 varcond_hasInvariant [TacletBuilder b]
 :
-   HAS_INVARIANT LPAREN modality=varId RPAREN
+   HAS_INVARIANT LPAREN t=varId COMMA moda=varId RPAREN
    { 
-      b.addVariableCondition(new HasLoopInvariantCondition((SchemaVariable) modality)); 
+      b.addVariableCondition(new HasLoopInvariantCondition((ProgramSV)t, (SchemaVariable)moda)); 
    }
 ;
 
 varcond_getInvariant [TacletBuilder b]
 :
-   GET_INVARIANT LPAREN inv=varId COMMA modality=varId RPAREN
+   GET_INVARIANT LPAREN t=varId COMMA moda=varId COMMA inv=varId RPAREN
    { 
-      b.addVariableCondition(new LoopInvariantCondition((SchemaVariable)inv, (SchemaVariable) modality)); 
+      b.addVariableCondition(new LoopInvariantCondition((ProgramSV)t, (SchemaVariable)moda, (SchemaVariable)inv)); 
    }
 ;
 
 varcond_getFreeInvariant [TacletBuilder b]
 :
-   GET_FREE_INVARIANT LPAREN inv=varId COMMA modality=varId RPAREN
+   GET_FREE_INVARIANT LPAREN t=varId COMMA moda=varId COMMA inv=varId RPAREN
    { 
-      b.addVariableCondition(new LoopFreeInvariantCondition((SchemaVariable)inv, (SchemaVariable) modality)); 
+      b.addVariableCondition(new LoopFreeInvariantCondition((ProgramSV)t, (SchemaVariable)moda, (SchemaVariable)inv)); 
    }
 ;
 
 varcond_getVariant [TacletBuilder b]
 :
-   GET_VARIANT LPAREN variant=varId RPAREN
+   GET_VARIANT LPAREN t = varId COMMA variant=varId RPAREN
    { 
-      b.addVariableCondition(new LoopVariantCondition((SchemaVariable)variant));
+      b.addVariableCondition(new LoopVariantCondition((ProgramSV)t, (SchemaVariable)variant)); 
    }
 ;
+
+varcond_storeActiveStmtIn[TacletBuilder b]
+:
+   STORE_ACTIVE_STMT_IN LPAREN sv=varId COMMA t=term RPAREN 
+   {
+      b.addVariableCondition(new StoreActiveStmtInCondition((ProgramSV) sv, t));
+   }
+;
+
 varcond_dropEffectlessElementaries[TacletBuilder b]
 :
    DROP_EFFECTLESS_ELEMENTARIES LPAREN u=varId COMMA x=varId COMMA result=varId RPAREN 
@@ -3951,7 +3961,7 @@ varcond_hasLoopLabel[TacletBuilder b, boolean negated]
 :
    HAS_LOOP_LABEL
    {
-      b.addVariableCondition(new HasLoopLabelCondition(negated));
+      b.addVariableCondition(new HasLoopLabelCondition((ProgramSV)t, negated));
    }
 ;
 

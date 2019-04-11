@@ -1,12 +1,9 @@
 package de.uka.ilkd.key.rule.conditions;
 
-import de.uka.ilkd.key.java.JavaTools;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.java.Statement;
-import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.statement.LoopStatement;
-import de.uka.ilkd.key.logic.JavaBlock;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -15,15 +12,17 @@ import de.uka.ilkd.key.rule.inst.SVInstantiations;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 
 /**
- * TODO
+ * Extracts the variant for a loop term.
  * 
  * @author Dominic Steinhoefel
  */
 public class LoopVariantCondition implements VariableCondition {
-
+    private final SchemaVariable loopStmtSV;
     private final SchemaVariable variantSV;
 
-    public LoopVariantCondition(SchemaVariable variantSV) {
+    public LoopVariantCondition(ProgramSV loopStmtSV,
+            SchemaVariable variantSV) {
+        this.loopStmtSV = loopStmtSV;
         this.variantSV = variantSV;
     }
 
@@ -36,17 +35,14 @@ public class LoopVariantCondition implements VariableCondition {
             return matchCond;
         }
 
-        final Statement activeStmt = (Statement) JavaTools.getActiveStatement(
-                JavaBlock.createJavaBlock((StatementBlock) svInst
-                        .getContextInstantiation().contextProgram()));
-        final LoopStatement loop = (LoopStatement) activeStmt;
+        final LoopStatement loop = (LoopStatement) svInst
+                .getInstantiation(loopStmtSV);
         final LoopSpecification loopSpec = //
                 services.getSpecificationRepository().getLoopSpec(loop);
 
         if (loopSpec == null) {
             return null;
         }
-
         final Term variant = loopSpec.getVariant(loopSpec.getInternalSelfTerm(),
                 loopSpec.getInternalAtPres(), services);
 
@@ -60,6 +56,6 @@ public class LoopVariantCondition implements VariableCondition {
 
     @Override
     public String toString() {
-        return "\\getVariant(" + variantSV + ")";
+        return "\\getVariant(" + loopStmtSV + ", " + variantSV + ")";
     }
 }

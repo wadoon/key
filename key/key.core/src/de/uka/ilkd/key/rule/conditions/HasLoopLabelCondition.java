@@ -20,6 +20,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.logic.ProgramPrefix;
+import de.uka.ilkd.key.logic.op.ProgramSV;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
 import de.uka.ilkd.key.rule.MatchConditions;
@@ -27,15 +28,17 @@ import de.uka.ilkd.key.rule.VariableCondition;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
 
 /**
- * Stores all the loop labels in the current program prefix pi in the given list
- * SV.
+ * Stores all the loop labels in front of the given loop term in the current
+ * program prefix pi in the given list SV.
  *
  * @author Dominic Steinhoefel
  */
 public class HasLoopLabelCondition implements VariableCondition {
     private final boolean negated;
+    private final ProgramSV loopStmtSV;
 
-    public HasLoopLabelCondition(boolean negated) {
+    public HasLoopLabelCondition(ProgramSV loopStmtSV, boolean negated) {
+        this.loopStmtSV = loopStmtSV;
         this.negated = negated;
     }
 
@@ -44,14 +47,16 @@ public class HasLoopLabelCondition implements VariableCondition {
             MatchConditions matchCond, Services services) {
         final SVInstantiations svInst = matchCond.getInstantiations();
 
+        final LoopStatement loopStmt = (LoopStatement) svInst
+                .getInstantiation(loopStmtSV);
+
         final ArrayList<ProgramElement> labels = new ArrayList<>();
         ProgramPrefix prefix = //
                 (ProgramPrefix) svInst.getContextInstantiation()
                         .contextProgram();
         do {
             if (prefix instanceof LabeledStatement
-                    && ((LabeledStatement) prefix)
-                            .getBody() instanceof LoopStatement) {
+                    && ((LabeledStatement) prefix).getBody() == loopStmt) {
                 labels.add(((LabeledStatement) prefix).getLabel());
             }
         }
@@ -68,7 +73,7 @@ public class HasLoopLabelCondition implements VariableCondition {
 
     @Override
     public String toString() {
-        return String.format("\\varcond (%s\\hasLoopLabel)",
-                negated ? "\\not" : "");
+        return String.format("\\varcond (%s\\hasLoopLabel(%s)",
+                negated ? "\\not" : "", loopStmtSV);
     }
 }
