@@ -322,7 +322,7 @@ public final class StrategyProperties extends Properties {
         //                        implementation and to update the tests.
         sp.setProperty(StrategyProperties.LOOP_OPTIONS_KEY,
                        loopTreatmentInvariant ?
-                           StrategyProperties.LOOP_SCOPE_INV_TACLET
+                           StrategyProperties.LOOP_INVARIANT
                            : StrategyProperties.LOOP_EXPAND);
         sp.setProperty(StrategyProperties.BLOCK_OPTIONS_KEY,
                        blockTreatmentContract ?
