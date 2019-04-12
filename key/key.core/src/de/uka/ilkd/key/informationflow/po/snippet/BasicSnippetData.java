@@ -98,7 +98,7 @@ class BasicSnippetData {
         /**
          * Variables originally used during parsing.
          */
-        BLOCK_VARS(BlockSpecificationElement.Variables.class),
+        BLOCK_VARS(AuxiliaryContract.Variables.class),
         LABELS(Label[].class),
         EXECUTION_CONTEXT(ExecutionContext.class); // this does not fit well here
 
@@ -135,7 +135,7 @@ class BasicSnippetData {
                 new StateVars(contract.getSelf(), contract.getParams(),
                               contract.getResult(), contract.getExc(), heap);
     }
-
+    
     BasicSnippetData(LoopSpecification invariant,
                      ExecutionContext context,
                      Term guardTerm,
@@ -185,8 +185,8 @@ class BasicSnippetData {
         origVars = new StateVars(invariant.getInternalSelfTerm(),
                                  guardTerm, localVarsTerms, heap);
     }
-
-
+    
+    
     BasicSnippetData(InformationFlowContract contract,
                      Services services) {
         this.hasMby = contract.hasMby();
@@ -195,7 +195,7 @@ class BasicSnippetData {
 
         contractContents.put(Key.TARGET_METHOD, contract.getTarget());
         contractContents.put(Key.FOR_CLASS, contract.getKJT());
-        contractContents.put(Key.PRECONDITION, contract.getPre());
+        contractContents.put(Key.PRECONDITION, contract.getPre());        
         contractContents.put(Key.MODIFIES, contract.getMod());
         contractContents.put(Key.DEPENDENS, contract.getDep());
         contractContents.put(Key.MEASURED_BY, contract.getMby());

@@ -39,17 +39,17 @@ import de.uka.ilkd.key.util.InfFlowSpec;
 /**
  * Default implementation of {@link BlockContract}.
  *
- * @see SimpleBlockContract.Creator
+ * @see BlockContractImpl.Creator
  *
  * @author wacker, lanzinger
  */
-public final class SimpleBlockContract extends AbstractBlockSpecificationElement
+public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
         implements BlockContract {
 
     /**
-     * @see BlockContract#getFunctionalContracts()
+     * @see #toLoopContract()
      */
-    private ImmutableSet<FunctionalBlockContract> functionalContracts;
+    private LoopContract loopContract = null;
 
     /**
      *
@@ -80,22 +80,22 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
      * @param hasMod
      *            a map specifying on which heaps this contract has a modified clause.
      * @param functionalContracts
-     *            the functional loop contracts corresponding to this contract.
+     *            the functional contracts corresponding to this contract.
      */
-    public SimpleBlockContract(final String baseName, final StatementBlock block,
+    public BlockContractImpl(final String baseName, final StatementBlock block,
             final List<Label> labels, final IProgramMethod method, final Modality modality,
             final Map<LocationVariable, Term> preconditions, final Term measuredBy,
             final Map<LocationVariable, Term> postconditions,
             final Map<LocationVariable, Term> modifiesClauses,
-            Map<LocationVariable, Term> declaresClauses,
+            final Map<LocationVariable, Term> declaresClauses,
             final Map<ProgramVariable, Term> accessibleClauses,
             final ImmutableList<InfFlowSpec> infFlowSpecs, final Variables variables,
             final boolean transactionApplicable, final Map<LocationVariable, Boolean> hasMod,
-            ImmutableSet<FunctionalBlockContract> functionalContracts) {
-        super(baseName, block, labels, method, modality, preconditions, measuredBy, postconditions,
-                modifiesClauses, declaresClauses, accessibleClauses, infFlowSpecs, variables, transactionApplicable, hasMod);
-
-        this.functionalContracts = functionalContracts;
+            final ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts) {
+        super(baseName, block, labels, method, modality, preconditions,
+                measuredBy, postconditions, modifiesClauses, declaresClauses,
+                accessibleClauses, infFlowSpecs, variables,
+                transactionApplicable, hasMod, functionalContracts);
     }
 
     /**
@@ -111,17 +111,31 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
                 .combine();
     }
 
-    @Override
-    public ImmutableSet<FunctionalBlockContract> getFunctionalContracts() {
-        return functionalContracts;
+    /**
+     *
+     * @param loopContract the loop contract from which this block contract was created.
+     * @see #toLoopContract()
+     */
+    void setLoopContract(LoopContract loopContract) {
+        if (this.loopContract != null) {
+            throw new IllegalStateException();
+        }
+
+        this.loopContract = loopContract;
     }
 
     @Override
-    public void setFunctionalBlockContract(FunctionalBlockContract contract) {
-        assert contract.id() != Contract.INVALID_ID;
-        assert contract.getBlockContract().equals(this);
+    public LoopContract toLoopContract() {
+        return loopContract;
+    }
 
-        functionalContracts = DefaultImmutableSet.<FunctionalBlockContract> nil().add(contract);
+    @Override
+    public void setFunctionalContract(FunctionalAuxiliaryContract<?> contract) {
+        super.setFunctionalContract(contract);
+
+        if (loopContract != null) {
+            loopContract.setFunctionalContract(contract);
+        }
     }
 
     @Override
@@ -137,12 +151,13 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
 
     @Override
     public String getUniqueName() {
-        if (getTarget() != null)
+        if (getTarget() != null) {
             return "Block Contract " + getBlock().getStartPosition().getLine() + " "
                     + getTarget().getUniqueName();
-        else
+        } else {
             return "Block Contract " + getBlock().getStartPosition().getLine() + " "
                     + Math.abs(getBlock().hashCode());
+        }
     }
 
     @Override
@@ -159,9 +174,14 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
             final Map<ProgramVariable, Term> accessibleClauses,
             final ImmutableList<InfFlowSpec> newinfFlowSpecs, final Variables newVariables,
             Term newMeasuredBy) {
-        return new SimpleBlockContract(baseName, newBlock, labels, method, modality,
-                newPreconditions, newMeasuredBy, newPostconditions, newModifiesClauses,
-                newDeclaresClauses, accessibleClauses, newinfFlowSpecs, newVariables, transactionApplicable, hasMod, functionalContracts);
+        BlockContractImpl result =
+                new BlockContractImpl(baseName, newBlock, labels, method, modality,
+                                      newPreconditions, newMeasuredBy, newPostconditions,
+                                      newModifiesClauses, newDeclaresClauses, accessibleClauses, 
+                                      newinfFlowSpecs, newVariables,
+                                      transactionApplicable, hasMod, getFunctionalContracts());
+        result.setLoopContract(loopContract);
+        return result;
     }
 
     @Override
@@ -174,9 +194,13 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
     public BlockContract setTarget(KeYJavaType newKJT, IObserverFunction newPM) {
         assert newPM instanceof IProgramMethod;
         assert newKJT.equals(newPM.getContainerType());
-        return new SimpleBlockContract(baseName, block, labels, (IProgramMethod) newPM, modality,
-                preconditions, measuredBy, postconditions, modifiesClauses, declaresClauses, accessibleClauses, infFlowSpecs, variables,
-                transactionApplicable, hasMod, functionalContracts);
+        BlockContractImpl result = new BlockContractImpl(
+                baseName, block, labels, (IProgramMethod) newPM, modality,
+                preconditions, measuredBy, postconditions, modifiesClauses, 
+                declaresClauses, accessibleClauses, infFlowSpecs, variables,
+                transactionApplicable, hasMod, getFunctionalContracts());
+        result.setLoopContract(loopContract);
+        return result;
     }
 
     @Override
@@ -190,11 +214,11 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
     }
 
     /**
-     * This class is used to build {@link SimpleBlockContract}s.
+     * This class is used to build {@link BlockContractImpl}s.
      *
      * @see Creator#create()
      */
-    public static class Creator extends AbstractBlockSpecificationElement.Creator<BlockContract> {
+    public static class Creator extends AbstractAuxiliaryContractImpl.Creator<BlockContract> {
 
         /**
          *
@@ -263,9 +287,10 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
                 Map<ProgramVariable, Term> accessibleClauses,
                 ImmutableList<InfFlowSpec> infFlowSpecs, Variables variables,
                 boolean transactionApplicable, Map<LocationVariable, Boolean> hasMod) {
-            return new SimpleBlockContract(baseName, block, labels, method, modality, preconditions,
+            return new BlockContractImpl(baseName, block, labels, method, modality, preconditions,
                     measuredBy, postconditions, modifiesClauses, declaresClauses,
-                    accessibleClauses, infFlowSpecs, variables, transactionApplicable, hasMod, null);
+                    accessibleClauses, infFlowSpecs, variables,
+                    transactionApplicable, hasMod, null);
         }
     }
 
@@ -274,7 +299,7 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
      * simultaneously.
      */
     protected static class Combinator
-            extends AbstractBlockSpecificationElement.Combinator<BlockContract> {
+            extends AbstractAuxiliaryContractImpl.Combinator<BlockContract> {
 
         /**
          *
@@ -307,7 +332,8 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
             placeholderVariables = head.getPlaceholderVariables();
             remembranceVariables = placeholderVariables.combineRemembranceVariables();
 
-            ImmutableSet<FunctionalBlockContract> functionalContracts = DefaultImmutableSet.nil();
+            ImmutableSet<FunctionalAuxiliaryContract<?>> functionalContracts =
+                    DefaultImmutableSet.nil();
 
             for (BlockContract contract : contracts) {
                 addConditionsFrom(contract);
@@ -324,7 +350,7 @@ public final class SimpleBlockContract extends AbstractBlockSpecificationElement
                 hasMod.put(heap, hm);
             }
 
-            SimpleBlockContract result = new SimpleBlockContract(baseName, head.getBlock(),
+            BlockContractImpl result = new BlockContractImpl(baseName, head.getBlock(),
                     head.getLabels(), head.getMethod(), head.getModality(), preconditions,
                     contracts[0].getMby(), postconditions, modifiesClauses, declaresClauses, accessibleClauses, head.getInfFlowSpecs(),
                     placeholderVariables, head.isTransactionApplicable(), hasMod,

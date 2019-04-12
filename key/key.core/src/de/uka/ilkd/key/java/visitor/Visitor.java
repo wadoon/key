@@ -137,6 +137,7 @@ import de.uka.ilkd.key.java.statement.LabeledStatement;
 import de.uka.ilkd.key.java.statement.LoopInit;
 import de.uka.ilkd.key.java.statement.MergePointStatement;
 import de.uka.ilkd.key.java.statement.LoopScopeBlock;
+import de.uka.ilkd.key.java.statement.LoopStatement;
 import de.uka.ilkd.key.java.statement.MethodBodyStatement;
 import de.uka.ilkd.key.java.statement.MethodFrame;
 import de.uka.ilkd.key.java.statement.Return;
@@ -196,7 +197,7 @@ public interface Visitor {
     void performActionOnSingletonPV(SingletonPV singletonPV);
 
     void performActionOnSingletonPVFun(SingletonPVFun singletonPVFun);
-    
+
     void performActionOnSetUnion(SetUnion x);
 
     void performActionOnIntersect(Intersect x);
@@ -474,6 +475,35 @@ public interface Visitor {
     void performActionOnBlockContract(BlockContract x);
 
     void performActionOnLoopContract(LoopContract x);
+    /**
+     * Adds block contract for new statement block to block contract
+     * of old block statement.
+     *
+     * @param oldBlock the old block
+     * @param newBlock the new block
+     */
+    void performActionOnBlockContract(final StatementBlock oldBlock,
+                                      final StatementBlock newBlock);
+
+    /**
+     * Adds block contract for new statement block to block contract
+     * of old block statement.
+     *
+     * @param oldBlock the old block
+     * @param newBlock the new block
+     */
+    void performActionOnLoopContract(final StatementBlock oldBlock,
+                                     final StatementBlock newBlock);
+
+    /**
+     * Adds loop contract for new loop statement to loop contract
+     * of old loop statement.
+     *
+     * @param oldLoop the old loop statement
+     * @param newLoop the new loop statement
+     */
+    void performActionOnLoopContract(final LoopStatement oldLoop,
+                                     final LoopStatement newLoop);
 
     void performActionOnMergeContract(MergeContract x);
 
@@ -484,7 +514,7 @@ public interface Visitor {
     void performActionOnTransactionStatement(TransactionStatement transSt);
 
     public void performActionOnEmptyMapLiteral(EmptyMapLiteral aThis);
-    
+
     void performActionOnAbstractPlaceholderStatement(
             AbstractPlaceholderStatement abstractPlaceholderStatement);
 

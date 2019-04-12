@@ -24,6 +24,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
+import de.uka.ilkd.key.java.statement.JavaStatement;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -45,8 +46,8 @@ import de.uka.ilkd.key.proof.init.ProofOblInput;
 import de.uka.ilkd.key.proof.init.ProofObligationVars;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.rule.inst.SVInstantiations;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContract;
-import de.uka.ilkd.key.speclang.BlockSpecificationElement;
 import de.uka.ilkd.key.util.MiscTools;
 
 /**
@@ -58,7 +59,7 @@ import de.uka.ilkd.key.util.MiscTools;
  *
  * @author wacker, lanzinger
  */
-public abstract class AbstractBlockContractRule extends AbstractBlockSpecificationElementRule {
+public abstract class AbstractBlockContractRule extends AbstractAuxiliaryContractRule {
 
     /**
      *
@@ -75,7 +76,9 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         if (instantiation == null) {
             return DefaultImmutableSet.nil();
         }
-        return getApplicableContracts(services.getSpecificationRepository(), instantiation.block,
+        return getApplicableContracts(
+                services.getSpecificationRepository(),
+                instantiation.statement,
                 instantiation.modality, goal);
     }
 
@@ -83,7 +86,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
      *
      * @param specifications
      *            a specification repository.
-     * @param block
+     * @param statement
      *            a block.
      * @param modality
      *            the current goal's modality.
@@ -92,18 +95,24 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
      * @return all applicable block contracts for the block from the repository.
      */
     public static ImmutableSet<BlockContract> getApplicableContracts(
-            final SpecificationRepository specifications, final StatementBlock block,
+            final SpecificationRepository specifications, final JavaStatement statement,
             final Modality modality, final Goal goal) {
-        ImmutableSet<BlockContract> collectedContracts
+        if (statement instanceof StatementBlock) {
+            StatementBlock block = (StatementBlock) statement;
+
+            ImmutableSet<BlockContract> collectedContracts
                 = specifications.getBlockContracts(block, modality);
-        if (modality == Modality.BOX) {
-            collectedContracts = collectedContracts
-                    .union(specifications.getBlockContracts(block, Modality.DIA));
-        } else if (modality == Modality.BOX_TRANSACTION) {
-            collectedContracts = collectedContracts
-                    .union(specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
+            if (modality == Modality.BOX) {
+                collectedContracts = collectedContracts
+                        .union(specifications.getBlockContracts(block, Modality.DIA));
+            } else if (modality == Modality.BOX_TRANSACTION) {
+                collectedContracts = collectedContracts
+                        .union(specifications.getBlockContracts(block, Modality.DIA_TRANSACTION));
+            }
+            return filterAppliedContracts(collectedContracts, goal);
+        } else {
+            return null;
         }
-        return filterAppliedContracts(collectedContracts, goal);
     }
 
     /**
@@ -141,7 +150,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
             if (app instanceof BlockContractInternalBuiltInRuleApp) {
                 BlockContractInternalBuiltInRuleApp blockRuleApp
                         = (BlockContractInternalBuiltInRuleApp) app;
-                if (blockRuleApp.getBlock().equals(contract.getBlock())
+                if (blockRuleApp.getStatement().equals(contract.getBlock())
                         && selfOrParentNode.getChildNr(previousNode) == 0) {
                     // prevent application of contract in its own check validity branch
                     // but not in other branches, e.g., do-while
@@ -192,7 +201,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
         for (LocationVariable variable : variables) {
             if (contract.hasModifiesClause(variable)) {
                 final String anonymisationName
-                        = tb.newName(BlockContractBuilders.ANON_OUT_PREFIX + variable.name());
+                        = tb.newName(AuxiliaryContractBuilders.ANON_OUT_PREFIX + variable.name());
                 final Function anonymisationFunction
                         = new Function(new Name(anonymisationName), variable.sort(), true);
                 services.getNamespaces().functions().addSafely(anonymisationFunction);
@@ -319,7 +328,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
     }
 
     private static ProofObligationVars generateProofObligationVariables(
-            final BlockSpecificationElement.Variables variables,
+            final AuxiliaryContract.Variables variables,
             final ProgramVariable exceptionParameter, final LocationVariable baseHeap,
             final ImmutableList<Term> localVarsAtPre, final ImmutableList<Term> localVarsAtPost,
             final Services services, final TermBuilder tb) {
@@ -380,7 +389,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
             return false;
         }
 
-        if (instantiation.block.getChildCount() == 1 && instantiation.block
+        if (instantiation.statement.getChildCount() == 1 && instantiation.statement
                 .getChildAt(0) instanceof AbstractPlaceholderStatement) {
             /*
              * NOTE (DS, 2019-02-01): I'm using parts of the block contract
@@ -431,7 +440,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
 
     protected InfFlowValidityData setUpInfFlowValidityGoal(final Goal infFlowGoal,
             final BlockContract contract, final Map<LocationVariable, Function> anonymisationHeaps,
-            final Services services, final BlockSpecificationElement.Variables variables,
+            final Services services, final AuxiliaryContract.Variables variables,
             final ProgramVariable exceptionParameter, final List<LocationVariable> heaps,
             final ImmutableSet<ProgramVariable> localInVariables,
             final ImmutableSet<ProgramVariable> localOutVariables,
@@ -503,7 +512,7 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
      * A builder for {@link Instantiation}s.
      */
     protected static final class Instantiator
-            extends AbstractBlockSpecificationElementRule.Instantiator {
+            extends AbstractAuxiliaryContractRule.Instantiator {
 
         /**
          *
@@ -520,9 +529,12 @@ public abstract class AbstractBlockContractRule extends AbstractBlockSpecificati
 
         @Override
         protected boolean hasApplicableContracts(final Services services,
-                final StatementBlock block, final Modality modality, Goal goal) {
-            return !getApplicableContracts(services.getSpecificationRepository(), block, modality,
-                    goal).isEmpty();
+                final JavaStatement statement, final Modality modality, Goal goal) {
+            ImmutableSet<BlockContract> contracts = getApplicableContracts(
+                    services.getSpecificationRepository(),
+                    statement, modality, goal);
+
+            return contracts != null && !contracts.isEmpty();
         }
     }
 

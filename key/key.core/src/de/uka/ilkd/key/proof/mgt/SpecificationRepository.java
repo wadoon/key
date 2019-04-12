@@ -99,6 +99,12 @@ public final class SpecificationRepository {
     private final Map<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>>
         loopContracts =
             new LinkedHashMap<Pair<StatementBlock, Integer>, ImmutableSet<LoopContract>>();
+    /**
+     * A map which relates each loop statement its starting line number and set of loop contracts.
+     */
+    private final Map<Pair<LoopStatement, Integer>, ImmutableSet<LoopContract>>
+        loopContractsOnLoops =
+            new LinkedHashMap<Pair<LoopStatement, Integer>, ImmutableSet<LoopContract>>();
     private Map<MergePointStatement, ImmutableSet<MergeContract>>
         mergeContracts =
             new LinkedHashMap<MergePointStatement, ImmutableSet<MergeContract>>();
@@ -371,8 +377,9 @@ public final class SpecificationRepository {
     }
 
     private RepresentsAxiom getRepresentsAxiom(KeYJavaType kjt, ClassAxiom ax) {
-        if (!(ax instanceof RepresentsAxiom) || axioms.get(kjt) == null)
+        if (!(ax instanceof RepresentsAxiom) || axioms.get(kjt) == null) {
             return null;
+        }
         RepresentsAxiom result = null;
         for (ClassAxiom ca : axioms.get(kjt)) {
             if (ca instanceof RepresentsAxiom
@@ -540,8 +547,9 @@ public final class SpecificationRepository {
      */
     private void createContractsFromInitiallyClause(InitiallyClause inv,
             KeYJavaType kjt) throws SLTranslationException {
-        if (!kjt.equals(inv.getKJT()))
+        if (!kjt.equals(inv.getKJT())) {
             inv = inv.setKJT(kjt);
+        }
         for (IProgramMethod pm : services.getJavaInfo().getConstructors(kjt)) {
             if (!JMLInfoExtractor.isHelper(pm)) {
                 final ImmutableSet<Contract> oldContracts = getContracts(kjt,
@@ -549,9 +557,10 @@ public final class SpecificationRepository {
                 ImmutableSet<FunctionalOperationContract> oldFuncContracts = DefaultImmutableSet
                         .nil();
                 for (Contract old : oldContracts) {
-                    if (old instanceof FunctionalOperationContract)
+                    if (old instanceof FunctionalOperationContract) {
                         oldFuncContracts = oldFuncContracts
                                 .add((FunctionalOperationContract) old);
+                    }
                 }
                 if (oldFuncContracts.isEmpty()) {
                     final FunctionalOperationContract iniContr = cf.func(pm,
@@ -911,6 +920,7 @@ public final class SpecificationRepository {
                 .toArray(new FunctionalOperationContract[toCombine.size()]);
         Arrays.sort(contractsArray,
                 new Comparator<FunctionalOperationContract>() {
+                    @Override
                     public int compare(FunctionalOperationContract c1,
                             FunctionalOperationContract c2) {
                         return c1.getName().compareTo(c2.getName());
@@ -971,8 +981,9 @@ public final class SpecificationRepository {
         // in any case, create axiom with non-static target
         addClassAxiom(new PartialInvAxiom(inv, false, services));
         // for a static invariant, create also an axiom with a static target
-        if (inv.isStatic())
+        if (inv.isStatic()) {
             addClassAxiom(new PartialInvAxiom(inv, true, services));
+        }
         // inherit non-private, non-static invariants
         if (!inv.isStatic()
                 && VisibilityModifier.allowsInheritance(inv.getVisibility())) {
@@ -1047,8 +1058,9 @@ public final class SpecificationRepository {
     public void addInitiallyClause(InitiallyClause ini) {
         ImmutableSet<InitiallyClause> oldClauses = initiallyClauses
                 .get(ini.getKJT());
-        if (oldClauses == null)
+        if (oldClauses == null) {
             oldClauses = DefaultImmutableSet.<InitiallyClause> nil();
+        }
         initiallyClauses.put(ini.getKJT(), oldClauses.add(ini));
     }
 
@@ -1083,10 +1095,12 @@ public final class SpecificationRepository {
             // add invariant axiom for own class and other final classes
             for (KeYJavaType kjt : services.getJavaInfo()
                     .getAllKeYJavaTypes()) {
-                if (kjt != selfKjt && !ji.isFinal(kjt))
+                if (kjt != selfKjt && !ji.isFinal(kjt)) {
                     continue; // only final classes
-                if (kjt != selfKjt && JavaInfo.isPrivate(kjt))
+                }
+                if (kjt != selfKjt && JavaInfo.isPrivate(kjt)) {
                     continue; // only non-private classes
+                }
                 final ImmutableSet<ClassInvariant> myInvs = getClassInvariants(
                         kjt);
                 final ProgramVariable selfVar = tb.selfVar(kjt, false);
@@ -1184,8 +1198,9 @@ public final class SpecificationRepository {
                                 tb.resultVar(pm, false), atPreVars, services);
                         Term preContract = fop.getPre(heaps, selfVar, paramVars,
                                 atPreVars, services);
-                        if (preContract == null)
+                        if (preContract == null) {
                             preContract = tb.tt();
+                        }
                         if (representsFromContract != null) {
                             // TODO Wojtek: I do not understand the visibility
                             // issues of model fields/methods.
@@ -1205,8 +1220,9 @@ public final class SpecificationRepository {
                     }
                     for (FunctionalOperationContract fop : getOperationContracts(
                             kjt, pm)) {
-                        if (!fop.getSpecifiedIn().equals(kjt))
+                        if (!fop.getSpecifiedIn().equals(kjt)) {
                             continue;
+                        }
                         Term preFromContract = fop.getPre(heaps, selfVar,
                                 paramVars, atPreVars, services);
                         Term postFromContract = fop.getPost(heaps, selfVar,
@@ -1262,9 +1278,9 @@ public final class SpecificationRepository {
                         currentAxioms = DefaultImmutableSet.<ClassAxiom> nil();
                     }
                     oldRep = getRepresentsAxiom(sub, subAx);
-                    if (oldRep == null)
+                    if (oldRep == null) {
                         axioms.put(sub, currentAxioms.add(subAx));
-                    else {
+                    } else {
                         final RepresentsAxiom newSubRep = oldRep.conjoin(subAx,
                                 tb);
                         axioms.put(sub,
@@ -1523,29 +1539,70 @@ public final class SpecificationRepository {
                         .get(lineStmtPair))
                 .orElseGet(() -> DefaultImmutableSet.nil());
     }
+
+    /**
+     * Returns all block contracts for the specified block.
+     *
+     * @param block a block.
+     * @return all block contracts for the specified block.
+     */
     public ImmutableSet<BlockContract> getBlockContracts(StatementBlock block) {
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
         final ImmutableSet<BlockContract> contracts = blockContracts.get(b);
-        return Optional.ofNullable(contracts)
-                .orElseGet(() -> DefaultImmutableSet.nil());
+        return Optional.ofNullable (contracts)
+                .orElseGet(() -> DefaultImmutableSet. nil());
     }
 
+    /**
+     * Returns all loop contracts for the specified block.
+     *
+     * @param block a block.
+     * @return all loop contracts for the specified block.
+     */
     public ImmutableSet<LoopContract> getLoopContracts(StatementBlock block) {
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
         final ImmutableSet<LoopContract> contracts = loopContracts.get(b);
-        return Optional.ofNullable(contracts)
-                .orElseGet(() -> DefaultImmutableSet.nil());
+        if (contracts == null) {
+            return DefaultImmutableSet.<LoopContract> nil();
+        } else {
+            return contracts;
+        }
+    }
+
+    /**
+     * Returns all loop contracts for the specified loop.
+     *
+     * @param loop a loop.
+     * @return all loop contracts for the specified loop.
+     */
+    public ImmutableSet<LoopContract> getLoopContracts(LoopStatement loop) {
+        final Pair<LoopStatement, Integer> b = new Pair<LoopStatement, Integer>(
+                loop, loop.getStartPosition().getLine());
+        final ImmutableSet<LoopContract> contracts = loopContractsOnLoops.get(b);
+        if (contracts == null) {
+            return DefaultImmutableSet.<LoopContract> nil();
+        } else {
+            return contracts;
+        }
     }
 
     public ImmutableSet<MergeContract> getMergeContracts(
             MergePointStatement mps) {
         final ImmutableSet<MergeContract> contracts = mergeContracts.get(mps);
-        return Optional.ofNullable(contracts)
-                .orElseGet(() -> DefaultImmutableSet.nil());
+        return Optional.ofNullable (contracts)
+                .orElseGet(() -> DefaultImmutableSet. nil());
     }
 
+    /**
+     * Returns block contracts for according block statement
+     * and modality.
+     *
+     * @param block     the given block.
+     * @param modality the given modality.
+     * @return
+     */
     public ImmutableSet<BlockContract> getBlockContracts(
             final StatementBlock block, final Modality modality) {
         ImmutableSet<BlockContract> result = getBlockContracts(block);
@@ -1577,6 +1634,29 @@ public final class SpecificationRepository {
     }
 
     /**
+     * Returns loop contracts for according loop statement
+     * and modality.
+     *
+     * @param loop     the given loop.
+     * @param modality the given modality.
+     * @return the set of resulting loop statements.
+     */
+    public ImmutableSet<LoopContract> getLoopContracts(
+            final LoopStatement loop, final Modality modality) {
+        ImmutableSet<LoopContract> result = getLoopContracts(loop);
+        final Modality matchModality = getMatchModality(modality);
+        for (LoopContract contract : result) {
+            if (!contract.getModality().equals(matchModality)
+                    || (modality.transaction()
+                            && !contract.isTransactionApplicable()
+                            && !contract.isReadOnly(services))) {
+                result = result.remove(contract);
+            }
+        }
+        return result;
+    }
+
+    /**
      * Adds a new {@code BlockContract} and a new {@link FunctionalBlockContract}
      * to the repository.
      *
@@ -1595,10 +1675,9 @@ public final class SpecificationRepository {
      */
     public void addBlockContract(final BlockContract contract, boolean addFunctionalContract) {
         final StatementBlock block = contract.getBlock();
-        final Pair<StatementBlock, Integer> b =
-                new Pair<>(block, block.getStartPosition().getLine());
-        final ImmutableSet<BlockContract> newContractSet =
-                getBlockContracts(block).add(contract);
+        final Pair<StatementBlock, Integer> b = new Pair<>(
+                block, block.getStartPosition().getLine());
+        final ImmutableSet<BlockContract> newContractSet = getBlockContracts(block).add(contract);
 
         blockContracts.put(b, newContractSet);
 
@@ -1664,13 +1743,24 @@ public final class SpecificationRepository {
      *  based on {@code contract}.
      */
     public void addLoopContract(final LoopContract contract, boolean addFunctionalContract) {
+        if (contract.isOnBlock()) {
         final StatementBlock block = contract.getBlock();
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
         loopContracts.put(b, getLoopContracts(block).add(contract));
+        } else {
+            final LoopStatement loop = contract.getLoop();
+            final Pair<LoopStatement, Integer> b = new Pair<LoopStatement, Integer>(
+                    loop, loop.getStartPosition().getLine());
+            loopContractsOnLoops.put(b, getLoopContracts(loop).add(contract));
+        }
 
         if (addFunctionalContract) {
+            if (contract.isInternalOnly()) {
+                addContract(cf.funcBlock(contract.toBlockContract()));
+            } else {
             addContract(cf.funcLoop(contract));
+            }
         }
     }
 
@@ -1682,12 +1772,21 @@ public final class SpecificationRepository {
      * @param contract the {@code LoopContract} to remove.
      */
     public void removeLoopContract(final LoopContract contract) {
+        if (contract.isOnBlock()) {
         final StatementBlock block = contract.getBlock();
         final Pair<StatementBlock, Integer> b = new Pair<StatementBlock, Integer>(
                 block, block.getStartPosition().getLine());
 
         ImmutableSet<LoopContract> set = loopContracts.get(b);
         loopContracts.put(b, set.remove(contract));
+        } else {
+            final LoopStatement loop = contract.getLoop();
+            final Pair<LoopStatement, Integer> b = new Pair<LoopStatement, Integer>(
+                    loop, loop.getStartPosition().getLine());
+
+            ImmutableSet<LoopContract> set = loopContractsOnLoops.get(b);
+            loopContractsOnLoops.put(b, set.remove(contract));
+        }
     }
 
     /**

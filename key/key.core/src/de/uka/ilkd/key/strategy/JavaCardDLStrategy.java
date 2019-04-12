@@ -221,20 +221,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             inftyConst());
         }
 
-        // NOTE (DS, 2019-04-10): The new loop-scope based rules are realized
-        // as taclets. The strategy settings for those are handled further
-        // down in this class.
-        Feature loopInvF;
+        final Feature loopInvF;
         final String loopProp =
                 strategyProperties
                         .getProperty(StrategyProperties.LOOP_OPTIONS_KEY);
         if (loopProp.equals(StrategyProperties.LOOP_INVARIANT)) {
             loopInvF = loopInvFeature(longConst(0));
-        /* NOTE (DS, 2019-04-10): Deactivated the built-in loop scope rule
-         * since we now have the loop scope taclets which are based on the
-         * same theory, but offer several advantages. */
-        //} else if (loopProp.equals(StrategyProperties.LOOP_SCOPE_INVARIANT)) {
-        //    loopInvF = loopInvFeature(inftyConst(), longConst(0));
+            /* NOTE (DS, 2019-04-10): Deactivated the built-in loop scope rule
+             * since we now have the loop scope taclets which are based on the
+             * same theory, but offer several advantages. */
         } else {
             loopInvF = loopInvFeature(inftyConst());
         }
@@ -251,7 +246,9 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
             loopBlockApplyHeadFeature = loopContractApplyHead(longConst(Long.MIN_VALUE));
         } else if (blockProperty.equals(StrategyProperties.BLOCK_CONTRACT_EXTERNAL)) {
             blockFeature = blockContractExternalFeature(longConst(Long.MIN_VALUE));
-            loopBlockFeature = loopContractExternalFeature(longConst(Long.MIN_VALUE));
+            loopBlockFeature = SumFeature.createSum(
+                    loopContractExternalFeature(longConst(Long.MIN_VALUE)),
+                    loopContractInternalFeature(longConst(42)));
             loopBlockApplyHeadFeature = loopContractApplyHead(longConst(Long.MIN_VALUE));
         } else {
             blockFeature = blockContractInternalFeature(inftyConst());
@@ -271,7 +268,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         } else {
             mergeRuleF = mergeRuleFeature(inftyConst());
         }
-
         final Feature ifElseTacletF = StaticFeatureCollection.ifElseFeature(longConst(10000));
 
         // final Feature smtF = smtFeature(inftyConst());
@@ -365,25 +361,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 "update_elim",
                 add(longConst(-8000), ScaleFeature.createScaled(
                         FindDepthFeature.INSTANCE, 10.0)));
-
-        // taclets for special abstract update handling which should
-        // be prioritized to the other update rules.
         bindRuleSet(d, "abstrUpdPriorityRules", -10000);
-
         bindRuleSet(
                 d,
                 "update_apply_on_update",
                 add(longConst(-7000), ScaleFeature.createScaled(
                         FindDepthFeature.INSTANCE, 10.0)));
-
         bindRuleSet(d, "update_join", -4600);
-
-        // taclets for special abstract update handling which should
-        // be lower prioritized to the other update rules, or actually
-        // to most other rules.
         bindRuleSet(d, "abstrUpdLowPrioRules", 10000);
         bindRuleSet(d, "abstrUpdLowestPrioRules", 1000000);
-
         bindRuleSet(d, "update_apply", -4500);
 
         setUpStringNormalisation(d);
@@ -1006,15 +992,15 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
     private boolean classAxiomDelayedApplication() {
         String classAxiomSetting =
-                (String) strategyProperties
-                .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
+                strategyProperties
+                        .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
         return StrategyProperties.CLASS_AXIOM_DELAYED.equals(classAxiomSetting);
     }
 
     private boolean classAxiomApplicationEnabled() {
         String classAxiomSetting =
-                (String) strategyProperties
-                .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
+                strategyProperties
+                        .getProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY);
         return !StrategyProperties.CLASS_AXIOM_OFF.equals(classAxiomSetting);
     }
 
@@ -1252,10 +1238,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 add(SetsSmallerThanFeature.create(instOf("commRight"),
                         instOf("commLeft"), locSetLDT),
                         NotInScopeOfModalityFeature.INSTANCE, longConst(-800)));
-
-        bindRuleSet(
-                d,
-                "abstr_upd_commute",
+        bindRuleSet(d, "abstr_upd_commute",
                 add(SetsSmallerThanFeature.create(instOf("uright"),
                         instOf("uleft"), locSetLDT), longConst(-800)));
 
@@ -2680,7 +2663,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                 .create(heapLDT),
                                                 not(ff.ifThenElse)))),
                         not(ContainsTermFeature.create(instOf("s"), instOf("t1")))));
-
+        
         // Without EqNonDuplicateAppFeature.INSTANCE
         // rule 'applyEq' might be applied on the same term
         // without changing the sequent for a really long time. This is tested by
@@ -2807,6 +2790,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         setupInEqSimpInstantiationWithoutRetry(d);
     }
 
+    @Override
     public Name name() {
         return new Name(JAVA_CARD_DL_STRATEGY);
     }
@@ -2821,6 +2805,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      *         <code>TopRuleAppCost.INSTANCE</code> indicates that the rule
      *         shall not be applied at all (it is discarded by the strategy).
      */
+    @Override
     public RuleAppCost computeCost(RuleApp app, PosInOccurrence pio,
             Goal goal) {
         return costComputationF.computeCost(app, pio, goal);
@@ -2834,11 +2819,13 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
      * @param goal the goal
      * @return true iff the rule should be applied, false otherwise
      */
+    @Override
     public final boolean isApprovedApp(RuleApp app, PosInOccurrence pio,
             Goal goal) {
         return !(approvalF.computeCost(app, pio, goal) instanceof TopRuleAppCost);
     }
 
+    @Override
     protected RuleAppCost instantiateApp(RuleApp app,
             PosInOccurrence pio, Goal goal) {
         return instantiationF.computeCost(app, pio, goal);
