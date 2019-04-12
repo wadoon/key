@@ -61,15 +61,15 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.Pair;
 
 /**
- * 
+ *
  * This class defines a meta operator to resolve an enhanced for loop - by transformation to a
  * "normal" loop.
- * 
+ *
  * This class is used to transform an enh. for loop over an iterable object into a while loop +
  * surrounding statements.
- * 
+ *
  * @author mulbrich, bruns
- * 
+ *
  */
 
 public class EnhancedForElimination extends ProgramTransformer {
@@ -161,7 +161,7 @@ public class EnhancedForElimination extends ProgramTransformer {
 
     /**
      * Creates a new enhaced for-loop elimination.
-     * 
+     *
      * @param execContext the execution context.
      * @param forStatement the enhanced for loop to eliminate.
      */
@@ -181,18 +181,18 @@ public class EnhancedForElimination extends ProgramTransformer {
      * <li>updates remains empty
      * <li>body: stm
      * </ul>
-     * 
+     *
      * <p>
      * Loops over arrays are treated by a taclet without use of this class.
-     * 
+     *
      * <p>
      * Loops over Iterable-objects are treated by this meta-construct.
-     * 
+     *
      * <p>
      * The rules which use this meta construct must ensure that exp is of type Iterable.
-     * 
+     *
      * @see #makeIterableForLoop(LocalVariableDeclaration, Expression, Statement)
-     * 
+     *
      * @see ProgramTransformer#transform(de.uka.ilkd.key.java.ProgramElement, Services,
      *      SVInstantiations)
      */
@@ -399,7 +399,7 @@ public class EnhancedForElimination extends ProgramTransformer {
     }
 
     /*
-     * <values> = \seq_concat(<values>, \seq_singleton(<lvd>)); 
+     * <values> = \seq_concat(<values>, \seq_singleton(<lvd>));
      */
     private Statement makeValuesUpdate(ProgramVariable valuesVar, LocalVariableDeclaration lvd){
         final VariableSpecification var = lvd.getVariables().get(0);
@@ -436,7 +436,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      * translating the <code>\index</code> keyword from JML. The values function
      * symbol is a placeholder which stems from translating the
      * <code>\values</code> keyword from JML.
-     * 
+     *
      * @param rawInv
      *            The "raw" invariant.
      * @param loopIdxVar
@@ -445,7 +445,7 @@ public class EnhancedForElimination extends ProgramTransformer {
      *            Optional actual program variable for the values placeholder.
      * @param services
      *            The {@link Services} object.
-     * 
+     *
      * @return The updated {@link LoopSpecification}, or null if the supplied
      *         invariant is null.
      */
@@ -491,7 +491,7 @@ public class EnhancedForElimination extends ProgramTransformer {
     /**
      * Updates the given invariants (map from heap to a single invariant) by
      * replacing in them termToReplace by a term containing replaceWith.
-     * 
+     *
      * @param invs
      *            The invariants in which to replace.
      * @param termToReplace

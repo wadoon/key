@@ -55,10 +55,10 @@ public class StoreActiveStmtInCondition implements VariableCondition {
         term.execPostOrder(replVisitor);
         final Term instantiatedTerm = replVisitor.getTerm();
 
-        return matchCond.setInstantiations( //
-                svInst.add(storeInSV, (Statement) JavaTools
-                        .getActiveStatement(instantiatedTerm.javaBlock()),
-                        services));
+        return matchCond.setInstantiations(//
+            svInst.add(storeInSV, (Statement) JavaTools
+                .getActiveStatement(instantiatedTerm.javaBlock()),
+                    services));
     }
 
     @Override

@@ -29,7 +29,6 @@ import de.uka.ilkd.key.java.visitor.JavaASTVisitor;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
@@ -73,8 +72,7 @@ public final class DropEffectlessElementariesCondition
 //                }
                 //@formatter:on
                 return null;
-            }
-            else {
+            } else {
                 /*
                  * In the standard case, we can drop the update here. However,
                  * if the target contains abstract programs that might access
@@ -82,73 +80,13 @@ public final class DropEffectlessElementariesCondition
                  */
                 if (!containsAbstractStatementUsingLHS(target, lhs, services)) {
                     return services.getTermBuilder().skip();
-                }
-                else {
+                } else {
                     return null;
                 }
             }
-        }
-        else if (update.op() instanceof AbstractUpdate) {
+        } else if (update.op() instanceof AbstractUpdate) {
             return null;
-            //final TermBuilder tb = services.getTermBuilder();
-            //final LocSetLDT locSetLDT = services.getTypeConverter()
-            //        .getLocSetLDT();
-
-            //final AbstractUpdate oldUpdate = (AbstractUpdate) update.op();
-            //final Set<Term> assignables = oldUpdate.getAssignables();
-
-            //if (assignables.isEmpty() || assignables.size() == 1 && assignables
-            //        .iterator().next() == locSetLDT.getAllLocs()) {
-            //    /*
-            //     * If we can assign everything, we stay on the save side and
-            //     * don't allow to drop the update.
-            //     */
-            //    return null;
-            //}
-
-            //if (!assignables.isEmpty() || assignables.size() == 1
-            //        && assignables.iterator().next() == locSetLDT.getEmpty()) {
-            //    /*
-            //     * If this update assigns anything when at the same time, there
-            //     * is an allLocs accessible in the target, we may not drop it
-            //     * (assignable is not relevant, but we ignore this for now --
-            //     * it's "only" a completeness problem).
-            //     */
-
-            //    final Set<Operator> opsInTarget = //
-            //            AbstractExecutionUtils
-            //                    .collectNullaryPVsOrSkLocSets(target, services);
-
-            //    if (opsInTarget.contains(locSetLDT.getAllLocs())) {
-            //        return null;
-            //    }
-            //}
-
-            ///*
-            // * TODO (DS, 2019-01-03): There might also be fields in the loc set,
-            // * we might have to eventually consider this. As of now, there are
-            // * no examples for this case...
-            // */
-            //final List<Term> relevantAssignables = assignables.stream()
-            //        .filter(t -> t.op() != locSetLDT.getSingletonPV()
-            //                || relevantVars.contains(t.sub(0).sub(0).op()))
-            //        .collect(Collectors.toList());
-
-            //relevantVars.removeAll(relevantAssignables.stream()
-            //        .filter(t -> t.op() == locSetLDT.getSingletonPV())
-            //        .map(t -> t.sub(0).sub(0)).map(Term::op)
-            //        .map(LocationVariable.class::cast)
-            //        .collect(Collectors.toList()));
-
-            //if (assignables.size() == relevantAssignables.size()) {
-            //    return null;
-            //}
-
-            //return services.getTermBuilder().abstractUpdate(
-            //        oldUpdate.getAbstractPlaceholderStatement(),
-            //        tb.union(relevantAssignables), update.sub(0));
-        }
-        else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
+        } else if (update.op() == UpdateJunctor.PARALLEL_UPDATE) {
             Term sub0 = update.sub(0);
             Term sub1 = update.sub(1);
             /*
@@ -161,22 +99,19 @@ public final class DropEffectlessElementariesCondition
                     relevantVars, services);
             if (newSub0 == null && newSub1 == null) {
                 return null;
-            }
-            else {
+            } else {
                 newSub0 = newSub0 == null ? sub0 : newSub0;
                 newSub1 = newSub1 == null ? sub1 : newSub1;
                 return services.getTermBuilder().parallel(newSub0, newSub1);
             }
-        }
-        else if (update.op() == UpdateApplication.UPDATE_APPLICATION) {
+        } else if (update.op() == UpdateApplication.UPDATE_APPLICATION) {
             Term sub0 = update.sub(0);
             Term sub1 = update.sub(1);
             Term newSub1 = dropEffectlessElementariesHelper(sub1, target,
                     relevantVars, services);
             return newSub1 == null ? null
                     : services.getTermBuilder().apply(sub0, newSub1, null);
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -209,15 +144,12 @@ public final class DropEffectlessElementariesCondition
                 services);
         if (properResultInst == null) {
             return null;
-        }
-        else if (resultInst == null) {
+        } else if (resultInst == null) {
             svInst = svInst.add(result, properResultInst, services);
             return mc.setInstantiations(svInst);
-        }
-        else if (resultInst.equals(properResultInst)) {
+        } else if (resultInst.equals(properResultInst)) {
             return mc;
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -241,14 +173,6 @@ public final class DropEffectlessElementariesCondition
                         lhs, services);
         visitor.start();
         return visitor.result();
-    }
-
-    private static boolean containsNonRigidFunctionSymbols(Term target) {
-        final OpCollector opCollector = new OpCollector();
-        target.execPostOrder(opCollector);
-        final boolean containsNonRigidFuncSymbs = opCollector.ops().stream()
-                .anyMatch(op -> op instanceof Function && !op.isRigid());
-        return containsNonRigidFuncSymbs;
     }
 
     private static class ContainsAbstractStatementUsingLHSVisitor

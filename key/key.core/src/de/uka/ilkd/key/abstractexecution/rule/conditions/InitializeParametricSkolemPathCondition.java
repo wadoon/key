@@ -93,7 +93,7 @@ public class InitializeParametricSkolemPathCondition
         if (funcSymb == null) {
             final Sort setSort = //
                     services.getTypeConverter().getSetLDT().targetSort();
-            funcSymb = new Function( //
+            funcSymb = new Function(//
                     funcSymbName, Sort.FORMULA, true, true, setSort);
             functions.add(funcSymb);
         }

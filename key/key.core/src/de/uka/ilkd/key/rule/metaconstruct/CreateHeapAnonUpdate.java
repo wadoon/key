@@ -37,7 +37,7 @@ import de.uka.ilkd.key.util.MiscTools;
  * formula (for determining the relevant heap contexts) and three Skolem terms
  * for the currently implemented heaps: The normal heap, the savedHeap for
  * transactions, and the permissions heap.
- * 
+ *
  * @author Dominic Steinhoefel
  */
 public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
@@ -69,23 +69,23 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
 
     /**
      * Creates the anonymizing update for the given loop specification.
-     * 
+     *
      * @param loopSpec
-     *            The {@link LoopSpecification}.
+     *     The {@link LoopSpecification}.
      * @param isTransaction
-     *            set to true iff we're in a transaction modality (then, there
-     *            are more heaps available).
+     *     set to true iff we're in a transaction modality (then, there are more
+     *     heaps available).
      * @param isPermissions
-     *            set to true if the permissions profile is active (then, the
-     *            permissions heap is available).
+     *     set to true if the permissions profile is active (then, the
+     *     permissions heap is available).
      * @param anonHeapTerm
-     *            The term with the Skolem heap.
+     *     The term with the Skolem heap.
      * @param anonSavedHeapTerm
-     *            The term with the Skolem saved heap.
+     *     The term with the Skolem saved heap.
      * @param anonPermissionsHeapTerm
-     *            The term with the Skolem permissions heap.
+     *     The term with the Skolem permissions heap.
      * @param services
-     *            The {@link Services} object (for the {@link TermBuilder}).
+     *     The {@link Services} object (for the {@link TermBuilder}).
      * @return The anonymizing update.
      */
     private static Term createHeapAnonUpdate(LoopSpecification loopSpec,
@@ -129,16 +129,16 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
     /**
      * Creates an elementary "heap := anon_heap_LOOP<<anonHeapFunction>>"
      * update, or a Skip update if the mod signals that nothing is modified.
-     * 
+     *
      * @param heap
-     *            The heap variable.
+     *     The heap variable.
      * @param anonHeap
-     *            The anonymized heap term.
+     *     The anonymized heap term.
      * @param mod
-     *            The modifies clause, only for checking whether it's strictly
-     *            nothing (then the elementary update is a skip).
+     *     The modifies clause, only for checking whether it's strictly nothing
+     *     (then the elementary update is a skip).
      * @param services
-     *            The {@link Services} object (for the {@link TermBuilder}).
+     *     The {@link Services} object (for the {@link TermBuilder}).
      * @return An elementary anonymizing heap update.
      */
     private static Term createElementaryAnonUpdate(LocationVariable heap,

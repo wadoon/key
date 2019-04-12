@@ -54,22 +54,22 @@ public class AbstractExecutionUtils {
      * second element. The two sets are disjunct.
      *
      * @param target
-     *            The term for which to analyze the assigned-before-used
-     *            relationships.
+     *     The term for which to analyze the assigned-before-used relationships.
      * @param runtimeInstance
-     *            An optional runtime instance {@link LocationVariable} to
-     *            normalize self terms (because otherwise, there might be
-     *            different such terms around).
+     *     An optional runtime instance {@link LocationVariable} to normalize
+     *     self terms (because otherwise, there might be different such terms
+     *     around).
      * @param services
-     *            The {@link Services} object.
+     *     The {@link Services} object.
      * @return (1) assigned-before-used and (2) used-before-assigned operators.
-     *         Sets are ordered. May be an empty optional if there is a
-     *         construct not (yet) supported, in this case, the condition should
-     *         not be applicable.
+     * Sets are ordered. May be an empty optional if there is a construct not
+     * (yet) supported, in this case, the condition should not be applicable.
      */
-    public static Optional<Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>>> opsAssignedBeforeUsed(
-            Term target, Optional<LocationVariable> runtimeInstance,
-            Services services) {
+    public static
+            Optional<Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>>>
+            opsAssignedBeforeUsed(Term target,
+                    Optional<LocationVariable> runtimeInstance,
+                    Services services) {
         final Set<AbstrUpdateUpdatableLoc> assignedBeforeUsed = new LinkedHashSet<>();
         final Set<AbstrUpdateUpdatableLoc> usedBeforeAssigned = new LinkedHashSet<>();
 
@@ -217,19 +217,19 @@ public class AbstractExecutionUtils {
      * overwritten, which does not have to be the case for "maybes".
      *
      * @param update
-     *            The abstract update to check.
+     *     The abstract update to check.
      * @param assignedBeforeUsed
-     *            A set of assigned-before-used operators. Results are added to
-     *            the passed set.
+     *     A set of assigned-before-used operators. Results are added to the
+     *     passed set.
      * @param usedBeforeAssigned
-     *            A set of used-before-assigned operators. Results are added to
-     *            the passed set.
+     *     A set of used-before-assigned operators. Results are added to the
+     *     passed set.
      * @param runtimeInstance
-     *            An optional runtime instance {@link LocationVariable} to
-     *            normalize self terms (because otherwise, there might be
-     *            different such terms around).
+     *     An optional runtime instance {@link LocationVariable} to normalize
+     *     self terms (because otherwise, there might be different such terms
+     *     around).
      * @param services
-     *            The {@link Services} object.
+     *     The {@link Services} object.
      */
     private static void opsHaveToAssignBeforeUsedForAbstrUpd(final Term update,
             final Set<AbstrUpdateUpdatableLoc> assignedBeforeUsed,
@@ -255,25 +255,23 @@ public class AbstractExecutionUtils {
      * Extracts the list of abstract updates from a concatenation of such.
      *
      * @param concatenation
-     *            A concatenation of abstract updates
-     *            <code>U1 ++ U2 ++ ... ++ Un</code>.
+     *     A concatenation of abstract updates
+     *     <code>U1 ++ U2 ++ ... ++ Un</code>.
      * @return The contained abstract updates of the concatenation in the
-     *         original order.
+     * original order.
      */
-    public static List<Term> abstractUpdatesFromConcatenation(
-            Term concatenation) {
+    public static List<Term>
+            abstractUpdatesFromConcatenation(Term concatenation) {
         final List<Term> result = new ArrayList<>();
 
         if (concatenation.op() instanceof AbstractUpdate) {
             result.add(concatenation);
-        }
-        else if (concatenation.op() == UpdateJunctor.CONCATENATED_UPDATE) {
+        } else if (concatenation.op() == UpdateJunctor.CONCATENATED_UPDATE) {
             result.addAll(
                     abstractUpdatesFromConcatenation(concatenation.sub(0)));
             result.addAll(
                     abstractUpdatesFromConcatenation(concatenation.sub(1)));
-        }
-        else {
+        } else {
             throw new RuntimeException(
                     "Not an abstract update or concatenation: "
                             + concatenation);
@@ -286,11 +284,11 @@ public class AbstractExecutionUtils {
      * Returns {@link Term}s of the RHS of an {@link AbstractUpdate} term.
      *
      * @param update
-     *            The {@link AbstractUpdate} {@link Term} for which to return
-     *            the accessibles.
+     *     The {@link AbstractUpdate} {@link Term} for which to return the
+     *     accessibles.
      * @param tb
-     *            The {@link TermBuilder}, needed for disassembling the update
-     *            {@link Term}.
+     *     The {@link TermBuilder}, needed for disassembling the update
+     *     {@link Term}.
      * @return All {@link Term}s in the RHS of an {@link AbstractUpdate} term.
      */
     public static Set<Term> getAccessiblesForAbstractUpdate(Term update,
@@ -306,11 +304,11 @@ public class AbstractExecutionUtils {
      * set.
      *
      * @param update
-     *            The {@link AbstractUpdate} to check.
+     *     The {@link AbstractUpdate} to check.
      * @param services
-     *            The {@link Services} object (for the {@link LocSetLDT}).
+     *     The {@link Services} object (for the {@link LocSetLDT}).
      * @return true iff the {@link AbstractUpdate} accesseaccesses allLocs
-     *         location set.
+     * location set.
      */
     public static boolean accessesAllLocs(Term update, Services services) {
         final Operator allLocs = services.getTypeConverter().getLocSetLDT()
@@ -322,7 +320,7 @@ public class AbstractExecutionUtils {
 
     /**
      * @param updateTerm
-     *            The term to check.
+     *     The term to check.
      * @return true iff the given {@link Term} contains an abstract update.
      */
     public static boolean containsAbstractUpdate(Term updateTerm) {

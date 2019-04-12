@@ -58,8 +58,7 @@ public abstract class MutualExclusionFormula extends AbstractTermTransformer {
         for (Term t : term.subs()) {
             if (t.op() instanceof ProgramVariable) {
                 participatingTerms.add(t);
-            }
-            else if (t.op() instanceof ProgramSV) {
+            } else if (t.op() instanceof ProgramSV) {
                 if (((ProgramSV) t.op()).isListSV()) {
                     @SuppressWarnings({ "rawtypes", "unchecked" })
                     final ImmutableArray<ProgramVariable> instantiation = //
@@ -68,15 +67,13 @@ public abstract class MutualExclusionFormula extends AbstractTermTransformer {
                     assert instantiation != null;
                     participatingTerms.addAll(instantiation.stream()
                             .map(tb::var).collect(Collectors.toList()));
-                }
-                else {
+                } else {
                     final ProgramVariable instantiation = (ProgramVariable) svInst
                             .getInstantiation((ProgramSV) t.op());
                     assert instantiation != null;
                     participatingTerms.add(tb.var(instantiation));
                 }
-            }
-            else if (t.op() instanceof SchemaVariable) {
+            } else if (t.op() instanceof SchemaVariable) {
                 final Object instantiation = svInst
                         .getInstantiation((ProgramSV) t.op());
                 assert instantiation != null;
@@ -84,11 +81,9 @@ public abstract class MutualExclusionFormula extends AbstractTermTransformer {
                         && ((Term) instantiation).sort() == booleanSort) {
                     participatingTerms.add(((Term) instantiation));
                 }
-            }
-            else if (t.sort() == booleanSort) {
+            } else if (t.sort() == booleanSort) {
                 participatingTerms.add(t);
-            }
-            else {
+            } else {
                 // Unsupported type of operator
                 return null;
             }
@@ -106,8 +101,7 @@ public abstract class MutualExclusionFormula extends AbstractTermTransformer {
                 if (i == j) {
                     subResult = tb.and(subResult,
                             trueTerm(participatingTerms.get(j), services));
-                }
-                else {
+                } else {
                     subResult = tb.and(subResult,
                             falseTerm(participatingTerms.get(j), services));
                 }
@@ -132,13 +126,11 @@ public abstract class MutualExclusionFormula extends AbstractTermTransformer {
         if (term.sort().extendsTrans(services.getJavaInfo().objectSort())) {
             final Term result = tb.equals(term, tb.NULL());
             return negate ? result : tb.not(result); // that's correct!
-        }
-        else if (term.sort().equals(
+        } else if (term.sort().equals(
                 services.getTypeConverter().getBooleanLDT().targetSort())) {
             final Term result = tb.equals(term, tb.TRUE());
             return negate ? tb.not(result) : result;
-        }
-        else {
+        } else {
             throw new RuntimeException(String.format(
                     "Unexpected type %s, expected an Object type or boolean",
                     term.sort().name()));

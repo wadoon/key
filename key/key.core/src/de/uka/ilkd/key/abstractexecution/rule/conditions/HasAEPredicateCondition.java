@@ -46,7 +46,7 @@ public class HasAEPredicateCondition implements VariableCondition {
         final TermLabel aeLabel = ParameterlessTermLabel.AE_EQUIV_PROOF_LABEL;
         final Sort booleanSort = //
                 services.getTypeConverter().getBooleanLDT().targetSort();
-        final FilterVisitor visitor = new FilterVisitor( //
+        final FilterVisitor visitor = new FilterVisitor(//
                 t -> t.containsLabel(aeLabel) && //
                         !t.subs().isEmpty() && //
                         t.sub(t.subs().size() - 1).sort() == booleanSort);

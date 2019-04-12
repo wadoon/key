@@ -42,8 +42,7 @@ public class IsDefinedCondition implements VariableCondition {
 
         if (svInst.getInstantiation(svToCheck) == null) {
             return negated ? matchCond : null;
-        }
-        else {
+        } else {
             return negated ? null : matchCond;
         }
     }

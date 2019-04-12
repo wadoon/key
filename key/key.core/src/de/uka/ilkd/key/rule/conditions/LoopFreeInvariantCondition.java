@@ -24,7 +24,7 @@ import de.uka.ilkd.key.util.MiscTools;
 /**
  * Extracts the free loop invariants for the given loop term. Free invariants
  * are only assumed, but not proven (like an axiom).
- * 
+ *
  * @author Dominic Steinhoefel
  */
 public class LoopFreeInvariantCondition implements VariableCondition {
@@ -65,7 +65,7 @@ public class LoopFreeInvariantCondition implements VariableCondition {
         final MethodFrame mf = //
                 JavaTools.getInnermostMethodFrame(javaBlock, services);
         final Term selfTerm = Optional.ofNullable(mf).map(
-                methodFrame -> MiscTools.getSelfTerm(methodFrame, services))
+            methodFrame -> MiscTools.getSelfTerm(methodFrame, services))
                 .orElse(null);
 
         final Modality modality = (Modality) svInst
@@ -91,6 +91,7 @@ public class LoopFreeInvariantCondition implements VariableCondition {
 
     @Override
     public String toString() {
-        return "\\getFreeInvariant(" + loopStmtSV + ", " + modalitySV + ", " + invSV + ")";
+        return "\\getFreeInvariant(" + loopStmtSV + ", " + modalitySV + ", "
+                + invSV + ")";
     }
 }

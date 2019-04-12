@@ -27,20 +27,20 @@ import de.uka.ilkd.key.util.MiscTools;
 
 /**
  * Initializes the "before loop" update needed for the assignable clause.
- * 
+ *
  * Only remembers the heaps of the context, not the changed local variables,
  * although this is done for the built-in loop invariant rules, where they
  * however are never used.
- * 
+ *
  * NOTE: If the local variables should be remembered, we have to find a way to
  * declare them globally in taclets, which currently is not possible for
  * statically unknown lists of variables. Variable conditions cannot access the
  * goal-local namespaces, only the global one.
- * 
+ *
  * Expects as arguments the loop formula (for determining the relevant heap
  * contexts) and three Skolem terms for the currently implemented heaps: The
  * normal heap, the savedHeap for transactions, and the permissions heap.
- * 
+ *
  * @author Dominic Steinhoefel
  */
 public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
@@ -66,23 +66,23 @@ public final class CreateBeforeLoopUpdate extends AbstractTermTransformer {
 
     /**
      * Creates the anonymizing update for the given loop specification.
-     * 
+     *
      * @param loopSpec
-     *            The {@link LoopSpecification}.
+     *     The {@link LoopSpecification}.
      * @param isTransaction
-     *            set to true iff we're in a transaction modality (then, there
-     *            are more heaps available).
+     *     set to true iff we're in a transaction modality (then, there are more
+     *     heaps available).
      * @param isPermissions
-     *            set to true if the permissions profile is active (then, the
-     *            permissions heap is available).
+     *     set to true if the permissions profile is active (then, the
+     *     permissions heap is available).
      * @param anonHeapTerm
-     *            The term with the Skolem heap.
+     *     The term with the Skolem heap.
      * @param anonSavedHeapTerm
-     *            The term with the Skolem saved heap.
+     *     The term with the Skolem saved heap.
      * @param anonPermissionsHeapTerm
-     *            The term with the Skolem permissions heap.
+     *     The term with the Skolem permissions heap.
      * @param services
-     *            The {@link Services} object (for the {@link TermBuilder}).
+     *     The {@link Services} object (for the {@link TermBuilder}).
      * @return The anonymizing update.
      */
     private static Term createBeforeLoopUpdate(boolean isTransaction,

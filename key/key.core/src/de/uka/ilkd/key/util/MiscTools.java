@@ -79,97 +79,103 @@ import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
-
 /**
- * Collection of some common, stateless functionality. Originally stolen from the weissInvariants side branch.
+ * Collection of some common, stateless functionality. Originally stolen from
+ * the weissInvariants side branch.
  */
 public final class MiscTools {
 
-
     private MiscTools() {
     }
-
 
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
 
-
     // TODO Is rp always a program variable?
     public static ProgramVariable getSelf(MethodFrame mf) {
         ExecutionContext ec = (ExecutionContext) mf.getExecutionContext();
         ReferencePrefix rp = ec.getRuntimeInstance();
-        if(!(rp instanceof TypeReference) && rp != null) {
+        if (!(rp instanceof TypeReference) && rp != null) {
             return (ProgramVariable) rp;
         } else {
             return null;
         }
     }
 
-
     /**
-     * Returns the receiver term of the passed method frame, or null if the frame belongs to a
-     * static method.
+     * Returns the receiver term of the passed method frame, or null if the
+     * frame belongs to a static method.
      *
-     * @param mf a method frame.
-     * @param services services.
-     * @return the receiver term of the passed method frame, or null if the frame belongs to a
-     * static method.
+     * @param mf
+     *     a method frame.
+     * @param services
+     *     services.
+     * @return the receiver term of the passed method frame, or null if the
+     * frame belongs to a static method.
      */
     public static Term getSelfTerm(MethodFrame mf, Services services) {
-	ExecutionContext ec = (ExecutionContext) mf.getExecutionContext();
-	ReferencePrefix rp = ec.getRuntimeInstance();
-	if(!(rp instanceof TypeReference) && rp != null) {
-	    return services.getTypeConverter().convertToLogicElement(rp);
-	} else {
-	    return null;
-	}
+        ExecutionContext ec = (ExecutionContext) mf.getExecutionContext();
+        ReferencePrefix rp = ec.getRuntimeInstance();
+        if (!(rp instanceof TypeReference) && rp != null) {
+            return services.getTypeConverter().convertToLogicElement(rp);
+        } else {
+            return null;
+        }
     }
 
     /**
-     * All variables read in the specified program element, excluding newly declared variables.
+     * All variables read in the specified program element, excluding newly
+     * declared variables.
      *
-     * @param pe a program element.
-     * @param services services.
-     * @return all variables read in the specified program element,
-     *  excluding newly declared variables.
+     * @param pe
+     *     a program element.
+     * @param services
+     *     services.
+     * @return all variables read in the specified program element, excluding
+     * newly declared variables.
      */
     public static ImmutableSet<ProgramVariable> getLocalIns(ProgramElement pe,
-	    					     	    Services services) {
-	final ReadPVCollector rpvc = new ReadPVCollector(pe, services);
-	rpvc.start();
-	return rpvc.result();
+            Services services) {
+        final ReadPVCollector rpvc = new ReadPVCollector(pe, services);
+        rpvc.start();
+        return rpvc.result();
     }
 
-
     /**
-     * All variables changed in the specified program element, excluding newly declared variables.
+     * All variables changed in the specified program element, excluding newly
+     * declared variables.
      *
-     * @param pe a program element.
-     * @param services services.
-     * @return all variables changed in the specified program element,
-     *  excluding newly declared variables.
+     * @param pe
+     *     a program element.
+     * @param services
+     *     services.
+     * @return all variables changed in the specified program element, excluding
+     * newly declared variables.
      */
-    public static ImmutableSet<ProgramVariable> getLocalOuts(
-	    					ProgramElement pe,
-	    			                Services services) {
-        final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, services);
-	wpvc.start();
+    public static ImmutableSet<ProgramVariable> getLocalOuts(ProgramElement pe,
+            Services services) {
+        final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(
+                pe, services);
+        wpvc.start();
         return wpvc.getWrittenPVs();
     }
 
     /**
-     * All variables changed in the specified program element, including newly declared variables.
+     * All variables changed in the specified program element, including newly
+     * declared variables.
      *
-     * @param pe a program element.
-     * @param services services.
-     * @return all variables changed in the specified program element,
-     *  including newly declared variables.
+     * @param pe
+     *     a program element.
+     * @param services
+     *     services.
+     * @return all variables changed in the specified program element, including
+     * newly declared variables.
      */
-    public static ImmutableSet<ProgramVariable> getLocalOutsAndDeclared(
-            ProgramElement pe,
-            Services services) {
-        final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, services);
+    public static ImmutableSet<ProgramVariable>
+            getLocalOutsAndDeclared(ProgramElement pe, Services services) {
+        final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(
+                pe, services);
         wpvc.start();
         return wpvc.getWrittenPVs().union(wpvc.getDeclaredPVs());
     }
@@ -177,49 +183,59 @@ public final class MiscTools {
     /**
      * All variables newly declared in the specified program element.
      *
-     * @param pe a program element.
-     * @param services services.
+     * @param pe
+     *     a program element.
+     * @param services
+     *     services.
      * @return all variables newly declared in the specified program element.
      */
-    public static ImmutableSet<ProgramVariable> getLocallyDeclaredVars(
-            ProgramElement pe,
-            Services services) {
-        final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(pe, services);
+    public static ImmutableSet<ProgramVariable>
+            getLocallyDeclaredVars(ProgramElement pe, Services services) {
+        final WrittenAndDeclaredPVCollector wpvc = new WrittenAndDeclaredPVCollector(
+                pe, services);
         wpvc.start();
         return wpvc.getDeclaredPVs();
     }
 
     /**
-     * Recursively collect all observers for this term including all of its sub terms.
-     * @param t the term for which we want to collect the observer functions.
-     * @return the observers as a set of pairs with sorts and according observers
+     * Recursively collect all observers for this term including all of its sub
+     * terms.
+     *
+     * @param t
+     *     the term for which we want to collect the observer functions.
+     * @return the observers as a set of pairs with sorts and according
+     * observers
      */
-    public static ImmutableSet<Pair<Sort, IObserverFunction>> collectObservers(Term t) {
-        ImmutableSet<Pair<Sort, IObserverFunction>> result = DefaultImmutableSet.nil();
-	if(t.op() instanceof IObserverFunction) {
-	    final IObserverFunction obs = (IObserverFunction)t.op();
-	    final Sort s = obs.isStatic()
-	             	   ? obs.getContainerType().getSort()
-	                   : t.sub(1).sort();
-	    result = result.add(new Pair<Sort,IObserverFunction>(s, obs));
-	}
-	for(Term sub : t.subs()) {
-	    result = result.union(collectObservers(sub));
-	}
-	return result;
+    public static ImmutableSet<Pair<Sort, IObserverFunction>>
+            collectObservers(Term t) {
+        ImmutableSet<Pair<Sort, IObserverFunction>> result = DefaultImmutableSet
+                .nil();
+        if (t.op() instanceof IObserverFunction) {
+            final IObserverFunction obs = (IObserverFunction) t.op();
+            final Sort s = obs.isStatic() ? obs.getContainerType().getSort()
+                    : t.sub(1).sort();
+            result = result.add(new Pair<Sort, IObserverFunction>(s, obs));
+        }
+        for (Term sub : t.subs()) {
+            result = result.union(collectObservers(sub));
+        }
+        return result;
     }
 
     /**
      * {@code true} iff both are <code>null</code> or <code>a.equals(b)</code>
      * with <code>equals</code> from type T.
      *
-     * @param a an object.
-     * @param b another object.
-     * @param <T> type of {@code a} and result value.
-     * @return {@code true} iff both are <code>null</code> or <code>a.equals(b)</code>
-     *  with <code>equals</code> from type T.
+     * @param a
+     *     an object.
+     * @param b
+     *     another object.
+     * @param <T>
+     *     type of {@code a} and result value.
+     * @return {@code true} iff both are <code>null</code> or
+     * <code>a.equals(b)</code> with <code>equals</code> from type T.
      */
-    public static <T> boolean equalsOrNull(T a, Object b){
+    public static <T> boolean equalsOrNull(T a, Object b) {
         if (a == null) {
             return b == null;
         } else {
@@ -231,76 +247,89 @@ public final class MiscTools {
      * {@code true} iff all are <code>null</code> or <code>a.equals(b)</code>
      * with <code>equals</code> from type T for every {@code b}.
      *
-     * @param a an object.
-     * @param bs other object.
-     * @param <T> type of {@code a} and result value.
-     * @return {@code true} iff all are <code>null</code> or <code>a.equals(b)</code>
-     *  with <code>equals</code> from type T for every {@code b}.
+     * @param a
+     *     an object.
+     * @param bs
+     *     other object.
+     * @param <T>
+     *     type of {@code a} and result value.
+     * @return {@code true} iff all are <code>null</code> or
+     * <code>a.equals(b)</code> with <code>equals</code> from type T for every
+     * {@code b}.
      */
-    public static <T> boolean equalsOrNull(T a, Object... bs){
+    public static <T> boolean equalsOrNull(T a, Object... bs) {
         boolean result = true;
-        for (Object b: bs){
+        for (Object b : bs) {
             result = result && equalsOrNull(a, b);
         }
         return result;
     }
 
-
     // =======================================================
     // Methods operating on Arrays
     // =======================================================
-    
+
     /**
      * Concatenates two arrays.
      *
-     * @param s1 an array.
-     * @param s2 another array.
-     * @param <S> type o array {@code s1} and of result array.
-     * @param <T> type of array {@code s2}.
+     * @param s1
+     *     an array.
+     * @param s2
+     *     another array.
+     * @param <S>
+     *     type o array {@code s1} and of result array.
+     * @param <T>
+     *     type of array {@code s2}.
      * @return the concatenation of both arrays.
      */
-    public static <S,T extends S> S[] concat(S[] s1, T[] s2) {
-        S[] res = Arrays.copyOf(s1, s1.length+s2.length);
+    public static <S, T extends S> S[] concat(S[] s1, T[] s2) {
+        S[] res = Arrays.copyOf(s1, s1.length + s2.length);
         for (int i = 0; i < s2.length; i++) {
-            res[i+s1.length] = s2[i];
+            res[i + s1.length] = s2[i];
         }
         return res;
     }
-
 
     // =======================================================
     // Methods operating on Collections
     // =======================================================
 
     /**
-     * Combine two maps by function application. Values of <code>m0</code> which are not keys of
-     * <code>m1</code> are dropped. This implementation tries to use the same implementation of
-     * {@link java.util.Map} (provided in Java SE) as <code>m0</code>.
+     * Combine two maps by function application. Values of <code>m0</code> which
+     * are not keys of <code>m1</code> are dropped. This implementation tries to
+     * use the same implementation of {@link java.util.Map} (provided in Java
+     * SE) as <code>m0</code>.
      *
-     * @param m0 a map.
-     * @param m1 another map.
-     * @param <S> type of {@code m0}.
-     * @param <T> type of {@code m1}.
-     * @param <U> new type of result map indexes.
+     * @param m0
+     *     a map.
+     * @param m1
+     *     another map.
+     * @param <S>
+     *     type of {@code m0}.
+     * @param <T>
+     *     type of {@code m1}.
+     * @param <U>
+     *     new type of result map indexes.
      * @return the combination of both maps.
      */
-    public static <S,T,U> Map<S,U> apply(Map<S,? extends T> m0, Map<T,U> m1) {
-        Map<S,U> res = null;
-        final int size = m0.size() < m1.size()? m0.size(): m1.size();
+    public static <S, T, U> Map<S, U> apply(Map<S, ? extends T> m0,
+            Map<T, U> m1) {
+        Map<S, U> res = null;
+        final int size = m0.size() < m1.size() ? m0.size() : m1.size();
         // try to use more specific implementation
         if (m0 instanceof java.util.TreeMap) {
-            res = new java.util.TreeMap<S,U>();
+            res = new java.util.TreeMap<S, U>();
         } else if (m0 instanceof java.util.concurrent.ConcurrentHashMap) {
-            res = new java.util.concurrent.ConcurrentHashMap<S,U>(size);
+            res = new java.util.concurrent.ConcurrentHashMap<S, U>(size);
         } else if (m0 instanceof java.util.IdentityHashMap) {
             res = new java.util.IdentityHashMap<S, U>(size);
         } else if (m0 instanceof java.util.WeakHashMap) {
-            res = new java.util.WeakHashMap<S,U>(size);
+            res = new java.util.WeakHashMap<S, U>(size);
         } else {
             res = new HashMap<S, U>(size);
         }
 
-        for (Entry<S, ? extends T> e: m0.entrySet()) {
+        for (Entry<S, ? extends T> e : m0.entrySet()) {
             final U value = m1.get(e.getValue());
             if (value != null) {
                 res.put(e.getKey(), value);
@@ -309,23 +338,24 @@ public final class MiscTools {
         return res;
     }
 
-
     // =======================================================
     // Methods operating on Strings
     // =======================================================
 
     /**
-     * Separates the single directory entries in a filename. The first element is an empty String
-     * iff the filename is absolute. (For a Windows filename, it contains a drive letter and a
-     * colon). Ignores double slashes and slashes at the end, removes references to the cwd. E.g.,
-     * "/home//daniel/./key/" yields {"","home","daniel","key"}. Tries to automatically detect UNIX
-     * or Windows directory delimiters. There is no check whether all other characters are valid for
-     * filenames.
+     * Separates the single directory entries in a filename. The first element
+     * is an empty String iff the filename is absolute. (For a Windows filename,
+     * it contains a drive letter and a colon). Ignores double slashes and
+     * slashes at the end, removes references to the cwd. E.g.,
+     * "/home//daniel/./key/" yields {"","home","daniel","key"}. Tries to
+     * automatically detect UNIX or Windows directory delimiters. There is no
+     * check whether all other characters are valid for filenames.
      *
-     * @param filename a file name.
+     * @param filename
+     *     a file name.
      * @return all directory entries in the file name.
      */
-    static List<String> disectFilename(String filename){
+    static List<String> disectFilename(String filename) {
         final char sep = File.separatorChar;
         List<String> res = new ArrayList<String>();
         // if filename contains slashes, take it as UNIX filename, otherwise Windows
@@ -338,9 +368,9 @@ public final class MiscTools {
             return res;
         }
         int i = 0;
-        while (i < filename.length()){
-            int j = filename.indexOf(sep,i);
-            if (j == -1){ // no slash anymore
+        while (i < filename.length()) {
+            int j = filename.indexOf(sep, i);
+            if (j == -1) { // no slash anymore
                 final String s = filename.substring(i, filename.length());
                 if (!s.equals(".")) {
                     res.add(s);
@@ -360,36 +390,44 @@ public final class MiscTools {
                     res.add(s);
                 }
             }
-            i = j+1;
+            i = j + 1;
         }
         return res;
     }
 
     /**
-     * Returns a filename relative to another one. The second parameter needs to be absolute and is
-     * expected to refer to a directory. This method only operates on Strings, not on real files!
-     * Note that it treats Strings case-sensitive. The resulting filename always uses UNIX
-     * directory delimiters. Raises a RuntimeException if no relative path could be found (may
-     * happen on Windows systems).
+     * Returns a filename relative to another one. The second parameter needs to
+     * be absolute and is expected to refer to a directory. This method only
+     * operates on Strings, not on real files! Note that it treats Strings
+     * case-sensitive. The resulting filename always uses UNIX directory
+     * delimiters. Raises a RuntimeException if no relative path could be found
+     * (may happen on Windows systems).
      *
-     * @param origFilename a filename.
-     * @param toFilename the name of a parent directory of {@code origFilename}.
+     * @param origFilename
+     *     a filename.
+     * @param toFilename
+     *     the name of a parent directory of {@code origFilename}.
      * @return {@code origFilename} relative to {@code toFilename}
      */
-    public static String makeFilenameRelative(String origFilename, String toFilename){
+    public static String makeFilenameRelative(String origFilename,
+            String toFilename) {
         final List<String> origFileNameSections = disectFilename(origFilename);
-        String[] a = origFileNameSections.toArray(new String[origFileNameSections.size()]);
-        final List<String> destinationFilenameSections = disectFilename(toFilename);
+        String[] a = origFileNameSections
+                .toArray(new String[origFileNameSections.size()]);
+        final List<String> destinationFilenameSections = disectFilename(
+                toFilename);
         String[] b = destinationFilenameSections
                 .toArray(new String[destinationFilenameSections.size()]);
 
         // check for Windows paths
-        if (File.separatorChar == '\\' &&
-                a[0].length() == 2 && a[0].charAt(1) == ':') {
+        if (File.separatorChar == '\\' && a[0].length() == 2
+                && a[0].charAt(1) == ':') {
             char drive = Character.toUpperCase(a[0].charAt(0));
-            if (!(b[0].length() == 2 && Character.toUpperCase(b[0].charAt(0)) == drive
+            if (!(b[0].length() == 2
+                    && Character.toUpperCase(b[0].charAt(0)) == drive
                     && b[0].charAt(1) == ':')) {
-                throw new RuntimeException("cannot make paths on different drives relative");
+                throw new RuntimeException(
+                        "cannot make paths on different drives relative");
             }
             // remove drive letter
             a[0] = "";
@@ -406,29 +444,29 @@ public final class MiscTools {
                         + "Please use absolute paths to make others relative to them.");
             }
 
-        // remove ".." from paths
-        a = removeDotDot(a);
-        b = removeDotDot(b);
+            // remove ".." from paths
+            a = removeDotDot(a);
+            b = removeDotDot(b);
 
-        // FIXME: there may be leading ..'s
+            // FIXME: there may be leading ..'s
 
             i = 1;
             boolean diff = false;
-        while (i < b.length){
-            // shared until i
+            while (i < b.length) {
+                // shared until i
                 if (i >= a.length || !a[i].equals(b[i])) {
                     diff = true;
                 }
-            // add ".." for each remaining element in b
-            // and collect the remaining elements of a
-            if (diff) {
-                s = s + "../";
+                // add ".." for each remaining element in b
+                // and collect the remaining elements of a
+                if (diff) {
+                    s = s + "../";
                     if (i < a.length) {
                         t += (a[i].equals("") ? "" : "/") + a[i];
                     }
+                }
+                i++;
             }
-            i++;
-        }
         } else {
             i = 0;
         }
@@ -443,50 +481,39 @@ public final class MiscTools {
         // strip ending slash
         t = s + t;
         if (t.length() > 0 && t.charAt(t.length() - 1) == '/') {
-            t = t.substring(0,t.length()-1);
+            t = t.substring(0, t.length() - 1);
         }
         return t;
     }
 
-
     private static String[] removeDotDot(String[] a) {
         String[] newa = new String[a.length];
         int k = 0;
-        for (int j = 0; j < a.length-1; j++){
-            if (a[j].equals("..") || !a[j+1].equals("..")){
+        for (int j = 0; j < a.length - 1; j++) {
+            if (a[j].equals("..") || !a[j + 1].equals("..")) {
                 newa[k] = a[j];
                 k++;
             } else {
                 j++;
             }
         }
-        if (!a[a.length-1].equals("..")){
+        if (!a[a.length - 1].equals("..")) {
             newa[k] = a[a.length - 1];
             k++;
         }
         return Arrays.copyOf(newa, k);
     }
 
-
     public static Name toValidTacletName(String s) {
         s = s.replaceAll("\\s|\\.|::\\$|::|<|>|/", "_");
         return new Name(s);
     }
 
-
     public static String toValidFileName(String s) {
-        s = s.replace("\\", "_")
-             .replace("$", "_")
-             .replace("?", "_")
-             .replace("|", "_")
-             .replace("<", "_")
-             .replace(">", "_")
-             .replace(":", "_")
-             .replace("*", "+")
-             .replace("\"", "'")
-             .replace("/", "-")
-             .replace("[", "(")
-             .replace("]", ")");
+        s = s.replace("\\", "_").replace("$", "_").replace("?", "_")
+                .replace("|", "_").replace("<", "_").replace(">", "_")
+                .replace(":", "_").replace("*", "+").replace("\"", "'")
+                .replace("/", "-").replace("[", "(").replace("]", ")");
         return s;
     }
 
@@ -495,22 +522,24 @@ public final class MiscTools {
         return new Name(s);
     }
 
-
     /**
-     * Join the string representations of a collection of objects into onw string. The individual
-     * elements are separated by a delimiter.
+     * Join the string representations of a collection of objects into onw
+     * string. The individual elements are separated by a delimiter.
      *
      * {@link Object#toString()} is used to turn the objects into strings.
      *
-     * @param collection an arbitrary non-null collection
-     * @param delimiter  a non-null string which is put between the elements.
+     * @param collection
+     *     an arbitrary non-null collection
+     * @param delimiter
+     *     a non-null string which is put between the elements.
      *
-     * @return the concatenation of all string representations separated by the delimiter
+     * @return the concatenation of all string representations separated by the
+     * delimiter
      */
     public static String join(Iterable<?> collection, String delimiter) {
         StringBuilder sb = new StringBuilder();
         for (Object obj : collection) {
-            if(sb.length() > 0) {
+            if (sb.length() > 0) {
                 sb.append(delimiter);
             }
             sb.append(obj);
@@ -520,37 +549,43 @@ public final class MiscTools {
     }
 
     /**
-     * Join the string representations of an array of objects into one string. The individual
-     * elements are separated by a delimiter.
+     * Join the string representations of an array of objects into one string.
+     * The individual elements are separated by a delimiter.
      *
      * {@link Object#toString()} is used to turn the objects into strings.
      *
-     * @param collection an arbitrary non-null array of objects
-     * @param delimiter  a non-null string which is put between the elements.
+     * @param collection
+     *     an arbitrary non-null array of objects
+     * @param delimiter
+     *     a non-null string which is put between the elements.
      *
-     * @return the concatenation of all string representations separated by the delimiter
+     * @return the concatenation of all string representations separated by the
+     * delimiter
      */
     public static String join(Object[] collection, String delimiter) {
         return join(Arrays.asList(collection), delimiter);
     }
 
     /**
-     * Takes a string and returns a string which is potentially shorter and contains a
-     * sub-collection of the original characters.
+     * Takes a string and returns a string which is potentially shorter and
+     * contains a sub-collection of the original characters.
      *
-     * All alphabetic characters (A-Z and a-z) are copied to the result while all other characters
-     * are removed.
+     * All alphabetic characters (A-Z and a-z) are copied to the result while
+     * all other characters are removed.
      *
-     * @param string an arbitrary string
-     * @return a string which is a sub-structure of the original character sequence
+     * @param string
+     *     an arbitrary string
+     * @return a string which is a sub-structure of the original character
+     * sequence
      *
      * @author Mattias Ulbrich
      */
-    public static /*@ non_null @*/ String filterAlphabetic(/*@ non_null @*/ String string) {
+    public static /* @ non_null @ */ String
+            filterAlphabetic(/* @ non_null @ */ String string) {
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < string.length(); i++) {
             char c = string.charAt(i);
-            if((c >= 'A' && c <= 'Z') || (c >= 'A' && c <= 'Z')) {
+            if ((c >= 'A' && c <= 'Z') || (c >= 'A' && c <= 'Z')) {
                 res.append(c);
             }
         }
@@ -558,26 +593,29 @@ public final class MiscTools {
     }
 
     /**
-     * Checks whether a string contains another one as a whole word (i.e., separated by
-     * white spaces or a semicolon at the end).
+     * Checks whether a string contains another one as a whole word (i.e.,
+     * separated by white spaces or a semicolon at the end).
      *
-     * @param s string to search in
-     * @param word string to be searched for
+     * @param s
+     *     string to search in
+     * @param word
+     *     string to be searched for
      * @return the answer to the question specified above
      */
-    public static boolean containsWholeWord(String s, String word){
+    public static boolean containsWholeWord(String s, String word) {
         if (s == null || word == null) {
             return false;
         }
         int i = -1;
         final int wl = word.length();
         while (true) {
-            i = s.indexOf(word, i+1);
+            i = s.indexOf(word, i + 1);
             if (i < 0 || i >= s.length()) {
                 break;
             }
-            if (i == 0 || Character.isWhitespace(s.charAt(i-1))) {
-                if (i + wl == s.length() || Character.isWhitespace(s.charAt(i + wl))
+            if (i == 0 || Character.isWhitespace(s.charAt(i - 1))) {
+                if (i + wl == s.length()
+                        || Character.isWhitespace(s.charAt(i + wl))
                         || s.charAt(i + wl) == ';') {
                     return true;
                 }
@@ -586,46 +624,50 @@ public final class MiscTools {
         return false;
     }
 
-
     /**
-     * There are different kinds of JML markers. See Section 4.4 "Annotation markers" of the JML
-     * reference manual.
+     * There are different kinds of JML markers. See Section 4.4 "Annotation
+     * markers" of the JML reference manual.
      *
      * @param comment
      * @return
      */
     public static boolean isJMLComment(String comment) {
         try {
-        return (comment.startsWith("/*@") || comment.startsWith("//@")
-                || comment.startsWith("/*+KeY@") || comment.startsWith("//+KeY@")
-                    || (comment.startsWith("/*-") && !comment.substring(3, 6).equals("KeY")
+            return (comment.startsWith("/*@") || comment.startsWith("//@")
+                    || comment.startsWith("/*+KeY@")
+                    || comment.startsWith("//+KeY@")
+                    || (comment.startsWith("/*-")
+                            && !comment.substring(3, 6).equals("KeY")
                             && comment.contains("@"))
-                || (comment.startsWith("//-") && !comment.substring(3,6).equals("KeY") && comment.contains("@")));
-        } catch (IndexOutOfBoundsException e){
+                    || (comment.startsWith("//-")
+                            && !comment.substring(3, 6).equals("KeY")
+                            && comment.contains("@")));
+        } catch (IndexOutOfBoundsException e) {
             return false;
         }
     }
 
     /**
      * <p>
-     * Returns the display name of the applied rule in the given {@link Node} of the proof tree in
-     * KeY.
+     * Returns the display name of the applied rule in the given {@link Node} of
+     * the proof tree in KeY.
      * </p>
      * <p>
-     * This method is required for the symbolic execution tree extraction, e.g. used in the Symbolic
-     * Execution Tree Debugger.
+     * This method is required for the symbolic execution tree extraction, e.g.
+     * used in the Symbolic Execution Tree Debugger.
      * </p>
      *
-     * @param node The given {@link Node}.
-     * @return The display name of the applied rule in the given {@link Node} or {@code null} if no
-     *         one exists.
+     * @param node
+     *     The given {@link Node}.
+     * @return The display name of the applied rule in the given {@link Node} or
+     * {@code null} if no one exists.
      */
     public static String getRuleDisplayName(Node node) {
-       String name = null;
-       if (node != null) {
-          name = getRuleDisplayName(node.getAppliedRuleApp());
-       }
-       return name;
+        String name = null;
+        if (node != null) {
+            name = getRuleDisplayName(node.getAppliedRuleApp());
+        }
+        return name;
     }
 
     /**
@@ -633,118 +675,134 @@ public final class MiscTools {
      * Returns the display name of the {@link RuleApp}.
      * </p>
      * <p>
-     * This method is required for the symbolic execution tree extraction, e.g. used in the Symbolic
-     * Execution Tree Debugger.
+     * This method is required for the symbolic execution tree extraction, e.g.
+     * used in the Symbolic Execution Tree Debugger.
      * </p>
      *
-     * @param ruleApp The given {@link RuleApp}.
-     * @return The display name of the {@link RuleApp} or {@code null} if no one exists.
+     * @param ruleApp
+     *     The given {@link RuleApp}.
+     * @return The display name of the {@link RuleApp} or {@code null} if no one
+     * exists.
      */
     public static String getRuleDisplayName(RuleApp ruleApp) {
-       String name = null;
-       if (ruleApp != null) {
-          Rule rule = ruleApp.rule();
-          if (rule != null) {
-             name = rule.displayName();
-          }
-       }
-       return name;
+        String name = null;
+        if (ruleApp != null) {
+            Rule rule = ruleApp.rule();
+            if (rule != null) {
+                name = rule.displayName();
+            }
+        }
+        return name;
     }
-    
+
     /**
      * <p>
-     * Returns the name of the applied rule in the given {@link Node} of the proof tree in KeY.
+     * Returns the name of the applied rule in the given {@link Node} of the
+     * proof tree in KeY.
      * </p>
      * <p>
-     * This method is required for the symbolic execution tree extraction, e.g. used in the Symbolic
-     * Execution Tree Debugger.
+     * This method is required for the symbolic execution tree extraction, e.g.
+     * used in the Symbolic Execution Tree Debugger.
      * </p>
      *
-     * @param node The given {@link Node}.
-     * @return The display name of the applied rule in the given {@link Node} or {@code null} if no
-     *         one exists.
+     * @param node
+     *     The given {@link Node}.
+     * @return The display name of the applied rule in the given {@link Node} or
+     * {@code null} if no one exists.
      */
     public static String getRuleName(Node node) {
-       String name = null;
-       if (node != null) {
-          name = getRuleName(node.getAppliedRuleApp());
-       }
-       return name;
+        String name = null;
+        if (node != null) {
+            name = getRuleName(node.getAppliedRuleApp());
+        }
+        return name;
     }
-    
+
     /**
      * <p>
      * Returns the name of the {@link RuleApp}.
      * </p>
      * <p>
-     * This method is required for the symbolic execution tree extraction, e.g. used in the Symbolic
-     * Execution Tree Debugger.
+     * This method is required for the symbolic execution tree extraction, e.g.
+     * used in the Symbolic Execution Tree Debugger.
      * </p>
      *
-     * @param ruleApp The given {@link RuleApp}.
-     * @return The display name of the {@link RuleApp} or {@code null} if no one exists.
+     * @param ruleApp
+     *     The given {@link RuleApp}.
+     * @return The display name of the {@link RuleApp} or {@code null} if no one
+     * exists.
      */
     public static String getRuleName(RuleApp ruleApp) {
-       String name = null;
-       if (ruleApp != null) {
-          Rule rule = ruleApp.rule();
-          if (rule != null) {
-             name = rule.name().toString();
-          }
-       }
-       return name;
-    }
-    
-    /**
-     * Returns the {@link OneStepSimplifier} used in the given {@link Proof}.
-     *
-     * @param proof The {@link Proof} to get its used {@link OneStepSimplifier}.
-     * @return The used {@link OneStepSimplifier} or {@code null} if not available.
-     */
-    public static OneStepSimplifier findOneStepSimplifier(Proof proof) {
-       if (proof != null && !proof.isDisposed() && proof.getInitConfig() !=null) {
-          Profile profile = proof.getInitConfig().getProfile();
-          return findOneStepSimplifier(profile);
-        } else {
-          return null;
-       }
-    }
-    
-    /**
-     * Returns the {@link OneStepSimplifier} used in the given {@link Profile}.
-     *
-     * @param profile The {@link Profile} to get its used {@link OneStepSimplifier}.
-     * @return The used {@link OneStepSimplifier} or {@code null} if not available.
-     */
-    public static OneStepSimplifier findOneStepSimplifier(Profile profile) {
-       if (profile instanceof JavaProfile) {
-          return ((JavaProfile) profile).getOneStepSimpilifier();
-        } else {
-          return null;
-       }
+        String name = null;
+        if (ruleApp != null) {
+            Rule rule = ruleApp.rule();
+            if (rule != null) {
+                name = rule.name().toString();
+            }
+        }
+        return name;
     }
 
     /**
-     * Returns the actual variable for a given one (this means it returns the renamed variable).
+     * Returns the {@link OneStepSimplifier} used in the given {@link Proof}.
      *
-     * @param node the Node where to look up the actual variable (result from renaming)
+     * @param proof
+     *     The {@link Proof} to get its used {@link OneStepSimplifier}.
+     * @return The used {@link OneStepSimplifier} or {@code null} if not
+     * available.
+     */
+    public static OneStepSimplifier findOneStepSimplifier(Proof proof) {
+        if (proof != null && !proof.isDisposed()
+                && proof.getInitConfig() != null) {
+            Profile profile = proof.getInitConfig().getProfile();
+            return findOneStepSimplifier(profile);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the {@link OneStepSimplifier} used in the given {@link Profile}.
+     *
+     * @param profile
+     *     The {@link Profile} to get its used {@link OneStepSimplifier}.
+     * @return The used {@link OneStepSimplifier} or {@code null} if not
+     * available.
+     */
+    public static OneStepSimplifier findOneStepSimplifier(Profile profile) {
+        if (profile instanceof JavaProfile) {
+            return ((JavaProfile) profile).getOneStepSimpilifier();
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Returns the actual variable for a given one (this means it returns the
+     * renamed variable).
+     *
+     * @param node
+     *     the Node where to look up the actual variable (result from renaming)
      * @return The renamed variable
      */
-    public static ProgramVariable findActualVariable(ProgramVariable originalVar, Node node) {
+    public static ProgramVariable
+            findActualVariable(ProgramVariable originalVar, Node node) {
         ProgramVariable actualVar = originalVar;
-        if (node != null) {          
+        if (node != null) {
             outer: do {
-                    if (node.getRenamingTable() != null) {
-                        for (RenamingTable rt : node.getRenamingTable()) {
-                            ProgramVariable renamedVar = (ProgramVariable) rt.getRenaming(actualVar);
-                            if (renamedVar != null || !node.getLocalProgVars().contains(actualVar)) {
-                                actualVar = renamedVar;
-                                break outer;
-                            }
+                if (node.getRenamingTable() != null) {
+                    for (RenamingTable rt : node.getRenamingTable()) {
+                        ProgramVariable renamedVar = (ProgramVariable) rt
+                                .getRenaming(actualVar);
+                        if (renamedVar != null || !node.getLocalProgVars()
+                                .contains(actualVar)) {
+                            actualVar = renamedVar;
+                            break outer;
                         }
                     }
-                    node = node.parent();
-                } while (node != null);
+                }
+                node = node.parent();
+            } while (node != null);
         }
         return actualVar;
     }
@@ -757,39 +815,40 @@ public final class MiscTools {
         /**
          * The list of resulting (i.e., read) program variables.
          */
-        private ImmutableSet<ProgramVariable> result = DefaultImmutableSet.<ProgramVariable>nil();
+        private ImmutableSet<ProgramVariable> result = DefaultImmutableSet
+                .<ProgramVariable> nil();
 
         /**
          * The declared program variables.
          */
         private ImmutableSet<ProgramVariable> declaredPVs = DefaultImmutableSet
-                .<ProgramVariable>nil();
+                .<ProgramVariable> nil();
 
         private final ProgramElement root;
 
-	public ReadPVCollector(ProgramElement root, Services services) {
-	    super(root, services);
+        public ReadPVCollector(ProgramElement root, Services services) {
+            super(root, services);
             this.root = root;
-	}
+        }
 
-	@Override
-	protected void doDefaultAction(SourceElement node) {
-	    if(node instanceof ProgramVariable) {
-		    ProgramVariable pv = (ProgramVariable) node;
-		    if(!pv.isMember() && !declaredPVs.contains(pv)) {
-		        result = result.add(pv);
-		    }
-	    } else if(node instanceof AbstractPlaceholderStatement) {
-            final AbstractPlaceholderStatement aps = (AbstractPlaceholderStatement) node;
-
-            for (final ProgramVariable pv : AbstractExecutionContractUtils
-                    .getAccessibleProgVarsForNoBehaviorContract(aps, root,
-                            services)) {
+        @Override
+        protected void doDefaultAction(SourceElement node) {
+            if (node instanceof ProgramVariable) {
+                ProgramVariable pv = (ProgramVariable) node;
                 if (!pv.isMember() && !declaredPVs.contains(pv)) {
                     result = result.add(pv);
                 }
-            }
-	    } else if (node instanceof VariableSpecification) {
+            } else if (node instanceof AbstractPlaceholderStatement) {
+                final AbstractPlaceholderStatement aps = (AbstractPlaceholderStatement) node;
+
+                for (final ProgramVariable pv : AbstractExecutionContractUtils
+                        .getAccessibleProgVarsForNoBehaviorContract(aps, root,
+                                services)) {
+                    if (!pv.isMember() && !declaredPVs.contains(pv)) {
+                        result = result.add(pv);
+                    }
+                }
+            } else if (node instanceof VariableSpecification) {
                 VariableSpecification vs = (VariableSpecification) node;
                 ProgramVariable pv = (ProgramVariable) vs.getProgramVariable();
                 if (!pv.isMember()) {
@@ -809,33 +868,34 @@ public final class MiscTools {
         /**
          * The written program variables.
          */
-        private ImmutableSet<ProgramVariable> writtenPVs =
-                DefaultImmutableSet.<ProgramVariable>nil();
+        private ImmutableSet<ProgramVariable> writtenPVs = DefaultImmutableSet
+                .<ProgramVariable> nil();
 
         /**
          * The declared program variables.
          */
-        private ImmutableSet<ProgramVariable> declaredPVs =
-                DefaultImmutableSet.<ProgramVariable>nil();
+        private ImmutableSet<ProgramVariable> declaredPVs = DefaultImmutableSet
+                .<ProgramVariable> nil();
 
         private final ProgramElement root;
 
-        public WrittenAndDeclaredPVCollector(ProgramElement root, Services services) {
+        public WrittenAndDeclaredPVCollector(ProgramElement root,
+                Services services) {
             super(root, services);
             this.root = root;
         }
 
-	@Override
-	protected void doDefaultAction(SourceElement node) {
-	    if(node instanceof Assignment) {
-		    ProgramElement lhs = ((Assignment) node).getChildAt(0);
-		    if(lhs instanceof ProgramVariable) {
-		        ProgramVariable pv = (ProgramVariable) lhs;
-		        if(!pv.isMember() && !declaredPVs.contains(pv)) {
-                            writtenPVs = writtenPVs.add(pv);
-		        }
-		    }
-	    } else if(node instanceof AbstractPlaceholderStatement) {
+        @Override
+        protected void doDefaultAction(SourceElement node) {
+            if (node instanceof Assignment) {
+                ProgramElement lhs = ((Assignment) node).getChildAt(0);
+                if (lhs instanceof ProgramVariable) {
+                    ProgramVariable pv = (ProgramVariable) lhs;
+                    if (!pv.isMember() && !declaredPVs.contains(pv)) {
+                        writtenPVs = writtenPVs.add(pv);
+                    }
+                }
+            } else if (node instanceof AbstractPlaceholderStatement) {
                 final AbstractPlaceholderStatement aps = (AbstractPlaceholderStatement) node;
 
                 for (final ProgramVariable pv : AbstractExecutionContractUtils
@@ -845,16 +905,16 @@ public final class MiscTools {
                         writtenPVs = writtenPVs.add(pv);
                     }
                 }
-	    } else if(node instanceof VariableSpecification) {
-		    VariableSpecification vs = (VariableSpecification) node;
-		    ProgramVariable pv = (ProgramVariable) vs.getProgramVariable();
-		    if(!pv.isMember()) {
-		        assert !declaredPVs.contains(pv);
-                        assert !writtenPVs.contains(pv);
-		        declaredPVs = declaredPVs.add(pv);
-		    }
-	    }
-	}
+            } else if (node instanceof VariableSpecification) {
+                VariableSpecification vs = (VariableSpecification) node;
+                ProgramVariable pv = (ProgramVariable) vs.getProgramVariable();
+                if (!pv.isMember()) {
+                    assert !declaredPVs.contains(pv);
+                    assert !writtenPVs.contains(pv);
+                    declaredPVs = declaredPVs.add(pv);
+                }
+            }
+        }
 
         public ImmutableSet<ProgramVariable> getWrittenPVs() {
             return writtenPVs;
@@ -862,12 +922,12 @@ public final class MiscTools {
 
         public ImmutableSet<ProgramVariable> getDeclaredPVs() {
             return declaredPVs;
-	}
+        }
     }
 
     public static ImmutableList<Term> toTermList(Iterable<ProgramVariable> list,
-                                                 TermBuilder tb) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+            TermBuilder tb) {
+        ImmutableList<Term> result = ImmutableSLList.<Term> nil();
         for (ProgramVariable pv : list) {
             if (pv != null) {
                 Term t = tb.var(pv);
@@ -876,27 +936,29 @@ public final class MiscTools {
         }
         return result;
     }
-    
+
     /**
      * read an input stream to its end into a string.
      *
-     * @param is a non-null open input stream
+     * @param is
+     *     a non-null open input stream
      * @return the string created from the input of the stream
-     * @throws IOException may occur while reading the stream
+     * @throws IOException
+     *     may occur while reading the stream
      */
     public static String toString(InputStream is) throws IOException {
         StringBuilder sb = new StringBuilder();
         byte[] buffer = new byte[2048];
         int read;
-        while((read=is.read(buffer)) > 0) {
+        while ((read = is.read(buffer)) > 0) {
             sb.append(new String(buffer, 0, read));
         }
         return sb.toString();
     }
 
-    public static ImmutableList<Term> filterOutDuplicates(ImmutableList<Term> localIns,
-                                                          ImmutableList<Term> localOuts) {
-        ImmutableList<Term> result = ImmutableSLList.<Term>nil();
+    public static ImmutableList<Term> filterOutDuplicates(
+            ImmutableList<Term> localIns, ImmutableList<Term> localOuts) {
+        ImmutableList<Term> result = ImmutableSLList.<Term> nil();
         for (Term localIn : localIns) {
             if (!localOuts.contains(localIn)) {
                 result = result.append(localIn);
@@ -911,43 +973,47 @@ public final class MiscTools {
      * @return The default taclet options.
      */
     public static HashMap<String, String> getDefaultTacletOptions() {
-       HashMap<String, String> result = new HashMap<String, String>();
-       result.put("Strings", "Strings:on");
-       result.put("reach", "reach:on");
-       result.put("JavaCard", "JavaCard:off");
-       result.put("assertions", "assertions:on");
-       result.put("bigint", "bigint:on");
-       result.put("intRules", "intRules:arithmeticSemanticsIgnoringOF");
-       result.put("programRules", "programRules:Java");
-       result.put("modelFields", "modelFields:showSatisfiability");
-       result.put("initialisation", "initialisation:disableStaticInitialisation");
-       result.put("sequences", "sequences:on");
-       result.put("runtimeExceptions", "runtimeExceptions:allow");
-       result.put("integerSimplificationRules", "integerSimplificationRules:full");
-       result.put("optimisedSelectRules", "optimisedSelectRules:on");
-       result.put("wdChecks", "wdChecks:off");
-       result.put("wdOperator", "wdOperator:L");
-       result.put("permissions", "permissions:off"); 
-       return result;
+        HashMap<String, String> result = new HashMap<String, String>();
+        result.put("Strings", "Strings:on");
+        result.put("reach", "reach:on");
+        result.put("JavaCard", "JavaCard:off");
+        result.put("assertions", "assertions:on");
+        result.put("bigint", "bigint:on");
+        result.put("intRules", "intRules:arithmeticSemanticsIgnoringOF");
+        result.put("programRules", "programRules:Java");
+        result.put("modelFields", "modelFields:showSatisfiability");
+        result.put("initialisation",
+                "initialisation:disableStaticInitialisation");
+        result.put("sequences", "sequences:on");
+        result.put("runtimeExceptions", "runtimeExceptions:allow");
+        result.put("integerSimplificationRules",
+                "integerSimplificationRules:full");
+        result.put("optimisedSelectRules", "optimisedSelectRules:on");
+        result.put("wdChecks", "wdChecks:off");
+        result.put("wdOperator", "wdOperator:L");
+        result.put("permissions", "permissions:off");
+        return result;
     }
-    
+
     /**
-     * Returns the path to the source file defined by the given {@link PositionInfo}.
+     * Returns the path to the source file defined by the given
+     * {@link PositionInfo}.
      *
-     * @param posInfo The {@link PositionInfo} to extract source file from.
+     * @param posInfo
+     *     The {@link PositionInfo} to extract source file from.
      * @return The source file name or {@code null} if not available.
      */
     public static String getSourcePath(PositionInfo posInfo) {
-       String result = null;
-       if (posInfo.getFileName() != null) {
-          result = posInfo.getFileName(); // posInfo.getFileName() is a path to a file
+        String result = null;
+        if (posInfo.getFileName() != null) {
+            result = posInfo.getFileName(); // posInfo.getFileName() is a path to a file
         } else if (posInfo.getParentClass() != null) {
-          result = posInfo.getParentClass(); // posInfo.getParentClass() is a path to a file
-       }
-       if (result != null && result.startsWith("FILE:")) {
-          result = result.substring("FILE:".length());
-       }
-       return result;
+            result = posInfo.getParentClass(); // posInfo.getParentClass() is a path to a file
+        }
+        if (result != null && result.startsWith("FILE:")) {
+            result = result.substring("FILE:".length());
+        }
+        return result;
     }
 
     /**
@@ -956,9 +1022,9 @@ public final class MiscTools {
      * ignored. The result is sorted (LinkedHashSet):
      *
      * @param s
-     *            The term to split.
+     *     The term to split.
      * @param splitAt
-     *            The <strong>binary</strong> operation op at which to split.
+     *     The <strong>binary</strong> operation op at which to split.
      * @return The constituents of the given set-like term.
      */
     public static Set<Term> disasembleSetTerm(Term s, Function splitAt) {
@@ -980,10 +1046,10 @@ public final class MiscTools {
      * also considering {@link JavaBlock}s.
      *
      * @param t
-     *            The {@link Term} from which to collect.
+     *     The {@link Term} from which to collect.
      * @param services
-     *            The {@link Services} object, for the
-     *            {@link ProgramVariableCollector}.
+     *     The {@link Services} object, for the
+     *     {@link ProgramVariableCollector}.
      *
      * @return All {@link LocationVariable}s in the given {@link Term}.
      */
@@ -1010,15 +1076,15 @@ public final class MiscTools {
      * Replaces all occurrences of pv by t in replaceIn.
      *
      * @param pv
-     *            The {@link LocationVariable} to replace.
+     *     The {@link LocationVariable} to replace.
      * @param with
-     *            The {@link Term} by which to replace pv.
+     *     The {@link Term} by which to replace pv.
      * @param replaceIn
-     *            The {@link Term} in which to replace pv by t.
+     *     The {@link Term} in which to replace pv by t.
      * @param services
-     *            The {@link Services} object, for the {@link TermBuilder}.
+     *     The {@link Services} object, for the {@link TermBuilder}.
      * @return The {@link Term} replaceIn with all occurrences of pv replaced by
-     *         t.
+     * t.
      */
     public static Term replaceVarInTerm(LocationVariable pv, Term with,
             final Term replaceIn, Services services) {
@@ -1035,9 +1101,9 @@ public final class MiscTools {
      * inside the given {@link Term}.
      *
      * @param t
-     *            The {@link Term} in which to simplify updates.
+     *     The {@link Term} in which to simplify updates.
      * @param services
-     *            The {@link Services} object.
+     *     The {@link Services} object.
      * @return The simplified {@link Term}.
      */
     public static Term simplifyUpdatesInTerm(Term t, Services services) {
@@ -1058,9 +1124,9 @@ public final class MiscTools {
      * normal form (no duplicates, no nested update applications).
      *
      * @param t
-     *            The update term to simplify.
+     *     The update term to simplify.
      * @param services
-     *            The {@link Services} object (for the {@link TermBuilder}).
+     *     The {@link Services} object (for the {@link TermBuilder}).
      * @return The simplified update {@link Term}.
      */
     public static Term simplifyUpdate(Term t, Services services) {
@@ -1089,10 +1155,10 @@ public final class MiscTools {
      * would have to think way more for doing it correctly.
      *
      * @param t
-     *            The update application term to simplify. If not an update
-     *            application term, the original term is directly returned.
+     *     The update application term to simplify. If not an update application
+     *     term, the original term is directly returned.
      * @param services
-     *            The {@link Services} object.
+     *     The {@link Services} object.
      * @return The simplified term.
      */
     public static Term simplifyUpdateApplication(Term t, Services services) {
@@ -1139,7 +1205,7 @@ public final class MiscTools {
 
     /**
      * @param t
-     *            The Term to check.
+     *     The Term to check.
      * @return true iff t contains an update application.
      */
     private static boolean containsUpdateApplications(Term t) {
@@ -1149,37 +1215,33 @@ public final class MiscTools {
         return !fv.result().isEmpty();
     }
 
-
     /**
      * Abstract Execution added program variables to assignable terms. They
      * appear as "singletonPV(x)" terms in the modifies clause. For loop
      * invariant applications, they have to be ignored (we obtain the modified
      * visible locals by static analysis). Therefore, we filter them from the
      * modifies term by this method.
-     * 
+     *
      * @param modTerm
-     *            The original modifies term, maybe with singletonPV functions.
+     *     The original modifies term, maybe with singletonPV functions.
      * @param services
-     *            The {@link Services} object (for {@link TermBuilder} and
-     *            {@link LocSetLDT}).
+     *     The {@link Services} object (for {@link TermBuilder} and
+     *     {@link LocSetLDT}).
      * @return The modTerm without singletonPV subterms.
      */
     public static Term removeSingletonPVs(Term modTerm, Services services) {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         final TermBuilder tb = services.getTermBuilder();
-    
+
         if (modTerm.op() == locSetLDT.getSingletonPV()) {
             return tb.empty();
-        }
-        else if (modTerm.op() == locSetLDT.getUnion()) {
+        } else if (modTerm.op() == locSetLDT.getUnion()) {
             return tb.union(removeSingletonPVs(modTerm.sub(0), services),
                     removeSingletonPVs(modTerm.sub(1), services));
-        }
-        else {
+        } else {
             return modTerm;
         }
     }
-
 
     /**
      * Returns the {@link LoopSpecification} for the program in the given term,
@@ -1188,51 +1250,49 @@ public final class MiscTools {
      * Asserts that there is indeed a Java block in the term which has as active
      * statement a loop statement, thus throws an {@link AssertionError} if not
      * or otherwise results in undefined behavior in that case.
-     * 
+     *
      * @param loopTerm
-     *            The term for which to return the {@link LoopSpecification}.
+     *     The term for which to return the {@link LoopSpecification}.
      * @param services
-     *            The {@link Services} object.
-     * 
+     *     The {@link Services} object.
+     *
      * @return The {@link LoopSpecification} for the loop statement in the given
-     *         term or an empty optional if there is no specified invariant for
-     *         the loop.
+     * term or an empty optional if there is no specified invariant for the
+     * loop.
      */
     public static Optional<LoopSpecification>
             getSpecForTermWithLoopStmt(final Term loopTerm, Services services) {
         assert loopTerm.op() instanceof Modality;
         assert loopTerm.javaBlock() != JavaBlock.EMPTY_JAVABLOCK;
-    
+
         final ProgramElement pe = loopTerm.javaBlock().program();
         assert pe != null;
         assert pe instanceof StatementBlock;
         assert ((StatementBlock) pe).getFirstElement() instanceof LoopStatement;
-    
+
         final LoopStatement loop = //
                 (LoopStatement) ((StatementBlock) pe).getFirstElement();
-    
+
         return Optional.ofNullable(
                 services.getSpecificationRepository().getLoopSpec(loop));
     }
 
-
     /**
      * @param services
-     *            The {@link Services} object.
+     *     The {@link Services} object.
      * @return true iff the given {@link Services} object is associated to a
-     *         {@link Profile} with permissions.
+     * {@link Profile} with permissions.
      */
     public static boolean isPermissions(Services services) {
         return services.getProfile() instanceof JavaProfile
                 && ((JavaProfile) services.getProfile()).withPermissions();
     }
 
-
     /**
      * Checks whether the given {@link Modality} is a transaction modality.
-     * 
+     *
      * @param modality
-     *            The modality to check.
+     *     The modality to check.
      * @return true iff the given {@link Modality} is a transaction modality.
      */
     public static boolean isTransaction(final Modality modality) {
@@ -1244,28 +1304,28 @@ public final class MiscTools {
      * Returns the applicable heap contexts out of the currently available set
      * of three contexts: The normal heap, the saved heap (transaction), and the
      * permission heap.
-     * 
+     *
      * @param modality
-     *            The current modality (checked for transaction).
+     *     The current modality (checked for transaction).
      * @param services
-     *            The {@link Services} object (for {@link HeapLDT} and for
-     *            checking whether we're in the permissions profile).
+     *     The {@link Services} object (for {@link HeapLDT} and for checking
+     *     whether we're in the permissions profile).
      * @return The list of the applicable heaps for the given scenario.
      */
-    public static List<LocationVariable> applicableHeapContexts(Modality modality,
-            Services services) {
+    public static List<LocationVariable>
+            applicableHeapContexts(Modality modality, Services services) {
         final List<LocationVariable> result = new ArrayList<>();
-    
+
         result.add(services.getTypeConverter().getHeapLDT().getHeap());
-    
+
         if (isTransaction(modality)) {
             result.add(services.getTypeConverter().getHeapLDT().getSavedHeap());
         }
-    
+
         if (isPermissions(services)) {
             result.add(services.getTypeConverter().getHeapLDT()
                     .getPermissionHeap());
         }
-       return result;
+        return result;
     }
 }

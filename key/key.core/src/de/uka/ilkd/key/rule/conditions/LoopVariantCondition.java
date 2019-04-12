@@ -13,7 +13,7 @@ import de.uka.ilkd.key.speclang.LoopSpecification;
 
 /**
  * Extracts the variant for a loop term.
- * 
+ *
  * @author Dominic Steinhoefel
  */
 public class LoopVariantCondition implements VariableCondition {
@@ -37,7 +37,7 @@ public class LoopVariantCondition implements VariableCondition {
 
         final LoopStatement loop = (LoopStatement) svInst
                 .getInstantiation(loopStmtSV);
-        final LoopSpecification loopSpec = //
+        final LoopSpecification loopSpec =//
                 services.getSpecificationRepository().getLoopSpec(loop);
 
         if (loopSpec == null) {
@@ -50,7 +50,7 @@ public class LoopVariantCondition implements VariableCondition {
             return null;
         }
 
-        return matchCond.setInstantiations( //
+        return matchCond.setInstantiations(//
                 svInst.add(variantSV, variant, services));
     }
 

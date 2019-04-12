@@ -150,8 +150,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
                 success = success
                         || !pushThroughRes.remainingConcreteUpdate.isPresent();
                 resultingUpdates.add(pushThroughRes.resultingAbstractUpdate);
-            }
-            else {
+            } else {
                 resultingUpdates.add(currentConcrUpdate);
                 resultingUpdates.add(currentAbstractUpdate);
                 currentConcrUpdate = null;
@@ -164,8 +163,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
                                 .orElseThrow(() -> new RuntimeException(
                                         "Access to empty Optional, check for isPresent before!"));
                 success = true;
-            }
-            else {
+            } else {
                 /* Nothing remains to be pushed through, wrap up. */
                 resultingUpdates.addAll(abstrUpdatesToProcess);
                 currentConcrUpdate = null;
@@ -188,15 +186,15 @@ public final class ApplyConcrOnAbstrUpdateCondition
      * normal form and a single (i.e., not concatenated) abstract update.
      *
      * @param concrUpdate
-     *            The concrete update to push through.
+     *     The concrete update to push through.
      * @param abstrUpdateTerm
-     *            The abstract update on which to apply the concrete one.
+     *     The abstract update on which to apply the concrete one.
      * @param tb
      * @param services
-     *            The {@link Services} object.
+     *     The {@link Services} object.
      * @return The new abstract (first component) and concrete (second
-     *         component) update, or null if the operation is not allowed (if
-     *         allLocs is in the game...).
+     * component) update, or null if the operation is not allowed (if allLocs is
+     * in the game...).
      */
     private PushThroughResult pushThroughConcrUpdate(final Term concrUpdate,
             final Term abstrUpdateTerm, final Services services) {
@@ -283,8 +281,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
                     if (!isHeapVar) {
                         currentFollowingConcrUpdElems
                                 .add(tb.elementary(lhs, rhs));
-                    }
-                    else {
+                    } else {
                         pushThroughFields.add((FieldLoc) lhsLoc);
                     }
                 }
@@ -294,8 +291,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
                         currentRemainingConcrUpdElems
                                 .add(tb.elementary(lhs, rhs));
                     }
-                }
-                else {
+                } else {
                     success = true;
                     if (isHeapVar) {
                         dropFields.add((FieldLoc) lhsLoc);
@@ -357,8 +353,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
                 filterFieldLocsFromStoreExpr(t.sub(0), fieldsToKeep, services);
         if (!fieldsToKeep.contains(reprLoc)) {
             return subResult;
-        }
-        else {
+        } else {
             return tb.store(subResult, t.sub(1), t.sub(2), t.sub(3));
         }
     }
@@ -384,8 +379,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
                 removeFieldLocsFromStoreExpr(t.sub(0), fieldsToDrop, services);
         if (fieldsToDrop.contains(reprLoc)) {
             return subResult;
-        }
-        else {
+        } else {
             return tb.store(subResult, t.sub(1), t.sub(2), t.sub(3));
         }
     }

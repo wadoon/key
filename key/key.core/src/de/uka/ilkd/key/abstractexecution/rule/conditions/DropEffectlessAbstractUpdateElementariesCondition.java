@@ -130,9 +130,8 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             if (newElementaryAbstractUpdates.equals(origAbstractUpdates)) {
                 return null;
             }
-        }
-        else {
-            newResult = dropEffectlessAbstractUpdateElementaries( //
+        } else {
+            newResult = dropEffectlessAbstractUpdateElementaries(//
                     u, target, runtimeInstance, services);
         }
 
@@ -143,14 +142,13 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
         return mc.setInstantiations(svInst.add(resultSV, newResult, services));
     }
 
-    private static List<Term> extractAbstractUpdatesFromConcatenation(
-            Term concatenation) {
+    private static List<Term>
+            extractAbstractUpdatesFromConcatenation(Term concatenation) {
         final List<Term> result = new ArrayList<>();
 
         if (concatenation.op() instanceof AbstractUpdate) {
             result.add(concatenation);
-        }
-        else {
+        } else {
             for (Term sub : concatenation.subs()) {
                 result.addAll(extractAbstractUpdatesFromConcatenation(sub));
             }
@@ -234,8 +232,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
         }
 
         final Set<AbstrUpdateRHS> newAccessibles = //
-                accessibleLocs.stream()
-                        .map(AbstrUpdateRHS.class::cast)
+                accessibleLocs.stream().map(AbstrUpdateRHS.class::cast)
                         // .filter(loc -> visitor.getResult().contains(loc))
                         .collect(Collectors
                                 .toCollection(() -> new LinkedHashSet<>()));

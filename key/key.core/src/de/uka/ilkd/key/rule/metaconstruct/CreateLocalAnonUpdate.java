@@ -34,7 +34,7 @@ import de.uka.ilkd.key.util.MiscTools;
  * Expects a loop body and creates the anonymizing update
  * <code>out_1:=anon_1||...||out_n:=anon_n</code>, where anon_1, ..., anon_n are
  * the written variables in the loop body visible to the outside.
- * 
+ *
  * @author Dominic Steinhoefel
  */
 public final class CreateLocalAnonUpdate extends AbstractTermTransformer {

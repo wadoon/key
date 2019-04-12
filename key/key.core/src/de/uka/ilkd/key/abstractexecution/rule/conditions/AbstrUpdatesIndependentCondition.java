@@ -128,8 +128,8 @@ public final class AbstrUpdatesIndependentCondition
 
     @Override
     public String toString() {
-        return String.format( //
-                "\\abstrUpdatesIndependent(%s, %s)", //
+        return String.format(//
+                "\\abstrUpdatesIndependent(%s, %s)",//
                 u1, u2);
     }
 }

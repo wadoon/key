@@ -148,8 +148,8 @@ public final class ApplyAbstrOnConcrUpdateCondition
             }
 
             /* Check that y is no left-hand side of the concrete update */
-            if (MergeRuleUtils.getUpdateLeftSideLocations(newConcreteUpdate, services.getTermBuilder())
-                    .contains(y)) {
+            if (MergeRuleUtils.getUpdateLeftSideLocations(newConcreteUpdate,
+                    services.getTermBuilder()).contains(y)) {
                 continue;
             }
 
@@ -193,11 +193,11 @@ public final class ApplyAbstrOnConcrUpdateCondition
      * Removes the elementary "lhs:=..." from the given concrete update.
      *
      * @param update
-     *            The update from which to remove the elementary.
+     *     The update from which to remove the elementary.
      * @param lhs
-     *            The lhs of the elementary to remove.
+     *     The lhs of the elementary to remove.
      * @param tb
-     *            {@link TermBuilder} object.
+     *     {@link TermBuilder} object.
      * @return The new update.
      */
     private Term removeElementaryWithLHS(final Term update,

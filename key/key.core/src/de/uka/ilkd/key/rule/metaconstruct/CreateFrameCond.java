@@ -40,7 +40,7 @@ import de.uka.ilkd.key.util.MiscTools;
  * taclet, created by a variable condition; new symbols created there are not
  * automatically stored in the proof, or will be generated/stored multiple
  * times.
- * 
+ *
  * @author Dominic Steinhoefel
  */
 public final class CreateFrameCond extends AbstractTermTransformer {
@@ -80,17 +80,17 @@ public final class CreateFrameCond extends AbstractTermTransformer {
 
     /**
      * Creates the frame condition.
-     * 
+     *
      * @param loopSpec
-     *            The {@link LoopSpecification}, for the modifies clause.
+     *     The {@link LoopSpecification}, for the modifies clause.
      * @param isTransaction
-     *            A flag set to true iff the current modality is a transaction
-     *            modality.
+     *     A flag set to true iff the current modality is a transaction
+     *     modality.
      * @param heapToBeforeLoopMap
-     *            The map from heap variables to a map from original to
-     *            pre-state terms.
+     *     The map from heap variables to a map from original to pre-state
+     *     terms.
      * @param services
-     *            The {@link Services} object.
+     *     The {@link Services} object.
      * @return The frame condition.
      */
     private static Term createFrameCondition(final LoopSpecification loopSpec,
@@ -115,8 +115,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
             if (tb.strictlyNothing().equals(mod)) {
                 fc = tb.frameStrictlyEmpty(tb.var(heap),
                         heapToBeforeLoopMap.get(heap));
-            }
-            else {
+            } else {
                 fc = tb.frame(tb.var(heap), heapToBeforeLoopMap.get(heap), mod);
             }
 
@@ -131,22 +130,22 @@ public final class CreateFrameCond extends AbstractTermTransformer {
      * Creates the map from heap variables to a map from original terms to the
      * pre-state terms. Thereby, saves the new variables in the namespaces
      * (which should not have occurred before!).
-     * 
+     *
      * @param isTransaction
-     *            Signals that the current modality is a transaction modality.
+     *     Signals that the current modality is a transaction modality.
      * @param isPermissions
-     *            Signals that the current profile is one with permissions.
+     *     Signals that the current profile is one with permissions.
      * @param heapBeforePV
-     *            The fresh PV for saving the standard heap.
+     *     The fresh PV for saving the standard heap.
      * @param savedHeapBeforePV
-     *            The fresh PV for saving the transaction heap.
+     *     The fresh PV for saving the transaction heap.
      * @param permissionsHeapBeforePV
-     *            The fresh PV for saving the permissions heap.
+     *     The fresh PV for saving the permissions heap.
      * @param services
-     *            The {@link Services} object.
-     * 
+     *     The {@link Services} object.
+     *
      * @return A map from heap variables to a map from original terms to the
-     *         pre-state terms.
+     * pre-state terms.
      */
     private Map<LocationVariable, Map<Term, Term>> createHeapToBeforeLoopMap(
             boolean isTransaction, boolean isPermissions,

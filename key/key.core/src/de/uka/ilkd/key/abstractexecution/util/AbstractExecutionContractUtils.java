@@ -54,14 +54,14 @@ public class AbstractExecutionContractUtils {
      * the given {@link AbstractPlaceholderStatement}.
      *
      * @param aps
-     *            The {@link AbstractPlaceholderStatement} for which to return
-     *            the accessible locations.
+     *     The {@link AbstractPlaceholderStatement} for which to return the
+     *     accessible locations.
      * @param context
-     *            The context program (for choosing the "right" contract).
+     *     The context program (for choosing the "right" contract).
      * @param services
-     *            The {@link Services} object.
+     *     The {@link Services} object.
      * @return The accessible locations for the given
-     *         {@link AbstractPlaceholderStatement}.
+     * {@link AbstractPlaceholderStatement}.
      */
     public static Set<AbstrUpdateRHS> getAccessibleTermsForNoBehaviorContract(
             AbstractPlaceholderStatement aps, ProgramElement context,
@@ -75,14 +75,14 @@ public class AbstractExecutionContractUtils {
      * contract for the given {@link AbstractPlaceholderStatement}.
      *
      * @param aps
-     *            The {@link AbstractPlaceholderStatement} for which to return
-     *            the accessible {@link ProgramVariable}s.
+     *     The {@link AbstractPlaceholderStatement} for which to return the
+     *     accessible {@link ProgramVariable}s.
      * @param context
-     *            The context program (for choosing the "right" contract).
+     *     The context program (for choosing the "right" contract).
      * @param services
-     *            The {@link Services} object.
+     *     The {@link Services} object.
      * @return The accessible {@link ProgramVariable}s for the given
-     *         {@link AbstractPlaceholderStatement}.
+     * {@link AbstractPlaceholderStatement}.
      */
     public static List<ProgramVariable>
             getAccessibleProgVarsForNoBehaviorContract(
@@ -99,14 +99,14 @@ public class AbstractExecutionContractUtils {
      * the given {@link AbstractPlaceholderStatement}.
      *
      * @param aps
-     *            The {@link AbstractPlaceholderStatement} for which to return
-     *            the assignable locations.
+     *     The {@link AbstractPlaceholderStatement} for which to return the
+     *     assignable locations.
      * @param context
-     *            The context program (for choosing the "right" contract).
+     *     The context program (for choosing the "right" contract).
      * @param services
-     *            The {@link Services} object.
+     *     The {@link Services} object.
      * @return The assignable locations for the given
-     *         {@link AbstractPlaceholderStatement}.
+     * {@link AbstractPlaceholderStatement}.
      */
     public static Set<AbstrUpdateLHS> getAssignableOpsForNoBehaviorContract(
             AbstractPlaceholderStatement aps, ProgramElement context,
@@ -120,14 +120,14 @@ public class AbstractExecutionContractUtils {
      * contract for the given {@link AbstractPlaceholderStatement}.
      *
      * @param aps
-     *            The {@link AbstractPlaceholderStatement} for which to return
-     *            the assignable {@link ProgramVariable}s.
+     *     The {@link AbstractPlaceholderStatement} for which to return the
+     *     assignable {@link ProgramVariable}s.
      * @param context
-     *            The context program (for choosing the "right" contract).
+     *     The context program (for choosing the "right" contract).
      * @param services
-     *            The {@link Services} object.
+     *     The {@link Services} object.
      * @return The assignable {@link ProgramVariable}s for the given
-     *         {@link AbstractPlaceholderStatement}.
+     * {@link AbstractPlaceholderStatement}.
      */
     public static List<ProgramVariable>
             getAssignableProgVarsForNoBehaviorContract(
@@ -147,15 +147,15 @@ public class AbstractExecutionContractUtils {
      * {@link #findRightContract(List, ProgramElement, LocationVariable, Services)}).
      *
      * @param contracts
-     *            The list of contracts for the placeholder statement.
+     *     The list of contracts for the placeholder statement.
      * @param svInst
-     *            The {@link SVInstantiations}.
+     *     The {@link SVInstantiations}.
      * @param heap
-     *            The heap term.
+     *     The heap term.
      * @param services
-     *            The services object.
+     *     The services object.
      * @return The most suitable {@link BlockContract} of the list. Will return
-     *         null iff the given contracts list is empty.
+     * null iff the given contracts list is empty.
      */
     public static BlockContract findRightContract(
             final List<BlockContract> contracts, final SVInstantiations svInst,
@@ -171,15 +171,15 @@ public class AbstractExecutionContractUtils {
      * quite ad-hoc.
      *
      * @param contracts
-     *            The list of contracts for the placeholder statement.
+     *     The list of contracts for the placeholder statement.
      * @param contextProgram
-     *            The context program (for choosing the right contract).
+     *     The context program (for choosing the right contract).
      * @param heap
-     *            The heap term.
+     *     The heap term.
      * @param services
-     *            The services object.
+     *     The services object.
      * @return The most suitable {@link BlockContract} of the list. Will return
-     *         null iff the given contracts list is empty.
+     * null iff the given contracts list is empty.
      */
     public static BlockContract findRightContract(
             final List<BlockContract> contracts,
@@ -201,15 +201,15 @@ public class AbstractExecutionContractUtils {
      * first one wins.
      *
      * @param contracts
-     *            The list of contracts for the placeholder statement.
+     *     The list of contracts for the placeholder statement.
      * @param contextProgram
-     *            The context program (for choosing the right contract).
+     *     The context program (for choosing the right contract).
      * @param heap
-     *            The heap term.
+     *     The heap term.
      * @param services
-     *            The services object.
+     *     The services object.
      * @return The most suitable {@link BlockContract} of the list. Will return
-     *         null iff the given contracts list is empty.
+     * null iff the given contracts list is empty.
      */
     public static BlockContract findRightContract(
             final List<BlockContract> contracts,
@@ -247,8 +247,7 @@ public class AbstractExecutionContractUtils {
                     contract = bc;
                 }
             }
-        }
-        else {
+        } else {
             contract = contracts.iterator().next();
         }
         return contract;
@@ -266,15 +265,15 @@ public class AbstractExecutionContractUtils {
      * {@link AbstrUpdateRHS}s.
      *
      * @param abstrStmt
-     *            The {@link AbstractPlaceholderStatement} for which to extract
-     *            the accessible and assignable clause.
+     *     The {@link AbstractPlaceholderStatement} for which to extract the
+     *     accessible and assignable clause.
      * @param contextProgram
-     *            The context program to determine the right contract (after
-     *            renamings).
+     *     The context program to determine the right contract (after
+     *     renamings).
      * @param services
-     *            The {@link Services} object.
+     *     The {@link Services} object.
      * @return A pair of (1) the accessible and (2) the assignable locations for
-     *         the {@link AbstractPlaceholderStatement}.
+     * the {@link AbstractPlaceholderStatement}.
      */
     public static Pair<Set<AbstrUpdateRHS>, Set<AbstrUpdateLHS>>
             getAccessibleAndAssignableTermsForNoBehaviorContract(
@@ -295,19 +294,19 @@ public class AbstractExecutionContractUtils {
      * (everything assignable and accessible).
      *
      * @param abstrStmt
-     *            The {@link AbstractPlaceholderStatement} for which to extract
-     *            the accessible and assignable clause.
+     *     The {@link AbstractPlaceholderStatement} for which to extract the
+     *     accessible and assignable clause.
      * @param surroundingVars
-     *            {@link LocationVariable}s in the context to distinguish
-     *            several contracts.
+     *     {@link LocationVariable}s in the context to distinguish several
+     *     contracts.
      * @param runtimeInstance
-     *            An optional runtime instance {@link LocationVariable} to
-     *            normalize self terms (because otherwise, there might be
-     *            different such terms around).
+     *     An optional runtime instance {@link LocationVariable} to normalize
+     *     self terms (because otherwise, there might be different such terms
+     *     around).
      * @param services
-     *            The {@link Services} object.
+     *     The {@link Services} object.
      * @return A pair of (1) the accessible and (2) the assignable locations for
-     *         the {@link AbstractPlaceholderStatement}.
+     * the {@link AbstractPlaceholderStatement}.
      */
     public static Pair<Set<AbstrUpdateRHS>, Set<AbstrUpdateLHS>>
             getAccessibleAndAssignableTermsForNoBehaviorContract(
@@ -328,8 +327,7 @@ public class AbstractExecutionContractUtils {
                     .singleton(new AllLocsLoc(locSetLDT.getAllLocs()));
             assignableClause = Collections
                     .singleton(new AllLocsLoc(locSetLDT.getAllLocs()));
-        }
-        else {
+        } else {
             final LocationVariable heap = services.getTypeConverter()
                     .getHeapLDT().getHeap();
 
@@ -361,18 +359,18 @@ public class AbstractExecutionContractUtils {
      * (everything assignable and accessible).
      *
      * @param abstrStmt
-     *            The {@link AbstractPlaceholderStatement} for which to extract
-     *            the accessible and assignable locations.
+     *     The {@link AbstractPlaceholderStatement} for which to extract the
+     *     accessible and assignable locations.
      * @param services
-     *            The {@link Services} object.
+     *     The {@link Services} object.
      * @param runtimeInstance
-     *            An optional runtime instance {@link LocationVariable} to
-     *            normalize self terms (because otherwise, there might be
-     *            different such terms around).
+     *     An optional runtime instance {@link LocationVariable} to normalize
+     *     self terms (because otherwise, there might be different such terms
+     *     around).
      * @param svInst
-     *            The current {@link SVInstantiations} (for the context).
+     *     The current {@link SVInstantiations} (for the context).
      * @return A pair of (1) the accessible and (2) the assignable locations for
-     *         the {@link AbstractPlaceholderStatement}.
+     * the {@link AbstractPlaceholderStatement}.
      */
     public static Pair<Set<AbstrUpdateRHS>, Set<AbstrUpdateLHS>>
             getAccessibleAndAssignableTermsForNoBehaviorContract(
@@ -417,12 +415,12 @@ public class AbstractExecutionContractUtils {
      * behavior (like "exceptional_behavior" etc.).
      *
      * @param abstrStmt
-     *            The {@link AbstractPlaceholderStatement} for which to return
-     *            the contracts.
+     *     The {@link AbstractPlaceholderStatement} for which to return the
+     *     contracts.
      * @param services
-     *            The {@link Services} object.
+     *     The {@link Services} object.
      * @return All the contracts for the given
-     *         {@link AbstractPlaceholderStatement}.
+     * {@link AbstractPlaceholderStatement}.
      */
     public static List<BlockContract> getNoBehaviorContracts(
             final AbstractPlaceholderStatement abstrStmt,
