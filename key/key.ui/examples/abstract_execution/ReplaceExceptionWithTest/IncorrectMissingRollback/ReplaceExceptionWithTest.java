@@ -28,25 +28,25 @@ public class ReplaceExceptionWithTest {
         //@ declares \dl_localsInit;
         //@ assignable \dl_localsInit, \dl_args, res;
         //@ accessible \dl_localsInit, \dl_args, res;
-        { abstract_statement Init; }
+        { \abstract_statement Init; }
 
         try {
             //@ declares \dl_localsNormal;
             //@ assignable \dl_localsNormal, \dl_localsInit, \dl_args, res;
             //@ accessible \dl_localsNormal, \dl_localsInit, \dl_args, res;
             //@ exceptional_behavior requires throwsExc;
-            { abstract_statement Normal; }
+            { \abstract_statement Normal; }
         } catch (Throwable t) {
             //@ declares \dl_localsExceptional;
             //@ assignable \dl_localsInit, \dl_localsExceptional, \dl_args, res;
             //@ accessible \dl_localsInit, \dl_localsExceptional, \dl_args, res;
-            { abstract_statement Exceptional; }
+            { \abstract_statement Exceptional; }
         }
 
         //@ declares \dl_localsAfter;
         //@ assignable \dl_localsAfter, \dl_localsInit, \dl_localsInit, \dl_args, res;
         //@ accessible \dl_localsAfter, \dl_localsInit, \dl_localsInit, \dl_args, res;
-        { abstract_statement After; }
+        { \abstract_statement After; }
         
         return res;
     }
@@ -56,25 +56,25 @@ public class ReplaceExceptionWithTest {
         //@ declares \dl_localsInit;
         //@ assignable \dl_localsInit, \dl_args, res;
         //@ accessible \dl_localsInit, \dl_args, res;
-        { abstract_statement Init; }
+        { \abstract_statement Init; }
 
         if (!throwsExc) {
             //@ declares \dl_localsNormal;
             //@ assignable \dl_localsNormal, \dl_localsInit, \dl_args, res;
             //@ accessible \dl_localsNormal, \dl_localsInit, \dl_args, res;
             //@ exceptional_behavior requires throwsExc;
-            { abstract_statement Normal; }
+            { \abstract_statement Normal; }
         } else {
             //@ declares \dl_localsExceptional;
             //@ assignable \dl_localsInit, \dl_localsExceptional, \dl_args, res;
             //@ accessible \dl_localsInit, \dl_localsExceptional, \dl_args, res;
-            { abstract_statement Exceptional; }
+            { \abstract_statement Exceptional; }
         }
 
         //@ declares \dl_localsAfter;
         //@ assignable \dl_localsAfter, \dl_localsInit, \dl_localsInit, \dl_args, res;
         //@ accessible \dl_localsAfter, \dl_localsInit, \dl_localsInit, \dl_args, res;
-        { abstract_statement After; }
+        { \abstract_statement After; }
         
         return res;
     }

@@ -24,19 +24,19 @@ public class SplitLoopRefactoring {
         //@ declares \dl_localsPreProc;
         //@ assignable \dl_heap, \dl_localsPreProc, res;
         //@ accessible \dl_heap, \dl_localsPreProc, res, loopArgs;
-        { abstract_statement PreProc; }
+        { \abstract_statement PreProc; }
         
         //@ declares \dl_outA;
         //@ assignable \dl_outA;
         //@ accessible \nothing;
-        { abstract_statement InitA; }
+        { \abstract_statement InitA; }
 
         //@ declares \dl_outB;
         //@ assignable \dl_outB;
         //@ accessible \nothing;
         //@ return_behavior requires false;
         //@ exceptional_behavior requires false;
-        { abstract_statement InitB; }
+        { \abstract_statement InitB; }
       
         i = -1;
         
@@ -52,7 +52,7 @@ public class SplitLoopRefactoring {
             //@ accessible \dl_localsLoopBodyA, obj, res, \dl_localsPreProc;
             //@ break_behavior requires false;
             //@ continue_behavior requires false;
-            { abstract_statement LoopBodyA; }
+            { \abstract_statement LoopBodyA; }
             
             //@ declares \dl_localsLoopBodyB;
             //@ assignable \dl_localsLoopBodyB, \dl_outB;
@@ -60,23 +60,23 @@ public class SplitLoopRefactoring {
             //@ return_behavior requires false;
             //@ exceptional_behavior requires false;
             //@ break_behavior requires false;
-            { abstract_statement LoopBodyB; }
+            { \abstract_statement LoopBodyB; }
         }
 
         //@ declares \dl_localsPostProcA;
         //@ assignable \dl_localsPostProcA;
         //@ accessible \dl_heap, \dl_localsPostProcA, res, \dl_outA, \dl_localsPreProc;
-        { abstract_statement PostProcA; }
+        { \abstract_statement PostProcA; }
 
         //@ declares \dl_localsPostProcB;
         //@ assignable \dl_heap, \dl_localsPostProcB;
         //@ accessible \dl_heap, \dl_localsPostProcB, res, \dl_outB, \dl_localsPreProc;
-        { abstract_statement PostProcB; }
+        { \abstract_statement PostProcB; }
 
         //@ declares \dl_localsPostProc;
         //@ assignable \dl_heap, \dl_localsPostProc, \dl_localsPreProc, \dl_outA, \dl_outB, \dl_localsPostProcA, \dl_localsPostProcB, res;
         //@ accessible \dl_heap, \dl_localsPostProc, \dl_localsPreProc, \dl_outA, \dl_outB, \dl_localsPostProcA, \dl_localsPostProcB, res;
-        { abstract_statement PostProc; }
+        { \abstract_statement PostProc; }
 
         return res;
     }
@@ -85,12 +85,12 @@ public class SplitLoopRefactoring {
         //@ declares \dl_localsPreProc;
         //@ assignable \dl_heap, \dl_localsPreProc, res;
         //@ accessible \dl_heap, \dl_localsPreProc, res, loopArgs;
-        { abstract_statement PreProc; }
+        { \abstract_statement PreProc; }
         
         //@ declares \dl_outA;
         //@ assignable \dl_outA;
         //@ accessible \nothing;
-        { abstract_statement InitA; }
+        { \abstract_statement InitA; }
 
         i = -1;
         
@@ -106,20 +106,20 @@ public class SplitLoopRefactoring {
             //@ accessible \dl_localsLoopBodyA, obj, res, \dl_localsPreProc;
             //@ break_behavior requires false;
             //@ continue_behavior requires false;
-            { abstract_statement LoopBodyA; }
+            { \abstract_statement LoopBodyA; }
         }
 
         //@ declares \dl_localsPostProcA;
         //@ assignable \dl_localsPostProcA;
         //@ accessible \dl_heap, \dl_localsPostProcA, res, \dl_outA, \dl_localsPreProc;
-        { abstract_statement PostProcA; }
+        { \abstract_statement PostProcA; }
         
         //@ declares \dl_outB;
         //@ assignable \dl_outB;
         //@ accessible \nothing;
         //@ return_behavior requires false;
         //@ exceptional_behavior requires false;
-        { abstract_statement InitB; }
+        { \abstract_statement InitB; }
        
         i = -1;
         
@@ -136,18 +136,18 @@ public class SplitLoopRefactoring {
             //@ return_behavior requires false;
             //@ exceptional_behavior requires false;
             //@ break_behavior requires false;
-            { abstract_statement LoopBodyB; }
+            { \abstract_statement LoopBodyB; }
         }
 
         //@ declares \dl_localsPostProcB;
         //@ assignable \dl_heap, \dl_localsPostProcB;
         //@ accessible \dl_heap, \dl_localsPostProcB, res, \dl_outB, \dl_localsPreProc;
-        { abstract_statement PostProcB; }
+        { \abstract_statement PostProcB; }
 
         //@ declares \dl_localsPostProc;
         //@ assignable \dl_heap, \dl_localsPostProc, \dl_localsPreProc, \dl_outA, \dl_outB, \dl_localsPostProcA, \dl_localsPostProcB, res;
         //@ accessible \dl_heap, \dl_localsPostProc, \dl_localsPreProc, \dl_outA, \dl_outB, \dl_localsPostProcA, \dl_localsPostProcB, res;
-        { abstract_statement PostProc; }
+        { \abstract_statement PostProc; }
 
         return res;
     }

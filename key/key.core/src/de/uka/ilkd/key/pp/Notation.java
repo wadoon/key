@@ -16,6 +16,7 @@ package de.uka.ilkd.key.pp;
 import java.io.IOException;
 import java.util.Iterator;
 
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 
 import de.uka.ilkd.key.java.ProgramElement;
@@ -575,8 +576,8 @@ public abstract class Notation {
 		} else {
 		    // logger.debug("Instantiation of " + t+ " [" + t.op() +
                         // "]" + " known.");
-		    if (o instanceof ImmutableList) {
-            final Iterator<Object> it = ((ImmutableList<Object>) o)
+		    if (o instanceof ImmutableList || o instanceof ImmutableArray) {
+            final Iterator<Object> it = ((Iterable<Object>) o)
 				.iterator();
 			sp.getLayouter().print("{");
 			while (it.hasNext()) {

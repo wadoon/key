@@ -2372,7 +2372,7 @@ public class PrettyPrinter {
         markStart(0, x);
         printHeader(x);
         writeInternalIndentation(x);
-        write("abstract_statement ");
+        write("\\abstract_statement ");
         write(x.getId());
         write(";");
         printFooter(x);

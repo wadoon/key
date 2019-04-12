@@ -13,7 +13,7 @@ public class TestAEHeap {
         //@ accessible this.field1, this.field2;
         //@ return_behavior requires false;
         //@ exceptional_behavior requires false;
-        { abstract_statement P; }
+        { \abstract_statement P; }
        
         return;
     }
@@ -29,7 +29,7 @@ public class TestAEHeap {
         //@ accessible this.field1, this.field2;
         //@ return_behavior requires false;
         //@ exceptional_behavior requires false;
-        { abstract_statement P; }
+        { \abstract_statement P; }
        
         return;
     }

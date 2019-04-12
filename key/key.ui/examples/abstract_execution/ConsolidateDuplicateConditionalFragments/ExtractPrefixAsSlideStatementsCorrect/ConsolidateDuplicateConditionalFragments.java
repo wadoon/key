@@ -42,7 +42,7 @@ public class ConsolidateDuplicateConditionalFragments {
         //@ accessible \dl_localsInit, \dl_params;
         //@ return_behavior requires false;
         //@ exceptional_behavior requires \dl_initThrows;
-        { abstract_statement Init; }
+        { \abstract_statement Init; }
         
         if (b) {
             //@ declares \dl_localsP;
@@ -50,23 +50,23 @@ public class ConsolidateDuplicateConditionalFragments {
             //@ accessible \dl_heap, \dl_localsP, res, \dl_params;
             //@ return_behavior requires \dl_pReturns;
             //@ exceptional_behavior requires \dl_pThrows;
-            { abstract_statement P; }
+            { \abstract_statement P; }
             
             //@ declares \dl_localsQ1;
             //@ assignable \dl_allLocs;
             //@ accessible \dl_allLocs;
-            { abstract_statement Q1; }
+            { \abstract_statement Q1; }
         }
         else {
             //@ declares \dl_localsP;
             //@ assignable \dl_heap, \dl_localsP, res;
             //@ accessible \dl_heap, \dl_localsP, res, \dl_params;
-            { abstract_statement P; }
+            { \abstract_statement P; }
 
             //@ declares \dl_localsQ2;
             //@ assignable \dl_allLocs;
             //@ accessible \dl_allLocs;
-            { abstract_statement Q2; }
+            { \abstract_statement Q2; }
         }
 
         return res;
@@ -79,26 +79,26 @@ public class ConsolidateDuplicateConditionalFragments {
         //@ accessible \dl_heap, \dl_localsP, res, \dl_params;
         //@ return_behavior requires \dl_pReturns;
         //@ exceptional_behavior requires \dl_pThrows;
-        { abstract_statement P; }
+        { \abstract_statement P; }
         
         //@ declares \dl_localsInit;
         //@ assignable \dl_localsInit, \dl_hasTo(b);
         //@ accessible \dl_localsInit, \dl_params;
         //@ return_behavior requires false;
         //@ exceptional_behavior requires \dl_initThrows;
-        { abstract_statement Init; }
+        { \abstract_statement Init; }
         
         if (b) {
             //@ declares \dl_localsQ1;
             //@ assignable \dl_allLocs;
             //@ accessible \dl_allLocs;
-            { abstract_statement Q1; }
+            { \abstract_statement Q1; }
         }
         else {
             //@ declares \dl_localsQ2;
             //@ assignable \dl_allLocs;
             //@ accessible \dl_allLocs;
-            { abstract_statement Q2; }
+            { \abstract_statement Q2; }
         }
 
         return res;

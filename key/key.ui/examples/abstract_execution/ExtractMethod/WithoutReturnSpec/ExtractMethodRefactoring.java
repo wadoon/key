@@ -23,17 +23,17 @@ public class ExtractMethodRefactoring {
         //@ declares \dl_localsP;
         //@ assignable \dl_heap, \dl_localsP, \dl_args, tmp, res;
         //@ accessible \dl_heap, \dl_localsP, \dl_args, tmp, res;
-        { abstract_statement P; }
+        { \abstract_statement P; }
 
         //@ declares \dl_localsQ;
         //@ assignable \dl_hasTo(tmp), \dl_heap, \dl_localsQ;
         //@ accessible \dl_heap, \dl_localsP, \dl_localsQ, \dl_args, tmp, res;
-        { abstract_statement Q; }
+        { \abstract_statement Q; }
 
         //@ declares \dl_localsR;
         //@ assignable \dl_heap, \dl_localsP, \dl_localsR, \dl_args, tmp, res;
         //@ accessible \dl_heap, \dl_localsP, \dl_localsR, \dl_args, tmp, res;
-        { abstract_statement R; }
+        { \abstract_statement R; }
 
         return res;
     }
@@ -43,14 +43,14 @@ public class ExtractMethodRefactoring {
         //@ declares \dl_localsP;
         //@ assignable \dl_heap, \dl_localsP, \dl_args, tmp, res;
         //@ accessible \dl_heap, \dl_localsP, \dl_args, tmp, res;
-        { abstract_statement P; }
+        { \abstract_statement P; }
 
         tmp = extracted(res, tmp);
 
         //@ declares \dl_localsR;
         //@ assignable \dl_heap, \dl_localsP, \dl_localsR, \dl_args, tmp, res;
         //@ accessible \dl_heap, \dl_localsP, \dl_localsR, \dl_args, tmp, res;
-        { abstract_statement R; }
+        { \abstract_statement R; }
 
         return res;
     }
@@ -60,7 +60,7 @@ public class ExtractMethodRefactoring {
         //@ declares \dl_localsQ;
         //@ assignable \dl_hasTo(tmp), \dl_heap, \dl_localsQ;
         //@ accessible \dl_heap, \dl_localsP, \dl_localsQ, \dl_args, tmp, res;
-        { abstract_statement Q; }
+        { \abstract_statement Q; }
 
         return tmp;
     }

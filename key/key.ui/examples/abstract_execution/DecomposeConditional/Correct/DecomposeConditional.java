@@ -38,26 +38,26 @@ public class DecomposeConditional {
         //@ assignable \dl_hasTo(guard);
         //@ accessible \dl_heap, \dl_args, res, guard;
         //@ return_behavior requires false;
-        { abstract_statement GuardExpr; }
+        { \abstract_statement GuardExpr; }
         
         if (guard) {
             //@ declares \dl_localsThen;
             //@ assignable \dl_heap, \dl_localsThen, \dl_hasTo(tmp);
             //@ accessible \dl_heap, \dl_localsThen, tmp, \dl_args, res, guard;
             //@ return_behavior requires false;
-            { abstract_statement ThenProg; }
+            { \abstract_statement ThenProg; }
         } else {
             //@ declares \dl_localsElse;
             //@ assignable \dl_heap, \dl_localsElse, \dl_hasTo(tmp);
             //@ accessible \dl_heap, \dl_localsElse, tmp, \dl_args, res, guard;
             //@ return_behavior requires false;
-            { abstract_statement ElseProg; }
+            { \abstract_statement ElseProg; }
         }
 
         //@ declares \dl_localsPostProc;
         //@ assignable \dl_heap, \dl_localsPostProc, tmp, \dl_args, res, guard;
         //@ accessible \dl_heap, \dl_localsPostProc, tmp, \dl_args, res, guard;
-        { abstract_statement PostProc; }
+        { \abstract_statement PostProc; }
         
         return res;
     }
@@ -75,7 +75,7 @@ public class DecomposeConditional {
         //@ declares \dl_localsPostProc;
         //@ assignable \dl_heap, \dl_localsPostProc, tmp, \dl_args, res, guard;
         //@ accessible \dl_heap, \dl_localsPostProc, tmp, \dl_args, res, guard;
-        { abstract_statement PostProc; }
+        { \abstract_statement PostProc; }
         
         return res;
     }
@@ -85,7 +85,7 @@ public class DecomposeConditional {
         //@ assignable \dl_hasTo(guard);
         //@ accessible \dl_heap, \dl_args, res, guard;
         //@ return_behavior requires false;
-        { abstract_statement GuardExpr; }
+        { \abstract_statement GuardExpr; }
 
         return guard;
     }
@@ -96,7 +96,7 @@ public class DecomposeConditional {
         //@ assignable \dl_heap, \dl_localsThen, \dl_hasTo(tmp);
         //@ accessible \dl_heap, \dl_localsThen, tmp, \dl_args, res, guard;
         //@ return_behavior requires false;
-        { abstract_statement ThenProg; }
+        { \abstract_statement ThenProg; }
         
         return tmp;
     }
@@ -107,7 +107,7 @@ public class DecomposeConditional {
         //@ assignable \dl_heap, \dl_localsElse, \dl_hasTo(tmp);
         //@ accessible \dl_heap, \dl_localsElse, tmp, \dl_args, res, guard;
         //@ return_behavior requires false;
-        { abstract_statement ElseProg; }
+        { \abstract_statement ElseProg; }
         
         return tmp;
     }

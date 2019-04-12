@@ -21,25 +21,25 @@
 public class ConsolidateDuplicateConditionalFragments {
     public Object before(Object result, boolean b) {
         if (b) {
-            abstract_statement P;
-            abstract_statement Q1;
+            \abstract_statement P;
+            \abstract_statement Q1;
         }
         else {
-            abstract_statement P;
-            abstract_statement Q2;
+            \abstract_statement P;
+            \abstract_statement Q2;
         }
 
         return result;
     }
 
     public Object after(Object result, boolean b) {
-        abstract_statement P;
+        \abstract_statement P;
 
         if (b) {
-            abstract_statement Q1;
+            \abstract_statement Q1;
         }
         else {
-            abstract_statement Q2;
+            \abstract_statement Q2;
         }
 
         return result;

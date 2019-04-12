@@ -27,7 +27,7 @@ public class LoopUnrolling {
         //@ return_behavior requires false;
         //@ continue_behavior requires false;
         //@ break_behavior requires false;
-        { abstract_statement Guard; }
+        { \abstract_statement Guard; }
         
         /*@ loop_invariant 
           @      i >= 0 && i <= threshold
@@ -38,14 +38,14 @@ public class LoopUnrolling {
             //@ assignable \dl_hasTo(res);
             //@ accessible res, i, \dl_args;
             //@ continue_behavior requires false;
-            { abstract_statement Body; }
+            { \abstract_statement Body; }
 
             //@ assignable \dl_hasTo(b);
             //@ accessible res, i, \dl_args;
             //@ return_behavior requires false;
             //@ continue_behavior requires false;
             //@ break_behavior requires false;
-            { abstract_statement Guard; }
+            { \abstract_statement Guard; }
 
             i++;
         }
@@ -62,7 +62,7 @@ public class LoopUnrolling {
         //@ return_behavior requires false;
         //@ continue_behavior requires false;
         //@ break_behavior requires false;
-        { abstract_statement Guard; }
+        { \abstract_statement Guard; }
         
         /*@ loop_invariant 
           @      i >= 0 && i <= threshold
@@ -74,14 +74,14 @@ public class LoopUnrolling {
                 //@ assignable \dl_hasTo(res);
                 //@ accessible res, i, \dl_args;
                 //@ continue_behavior requires false;
-                { abstract_statement Body; }
+                { \abstract_statement Body; }
 
                 //@ assignable \dl_hasTo(b);
                 //@ accessible res, i, \dl_args;
                 //@ return_behavior requires false;
                 //@ continue_behavior requires false;
                 //@ break_behavior requires false;
-                { abstract_statement Guard; }
+                { \abstract_statement Guard; }
 
                 i++;
             } else break;
@@ -90,14 +90,14 @@ public class LoopUnrolling {
                 //@ assignable \dl_hasTo(res);
                 //@ accessible res, i, \dl_args;
                 //@ continue_behavior requires false;
-                { abstract_statement Body; }
+                { \abstract_statement Body; }
 
                 //@ assignable \dl_hasTo(b);
                 //@ accessible res, i, \dl_args;
                 //@ return_behavior requires false;
                 //@ continue_behavior requires false;
                 //@ break_behavior requires false;
-                { abstract_statement Guard; }
+                { \abstract_statement Guard; }
 
                 i++;
             } else break;

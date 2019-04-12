@@ -27,16 +27,16 @@ public class ConsolidateDuplicateConditionalFragments {
     public Object before(Object result) {
         try {
             //@ return_behavior requires false;
-            { abstract_statement TryProg; }
+            { \abstract_statement TryProg; }
             
-            abstract_statement Postfix;
+            \abstract_statement Postfix;
         }
         catch (Throwable t) {
             //@ exceptional_behavior requires false;
             //@ return_behavior requires false;
-            { abstract_statement CatchProg; }
+            { \abstract_statement CatchProg; }
             
-            abstract_statement Postfix;
+            \abstract_statement Postfix;
         }
 
         return result;
@@ -45,14 +45,14 @@ public class ConsolidateDuplicateConditionalFragments {
     public Object after(Object result) {
         try {
             //@ return_behavior requires false;
-            { abstract_statement TryProg; }
+            { \abstract_statement TryProg; }
         }
         catch (Throwable t) {
             //@ exceptional_behavior requires false;
             //@ return_behavior requires false;
-            { abstract_statement CatchProg; }
+            { \abstract_statement CatchProg; }
         } finally {
-            abstract_statement Postfix;
+            \abstract_statement Postfix;
         }
 
         return result;

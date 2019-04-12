@@ -20,12 +20,12 @@
 public class ConsolidateDuplicateConditionalFragmentsPostfix {
     public int before(Object result, boolean b) {
         if (b) {
-            abstract_statement Q1;
-            abstract_statement P;
+            \abstract_statement Q1;
+            \abstract_statement P;
         }
         else {
-            abstract_statement Q2;
-            abstract_statement P;
+            \abstract_statement Q2;
+            \abstract_statement P;
         }
 
         return result;
@@ -33,12 +33,12 @@ public class ConsolidateDuplicateConditionalFragmentsPostfix {
 
     public int after(Object result, boolean b) {
         if (b) {
-            abstract_statement Q1;
+            \abstract_statement Q1;
         }
         else {
-            abstract_statement Q2;
+            \abstract_statement Q2;
         }
-        abstract_statement P;
+        \abstract_statement P;
 
         return result;
     }

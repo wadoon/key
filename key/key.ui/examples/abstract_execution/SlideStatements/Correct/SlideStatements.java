@@ -28,33 +28,33 @@ public class SlideStatements {
         //@ declares \dl_localsA;
         //@ assignable \dl_heap, \dl_localsA, \dl_args, res;
         //@ accessible \dl_heap, \dl_localsA, \dl_args, res;
-        { abstract_statement A; }
+        { \abstract_statement A; }
         
         //@ declares \dl_localsB;
         //@ assignable \dl_localsB;
         //@ accessible \dl_heap, \dl_localsB, \dl_args, res;
         //@ return_behavior requires false;
         //@ exceptional_behavior requires false;
-        { abstract_statement B; }
+        { \abstract_statement B; }
         
         //@ declares \dl_localsC;
         //@ assignable \dl_localsC;
         //@ accessible \dl_heap, \dl_localsC, \dl_args, res;
         //@ return_behavior requires false;
         //@ exceptional_behavior requires false;
-        { abstract_statement C; }
+        { \abstract_statement C; }
         
         //@ declares \dl_localsD;
         //@ assignable \dl_localsD;
         //@ accessible \dl_heap, \dl_localsD, \dl_args, res;
         //@ return_behavior requires false;
         //@ exceptional_behavior requires false;
-        { abstract_statement D; }
+        { \abstract_statement D; }
         
         //@ declares \dl_localsE;
         //@ assignable \dl_heap, \dl_localsA, \dl_localsB, \dl_localsC, \dl_localsD, \dl_localsE, \dl_args, res;
         //@ accessible \dl_heap, \dl_localsA, \dl_localsB, \dl_localsC, \dl_localsD, \dl_localsE, \dl_args, res;
-        { abstract_statement E; }
+        { \abstract_statement E; }
         
         return res;
     }
@@ -64,33 +64,33 @@ public class SlideStatements {
         //@ declares \dl_localsA;
         //@ assignable \dl_heap, \dl_localsA, \dl_args, res;
         //@ accessible \dl_heap, \dl_localsA, \dl_args, res;
-        { abstract_statement A; }
+        { \abstract_statement A; }
         
         //@ declares \dl_localsD;
         //@ assignable \dl_localsD;
         //@ accessible \dl_heap, \dl_localsD, \dl_args, res;
         //@ return_behavior requires false;
         //@ exceptional_behavior requires false;
-        { abstract_statement D; }
+        { \abstract_statement D; }
         
         //@ declares \dl_localsC;
         //@ assignable \dl_localsC;
         //@ accessible \dl_heap, \dl_localsC, \dl_args, res;
         //@ return_behavior requires false;
         //@ exceptional_behavior requires false;
-        { abstract_statement C; }
+        { \abstract_statement C; }
         
         //@ declares \dl_localsB;
         //@ assignable \dl_localsB;
         //@ accessible \dl_heap, \dl_localsB, \dl_args, res;
         //@ return_behavior requires false;
         //@ exceptional_behavior requires false;
-        { abstract_statement B; }
+        { \abstract_statement B; }
         
         //@ declares \dl_localsE;
         //@ assignable \dl_heap, \dl_localsA, \dl_localsB, \dl_localsC, \dl_localsD, \dl_localsE, \dl_args, res;
         //@ accessible \dl_heap, \dl_localsA, \dl_localsB, \dl_localsC, \dl_localsD, \dl_localsE, \dl_args, res;
-        { abstract_statement E; }
+        { \abstract_statement E; }
         
         return res;
     }

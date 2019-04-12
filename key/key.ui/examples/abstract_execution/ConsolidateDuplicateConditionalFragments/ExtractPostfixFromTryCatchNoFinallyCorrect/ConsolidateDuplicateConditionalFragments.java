@@ -32,25 +32,25 @@ public class ConsolidateDuplicateConditionalFragments {
             //@ declares \dl_localsTryProg;
             //@ assignable res, \dl_heap, \dl_localsTryProg, \dl_args;
             //@ accessible res, \dl_heap, \dl_localsTryProg, \dl_args;
-            { abstract_statement TryProg; }
+            { \abstract_statement TryProg; }
             
             //@ declares \dl_localsPostfix;
             //@ assignable res, \dl_heap, \dl_localsPostfix, \dl_args;
             //@ accessible res, \dl_heap, \dl_localsPostfix, \dl_args;
             //@ exceptional_behavior requires false;
-            { abstract_statement Postfix; }
+            { \abstract_statement Postfix; }
         }
         catch (Throwable t) {
             //@ declares \dl_localsCatchProg;
             //@ assignable res, \dl_heap, \dl_localsCatchProg, \dl_args;
             //@ accessible res, \dl_heap, \dl_localsCatchProg, \dl_args;
-            { abstract_statement CatchProg; }
+            { \abstract_statement CatchProg; }
             
             //@ declares \dl_localsPostfix;
             //@ assignable res, \dl_heap, \dl_localsPostfix, \dl_args;
             //@ accessible res, \dl_heap, \dl_localsPostfix, \dl_args;
             //@ exceptional_behavior requires false;
-            { abstract_statement Postfix; }
+            { \abstract_statement Postfix; }
         }
 
         return res;
@@ -62,20 +62,20 @@ public class ConsolidateDuplicateConditionalFragments {
             //@ declares \dl_localsTryProg;
             //@ assignable res, \dl_heap, \dl_localsTryProg, \dl_args;
             //@ accessible res, \dl_heap, \dl_localsTryProg, \dl_args;
-            { abstract_statement TryProg; }
+            { \abstract_statement TryProg; }
         }
         catch (Throwable t) {
             //@ declares \dl_localsCatchProg;
             //@ assignable res, \dl_heap, \dl_localsCatchProg, \dl_args;
             //@ accessible res, \dl_heap, \dl_localsCatchProg, \dl_args;
-            { abstract_statement CatchProg; }
+            { \abstract_statement CatchProg; }
         }
         
         //@ declares \dl_localsPostfix;
         //@ assignable res, \dl_heap, \dl_localsPostfix, \dl_args;
         //@ accessible res, \dl_heap, \dl_localsPostfix, \dl_args;
         //@ exceptional_behavior requires false;
-        { abstract_statement Postfix; }
+        { \abstract_statement Postfix; }
 
         return res;
     }

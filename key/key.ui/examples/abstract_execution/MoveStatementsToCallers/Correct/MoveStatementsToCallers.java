@@ -25,7 +25,7 @@ public class MoveStatementsToCallers {
         //@ declares \dl_localsB;
         //@ assignable \dl_heap, \dl_localsB, \dl_args, res;
         //@ accessible \dl_heap, \dl_localsB, \dl_args, res;
-        { abstract_statement B; }
+        { \abstract_statement B; }
         
         return res;
     }
@@ -36,13 +36,13 @@ public class MoveStatementsToCallers {
         //@ assignable \dl_heap, \dl_localsC;
         //@ accessible \dl_heap, \dl_localsC, \dl_args;
         //@ return_behavior requires false;
-        { abstract_statement C; }
+        { \abstract_statement C; }
         
         //@ declares \dl_localsA;
         //@ assignable \dl_heap, \dl_localsA;
         //@ accessible \dl_heap, \dl_localsA, \dl_args;
         //@ return_behavior requires false;
-        { abstract_statement A; }
+        { \abstract_statement A; }
 
         return;
     }
@@ -55,12 +55,12 @@ public class MoveStatementsToCallers {
         //@ assignable \dl_heap, \dl_localsA;
         //@ accessible \dl_heap, \dl_localsA, \dl_args;
         //@ return_behavior requires false;
-        { abstract_statement A; }
+        { \abstract_statement A; }
         
         //@ declares \dl_localsB;
         //@ assignable \dl_heap, \dl_localsB, \dl_args, res;
         //@ accessible \dl_heap, \dl_localsB, \dl_args, res;
-        { abstract_statement B; }
+        { \abstract_statement B; }
         
         return res;
     }
@@ -71,7 +71,7 @@ public class MoveStatementsToCallers {
         //@ assignable \dl_heap, \dl_localsC;
         //@ accessible \dl_heap, \dl_localsC, \dl_args;
         //@ return_behavior requires false;
-        { abstract_statement C; }
+        { \abstract_statement C; }
 
         return;
     }

@@ -26,18 +26,18 @@ public class ExtractMethodRefactoring {
         //@ declares \dl_localsP;
         //@ assignable \dl_localsP, \dl_args, this.tmp, res;
         //@ accessible \dl_localsP, \dl_args, this.tmp, res;
-        { abstract_statement P; }
+        { \abstract_statement P; }
 
         //@ declares \dl_localsQ;
         //@ assignable \dl_hasTo(this.tmp), \dl_localsQ;
         //@ accessible \dl_localsP, \dl_localsQ, \dl_args, this.tmp, res;
         //@ return_behavior requires false;
-        { abstract_statement Q; }
+        { \abstract_statement Q; }
 
         //@ declares \dl_localsR;
         //@ assignable \dl_localsP, \dl_localsR, \dl_args, this.tmp, res;
         //@ accessible \dl_localsP, \dl_localsR, \dl_args, this.tmp, res;
-        { abstract_statement R; }
+        { \abstract_statement R; }
 
         return res;
     }
@@ -47,14 +47,14 @@ public class ExtractMethodRefactoring {
         //@ declares \dl_localsP;
         //@ assignable \dl_localsP, \dl_args, this.tmp, res;
         //@ accessible \dl_localsP, \dl_args, this.tmp, res;
-        { abstract_statement P; }
+        { \abstract_statement P; }
 
         extracted(res);
 
         //@ declares \dl_localsR;
         //@ assignable \dl_localsP, \dl_localsR, \dl_args, this.tmp, res;
         //@ accessible \dl_localsP, \dl_localsR, \dl_args, this.tmp, res;
-        { abstract_statement R; }
+        { \abstract_statement R; }
 
         return res;
     }
@@ -65,6 +65,6 @@ public class ExtractMethodRefactoring {
         //@ assignable \dl_hasTo(this.tmp), \dl_localsQ;
         //@ accessible \dl_localsP, \dl_localsQ, \dl_args, this.tmp, res;
         //@ return_behavior requires false;
-        { abstract_statement Q; }
+        { \abstract_statement Q; }
     }
 }

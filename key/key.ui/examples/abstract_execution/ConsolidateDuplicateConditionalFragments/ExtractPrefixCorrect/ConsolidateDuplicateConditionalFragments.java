@@ -24,15 +24,15 @@ public class ConsolidateDuplicateConditionalFragments {
             //@ assignable \dl_heap, \dl_localsP, result;
             //@ accessible \dl_heap, \dl_localsP, result;
             //@ declares \dl_localsP;
-            { abstract_statement P; }
-            abstract_statement Q1;
+            { \abstract_statement P; }
+            \abstract_statement Q1;
         }
         else {
             //@ assignable \dl_heap, \dl_localsP, result;
             //@ accessible \dl_heap, \dl_localsP, result;
             //@ declares \dl_localsP;
-            { abstract_statement P; }
-            abstract_statement Q2;
+            { \abstract_statement P; }
+            \abstract_statement Q2;
         }
 
         return result;
@@ -42,13 +42,13 @@ public class ConsolidateDuplicateConditionalFragments {
         //@ assignable \dl_heap, \dl_localsP, result;
         //@ accessible \dl_heap, \dl_localsP, result;
         //@ declares \dl_localsP;
-        { abstract_statement P; }
+        { \abstract_statement P; }
         
         if (b) {
-            abstract_statement Q1;
+            \abstract_statement Q1;
         }
         else {
-            abstract_statement Q2;
+            \abstract_statement Q2;
         }
 
         return result;

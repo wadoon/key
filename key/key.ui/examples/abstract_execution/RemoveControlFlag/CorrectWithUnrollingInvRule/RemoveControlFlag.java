@@ -45,7 +45,7 @@ public class RemoveControlFlag {
                 //@ accessible \dl_localsBody, res, i, \dl_args;
                 //@ continue_behavior requires false; 
                 // NOTE: When body continues, the variant is violated and the loop does not necessarily termiante!
-                { abstract_statement Body; }
+                { \abstract_statement Body; }
 
                 done = true;
             }
@@ -73,7 +73,7 @@ public class RemoveControlFlag {
                 //@ assignable \dl_localsBody, \dl_hasTo(res);
                 //@ accessible \dl_localsBody, res, i, \dl_args;
                 //@ continue_behavior requires false; 
-                { abstract_statement Body; }
+                { \abstract_statement Body; }
        
                 done = true;
                 break;
@@ -108,7 +108,7 @@ public class RemoveControlFlag {
                 //@ assignable \dl_localsBody, \dl_hasTo(res);
                 //@ accessible \dl_localsBody, res, i, \dl_args;
                 //@ continue_behavior requires false; 
-                { abstract_statement Body; }
+                { \abstract_statement Body; }
        
                 done = true;
                 break;
@@ -136,7 +136,7 @@ public class RemoveControlFlag {
                 //@ assignable \dl_localsBody, \dl_hasTo(res);
                 //@ accessible \dl_localsBody, res, i, \dl_args;
                 //@ continue_behavior requires false; 
-                { abstract_statement Body; }
+                { \abstract_statement Body; }
        
                 break;
             }
