@@ -72,7 +72,7 @@ public class LoopScopeTools {
     }
 
     /**
-     * Creates the variant proof obligation and update.
+     * Creates the variant update.
      *
      * @param inst
      *            The {@link Instantiation} for this rule application.
@@ -80,7 +80,7 @@ public class LoopScopeTools {
      *            The variant term as given by the loop specification.
      * @param services
      *            The {@link Services} object.
-     * @return The variant proof obligation and update.
+     * @return The variant update.
      */
     protected static Term prepareVariant(Term term, Term variant,
             TermServices services) {
