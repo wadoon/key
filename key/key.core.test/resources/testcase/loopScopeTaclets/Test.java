@@ -63,6 +63,19 @@ public class TestNoLabels {
     /*@ public normal_behavior
     @ ensures true;
     @*/
+  public static void benchmarkWhileShort() {
+      int j;
+
+      // 5
+      j = 0;
+      //@ loop_invariant j >= 0 && j <= 15;
+      //@ decreases 15 - j;
+      while (j < 15) {j=j+1;}
+  }
+    
+    /*@ public normal_behavior
+    @ ensures true;
+    @*/
   public static void benchmarkWhile() {
       int j;
 
