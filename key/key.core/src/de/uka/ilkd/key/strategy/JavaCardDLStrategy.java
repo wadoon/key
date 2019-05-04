@@ -334,6 +334,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
         // always give infinite cost to obsolete rules
         bindRuleSet(d, "obsolete", inftyConst());
 
+
+        // HACK: Just for testing
+        bindRuleSet(d, "elimQuantifier", inftyConst());
+
         // taclets for special invariant handling
         bindRuleSet(d, "loopInvariant", -20000);
 
@@ -1374,6 +1378,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     // //////////////////////////////////////////////////////////////////////////
 
     private void setupQuantifierInstantiation(RuleSetDispatchFeature d) {
+        System.out.println("Call setupQuant");
         if (quantifierInstantiatedEnabled()) {
             final TermBuffer varInst = new TermBuffer();
             final Feature branchPrediction =

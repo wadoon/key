@@ -38,7 +38,6 @@ public class ConflictBasedIstantiation implements TermGenerator {
     public static ConflictBasedIstantiation getInstance() {
         if (ConflictBasedIstantiation.instance == null) {
             ConflictBasedIstantiation.instance = new ConflictBasedIstantiation();
-            System.out.println("I am alive!!!!");
         }
         return ConflictBasedIstantiation.instance;
     }
