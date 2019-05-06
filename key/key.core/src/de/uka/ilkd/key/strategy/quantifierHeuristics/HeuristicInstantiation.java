@@ -44,17 +44,7 @@ public class HeuristicInstantiation implements TermGenerator {
         final QuantifiableVariable var =
                 qf.varsBoundHere ( 0 ).last ();
         HIIterator hiit = new HIIterator ( ia.getSubstitution ().iterator (), var, goal.proof().getServices() );
-
-        //        for(Iterator<Term> it = hiit; it.hasNext(); ) {
-        //            Term t = it.next();
-        //            System.out.println("Term: " + t.toString());
-        //            System.out.println("Arity: " + t.arity());
-        //            System.out.println("Depth: " + t.depth());
-        //            System.out.println("OP: " + t.op());
-        //            System.out.println("bound vars: " + t.boundVars());
-        //            System.out.println("free vars: " + t.freeVars());
-        //        }
-
+        System.out.println("Sequent: " + goal.sequent().toString());
         return hiit;
     }
 

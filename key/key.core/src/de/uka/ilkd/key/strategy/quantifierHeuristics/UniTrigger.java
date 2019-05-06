@@ -29,28 +29,28 @@ import de.uka.ilkd.key.logic.op.Quantifier;
 
 
 class UniTrigger implements Trigger {
-  
+
     private final Term trigger;
     private final ImmutableSet<QuantifiableVariable> uqvs;
-    
+
     private final TriggersSet triggerSetThisBelongsTo;
-    
+
     private final boolean onlyUnify;
     private final boolean isElementOfMultitrigger;
-   
+
     private final LRUCache<Term, ImmutableSet<Substitution>> matchResults = new LRUCache<Term, ImmutableSet<Substitution>> ( 1000 );
-    
+
     UniTrigger(Term trigger,ImmutableSet<QuantifiableVariable> uqvs,
-               boolean isUnify,boolean isElementOfMultitrigger,
-               TriggersSet triggerSetThisBelongsTo){
+            boolean isUnify,boolean isElementOfMultitrigger,
+            TriggersSet triggerSetThisBelongsTo){
         this.trigger = trigger;
         this.uqvs=uqvs;
         this.onlyUnify=isUnify;
         this.isElementOfMultitrigger=isElementOfMultitrigger;
         this.triggerSetThisBelongsTo = triggerSetThisBelongsTo;
     }
-        
-    public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm, 
+
+    public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm,
             Services services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
         for (Term aTargetTerm : targetTerm) allsubs = allsubs.union(getSubstitutionsFromTerm(aTargetTerm, services));
@@ -67,6 +67,7 @@ class UniTrigger implements Trigger {
     }
 
     private ImmutableSet<Substitution> getSubstitutionsFromTermHelp(Term t, Services services) {
+        System.out.println("Term: " + t.toString());
         ImmutableSet<Substitution> newSubs = DefaultImmutableSet.<Substitution>nil();
         if ( t.freeVars ().size () > 0 || t.op () instanceof Quantifier )
             newSubs = Matching.twoSidedMatching ( this, t, services );
@@ -75,7 +76,7 @@ class UniTrigger implements Trigger {
         return newSubs;
     }
 
-    
+
     public Term getTriggerTerm() {
         return trigger;
     }
@@ -100,17 +101,17 @@ class UniTrigger implements Trigger {
         return triggerSetThisBelongsTo;
     }
 
-    
-    
+
+
     /**
      * use similar algorithm as basic matching to detect loop
-     * 
+     *
      * @param candidate
      * @param searchTerm
      */
     public static boolean passedLoopTest(Term candidate, Term searchTerm) {
         final ImmutableSet<Substitution> substs =
-            BasicMatching.getSubstitutions ( candidate, searchTerm );
+                BasicMatching.getSubstitutions ( candidate, searchTerm );
 
         for (Substitution subst1 : substs) {
             final Substitution subst = subst1;
@@ -118,8 +119,8 @@ class UniTrigger implements Trigger {
         }
         return true;
     }
-    
-     /**
+
+    /**
      * Test whether this substitution constains loop.
      * It is mainly used for unitrigger's loop test.
      */
@@ -129,20 +130,20 @@ class UniTrigger implements Trigger {
             if ( containsLoop ( subst.getVarMap(), it.next () ) ) return true;
         }
         return false;
-    } 
-    
+    }
+
     /**
      * Code copied from logic.EqualityConstraint
      */
     private static boolean containsLoop(ImmutableMap<QuantifiableVariable,Term> varMap,
-                                        QuantifiableVariable var) {
+            QuantifiableVariable var) {
         ImmutableList<QuantifiableVariable> body          =
-            ImmutableSLList.<QuantifiableVariable>nil();
+                ImmutableSLList.<QuantifiableVariable>nil();
         ImmutableList<Term>                 fringe        = ImmutableSLList.<Term>nil();
         Term                       checkForCycle = varMap.get( var );
-        
+
         if ( checkForCycle.op () == var ) return false;
-        
+
         while ( true ) {
             for (QuantifiableVariable quantifiableVariable : checkForCycle.freeVars()) {
                 final QuantifiableVariable termVar = quantifiableVariable;

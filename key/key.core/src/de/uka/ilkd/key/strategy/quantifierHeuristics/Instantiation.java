@@ -103,7 +103,6 @@ class Instantiation {
      */
     private void addInstances(ImmutableSet<Term> terms, Services services) {
         for (final Trigger t : triggersSet.getAllTriggers()) {
-            System.out.println("Trigger: " + t);
             for (final Substitution sub : t.getSubstitutionsFromTerms(terms,
                     services)) {
                 addInstance(sub, services);

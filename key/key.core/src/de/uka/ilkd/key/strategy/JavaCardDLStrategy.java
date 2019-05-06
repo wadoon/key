@@ -32,6 +32,7 @@ import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.proof.rulefilter.SetRuleFilter;
 import de.uka.ilkd.key.rule.RuleApp;
 import de.uka.ilkd.key.rule.UseDependencyContractRule;
+import de.uka.ilkd.key.strategy.conflictbasedinst.CBITermGenerator;
 import de.uka.ilkd.key.strategy.feature.AgeFeature;
 import de.uka.ilkd.key.strategy.feature.AllowedCutPositionFeature;
 import de.uka.ilkd.key.strategy.feature.AutomatedRuleFeature;
@@ -336,7 +337,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
 
         // HACK: Just for testing
-        bindRuleSet(d, "elimQuantifier", inftyConst());
+        // bindRuleSet(d, "elimQuantifier", inftyConst());
 
         // taclets for special invariant handling
         bindRuleSet(d, "loopInvariant", -20000);
@@ -1378,7 +1379,6 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     // //////////////////////////////////////////////////////////////////////////
 
     private void setupQuantifierInstantiation(RuleSetDispatchFeature d) {
-        System.out.println("Call setupQuant");
         if (quantifierInstantiatedEnabled()) {
             final TermBuffer varInst = new TermBuffer();
             final Feature branchPrediction =
@@ -1402,10 +1402,10 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                             add(instantiate("t", varInst),
                                                     branchPrediction,
                                                     longConst(10)))}));
-            //            bindRuleSet(d, "gamma",
-            //                    forEach(varInst, ConflictBasedIstantiation.getInstance(),
-            //                            add(instantiate("t", varInst), branchPrediction,
-            //                                    longConst(11))));
+            bindRuleSet(d, "gamma",
+                    forEach(varInst, CBITermGenerator.getInstance(),
+                            add(instantiate("t", varInst), branchPrediction,
+                                    longConst(11))));
 
             final TermBuffer splitInst = new TermBuffer();
 
