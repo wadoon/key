@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * @author weigl
+ * @author Alexander Weigl
  */
 @XmlRootElement()
 @XmlAccessorType(XmlAccessType.FIELD)
