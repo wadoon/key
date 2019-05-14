@@ -1,8 +1,13 @@
+//TODO copy examles.zip into distribution
+//TODO example.zip seems to build wrong
+//TODO figure out why javacc is always executed
+
 plugins {
     id("ca.coglinc.javacc") version("2.4.0") apply false
     id("idea")
     id("eclipse")
     id "com.jfrog.bintray" version "1.8.4" apply false
+    id 'com.github.johnrengelman.shadow' version "5.0.0" apply false
 }
 
 idea {
@@ -12,15 +17,22 @@ idea {
     }
 }
 
-group = "org.key_project"
-version = "2.8.0-SNAPSHOT"
-
 static def getDate() {
     return new Date().format('yyyyMMdd')
 }
 
+static def getGitRevision() {
+    def cmd = "git rev-parse --short HEAD"
+    def process = cmd.execute()
+    return process.text.trim()
+}
 
 ext.dateVersion = getDate()
+ext.gitRevision = getGitRevision()
+
+group = "org.key_project"
+version = "2.7.0-${System.env.BUILD_NUMBER ?: ext.gitRevision}"
+
 
 try {
     ext.gitRevision = "git rev-parse HEAD".execute().in.readLines().get(0)
@@ -37,6 +49,12 @@ subprojects {
     apply plugin: "eclipse"
     apply plugin: "com.jfrog.bintray"
 
+    /*
+    apply plugin: 'checkstyle'
+    apply plugin: 'pmd'
+    apply plugin: 'findbugs'
+    */
+
     group = rootProject.group
     version = rootProject.version
     ext.gitRevision = rootProject.ext.gitRevision
@@ -52,19 +70,34 @@ subprojects {
     }
 
     tasks.withType(Test) {//Configure all tests
-        //Please take a look at: org.key_project.util.helper.FindResources
-        //How to obtain the different test resources
+        systemProperty "testcases", "src/test/resources/testcase"
+        systemProperty "TACLET_PROOFS", "tacletProofs"
+        systemProperty "EXAMPLES_DIR", new File(project(":key.ui").projectDir, "examples")
+        systemProperty "RUNALLPROOFS_DIR", "$buildDir/report/runallproves"
 
-        systemProperty "KEY_EXAMPLES_DIR", file("${project(":key.ui").projectDir}/examples")
-        systemProperty "KEY_TESTRESULT_RUNALLPROOFS", "$projectDir/reports/runallproofs"
-        systemProperty "TEST_RESOURCES", "src/test/resources"
-        systemProperty "TEST_CASES", "src/test/resources/testcase"
-        systemProperty "TACLET_PROOFS", "${project(":key.core").projectDir}/tacletProofs"
 
         systemProperty "key.disregardSettings", "true"
         maxHeapSize = "4g"
     }
 
+
+    /*findbugs { findbugsTest.enabled = false; ignoreFailures = true }
+    pmd { pmdTest.enabled = false; ignoreFailures = true }
+    tasks.withType(Checkstyle) {
+        configFile file("$rootDir/scripts/tools/checkstyle/key_checks.xml")
+    }
+    tasks.withType(FindBugs) {
+        reports {
+            xml.enabled = false
+            html.enabled = true
+        }
+    }
+    tasks.withType(Pmd) {
+        reports {
+            xml.enabled = true
+            html.enabled = true
+        }
+    }*/
 
     repositories {
         mavenCentral()
@@ -130,7 +163,7 @@ subprojects {
     bintray {
         user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
         key = project.hasProperty('bintrayApiKey') ? project.property('bintrayApiKey') : System.getenv('BINTRAY_API_KEY')
-        publications  = ['mavenJava']
+        publications = ['mavenJava']
 
         dryRun = false //[Default: false] Whether to run this as dry-run, without deploying
         publish = true //[Default: false] Whether version should be auto published after an upload
@@ -145,12 +178,27 @@ subprojects {
             vcsUrl = 'https://git.key-project.org/key/key.git'
         }
     }
+
+
+    eclipse {
+        classpath {
+            file {
+                whenMerged {
+                    def source = entries.find { it.path == 'src/main/java' }
+                    source.entryAttributes['ignore_optional_problems'] = 'true'
+
+                    entries.findAll { it.path.endsWith('/resources') }.each { it.excludes = ["**/*.java"] }
+                }
+            }
+        }
+    }
 }
 
 allprojects {
     tasks.withType(Javadoc) {
         if (JavaVersion.current().isJava9Compatible()) {
-            options.addBooleanOption('html5', true)
+            options.encoding = 'UTF-8'
+            //not working jenkins: options.addBooleanOption('html5', true)
         }
     }
 }
@@ -215,11 +263,21 @@ project(":key.core") {
         }
     }
 
+    tasks.withType(Test) {//Configure all tests
+        systemProperty "testcases", "src/test/resources/testcase"
+        systemProperty "TACLET_PROOFS", "tacletProofs"
+        systemProperty "EXAMPLES_DIR", new File(project(":key.ui").projectDir, "examples")
+        systemProperty "RUNALLPROOFS_DIR", "$buildDir/report/runallproves"
+
+
+        systemProperty "key.disregardSettings", "true"
+        maxHeapSize = "4g"
+    }
+
     test {
         filter {
             includeTestsMatching "JavaTests"
             includeTestsMatching "LogicModelTests"
-
             includeTestsMatching "ParserTests"
             includeTestsMatching "ProofConstructionTests"
             includeTestsMatching "RuleTests"
@@ -260,6 +318,7 @@ project(":key.core.proof_references") {
         compile project(":key.core")
     }
     test {
+        systemProperty "testcases", "src/test/resources/testcase"
         maxHeapSize = "4g"
         systemProperty "testcases", "src/test/resources/testcase"
         filter { includeTestsMatching "AllProofReferencesTests" }
@@ -272,10 +331,8 @@ project(":key.core.symbolic_execution") {
     }
     test {
         systemProperty "testcases", "src/test/resources/testcase"
-
-        filter {
-            includeTestsMatching "AllSymbolicExecutionTests"
-        }
+        maxHeapSize = "4g"
+        filter { includeTestsMatching "AllSymbolicExecutionTests" }
     }
 }
 
@@ -298,26 +355,38 @@ project(":key.removegenerics") {
 
 project(":key.ui") {
     apply plugin: "application"
+    apply plugin: 'com.github.johnrengelman.shadow'
+
     dependencies {
-        compile(project(":key.core"))
+        compile project(":key.core")
+        compile project(":key.core:rifl")
+
         compile(project(":key.core.proof_references"))
         compile(project(":key.core.symbolic_execution"))
         compile(project(":key.core.testgen"))
         compile(project(":key.removegenerics"))
 
         runtimeOnly project(":keyext.interactionlog")
-        runtimeOnly project(":keyext.script.ui")
+        //runtimeOnly project(":keyext.script.ui")
     }
 
     task createExamplesZip(type: Zip) {
-        destinationDirectory = file("$projectDir/resources")
+        destinationDirectory = file("$buildDir/resources/main/")
         archiveFileName = "examples.zip"
-        from 'examples'
-        include '*'
-        include '*/*'
+        from "examples"
+        include "**/**"
     }
 
-    processResources.dependsOn(createExamplesZip)
+    processResources.dependsOn << createExamplesZip
+
+    shadowJar {
+        archiveClassifier = "exe"
+        archiveBaseName = "key"
+    }
+
+    distZip {
+        archiveBaseName = "key"
+    }
 
     application {
         //dependsOn(createExamplesZip)
@@ -327,7 +396,6 @@ project(":key.ui") {
     run {
         systemProperties["key.examples.dir"] = "$projectDir/examples"
     }
-
 }
 
 project(":keyext.interactionlog") {
@@ -343,13 +411,18 @@ task start {
     dependsOn project(":key.ui").run
 }
 
+
 task alldoc(type: Javadoc) {
     group "documentation"
-    def projects = allprojects - rootProject
+    def projects = subprojects
     //key.ui javadoc is broken
     source projects.collect { it.sourceSets.main.allJava }
     classpath = files(projects.collect { it.sourceSets.main.compileClasspath })
     destinationDir = file("${buildDir}/docs/javadoc")
+
+    if (JavaVersion.current().isJava9Compatible()) {
+        //notworking on jenkins    options.addBooleanOption('html5', true)
+    }
 
     configure(options) {
         //showFromPrivate()
@@ -357,7 +430,7 @@ task alldoc(type: Javadoc) {
         // overview = new File( projectDir, 'src/javadoc/package.html' )
         //stylesheetFile = new File( projectDir, 'src/javadoc/stylesheet.css' )
         windowTitle = 'KeY API Documentation'
-        docTitle = "KeY JavaDoc ($project.version)"
+        docTitle = "KeY JavaDoc ($project.version) -- ${getDate()}"
         bottom = "Copyright &copy; 2003-2019 <a href=\"http://key-project.org\">The KeY-Project</a>."
         use = true
         links += 'http://download.oracle.com/javase/8/docs/api/'
@@ -365,6 +438,13 @@ task alldoc(type: Javadoc) {
         links += "http://www.antlr3.org/api/Java/"
         links += "http://recoder.sourceforge.net/doc/api/"
     }
+}
+
+task alldocJar(type: Zip) {
+    dependsOn alldoc
+    from alldoc
+    archiveFileName = "key-api-doc-${project.version}.zip"
+    destinationDirectory = file("$buildDir/distribution")
 }
 
 task fatJar(type: Jar) {
@@ -388,5 +468,6 @@ task fatJar(type: Jar) {
     archiveName = "key-${project.version}-exec.jar"
     destinationDir(buildDir)
     from jarFiles
+    with project(":key.ui").jar
     from "$rootDir/LICENSE.TXT"
 }

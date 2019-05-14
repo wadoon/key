@@ -173,7 +173,7 @@ public class HelperClassForTests {
      * @throws ProblemLoaderException Occurred Exception.
      * @throws ProofInputException Occurred Exception.
      */
-    public static HashMap<String, String> setDefaultTacletOptions(String baseDir,
+    public static HashMap<String, String> setDefaultTacletOptions(File baseDir,
                                                                   String javaPathInBaseDir) throws ProblemLoaderException, ProofInputException {
        if (!ProofSettings.isChoiceSettingInitialised()) {
           // Make sure that required files exists

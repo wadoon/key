@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof_references.testcase;
 
+import java.io.File;
 import java.util.LinkedHashSet;
 
 import org.key_project.util.collection.ImmutableList;
@@ -45,7 +46,7 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
                 true,
                 ImmutableSLList.<IProofReferencesAnalyst>nil().append(new MethodBodyExpandProofReferencesAnalyst(), new ContractProofReferencesAnalyst()),
                 new ExpectedProofReferences(IProofReference.INLINE_METHOD, "UseOperationContractTest::main"), 
-                new ExpectedProofReferences(IProofReference.USE_CONTRACT, "pre: {heap=java.lang.Object::<inv>(heap,self)<<impl>>}; mby: null; post: {heap=and(and(equals(result,Z(2(4(#)))),java.lang.Object::<inv>(heap,self)<<impl>>)<<SC>>,equals(exc,null)<<impl>>)}; mods: {heap=allLocs, savedHeap=null}; hasMod: {heap=true, savedHeap=true}; termination: diamond; transaction: false"));
+                new ExpectedProofReferences(IProofReference.USE_CONTRACT, "pre: {heap=java.lang.Object::<inv>(heap,self)<<impl>>}; mby: null; post: {heap=and(and(equals(result<<origin(ensures @ UseOperationContractTest.java @ line 12) ([])>>,Z(2(4(#))))<<origin(ensures @ UseOperationContractTest.java @ line 12) ([])>>,java.lang.Object::<inv>(heap,self)<<impl>>)<<SC>>,equals(exc<<origin(ensures (implicit)) ([])>>,null)<<impl, origin(ensures (implicit)) ([])>>)}; mods: {heap=allLocs, savedHeap=null}; hasMod: {heap=true, savedHeap=true}; termination: diamond; transaction: false"));
    }
    
    /**
@@ -117,9 +118,9 @@ public class TestProofReferenceUtil extends AbstractProofReferenceTestCase {
     * @param expectedReferences The expected proof references.
     * @throws Exception Occurred Exception.
     */
-   protected void doAPITest(String baseDir, 
-                            String javaPathInBaseDir, 
-                            String containerTypeName, 
+   protected void doAPITest(File baseDir,
+                            String javaPathInBaseDir,
+                            String containerTypeName,
                             String methodFullName,
                             boolean useContracts,
                             final ImmutableList<IProofReferencesAnalyst> analysts,

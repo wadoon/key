@@ -67,7 +67,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
     * @param expectedReferences The expected proof references.
     * @throws Exception Occurred Exception.
     */
-   protected void doReferenceFunctionTest(String baseDir,
+   protected void doReferenceFunctionTest(File baseDir,
                                           String javaPathInBaseDir,
                                           String containerTypeName,
                                           String targetName,
@@ -89,7 +89,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
     * @param expectedReferences The expected proof references.
     * @throws Exception Occurred Exception.
     */
-   protected void doReferenceFunctionTest(String baseDir,
+   protected void doReferenceFunctionTest(File baseDir,
                                           String javaPathInBaseDir,
                                           String containerTypeName,
                                           String targetName,
@@ -112,7 +112,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
     * @param expectedReferences The expected proof references.
     * @throws Exception Occurred Exception.
     */
-   protected void doReferenceMethodTest(String baseDir,
+   protected void doReferenceMethodTest(File baseDir,
                                         String javaPathInBaseDir,
                                         String containerTypeName,
                                         String methodFullName,
@@ -134,7 +134,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
     * @param expectedReferences The expected proof references.
     * @throws Exception Occurred Exception.
     */
-   protected void doReferenceMethodTest(String baseDir,
+   protected void doReferenceMethodTest(File baseDir,
                                         String javaPathInBaseDir,
                                         String containerTypeName,
                                         String methodFullName,
@@ -301,7 +301,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
     * @param tester The {@link IProofTester} which executes the test steps.
     * @throws Exception Occurred Exception.
     */
-   protected void doProofFunctionTest(String baseDir,
+   protected void doProofFunctionTest(File baseDir,
                                       String javaPathInBaseDir,
                                       String containerTypeName,
                                       final String targetName,
@@ -368,7 +368,7 @@ public abstract class AbstractProofReferenceTestCase extends TestCase {
     * @param tester The {@link IProofTester} which executes the test steps.
     * @throws Exception Occurred Exception.
     */
-   protected void doProofMethodTest(String baseDir,
+   protected void doProofMethodTest(File baseDir,
                                     String javaPathInBaseDir,
                                     String containerTypeName,
                                     String methodFullName,
