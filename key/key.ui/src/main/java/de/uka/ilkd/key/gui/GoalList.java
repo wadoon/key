@@ -18,7 +18,12 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.configuration.Config;
-import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.prooftree.DisableGoal;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.pp.LogicPrinter;
@@ -42,8 +47,11 @@ import java.util.EventObject;
 import java.util.List;
 import java.util.WeakHashMap;
 
-public class GoalList extends JList<Goal> implements KeYPaneExtension {
+public class GoalList extends JList<Goal> implements TabPanel {
 
+    public static final Icon GOAL_LIST_ICON =
+            IconFontSwing.buildIcon(FontAwesomeSolid.FLAG_CHECKERED,
+                                    MainWindowTabbedPane.TAB_ICON_SIZE);
     /**
      *
      */
@@ -60,8 +68,7 @@ public class GoalList extends JList<Goal> implements KeYPaneExtension {
     private final SelectingGoalListModel selectingListModel;
     private final GoalListModel goalListModel;
     // clear this cache whenever some display settings are changed?
-    private final WeakHashMap<Sequent, String> seqToString =
-            new WeakHashMap<Sequent, String>();
+    private final WeakHashMap<Sequent, String> seqToString = new WeakHashMap<>();
     private KeYMediator mediator;
     /**
      * interactive prover listener
@@ -109,11 +116,7 @@ public class GoalList extends JList<Goal> implements KeYPaneExtension {
         addMouseListener(ml);
 
         updateUI();
-    }
-
-    @Override
-    public void init(MainWindow window, KeYMediator mediator) {
-        setMediator(mediator);
+        KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this, KeYGuiExtension.KeyboardShortcuts.GOAL_LIST);
     }
 
     @Override
@@ -123,7 +126,7 @@ public class GoalList extends JList<Goal> implements KeYPaneExtension {
 
     @Override
     public Icon getIcon() {
-        return null;
+        return GOAL_LIST_ICON;
     }
 
     @Override
@@ -886,10 +889,5 @@ public class GoalList extends JList<Goal> implements KeYPaneExtension {
 
             return sup;
         }
-    }
-
-    @Override
-    public int priority() {
-        return 250;
     }
 }

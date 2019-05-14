@@ -19,12 +19,16 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.*;
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeEvent;
 import de.uka.ilkd.key.gui.configuration.ConfigChangeListener;
-import de.uka.ilkd.key.gui.ext.KeYPaneExtension;
-import de.uka.ilkd.key.gui.fonticons.FontAwesomeBold;
-import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.extension.api.ContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.DefaultContextMenuKind;
+import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
+import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.nodeviews.TacletInfoToggle;
 import de.uka.ilkd.key.gui.notification.events.GeneralInformationEvent;
 import de.uka.ilkd.key.proof.*;
@@ -44,17 +48,26 @@ import javax.swing.tree.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 
-public class ProofTreeView extends JPanel implements KeYPaneExtension {
+public class ProofTreeView extends JPanel implements TabPanel {
 
-    public static final Color GRAY_COLOR = Color.DARK_GRAY;
-    public static final Color BISQUE_COLOR = new Color(240, 228, 196);
-    public static final Color LIGHT_BLUE_COLOR = new Color(230, 254, 255);
-    public static final Color DARK_BLUE_COLOR = new Color(31, 77, 153);
-    public static final Color DARK_GREEN_COLOR = new Color(0, 128, 51);
-    public static final Color DARK_RED_COLOR = new Color(191, 0, 0);
-    public static final Color PINK_COLOR = new Color(255, 0, 240);
-    public static final Color ORANGE_COLOR = new Color(255, 140, 0);
+    public static final ColorSettings.ColorProperty GRAY_COLOR =
+            ColorSettings.define("[proofTree]gray", "", Color.DARK_GRAY);
+    public static final ColorSettings.ColorProperty BISQUE_COLOR =
+            ColorSettings.define("[proofTree]bisque", "", new Color(240, 228, 196));
+    public static final ColorSettings.ColorProperty LIGHT_BLUE_COLOR =
+            ColorSettings.define("[proofTree]lightBlue", "", new Color(230, 254, 255));
+    public static final ColorSettings.ColorProperty DARK_BLUE_COLOR =
+            ColorSettings.define("[proofTree]darkBlue", "", new Color(31, 77, 153));
+    public static final ColorSettings.ColorProperty DARK_GREEN_COLOR =
+            ColorSettings.define("[proofTree]darkGreen", "", new Color(0, 128, 51));
+    public static final ColorSettings.ColorProperty DARK_RED_COLOR =
+            ColorSettings.define("[proofTree]darkRed", "", new Color(191, 0, 0));
+    public static final ColorSettings.ColorProperty PINK_COLOR =
+            ColorSettings.define("[proofTree]pink", "", new Color(255, 0, 240));
+    public static final ColorSettings.ColorProperty ORANGE_COLOR =
+            ColorSettings.define("[proofTree]orange", "", new Color(255, 140, 0));
     /**
      * KeYStroke for the search panel: STRG+SHIFT+F
      */
@@ -62,18 +75,21 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
             java.awt.event.InputEvent.CTRL_DOWN_MASK
                     | java.awt.event.InputEvent.SHIFT_DOWN_MASK
                     | Toolkit.getDefaultToolkit().getMenuShortcutKeyMask());
-    public static final Icon PROOF_ICON = IconFontSwing.buildIcon(FontAwesomeBold.TREE, MainWindowTabbedPane.TAB_ICON_SIZE);
+
     private static final long serialVersionUID = 3732875161168302809L;
     // Taclet info can be shown for inner nodes.
     public final TacletInfoToggle tacletInfoToggle = new TacletInfoToggle();
+
     /**
      * The JTree that is used for actual display and interaction
      */
     final JTree delegateView;
+
     /**
      * the model that is displayed by the delegateView
      */
     GUIProofTreeModel delegateModel;
+
     /**
      * the mediator is stored here
      */
@@ -108,6 +124,7 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
      * the search dialog
      */
     private ProofTreeSearchBar proofTreeSearchPanel;
+    private int iconHeight = 12;
 
     /**
      * creates a new proof tree
@@ -127,20 +144,27 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
                 new DefaultMutableTreeNode("No proof loaded")) {
             private static final long serialVersionUID = 6555955929759162324L;
 
+            @Override
+            public void setFont(Font font) {
+                iconHeight = font.getSize();
+                super.setFont(font);
+            }
+
             public void updateUI() {
                 super.updateUI();
                 /* we want plus/minus signs to expand/collapse tree nodes */
                 final TreeUI ui = getUI();
                 if (ui instanceof BasicTreeUI) {
                     final BasicTreeUI treeUI = (BasicTreeUI) ui;
-                    treeUI.setExpandedIcon(IconFactory.expandedIcon());
-                    treeUI.setCollapsedIcon(IconFactory.collapsedIcon());
+                    treeUI.setExpandedIcon(IconFactory.expandedIcon(iconHeight));
+                    treeUI.setCollapsedIcon(IconFactory.collapsedIcon(iconHeight));
                 }
                 if (ui instanceof CacheLessMetalTreeUI) {
                     ((CacheLessMetalTreeUI) ui).clearDrawingCache();
                 }
             }
         };
+        iconHeight = delegateView.getFontMetrics(delegateView.getFont()).getHeight();
         delegateView.setUI(new CacheLessMetalTreeUI());
 
         delegateView.getInputMap(JComponent.WHEN_FOCUSED).getParent()
@@ -203,6 +227,9 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
         registerKeyboardAction(keyboardAction,
                 searchKeyStroke,
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+        KeYGuiExtensionFacade.installKeyboardShortcuts(mediator, this,
+                KeYGuiExtension.KeyboardShortcuts.PROOF_TREE_VIEW);
     }
 
     protected void finalize() throws Throwable {
@@ -271,6 +298,25 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
         mediator.getUI().getProofControl().removeAutoModeListener(proofListener);
         mediator.removeGUIListener(guiListener);
     }
+
+    public boolean selectAbove() {
+        return selectRelative(+1);
+    }
+    public boolean selectBelow() {
+        return selectRelative(-1);
+    }
+
+    private boolean selectRelative(int i) {
+        TreePath path = delegateView.getSelectionPath();
+        int row = delegateView.getRowForPath(path);
+        TreePath newPath = delegateView.getPathForRow(row-i);
+        if (newPath != null) {
+            delegateView.setSelectionPath(newPath);
+            return true;
+        }
+        return false;
+    }
+
 
     public void removeNotify() {
         unregister();
@@ -470,30 +516,19 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
     }
 
     @Override
-    public void init(MainWindow window, KeYMediator mediator) {
-        setMediator(mediator);
-    }
-
-    @Override
     public String getTitle() {
         return "Proof";
     }
 
     @Override
     public Icon getIcon() {
-        return PROOF_ICON;
+        return IconFactory.PROOF_TREE.get(MainWindowTabbedPane.TAB_ICON_SIZE);
     }
 
     @Override
     public JComponent getComponent() {
         return this;
     }
-
-    @Override
-    public int priority() {
-        return 0;
-    }
-
     // INNER CLASSES
 
     // to prevent memory leaks
@@ -689,7 +724,7 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
          *
          */
         private static final long serialVersionUID = -4990023575036168279L;
-        private Icon keyHole20x20 = IconFactory.keyHole(20, 20);
+        private Icon keyHole20x20 = IconFactory.keyHole(iconHeight, iconHeight);
 
         public Component getTreeCellRendererComponent(JTree tree,
                                                       Object value,
@@ -698,7 +733,7 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
                                                       boolean leaf,
                                                       int row,
                                                       boolean hasFocus) {
-            if (proof == null) {
+            if (proof == null || proof.isDisposed()) {
                 // print dummy tree;
                 return super.getTreeCellRendererComponent(tree, value, sel,
                         expanded, leaf, row, hasFocus);
@@ -706,10 +741,10 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
 
             if (value instanceof GUIBranchNode) {
                 super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-                setBackgroundNonSelectionColor(BISQUE_COLOR);
+                setBackgroundNonSelectionColor(BISQUE_COLOR.get());
                 if (((GUIBranchNode) value).isClosed()) {
                     // all goals below this node are closed
-                    this.setIcon(IconFactory.provedFolderIcon());
+                    this.setIcon(IconFactory.provedFolderIcon(iconHeight));
                 } else {
 
                     // Find leaf goal for node and check whether this is a linked goal.
@@ -739,7 +774,7 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
 
                     proof.breadthFirstSearch(((GUIBranchNode) value).getNode(), v);
                     if (v.isLinked()) {
-                        this.setIcon(IconFactory.linkedFolderIcon());
+                        this.setIcon(IconFactory.linkedFolderIcon(iconHeight));
                     }
 
                 }
@@ -749,8 +784,8 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
 
             if (value instanceof GUIOneStepChildTreeNode) {
                 super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-                setForeground(GRAY_COLOR);
-                setIcon(IconFactory.oneStepSimplifier(16));
+                setForeground(GRAY_COLOR.get());
+                setIcon(IconFactory.oneStepSimplifier(iconHeight));
                 setText(value.toString());
                 return this;
             }
@@ -776,24 +811,24 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
             if (node.leaf()) {
                 Goal goal = proof.getGoal(node);
                 if (goal == null || node.isClosed()) {
-                    tree_cell.setForeground(DARK_GREEN_COLOR);
-                    tree_cell.setIcon(IconFactory.keyHoleClosed(20, 20));
+                    tree_cell.setForeground(DARK_GREEN_COLOR.get());
+                    tree_cell.setIcon(IconFactory.keyHoleClosed(iconHeight));
                     ProofTreeView.this.setToolTipText("Closed Goal");
                     tree_cell.setToolTipText("A closed goal");
                 } else {
                     if (goal.isLinked()) {
-                        tree_cell.setForeground(PINK_COLOR);
-                        tree_cell.setIcon(IconFactory.keyHoleLinked(20, 20));
+                        tree_cell.setForeground(PINK_COLOR.get());
+                        tree_cell.setIcon(IconFactory.keyHoleLinked(iconHeight, iconHeight));
                         ProofTreeView.this.setToolTipText("Linked Goal");
                         tree_cell.setToolTipText("Linked goal - no automatic rule application");
                     } else if (!goal.isAutomatic()) {
-                        tree_cell.setForeground(ORANGE_COLOR);
-                        tree_cell.setIcon(IconFactory.keyHoleInteractive(20, 20));
+                        tree_cell.setForeground(ORANGE_COLOR.get());
+                        tree_cell.setIcon(IconFactory.keyHoleInteractive(iconHeight, iconHeight));
                         ProofTreeView.this.setToolTipText("Disabled Goal");
                         tree_cell.setToolTipText("Interactive goal - no automatic rule application");
                     } else {
-                        tree_cell.setForeground(DARK_RED_COLOR);
-                        tree_cell.setIcon(keyHole20x20);
+                        tree_cell.setForeground(DARK_RED_COLOR.get());
+                        tree_cell.setIcon(IconFactory.keyHole(iconHeight, iconHeight));
                         ProofTreeView.this.setToolTipText("Open Goal");
                         tree_cell.setToolTipText("An open goal");
                     }
@@ -829,14 +864,14 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
             }
 
             if (node.getNodeInfo().getNotes() != null) {
-                tree_cell.setBackgroundNonSelectionColor(ORANGE_COLOR);
+                tree_cell.setBackgroundNonSelectionColor(ORANGE_COLOR.get());
             } else if (node.getNodeInfo().getActiveStatement() != null) {
-                tree_cell.setBackgroundNonSelectionColor(LIGHT_BLUE_COLOR);
+                tree_cell.setBackgroundNonSelectionColor(LIGHT_BLUE_COLOR.get());
 
             } else {
                 tree_cell.setBackgroundNonSelectionColor(Color.white);
             }
-            if (sel) tree_cell.setBackground(DARK_BLUE_COLOR);
+            if (sel) tree_cell.setBackground(DARK_BLUE_COLOR.get());
 
             tree_cell.setFont(tree.getFont());
             tree_cell.setText(nodeText);
@@ -995,6 +1030,14 @@ public class ProofTreeView extends JPanel implements KeYPaneExtension {
             this.add(new JSeparator());
             this.add(subtreeStatistics);
             subtreeStatistics.addActionListener(this);
+
+            List<Action> extensionActions =
+                    KeYGuiExtensionFacade.getContextMenuItems(DefaultContextMenuKind.PROOF_TREE, invokedNode, mediator);
+            if (!extensionActions.isEmpty()) {
+                add(new JSeparator());
+                extensionActions.forEach(this::add);
+            }
+
         }
 
         public void actionPerformed(ActionEvent e) {

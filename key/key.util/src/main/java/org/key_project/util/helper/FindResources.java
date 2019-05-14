@@ -105,9 +105,15 @@ public final class FindResources {
     }
 
     /**
-     * @param exists
-     * @param property
-     * @param candidates
+     * Search for a folder.
+     * <p>
+     * The folder is searched by a value given via java system properties or by a list of candidates.
+     * <p>
+     * You can specify whether the folder should exists or not. If the should exists the method could return null.
+     *
+     * @param property a key for {@link System#getProperty(String)}
+     * @param exists       flag whether the folder should exists
+     * @param candidates   a list of candidates, used if <code>propertyName</code> is not set by the user
      * @return
      */
     public static File findFolder(boolean exists, String property, String... candidates) {

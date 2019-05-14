@@ -2,12 +2,15 @@ package org.key_project.ui.interactionlog.model;
 
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+import org.key_project.ui.interactionlog.api.Interaction;
 
 import javax.xml.bind.annotation.XmlTransient;
 import java.beans.Transient;
 
 @XmlTransient
 public abstract class NodeInteraction extends Interaction {
+    private static final long serialVersionUID = 1L;
+
     private transient int serialNr;
 
     private NodeIdentifier nodeId;

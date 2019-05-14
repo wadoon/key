@@ -1,6 +1,7 @@
 package org.key_project.ui.interactionlog.model;
 
 import de.uka.ilkd.key.proof.Proof;
+import org.key_project.ui.interactionlog.api.Interaction;
 import org.key_project.util.RandomName;
 
 import javax.xml.bind.annotation.*;
@@ -17,6 +18,8 @@ import java.util.List;
 @XmlRootElement(name = "interaction-log")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class InteractionLog implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     @XmlTransient
     private WeakReference<Proof> proof;
 

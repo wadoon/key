@@ -32,7 +32,9 @@ import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 
+import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.smt.InformationWindow.Information;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.Modus;
 import de.uka.ilkd.key.gui.smt.ProgressDialog.ProgressDialogListener;
@@ -67,8 +69,14 @@ public class SolverListener implements SolverLauncherListener {
         private Timer timer = new Timer();
         private final SMTSettings settings;
         private final Proof smtProof;
-        private final static Color RED = new Color(180, 43, 43);
-        private final static Color GREEN = new Color(43, 180, 43);
+        private final static ColorSettings.ColorProperty RED =
+                ColorSettings.define("[solverListener]red", "",
+                new Color(180, 43, 43));
+
+        private final static ColorSettings.ColorProperty GREEN =
+                ColorSettings.define("[solverListener]green", "",
+                        new Color(43, 180, 43));
+
         private static int FILE_ID = 0;
 
         private static final int RESOLUTION = 1000;
@@ -215,14 +223,20 @@ public class SolverListener implements SolverLauncherListener {
         }
 
         private void applyResults() {
+            KeYMediator mediator = MainWindow.getInstance().getMediator();
+            mediator.stopInterface(true);
+            try {
                 for (SMTProblem problem : smtProblems) {
                         if (problem.getFinalResult().isValid() == ThreeValuedTruth.VALID) {
-                        	IBuiltInRuleApp app = 
+                        	IBuiltInRuleApp app =
                         			RuleAppSMT.rule.createApp( null ).
                         					     setTitle( getTitle(problem) );
                         	problem.getGoal().apply(app);
                         }
                 }
+            } finally {
+                mediator.startInterface(true);
+            }
 
         }
         
@@ -447,7 +461,7 @@ public class SolverListener implements SolverLauncherListener {
                 switch (reason) {
                 case Exception:
                         progressModel.setProgress(0,x,y);
-                        progressModel.setTextColor(RED,x,y);
+                        progressModel.setTextColor(RED.get(),x,y);
                         progressModel.setText("Exception!",x,y);
                
             
@@ -473,7 +487,7 @@ public class SolverListener implements SolverLauncherListener {
         		
         	
                 progressModel.setProgress(0,x,y);
-                progressModel.setTextColor(GREEN,x,y);
+                progressModel.setTextColor(GREEN.get(),x,y);
                 if(problem.solver.getType()==SolverType.Z3_CE_SOLVER){
                 	progressModel.setText("No Counterexample.",x,y);           
         		}
@@ -487,7 +501,7 @@ public class SolverListener implements SolverLauncherListener {
         private void unsuccessfullyStopped(InternSMTProblem problem, int x, int y) {
             if(problem.solver.getType()==SolverType.Z3_CE_SOLVER){
                 progressModel.setProgress(0,x,y);
-                progressModel.setTextColor(RED,x,y);
+                progressModel.setTextColor(RED.get(),x,y);
                 progressModel.setText("Counter Example.",x,y);
             } else {
                 progressModel.setProgress(0, x, y);
@@ -645,7 +659,6 @@ public class SolverListener implements SolverLauncherListener {
                     discardEvent(launcher);
                     //remove semantics blasting proof for ce dialog
                     if(counterexample && smtProof != null){
-                    	   MainWindow mw = MainWindow.getInstance();
                         smtProof.dispose();
                     }
                     

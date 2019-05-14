@@ -1,6 +1,6 @@
 package org.key_project.ui.interactionlog.model;
 
-import org.key_project.ui.interactionlog.algo.InteractionVisitor;
+import org.key_project.ui.interactionlog.api.Interaction;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -15,6 +15,8 @@ import java.awt.*;
 @XmlRootElement()
 @XmlAccessorType(XmlAccessType.FIELD)
 public class UserNoteInteraction extends Interaction {
+    private static final long serialVersionUID = 1L;
+
     private String note;
 
     public UserNoteInteraction() {
@@ -25,11 +27,6 @@ public class UserNoteInteraction extends Interaction {
     public UserNoteInteraction(String note) {
         this();
         this.note = note;
-    }
-
-    @Override
-    public <T> T accept(InteractionVisitor<T> visitor) {
-        return visitor.visit(this);
     }
 
     public String getNote() {
@@ -45,4 +42,10 @@ public class UserNoteInteraction extends Interaction {
         return note;
     }
 
+    @Override
+    public String getMarkdown() {
+        return String.format("## Note%n" +
+                "**Date**: %s%n" +
+                "```%n%s%n```", getCreated(), getNote());
+    }
 }
