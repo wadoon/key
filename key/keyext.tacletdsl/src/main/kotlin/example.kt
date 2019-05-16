@@ -1,5 +1,16 @@
 import ApplyRestriction.SameUpdateLevel
 
+class Operator<A, B, C>()
+sealed class Term<S>() {}
+data class Var<S>(val name: String, val sort: S) : Term<S>()
+data class Op<A, B, S>(val left: Term<A>, val right: Term<B>,
+                       val operator: Operator<A, B, S>) : Term<S>()
+
+val equal = Operator<Any, Any, Boolean>()
+val term = Op(Var("name", Any()),
+        Var("name", Any()), equal)
+
+
 val base = rules {
     val b = schemaFormula("b")
     val c = schemaFormula("c")
@@ -16,7 +27,6 @@ val base = rules {
         findAntec(b `&` c)
         replaceWith("b,c ==>")
         heuristics = ALPHA
-        ruleSet()
         displayname("andLefty")
     }
 

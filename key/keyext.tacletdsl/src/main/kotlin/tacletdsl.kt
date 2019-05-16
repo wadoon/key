@@ -1,5 +1,11 @@
-import de.uka.ilkd.key.rule.AntecTaclet
-import de.uka.ilkd.key.rule.Taclet
+import de.uka.ilkd.key.logic.Choice
+import de.uka.ilkd.key.logic.Term
+import de.uka.ilkd.key.logic.op.SchemaVariable
+import de.uka.ilkd.key.rule.*
+import de.uka.ilkd.key.rule.tacletbuilder.TacletGoalTemplate
+import org.key_project.util.collection.ImmutableList
+import org.key_project.util.collection.ImmutableMap
+import org.key_project.util.collection.ImmutableSet
 
 enum class ApplyRestriction {
     NONE, SameUpdateLevel, InSequentState,
@@ -41,7 +47,20 @@ class TacletBuilder(val name: String) {
     }
 
     fun build(): Taclet {
-        val taclet = AntecTaclet(name, )
+        val applPart: TacletApplPart
+        val goalTemplates: ImmutableList<TacletGoalTemplate>
+        val heuristics: ImmutableList<RuleSet>
+        val attrs: TacletAttributes
+        val find: Term;
+        val ignoreTopLevelUpdates: Boolean = false
+        val prefixMap: ImmutableMap<SchemaVariable, TacletPrefix>
+        val choices: ImmutableSet<Choice>? = null
+        val tacletAnnotations: ImmutableSet<TacletAnnotation> = ImmutableSet.fromSet(HashSet())
+
+        val taclet = AntecTaclet(name,
+                applPart, goalTemplates, heuristics, attrs, find, ignoreTopLevelUpdates,
+                prefixMap, choices, tacletAnnotations);
+
 
     }
 }
