@@ -44,7 +44,6 @@ public class HeuristicInstantiation implements TermGenerator {
         final QuantifiableVariable var =
                 qf.varsBoundHere ( 0 ).last ();
         HIIterator hiit = new HIIterator ( ia.getSubstitution ().iterator (), var, goal.proof().getServices() );
-        System.out.println("Sequent: " + goal.sequent().toString());
         return hiit;
     }
 
