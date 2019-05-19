@@ -68,6 +68,9 @@ subprojects {
     apply plugin: 'findbugs'
     */
 
+    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_1_8
+
     group = rootProject.group
     version = rootProject.version
     ext.gitRevision = rootProject.ext.gitRevision

@@ -1,14 +1,18 @@
 import ApplyRestriction.SameUpdateLevel
 
+/*
 class Operator<A, B, C>()
 sealed class Term<S>() {}
 data class Var<S>(val name: String, val sort: S) : Term<S>()
 data class Op<A, B, S>(val left: Term<A>, val right: Term<B>,
                        val operator: Operator<A, B, S>) : Term<S>()
-
 val equal = Operator<Any, Any, Boolean>()
 val term = Op(Var("name", Any()),
         Var("name", Any()), equal)
+*/
+
+val ALPHA = Heuristic("alpha")
+val SIMPLIFY = Heuristic("simplify")
 
 
 val base = rules {
@@ -18,21 +22,25 @@ val base = rules {
     val cutFormula = schemaFormula("cutFormula")
     val br = schemaFormula("br", rigid = true)
     val cr = schemaFormula("cr", rigid = true)
-    val ALPHA = Heuristic("alpha")
-    val SIMPLIFY = Heuristic("simplify")
 
+
+    taclet("test") {
+        branch {
+
+        }
+    }
 
     taclet("andLeft") {
-        restriction = SameUpdateLevel
+        restriction(SameUpdateLevel)
         findAntec(b `&` c)
         replaceWith("b,c ==>")
         heuristics = ALPHA
-        displayname("andLefty")
+        displayName = "andLefty"
     }
 
     taclet("insert_eqv_once_lr") {
-        find("br <-> cr ==>")
-        addrules {
+        findAntec("br <-> cr ==>")
+        addRules {
             taclet("insert_eqv") {
                 find("br")
                 replaceWith("cr")
@@ -41,7 +49,7 @@ val base = rules {
     }
 
     taclet("cut_direct") {
-        restriction = SameUpdateLevel
+        restriction(SameUpdateLevel)
         find("cutFormula")
 
         replaceWith("true") {
@@ -58,7 +66,7 @@ val base = rules {
 
     taclet("case_distinction_l") {
         find("b ==>")
-        addrules {
+        addRules {
             taclet("to_true") {
                 find("b ==>")
                 replaceWith("true ==>")
@@ -69,10 +77,14 @@ val base = rules {
             replaceWith("false ==>")
             heuristics = SIMPLIFY
         }
-        displayname("case_distinction")
+        displayName("case_distinction")
     }
 }
 
 private infix fun String.`&`(right: String): String {
     return "$this & right"
+}
+
+fun main() {
+    println("Abc")
 }
