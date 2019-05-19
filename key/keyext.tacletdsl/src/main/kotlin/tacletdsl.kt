@@ -3,10 +3,16 @@ import de.uka.ilkd.key.logic.*
 import de.uka.ilkd.key.logic.op.*
 import de.uka.ilkd.key.logic.op.Function
 import de.uka.ilkd.key.logic.sort.Sort
+import de.uka.ilkd.key.parser.DefaultTermParser
+import de.uka.ilkd.key.pp.AbbrevMap
+import de.uka.ilkd.key.proof.init.InitConfig
+import de.uka.ilkd.key.proof.init.JavaProfile
+import de.uka.ilkd.key.proof.init.Profile
 import de.uka.ilkd.key.rule.*
 import de.uka.ilkd.key.rule.RewriteTaclet.*
 import de.uka.ilkd.key.rule.tacletbuilder.*
 import org.key_project.util.collection.*
+import java.io.StringReader
 import java.lang.IllegalStateException
 import java.util.*
 import kotlin.collections.HashSet
@@ -79,7 +85,8 @@ class TacletBuilder(val name: String) {
         val subTaclets = newRules.build()
         val term = findTerm?.let { ctx.parse(it) }
         val assummptions: List<Term> = arrayListOf()
-        val apprestr = restriction.map { it.flag }.reduce { acc, i -> acc or i }
+        val apprestr = if (restriction.isEmpty()) 0
+        else restriction.map { it.flag }.reduce { acc, i -> acc or i }
 
 
         val builder = when {
@@ -135,7 +142,7 @@ class TacletBuilder(val name: String) {
 
 
 class Context {
-    lateinit var services: Services
+    var services: Services = Services(JavaProfile())
     val termFactory: TermFactory
         get() = services.termFactory
 
@@ -162,7 +169,8 @@ class Context {
     val schemaVariables: Namespace<SchemaVariable> = Namespace()
 
     fun parse(findTerm: String): Term {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val reader = StringReader(findTerm)
+        return DefaultTermParser().parse(reader, null, services, namespaces, AbbrevMap())
     }
 
     fun parseSeq(addedSequent: String?): Sequent? = addedSequent?.let { parseSeq(it) }
@@ -188,10 +196,7 @@ class Branch {
 }
 
 class TacletBase {
-    private val context: Context
-        get() {
-            return Context()
-        }
+    private val context: Context = Context()
 
     val taclets: MutableList<TacletBuilder> = arrayListOf()
 
@@ -204,6 +209,7 @@ class TacletBase {
     }
 
     fun schemaFormula(name: String, rigid: Boolean = false): String {
+        context.schemaVariables.add(SchemaVariableFactory.createFormulaSV(Name(name), rigid))
         return name
     }
 

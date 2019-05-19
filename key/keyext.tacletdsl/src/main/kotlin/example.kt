@@ -23,13 +23,6 @@ val base = rules {
     val br = schemaFormula("br", rigid = true)
     val cr = schemaFormula("cr", rigid = true)
 
-
-    taclet("test") {
-        branch {
-
-        }
-    }
-
     taclet("andLeft") {
         restriction(SameUpdateLevel)
         findAntec(b `&` c)
@@ -86,5 +79,6 @@ private infix fun String.`&`(right: String): String {
 }
 
 fun main() {
-    println("Abc")
+    val taclets = base.build()
+    println(taclets)
 }
