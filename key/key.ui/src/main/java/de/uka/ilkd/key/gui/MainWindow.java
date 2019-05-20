@@ -150,8 +150,8 @@ public final class MainWindow extends JFrame {
     /**
      *
      */
-    CControl dockControl = new CControl(this);
-    JCheckBoxMenuItem saveSMTFile;
+    private CControl dockControl = new CControl(this);
+    private JCheckBoxMenuItem saveSMTFile;
     /**
      * the first toolbar
      */
@@ -1042,6 +1042,10 @@ public final class MainWindow extends JFrame {
             SwingUtilities.invokeLater(sequentUpdater);
         }
 
+    }
+
+    public CControl getDockControl() {
+        return dockControl;
     }
 
     void displayResults(String message) {

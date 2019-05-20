@@ -379,7 +379,7 @@ project(":key.ui") {
                 'lib/docking-frames-core.jar')
         //runtime name: 'docking-frames-ext-toolbar'
         //runtime name: 'docking-frames-ext-toolbar-common'
-
+        runtimeOnly project(":keyext.editor")
         runtimeOnly project(":keyext.script.ui")
         runtimeOnly project(":keyext.interactionlog")
     }
@@ -409,6 +409,7 @@ project(":key.ui") {
 
     run {
         systemProperties["key.examples.dir"] = "$projectDir/examples"
+        args "--experimental"
     }
 }
 

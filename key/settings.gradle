@@ -14,6 +14,7 @@ include "key.core.example"
 include "key.core.symbolic_execution.example"
 
 include ':keyext.interactionlog'
+include ':keyext.editor'
 include ':keyext.script'
 include ':keyext.script.ui'
 
