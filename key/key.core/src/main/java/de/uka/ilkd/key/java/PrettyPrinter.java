@@ -21,6 +21,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Stack;
 
+import de.uka.ilkd.key.java.statement.Assume;
 import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.abstraction.Type;
@@ -1365,7 +1366,39 @@ public class PrettyPrinter {
         
         printFooter(x);
     }
- 
+
+    public void printAssume(Assume x) throws IOException {
+
+        printHeader(x);
+        writeInternalIndentation(x);
+
+        // Mark statement start ...
+        markStart(0,x);
+
+        boolean wasNoLinefeed  = noLinefeed;
+        boolean wasNoSemicolon = noSemicolons;
+        markKeywordStart();
+        write("#assume");
+        markKeywordEnd();
+        write(" ");
+
+        noLinefeed   = true;
+        noSemicolons = true;
+        writeElement(0, x.getCondition());
+
+        noSemicolons = wasNoSemicolon;
+        noLinefeed   = wasNoLinefeed;
+
+        write(";");
+
+        output();
+        // Mark statement end ...
+        markEnd(0,x);
+
+        printFooter(x);
+    }
+
+
     public void printArrayDeclaration(ArrayDeclaration type) throws java.io.IOException {
 	Type baseType = type.getBaseType().getKeYJavaType().getJavaType();       
         assert baseType != null;
@@ -3200,5 +3233,4 @@ public class PrettyPrinter {
         printFooter(x);
     }
 
-    
 }

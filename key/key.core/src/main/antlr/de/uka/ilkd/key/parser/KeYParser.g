@@ -1050,6 +1050,13 @@ options {
             }else{
                 sjb.javaBlock = jr.readBlockWithProgramVariables(programVariables(), s);
             }
+    } catch(Exception ex) {
+        RecognitionException rex = new RecognitionException(input);
+        rex.initCause(ex);
+        throw rex;
+    }
+    /* This error handling is broken since the exception information is thrown away
+     * anyway.
         } catch (de.uka.ilkd.key.java.PosConvertException e) {
             lineOffset=e.getLine()-1;
             colOffset=e.getColumn()+1;
@@ -1080,7 +1087,7 @@ options {
             }   
             throw new RecognitionException(input);
             //throw new JavaParserException(e.getMessage(), t.getText(), getSourceName(), t.getLine(), t.getCharPositionInLine());
-        } 
+        } */
         return sjb;
     }
 

@@ -132,6 +132,11 @@ public abstract class JavaASTVisitor extends JavaASTWalker
     }
 
     @Override
+    public void performActionOnAssume(Assume x) {
+        doDefaultAction(x);
+    }
+
+    @Override
     public void performActionOnBinaryAnd(BinaryAnd x) {
         doDefaultAction(x);
     }

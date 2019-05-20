@@ -593,6 +593,7 @@ TOKEN :
 		    | < UNPACK: "#unpack" >
 		    | < FORINITUNFOLDTRANSFORMER: "#forInitUnfoldTransformer" >
 		    | < SET: "#set" >
+		    | < ASSUME: "#assume" >
 		    }
 
 /* LITERALS */
@@ -3607,6 +3608,7 @@ Statement Statement() :
      | result = SynchronizedStatement()
      | result = TryStatement()
      | result = AssertStatement()
+     | result = AssumeStatement()
      | result = StatementSV()
      )
 	{
@@ -4082,6 +4084,28 @@ Assert AssertStatement() :
     }
 }
 
+/*
+ * Assume statements are an extension only available in KeY.
+ */
+Assume AssumeStatement() :
+{
+    Assume result;
+    Expression cond = null;
+}
+{
+    "#assume"
+	{
+	    result = new Assume(); /* factory.createAssume(); not available */
+	    setPrefixInfo(result);
+	}
+    cond = Expression()
+	";"
+    {
+	result.setCondition(cond);
+	checkConstruction(result);
+	return result;
+    }
+}
 
 If IfStatement() :
     /*

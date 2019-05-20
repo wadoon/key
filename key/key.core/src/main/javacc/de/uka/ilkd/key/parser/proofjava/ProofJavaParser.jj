@@ -431,6 +431,7 @@ TOKEN :
           matchedToken.kind = IDENTIFIER;
       }
   }
+| < ASSUME: "#assume" >
 | < AT: "@" > {
 	  if (!ProofJavaParser.jdk1_5) {
 	  	  // TODO
@@ -3680,6 +3681,7 @@ Statement Statement() :
 | result = LoopScope()
 | result = TryStatement()
 | result = AssertStatement()
+| result = AssumeStatement()
 | result = KeYCatchAllStatement()
 )
   {
@@ -4145,6 +4147,29 @@ Assert AssertStatement() :
       setPostfixInfo(result);
       return result;
   }
+}
+
+/*
+ * Assume statements are an extension only available in KeY.
+ */
+Assume AssumeStatement() :
+{
+    Assume result;
+    Expression cond = null;
+}
+{
+    "#assume"
+	{
+	    result = factory.createAssume();
+	    setPrefixInfo(result);
+	}
+    cond = Expression()
+	";"
+    {
+	result.setCondition(cond);
+	checkConstruction(result);
+	return result;
+    }
 }
 
 

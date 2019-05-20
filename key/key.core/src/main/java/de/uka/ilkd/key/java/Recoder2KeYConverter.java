@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
+import de.uka.ilkd.key.java.statement.Assume;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
@@ -1834,6 +1835,12 @@ public class Recoder2KeYConverter {
         }
         return new Assert((Expression) callConvert(a.getCondition()), message,
                 positionInfo(a));
+    }
+
+    /** convert Assume */
+    public Assume convert(de.uka.ilkd.key.java.recoderext.Assume a) {
+        final Expression message;
+        return new Assume((Expression) callConvert(a.getCondition()), positionInfo(a));
     }
 
     /**

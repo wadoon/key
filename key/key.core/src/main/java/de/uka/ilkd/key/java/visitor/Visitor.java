@@ -115,6 +115,7 @@ import de.uka.ilkd.key.java.reference.ThisReference;
 import de.uka.ilkd.key.java.reference.TypeReference;
 import de.uka.ilkd.key.java.reference.VariableReference;
 import de.uka.ilkd.key.java.statement.Assert;
+import de.uka.ilkd.key.java.statement.Assume;
 import de.uka.ilkd.key.java.statement.Break;
 import de.uka.ilkd.key.java.statement.Case;
 import de.uka.ilkd.key.java.statement.Catch;
@@ -459,6 +460,8 @@ public interface Visitor {
 
     void performActionOnAssert(Assert assert1);
 
+    void performActionOnAssume(Assume assume);
+
     void performActionOnProgramConstant(ProgramConstant constant);
 
     void performActionOnLocationVariable(LocationVariable variable);
@@ -508,4 +511,5 @@ public interface Visitor {
     void performActionOnTransactionStatement(TransactionStatement transSt);
 
     public void performActionOnEmptyMapLiteral(EmptyMapLiteral aThis);
+
 }

@@ -16,6 +16,7 @@ package de.uka.ilkd.key.java.visitor;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+import de.uka.ilkd.key.java.statement.Assume;
 import org.key_project.util.ExtList;
 import org.key_project.util.collection.ImmutableArray;
 
@@ -210,6 +211,27 @@ public abstract class CreatingASTVisitor extends JavaASTVisitor {
                     .removeFirstOccurrence(Expression.class);
 
             addChild(new Assert(condition, message, pos));
+
+            changed();
+        } else {
+            doDefaultAction(x);
+        }
+    }
+
+    @Override
+    public void performActionOnAssume(Assume x) {
+        ExtList changeList = stack.peek();
+        if (changeList.getFirst() == CHANGED) {
+            changeList.removeFirst();
+            PositionInfo pos = changeList.removeFirstOccurrence(PositionInfo.class);
+            if (!preservesPositionInfo) {
+                pos = PositionInfo.UNDEFINED;
+            }
+
+            Expression condition =
+                    changeList.removeFirstOccurrence(Expression.class);
+
+            addChild(new Assume(condition, pos));
 
             changed();
         } else {
