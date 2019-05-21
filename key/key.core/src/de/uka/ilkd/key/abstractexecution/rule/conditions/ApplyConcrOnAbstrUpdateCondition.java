@@ -72,10 +72,6 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * Works also for abstract update concatenations; then, the update is stepwise
  * pushed into the concatenation.
  *
- * TODO (DS, 2019-02-13): Check whether there are problems when dropping the "no
- * Java block"-condition. Was introduced originally due give higher priority to
- * the ApplyAbstrOnConcrUpdateCondition rule. But maybe we don't need it???
- *
  * @author Dominic Steinhoefel
  */
 public final class ApplyConcrOnAbstrUpdateCondition
@@ -102,8 +98,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
         final Term phi = (Term) svInst.getInstantiation(phiSV);
         final Term result = (Term) svInst.getInstantiation(resultSV);
 
-        if (concrUpdate == null || abstrUpdateTerm == null || phi == null
-                || result != null) {
+        if (concrUpdate == null || abstrUpdateTerm == null || result != null) {
             return mc;
         }
 
@@ -113,9 +108,9 @@ public final class ApplyConcrOnAbstrUpdateCondition
             return null;
         }
 
-        if (phi.containsJavaBlockRecursive()) {
-            return null;
-        }
+//        if (phi.containsJavaBlockRecursive()) {
+//            return null;
+//        }
 
         /*
          * The concrete update to apply next to the upcoming abstract one in the

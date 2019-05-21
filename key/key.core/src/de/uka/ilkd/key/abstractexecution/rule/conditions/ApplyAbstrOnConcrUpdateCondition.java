@@ -52,7 +52,7 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  * (where phi does not contain y) to
  *
  * <pre>
- *   {U_P(..., x, ... := ...)}
+ *   {U_P(..., hasTo(x), ... := ...)}
  *      {... || ...}
  *        phi(x)
  * </pre>
@@ -211,7 +211,7 @@ public final class ApplyAbstrOnConcrUpdateCondition
 
     private static Term substLocVarInAbstractUpdate(Term abstractUpdateTerm,
             LocationVariable lhs1, LocationVariable lhs2, Services services) {
-        final TermBuilder tb = services.getTermBuilder();
+//        final TermBuilder tb = services.getTermBuilder();
         final TermFactory tf = services.getTermFactory();
         final AbstractUpdate abstrUpd = //
                 (AbstractUpdate) abstractUpdateTerm.op();
@@ -220,9 +220,11 @@ public final class ApplyAbstrOnConcrUpdateCondition
                 .changeAssignables(abstrUpd,
                         Collections.singletonMap(lhs1, lhs2), services);
 
-        final Term newAbstrUpdRHS = //
-                MiscTools.replaceVarInTerm(lhs1, tb.var(lhs2),
-                        abstractUpdateTerm.sub(0), services);
+//        final Term newAbstrUpdRHS = //
+//                MiscTools.replaceVarInTerm(lhs1, tb.var(lhs2),
+//                        abstractUpdateTerm.sub(0), services);
+        
+        final Term newAbstrUpdRHS = abstractUpdateTerm.sub(0);
 
         return tf.createTerm(newAbstrUpd, newAbstrUpdRHS);
     }

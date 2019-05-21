@@ -280,7 +280,10 @@ public class SVInstantiations {
         if (b == null) {
             return rebuildSorts(services);
         } else if (!b.booleanValue()) {
-            throw INCOMPATIBLE_INSTANTIATION_EXCEPTION;
+//            throw INCOMPATIBLE_INSTANTIATION_EXCEPTION;
+            throw new SortException(
+                    "Sort of SV " + p_sv + "is not compatible with its "
+                            + "instantiation's sort " + p_entry);
         }
         if (p_forceRebuild) {
             return rebuildSorts(services);

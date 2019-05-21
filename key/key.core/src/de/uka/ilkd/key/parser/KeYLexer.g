@@ -253,6 +253,8 @@ lexer grammar KeYLexer;
 	APPLY_ABSTR_ON_CONCR_UPDATE : '\\applyAbstrOnConcrUpdate';
 	APPLY_CONCR_ON_ABSTR_UPDATE : '\\applyConcrOnAbstrUpdate';
 	DROP_EFFECTLESS_ABSTRACT_UPDATE_ASSIGNMENTS : '\\dropEffectlessAbstractUpdateAssignments';
+	DROP_EFFECTLESS_ABSTRACT_UPDATE : '\\dropEffectlessAbstractUpdate';
+	CAN_UNIFY_ABSTR_UPD_LHS_FOR_TARGETS : '\\canUnifyAbstrUpdLHSForTargets';
 	DROP_EFFECTLESS_ELEMENTARIES : '\\dropEffectlessElementaries';
 	DROP_EFFECTLESS_STORES : '\\dropEffectlessStores';
 	ABSTRACT_UPDATE : '\\abstractUpdate';

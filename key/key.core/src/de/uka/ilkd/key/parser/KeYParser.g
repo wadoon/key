@@ -3871,6 +3871,8 @@ varexp[TacletBuilder b]
     | varcond_applyAbstrOnConcrUpdate[b]
     | varcond_applyConcrOnAbstrUpdate[b]
     | varcond_dropEffectlessAbstractUpdateAssignments[b]
+    | varcond_dropEffectlessAbstractUpdate[b]
+    | varcond_canUnifyAbstrUpdateLHSForTarget[b]
     | varcond_instantiateVarsFresh[b]
     | varcond_newPV[b]
     | varcond_initializeExpression[b]
@@ -4113,6 +4115,7 @@ varcond_abstrUpdatesIndependent[TacletBuilder b]
 varcond_applyConcrOnAbstrUpdate[TacletBuilder b]
 :
    APPLY_CONCR_ON_ABSTR_UPDATE LPAREN u1=varId COMMA u2=varId COMMA phi=varId COMMA result=varId RPAREN 
+   //APPLY_CONCR_ON_ABSTR_UPDATE LPAREN u1=varId COMMA u2=varId COMMA result=varId RPAREN
    {
       b.addVariableCondition(new ApplyConcrOnAbstrUpdateCondition((UpdateSV)u1, 
                                                                   (UpdateSV)u2, 
@@ -4143,6 +4146,28 @@ varcond_dropEffectlessAbstractUpdateAssignments[TacletBuilder b]
                                                              (SchemaVariable)result));
    }
 ;
+
+varcond_canUnifyAbstrUpdateLHSForTarget[TacletBuilder b]
+:
+   CAN_UNIFY_ABSTR_UPD_LHS_FOR_TARGETS LPAREN u1=varId COMMA target1=varId COMMA u2=varId COMMA target2=varId RPAREN 
+   {
+      b.addVariableCondition(new CanUnifyAbstrUpdLHSForTargetsCondition((UpdateSV)u1, 
+                                                             (SchemaVariable)target1,
+                                                             (UpdateSV)u2, 
+                                                             (SchemaVariable)target2));
+   }
+;
+
+varcond_dropEffectlessAbstractUpdate[TacletBuilder b]
+:
+   DROP_EFFECTLESS_ABSTRACT_UPDATE LPAREN u=varId COMMA target=varId COMMA result=varId RPAREN 
+   {
+      b.addVariableCondition(new DropEffectlessAbstractUpdateCondition((UpdateSV)u, 
+                                                             (SchemaVariable)target, 
+                                                             (SchemaVariable)result));
+   }
+;
+
 varcond_dropEffectlessElementaries[TacletBuilder b]
 :
    DROP_EFFECTLESS_ELEMENTARIES LPAREN u=varId COMMA x=varId COMMA result=varId RPAREN 

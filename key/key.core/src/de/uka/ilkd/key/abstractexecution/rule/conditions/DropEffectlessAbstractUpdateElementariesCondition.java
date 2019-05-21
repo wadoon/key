@@ -130,9 +130,11 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             if (newElementaryAbstractUpdates.equals(origAbstractUpdates)) {
                 return null;
             }
-        } else {
+        } else if (u.op() instanceof AbstractUpdate) {
             newResult = dropEffectlessAbstractUpdateElementaries(//
                     u, target, runtimeInstance, services);
+        } else {
+            return null;
         }
 
         if (newResult == null) {

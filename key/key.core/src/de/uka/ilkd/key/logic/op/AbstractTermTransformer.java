@@ -41,6 +41,7 @@ import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula2;
 import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula3;
 import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula4;
 import de.uka.ilkd.key.rule.metaconstruct.MutualExclusionFormula5;
+import de.uka.ilkd.key.rule.metaconstruct.NormalSpec;
 import de.uka.ilkd.key.rule.metaconstruct.ReturnSpec;
 import de.uka.ilkd.key.rule.metaconstruct.SetLastComponentOfAEPredsToFalseTransformer;
 import de.uka.ilkd.key.rule.metaconstruct.arith.DivideLCRMonomials;
@@ -134,6 +135,7 @@ public abstract class AbstractTermTransformer extends AbstractSortedOperator
     public static final AbstractTermTransformer MUTUAL_EXCLUSION_FORMULA_4 = new MutualExclusionFormula4();
     public static final AbstractTermTransformer MUTUAL_EXCLUSION_FORMULA_5 = new MutualExclusionFormula5();
 
+    public static final AbstractTermTransformer NORMAL_SPEC = new NormalSpec();
     public static final AbstractTermTransformer RETURN_SPEC = new ReturnSpec();
     public static final AbstractTermTransformer EXC_SPEC = new ExcSpec();
     public static final AbstractTermTransformer BREAKS_SPEC = new BreaksSpec();
