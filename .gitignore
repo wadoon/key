@@ -23,3 +23,10 @@ smt-solvers
 *.nav
 *.out
 *.snm
+
+*.serialized
+**/testresults/**
+
+# *.orig files are created by git during merges
+*.orig
+key/key.ui/examples/**/**.proof

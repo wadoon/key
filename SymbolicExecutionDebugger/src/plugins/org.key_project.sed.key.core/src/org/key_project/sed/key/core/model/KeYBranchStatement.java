@@ -13,6 +13,9 @@
 
 package org.key_project.sed.key.core.model;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
@@ -21,11 +24,11 @@ import org.eclipse.jdt.core.dom.IfStatement;
 import org.eclipse.jdt.core.dom.SwitchStatement;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
-import org.key_project.sed.core.model.ISEDBranchCondition;
-import org.key_project.sed.core.model.ISEDBranchStatement;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.impl.AbstractSEDBranchStatement;
-import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
+import org.key_project.sed.core.model.ISEBranchCondition;
+import org.key_project.sed.core.model.ISEBranchStatement;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.impl.AbstractSEBranchStatement;
+import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.java.CollectionUtil;
@@ -37,11 +40,11 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Implementation of {@link ISEDBranchStatement} for the symbolic execution debugger (SED)
+ * Implementation of {@link ISEBranchStatement} for the symbolic execution debugger (SED)
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYBranchStatement extends AbstractSEDBranchStatement implements IKeYSEDDebugNode<IExecutionBranchStatement> {
+public class KeYBranchStatement extends AbstractSEBranchStatement implements IKeYSENode<IExecutionBranchStatement> {
    /**
     * The {@link IExecutionBranchStatement} to represent by this debug node.
     */
@@ -50,7 +53,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
    /**
     * The contained children.
     */
-   private IKeYSEDDebugNode<?>[] children;
+   private IKeYSENode<?>[] children;
 
    /**
     * The source name.
@@ -70,7 +73,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
    /**
     * The method call stack.
     */
-   private IKeYSEDDebugNode<?>[] callStack;
+   private IKeYSENode<?>[] callStack;
    
    /**
     * The constraints
@@ -80,7 +83,17 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
    /**
     * The conditions under which a group ending in this node starts.
     */
-   private SEDMemoryBranchCondition[] groupStartConditions;
+   private SEMemoryBranchCondition[] groupStartConditions;
+   
+   /**
+    * The outgoing links.
+    */
+   private final List<KeYNodeLink> outgoingLinks = new LinkedList<KeYNodeLink>();
+
+   /**
+    * The incoming links.
+    */
+   private final List<KeYNodeLink> incomingLinks = new LinkedList<KeYNodeLink>();
    
    /**
     * Constructor.
@@ -90,7 +103,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     * @param executionNode The {@link IExecutionBranchStatement} to represent by this debug node.
     */
    public KeYBranchStatement(KeYDebugTarget target, 
-                             IKeYSEDDebugNode<?> parent, 
+                             IKeYSENode<?> parent, 
                              KeYThread thread, 
                              IExecutionBranchStatement executionNode) throws DebugException {
       super(target, parent, thread);
@@ -120,15 +133,15 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?> getParent() throws DebugException {
-      return (IKeYSEDDebugNode<?>)super.getParent();
+   public IKeYSENode<?> getParent() throws DebugException {
+      return (IKeYSENode<?>)super.getParent();
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
+   public IKeYSENode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
@@ -367,7 +380,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getCallStack() throws DebugException {
+   public IKeYSENode<?>[] getCallStack() throws DebugException {
       synchronized (this) {
          if (callStack == null) {
             callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
@@ -401,7 +414,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     * {@inheritDoc}
     */
    @Override
-   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+   public SEMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          if (groupStartConditions == null) {
             groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
@@ -414,7 +427,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     * {@inheritDoc}
     */
    @Override
-   public ISEDBranchCondition[] getGroupEndConditions() throws DebugException {
+   public ISEBranchCondition[] getGroupEndConditions() throws DebugException {
       synchronized (this) { // Is thread save execution really required?
          return KeYModelUtil.computeGroupEndConditions(this);
       }
@@ -424,7 +437,7 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     * {@inheritDoc}
     */
    @Override
-   public void setParent(ISEDDebugNode parent) {
+   public void setParent(ISENode parent) {
       super.setParent(parent);
    }
 
@@ -440,7 +453,55 @@ public class KeYBranchStatement extends AbstractSEDBranchStatement implements IK
     * {@inheritDoc}
     */
    @Override
-   public boolean isTruthValueEvaluationEnabled() {
-      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
+   public boolean isTruthValueTracingEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueTracingEnabled(getExecutionNode().getProof());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addOutgoingLink(KeYNodeLink link) {
+      outgoingLinks.add(link);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYNodeLink[] getOutgoingLinks() throws DebugException {
+      return outgoingLinks.toArray(new KeYNodeLink[outgoingLinks.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYNodeLink[] getIncomingLinks() throws DebugException {
+      return incomingLinks.toArray(new KeYNodeLink[incomingLinks.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addIncomingLink(KeYNodeLink link) {
+      incomingLinks.add(link);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeIncomingLink(KeYNodeLink link) {
+      incomingLinks.remove(link);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeOutgoingLink(KeYNodeLink link) {
+      outgoingLinks.remove(link);
    }
 }

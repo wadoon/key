@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.WeakHashMap;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -238,6 +239,14 @@ public class ProofProviderAdapterFactory implements IAdapterFactory {
        * {@inheritDoc}
        */
       @Override
+      public IProject getProject() {
+         return null;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
       public void selectionChanged(SelectionChangedEvent event) {
          fireCurrentProofsChanged(new ProofProviderEvent(this, 
                                                          getCurrentProofs(), 
@@ -309,6 +318,38 @@ public class ProofProviderAdapterFactory implements IAdapterFactory {
       @Override
       public void disconnected(DSConnectionEvent e) {
          fireCurrentProofsChangedThreadSave();
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isCanStartAutomode() {
+         return false;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isCanApplyRules() {
+         return false;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isCanPruneProof() {
+         return false;
+      }
+
+      /**
+       * {@inheritDoc}
+       */
+      @Override
+      public boolean isCanStartSMTSolver() {
+         return false;
       }
    };
 }

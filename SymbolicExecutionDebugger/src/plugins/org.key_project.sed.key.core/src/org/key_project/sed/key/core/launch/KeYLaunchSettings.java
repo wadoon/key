@@ -20,7 +20,7 @@ import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
-import org.key_project.sed.core.model.ISEDMethodReturn;
+import org.key_project.sed.core.model.ISEMethodReturn;
 import org.key_project.sed.key.core.model.KeYDebugTarget;
 import org.key_project.sed.key.core.util.KeySEDUtil;
 
@@ -71,9 +71,9 @@ public class KeYLaunchSettings {
    private final String precondition;
    
    /**
-    * If this is {@code true} an {@link ISEDMethodReturn} will contain the return value,
+    * If this is {@code true} an {@link ISEMethodReturn} will contain the return value,
     * but the performance will suffer.
-    * If it is {@code false} only the name of the returned method is shown in an {@link ISEDMethodReturn}.
+    * If it is {@code false} only the name of the returned method is shown in an {@link ISEMethodReturn}.
     */
    private final boolean showMethodReturnValues;
    
@@ -148,9 +148,9 @@ public class KeYLaunchSettings {
    private final boolean variablesAreOnlyComputedFromUpdates;
    
    /**
-    * Is truth value evaluation enabled?
+    * Is truth value tracing enabled?
     */
-   private final boolean truthValueEvaluationEnabled;
+   private final boolean truthValueTracingEnabled;
    
    /**
     * Is reached source code highlighted?
@@ -168,6 +168,11 @@ public class KeYLaunchSettings {
    private final boolean simplifyConditions;
    
    /**
+    * {@code true} full branch condition is hidden in case an additional label is available, {@code false} full branch condition is always shown.
+    */
+   private final boolean hideFullBranchConditionIfAdditionalLabelIsAvailable;
+   
+   /**
     * Constructor.
     * @param newDebugSession {@code true} new debug session, {@code false} continue existing *.proof file.
     * @param proofFileToContinue The path to the proof file to continue.
@@ -175,7 +180,7 @@ public class KeYLaunchSettings {
     * @param useExistingContract Use an existing contract or generate default contract?
     * @param existingContract The ID of the existing contract to use.
     * @param precondition The precondition.
-    * @param showMethodReturnValues Show method return values of {@link ISEDMethodReturn} instances?
+    * @param showMethodReturnValues Show method return values of {@link ISEMethodReturn} instances?
     * @param showVariablesOfSelectedDebugNode Show variables of selected debug node?
     * @param showKeYMainWindow Show KeY's main window?
     * @param mergeBranchConditions Merge branch conditions?
@@ -189,10 +194,11 @@ public class KeYLaunchSettings {
     * @param usePrettyPrinting Use pretty printing?
     * @param showSignatureOnMethodReturnNodes Show signature on method return nodes?
     * @param variablesAreOnlyComputedFromUpdates {@code true} {@link IExecutionVariable} are only computed from updates, {@code false} {@link IExecutionVariable}s are computed according to the type structure of the visible memory.
-    * @param truthValueEvaluationEnabled Is truth value evaluation enabled?
+    * @param truthValueTracingEnabled Is truth value tracing enabled?
     * @param highlightReachedSourceCode Is reached source code highlighted?
     * @param groupingEnabled Is grouping enabled?
     * @param simplifyConditions {@code true} simplify conditions, {@code false} do not simplify conditions.
+    * @param hideFullBranchConditionIfAdditionalLabelIsAvailable {@code true} full branch condition is hidden in case an additional label is available, {@code false} full branch condition is always shown.
     * @throws JavaModelException Occurred Exception.
     */
    public KeYLaunchSettings(boolean newDebugSession,
@@ -216,10 +222,11 @@ public class KeYLaunchSettings {
                             boolean usePrettyPrinting,
                             boolean showSignatureOnMethodReturnNodes,
                             boolean variablesAreOnlyComputedFromUpdates,
-                            boolean truthValueEvaluationEnabled,
+                            boolean truthValueTracingEnabled,
                             boolean highlightReachedSourceCode,
                             boolean groupingEnabled,
-                            boolean simplifyConditions) throws JavaModelException {
+                            boolean simplifyConditions,
+                            boolean hideFullBranchConditionIfAdditionalLabelIsAvailable) throws JavaModelException {
       this.newDebugSession = newDebugSession;
       this.proofFileToContinue = proofFileToContinue;
       this.method = method;
@@ -242,10 +249,11 @@ public class KeYLaunchSettings {
       this.usePrettyPrinting = usePrettyPrinting;
       this.showSignatureOnMethodReturnNodes = showSignatureOnMethodReturnNodes;
       this.variablesAreOnlyComputedFromUpdates = variablesAreOnlyComputedFromUpdates;
-      this.truthValueEvaluationEnabled = truthValueEvaluationEnabled;
+      this.truthValueTracingEnabled = truthValueTracingEnabled;
       this.highlightReachedSourceCode = highlightReachedSourceCode;
       this.groupingEnabled = groupingEnabled;
       this.simplifyConditions = simplifyConditions;
+      this.hideFullBranchConditionIfAdditionalLabelIsAvailable = hideFullBranchConditionIfAdditionalLabelIsAvailable;
    }
 
    /**
@@ -297,8 +305,8 @@ public class KeYLaunchSettings {
    }
 
    /**
-    * Checks if method return values of {@link ISEDMethodReturn} instances should be shown.
-    * @return Show method return values of {@link ISEDMethodReturn} instances?
+    * Checks if method return values of {@link ISEMethodReturn} instances should be shown.
+    * @return Show method return values of {@link ISEMethodReturn} instances?
     */
    public boolean isShowMethodReturnValues() {
       return showMethodReturnValues;
@@ -425,11 +433,11 @@ public class KeYLaunchSettings {
    }
 
    /**
-    * Checks if truth value evaluation is enabled.
+    * Checks if truth value tracing is enabled.
     * @return {@code true} enabled, {@code false} disabled
     */
-   public boolean isTruthValueEvaluationEnabled() {
-      return truthValueEvaluationEnabled;
+   public boolean isTruthValueTracingEnabled() {
+      return truthValueTracingEnabled;
    }
 
    /**
@@ -454,5 +462,13 @@ public class KeYLaunchSettings {
     */
    public boolean isSimplifyConditions() {
       return simplifyConditions;
+   }
+
+   /**
+    * Checks if branch conditions should be hidden in case of alternative labels.
+    * @return {@code true} full branch condition is hidden in case an additional label is available, {@code false} full branch condition is always shown.
+    */
+   public boolean isHideFullBranchConditionIfAdditionalLabelIsAvailable() {
+      return hideFullBranchConditionIfAdditionalLabelIsAvailable;
    }
 }

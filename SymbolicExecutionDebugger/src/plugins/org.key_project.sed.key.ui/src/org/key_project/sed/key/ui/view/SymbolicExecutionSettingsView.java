@@ -18,6 +18,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.debug.core.DebugEvent;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.IDebugEventSetListener;
@@ -297,6 +298,16 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView impleme
     * {@inheritDoc}
     */
    @Override
+   public IProject getProject() {
+      return proofsDebugTarget != null && proofsDebugTarget.getMethod() != null? 
+             proofsDebugTarget.getMethod().getResource().getProject() : 
+             null;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
    public void addProofProviderListener(IProofProviderListener l) {
       if (l != null) {
          proofProviderListener.add(l);
@@ -333,5 +344,37 @@ public class SymbolicExecutionSettingsView extends AbstractViewBasedView impleme
       for (IProofProviderListener l : toInform) {
          l.currentProofsChanged(e);
       }
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanStartAutomode() {
+      return false;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanApplyRules() {
+      return false;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanPruneProof() {
+      return false;
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public boolean isCanStartSMTSolver() {
+      return false;
    }
 }

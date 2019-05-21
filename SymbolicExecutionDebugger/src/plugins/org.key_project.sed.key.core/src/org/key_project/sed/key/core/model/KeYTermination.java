@@ -14,14 +14,16 @@
 package org.key_project.sed.key.core.model;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.jdt.core.IMethod;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDTermination;
-import org.key_project.sed.core.model.impl.AbstractSEDTermination;
-import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISETermination;
+import org.key_project.sed.core.model.impl.AbstractSETermination;
+import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -29,15 +31,16 @@ import org.key_project.util.eclipse.ResourceUtil;
 import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionNode;
 import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination;
+import de.uka.ilkd.key.symbolic_execution.model.IExecutionTermination.TerminationKind;
 import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Implementation of {@link ISEDTermination} for the symbolic execution debugger (SED)
+ * Implementation of {@link ISETermination} for the symbolic execution debugger (SED)
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYTermination extends AbstractSEDTermination implements IKeYTerminationNode<IExecutionTermination> {
+public class KeYTermination extends AbstractSETermination implements IKeYTerminationNode<IExecutionTermination> {
    /**
     * The {@link IExecutionTermination} to represent by this debug node.
     */
@@ -46,12 +49,12 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYTermin
    /**
     * The contained children.
     */
-   private IKeYSEDDebugNode<?>[] children;
+   private IKeYSENode<?>[] children;
 
    /**
     * The method call stack.
     */
-   private IKeYSEDDebugNode<?>[] callStack;
+   private IKeYSENode<?>[] callStack;
    
    /**
     * The constraints
@@ -66,7 +69,17 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYTermin
    /**
     * The conditions under which a group ending in this node starts.
     */
-   private SEDMemoryBranchCondition[] groupStartConditions;
+   private SEMemoryBranchCondition[] groupStartConditions;
+   
+   /**
+    * The outgoing links.
+    */
+   private final List<KeYNodeLink> outgoingLinks = new LinkedList<KeYNodeLink>();
+
+   /**
+    * The incoming links.
+    */
+   private final List<KeYNodeLink> incomingLinks = new LinkedList<KeYNodeLink>();
 
    /**
     * Constructor.
@@ -76,7 +89,7 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYTermin
     * @param executionNode The {@link IExecutionTermination} to represent by this debug node.
     */
    public KeYTermination(KeYDebugTarget target, 
-                         IKeYSEDDebugNode<?> parent, 
+                         IKeYSENode<?> parent, 
                          KeYThread thread, 
                          IExecutionTermination executionNode) throws DebugException {
       super(target, parent, thread);
@@ -85,6 +98,19 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYTermin
       target.registerDebugNode(this);
       thread.addTermination(this);
       initializeAnnotations();
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public String getNodeType() {
+      if (TerminationKind.BLOCK_CONTRACT_NORMAL == getExecutionNode().getTerminationKind()) {
+         return "Block Contract " + super.getNodeType();
+      }
+      else {
+         return super.getNodeType();
+      }
    }
 
    /**
@@ -107,15 +133,15 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYTermin
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?> getParent() throws DebugException {
-      return (IKeYSEDDebugNode<?>)super.getParent();
+   public IKeYSENode<?> getParent() throws DebugException {
+      return (IKeYSENode<?>)super.getParent();
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public void setParent(ISEDDebugNode parent) {
+   public void setParent(ISENode parent) {
       super.setParent(parent);
    }
 
@@ -123,7 +149,7 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYTermin
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
+   public IKeYSENode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
@@ -174,7 +200,7 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYTermin
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getCallStack() throws DebugException {
+   public IKeYSENode<?>[] getCallStack() throws DebugException {
       synchronized (this) {
          if (callStack == null) {
             callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
@@ -284,7 +310,7 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYTermin
     * {@inheritDoc}
     */
    @Override
-   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+   public SEMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          if (groupStartConditions == null) {
             groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
@@ -297,7 +323,55 @@ public class KeYTermination extends AbstractSEDTermination implements IKeYTermin
     * {@inheritDoc}
     */
    @Override
-   public boolean isTruthValueEvaluationEnabled() {
-      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
+   public boolean isTruthValueTracingEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueTracingEnabled(getExecutionNode().getProof());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addOutgoingLink(KeYNodeLink link) {
+      outgoingLinks.add(link);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYNodeLink[] getOutgoingLinks() throws DebugException {
+      return outgoingLinks.toArray(new KeYNodeLink[outgoingLinks.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYNodeLink[] getIncomingLinks() throws DebugException {
+      return incomingLinks.toArray(new KeYNodeLink[incomingLinks.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addIncomingLink(KeYNodeLink link) {
+      incomingLinks.add(link);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeIncomingLink(KeYNodeLink link) {
+      incomingLinks.remove(link);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeOutgoingLink(KeYNodeLink link) {
+      outgoingLinks.remove(link);
    }
 }

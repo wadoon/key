@@ -34,9 +34,9 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IViewPart;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDDebugTarget;
-import org.key_project.sed.core.model.ISEDThread;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.ISEDebugTarget;
+import org.key_project.sed.core.model.ISEThread;
 import org.key_project.sed.core.util.LaunchUtil;
 import org.key_project.util.collection.ImmutableSet;
 import org.key_project.util.eclipse.WorkbenchUtil;
@@ -170,9 +170,9 @@ public final class KeySEDUtil {
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_VARIABLES_ARE_COMPUTED_FROM_UPDATES = "org.key_project.sed.key.core.launch.sed.key.attribute.variablesAreOnlyComputedFromUpdates";
 
     /**
-     * The key of the attribute to store if truth value evaluation is enabled or not.
+     * The key of the attribute to store if truth value tracing is enabled or not.
      */
-    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED = "org.key_project.sed.key.core.launch.sed.key.attribute.truthValueEvaluationEnabled";
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_TRACING_ENABLED = "org.key_project.sed.key.core.launch.sed.key.attribute.truthValueTracingEnabled";
 
     /**
      * The key of the attribute to store if reached source code is highlighted or not.
@@ -188,6 +188,11 @@ public final class KeySEDUtil {
      * The key of the attribute to store if conditions are simplified or not.
      */
     public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SIMPLIFY_CONDITIONS = "org.key_project.sed.key.core.launch.sed.key.attribute.simplifyConditions";
+
+    /**
+     * The key of the attribute to store if full branch conditions are hidden or not.
+     */
+    public static final String LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS = "org.key_project.sed.key.core.launch.sed.key.attribute.hideFullBranchConditionIfAdditionalLabelIsAvailable";
     
     /**
      * The launch mode supported by the Symbolic Execution Debugger based on KeY.
@@ -387,13 +392,13 @@ public final class KeySEDUtil {
     }
 
     /**
-     * Checks if truth value evaluation is enabled or not.
+     * Checks if truth value tracing is enabled or not.
      * @param configuration The {@link ILaunchConfiguration} to read from.
-     * @return {@code true} truth value evaluation enabled, {@code false} truth value evaluation disabled.
+     * @return {@code true} truth value tracing enabled, {@code false} truth value tracing disabled.
      * @throws CoreException Occurred Exception.
      */
-    public static boolean isTruthValueEvaluationEnabled(ILaunchConfiguration configuration) throws CoreException {
-       return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_EVALUATION_ENABLED, KeYSEDPreferences.isTruthValueEvaluationEnabled()) : KeYSEDPreferences.isTruthValueEvaluationEnabled();
+    public static boolean isTruthValueTracingEnabled(ILaunchConfiguration configuration) throws CoreException {
+       return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_TRACING_ENABLED, KeYSEDPreferences.isTruthValueTracingEnabled()) : KeYSEDPreferences.isTruthValueTracingEnabled();
     }
 
     /**
@@ -424,6 +429,16 @@ public final class KeySEDUtil {
      */
     public static boolean isSimplifyConditions(ILaunchConfiguration configuration) throws CoreException {
        return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SIMPLIFY_CONDITIONS, KeYSEDPreferences.isSimplifyConditions()) : KeYSEDPreferences.isSimplifyConditions();
+    }
+
+    /**
+     * Checks if full branch conditions might be hidden in case of alternative labels.
+     * @param configuration The {@link ILaunchConfiguration} to read from.
+     * @return {@code true} full branch condition is hidden in case an additional label is available, {@code false} full branch condition is always shown.
+     * @throws CoreException Occurred Exception.
+     */
+    public static boolean isHideFullBranchConditionIfAdditionalLabelIsAvailable(ILaunchConfiguration configuration) throws CoreException {
+       return configuration != null ? configuration.getAttribute(LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIDE_FULL_BRANCH_CONDITIONS_IN_CASE_OF_ALTERNATIVE_LABELS, KeYSEDPreferences.isHideFullBranchConditionIfAdditionalLabelIsAvailable()) : KeYSEDPreferences.isHideFullBranchConditionIfAdditionalLabelIsAvailable();
     }
     
     /**
@@ -710,14 +725,14 @@ public final class KeySEDUtil {
     }
 
    /**
-    * Prints the {@link ISEDDebugTarget} into the console via {@link System#out}.
-    * @param target The {@link ISEDDebugTarget} to print.
+    * Prints the {@link ISEDebugTarget} into the console via {@link System#out}.
+    * @param target The {@link ISEDebugTarget} to print.
     * @throws DebugException Occurred Exception.
     */
-   public static void printDebugTarget(ISEDDebugTarget target) throws DebugException {
+   public static void printDebugTarget(ISEDebugTarget target) throws DebugException {
       if (target != null) {
          System.out.println(target + "    (" + target.getClass() + ")");
-         for (ISEDThread thread : target.getSymbolicThreads()) {
+         for (ISEThread thread : target.getSymbolicThreads()) {
             printDebugNode(thread, 1);
          }
       }
@@ -727,12 +742,12 @@ public final class KeySEDUtil {
    }
 
    /**
-    * Prints the given {@link ISEDDebugNode} into the console via {@link System#out}.
-    * @param node The {@link ISEDDebugNode} to print.
+    * Prints the given {@link ISENode} into the console via {@link System#out}.
+    * @param node The {@link ISENode} to print.
     * @param level The level.
     * @throws DebugException Occurred Exception.
     */
-   public static void printDebugNode(ISEDDebugNode node, int level) throws DebugException {
+   public static void printDebugNode(ISENode node, int level) throws DebugException {
       // Print level
       for (int i = 0; i < level; i++) {
          System.out.print("\t");
@@ -740,7 +755,7 @@ public final class KeySEDUtil {
       // Print node and children
       if (node != null) {
          System.out.println(node);
-         for (ISEDDebugNode child : node.getChildren()) {
+         for (ISENode child : node.getChildren()) {
             printDebugNode(child, level + 1);
          }
       }
@@ -766,5 +781,87 @@ public final class KeySEDUtil {
       };
       Display.getDefault().syncExec(run);
       return run.getResult();
+   }
+   
+   /**
+    * Updates the given {@link ILaunchConfiguration}.
+    * @param config The {@link ILaunchConfiguration} to update.
+    * @param useExistingContract The new value to set.
+    * @param preconditionOrExistingContract The new value to set.
+    * @param showMethodReturnValues The new value to set.
+    * @param showVariablesOfSelectedDebugNode The new value to set.
+    * @param showKeYMainWindow The new value to set.
+    * @param mergeBranchConditions The new value to set.
+    * @param useUnicode The new value to set.
+    * @param usePrettyPrinting The new value to set.
+    * @param showSignatureOnMethodReturnNodes The new value to set.
+    * @param higlightReachedSourceCode The new value to set.
+    * @param truthValueTracingEnabled The new value to set.
+    * @param variablesAreComputedFromUpdates The new value to set.
+    * @return The updated {@link ILaunchConfiguration}.
+    * @throws CoreException Occurred Exception.
+    */
+   public static ILaunchConfiguration updateLaunchConfiguration(ILaunchConfiguration config,
+                                                                Boolean useExistingContract,
+                                                                String preconditionOrExistingContract,
+                                                                Boolean showMethodReturnValues,
+                                                                Boolean showVariablesOfSelectedDebugNode,
+                                                                Boolean showKeYMainWindow,
+                                                                Boolean mergeBranchConditions,
+                                                                Boolean useUnicode,
+                                                                Boolean usePrettyPrinting,
+                                                                Boolean showSignatureOnMethodReturnNodes,
+                                                                Boolean higlightReachedSourceCode,
+                                                                Boolean truthValueTracingEnabled,
+                                                                Boolean variablesAreComputedFromUpdates) throws CoreException {
+      ILaunchConfigurationWorkingCopy wc = config.getWorkingCopy();
+      if (useExistingContract != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_EXISTING_CONTRACT, useExistingContract);
+         if (preconditionOrExistingContract != null) {
+            if (useExistingContract) {
+               wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_EXISTING_CONTRACT, preconditionOrExistingContract);
+            }
+            else {
+               wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
+            }
+         }
+      }
+      else {
+         if (preconditionOrExistingContract != null) {
+            wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_PRECONDITION, preconditionOrExistingContract);
+         }
+      }
+      if (showMethodReturnValues != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_METHOD_RETURN_VALUES_IN_DEBUG_NODES, showMethodReturnValues);
+      }
+      if (showVariablesOfSelectedDebugNode != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_VARIABLES_OF_SELECTED_DEBUG_NODE, showVariablesOfSelectedDebugNode);
+      }
+      if (showKeYMainWindow != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_KEY_MAIN_WINDOW, showKeYMainWindow);
+      }
+      if (mergeBranchConditions != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_MERGE_BRANCH_CONDITIONS, mergeBranchConditions);
+      }
+      if (useUnicode != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_UNICODE, useUnicode);
+      }
+      if (usePrettyPrinting != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_USE_PRETTY_PRINTING, usePrettyPrinting);
+      }
+      if (showSignatureOnMethodReturnNodes != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_SHOW_SIGNATURE_ON_MEHTOD_RETURN_NODES, showSignatureOnMethodReturnNodes);
+      }
+      if (higlightReachedSourceCode != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_HIGHLIGHT_REACHED_SOURCE_CODE, higlightReachedSourceCode);
+      }
+      if (truthValueTracingEnabled != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_TRUTH_VALUE_TRACING_ENABLED, truthValueTracingEnabled);
+      }
+      if (variablesAreComputedFromUpdates != null) {
+         wc.setAttribute(KeySEDUtil.LAUNCH_CONFIGURATION_TYPE_ATTRIBUTE_VARIABLES_ARE_COMPUTED_FROM_UPDATES, variablesAreComputedFromUpdates);
+      }
+      config = wc.doSave();
+      return config;
    }
 }

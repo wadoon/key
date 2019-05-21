@@ -13,6 +13,7 @@
 
 package org.key_project.key4eclipse.starter.core.util;
 
+import org.eclipse.core.resources.IProject;
 import org.key_project.key4eclipse.starter.core.util.event.IProofProviderListener;
 
 import de.uka.ilkd.key.control.KeYEnvironment;
@@ -67,4 +68,34 @@ public interface IProofProvider {
     * @param l The {@link IProofProviderListener} to remove.
     */
    public void removeProofProviderListener(IProofProviderListener l);
+   
+   /**
+    * Returns the project which provides the proof or the source code.
+    * @return The {@link IProject} if known or {@code null} if unknown.
+    */
+   public IProject getProject();
+
+   /**
+    * Checks if it is allowed to start the auto mode.
+    * @return {@code true} can start auto mode, {@code false} is not allowed to start auto mode.
+    */
+   public boolean isCanStartAutomode();
+   
+   /**
+    * Checks if it is allowed to apply rules.
+    * @return {@code true} can apply rules, {@code false} is not allowed to apply rules.
+    */
+   public boolean isCanApplyRules();
+
+   /**
+    * Checks if it is allowed to prune proof.
+    * @return {@code true} can prune proof, {@code false} is not allowed to prune proof.
+    */
+   public boolean isCanPruneProof();
+
+   /**
+    * Checks if it is allowed to start SMT solver.
+    * @return {@code true} can start SMT solver, {@code false} is not allowed to start SMT solver.
+    */
+   public boolean isCanStartSMTSolver();
 }

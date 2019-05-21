@@ -23,7 +23,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTreeItem;
 import org.junit.Test;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.key.core.test.util.TestBreakpointsUtil;
 import org.key_project.util.test.util.TestUtilsUtil;
@@ -36,14 +36,13 @@ public class SWTBotChangeConditonWithErrorOKThenCancel extends AbstractKeYDebugT
    public void test() throws Exception{
       IKeYDebugTargetTestExecutor executor = new AbstractKeYDebugTargetTestExecutor() {
          @Override
-         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDDebugTarget target, ILaunch launch) throws Exception {            
+         public void test(SWTWorkbenchBot bot, IJavaProject project, IMethod method, String targetName, SWTBotView debugView, SWTBotTree debugTree, ISEDebugTarget target, ILaunch launch) throws Exception {            
             // Get debug target TreeItem
             ErrorDialog.AUTOMATED_MODE=false;
             TestBreakpointsUtil.addSomeBreakpoints(CALLER_PATH, bot, 14);
             SWTBotTreeItem item = TestSedCoreUtil.selectInDebugTree(debugView, 0, 0, 0);
             resume(bot, item, target);
             assertTrue(TestBreakpointsUtil.checkTargetConditiondofAllBreakpoints(target, null, false));
-            assertTrue(TestBreakpointsUtil.checkProofConditionofAllBreakpoints(target,  null, false));
             assertTrue(TestBreakpointsUtil.changeCondition(bot, "BreakpointStopCallerAndLoop [entry] - main(int)", "abcdefg"));
             TestUtilsUtil.sleep(2000);
             TestUtilsUtil.clickDirectly(bot,"Edit Condition");
@@ -71,6 +70,7 @@ public class SWTBotChangeConditonWithErrorOKThenCancel extends AbstractKeYDebugT
             Boolean.FALSE,
             Boolean.FALSE,
             Boolean.TRUE,
+            Boolean.FALSE,
             8, 
             executor);   
    } 

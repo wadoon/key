@@ -13,16 +13,19 @@
 
 package org.key_project.sed.key.core.model;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.model.IStackFrame;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil;
 import org.key_project.key4eclipse.starter.core.util.KeYUtil.SourceLocation;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDLoopInvariant;
-import org.key_project.sed.core.model.impl.AbstractSEDLoopInvariant;
-import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
+import org.key_project.sed.core.model.ISELoopInvariant;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.impl.AbstractSELoopInvariant;
+import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 
@@ -34,11 +37,11 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Implementation of {@link ISEDLoopInvariant} for the symbolic execution debugger (SED)
+ * Implementation of {@link ISELoopInvariant} for the symbolic execution debugger (SED)
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYLoopInvariant extends AbstractSEDLoopInvariant implements IKeYSEDDebugNode<IExecutionLoopInvariant> {
+public class KeYLoopInvariant extends AbstractSELoopInvariant implements IKeYSENode<IExecutionLoopInvariant> {
    /**
     * The {@link IExecutionLoopInvariant} to represent by this debug node.
     */
@@ -47,7 +50,7 @@ public class KeYLoopInvariant extends AbstractSEDLoopInvariant implements IKeYSE
    /**
     * The contained children.
     */
-   private IKeYSEDDebugNode<?>[] children;
+   private IKeYSENode<?>[] children;
 
    /**
     * The source name.
@@ -72,12 +75,22 @@ public class KeYLoopInvariant extends AbstractSEDLoopInvariant implements IKeYSE
    /**
     * The method call stack.
     */
-   private IKeYSEDDebugNode<?>[] callStack;
+   private IKeYSENode<?>[] callStack;
    
    /**
     * The conditions under which a group ending in this node starts.
     */
-   private SEDMemoryBranchCondition[] groupStartConditions;
+   private SEMemoryBranchCondition[] groupStartConditions;
+   
+   /**
+    * The outgoing links.
+    */
+   private final List<KeYNodeLink> outgoingLinks = new LinkedList<KeYNodeLink>();
+
+   /**
+    * The incoming links.
+    */
+   private final List<KeYNodeLink> incomingLinks = new LinkedList<KeYNodeLink>();
 
    /**
     * Constructor.
@@ -87,7 +100,7 @@ public class KeYLoopInvariant extends AbstractSEDLoopInvariant implements IKeYSE
     * @param executionNode The {@link IExecutionLoopInvariant} to represent by this debug node.
     */
    public KeYLoopInvariant(KeYDebugTarget target, 
-                           IKeYSEDDebugNode<?> parent, 
+                           IKeYSENode<?> parent, 
                            KeYThread thread, 
                            IExecutionLoopInvariant executionNode) throws DebugException {
       super(target, parent, thread);
@@ -117,15 +130,15 @@ public class KeYLoopInvariant extends AbstractSEDLoopInvariant implements IKeYSE
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?> getParent() throws DebugException {
-      return (IKeYSEDDebugNode<?>)super.getParent();
+   public IKeYSENode<?> getParent() throws DebugException {
+      return (IKeYSENode<?>)super.getParent();
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
+   public IKeYSENode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
@@ -377,7 +390,7 @@ public class KeYLoopInvariant extends AbstractSEDLoopInvariant implements IKeYSE
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getCallStack() throws DebugException {
+   public IKeYSENode<?>[] getCallStack() throws DebugException {
       synchronized (this) {
          if (callStack == null) {
             callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
@@ -398,7 +411,7 @@ public class KeYLoopInvariant extends AbstractSEDLoopInvariant implements IKeYSE
     * {@inheritDoc}
     */
    @Override
-   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+   public SEMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          if (groupStartConditions == null) {
             groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
@@ -411,7 +424,7 @@ public class KeYLoopInvariant extends AbstractSEDLoopInvariant implements IKeYSE
     * {@inheritDoc}
     */
    @Override
-   public void setParent(ISEDDebugNode parent) {
+   public void setParent(ISENode parent) {
       super.setParent(parent);
    }
 
@@ -419,7 +432,55 @@ public class KeYLoopInvariant extends AbstractSEDLoopInvariant implements IKeYSE
     * {@inheritDoc}
     */
    @Override
-   public boolean isTruthValueEvaluationEnabled() {
-      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
+   public boolean isTruthValueTracingEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueTracingEnabled(getExecutionNode().getProof());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addOutgoingLink(KeYNodeLink link) {
+      outgoingLinks.add(link);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYNodeLink[] getOutgoingLinks() throws DebugException {
+      return outgoingLinks.toArray(new KeYNodeLink[outgoingLinks.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYNodeLink[] getIncomingLinks() throws DebugException {
+      return incomingLinks.toArray(new KeYNodeLink[incomingLinks.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addIncomingLink(KeYNodeLink link) {
+      incomingLinks.add(link);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeIncomingLink(KeYNodeLink link) {
+      incomingLinks.remove(link);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeOutgoingLink(KeYNodeLink link) {
+      outgoingLinks.remove(link);
    }
 }

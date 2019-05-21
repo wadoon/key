@@ -14,7 +14,7 @@ import org.eclipse.swtbot.eclipse.finder.widgets.SWTBotView;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotShell;
 import org.eclipse.swtbot.swt.finder.widgets.SWTBotTree;
 import org.eclipse.ui.IPerspectiveDescriptor;
-import org.key_project.sed.core.model.ISEDDebugTarget;
+import org.key_project.sed.core.model.ISEDebugTarget;
 import org.key_project.sed.core.test.util.TestSedCoreUtil;
 import org.key_project.sed.ui.perspective.SymbolicDebugPerspectiveFactory;
 import org.key_project.sed.ui.visualization.execution_tree.util.ExecutionTreeUtil;
@@ -47,7 +47,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
     * </p>
     */
    public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = false;
-   
+
    /**
     * The used temporary oracle directory.
     */
@@ -67,7 +67,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
       }
       oracleDirectory = directory;
    }
-   
+
    /**
     * Performs a layout test.
     * @param projectName The project Name.
@@ -77,20 +77,20 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
     * @param pathReplacements The path replacements to do.
     * @throws Exception Occurred Exception.
     */
-   protected void doLayoutTest(final String projectName, 
+   protected void doLayoutTest(final String projectName,
                                String pathInBundle,
                                final String pathToSetFile,
                                final String pathToOracleFiles,
                                PathReplacement... pathReplacements) throws Exception {
       IDiagramTestSteps steps = new AbstractDiagramTestSteps() {
          @Override
-         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+         public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
             assertDiagram(bot, project, pathToSetFile, pathToOracleFiles, null);
          }
       };
       doDiagramTest(projectName, pathInBundle, pathToSetFile, steps, pathReplacements);
    }
-   
+
    /**
     * Performs a diagram test.
     * @param projectName The project Name.
@@ -100,7 +100,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
     * @param pathReplacements The path replacements to do.
     * @throws Exception Occurred Exception.
     */
-   protected void doDiagramTest(final String projectName, 
+   protected void doDiagramTest(final String projectName,
                                 String pathInBundle,
                                 final String pathToSetFile,
                                 final IDiagramTestSteps testSteps,
@@ -115,7 +115,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
          // Create diagram
          ISetFileTestSteps additionalTestSteps = new ISetFileTestSteps() {
             @Override
-            public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDDebugTarget target) throws Exception {
+            public void test(SWTWorkbenchBot bot, IProject project, IFile setFile, SWTBotView debugView, SWTBotTree debugTree, ILaunch launch, ISEDebugTarget target) throws Exception {
                try {
                   testSteps.init(bot, project, setFile, debugView, debugTree, launch, target);
                   // Select debug target
@@ -151,16 +151,16 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
        * @param debugView The debug view.
        * @param debugTree The debug tree.
        * @param launch The {@link ILaunch}.
-       * @param target The {@link ISEDDebugTarget}.
+       * @param target The {@link ISEDebugTarget}.
        */
-      public void init(SWTWorkbenchBot bot, 
-                       IProject project, 
-                       IFile setFile, 
-                       SWTBotView debugView, 
-                       SWTBotTree debugTree, 
-                       ILaunch launch, 
-                       ISEDDebugTarget target) throws Exception;
-      
+      public void init(SWTWorkbenchBot bot,
+                       IProject project,
+                       IFile setFile,
+                       SWTBotView debugView,
+                       SWTBotTree debugTree,
+                       ILaunch launch,
+                       ISEDebugTarget target) throws Exception;
+
       /**
        * Executes the test steps.
        * @param bot The used {@link SWTWorkbenchBot}.
@@ -169,15 +169,15 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
        * @param debugView The debug view.
        * @param debugTree The debug tree.
        * @param launch The {@link ILaunch}.
-       * @param target The {@link ISEDDebugTarget}.
+       * @param target The {@link ISEDebugTarget}.
        */
-      public void test(SWTWorkbenchBot bot, 
-                       IProject project, 
-                       IFile setFile, 
-                       SWTBotView debugView, 
-                       SWTBotTree debugTree, 
-                       ILaunch launch, 
-                       ISEDDebugTarget target) throws Exception;
+      public void test(SWTWorkbenchBot bot,
+                       IProject project,
+                       IFile setFile,
+                       SWTBotView debugView,
+                       SWTBotTree debugTree,
+                       ILaunch launch,
+                       ISEDebugTarget target) throws Exception;
    }
 
    /**
@@ -189,13 +189,13 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
        * {@inheritDoc}
        */
       @Override
-      public void init(SWTWorkbenchBot bot, 
-                       IProject project, 
-                       IFile setFile, 
-                       SWTBotView debugView, 
-                       SWTBotTree debugTree, 
-                       ILaunch launch, 
-                       ISEDDebugTarget target) throws Exception {
+      public void init(SWTWorkbenchBot bot,
+                       IProject project,
+                       IFile setFile,
+                       SWTBotView debugView,
+                       SWTBotTree debugTree,
+                       ILaunch launch,
+                       ISEDebugTarget target) throws Exception {
       }
    }
 
@@ -208,7 +208,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
     * @param fileNameSuffix A file name suffix.
     * @throws Exception Occurred Exception
     */
-   protected static void assertDiagram(SWTWorkbenchBot bot, 
+   protected static void assertDiagram(SWTWorkbenchBot bot,
                                        IProject project,
                                        String pathToSetFile,
                                        String pathToOracleFiles,
@@ -220,7 +220,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
       // Finish wizard
       SWTBotShell wizardShell = bot.shell("Save Symbolic Execution Tree Diagram");
       wizardShell.bot().tree().select(project.getName());
-      final String fileName = "Current" + 
+      final String fileName = "Current" +
                               IOUtil.getFileNameWithoutExtension(pathToSetFile) +
                               (fileNameSuffix != null ? fileNameSuffix : "");
       wizardShell.bot().text(1).setText(fileName);
@@ -250,7 +250,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
          }
       }
    }
-   
+
    /**
     * Copies the oracle files into a temporary directory.
     * @param pathToOracleFiles The path to the oracle files.
@@ -272,7 +272,7 @@ public abstract class AbstractSymbolicExecutionTreeTest extends AbstractSWTBotSe
       // Print message to the user.
       printOracleDirectory();
    }
-   
+
    /**
     * Prints {@link #oracleDirectory} to the user via {@link System#out}.
     */

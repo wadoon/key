@@ -14,14 +14,16 @@
 package org.key_project.sed.key.core.model;
 
 import java.io.File;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.debug.core.DebugException;
 import org.eclipse.jdt.core.IMethod;
-import org.key_project.sed.core.model.ISEDDebugNode;
-import org.key_project.sed.core.model.ISEDLoopBodyTermination;
-import org.key_project.sed.core.model.impl.AbstractSEDLoopBodyTermination;
-import org.key_project.sed.core.model.memory.SEDMemoryBranchCondition;
+import org.key_project.sed.core.model.ISELoopBodyTermination;
+import org.key_project.sed.core.model.ISENode;
+import org.key_project.sed.core.model.impl.AbstractSELoopBodyTermination;
+import org.key_project.sed.core.model.memory.SEMemoryBranchCondition;
 import org.key_project.sed.key.core.util.KeYModelUtil;
 import org.key_project.sed.key.core.util.LogUtil;
 import org.key_project.util.eclipse.ResourceUtil;
@@ -33,11 +35,11 @@ import de.uka.ilkd.key.symbolic_execution.profile.SymbolicExecutionJavaProfile;
 import de.uka.ilkd.key.symbolic_execution.util.SymbolicExecutionUtil;
 
 /**
- * Implementation of {@link ISEDLoopBodyTermination} for the symbolic execution debugger (SED)
+ * Implementation of {@link ISELoopBodyTermination} for the symbolic execution debugger (SED)
  * based on KeY.
  * @author Martin Hentschel
  */
-public class KeYLoopBodyTermination extends AbstractSEDLoopBodyTermination implements IKeYSEDDebugNode<IExecutionTermination> {
+public class KeYLoopBodyTermination extends AbstractSELoopBodyTermination implements IKeYSENode<IExecutionTermination> {
    /**
     * The {@link IExecutionTermination} to represent by this debug node.
     */
@@ -46,12 +48,12 @@ public class KeYLoopBodyTermination extends AbstractSEDLoopBodyTermination imple
    /**
     * The contained children.
     */
-   private IKeYSEDDebugNode<?>[] children;
+   private IKeYSENode<?>[] children;
 
    /**
     * The method call stack.
     */
-   private IKeYSEDDebugNode<?>[] callStack;
+   private IKeYSENode<?>[] callStack;
    
    /**
     * The constraints
@@ -66,7 +68,17 @@ public class KeYLoopBodyTermination extends AbstractSEDLoopBodyTermination imple
    /**
     * The conditions under which a group ending in this node starts.
     */
-   private SEDMemoryBranchCondition[] groupStartConditions;
+   private SEMemoryBranchCondition[] groupStartConditions;
+   
+   /**
+    * The outgoing links.
+    */
+   private final List<KeYNodeLink> outgoingLinks = new LinkedList<KeYNodeLink>();
+
+   /**
+    * The incoming links.
+    */
+   private final List<KeYNodeLink> incomingLinks = new LinkedList<KeYNodeLink>();
 
    /**
     * Constructor.
@@ -76,7 +88,7 @@ public class KeYLoopBodyTermination extends AbstractSEDLoopBodyTermination imple
     * @param executionNode The {@link IExecutionTermination} to represent by this debug node.
     */
    public KeYLoopBodyTermination(KeYDebugTarget target, 
-                                 IKeYSEDDebugNode<?> parent, 
+                                 IKeYSENode<?> parent, 
                                  KeYThread thread, 
                                  IExecutionTermination executionNode) throws DebugException {
       super(target, parent, thread);
@@ -107,15 +119,15 @@ public class KeYLoopBodyTermination extends AbstractSEDLoopBodyTermination imple
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?> getParent() throws DebugException {
-      return (IKeYSEDDebugNode<?>)super.getParent();
+   public IKeYSENode<?> getParent() throws DebugException {
+      return (IKeYSENode<?>)super.getParent();
    }
 
    /**
     * {@inheritDoc}
     */
    @Override
-   public void setParent(ISEDDebugNode parent) {
+   public void setParent(ISENode parent) {
       super.setParent(parent);
    }
 
@@ -123,7 +135,7 @@ public class KeYLoopBodyTermination extends AbstractSEDLoopBodyTermination imple
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getChildren() throws DebugException {
+   public IKeYSENode<?>[] getChildren() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          IExecutionNode<?>[] executionChildren = executionNode.getChildren();
          if (children == null) {
@@ -174,7 +186,7 @@ public class KeYLoopBodyTermination extends AbstractSEDLoopBodyTermination imple
     * {@inheritDoc}
     */
    @Override
-   public IKeYSEDDebugNode<?>[] getCallStack() throws DebugException {
+   public IKeYSENode<?>[] getCallStack() throws DebugException {
       synchronized (this) {
          if (callStack == null) {
             callStack = KeYModelUtil.createCallStack(getDebugTarget(), executionNode.getCallStack()); 
@@ -284,7 +296,7 @@ public class KeYLoopBodyTermination extends AbstractSEDLoopBodyTermination imple
     * {@inheritDoc}
     */
    @Override
-   public SEDMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
+   public SEMemoryBranchCondition[] getGroupStartConditions() throws DebugException {
       synchronized (this) { // Thread save execution is required because thanks lazy loading different threads will create different result arrays otherwise.
          if (groupStartConditions == null) {
             groupStartConditions = KeYModelUtil.createCompletedBlocksConditions(this);
@@ -297,7 +309,55 @@ public class KeYLoopBodyTermination extends AbstractSEDLoopBodyTermination imple
     * {@inheritDoc}
     */
    @Override
-   public boolean isTruthValueEvaluationEnabled() {
-      return SymbolicExecutionJavaProfile.isTruthValueEvaluationEnabled(getExecutionNode().getProof());
+   public boolean isTruthValueTracingEnabled() {
+      return SymbolicExecutionJavaProfile.isTruthValueTracingEnabled(getExecutionNode().getProof());
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addOutgoingLink(KeYNodeLink link) {
+      outgoingLinks.add(link);
+   }
+   
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYNodeLink[] getOutgoingLinks() throws DebugException {
+      return outgoingLinks.toArray(new KeYNodeLink[outgoingLinks.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public KeYNodeLink[] getIncomingLinks() throws DebugException {
+      return incomingLinks.toArray(new KeYNodeLink[incomingLinks.size()]);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void addIncomingLink(KeYNodeLink link) {
+      incomingLinks.add(link);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeIncomingLink(KeYNodeLink link) {
+      incomingLinks.remove(link);
+   }
+
+   /**
+    * {@inheritDoc}
+    */
+   @Override
+   public void removeOutgoingLink(KeYNodeLink link) {
+      outgoingLinks.remove(link);
    }
 }

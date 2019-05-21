@@ -44,7 +44,7 @@ public class AbstractResourceTest extends AbstractSetupTestCase {
     * </p>
     */
    public static final boolean CREATE_NEW_ORACLE_FILES_IN_TEMP_DIRECTORY = false;
-   
+
    /**
     * The used temporary oracle directory.
     */
@@ -66,11 +66,11 @@ public class AbstractResourceTest extends AbstractSetupTestCase {
    }
 
    private boolean oldAutoBuildEnabled = true;
-   
+
    private StrategyProperties spToRestore;
-   
+
    private int maxStepsToRestore = -1;
-   
+
    @Before
    @Override
    public void setUp() throws Exception {
@@ -81,7 +81,7 @@ public class AbstractResourceTest extends AbstractSetupTestCase {
       spToRestore = ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getActiveStrategyProperties();
       maxStepsToRestore = ProofSettings.DEFAULT_SETTINGS.getStrategySettings().getMaxSteps();
       // Update settings
-      StrategyProperties sp = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(false, true, true, false, false);
+      StrategyProperties sp = SymbolicExecutionStrategy.getSymbolicExecutionStrategyProperties(false, true, true, false, false, false);
       ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setActiveStrategyProperties(sp);
       ProofSettings.DEFAULT_SETTINGS.getStrategySettings().setMaxSteps(1000);
    }
@@ -99,7 +99,7 @@ public class AbstractResourceTest extends AbstractSetupTestCase {
       }
       KeY4EclipseResourcesTestUtil.enableAutoBuild(oldAutoBuildEnabled);
    }
-   
+
    /**
     * Prints {@link #oracleDirectory} to the user via {@link System#out}.
     */
