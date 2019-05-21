@@ -8,6 +8,8 @@ import java.nio.file.Path;
  * @version 1 (20.05.19)
  */
 public interface EditorFactory {
+    String getName();
+
     Editor open(Path path) throws IOException;
 
     Editor open(String mimeType);

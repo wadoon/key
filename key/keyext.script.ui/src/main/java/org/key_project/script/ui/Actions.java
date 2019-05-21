@@ -18,7 +18,7 @@ import java.awt.event.ActionEvent;
  */
 @AllArgsConstructor
 public class Actions {
-    private static final String MENU_PROOF_SCRIPTS_COPY = ScriptPanel.MENU_PROOF_SCRIPTS + ".Copy labels";
+    private static final String MENU_PROOF_SCRIPTS_COPY = ScriptEditor.MENU_PROOF_SCRIPTS + ".Copy labels";
 
     private final MainWindow window;
     private final KeYMediator mediator;

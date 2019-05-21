@@ -1,32 +1,43 @@
 package org.key_project.editor;
 
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
+import de.uka.ilkd.key.gui.actions.KeyAction;
 import lombok.Getter;
+import org.fife.rsta.ui.CollapsibleSectionPanel;
+import org.fife.rsta.ui.GoToDialog;
+import org.fife.rsta.ui.search.FindToolBar;
+import org.fife.rsta.ui.search.ReplaceToolBar;
+import org.fife.rsta.ui.search.SearchEvent;
+import org.fife.rsta.ui.search.SearchListener;
+import org.fife.ui.rsyntaxtextarea.ErrorStrip;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.RSyntaxUtilities;
-import org.fife.ui.rtextarea.Gutter;
-import org.fife.ui.rtextarea.RTextScrollPane;
+import org.fife.ui.rtextarea.*;
 import org.key_project.util.RandomName;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.nio.file.Path;
 
 /**
  * @author Alexander Weigl
  * @version 1 (20.05.19)
  */
-public class Editor extends JPanel {
+public class Editor extends JPanel implements SearchListener {
     public static final String PROP_DIRTY = "DIRTY";
     public static final String PROP_PATH = "PATH";
 
     @Getter
-    private final RSyntaxTextArea editor;
+    protected final RSyntaxTextArea editor;
 
     @Getter
-    private final Gutter gutter;
+    protected final Gutter gutter;
 
     @Getter
     private final RTextScrollPane editorView;
@@ -37,6 +48,7 @@ public class Editor extends JPanel {
 
     protected JToolBar toolBarActions = new JToolBar();
 
+
     @Getter
     private boolean dirty;
 
@@ -45,7 +57,13 @@ public class Editor extends JPanel {
 
     public Editor() {
         super(new BorderLayout(5, 5));
+
+        FindToolBar findToolBar = new FindToolBar(this);
+        ReplaceToolBar replaceToolBar = new ReplaceToolBar(this);
+        replaceToolBar.setSearchContext(findToolBar.getSearchContext());
+
         toolBarActions.setFloatable(false);
+
         editor = new RSyntaxTextArea();
         editorView = new RTextScrollPane(editor);
         gutter = RSyntaxUtilities.getGutter(editor);
@@ -76,10 +94,49 @@ public class Editor extends JPanel {
             }
         });
         add(toolBarActions, BorderLayout.NORTH);
-        add(editorView);
+        CollapsibleSectionPanel csp = new CollapsibleSectionPanel();
+        csp.add(editorView);
+        add(csp);
+
+        ErrorStrip errorStrip = new ErrorStrip(editor);
+        add(errorStrip, BorderLayout.LINE_END);
+
 
         addPropertyChangeListener(it -> dockable.setTitleText(getTitle()));
         dockable.setTitleText(getTitle());
+
+        registerKeyboardAction(
+                EditorExtension.getSaveAction(),
+                EditorExtension.getSaveAction().getAcceleratorKey(),
+                WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+        registerKeyboardAction(
+                EditorExtension.getActionLoad(),
+                EditorExtension.getActionLoad().getAcceleratorKey(),
+                WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+        registerKeyboardAction(
+                EditorExtension.getActionSaveAs(),
+                EditorExtension.getActionSaveAs().getAcceleratorKey(),
+                WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+        KeyAction actionGoto = new GoToLineAction();
+        registerKeyboardAction(
+                actionGoto,
+                actionGoto.getAcceleratorKey(),
+                WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+
+        KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK);
+        Action a = csp.addBottomComponent(ks, findToolBar);
+        a.putValue(Action.NAME, "Show Find Search Bar");
+        registerKeyboardAction(a, ks, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        ks = KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK);
+        a = csp.addBottomComponent(ks, replaceToolBar);
+        a.putValue(Action.NAME, "Show Replace Search Bar");
+        registerKeyboardAction(a, ks, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+
     }
 
     public String getTitle() {
@@ -116,5 +173,80 @@ public class Editor extends JPanel {
 
     public void setMimeType(String mime) {
         editor.setSyntaxEditingStyle(mime);
+    }
+
+    @Override
+    public void searchEvent(SearchEvent e) {
+
+        SearchEvent.Type type = e.getType();
+        SearchContext context = e.getSearchContext();
+        SearchResult result = null;
+
+        switch (type) {
+            default: // Prevent FindBugs warning later
+            case MARK_ALL:
+                result = SearchEngine.markAll(editor, context);
+                break;
+            case FIND:
+                result = SearchEngine.find(editor, context);
+                if (!result.wasFound()) {
+                    UIManager.getLookAndFeel().provideErrorFeedback(editor);
+                }
+                break;
+            case REPLACE:
+                result = SearchEngine.replace(editor, context);
+                if (!result.wasFound()) {
+                    UIManager.getLookAndFeel().provideErrorFeedback(editor);
+                }
+                break;
+            case REPLACE_ALL:
+                result = SearchEngine.replaceAll(editor, context);
+                JOptionPane.showMessageDialog(null, result.getCount() +
+                        " occurrences replaced.");
+                break;
+        }
+
+        String text = null;
+        if (result.wasFound()) {
+            text = "Text found; occurrences marked: " + result.getMarkedCount();
+        } else if (type == SearchEvent.Type.MARK_ALL) {
+            if (result.getMarkedCount() > 0) {
+                text = "Occurrences marked: " + result.getMarkedCount();
+            } else {
+                text = "";
+            }
+        } else {
+            text = "Text not found";
+        }
+    }
+
+    @Override
+    public String getSelectedText() {
+        return null;
+    }
+
+    private class GoToLineAction extends KeyAction {
+        GoToLineAction() {
+            setName("Go To Line...");
+            int c = getToolkit().getMenuShortcutKeyMask();
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_L, c));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            GoToDialog dialog = new GoToDialog((Frame) null);
+            dialog.setMaxLineNumberAllowed(editor.getLineCount());
+            dialog.setVisible(true);
+            int line = dialog.getLineNumber();
+            if (line > 0) {
+                try {
+                    editor.setCaretPosition(editor.getLineStartOffset(line - 1));
+                } catch (BadLocationException ble) { // Never happens
+                    UIManager.getLookAndFeel().provideErrorFeedback(editor);
+                    ble.printStackTrace();
+                }
+            }
+        }
+
     }
 }

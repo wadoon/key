@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.core;
 
+import java.util.Collection;
 import java.util.EventObject;
 
 import javax.swing.Action;
@@ -66,6 +67,7 @@ import de.uka.ilkd.key.rule.Taclet;
 import de.uka.ilkd.key.settings.ProofSettings;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
 import de.uka.ilkd.key.util.ThreadUtilities;
+import org.key_project.util.lookup.Lookup;
 
 /**
  * The {@link KeYMediator} provides control logic for the user interface implemented in Swing.
@@ -105,7 +107,7 @@ public class KeYMediator {
      * boolean flag indicating if the GUI is in auto mode
      */
     private boolean inAutoMode = false;
-    
+
 
     /** creates the KeYMediator with a reference to the application's
      * main frame and the current proof settings
@@ -120,6 +122,8 @@ public class KeYMediator {
 
 	ui.getProofControl().addAutoModeListener(proofListener);
     }
+
+
 
 
     /** returns the used NotationInfo
@@ -204,8 +208,8 @@ public class KeYMediator {
     public boolean ensureProofLoaded() {
     	return getSelectedProof() != null;
     }
-   
-   
+
+
     /**
      * Returns a filter that is used for filtering taclets that should not be showed while
      * interactive proving.
@@ -356,7 +360,7 @@ public class KeYMediator {
 	listenerList.remove(GUIListener.class, listener);
     }
 
-         
+
     public void addInterruptedListener(InterruptListener listener) {
         listenerList.add(InterruptListener.class, listener);
     }
@@ -543,8 +547,28 @@ public class KeYMediator {
       ThreadUtilities.invokeOnEventQueue(interfaceSignaller);
    }
 
-   
-   /**
+    private Lookup userData = new Lookup();
+
+    public <T> Collection<T> lookupAll(Class<T> service) {
+        return userData.lookupAll(service);
+    }
+    public <T> T get(Class<T> service) {
+        try {
+            return userData.get(service);
+        } catch (IllegalStateException e) {
+            return null;
+        }
+    }
+    public <T> void register(T obj, Class<T> service) {
+        userData.register(obj, service);
+    }
+    public <T> void deregister(T obj, Class<T> service) {
+        userData.deregister(obj, service);
+    }
+
+
+
+    /**
     * Checks if the auto mode is currently running.
     *
     * @return {@code true} auto mode is running, {@code false} auto mode is not
@@ -676,7 +700,7 @@ public class KeYMediator {
             }
         });
     }
-    
+
     /**
      * takes a notification event and informs the notification
      * manager

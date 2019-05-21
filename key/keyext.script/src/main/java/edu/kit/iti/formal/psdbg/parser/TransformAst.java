@@ -99,6 +99,13 @@ public class TransformAst implements ScriptLanguageVisitor<Object> {
 
     @Override
     public List<ProofScript> visitStart(ScriptLanguageParser.StartContext ctx) {
+        if (ctx.stmtList() != null) {
+            Statements body = (Statements) ctx.stmtList().accept(this);
+            ProofScript main = new ProofScript();
+            main.setName("__main__");
+            main.setBody(body);
+            scripts.add(main);
+        }
         ctx.script().forEach(s ->
                 scripts.add((ProofScript) s.accept(this)));
         return scripts;

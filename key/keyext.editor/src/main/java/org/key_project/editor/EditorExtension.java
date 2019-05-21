@@ -6,6 +6,7 @@ import bibliothek.gui.dock.common.event.CFocusListener;
 import bibliothek.gui.dock.common.intern.CDockable;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
@@ -14,6 +15,7 @@ import lombok.Getter;
 import lombok.val;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
@@ -25,18 +27,27 @@ import java.nio.file.Files;
  */
 public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.Toolbar {
     public static final float ICON_SIZE = 16;
+    private static SaveAction actionSave;
+    private static SaveAsAction actionSaveAs;
+    private static LoadAction actionLoad;
     @Getter
-    private SaveAction actionSave;
-    @Getter
-    private SaveAsAction actionSaveAs;
-    @Getter
-    private LoadAction actionLoad;
+    private NewAction actionNew;
     @Getter
     private JFileChooser fileChooser = new JFileChooser();
-
     private CControl control;
-
     private MainWindow mainWindow;
+
+    public static LoadAction getActionLoad() {
+        return actionLoad;
+    }
+
+    public static SaveAsAction getActionSaveAs() {
+        return actionSaveAs;
+    }
+
+    public static KeyAction getSaveAction() {
+        return actionSave;
+    }
 
     public void addEditor(Editor editor) {
         EditorFacade.addEditor(editor, mainWindow);
@@ -58,6 +69,7 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
             this.control = window.getDockControl();
             this.mainWindow = window;
             control.addMultipleDockableFactory("editors", EditorFacade.getEditorDockableFactory());
+            actionNew = new NewAction();
             actionLoad = new LoadAction(window);
             actionSaveAs = new SaveAsAction(window);
             actionSave = new SaveAction(window);
@@ -82,6 +94,7 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
     public JToolBar getToolbar(MainWindow mainWindow) {
         init(mainWindow, null);
         JToolBar tb = new JToolBar();
+        tb.add(actionNew);
         tb.add(actionLoad);
         tb.add(actionSave);
         tb.add(actionSaveAs);
@@ -165,6 +178,29 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
                 val editor = EditorFacade.open(file.toPath());
                 addEditor(editor);
             }
+        }
+    }
+
+    private class NewAction extends KeyAction {
+        public NewAction() {
+            setName("New file");
+            setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.FILE, ICON_SIZE));
+            setTooltip("Store script file");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JPopupMenu menu = new JPopupMenu();
+            EditorFacade.getEditorFactories().forEach(it -> {
+                val item = new JMenuItem(it.getName());
+                item.addActionListener(evt ->
+                        EditorFacade.addEditor(it.open(), mainWindow));
+                menu.add(item);
+            });
+            Component c = (Component) e.getSource();
+            int x = c.getLocationOnScreen().x + c.getWidth();
+            int y = c.getLocationOnScreen().y + c.getHeight();
+            menu.show(mainWindow, x, y);
         }
     }
 }

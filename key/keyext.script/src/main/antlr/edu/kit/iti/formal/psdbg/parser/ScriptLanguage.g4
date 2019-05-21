@@ -5,7 +5,7 @@ grammar ScriptLanguage;
 */
 
 start
-    :   (script)*
+    :  stmtList (script)*
     ;
 
 script

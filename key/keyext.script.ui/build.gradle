@@ -2,12 +2,12 @@ dependencies {
     implementation project(":keyext.script")
     implementation project(":key.ui")
 
-    implementation "com.google.guava:guava:27.0.1-jre"
-
+    implementation project(":keyext.editor")
     implementation "com.fifesoft:rsyntaxtextarea:3.0.2"
     implementation "com.fifesoft:rstaui:3.0.0"
     implementation "com.fifesoft:autocomplete:3.0.0"
     compileOnly "org.projectlombok:lombok:1.18.6"
     annotationProcessor "org.projectlombok:lombok:1.18.6"
+    implementation "com.google.guava:guava:27.0.1-jre"
 
 }
