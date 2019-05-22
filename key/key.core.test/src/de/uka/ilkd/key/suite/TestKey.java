@@ -77,6 +77,7 @@ public class TestKey extends TestSuite {
         de.uka.ilkd.key.rule.abstractexecution.TestLocExtr.class,
         de.uka.ilkd.key.rule.abstractexecution.AEHeapTests.class,
         de.uka.ilkd.key.rule.abstractexecution.AETypeCheckerTests.class,
+        de.uka.ilkd.key.rule.abstractexecution.AEPostConditionTests.class,
     };
 
 
