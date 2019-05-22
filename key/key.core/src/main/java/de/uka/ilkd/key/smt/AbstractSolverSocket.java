@@ -54,6 +54,9 @@ public abstract class AbstractSolverSocket implements PipeListener<SolverCommuni
 		else if(type == SolverType.Z3_CE_SOLVER){
 			return new Z3CESocket(name, query);
 		}
+		else if(type == SolverType.Z3_NEW_TL_SOLVER){
+			return new Z3Socket(name, query);
+		}
 		else if(type == SolverType.SIMPLIFY_SOLVER){
 			return new SimplifySocket(name, query);
 		}
@@ -329,9 +332,14 @@ class CVC4Socket extends AbstractSolverSocket{
         if ("".equals(message)) return;
         if (message.indexOf("success")==-1)
             sc.addMessage(message);
-        if(type == Pipe.ERROR_MESSAGE && message.indexOf("Interrupted by signal")==-1){
+        if(type == Pipe.ERROR_MESSAGE){
             throw new RuntimeException("Error while executing CVC4:\n" +message);
         }
+
+        // temp hack TODO js/mu
+		if(message.contains("(error ")) {
+			throw new RuntimeException("Something went wrong somewhere in CVC4: " + message);
+		}
 
         if(sc.getState() == WAIT_FOR_RESULT ){
             if(message.indexOf("\n"+UNSAT) > -1){

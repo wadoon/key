@@ -13,6 +13,7 @@
 package de.uka.ilkd.key.smt;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -48,7 +49,6 @@ import de.uka.ilkd.key.util.Debug;
 
 public class SMTFloatTranslator implements SMTTranslator {
 
-  
 	private static class NoTranslationAvailableException
 		      extends Exception {
 		public NoTranslationAvailableException(String message) {
@@ -619,6 +619,21 @@ public class SMTFloatTranslator implements SMTTranslator {
 	@Override
 	public Collection<Throwable> getExceptionsOfTacletTranslation() {
 		return new LinkedList<Throwable>();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * This implementation does not support translation taclets.
+	 * Always returns null.
+	 *
+	 * @param services The current proof services
+	 * @param settings The current SMT settings
+	 * @return null
+	 */
+	@Override
+	public ArrayList<StringBuffer> translateTaclets(Services services, SMTSettings settings) {
+		return null;
 	}
 
 }

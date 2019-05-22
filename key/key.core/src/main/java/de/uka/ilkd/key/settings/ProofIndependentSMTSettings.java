@@ -155,6 +155,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
 
         private ProofIndependentSMTSettings() {
                 dataOfSolvers.put(SolverType.Z3_SOLVER, new SolverData(SolverType.Z3_SOLVER));
+                dataOfSolvers.put(SolverType.Z3_NEW_TL_SOLVER, new SolverData(SolverType.Z3_NEW_TL_SOLVER));
                 dataOfSolvers.put(SolverType.Z3_CE_SOLVER, new SolverData(SolverType.Z3_CE_SOLVER));
                 dataOfSolvers.put(SolverType.Z3_FP_SOLVER, new SolverData(SolverType.Z3_FP_SOLVER));
                 dataOfSolvers.put(SolverType.MATHSAT_FP_SOLVER, new SolverData(SolverType.MATHSAT_FP_SOLVER));
@@ -163,6 +164,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
                 dataOfSolvers.put(SolverType.CVC3_SOLVER, new SolverData(SolverType.CVC3_SOLVER));
                 dataOfSolvers.put(SolverType.CVC4_SOLVER, new SolverData(SolverType.CVC4_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Z3",1,SolverType.Z3_SOLVER));
+                solverUnions.add(new SolverTypeCollection("Z3",1,SolverType.Z3_NEW_TL_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Z3 (FP)",1,SolverType.Z3_FP_SOLVER));
                 solverUnions.add(new SolverTypeCollection("mathsat (FP)",1,SolverType.MATHSAT_FP_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Yices",1,SolverType.YICES_SOLVER));
@@ -170,6 +172,7 @@ public class ProofIndependentSMTSettings implements de.uka.ilkd.key.settings.Set
                 solverUnions.add(new SolverTypeCollection("CVC4",1,SolverType.CVC4_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Simplify",1,SolverType.SIMPLIFY_SOLVER));
                 solverUnions.add(new SolverTypeCollection("Multiple Solvers",2,SolverType.Z3_SOLVER,
+                                SolverType.Z3_NEW_TL_SOLVER,
                                 SolverType.YICES_SOLVER,
                                 SolverType.CVC3_SOLVER,
                                 SolverType.CVC4_SOLVER,

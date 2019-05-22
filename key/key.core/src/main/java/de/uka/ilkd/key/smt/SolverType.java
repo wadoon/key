@@ -20,12 +20,13 @@ import java.util.List;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.smt.AbstractSMTTranslator.Configuration;
+import de.uka.ilkd.key.smt.newsmt2.ModularSMTLib2Translator;
 
 
 /**
  * This interface is used for modeling different solvers. It provides methods that encode information
  * about the concrete solver:
- * - name 
+ * - name
  * - command for starting the solver
  * - parameters
  * - supported versions
@@ -52,7 +53,7 @@ public interface SolverType  {
 	public boolean isInstalled(boolean recheck);
 
 	/**
-	 * Some specific information about the solver which can be presented. <code>null</code> means no information. 
+	 * Some specific information about the solver which can be presented. <code>null</code> means no information.
 	 */
 	public String getInfo();
 
@@ -66,14 +67,14 @@ public interface SolverType  {
 
 
 	/** the command for starting the solver. For example "z3" if it is registered in the PATH variable,
-	 * otherwise "ABSOLUTE_PATH/z3"*/        
+	 * otherwise "ABSOLUTE_PATH/z3"*/
 	public String getSolverCommand();
 	public void setSolverCommand(String s);
 	public String getDefaultSolverCommand();
 
 
 	/**
-	 * The translator to be used. So far each solver supports only one format. 
+	 * The translator to be used. So far each solver supports only one format.
 	 */
 	public SMTTranslator createTranslator(Services services);
 	/**
@@ -93,7 +94,7 @@ public interface SolverType  {
 	public String modifyProblem(String problem);
 
 	/**
-	 * Returns the parameter that can be used to gain the version of the solver when 
+	 * Returns the parameter that can be used to gain the version of the solver when
 	 * executing it.
 	 *       */
 	public String getVersionParameter();
@@ -131,10 +132,12 @@ public interface SolverType  {
     static public final SolverType Z3_SOLVER = new AbstractSolverType() {
 
 
+            @Override
             public String getDefaultSolverCommand() {
                 return "z3";
                 }
 
+            @Override
             public String getDefaultSolverParameters() {
                 return "-in -smt2";
                 }
@@ -151,32 +154,38 @@ public interface SolverType  {
                     return "Z3";
             }
 
+            @Override
             public String getVersionParameter() {
             	return "-version";
                 }
-           
+
             @Override
                 public String getRawVersion () {
                     final String tmp = super.getRawVersion();
-                    if (tmp==null) return null;
+                    if (tmp==null) {
+                        return null;
+                    }
                     return tmp.substring(tmp.indexOf("version"));
                 }
 
+            @Override
             public String[] getSupportedVersions() {
             	return new String[] {"version 3.2","version 4.1","version 4.3.0","version 4.3.1"};
                 }
 
+            @Override
             public String[] getDelimiters() {
             	return new String [] {"\n","\r"};
                 }
 
+            @Override
             public boolean supportsIfThenElse() {
                     return true;
                 }
 
             @Override
             public SMTTranslator createTranslator(Services services) {
-                    return new SmtLib2Translator(services,
+				return new SmtLib2Translator(services,
                                     new Configuration(false,false));
             }
 
@@ -200,9 +209,89 @@ public interface SolverType  {
 
 
 
-			
+
 
     };
+
+	/**
+	 * Z3 with new modular translator
+	 */
+	static public final SolverType Z3_NEW_TL_SOLVER = new AbstractSolverType() {
+
+
+		@Override
+		public String getDefaultSolverCommand() {
+			return "z3";
+		}
+
+		@Override
+		public String getDefaultSolverParameters() {
+			return "-in -smt2";
+		}
+
+		@Override
+		public SMTSolver createSolver(SMTProblem problem,
+									  SolverListener listener, Services services) {
+			return new SMTSolverImplementation(problem, listener,
+					services, this);
+		}
+
+		@Override
+		public String getName() {
+			return "Z3_NEW_TL";
+		}
+
+		@Override
+		public String getVersionParameter() {
+			return "-version";
+		}
+
+		@Override
+		public String getRawVersion() {
+			final String tmp = super.getRawVersion();
+			if (tmp == null) {
+				return null;
+			}
+			return tmp.substring(tmp.indexOf("version"));
+		}
+
+		@Override
+		public String[] getSupportedVersions() {
+			return new String[]{"version 3.2", "version 4.1", "version 4.3.0", "version 4.3.1"};
+		}
+
+		@Override
+		public String[] getDelimiters() {
+			return new String[]{"\n", "\r"};
+		}
+
+		@Override
+		public boolean supportsIfThenElse() {
+			return true;
+		}
+
+		@Override
+		public SMTTranslator createTranslator(Services services) {
+			return new ModularSMTLib2Translator();
+		}
+
+
+		@Override
+		public String getInfo() {
+			return "";
+//                    return "Z3 does not use quantifier elimination by default. This means for example that"
+//                                    + " the following problem cannot be solved automatically by default:\n\n"
+//                                    + "\\functions{\n"
+//                                    + "\tint n;\n"
+//                                    + "}\n\n"
+//                                    + "\\problem{\n"
+//                                    + "\t((\\forall int x;(x<=0 | x >= n+1)) & n >= 1)->false\n"
+//                                    + "}"
+//                                    + "\n\n"
+//                                    + "You can activate quantifier elimination by appending QUANT_FM=true to"
+//                                    + " the execution command.";
+		}
+	};
 
 	/**
 	 * Class for the Z3 solver. It makes use of the SMT2-format.
@@ -212,11 +301,13 @@ public interface SolverType  {
 
 
 
-		public String getDefaultSolverCommand() {
-			return "z3";                    
+		@Override
+        public String getDefaultSolverCommand() {
+			return "z3";
 		};
 
-		public String getDefaultSolverParameters() {
+		@Override
+        public String getDefaultSolverParameters() {
 			return "-in -smt2";
 		};
 
@@ -232,19 +323,23 @@ public interface SolverType  {
 			return "Z3_CE";
 		}
 
-		public String getVersionParameter() {
+		@Override
+        public String getVersionParameter() {
 			return "-version";
 		};
 
-		public String[] getSupportedVersions() {
+		@Override
+        public String[] getSupportedVersions() {
 			return new String[] {"version 4.3.1"};
 		};
 
-		public String[] getDelimiters() {
+		@Override
+        public String[] getDelimiters() {
 			return new String [] {"\n","\r"};
 		};
 
-		public boolean supportsIfThenElse() {
+		@Override
+        public boolean supportsIfThenElse() {
 			return true;
 		};
 		@Override
@@ -270,7 +365,7 @@ public interface SolverType  {
 			//                                        + " the execution command.";
 		}
 
-		
+
 
 	};
 
@@ -410,7 +505,8 @@ public interface SolverType  {
 	                        services, this);
 	    }
 
-	    public String getDefaultSolverCommand() {
+	    @Override
+        public String getDefaultSolverCommand() {
 	        return "cvc3";
 	    }
 
@@ -422,29 +518,35 @@ public interface SolverType  {
 	    @Override
 	    public String getRawVersion () {
 	        final String tmp = super.getRawVersion();
-	        if (tmp==null) return null;
+	        if (tmp==null) {
+                return null;
+            }
 	        return tmp.substring(tmp.indexOf("version"));
 	    }
 
 	    @Override
 	    public String getDefaultSolverParameters() {
 	        // version 2.4.1 uses different parameters
-	        if (useNewVersion())
-	            return "-lang smt +model +interactive";
+	        if (useNewVersion()) {
+                return "-lang smt +model +interactive";
 	        //                      return "-lang smt2 +model +interactive";
-	        else
-	            return "+lang smt +model +int";
+            } else {
+                return "+lang smt +model +int";
+            }
 	    }
 
-	    public String[] getDelimiters() {
+	    @Override
+        public String[] getDelimiters() {
 	        return new String [] {"CVC>","C>"};
 	    }
 
-	    public String[] getSupportedVersions() {
+	    @Override
+        public String[] getSupportedVersions() {
 	        return new String[] {"version 2.2", "version 2.4.1"};
 	    }
 
-	    public String getVersionParameter() {
+	    @Override
+        public String getVersionParameter() {
 	        return "-version";
 	    }
 
@@ -457,7 +559,8 @@ public interface SolverType  {
 	        return new SmtLibTranslator(services,conf);
 	    }
 
-	    public boolean supportsIfThenElse() {
+	    @Override
+        public boolean supportsIfThenElse() {
 	        return true;
 	    }
 
@@ -470,7 +573,7 @@ public interface SolverType  {
 
 
 	};
-	
+
 	/**
 	 * CVC4 is the successor to CVC3.
 	 * @author bruns
@@ -531,7 +634,7 @@ public interface SolverType  {
         public String[] getSupportedVersions() {
             return new String[]{"version 1.3"};
         }
-	    
+
 	};
 
 
@@ -564,7 +667,8 @@ public interface SolverType  {
 			return "yices";
 		}
 
-		public String[] getDelimiters() {
+		@Override
+        public String[] getDelimiters() {
 			return new String [] {"\n","\r"};
                 }
 
@@ -574,11 +678,13 @@ public interface SolverType  {
 		}
 
 
-		public String getVersionParameter() {
+		@Override
+        public String getVersionParameter() {
 			return "--version";
                 }
 
-		public String[] getSupportedVersions() {
+		@Override
+        public String[] getSupportedVersions() {
 			return new String [] {"1.0.34"};
                 }
 
@@ -588,14 +694,16 @@ public interface SolverType  {
 			+ "required logic AUFLIA.";
 		}
 
-		public boolean supportsIfThenElse() {
+		@Override
+        public boolean supportsIfThenElse() {
 			return true;
 		};
 
 
 
 
-		public String modifyProblem(String problem) {
+		@Override
+        public String modifyProblem(String problem) {
 			return problem += "\n\n check\n";
 				}
 
@@ -625,31 +733,38 @@ public interface SolverType  {
 					new Configuration(false,true));
 		}
 
-		public String getDefaultSolverCommand() {
+		@Override
+        public String getDefaultSolverCommand() {
 			return "simplify";
                 }
 
-		public String[] getSupportedVersions() {
+		@Override
+        public String[] getSupportedVersions() {
 			return new String []{"version 1.5.4"};
                 }
 
             @Override
                 public String getRawVersion () {
                     final String tmp = super.getRawVersion();
-                    if (tmp==null) return null;
+                    if (tmp==null) {
+                        return null;
+                    }
                     return tmp.substring(tmp.indexOf("version"));
                 }
 
-		public String[] getDelimiters() {
+		@Override
+        public String[] getDelimiters() {
 			return new String [] {">"};
                 }
 
-		public String getDefaultSolverParameters() {
+		@Override
+        public String getDefaultSolverParameters() {
 			return "-print";
                 }
 
 
-		public String getVersionParameter() {
+		@Override
+        public String getVersionParameter() {
 			return "-version";
                 }
 
@@ -659,7 +774,8 @@ public interface SolverType  {
 			return "Simplify only supports integers within the interval [-2147483646,2147483646]=[-2^31+2,2^31-2].";
 		}
 
-		public boolean supportsIfThenElse() {
+		@Override
+        public boolean supportsIfThenElse() {
 			return false;
                 }
 
@@ -684,7 +800,6 @@ abstract class AbstractSolverType implements SolverType {
 	private boolean supportHasBeenChecked = false;
 
 
-	
 
 
 
@@ -693,7 +808,8 @@ abstract class AbstractSolverType implements SolverType {
 
 
 
-	
+
+
 
 
 
@@ -715,13 +831,14 @@ abstract class AbstractSolverType implements SolverType {
 
 	 /**
 	  * check, if this solver is installed and can be used.
-	  * 
+	  *
 	  * @param recheck
 	  *                if false, the solver is not checked again, if a cached
 	  *                value for this exists.
 	  * @return true, if it is installed.
 	  */
-	 public boolean isInstalled(boolean recheck) {
+	 @Override
+    public boolean isInstalled(boolean recheck) {
 		 if (recheck || !installWasChecked) {
 
 			 String cmd = getSolverCommand();
@@ -750,7 +867,8 @@ abstract class AbstractSolverType implements SolverType {
 
 	 }
 
-	 public boolean checkForSupport(){
+	 @Override
+    public boolean checkForSupport(){
 		 if(!isInstalled){
 			 return false;
 		 }
@@ -781,14 +899,16 @@ abstract class AbstractSolverType implements SolverType {
 		 return isSupportedVersion;
 	 }
 
-	 public String getSolverParameters() {
+	 @Override
+    public String getSolverParameters() {
 		 if(solverParameters == null){
 			 return getDefaultSolverParameters();
 		 }
 		 return solverParameters;
 	 }
 
-	 public void setSolverParameters(String s) {
+	 @Override
+    public void setSolverParameters(String s) {
 
 		 solverParameters= s;
 	 }
@@ -807,17 +927,22 @@ abstract class AbstractSolverType implements SolverType {
 		 return solverCommand;
 	 }
 
-	 public String getVersion() {
+	 @Override
+    public String getVersion() {
 		 return solverVersion;
 		}
 
+        @Override
         public String getRawVersion() {
-            if (isInstalled(true))
+            if (isInstalled(true)) {
                 return VersionChecker.INSTANCE.getVersionFor(getSolverCommand(),getVersionParameter());
-            else return null;
+            } else {
+                return null;
+            }
 	 }
 
-	 public String toString() {
+	 @Override
+    public String toString() {
 		 return getName();
 	 }
 
