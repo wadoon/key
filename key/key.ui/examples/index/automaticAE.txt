@@ -123,34 +123,40 @@ keySettings = "#Proof-Settings-Config-File
 [SMTSettings]instantiateHierarchyAssumptions=true
 [SMTSettings]useUninterpretedMultiplication=true
 [SMTSettings]SelectedTaclets=
-[Choice]DefaultChoices=assertions-assertions:on , intRules-intRules:arithmeticSemanticsIgnoringOF , initialisation-initialisation:disableStaticInitialisation , programRules-programRules:Java , runtimeExceptions-runtimeExceptions:ban , JavaCard-JavaCard:on , Strings-Strings:on , modelFields-modelFields:showSatisfiability , bigint-bigint:on , sequences-sequences:on , reach-reach:on , integerSimplificationRules-integerSimplificationRules:full , wdOperator-wdOperator:L , wdChecks-wdChecks:off , permissions-permissions:off , moreSeqRules-moreSeqRules:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal:off
+[Choice]DefaultChoices=assertions-assertions:on , intRules-intRules:arithmeticSemanticsIgnoringOF , initialisation-initialisation:disableStaticInitialisation , programRules-programRules:Java , runtimeExceptions-runtimeExceptions:ban , JavaCard-JavaCard:on , Strings-Strings:on , modelFields-modelFields:showSatisfiability , bigint-bigint:on , sequences-sequences:on , reach-reach:on , integerSimplificationRules-integerSimplificationRules:full , wdOperator-wdOperator:L , wdChecks-wdChecks:off , permissions-permissions:off , moreSeqRules-moreSeqRules:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal:off , javaLoopTreatment-javaLoopTreatment\\:efficient
 [Strategy]ActiveStrategy=JavaCardDLStrategy
 
 "
 
 # Examples used in the Abstract Execution paper submitted to FM 2019
-group aepaper {
-   provable ./abstract_execution/SplitLoop/Correct/splitLoopRefactoring.key
-   notprovable ./abstract_execution/ExtractMethod/WithoutReturnSpec/extractMethodRefactoring.key
-   notprovable ./abstract_execution/ExtractMethod/WrongAssignable/extractMethodRefactoring.key
+group aepaper-provable {
    provable ./abstract_execution/ExtractMethod/CorrectSpecified/extractMethodRefactoring.key
    provable ./abstract_execution/ExtractMethod/Heap/extractMethodRefactoring.key
-   provable ./abstract_execution/LoopUnrolling/Correct/loopUnrolling.key
    provable ./abstract_execution/DecomposeConditional/Correct/decomposeConditional.key
    provable ./abstract_execution/SlideStatements/Correct/slideStatements.key
-   provable ./abstract_execution/RemoveControlFlag/CorrectWithUnrollingInvRule/removeControlFlag.key
-   provable ./abstract_execution/RemoveControlFlag/Correct/removeControlFlag.key
    provable ./abstract_execution/ReplaceExceptionWithTest/CorrectRollbackForSinglePV/replaceExceptionWithTest.key
    provable ./abstract_execution/ReplaceExceptionWithTest/CorrectRollbackForSkolemLocset/replaceExceptionWithTest.key
-   notprovable ./abstract_execution/ReplaceExceptionWithTest/IncorrectMissingRollback/replaceExceptionWithTest.key
    provable ./abstract_execution/MoveStatementsToCallers/Correct/moveStatementsToCallers.key
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixAsSlideStatementsCorrect/consolidateDuplicateConditionalFragments.key
-   notprovable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixIncorrect/consolidateDuplicateConditionalFragmentsPrefixIncorrect.key
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfixFromTryCatchNoFinallyCorrect/consolidateDuplicateConditionalFragments.key
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfixFromTryCatchCorrect/consolidateDuplicateConditionalFragments.key
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixCorrect/consolidateDuplicateConditionalFragmentsPrefixCorrect.key
    provable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPostfix/consolidateDuplicateConditionalFragmentsPostfix.key
    loadable ./abstract_execution/ExtractMethod/CorrectSpecified/extractMethodRefactoring.proof
+}
+
+group aepaper-notprovable {
+   notprovable ./abstract_execution/ExtractMethod/WithoutReturnSpec/extractMethodRefactoring.key
+   notprovable ./abstract_execution/ExtractMethod/WrongAssignable/extractMethodRefactoring.key
+   notprovable ./abstract_execution/ReplaceExceptionWithTest/IncorrectMissingRollback/replaceExceptionWithTest.key
+   notprovable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixIncorrect/consolidateDuplicateConditionalFragmentsPrefixIncorrect.key
+}
+
+group aepaper-loops {
+   # provable ./abstract_execution/SplitLoop/Correct/splitLoopRefactoring.key # takes very long!
+   provable ./abstract_execution/LoopUnrolling/Correct/loopUnrolling.key
+   provable ./abstract_execution/RemoveControlFlag/CorrectWithUnrollingInvRule/removeControlFlag.key
+   provable ./abstract_execution/RemoveControlFlag/Correct/removeControlFlag.key
    loadable ./abstract_execution/RemoveControlFlag/CorrectWithUnrollingInvRule/removeControlFlag.proof
    loadable ./abstract_execution/RemoveControlFlag/Correct/removeControlFlag.proof
 }
