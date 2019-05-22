@@ -97,8 +97,7 @@ public final class DropEffectlessAbstractUpdateCondition implements VariableCond
         if (u.op() == UpdateJunctor.CONCATENATED_UPDATE) {
             final List<Term> origAbstractUpdates = //
                     Collections.unmodifiableList(extractAbstractUpdatesFromConcatenation(u));
-            final LinkedList<Term> newElementaryAbstractUpdates = //
-                    new LinkedList<>(origAbstractUpdates);
+            final LinkedList<Term> newElementaryAbstractUpdates = new LinkedList<>();
 
             final TermBuilder tb = services.getTermBuilder();
             for (int i = origAbstractUpdates.size() - 1; i >= 0; i--) {
