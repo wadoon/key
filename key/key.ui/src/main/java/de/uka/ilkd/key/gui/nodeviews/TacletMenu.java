@@ -489,14 +489,14 @@ public class TacletMenu extends JMenu {
 
         JMenu target = this;
         for (TacletApp app : normalTaclets) {
-            target.add(createMenuItem(app, control));
-            remainingTacletSize --;
             if(remainingTacletSize == 0){
                 JMenu newTarget = new JMenu(MORE_RULES);
                 target.add(newTarget);
                 target = newTarget;
                 remainingTacletSize = RULES_PER_MENU;
             }
+            target.add(createMenuItem(app, control));
+            remainingTacletSize --;
         }
 
         //add globally
