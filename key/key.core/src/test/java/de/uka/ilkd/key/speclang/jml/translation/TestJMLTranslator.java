@@ -17,6 +17,7 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import de.uka.ilkd.key.logic.label.OriginTermLabel.SpecType;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 
@@ -550,37 +551,35 @@ public class TestJMLTranslator extends TestCase {
         Term result = null;
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
-        result = JMLTranslator.translate(new PositionedString("0 == 0.0f"),
-                testClassType, selfVar, null, null, null, null, Term.class, services);
+        result = translate("0 == 0.0f", selfVar);
         assertEquals("javaEqFloat(float::cast(Z(0(#))),FP(0(#),0(#)))", result.toString());
 
-        result = JMLTranslator.translate(new PositionedString("1.f != 0.0f"),
-                testClassType, selfVar, null, null, null, null, Term.class, services);
+        result = translate("1.f != 0.0f", selfVar);
         assertEquals("not(javaEqFloat(FP(6(1(2(3(5(3(5(6(0(1(#)))))))))),0(#)),FP(0(#),0(#))))", result.toString());
 
-        result = JMLTranslator.translate(new PositionedString("0.0d == 0"),
-                testClassType, selfVar, null, null, null, null, Term.class, services);
+        result = translate("0.0d == 0", selfVar);
         assertEquals("javaEqDouble(DFP(0(#),0(#)),double::cast(Z(0(#))))", result.toString());
 
-        result = JMLTranslator.translate(new PositionedString("0.0d == 0.0f"),
-                testClassType, selfVar, null, null, null, null, Term.class, services);
+        result = translate("0.0d == 0.0f", selfVar);
         assertEquals("javaEqDouble(DFP(0(#),0(#)),double::cast(FP(0(#),0(#))))", result.toString());
+    }
+
+    private Term translate(String posText, ProgramVariable selfVar) throws SLTranslationException {
+        return JMLTranslator.translate(new PositionedString(posText), testClassType, selfVar, null,
+                null, null, null, SpecType.NONE, Term.class, services);
     }
 
     public void testNumericPromotionArithmetic() throws SLTranslationException {
         Term result = null;
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
-        result = JMLTranslator.translate(new PositionedString("0 + 0.0f"),
-                testClassType, selfVar, null, null, null, null, Term.class, services);
+        result = translate("0 + 0.0f", selfVar);
         assertEquals("javaAddFloat(float::cast(Z(0(#))),FP(0(#),0(#)))", result.toString());
 
-        result = JMLTranslator.translate(new PositionedString("0.0d * 0"),
-                testClassType, selfVar, null, null, null, null, Term.class, services);
+        result = translate("0.0d * 0", selfVar);
         assertEquals("javaMulDouble(DFP(0(#),0(#)),double::cast(Z(0(#))))", result.toString());
 
-        result = JMLTranslator.translate(new PositionedString("0.0d - 0.0f"),
-                testClassType, selfVar, null, null, null, null, Term.class, services);
+        result = translate("0.0d - 0.0f", selfVar);
         assertEquals("javaSubDouble(DFP(0(#),0(#)),double::cast(FP(0(#),0(#))))", result.toString());
     }
 
@@ -589,12 +588,10 @@ public class TestJMLTranslator extends TestCase {
         Term result = null;
         ProgramVariable selfVar = buildSelfVarAsProgVar();
 
-        result = JMLTranslator.translate(new PositionedString("-1.0f"),
-                testClassType, selfVar, null, null, null, null, Term.class, services);
+        result = translate("-1.0f", selfVar);
         assertEquals("FP(6(1(2(3(5(3(5(6(0(1(#)))))))))),0(#))", result.sub(0).toString());
 
-        result = JMLTranslator.translate(new PositionedString("-1.0"),
-                testClassType, selfVar, null, null, null, null, Term.class, services);
+        result = translate("-1.0", selfVar);
         assertEquals("DFP(8(0(4(7(1(0(0(0(8(8(1(4(2(8(1(7(0(6(4(#))))))))))))))))))),0(#))", result.sub(0).toString());
 
     }
@@ -605,12 +602,10 @@ public class TestJMLTranslator extends TestCase {
 
         // i, array is a field in TestClass
         // it works with spaces
-        Term reference = JMLTranslator.translate(new PositionedString("array[1 .. i]"), // .. i]"),
-                testClassType, selfVar, null, null, null, null, Term.class, services);
+        Term reference = translate("array[1 .. i]", selfVar);
 
         // but failed without
-        Term result = JMLTranslator.translate(new PositionedString("array[1..i]"), // .. i]"),
-                testClassType, selfVar, null, null, null, null, Term.class, services);
+        Term result = translate("array[1..i]", selfVar);
 
         assertEquals(reference, result);
 
