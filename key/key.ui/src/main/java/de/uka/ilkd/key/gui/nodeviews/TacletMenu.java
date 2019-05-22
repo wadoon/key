@@ -39,7 +39,6 @@ import de.uka.ilkd.key.gui.smt.SolverListener;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.java.ProgramElement;
 import de.uka.ilkd.key.logic.JavaBlock;
-import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.NameCreationInfo;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.ProgramElementName;
@@ -103,7 +102,7 @@ public class TacletMenu extends JMenu {
     private static final Set<String> CLUTTER_RULES =
             ProofIndependentSettings.DEFAULT_INSTANCE.getViewSettings().getClutterRules();
 
-    public static final int TOO_MANY_TACLETS_THRESHOLD = 15; //reduce for debugging.
+    public static final int RULES_PER_MENU = 15; //reduce for debugging.
 
     private PosInSequent pos;
     private CurrentGoalView sequentView;
@@ -477,7 +476,7 @@ public class TacletMenu extends JMenu {
             }
             if (!mediator.getFilterForInteractiveProving().filter(taclet)) {
                 continue;
-        }
+            }
 
             if (isRareRule(taclet)) {
                 rareTaclets.add(app);
@@ -485,18 +484,18 @@ public class TacletMenu extends JMenu {
                 normalTaclets.add(app);
             }
         }
+        int remainingTacletSize = normalTaclets.size();
         normalTaclets.addAll(rareTaclets);
 
-        int currentSize = 0;
         JMenu target = this;
         for (TacletApp app : normalTaclets) {
             target.add(createMenuItem(app, control));
-            ++currentSize;
-            if(currentSize>= TOO_MANY_TACLETS_THRESHOLD){
+            remainingTacletSize --;
+            if(remainingTacletSize == 0){
                 JMenu newTarget = new JMenu(MORE_RULES);
                 target.add(newTarget);
                 target = newTarget;
-                currentSize = 0;
+                remainingTacletSize = RULES_PER_MENU;
             }
         }
 
@@ -548,9 +547,12 @@ public class TacletMenu extends JMenu {
         /*if (more.getItemCount() > 0) {
             add(more);
         }*/
-        }
+    }
+
     private boolean isRareRule(Taclet taclet) {
-        if( CLUTTER_RULES.contains(taclet.name().toString())) return true;
+        if (CLUTTER_RULES.contains(taclet.name().toString())) {
+            return true;
+        }
         return taclet.getRuleSets().stream()
                 .anyMatch(it -> CLUTTER_RULESETS.contains(it.name().toString()));
     }
