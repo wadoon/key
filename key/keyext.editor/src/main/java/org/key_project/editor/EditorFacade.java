@@ -9,6 +9,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import lombok.Data;
 import lombok.val;
 import org.fife.ui.rsyntaxtextarea.Theme;
+import org.key_project.editor.java.JavaJMLEditorFactory;
 import org.key_project.editor.keyfile.KeyEditorFactory;
 
 import java.io.DataInputStream;
@@ -31,8 +32,9 @@ public class EditorFacade {
     private static EditorDockableFactory editorDockableFactory = new EditorDockableFactory();
 
     static {
-        factories.add(new KeyEditorFactory());
-        factories.add(new FallbackEditorFactory());
+        register(new FallbackEditorFactory());
+        register(new JavaJMLEditorFactory());
+        register(new KeyEditorFactory());
     }
 
     public static MultipleCDockableFactory<?, ?> getEditorDockableFactory() {
@@ -76,7 +78,7 @@ public class EditorFacade {
         return factories;
     }
 
-    Theme getEditorTheme() {
+    public static Theme getEditorTheme() {
         if (EDITOR_THEME == null) {
             InputStream themeRes = EditorFacade
                     .class.getResourceAsStream("org/fife/ui/rsyntaxtextarea/themes/eclipse.xml");

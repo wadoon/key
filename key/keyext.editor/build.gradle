@@ -1,10 +1,41 @@
+plugins {
+    id "antlr"
+}
 dependencies {
     implementation project(":key.ui")
+
+    antlr "org.antlr:antlr4:4.7.2" // use ANTLR version 4
+    implementation "org.antlr:antlr4:4.7.2" // use ANTLR version 4
+
 
     implementation "com.fifesoft:rsyntaxtextarea:3.0.2"
     implementation "com.fifesoft:rstaui:3.0.0"
     implementation "com.fifesoft:autocomplete:3.0.0"
     compileOnly "org.projectlombok:lombok:1.18.6"
     annotationProcessor "org.projectlombok:lombok:1.18.6"
-
 }
+
+//https://github.com/gradle/gradle/issues/2565
+generateGrammarSource {
+    outputs.cacheIf { true }
+    outputDirectory = file("build/generated-src/antlr/main/")
+    sourceSets.main.java.srcDirs += outputDirectory
+    final PARSER_PACKAGE_NAME = 'edu.key_project.editor.java'
+    arguments += ["-visitor", "-no-listener", "-package", PARSER_PACKAGE_NAME]
+
+    doLast {
+        def parserFilePattern = 'Java*'
+        def outputPath = generateGrammarSource.outputDirectory.canonicalPath
+        def parserPackagePath = "${outputPath}/${PARSER_PACKAGE_NAME.replace('.', '/')}"
+        file(parserPackagePath).mkdirs()
+        copy {
+            from outputPath
+            into parserPackagePath
+            include parserFilePattern
+        }
+        delete fileTree(outputPath) {
+            include parserFilePattern
+        }
+    }
+}
+

@@ -65,6 +65,7 @@ public class Editor extends JPanel implements SearchListener {
         toolBarActions.setFloatable(false);
 
         editor = new RSyntaxTextArea();
+        //EditorFacade.getEditorTheme().apply(editor);
         editorView = new RTextScrollPane(editor);
         gutter = RSyntaxUtilities.getGutter(editor);
         editor.setAntiAliasingEnabled(true);
