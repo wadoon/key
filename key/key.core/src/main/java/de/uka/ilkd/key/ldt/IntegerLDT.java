@@ -591,9 +591,8 @@ public final class IntegerLDT extends LDT {
                 f = (Function)it.op();
             }
             // numbers must end with a sharp
-            if (f == sharp) {
-                sb.toString();
-            }
+            assert f == sharp;
+            return sb.toString();
         }
         throw new RuntimeException("IntegerLDT: Cannot convert term to program: " + t);
     }
