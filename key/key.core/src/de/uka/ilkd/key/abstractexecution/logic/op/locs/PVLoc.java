@@ -64,6 +64,11 @@ public class PVLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
     public AbstrUpdateUpdatableLoc toUpdatableRHS() {
         return this;
     }
+    
+    @Override
+    public boolean mayAssign(AbstractUpdateLoc otherLoc) {
+        return otherLoc instanceof PVLoc && otherLoc.equals(this);
+    }
 
     @Override
     public boolean equals(Object obj) {

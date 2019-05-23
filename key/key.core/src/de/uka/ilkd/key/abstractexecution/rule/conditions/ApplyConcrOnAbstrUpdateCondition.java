@@ -29,6 +29,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateUpdatableLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.FieldLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.HeapLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
@@ -233,14 +234,14 @@ public final class ApplyConcrOnAbstrUpdateCondition
                     ? AbstractUpdateFactory
                             .abstrUpdateLocsFromTermSafe(rhs, Optional.empty(),
                                     services)
-                            .stream().filter(FieldLoc.class::isInstance)
-                            .map(FieldLoc.class::cast)
+                            .stream().filter(HeapLoc.class::isInstance)
+                            .map(HeapLoc.class::cast)
                             .collect(Collectors
                                     .toCollection(() -> new LinkedHashSet<>()))
                     : Collections.singleton(new PVLoc(lhs));
 
-            final Set<FieldLoc> pushThroughFields = new LinkedHashSet<>();
-            final Set<FieldLoc> dropFields = new LinkedHashSet<>();
+            final Set<HeapLoc> pushThroughFields = new LinkedHashSet<>();
+            final Set<HeapLoc> dropFields = new LinkedHashSet<>();
 
             for (AbstrUpdateUpdatableLoc lhsLoc : locs) {
                 /*
@@ -277,7 +278,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
                         currentFollowingConcrUpdElems
                                 .add(tb.elementary(lhs, rhs));
                     } else {
-                        pushThroughFields.add((FieldLoc) lhsLoc);
+                        pushThroughFields.add((HeapLoc) lhsLoc);
                     }
                 }
 
@@ -289,7 +290,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
                 } else {
                     success = true;
                     if (isHeapVar) {
-                        dropFields.add((FieldLoc) lhsLoc);
+                        dropFields.add((HeapLoc) lhsLoc);
                     }
                 }
             }
@@ -331,8 +332,9 @@ public final class ApplyConcrOnAbstrUpdateCondition
                 followingConcrUpdate);
     }
 
+    // TODO Update for ArrayLocs
     private Term filterFieldLocsFromStoreExpr(Term t,
-            Set<FieldLoc> fieldsToKeep, Services services) {
+            Set<HeapLoc> fieldsToKeep, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
@@ -340,7 +342,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
             return t;
         }
 
-        final FieldLoc reprLoc = (FieldLoc) AbstractUpdateFactory
+        final HeapLoc reprLoc = (HeapLoc) AbstractUpdateFactory
                 .abstrUpdateLocsFromTermSafe(t, Optional.empty(), services)
                 .iterator().next();
 
@@ -353,8 +355,9 @@ public final class ApplyConcrOnAbstrUpdateCondition
         }
     }
 
+    // TODO Update for ArrayLocs
     private Term removeFieldLocsFromStoreExpr(Term t,
-            Set<FieldLoc> fieldsToDrop, Services services) {
+            Set<HeapLoc> fieldsToDrop, Services services) {
         if (fieldsToDrop.isEmpty()) {
             return t;
         }

@@ -26,6 +26,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateUpdatableLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllFieldsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.ArrayLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
@@ -63,10 +64,10 @@ public class AbstractUpdateFactory {
                     new LinkedHashMap<>();
 
     /**
-     * Constructor. NOTE: You should not use this constructor, but instead
-     * access {@link Services#abstractUpdateFactory()}, since this factory
-     * caches {@link AbstractUpdate}s. You'll probably face incompleteness
-     * issues if you don't follow this rule.
+     * Constructor. NOTE: You should not use this constructor, but instead access
+     * {@link Services#abstractUpdateFactory()}, since this factory caches
+     * {@link AbstractUpdate}s. You'll probably face incompleteness issues if you
+     * don't follow this rule.
      */
     public AbstractUpdateFactory() {
     }
@@ -75,28 +76,23 @@ public class AbstractUpdateFactory {
      * Returns abstract update operator for the passed
      * {@link AbstractPlaceholderStatement} and left-hand side.
      *
-     * @param phs
-     *     The {@link AbstractPlaceholderStatement} for which this
-     *     {@link AbstractUpdate} should be created.
-     * @param lhs
-     *     The update's left-hand side. Should be a {@link SetLDT} term.
-     * @param runtimeInstance
-     *     An optional runtime instance {@link LocationVariable} to normalize
-     *     self terms (because otherwise, there might be different such terms
-     *     around).
-     * @param services
-     *     The {@link Services} object.
+     * @param phs             The {@link AbstractPlaceholderStatement} for which
+     *                        this {@link AbstractUpdate} should be created.
+     * @param lhs             The update's left-hand side. Should be a
+     *                        {@link SetLDT} term.
+     * @param runtimeInstance An optional runtime instance {@link LocationVariable}
+     *                        to normalize self terms (because otherwise, there
+     *                        might be different such terms around).
+     * @param services        The {@link Services} object.
      * @return The {@link AbstractUpdate} for the given
-     * {@link AbstractPlaceholderStatement} and left-hand side.
+     *         {@link AbstractPlaceholderStatement} and left-hand side.
      */
-    public AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
-            Term lhs, Optional<LocationVariable> runtimeInstance,
-            Services services) {
+    public AbstractUpdate getInstance(AbstractPlaceholderStatement phs, Term lhs,
+            Optional<LocationVariable> runtimeInstance, Services services) {
         final LinkedHashSet<AbstrUpdateLHS> assignables = //
-                abstrUpdateLocsFromTermSafe(lhs, runtimeInstance, services)
-                        .stream().map(AbstrUpdateLHS.class::cast)
-                        .collect(Collectors
-                                .toCollection(() -> new LinkedHashSet<>()));
+                abstrUpdateLocsFromTermSafe(lhs, runtimeInstance, services).stream()
+                        .map(AbstrUpdateLHS.class::cast)
+                        .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
         return getInstance(phs, assignables, services);
     }
@@ -105,15 +101,12 @@ public class AbstractUpdateFactory {
      * Returns abstract update operator for the passed
      * {@link AbstractPlaceholderStatement} and left-hand side.
      *
-     * @param phs
-     *     The {@link AbstractPlaceholderStatement} for which this
-     *     {@link AbstractUpdate} should be created.
-     * @param assignables
-     *     The update's left-hand side.
-     * @param services
-     *     The {@link Services} object.
+     * @param phs         The {@link AbstractPlaceholderStatement} for which this
+     *                    {@link AbstractUpdate} should be created.
+     * @param assignables The update's left-hand side.
+     * @param services    The {@link Services} object.
      * @return The {@link AbstractUpdate} for the given
-     * {@link AbstractPlaceholderStatement} and left-hand side.
+     *         {@link AbstractPlaceholderStatement} and left-hand side.
      */
     public AbstractUpdate getInstance(AbstractPlaceholderStatement phs,
             Set<AbstrUpdateLHS> assignables, Services services) {
@@ -137,12 +130,11 @@ public class AbstractUpdateFactory {
      * Returns a new abstract update for the same
      * {@link AbstractPlaceholderStatement}, but with the supplied assignables.
      *
-     * @param abstrUpd
-     *     The original {@link AbstractUpdate}.
-     * @param newAssignables
-     *     The new assignables (left-hand sides).
+     * @param abstrUpd       The original {@link AbstractUpdate}.
+     * @param newAssignables The new assignables (left-hand sides).
      * @return A new {@link AbstractUpdate} for the same
-     * {@link AbstractPlaceholderStatement}, but with the supplied assignables.
+     *         {@link AbstractPlaceholderStatement}, but with the supplied
+     *         assignables.
      */
     public AbstractUpdate changeAssignables(AbstractUpdate abstrUpd,
             Set<AbstrUpdateLHS> assignables) {
@@ -167,20 +159,17 @@ public class AbstractUpdateFactory {
      * {@link ProgramVariable}s in the assignables replaced according to the
      * supplied map.
      *
-     * @param replMap
-     *     The replace map.
-     * @param services
-     *     The {@link Services} object.
+     * @param replMap  The replace map.
+     * @param services The {@link Services} object.
      *
      * @return A new {@link AbstractUpdate} of this one with the
-     * {@link ProgramVariable}s in the assignables replaced according to the
-     * supplied map.
+     *         {@link ProgramVariable}s in the assignables replaced according to the
+     *         supplied map.
      */
     public AbstractUpdate changeAssignables(AbstractUpdate abstrUpd,
             Map<ProgramVariable, ProgramVariable> replMap, Services services) {
-        final Set<AbstrUpdateLHS> newAssignables = abstrUpd.getAllAssignables()
-                .stream().map(lhs -> lhs.replaceVariables(replMap, services))
-                .map(AbstrUpdateLHS.class::cast)
+        final Set<AbstrUpdateLHS> newAssignables = abstrUpd.getAllAssignables().stream()
+                .map(lhs -> lhs.replaceVariables(replMap, services)).map(AbstrUpdateLHS.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
         return changeAssignables(abstrUpd, newAssignables);
     }
@@ -189,14 +178,12 @@ public class AbstractUpdateFactory {
      * Extracts from the given {@link Term} to the {@link AbstractUpdateLoc}s
      * contained in it.
      *
-     * @param t
-     *     The {@link Term} to extract all {@link AbstractUpdateLoc}s from.
-     * @param runtimeInstance
-     *     An optional runtime instance {@link LocationVariable} to normalize
-     *     self terms (because otherwise, there might be different such terms
-     *     around).
-     * @param services
-     *     The {@link Services} object.
+     * @param t               The {@link Term} to extract all
+     *                        {@link AbstractUpdateLoc}s from.
+     * @param runtimeInstance An optional runtime instance {@link LocationVariable}
+     *                        to normalize self terms (because otherwise, there
+     *                        might be different such terms around).
+     * @param services        The {@link Services} object.
      * @return All {@link AbstractUpdateLoc}s in the given {@link Term}.
      */
     public static Set<AbstractUpdateLoc> extractAbstrUpdateLocsFromTerm(Term t,
@@ -211,8 +198,7 @@ public class AbstractUpdateFactory {
         final Set<AbstractUpdateLoc> result = new LinkedHashSet<>();
         for (Term sub : t.subs()) {
             result.addAll(Optional
-                    .ofNullable(extractAbstrUpdateLocsFromTerm(sub,
-                            runtimeInstance, services))
+                    .ofNullable(extractAbstrUpdateLocsFromTerm(sub, runtimeInstance, services))
                     .orElse(Collections.emptySet()));
         }
         return result;
@@ -220,30 +206,25 @@ public class AbstractUpdateFactory {
 
     /**
      * Converts the given {@link Term} to the {@link AbstractUpdateLoc}s it is
-     * representing. Throws a {@link RuntimeException} if the given {@link Term}
-     * is not directly representing any locations; use
+     * representing. Throws a {@link RuntimeException} if the given {@link Term} is
+     * not directly representing any locations; use
      * {@link #extractAbstrUpdateLocsFromTerm(Term, Optional, Services)} for
-     * extraction if the passed {@link Term} does not have to represent
-     * locations.
+     * extraction if the passed {@link Term} does not have to represent locations.
      *
-     * @param t
-     *     The {@link Term} to extract all {@link AbstractUpdateLoc}s from.
-     * @param runtimeInstance
-     *     An optional runtime instance {@link LocationVariable} to normalize
-     *     self terms (because otherwise, there might be different such terms
-     *     around).
-     * @param services
-     *     The {@link Services} object.
-     * @return All {@link AbstractUpdateLoc}s from the given {@link Term} or
-     * null if the {@link Term} does not represent {@link AbstractUpdateLoc}s.
+     * @param t               The {@link Term} to extract all
+     *                        {@link AbstractUpdateLoc}s from.
+     * @param runtimeInstance An optional runtime instance {@link LocationVariable}
+     *                        to normalize self terms (because otherwise, there
+     *                        might be different such terms around).
+     * @param services        The {@link Services} object.
+     * @return All {@link AbstractUpdateLoc}s from the given {@link Term} or null if
+     *         the {@link Term} does not represent {@link AbstractUpdateLoc}s.
      */
     public static Set<AbstractUpdateLoc> abstrUpdateLocsFromTermSafe(Term t,
             Optional<LocationVariable> runtimeInstance, Services services) {
-        return Optional
-                .ofNullable(abstrUpdateLocsFromTermUnsafe(t, runtimeInstance,
-                        services))
-                .orElseThrow(() -> new RuntimeException(String.format(
-                        "Unsupported term %s, cannot extract locs", t)));
+        return Optional.ofNullable(abstrUpdateLocsFromTermUnsafe(t, runtimeInstance, services))
+                .orElseThrow(() -> new RuntimeException(
+                        String.format("Unsupported term %s, cannot extract locs", t)));
     }
 
     /**
@@ -251,22 +232,19 @@ public class AbstractUpdateFactory {
      * representing. Returns null if the given {@link Term} is not directly
      * representing any locations; use
      * {@link #extractAbstrUpdateLocsFromTerm(Term, Optional, Services)} for
-     * extraction if the passed {@link Term} does not have to represent
-     * locations, or
-     * {@link #abstrUpdateLocsFromTermSafe(Term, Optional, Services)} for a
-     * variant ensuring that the result is non-null by throwing an exception
-     * (fail early).
+     * extraction if the passed {@link Term} does not have to represent locations,
+     * or {@link #abstrUpdateLocsFromTermSafe(Term, Optional, Services)} for a
+     * variant ensuring that the result is non-null by throwing an exception (fail
+     * early).
      *
-     * @param t
-     *     The {@link Term} to extract all {@link AbstractUpdateLoc}s from.
-     * @param runtimeInstance
-     *     An optional runtime instance {@link LocationVariable} to normalize
-     *     self terms (because otherwise, there might be different such terms
-     *     around).
-     * @param services
-     *     The {@link Services} object.
-     * @return All {@link AbstractUpdateLoc}s from the given {@link Term} or
-     * null if the {@link Term} does not represent {@link AbstractUpdateLoc}s.
+     * @param t               The {@link Term} to extract all
+     *                        {@link AbstractUpdateLoc}s from.
+     * @param runtimeInstance An optional runtime instance {@link LocationVariable}
+     *                        to normalize self terms (because otherwise, there
+     *                        might be different such terms around).
+     * @param services        The {@link Services} object.
+     * @return All {@link AbstractUpdateLoc}s from the given {@link Term} or null if
+     *         the {@link Term} does not represent {@link AbstractUpdateLoc}s.
      */
     public static Set<AbstractUpdateLoc> abstrUpdateLocsFromTermUnsafe(Term t,
             Optional<LocationVariable> runtimeInstance, Services services) {
@@ -289,8 +267,8 @@ public class AbstractUpdateFactory {
                 && ((Function) op).sort() == locSetLDT.targetSort()) {
             result.add(new SkolemLoc((Function) op));
         } else if (op == locSetLDT.getSingletonPV()) {
-            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTermUnsafe(
-                    t.sub(0), runtimeInstance, services);
+            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTermUnsafe(t.sub(0),
+                    runtimeInstance, services);
             if (subResult == null) {
                 return null;
             }
@@ -298,8 +276,8 @@ public class AbstractUpdateFactory {
             result.addAll(subResult);
         } else if (op == locSetLDT.getHasTo()) {
             // There is exactly one location inside a hasTo
-            final AbstractUpdateLoc subResult = abstrUpdateLocsFromTermUnsafe(
-                    t.sub(0), runtimeInstance, services).iterator().next();
+            final AbstractUpdateLoc subResult = abstrUpdateLocsFromTermUnsafe(t.sub(0),
+                    runtimeInstance, services).iterator().next();
             if (subResult == null) {
                 return null;
             }
@@ -307,10 +285,10 @@ public class AbstractUpdateFactory {
             assert subResult instanceof AbstrUpdateLHS;
             result.add(new HasToLoc((AbstrUpdateLHS) subResult));
         } else if (op == locSetLDT.getUnion() || op == setLDT.getUnion()) {
-            final Set<AbstractUpdateLoc> subResult1 = abstrUpdateLocsFromTermUnsafe(
-                    t.sub(0), runtimeInstance, services);
-            final Set<AbstractUpdateLoc> subResult2 = abstrUpdateLocsFromTermUnsafe(
-                    t.sub(1), runtimeInstance, services);
+            final Set<AbstractUpdateLoc> subResult1 = abstrUpdateLocsFromTermUnsafe(t.sub(0),
+                    runtimeInstance, services);
+            final Set<AbstractUpdateLoc> subResult2 = abstrUpdateLocsFromTermUnsafe(t.sub(1),
+                    runtimeInstance, services);
             if (subResult1 == null || subResult2 == null) {
                 return null;
             }
@@ -318,8 +296,8 @@ public class AbstractUpdateFactory {
             result.addAll(subResult1);
             result.addAll(subResult2);
         } else if (op == setLDT.getSingleton()) {
-            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTermUnsafe(
-                    t.sub(0), runtimeInstance, services);
+            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTermUnsafe(t.sub(0),
+                    runtimeInstance, services);
             if (subResult == null) {
                 return null;
             }
@@ -349,12 +327,10 @@ public class AbstractUpdateFactory {
      * represented set of {@link AbstractUpdateLoc}s. Returns null if it
      * {@link Term} operator is unexpected.
      *
-     * @param t
-     *     The {@link Term} to transform.
-     * @param runtimeInstance
-     *     The optional runtime instance for self variable transformation.
-     * @param services
-     *     The {@link Services} object.
+     * @param t               The {@link Term} to transform.
+     * @param runtimeInstance The optional runtime instance for self variable
+     *                        transformation.
+     * @param services        The {@link Services} object.
      * @return The contained {@link AbstractUpdateLoc}s.
      */
     private static Set<AbstractUpdateLoc> abstrUpdateLocsFromHeapTerm(Term t,
@@ -376,6 +352,8 @@ public class AbstractUpdateFactory {
             result.add(new FieldLoc(Optional.empty(), Optional.empty(), obj,
                     fieldPVFromFieldFunc(field, services),
                     (LocationVariable) tb.getBaseHeap().op()));
+        } else if (t.op() == locSetLDT.getAllFields() && t.subs().size() == 1) {
+            result.add(new AllFieldsLoc(t.sub(0)));
         } else if (heapLDT.isSelectOp(op) && t.subs().size() == 3
                 && t.sub(2).op() == heapLDT.getArr()) {
             final Term heapTerm = t.sub(0);
@@ -384,8 +362,8 @@ public class AbstractUpdateFactory {
             final Term array = t.sub(2).sub(0);
             result.add(new ArrayLoc(obj, array));
 
-            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromHeapTerm(
-                    heapTerm, runtimeInstance, services);
+            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromHeapTerm(heapTerm,
+                    runtimeInstance, services);
             if (subResult == null) {
                 return null;
             }
@@ -397,35 +375,51 @@ public class AbstractUpdateFactory {
             final Term field = t.sub(2);
 
             /*
-             * If the field is a logic variable, it's part of the assignable
-             * clause or something that we're not interested in, since it has to
-             * be in the scope of a quantifier.
+             * If the field is a logic variable, it's part of the assignable clause or
+             * something that we're not interested in, since it has to be in the scope of a
+             * quantifier.
              */
             if (!(field.op() instanceof LogicVariable)) {
-                final Term obj = //
-                        normalizeSelfVar(t.sub(1), runtimeInstance, services);
-                result.add(
-                        new FieldLoc(Optional.of(sort), Optional.of(heapTerm),
-                                obj, fieldPVFromFieldFunc(field, services),
-                                (LocationVariable) tb.getBaseHeap().op()));
+                final Term obj = normalizeSelfVar(t.sub(1), runtimeInstance, services);
+                result.add(new FieldLoc(Optional.of(sort), Optional.of(heapTerm), obj,
+                        fieldPVFromFieldFunc(field, services),
+                        (LocationVariable) tb.getBaseHeap().op()));
 
-                final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromHeapTerm(
-                        heapTerm, runtimeInstance, services);
+                final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromHeapTerm(heapTerm,
+                        runtimeInstance, services);
                 if (subResult != null) {
                     result.addAll(subResult);
                 }
             }
+        } else if (op == heapLDT.getStore() && t.subs().size() == 4
+                && t.sub(2).op() == heapLDT.getArr()) {
+            /*
+             * TODO (DS, 2019-05-22): Check what happens if the array is not a local
+             * variable, but a field...
+             */
+
+            final Term heapTerm = t.sub(0);
+            final Term array = normalizeSelfVar(t.sub(1), runtimeInstance, services);
+            final Term index = t.sub(2);
+            result.add(new ArrayLoc(array, index.sub(0)));
+
+            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromHeapTerm(heapTerm,
+                    runtimeInstance, services);
+            if (subResult == null) {
+                return null;
+            }
+
+            result.addAll(subResult);
         } else if (op == heapLDT.getStore()) {
             final Term heapTerm = t.sub(0);
-            final Term obj = //
-                    normalizeSelfVar(t.sub(1), runtimeInstance, services);
+            final Term obj = normalizeSelfVar(t.sub(1), runtimeInstance, services);
             final Term field = t.sub(2);
             result.add(new FieldLoc(Optional.empty(), Optional.empty(), obj,
                     fieldPVFromFieldFunc(field, services),
                     (LocationVariable) tb.getBaseHeap().op()));
 
-            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromHeapTerm(
-                    heapTerm, runtimeInstance, services);
+            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromHeapTerm(heapTerm,
+                    runtimeInstance, services);
             if (subResult == null) {
                 return null;
             }
@@ -435,19 +429,18 @@ public class AbstractUpdateFactory {
             final Term heapTerm = t.sub(0);
             final Term anonLocsTerm = t.sub(1);
 
-            Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTermUnsafe(
-                    anonLocsTerm, runtimeInstance, services);
+            Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTermUnsafe(anonLocsTerm,
+                    runtimeInstance, services);
             if (subResult == null) {
                 return null;
             }
 
             if (subResult.stream().anyMatch(loc -> loc instanceof AllLocsLoc)) {
                 /*
-                 * All of this heap is anonymized -> return the elements of the
-                 * heap, since all those are assigned.
+                 * All of this heap is anonymized -> return the elements of the heap, since all
+                 * those are assigned.
                  */
-                subResult = abstrUpdateLocsFromTermUnsafe(heapTerm,
-                        runtimeInstance, services);
+                subResult = abstrUpdateLocsFromTermUnsafe(heapTerm, runtimeInstance, services);
                 if (subResult == null) {
                     return null;
                 }
@@ -461,38 +454,35 @@ public class AbstractUpdateFactory {
         return result;
     }
 
-    private static boolean isHeapOp(final Operator op,
-            final LocSetLDT locSetLDT, final HeapLDT heapLDT) {
-        return op == locSetLDT.getSingleton() || heapLDT.isSelectOp(op)
-                || op == heapLDT.getStore() || op == heapLDT.getAnon();
+    private static boolean isHeapOp(final Operator op, final LocSetLDT locSetLDT,
+            final HeapLDT heapLDT) {
+        return op == locSetLDT.getSingleton() || heapLDT.isSelectOp(op) || op == heapLDT.getStore()
+                || op == heapLDT.getAnon() || op == locSetLDT.getAllFields();
     }
 
     /**
-     * If the operator of the given {@link Term} is a "self" variable, we
-     * normalize it to the given runtimeInstance if the {@link KeYJavaType}s of
-     * the variable and the instance are the same.
+     * If the operator of the given {@link Term} is a "self" variable, we normalize
+     * it to the given runtimeInstance if the {@link KeYJavaType}s of the variable
+     * and the instance are the same.
      *
-     * @param objTerm
-     *     The objTerm to normalize.
-     * @param runtimeInstance
-     *     An optional runtime instance {@link LocationVariable} to normalize
-     *     self terms (because otherwise, there might be different such terms
-     *     around). For an empty optional, we return objTerm.
-     * @param services
-     *     The {@link Services} object (for the {@link TermBuilder}).
-     * @return The original objTemr if runtimeInstance if empty, the objTerm is
-     * not a "self" term, or the types of the objTerm and the runtimeInstance
-     * are different, or otherwise a {@link Term} with the runtime instance.
+     * @param objTerm         The objTerm to normalize.
+     * @param runtimeInstance An optional runtime instance {@link LocationVariable}
+     *                        to normalize self terms (because otherwise, there
+     *                        might be different such terms around). For an empty
+     *                        optional, we return objTerm.
+     * @param services        The {@link Services} object (for the
+     *                        {@link TermBuilder}).
+     * @return The original objTemr if runtimeInstance if empty, the objTerm is not
+     *         a "self" term, or the types of the objTerm and the runtimeInstance
+     *         are different, or otherwise a {@link Term} with the runtime instance.
      */
-    private static Term normalizeSelfVar(Term objTerm,
-            Optional<LocationVariable> runtimeInstance, Services services) {
+    private static Term normalizeSelfVar(Term objTerm, Optional<LocationVariable> runtimeInstance,
+            Services services) {
         // objTerm = MiscTools.simplifyUpdateApplication(objTerm, services);
 
-        if (!runtimeInstance.isPresent()
-                || !(objTerm.op() instanceof LocationVariable)
+        if (!runtimeInstance.isPresent() || !(objTerm.op() instanceof LocationVariable)
                 || !objTerm.op().toString().equals("self")
-                || !((LocationVariable) objTerm.op()).sort()
-                        .equals(runtimeInstance.get().sort())) {
+                || !((LocationVariable) objTerm.op()).sort().equals(runtimeInstance.get().sort())) {
             return objTerm;
         }
 
@@ -503,23 +493,20 @@ public class AbstractUpdateFactory {
      * Returns, for a term representing a field, the "canonical" field program
      * variable.
      *
-     * @param field
-     *     The field term, something like "my.package.Type::$field", of Sort
-     *     "Field" (of {@link HeapLDT}).
-     * @param services
-     *     The {@link Services} object (for {@link JavaInfo} and
-     *     {@link HeapLDT}).
+     * @param field    The field term, something like "my.package.Type::$field", of
+     *                 Sort "Field" (of {@link HeapLDT}).
+     * @param services The {@link Services} object (for {@link JavaInfo} and
+     *                 {@link HeapLDT}).
      * @return The canonical program variable representing the field.
      */
-    private static LocationVariable fieldPVFromFieldFunc(Term field,
-            Services services) {
+    private static LocationVariable fieldPVFromFieldFunc(Term field, Services services) {
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
         final JavaInfo javaInfo = services.getJavaInfo();
         assert field.sort() == heapLDT.getFieldSort();
 
         /*
-         * NOTE (DS, 2019-03-12): It sometimes happens that we get passed an
-         * update application here. In this case, the target is the field.
+         * NOTE (DS, 2019-03-12): It sometimes happens that we get passed an update
+         * application here. In this case, the target is the field.
          */
         if (field.op() == UpdateApplication.UPDATE_APPLICATION) {
             field = UpdateApplication.getTarget(field);
@@ -539,44 +526,37 @@ public class AbstractUpdateFactory {
         final String fieldStr = field.toString().substring(sepIdx + sepSize);
 
         final KeYJavaType kjt = javaInfo.getKeYJavaType(typeStr);
-        return (LocationVariable) javaInfo
-                .getCanonicalFieldProgramVariable(fieldStr, kjt);
+        return (LocationVariable) javaInfo.getCanonicalFieldProgramVariable(fieldStr, kjt);
     }
 
     /**
      * Transforms a set of abstract update right-hand sides to a set union term.
      *
-     * @param accessibles
-     *     The accessibles (right-hand sides) to construct the union term of.
+     * @param accessibles The accessibles (right-hand sides) to construct the union
+     *                    term of.
      *
-     * @param services
-     *     The services object.
+     * @param services    The services object.
      *
      * @return A set union term from the given accessibles.
      */
-    public Term accessiblesToSetUnion(Set<AbstrUpdateRHS> accessibles,
-            Services services) {
+    public Term accessiblesToSetUnion(Set<AbstrUpdateRHS> accessibles, Services services) {
         final TermBuilder tb = services.getTermBuilder();
         return tb.setUnion(accessibles.stream().map(loc -> loc.toTerm(services))
                 .map(tb::setSingleton).collect(Collectors.toList()));
     }
 
     /**
-     * Extracts a set of {@link AbstrUpdateUpdatableLoc}s from a set union which
-     * is the right-hand side of an {@link AbstractUpdate} {@link Term}. Returns
-     * null if there is an unexpected operator in the term (might happen for
-     * intermediate stages in heap simplification, etc.).
+     * Extracts a set of {@link AbstrUpdateUpdatableLoc}s from a set union which is
+     * the right-hand side of an {@link AbstractUpdate} {@link Term}. Returns null
+     * if there is an unexpected operator in the term (might happen for intermediate
+     * stages in heap simplification, etc.).
      *
-     * @param t
-     *     The right-hand side to transform.
-     * @param runtimeInstance
-     *     An optional runtime instance {@link LocationVariable} to normalize
-     *     self terms (because otherwise, there might be different such terms
-     *     around).
-     * @param services
-     *     The {@link Services} object.
-     * @return The {@link Set} of {@link AbstrUpdateUpdatableLoc}s represented
-     * by t.
+     * @param t               The right-hand side to transform.
+     * @param runtimeInstance An optional runtime instance {@link LocationVariable}
+     *                        to normalize self terms (because otherwise, there
+     *                        might be different such terms around).
+     * @param services        The {@link Services} object.
+     * @return The {@link Set} of {@link AbstrUpdateUpdatableLoc}s represented by t.
      */
     public static Set<AbstrUpdateUpdatableLoc> getUpdatableRHSsUnsafe(Term t,
             Optional<LocationVariable> runtimeInstance, Services services) {
@@ -592,24 +572,20 @@ public class AbstractUpdateFactory {
     }
 
     /**
-     * Extracts a set of {@link AbstrUpdateUpdatableLoc}s from a set union which
-     * is the right-hand side of an {@link AbstractUpdate} {@link Term}.
+     * Extracts a set of {@link AbstrUpdateUpdatableLoc}s from a set union which is
+     * the right-hand side of an {@link AbstractUpdate} {@link Term}.
      *
-     * @param t
-     *     The right-hand side to transform.
-     * @param runtimeInstance
-     *     An optional runtime instance {@link LocationVariable} to normalize
-     *     self terms (because otherwise, there might be different such terms
-     *     around).
-     * @param services
-     *     The {@link Services} object.
-     * @return The {@link Set} of {@link AbstrUpdateUpdatableLoc}s represented
-     * by t.
+     * @param t               The right-hand side to transform.
+     * @param runtimeInstance An optional runtime instance {@link LocationVariable}
+     *                        to normalize self terms (because otherwise, there
+     *                        might be different such terms around).
+     * @param services        The {@link Services} object.
+     * @return The {@link Set} of {@link AbstrUpdateUpdatableLoc}s represented by t.
      */
     public static Set<AbstrUpdateUpdatableLoc> getUpdatableRHSsSafe(Term t,
             Optional<LocationVariable> runtimeInstance, Services services) {
-        return abstrUpdateLocsFromTermSafe(t, runtimeInstance, services)
-                .stream().filter(AbstrUpdateUpdatableLoc.class::isInstance)
+        return abstrUpdateLocsFromTermSafe(t, runtimeInstance, services).stream()
+                .filter(AbstrUpdateUpdatableLoc.class::isInstance)
                 .map(AbstrUpdateUpdatableLoc.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }

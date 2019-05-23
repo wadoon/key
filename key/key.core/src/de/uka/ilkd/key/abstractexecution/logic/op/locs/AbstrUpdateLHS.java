@@ -23,4 +23,16 @@ public interface AbstrUpdateLHS extends AbstractUpdateLoc {
      *         (RHS). Principle use case is to unwrap hasTo-s.
      */
     AbstrUpdateUpdatableLoc toUpdatableRHS();
+
+    /**
+     * Evaluates whether this {@link AbstrUpdateLHS} may assign otherLoc. This is
+     * the case, for instance, if this {@link AbstrUpdateLHS} is a {@link PVLoc}
+     * assigning the program variable of otherLoc which is also a {@link PVLoc}; but
+     * also, if otherLoc is an {@link ArrayLoc} for array A and this
+     * {@link AbstrUpdateLHS} is an {@link AllFieldsLoc} for A.
+     * 
+     * @param otherLoc The location for which to evaluate whether we can assign it.
+     * @return true if this {@link AbstrUpdateLHS} may assign otherLoc.
+     */
+    boolean mayAssign(AbstractUpdateLoc otherLoc);
 }

@@ -65,6 +65,11 @@ public class SkolemLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
     public AbstrUpdateUpdatableLoc toUpdatableRHS() {
         return this;
     }
+    
+    @Override
+    public boolean mayAssign(AbstractUpdateLoc otherLoc) {
+        return otherLoc instanceof SkolemLoc && otherLoc.equals(this);
+    }
 
     @Override
     public int hashCode() {

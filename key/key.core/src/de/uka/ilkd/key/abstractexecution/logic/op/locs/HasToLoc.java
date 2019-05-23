@@ -59,6 +59,11 @@ public class HasToLoc implements AbstrUpdateLHS {
     public AbstrUpdateUpdatableLoc toUpdatableRHS() {
         return child.toUpdatableRHS();
     }
+    
+    @Override
+    public boolean mayAssign(AbstractUpdateLoc otherLoc) {
+        return child.mayAssign(otherLoc);
+    }
 
     @Override
     public boolean equals(Object obj) {

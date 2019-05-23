@@ -54,6 +54,11 @@ public class EmptyLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
     public String toString() {
         return "empty";
     }
+    
+    @Override
+    public boolean mayAssign(AbstractUpdateLoc otherLoc) {
+        return false;
+    }
 
     @Override
     public AbstrUpdateUpdatableLoc toUpdatableRHS() {

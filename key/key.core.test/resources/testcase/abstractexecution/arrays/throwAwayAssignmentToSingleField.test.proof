@@ -1,0 +1,137 @@
+\profile "Java Profile";
+
+\settings {
+"#Proof-Settings-Config-File
+#Wed May 22 17:56:32 CEST 2019
+[StrategyProperty]QUERYAXIOM_OPTIONS_KEY=QUERYAXIOM_ON
+[SMTSettings]invariantForall=false
+[Strategy]ActiveStrategy=JavaCardDLStrategy
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY1=USER_TACLETS_OFF
+[StrategyProperty]QUANTIFIERS_OPTIONS_KEY=QUANTIFIERS_NON_SPLITTING_WITH_PROGS
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY2=USER_TACLETS_OFF
+[Choice]DefaultChoices=assertions-assertions\\:on , intRules-intRules\\:arithmeticSemanticsIgnoringOF , initialisation-initialisation\\:disableStaticInitialisation , programRules-programRules\\:Java , runtimeExceptions-runtimeExceptions\\:ban , JavaCard-JavaCard\\:off , Strings-Strings\\:on , modelFields-modelFields\\:treatAsAxiom , bigint-bigint\\:on , sequences-sequences\\:on , reach-reach\\:on , integerSimplificationRules-integerSimplificationRules\\:full , wdOperator-wdOperator\\:L , wdChecks-wdChecks\\:off , permissions-permissions\\:off , moreSeqRules-moreSeqRules\\:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal\\:off , javaLoopTreatment-javaLoopTreatment\\:efficient
+[StrategyProperty]LOOP_OPTIONS_KEY=LOOP_SCOPE_INV_TACLET
+[StrategyProperty]INF_FLOW_CHECK_PROPERTY=INF_FLOW_CHECK_FALSE
+[SMTSettings]UseBuiltUniqueness=false
+[SMTSettings]explicitTypeHierarchy=false
+[SMTSettings]instantiateHierarchyAssumptions=true
+[StrategyProperty]NON_LIN_ARITH_OPTIONS_KEY=NON_LIN_ARITH_DEF_OPS
+[SMTSettings]SelectedTaclets=
+[StrategyProperty]DEP_OPTIONS_KEY=DEP_ON
+[StrategyProperty]AUTO_INDUCTION_OPTIONS_KEY=AUTO_INDUCTION_OFF
+[Strategy]MaximumNumberOfAutomaticApplications=50000
+[StrategyProperty]STOPMODE_OPTIONS_KEY=STOPMODE_DEFAULT
+[StrategyProperty]CLASS_AXIOM_OPTIONS_KEY=CLASS_AXIOM_FREE
+[SMTSettings]useConstantsForBigOrSmallIntegers=true
+[StrategyProperty]MPS_OPTIONS_KEY=MPS_MERGE
+[StrategyProperty]SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OPTIONS_KEY=SYMBOLIC_EXECUTION_NON_EXECUTION_BRANCH_HIDING_OFF
+[Strategy]Timeout=-1
+[StrategyProperty]SYMBOLIC_EXECUTION_ALIAS_CHECK_OPTIONS_KEY=SYMBOLIC_EXECUTION_ALIAS_CHECK_NEVER
+[StrategyProperty]QUERY_NEW_OPTIONS_KEY=QUERY_OFF
+[SMTSettings]useUninterpretedMultiplication=true
+[StrategyProperty]BLOCK_OPTIONS_KEY=BLOCK_CONTRACT_INTERNAL
+[StrategyProperty]METHOD_OPTIONS_KEY=METHOD_CONTRACT
+[StrategyProperty]USER_TACLETS_OPTIONS_KEY3=USER_TACLETS_OFF
+[SMTSettings]maxGenericSorts=2
+[StrategyProperty]OSS_OPTIONS_KEY=OSS_OFF
+[StrategyProperty]SPLITTING_OPTIONS_KEY=SPLITTING_DELAYED
+[SMTSettings]integersMinimum=-2147483645
+[StrategyProperty]VBT_PHASE=VBT_SYM_EX
+[SMTSettings]integersMaximum=2147483645
+"
+}
+
+\javaSource ".";
+
+\functions {
+   Object _result;
+   int[] _A;
+   LocSet localsP0;
+}
+
+\predicates {
+   Post(Object);
+}
+
+\programVariables {
+   Object result;
+   int x;
+   int[] A;
+   BasicArrayTests objUnderTest;
+}
+
+\problem {
+\forall int _x1;
+  \forall int _x2;
+    (    {result:=_result || A:=_A || x:=_x1}
+           \<{ try {
+                 result=objUnderTest.throwAwayAssignmentToSingleField(A,x)@BasicArrayTests;
+               }   catch (Throwable t) {
+                 result=t;
+               }
+             }\> Post(result)
+     <-> {result:=_result || A:=_A || x:=_x2}
+           \<{ try {
+                  result=objUnderTest.throwAwayAssignmentToSingleField(A,x)@BasicArrayTests;
+               }   catch (Throwable t) {
+                 result=t;
+               }
+             }\> Post(result))
+
+}
+
+\proof {
+(keyLog "0" (keyUser "dscheurer" ) (keyVersion "e9b73208cb39bcd1f117e342317538c3bc976fd5"))
+
+(autoModeTime "31732")
+
+(branch "dummy ID"
+(rule "allRight" (formula "1") (newnames "heap_Before_BLOCK,savedHeap_Before_BLOCK,heap_Before_METHOD,savedHeap_Before_METHOD,heap_Before_BLOCK,savedHeap_Before_BLOCK,heap_Before_METHOD,savedHeap_Before_METHOD,heap_Before_BLOCK,savedHeap_Before_BLOCK,heap_Before_METHOD,savedHeap_Before_METHOD,heap_Before_BLOCK,savedHeap_Before_BLOCK,heap_Before_METHOD,savedHeap_Before_METHOD,heap_Before_BLOCK,savedHeap_Before_BLOCK,heap_Before_METHOD,savedHeap_Before_METHOD,heap_Before_BLOCK,savedHeap_Before_BLOCK,heap_Before_METHOD,savedHeap_Before_METHOD,heap_Before_BLOCK,savedHeap_Before_BLOCK,heap_Before_METHOD,savedHeap_Before_METHOD") (inst "sk=_x1_0"))
+(rule "allRight" (formula "1") (inst "sk=_x2_0"))
+(rule "equiv_right" (formula "1"))
+(branch "Case '->'"
+    (opengoal "\\forall int _x1;   \\forall int _x2;     (    {result:=_result || A:=_A || x:=_x1}            \\<{ try {                  result=objUnderTest.throwAwayAssignmentToSingleField(A,x)@BasicArrayTests;                }   catch (Throwable t) {                  result=t;                }              }\\> Post(result)      <-> {result:=_result || A:=_A || x:=_x2}            \\<{ try {                   result=objUnderTest.throwAwayAssignmentToSingleField(A,x)@BasicArrayTests;                }   catch (Throwable t) {                  result=t;                }              }\\> Post(result)) ")
+)
+(branch "Case '<-'"
+   (rule "diamondToBox" (formula "1") (term "1"))
+   (rule "notLeft" (formula "1"))
+   (rule "methodBodyExpand" (formula "2") (term "1") (newnames "heapBefore_throwAwayAssignmentToSingleField,savedHeapBefore_throwAwayAssignmentToSingleField"))
+   (rule "sequentialToParallel2" (formula "2"))
+   (rule "simplifyUpdate3" (formula "2") (term "1,0"))
+   (rule "assignment_to_primitive_array_component" (formula "2") (newnames "normal,exc,returns,result_0"))
+   (branch "Normal Execution (A != null)"
+      (rule "abstractExecutionNonVoid" (formula "2") (term "1,1") (inst "#label=_label1") (inst "#v1=v1") (inst "result=result_P_0") (inst "returns=returns_P_0") (inst "exc=exc_P_0") (inst "normal=normal_P_0") (userinteraction))
+      (rule "concrete_and_3" (formula "2") (term "0,0,1,1,0,1,1"))
+      (rule "dropEffectlessAbstractUpdate2" (formula "2") (term "0,1,1"))
+      (rule "simplifyUpdate2" (formula "2"))
+      (rule "applySkip2" (formula "2") (term "0,1,1"))
+      (rule "simplifyUpdate2" (formula "2") (term "0,1,1"))
+      (rule "simplifyUpdate2" (formula "2") (term "1,1,1,1"))
+      (rule "sequentialToParallel2" (formula "2"))
+      (rule "simplifyUpdate2" (formula "2"))
+      (rule "simplifyUpdate3" (formula "2") (term "1,0"))
+      (rule "impRight" (formula "2"))
+      (rule "simplifyUpdate2" (formula "1"))
+      (rule "applyOnElementary" (formula "3") (term "1,0") (userinteraction))
+      (rule "applyOnRigidTerm" (formula "3") (term "0,1,0") (userinteraction))
+      (rule "simplifyUpdate3" (formula "1") (term "0"))
+      (rule "applySkip2" (formula "1"))
+      (rule "simplifyUpdate1" (formula "3") (term "3,0,1,0"))
+      (rule "simplifyUpdate1" (formula "3") (term "2,0,1,0"))
+      (rule "simplifyUpdate1" (formula "3") (term "1,0,1,0"))
+      (rule "simplifyUpdate1" (formula "3") (term "0,0,1,0"))
+      (rule "applyOnPV" (formula "3") (term "3,0,1,0"))
+      (rule "applyOnPV" (formula "3") (term "1,0,1,0"))
+      (rule "andLeft" (formula "1"))
+      (rule "applyConcrOnAbstrUpd" (formula "4") (userinteraction))
+       (opengoal "\\forall int _x1;   \\forall int _x2;     (    {result:=_result || A:=_A || x:=_x1}            \\<{ try {                  result=objUnderTest.throwAwayAssignmentToSingleField(A,x)@BasicArrayTests;                }   catch (Throwable t) {                  result=t;                }              }\\> Post(result)      <-> {result:=_result || A:=_A || x:=_x2}            \\<{ try {                   result=objUnderTest.throwAwayAssignmentToSingleField(A,x)@BasicArrayTests;                }   catch (Throwable t) {                  result=t;                }              }\\> Post(result)) ")
+   )
+   (branch "Null Reference (A = null)"
+       (opengoal "\\forall int _x1;   \\forall int _x2;     (    {result:=_result || A:=_A || x:=_x1}            \\<{ try {                  result=objUnderTest.throwAwayAssignmentToSingleField(A,x)@BasicArrayTests;                }   catch (Throwable t) {                  result=t;                }              }\\> Post(result)      <-> {result:=_result || A:=_A || x:=_x2}            \\<{ try {                   result=objUnderTest.throwAwayAssignmentToSingleField(A,x)@BasicArrayTests;                }   catch (Throwable t) {                  result=t;                }              }\\> Post(result)) ")
+   )
+   (branch "Index Out of Bounds (A != null, but 14 Out of Bounds!)"
+       (opengoal "\\forall int _x1;   \\forall int _x2;     (    {result:=_result || A:=_A || x:=_x1}            \\<{ try {                  result=objUnderTest.throwAwayAssignmentToSingleField(A,x)@BasicArrayTests;                }   catch (Throwable t) {                  result=t;                }              }\\> Post(result)      <-> {result:=_result || A:=_A || x:=_x2}            \\<{ try {                   result=objUnderTest.throwAwayAssignmentToSingleField(A,x)@BasicArrayTests;                }   catch (Throwable t) {                  result=t;                }              }\\> Post(result)) ")
+   )
+)
+)
+}

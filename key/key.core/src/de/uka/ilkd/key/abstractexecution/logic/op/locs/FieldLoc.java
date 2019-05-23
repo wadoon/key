@@ -33,7 +33,7 @@ import de.uka.ilkd.key.proof.ProgVarReplacer;
  *
  * @author Dominic Steinhoefel
  */
-public class FieldLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
+public class FieldLoc implements HeapLoc {
     private final Sort sort;
     private final Optional<Term> heapTerm;
     private final Term objTerm;
@@ -91,6 +91,11 @@ public class FieldLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
     @Override
     public AbstrUpdateUpdatableLoc toUpdatableRHS() {
         return this;
+    }
+    
+    @Override
+    public boolean mayAssign(AbstractUpdateLoc otherLoc) {
+        return otherLoc instanceof FieldLoc && otherLoc.equals(this);
     }
 
     @Override

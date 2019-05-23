@@ -15,8 +15,8 @@ package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 import java.util.Map;
 import java.util.Set;
 
-import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -24,17 +24,15 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
- * An array location for use in an {@link AbstractUpdate} left-hand side.
+ * An "all fields" array location ("myArray[*]").
  *
  * @author Dominic Steinhoefel
  */
-public class ArrayLoc implements HeapLoc {
+public class AllFieldsLoc implements HeapLoc {
     private final Term array;
-    private final Term index;
 
-    public ArrayLoc(Term array, Term index) {
+    public AllFieldsLoc(Term array) {
         this.array = array;
-        this.index = index;
     }
 
     /**
@@ -44,30 +42,25 @@ public class ArrayLoc implements HeapLoc {
         return array;
     }
 
-    /**
-     * @return the index
-     */
-    public Term getIndex() {
-        return index;
-    }
-
     @Override
     public Term toTerm(Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        return tb.dotArr(array, index);
+        return tb.allFields(array);
     }
 
     @Override
     public AbstractUpdateLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
             Services services) {
-        return this; // TODO?
+        return new AllFieldsLoc(GenericTermReplacer.replace(array,
+                t -> t.op() instanceof ProgramVariable && replMap.containsKey(t.op()),
+                t -> services.getTermBuilder().var(replMap.get((ProgramVariable) t.op())),
+                services));
     }
 
     @Override
     public Set<Operator> childOps() {
         final OpCollector opColl = new OpCollector();
         array.execPostOrder(opColl);
-        index.execPostOrder(opColl);
         return opColl.ops();
     }
 
@@ -75,32 +68,28 @@ public class ArrayLoc implements HeapLoc {
     public AbstrUpdateUpdatableLoc toUpdatableRHS() {
         return this;
     }
-
+    
     @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc) {
-        if (otherLoc instanceof AllFieldsLoc) {
-            /*
-             * TODO (DS, 2019-05-22): Check whether that's the intended semantics, since
-             * actually, an a[5] cannot really assign a[*], at least not all positions...
-             */
-            return ((AllFieldsLoc) otherLoc).getArray().equals(this.array);
+        if (otherLoc instanceof ArrayLoc) {
+            return ((ArrayLoc) otherLoc).getArray().equals(this.array);
         } else {
-            return otherLoc instanceof ArrayLoc && otherLoc.equals(this);
+            return otherLoc instanceof AllFieldsLoc && otherLoc.equals(this);
         }
     }
 
     @Override
     public String toString() {
-        return String.format("%s[%s])", array, index);
+        return String.format("%s.*", array);
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof ArrayLoc && obj.hashCode() == hashCode();
+        return obj instanceof AllFieldsLoc && obj.hashCode() == hashCode();
     }
 
     @Override
     public int hashCode() {
-        return 5 + 7 * array.hashCode() + 11 * index.hashCode();
+        return 31 + 7 * array.hashCode();
     }
 }

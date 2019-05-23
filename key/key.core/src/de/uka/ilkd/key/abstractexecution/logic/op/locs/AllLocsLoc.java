@@ -59,6 +59,12 @@ public class AllLocsLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
     public AbstrUpdateUpdatableLoc toUpdatableRHS() {
         return this;
     }
+    
+    @Override
+    public boolean mayAssign(AbstractUpdateLoc otherLoc) {
+        // allLocs can assign everything.
+        return true;
+    }
 
     @Override
     public boolean equals(Object obj) {

@@ -349,6 +349,8 @@ public class AbstractPlaceholderSpecsTypeChecker {
         final Operator op = elemTerm.op();
         if (op instanceof ProgramVariable) {
             return op;
+        } else if (op == locSetLDT.getAllFields()) {
+            return elemTerm.sub(0).op();
         } else if (op instanceof Function && op.arity() == 0) {
             return elemTerm.op();
         } else if (op == locSetLDT.getSingletonPV()) {
