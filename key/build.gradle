@@ -10,6 +10,8 @@ plugins {
     id 'com.github.johnrengelman.shadow' version "5.0.0" apply false
 }
 
+apply plugin: org.example.greeting.GreetingPlugin
+
 idea {
     module {
         downloadJavadoc = false
@@ -61,6 +63,8 @@ subprojects {
     apply plugin: "idea"
     apply plugin: "eclipse"
     apply plugin: "com.jfrog.bintray"
+    apply plugin: org.example.greeting.GreetingPlugin
+    apply plugin: org.key_project.tools.DiffcheckPlugin
 
     /*
     apply plugin: 'checkstyle'
