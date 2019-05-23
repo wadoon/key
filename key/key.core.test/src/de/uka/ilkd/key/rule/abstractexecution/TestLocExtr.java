@@ -20,7 +20,7 @@ import org.junit.Test;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.FieldLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.FieldLocRHS;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.parser.AbstractTestTermParser;
@@ -78,18 +78,18 @@ public class TestLocExtr extends AbstractTestTermParser {
                         .toArray(new AbstractUpdateLoc[0]);
 
         assertEquals(2, storeTermLocs.length);
-        assertEquals(FieldLoc.class, storeTermLocs[0].getClass());
+        assertEquals(FieldLocRHS.class, storeTermLocs[0].getClass());
         assertEquals("self.f1", storeTermLocs[0].toString());
-        assertEquals(FieldLoc.class, storeTermLocs[1].getClass());
+        assertEquals(FieldLocRHS.class, storeTermLocs[1].getClass());
         assertEquals("self.f", storeTermLocs[1].toString());
 
         assertEquals(1, selectTermLocs.length);
-        assertEquals(FieldLoc.class, selectTermLocs[0].getClass());
+        assertEquals(FieldLocRHS.class, selectTermLocs[0].getClass());
         assertEquals("self.f", selectTermLocs[0].toString());
         assertEquals(selectTermLocs[0], storeTermLocs[1]);
 
         assertEquals(1, locSetTermLocs.length);
-        assertEquals(FieldLoc.class, locSetTermLocs[0].getClass());
+        assertEquals(FieldLocRHS.class, locSetTermLocs[0].getClass());
         assertEquals("self.f", locSetTermLocs[0].toString());
         assertEquals(selectTermLocs[0], locSetTermLocs[0]);
     }

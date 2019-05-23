@@ -27,7 +27,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  *
  * @author Dominic Steinhoefel
  */
-public class AllLocsLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
+public class AllLocsLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
     private final Function allLocs;
 
     public AllLocsLoc(Function allLocs) {
@@ -40,7 +40,7 @@ public class AllLocsLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
     }
 
     @Override
-    public AbstractUpdateLoc replaceVariables(
+    public AbstractUpdateAssgnLoc replaceVariables(
             Map<ProgramVariable, ProgramVariable> replMap, Services services) {
         return this;
     }
@@ -53,11 +53,6 @@ public class AllLocsLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
     @Override
     public String toString() {
         return "allLocs";
-    }
-
-    @Override
-    public AbstrUpdateUpdatableLoc toUpdatableRHS() {
-        return this;
     }
     
     @Override

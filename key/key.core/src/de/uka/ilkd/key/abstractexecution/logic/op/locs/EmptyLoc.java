@@ -27,7 +27,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  *
  * @author Dominic Steinhoefel
  */
-public class EmptyLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
+public class EmptyLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
     private final Function emptyLocSet;
 
     public EmptyLoc(Function empty) {
@@ -40,8 +40,8 @@ public class EmptyLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
     }
 
     @Override
-    public AbstractUpdateLoc replaceVariables(
-            Map<ProgramVariable, ProgramVariable> replMap, Services services) {
+    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
+            Services services) {
         return this;
     }
 
@@ -54,15 +54,10 @@ public class EmptyLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
     public String toString() {
         return "empty";
     }
-    
+
     @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc) {
         return false;
-    }
-
-    @Override
-    public AbstrUpdateUpdatableLoc toUpdatableRHS() {
-        return this;
     }
 
     @Override

@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateUpdatableLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
@@ -46,41 +46,34 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  */
 public class AbstractExecutionUtils {
     /**
-     * Computes the sets of assigned-before-used and used-before-assigned
-     * operators in the target term. In case of a conflict, i.e. in one subterm
-     * an operator is used before assigned and in the other vice versa, used
-     * before assigned always wins. The returned pair consists of the
-     * assigned-before-used set as first and the used-before-assigned set as
-     * second element. The two sets are disjunct.
+     * Computes the sets of assigned-before-used and used-before-assigned operators
+     * in the target term. In case of a conflict, i.e. in one subterm an operator is
+     * used before assigned and in the other vice versa, used before assigned always
+     * wins. The returned pair consists of the assigned-before-used set as first and
+     * the used-before-assigned set as second element. The two sets are disjunct.
      *
-     * @param target
-     *     The term for which to analyze the assigned-before-used relationships.
-     * @param runtimeInstance
-     *     An optional runtime instance {@link LocationVariable} to normalize
-     *     self terms (because otherwise, there might be different such terms
-     *     around).
-     * @param services
-     *     The {@link Services} object.
-     * @return (1) assigned-before-used and (2) used-before-assigned operators.
-     * Sets are ordered. May be an empty optional if there is a construct not
-     * (yet) supported, in this case, the condition should not be applicable.
+     * @param target          The term for which to analyze the assigned-before-used
+     *                        relationships.
+     * @param runtimeInstance An optional runtime instance {@link LocationVariable}
+     *                        to normalize self terms (because otherwise, there
+     *                        might be different such terms around).
+     * @param services        The {@link Services} object.
+     * @return (1) assigned-before-used and (2) used-before-assigned operators. Sets
+     *         are ordered. May be an empty optional if there is a construct not
+     *         (yet) supported, in this case, the condition should not be
+     *         applicable.
      */
-    public static
-            Optional<Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>>>
-            opsAssignedBeforeUsed(Term target,
-                    Optional<LocationVariable> runtimeInstance,
-                    Services services) {
-        final Set<AbstrUpdateUpdatableLoc> assignedBeforeUsed = new LinkedHashSet<>();
-        final Set<AbstrUpdateUpdatableLoc> usedBeforeAssigned = new LinkedHashSet<>();
+    public static Optional<Pair<Set<AbstractUpdateAssgnLoc>, Set<AbstractUpdateLoc>>> opsAssignedBeforeUsed(
+            Term target, Optional<LocationVariable> runtimeInstance, Services services) {
+        final Set<AbstractUpdateAssgnLoc> assignedBeforeUsed = new LinkedHashSet<>();
+        final Set<AbstractUpdateLoc> usedBeforeAssigned = new LinkedHashSet<>();
 
         final Set<AbstractUpdateLoc> locs = AbstractUpdateFactory
-                .abstrUpdateLocsFromTermUnsafe(target, runtimeInstance,
-                        services);
+                .abstrUpdateLocsFromTermUnsafe(target, runtimeInstance, services);
 
         if (locs != null) {
-            locs.stream().filter(AbstrUpdateUpdatableLoc.class::isInstance)
-                    .map(AbstrUpdateUpdatableLoc.class::cast)
-                    .forEach(usedBeforeAssigned::add);
+            locs.stream().filter(AbstractUpdateLoc.class::isInstance)
+                    .map(AbstractUpdateLoc.class::cast).forEach(usedBeforeAssigned::add);
         }
 
         // Update applications -- those are most interesting
@@ -90,30 +83,28 @@ public class AbstractExecutionUtils {
 
             // Update in sequential normal form
             if (MergeRuleUtils.isUpdateNormalForm(update)) {
-                final List<Term> elems = MergeRuleUtils.getElementaryUpdates(
-                        update, services.getTermBuilder());
+                final List<Term> elems = MergeRuleUtils.getElementaryUpdates(update,
+                        services.getTermBuilder());
 
                 for (final Term elem : elems) {
                     assert elem.op() instanceof ElementaryUpdate;
-                    assert ((ElementaryUpdate) elem.op())
-                            .lhs() instanceof LocationVariable;
+                    assert ((ElementaryUpdate) elem.op()).lhs() instanceof LocationVariable;
 
                     final UpdateableOperator lhs = //
                             ((ElementaryUpdate) elem.op()).lhs();
-                    final AbstrUpdateUpdatableLoc lhsLoc = //
+                    final AbstractUpdateAssgnLoc lhsLoc = //
                             new PVLoc((LocationVariable) lhs);
                     final Term rhs = elem.sub(0);
 
                     AbstractUpdateFactory
-                            .extractAbstrUpdateLocsFromTerm(rhs,
-                                    runtimeInstance, services)
-                            .stream()
-                            .filter(AbstrUpdateUpdatableLoc.class::isInstance)
-                            .map(AbstrUpdateUpdatableLoc.class::cast)
-                            .filter(loc -> !assignedBeforeUsed.contains(loc))
+                            .extractAbstrUpdateLocsFromTerm(rhs, runtimeInstance, services).stream()
+                            .filter(AbstractUpdateLoc.class::isInstance)
+                            .map(AbstractUpdateLoc.class::cast)
+                            .filter(loc -> assignedBeforeUsed.stream()
+                                    .noneMatch(assgnLoc -> assgnLoc.mayAssign(loc)))
                             .forEach(usedBeforeAssigned::add);
 
-                    if (!usedBeforeAssigned.contains(lhsLoc)) {
+                    if (!usedBeforeAssigned.stream().anyMatch(loc -> lhsLoc.mayAssign(loc))) {
                         assignedBeforeUsed.add(lhsLoc);
                     }
                 }
@@ -121,8 +112,8 @@ public class AbstractExecutionUtils {
 
             // Abstract Update
             else if (update.op() instanceof AbstractUpdate) {
-                opsHaveToAssignBeforeUsedForAbstrUpd(update, assignedBeforeUsed,
-                        usedBeforeAssigned, runtimeInstance, services);
+                opsHaveToAssignBeforeUsedForAbstrUpd(update, assignedBeforeUsed, usedBeforeAssigned,
+                        runtimeInstance, services);
             }
 
             // Concatenated abstract update
@@ -130,9 +121,8 @@ public class AbstractExecutionUtils {
                 final List<Term> abstractUpdateTerms = //
                         abstractUpdatesFromConcatenation(update);
                 for (Term abstrUpdTerm : abstractUpdateTerms) {
-                    opsHaveToAssignBeforeUsedForAbstrUpd(abstrUpdTerm,
-                            assignedBeforeUsed, usedBeforeAssigned,
-                            runtimeInstance, services);
+                    opsHaveToAssignBeforeUsedForAbstrUpd(abstrUpdTerm, assignedBeforeUsed,
+                            usedBeforeAssigned, runtimeInstance, services);
                 }
             }
 
@@ -142,20 +132,21 @@ public class AbstractExecutionUtils {
                 return Optional.empty();
             }
 
-            final Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>> subResult = //
-                    opsAssignedBeforeUsed(updateTarget, runtimeInstance,
-                            services).orElse(null);
+            final Pair<Set<AbstractUpdateAssgnLoc>, Set<AbstractUpdateLoc>> subResult = //
+                    opsAssignedBeforeUsed(updateTarget, runtimeInstance, services).orElse(null);
 
             if (subResult == null) {
                 return Optional.empty();
             }
 
             usedBeforeAssigned.addAll(subResult.second.stream()
-                    .filter(op -> !assignedBeforeUsed.contains(op))
+                    .filter(rhsLoc -> !assignedBeforeUsed.stream()
+                            .anyMatch(lhsLoc -> lhsLoc.mayAssign(rhsLoc)))
                     .collect(Collectors.toSet()));
 
             assignedBeforeUsed.addAll(subResult.first.stream()
-                    .filter(op -> !usedBeforeAssigned.contains(op))
+                    .filter(lhsLoc -> !usedBeforeAssigned.stream()
+                            .anyMatch(rhsLoc -> lhsLoc.mayAssign(rhsLoc)))
                     .collect(Collectors.toSet()));
         }
 
@@ -169,9 +160,8 @@ public class AbstractExecutionUtils {
         // Any other term
         else {
             for (final Term sub : target.subs()) {
-                final Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>> subResult = //
-                        opsAssignedBeforeUsed(sub, runtimeInstance, services)
-                                .orElse(null);
+                final Pair<Set<AbstractUpdateAssgnLoc>, Set<AbstractUpdateLoc>> subResult = //
+                        opsAssignedBeforeUsed(sub, runtimeInstance, services).orElse(null);
 
                 if (subResult == null) {
                     return Optional.empty();
@@ -184,97 +174,88 @@ public class AbstractExecutionUtils {
                 assignedBeforeUsed.addAll(subResult.first);
 
                 /*
-                 * Now, remove those from "assigned before used" that are used
-                 * before assigned. Take that term as example:
+                 * Now, remove those from "assigned before used" that are used before assigned.
+                 * Take that term as example:
                  *
                  * {U}({x:=y}phi & (psi(x)))
                  *
-                 * Here, x should be used before assigned and not assigned
-                 * before used. Therefore the removal.
+                 * Here, x should be used before assigned and not assigned before used.
+                 * Therefore the removal.
                  */
-                assignedBeforeUsed.removeAll(usedBeforeAssigned);
+                assignedBeforeUsed.removeIf(
+                        abu -> usedBeforeAssigned.stream().anyMatch(uba -> abu.mayAssign(uba)));
             }
         }
 
         /*
-         * At the end, all operators that are assigned before used should not be
-         * in the used before assigned set.
+         * At the end, all operators that are assigned before used should not be in the
+         * used before assigned set.
          */
         assert assignedBeforeUsed.stream()
-                .noneMatch(usedBeforeAssigned::contains);
+                .noneMatch(abu -> usedBeforeAssigned.stream().anyMatch(uba -> abu.mayAssign(uba)));
 
         /* Also vice versa */
         assert usedBeforeAssigned.isEmpty() || usedBeforeAssigned.stream()
-                .noneMatch(assignedBeforeUsed::contains);
+                .noneMatch(uba -> assignedBeforeUsed.stream().anyMatch(abu -> abu.mayAssign(uba)));
 
         return Optional.of(new Pair<>(assignedBeforeUsed, usedBeforeAssigned));
     }
 
     /**
      * Calculates for an abstract update which operators in it are "have-to"
-     * assigned before used. The "maybe" assignables are ignored! The current
-     * use case is to drop assignables in prior abstract updates that are
-     * overwritten, which does not have to be the case for "maybes".
+     * assigned before used. The "maybe" assignables are ignored! The current use
+     * case is to drop assignables in prior abstract updates that are overwritten,
+     * which does not have to be the case for "maybes".
      *
-     * @param update
-     *     The abstract update to check.
-     * @param assignedBeforeUsed
-     *     A set of assigned-before-used operators. Results are added to the
-     *     passed set.
-     * @param usedBeforeAssigned
-     *     A set of used-before-assigned operators. Results are added to the
-     *     passed set.
-     * @param runtimeInstance
-     *     An optional runtime instance {@link LocationVariable} to normalize
-     *     self terms (because otherwise, there might be different such terms
-     *     around).
-     * @param services
-     *     The {@link Services} object.
+     * @param update             The abstract update to check.
+     * @param assignedBeforeUsed A set of assigned-before-used operators. Results
+     *                           are added to the passed set.
+     * @param usedBeforeAssigned A set of used-before-assigned operators. Results
+     *                           are added to the passed set.
+     * @param runtimeInstance    An optional runtime instance
+     *                           {@link LocationVariable} to normalize self terms
+     *                           (because otherwise, there might be different such
+     *                           terms around).
+     * @param services           The {@link Services} object.
      */
     private static void opsHaveToAssignBeforeUsedForAbstrUpd(final Term update,
-            final Set<AbstrUpdateUpdatableLoc> assignedBeforeUsed,
-            final Set<AbstrUpdateUpdatableLoc> usedBeforeAssigned,
+            final Set<AbstractUpdateAssgnLoc> assignedBeforeUsed,
+            final Set<AbstractUpdateLoc> usedBeforeAssigned,
             Optional<LocationVariable> runtimeInstance, Services services) {
         assert update.op() instanceof AbstractUpdate;
 
         usedBeforeAssigned.addAll(AbstractUpdateFactory
-                .extractAbstrUpdateLocsFromTerm(update.sub(0), runtimeInstance,
-                        services)
-                .stream().filter(AbstrUpdateUpdatableLoc.class::isInstance)
-                .filter(op -> !assignedBeforeUsed.contains(op))
-                .map(AbstrUpdateUpdatableLoc.class::cast)
+                .extractAbstrUpdateLocsFromTerm(update.sub(0), runtimeInstance, services).stream()
+                .filter(AbstractUpdateLoc.class::isInstance)
+                .filter(op -> assignedBeforeUsed.stream().noneMatch(assgn -> assgn.mayAssign(op)))
+                .map(AbstractUpdateLoc.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>())));
 
         final AbstractUpdate abstrUpdate = (AbstractUpdate) update.op();
         assignedBeforeUsed.addAll(abstrUpdate.getHasToAssignables().stream()
-                .filter(op -> !usedBeforeAssigned.contains(op))
+                .filter(hasToAssgn -> usedBeforeAssigned.stream()
+                        .noneMatch(used -> hasToAssgn.mayAssign(used)))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>())));
     }
 
     /**
      * Extracts the list of abstract updates from a concatenation of such.
      *
-     * @param concatenation
-     *     A concatenation of abstract updates
-     *     <code>U1 ++ U2 ++ ... ++ Un</code>.
-     * @return The contained abstract updates of the concatenation in the
-     * original order.
+     * @param concatenation A concatenation of abstract updates
+     *                      <code>U1 ++ U2 ++ ... ++ Un</code>.
+     * @return The contained abstract updates of the concatenation in the original
+     *         order.
      */
-    public static List<Term>
-            abstractUpdatesFromConcatenation(Term concatenation) {
+    public static List<Term> abstractUpdatesFromConcatenation(Term concatenation) {
         final List<Term> result = new ArrayList<>();
 
         if (concatenation.op() instanceof AbstractUpdate) {
             result.add(concatenation);
         } else if (concatenation.op() == UpdateJunctor.CONCATENATED_UPDATE) {
-            result.addAll(
-                    abstractUpdatesFromConcatenation(concatenation.sub(0)));
-            result.addAll(
-                    abstractUpdatesFromConcatenation(concatenation.sub(1)));
+            result.addAll(abstractUpdatesFromConcatenation(concatenation.sub(0)));
+            result.addAll(abstractUpdatesFromConcatenation(concatenation.sub(1)));
         } else {
-            throw new RuntimeException(
-                    "Not an abstract update or concatenation: "
-                            + concatenation);
+            throw new RuntimeException("Not an abstract update or concatenation: " + concatenation);
         }
 
         return result;
@@ -283,16 +264,13 @@ public class AbstractExecutionUtils {
     /**
      * Returns {@link Term}s of the RHS of an {@link AbstractUpdate} term.
      *
-     * @param update
-     *     The {@link AbstractUpdate} {@link Term} for which to return the
-     *     accessibles.
-     * @param tb
-     *     The {@link TermBuilder}, needed for disassembling the update
-     *     {@link Term}.
+     * @param update The {@link AbstractUpdate} {@link Term} for which to return the
+     *               accessibles.
+     * @param tb     The {@link TermBuilder}, needed for disassembling the update
+     *               {@link Term}.
      * @return All {@link Term}s in the RHS of an {@link AbstractUpdate} term.
      */
-    public static Set<Term> getAccessiblesForAbstractUpdate(Term update,
-            TermBuilder tb) {
+    public static Set<Term> getAccessiblesForAbstractUpdate(Term update, TermBuilder tb) {
         assert update.op() instanceof AbstractUpdate;
         assert update.arity() == 1;
 
@@ -300,27 +278,21 @@ public class AbstractExecutionUtils {
     }
 
     /**
-     * Checks whether an {@link AbstractUpdate} accesses the allLocs location
-     * set.
+     * Checks whether an {@link AbstractUpdate} accesses the allLocs location set.
      *
-     * @param update
-     *     The {@link AbstractUpdate} to check.
-     * @param services
-     *     The {@link Services} object (for the {@link LocSetLDT}).
-     * @return true iff the {@link AbstractUpdate} accesseaccesses allLocs
-     * location set.
+     * @param update   The {@link AbstractUpdate} to check.
+     * @param services The {@link Services} object (for the {@link LocSetLDT}).
+     * @return true iff the {@link AbstractUpdate} accesseaccesses allLocs location
+     *         set.
      */
     public static boolean accessesAllLocs(Term update, Services services) {
-        final Operator allLocs = services.getTypeConverter().getLocSetLDT()
-                .getAllLocs();
-        return getAccessiblesForAbstractUpdate(update,
-                services.getTermBuilder()).stream()
-                        .anyMatch(t -> t.op() == allLocs);
+        final Operator allLocs = services.getTypeConverter().getLocSetLDT().getAllLocs();
+        return getAccessiblesForAbstractUpdate(update, services.getTermBuilder()).stream()
+                .anyMatch(t -> t.op() == allLocs);
     }
 
     /**
-     * @param updateTerm
-     *     The term to check.
+     * @param updateTerm The term to check.
      * @return true iff the given {@link Term} contains an abstract update.
      */
     public static boolean containsAbstractUpdate(Term updateTerm) {

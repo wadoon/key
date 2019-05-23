@@ -19,6 +19,7 @@ import org.key_project.util.collection.ImmutableSLList;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.SequentFormula;
+import recoder.util.Debug;
 
 /**
  * A PositionTable describes the start and end positions of substrings of a
@@ -178,6 +179,24 @@ public class PositionTable {
             return new Range(0, length);
         } else {
             int sub = path.head().intValue();
+            
+            /*
+             * NOTE (DS, 2019-05-23): Sorry, the condition below is a super-ugly hack. What
+             * happened is that for my Abstract Execution implementation, the highlighting of
+             * Abstract Path Conditions C_P(...) caused trouble, since sub was greater than
+             * the children array length. I could have tried to find the source of the problem,
+             * but did not have the time...
+             */
+            if (children.length <= sub) {
+                if (children.length == 0) {
+                    return new Range(0, length);
+                } else {
+                    sub = children.length - 1;
+                }
+                Debug.error("Problem in position table (method rangeForPath), "
+                        + "highlighting will probably be broken.");
+            }
+            
             Range r = children[sub].rangeForPath(path.tail(), endPos[sub] - startPos[sub]);
             r.start += startPos[sub];
             r.end += startPos[sub];

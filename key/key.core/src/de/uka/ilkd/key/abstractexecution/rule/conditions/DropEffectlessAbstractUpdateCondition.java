@@ -25,7 +25,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateUpdatableLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
@@ -150,7 +150,7 @@ public final class DropEffectlessAbstractUpdateCondition implements VariableCond
             Optional<LocationVariable> runtimeInstance, Services services) {
         final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
 
-        final Set<AbstrUpdateUpdatableLoc> assignables = new LinkedHashSet<>();
+        final Set<AbstractUpdateAssgnLoc> assignables = new LinkedHashSet<>();
         assignables.addAll(abstrUpd.getHasToAssignables());
         assignables.addAll(abstrUpd.getMaybeAssignables());
 
@@ -161,7 +161,7 @@ public final class DropEffectlessAbstractUpdateCondition implements VariableCond
             return false;
         }
 
-        final Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>> opsAnalysisResult = //
+        final Pair<Set<AbstractUpdateAssgnLoc>, Set<AbstractUpdateLoc>> opsAnalysisResult = //
                 AbstractExecutionUtils.opsAssignedBeforeUsed(target, runtimeInstance, services)
                         .orElse(null);
 
@@ -169,7 +169,7 @@ public final class DropEffectlessAbstractUpdateCondition implements VariableCond
             return false;
         }
 
-        final Set<AbstrUpdateUpdatableLoc> opsHaveToAssignBeforeUsed = opsAnalysisResult.first;
+        final Set<AbstractUpdateAssgnLoc> opsHaveToAssignBeforeUsed = opsAnalysisResult.first;
 
         /*
          * We can also remove all assignables that are not occurring at all in the
@@ -181,8 +181,10 @@ public final class DropEffectlessAbstractUpdateCondition implements VariableCond
                 .extractAbstrUpdateLocsFromTerm(target, runtimeInstance, services);
 
         final long effectiveAssignables = assignables.stream()
-                .filter(op -> !opsHaveToAssignBeforeUsed.contains(op))
-                .filter(loc -> locsInTarget.contains(loc)).count();
+                .filter(assignable -> !opsHaveToAssignBeforeUsed.contains(assignable))
+                .filter(assignable -> locsInTarget.stream()
+                        .anyMatch(targetLoc -> assignable.mayAssign(targetLoc)))
+                .count();
 
         return effectiveAssignables == 0;
     }

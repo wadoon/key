@@ -10,11 +10,13 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.logic.op.locs;
+package de.uka.ilkd.key.abstractexecution.logic.op.locs.heap;
 
 import java.util.Map;
 import java.util.Set;
 
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.OpCollector;
@@ -28,10 +30,10 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  *
  * @author Dominic Steinhoefel
  */
-public class AllFieldsLoc implements HeapLoc {
+public class AllFieldsLocLHS extends HeapLocLHS {
     private final Term array;
 
-    public AllFieldsLoc(Term array) {
+    public AllFieldsLocLHS(Term array) {
         this.array = array;
     }
 
@@ -41,17 +43,17 @@ public class AllFieldsLoc implements HeapLoc {
     public Term getArray() {
         return array;
     }
-
+    
     @Override
-    public Term toTerm(Services services) {
+    protected Term toTerm(Services services) {
         final TermBuilder tb = services.getTermBuilder();
         return tb.allFields(array);
     }
 
     @Override
-    public AbstractUpdateLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
+    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
             Services services) {
-        return new AllFieldsLoc(GenericTermReplacer.replace(array,
+        return new AllFieldsLocLHS(GenericTermReplacer.replace(array,
                 t -> t.op() instanceof ProgramVariable && replMap.containsKey(t.op()),
                 t -> services.getTermBuilder().var(replMap.get((ProgramVariable) t.op())),
                 services));
@@ -65,16 +67,12 @@ public class AllFieldsLoc implements HeapLoc {
     }
 
     @Override
-    public AbstrUpdateUpdatableLoc toUpdatableRHS() {
-        return this;
-    }
-    
-    @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc) {
-        if (otherLoc instanceof ArrayLoc) {
-            return ((ArrayLoc) otherLoc).getArray().equals(this.array);
+        if (otherLoc instanceof ArrayLocRHS) {
+            return ((ArrayLocRHS) otherLoc).getArray().equals(this.array);
         } else {
-            return otherLoc instanceof AllFieldsLoc && otherLoc.equals(this);
+            return otherLoc instanceof AllFieldsLocRHS
+                    && ((AllFieldsLocRHS) otherLoc).getArray().equals(this.array);
         }
     }
 
@@ -85,7 +83,7 @@ public class AllFieldsLoc implements HeapLoc {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof AllFieldsLoc && obj.hashCode() == hashCode();
+        return obj instanceof AllFieldsLocLHS && obj.hashCode() == hashCode();
     }
 
     @Override

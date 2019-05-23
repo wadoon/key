@@ -27,10 +27,13 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateUpdatableLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.FieldLoc;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.HeapLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.FieldLocRHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.HeapLocLHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.HeapLocRHS;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.HeapLDT;
@@ -75,15 +78,14 @@ import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
  *
  * @author Dominic Steinhoefel
  */
-public final class ApplyConcrOnAbstrUpdateCondition
-        implements VariableCondition {
+public final class ApplyConcrOnAbstrUpdateCondition implements VariableCondition {
     private final UpdateSV u1SV;
     private final UpdateSV u2SV;
     private final SchemaVariable phiSV;
     private final SchemaVariable resultSV;
 
-    public ApplyConcrOnAbstrUpdateCondition(UpdateSV u1SV, UpdateSV u2SV,
-            SchemaVariable phiSV, SchemaVariable resultSV) {
+    public ApplyConcrOnAbstrUpdateCondition(UpdateSV u1SV, UpdateSV u2SV, SchemaVariable phiSV,
+            SchemaVariable resultSV) {
         this.u1SV = u1SV;
         this.u2SV = u2SV;
         this.phiSV = phiSV;
@@ -91,8 +93,8 @@ public final class ApplyConcrOnAbstrUpdateCondition
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
-            MatchConditions mc, Services services) {
+    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions mc,
+            Services services) {
         SVInstantiations svInst = mc.getInstantiations();
         final Term concrUpdate = (Term) svInst.getInstantiation(u1SV);
         final Term abstrUpdateTerm = (Term) svInst.getInstantiation(u2SV);
@@ -114,37 +116,34 @@ public final class ApplyConcrOnAbstrUpdateCondition
 //        }
 
         /*
-         * The concrete update to apply next to the upcoming abstract one in the
-         * queue.
+         * The concrete update to apply next to the upcoming abstract one in the queue.
          */
         Term currentConcrUpdate = concrUpdate;
         /*
-         * Contains a sequence of concrete and abstract updates. We don't
-         * concatenate the abstract ones afterward, this can be done again by
-         * the concatenation rules.
+         * Contains a sequence of concrete and abstract updates. We don't concatenate
+         * the abstract ones afterward, this can be done again by the concatenation
+         * rules.
          */
         final List<Term> resultingUpdates = new ArrayList<>();
         final Queue<Term> abstrUpdatesToProcess = new LinkedList<>();
 
-        abstrUpdatesToProcess.addAll(AbstractExecutionUtils
-                .abstractUpdatesFromConcatenation(abstrUpdateTerm));
+        abstrUpdatesToProcess
+                .addAll(AbstractExecutionUtils.abstractUpdatesFromConcatenation(abstrUpdateTerm));
 
         boolean success = false;
 
         while (!abstrUpdatesToProcess.isEmpty()) {
             final Term currentAbstractUpdate = abstrUpdatesToProcess.poll();
-            final PushThroughResult pushThroughRes = pushThroughConcrUpdate(
-                    currentConcrUpdate, currentAbstractUpdate, services);
+            final PushThroughResult pushThroughRes = pushThroughConcrUpdate(currentConcrUpdate,
+                    currentAbstractUpdate, services);
 
             if (pushThroughRes == null && !success) {
                 return null;
             }
 
             if (pushThroughRes != null) {
-                pushThroughRes.remainingConcreteUpdate
-                        .ifPresent(resultingUpdates::add);
-                success = success
-                        || !pushThroughRes.remainingConcreteUpdate.isPresent();
+                pushThroughRes.remainingConcreteUpdate.ifPresent(resultingUpdates::add);
+                success = success || !pushThroughRes.remainingConcreteUpdate.isPresent();
                 resultingUpdates.add(pushThroughRes.resultingAbstractUpdate);
             } else {
                 resultingUpdates.add(currentConcrUpdate);
@@ -152,8 +151,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
                 currentConcrUpdate = null;
             }
 
-            if (pushThroughRes != null
-                    && pushThroughRes.pushedThroughConcreteUpdate.isPresent()) {
+            if (pushThroughRes != null && pushThroughRes.pushedThroughConcreteUpdate.isPresent()) {
                 currentConcrUpdate = //
                         pushThroughRes.pushedThroughConcreteUpdate
                                 .orElseThrow(() -> new RuntimeException(
@@ -178,25 +176,42 @@ public final class ApplyConcrOnAbstrUpdateCondition
     }
 
     /**
-     * Performs the actual "push-through" operation for a concrete update in
-     * normal form and a single (i.e., not concatenated) abstract update.
+     * Performs the actual "push-through" operation for a concrete update in normal
+     * form and a single (i.e., not concatenated) abstract update.
      *
-     * @param concrUpdate
-     *     The concrete update to push through.
-     * @param abstrUpdateTerm
-     *     The abstract update on which to apply the concrete one.
+     * @param concrUpdate     The concrete update to push through.
+     * @param abstrUpdateTerm The abstract update on which to apply the concrete
+     *                        one.
      * @param tb
-     * @param services
-     *     The {@link Services} object.
-     * @return The new abstract (first component) and concrete (second
-     * component) update, or null if the operation is not allowed (if allLocs is
-     * in the game...).
+     * @param services        The {@link Services} object.
+     * @return The new abstract (first component) and concrete (second component)
+     *         update, or null if the operation is not allowed (if allLocs is in the
+     *         game...).
      */
     private PushThroughResult pushThroughConcrUpdate(final Term concrUpdate,
             final Term abstrUpdateTerm, final Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        final AbstractUpdate abstrUpd = (AbstractUpdate) abstrUpdateTerm.op();
+        final AbstractUpdate abstrUpdBeforeRepl = (AbstractUpdate) abstrUpdateTerm.op();
+
+        // First, apply concrete update on the heap LHSs of the abstract update
+        final Set<AbstractUpdateAssgnLoc> newAssignables = abstrUpdBeforeRepl.getAllAssignables()
+                .stream()
+                .map(assgn -> assgn instanceof HeapLocLHS
+                        ? ((HeapLocLHS) assgn).applyUpdate(services.getProof(), concrUpdate)
+                                .orElseThrow()
+                        : (assgn instanceof HasToLoc
+                                && (((HasToLoc) assgn).child() instanceof HeapLocLHS)
+                                        ? ((HeapLocLHS) ((HasToLoc) assgn).child())
+                                                .applyUpdate(services.getProof(), concrUpdate)
+                                                .orElseThrow()
+                                        : assgn))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        final AbstractUpdate abstrUpd = //
+                newAssignables.equals(abstrUpdBeforeRepl.getAllAssignables()) //
+                        ? abstrUpdBeforeRepl
+                        : services.abstractUpdateFactory().changeAssignables(abstrUpdBeforeRepl,
+                                newAssignables);
 
         Term currentAccessibles = abstrUpdateTerm.sub(0);
         final List<Term> currentRemainingConcrUpdElems = new ArrayList<>();
@@ -204,109 +219,94 @@ public final class ApplyConcrOnAbstrUpdateCondition
 
         boolean success = false;
 
-        for (LocationVariable lhs : MergeRuleUtils.getUpdateLeftSideLocations(
-                concrUpdate, services.getTermBuilder())) {
+        for (LocationVariable elemUpdateLhs : MergeRuleUtils.getUpdateLeftSideLocations( //
+                concrUpdate, tb)) {
             final Term rhs = //
-                    MergeRuleUtils.getUpdateRightSideFor(concrUpdate, lhs,
+                    MergeRuleUtils.getUpdateRightSideFor(concrUpdate, elemUpdateLhs,
                             services.getTermBuilder());
             final boolean isHeapVar = //
-                    lhs.sort() == heapLDT.targetSort();
+                    elemUpdateLhs.sort() == heapLDT.targetSort();
 
             // First, substitute in the accessibles
             {
                 final Term oldAccessibles = currentAccessibles;
-                currentAccessibles = MiscTools.replaceVarInTerm(lhs, rhs,
+                currentAccessibles = MiscTools.replaceVarInTerm(elemUpdateLhs, rhs,
                         currentAccessibles, services);
                 if (!oldAccessibles.equals(currentAccessibles) && !isHeapVar) {
                     /*
-                     * NOTE (DS, 2019-03-12): For heaps, it is easy to create
-                     * syntactically different, but equivalent terms, which can
-                     * lead to an endless circle of applying this rule and
-                     * simplifying the term back to the original state,
-                     * therefore we don't register it as a success if the
-                     * accessibles changed.
+                     * NOTE (DS, 2019-03-12): For heaps, it is easy to create syntactically
+                     * different, but equivalent terms, which can lead to an endless circle of
+                     * applying this rule and simplifying the term back to the original state,
+                     * therefore we don't register it as a success if the accessibles changed.
                      */
                     success = true;
                 }
             }
 
-            final Set<AbstrUpdateUpdatableLoc> locs = isHeapVar
+            final Set<AbstractUpdateLoc> elemUpdateLhsLocs = isHeapVar
                     ? AbstractUpdateFactory
-                            .abstrUpdateLocsFromTermSafe(rhs, Optional.empty(),
-                                    services)
-                            .stream().filter(HeapLoc.class::isInstance)
-                            .map(HeapLoc.class::cast)
-                            .collect(Collectors
-                                    .toCollection(() -> new LinkedHashSet<>()))
-                    : Collections.singleton(new PVLoc(lhs));
+                            .abstrUpdateLocsFromTermSafe(rhs, Optional.empty(), services).stream()
+                            .filter(HeapLocRHS.class::isInstance).map(HeapLocRHS.class::cast)
+                            .collect(Collectors.toCollection(() -> new LinkedHashSet<>()))
+                    : Collections.singleton(new PVLoc(elemUpdateLhs));
 
-            final Set<HeapLoc> pushThroughFields = new LinkedHashSet<>();
-            final Set<HeapLoc> dropFields = new LinkedHashSet<>();
+            final Set<HeapLocRHS> pushThroughFields = new LinkedHashSet<>();
+            final Set<HeapLocRHS> dropFields = new LinkedHashSet<>();
 
-            for (AbstrUpdateUpdatableLoc lhsLoc : locs) {
+            for (AbstractUpdateLoc elemUpdateLhsLoc : elemUpdateLhsLocs) {
                 /*
-                 * We may push through if (1) lhs is not assigned (neither
-                 * "maybe" nor "has to"), and (2) the abstract update does not
-                 * assign allLocs.
+                 * We may push through if (1) lhs is not assigned (neither "maybe" nor
+                 * "has to"), and (2) the abstract update does not assign allLocs.
                  */
-                final boolean mayPushThrough = !abstrUpd.mayAssign(lhsLoc)
+                final boolean mayPushThrough = !abstrUpd.mayAssign(elemUpdateLhsLoc)
                         && !abstrUpd.assignsAllLocs();
 
                 /*
-                 * We may drop if (1.1) lhs is assigned as "has to" or (1.2) the
-                 * abstract update does not assign that variable at all and also
-                 * not allLocs (because then we push through), and (2) the
-                 * abstract update does not access allLocs.
+                 * We may drop if (1.1) lhs is assigned as "has to" or (1.2) the abstract update
+                 * does not assign that variable at all and also not allLocs (because then we
+                 * push through), and (2) the abstract update does not access allLocs.
                  */
-                final boolean mayDrop = (abstrUpd.hasToAssign(lhsLoc)
-                        || (!abstrUpd.mayAssign(lhsLoc)
-                                && !abstrUpd.assignsAllLocs()))
-                        && !AbstractExecutionUtils
-                                .accessesAllLocs(abstrUpdateTerm, services);
+                final boolean mayDrop = (abstrUpd.hasToAssign(elemUpdateLhsLoc)
+                        || (!abstrUpd.mayAssign(elemUpdateLhsLoc) && !abstrUpd.assignsAllLocs()))
+                        && !AbstractExecutionUtils.accessesAllLocs(abstrUpdateTerm, services);
 
                 /*
-                 * Note that there is a situation where the update may be pushed
-                 * through, but not dropped (that is, it appears twice in the
-                 * result): If the lhs is not assigned, but the update accesses
-                 * allLocs.
+                 * Note that there is a situation where the update may be pushed through, but
+                 * not dropped (that is, it appears twice in the result): If the lhs is not
+                 * assigned, but the update accesses allLocs.
                  */
 
                 if (mayPushThrough) {
                     success = true;
 
                     if (!isHeapVar) {
-                        currentFollowingConcrUpdElems
-                                .add(tb.elementary(lhs, rhs));
+                        currentFollowingConcrUpdElems.add(tb.elementary(elemUpdateLhs, rhs));
                     } else {
-                        pushThroughFields.add((HeapLoc) lhsLoc);
+                        pushThroughFields.add((HeapLocRHS) elemUpdateLhsLoc);
                     }
                 }
 
                 if (!mayDrop) {
                     if (!isHeapVar) {
-                        currentRemainingConcrUpdElems
-                                .add(tb.elementary(lhs, rhs));
+                        currentRemainingConcrUpdElems.add(tb.elementary(elemUpdateLhs, rhs));
                     }
                 } else {
                     success = true;
                     if (isHeapVar) {
-                        dropFields.add((HeapLoc) lhsLoc);
+                        dropFields.add((HeapLocRHS) elemUpdateLhsLoc);
                     }
                 }
             }
 
             if (isHeapVar && success) {
                 /*
-                 * Now create the remaining and pushed through parts of the
-                 * heap.
+                 * Now create the remaining and pushed through parts of the heap.
                  */
-                currentRemainingConcrUpdElems.add(
-                        tb.elementary(lhs, removeFieldLocsFromStoreExpr(rhs,
-                                dropFields, services)));
+                currentRemainingConcrUpdElems.add(tb.elementary(elemUpdateLhs,
+                        removeFieldLocsFromStoreExpr(rhs, dropFields, services)));
 
-                currentFollowingConcrUpdElems.add(
-                        tb.elementary(lhs, filterFieldLocsFromStoreExpr(rhs,
-                                pushThroughFields, services)));
+                currentFollowingConcrUpdElems.add(tb.elementary(elemUpdateLhs,
+                        filterFieldLocsFromStoreExpr(rhs, pushThroughFields, services)));
             }
         }
 
@@ -314,27 +314,23 @@ public final class ApplyConcrOnAbstrUpdateCondition
             return null;
         }
 
-        final Term newAbstrUpdTerm = tb.abstractUpdate(abstrUpd,
-                currentAccessibles);
+        final Term newAbstrUpdTerm = tb.abstractUpdate(abstrUpd, currentAccessibles);
 
         final Optional<Term> remainingConcrUpdate = //
                 currentRemainingConcrUpdElems.isEmpty() ? Optional.empty()
-                        : Optional.of(tb.parallel(
-                                currentRemainingConcrUpdElems.stream().collect(
-                                        ImmutableSLList.toImmutableList())));
+                        : Optional.of(tb.parallel(currentRemainingConcrUpdElems.stream()
+                                .collect(ImmutableSLList.toImmutableList())));
         final Optional<Term> followingConcrUpdate = //
                 currentFollowingConcrUpdElems.isEmpty() ? Optional.empty()
-                        : Optional.of(tb.parallel(
-                                currentFollowingConcrUpdElems.stream().collect(
-                                        ImmutableSLList.toImmutableList())));
+                        : Optional.of(tb.parallel(currentFollowingConcrUpdElems.stream()
+                                .collect(ImmutableSLList.toImmutableList())));
 
-        return new PushThroughResult(remainingConcrUpdate, newAbstrUpdTerm,
-                followingConcrUpdate);
+        return new PushThroughResult(remainingConcrUpdate, newAbstrUpdTerm, followingConcrUpdate);
     }
 
     // TODO Update for ArrayLocs
-    private Term filterFieldLocsFromStoreExpr(Term t,
-            Set<HeapLoc> fieldsToKeep, Services services) {
+    private Term filterFieldLocsFromStoreExpr(Term t, Set<HeapLocRHS> fieldsToKeep,
+            Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
@@ -342,9 +338,8 @@ public final class ApplyConcrOnAbstrUpdateCondition
             return t;
         }
 
-        final HeapLoc reprLoc = (HeapLoc) AbstractUpdateFactory
-                .abstrUpdateLocsFromTermSafe(t, Optional.empty(), services)
-                .iterator().next();
+        final HeapLocRHS reprLoc = (HeapLocRHS) AbstractUpdateFactory
+                .abstrUpdateLocsFromTermSafe(t, Optional.empty(), services).iterator().next();
 
         final Term subResult = //
                 filterFieldLocsFromStoreExpr(t.sub(0), fieldsToKeep, services);
@@ -356,8 +351,8 @@ public final class ApplyConcrOnAbstrUpdateCondition
     }
 
     // TODO Update for ArrayLocs
-    private Term removeFieldLocsFromStoreExpr(Term t,
-            Set<HeapLoc> fieldsToDrop, Services services) {
+    private Term removeFieldLocsFromStoreExpr(Term t, Set<HeapLocRHS> fieldsToDrop,
+            Services services) {
         if (fieldsToDrop.isEmpty()) {
             return t;
         }
@@ -369,9 +364,8 @@ public final class ApplyConcrOnAbstrUpdateCondition
             return t;
         }
 
-        final FieldLoc reprLoc = (FieldLoc) AbstractUpdateFactory
-                .abstrUpdateLocsFromTermSafe(t, Optional.empty(), services)
-                .iterator().next();
+        final FieldLocRHS reprLoc = (FieldLocRHS) AbstractUpdateFactory
+                .abstrUpdateLocsFromTermSafe(t, Optional.empty(), services).iterator().next();
 
         final Term subResult = //
                 removeFieldLocsFromStoreExpr(t.sub(0), fieldsToDrop, services);
@@ -390,8 +384,8 @@ public final class ApplyConcrOnAbstrUpdateCondition
 
     private static class PushThroughResult {
         /**
-         * The part of the concrete update that cannot be pushed through because
-         * of "maybe" assignables in the abstract update.
+         * The part of the concrete update that cannot be pushed through because of
+         * "maybe" assignables in the abstract update.
          */
         public final Optional<Term> remainingConcreteUpdate;
         /**
@@ -404,8 +398,7 @@ public final class ApplyConcrOnAbstrUpdateCondition
         public final Optional<Term> pushedThroughConcreteUpdate;
 
         public PushThroughResult(Optional<Term> remainingConcreteUpdate,
-                Term resultingAbstractUpdate,
-                Optional<Term> pushedThroughConcreteUpdate) {
+                Term resultingAbstractUpdate, Optional<Term> pushedThroughConcreteUpdate) {
             this.remainingConcreteUpdate = remainingConcreteUpdate;
             this.resultingAbstractUpdate = resultingAbstractUpdate;
             this.pushedThroughConcreteUpdate = pushedThroughConcreteUpdate;

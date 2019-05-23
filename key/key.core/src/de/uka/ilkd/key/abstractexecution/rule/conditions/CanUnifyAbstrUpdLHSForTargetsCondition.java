@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
@@ -87,16 +87,16 @@ public final class CanUnifyAbstrUpdLHSForTargetsCondition implements VariableCon
 
         assert abstrUpd1.getAllAssignables().size() == abstrUpd2.getAllAssignables().size();
 
-        final List<AbstrUpdateLHS> upd1assign = new ArrayList<>();
+        final List<AbstractUpdateAssgnLoc> upd1assign = new ArrayList<>();
         upd1assign.addAll(abstrUpd1.getAllAssignables());
-        final List<AbstrUpdateLHS> upd2assign = new ArrayList<>();
+        final List<AbstractUpdateAssgnLoc> upd2assign = new ArrayList<>();
         upd2assign.addAll(abstrUpd2.getAllAssignables());
 
         final Map<ProgramVariable, ProgramVariable> substMap = new LinkedHashMap<>();
 
         for (int i = 0; i < upd1assign.size(); i++) {
-            AbstrUpdateLHS upd1lhs = upd1assign.get(i);
-            AbstrUpdateLHS upd2lhs = upd2assign.get(i);
+            AbstractUpdateAssgnLoc upd1lhs = upd1assign.get(i);
+            AbstractUpdateAssgnLoc upd2lhs = upd2assign.get(i);
 
             if (!upd1lhs.equals(upd2lhs)) {
                 if (upd1lhs instanceof HasToLoc && upd2lhs instanceof HasToLoc) {

@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
@@ -24,25 +25,30 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  *
  * @author Dominic Steinhoefel
  */
-public class HasToLoc implements AbstrUpdateLHS {
-    private final AbstrUpdateLHS child;
+public class HasToLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
+    private final AbstractUpdateAssgnLoc child;
 
-    public HasToLoc(AbstrUpdateLHS child) {
+    public HasToLoc(AbstractUpdateAssgnLoc child) {
         assert !(child instanceof HasToLoc);
         assert !(child instanceof AllLocsLoc);
 
         this.child = child;
     }
 
-    public AbstrUpdateLHS child() {
+    public AbstractUpdateAssgnLoc child() {
         return child;
     }
 
     @Override
-    public AbstractUpdateLoc replaceVariables(
-            Map<ProgramVariable, ProgramVariable> replMap, Services services) {
-        return new HasToLoc(
-                (AbstrUpdateLHS) child.replaceVariables(replMap, services));
+    public Term toTerm(Services services) {
+        // TODO Implement.
+        return null;
+    }
+
+    @Override
+    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
+            Services services) {
+        return new HasToLoc((AbstractUpdateAssgnLoc) child.replaceVariables(replMap, services));
     }
 
     @Override
@@ -55,11 +61,6 @@ public class HasToLoc implements AbstrUpdateLHS {
         return String.format("hasTo(%s)", child.toString());
     }
 
-    @Override
-    public AbstrUpdateUpdatableLoc toUpdatableRHS() {
-        return child.toUpdatableRHS();
-    }
-    
     @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc) {
         return child.mayAssign(otherLoc);

@@ -25,9 +25,7 @@ import org.key_project.util.collection.ImmutableSLList;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateRHS;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateUpdatableLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.HasToLoc;
@@ -54,22 +52,21 @@ import de.uka.ilkd.key.util.Pair;
  *
  * @author Dominic Steinhoefel
  */
-public final class DropEffectlessAbstractUpdateElementariesCondition
-        implements VariableCondition {
+public final class DropEffectlessAbstractUpdateElementariesCondition implements VariableCondition {
     private final UpdateSV uSV;
     private final SchemaVariable targetSV;
     private final SchemaVariable resultSV;
 
-    public DropEffectlessAbstractUpdateElementariesCondition(UpdateSV uSV,
-            SchemaVariable targetSV, SchemaVariable resultSV) {
+    public DropEffectlessAbstractUpdateElementariesCondition(UpdateSV uSV, SchemaVariable targetSV,
+            SchemaVariable resultSV) {
         this.uSV = uSV;
         this.targetSV = targetSV;
         this.resultSV = resultSV;
     }
 
     @Override
-    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate,
-            MatchConditions mc, Services services) {
+    public MatchConditions check(SchemaVariable var, SVSubstitute instCandidate, MatchConditions mc,
+            Services services) {
         final SVInstantiations svInst = mc.getInstantiations();
 
         final Optional<LocationVariable> runtimeInstance = Optional.empty();
@@ -89,12 +86,11 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
 
         if (target.isRigid()) {
             /*
-             * TODO (DS, 2019-01-04): CHECK MATCHING FOR NONRIGID TERMS!
-             * Actually, the taclets using this condition only match on nonrigid
-             * targets. For some reason, however, this matching does not work
-             * (i.e., the taclets are also applied to rigid targets). That
-             * shouldn't do any harm, but we have other taclets for these cases.
-             * We should in any case check why the matching does not work...
+             * TODO (DS, 2019-01-04): CHECK MATCHING FOR NONRIGID TERMS! Actually, the
+             * taclets using this condition only match on nonrigid targets. For some reason,
+             * however, this matching does not work (i.e., the taclets are also applied to
+             * rigid targets). That shouldn't do any harm, but we have other taclets for
+             * these cases. We should in any case check why the matching does not work...
              */
             return null;
         }
@@ -105,8 +101,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
 
         if (u.op() == UpdateJunctor.CONCATENATED_UPDATE) {
             final List<Term> origAbstractUpdates = //
-                    Collections.unmodifiableList(
-                            extractAbstractUpdatesFromConcatenation(u));
+                    Collections.unmodifiableList(extractAbstractUpdatesFromConcatenation(u));
             final List<Term> newElementaryAbstractUpdates = //
                     new ArrayList<>(origAbstractUpdates);
 
@@ -115,17 +110,16 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
                 final Term elementaryAbstrUpd = //
                         origAbstractUpdates.get(i);
                 final Term newUpdate = Optional
-                        .ofNullable(dropEffectlessAbstractUpdateElementaries(
-                                elementaryAbstrUpd, target, runtimeInstance,
-                                services))
+                        .ofNullable(dropEffectlessAbstractUpdateElementaries(elementaryAbstrUpd,
+                                target, runtimeInstance, services))
                         .orElse(elementaryAbstrUpd);
 
                 newElementaryAbstractUpdates.set(i, newUpdate);
                 target = tb.apply(newUpdate, target);
             }
 
-            newResult = tb.concatenated(ImmutableSLList.<Term> nil()
-                    .append(newElementaryAbstractUpdates));
+            newResult = tb
+                    .concatenated(ImmutableSLList.<Term>nil().append(newElementaryAbstractUpdates));
 
             if (newElementaryAbstractUpdates.equals(origAbstractUpdates)) {
                 return null;
@@ -144,8 +138,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
         return mc.setInstantiations(svInst.add(resultSV, newResult, services));
     }
 
-    private static List<Term>
-            extractAbstractUpdatesFromConcatenation(Term concatenation) {
+    private static List<Term> extractAbstractUpdatesFromConcatenation(Term concatenation) {
         final List<Term> result = new ArrayList<>();
 
         if (concatenation.op() instanceof AbstractUpdate) {
@@ -159,12 +152,11 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
         return result;
     }
 
-    private static Term dropEffectlessAbstractUpdateElementaries(Term update,
-            Term target, Optional<LocationVariable> runtimeInstance,
-            Services services) {
+    private static Term dropEffectlessAbstractUpdateElementaries(Term update, Term target,
+            Optional<LocationVariable> runtimeInstance, Services services) {
         final AbstractUpdate abstrUpd = (AbstractUpdate) update.op();
 
-        final Set<AbstrUpdateUpdatableLoc> assignables = new LinkedHashSet<>();
+        final Set<AbstractUpdateAssgnLoc> assignables = new LinkedHashSet<>();
         assignables.addAll(abstrUpd.getHasToAssignables());
         assignables.addAll(abstrUpd.getMaybeAssignables());
 
@@ -176,71 +168,62 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
 
         if (abstrUpd.assignsAllLocs()) {
             /*
-             * If an abstract update may change all locations, then it is never
-             * effectless. However, we can simplify this to allLocs alone if
-             * there are more ops in the assignable (the locset union rules
-             * don't apply here since the lhs is built into the operator
-             * itself).
+             * If an abstract update may change all locations, then it is never effectless.
+             * However, we can simplify this to allLocs alone if there are more ops in the
+             * assignable (the locset union rules don't apply here since the lhs is built
+             * into the operator itself).
              */
             if (assignables.size() > 1) {
-                return tb.abstractUpdate(
-                        services.abstractUpdateFactory().changeAssignables(
-                                abstrUpd,
-                                Collections.singleton(new AllLocsLoc(allLocs))),
-                        accessiblesTerm);
+                return tb.abstractUpdate(services.abstractUpdateFactory().changeAssignables(
+                        abstrUpd, Collections.singleton(new AllLocsLoc(allLocs))), accessiblesTerm);
             }
 
             return null;
         }
 
-        final Pair<Set<AbstrUpdateUpdatableLoc>, Set<AbstrUpdateUpdatableLoc>> opsAnalysisResult = //
-                AbstractExecutionUtils.opsAssignedBeforeUsed(target,
-                        runtimeInstance, services).orElse(null);
+        final Pair<Set<AbstractUpdateAssgnLoc>, Set<AbstractUpdateLoc>> opsAnalysisResult = //
+                AbstractExecutionUtils.opsAssignedBeforeUsed(target, runtimeInstance, services)
+                        .orElse(null);
 
         if (opsAnalysisResult == null) {
             return null;
         }
 
-        final Set<AbstrUpdateUpdatableLoc> opsHaveToAssignBeforeUsed = opsAnalysisResult.first;
+        final Set<AbstractUpdateAssgnLoc> opsHaveToAssignBeforeUsed = opsAnalysisResult.first;
 
         /*
-         * We can also remove all assignables that are not occurring at all in
-         * the target. Then, we also remove them from the accessibles. TODO (DS,
-         * 2019-03-01): It does not make sense to remove them from the
-         * accessibles when I think about it now. Deactivated that. Maybe plug
-         * it in if I'm wrong...
+         * We can also remove all assignables that are not occurring at all in the
+         * target. Then, we also remove them from the accessibles. TODO (DS,
+         * 2019-03-01): It does not make sense to remove them from the accessibles when
+         * I think about it now. Deactivated that. Maybe plug it in if I'm wrong...
          */
         final Set<AbstractUpdateLoc> locsInTarget = AbstractUpdateFactory
-                .extractAbstrUpdateLocsFromTerm(target, runtimeInstance,
-                        services);
+                .extractAbstrUpdateLocsFromTerm(target, runtimeInstance, services);
 
-        final Set<AbstrUpdateLHS> newAssignables = assignables.stream()
+        final Set<AbstractUpdateAssgnLoc> newAssignables = assignables.stream()
                 .filter(op -> !opsHaveToAssignBeforeUsed.contains(op))
-                .filter(loc -> locsInTarget.contains(loc))
+                .filter(loc -> locsInTarget.stream().anyMatch(targLoc -> loc.mayAssign(targLoc)))
                 .map(loc -> abstrUpd.hasToAssign(loc) ? new HasToLoc(loc) : loc)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
         final Set<AbstractUpdateLoc> accessibleLocs = //
-                AbstractUpdateFactory.abstrUpdateLocsFromTermUnsafe(
-                        accessiblesTerm, runtimeInstance, services);
+                AbstractUpdateFactory.abstrUpdateLocsFromTermUnsafe(accessiblesTerm,
+                        runtimeInstance, services);
         if (accessibleLocs == null) {
             /*
-             * There are funny operators in the accessibles term, which might
-             * happen from time to time (like in heap simplification). We won't
-             * apply this simplification and wait until the problem got
-             * simplified.
+             * There are funny operators in the accessibles term, which might happen from
+             * time to time (like in heap simplification). We won't apply this
+             * simplification and wait until the problem got simplified.
              */
             return null;
         }
 
-        final Set<AbstrUpdateRHS> newAccessibles = //
-                accessibleLocs.stream().map(AbstrUpdateRHS.class::cast)
+        final Set<AbstractUpdateLoc> newAccessibles = //
+                accessibleLocs.stream().map(AbstractUpdateLoc.class::cast)
                         // .filter(loc -> visitor.getResult().contains(loc))
-                        .collect(Collectors
-                                .toCollection(() -> new LinkedHashSet<>()));
+                        .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 
-        if (abstrUpd.getAllAssignables().stream()
-                .noneMatch(op -> !newAssignables.contains(op))) {
+        if (abstrUpd.getAllAssignables().stream().noneMatch(op -> !newAssignables.contains(op))) {
             // No change.
             return null;
         }
@@ -249,15 +232,14 @@ public final class DropEffectlessAbstractUpdateElementariesCondition
             return tb.skip();
         }
 
-        return tb.abstractUpdate(abstrUpd.getAbstractPlaceholderStatement(),
-                newAssignables, newAccessibles);
+        return tb.abstractUpdate(abstrUpd.getAbstractPlaceholderStatement(), newAssignables,
+                newAccessibles);
     }
 
     @Override
     public String toString() {
-        return String.format(
-                "\\dropEffectlessAbstractUpdateElementaries(%s, %s)", uSV,
-                targetSV, resultSV);
+        return String.format("\\dropEffectlessAbstractUpdateElementaries(%s, %s)", uSV, targetSV,
+                resultSV);
     }
 
 }

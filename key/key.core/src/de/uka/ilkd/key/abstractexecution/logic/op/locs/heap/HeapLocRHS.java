@@ -10,14 +10,16 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.logic.op.locs;
+package de.uka.ilkd.key.abstractexecution.logic.op.locs.heap;
+
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 
 /**
  * A "heap location", e.g., a field, array location, or "all fields" array
- * location.
+ * location, for the right-hand-side of an abstract update.
  * 
  * @author Dominic Steinhoefel
  */
-public interface HeapLoc extends AbstrUpdateUpdatableLoc {
+public interface HeapLocRHS extends AbstractUpdateLoc {
 
 }

@@ -12,39 +12,22 @@
 //
 package de.uka.ilkd.key.abstractexecution.logic.op.locs;
 
-import java.util.Map;
-import java.util.Set;
-
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.ldt.SetLDT;
+import de.uka.ilkd.key.logic.Term;
 
 /**
- * A left-hand side or right-hand side location of an abstract update.
+ * A right-hand side location of an abstract update.
  *
  * @author Dominic Steinhoefel
  */
 public interface AbstractUpdateLoc {
     /**
-     * Returns a new {@link AbstractUpdateLoc} of this one with the
-     * {@link ProgramVariable}s replaced according to the supplied map.
-     *
-     * @param replMap
-     *            The replace map.
      * @param services
      *            The {@link Services} object.
-     * @return A new {@link AbstractUpdateLoc} of this one with the
-     *         {@link ProgramVariable}s replaced according to the supplied map.
+     * @return A {@link Term} of {@link SetLDT} type suitable as a right-hand
+     *         side of an abstract update (but not yet wrapped in a setSingleton
+     *         or the like).
      */
-    AbstractUpdateLoc replaceVariables(
-            Map<ProgramVariable, ProgramVariable> replMap, Services services);
-
-    /**
-     * All {@link AbstractUpdateLoc}s are containers. This method returns the
-     * "real" KeY {@link Operator}s which they represent.
-     *
-     * @return The KeY {@link Operator}s that this {@link AbstractUpdateLoc}
-     *         container represents.
-     */
-    Set<Operator> childOps();
+    Term toTerm(Services services);
 }

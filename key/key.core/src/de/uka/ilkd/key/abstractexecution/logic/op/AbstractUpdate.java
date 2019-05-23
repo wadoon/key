@@ -21,8 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateUpdatableLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.EmptyLoc;
@@ -47,11 +46,11 @@ public final class AbstractUpdate extends AbstractSortedOperator {
     private final AbstractPlaceholderStatement phs;
 
     /**
-     * Assignables, both "has-to" and "maybe". Use
-     * {@link #getMaybeAssignables()} or {@link #getHasToAssignables()} to get
-     * easier access to the two different sorts of assignables.
+     * Assignables, both "has-to" and "maybe". Use {@link #getMaybeAssignables()} or
+     * {@link #getHasToAssignables()} to get easier access to the two different
+     * sorts of assignables.
      */
-    private final Set<AbstrUpdateLHS> assignables;
+    private final Set<AbstractUpdateAssgnLoc> assignables;
 
     /**
      * The hash code of this {@link AbstractUpdate}; computed of the
@@ -61,8 +60,8 @@ public final class AbstractUpdate extends AbstractSortedOperator {
     private final int hashCode;
 
     /**
-     * "Backup" of the Services object, s.t. it not always has to be provided
-     * when only replacing program variables etc.
+     * "Backup" of the Services object, s.t. it not always has to be provided when
+     * only replacing program variables etc.
      */
     private final Services services;
 
@@ -71,29 +70,22 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * left-hand side, similarly as for {@link ElementaryUpdate}. Use
      * {@link #getInstance(AbstractPlaceholderStatement, Term, Optional, Services)}.
      *
-     * @param phs
-     *            The {@link AbstractPlaceholderStatement} for which this
-     *            {@link AbstractUpdate} should be created.
-     * @param assignables
-     *            The update's left-hand side (assignables).
-     * @param services
-     *            The {@link Services} object.
+     * @param phs         The {@link AbstractPlaceholderStatement} for which this
+     *                    {@link AbstractUpdate} should be created.
+     * @param assignables The update's left-hand side (assignables).
+     * @param services    The {@link Services} object.
      */
     AbstractUpdate(final AbstractPlaceholderStatement phs,
-            final Set<AbstrUpdateLHS> assignables, final Services services) {
+            final Set<AbstractUpdateAssgnLoc> assignables, final Services services) {
         super(new Name("U_" + phs.getId() + "("
-                + assignables.stream().map(lhs -> lhs.toString())
-                        .collect(Collectors.joining(","))
-                + ")"),
-                new Sort[] {
-                        services.getTypeConverter().getSetLDT().targetSort() },
+                + assignables.stream().map(lhs -> lhs.toString()).collect(Collectors.joining(","))
+                + ")"), new Sort[] { services.getTypeConverter().getSetLDT().targetSort() },
                 Sort.UPDATE, false);
 
         this.services = services;
         this.phs = phs;
         this.assignables = Collections.unmodifiableSet(assignables);
-        this.hashCode = 5 + 17 * phs.getId().hashCode()
-                + 27 * assignables.hashCode();
+        this.hashCode = 5 + 17 * phs.getId().hashCode() + 27 * assignables.hashCode();
     }
 
     /**
@@ -103,11 +95,10 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * {@link AbstractUpdate}s are cached (otherwise, you get multiple instances
      * that look the same, but aren't, which can lead to problems in KeY).
      *
-     * @param newAssignables
-     *            The new left-hand side for the {@link AbstractUpdate}.
+     * @param newAssignables The new left-hand side for the {@link AbstractUpdate}.
      * @return A new {@link AbstractUpdate} with the given left-hand side.
      */
-    AbstractUpdate changeAssignables(final Set<AbstrUpdateLHS> newAssignables) {
+    AbstractUpdate changeAssignables(final Set<AbstractUpdateAssgnLoc> newAssignables) {
         return new AbstractUpdate(phs, newAssignables, services);
     }
 
@@ -117,8 +108,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
 
     public String getUpdateName() {
         /*
-         * TODO (DS, 2019-01-03): There might be collisions here, ignoring for
-         * now...
+         * TODO (DS, 2019-01-03): There might be collisions here, ignoring for now...
          */
         return "U_" + phs.getId();
     }
@@ -135,84 +125,89 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      *
      * @return All assignables.
      */
-    public Set<AbstrUpdateLHS> getAllAssignables() {
+    public Set<AbstractUpdateAssgnLoc> getAllAssignables() {
         return assignables;
     }
 
     /**
      * Assignables that may be assigned.
      *
-     * @return The elements of the assignables union of this abstract update
-     *         that may be assigned.
+     * @return The elements of the assignables union of this abstract update that
+     *         may be assigned.
      */
-    public Set<AbstrUpdateUpdatableLoc> getMaybeAssignables() {
+    public Set<AbstractUpdateAssgnLoc> getMaybeAssignables() {
         return assignables.stream().filter(lhs -> !(lhs instanceof HasToLoc))
-                .map(AbstrUpdateUpdatableLoc.class::cast)
+                .map(AbstractUpdateAssgnLoc.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 
     /**
-     * Assignables that have to be assigned. Removes the {@link HasToLoc}
-     * wrappers.
+     * Assignables that have to be assigned. Removes the {@link HasToLoc} wrappers.
      *
-     * @return The elements of the assignables union of this abstract update
-     *         that have to be assigned.
+     * @return The elements of the assignables union of this abstract update that
+     *         have to be assigned.
      */
-    public Set<AbstrUpdateUpdatableLoc> getHasToAssignables() {
-        return assignables.stream().filter(HasToLoc.class::isInstance)
-                .map(HasToLoc.class::cast).map(HasToLoc::child)
-                .map(AbstrUpdateUpdatableLoc.class::cast)
+    public Set<AbstractUpdateAssgnLoc> getHasToAssignables() {
+        return assignables.stream().filter(HasToLoc.class::isInstance).map(HasToLoc.class::cast)
+                .map(HasToLoc::child).map(AbstractUpdateAssgnLoc.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
     }
 
     /**
-     * @return true iff this abstract update assigns allLocs (i.e., all
-     *         locations).
+     * @return true iff this abstract update assigns allLocs (i.e., all locations).
      */
     public boolean assignsAllLocs() {
         return assignables.stream().anyMatch(AllLocsLoc.class::isInstance);
     }
 
     /**
-     * @param loc
-     *            The {@link AbstractUpdateLoc}s to check.
+     * @param loc The {@link AbstractUpdateLoc}s to check.
      * @return true iff this {@link AbstractUpdate} may assign any of the given
      *         locations (includes "have-to"s).
      */
-    public boolean mayAssignAny(Collection<AbstrUpdateUpdatableLoc> loc) {
+    public boolean mayAssignAny(Collection<AbstractUpdateLoc> loc) {
         return loc.stream().anyMatch(this::mayAssign);
     }
 
     /**
-     * @param loc
-     *            The {@link AbstractUpdateLoc} to check.
-     * @return true iff this {@link AbstractUpdate} may assign the given
-     *         location (includes "have-to"s).
+     * @param loc The {@link AbstractUpdateLoc} to check.
+     * @return true iff this {@link AbstractUpdate} may assign the given location
+     *         (includes "have-to"s).
      */
-    public boolean mayAssign(AbstrUpdateUpdatableLoc loc) {
-        return getMaybeAssignables().stream().anyMatch(loc::mayAssign)
-                || getHasToAssignables().stream().anyMatch(loc::mayAssign);
+    public boolean mayAssign(AbstractUpdateLoc loc) {
+        return getMaybeAssignables().stream().anyMatch(assignable -> assignable.mayAssign(loc))
+                || getHasToAssignables().stream().anyMatch(assignable -> assignable.mayAssign(loc));
     }
 
     /**
-     * @param loc
-     *            The {@link AbstractUpdateLoc}s to check.
-     * @return true iff this {@link AbstractUpdate} has to assign any of the
-     *         given locations (includes "have-to"s).
+     * @param loc The {@link AbstractUpdateLoc}s to check.
+     * @return true iff this {@link AbstractUpdate} has to assign any of the given
+     *         locations (includes "have-to"s).
      */
-    public boolean hasToAssignAny(Collection<AbstrUpdateUpdatableLoc> loc) {
+    public boolean hasToAssignAny(Collection<AbstractUpdateLoc> loc) {
         return loc.stream().anyMatch(this::hasToAssign);
     }
 
     /**
-     * True if the given {@link AbstractUpdate} has to assign the given
-     * location.
+     * True if the given {@link AbstractUpdate} has to assign the given location.
      *
      * @param loc
      * @return
      */
-    public boolean hasToAssign(AbstrUpdateUpdatableLoc loc) {
-        return getHasToAssignables().stream().anyMatch(loc::mayAssign);
+    public boolean hasToAssign(AbstractUpdateLoc loc) {
+        return getHasToAssignables().stream().anyMatch(assignable -> assignable.mayAssign(loc));
+    }
+
+    /**
+     * True if the given {@link AbstractUpdate} has to assign the given location.
+     *
+     * @param loc
+     * @return
+     */
+    public boolean hasToAssign(AbstractUpdateAssgnLoc loc) {
+        return loc instanceof HasToLoc //
+                ? getHasToAssignables().contains(((HasToLoc) loc).child())
+                : getHasToAssignables().contains(loc);
     }
 
     /**
@@ -220,7 +215,6 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      */
     public boolean assignsNothing() {
         // NOTE (DS, 2019-03-01): Second case shouldn't occur...
-        return assignables.isEmpty()
-                || assignables.stream().allMatch(EmptyLoc.class::isInstance);
+        return assignables.isEmpty() || assignables.stream().allMatch(EmptyLoc.class::isInstance);
     }
 }

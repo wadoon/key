@@ -10,29 +10,23 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.logic.op.locs;
-
-import java.util.Map;
-import java.util.Set;
+package de.uka.ilkd.key.abstractexecution.logic.op.locs.heap;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
-import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
  * An array location for use in an {@link AbstractUpdate} left-hand side.
  *
  * @author Dominic Steinhoefel
  */
-public class ArrayLoc implements HeapLoc {
+public class ArrayLocRHS implements HeapLocRHS {
     private final Term array;
     private final Term index;
 
-    public ArrayLoc(Term array, Term index) {
+    public ArrayLocRHS(Term array, Term index) {
         this.array = array;
         this.index = index;
     }
@@ -58,45 +52,13 @@ public class ArrayLoc implements HeapLoc {
     }
 
     @Override
-    public AbstractUpdateLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
-            Services services) {
-        return this; // TODO?
-    }
-
-    @Override
-    public Set<Operator> childOps() {
-        final OpCollector opColl = new OpCollector();
-        array.execPostOrder(opColl);
-        index.execPostOrder(opColl);
-        return opColl.ops();
-    }
-
-    @Override
-    public AbstrUpdateUpdatableLoc toUpdatableRHS() {
-        return this;
-    }
-
-    @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc) {
-        if (otherLoc instanceof AllFieldsLoc) {
-            /*
-             * TODO (DS, 2019-05-22): Check whether that's the intended semantics, since
-             * actually, an a[5] cannot really assign a[*], at least not all positions...
-             */
-            return ((AllFieldsLoc) otherLoc).getArray().equals(this.array);
-        } else {
-            return otherLoc instanceof ArrayLoc && otherLoc.equals(this);
-        }
-    }
-
-    @Override
     public String toString() {
         return String.format("%s[%s])", array, index);
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof ArrayLoc && obj.hashCode() == hashCode();
+        return obj instanceof ArrayLocRHS && obj.hashCode() == hashCode();
     }
 
     @Override

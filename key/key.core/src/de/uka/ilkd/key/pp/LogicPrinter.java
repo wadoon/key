@@ -26,7 +26,7 @@ import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstrUpdateLHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.PrettyPrinter;
 import de.uka.ilkd.key.java.ProgramElement;
@@ -1619,7 +1619,7 @@ public class LogicPrinter {
         layouter.print("(");
 
         layouter.print(op.getAllAssignables().stream()
-                .map(AbstrUpdateLHS::toString).collect(Collectors.joining(", ")));
+                .map(AbstractUpdateAssgnLoc::toString).collect(Collectors.joining(", ")));
 
         layouter.print(asgn);
         layouter.brk(0);

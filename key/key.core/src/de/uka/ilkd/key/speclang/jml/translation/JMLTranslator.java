@@ -897,62 +897,6 @@ public final class JMLTranslator {
             }
         });
 
-//        translationMethods.put(JMLKeyWord.NOT_MOD, new JMLPostExpressionTranslationMethod(){
-//
-//            @Override
-//            protected String name() {
-//                return "\\not_modified";
-//            }
-//
-//            /**
-//             * @param services Services
-//             * @param heapAtPre The pre-state heap (since we are in a post-condition)
-//             * @param params Must be of length 1 with a Term (store-ref expression)
-//             */
-//            @Override
-//            protected Term translate(Services services, Term heapAtPre, Object[] params) throws SLTranslationException {
-//                checkParameters(params, Term.class);
-//                Term t = (Term) params[0];
-//
-//                // collect variables from storereflist
-//                java.util.List<Term> storeRefs = new java.util.ArrayList<Term>();
-//                final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
-//                final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-//                while (t.op() == ldt.getUnion()){
-//                    storeRefs.add(t.sub(0));
-//                    t = t.sub(1);
-//                }
-//                storeRefs.add(t);
-//                // construct equality predicates
-//                Term res = TB.tt();
-//                for (Term sr: storeRefs){
-//                    if (sr.op() == ldt.getSingleton()){
-//                        final Term ref = TB.dot(services, Sort.ANY, sr.sub(0), sr.sub(1));
-//                        res = TB.and(res, TB.equals(ref,convertToOld(services, heapAtPre, ref)));
-//                    } else if (sr.op() == ldt.getEmpty()){
-//                        // do nothing
-//                    } else if (sr.op().equals(ldt.getSetMinus()) && sr.sub(0).op().equals(ldt.getAllLocs()) && sr.sub(1).op().equals(ldt.getFreshLocs())){
-//                        // this is the case for "\everything"
-//                        final JavaInfo ji = services.getJavaInfo();
-//                        final LogicVariable fld = new LogicVariable(new Name("f"), heapLDT.getFieldSort());
-//                        final LogicVariable obj = new LogicVariable(new Name("o"), ji.objectSort());
-//                        final Term objTerm = TB.var(obj);
-//                        final Term fldTerm = TB.var(fld);
-//                        final Term ref = TB.dot(services, Sort.ANY, objTerm, fldTerm);
-//                        final Term fresh = TB.subset(services, TB.singleton(services, objTerm, fldTerm ), TB.freshLocs(services, heapAtPre));
-//                        final Term bodyTerm = TB.or(TB.equals(ref, convertToOld(services, heapAtPre, ref)),fresh);
-//                        res = TB.and(res, TB.all(fld, TB.all(obj, bodyTerm)));
-//                    } else {
-//                        // all other results are not meant to occur
-//                        throw new SLTranslationException("Term "+sr+" is not a valid store-ref expression.");
-//                    }
-//                }
-//                return res;
-//            }
-//
-//        });
-
-
         translationMethods.put(JMLKeyWord.INDEX_OF, new JMLTranslationMethod() {
 
             @Override

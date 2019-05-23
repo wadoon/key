@@ -28,7 +28,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  *
  * @author Dominic Steinhoefel
  */
-public class SkolemLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
+public class SkolemLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
     private final Function skLoc;
 
     public SkolemLoc(Function skLoc) {
@@ -41,8 +41,8 @@ public class SkolemLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
     }
 
     @Override
-    public AbstractUpdateLoc replaceVariables(
-            Map<ProgramVariable, ProgramVariable> replMap, Services services) {
+    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
+            Services services) {
         return this;
     }
 
@@ -61,11 +61,6 @@ public class SkolemLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
         return obj instanceof SkolemLoc && obj.hashCode() == hashCode();
     }
 
-    @Override
-    public AbstrUpdateUpdatableLoc toUpdatableRHS() {
-        return this;
-    }
-    
     @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc) {
         return otherLoc instanceof SkolemLoc && otherLoc.equals(this);

@@ -830,6 +830,7 @@ storeref returns [Term ret = null] throws SLTranslationException
 :       NOTHING { result = tb.empty(); }
     |   EVERYTHING { result = tb.createdLocs(); }
     |   NOT_SPECIFIED { result = tb.createdLocs(); }
+    |   HAS_TO LPAREN ( result = storeRefExpr ) RPAREN { result = tb.hasTo(result); }
     |   result = storeRefExpr;
 
 

@@ -10,44 +10,49 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.logic.op.locs;
+package de.uka.ilkd.key.abstractexecution.logic.op.locs.heap;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 
 /**
- * Represents a rigid RHG of non-locset type (e.g., some constant). Can appear
- * after substituting locations on right-hand sides of abstract updates with
- * some symbols.
+ * An "all fields" array location ("myArray[*]").
  *
  * @author Dominic Steinhoefel
  */
-public class RigidRHS implements AbstractUpdateLoc {
-    private final Term t;
+public class AllFieldsLocRHS implements HeapLocRHS {
+    private final Term array;
 
-    public RigidRHS(Term t) {
-        assert !t.sort().name().toString().equals("LocSet");
-        this.t = t;
+    public AllFieldsLocRHS(Term array) {
+        this.array = array;
+    }
+
+    /**
+     * @return the array
+     */
+    public Term getArray() {
+        return array;
     }
 
     @Override
     public Term toTerm(Services services) {
-        return t;
+        final TermBuilder tb = services.getTermBuilder();
+        return tb.allFields(array);
     }
 
     @Override
     public String toString() {
-        return t.toString();
+        return String.format("%s.*", array);
     }
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof RigidRHS && obj.hashCode() == hashCode();
+        return obj instanceof AllFieldsLocRHS && obj.hashCode() == hashCode();
     }
 
     @Override
     public int hashCode() {
-        return 5 + 17 * t.hashCode();
+        return 31 + 7 * array.hashCode();
     }
-
 }

@@ -10,7 +10,7 @@
 // The KeY system is protected by the GNU General
 // Public License. See LICENSE.TXT for details.
 //
-package de.uka.ilkd.key.abstractexecution.logic.op.locs;
+package de.uka.ilkd.key.abstractexecution.logic.op.locs.heap;
 
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -18,14 +18,16 @@ import java.util.Optional;
 import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
-import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
 
 /**
@@ -33,55 +35,39 @@ import de.uka.ilkd.key.proof.ProgVarReplacer;
  *
  * @author Dominic Steinhoefel
  */
-public class FieldLoc implements HeapLoc {
-    private final Sort sort;
-    private final Optional<Term> heapTerm;
+public class FieldLocLHS extends HeapLocLHS {
     private final Term objTerm;
     private final LocationVariable fieldPV;
-    private final LocationVariable heapVar;
 
-    public FieldLoc(Optional<Sort> sort, Optional<Term> heapTerm, Term objTerm,
-            LocationVariable fieldPV, LocationVariable heapVar) {
-        this.sort = sort.orElse(fieldPV.sort());
-        this.heapTerm = heapTerm;
+    public FieldLocLHS(Term objTerm, LocationVariable fieldPV) {
         this.objTerm = objTerm;
         this.fieldPV = fieldPV;
-        this.heapVar = heapVar;
+    }
+    
+    @Override
+    protected Term toTerm(Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        return tb.singleton(objTerm, tb.var(fieldPV));
     }
 
     @Override
-    public Term toTerm(Services services) {
-        return services.getTermBuilder().select(sort,
-                heapTerm.orElse(services.getTermBuilder().getBaseHeap()),
-                objTerm, fieldPV);
-    }
-
-    @Override
-    public AbstractUpdateLoc replaceVariables(
-            Map<ProgramVariable, ProgramVariable> replMap, Services services) {
+    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
+            Services services) {
         final ProgVarReplacer pvr = new ProgVarReplacer(replMap, services);
 
-        final LocationVariable lHeapVar = Optional
-                .ofNullable(replMap.get(heapVar))
-                .map(LocationVariable.class::cast).orElse(heapVar);
-        final LocationVariable lFieldPV = Optional
-                .ofNullable(replMap.get(fieldPV))
+        final LocationVariable lFieldPV = Optional.ofNullable(replMap.get(fieldPV))
                 .map(LocationVariable.class::cast).orElse(fieldPV);
-        final Optional<Term> lHeapTerm = heapTerm.map(t -> pvr.replace(t));
         final Term lObjTerm = pvr.replace(objTerm);
 
-        return new FieldLoc(Optional.of(sort), lHeapTerm, lObjTerm, lFieldPV,
-                lHeapVar);
+        return new FieldLocLHS(lObjTerm, lFieldPV);
     }
 
     @Override
     public Set<Operator> childOps() {
         final Set<Operator> result = new LinkedHashSet<>();
-        result.add(heapVar);
         result.add(fieldPV);
 
         final OpCollector opColl = new OpCollector();
-        heapTerm.ifPresent(t -> t.execPostOrder(opColl));
         objTerm.execPostOrder(opColl);
         result.addAll(opColl.ops());
 
@@ -89,13 +75,10 @@ public class FieldLoc implements HeapLoc {
     }
 
     @Override
-    public AbstrUpdateUpdatableLoc toUpdatableRHS() {
-        return this;
-    }
-    
-    @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc) {
-        return otherLoc instanceof FieldLoc && otherLoc.equals(this);
+        return otherLoc instanceof FieldLocRHS
+                && ((FieldLocRHS) otherLoc).getObjTerm().equals(this.objTerm)
+                && ((FieldLocRHS) otherLoc).getFieldPV().equals(this.fieldPV);
     }
 
     @Override
@@ -106,7 +89,7 @@ public class FieldLoc implements HeapLoc {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof FieldLoc && obj.hashCode() == hashCode();
+        return obj instanceof FieldLocLHS && obj.hashCode() == hashCode();
     }
 
     @Override

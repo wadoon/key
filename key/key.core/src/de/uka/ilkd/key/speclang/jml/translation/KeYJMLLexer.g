@@ -94,6 +94,7 @@ lexer grammar KeYJMLLexer;
     LBLPOS               : '\\lblpos';
     LOCKSET              : '\\lockset';
     LOCSET               : '\\locset';  //KeY extension, not official JML
+    HAS_TO               : '\\hasTo';  //KeY extension, not official JML
     MAP                  : '\\map';  //KeY extension, not official JML
     MAPEMPTY             : '\\map_empty';  //KeY extension, not official JML
     MAP_GET              : '\\map_get';  //KeY extension, not official JML

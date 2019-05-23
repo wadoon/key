@@ -18,7 +18,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
-import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.Operator;
 
@@ -41,8 +41,8 @@ public class OpCollector extends DefaultVisitor {
             ops.add(((ElementaryUpdate) t.op()).lhs());
         }
         if (t.op() instanceof AbstractUpdate) {
-            ((AbstractUpdate) t.op()).getAllAssignables().stream()
-                    .map(AbstractUpdateLoc::childOps).forEach(ops::addAll);
+            ((AbstractUpdate) t.op()).getAllAssignables().stream().map(AbstractUpdateAssgnLoc::childOps)
+                    .forEach(ops::addAll);
         }
     }
 

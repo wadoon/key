@@ -28,7 +28,7 @@ import de.uka.ilkd.key.logic.op.ProgramVariable;
  *
  * @author Dominic Steinhoefel
  */
-public class PVLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
+public class PVLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
     private final LocationVariable locVar;
 
     public PVLoc(LocationVariable locVar) {
@@ -41,8 +41,8 @@ public class PVLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
     }
 
     @Override
-    public AbstractUpdateLoc replaceVariables(
-            Map<ProgramVariable, ProgramVariable> replMap, Services services) {
+    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
+            Services services) {
         if (replMap.containsKey(locVar)) {
             return new PVLoc((LocationVariable) replMap.get(locVar));
         } else {
@@ -60,11 +60,6 @@ public class PVLoc implements AbstrUpdateLHS, AbstrUpdateUpdatableLoc {
         return locVar.toString();
     }
 
-    @Override
-    public AbstrUpdateUpdatableLoc toUpdatableRHS() {
-        return this;
-    }
-    
     @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc) {
         return otherLoc instanceof PVLoc && otherLoc.equals(this);
