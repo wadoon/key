@@ -27,6 +27,8 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.actions.*;
 import de.uka.ilkd.key.gui.configuration.Config;
+import de.uka.ilkd.key.gui.docking.DockingHelper;
+import de.uka.ilkd.key.gui.docking.DockingLayout;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
@@ -301,33 +303,6 @@ public final class MainWindow extends JFrame {
         return instance != null;
     }
 
-    private static CDockable createDock(TabPanel p) {
-        CAction[] actions =
-                p.getTitleActions().stream().map(MainWindow::translateAction)
-                        .toArray(CAction[]::new);
-
-        return new DefaultSingleCDockable(p.getTitle(), p.getIcon(), p.getTitle(), p.getComponent(),
-                p.getPermissions(), actions);
-    }
-
-    private static CAction translateAction(Action action) {
-        CButton button = new CButton(
-                (String) action.getValue(Action.NAME),
-                (Icon) action.getValue(Action.SMALL_ICON));
-        button.addActionListener(action);
-        button.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
-        button.setEnabled(action.isEnabled());
-
-        action.addPropertyChangeListener(evt -> {
-            button.setText((String) action.getValue(Action.NAME));
-            button.setIcon((Icon) action.getValue(Action.SMALL_ICON));
-            button.setTooltip((String) action.getValue(Action.SHORT_DESCRIPTION));
-            button.setEnabled(action.isEnabled());
-        });
-
-        return button;
-    }
-
     public TermLabelVisibilityManager getVisibleTermLabels() {
         return termLabelMenu.getVisibleTermLabels();
     }
@@ -384,6 +359,10 @@ public final class MainWindow extends JFrame {
         result.getUI().getProofControl().addAutoModeListener(proofListener);
         result.addGUIListener(new MainGUIListener());
         return result;
+    }
+
+    public CControl getDockControl() {
+        return dockControl;
     }
 
     /**
@@ -491,7 +470,7 @@ public final class MainWindow extends JFrame {
         grid.add(0, 0, 1, 1, dockProofListView);
         grid.add(0, 1, 1, 2,
                 Stream.concat(defaultPanels, extPanels)
-                        .map(MainWindow::createDock)
+                        .map(DockingHelper::createDock)
                         .toArray(CDockable[]::new));
         grid.add(1, 0, 2, 3, dockSequent);
         grid.add(2, 0, 1, 3, dockSourceView);
@@ -1042,10 +1021,6 @@ public final class MainWindow extends JFrame {
             SwingUtilities.invokeLater(sequentUpdater);
         }
 
-    }
-
-    public CControl getDockControl() {
-        return dockControl;
     }
 
     void displayResults(String message) {
