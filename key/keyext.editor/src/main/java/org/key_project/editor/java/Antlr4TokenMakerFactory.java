@@ -1,6 +1,5 @@
 package org.key_project.editor.java;
 
-import lombok.val;
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Recognizer;
 import org.fife.ui.rsyntaxtextarea.Token;
@@ -38,7 +37,7 @@ public abstract class Antlr4TokenMakerFactory extends TokenMakerBase {
             for (org.antlr.v4.runtime.Token token : tokens) {
                 int newType = rewriteTokenType(token.getType());
                 int start = token.getStartIndex();
-                val t = new TokenImpl(text,
+                TokenImpl t = new TokenImpl(text,
                         text.offset + start,
                         text.offset + start + token.getText().length() - 1,
                         startOffset + start, newType, 0);

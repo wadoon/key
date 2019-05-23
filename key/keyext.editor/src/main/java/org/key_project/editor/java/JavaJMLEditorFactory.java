@@ -15,7 +15,7 @@ public class JavaJMLEditorFactory extends AbstractEditorFactory {
 
     @Override
     public Editor open() {
-        val editor = new JavaJMLEditor();
+        JavaJMLEditor editor = new JavaJMLEditor();
         editor.setMimeType(JavaJMLEditor.MIME_TYPE);
         return editor;
     }

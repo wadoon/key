@@ -6,13 +6,14 @@ import bibliothek.gui.dock.common.event.CFocusListener;
 import bibliothek.gui.dock.common.intern.CDockable;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.proof.Proof;
 import lombok.Getter;
-import lombok.val;
 
 import javax.swing.*;
 import java.awt.*;
@@ -20,6 +21,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
  * @author Alexander Weigl
@@ -30,6 +32,8 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
     private static SaveAction actionSave;
     private static SaveAsAction actionSaveAs;
     private static LoadAction actionLoad;
+    private static OpenCurrentAsFileAction actionOpenCurrentProofFile;
+
     @Getter
     private NewAction actionNew;
     @Getter
@@ -73,11 +77,12 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
             actionLoad = new LoadAction(window);
             actionSaveAs = new SaveAsAction(window);
             actionSave = new SaveAction(window);
+            actionOpenCurrentProofFile = new OpenCurrentAsFileAction();
 
             control.addFocusListener(new CFocusListener() {
                 @Override
                 public void focusGained(CDockable cDockable) {
-                    val e = getCurrentEditor() != null;
+                    boolean e = getCurrentEditor() != null;
                     actionSave.setEnabled(e);
                     actionSaveAs.setEnabled(e);
                 }
@@ -98,7 +103,32 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
         tb.add(actionLoad);
         tb.add(actionSave);
         tb.add(actionSaveAs);
+        tb.addSeparator();
+        tb.add(actionOpenCurrentProofFile);
         return tb;
+    }
+
+    private class OpenCurrentAsFileAction extends KeyAction {
+        public OpenCurrentAsFileAction() {
+            setName("Open Current Proof As File...");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if (mainWindow.getRecentFiles() != null
+                    && mainWindow.getRecentFiles().getMostRecent() != null) {
+                final String recentFile = mainWindow.getRecentFiles()
+                        .getMostRecent().getAbsolutePath();
+                if (recentFile != null) {
+                    File f = new File(recentFile);
+                    try {
+                        EditorFacade.open(f.toPath());
+                    } catch (Exception exc) {
+                        setEnabled(false);
+                    }
+                }
+            }
+        }
     }
 
     class SaveAsAction extends MainWindowAction {
@@ -112,9 +142,9 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            val editor = getCurrentEditor();
+            Editor editor = getCurrentEditor();
             if (editor != null) {
-                val file = editor.getPath();
+                Path file = editor.getPath();
                 if (file != null) {
                     fileChooser.setCurrentDirectory(file.getParent().toFile());
                     fileChooser.setSelectedFile(file.toFile());
@@ -145,7 +175,7 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            val editor = getCurrentEditor();
+            Editor editor = getCurrentEditor();
             if (editor != null) {
                 if (editor.getPath() != null) {
                     try {
@@ -175,7 +205,7 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
             int c = fileChooser.showOpenDialog(mainWindow);
             if (c == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
-                val editor = EditorFacade.open(file.toPath());
+                Editor editor = EditorFacade.open(file.toPath());
                 addEditor(editor);
             }
         }
@@ -192,7 +222,7 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
         public void actionPerformed(ActionEvent e) {
             JPopupMenu menu = new JPopupMenu();
             EditorFacade.getEditorFactories().forEach(it -> {
-                val item = new JMenuItem(it.getName());
+                JMenuItem item = new JMenuItem(it.getName());
                 item.addActionListener(evt ->
                         EditorFacade.addEditor(it.open(), mainWindow));
                 menu.add(item);

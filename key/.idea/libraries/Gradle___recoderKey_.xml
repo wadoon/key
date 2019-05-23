@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: :recoderKey:">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/key.core/lib/recoderKey.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

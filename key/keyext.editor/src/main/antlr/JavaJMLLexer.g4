@@ -201,10 +201,10 @@ ELLIPSIS:           '...';
 WS:                 [ \t\r\n\u000C]+ -> channel(HIDDEN);
 //Extension for JML
 JML_START: '/*@' -> pushMode(jmlContract);
-JML_END: '*/'; // should never be hit by this lexer mode, catched by expr or jmlContract
 JML_SINGLELINE:  '//@' -> type(JML_START), pushMode(jmlSLContract);
 
-COMMENT:            '/*' ~[@] .*? '*/'    -> channel(HIDDEN);
+COMMENT_START:      '/*' ~[@]        -> channel(HIDDEN), pushMode(comment);
+COMMENT_END:       '*/'; // should never be hit by this lexer mode, catched by modes expr, jmlContract, comment.
 LINE_COMMENT:       '//' ~[\r\n]*    -> channel(HIDDEN);
 
 // Identifiers
@@ -269,11 +269,9 @@ JavaLetterOrDigit
 
 ERROR_CHAR: .;//catch errors
 
-/**
-Lexer for JML contracts.
+/** Lexer for JML contracts. 
+******************************************************************************/
 
-
-*/
 mode jmlContract;
 /* JML and JML* keywords */
 
@@ -347,7 +345,7 @@ INSTANCE:               'instance';
 TWO_STATE:              'two_state';
 NO_STATE:               'no_state';
 
-JC_JML_END:             '*/'                -> type(JML_END), popMode;
+JC_JML_END:             '*/'                -> type(COMMENT_END), popMode;
 WS_CONTRACT:             [ @\t\r\n\u000C]+   -> channel(HIDDEN);
 LINE_COMMENT_CONTRACT:  '//' ~[\r\n]*       -> channel(HIDDEN);
 
@@ -537,9 +535,9 @@ JE_ELLIPSIS:           '...' -> type(ELLIPSIS);
 
 JE_WS:                 [ @\t\r\n\u000C]+ -> channel(HIDDEN), type(WS);
 //JML:                '/*@' .*? '*/'; // capture
-JE_COMMENT:            '{*' .*? '*}'    -> channel(HIDDEN), type(COMMENT);
-JE_LINE_COMMENT:       '//' ~[\r\n]*    -> channel(HIDDEN), type(LINE_COMMENT);
-JE_END_COMMENT:        '*/' -> /*channel(HIDDEN),*/ popMode, popMode, type(JML_END);
+JE_COMMENT:            '{*'              -> channel(HIDDEN), type(COMMENT_START), pushMode(jmlComment);
+JE_LINE_COMMENT:       '//' ~[\r\n]*     -> channel(HIDDEN), type(LINE_COMMENT);
+JE_END_COMMENT:        '*/' -> /*channel(HIDDEN),*/ popMode, popMode, type(COMMENT_END);
 // Identifiers
 
 //JE_IDENTIFIER:         JavaLetter JavaLetterOrDigit* -> type(IDENTIFIER);
@@ -607,5 +605,18 @@ JML_IDENTIFIER : '\\'? JavaLetter  ( JavaLetterOrDigit )*  -> type(IDENTIFIER);
 JE_ERROR_CHAR: . -> type(ERROR_CHAR);
 
 mode jmlSLContract;
-STOP: '\n\r\f' -> type(JML_END), popMode;
+STOP: '\n\r\f' -> type(COMMENT_END), popMode;
 SL_ALL: ~[\n\r\f]+ -> channel(HIDDEN); //TODO
+
+
+
+mode comment;
+
+COMMENT_END_COMMENT: '*/'   -> channel(HIDDEN), popMode, type(COMMENT_END);
+COMMENT_EVERY_CHAR: .       -> channel(HIDDEN);
+
+
+mode jmlComment;
+
+JML_COMMENT_END: '*}'         -> channel(HIDDEN), popMode, type(COMMENT_END);
+JML_COMMENT_EVERY_CHAR: .     -> channel(HIDDEN), type(COMMENT_EVERY_CHAR);

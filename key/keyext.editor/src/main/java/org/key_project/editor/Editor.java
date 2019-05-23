@@ -158,6 +158,10 @@ public class Editor extends JPanel implements SearchListener {
         firePropertyChange(PROP_DIRTY, oldDirty, dirty);
     }
 
+    public Path getPath() {
+        return path;
+    }
+
     public void setPath(Path f) {
         Path oldFile = path;
         path = f;
