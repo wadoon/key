@@ -59,9 +59,7 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
 
     public Editor getCurrentEditor() {
         try {
-            return (Editor)
-                    ((DefaultMultipleCDockable)
-                            mainWindow.getDockControl().getFocusedCDockable()).getContentPane();
+            return (Editor) (mainWindow.getDockControl().getFocusedCDockable());
         } catch (ClassCastException e) {
         }
         return null;

@@ -65,8 +65,10 @@ public class JavaJMLEditor extends Editor {
         public void actionPerformed(ActionEvent e) {
             //Save file:
             EditorExtension.getSaveAction().actionPerformed(e);
-            MainWindow.getInstance().getMediator().getUI().loadProblem(
-                    getPath().toFile());
+            if (getPath() != null) {
+                MainWindow.getInstance().getMediator().getUI().loadProblem(
+                        getPath().toFile());
+            }
         }
     }
 }

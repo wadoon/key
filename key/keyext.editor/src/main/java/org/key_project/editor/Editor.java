@@ -2,6 +2,7 @@ package org.key_project.editor;
 
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.symbolic_execution.util.SideProofStore;
 import lombok.Getter;
 import org.fife.rsta.ui.CollapsibleSectionPanel;
 import org.fife.rsta.ui.GoToDialog;
@@ -23,13 +24,16 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+import java.beans.PropertyChangeSupport;
 import java.nio.file.Path;
+
+import static javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
 
 /**
  * @author Alexander Weigl
  * @version 1 (20.05.19)
  */
-public class Editor extends JPanel implements SearchListener {
+public class Editor extends DefaultMultipleCDockable implements SearchListener {
     public static final String PROP_DIRTY = "DIRTY";
     public static final String PROP_PATH = "PATH";
 
@@ -43,11 +47,12 @@ public class Editor extends JPanel implements SearchListener {
     private final RTextScrollPane editorView;
 
     private final String name = RandomName.getRandomName("-") + ".kps";
-    private final DefaultMultipleCDockable dockable = new DefaultMultipleCDockable(
-            EditorFacade.getEditorDockableFactory(), this);
+    private final DefaultMultipleCDockable dockable = this;
+
+    private final PropertyChangeSupport eventSupport = new PropertyChangeSupport(this);
+    private final JPanel pane;
 
     protected JToolBar toolBarActions = new JToolBar();
-
 
     @Getter
     private boolean dirty;
@@ -56,11 +61,14 @@ public class Editor extends JPanel implements SearchListener {
     private Path path;
 
     public Editor() {
-        super(new BorderLayout(5, 5));
+        super(EditorFacade.getEditorDockableFactory());
+        pane = (JPanel) getContentPane();
+        pane.setLayout(new BorderLayout(5, 5));
 
         FindToolBar findToolBar = new FindToolBar(this);
         ReplaceToolBar replaceToolBar = new ReplaceToolBar(this);
         replaceToolBar.setSearchContext(findToolBar.getSearchContext());
+
 
         toolBarActions.setFloatable(false);
 
@@ -103,26 +111,26 @@ public class Editor extends JPanel implements SearchListener {
         add(errorStrip, BorderLayout.LINE_END);
 
 
-        addPropertyChangeListener(it -> dockable.setTitleText(getTitle()));
+        eventSupport.addPropertyChangeListener(it -> dockable.setTitleText(getTitle()));
         dockable.setTitleText(getTitle());
 
-        registerKeyboardAction(
+        pane.registerKeyboardAction(
                 EditorExtension.getSaveAction(),
                 EditorExtension.getSaveAction().getAcceleratorKey(),
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        registerKeyboardAction(
+        pane.registerKeyboardAction(
                 EditorExtension.getActionLoad(),
                 EditorExtension.getActionLoad().getAcceleratorKey(),
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        registerKeyboardAction(
+        pane.registerKeyboardAction(
                 EditorExtension.getActionSaveAs(),
                 EditorExtension.getActionSaveAs().getAcceleratorKey(),
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         KeyAction actionGoto = new GoToLineAction();
-        registerKeyboardAction(
+        pane.registerKeyboardAction(
                 actionGoto,
                 actionGoto.getAcceleratorKey(),
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
@@ -131,13 +139,11 @@ public class Editor extends JPanel implements SearchListener {
         KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK);
         Action a = csp.addBottomComponent(ks, findToolBar);
         a.putValue(Action.NAME, "Show Find Search Bar");
-        registerKeyboardAction(a, ks, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        pane.registerKeyboardAction(a, ks, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         ks = KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK);
         a = csp.addBottomComponent(ks, replaceToolBar);
         a.putValue(Action.NAME, "Show Replace Search Bar");
-        registerKeyboardAction(a, ks, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
-
+        pane.registerKeyboardAction(a, ks, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 
     public String getTitle() {
@@ -155,7 +161,7 @@ public class Editor extends JPanel implements SearchListener {
     public void setDirty(boolean dirty) {
         boolean oldDirty = isDirty();
         this.dirty = dirty;
-        firePropertyChange(PROP_DIRTY, oldDirty, dirty);
+        eventSupport.firePropertyChange(PROP_DIRTY, oldDirty, dirty);
     }
 
     public Path getPath() {
@@ -165,7 +171,7 @@ public class Editor extends JPanel implements SearchListener {
     public void setPath(Path f) {
         Path oldFile = path;
         path = f;
-        firePropertyChange(PROP_PATH, oldFile, f);
+        eventSupport.firePropertyChange(PROP_PATH, oldFile, f);
     }
 
     public DefaultMultipleCDockable getDockable() {
@@ -233,7 +239,7 @@ public class Editor extends JPanel implements SearchListener {
     private class GoToLineAction extends KeyAction {
         GoToLineAction() {
             setName("Go To Line...");
-            int c = getToolkit().getMenuShortcutKeyMask();
+            int c = InputEvent.CTRL_DOWN_MASK;
             putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_L, c));
         }
 

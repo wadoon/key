@@ -18,7 +18,8 @@ dependencies {
                 'lib/docking-frames-core.jar')
 
     runtimeOnly project(":keyext.interactionlog")
-    //runtimeOnly project(":keyext.script.ui")
+    runtimeOnly project(":keyext.editor")
+    runtimeOnly project(":keyext.script.ui")
 }
 
 task createExamplesZip(type: Zip) {
@@ -47,8 +48,9 @@ application {
 
 run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
-    
-    run
+
+    args "--experimental"
+
 }
 
 

@@ -7,7 +7,6 @@ import bibliothek.gui.dock.common.MultipleCDockableLayout;
 import bibliothek.util.xml.XElement;
 import de.uka.ilkd.key.gui.MainWindow;
 import lombok.Data;
-import lombok.val;
 import org.fife.ui.rsyntaxtextarea.Theme;
 import org.key_project.editor.java.JavaJMLEditorFactory;
 import org.key_project.editor.keyfile.KeyEditorFactory;
@@ -127,30 +126,30 @@ public class EditorFacade {
     }
 
     public static class EditorDockableFactory
-            implements MultipleCDockableFactory<DefaultMultipleCDockable, EditorDockableData> {
+            implements MultipleCDockableFactory<Editor, EditorDockableData> {
         @Override
-        public EditorDockableData write(DefaultMultipleCDockable defaultMultipleCDockable) {
-            val editor = (Editor) defaultMultipleCDockable.getContentPane();
+        public EditorDockableData write(Editor defaultMultipleCDockable) {
+            Editor editor = (Editor) defaultMultipleCDockable;
             EditorDockableData dockableData = create();
-            dockableData.path = editor.getPath().toString();
+            dockableData.path = (editor == null ? "" : editor.getPath().toString());
             dockableData.textContent = editor.getText();
             dockableData.mimeType = editor.getMimeType();
             return dockableData;
         }
 
         @Override
-        public DefaultMultipleCDockable read(EditorDockableData editorDockableData) {
+        public Editor read(EditorDockableData editorDockableData) {
             if (editorDockableData.path != null && !editorDockableData.path.isBlank())
-                return open(Paths.get(editorDockableData.path)).getDockable();
+                return open(Paths.get(editorDockableData.path));
             else {
-                val e = open(editorDockableData.mimeType);
+                Editor e = open(editorDockableData.mimeType);
                 e.setText(editorDockableData.textContent);
-                return e.getDockable();
+                return e;
             }
         }
 
         @Override
-        public boolean match(DefaultMultipleCDockable defaultMultipleCDockable,
+        public boolean match(Editor defaultMultipleCDockable,
                              EditorDockableData editorDockableData) {
             return editorDockableData.equals(write(defaultMultipleCDockable));
             /*return Objects.equals(editor.getPath().toString(), editorDockableData.path)
@@ -173,7 +172,7 @@ public class EditorFacade {
 
         @Override
         public Editor open(Path path) throws IOException {
-            val e = open();
+            Editor e = open();
             e.setText(Files.readString(path));
             e.setDirty(false);
             e.setPath(path);
@@ -187,7 +186,7 @@ public class EditorFacade {
 
         @Override
         public Editor open() {
-            val e = new Editor();
+            Editor e = new Editor();
             e.setMimeType("text/plain");
             return e;
         }
