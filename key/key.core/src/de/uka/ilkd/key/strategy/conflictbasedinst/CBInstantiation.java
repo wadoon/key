@@ -6,10 +6,10 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
+import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Quantifier;
 
 public class CBInstantiation {
@@ -32,33 +32,24 @@ public class CBInstantiation {
     }
 
     private void addToContext(Sequent seq) {
-        seq.antecedent().asList().forEach(e -> addToContext(e.formula()));
-        seq.succedent().asList().forEach(e -> addToContext(services.getTermBuilder().not(e.formula())));
         System.out.println("*** Adding Antecedent ***");
-        for(final SequentFormula sf: seq.antecedent()) {
-            System.out.println("Propose: " + sf.formula().toString());
-            addToContext(sf.formula());
-        }
+        seq.antecedent().asList().forEach(e -> addToContext(e.formula(), true));
         System.out.println("*** Adding Succedent ***");
-        for(final SequentFormula sf: seq.succedent()) {
-            System.out.println("Propose: " + sf.formula().toString());
-            addToContext(services.getTermBuilder().not(sf.formula()));
-        }
-
+        seq.succedent().asList().forEach(e -> addToContext(e.formula(), false));
     }
 
-    private void addToContext(Term t) {
-        if(isGroundLiteral(t)) {
-            System.out.println("operator: " + t.op().toString());
-            System.out.println("Adding: " + t.toString());
+    private void addToContext(Term t, boolean b) {
+        if(t.op() == Junctor.NOT) {
+
+        }
+    }
+
+    private void addToContextHelper(Term t, boolean b) {
+        if(b) {
             context.add(t);
         }else {
-            System.out.println("Not Adding: " + t.toString());
+            context.add(services.getTermBuilder().not(t));
         }
-    }
-
-    private boolean isGroundLiteral(Term t) {
-        return isGround(t) && isLiteral(t);
     }
 
     private void flat(Term formula2, Services services) {
@@ -66,13 +57,8 @@ public class CBInstantiation {
         TermBuilder tb = new TermBuilder(tf, services);
     }
 
-    private boolean isGround(Term t) {
-        return !isQuantified(t);
-    }
-
     private boolean isQuantified(Term t) {
         if(t.op() instanceof Quantifier) {
-            System.out.println("Quantified: " + t.toString());
             return true;
         }
         return isQuantified(t.subs());
@@ -82,10 +68,6 @@ public class CBInstantiation {
         for(Term sub: subs) {
             if(isQuantified(sub)) return true;
         }
-        return false;
-    }
-
-    private boolean isLiteral(Term t) {
         return false;
     }
 

@@ -18,55 +18,57 @@ import java.util.Iterator;
 import org.key_project.util.collection.ImmutableMap;
 import org.key_project.util.collection.ImmutableSet;
 
-import de.uka.ilkd.key.logic.*;
+import de.uka.ilkd.key.logic.ClashFreeSubst;
+import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.TermCreationException;
+import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.util.Debug;
 
 /**
- * This class decribes a substitution,which store a map(varMap) from quantifiable 
+ * This class decribes a substitution,which store a map(varMap) from quantifiable
  * variable to a term(instance).
  */
 public class Substitution {
     private final ImmutableMap<QuantifiableVariable,Term> varMap;
-    
+
     public Substitution(ImmutableMap<QuantifiableVariable,Term> map){
         varMap = map;
     }
-    
+
     public ImmutableMap<QuantifiableVariable,Term> getVarMap(){
         return varMap;
     }
-    
+
     public Term getSubstitutedTerm(QuantifiableVariable var){
-    	return varMap.get(var);
+        return varMap.get(var);
     }
-    
+
     public boolean isTotalOn(ImmutableSet<QuantifiableVariable> vars) {
         for (QuantifiableVariable var : vars) {
             if (!varMap.containsKey(var)) return false;
         }
         return true;
     }
-    
+
 
     /**
-     * @return true if every instance in the varMap does not contain variable. 
+     * @return true if every instance in the varMap does not contain variable.
      */
     public boolean isGround() {
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
         while ( it.hasNext () ) {
-            final Term t = getSubstitutedTerm(it.next ()); 
+            final Term t = getSubstitutedTerm(it.next ());
             if ( t.freeVars ().size () != 0 ) {
-            	Debug.out("evil free vars in term: " + t);
                 return false;
             }
         }
         return true;
-    }   
-  
-    
+    }
+
+
     public Term apply(Term t, TermServices services) {
         assert isGround() :
             "non-ground substitutions are not yet implemented: " + this;
@@ -76,7 +78,7 @@ public class Substitution {
             final QuantifiableVariable var = it.next ();
             final Sort quantifiedVarSort = var.sort ();
             final Function quantifiedVarSortCast =
-                quantifiedVarSort.getCastSymbol (services);
+                    quantifiedVarSort.getCastSymbol (services);
             Term instance = getSubstitutedTerm( var );
             if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) ) {
                 instance = tb.func ( quantifiedVarSortCast, instance );
@@ -90,7 +92,7 @@ public class Substitution {
         final ClashFreeSubst subst = new ClashFreeSubst ( var,  instance, tb);
         return subst.apply ( t );
     }
-    
+
     /**
      * Try to apply the substitution to a term, introducing casts if
      * necessary (may never be the case any more, XXX)
@@ -102,38 +104,41 @@ public class Substitution {
         final Iterator<QuantifiableVariable> it = varMap.keyIterator ();
         while ( it.hasNext () ) {
             final QuantifiableVariable var = it.next ();
-            Term instance = getSubstitutedTerm( var );            
+            Term instance = getSubstitutedTerm( var );
             try {
                 t = applySubst ( var, instance, t, tb );
             } catch (TermCreationException e) {
-                final Sort quantifiedVarSort = var.sort ();                
+                final Sort quantifiedVarSort = var.sort ();
                 if ( !instance.sort ().extendsTrans ( quantifiedVarSort ) ) {
                     final Function quantifiedVarSortCast =
-                        quantifiedVarSort.getCastSymbol (services);
+                            quantifiedVarSort.getCastSymbol (services);
                     instance = tb.func ( quantifiedVarSortCast, instance );
                     t = applySubst ( var, instance, t, tb );
                 } else {
                     throw e;
                 }
-            }        
+            }
         }
         return t;
     }
-    
+
+    @Override
     public boolean equals(Object arg0) {
         if ( !(arg0 instanceof Substitution) ) return false;
         final Substitution s = (Substitution)arg0;
         return varMap.equals(s.varMap);
     }
 
+    @Override
     public int hashCode() {
         return varMap.hashCode();
     }
-    
+
+    @Override
     public String toString() {
-    	return "" + varMap;
+        return "" + varMap;
     }
-    
+
     public boolean termContainsValue(Term term) {
         Iterator<Term> it = varMap.valueIterator ();
         while ( it.hasNext () ) {

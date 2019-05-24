@@ -50,6 +50,7 @@ class UniTrigger implements Trigger {
         this.triggerSetThisBelongsTo = triggerSetThisBelongsTo;
     }
 
+    @Override
     public ImmutableSet<Substitution> getSubstitutionsFromTerms(ImmutableSet<Term> targetTerm,
             Services services) {
         ImmutableSet<Substitution> allsubs = DefaultImmutableSet.<Substitution>nil();
@@ -67,7 +68,6 @@ class UniTrigger implements Trigger {
     }
 
     private ImmutableSet<Substitution> getSubstitutionsFromTermHelp(Term t, Services services) {
-        System.out.println("Term: " + t.toString());
         ImmutableSet<Substitution> newSubs = DefaultImmutableSet.<Substitution>nil();
         if ( t.freeVars ().size () > 0 || t.op () instanceof Quantifier )
             newSubs = Matching.twoSidedMatching ( this, t, services );
@@ -77,18 +77,22 @@ class UniTrigger implements Trigger {
     }
 
 
+    @Override
     public Term getTriggerTerm() {
         return trigger;
     }
 
+    @Override
     public boolean equals(Object arg0) {
         if (!(arg0 instanceof UniTrigger)) return false;
         final UniTrigger a = (UniTrigger) arg0;
         return a.trigger.equals(trigger);
     }
+    @Override
     public int hashCode() {
         return trigger.hashCode();
     }
+    @Override
     public String toString() {
         return "" + trigger;
     }
