@@ -51,4 +51,32 @@ public class AEPostConditionTests extends TestCase {
 
         assertTrue(proof.closed());
     }
+
+    @Test
+    public void testDutchFlag0() {
+        dutchFlag(0);
+    }
+
+    @Test
+    public void testDutchFlag1() {
+        dutchFlag(1);
+    }
+
+    @Test
+    public void testDutchFlag2() {
+        dutchFlag(2);
+    }
+
+    @Test
+    public void testDutchFlag3() {
+        dutchFlag(3);
+    }
+
+    private void dutchFlag(int i) {
+        final Proof proof = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX,
+                "arrays/step" + i + ".key");
+        MergeRuleTests.startAutomaticStrategy(proof);
+
+        assertTrue(proof.closed());
+    }
 }

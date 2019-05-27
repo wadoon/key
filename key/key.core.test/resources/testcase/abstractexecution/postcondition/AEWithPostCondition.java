@@ -46,7 +46,7 @@ public class AEWithPostCondition {
         int i = 0;
 
         //@ accessible input, x, i;
-        //@ assignable \dl_hasTo(x), \dl_hasTo(i);
+        //@ assignable \hasTo(x), \hasTo(i);
         //@
         //@ normal_behavior ensures x == input * input && i == input;
         //@ exceptional_behavior requires false;
@@ -72,7 +72,7 @@ public class AEWithPostCondition {
             //@ ghost int oldI = i;
             
             //@ accessible input, x, i;
-            //@ assignable \dl_hasTo(x), \dl_hasTo(i);
+            //@ assignable \hasTo(x), \hasTo(i);
             //@
             //@ normal_behavior ensures x == oldX + input && i == oldI + 1;
             //@ exceptional_behavior requires false;
