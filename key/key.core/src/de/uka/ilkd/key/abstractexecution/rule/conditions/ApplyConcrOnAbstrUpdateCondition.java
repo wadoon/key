@@ -43,7 +43,6 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -129,8 +128,10 @@ public final class ApplyConcrOnAbstrUpdateCondition implements VariableCondition
         final List<Term> resultingUpdates = new ArrayList<>();
         final Queue<Term> abstrUpdatesToProcess = new LinkedList<>();
 
-        if (abstrUpdateTerm.op() == UpdateJunctor.CONCATENATED_UPDATE && abstrUpdateTerm.subs()
-                .stream().anyMatch(sub -> !(sub.op() instanceof AbstractUpdate))) {
+        try {
+            abstrUpdatesToProcess.addAll(
+                    AbstractExecutionUtils.abstractUpdatesFromConcatenation(abstrUpdateTerm));
+        } catch (RuntimeException e) {
             /*
              * It's a concatenation of abstract and concrete updates... In that case, we for
              * now don't do anything. NOTE (DS, 2019-05-24): It is though possible to split
@@ -139,9 +140,6 @@ public final class ApplyConcrOnAbstrUpdateCondition implements VariableCondition
              */
             return null;
         }
-
-        abstrUpdatesToProcess
-                .addAll(AbstractExecutionUtils.abstractUpdatesFromConcatenation(abstrUpdateTerm));
 
         boolean success = false;
 
@@ -242,7 +240,7 @@ public final class ApplyConcrOnAbstrUpdateCondition implements VariableCondition
         final List<Term> currentRemainingConcrUpdElems = new ArrayList<>();
         final List<Term> currentFollowingConcrUpdElems = new ArrayList<>();
 
-        boolean success = false;
+        boolean success = !abstrUpdateAccessiblesTerm.equals(abstrUpdateTerm.sub(0));
 
         for (LocationVariable elemUpdateLhs : MergeRuleUtils.getUpdateLeftSideLocations( //
                 concrUpdate, tb)) {
