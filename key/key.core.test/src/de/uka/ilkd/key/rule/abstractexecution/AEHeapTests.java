@@ -43,4 +43,23 @@ public class AEHeapTests extends TestCase {
         assertFalse(proof.closed());
         assertEquals(1, proof.openGoals().size());
     }
+
+    @Test
+    public void testIneffectiveArrayAssignment() {
+        final Proof proof = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX,
+                "arrays/throwAwayAssignmentToSingleField.key");
+        MergeRuleTests.startAutomaticStrategy(proof);
+
+        assertTrue(proof.closed());
+    }
+
+    @Test
+    public void testEffectiveArrayAssignment() {
+        final Proof proof = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX,
+                "arrays/cannotThrowAwayAssignmentToSingleField.key");
+        MergeRuleTests.startAutomaticStrategy(proof);
+
+        assertFalse(proof.closed());
+        assertEquals(2, proof.openGoals().size());
+    }
 }

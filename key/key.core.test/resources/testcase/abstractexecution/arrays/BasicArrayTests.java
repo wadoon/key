@@ -16,4 +16,19 @@ public class BasicArrayTests {
         
         return A[14];
     }
+    
+  /*@ public normal_behavior
+    @ requires A != null && A.length > 14;
+    @*/
+  public Integer cannotThrowAwayAssignmentToSingleField(int[] A, int x) {
+      A[14] = x;
+      
+      //@ assignable \dl_hasTo(A[*]);
+      //@ accessible A[0..14], A[15..A.length-1]; // <- changed 13 to 14
+      //@ return_behavior requires false;
+      //@ exceptional_behavior requires false;
+      { \abstract_statement P; }
+      
+      return A[14];
+  }
 }
