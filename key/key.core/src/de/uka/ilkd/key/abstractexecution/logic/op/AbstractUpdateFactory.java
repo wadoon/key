@@ -46,6 +46,7 @@ import de.uka.ilkd.key.ldt.SetLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.Function;
+import de.uka.ilkd.key.logic.op.IfThenElse;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -377,9 +378,9 @@ public class AbstractUpdateFactory {
 
         if (op instanceof LocationVariable) {
             result.add(new PVLoc((LocationVariable) op));
-        } else if (t.op() == locSetLDT.getAllLocs()) {
+        } else if (op == locSetLDT.getAllLocs()) {
             result.add(new AllLocsLoc(locSetLDT.getAllLocs()));
-        } else if (t.op() == locSetLDT.getEmpty()) {
+        } else if (op == locSetLDT.getEmpty()) {
             result.add(new EmptyLoc(locSetLDT.getEmpty()));
         } else if (op instanceof Function && op.arity() == 0
                 && ((Function) op).sort() == locSetLDT.targetSort()) {
@@ -422,6 +423,16 @@ public class AbstractUpdateFactory {
         } else if (t.isRigid() && t.sort() != locSetLDT.targetSort()
                 && t.sort() != heapLDT.getFieldSort()) {
             result.add(new RigidRHS(t));
+        } else if (op == IfThenElse.IF_THEN_ELSE) {
+            for (int i = 1; i <= 2; i++) {
+                final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTermUnsafe(t.sub(i),
+                        runtimeInstance, services);
+                if (subResult == null) {
+                    return null;
+                }
+
+                result.addAll(subResult);
+            }
         } else {
             return null;
         }
@@ -496,6 +507,8 @@ public class AbstractUpdateFactory {
 
         if (op instanceof LocationVariable) {
             /* This is the heap LV, in which we are not interested here. */
+            /* TODO (DS, 2019-05-27): Seems that we still need it, check if that breaks anything */
+            result.add(new PVLoc((LocationVariable) op));
         } else if (op == locSetLDT.getSingleton() && t.sub(1).op() == heapLDT.getArr()) {
             result.add(new ArrayLocRHS(t.sub(0), t.sub(1).sub(0)));
         } else if (op == locSetLDT.getSingleton()) {

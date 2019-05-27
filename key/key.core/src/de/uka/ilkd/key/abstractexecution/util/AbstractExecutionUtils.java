@@ -31,6 +31,7 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayRange;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.FieldLocRHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.HeapLocRHS;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.OpCollector;
@@ -335,7 +336,8 @@ public class AbstractExecutionUtils {
 
         final Term abstrUpdLocUnionTerm = abstrUpdateAccLocs.stream()
                 .filter(HeapLocRHS.class::isInstance).map(HeapLocRHS.class::cast)
-                .map(l -> l.toTerm(services))
+                //.map(l -> l.toTerm(services))
+                .map(rhs -> convertHeapLocRHStoLocSetTerm(rhs, services))
                 .collect(Collectors.reducing(tb.empty(), (t1, t2) -> tb.union(t1, t2)));
 
         if (abstrUpdLocUnionTerm.equals(tb.empty())) {
@@ -356,13 +358,16 @@ public class AbstractExecutionUtils {
 
     private static Term convertHeapLocRHStoLocSetTerm(HeapLocRHS toConvert, Services services) {
         final TermBuilder tb = services.getTermBuilder();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
         if (toConvert instanceof ArrayLocRHS) {
             return tb.singleton(((ArrayLocRHS) toConvert).getArray(),
                     tb.arr(((ArrayLocRHS) toConvert).getIndex()));
         } else if (toConvert instanceof FieldLocRHS) {
-            return tb.singleton(((FieldLocRHS) toConvert).getObjTerm(),
-                    tb.var(((FieldLocRHS) toConvert).getFieldPV()));
+            final Term objTerm = ((FieldLocRHS) toConvert).getObjTerm();
+            final LocationVariable fieldPV = ((FieldLocRHS) toConvert).getFieldPV();
+            final Term fieldSymbol = tb.func(heapLDT.getFieldSymbolForPV(fieldPV, services));
+            return tb.singleton(objTerm, fieldSymbol);
         } else if (toConvert instanceof ArrayRange || toConvert instanceof AllFieldsLocRHS) {
             // Here, the result is the same.
             return toConvert.toTerm(services);

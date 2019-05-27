@@ -18,12 +18,14 @@ import java.util.Set;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
@@ -76,6 +78,11 @@ public abstract class HeapLocLHS implements AbstractUpdateAssgnLoc {
 
     @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
+        if (otherLoc instanceof PVLoc) {
+            final LocationVariable baseHeap = services.getTypeConverter().getHeapLDT().getHeap();
+            return ((PVLoc) otherLoc).getVar().equals(baseHeap);
+        }
+
         /*
          * TODO (DS, 2019-05-27): We might fail to prove the disjointness condition
          * although it actually holds; for instance, we might need premises from the

@@ -47,7 +47,7 @@ public class AEHeapTests extends TestCase {
     @Test
     public void testIneffectiveArrayAssignment() {
         final Proof proof = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX,
-                "arrays/throwAwayAssignmentToSingleField.key");
+                "arrays/basicTests/throwAwayAssignmentToSingleField.key");
         MergeRuleTests.startAutomaticStrategy(proof);
 
         assertTrue(proof.closed());
@@ -56,10 +56,38 @@ public class AEHeapTests extends TestCase {
     @Test
     public void testEffectiveArrayAssignment() {
         final Proof proof = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX,
-                "arrays/cannotThrowAwayAssignmentToSingleField.key");
+                "arrays/basicTests/cannotThrowAwayAssignmentToSingleField.key");
         MergeRuleTests.startAutomaticStrategy(proof);
 
         assertFalse(proof.closed());
         assertEquals(2, proof.openGoals().size());
+    }
+
+    @Test
+    public void testDutchFlag0() {
+        dutchFlag(0);
+    }
+
+    @Test
+    public void testDutchFlag1() {
+        dutchFlag(1);
+    }
+
+    @Test
+    public void testDutchFlag2() {
+        dutchFlag(2);
+    }
+
+    @Test
+    public void testDutchFlag3() {
+        dutchFlag(3);
+    }
+
+    private void dutchFlag(int i) {
+        final Proof proof = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX,
+                "arrays/dutchFlag/step" + i + ".key");
+        MergeRuleTests.startAutomaticStrategy(proof);
+
+        assertTrue(proof.closed());
     }
 }
