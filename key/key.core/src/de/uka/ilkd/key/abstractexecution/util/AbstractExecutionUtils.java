@@ -23,9 +23,16 @@ import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AllLocsLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.AllFieldsLocRHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayLocRHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayRange;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.FieldLocRHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.HeapLocRHS;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.LocSetLDT;
+import de.uka.ilkd.key.logic.GenericTermReplacer;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -101,10 +108,11 @@ public class AbstractExecutionUtils {
                             .filter(AbstractUpdateLoc.class::isInstance)
                             .map(AbstractUpdateLoc.class::cast)
                             .filter(loc -> assignedBeforeUsed.stream()
-                                    .noneMatch(assgnLoc -> assgnLoc.mayAssign(loc)))
+                                    .noneMatch(assgnLoc -> assgnLoc.mayAssign(loc, services)))
                             .forEach(usedBeforeAssigned::add);
 
-                    if (!usedBeforeAssigned.stream().anyMatch(loc -> lhsLoc.mayAssign(loc))) {
+                    if (!usedBeforeAssigned.stream()
+                            .anyMatch(loc -> lhsLoc.mayAssign(loc, services))) {
                         assignedBeforeUsed.add(lhsLoc);
                     }
                 }
@@ -141,12 +149,12 @@ public class AbstractExecutionUtils {
 
             usedBeforeAssigned.addAll(subResult.second.stream()
                     .filter(rhsLoc -> !assignedBeforeUsed.stream()
-                            .anyMatch(lhsLoc -> lhsLoc.mayAssign(rhsLoc)))
+                            .anyMatch(lhsLoc -> lhsLoc.mayAssign(rhsLoc, services)))
                     .collect(Collectors.toSet()));
 
             assignedBeforeUsed.addAll(subResult.first.stream()
                     .filter(lhsLoc -> !usedBeforeAssigned.stream()
-                            .anyMatch(rhsLoc -> lhsLoc.mayAssign(rhsLoc)))
+                            .anyMatch(rhsLoc -> lhsLoc.mayAssign(rhsLoc, services)))
                     .collect(Collectors.toSet()));
         }
 
@@ -182,8 +190,8 @@ public class AbstractExecutionUtils {
                  * Here, x should be used before assigned and not assigned before used.
                  * Therefore the removal.
                  */
-                assignedBeforeUsed.removeIf(
-                        abu -> usedBeforeAssigned.stream().anyMatch(uba -> abu.mayAssign(uba)));
+                assignedBeforeUsed.removeIf(abu -> usedBeforeAssigned.stream()
+                        .anyMatch(uba -> abu.mayAssign(uba, services)));
             }
         }
 
@@ -191,12 +199,12 @@ public class AbstractExecutionUtils {
          * At the end, all operators that are assigned before used should not be in the
          * used before assigned set.
          */
-        assert assignedBeforeUsed.stream()
-                .noneMatch(abu -> usedBeforeAssigned.stream().anyMatch(uba -> abu.mayAssign(uba)));
+        assert assignedBeforeUsed.stream().noneMatch(
+                abu -> usedBeforeAssigned.stream().anyMatch(uba -> abu.mayAssign(uba, services)));
 
         /* Also vice versa */
-        assert usedBeforeAssigned.isEmpty() || usedBeforeAssigned.stream()
-                .noneMatch(uba -> assignedBeforeUsed.stream().anyMatch(abu -> abu.mayAssign(uba)));
+        assert usedBeforeAssigned.isEmpty() || usedBeforeAssigned.stream().noneMatch(
+                uba -> assignedBeforeUsed.stream().anyMatch(abu -> abu.mayAssign(uba, services)));
 
         return Optional.of(new Pair<>(assignedBeforeUsed, usedBeforeAssigned));
     }
@@ -227,14 +235,15 @@ public class AbstractExecutionUtils {
         usedBeforeAssigned.addAll(AbstractUpdateFactory
                 .extractAbstrUpdateLocsFromTerm(update.sub(0), runtimeInstance, services).stream()
                 .filter(AbstractUpdateLoc.class::isInstance)
-                .filter(op -> assignedBeforeUsed.stream().noneMatch(assgn -> assgn.mayAssign(op)))
+                .filter(op -> assignedBeforeUsed.stream()
+                        .noneMatch(assgn -> assgn.mayAssign(op, services)))
                 .map(AbstractUpdateLoc.class::cast)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>())));
 
         final AbstractUpdate abstrUpdate = (AbstractUpdate) update.op();
         assignedBeforeUsed.addAll(abstrUpdate.getHasToAssignables().stream()
                 .filter(hasToAssgn -> usedBeforeAssigned.stream()
-                        .noneMatch(used -> hasToAssgn.mayAssign(used)))
+                        .noneMatch(used -> hasToAssgn.mayAssign(used, services)))
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>())));
     }
 
@@ -289,6 +298,119 @@ public class AbstractExecutionUtils {
         final Operator allLocs = services.getTypeConverter().getLocSetLDT().getAllLocs();
         return getAccessiblesForAbstractUpdate(update, services.getTermBuilder()).stream()
                 .anyMatch(t -> t.op() == allLocs);
+    }
+
+    /**
+     * Evaluates whether the given abstract update accesses "abstractly" a given
+     * location term. This is done by trying to prove that the specified heap
+     * locations are disjoint. If this can be shown, the method returns "false", if
+     * not, it returns "true" (which is, so to say, the default value, and
+     * represents both "true" and "unknown"). Callers of the method should therefore
+     * not induce unsound behavior if this method returns true as a false negative.
+     * If the method returns false, on the other hand, it can be taken for granted
+     * that there is not relation between the location sets.
+     * 
+     * @param abstrUpdTerm The abstract update term.
+     * @param lhsLoc       The location for which abstract access should be checked.
+     * @param services     The {@link Services} object.
+     * @return true iff the abstract update accesses abstractly the given location.
+     */
+    public static boolean accessesAbstractly(Term abstrUpdTerm, AbstractUpdateLoc rhsLoc,
+            Services services) {
+        final Set<AbstractUpdateLoc> abstrUpdateAccLocs = AbstractUpdateFactory
+                .abstrUpdateLocsFromTermSafe(abstrUpdTerm.sub(0), Optional.empty(), services);
+
+        if (abstrUpdateAccLocs.stream().anyMatch(AllLocsLoc.class::isInstance)) {
+            return true;
+        }
+
+        if (!(rhsLoc instanceof HeapLocRHS)) {
+            return false;
+        }
+
+        final Term rhsLocTermAsLhsLocTerm = //
+                convertHeapLocRHStoLocSetTerm((HeapLocRHS) rhsLoc, services);
+
+        final TermBuilder tb = services.getTermBuilder();
+
+        final Term abstrUpdLocUnionTerm = abstrUpdateAccLocs.stream()
+                .filter(HeapLocRHS.class::isInstance).map(HeapLocRHS.class::cast)
+                .map(l -> l.toTerm(services))
+                .collect(Collectors.reducing(tb.empty(), (t1, t2) -> tb.union(t1, t2)));
+
+        if (abstrUpdLocUnionTerm.equals(tb.empty())) {
+            return false;
+        }
+
+        final Term disjointTerm = tb.disjoint(rhsLocTermAsLhsLocTerm, abstrUpdLocUnionTerm);
+
+        final boolean provablyDisjoint = //
+                MergeRuleUtils.isProvableWithSplitting(disjointTerm, services, 1000);
+
+        if (provablyDisjoint) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private static Term convertHeapLocRHStoLocSetTerm(HeapLocRHS toConvert, Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+
+        if (toConvert instanceof ArrayLocRHS) {
+            return tb.singleton(((ArrayLocRHS) toConvert).getArray(),
+                    tb.arr(((ArrayLocRHS) toConvert).getIndex()));
+        } else if (toConvert instanceof FieldLocRHS) {
+            return tb.singleton(((FieldLocRHS) toConvert).getObjTerm(),
+                    tb.var(((FieldLocRHS) toConvert).getFieldPV()));
+        } else if (toConvert instanceof ArrayRange || toConvert instanceof AllFieldsLocRHS) {
+            // Here, the result is the same.
+            return toConvert.toTerm(services);
+        }
+
+        return null;
+    }
+
+    /**
+     * Applies the given update (concrete & in normal form!) to the target. This is
+     * done by performing a simple substitution of left-hand sides for right-hand
+     * sides, which is unsound if there may be modal operators in the target term.
+     * So this method is only to be used in situations where this certainly is not
+     * the case.
+     * 
+     * @param upd      The update to apply.
+     * @param target   The target term.
+     * @param services The {@link Services} object.
+     * @return The term after update application.
+     */
+    public static Term applyUpdate(Term upd, Term target, Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+
+        for (Term elemUpd : MergeRuleUtils.getElementaryUpdates(upd, tb)) {
+            target = GenericTermReplacer.replace(target, //
+                    t -> t.op() == ((ElementaryUpdate) elemUpd.op()).lhs(), //
+                    t -> elemUpd.sub(0), //
+                    services);
+        }
+
+        return target;
+
+        //@formatter:off
+//        final Proof proof = services.getProof();
+//
+//        final Term termAfterUpdAppl = tb.apply(upd, target);
+//        final Function pred = //
+//                new Function(new Name("auxiliary-pred"), Sort.FORMULA, termAfterUpdAppl.sort());
+//        final Term predTerm = tb.func(pred, termAfterUpdAppl);
+//        Term simplTerm;
+//        try {
+//            simplTerm = MergeRuleUtils.simplify(proof, predTerm, 1000);
+//        } catch (ProofInputException e) {
+//            return termAfterUpdAppl;
+//        }
+//
+//        return simplTerm.sub(0);
+        //@formatter:on
     }
 
     /**

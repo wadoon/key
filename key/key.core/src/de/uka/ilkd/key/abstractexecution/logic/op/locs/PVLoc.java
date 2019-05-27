@@ -55,13 +55,20 @@ public class PVLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
         return Collections.singleton(locVar);
     }
 
+    /**
+     * @return the encapsulated location variable.
+     */
+    public LocationVariable getVar() {
+        return locVar;
+    }
+
     @Override
     public String toString() {
         return locVar.toString();
     }
 
     @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc) {
+    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
         return otherLoc instanceof PVLoc && otherLoc.equals(this);
     }
 

@@ -18,6 +18,7 @@ import java.util.Set;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
@@ -40,7 +41,7 @@ public class ArrayLocLHS extends HeapLocLHS {
     }
 
     @Override
-    protected Term toTerm(Services services) {
+    public Term toTerm(Services services) {
         final TermBuilder tb = services.getTermBuilder();
         return tb.dotArr(array, index);
     }
@@ -74,22 +75,21 @@ public class ArrayLocLHS extends HeapLocLHS {
     }
 
     @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc) {
+    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
         if (otherLoc instanceof AllFieldsLocRHS) {
             /*
              * TODO (DS, 2019-05-22): Check whether that's the intended semantics, since
              * actually, an a[5] cannot really assign a[*], at least not all positions...
              */
             return ((AllFieldsLocRHS) otherLoc).getArray().equals(this.array);
-        } else {
-            /*
-             * TODO (DS, 2019-05-23): Equality might be misleading... Might there be
-             * aliasing etc., or does this practically not occur?
-             */
-            return otherLoc instanceof ArrayLocRHS
-                    && ((ArrayLocRHS) otherLoc).getArray().equals(this.array)
-                    && ((ArrayLocRHS) otherLoc).getIndex().equals(this.getIndex());
+        } else if (otherLoc instanceof PVLoc) {
+            return ((PVLoc) otherLoc).getVar()
+                    .equals(services.getTypeConverter().getHeapLDT().getHeap());
+        } else if (otherLoc instanceof ArrayLocRHS || otherLoc instanceof ArrayRange) {
+            return super.mayAssign(otherLoc, services);
         }
+        
+        return false;
     }
 
     @Override

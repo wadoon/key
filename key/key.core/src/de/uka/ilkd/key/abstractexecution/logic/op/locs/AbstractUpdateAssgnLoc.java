@@ -58,7 +58,8 @@ public interface AbstractUpdateAssgnLoc {
      * {@link AbstractUpdateAssgnLoc} is an {@link AllFieldsLocRHS} for A.
      * 
      * @param otherLoc The location for which to evaluate whether we can assign it.
+     * @param services TODO
      * @return true if this {@link AbstractUpdateAssgnLoc} may assign otherLoc.
      */
-    boolean mayAssign(AbstractUpdateLoc otherLoc);
+    boolean mayAssign(AbstractUpdateLoc otherLoc, Services services);
 }

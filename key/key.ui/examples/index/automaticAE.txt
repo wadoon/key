@@ -125,11 +125,10 @@ keySettings = "#Proof-Settings-Config-File
 [SMTSettings]SelectedTaclets=
 [Choice]DefaultChoices=assertions-assertions:on , intRules-intRules:arithmeticSemanticsIgnoringOF , initialisation-initialisation:disableStaticInitialisation , programRules-programRules:Java , runtimeExceptions-runtimeExceptions:ban , JavaCard-JavaCard:on , Strings-Strings:on , modelFields-modelFields:showSatisfiability , bigint-bigint:on , sequences-sequences:on , reach-reach:on , integerSimplificationRules-integerSimplificationRules:full , wdOperator-wdOperator:L , wdChecks-wdChecks:off , permissions-permissions:off , moreSeqRules-moreSeqRules:off , mergeGenerateIsWeakeningGoal-mergeGenerateIsWeakeningGoal:off , javaLoopTreatment-javaLoopTreatment\\:efficient
 [Strategy]ActiveStrategy=JavaCardDLStrategy
-
 "
 
 # Examples used in the Abstract Execution paper submitted to FM 2019
-group aepaper-provable {
+group aepaper_provable {
    provable ./abstract_execution/ExtractMethod/CorrectSpecified/extractMethodRefactoring.key
    provable ./abstract_execution/ExtractMethod/Heap/extractMethodRefactoring.key
    provable ./abstract_execution/DecomposeConditional/Correct/decomposeConditional.key
@@ -145,14 +144,14 @@ group aepaper-provable {
    loadable ./abstract_execution/ExtractMethod/CorrectSpecified/extractMethodRefactoring.proof
 }
 
-group aepaper-notprovable {
+group aepaper_notprovable {
    notprovable ./abstract_execution/ExtractMethod/WithoutReturnSpec/extractMethodRefactoring.key
    notprovable ./abstract_execution/ExtractMethod/WrongAssignable/extractMethodRefactoring.key
    notprovable ./abstract_execution/ReplaceExceptionWithTest/IncorrectMissingRollback/replaceExceptionWithTest.key
    notprovable ./abstract_execution/ConsolidateDuplicateConditionalFragments/ExtractPrefixIncorrect/consolidateDuplicateConditionalFragmentsPrefixIncorrect.key
 }
 
-group aepaper-loops {
+group aepaper_loops {
    # provable ./abstract_execution/SplitLoop/Correct/splitLoopRefactoring.key # takes very long!
    provable ./abstract_execution/LoopUnrolling/Correct/loopUnrolling.key
    provable ./abstract_execution/RemoveControlFlag/CorrectWithUnrollingInvRule/removeControlFlag.key

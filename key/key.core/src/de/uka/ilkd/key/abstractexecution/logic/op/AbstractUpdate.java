@@ -175,8 +175,8 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      *         (includes "have-to"s).
      */
     public boolean mayAssign(AbstractUpdateLoc loc) {
-        return getMaybeAssignables().stream().anyMatch(assignable -> assignable.mayAssign(loc))
-                || getHasToAssignables().stream().anyMatch(assignable -> assignable.mayAssign(loc));
+        return getMaybeAssignables().stream().anyMatch(assignable -> assignable.mayAssign(loc, services))
+                || getHasToAssignables().stream().anyMatch(assignable -> assignable.mayAssign(loc, services));
     }
 
     /**
@@ -195,7 +195,7 @@ public final class AbstractUpdate extends AbstractSortedOperator {
      * @return
      */
     public boolean hasToAssign(AbstractUpdateLoc loc) {
-        return getHasToAssignables().stream().anyMatch(assignable -> assignable.mayAssign(loc));
+        return getHasToAssignables().stream().anyMatch(assignable -> assignable.mayAssign(loc, services));
     }
 
     /**

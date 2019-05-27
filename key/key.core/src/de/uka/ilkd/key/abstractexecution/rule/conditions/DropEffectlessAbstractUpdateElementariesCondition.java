@@ -202,7 +202,7 @@ public final class DropEffectlessAbstractUpdateElementariesCondition implements 
 
         final Set<AbstractUpdateAssgnLoc> newAssignables = assignables.stream()
                 .filter(op -> !opsHaveToAssignBeforeUsed.contains(op))
-                .filter(loc -> locsInTarget.stream().anyMatch(targLoc -> loc.mayAssign(targLoc)))
+                .filter(loc -> locsInTarget.stream().anyMatch(targLoc -> loc.mayAssign(targLoc, services)))
                 .map(loc -> abstrUpd.hasToAssign(loc) ? new HasToLoc(loc) : loc)
                 .collect(Collectors.toCollection(() -> new LinkedHashSet<>()));
 

@@ -32,7 +32,9 @@ import de.uka.ilkd.key.abstractexecution.logic.op.locs.RigidRHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.SkolemLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.AllFieldsLocLHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.AllFieldsLocRHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayLocLHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayLocRHS;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.ArrayRange;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.FieldLocLHS;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.heap.FieldLocRHS;
 import de.uka.ilkd.key.java.JavaInfo;
@@ -449,16 +451,21 @@ public class AbstractUpdateFactory {
         final Set<AbstractUpdateAssgnLoc> result = new LinkedHashSet<>();
 
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
         final Operator op = t.op();
 
-        if (op == locSetLDT.getSingleton()) {
+        if (op == locSetLDT.getSingleton() && t.sub(1).op() == heapLDT.getArr()) {
+            result.add(new ArrayLocLHS(t.sub(0), t.sub(1).sub(0)));
+        } else if (op == locSetLDT.getSingleton()) {
             final Term obj = //
                     normalizeSelfVar(t.sub(0), runtimeInstance, services);
             final Term field = t.sub(1);
             result.add(new FieldLocLHS(obj, fieldPVFromFieldFunc(field, services)));
         } else if (t.op() == locSetLDT.getAllFields() && t.subs().size() == 1) {
             result.add(new AllFieldsLocLHS(t.sub(0)));
+        } else if (t.op() == locSetLDT.getArrayRange()) {
+            result.add(new ArrayRange(t.sub(0), t.sub(1), t.sub(2)));
         } else {
             return null;
         }
@@ -489,6 +496,8 @@ public class AbstractUpdateFactory {
 
         if (op instanceof LocationVariable) {
             /* This is the heap LV, in which we are not interested here. */
+        } else if (op == locSetLDT.getSingleton() && t.sub(1).op() == heapLDT.getArr()) {
+            result.add(new ArrayLocRHS(t.sub(0), t.sub(1).sub(0)));
         } else if (op == locSetLDT.getSingleton()) {
             final Term obj = //
                     normalizeSelfVar(t.sub(0), runtimeInstance, services);
@@ -497,6 +506,8 @@ public class AbstractUpdateFactory {
                     fieldPVFromFieldFunc(field, services)));
         } else if (t.op() == locSetLDT.getAllFields() && t.subs().size() == 1) {
             result.add(new AllFieldsLocRHS(t.sub(0)));
+        } else if (t.op() == locSetLDT.getArrayRange()) {
+            result.add(new ArrayRange(t.sub(0), t.sub(1), t.sub(2)));
         } else if (heapLDT.isSelectOp(op) && t.subs().size() == 3
                 && t.sub(2).op() == heapLDT.getArr()) {
             final Term heapTerm = t.sub(0);
@@ -602,13 +613,15 @@ public class AbstractUpdateFactory {
 
     private static boolean isLHSHeapOp(final Operator op, final LocSetLDT locSetLDT,
             final HeapLDT heapLDT) {
-        return op == locSetLDT.getSingleton() || op == locSetLDT.getAllFields();
+        return op == locSetLDT.getArrayRange() || op == locSetLDT.getSingleton()
+                || op == locSetLDT.getAllFields();
     }
 
     private static boolean isRHSHeapOp(final Operator op, final LocSetLDT locSetLDT,
             final HeapLDT heapLDT) {
-        return op == locSetLDT.getSingleton() || heapLDT.isSelectOp(op) || op == heapLDT.getStore()
-                || op == heapLDT.getAnon() || op == locSetLDT.getAllFields();
+        return op == locSetLDT.getArrayRange() || op == locSetLDT.getSingleton()
+                || heapLDT.isSelectOp(op) || op == heapLDT.getStore() || op == heapLDT.getAnon()
+                || op == locSetLDT.getAllFields();
     }
 
     /**

@@ -56,7 +56,7 @@ public class AllLocsLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
     }
     
     @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc) {
+    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
         // allLocs can assign everything.
         return true;
     }

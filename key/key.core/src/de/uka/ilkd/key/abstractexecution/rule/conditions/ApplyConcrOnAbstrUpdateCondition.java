@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
@@ -42,6 +43,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.logic.op.UpdateSV;
 import de.uka.ilkd.key.rule.MatchConditions;
 import de.uka.ilkd.key.rule.VariableCondition;
@@ -127,6 +129,17 @@ public final class ApplyConcrOnAbstrUpdateCondition implements VariableCondition
         final List<Term> resultingUpdates = new ArrayList<>();
         final Queue<Term> abstrUpdatesToProcess = new LinkedList<>();
 
+        if (abstrUpdateTerm.op() == UpdateJunctor.CONCATENATED_UPDATE && abstrUpdateTerm.subs()
+                .stream().anyMatch(sub -> !(sub.op() instanceof AbstractUpdate))) {
+            /*
+             * It's a concatenation of abstract and concrete updates... In that case, we for
+             * now don't do anything. NOTE (DS, 2019-05-24): It is though possible to split
+             * updates up and fall back to a normal situation, if necessary, it could be
+             * implemented here.
+             */
+            return null;
+        }
+
         abstrUpdatesToProcess
                 .addAll(AbstractExecutionUtils.abstractUpdatesFromConcatenation(abstrUpdateTerm));
 
@@ -195,25 +208,37 @@ public final class ApplyConcrOnAbstrUpdateCondition implements VariableCondition
         final AbstractUpdate abstrUpdBeforeRepl = (AbstractUpdate) abstrUpdateTerm.op();
 
         // First, apply concrete update on the heap LHSs of the abstract update
-        final Set<AbstractUpdateAssgnLoc> newAssignables = abstrUpdBeforeRepl.getAllAssignables()
-                .stream()
-                .map(assgn -> assgn instanceof HeapLocLHS
-                        ? ((HeapLocLHS) assgn).applyUpdate(services.getProof(), concrUpdate)
-                                .orElseThrow()
-                        : (assgn instanceof HasToLoc
-                                && (((HasToLoc) assgn).child() instanceof HeapLocLHS)
-                                        ? ((HeapLocLHS) ((HasToLoc) assgn).child())
-                                                .applyUpdate(services.getProof(), concrUpdate)
-                                                .orElseThrow()
-                                        : assgn))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<AbstractUpdateAssgnLoc> newAssignables = null;
+        try {
+            newAssignables = abstrUpdBeforeRepl.getAllAssignables().stream()
+                    .map(assgn -> assgn instanceof HeapLocLHS
+                            ? ((HeapLocLHS) assgn).applyUpdate(services.getProof(), concrUpdate)
+                                    .orElseThrow()
+                            : (assgn instanceof HasToLoc
+                                    && (((HasToLoc) assgn).child() instanceof HeapLocLHS)
+                                            ? new HasToLoc(((HeapLocLHS) ((HasToLoc) assgn).child())
+                                                    .applyUpdate(services.getProof(), concrUpdate)
+                                                    .orElseThrow())
+                                            : assgn))
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+        } catch (NoSuchElementException nsee) {
+            /*
+             * Applying the update to the heap location did not work as expected, we're not
+             * applicable
+             */
+            return null;
+        }
+
+        final Term abstrUpdateAccessiblesTerm = //
+                AbstractExecutionUtils.applyUpdate(concrUpdate, abstrUpdateTerm.sub(0), services);
+
         final AbstractUpdate abstrUpd = //
                 newAssignables.equals(abstrUpdBeforeRepl.getAllAssignables()) //
                         ? abstrUpdBeforeRepl
                         : services.abstractUpdateFactory().changeAssignables(abstrUpdBeforeRepl,
                                 newAssignables);
 
-        Term currentAccessibles = abstrUpdateTerm.sub(0);
+        Term currentAccessibles = abstrUpdateAccessiblesTerm;
         final List<Term> currentRemainingConcrUpdElems = new ArrayList<>();
         final List<Term> currentFollowingConcrUpdElems = new ArrayList<>();
 
@@ -268,7 +293,9 @@ public final class ApplyConcrOnAbstrUpdateCondition implements VariableCondition
                  */
                 final boolean mayDrop = (abstrUpd.hasToAssign(elemUpdateLhsLoc)
                         || (!abstrUpd.mayAssign(elemUpdateLhsLoc) && !abstrUpd.assignsAllLocs()))
-                        && !AbstractExecutionUtils.accessesAllLocs(abstrUpdateTerm, services);
+                        && !AbstractExecutionUtils.accessesAbstractly(
+                                tb.abstractUpdate(abstrUpd, abstrUpdateAccessiblesTerm),
+                                elemUpdateLhsLoc, services);
 
                 /*
                  * Note that there is a situation where the update may be pushed through, but
@@ -364,15 +391,17 @@ public final class ApplyConcrOnAbstrUpdateCondition implements VariableCondition
             return t;
         }
 
-        final FieldLocRHS reprLoc = (FieldLocRHS) AbstractUpdateFactory
+        final HeapLocRHS reprLoc = (HeapLocRHS) AbstractUpdateFactory
                 .abstrUpdateLocsFromTermSafe(t, Optional.empty(), services).iterator().next();
 
         final Term subResult = //
                 removeFieldLocsFromStoreExpr(t.sub(0), fieldsToDrop, services);
         if (fieldsToDrop.contains(reprLoc)) {
             return subResult;
-        } else {
+        } else if (reprLoc instanceof FieldLocRHS) {
             return tb.store(subResult, t.sub(1), t.sub(2), t.sub(3));
+        } else {
+            return t;
         }
     }
 

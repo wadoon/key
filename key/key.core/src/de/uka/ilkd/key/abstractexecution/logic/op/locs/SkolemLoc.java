@@ -62,7 +62,7 @@ public class SkolemLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
     }
 
     @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc) {
+    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
         return otherLoc instanceof SkolemLoc && otherLoc.equals(this);
     }
 

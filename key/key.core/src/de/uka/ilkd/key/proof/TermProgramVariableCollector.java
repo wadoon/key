@@ -15,7 +15,10 @@ package de.uka.ilkd.key.proof;
 
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.DefaultVisitor;
@@ -41,7 +44,17 @@ public class TermProgramVariableCollector extends DefaultVisitor {
     public void visit(Term t) {
 	if ( t.op() instanceof LocationVariable ) {
 	    result.add ( (LocationVariable) t.op() );
-	} 
+	}
+	
+	if (t.op() instanceof AbstractUpdate) {
+	    final AbstractUpdate abstrUpd = (AbstractUpdate) t.op();
+            final Set<LocationVariable> varsInAbstrUpdAssignables = //
+                    abstrUpd.getAllAssignables().stream().map(assgn -> assgn.childOps())
+                    .flatMap(s -> s.stream()).filter(LocationVariable.class::isInstance)
+                    .map(LocationVariable.class::cast)
+                    .collect(Collectors.toCollection(LinkedHashSet::new));
+            result.addAll(varsInAbstrUpdAssignables);
+	}
 	
 	if ( !t.javaBlock ().isEmpty() ) {
 	    ProgramVariableCollector pvc

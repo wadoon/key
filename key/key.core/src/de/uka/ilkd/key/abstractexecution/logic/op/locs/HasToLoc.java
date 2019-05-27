@@ -62,8 +62,8 @@ public class HasToLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
     }
 
     @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc) {
-        return child.mayAssign(otherLoc);
+    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
+        return child.mayAssign(otherLoc, services);
     }
 
     @Override

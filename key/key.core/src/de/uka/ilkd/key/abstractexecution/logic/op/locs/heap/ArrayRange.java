@@ -1,6 +1,6 @@
 // This file is part of KeY - Integrated Deductive Software Design
 //
-// Copyright (C) 2001-2011 Universitaet Karlsruhe (TH), Germany
+// Copyright (C) 2001-2010 Universitaet Karlsruhe (TH), Germany
 //                         Universitaet Koblenz-Landau, Germany
 //                         Chalmers University of Technology, Sweden
 // Copyright (C) 2011-2019 Karlsruhe Institute of Technology, Germany
@@ -27,74 +27,65 @@ import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 
 /**
- * An "all fields" array location ("myArray[*]").
- *
  * @author Dominic Steinhoefel
+ *
  */
-public class AllFieldsLocLHS extends HeapLocLHS {
-    private final Term array;
+public class ArrayRange extends HeapLocLHS implements HeapLocRHS {
+    final Term array;
+    final Term left;
+    final Term right;
 
-    public AllFieldsLocLHS(Term array) {
+    public ArrayRange(Term array, Term left, Term right) {
         this.array = array;
-    }
-
-    /**
-     * @return the array
-     */
-    public Term getArray() {
-        return array;
-    }
-
-    @Override
-    public Term toTerm(Services services) {
-        final TermBuilder tb = services.getTermBuilder();
-        return tb.allFields(array);
-    }
-
-    @Override
-    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
-            Services services) {
-        return new AllFieldsLocLHS(GenericTermReplacer.replace(array,
-                t -> t.op() instanceof ProgramVariable && replMap.containsKey(t.op()),
-                t -> services.getTermBuilder().var(replMap.get((ProgramVariable) t.op())),
-                services));
+        this.left = left;
+        this.right = right;
     }
 
     @Override
     public Set<Operator> childOps() {
         final OpCollector opColl = new OpCollector();
         array.execPostOrder(opColl);
+        left.execPostOrder(opColl);
+        right.execPostOrder(opColl);
         return opColl.ops();
     }
 
     @Override
+    public AbstractUpdateAssgnLoc replaceVariables(Map<ProgramVariable, ProgramVariable> replMap,
+            Services services) {
+        /*
+         * (NOTE, 2019-05-24): Is that the right thing to do (not replacing anything in
+         * left and right)?
+         */
+        return new ArrayRange(GenericTermReplacer.replace(array,
+                t -> t.op() instanceof ProgramVariable && replMap.containsKey(t.op()),
+                t -> services.getTermBuilder().var(replMap.get((ProgramVariable) t.op())),
+                services), left, right);
+    }
+
+    @Override
     public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
-        if (otherLoc instanceof ArrayLocRHS) {
-            return ((ArrayLocRHS) otherLoc).getArray().equals(this.array);
+        if (otherLoc instanceof AllFieldsLocRHS) {
+            return ((AllFieldsLocRHS) otherLoc).getArray().equals(array);
         } else if (otherLoc instanceof PVLoc) {
             return ((PVLoc) otherLoc).getVar()
                     .equals(services.getTypeConverter().getHeapLDT().getHeap());
-        } else if (otherLoc instanceof AllFieldsLocRHS) {
-            return ((AllFieldsLocRHS) otherLoc).getArray().equals(this.array);
-        } else if (otherLoc instanceof ArrayRange) {
+        } else if (otherLoc instanceof ArrayLocRHS || otherLoc instanceof ArrayRange) {
             super.mayAssign(otherLoc, services);
         }
-        
+
         return false;
     }
 
     @Override
+    public Term toTerm(Services services) {
+        final TermBuilder tb = services.getTermBuilder();
+        return tb.arrayRange(array, left, right);
+    }
+
+    @Override
     public String toString() {
-        return String.format("%s.*", array);
+        return String.format("%s[%s..%s]", array, left, right);
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        return obj instanceof AllFieldsLocLHS && obj.hashCode() == hashCode();
-    }
-
-    @Override
-    public int hashCode() {
-        return 31 + 7 * array.hashCode();
-    }
 }

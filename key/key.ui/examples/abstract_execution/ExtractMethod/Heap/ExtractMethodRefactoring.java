@@ -29,7 +29,7 @@ public class ExtractMethodRefactoring {
         { \abstract_statement P; }
 
         //@ declares \dl_localsQ;
-        //@ assignable \dl_hasTo(this.tmp), \dl_localsQ;
+        //@ assignable this.tmp, \dl_localsQ;
         //@ accessible \dl_localsP, \dl_localsQ, \dl_args, this.tmp, res;
         //@ return_behavior requires false;
         { \abstract_statement Q; }
@@ -62,7 +62,7 @@ public class ExtractMethodRefactoring {
     //@ declares \dl_final(\dl_localsP), \dl_final(\dl_args);
     private void extracted(final Object res) {
         //@ declares \dl_localsQ;
-        //@ assignable \dl_hasTo(this.tmp), \dl_localsQ;
+        //@ assignable this.tmp, \dl_localsQ;
         //@ accessible \dl_localsP, \dl_localsQ, \dl_args, this.tmp, res;
         //@ return_behavior requires false;
         { \abstract_statement Q; }

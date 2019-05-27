@@ -183,7 +183,7 @@ public final class DropEffectlessAbstractUpdateCondition implements VariableCond
         final long effectiveAssignables = assignables.stream()
                 .filter(assignable -> !opsHaveToAssignBeforeUsed.contains(assignable))
                 .filter(assignable -> locsInTarget.stream()
-                        .anyMatch(targetLoc -> assignable.mayAssign(targetLoc)))
+                        .anyMatch(targetLoc -> assignable.mayAssign(targetLoc, services)))
                 .count();
 
         return effectiveAssignables == 0;

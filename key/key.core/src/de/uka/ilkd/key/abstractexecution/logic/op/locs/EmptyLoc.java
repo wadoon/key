@@ -56,7 +56,7 @@ public class EmptyLoc implements AbstractUpdateAssgnLoc, AbstractUpdateLoc {
     }
 
     @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc) {
+    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
         return false;
     }
 

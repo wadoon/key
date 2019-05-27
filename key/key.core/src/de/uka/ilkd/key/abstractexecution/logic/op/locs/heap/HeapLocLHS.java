@@ -17,10 +17,14 @@ import java.util.Set;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.util.AbstractExecutionUtils;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.proof.Proof;
-import de.uka.ilkd.key.proof.init.ProofInputException;
 import de.uka.ilkd.key.util.mergerule.MergeRuleUtils;
 
 /**
@@ -46,25 +50,55 @@ public abstract class HeapLocLHS implements AbstractUpdateAssgnLoc {
     public Optional<HeapLocLHS> applyUpdate(Proof proof, Term update) {
         final Services services = proof.getServices();
 
-        try {
-            final Term termAfterUpdAppl = MergeRuleUtils.simplify(proof,
-                    services.getTermBuilder().apply(update, toTerm(services)), 1000);
-            final Set<AbstractUpdateAssgnLoc> newLocs = AbstractUpdateFactory
-                    .abstrUpdateAssgnLocsFromTermUnsafe(termAfterUpdAppl, Optional.empty(),
-                            services);
+        final Term termWithoutUpd = toTerm(services);
 
-            if (newLocs == null || newLocs.size() != 1) {
-                return Optional.empty();
-            } else {
-                final AbstractUpdateAssgnLoc elem = newLocs.iterator().next();
-                return elem instanceof HeapLocLHS ? Optional.of((HeapLocLHS) elem)
-                        : Optional.empty();
-            }
-        } catch (ProofInputException e) {
+        final Term simplTerm = //
+                AbstractExecutionUtils.applyUpdate(update, termWithoutUpd, services);
+
+        final OpCollector opColl = new OpCollector();
+        simplTerm.execPostOrder(opColl);
+        if (simplTerm.op() != termWithoutUpd.op()
+                || opColl.ops().stream().anyMatch(op -> op instanceof ElementaryUpdate)) {
+            // There should be no more updates any more
             return Optional.empty();
+        }
+
+        final Set<AbstractUpdateAssgnLoc> newLocs = AbstractUpdateFactory
+                .abstrUpdateAssgnLocsFromTermUnsafe(simplTerm, Optional.empty(), services);
+
+        if (newLocs == null || newLocs.size() != 1) {
+            return Optional.empty();
+        } else {
+            final AbstractUpdateAssgnLoc elem = newLocs.iterator().next();
+            return elem instanceof HeapLocLHS ? Optional.of((HeapLocLHS) elem) : Optional.empty();
         }
     }
 
-    protected abstract Term toTerm(Services services);
+    @Override
+    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
+        /*
+         * TODO (DS, 2019-05-27): We might fail to prove the disjointness condition
+         * although it actually holds; for instance, we might need premises from the
+         * current proof situation, or there is some basic prover incapacity. We have to
+         * check what the implications of such "false negatives" are, and to ensure that
+         * they are not critical for soundness.
+         */
+
+        final TermBuilder tb = services.getTermBuilder();
+
+        final Term disjointTerm = //
+                tb.disjoint(toTerm(services), otherLoc.toTerm(services));
+
+        return MergeRuleUtils.isProvableWithSplitting( //
+                disjointTerm, services, 1000);
+    }
+
+    /**
+     * Converts this {@link HeapLocLHS} to a term representation.
+     * 
+     * @param services The {@link Services} object.
+     * @return A term representation of this {@link HeapLocLHS}, sort is LocSet.
+     */
+    public abstract Term toTerm(Services services);
 
 }

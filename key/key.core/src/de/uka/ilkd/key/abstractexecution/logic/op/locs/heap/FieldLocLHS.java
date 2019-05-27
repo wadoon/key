@@ -20,7 +20,9 @@ import java.util.Set;
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateAssgnLoc;
 import de.uka.ilkd.key.abstractexecution.logic.op.locs.AbstractUpdateLoc;
+import de.uka.ilkd.key.abstractexecution.logic.op.locs.PVLoc;
 import de.uka.ilkd.key.java.Services;
+import de.uka.ilkd.key.ldt.HeapLDT;
 import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
@@ -43,11 +45,13 @@ public class FieldLocLHS extends HeapLocLHS {
         this.objTerm = objTerm;
         this.fieldPV = fieldPV;
     }
-    
+
     @Override
-    protected Term toTerm(Services services) {
+    public Term toTerm(Services services) {
         final TermBuilder tb = services.getTermBuilder();
-        return tb.singleton(objTerm, tb.var(fieldPV));
+        final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+        
+        return tb.singleton(objTerm, tb.func(heapLDT.getFieldSymbolForPV(fieldPV, services)));
     }
 
     @Override
@@ -75,10 +79,16 @@ public class FieldLocLHS extends HeapLocLHS {
     }
 
     @Override
-    public boolean mayAssign(AbstractUpdateLoc otherLoc) {
-        return otherLoc instanceof FieldLocRHS
-                && ((FieldLocRHS) otherLoc).getObjTerm().equals(this.objTerm)
-                && ((FieldLocRHS) otherLoc).getFieldPV().equals(this.fieldPV);
+    public boolean mayAssign(AbstractUpdateLoc otherLoc, Services services) {
+        /*
+         * The comparison to the name of the base heap is ugly, but for now, I would
+         * rather not also pass the services object here...
+         */
+        return (otherLoc instanceof PVLoc && ((PVLoc) otherLoc).getVar()
+                .equals(services.getTypeConverter().getHeapLDT().getHeap()))
+                || (otherLoc instanceof FieldLocRHS
+                        && ((FieldLocRHS) otherLoc).getObjTerm().equals(this.objTerm)
+                        && ((FieldLocRHS) otherLoc).getFieldPV().equals(this.fieldPV));
     }
 
     @Override

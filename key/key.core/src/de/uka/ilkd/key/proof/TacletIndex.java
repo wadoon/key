@@ -59,7 +59,14 @@ import de.uka.ilkd.key.util.Debug;
 public abstract class TacletIndex  {
     
     private static final Object DEFAULT_SV_KEY = new Object(); 
-    private static final Object DEFAULT_PROGSV_KEY = new Object(); 
+    private static final Object DEFAULT_PROGSV_KEY = new Object();
+    /**
+     * Set to true if you want to allow the application of rules with \add etc.
+     * under several update applications. Otherwise, only one update before is
+     * allowed. Bad for performance, but occasionally nice for testing & prototyping
+     * etc.
+     */
+    private static final boolean MATCH_MORE_THAN_ONE_UPDATE_LEVEL = true;
    
     /** contains rewrite Taclets */
     protected HashMap<Object, ImmutableList<NoPosTacletApp>> rwList 
@@ -401,7 +408,19 @@ public abstract class TacletIndex  {
 	        final ImmutableList<NoPosTacletApp> targetIndexed = 
 	                getListHelp(map, target, false, prefixOccurrences);
 	        return merge(res, targetIndexed);// otherwise only duplicates are added
-	    } 
+	    } else if (MATCH_MORE_THAN_ONE_UPDATE_LEVEL) {
+                /*
+                 * NOTE (DS, 2019-05-24): This recursive call allows, e.g., to use an array
+                 * assignment rule on the formula "{i:=0}{j:=1}\[{ A[i] = j; }\](A[i]=A[j])".
+                 * Otherwise, only one update before is allowed. Generally, allowing this is bad
+                 * for performance, but it might be OK occasionally for testing, prototyping
+                 * etc. (I wanted it for abstract execution, where I had multiple update
+                 * applications that were not simplified to one update)
+                 */
+                final ImmutableList<NoPosTacletApp> targetIndexed = 
+                        getListHelp(map, target, true, prefixOccurrences);
+                return merge(res, targetIndexed);
+	    }
 	} 
 	
 	res = merge(res, map.get(term.sort()));

@@ -355,6 +355,8 @@ public class AbstractPlaceholderSpecsTypeChecker {
             return elemTerm.op();
         } else if (op == locSetLDT.getSingletonPV()) {
             return locSetElemTermsToOp(elemTerm.sub(0), services);
+        } else if (op == locSetLDT.getSingleton() && elemTerm.sub(1).op() == heapLDT.getArr()) {
+            return locSetElemTermsToOp(elemTerm.sub(0), services);
         } else if (op == locSetLDT.getSingleton()) {
             return locSetElemTermsToOp(elemTerm.sub(1), services);
         } else if (op == setLDT.getSingleton()) {
@@ -363,6 +365,8 @@ public class AbstractPlaceholderSpecsTypeChecker {
             return locSetElemTermsToOp(elemTerm.sub(0), services);
         } else if (heapLDT.isSelectOp(op)) {
             return locSetElemTermsToOp(elemTerm.sub(2), services);
+        } else if (op == locSetLDT.getArrayRange()) {
+            return locSetElemTermsToOp(elemTerm.sub(0), services);
         } else {
             assert false : "Unexpected element of (loc) set union.";
             return null;
