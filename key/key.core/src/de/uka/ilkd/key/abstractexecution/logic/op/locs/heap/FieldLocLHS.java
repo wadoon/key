@@ -27,9 +27,11 @@ import de.uka.ilkd.key.logic.OpCollector;
 import de.uka.ilkd.key.logic.ProgramElementName;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.logic.sort.NullSort;
 import de.uka.ilkd.key.proof.ProgVarReplacer;
 
 /**
@@ -50,7 +52,7 @@ public class FieldLocLHS extends HeapLocLHS {
     public Term toTerm(Services services) {
         final TermBuilder tb = services.getTermBuilder();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
-        
+
         return tb.singleton(objTerm, tb.func(heapLDT.getFieldSymbolForPV(fieldPV, services)));
     }
 
@@ -91,9 +93,18 @@ public class FieldLocLHS extends HeapLocLHS {
                         && ((FieldLocRHS) otherLoc).getFieldPV().equals(this.fieldPV));
     }
 
+    /**
+     * @return true iff this is a static location.
+     */
+    public boolean isStatic() {
+        return objTerm.op() instanceof Function
+                && ((Function) objTerm.op()).sort() instanceof NullSort;
+    }
+
     @Override
     public String toString() {
-        return String.format("%s.%s", objTerm,
+        return String.format("%s.%s",
+                isStatic() ? fieldPV.getContainerType().getName() : objTerm.toString(),
                 ((ProgramElementName) fieldPV.name()).getProgramName());
     }
 
