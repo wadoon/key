@@ -69,6 +69,46 @@ public class DutchFlag {
       @         && (\forall int q; q >= bb && q < \result.length; \result[q]==2)
       @         && 0<=wb && wb<=wt && wt==bb && bb<=A.length;
       @*/
+    public static int[] dutchFlagStep1a(int[] A) {
+        /*@
+          @ assignable wb, wt, bb;
+          @ accessible wb, wt, bb, A;
+          @
+          @ normal_behavior
+          @ ensures wb==0 && wt==0 && bb==A.length;
+          @
+          @ exceptional_behavior requires false;
+          @ return_behavior requires false;
+          @*/
+        { \abstract_statement P0; }
+
+        
+        /*@ declares \dl_localsP1;
+          @ assignable \dl_localsP1, wb, wt, bb, A[*];
+          @ accessible \dl_localsP1, wb, wt, bb, A[*];
+          @
+          @ normal_behavior
+          @ ensures    (\forall int q; q >= 0 && q < wb; A[q]==0)
+          @         && (\forall int q; q >= wb && q < wt; A[q]==1)
+          @         && (\forall int q; q >= bb && q < A.length; A[q]==2)
+          @         && 0<=wb && wb<=wt && wt==bb && bb<=\old(A.length);
+          @
+          @ exceptional_behavior requires false;
+          @ return_behavior requires false;
+          @*/
+        { \abstract_statement P1; }
+        
+        return A;
+    }
+
+    /*@ public normal_behavior
+      @ requires   A.length > 0
+      @            && (\forall int i; i>=0 & i<A.length; A[i] == 0 || A[i] == 1 || A[i] == 2);
+      @ ensures    (\forall int q; q >= 0 && q < wb; \result[q]==0)
+      @         && (\forall int q; q >= wb && q < wt; \result[q]==1)
+      @         && (\forall int q; q >= bb && q < \result.length; \result[q]==2)
+      @         && 0<=wb && wb<=wt && wt==bb && bb<=A.length;
+      @*/
     public static int[] dutchFlagStep2(int[] A) {
         wb = 0;
         wt = 0;
