@@ -65,27 +65,32 @@ public class AEHeapTests extends TestCase {
 
     @Test
     public void testDutchFlag0() {
-        dutchFlag(0);
+        dutchFlag("0");
     }
 
     @Test
     public void testDutchFlag1() {
-        dutchFlag(1);
+        dutchFlag("1");
+    }
+
+    @Test
+    public void testDutchFlag1a() {
+        dutchFlag("1a");
     }
 
     @Test
     public void testDutchFlag2() {
-        dutchFlag(2);
+        dutchFlag("2");
     }
 
     @Test
     public void testDutchFlag3() {
-        dutchFlag(3);
+        dutchFlag("3");
     }
 
-    private void dutchFlag(int i) {
+    private void dutchFlag(String i) {
         final Proof proof = MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX,
-                "arrays/dutchFlag/step" + i + ".key");
+                String.format("arrays/dutchFlag/step%s.key", i));
         MergeRuleTests.startAutomaticStrategy(proof);
 
         assertTrue(proof.closed());
