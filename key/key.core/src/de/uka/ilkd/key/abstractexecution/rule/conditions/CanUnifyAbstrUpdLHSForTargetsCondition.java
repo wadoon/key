@@ -118,7 +118,7 @@ public final class CanUnifyAbstrUpdLHSForTargetsCondition implements VariableCon
         }
 
         final ProgVarReplacer pvr = new ProgVarReplacer(substMap, services);
-        if (target1.equals(pvr.replace(target2))) {
+        if (target1.equalsModIrrelevantTermLabels(pvr.replace(target2))) {
             return mc;
         } else {
             return null;
