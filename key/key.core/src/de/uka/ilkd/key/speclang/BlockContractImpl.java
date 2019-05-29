@@ -176,11 +176,17 @@ public final class BlockContractImpl extends AbstractAuxiliaryContractImpl
         Map<LocationVariable, Term> newModifiesClauses =
                 modifiesClauses.entrySet().stream().collect(
                         MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newDeclaresClauses =
+                declaresClauses.entrySet().stream().collect(
+                        MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<ProgramVariable, Term> newAccessibleClauses =
+                accessibleClauses.entrySet().stream().collect(
+                        MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Term newMeasuredBy = op.apply(measuredBy);
 
         return update(
                 block,
-                newPreconditions, newPostconditions, newModifiesClauses,
+                newPreconditions, newPostconditions, newModifiesClauses, newDeclaresClauses, newAccessibleClauses,
                 infFlowSpecs.stream().map(spec -> spec.map(op)).collect(ImmutableList.collector()),
                 variables,
                 newMeasuredBy);

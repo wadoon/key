@@ -547,7 +547,7 @@ public class JMLSpecFactory {
         } else {
             clauses.declares.put(heap,
                     translateUnionClauses(pm, progVars.selfVar,
-                    progVars.paramVars, progVars.atPres, progVars.atBefores, declares));
+                    progVars.paramVars, progVars.atPres, progVars.atBefores, declares, SpecType.DECLARES));
         }
     }
     /**

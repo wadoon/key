@@ -22,11 +22,16 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.StringJoiner;
 
+import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 

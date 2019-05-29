@@ -620,6 +620,11 @@ public class OriginTermLabel implements TermLabel {
         ASSIGNABLE("assignable"),
 
         /**
+         * assignable
+         */
+        DECLARES("declares"),
+
+        /**
          * decreases
          */
         DECREASES("decreases"),

@@ -281,7 +281,7 @@ public final class MethodWellDefinedness extends WellDefinednessCheck {
         return new MethodWellDefinedness(
                 getName(), id(), type(), getTarget(), getHeap(), getOrigVars(),
                 getRequires().map(op),
-                op.apply(getAssignable()), op.apply(getAccessible()),
+                op.apply(getAssignable()), op.apply(getDeclares()), op.apply(getAccessible()),
                 getEnsures().map(op),
                 op.apply(getMby()), op.apply(getRepresents()),
                 contract.map(op, services),

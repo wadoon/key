@@ -181,7 +181,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
             Map<LocationVariable, Term> freePosts,
             Map<LocationVariable, Term> axioms,
             Map<LocationVariable, Term> mods,
-                                    Map<LocationVariable, Term> declares,
+            Map<LocationVariable, Term> declares,
             Map<ProgramVariable, Term> accessibles,
             Map<LocationVariable, Boolean> hasRealMod,
             ProgramVariable selfVar,
@@ -263,6 +263,8 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
                 MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<LocationVariable, Term> newMods = originalMods.entrySet().stream().collect(
                 MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
+        Map<LocationVariable, Term> newDeclares = originalDeclares.entrySet().stream().collect(
+                MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Map<ProgramVariable, Term> newAccessibles = originalDeps.entrySet().stream().collect(
                 MapUtil.collector(Map.Entry::getKey, entry -> op.apply(entry.getValue())));
         Term newGlobalDefs = op.apply(globalDefs);
@@ -270,7 +272,7 @@ public class FunctionalOperationContractImpl implements FunctionalOperationContr
         return new FunctionalOperationContractImpl(
                 baseName, name, kjt, pm, specifiedIn, modality,
                 newPres, newFreePres, newMby, newPosts, newFreePosts,
-                newAxioms, newMods, newAccessibles,
+                newAxioms, newMods, newDeclares, newAccessibles,
                 hasRealModifiesClause, originalSelfVar, originalParamVars,
                 originalResultVar, originalExcVar, originalAtPreVars,
                 newGlobalDefs,

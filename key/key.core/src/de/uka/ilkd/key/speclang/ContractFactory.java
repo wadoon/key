@@ -555,6 +555,7 @@ public class ContractFactory {
                 new LinkedHashMap<LocationVariable, Term>(t.originalMods);
         Map<ProgramVariable, Term> deps =
                 new LinkedHashMap<ProgramVariable, Term>(t.originalDeps);
+        Map<LocationVariable,Term> declares = new LinkedHashMap<>(t.originalDeclares);
 
         // keep this to check if every contract has the same mod
         // then no if-then-else cascades are needed.
@@ -603,16 +604,9 @@ public class ContractFactory {
                 }
             }
         }
-        /*
-         * TODO (DS, 2019-01-04): I'm not doing anything with declares for now
-         * due to time reasons, so it's completely ignored for unions. This has
-         * to be changed eventually! Reminder: declares offers the possibility
-         * to declares Skolem location sets that can be used for abstract execution.
-         */
-        Map<LocationVariable,Term> declares = t.originalDeclares;
         Modality moda = t.modality;
         return joinWithOtherContracts(name, t, others, pres, mby, hasMod, uniformMod,
-                                      posts, freePosts, axioms, mods, deps, moda);
+                                      posts, freePosts, axioms, mods, deps, declares, moda);
     }
 
     private static Modality combineModalities(Modality moda,
@@ -769,6 +763,7 @@ public class ContractFactory {
                                        Map<LocationVariable, Term> axioms,
                                        Map<LocationVariable, Term> mods,
                                        Map<ProgramVariable, Term> deps,
+                                       Map<LocationVariable, Term> declares,
                                        Modality moda) {
         for (FunctionalOperationContract other : others) {
             moda = combineModalities(moda, other.getModality());
