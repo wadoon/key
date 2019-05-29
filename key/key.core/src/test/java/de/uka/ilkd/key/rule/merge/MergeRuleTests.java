@@ -143,7 +143,7 @@ public class MergeRuleTests extends TestCase {
     // * point statements.
     // */
     //
-    @Test
+    //@Test
     //public void testDoAutomaticGcdProofWithMergePointStatementAndBlockContract() {
     //    final Proof proof = loadProof(TEST_RESOURCES_DIR_PREFIX,
     //            "gcd.MPSAndBlockContract.key");
@@ -361,7 +361,7 @@ public class MergeRuleTests extends TestCase {
      *
      * @return The loaded proof.
      */
-    public static Proof loadProof(String directory, String proofFileName) {
+    public static Proof loadProof(File directory, String proofFileName) {
         try {
             return loadProof(directory, proofFileName, true);
         }
@@ -390,9 +390,9 @@ public class MergeRuleTests extends TestCase {
      *             if the proof could not be loaded and failInCaseOfError is
      *             false.
      */
-    public static Proof loadProof(String directory, String proofFileName,
+    public static Proof loadProof(File directory, String proofFileName,
             boolean failInCaseOfError) throws ProblemLoaderException {
-        File proofFile = new File(directory + proofFileName);
+        File proofFile = new File(directory, proofFileName);
         assertTrue(proofFile.exists());
 
         try {
