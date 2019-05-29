@@ -1473,6 +1473,7 @@ public class TermBuilder {
         }
         return result;
     }
+    
     /**
      * This value is only used as a marker for "\strictly_nothing" in JML. It
      * may return any term. Preferably of type LocSet, but this is not

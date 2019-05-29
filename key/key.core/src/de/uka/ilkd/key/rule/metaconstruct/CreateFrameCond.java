@@ -112,7 +112,7 @@ public final class CreateFrameCond extends AbstractTermTransformer {
                     services);
             final Term fc;
 
-            if (tb.strictlyNothing().equals(mod)) {
+            if (tb.strictlyNothing().equalsModIrrelevantTermLabels(mod)) {
                 fc = tb.frameStrictlyEmpty(tb.var(heap),
                         heapToBeforeLoopMap.get(heap));
             } else {
