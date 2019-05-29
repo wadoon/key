@@ -98,7 +98,8 @@ remove_project() {
     echo "Safe deletion of $1"
     #known files safe to delete!
     rm -rf $1/build.{gradle,xml} $1/testresults $1/runallproofs_tmp $1/bin $1/.??* $1/lib
-    rm -ri $1
+    #rm -ri $1
+    rm -r $1
 }
 
 
