@@ -14,6 +14,7 @@
 package org.key_project.util.collection;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -109,10 +110,12 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	return result;
     }    
 
+    @Override
     public int hashCode() {
 	return Arrays.hashCode(content);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public boolean equals (Object o) {
 	if (o == this) {
@@ -137,6 +140,7 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	return true;
     }
 
+    @Override
     public String toString() {
 	StringBuilder sb = new StringBuilder();
 	sb.append("[");
@@ -146,10 +150,6 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	}
 	sb.append("]");
 	return sb.toString();
-    }
-
-    public Stream<S> stream() {
-        return StreamSupport.stream(this.spliterator(), false);
     }
 
     @Override
@@ -166,14 +166,17 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
 	    this.coll = coll;
 	}
 
+	@Override
 	public boolean hasNext() {
 	    return i < coll.size();
 	}
 
+	@Override
 	public T next() {
 	    return coll.get(i++);
 	}
 
+	@Override
 	public void remove() {
 	    throw new UnsupportedOperationException("Illegal modification access on unmodifiable array.");
 	}
@@ -193,4 +196,27 @@ public class ImmutableArray<S> implements java.lang.Iterable<S>, java.io.Seriali
         return ret.reverse();
     }
     
+    /**
+     * Convert an {@link ImmutableArray} to a {@link List}.
+     *
+     * @return This element converted to a {@link List}.
+     */
+    public List<S> toList() {
+        List<S> result = new ArrayList<>();
+        Iterator<S> it = iterator();
+        while (it.hasNext()) {
+            result.add(it.next());
+        }
+        return result;
+    }
+
+
+    /**
+     * A stream object for this collection.
+     *
+     * @return a non-null stream object
+     */
+    public Stream<S> stream() {
+        return StreamSupport.stream(spliterator(), false);
+    }
 }

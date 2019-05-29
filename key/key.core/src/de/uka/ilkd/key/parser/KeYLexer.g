@@ -226,6 +226,7 @@ lexer grammar KeYLexer;
 	PROGRAMVARIABLES : '\\programVariables';
 
         // Keywords for varcond and related stuff
+	SAME_OBSERVER : '\\sameObserver';
     HAS_AE_PREDICATE : '\\hasAEPredicate' ;
     INITIALIZE_PARAMETRIC_SKOLEM_UPDATE : '\\initializeParametricSkolemUpdate' ;
     INITIALIZE_PARAMETRIC_SKOLEM_PATH_CONDITION : '\\initializeParametricSkolemPathCondition' ;
@@ -245,7 +246,7 @@ lexer grammar KeYLexer;
 	GET_FREE_INVARIANT : '\\getFreeInvariant';
 	GET_VARIANT : '\\getVariant';
 	APPLY_UPDATE_ON_RIGID : '\\applyUpdateOnRigid';
-    DEPENDINGON : '\\dependingOn';
+        DEPENDINGON : '\\dependingOn';
     FRESHFOR : '\\freshFor';
     INITIALIZE_EXPRESSION : '\\initializeExpression';
 	DISJOINTMODULONULL  : '\\disjointModuloNull';

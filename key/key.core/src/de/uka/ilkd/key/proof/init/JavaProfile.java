@@ -19,6 +19,8 @@ import org.key_project.util.collection.ImmutableSet;
 
 import de.uka.ilkd.key.logic.label.AbstractExecutionTermLabel;
 import de.uka.ilkd.key.logic.label.AbstractExecutionTermLabelFactory;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
+import de.uka.ilkd.key.logic.label.OriginTermLabelFactory;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.SingletonLabelFactory;
 import de.uka.ilkd.key.logic.label.TermLabel;
@@ -27,23 +29,7 @@ import de.uka.ilkd.key.proof.mgt.ComplexRuleJustification;
 import de.uka.ilkd.key.proof.mgt.ComplexRuleJustificationBySpec;
 import de.uka.ilkd.key.proof.mgt.RuleJustification;
 import de.uka.ilkd.key.prover.impl.DepthFirstGoalChooserBuilder;
-import de.uka.ilkd.key.rule.AbstractAuxiliaryContractBuiltInRuleApp;
-import de.uka.ilkd.key.rule.AbstractContractRuleApp;
-import de.uka.ilkd.key.rule.BlockContractExternalRule;
-import de.uka.ilkd.key.rule.BlockContractInternalRule;
-import de.uka.ilkd.key.rule.BuiltInRule;
-import de.uka.ilkd.key.rule.LoopApplyHeadRule;
-import de.uka.ilkd.key.rule.LoopContractExternalRule;
-import de.uka.ilkd.key.rule.LoopContractInternalRule;
-import de.uka.ilkd.key.rule.LoopInvariantBuiltInRuleApp;
-import de.uka.ilkd.key.rule.LoopScopeInvariantRule;
-import de.uka.ilkd.key.rule.OneStepSimplifier;
-import de.uka.ilkd.key.rule.QueryExpand;
-import de.uka.ilkd.key.rule.Rule;
-import de.uka.ilkd.key.rule.RuleApp;
-import de.uka.ilkd.key.rule.UseDependencyContractRule;
-import de.uka.ilkd.key.rule.UseOperationContractRule;
-import de.uka.ilkd.key.rule.WhileInvariantRule;
+import de.uka.ilkd.key.rule.*;
 import de.uka.ilkd.key.rule.merge.MergeRule;
 import de.uka.ilkd.key.strategy.JavaCardDLStrategyFactory;
 import de.uka.ilkd.key.strategy.StrategyFactory;
@@ -95,6 +81,11 @@ public class JavaProfile extends AbstractProfile {
      */
     @Override
     protected ImmutableList<TermLabelConfiguration> computeTermLabelConfiguration() {
+        ImmutableList<TermLabelPolicy> originTermLabelPolicyList =
+                ImmutableSLList.<TermLabelPolicy>nil().append(new OriginTermLabelPolicy());
+        ImmutableList<TermLabelRefactoring> originTermLabelRefactorings =
+                ImmutableSLList.<TermLabelRefactoring>nil().append(
+                        new OriginTermLabelRefactoring());
         ImmutableList<TermLabelConfiguration> result = ImmutableSLList.nil();
         result = result.prepend(
             new TermLabelConfiguration(
@@ -155,6 +146,18 @@ public class JavaProfile extends AbstractProfile {
                     AbstractExecutionTermLabel.NAME,
                     new AbstractExecutionTermLabelFactory()
             ));
+        result = result.prepend(
+                new TermLabelConfiguration(
+                        OriginTermLabel.NAME,
+                        new OriginTermLabelFactory(),
+                        originTermLabelPolicyList,
+                        null,
+                        null,
+                        null,
+                        null,
+                        originTermLabelRefactorings,
+                        null
+                ));
         return result;
     }
 

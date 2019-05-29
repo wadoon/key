@@ -100,10 +100,13 @@ public final class ParameterlessTermLabel implements TermLabel {
            new ParameterlessTermLabel(SELF_COMPOSITION_LABEL_NAME);
 
    /**
-    * Label attached to the post condition.
+    * Name of {@link #POST_CONDITION_LABEL}.
     */
    public static final Name POST_CONDITION_LABEL_NAME = new Name("postCondition");
 
+   /**
+    * Label attached to the post-condition.
+    */
    public static final TermLabel POST_CONDITION_LABEL =
            new ParameterlessTermLabel(POST_CONDITION_LABEL_NAME);
 

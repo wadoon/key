@@ -46,6 +46,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermCreationException;
 import de.uka.ilkd.key.logic.TermServices;
+import de.uka.ilkd.key.logic.label.OriginTermLabel;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramVariable;
@@ -75,6 +76,9 @@ import de.uka.ilkd.key.util.Triple;
 
 public final class JMLTranslator {
 
+    /**
+     * The term builder object.
+     */
     private final TermBuilder tb;
     private final String fileName;
     private TermServices services;                          // to be used in future
@@ -267,6 +271,7 @@ public final class JMLTranslator {
         });
         translationMethods.put(JMLKeyWord.ASSIGNABLE,
                                new JMLTranslationMethod() {
+
             @Override
             public Term translate(SLTranslationExceptionManager excManager,
                                   Object... params)
@@ -896,6 +901,62 @@ public final class JMLTranslator {
                 return new SLExpression(term);
             }
         });
+
+//        translationMethods.put(JMLKeyWord.NOT_MOD, new JMLPostExpressionTranslationMethod(){
+//
+//            @Override
+//            protected String name() {
+//                return "\\not_modified";
+//            }
+//
+//            /**
+//             * @param services Services
+//             * @param heapAtPre The pre-state heap (since we are in a post-condition)
+//             * @param params Must be of length 1 with a Term (store-ref expression)
+//             */
+//            @Override
+//            protected Term translate(Services services, Term heapAtPre, Object[] params) throws SLTranslationException {
+//                checkParameters(params, Term.class);
+//                Term t = (Term) params[0];
+//
+//                // collect variables from storereflist
+//                java.util.List<Term> storeRefs = new java.util.ArrayList<Term>();
+//                final LocSetLDT ldt = services.getTypeConverter().getLocSetLDT();
+//                final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
+//                while (t.op() == ldt.getUnion()){
+//                    storeRefs.add(t.sub(0));
+//                    t = t.sub(1);
+//                }
+//                storeRefs.add(t);
+//                // construct equality predicates
+//                Term res = TB.tt();
+//                for (Term sr: storeRefs){
+//                    if (sr.op() == ldt.getSingleton()){
+//                        final Term ref = TB.dot(services, Sort.ANY, sr.sub(0), sr.sub(1));
+//                        res = TB.and(res, TB.equals(ref,convertToOld(services, heapAtPre, ref)));
+//                    } else if (sr.op() == ldt.getEmpty()){
+//                        // do nothing
+//                    } else if (sr.op().equals(ldt.getSetMinus()) && sr.sub(0).op().equals(ldt.getAllLocs()) && sr.sub(1).op().equals(ldt.getFreshLocs())){
+//                        // this is the case for "\everything"
+//                        final JavaInfo ji = services.getJavaInfo();
+//                        final LogicVariable fld = new LogicVariable(new Name("f"), heapLDT.getFieldSort());
+//                        final LogicVariable obj = new LogicVariable(new Name("o"), ji.objectSort());
+//                        final Term objTerm = TB.var(obj);
+//                        final Term fldTerm = TB.var(fld);
+//                        final Term ref = TB.dot(services, Sort.ANY, objTerm, fldTerm);
+//                        final Term fresh = TB.subset(services, TB.singleton(services, objTerm, fldTerm ), TB.freshLocs(services, heapAtPre));
+//                        final Term bodyTerm = TB.or(TB.equals(ref, convertToOld(services, heapAtPre, ref)),fresh);
+//                        res = TB.and(res, TB.all(fld, TB.all(obj, bodyTerm)));
+//                    } else {
+//                        // all other results are not meant to occur
+//                        throw new SLTranslationException("Term "+sr+" is not a valid store-ref expression.");
+//                    }
+//                }
+//                return res;
+//            }
+//
+//        });
+
 
         translationMethods.put(JMLKeyWord.INDEX_OF, new JMLTranslationMethod() {
 
@@ -1715,6 +1776,7 @@ public final class JMLTranslator {
                                   ProgramVariable resultVar,
                                   ProgramVariable excVar,
                                   Map<LocationVariable, Term> atPres,
+                                  OriginTermLabel.SpecType specType,
                                   Class<T> resultClass,
                                   Services services)
                     throws SLTranslationException {
@@ -1732,6 +1794,8 @@ public final class JMLTranslator {
             throw parser.getExceptionManager().convertException(e);
         }
         if (resultClass.equals(Term.class)) {
+            Term term;
+
             if (expr.hasLabels()) {
                 T o = castToReturnType(result, resultClass);
                 assert o instanceof Term;
@@ -1739,7 +1803,17 @@ public final class JMLTranslator {
                 t = services.getTermBuilder().label(
                         (Term)castToReturnType(result, resultClass),
                         expr.getLabels());
-                return castToReturnType(t, resultClass);
+                term = (Term) castToReturnType(t, resultClass);
+            } else {
+                term = (Term) castToReturnType(result, resultClass);
+            }
+
+            if (specType != null) {
+                return castToReturnType(services.getTermBuilder().addLabelToAllSubs(term,
+                        new OriginTermLabel(specType, expr.fileName, expr.pos.getLine())),
+                        resultClass);
+            } else {
+                return castToReturnType(result, resultClass);
             }
         }
         return castToReturnType(result, resultClass);
@@ -1753,6 +1827,7 @@ public final class JMLTranslator {
                                   ProgramVariable excVar,
                                   Map<LocationVariable, Term> atPres,
                                   Map<LocationVariable, Term> atBefores,
+                                  OriginTermLabel.SpecType specType,
                                   Class<T> resultClass,
                                   Services services)
             throws SLTranslationException {
@@ -1770,13 +1845,26 @@ public final class JMLTranslator {
             throw parser.getExceptionManager().convertException(e);
         }
         if (resultClass.equals(Term.class)) {
+            Term term;
+
             if (expr.hasLabels()) {
                 T o = castToReturnType(result, resultClass);
                 assert o instanceof Term;
                 Term t = (Term)o;
                 t = services.getTermBuilder().label((Term)castToReturnType(result, resultClass), expr.getLabels());
-                return castToReturnType(t, resultClass);
+                term = (Term) castToReturnType(t, resultClass);
+            } else {
+                term = (Term) castToReturnType(result, resultClass);
             }
+
+            if (specType != null) {
+                return castToReturnType(services.getTermBuilder().addLabelToAllSubs(term,
+                        new OriginTermLabel(specType, expr.fileName, expr.pos.getLine())),
+                        resultClass);
+            } else {
+                return castToReturnType(result, resultClass);
+            }
+
         }
         return castToReturnType(result, resultClass);
     }
@@ -1785,7 +1873,8 @@ public final class JMLTranslator {
      * For testing only.
      */
     static <T> T translate(String jmlExpr, KeYJavaType specInClass, Class<T> resultClass, Services services) throws SLTranslationException {
-        return translate(new PositionedString(jmlExpr), specInClass, null, null, null, null, null, resultClass, services);
+        return translate(new PositionedString(jmlExpr), specInClass,
+                null, null, null, null, null, null, resultClass, services);
     }
 
 

@@ -12,6 +12,7 @@ package de.uka.ilkd.key.speclang;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.ImmutableList;
 
@@ -160,6 +161,20 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     //-------------------------------------------------------------------------
     //public interface
     //-------------------------------------------------------------------------
+
+    @Override
+    public InformationFlowContract map(UnaryOperator<Term> op, Services services) {
+        return new InformationFlowContractImpl(baseName, name, forClass, pm, specifiedIn, modality,
+                                               op.apply(origPre), op.apply(origMby),
+                                               op.apply(origMod), hasRealModifiesClause, origSelf,
+                                               origParams.stream().map(op)
+                                               .collect(ImmutableList.collector()),
+                                               op.apply(origResult), op.apply(origExc),
+                                               op.apply(origAtPre), op.apply(origDep),
+                                               origInfFlowSpecs.stream().map(spec -> spec.map(op))
+                                               .collect(ImmutableList.collector()),
+                                               toBeSaved, id);
+    }
 
     @Override
     public String getName() {
@@ -726,6 +741,7 @@ public final class InformationFlowContractImpl implements InformationFlowContrac
     public Term getAssignable(LocationVariable heap) {
         return null;
     }
+
 
     @Override
     public Term getDeclares(LocationVariable heap) {

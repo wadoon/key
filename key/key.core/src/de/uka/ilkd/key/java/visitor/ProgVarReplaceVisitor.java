@@ -51,6 +51,7 @@ import de.uka.ilkd.key.logic.op.UpdateableOperator;
 import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.BlockContract;
+import de.uka.ilkd.key.speclang.AuxiliaryContract;
 import de.uka.ilkd.key.speclang.LoopContract;
 import de.uka.ilkd.key.speclang.LoopSpecification;
 import de.uka.ilkd.key.speclang.MergeContract;
@@ -284,7 +285,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     @Override
     public void performActionOnBlockContract(final StatementBlock oldBlock,
-            final StatementBlock newBlock) {
+                                             final StatementBlock newBlock) {
         ImmutableSet<BlockContract> oldContracts = services
                 .getSpecificationRepository().getBlockContracts(oldBlock);
         for (BlockContract oldContract : oldContracts) {
@@ -296,7 +297,7 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
 
     @Override
     public void performActionOnLoopContract(final StatementBlock oldBlock,
-            final StatementBlock newBlock) {
+                                            final StatementBlock newBlock) {
         ImmutableSet<LoopContract> oldContracts = services
                 .getSpecificationRepository().getLoopContracts(oldBlock);
         for (LoopContract oldContract : oldContracts) {
@@ -479,7 +480,8 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         final ImmutableList<InfFlowSpec> newInfFlowSpecs = replaceVariablesInTermListTriples(
                 oldContract.getInfFlowSpecs());
 
-        OpReplacer replacer = new OpReplacer(replMap, services.getTermFactory());
+        OpReplacer replacer = new OpReplacer(
+                replaceMap, services.getTermFactory(), services.getProof());
 
         return changed ? oldContract.update(newBlock, newPreconditions,
                 newPostconditions, newModifiesClauses,
@@ -546,21 +548,24 @@ public class ProgVarReplaceVisitor extends CreatingASTVisitor {
         final ImmutableList<InfFlowSpec> newInfFlowSpecs = replaceVariablesInTermListTriples(
                 oldContract.getInfFlowSpecs());
 
-        OpReplacer replacer = new OpReplacer(replaceMap, services.getTermFactory());
+        OpReplacer replacer = new OpReplacer(
+                replaceMap, services.getTermFactory(), services.getProof());
 
         if (!changed) {
             return oldContract;
         } else if (newStatement instanceof StatementBlock) {
-            return oldContract.update((StatementBlock) newStatement,
-                    newPreconditions, newPostconditions, newModifiesClauses,
+            return oldContract.update((StatementBlock) newStatement, newPreconditions,
+                    newPostconditions, newModifiesClauses,
                     newDeclaresClauses, newAccessibleClauses, newInfFlowSpecs,
-                    newVariables, replacer.replace(oldContract.getMby()),
+                    newVariables,
+                    replacer.replace(oldContract.getMby()),
                     replacer.replace(oldContract.getDecreases()));
         } else {
-            return oldContract.update((LoopStatement) newStatement,
-                    newPreconditions, newPostconditions, newModifiesClauses,
+            return oldContract.update((LoopStatement) newStatement, newPreconditions,
+                    newPostconditions, newModifiesClauses,
                     newDeclaresClauses, newAccessibleClauses, newInfFlowSpecs,
-                    newVariables, replacer.replace(oldContract.getMby()),
+                    newVariables,
+                    replacer.replace(oldContract.getMby()),
                     replacer.replace(oldContract.getDecreases()));
         }
     }

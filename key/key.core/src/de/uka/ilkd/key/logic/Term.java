@@ -40,7 +40,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
  *  saving a lot of memory space.
  *  </li>
  *  <li> Term has to be created using the {@link TermFactory} and
- *    <emph>not</emph> by using the constructors itself.
+ *    _not_ by using the constructors itself.
  *  </li>
  *  <li> Term is subclassed, but all subclasses have to be package private, so
  *    that all other classes except {@link TermFactory} know only the class
@@ -72,11 +72,11 @@ public interface Term extends SVSubstitute, Sorted {
     public ImmutableArray<Term> subs();
 
     /**
-     * The <code>n</code>-th direct subterm. First one is the 0-th.
+     * The <code>n</code>-th direct subterm.
      */
     public Term sub(int n);
 
-     /**
+    /**
      * The logical variables bound by the top level operator.
      */
     public ImmutableArray<QuantifiableVariable> boundVars();
@@ -135,7 +135,9 @@ public interface Term extends SVSubstitute, Sorted {
 
     /**
      * Compares if two terms are equal modulo bound renaming
-     * @return true iff the given Term has the same values in
+     *
+     * @param o another term,
+     * @return true iff the given term has the same values in
      * operator, sort, arity, varsBoundHere and javaBlock as this object
      * modulo bound renaming
      */
@@ -177,4 +179,15 @@ public interface Term extends SVSubstitute, Sorted {
      * @return {@code true} The {@link Term} or one of its direct or indirect children contains a non empty {@link JavaBlock}, {@code false} no {@link JavaBlock} available.
      */
     public boolean containsJavaBlockRecursive();
+
+    /**
+     * Checks if {@code o} is a term syntactically equal to this one,
+     * except for some irrelevant labels.
+     *
+     * @param o an object
+     * @return {@code true} iff {@code o} is a term syntactically equal to this one,
+     * except for their labels.
+     * @see TermLabel#isStrategyRelevant
+     */
+    boolean equalsModIrrelevantTermLabels(Object o);
 }

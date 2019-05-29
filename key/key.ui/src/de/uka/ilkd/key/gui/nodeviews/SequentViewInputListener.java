@@ -20,15 +20,13 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.util.StringJoiner;
 
-import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdate;
+import de.uka.ilkd.key.gui.MainWindow;
+import de.uka.ilkd.key.gui.ext.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.logic.op.ElementaryUpdate;
-import de.uka.ilkd.key.logic.op.LocationVariable;
-import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.logic.op.UpdateJunctor;
 import de.uka.ilkd.key.pp.PosInSequent;
 import de.uka.ilkd.key.proof.io.ProofSaver;
 
@@ -37,16 +35,17 @@ import de.uka.ilkd.key.proof.io.ProofSaver;
  *
  * @author Kai Wallisch <kai.wallisch@ira.uka.de>
  */
-public class SequentViewInputListener
-        implements KeyListener, MouseMotionListener, MouseListener {
+public class SequentViewInputListener implements KeyListener, MouseMotionListener, MouseListener {
 
     private final SequentView sequentView;
     private boolean showTermInfo = false;
 
-    // do not refresh when set to false
+    //do not refresh when set to false
     private static boolean refresh = true;
 
     protected void showTermInfo(Point p) {
+        MainWindow mainWindow = sequentView.getMainWindow();
+
         if (showTermInfo) {
             PosInSequent mousePos = sequentView.getPosInSequent(p);
             String info = null;
@@ -58,15 +57,13 @@ public class SequentViewInputListener
                 final PosInOccurrence posInOcc = mousePos.getPosInOccurrence();
                 if (posInOcc != null) {
                     t = posInOcc.subTerm();
-
                     String operator = opStrFromTerm(t);
                     /*
                      * The hash code is displayed here since sometimes terms
                      * with equal string representation are still different.
                      */
                     info = operator + " ("
-                            + (t.isRigid() ? "Rigid" : "Nonrigid") + "), Sort: "
-                            + t.sort() + ", Hash: " + t.hashCode();
+                            + (t.isRigid() ? "Rigid" : "Nonrigid") + "), Sort: " + t.sort() + ", Hash:" + t.hashCode();
 
                     if (t.op() instanceof LocationVariable) {
                         info += ", Op Hash: " + t.op().hashCode();
@@ -85,17 +82,21 @@ public class SequentViewInputListener
                                 au.hashCode());
                     }
 
-                    Sequent seq = sequentView.getMainWindow().getMediator()
-                            .getSelectedNode().sequent();
+                    Sequent seq = sequentView.getMainWindow().getMediator().getSelectedNode().sequent();
                     info += ProofSaver.posInOccurrence2Proof(seq, posInOcc);
+
+                    StringJoiner extensionStr = new StringJoiner(", ", ", ", "");
+                    extensionStr.setEmptyValue("");
+                    KeYGuiExtensionFacade.getTermInfoStrings(sequentView.getMainWindow(), mousePos)
+                        .forEach(extensionStr::add);
+                    info += extensionStr;
                 }
             }
 
             if (info == null) {
-                sequentView.getMainWindow().setStandardStatusLine();
-            }
-            else {
-                sequentView.getMainWindow().setStatusLine(info);
+                mainWindow.setStandardStatusLine();
+            } else {
+                mainWindow.setStatusLine(info);
             }
         }
     }
@@ -118,14 +119,18 @@ public class SequentViewInputListener
     }
 
     public static boolean isRefresh() {
-        return refresh;
-    }
+		return refresh;
+	}
 
-    public static void setRefresh(boolean refresh) {
-        SequentViewInputListener.refresh = refresh;
-    }
 
-    SequentViewInputListener(SequentView sequentView) {
+
+	public static void setRefresh(boolean refresh) {
+		SequentViewInputListener.refresh = refresh;
+	}
+
+
+
+	SequentViewInputListener(SequentView sequentView) {
         this.sequentView = sequentView;
     }
 
@@ -144,8 +149,7 @@ public class SequentViewInputListener
 
     @Override
     public void keyReleased(KeyEvent e) {
-        if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) == 0
-                && showTermInfo) {
+        if ((e.getModifiersEx() & InputEvent.ALT_DOWN_MASK) == 0 && showTermInfo) {
             showTermInfo = false;
             sequentView.getMainWindow().setStandardStatusLine();
         }
@@ -159,8 +163,7 @@ public class SequentViewInputListener
     @Override
     public void mouseMoved(MouseEvent me) {
         showTermInfo(me.getPoint());
-        if (sequentView.refreshHighlightning && refresh
-                && sequentView.getDocument().getLength() > 0) {
+        if (sequentView.refreshHighlightning && refresh && sequentView.getDocument().getLength() > 0) {
             sequentView.highlight(me.getPoint());
         }
     }
