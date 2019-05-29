@@ -503,30 +503,42 @@ public class AbstractUpdateFactory {
         final LocSetLDT locSetLDT = services.getTypeConverter().getLocSetLDT();
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
-        final Operator op = t.op();
+        final Term tWoUpd = stripUpd(t);
+        @SuppressWarnings("unchecked")
+        final Optional<Term>[] subs = new Optional[3];
+        for (int i = 0; i <= 2; i++) {
+            subs[i] = tWoUpd.subs().size() > i ? //
+                    Optional.of(stripUpd(tWoUpd.sub(i))) : //
+                    Optional.empty();
+        }
+
+        final Operator op = tWoUpd.op();
 
         if (op instanceof LocationVariable) {
             /* This is the heap LV, in which we are not interested here. */
-            /* TODO (DS, 2019-05-27): Seems that we still need it, check if that breaks anything */
+            /*
+             * TODO (DS, 2019-05-27): Seems that we still need it, check if that breaks
+             * anything.
+             */
             result.add(new PVLoc((LocationVariable) op));
-        } else if (op == locSetLDT.getSingleton() && t.sub(1).op() == heapLDT.getArr()) {
-            result.add(new ArrayLocRHS(t.sub(0), t.sub(1).sub(0)));
+        } else if (op == locSetLDT.getSingleton() && subs[1].get().op() == heapLDT.getArr()) {
+            result.add(new ArrayLocRHS(subs[0].get(), subs[1].get().sub(0)));
         } else if (op == locSetLDT.getSingleton()) {
             final Term obj = //
-                    normalizeSelfVar(t.sub(0), runtimeInstance, services);
-            final Term field = t.sub(1);
+                    normalizeSelfVar(subs[0].get(), runtimeInstance, services);
+            final Term field = subs[1].get();
             result.add(new FieldLocRHS(Optional.empty(), Optional.empty(), obj,
                     fieldPVFromFieldFunc(field, services)));
-        } else if (t.op() == locSetLDT.getAllFields() && t.subs().size() == 1) {
-            result.add(new AllFieldsLocRHS(t.sub(0)));
-        } else if (t.op() == locSetLDT.getArrayRange()) {
-            result.add(new ArrayRange(t.sub(0), t.sub(1), t.sub(2)));
-        } else if (heapLDT.isSelectOp(op) && t.subs().size() == 3
-                && t.sub(2).op() == heapLDT.getArr()) {
-            final Term heapTerm = t.sub(0);
+        } else if (tWoUpd.op() == locSetLDT.getAllFields() && tWoUpd.subs().size() == 1) {
+            result.add(new AllFieldsLocRHS(subs[0].get()));
+        } else if (tWoUpd.op() == locSetLDT.getArrayRange()) {
+            result.add(new ArrayRange(subs[0].get(), subs[1].get(), subs[2].get()));
+        } else if (heapLDT.isSelectOp(op) && tWoUpd.subs().size() == 3
+                && subs[2].get().op() == heapLDT.getArr()) {
+            final Term heapTerm = subs[0].get();
             final Term obj = //
-                    normalizeSelfVar(t.sub(1), runtimeInstance, services);
-            final Term array = t.sub(2).sub(0);
+                    normalizeSelfVar(subs[1].get(), runtimeInstance, services);
+            final Term array = subs[2].get().sub(0);
             result.add(new ArrayLocRHS(obj, array));
 
             final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromHeapTerm(heapTerm,
@@ -538,8 +550,8 @@ public class AbstractUpdateFactory {
             result.addAll(subResult);
         } else if (heapLDT.isSelectOp(op)) {
             final Sort sort = heapLDT.getSortOfSelect(op);
-            final Term heapTerm = t.sub(0);
-            final Term field = t.sub(2);
+            final Term heapTerm = subs[0].get();
+            final Term field = subs[2].get();
 
             /*
              * If the field is a logic variable, it's part of the assignable clause or
@@ -547,7 +559,7 @@ public class AbstractUpdateFactory {
              * quantifier.
              */
             if (!(field.op() instanceof LogicVariable)) {
-                final Term obj = normalizeSelfVar(t.sub(1), runtimeInstance, services);
+                final Term obj = normalizeSelfVar(tWoUpd.sub(1), runtimeInstance, services);
                 result.add(new FieldLocRHS(Optional.of(sort), Optional.of(heapTerm), obj,
                         fieldPVFromFieldFunc(field, services)));
 
@@ -557,29 +569,29 @@ public class AbstractUpdateFactory {
                     result.addAll(subResult);
                 }
             }
-        } else if (op == heapLDT.getStore() && t.subs().size() == 4
-                && t.sub(2).op() == heapLDT.getArr()) {
+        } else if (op == heapLDT.getStore() && tWoUpd.subs().size() == 4
+                && subs[2].get().op() == heapLDT.getArr()) {
             /*
              * TODO (DS, 2019-05-22): Check what happens if the array is not a local
              * variable, but a field...
              */
 
-            final Term heapTerm = t.sub(0);
-            final Term array = normalizeSelfVar(t.sub(1), runtimeInstance, services);
-            final Term index = t.sub(2);
+            final Term heapTerm = tWoUpd.sub(0);
+            final Term array = normalizeSelfVar(subs[1].get(), runtimeInstance, services);
+            final Term index = subs[2].get();
             result.add(new ArrayLocRHS(array, index.sub(0)));
 
-            final Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromHeapTerm(heapTerm,
-                    runtimeInstance, services);
+            final Set<AbstractUpdateLoc> subResult = //
+                    abstrUpdateLocsFromHeapTerm(heapTerm, runtimeInstance, services);
             if (subResult == null) {
                 return null;
             }
 
             result.addAll(subResult);
         } else if (op == heapLDT.getStore()) {
-            final Term heapTerm = t.sub(0);
-            final Term obj = normalizeSelfVar(t.sub(1), runtimeInstance, services);
-            final Term field = t.sub(2);
+            final Term heapTerm = subs[0].get();
+            final Term obj = normalizeSelfVar(subs[1].get(), runtimeInstance, services);
+            final Term field = subs[2].get();
             result.add(new FieldLocRHS(Optional.empty(), Optional.empty(), obj,
                     fieldPVFromFieldFunc(field, services)));
 
@@ -596,8 +608,8 @@ public class AbstractUpdateFactory {
              * completely sure. Since this method is only about right-hand sides, nothing is
              * assigned...
              */
-            final Term heapTerm = t.sub(0);
-            final Term anonLocsTerm = t.sub(1);
+            final Term heapTerm = subs[0].get();
+            final Term anonLocsTerm = subs[1].get();
 
             Set<AbstractUpdateLoc> subResult = abstrUpdateLocsFromTermUnsafe(anonLocsTerm,
                     runtimeInstance, services);
@@ -622,6 +634,10 @@ public class AbstractUpdateFactory {
         }
 
         return result;
+    }
+
+    private static Term stripUpd(Term t) {
+        return TermBuilder.goBelowUpdates(t);
     }
 
     private static boolean isLHSHeapOp(final Operator op, final LocSetLDT locSetLDT,
