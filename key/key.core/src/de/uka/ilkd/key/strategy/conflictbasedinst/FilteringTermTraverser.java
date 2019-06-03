@@ -1,30 +1,37 @@
 package de.uka.ilkd.key.strategy.conflictbasedinst;
 
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import de.uka.ilkd.key.logic.Term;
-import de.uka.ilkd.key.strategy.conflictbasedinst.termtraverser.TermTraverser;
 
-public class FilteringTermTraverser extends TermTraverser {
+public class FilteringTermTraverser {
 
-    private Filter<Term> filter;
+    private Condition cond;
+    private Set<Term> terms;
 
-    public FilteringTermTraverser(Filter<Term> filter) {
-        this.filter = filter;
+    private FilteringTermTraverser(Condition cond) {
+        this.cond = cond;
+        this.terms = new HashSet<Term>();
     }
 
-    public Collection<Term> getResult() {
-        return filter.getResult();
+    private void filter(Term term) {
+        if(cond.decide(term)) terms.add(term);
+        term.subs().forEach(sub -> filter(sub));
     }
 
-    @Override
-    protected boolean traverseChilds(Term t) {
-        return true;
+    private Set<Term> getResult() {
+        return terms;
     }
 
-    @Override
-    protected void operateOn(Term t) {
-        if(filter.accept(t));
+    public static Set<Term> filter(Term term, Condition cond) {
+        FilteringTermTraverser traverser = new FilteringTermTraverser(cond);
+        traverser.filter(term);
+        return traverser.getResult();
+    }
+
+    private interface Condition {
+        boolean decide(Term t);
     }
 
 }
