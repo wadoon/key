@@ -52,8 +52,6 @@ public class CBITermGenerator implements TermGenerator {
         assert pos != null : "Feature is only applicable to rules with find";
 
         final Term quantifiedFormula = pos.sequentFormula().formula();
-        StringBuilder sb = new StringBuilder();
-        pos.sequentFormula().formula().subs().forEach(e -> sb.append(e.toString() + " "));
         final CBInstantiation cbInst = CBInstantiation.create(quantifiedFormula, goal.sequent(), goal.proof().getServices());
         final QuantifiableVariable var = quantifiedFormula.varsBoundHere(0).last();
         return new CBIIterator(cbInst.getSubstitution().iterator(), var, goal.proof().getServices());
