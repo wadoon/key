@@ -1,8 +1,11 @@
 package de.uka.ilkd.key.strategy.conflictbasedinst;
 
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 
 /**
@@ -19,23 +22,20 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
  */
 class FlatQuantifiedFormula {
 
-    private Term term;
+    private Term flattenedBody;
     private LinkedHashSet<QuantifiableVariable> vars;
     private LinkedHashSet<Term> constraints;
-    private boolean ground;
 
     public FlatQuantifiedFormula(Term term,
-            LinkedHashSet<QuantifiableVariable> vars, LinkedHashSet<Term> constraints,
-            boolean ground) {
+            LinkedHashSet<QuantifiableVariable> vars, LinkedHashSet<Term> constraints) {
         super();
-        this.term = term;
+        this.flattenedBody = term;
         this.vars = vars;
         this.constraints = constraints;
-        this.ground = ground;
     }
 
-    public Term getTerm() {
-        return term;
+    public Term getFlattenedBody() {
+        return flattenedBody;
     }
 
     public LinkedHashSet<QuantifiableVariable> getVars() {
@@ -46,12 +46,31 @@ class FlatQuantifiedFormula {
         return constraints;
     }
 
-    public boolean isGround() {
-        return ground;
+    public Term toTerm(Services services) {
+        TermBuilder tb = services.getTermBuilder();
+        Term ret = flattenedBody;
+        ret = tb.imp(tb.and(constraints), ret);
+        return concatQuantifier(ret, vars.iterator(), tb);
     }
 
-    public void setGround(boolean ground) {
-        this.ground = ground;
+    private Term concatQuantifier(Term ret, Iterator<QuantifiableVariable> it, TermBuilder tb) {
+        QuantifiableVariable qv = it.next();
+        if(it.hasNext()) {
+            return tb.all(qv, concatQuantifier(ret, it, tb));
+        } else {
+            return tb.all(qv, ret);
+        }
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj == this) return true;
+        if(obj == null) return false;
+        if(!(obj instanceof FlatQuantifiedFormula)) return false;
+        FlatQuantifiedFormula fqf = (FlatQuantifiedFormula) obj;
+        return fqf.getConstraints().equals(this.getConstraints())
+                && fqf.getFlattenedBody().equals(this.getFlattenedBody())
+                && fqf.getVars().equals(this.getVars());
     }
 
 
