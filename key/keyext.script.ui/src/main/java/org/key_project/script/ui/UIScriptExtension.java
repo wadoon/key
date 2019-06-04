@@ -65,6 +65,7 @@ public class UIScriptExtension implements
             if (debuggerFramework != null && debuggerFramework.getInterpreterThread() != null)
                 lblInterpreterStatus.setText(debuggerFramework.getInterpreterThread().getState().toString());
         });
+        timer.start();
     }
 
     @Override

@@ -52,6 +52,7 @@ public class Position implements Copyable<Position> {
     }
 
     public static Position end(Token token) {
+        if(token==null)return null;
         return new Position(
                 token.getStopIndex(),
                 token.getLine(),
