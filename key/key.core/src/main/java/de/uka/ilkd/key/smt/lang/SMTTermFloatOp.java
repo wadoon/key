@@ -80,6 +80,10 @@ public class SMTTermFloatOp extends SMTTerm{
 			return op;
 		}
 
+		public SMTSort getImageSort() {
+			return imageSort;
+		}
+
 		@Override
 		public boolean equals (Object other) {
 			if (other == null)
