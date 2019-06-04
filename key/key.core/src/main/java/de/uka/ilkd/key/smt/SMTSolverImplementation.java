@@ -348,7 +348,6 @@ final class SMTSolverImplementation implements SMTSolver, Runnable{
                 }
                 sb.append(c);
             }
-            System.out.println("sb = " + sb);
             return sb.toString();
         }
 
