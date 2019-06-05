@@ -39,7 +39,6 @@ public class CBITermGenerator implements TermGenerator {
     @Override
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
-
         final Term formula = pos.sequentFormula().formula();
         final Sequent sequent = goal.sequent();
         final Services services = goal.proof().getServices();
