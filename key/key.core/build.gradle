@@ -58,6 +58,7 @@ test {
         // use testProofRules or testRunAllProofs, avoid double execution on jenkins
         excludeTestsMatching "ProveRulesTest"
         excludeTestsMatching "RunAllProofsTestSuite"
+        excludeTestsMatching "RunAllProofsAbstractExecution"
         excludeTestsMatching "RunAllProofsInfFlow"
         excludeTestsMatching "RunAllProofsTestWithComputeCostProfiling"
         excludeTestsMatching "RunAllProofsFunctional"
@@ -105,6 +106,7 @@ task testRunAllProofs(type: Test) {
     filter { 
         // TODO does not exist any more: includeTestsMatching "RunAllProofsTestSuite"
         includeTestsMatching "RunAllProofsInfFlow"
+        includeTestsMatching "RunAllProofsAbstractExecution"
         includeTestsMatching "RunAllProofsFunctional"
     }
 }
