@@ -8,7 +8,7 @@
       <value name="length" programVariable="length" isArrayIndex="false" value="Z(1(#))" type="int" condition="true"/>
       <association name="[Z(0(#))]" isArrayIndex="true" arrayIndex="Z(0(#))" target="o2" condition="true"/>
    </object>
-   <object xml:id="o2" name="o_3" type="ObjectIntWrapper">
+   <object xml:id="o2" name="o_4" type="ObjectIntWrapper">
       <value name="value" programVariable="value" isArrayIndex="false" value="Z(2(4(#)))" type="int" condition="true"/>
    </object>
 </model>
