@@ -1,0 +1,22 @@
+#soundness test for taclet osupEQDef
+
+macro split-prop;
+
+rule osupDef;
+
+instantiate hide var=v_nv2 with='osup{Ord v_nv;}(f_j, f_i(v_nv))';
+instantiate hide var=nv2 with=f_k;
+
+rule impLeft
+  formula='   \forall Ord nv1; (olt(nv1, f_j) -> olt(f_i(nv1), f_k))
+ -> oleq(osup{Ord v_nv;}(f_j, f_i(v_nv)), f_k)';
+
+tryclose;
+
+rule impLeft;
+tryclose;
+
+rule 'oleq_antisym'
+  formula='oleq(f_k, osup{Ord v_nv;}(f_j, f_i(v_nv)))';
+
+tryclose;

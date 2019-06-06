@@ -1,0 +1,58 @@
+macro split-prop;
+rule oInd;
+tryclose branch;
+# Zero case closes automatically
+# Successor case 
+rule hide_right
+ formula='\forall Ord v_k; oleq(otimes(f_i, v_k), otimes(f_j, v_k))';
+rule allRight;
+rule impRight;
+rule otimes_DefSucc occ=0;
+rule otimes_DefSucc;
+rule oleqAddLessRight
+  formula='oleq(otimes(f_i, v_k_3), otimes(f_j, v_k_3))';
+instantiate hide var=k with=f_i ;
+rule oleq_replace
+  formula='oleq(f_i, f_j)';
+rule orLeft;
+rule oltAddLessLeft
+  formula='olt(f_i, f_j)';
+instantiate hide var=k with='otimes(f_j, v_k_3)';
+rule oltleq_trans
+  formula='olt(oadd(otimes(f_j, v_k_3), f_i), oadd(otimes(f_j, v_k_3), f_j))';
+tryclose branch;
+# Limit case
+rule hide_right
+ formula='\forall Ord v_k; oleq(otimes(f_i, v_k), otimes(f_j, v_k))';
+rule allRight;
+rule impRight;
+rule andLeft;
+rule otimes_DefLim occ=0;
+rule otimes_DefLim;
+rule ifthenelse_split occ=0;
+tryclose branch;
+rule ifthenelse_split;
+instantiate hide var=v_k with=o_1;
+rule impLeft;
+rule olimDefEquiv;
+rule andLeft;
+instantiate hide var=ov with=o_0 ;
+rule impLeft;
+rule oleq_zeroAxiom;
+instantiate hide var=nv with=nv1_2;
+rule oleq_replace  
+  formula='oleq(o_0, nv1_2)';
+tryclose branch;
+auto  otimesOneRight steps=2;
+rule oleq_replace
+  formula='oleq(f_i, f_j)';
+rule orLeft;
+cut 'olt(f_i, o_0)';
+tryclose branch;
+rule hide_right
+ formula='oleq(osup{Ord nv;}(nv1_2, otimes(f_i, nv)), o_0)';
+rule hide_right
+ formula='f_i = o_0';
+rule hide_left
+ formula='lim(nv1_2)';
+tryclose;
