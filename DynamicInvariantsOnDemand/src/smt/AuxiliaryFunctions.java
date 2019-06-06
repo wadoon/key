@@ -69,6 +69,8 @@ public class AuxiliaryFunctions {
 			newSequent = newSequent.addFormula(sf, true, false).sequent();
 		}
 		it = oldSequent.succedent().iterator();
+		//TODO: Daniel: auskommentieren bringt etwas? vlt. weil man dadurch bei innerLoop die inv entfernt, die
+		//den sequent allgemeingültig macht?
 		while (it.hasNext()) {
 			final SequentFormula sf = it.next();
 			if (hasModalities(sf.formula(), removePostCondition)) {

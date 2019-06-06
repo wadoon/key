@@ -35,16 +35,47 @@ public HashMap<String, ArrayList<Integer>> callGenTest(){
    testSuiteObject.testcode4();
    testSuiteObject.testcode5();
    testSuiteObject.testcode6();
+   testSuiteObject.testcode7();
+   testSuiteObject.testcode8();
+   testSuiteObject.testcode9();
+   testSuiteObject.testcode10();
+   testSuiteObject.testcode11();
+   testSuiteObject.testcode12();
+   testSuiteObject.testcode13();
+   testSuiteObject.testcode14();
+   testSuiteObject.testcode15();
+   testSuiteObject.testcode16();
+   testSuiteObject.testcode17();
+   testSuiteObject.testcode18();
+   testSuiteObject.testcode19();
+   testSuiteObject.testcode20();
+   testSuiteObject.testcode21();
+   testSuiteObject.testcode22();
+   testSuiteObject.testcode23();
+   testSuiteObject.testcode24();
+   testSuiteObject.testcode25();
+   testSuiteObject.testcode26();
+   testSuiteObject.testcode27();
+   testSuiteObject.testcode28();
+   testSuiteObject.testcode29();
+   testSuiteObject.testcode30();
+   testSuiteObject.testcode31();
+   testSuiteObject.testcode32();
+   testSuiteObject.testcode33();
+   testSuiteObject.testcode34();
+   testSuiteObject.testcode35();
+   testSuiteObject.testcode36();
+   testSuiteObject.testcode37();
+   testSuiteObject.testcode38();
     return varTraces;
  }
 
-  //Test Case for NodeNr: 1063
+  //Test Case for NodeNr: 3301
  public void  testcode0(){
    //Test preamble: creating objects and intializing test data
-   int r_0 = (int)0;
+   int a = (int)16;
+   int b = (int)9;
    boolean measuredByEmpty = (boolean)true;
-   int i_0 = (int)0;
-   int n = (int)0;
 
    //Other variables
 
@@ -52,18 +83,18 @@ public HashMap<String, ArrayList<Integer>> callGenTest(){
    /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(i_0);
+   inputVars.add(a);
+   inputVars.add(b);
    HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
    varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
  }
 
-  //Test Case for NodeNr: 1286
+  //Test Case for NodeNr: 3506
  public void  testcode1(){
    //Test preamble: creating objects and intializing test data
-   int r_0 = (int)4;
+   int a = (int)16;
+   int b = (int)11;
    boolean measuredByEmpty = (boolean)true;
-   int i_0 = (int)4;
-   int n = (int)4;
 
    //Other variables
 
@@ -71,18 +102,18 @@ public HashMap<String, ArrayList<Integer>> callGenTest(){
    /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(i_0);
+   inputVars.add(a);
+   inputVars.add(b);
    HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
    varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
  }
 
-  //Test Case for NodeNr: 1118
+  //Test Case for NodeNr: 3496
  public void  testcode2(){
    //Test preamble: creating objects and intializing test data
-   int r_0 = (int)1;
+   int a = (int)1;
+   int b = (int)11;
    boolean measuredByEmpty = (boolean)true;
-   int i_0 = (int)1;
-   int n = (int)1;
 
    //Other variables
 
@@ -90,18 +121,18 @@ public HashMap<String, ArrayList<Integer>> callGenTest(){
    /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(i_0);
+   inputVars.add(a);
+   inputVars.add(b);
    HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
    varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
  }
 
-  //Test Case for NodeNr: 1230
+  //Test Case for NodeNr: 3422
  public void  testcode3(){
    //Test preamble: creating objects and intializing test data
-   int r_0 = (int)3;
+   int a = (int)16;
+   int b = (int)10;
    boolean measuredByEmpty = (boolean)true;
-   int i_0 = (int)3;
-   int n = (int)3;
 
    //Other variables
 
@@ -109,18 +140,18 @@ public HashMap<String, ArrayList<Integer>> callGenTest(){
    /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(i_0);
+   inputVars.add(a);
+   inputVars.add(b);
    HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
    varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
  }
 
-  //Test Case for NodeNr: 1358
+  //Test Case for NodeNr: 3565
  public void  testcode4(){
    //Test preamble: creating objects and intializing test data
-   int r_0 = (int)16;
+   int a = (int)16;
+   int b = (int)14;
    boolean measuredByEmpty = (boolean)true;
-   int i_0 = (int)16;
-   int n = (int)16;
 
    //Other variables
 
@@ -128,18 +159,18 @@ public HashMap<String, ArrayList<Integer>> callGenTest(){
    /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(i_0);
+   inputVars.add(a);
+   inputVars.add(b);
    HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
    varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
  }
 
-  //Test Case for NodeNr: 1174
+  //Test Case for NodeNr: 3375
  public void  testcode5(){
    //Test preamble: creating objects and intializing test data
-   int r_0 = (int)2;
+   int a = (int)1;
+   int b = (int)10;
    boolean measuredByEmpty = (boolean)true;
-   int i_0 = (int)2;
-   int n = (int)2;
 
    //Other variables
 
@@ -147,18 +178,18 @@ public HashMap<String, ArrayList<Integer>> callGenTest(){
    /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(i_0);
+   inputVars.add(a);
+   inputVars.add(b);
    HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
    varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
  }
 
-  //Test Case for NodeNr: 1342
+  //Test Case for NodeNr: 3550
  public void  testcode6(){
    //Test preamble: creating objects and intializing test data
-   int r_0 = (int)5;
+   int a = (int)16;
+   int b = (int)12;
    boolean measuredByEmpty = (boolean)true;
-   int i_0 = (int)5;
-   int n = (int)5;
 
    //Other variables
 
@@ -166,7 +197,616 @@ public HashMap<String, ArrayList<Integer>> callGenTest(){
    /*@ nullable */ java.lang.Throwable exc = null;
    //Calling the method under test   
    ArrayList<Integer> inputVars = new ArrayList<Integer>();
-   inputVars.add(i_0);
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 3216
+ public void  testcode7(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)1;
+   int b = (int)9;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 3142
+ public void  testcode8(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)16;
+   int b = (int)8;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 3019
+ public void  testcode9(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)1;
+   int b = (int)8;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 2437
+ public void  testcode10(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)16;
+   int b = (int)5;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 2711
+ public void  testcode11(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)16;
+   int b = (int)6;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 2945
+ public void  testcode12(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)16;
+   int b = (int)7;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 2785
+ public void  testcode13(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)1;
+   int b = (int)7;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 2514
+ public void  testcode14(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)1;
+   int b = (int)6;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 2209
+ public void  testcode15(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)1;
+   int b = (int)5;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 2132
+ public void  testcode16(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)8;
+   int b = (int)4;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 2085
+ public void  testcode17(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)2;
+   int b = (int)4;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 1666
+ public void  testcode18(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)2;
+   int b = (int)3;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 1788
+ public void  testcode19(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)16;
+   int b = (int)3;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 1865
+ public void  testcode20(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)1;
+   int b = (int)4;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 1403
+ public void  testcode21(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)4;
+   int b = (int)2;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 1483
+ public void  testcode22(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)1;
+   int b = (int)3;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 1356
+ public void  testcode23(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)3;
+   int b = (int)2;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 1210
+ public void  testcode24(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)2;
+   int b = (int)2;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 981
+ public void  testcode25(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)8;
+   int b = (int)1;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 1064
+ public void  testcode26(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)1;
+   int b = (int)2;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 716
+ public void  testcode27(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)2;
+   int b = (int)1;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 934
+ public void  testcode28(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)4;
+   int b = (int)1;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 825
+ public void  testcode29(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)3;
+   int b = (int)1;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 607
+ public void  testcode30(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)1;
+   int b = (int)1;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 515
+ public void  testcode31(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)8;
+   int b = (int)0;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 475
+ public void  testcode32(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)6;
+   int b = (int)0;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 405
+ public void  testcode33(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)5;
+   int b = (int)0;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 195
+ public void  testcode34(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)2;
+   int b = (int)0;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 335
+ public void  testcode35(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)4;
+   int b = (int)0;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 265
+ public void  testcode36(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)3;
+   int b = (int)0;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 125
+ public void  testcode37(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)1;
+   int b = (int)0;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
+   HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
+   varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
+ }
+
+  //Test Case for NodeNr: 59
+ public void  testcode38(){
+   //Test preamble: creating objects and intializing test data
+   int a = (int)0;
+   int b = (int)0;
+   boolean measuredByEmpty = (boolean)true;
+
+   //Other variables
+
+   /*@ nullable */ int result = 0;
+   /*@ nullable */ java.lang.Throwable exc = null;
+   //Calling the method under test   
+   ArrayList<Integer> inputVars = new ArrayList<Integer>();
+   inputVars.add(a);
+   inputVars.add(b);
    HashMap<String, ArrayList<Integer>> traces = genInstrument.callGenInstrument(inputVars);
    varTraces = HelperFunctions.mergeMapsKeyWise(varTraces, traces);
  }

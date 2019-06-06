@@ -78,13 +78,13 @@ public class Main {
 	private static final String benchmarksFile14 = "benchmarks/cohennoinv/CohenNoInv.java";
 	private static final String benchmarksFile15 = "benchmarks/timesnopol/TimesNoPol.java";
 	
-	private static final String useBenchmark = benchmarksFile11;
+	private static final String useBenchmark = benchmarksFile13;
 	
 	private static final String digRelPath = "dig/dig/dig.py";
 	
 	// --- TestGen Parameters ---
 	// Amount of testcases / method calls for the function from which the traces should be obtained
-	public static final int startMaxLoopUnwinds = 6;
+	public static final int startMaxLoopUnwinds = 14;
 	public static int maxLoopUnwinds = startMaxLoopUnwinds;
 	public static int SMTintBound = 6;
 	public static final int concurrentSMTProcesses = 8;
@@ -258,7 +258,7 @@ public class Main {
 		Goal loopGoal = proof.openGoals().head();
 		
 		
-		//--- SetUp TermBuilder, Services and Namespaces for Parsing Terms ---
+		//--- SetUp TermBuilder, Services and Namespaces for Parsing Terms such as Invariants---
 		DefaultTermParser dtp = new DefaultTermParser();
 		// add update vars to namespace to be able to use the parser for those vars
 	    TermBuilder tb = proof.getServices().getTermBuilder();
@@ -423,23 +423,6 @@ public class Main {
 	        Goal useGoal = goalList.head();
 	        //}
 			
-	        Sequent invInitValidSequent = initGoal.sequent();
-//			boolean invInitiallyValid = false;
-//			try {
-//				Proof invInitValidProof = AuxiliaryFunctions.createProof(loopGoal.proof(), "invInitValidProof", invInitValidSequent);
-//				
-//				ImmutableList<Goal> openGoals = keyAPI.prove(invInitValidProof);
-//				
-//				// Check if invInitValid Goal got closed
-//				if (openGoals.isEmpty())
-//					invInitiallyValid = true;
-//				else
-//					invInitiallyValid = false;
-//				
-//			} catch (ProofInputException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
 	        boolean invInitiallyValid = false;
 			ImmutableList<Goal> openGoals = keyAPI.prove(proof);
 				
@@ -649,6 +632,7 @@ public class Main {
 		String invs = null;
 		try {
 			//call with polinv or ineqinv -> polinv
+			//example call (with pwd=/key/DynamicInvariantsOnDemand): sage -python 'dig/dig/dig.py' eqinv traces.tcs
 			ProcessBuilder builder = new ProcessBuilder("sage", "-python", digPath, eq_or_ineq, tracesPath);
 			builder.redirectErrorStream(true);
 			Process p;

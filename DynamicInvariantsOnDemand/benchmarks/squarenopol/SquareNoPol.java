@@ -25,14 +25,3 @@ class SquareNoPol {
 	}
 
 }
-
-
-
-
-
-
-
-
-
-
-

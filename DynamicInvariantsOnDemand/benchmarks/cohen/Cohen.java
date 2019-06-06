@@ -19,7 +19,7 @@ public class SimpleExamples {
 			int a = 1;
 			int b = y;
 			/*@
-			  @ loop_invariant (b <= r) && (b == a*y);
+			  @ loop_invariant (b == a*y);
 			  @ assignable \nothing;
 			  @*/
 			while(2*b <= r) {
