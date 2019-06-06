@@ -13,9 +13,12 @@
 
 package de.uka.ilkd.key.rule.abstractexecution;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Optional;
 
 import org.antlr.runtime.RecognitionException;
+import org.junit.Before;
 import org.junit.Test;
 
 import de.uka.ilkd.key.abstractexecution.logic.op.AbstractUpdateFactory;
@@ -33,10 +36,10 @@ import de.uka.ilkd.key.parser.AbstractTestTermParser;
  */
 public class TestLocExtr extends AbstractTestTermParser {
     public TestLocExtr() {
-        super(TestLocExtr.class.getName());
+        super();
     }
 
-    @Override
+    @Before
     public void setUp() throws RecognitionException {
         parseDecls(
                 "\\programVariables {Heap heap; testTermParserHeap.A self;}");

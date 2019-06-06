@@ -56,7 +56,7 @@ public class HasLoopLabelCondition implements VariableCondition {
                         .contextProgram();
         do {
             if (prefix instanceof LabeledStatement
-                    && ((LabeledStatement) prefix).getBody() == loopStmt) {
+                    && ((LabeledStatement) prefix).getBody().equals(loopStmt)) {
                 labels.add(((LabeledStatement) prefix).getLabel());
             }
         }

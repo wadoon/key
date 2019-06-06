@@ -12,10 +12,13 @@
 //
 package de.uka.ilkd.key.rule.abstractexecution;
 
+import java.io.File;
+
 import org.junit.Test;
 
 import de.uka.ilkd.key.rule.merge.MergeRuleTests;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
+import de.uka.ilkd.key.util.HelperClassForTests;
 import junit.framework.TestCase;
 
 /**
@@ -23,8 +26,8 @@ import junit.framework.TestCase;
  *
  */
 public class AETypeCheckerTests extends TestCase {
-    private static final String TEST_RESOURCES_DIR_PREFIX = //
-            "resources/testcase/abstractexecution/typechecker/";
+    private static final File TEST_RESOURCES_DIR_PREFIX = new File(
+            HelperClassForTests.TESTCASE_DIRECTORY, "abstractexecution/typechecker/");
 
     @Test
     public void testIncorrectAccessible() {
@@ -35,8 +38,7 @@ public class AETypeCheckerTests extends TestCase {
             MergeRuleTests.loadProof(TEST_RESOURCES_DIR_PREFIX,
                     "IncorrectAccessible/extractMethodRefactoring.key", false);
             fail("This proof should not load.");
-        }
-        catch (Throwable e) {
+        } catch (Throwable e) {
             assertEquals(SLTranslationException.class, e.getCause().getClass());
             assertEquals(expectedMsg, e.getMessage());
         }

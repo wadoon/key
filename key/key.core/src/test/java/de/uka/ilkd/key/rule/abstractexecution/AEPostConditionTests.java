@@ -12,10 +12,13 @@
 //
 package de.uka.ilkd.key.rule.abstractexecution;
 
+import java.io.File;
+
 import org.junit.Test;
 
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.rule.merge.MergeRuleTests;
+import de.uka.ilkd.key.util.HelperClassForTests;
 import junit.framework.TestCase;
 
 /**
@@ -23,7 +26,7 @@ import junit.framework.TestCase;
  *
  */
 public class AEPostConditionTests extends TestCase {
-    private static final String TEST_RESOURCES_DIR_PREFIX = "resources/testcase/abstractexecution/";
+    private static final File TEST_RESOURCES_DIR_PREFIX = new File(HelperClassForTests.TESTCASE_DIRECTORY, "abstractexecution/");
 
     @Test
     public void testPostConditionExampleStep0() {
