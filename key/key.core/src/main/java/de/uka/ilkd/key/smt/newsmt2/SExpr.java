@@ -31,7 +31,7 @@ import de.uka.ilkd.key.logic.sort.Sort;
 public class SExpr implements Writable {
 
     public enum Type {
-        INT, BOOL, UNIVERSE, PATTERN, NONE
+        INT, BOOL, FLOAT, DOUBLE, UNIVERSE, PATTERN, NONE
     }
 
     private static final Pattern EXTRACHAR_PATTERN =

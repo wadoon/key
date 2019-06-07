@@ -5,7 +5,6 @@ import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.op.Operator;
-import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.lang.SMTSort;
 import de.uka.ilkd.key.smt.lang.SMTTermFloatOp;
@@ -19,8 +18,8 @@ import java.util.Map;
 
 public class FloatHandler implements SMTHandler {
 
-    private final Map<Operator, SMTTermFloatOp.Op> nonConstOperators = new HashMap<>();
-    private final List<Operator> constOperators = new LinkedList<>();
+    private final Map<Operator, SMTTermFloatOp.Op> fpOperators = new HashMap<>();
+    private final List<Operator> fpLiterals = new LinkedList<>();
     private FloatLDT floatLDT;
     private DoubleLDT doubleLDT;
     private Services services;
@@ -32,81 +31,73 @@ public class FloatHandler implements SMTHandler {
         doubleLDT = services.getTypeConverter().getDoubleLDT();
 
         // float literals
-        constOperators.add(floatLDT.getFloatSymbol());
-        constOperators.add(doubleLDT.getDoubleSymbol());
+        fpLiterals.add(floatLDT.getFloatSymbol());
+        fpLiterals.add(doubleLDT.getDoubleSymbol());
 
         // operators with arguments
-        nonConstOperators.put(floatLDT.getLessThan(), SMTTermFloatOp.Op.FPLT);
-        nonConstOperators.put(floatLDT.getGreaterThan(), SMTTermFloatOp.Op.FPGT);
-        nonConstOperators.put(floatLDT.getLessOrEquals(), SMTTermFloatOp.Op.FPLEQ);
-        nonConstOperators.put(floatLDT.getGreaterOrEquals(), SMTTermFloatOp.Op.FPGEQ);
-        nonConstOperators.put(floatLDT.getEquals(), SMTTermFloatOp.Op.FPEQ);
-        nonConstOperators.put(floatLDT.getAddIEEE(), SMTTermFloatOp.Op.FPADD);
-        nonConstOperators.put(floatLDT.getSubIEEE(), SMTTermFloatOp.Op.FPSUB);
-        nonConstOperators.put(floatLDT.getMulIEEE(), SMTTermFloatOp.Op.FPMUL);
-        nonConstOperators.put(floatLDT.getDivIEEE(), SMTTermFloatOp.Op.FPDIV);
-        nonConstOperators.put(floatLDT.getJavaUnaryMinus(), SMTTermFloatOp.Op.FPNEG);
-        nonConstOperators.put(floatLDT.getAbs(), SMTTermFloatOp.Op.FPABS);
-        nonConstOperators.put(floatLDT.getJavaMin(), SMTTermFloatOp.Op.FPMIN);
-        nonConstOperators.put(floatLDT.getJavaMax(), SMTTermFloatOp.Op.FPMAX);
-        nonConstOperators.put(floatLDT.getIsNaN(), SMTTermFloatOp.Op.FPISNAN);
-        nonConstOperators.put(floatLDT.getIsZero(), SMTTermFloatOp.Op.FPISZERO);
-        nonConstOperators.put(floatLDT.getIsNormal(), SMTTermFloatOp.Op.FPISNORMAL);
-        nonConstOperators.put(floatLDT.getIsSubnormal(), SMTTermFloatOp.Op.FPISSUBNORMAL);
-        nonConstOperators.put(floatLDT.getIsInfinite(), SMTTermFloatOp.Op.FPISINFINITE);
-        nonConstOperators.put(floatLDT.getIsNegative(), SMTTermFloatOp.Op.FPISNEGATIVE);
-        nonConstOperators.put(floatLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
+        fpOperators.put(floatLDT.getLessThan(), SMTTermFloatOp.Op.FPLT);
+        fpOperators.put(floatLDT.getGreaterThan(), SMTTermFloatOp.Op.FPGT);
+        fpOperators.put(floatLDT.getLessOrEquals(), SMTTermFloatOp.Op.FPLEQ);
+        fpOperators.put(floatLDT.getGreaterOrEquals(), SMTTermFloatOp.Op.FPGEQ);
+        fpOperators.put(floatLDT.getEquals(), SMTTermFloatOp.Op.FPEQ);
+        fpOperators.put(floatLDT.getAddIEEE(), SMTTermFloatOp.Op.FPADD);
+        fpOperators.put(floatLDT.getSubIEEE(), SMTTermFloatOp.Op.FPSUB);
+        fpOperators.put(floatLDT.getMulIEEE(), SMTTermFloatOp.Op.FPMUL);
+        fpOperators.put(floatLDT.getDivIEEE(), SMTTermFloatOp.Op.FPDIV);
+        fpOperators.put(floatLDT.getJavaUnaryMinus(), SMTTermFloatOp.Op.FPNEG);
+        fpOperators.put(floatLDT.getAbs(), SMTTermFloatOp.Op.FPABS);
+        fpOperators.put(floatLDT.getJavaMin(), SMTTermFloatOp.Op.FPMIN);
+        fpOperators.put(floatLDT.getJavaMax(), SMTTermFloatOp.Op.FPMAX);
+        fpOperators.put(floatLDT.getIsNaN(), SMTTermFloatOp.Op.FPISNAN);
+        fpOperators.put(floatLDT.getIsZero(), SMTTermFloatOp.Op.FPISZERO);
+        fpOperators.put(floatLDT.getIsNormal(), SMTTermFloatOp.Op.FPISNORMAL);
+        fpOperators.put(floatLDT.getIsSubnormal(), SMTTermFloatOp.Op.FPISSUBNORMAL);
+        fpOperators.put(floatLDT.getIsInfinite(), SMTTermFloatOp.Op.FPISINFINITE);
+        fpOperators.put(floatLDT.getIsNegative(), SMTTermFloatOp.Op.FPISNEGATIVE);
+        fpOperators.put(floatLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
 
         //Double predicates and operations, translated identically to float operations
-        nonConstOperators.put(doubleLDT.getLessThan(), SMTTermFloatOp.Op.FPLT);
-        nonConstOperators.put(doubleLDT.getGreaterThan(), SMTTermFloatOp.Op.FPGT);
-        nonConstOperators.put(doubleLDT.getLessOrEquals(), SMTTermFloatOp.Op.FPLEQ);
-        nonConstOperators.put(doubleLDT.getGreaterOrEquals(), SMTTermFloatOp.Op.FPGEQ);
-        nonConstOperators.put(doubleLDT.getEquals(), SMTTermFloatOp.Op.FPEQ);
-        nonConstOperators.put(doubleLDT.getAddIEEE(), SMTTermFloatOp.Op.FPADD);
-        nonConstOperators.put(doubleLDT.getSubIEEE(), SMTTermFloatOp.Op.FPSUB);
-        nonConstOperators.put(doubleLDT.getMulIEEE(), SMTTermFloatOp.Op.FPMUL);
-        nonConstOperators.put(doubleLDT.getDivIEEE(), SMTTermFloatOp.Op.FPDIV);
-        nonConstOperators.put(doubleLDT.getJavaUnaryMinus(), SMTTermFloatOp.Op.FPNEG);
-        nonConstOperators.put(doubleLDT.getAbs(), SMTTermFloatOp.Op.FPABS);
-        nonConstOperators.put(doubleLDT.getIsNaN(), SMTTermFloatOp.Op.FPISNAN);
-        nonConstOperators.put(doubleLDT.getIsZero(), SMTTermFloatOp.Op.FPISZERO);
-        nonConstOperators.put(doubleLDT.getIsNormal(), SMTTermFloatOp.Op.FPISNORMAL);
-        nonConstOperators.put(doubleLDT.getIsSubnormal(), SMTTermFloatOp.Op.FPISSUBNORMAL);
-        nonConstOperators.put(doubleLDT.getIsInfinite(), SMTTermFloatOp.Op.FPISINFINITE);
-        nonConstOperators.put(doubleLDT.getIsNegative(), SMTTermFloatOp.Op.FPISNEGATIVE);
-        nonConstOperators.put(doubleLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
+        fpOperators.put(doubleLDT.getLessThan(), SMTTermFloatOp.Op.FPLT);
+        fpOperators.put(doubleLDT.getGreaterThan(), SMTTermFloatOp.Op.FPGT);
+        fpOperators.put(doubleLDT.getLessOrEquals(), SMTTermFloatOp.Op.FPLEQ);
+        fpOperators.put(doubleLDT.getGreaterOrEquals(), SMTTermFloatOp.Op.FPGEQ);
+        fpOperators.put(doubleLDT.getEquals(), SMTTermFloatOp.Op.FPEQ);
+        fpOperators.put(doubleLDT.getAddIEEE(), SMTTermFloatOp.Op.FPADD);
+        fpOperators.put(doubleLDT.getSubIEEE(), SMTTermFloatOp.Op.FPSUB);
+        fpOperators.put(doubleLDT.getMulIEEE(), SMTTermFloatOp.Op.FPMUL);
+        fpOperators.put(doubleLDT.getDivIEEE(), SMTTermFloatOp.Op.FPDIV);
+        fpOperators.put(doubleLDT.getJavaUnaryMinus(), SMTTermFloatOp.Op.FPNEG);
+        fpOperators.put(doubleLDT.getAbs(), SMTTermFloatOp.Op.FPABS);
+        fpOperators.put(doubleLDT.getIsNaN(), SMTTermFloatOp.Op.FPISNAN);
+        fpOperators.put(doubleLDT.getIsZero(), SMTTermFloatOp.Op.FPISZERO);
+        fpOperators.put(doubleLDT.getIsNormal(), SMTTermFloatOp.Op.FPISNORMAL);
+        fpOperators.put(doubleLDT.getIsSubnormal(), SMTTermFloatOp.Op.FPISSUBNORMAL);
+        fpOperators.put(doubleLDT.getIsInfinite(), SMTTermFloatOp.Op.FPISINFINITE);
+        fpOperators.put(doubleLDT.getIsNegative(), SMTTermFloatOp.Op.FPISNEGATIVE);
+        fpOperators.put(doubleLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
     }
 
     @Override
     public boolean canHandle(Term term) {
-        return nonConstOperators.containsKey(term.op()) || constOperators.contains(term.op());
+        return fpOperators.containsKey(term.op()) || fpLiterals.contains(term.op());
     }
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
         Operator op = term.op();
-        if (nonConstOperators.containsKey(op)) {
-            SMTTermFloatOp.Op fpop = nonConstOperators.get(op);
+        if (fpOperators.containsKey(op)) {
+            SMTTermFloatOp.Op fpop = fpOperators.get(op);
             String opName = fpop.getOpName();
-            SExpr.Type exprType = fpop.getImageSort().equals(SMTSort.BOOL) ? SExpr.Type.BOOL : SExpr.Type.UNIVERSE;
+            SExpr.Type exprType = fpop.getImageSort().equals(SMTSort.BOOL) ? SExpr.Type.BOOL : SExpr.Type.FLOAT;
             ImmutableArray<Term> subs = term.subs();
             List<SExpr> translatedSubs = new LinkedList<>();
             for (Term t : subs) {
                 translatedSubs.add(trans.translate(t));
             }
             return new SExpr(opName, exprType, translatedSubs);
-        } else if (op.equals(floatLDT.getFloatSymbol())) {
-            String fp = NumberTranslation.translateFloatToSMTLIB(term, services);
-            fp = fp.substring(1, fp.length() - 1);
-            return new SExpr(fp, SExpr.Type.UNIVERSE);
-        } else if (op.equals(doubleLDT.getDoubleSymbol())) {
-            String dp = NumberTranslation.translateDoubleToSMTLIB(term, services);
-            dp = dp.substring(1, dp.length() - 1);
-            return new SExpr(dp, SExpr.Type.UNIVERSE);
-        }else {
+        } // else if ... else if ...
+          else {
             throw new SMTTranslationException("Error in floating point translation!");
         }
-
     }
 }

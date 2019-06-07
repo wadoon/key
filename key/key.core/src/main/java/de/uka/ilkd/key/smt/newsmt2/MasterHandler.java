@@ -176,6 +176,24 @@ public class MasterHandler {
             default:
                 throw new SMTTranslationException("Cannot convert to int: " + exp);
             }
+        case FLOAT:
+            switch(exp.getType()) {
+                case FLOAT:
+                    return exp;
+                case UNIVERSE:
+                    return new SExpr("u2f", Type.FLOAT, exp);
+                default:
+                    throw new SMTTranslationException("Cannot convert to float: " + exp);
+            }
+        case DOUBLE:
+            switch(exp.getType()) {
+                case DOUBLE:
+                    return exp;
+                case UNIVERSE:
+                    return new SExpr("u2d", Type.FLOAT, exp);
+                default:
+                    throw new SMTTranslationException("Cannot convert to double: " + exp);
+            }
         case UNIVERSE:
             switch(exp.getType()) {
             case UNIVERSE:
@@ -184,6 +202,10 @@ public class MasterHandler {
                 return new SExpr("i2u", Type.UNIVERSE, exp);
             case BOOL:
                 return new SExpr("b2u", Type.UNIVERSE, exp);
+            case FLOAT:
+                return new SExpr("f2u", Type.UNIVERSE, exp);
+            case DOUBLE:
+                return new SExpr("d2u", Type.UNIVERSE, exp);
             default:
                 throw new SMTTranslationException("Cannot convert to universe: " + exp);
             }
