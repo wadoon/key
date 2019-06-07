@@ -15,7 +15,6 @@ import de.uka.ilkd.key.smt.SMTTranslationException;
 import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.BOOL;
-import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
 
 public class UninterpretedSymbolsHandler implements SMTHandler {
 
@@ -42,9 +41,6 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
             return new SExpr("null", Type.UNIVERSE);
         }
 
-        // future work: also special-case integers?
-        SExpr.Type exprType = term.sort() == Sort.FORMULA ? BOOL : UNIVERSE;
-
         String name = PREFIX + op.name().toString();
         if(!trans.isKnownSymbol(name)) {
             int a = op.arity();
@@ -66,7 +62,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
             }
         }
 
-        List<SExpr> children = trans.translate(term.subs(), exprType);
+        List<SExpr> children = trans.translate(term.subs(), Type.UNIVERSE);
         return new SExpr(name, Type.UNIVERSE, children);
     }
 
