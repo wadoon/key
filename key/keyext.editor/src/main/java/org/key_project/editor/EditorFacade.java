@@ -4,6 +4,7 @@ import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import bibliothek.gui.dock.common.MultipleCDockableFactory;
 import bibliothek.gui.dock.common.MultipleCDockableLayout;
+import bibliothek.util.xml.XAttribute;
 import bibliothek.util.xml.XElement;
 import de.uka.ilkd.key.gui.MainWindow;
 import lombok.Data;
@@ -112,8 +113,8 @@ public class EditorFacade {
 
         @Override
         public void writeXML(XElement xElement) {
-            xElement.getAttribute("PATH").setString(path);
-            xElement.getAttribute("TEXT_CONTENT").setString(textContent);
+            xElement.addString("PATH", path);
+            xElement.addString("TEXT_CONTENT", textContent);
             xElement.addString("MIMETYPE", mimeType);
         }
 
@@ -131,7 +132,7 @@ public class EditorFacade {
         public EditorDockableData write(Editor defaultMultipleCDockable) {
             Editor editor = (Editor) defaultMultipleCDockable;
             EditorDockableData dockableData = create();
-            dockableData.path = (editor == null ? "" : editor.getPath().toString());
+            dockableData.path = (editor.getPath() == null ? "" : editor.getPath().toString());
             dockableData.textContent = editor.getText();
             dockableData.mimeType = editor.getMimeType();
             return dockableData;
