@@ -133,6 +133,7 @@ public class DebuggerFramework<T> {
         interpreterThread.start();
     }
 
+
     private void run() {
         try {
             interpreter.interpret(mainScript);

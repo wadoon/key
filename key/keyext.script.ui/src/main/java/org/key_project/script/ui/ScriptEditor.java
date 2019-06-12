@@ -77,7 +77,7 @@ class ScriptEditor extends Editor {
         editor.setCloseMarkupTags(true);
         editor.setCodeFoldingEnabled(true);
         editor.addParser(new LintParser());
-        editor.setText("script main() {\n\tauto;\n}\n");
+        editor.setText("auto; \n\n \\\\To call subscripts simply add \\\\script name(){command;} and call it top level");
         ScriptUtils.createAutoCompletion().install(editor);
         gutter.setBookmarkIcon(BOOKMARK_ICON);
         gutter.setBookmarkingEnabled(true);
@@ -91,12 +91,12 @@ class ScriptEditor extends Editor {
         toolBarActions.add(actionCasesFromGoals);
     }
 
-    private void onRunSucceed(DebuggerFramework<KeyData> keyDataDebuggerFramework) {
+    public void onRunSucceed(DebuggerFramework<KeyData> keyDataDebuggerFramework) {
         window.setStatusLine("Interpreting finished");
         enableGui();
     }
 
-    private void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework, Throwable throwable) {
+    public void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework, Throwable throwable) {
         window.popupWarning(throwable.getMessage(), "Interpreting Error");
         throwable.printStackTrace();
         enableGui();
@@ -304,7 +304,12 @@ class ScriptEditor extends Editor {
                 });
                 setDebuggerFramework(df);
                 disableGui();
+                df.setSucceedListener(keyDataDebuggerFramework -> onRunSucceed(keyDataDebuggerFramework));
+                df.setErrorListener((keyDataDebuggerFramework, throwable) -> {
+                    onRuntimeError(keyDataDebuggerFramework,throwable);
+                });
                 df.start();
+
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
