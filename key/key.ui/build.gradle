@@ -18,6 +18,8 @@ dependencies {
                 'lib/docking-frames-core.jar')
 
     runtimeOnly project(":keyext.interactionlog")
+    //runtimeOnly project(":keyext.script.ui")
+    compile 'org.jetbrains:annotations:17.0.0'
     runtimeOnly project(":keyext.editor")
     runtimeOnly project(":keyext.script.ui")
 }
@@ -48,9 +50,8 @@ application {
 
 run {
     systemProperties["key.examples.dir"] = "$projectDir/examples"
-
+    
     args "--experimental"
-
 }
 
 
