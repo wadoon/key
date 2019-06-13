@@ -2,6 +2,8 @@ package org.key_project.script.ui;
 
 import com.google.common.base.Strings;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
@@ -44,7 +46,7 @@ import java.util.regex.Pattern;
  * @author Alexander Weigl
  * @version 1 (06.03.19)
  */
-class ScriptEditor extends Editor {
+class ScriptEditor extends Editor implements KeYSelectionListener {
     public static final String MENU_PROOF_SCRIPTS = "Proof Scripts";
     public static final float ICON_SIZE = 16;
     public static final String MENU_PROOF_SCRIPTS_EXEC = MENU_PROOF_SCRIPTS + ".Run";
@@ -89,13 +91,26 @@ class ScriptEditor extends Editor {
         toolBarActions.addSeparator();
         toolBarActions.add(actionSimpleReformat);
         toolBarActions.add(actionCasesFromGoals);
+
+        mediator.addKeYSelectionListener(this);
+
+
     }
 
+    /**
+     * Run if debugger framework was able to finish interpreting the proof script
+     * @param keyDataDebuggerFramework
+     */
     public void onRunSucceed(DebuggerFramework<KeyData> keyDataDebuggerFramework) {
         window.setStatusLine("Interpreting finished");
         enableGui();
     }
 
+    /**
+     * Run if debuggerframework encountered errors while interpreting
+     * @param keyDataDebuggerFramework
+     * @param throwable
+     */
     public void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework, Throwable throwable) {
         window.popupWarning(throwable.getMessage(), "Interpreting Error");
         throwable.printStackTrace();
@@ -158,6 +173,19 @@ class ScriptEditor extends Editor {
         int pos = editor.getCaretPosition();
         setText(builder.toString());
         editor.setCaretPosition(pos);
+    }
+
+    @Override
+    public void selectedNodeChanged(KeYSelectionEvent e) {
+        //currently do nothing
+    }
+
+    @Override
+    public void selectedProofChanged(KeYSelectionEvent e) {
+        if(mediator.getSelectedProof() != null){
+           setActionEnable();
+        }
+
     }
 
     class ToggleCommentAction extends KeyAction {
@@ -254,12 +282,14 @@ class ScriptEditor extends Editor {
     }
 
     class ExecuteAction extends KeyAction {
+
         public ExecuteAction() {
             setName("Execute Script");
             setMenuPath(MENU_PROOF_SCRIPTS_EXEC);
             setPriority(0);
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.PLAY_CIRCLE, ICON_SIZE,
                     new Color(140, 182, 60)));
+
             setEnabled();
         }
 
