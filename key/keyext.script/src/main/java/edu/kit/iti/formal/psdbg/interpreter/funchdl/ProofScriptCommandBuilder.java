@@ -124,7 +124,7 @@ public class ProofScriptCommandBuilder implements CommandHandler<KeyData> {
     @Override
     public String getHelp(CallStatement call) {
         ProofScriptCommand c = commands.get(call.getCommand());
-        InputStream res = getClass().getResourceAsStream("/edu/kit/iti/formal/psdbg/commands/" + call.getCommand() + ".html");
+        InputStream res = getClass().getResourceAsStream("/psdbg/commands/" + call.getCommand() + ".html");
         try {
             return CharStreams.toString(new InputStreamReader(res, "utf-8"));
         } catch (NullPointerException | IOException e) {

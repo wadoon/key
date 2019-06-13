@@ -94,7 +94,8 @@ public class MacroCommandHandler implements CommandHandler<KeyData> {
     @Override
     public String getHelp(CallStatement call) {
         ProofMacro macro = macros.get(call.getCommand());
-        InputStream res = getClass().getResourceAsStream("/edu/kit/iti/formal/psdbg/macros/" + call.getCommand() + ".html");
+
+        InputStream res = getClass().getResourceAsStream("/psdbg/macros/" + call.getCommand() + ".html");
         try {
             return CharStreams.toString(new InputStreamReader(res, "utf-8"));
         } catch (NullPointerException | IOException e) {

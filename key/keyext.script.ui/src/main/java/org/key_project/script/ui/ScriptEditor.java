@@ -2,6 +2,8 @@ package org.key_project.script.ui;
 
 import com.google.common.base.Strings;
 import de.uka.ilkd.key.core.KeYMediator;
+import de.uka.ilkd.key.core.KeYSelectionEvent;
+import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
@@ -44,7 +46,7 @@ import java.util.regex.Pattern;
  * @author Alexander Weigl
  * @version 1 (06.03.19)
  */
-class ScriptEditor extends Editor {
+class ScriptEditor extends Editor implements KeYSelectionListener {
     public static final String MENU_PROOF_SCRIPTS = "Proof Scripts";
     public static final float ICON_SIZE = 16;
     public static final String MENU_PROOF_SCRIPTS_EXEC = MENU_PROOF_SCRIPTS + ".Run";
@@ -77,7 +79,7 @@ class ScriptEditor extends Editor {
         editor.setCloseMarkupTags(true);
         editor.setCodeFoldingEnabled(true);
         editor.addParser(new LintParser());
-        editor.setText("script main() {\n\tauto;\n}\n");
+        editor.setText("auto; \n\n\\\\To call subscripts simply add \n\\\\script name(){command;} \n\\\\and call it top level using name;");
         ScriptUtils.createAutoCompletion().install(editor);
         gutter.setBookmarkIcon(BOOKMARK_ICON);
         gutter.setBookmarkingEnabled(true);
@@ -89,14 +91,28 @@ class ScriptEditor extends Editor {
         toolBarActions.addSeparator();
         toolBarActions.add(actionSimpleReformat);
         toolBarActions.add(actionCasesFromGoals);
+
+        mediator.addKeYSelectionListener(this);
+
+
     }
 
-    private void onRunSucceed(DebuggerFramework<KeyData> keyDataDebuggerFramework) {
+    /**
+     * Run if debugger framework was able to finish interpreting the proof script
+     * @param keyDataDebuggerFramework
+     */
+    public void onRunSucceed(DebuggerFramework<KeyData> keyDataDebuggerFramework) {
         window.setStatusLine("Interpreting finished");
         enableGui();
+        setActionEnable();
     }
 
-    private void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework, Throwable throwable) {
+    /**
+     * Run if debuggerframework encountered errors while interpreting
+     * @param keyDataDebuggerFramework
+     * @param throwable
+     */
+    public void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework, Throwable throwable) {
         window.popupWarning(throwable.getMessage(), "Interpreting Error");
         throwable.printStackTrace();
         enableGui();
@@ -160,6 +176,19 @@ class ScriptEditor extends Editor {
         editor.setCaretPosition(pos);
     }
 
+    @Override
+    public void selectedNodeChanged(KeYSelectionEvent e) {
+        //currently do nothing
+    }
+
+    @Override
+    public void selectedProofChanged(KeYSelectionEvent e) {
+        if(mediator.getSelectedProof() != null){
+           setActionEnable();
+        }
+
+    }
+
     class ToggleCommentAction extends KeyAction {
         public ToggleCommentAction() {
             setName("Toogle Comment");
@@ -203,7 +232,9 @@ class ScriptEditor extends Editor {
             DebuggerFramework debuggerFramework = mediator.get(DebuggerFramework.class);
             debuggerFramework.stop();
             try {
-                debuggerFramework.getInterpreterThread().wait(1000);
+                if(debuggerFramework.getInterpreterThread().isAlive()) {
+                    debuggerFramework.getInterpreterThread().wait(1000);
+                }
             } catch (InterruptedException e1) {
 
             } finally {
@@ -212,7 +243,7 @@ class ScriptEditor extends Editor {
         }
 
         public void setEnabled() {
-            setEnabled(getDebuggerFramework() != null);
+            setEnabled(getDebuggerFramework() != null && getDebuggerFramework().getStatePointer().getStepOver() != null);
         }
     }
 
@@ -222,7 +253,7 @@ class ScriptEditor extends Editor {
             setMenuPath(MENU_PROOF_SCRIPTS_EXEC);
             setPriority(40);
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.STEP_FORWARD, ICON_SIZE));
-
+            setTooltip("Step over next command");
             setEnabled();
             Timer timer = new Timer(250, e -> setEnabled());
             timer.setRepeats(true);
@@ -254,12 +285,14 @@ class ScriptEditor extends Editor {
     }
 
     class ExecuteAction extends KeyAction {
+
         public ExecuteAction() {
             setName("Execute Script");
             setMenuPath(MENU_PROOF_SCRIPTS_EXEC);
             setPriority(0);
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.PLAY_CIRCLE, ICON_SIZE,
                     new Color(140, 182, 60)));
+
             setEnabled();
         }
 
@@ -304,7 +337,12 @@ class ScriptEditor extends Editor {
                 });
                 setDebuggerFramework(df);
                 disableGui();
+                df.setSucceedListener(keyDataDebuggerFramework -> onRunSucceed(keyDataDebuggerFramework));
+                df.setErrorListener((keyDataDebuggerFramework, throwable) -> {
+                    onRuntimeError(keyDataDebuggerFramework,throwable);
+                });
                 df.start();
+
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
@@ -316,11 +354,18 @@ class ScriptEditor extends Editor {
             setName("Continue");
             setMenuPath(MENU_PROOF_SCRIPTS_EXEC);
             setPriority(30);
+            setTooltip("Continue after breakpoint");
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.FAST_FORWARD, ICON_SIZE));
+            setEnabled();
         }
 
         public void setEnabled() {
-            setEnabled(mediator.getSelectedProof() != null && getDebuggerFramework() != null);
+            setEnabled(
+                    mediator.getSelectedProof() != null
+                    && !mediator.getSelectedProof().closed()
+                    && getDebuggerFramework() != null
+                    && getDebuggerFramework().getStatePointer().getStepOver() != null
+                    && !getDebuggerFramework().getBreakpoints().isEmpty());
         }
 
         @Override
