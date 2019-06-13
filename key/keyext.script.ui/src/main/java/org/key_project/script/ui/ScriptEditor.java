@@ -79,7 +79,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         editor.setCloseMarkupTags(true);
         editor.setCodeFoldingEnabled(true);
         editor.addParser(new LintParser());
-        editor.setText("auto; \n\n \\\\To call subscripts simply add \\\\script name(){command;} and call it top level");
+        editor.setText("auto; \n\n\\\\To call subscripts simply add \n\\\\script name(){command;} \n\\\\and call it top level using name;");
         ScriptUtils.createAutoCompletion().install(editor);
         gutter.setBookmarkIcon(BOOKMARK_ICON);
         gutter.setBookmarkingEnabled(true);
@@ -104,6 +104,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     public void onRunSucceed(DebuggerFramework<KeyData> keyDataDebuggerFramework) {
         window.setStatusLine("Interpreting finished");
         enableGui();
+        setActionEnable();
     }
 
     /**
@@ -231,7 +232,9 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
             DebuggerFramework debuggerFramework = mediator.get(DebuggerFramework.class);
             debuggerFramework.stop();
             try {
-                debuggerFramework.getInterpreterThread().wait(1000);
+                if(debuggerFramework.getInterpreterThread().isAlive()) {
+                    debuggerFramework.getInterpreterThread().wait(1000);
+                }
             } catch (InterruptedException e1) {
 
             } finally {
@@ -240,7 +243,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         }
 
         public void setEnabled() {
-            setEnabled(getDebuggerFramework() != null);
+            setEnabled(getDebuggerFramework() != null && getDebuggerFramework().getStatePointer().getStepOver() != null);
         }
     }
 
@@ -250,7 +253,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
             setMenuPath(MENU_PROOF_SCRIPTS_EXEC);
             setPriority(40);
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.STEP_FORWARD, ICON_SIZE));
-
+            setTooltip("Step over next command");
             setEnabled();
             Timer timer = new Timer(250, e -> setEnabled());
             timer.setRepeats(true);
@@ -351,11 +354,18 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
             setName("Continue");
             setMenuPath(MENU_PROOF_SCRIPTS_EXEC);
             setPriority(30);
+            setTooltip("Continue after breakpoint");
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.FAST_FORWARD, ICON_SIZE));
+            setEnabled();
         }
 
         public void setEnabled() {
-            setEnabled(mediator.getSelectedProof() != null && getDebuggerFramework() != null);
+            setEnabled(
+                    mediator.getSelectedProof() != null
+                    && !mediator.getSelectedProof().closed()
+                    && getDebuggerFramework() != null
+                    && getDebuggerFramework().getStatePointer().getStepOver() != null
+                    && !getDebuggerFramework().getBreakpoints().isEmpty());
         }
 
         @Override
