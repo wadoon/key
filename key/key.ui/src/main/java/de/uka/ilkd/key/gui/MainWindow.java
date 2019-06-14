@@ -153,7 +153,7 @@ public final class MainWindow extends JFrame {
      *
      */
     private CControl dockControl = new CControl(this);
-    private JCheckBoxMenuItem saveSMTFile;
+    JCheckBoxMenuItem saveSMTFile;
     /**
      * the first toolbar
      */
@@ -251,9 +251,9 @@ public final class MainWindow extends JFrame {
         recentFileMenu = new RecentFileMenu(mediator);
 
         proofTreeView = new ProofTreeView(mediator);
-        infoView = new InfoView();
-        strategySelectionView = new StrategySelectionView();
-        openGoalsView = new GoalList();
+        infoView = new InfoView(this, mediator);
+        strategySelectionView = new StrategySelectionView(this, mediator);
+        openGoalsView = new GoalList(mediator);
 
         layoutMain();
         SwingUtilities.updateComponentTreeUI(this);
