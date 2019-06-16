@@ -1,0 +1,551 @@
+package org.key_project.ui.interactionlog.model
+
+import de.uka.ilkd.key.api.ProofMacroApi
+import de.uka.ilkd.key.control.InteractionListener
+import de.uka.ilkd.key.logic.PosInOccurrence
+import de.uka.ilkd.key.logic.Sequent
+import de.uka.ilkd.key.logic.Term
+import de.uka.ilkd.key.macros.ProofMacro
+import de.uka.ilkd.key.macros.ProofMacroFinishedInfo
+import de.uka.ilkd.key.macros.scripts.EngineState
+import de.uka.ilkd.key.macros.scripts.RuleCommand
+import de.uka.ilkd.key.pp.LogicPrinter
+import de.uka.ilkd.key.proof.Goal
+import de.uka.ilkd.key.proof.Node
+import de.uka.ilkd.key.proof.Proof
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo
+import de.uka.ilkd.key.rule.RuleApp
+import de.uka.ilkd.key.rule.TacletApp
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl
+import org.key_project.ui.interactionlog.algo.LogPrinter
+import org.key_project.ui.interactionlog.api.Interaction
+import org.key_project.util.RandomName
+import org.key_project.util.collection.ImmutableSLList
+import java.awt.Color
+import java.io.IOException
+import java.io.PrintWriter
+import java.io.Serializable
+import java.io.StringWriter
+import java.lang.ref.WeakReference
+import java.util.*
+import javax.xml.bind.annotation.*
+
+
+/**
+ * @author Alexander Weigl
+ * @version 1 (06.12.18)
+ */
+@XmlRootElement(name = "interaction-log")
+@XmlAccessorType(XmlAccessType.FIELD)
+class InteractionLog : Serializable {
+    @XmlTransient
+    var proof: WeakReference<Proof> = WeakReference<Proof>(null)
+
+    @XmlAttribute
+    val name: String
+
+    @XmlAttribute
+    var created = Date()
+
+    var interactions: MutableList<Interaction> = ArrayList()
+
+    @JvmOverloads
+    constructor(name: String = RandomName.getRandomName()) {
+        this.name = name
+    }
+
+    constructor(proof: Proof) {
+        val pos = Math.min(proof.name().toString().length, 25)
+        name = (RandomName.getRandomName(" ")
+                + " (" + proof.name().toString().substring(0, pos) + ")")
+        this.proof = WeakReference(proof)
+    }
+
+    override fun toString(): String {
+        return name
+    }
+
+    companion object {
+        private const val serialVersionUID = 1L
+    }
+}
+
+
+@XmlTransient
+abstract class NodeInteraction(@Transient var serialNr: Int? = null) : Interaction() {
+    var nodeId: NodeIdentifier? = null
+
+    constructor(node: Node) : this(node.serialNr()) {
+        this.nodeId = NodeIdentifier.get(node)
+    }
+
+    fun getNode(proof: Proof): Node {
+        return nodeId!!.findNode(proof).orElse(null)
+    }
+
+    companion object {
+        private val serialVersionUID = 1L
+    }
+}
+
+
+/**
+ * @author Alexander Weigl
+ */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+class MacroInteraction() : NodeInteraction() {
+    var macroName: String? = null
+
+    @XmlTransient
+    var macro: ProofMacro? = null
+
+    @XmlTransient
+    var pos: PosInOccurrence? = null
+
+    var info: String? = null
+
+    var openGoalSerialNumbers: List<Int>? = null
+
+    var openGoalNodeIds: List<NodeIdentifier>? = null
+
+    override val markdown: String
+        get() = String.format("## Applied macro %s%n```%n%s%n```", macro, info)
+
+    override val proofScriptRepresentation: String
+        get() = String.format("macro %s;%n", macro)
+
+    constructor(node: Node, macro: ProofMacro, posInOcc: PosInOccurrence, info: ProofMacroFinishedInfo) : this() {
+        this.info = info.toString()
+        macroName = macro.scriptCommandName
+        pos = posInOcc
+        val openGoals = if (info.proof != null)
+            info.proof.openGoals()
+        else
+            ImmutableSLList.nil()
+        this.openGoalSerialNumbers = openGoals.map { g -> g.node().serialNr() }
+        this.openGoalNodeIds = openGoals.map { g -> NodeIdentifier.get(g.node()) }
+    }
+
+    override fun toString(): String {
+        return macroName ?: "n/a"
+    }
+
+    @Throws(Exception::class)
+    override fun reapply(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
+        val macro = ProofMacroApi().getMacro(macroName)
+        val pio = pos
+        if (macro != null) {
+            if (!macro.canApplyTo(goal.node(), pio)) {
+                throw IllegalStateException("Macro not applicable")
+            }
+
+            try {
+                macro.applyTo(uic, goal.node(), pio, uic)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+
+        }
+    }
+
+    companion object {
+        private val serialVersionUID = 1L
+    }
+}
+
+
+/**
+ * @author Alexander Weigl
+ * @version 1 (06.12.18)
+ */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+class NodeIdentifier() : Serializable {
+
+    @XmlElement(required = true, name = "select")
+    private var list: MutableList<Int> = ArrayList()
+
+    @XmlAttribute
+    var branchLabel: String? = null
+
+    @XmlTransient
+    var serialNr: Int = 0
+
+    constructor(seq: List<Int>) : this() {
+        this.list.addAll(seq)
+    }
+
+    override fun toString(): String {
+        return list.stream()
+                .map { it.toString() }
+                .reduce("") { a, b -> a + b } +
+                " => " + serialNr
+    }
+
+
+    fun findNode(proof: Proof): Optional<Node> {
+        return findNode(proof.root())
+    }
+
+    fun findNode(node: Node): Optional<Node> {
+        var n = node
+        for (child in list) {
+            if (child <= n.childrenCount()) {
+                n = n.child(child)
+            } else {
+                return Optional.empty()
+            }
+        }
+        return Optional.of(n)
+    }
+
+    companion object {
+        private const val serialVersionUID = 7147788921672163642L
+
+        operator fun get(g: Goal): NodeIdentifier {
+            return get(g.node())
+        }
+
+        operator fun get(node: Node): NodeIdentifier {
+            var n: Node? = node
+            val list = LinkedList<Int>()
+            do {
+                val parent = n?.parent()
+                if (parent != null) {
+                    list.add(0, parent.getChildNr(n))
+                }
+                n = parent
+            } while (n != null)
+            val ni = NodeIdentifier(list)
+            ni.branchLabel = LogPrinter.getBranchingLabel(n)
+            return ni
+        }
+    }
+}
+
+
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+class PruneInteraction() : NodeInteraction() {
+    constructor(node: Node) : this() {
+        serialNr = node.serialNr()
+        nodeId = NodeIdentifier.get(node)
+    }
+
+    override val markdown: String
+        get() = String.format("## Prune%n%n"
+                + "**Date**: %s%n"
+                + "prune to node %s%n", created, nodeId)
+
+    override val proofScriptRepresentation: String
+        get() = String.format("prune %s%n", nodeId)
+
+    override fun toString(): String {
+        return "prune"
+    }
+
+    @Throws(Exception::class)
+    override fun reapply(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
+        nodeId?.findNode(goal.proof())
+                ?.get()
+                ?.also { goal.proof().pruneProof(it) }
+    }
+
+    companion object {
+        private val serialVersionUID = -8499747129362589793L
+    }
+}
+
+
+/**
+ * @author Alexander Weigl
+ * @version 1 (09.12.18)
+ */
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+class OccurenceIdentifier {
+    @XmlAttribute
+    var path: Array<Int>? = null
+    @XmlAttribute
+    var term: String? = null
+    @XmlAttribute
+    var toplevelTerm: String? = null
+    @XmlAttribute
+    var termHash: Int = 0
+    @XmlAttribute
+    var isAntec: Boolean = false
+
+    override fun toString(): String {
+        if (path == null) {
+            return " @toplevel"
+        }
+        return if (path!!.size != 0) {
+            term + " under " + toplevelTerm + "(Path: " + Arrays.toString(path) + ")"
+        } else {
+            term!! + " @toplevel"
+        }
+    }
+
+    fun rebuildOn(goal: Goal): PosInOccurrence? {
+        val seq = goal.node().sequent()
+        return rebuildOn(seq)
+    }
+
+    private fun rebuildOn(seq: Sequent): PosInOccurrence? {
+        //TODO
+        return null
+    }
+
+    companion object {
+
+        operator fun get(p: PosInOccurrence?): OccurenceIdentifier {
+            if (p == null)
+                return OccurenceIdentifier()
+
+            val indices = ArrayList<Int>()
+            val iter = p.iterator()
+            while (iter.next() != -1) {
+                indices.add(iter.child)
+            }
+
+            val occ = OccurenceIdentifier()
+            occ.path = indices.toTypedArray()
+            occ.term = iter.subTerm.toString()
+            occ.termHash = iter.subTerm.hashCode()
+            occ.toplevelTerm = p.topLevel().subTerm().toString()
+            occ.isAntec = p.isInAntec
+            return occ
+        }
+    }
+}
+
+
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+class UserNoteInteraction() : Interaction() {
+    var note: String = ""
+
+    override val markdown: String
+        get() = String.format("## Note%n" +
+                "**Date**: %s%n" +
+                "```%n%s%n```", created, note)
+
+    init {
+        graphicalStyle.backgroundColor = Color.red.brighter().brighter().brighter()
+        //TODO graphicalStyle.setIcon();
+    }
+
+    constructor(note: String) : this() {
+        this.note = note
+    }
+
+    override fun toString(): String {
+        return note
+    }
+
+    companion object {
+        private val serialVersionUID = 1L
+    }
+}
+
+
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+class SettingChangeInteraction() : Interaction() {
+    @XmlElement
+    var savedSettings: Properties? = null
+
+    @XmlAttribute
+    var type: InteractionListener.SettingType? = null
+
+    @XmlAttribute
+    var message: String? = null
+
+    override val markdown: String
+        get() {
+            val writer = StringWriter()
+            try {
+                savedSettings?.store(writer, "")
+            } catch (e: IOException) {
+                e.printStackTrace()
+            }
+
+            return String.format("Setting changed: %s%n%n```%n%s%n````%n", type?.name, writer)
+        }
+
+    constructor(settings: Properties, type: InteractionListener.SettingType) : this() {
+        graphicalStyle.backgroundColor = Color.WHITE
+        graphicalStyle.foregroundColor = Color.gray
+        this.type = type
+        this.savedSettings = settings
+    }
+
+    override fun toString(): String {
+        return (if (message != null) message!! + " : " else "") + type
+    }
+
+    @Throws(Exception::class)
+    override fun reapply(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
+        val settings = goal.proof().settings
+        when (type) {
+            InteractionListener.SettingType.SMT -> settings.smtSettings.readSettings(savedSettings)
+            InteractionListener.SettingType.CHOICE -> settings.choiceSettings.readSettings(savedSettings)
+            InteractionListener.SettingType.STRATEGY -> settings.strategySettings.readSettings(savedSettings)
+        }
+    }
+
+    companion object {
+        private val serialVersionUID = 1L
+    }
+}
+
+
+@XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
+class AutoModeInteraction() : Interaction() {
+    var info: ApplyStrategyInfo? = null
+
+    var initialNodeIds: List<NodeIdentifier> = arrayListOf()
+    var openGoalNodeIds: List<NodeIdentifier> = arrayListOf()
+
+    override val markdown: String
+        get() {
+            val sout = StringWriter()
+            val out = PrintWriter(sout)
+            out.write("## Apply auto strategy%n%n")
+            out.write("* Started on:")
+            initialNodeIds.forEach { nr -> out.format("  * %s%n", nr) }
+            if (openGoalNodeIds.isEmpty())
+                out.format("* **Closed all goals**")
+            else {
+                out.format("* finished on:%n")
+                initialNodeIds.forEach { nr -> out.format("  * %s%n", nr) }
+            }
+            out.format("```%n%s%n```", info)
+            return sout.toString()
+        }
+
+    override val proofScriptRepresentation: String
+        get() = "auto;%n"
+
+    constructor(initialNodes: List<Node>, info: ApplyStrategyInfo) : this() {
+        this.info = info
+        this.initialNodeIds = initialNodes.map { NodeIdentifier.get(it) }
+        val openGoals = info.proof.openGoals()
+        this.openGoalNodeIds = openGoals.map { NodeIdentifier.get(it) }
+    }
+
+    override fun toString(): String {
+        return "Auto Mode"
+    }
+
+    @Throws(Exception::class)
+    override fun reapply(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
+        uic.proofControl.startAutoMode(goal.proof(), goal.proof().openGoals(), uic)
+    }
+
+    companion object {
+        private val serialVersionUID = 3650173956594987169L
+    }
+}
+
+
+/**
+ * @author weigl
+ */
+@XmlRootElement
+class RuleInteraction() : NodeInteraction() {
+    var ruleName: String? = null
+    var posInOccurence: OccurenceIdentifier? = null
+    var arguments = HashMap<String, String>()
+
+    constructor(node: Node, app: RuleApp) : this() {
+        ruleName = app.rule().displayName()
+        nodeId = NodeIdentifier.get(node)
+        this.posInOccurence = OccurenceIdentifier.get(app.posInOccurrence())
+        if (app is TacletApp) {
+            /*SequentFormula seqForm = pos.getPosInOccurrence().sequentFormula();
+                String sfTerm = LogicPrinter.quickPrintTerm(seqForm.formula(), services);
+                String onTerm = LogicPrinter.quickPrintTerm(pos.getPosInOccurrence().subTerm(), services);
+                sb.append("\n    formula=`").append(sfTerm).append("`");
+                sb.append("\n    on=`").append(onTerm).append("`");
+                sb.append("\n    occ=?;");
+                */
+            val iter = app.instantiations().pairIterator()
+            while (iter.hasNext()) {
+                val entry = iter.next()
+                val p = entry.key().toString()
+
+                val inst = entry.value().instantiation
+                val v: String
+
+                if (inst is Term) {
+                    v = LogicPrinter.quickPrintTerm(inst, null)
+                } else {
+                    v = inst.toString()
+                }
+
+                arguments[p] = v
+            }
+        }
+    }
+
+    override val markdown: String
+        get() {
+            val out = StringBuilder()
+            out.append(String.format("## Rule applied %s%n%n", ruleName))
+            out.append(String.format("* applied on%s%n", posInOccurence))
+            out.append(String.format("* Parameters %n"))
+            arguments.forEach { (key, value) -> out.append(String.format("  * %s : %s%n", key, value)) }
+            out.append('\n')
+            return out.toString()
+        }
+
+    override val proofScriptRepresentation: String
+        get() {
+            val sout = StringWriter()
+            val out = PrintWriter(sout)
+
+            out.format("rule %s%n", ruleName)
+            out.format("\t     on = \"%s\"%n\tformula = \"%s\"%n",
+                    posInOccurence?.term,
+                    posInOccurence?.toplevelTerm
+            )
+
+            arguments.forEach { (k, v) -> out.format("     inst_%s = \"%s\"%n", firstWord(k), v.trim { it <= ' ' }) }
+            out.format(";%n")
+            return sout.toString()
+        }
+
+    override fun toString(): String {
+        return ruleName ?: "n/a"
+    }
+
+    private fun firstWord(k: String): String {
+        val t = k.trim { it <= ' ' }
+        val p = t.indexOf(' ')
+        return if (p <= 0)
+            t
+        else
+            t.substring(0, p)
+    }
+
+    @Throws(Exception::class)
+    override fun reapply(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
+        val ruleCommand = RuleCommand()
+        val state = EngineState(goal.proof())
+        val parameter: RuleCommand.Parameters?
+        try {
+            parameter = ruleCommand.evaluateArguments(state, arguments)
+            ruleCommand.execute(uic, parameter, state)
+        } catch (e: Exception) {
+            throw IllegalStateException("Rule application", e)
+        }
+
+    }
+
+    companion object {
+        private val serialVersionUID = -3178292652264875668L
+    }
+}
