@@ -85,7 +85,8 @@ public class UIScriptExtension implements
                 actions.getCopyNodePathBranchLabelsAction(),
                 actions.getCopyNodePathLineNumbersAction(),
                 actions.getCopyNodePathProgramStatementsAction(),
-                actions.getCopyNodePathRuleNamesAction()
+                actions.getCopyNodePathRuleNamesAction(),
+                actions.getAutoLoadProofScriptAction()
         );
     }
 

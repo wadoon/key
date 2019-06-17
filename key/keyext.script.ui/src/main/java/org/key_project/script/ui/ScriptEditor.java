@@ -30,6 +30,7 @@ import org.fife.ui.rsyntaxtextarea.parser.AbstractParser;
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult;
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice;
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult;
+import org.jetbrains.annotations.NotNull;
 import org.key_project.editor.Editor;
 import org.key_project.util.RandomName;
 
@@ -38,8 +39,11 @@ import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
+import java.nio.file.*;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -69,6 +73,8 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     private CreateCasesFromOpenGoalsAction actionCasesFromGoals = new CreateCasesFromOpenGoalsAction();
     @Getter
     private ContinueAction actionContinue = new ContinueAction();
+    @Getter
+    private LockAndAutoReloadAction actionLockAndAutoReload = new LockAndAutoReloadAction();
 
 
     public ScriptEditor() {
@@ -99,6 +105,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
 
     /**
      * Run if debugger framework was able to finish interpreting the proof script
+     *
      * @param keyDataDebuggerFramework
      */
     public void onRunSucceed(DebuggerFramework<KeyData> keyDataDebuggerFramework) {
@@ -109,6 +116,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
 
     /**
      * Run if debuggerframework encountered errors while interpreting
+     *
      * @param keyDataDebuggerFramework
      * @param throwable
      */
@@ -183,8 +191,8 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
 
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
-        if(mediator.getSelectedProof() != null){
-           setActionEnable();
+        if (mediator.getSelectedProof() != null) {
+            setActionEnable();
         }
 
     }
@@ -232,7 +240,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
             DebuggerFramework debuggerFramework = mediator.get(DebuggerFramework.class);
             debuggerFramework.stop();
             try {
-                if(debuggerFramework.getInterpreterThread().isAlive()) {
+                if (debuggerFramework.getInterpreterThread().isAlive()) {
                     debuggerFramework.getInterpreterThread().wait(1000);
                 }
             } catch (InterruptedException e1) {
@@ -339,7 +347,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
                 disableGui();
                 df.setSucceedListener(keyDataDebuggerFramework -> onRunSucceed(keyDataDebuggerFramework));
                 df.setErrorListener((keyDataDebuggerFramework, throwable) -> {
-                    onRuntimeError(keyDataDebuggerFramework,throwable);
+                    onRuntimeError(keyDataDebuggerFramework, throwable);
                 });
                 df.start();
 
@@ -362,10 +370,10 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         public void setEnabled() {
             setEnabled(
                     mediator.getSelectedProof() != null
-                    && !mediator.getSelectedProof().closed()
-                    && getDebuggerFramework() != null
-                    && getDebuggerFramework().getStatePointer().getStepOver() != null
-                    && !getDebuggerFramework().getBreakpoints().isEmpty());
+                            && !mediator.getSelectedProof().closed()
+                            && getDebuggerFramework() != null
+                            && getDebuggerFramework().getStatePointer().getStepOver() != null
+                            && !getDebuggerFramework().getBreakpoints().isEmpty());
         }
 
         @Override
@@ -446,6 +454,100 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         }
     }
 
+    private class LockAndAutoReloadAction extends KeyAction {
+        public LockAndAutoReloadAction() {
+            setName("Lock file and auto reload");
+            setSelected(false);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            Runnable func = this::update;
+            getEditor().setEnabled(!isSelected());
+            if (getPath() != null) {
+                if (isSelected()) {
+                    ModifiedFileWatcherService.getInstance().watch(
+                            getPath(), func);
+                } else {
+                    ModifiedFileWatcherService.getInstance().unwatch(getPath());
+                }
+            }
+        }
+
+        private void update() {
+            if (isSelected()) {
+                try {
+                    String s = Files.readString(getPath());
+                    setText(s);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+
+class ModifiedFileWatcherService implements Runnable {
+    private static final WatchService watchService;
+    private static ModifiedFileWatcherService SERVICE;
+
+    static {
+        WatchService ws = null;
+        try {
+            ws = FileSystems.getDefault().newWatchService();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        watchService = ws;
+    }
+
+    private final Map<WatchKey, Runnable> consumers = new HashMap<>();
+    private final Map<Path, WatchKey> keys = new HashMap<>();
+
+    ModifiedFileWatcherService() throws IOException {
+    }
+
+    static ModifiedFileWatcherService getInstance() {
+        try {
+            if (SERVICE == null) {
+                SERVICE = new ModifiedFileWatcherService();
+                Thread t = new Thread(SERVICE);
+                t.setDaemon(true);
+                t.start();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return SERVICE;
+    }
+
+    void unwatch(@NotNull Path watch) {
+        WatchKey wk = keys.get(watch);
+        if (wk != null) {
+            wk.cancel();
+            consumers.remove(wk);
+            keys.remove(watch);
+        }
+    }
+
+    void watch(@NotNull Path watch, Runnable consumer) {
+        try {
+            unwatch(watch);
+            WatchKey wk = watch.register(watchService, StandardWatchEventKinds.ENTRY_MODIFY);
+            consumers.put(wk, consumer);
+            keys.put(watch, wk);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void run() {
+        while (true) {
+            WatchKey wk = watchService.poll();
+            consumers.get(wk).run();
+        }
+    }
 }
 
 class LintParser extends AbstractParser {
