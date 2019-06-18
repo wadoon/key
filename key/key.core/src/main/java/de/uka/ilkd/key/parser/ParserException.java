@@ -14,12 +14,14 @@
 package de.uka.ilkd.key.parser;
 
 
+import de.uka.ilkd.key.util.Locatable;
+
 /** This class represents an error of a parser.
  *
  * @author Hubert Schmid
  */
 
-public final class ParserException extends Exception {
+public final class ParserException extends Exception implements Locatable {
 
     /* --- constructors --- */
 
@@ -43,6 +45,7 @@ public final class ParserException extends Exception {
     /* --- methods --- */
 
     /** @return The location may be null. */
+    @Override
     public Location getLocation() {
         return location;
     }

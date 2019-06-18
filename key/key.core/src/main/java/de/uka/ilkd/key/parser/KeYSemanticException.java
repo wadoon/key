@@ -13,10 +13,12 @@
 
 package de.uka.ilkd.key.parser;
 
+import de.uka.ilkd.key.util.Locatable;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.TokenStream;
+import org.jetbrains.annotations.Nullable;
 
-public class KeYSemanticException extends RecognitionException {
+public class KeYSemanticException extends RecognitionException implements Locatable {
     /**
      * 
      */
@@ -76,5 +78,10 @@ public class KeYSemanticException extends RecognitionException {
     public String toString() {
 	return filename+"("+this.getLine()+", "+this.getColumn()+"): "
 	    +getMessage();
+    }
+
+    @Override
+    public @Nullable Location getLocation() {
+        return new Location(getFilename(), getLine(), getColumn() + 1);
     }
 }

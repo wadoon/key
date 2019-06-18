@@ -14,25 +14,29 @@
 package de.uka.ilkd.key.proof;
 
 
-/** 
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.Locatable;
+import org.jetbrains.annotations.Nullable;
+
+/**
  * Represents an exception with position information. The row position is
  * absolut this means, if in a table it is the row of the table, but the column
  * position is relative to the text and does not describe the column of the
  * table. (has to be changed)
  */
-public abstract class SVInstantiationExceptionWithPosition 
-    extends SVInstantiationException {
+public abstract class SVInstantiationExceptionWithPosition
+    extends SVInstantiationException implements Locatable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 2157800633859913303L;
     private int row;
     private int column;
     private boolean inIfSequent;
-         
-    public SVInstantiationExceptionWithPosition( String description, 
-						 int    row, 
+
+    public SVInstantiationExceptionWithPosition( String description,
+						 int    row,
 						 int    column,
 						 boolean inIfSequent ) {
 	super(description);
@@ -41,7 +45,7 @@ public abstract class SVInstantiationExceptionWithPosition
 	this.inIfSequent = inIfSequent;
 
     }
-    
+
     public boolean inIfSequent() {
 	return inIfSequent;
     }
@@ -60,10 +64,10 @@ public abstract class SVInstantiationExceptionWithPosition
 	    errmsg += row <= 0 ? "" : ("\nAssumption number:" + row);
 	} else {
 	    errmsg += row    <= 0 ? "" : ("\nRow: " + getRow());
-	    errmsg += column <= 0 ? "" : ("\nColumn: " + getColumn());	
+	    errmsg += column <= 0 ? "" : ("\nColumn: " + getColumn());
 	}
 	return errmsg;
-    }    
+    }
 
     /**
      * Returns a string representation of this exception.
@@ -71,4 +75,9 @@ public abstract class SVInstantiationExceptionWithPosition
     public String toString() {
 	return getMessage();
     }
+
+	@Override
+	public @Nullable Location getLocation() {
+		return new Location(null, getRow(), getColumn());
+	}
 }

@@ -4,6 +4,7 @@ include "key.core"
 //include "key.core:informationflow"
 include "key.core:rifl"
 include "key.core:api"
+include "key.core:script"
 
 include "key.core.symbolic_execution"
 include "key.core.testgen"

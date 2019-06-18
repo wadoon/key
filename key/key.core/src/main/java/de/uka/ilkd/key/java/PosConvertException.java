@@ -14,12 +14,19 @@
 package de.uka.ilkd.key.java;
 
 
+import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.Locatable;
+import org.jetbrains.annotations.Nullable;
+import recoder.java.CompilationUnit;
+import recoder.kit.UnitKit;
+import recoder.service.UnresolvedReferenceException;
+
 /**
  * A convert exception enriched with a location within a file/source.
  *
  * The source's name itself is not captured.
  */
-public class PosConvertException extends ConvertException {
+public class PosConvertException extends ConvertException implements Locatable {
 
     private static final long serialVersionUID = 758453353495075586L;
 
@@ -74,4 +81,16 @@ public class PosConvertException extends ConvertException {
         return column;
     }
 
+    @Override
+    public @Nullable Location getLocation() {
+        Throwable cause = getCause();
+        String file = "";
+        if (cause instanceof UnresolvedReferenceException) {
+            UnresolvedReferenceException ure = (UnresolvedReferenceException) cause;
+            CompilationUnit cu = UnitKit.getCompilationUnit(ure.getUnresolvedReference());
+            String dataloc = cu.getDataLocation().toString();
+            file = dataloc.substring(dataloc.indexOf(':') + 1);
+        }
+        return new Location(file, getLine(), getColumn());
+    }
 }
