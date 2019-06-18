@@ -25,7 +25,7 @@ public final class ExceptionTools {
      * Second, this method contains special treatment for <i>external</i>-defined exceptions: {@link RecognitionException}
      * and {@link ParseException} from Antlr and JavaCC.
      * <p>
-     * Third, the method follows the causes ({@link Throwable#getCause}).
+     * Third, the method follows along the causes of the given exception.
      *
      * @author weigl
      * @see Locatable
@@ -64,25 +64,4 @@ public final class ExceptionTools {
 
         return null;
     }
-
-    private static Location getLocation(RecognitionException exc) {
-        Location location = null;
-        // ANTLR 3 - Recognition Exception.
-        if (exc instanceof SLTranslationException) {
-            SLTranslationException ste = (SLTranslationException) exc;
-            location = new Location(ste.getFileName(),
-                    ste.getLine(),
-                    ste.getColumn());
-        } else if (exc instanceof KeYSemanticException) {
-            KeYSemanticException kse = (KeYSemanticException) exc;
-            // ANTLR has 0-based column numbers, hence +1.
-            location = new Location(kse.getFilename(), kse.getLine(), kse.getColumn() + 1);
-        } else if (recEx.input != null) {
-            // ANTLR has 0-based column numbers, hence +1.
-            location = new Location(recEx.input.getSourceName(),
-                    recEx.line, recEx.charPositionInLine + 1);
-        }
-        return location;
-    }
-
 }

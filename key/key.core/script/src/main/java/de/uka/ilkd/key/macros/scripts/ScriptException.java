@@ -1,8 +1,9 @@
 package de.uka.ilkd.key.macros.scripts;
 
 import de.uka.ilkd.key.parser.Location;
+import de.uka.ilkd.key.util.Locatable;
 
-public class ScriptException extends Exception {
+public class ScriptException extends Exception implements Locatable {
 
     private static final long serialVersionUID = -1200219771837971833L;
 
@@ -47,6 +48,7 @@ public class ScriptException extends Exception {
         this.location = null;
     }
 
+    @Override
     public Location getLocation() {
         return location;
     }

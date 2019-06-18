@@ -6,6 +6,7 @@ plugins {
 dependencies {
     compile project(":key.core")
     compile project(":key.core:rifl")
+    compile project(":key.core:script")
 
     compile project(":key.core.proof_references")
     compile project(":key.core.symbolic_execution")

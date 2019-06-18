@@ -1,4 +1,3 @@
 dependencies {
     compile project (":key.core")
-    compile project (":key.core:script")
 }
