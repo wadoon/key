@@ -7,7 +7,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 
-
+@Deprecated // weigl: currently unused will be removed in future.
 public final class NetworkUtils {
 
     private static final URL KEY_URL = getURL("http://key-project.org/");

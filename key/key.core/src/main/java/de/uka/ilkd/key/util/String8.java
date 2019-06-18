@@ -24,6 +24,7 @@ import java.util.Arrays;
  * @author bruns
  *
  */
+@Deprecated//weigl: currently unused, will be removed in future
 public class String8 implements CharSequence, java.io.Serializable {
     
     private static final long serialVersionUID = 5370917742980374037L;
