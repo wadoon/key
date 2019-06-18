@@ -17,7 +17,7 @@ import edu.kit.iti.formal.psdbg.interpreter.dbg.*;
 import edu.kit.iti.formal.psdbg.lint.LintProblem;
 import edu.kit.iti.formal.psdbg.lint.LinterStrategy;
 import edu.kit.iti.formal.psdbg.parser.Facade;
-import edu.kit.iti.formal.psdbg.parser.ScriptLanguageLexer;
+import edu.kit.iti.formal.psdbg.parser.ScriptLexer;
 import edu.kit.iti.formal.psdbg.parser.ast.ProofScript;
 import lombok.Getter;
 import org.antlr.v4.runtime.CharStreams;
@@ -85,7 +85,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         editor.setCloseMarkupTags(true);
         editor.setCodeFoldingEnabled(true);
         editor.addParser(new LintParser());
-        editor.setText("auto; \n\n\\\\To call subscripts simply add \n\\\\script name(){command;} \n\\\\and call it top level using name;");
+        editor.setText("auto; \n\n//To call subscripts simply add \n//script name(){command;} \n//and call it top level using name;");
         ScriptUtils.createAutoCompletion().install(editor);
         gutter.setBookmarkIcon(BOOKMARK_ICON);
         gutter.setBookmarkingEnabled(true);
@@ -156,21 +156,21 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         String text = editor.getText();
         text = spacesAtLineEnd.matcher(text).replaceAll("\n");
 
-        ScriptLanguageLexer lexer = new ScriptLanguageLexer(CharStreams.fromString(text));
+        ScriptLexer lexer = new ScriptLexer(CharStreams.fromString(text));
 
         int nested = 0;
         StringBuilder builder = new StringBuilder();
         List<? extends Token> tokens = lexer.getAllTokens();
         for (int i = 0; i < tokens.size(); i++) {
             Token tok = tokens.get(i);
-            if (tok.getType() == ScriptLanguageLexer.INDENT)
+            if (tok.getType() == ScriptLexer.INDENT)
                 nested++;
 
             if (i + 1 < tokens.size() &&
-                    tokens.get(i + 1).getType() == ScriptLanguageLexer.DEDENT)
+                    tokens.get(i + 1).getType() == ScriptLexer.DEDENT)
                 nested--;
 
-            if (tok.getType() == ScriptLanguageLexer.WS && tok.getText().startsWith("\n")) {
+            if (tok.getType() == ScriptLexer.WS && tok.getText().startsWith("\n")) {
                 builder.append(
                         tok.getText().replaceAll("\n[ \t]*",
                                 "\n" + Strings.repeat(" ", nested * 4)));
@@ -457,7 +457,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     private class LockAndAutoReloadAction extends KeyAction {
         public LockAndAutoReloadAction() {
             setName("Lock file and auto reload");
-            setSelected(false);
+            setSelected(true);
         }
 
         @Override

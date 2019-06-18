@@ -51,7 +51,8 @@ public abstract class Facade {
      * @return
      */
     public static ScriptLanguageParser getParser(CharStream stream) {
-        ScriptLanguageParser slp = new ScriptLanguageParser(new CommonTokenStream(new ScriptLanguageLexer(stream)));
+        ScriptLanguageParser slp = new ScriptLanguageParser(new CommonTokenStream(
+                new ScriptLexer(stream)));
         return slp;
     }
 

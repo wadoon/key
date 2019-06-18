@@ -24,9 +24,26 @@ dependencies {
     antlr "org.antlr:antlr4:4.7.2"
 }
 
+//https://github.com/gradle/gradle/issues/2565
 generateGrammarSource {
-    maxHeapSize = "64m"
-    arguments += ["-visitor", "-long-messages", "-package","edu.kit.iti.formal.psdbg.parser"]
-    outputDirectory file("${project.buildDir}/generated-src/antlr/main/")
-}
+    outputs.cacheIf { true }
+    final PARSER_PACKAGE_NAME = 'edu.kit.iti.formal.psdbg.parser'
+    outputDirectory = file("build/generated-src/antlr/main/")
+    sourceSets.main.java.srcDirs += outputDirectory
+    arguments += ["-visitor", "-no-listener", "-package", PARSER_PACKAGE_NAME]
 
+    doLast {
+        def parserFilePattern = 'Script*'
+        def outputPath = generateGrammarSource.outputDirectory.canonicalPath
+        def parserPackagePath = "${outputPath}/${PARSER_PACKAGE_NAME.replace('.', '/')}"
+        file(parserPackagePath).mkdirs()
+        copy {
+            from outputPath
+            into parserPackagePath
+            include parserFilePattern
+        }
+        delete fileTree(outputPath) {
+            include parserFilePattern
+        }
+    }
+}

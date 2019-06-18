@@ -1,8 +1,7 @@
-grammar ScriptLanguage;
-/*start
-    : stmtList
-    ;
-*/
+parser grammar ScriptLanguageParser;
+
+options { tokenVocab=ScriptLexer; }
+
 
 start
     :  stmtList (script)*
@@ -39,9 +38,9 @@ statement
 
 letStmt
     :
-        'bind' expression
+        BIND expression
         ( SEMICOLON
-        | 'in' ( statement | INDENT stmtList DEDENT)
+        | IN ( statement | INDENT stmtList DEDENT)
         )
     ;
 
@@ -68,7 +67,7 @@ expression
     | expression IMP expression   #exprIMP
     //|   expression EQUIV expression already covered by EQ/NEQ
     | expression LBRACKET substExpressionList RBRACKET #exprSubst
-    | ID LPAREN  (expression (',' expression)*)? RPAREN  #function
+    | ID LPAREN  (expression (COMMA expression)*)? RPAREN  #function
     | MINUS expression         #exprNegate
     | NOT expression           #exprNot
     | LPAREN expression RPAREN #exprParen
@@ -152,76 +151,3 @@ callStmt
     :   CALL scriptCommand SEMICOLON
     ;
 */
-
-//LEXER Rules
-WS : [ \t\n\r]+ -> channel(HIDDEN) ;
-
-//comments, allowing nesting.
-SINGLE_LINE_COMMENT : '//' ~[\r\n]* -> channel(HIDDEN);
-MULTI_LINE_COMMENT  : '/*' (MULTI_LINE_COMMENT|.)*? '*/' -> channel(HIDDEN);
-
-CASES: 'cases';
-CASE: 'case';
-TRY: 'try';
-CLOSES: 'closes';
-DERIVABLE : 'derivable';
-DEFAULT: 'default';
-ASSIGN : ':=';
-LBRACKET: '[';
-RBRACKET:']';
-USING : 'using';
-MATCH : 'match';
-SCRIPT : 'script' ;
-TRUE : 'true' ;
-FALSE : 'false' ;
-CALL : 'call' ;
-REPEAT : 'repeat' ;
-/*INT : 'int' ;
-BOOL: 'bool' ;
-TERMTYPE : 'term' ;*/
-FOREACH : 'foreach' ;
-THEONLY : 'theonly' ;
-STRICT : 'strict' ;
-RELAX : 'relax';
-IF:'if';
-WHILE:'while';
-INDENT : '{' ;
-DEDENT : '}' ;
-SEMICOLON : ';' ;
-COLON : ':' ;
-SUBST_TO: '\\';
-
-STRING_LITERAL
-   : '\'' ('\'\'' | ~ ('\''))* '\''
-   ;
-
-TERM_LITERAL
-   : '`' ~('`')* '`'
-   ;
-
-PLUS : '+' ;
-MINUS : '-' ;
-MUL : '*' ;
-DIV : '/' ;
-EQ : '=' ;
-NEQ : '!=' ;
-GEQ : '>=' ;
-LEQ : '<=' ;
-GE : '>' ;
-LE : '<' ;
-AND : '&' ;
-OR: '|' ;
-IMP : '==>' ;
-EQUIV : '<=>' ;
-NOT: 'not';
-COMMA: ',';
-LPAREN: '(';
-RPAREN: ')';
-EXE_MARKER: '\u2316' -> channel(HIDDEN);
-QUESTION_MARK: '?';
-
-DIGITS : DIGIT+ ;
-fragment DIGIT : [0-9] ;
-ID : ([a-zA-Z]|'#'|'_') ([_a-zA-Z0-9] | '.' | '\\'| '#'|'<'|'>')*;
-
-ERROR_CHAR: .;

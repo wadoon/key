@@ -1,19 +1,17 @@
 package org.key_project.editor;
 
 import bibliothek.gui.dock.common.CControl;
-import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import bibliothek.gui.dock.common.event.CFocusListener;
 import bibliothek.gui.dock.common.intern.CDockable;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
-import de.uka.ilkd.key.proof.Proof;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,13 +20,18 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author Alexander Weigl
  * @version 1 (21.05.19)
  */
-public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.Toolbar {
+public class EditorExtension implements KeYGuiExtension,
+        KeYGuiExtension.Startup, KeYGuiExtension.Toolbar,
+        KeYGuiExtension.MainMenu {
     public static final float ICON_SIZE = 16;
+    private static final String EDITOR_MENU = "File.Editor";
     private static SaveAction actionSave;
     private static SaveAsAction actionSaveAs;
     private static LoadAction actionLoad;
@@ -101,14 +104,26 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
         tb.add(actionLoad);
         tb.add(actionSave);
         tb.add(actionSaveAs);
-        tb.addSeparator();
-        tb.add(actionOpenCurrentProofFile);
+        //tb.addSeparator();
+        //tb.add(actionOpenCurrentProofFile);
         return tb;
+    }
+
+    @Override
+    public @NotNull List<Action> getMainMenuActions(@NotNull MainWindow mainWindow) {
+        init(mainWindow, null);
+        return Arrays.asList(
+                actionNew,
+                actionLoad,
+                actionSave,
+                actionSaveAs,
+                actionOpenCurrentProofFile);
     }
 
     private class OpenCurrentAsFileAction extends KeyAction {
         public OpenCurrentAsFileAction() {
-            setName("Open Current Proof As File...");
+            setName("Open Current Proof As File");
+            setMenuPath(EDITOR_MENU);
         }
 
         @Override
@@ -136,6 +151,7 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
             setTooltip("Save the current proof scripts");
             setMenuPath("File");
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.SAVE, MainWindow.TOOLBAR_ICON_SIZE));
+            setMenuPath(EDITOR_MENU);
         }
 
         @Override
@@ -167,7 +183,7 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
             super(mw);
             setName("Save");
             setTooltip("Store script file");
-            setMenuPath("File");
+            setMenuPath(EDITOR_MENU);
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.DOWNLOAD, ICON_SIZE));
         }
 
@@ -195,7 +211,7 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
             super(mw);
             setName("Load proof script");
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.UPLOAD, ICON_SIZE));
-            setMenuPath("File");
+            setMenuPath(EDITOR_MENU);
         }
 
         @Override
@@ -214,6 +230,7 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
             setName("New file");
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.FILE, ICON_SIZE));
             setTooltip("Store script file");
+            setMenuPath(EDITOR_MENU);
         }
 
         @Override

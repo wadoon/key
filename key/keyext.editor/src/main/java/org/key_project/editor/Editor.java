@@ -2,7 +2,6 @@ package org.key_project.editor;
 
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.symbolic_execution.util.SideProofStore;
 import lombok.Getter;
 import org.fife.rsta.ui.CollapsibleSectionPanel;
 import org.fife.rsta.ui.GoToDialog;
@@ -135,6 +134,16 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
                 actionGoto.getAcceleratorKey(),
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
+        pane.registerKeyboardAction(
+                this::increaseFontSize,
+                KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, InputEvent.CTRL_DOWN_MASK),
+                WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+        pane.registerKeyboardAction(
+                this::decreaseFontSize,
+                KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK),
+                WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
 
         KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK);
         Action a = csp.addBottomComponent(ks, findToolBar);
@@ -144,6 +153,18 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
         a = csp.addBottomComponent(ks, replaceToolBar);
         a.putValue(Action.NAME, "Show Replace Search Bar");
         pane.registerKeyboardAction(a, ks, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+    }
+
+    private void decreaseFontSize(ActionEvent actionEvent) {
+        Font f = getEditor().getFont();
+        getEditor().setFont(f.deriveFont(f.getSize() - 2f));
+        System.out.println("Editor.decreaseFontSize");
+    }
+
+    private void increaseFontSize(ActionEvent actionEvent) {
+        Font f = getEditor().getFont();
+        getEditor().setFont(f.deriveFont(f.getSize() + 2f));
+        System.out.println("Editor.increaseFontSize");
     }
 
     public String getTitle() {

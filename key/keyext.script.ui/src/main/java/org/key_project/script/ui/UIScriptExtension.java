@@ -72,16 +72,6 @@ public class UIScriptExtension implements
     public List<Action> getMainMenuActions(MainWindow mainWindow) {
         init(mainWindow, mainWindow.getMediator());
         return Arrays.asList(
-                /*panel.getActionExecute(),
-                panel.getActionLoad(),
-                panel.getActionSave(),
-                panel.getActionSaveAs(),
-                panel.getActionCasesFromGoals(),
-                panel.getActionSimpleReformat(),
-                panel.getActionToggleAction(),
-                panel.getActionStop(),
-                panel.getActionStepOver(),
-                panel.getActionContinue(),*/
                 actions.getCopyNodePathBranchLabelsAction(),
                 actions.getCopyNodePathLineNumbersAction(),
                 actions.getCopyNodePathProgramStatementsAction(),

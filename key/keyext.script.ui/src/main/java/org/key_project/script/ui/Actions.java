@@ -6,8 +6,8 @@ import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import edu.kit.iti.formal.psdbg.LabelFactory;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 import org.key_project.editor.EditorFacade;
 
 import java.awt.*;
@@ -23,12 +23,11 @@ import java.util.TreeSet;
  * @author Alexander Weigl
  * @version 1 (01.03.19)
  */
-@AllArgsConstructor
 public class Actions {
     private static final String MENU_PROOF_SCRIPTS_COPY = ScriptEditor.MENU_PROOF_SCRIPTS + ".Copy labels";
 
-    private final MainWindow window;
-    private final KeYMediator mediator;
+    private final @NotNull MainWindow window;
+    private final @NotNull KeYMediator mediator;
 
     @Getter
     private final CopyNodePathBranchLabelsAction copyNodePathBranchLabelsAction = new CopyNodePathBranchLabelsAction();
@@ -40,6 +39,12 @@ public class Actions {
     private final CopyNodePathRuleNamesAction copyNodePathRuleNamesAction = new CopyNodePathRuleNamesAction();
     @Getter
     private final AutoLoadProofScriptAction autoLoadProofScriptAction = new AutoLoadProofScriptAction();
+
+    public Actions(@NotNull MainWindow window, @NotNull KeYMediator mediator) {
+        this.window = window;
+        this.mediator = mediator;
+        autoLoadProofScriptAction.actionPerformed(null);
+    }
 
     private void saveToClipboard(String label) {
         System.err.println(label);
@@ -106,7 +111,7 @@ public class Actions {
         public AutoLoadProofScriptAction() {
             setName("Auto open proof script");
             setSelected(true);
-            actionPerformed(null);
+            setMenuPath(ScriptEditor.MENU_PROOF_SCRIPTS);
         }
 
         @Override

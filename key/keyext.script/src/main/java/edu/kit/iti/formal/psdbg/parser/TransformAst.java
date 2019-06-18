@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
  * @version 2 (29.10.17), introduction of parent
  * version 1 (27.04.17)
  */
-public class TransformAst implements ScriptLanguageVisitor<Object> {
+public class TransformAst implements ScriptLanguageParserVisitor<Object> {
     /**
      * Start index for positional arguments for command calls
      */
