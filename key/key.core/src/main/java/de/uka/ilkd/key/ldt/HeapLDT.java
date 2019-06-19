@@ -490,11 +490,17 @@ public final class HeapLDT extends LDT {
     			return new FieldReference(field, null);
     		}
     		return new FieldReference(field, prefix);
-    	} else if (t.sort() == getFieldSort() && t.op() instanceof Function && ((Function) t.op()).isUnique()) {
-    		return services.getJavaInfo().getAttribute(getPrettyFieldName(t.op()), getClassName((Function) t.op()));
-    	}
+    	} else
+			getAttributeForField(t, services);
     	throw new IllegalArgumentException("Could not translate " + ProofSaver.printTerm(t, null) + " to program.");
     }
+
+	public ProgramVariable getAttributeForField(Term t, Services services) {
+		if (t.sort() == getFieldSort() && t.op() instanceof Function && ((Function) t.op()).isUnique()) {
+    		return services.getJavaInfo().getAttribute(getPrettyFieldName(t.op()), getClassName((Function) t.op()));
+    	}
+		return null;
+	}
     
     
     @Override

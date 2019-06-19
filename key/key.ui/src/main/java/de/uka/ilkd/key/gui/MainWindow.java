@@ -166,6 +166,9 @@ public final class MainWindow extends JFrame {
      * action for editing the most recent KeY file
      */
     private EditMostRecentFileAction editMostRecentFileAction;
+    
+    
+    private CalculateDependenciesAction calculateDependenciesAction;
 
     /**
      * action for saving a proof (attempt)
@@ -395,7 +398,10 @@ public final class MainWindow extends JFrame {
         unicodeToggleAction = new UnicodeToggleAction(this);
         goalSelectAboveAction = new GoalSelectAboveAction(this);
         goalSelectBelowAction = new GoalSelectBelowAction(this);
-
+        
+        calculateDependenciesAction = new CalculateDependenciesAction(this);
+        
+        
         Config.DEFAULT.setDefaultFonts();
 
         // create menubar
@@ -487,6 +493,7 @@ public final class MainWindow extends JFrame {
         toolBar.addSeparator();
         //toolBar.add(createHeatmapToggle());
         //toolBar.add(createHeatmapMenuOpener());
+        toolBar.add(calculateDependenciesAction);
 
         return toolBar;
     }
