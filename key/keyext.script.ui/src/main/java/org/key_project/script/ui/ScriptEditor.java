@@ -149,6 +149,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     private void setDebuggerFramework(DebuggerFramework<?> framework) {
         mediator.deregister(getDebuggerFramework(), DebuggerFramework.class);
         mediator.register(framework, DebuggerFramework.class);
+
     }
 
     private void simpleReformat() {

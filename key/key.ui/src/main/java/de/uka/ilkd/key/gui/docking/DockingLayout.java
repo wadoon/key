@@ -110,8 +110,8 @@ public final class DockingLayout
     public void init(MainWindow window, KeYMediator mediator) {
         this.window = window;
         installIcons(window);
-        loadLayouts(window.getDockControl());
-        setLayout(LAYOUT_NAMES[0]);
+        //loadLayouts(window.getDockControl());
+        //setLayout(LAYOUT_NAMES[0]);
         window.getMediator().addGUIListener(new GUIListener() {
             @Override
             public void modalDialogOpened(EventObject e) {
