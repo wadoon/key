@@ -327,7 +327,7 @@ public class LexPathOrdering implements TermOrdering {
             theoryFunctionNames.add("C");
             theoryFunctionNames.add("seqEmpty");
             theoryFunctionNames.add("empty");
-
+            theoryFunctionNames.add("SetEmpty");
             theoryFunctionNames.add("strPool");            
         }
 
@@ -374,6 +374,15 @@ public class LexPathOrdering implements TermOrdering {
             if ( opStr.equals ("infiniteUnion")) return Integer.valueOf ( 8 );            
             if ( opStr.equals ("setMinus")) return Integer.valueOf ( 9 );
 
+            //Begin Sets
+            if (opStr.equals ("single")) return Integer.valueOf( 4 );
+            if ( opStr.equals ("SetIntersection")) return Integer.valueOf ( 6 );
+            if ( opStr.equals ("SetUnion")) return Integer.valueOf ( 7 );
+                       
+            if ( opStr.equals ("SetDifference")) return Integer.valueOf ( 9 );
+            if ( opStr.equals ("cardinality")) return Integer.valueOf( 10 );
+            //End Sets
+            
             
             if ( opStr.equals ("seqSingleton")) return Integer.valueOf ( 6 );
             if ( opStr.equals ("seqConcat")) return Integer.valueOf ( 7 );
