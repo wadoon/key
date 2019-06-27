@@ -3848,6 +3848,7 @@ varexp[TacletBuilder b]
     | varcond_metadisjoint[b]
     | varcond_simplifyIfThenElseUpdate[b]
     | varcond_differentFields[b]
+    | varcond_onlyEventUpdates[b]
     | varcond_noEventUpdate[b]
     | varcond_applyEventOnRigid[b]
   ) 
@@ -4291,6 +4292,17 @@ varcond_noEventUpdate [TacletBuilder b]
    RPAREN
    {
             b.addVariableCondition(new NoEventUpdate((SchemaVariable)x));
+   }
+;
+
+varcond_onlyEventUpdates [TacletBuilder b]
+:
+   ONLY_EVENT_UPDATE
+   LPAREN
+     x = varId
+   RPAREN
+   {
+            b.addVariableCondition(new OnlyEventUpdate((SchemaVariable)x));
    }
 ;
 
