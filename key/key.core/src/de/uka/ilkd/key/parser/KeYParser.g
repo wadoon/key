@@ -2554,8 +2554,8 @@ elementary_update_term returns[Term _elementary_update_term=null]
          {
                 result = getServices().getTermBuilder().eventUpdate(marker, locset, timestamp);
          } |
-         ANON_EVENT_UPDATE LPAREN timestamp=equivalence_term RPAREN {
-                result = getServices().getTermBuilder().anonEventUpdate(timestamp);
+         ANON_EVENT_UPDATE LPAREN timestamp=equivalence_term COMMA anonUnique=equivalence_term  RPAREN {
+                result = getServices().getTermBuilder().anonEventUpdate(timestamp, anonUnique);
          }
    ;
         catch [TermCreationException ex] {
@@ -4297,12 +4297,12 @@ varcond_noEventUpdate [TacletBuilder b]
 
 varcond_onlyEventUpdates [TacletBuilder b]
 :
-   ONLY_EVENT_UPDATE
+   ONLY_EVENT_UPDATES
    LPAREN
      x = varId
    RPAREN
    {
-            b.addVariableCondition(new OnlyEventUpdate((SchemaVariable)x));
+            b.addVariableCondition(new OnlyEventUpdates((SchemaVariable)x));
    }
 ;
 

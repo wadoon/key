@@ -2,6 +2,7 @@ package de.uka.ilkd.key.rule.conditions;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.AnonEventUpdate;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
 import de.uka.ilkd.key.logic.op.EventUpdate;
 import de.uka.ilkd.key.logic.op.Operator;
@@ -47,7 +48,7 @@ public class NoEventUpdate extends VariableConditionAdapter {
 		if(op instanceof ElementaryUpdate || 
 				op == UpdateJunctor.SKIP) {
 			return false;
-		} else if (op==EventUpdate.SINGLETON) {
+		} else if (op==EventUpdate.SINGLETON || op instanceof AnonEventUpdate) {
 			return true;
 		} else if (op==UpdateJunctor.PARALLEL_UPDATE) {
 			return (checkForEvent(update.sub(0)) || checkForEvent(update.sub(1)));

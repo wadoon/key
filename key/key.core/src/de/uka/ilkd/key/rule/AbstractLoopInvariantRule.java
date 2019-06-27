@@ -608,7 +608,8 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             
             final Name anonEventStar = new Name(
                     tb.newName("anon_MemAcc_LOOP"));
-            final Function anonEventStarFunc = new Function(anonEventStar, services.getTypeConverter().getIntegerLDT().targetSort());
+            final Function anonEventStarFunc = new Function(anonEventStar, 
+            		services.getTypeConverter().getIntegerLDT().targetSort());
             services.getNamespaces().functions().addSafely(anonEventStarFunc);
             final Term anonEventStarTerm= tb.label(tb.func(anonEventStarFunc),
                     ParameterlessTermLabel.ANON_HEAP_LABEL);
