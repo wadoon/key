@@ -34,7 +34,7 @@ public class AnonEventUpdate extends AbstractSortedOperator {
 	}
 	
 	private AnonEventUpdate(Sort argSort) {
-		super(new Name("\\eventStar"), new Sort[]{argSort}, Sort.UPDATE, false);
+		super(new Name("\\eventStar"), new Sort[]{argSort,argSort}, Sort.UPDATE, false);
 	}
 	
 	public String toString() {

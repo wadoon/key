@@ -531,7 +531,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             anonUpdate = tb.skip();
         } else {
             anonUpdate = tb.anonUpd(heap, mod, anonHeapTerm);
-        }
+        } 
 
         return new AnonUpdateData( //
                 anonUpdate, loopHeap, //
@@ -606,8 +606,15 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
 
             anonUpdate = tb.parallel(anonUpdate, tAnon.anonUpdate);
             
+            final Name anonEventStar = new Name(
+                    tb.newName("anon_MemAcc_LOOP"));
+            final Function anonEventStarFunc = new Function(anonEventStar, services.getTypeConverter().getIntegerLDT().targetSort());
+            services.getNamespaces().functions().addSafely(anonEventStarFunc);
+            final Term anonEventStarTerm= tb.label(tb.func(anonEventStarFunc),
+                    ParameterlessTermLabel.ANON_HEAP_LABEL);
+            
  			anonUpdate = tb.parallel(anonUpdate, 
-            		tb.anonEventUpdate(tb.func(timestampAnonymizedValue)));
+            		tb.anonEventUpdate(tb.func(timestampAnonymizedValue), anonEventStarTerm));
 
             wellFormedAnon = and(tb, wellFormedAnon,
                     tb.wellFormed(tAnon.anonHeap));
