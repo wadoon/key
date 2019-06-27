@@ -920,6 +920,10 @@ public class TermBuilder {
         return tf.createTerm(EventUpdate.SINGLETON, marker, locset, timestamp);
     }
 
+    public Term anonEventUpdate(Term timestamp) {
+        return tf.createTerm(AnonEventUpdate.getAnonEventUpdateFor(services), timestamp);
+    }
+
     public Term elementary(UpdateableOperator lhs, Term rhs) {
         ElementaryUpdate eu = ElementaryUpdate.getInstance(lhs);
         return tf.createTerm(eu, rhs);
@@ -2196,4 +2200,6 @@ public class TermBuilder {
             return tf.createTerm(Junctor.OR, t1, t2);
         }
     }
+
+	
 }

@@ -568,10 +568,26 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
         final TermBuilder tb = services.getTermBuilder();
 
         Term anonUpdate = createLocalAnonUpdate(localOuts, services);
-        // can still be null
+
+        // HACK: timestamp variable should be accessed via a LDT for dependencies not by name
+        ProgramVariable pv = (ProgramVariable)services.getNamespaces().
+				programVariables().lookup("timestamp");
+        final Function timestampAnonymizedValue = new Function(
+                new Name(tb.newName(pv.name().toString())), pv.sort(),
+                true);
+        services.getNamespaces().functions().addSafely(timestampAnonymizedValue);        
+
+       	Term tsAnonUpdate = tb.elementary(tb.var(pv), tb.func(timestampAnonymizedValue));
+       	if (anonUpdate == null) {
+ 			anonUpdate = tsAnonUpdate;
+        } else {
+        	anonUpdate = tb.parallel(anonUpdate, tsAnonUpdate);
+        }
+        
+       /* // can still be null
         if (anonUpdate == null) {
             anonUpdate = tb.skip();
-        }
+        }*/
 
         Term wellFormedAnon = null;
         Term frameCondition = null;
@@ -589,6 +605,9 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             anonUpdateData = anonUpdateData.append(tAnon);
 
             anonUpdate = tb.parallel(anonUpdate, tAnon.anonUpdate);
+            
+ 			anonUpdate = tb.parallel(anonUpdate, 
+            		tb.anonEventUpdate(tb.func(timestampAnonymizedValue)));
 
             wellFormedAnon = and(tb, wellFormedAnon,
                     tb.wellFormed(tAnon.anonHeap));

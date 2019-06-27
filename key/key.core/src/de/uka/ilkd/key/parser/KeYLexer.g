@@ -213,6 +213,7 @@ lexer grammar KeYLexer;
 	TERM : '\\term';
 	UPDATE : '\\update';
 	EVENT_UPDATE : '\\eventUpdate';
+	ANON_EVENT_UPDATE : '\\eventStar';
 	VARIABLES : '\\variables';
 	VARIABLE : '\\variable';
 	SKOLEMTERM : '\\skolemTerm';
