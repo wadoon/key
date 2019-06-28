@@ -33,6 +33,7 @@ import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYResourceManager;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.ThreadUtilities;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Provides a basic implementation of {@link UserInterfaceControl} for 

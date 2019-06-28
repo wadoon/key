@@ -266,6 +266,10 @@ public class KeYFileChooser {
                         JOptionPane.WARNING_MESSAGE, null, null, null);
     }
 
+    public JFileChooser getFileChooser(){
+        return fileChooser;
+    }
+
     /**
      * Gets <b>the</b> file chooser for the prover.
      *

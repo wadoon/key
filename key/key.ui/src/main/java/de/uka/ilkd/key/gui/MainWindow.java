@@ -163,6 +163,21 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
+import de.uka.ilkd.key.util.*;
+import org.jetbrains.annotations.NotNull;
+
+import javax.swing.*;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.swing.event.MouseInputAdapter;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.File;
+import java.util.List;
+import java.util.*;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
+import java.util.stream.Stream;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.KeYResourceManager;
@@ -267,6 +282,9 @@ public final class MainWindow extends JFrame {
      * action for opening a KeY file
      */
     private OpenFileAction openFileAction;
+
+    private OpenSingleJavaFileAction openSingleJavaFileAction;
+
     /**
      * action for opening an example
      */
@@ -496,6 +514,7 @@ public final class MainWindow extends JFrame {
 
         // set up actions
         openFileAction = new OpenFileAction(this);
+        openSingleJavaFileAction = new OpenSingleJavaFileAction(this);
         openExampleAction = new OpenExampleAction(this);
         openMostRecentFileAction = new OpenMostRecentFileAction(this);
         editMostRecentFileAction = new EditMostRecentFileAction(this);
@@ -792,6 +811,7 @@ public final class MainWindow extends JFrame {
 
         fileMenu.add(openExampleAction);
         fileMenu.add(openFileAction);
+        fileMenu.add(openSingleJavaFileAction);
         fileMenu.add(openMostRecentFileAction);
         fileMenu.add(editMostRecentFileAction);
         fileMenu.add(saveFileAction);
@@ -1271,7 +1291,11 @@ public final class MainWindow extends JFrame {
         return notificationManager;
     }
 
-    protected void addRecentFile(String absolutePath) {
+    /**
+     * A file to the menu of recent opened files.
+     * @see RecentFileMenu#addRecentFile(String)
+     */
+    public void addRecentFile(@NotNull String absolutePath) {
         recentFileMenu.addRecentFile(absolutePath);
     }
 
