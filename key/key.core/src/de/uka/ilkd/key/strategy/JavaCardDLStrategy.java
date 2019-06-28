@@ -25,6 +25,7 @@ import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Junctor;
+import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.proof.Goal;
@@ -678,6 +679,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             longConst(0), inftyConst()));
         }
 
+        setupPullOutDepPred(d);
         return d;
     }
 
@@ -1742,6 +1744,19 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                 add(isInstantiated("newSymDef"),
                         sum(antecFor, SequentFormulasGenerator.antecedent(),
                                 not(add(columnOpEq, biggerLeftSide)))));
+    }
+    
+    private void setupPullOutDepPred(RuleSetDispatchFeature d) {
+    	
+    	Operator noRaW = getServices().getNamespaces().functions().lookup("noRaW");
+    	Operator noWaR = getServices().getNamespaces().functions().lookup("noWaR");
+    	Operator noR = getServices().getNamespaces().functions().lookup("noR");
+    	Operator noW = getServices().getNamespaces().functions().lookup("noW");
+    	
+    	bindRuleSet(d, "pull_out_dep_locations",     			
+    			add(applyTF(FocusProjection.create(1), or(op(noRaW), or(op(noWaR), op(noR), op(noW)))),
+    					applyTF("t", IsNonRigidTermFeature.INSTANCE),
+    					longConst(100)));
     }
 
     private void setupPullOutGcd(RuleSetDispatchFeature d, String ruleSet,
