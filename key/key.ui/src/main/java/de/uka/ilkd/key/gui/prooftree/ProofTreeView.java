@@ -704,8 +704,8 @@ public class ProofTreeView extends JPanel implements TabPanel {
             }
 
             // catching NullPointerException occurring when renaming root node
-            if (treeNode instanceof GUIBranchNode && treeNode
-                    .getNode().parent() != null) {
+            if (treeNode instanceof GUIBranchNode
+                    && treeNode.getNode().parent() != null) {
                 delegateView.setEditable(true);
             } else {
                 delegateView.setEditable(false);

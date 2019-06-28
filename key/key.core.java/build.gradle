@@ -1,0 +1,4 @@
+dependencies {
+    compile project(":key.util")
+    compile name: 'recoderKey'
+}

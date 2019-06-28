@@ -6,6 +6,8 @@ plugins {
 
 dependencies {
     compile project(":key.util")
+    compile project(":key.core.java")
+
     compile name: 'recoderKey'
     //compile name: 'javacc'
     //compile name: 'antlr'
