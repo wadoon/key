@@ -368,7 +368,7 @@ public class LexPathOrdering implements TermOrdering {
             if ( opStr.equals ( "div" ) ) return Integer.valueOf ( 8 );
             if ( opStr.equals ( "jdiv" ) ) return Integer.valueOf ( 9 );
 
-            
+                        
             if ( opStr.equals ("intersect")) return Integer.valueOf ( 6 );
             if ( opStr.equals ("union")) return Integer.valueOf ( 7 );
             if ( opStr.equals ("infiniteUnion")) return Integer.valueOf ( 8 );            
@@ -393,7 +393,6 @@ public class LexPathOrdering implements TermOrdering {
             if ( opStr.equals("heap")) return Integer.valueOf(0);
             if ( p_op instanceof Function && ((Function)p_op).isUnique()) return Integer.valueOf(5);
             if ( opStr.equals("pair")) return Integer.valueOf(10);
-
             
 /*            if ( p_op instanceof SortDependingSymbol ) return new Integer ( 10 );
 

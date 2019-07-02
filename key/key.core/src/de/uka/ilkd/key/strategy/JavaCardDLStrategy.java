@@ -1755,6 +1755,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     	
     	bindRuleSet(d, "pull_out_dep_locations",     			
     			add(applyTF(FocusProjection.create(1), or(op(noRaW), or(op(noWaR), op(noR), op(noW)))),
+    					applyTF(FocusProjection.create(2), ff.update),	
     					applyTF("t", IsNonRigidTermFeature.INSTANCE),
     					longConst(100)));
     }
