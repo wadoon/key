@@ -21,9 +21,11 @@ import de.uka.ilkd.key.ldt.IntegerLDT;
 import de.uka.ilkd.key.ldt.LocSetLDT;
 import de.uka.ilkd.key.ldt.SeqLDT;
 import de.uka.ilkd.key.logic.Name;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.PosInTerm;
 import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
 import de.uka.ilkd.key.logic.op.Quantifier;
@@ -679,7 +681,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                             longConst(0), inftyConst()));
         }
 
-        setupPullOutDepPred(d);
+        setupDependencyPredicateStrategy(d);
         return d;
     }
 
@@ -1746,20 +1748,31 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                 not(add(columnOpEq, biggerLeftSide)))));
     }
     
-    private void setupPullOutDepPred(RuleSetDispatchFeature d) {
+    private void setupDependencyPredicateStrategy(RuleSetDispatchFeature d) {
     	
-    	Operator noRaW = getServices().getNamespaces().functions().lookup("noRaW");
-    	Operator noWaR = getServices().getNamespaces().functions().lookup("noWaR");
-    	Operator noR = getServices().getNamespaces().functions().lookup("noR");
-    	Operator noW = getServices().getNamespaces().functions().lookup("noW");
+    	// move lookup of functions to LDT
+    	Namespace<Function> funcNames = getServices().getNamespaces().functions();
+		final Operator noRaW = funcNames.lookup("noRaW");
+		final Operator noWaR = funcNames.lookup("noWaR");
+		final Operator noR = funcNames.lookup("noR");
+		final Operator noW = funcNames.lookup("noW");
     	
+		
+		
+		
     	bindRuleSet(d, "pull_out_dep_locations",     			
     			add(applyTF(FocusProjection.create(1), or(op(noRaW), or(op(noWaR), op(noR), op(noW)))),
     					applyTF(FocusProjection.create(2), ff.update),	
     					applyTF("t", IsNonRigidTermFeature.INSTANCE),
     					longConst(100)));
+    	
+    	bindRuleSet(d, "dep_replace_known", 
+    			ifZero(MatchedIfFeature.INSTANCE,
+                        add(DiffFindAndIfFeature.INSTANCE,
+                        		not(contains(instOf("loc2"), instOf("loc1"))),
+                        		longConst(8000))));
     }
-
+    
     private void setupPullOutGcd(RuleSetDispatchFeature d, String ruleSet,
             boolean roundingUp) {
         final TermBuffer gcd = new TermBuffer();
