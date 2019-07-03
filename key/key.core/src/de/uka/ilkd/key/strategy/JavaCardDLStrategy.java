@@ -1736,7 +1736,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                 opSub(tf.mul, tf.atom, tf.atLeastTwoLiteral),
                                 tf.polynomial));
         final Feature biggerLeftSide =
-                MonomialsSmallerThanFeature
+                MonomialsSmallerThanFeature	
                 .create(instOf("newSymLeft"),
                         subAt(antecFor, PosInTerm.getTopLevel().down(0)
                                 .down(0)), numbers);
@@ -1766,11 +1766,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     					applyTF("t", IsNonRigidTermFeature.INSTANCE),
     					longConst(100)));
     	
-    	bindRuleSet(d, "dep_replace_known", 
-    			ifZero(MatchedIfFeature.INSTANCE,
-                        add(DiffFindAndIfFeature.INSTANCE,
-                        		not(contains(instOf("loc2"), instOf("loc1"))),
-                        		longConst(8000))));
+    	bindRuleSet(d, "dep_replace_known", longConst(8000));
     }
     
     private void setupPullOutGcd(RuleSetDispatchFeature d, String ruleSet,
@@ -2696,6 +2692,11 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
                                                 not(ff.ifThenElse)))),
                         not(ContainsTermFeature.create(instOf("s"), instOf("t1")))));
 
+        
+        bindRuleSet(d, "dep_replace_known", 
+    			ifZero(MatchedIfFeature.INSTANCE,
+                        add(DiffFindAndIfFeature.INSTANCE,
+                        		not(contains(instOf("loc2"), instOf("loc1"))))));
         return d;
     }
 
