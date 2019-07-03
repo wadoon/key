@@ -52,9 +52,3 @@ run {
     args "--experimental"
 }
 
-startScripts {
-    // Original version can be found there:
-    // https://github.com/gradle/gradle/blob/master/subprojects/plugins/src/main/resources/org/gradle/api/internal/plugins/
-    unixStartScriptGenerator.template = resources.text.fromFile("$rootDir/gradle/unixStartScript.txt")
-    windowsStartScriptGenerator.template = resources.text.fromFile("$rootDir/gradle/windowsStartScript.txt")
-}
