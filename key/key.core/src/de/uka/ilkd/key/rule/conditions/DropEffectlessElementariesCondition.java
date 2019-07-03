@@ -19,6 +19,7 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.ElementaryUpdate;
+import de.uka.ilkd.key.logic.op.EventUpdate;
 import de.uka.ilkd.key.logic.op.LocationVariable;
 import de.uka.ilkd.key.logic.op.SVSubstitute;
 import de.uka.ilkd.key.logic.op.SchemaVariable;
@@ -49,42 +50,44 @@ public final class DropEffectlessElementariesCondition
     private static Term dropEffectlessElementariesHelper(
 	    				Term update, 
 	    				Set<LocationVariable> relevantVars, TermServices services) {
-	if(update.op() instanceof ElementaryUpdate) {
-	    ElementaryUpdate eu = (ElementaryUpdate) update.op();
-	    LocationVariable lhs = (LocationVariable) eu.lhs();
-	    if(relevantVars.contains(lhs)) {
-	        relevantVars.remove(lhs);
-	        // removed, see bug #1269 (MU, CS)
-//	        // updates of the form "x:=x" can be discarded (MU,CS)
-//	        if(lhs.equals(update.sub(0).op())) {
-//	            return TB.skip();
-//	        }
-		return null;
-	    } else {
-		return services.getTermBuilder().skip();
-	    }
-	} else if(update.op() == UpdateJunctor.PARALLEL_UPDATE) {
-	    Term sub0 = update.sub(0);
-            Term sub1 = update.sub(1);
-            // first descend to the second sub-update to keep relevantVars in
-            // good order
-	    Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars, services);
-	    Term newSub0 = dropEffectlessElementariesHelper(sub0, relevantVars, services);
-	    if(newSub0 == null && newSub1 == null) {
-		return null;
-	    } else {
-		newSub0 = newSub0 == null ? sub0 : newSub0;
-		newSub1 = newSub1 == null ? sub1 : newSub1;
-		return services.getTermBuilder().parallel(newSub0, newSub1);
-	    }
-	} else if(update.op() == UpdateApplication.UPDATE_APPLICATION) {
-	    Term sub0 = update.sub(0);
-	    Term sub1 = update.sub(1);
-	    Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars, services);
-	    return newSub1 == null ? null : services.getTermBuilder().apply(sub0, newSub1, null);
-	} else {
-	    return null;
-	}
+    	if(update.op() instanceof ElementaryUpdate) {
+    		ElementaryUpdate eu = (ElementaryUpdate) update.op();
+    		LocationVariable lhs = (LocationVariable) eu.lhs();
+    		if(relevantVars.contains(lhs)) {
+    			relevantVars.remove(lhs);
+    			// removed, see bug #1269 (MU, CS)
+    			//	        // updates of the form "x:=x" can be discarded (MU,CS)
+    			//	        if(lhs.equals(update.sub(0).op())) {
+    			//	            return TB.skip();
+    			//	        }
+    			return null;
+    		} else {
+    			return services.getTermBuilder().skip();
+    		}
+    	} else if(update.op() == UpdateJunctor.PARALLEL_UPDATE) {
+    		Term sub0 = update.sub(0);
+    		Term sub1 = update.sub(1);
+    		// first descend to the second sub-update to keep relevantVars in
+    		// good order
+    		Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars, services);
+    		Term newSub0 = dropEffectlessElementariesHelper(sub0, relevantVars, services);
+    		if(newSub0 == null && newSub1 == null) {
+    			return null;
+    		} else {
+    			newSub0 = newSub0 == null ? sub0 : newSub0;
+    			newSub1 = newSub1 == null ? sub1 : newSub1;
+    			return services.getTermBuilder().parallel(newSub0, newSub1);
+    		}
+    	} else if(update.op() == UpdateApplication.UPDATE_APPLICATION) {
+    		Term sub0 = update.sub(0);
+    		Term sub1 = update.sub(1);
+    		Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars, services);
+    		return newSub1 == null ? null : services.getTermBuilder().apply(sub0, newSub1, null);
+    	} else if(update.op() instanceof EventUpdate) {
+    		return update;
+    	} else {
+    		return null;
+    	}
     }    
     
     
@@ -95,7 +98,7 @@ public final class DropEffectlessElementariesCondition
 		= services.getFactory().create(services);
 	target.execPostOrder(collector);
 	
-	if (collector.containsNonRigidNonProgramVariableSymbol()) {
+	if (collector.containsNonRigidNonProgramVariableSymbol() && !collector.containsAtMostDepPredAsNonRigid()) {
 		return null;
 	}
 	

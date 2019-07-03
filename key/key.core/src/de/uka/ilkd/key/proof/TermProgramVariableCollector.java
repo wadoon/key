@@ -19,14 +19,18 @@ import java.util.LinkedHashSet;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.visitor.ProgramVariableCollector;
 import de.uka.ilkd.key.logic.DefaultVisitor;
+import de.uka.ilkd.key.logic.Namespace;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.LocationVariable;
+import de.uka.ilkd.key.logic.op.Operator;
 
 public class TermProgramVariableCollector extends DefaultVisitor {
 
     private final HashSet<LocationVariable> result = new LinkedHashSet<LocationVariable> ();
     private boolean containsNonRigidFunctionSymbol = false;
     private final Services services;
+	private boolean containsAtMostDepPredAsNonRigid = true;
 
     
     public TermProgramVariableCollector(Services services) {
@@ -44,6 +48,18 @@ public class TermProgramVariableCollector extends DefaultVisitor {
 	    result.add ( (LocationVariable) t.op() );
 	} else if (!t.op().isRigid()) {
 		containsNonRigidFunctionSymbol = true;
+
+		Namespace<Function> funcNames = services.getNamespaces().functions();
+		final Operator noRaW = funcNames.lookup("noRaW");
+		final Operator noWaR = funcNames.lookup("noWaR");
+		final Operator noR = funcNames.lookup("noR");
+		final Operator noW = funcNames.lookup("noW");
+		if (t.op() == noRaW || t.op() == noWaR || t.op() == noR|| t.op() == noW) {
+			containsAtMostDepPredAsNonRigid &= true;
+		} else {
+			containsAtMostDepPredAsNonRigid = false;
+		}
+	
 	}
 	
 	if ( !t.javaBlock ().isEmpty() ) {
@@ -60,6 +76,10 @@ public class TermProgramVariableCollector extends DefaultVisitor {
     
     public boolean containsNonRigidNonProgramVariableSymbol() {
     	return containsNonRigidFunctionSymbol;
+    }
+    
+    public boolean containsAtMostDepPredAsNonRigid() {
+    	return containsAtMostDepPredAsNonRigid;
     }
 }
 
