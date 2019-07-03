@@ -83,8 +83,6 @@ public final class DropEffectlessElementariesCondition
     		Term sub1 = update.sub(1);
     		Term newSub1 = dropEffectlessElementariesHelper(sub1, relevantVars, services);
     		return newSub1 == null ? null : services.getTermBuilder().apply(sub0, newSub1, null);
-    	} else if(update.op() instanceof EventUpdate) {
-    		return update;
     	} else {
     		return null;
     	}
