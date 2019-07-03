@@ -14,6 +14,7 @@
 package de.uka.ilkd.key.pp;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Iterator;
 
 import org.key_project.util.collection.ImmutableList;
@@ -493,22 +494,24 @@ public abstract class Notation {
     /**
      * The standard concrete syntax for all kinds of variables.
      */
-    public static class VariableNotation extends Notation {
-	public VariableNotation() {
-	    super(1000);
-	}
+	public static class VariableNotation extends Notation {
+		public VariableNotation() {
+			super(1000);
+		}
 
-	public void print(Term t, LogicPrinter sp) throws IOException {
-	    if (t.op() instanceof ProgramVariable) {
-		sp
-			.printConstant(t.op().name().toString().replaceAll(
-				"::", "."));
-	    } else {
-		Debug.out("Unknown variable type");
-		sp.printConstant(t.op().name().toString());
-	    }
+		public void print(Term t, LogicPrinter sp) throws IOException {
+			String value = t.op().name().toString();
+
+			if (t.op() instanceof ProgramVariable) {
+				Stream<String> names = Arrays.stream(value.split("::"));
+				value = names.map(PrintingIndicesUtil::rewriteIndices)
+						.collect(Collectors.joining("."));
+				sp.printConstant(value);
+			} else {
+				sp.printConstant(value);
+			}
+		}
 	}
-    }
 
     
     public static final class SchemaVariableNotation extends VariableNotation {

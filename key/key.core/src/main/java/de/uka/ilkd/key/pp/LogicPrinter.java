@@ -153,8 +153,10 @@ public class LogicPrinter {
     public static String quickPrintTerm(Term t, Services services, boolean usePrettyPrinting, boolean useUnicodeSymbols) {
         final NotationInfo ni = new NotationInfo();
         if (services != null) {
-            ni.refresh(services, usePrettyPrinting, useUnicodeSymbols);
+            ni.refresh(services);
         }
+        ni.setPrettySyntax(usePrettyPrinting);
+        ni.setUnicodeEnabled(useUnicodeSymbols);
 
         // Use a SequentViewLogicPrinter instead of a plain LogicPrinter,
         // because the SequentViewLogicPrinter respects default TermLabel visibility settings.
@@ -1051,7 +1053,11 @@ public class LogicPrinter {
                 markStartKeyword();
             }
             if (!alreadyPrinted) {
-                layouter.print(name);
+                if(notationInfo.isUnicodeEnabled()) {
+                    layouter.print(PrintingIndicesUtil.rewriteIndices(name));
+                } else {
+                    layouter.print(name);
+                }
             }
             if (isKeyword) {
                 markEndKeyword();

@@ -401,6 +401,14 @@ public final class NotationInfo {
         return new Notation.FunctionNotation();
     }
 
+    public void setPrettySyntax(boolean prettySyntax) {
+        this.prettySyntax = prettySyntax;
+    }
+
+    public void setUnicodeEnabled(boolean unicodeEnabled) {
+        this.unicodeEnabled = unicodeEnabled;
+    }
+
     public boolean isPrettySyntax() {
         return prettySyntax;
     }

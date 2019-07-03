@@ -17,6 +17,8 @@ dependencies {
     //javacc name: 'javacc'
     javacc 'net.java.dev.javacc:javacc:4.0'
     antlr "org.antlr:antlr:3.5.2"   // use ANTLR version 3
+
+    testCompile 'pl.pragmatists:JUnitParams:1.1.1'
 }
 
 def javaCCOutputDir = file("${buildDir}/generated-src/javacc")
