@@ -28,6 +28,7 @@ import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.label.ParameterlessTermLabel;
 import de.uka.ilkd.key.logic.label.TermLabelManager;
 import de.uka.ilkd.key.logic.label.TermLabelState;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Modality;
 import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Goal;
@@ -260,10 +261,14 @@ public class LoopScopeInvariantRule extends AbstractLoopInvariantRule {
             Term[] uBeforeLoopDefAnonVariant) {
         final While loop = inst.loop;
 
+        final TermBuilder tb = services.getTermBuilder();
+        final Function noRaWBefore = services.getNamespaces().functions().lookup("noRaWBefore");
+        
         final Term newFormula = formulaWithLoopScope(services, inst, anonUpdate,
                 loop, loopLabel, stmtToReplace, frameCondition, variantPO,
                 termLabelState, presrvAndUCGoal, uBeforeLoopDefAnonVariant,
-                invTerm);
+                tb.and(invTerm, 
+                        tb.func(noRaWBefore, tb.func(services.getTypeConverter().getLocSetLDT().getEmpty()), tb.func(inst.anonEventMarker))));
 
         presrvAndUCGoal.setBranchLabel("Invariant Preserved and Used");
         presrvAndUCGoal.addFormula(new SequentFormula(uAnonInv), true, false);

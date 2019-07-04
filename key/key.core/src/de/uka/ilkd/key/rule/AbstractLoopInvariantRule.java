@@ -618,7 +618,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             services.getNamespaces().functions().addSafely(anonEventStarFunc);
             final Function anonReadSet = new Function(readSet, services.getTypeConverter().getLocSetLDT().targetSort());
             final Function anonWriteSet = new Function(writeSet, services.getTypeConverter().getLocSetLDT().targetSort());
-            
+            inst.anonEventMarker = anonEventStarFunc;
             
             final Term anonEventStarTerm= tb.label(tb.func(anonEventStarFunc),
                     ParameterlessTermLabel.ANON_HEAP_LABEL);
@@ -683,6 +683,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * to, the {@link LoopSpecification}, the the self {@link Term}.
      */
     protected static final class Instantiation {
+        public Function anonEventMarker;
         public final Term u;
         public final Term progPost;
         public final While loop;
@@ -716,6 +717,7 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
      * actual update and the anonymized heap.
      */
     protected static class AnonUpdateData {
+        public Function anonEventMarker;
         public final Term anonUpdate, anonHeap, loopHeap, loopHeapAtPre;
 
         public AnonUpdateData(Term anonUpdate, Term loopHeap,
