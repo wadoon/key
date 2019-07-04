@@ -22,19 +22,20 @@ public class AnonEventUpdate extends AbstractSortedOperator {
 	
 	public static AnonEventUpdate getAnonEventUpdateFor(Services s) {
 		Sort intSort = s.getTypeConverter().getIntegerLDT().targetSort();
+        Sort locSetSort = s.getTypeConverter().getLocSetLDT().targetSort();
 		AnonEventUpdate evUpdate = null;
 		synchronized(AnonEventUpdate.class) {
 		    evUpdate = anonEventUpdates.get(intSort);
 			if (evUpdate == null) {
-				evUpdate = new AnonEventUpdate(intSort);
+				evUpdate = new AnonEventUpdate(intSort, locSetSort);
 				anonEventUpdates.put(intSort, evUpdate);
 			}
 		}
 		return evUpdate;
 	}
 	
-	private AnonEventUpdate(Sort argSort) {
-		super(new Name("\\eventStar"), new Sort[]{argSort,argSort}, Sort.UPDATE, false);
+	private AnonEventUpdate(Sort argSort, Sort locSetSort) {
+		super(new Name("\\eventStar"), new Sort[]{argSort,locSetSort,locSetSort,argSort}, Sort.UPDATE, false);
 	}
 	
 	public String toString() {

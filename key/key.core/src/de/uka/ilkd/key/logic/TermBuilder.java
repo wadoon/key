@@ -920,8 +920,8 @@ public class TermBuilder {
         return tf.createTerm(EventUpdate.SINGLETON, marker, locset, timestamp);
     }
 
-    public Term anonEventUpdate(Term timestamp,Term anonUnique) {
-        return tf.createTerm(AnonEventUpdate.getAnonEventUpdateFor(services), timestamp, anonUnique);
+    public Term anonEventUpdate(Term timestamp, Term readSet, Term writeSet, Term anonUnique) {
+        return tf.createTerm(AnonEventUpdate.getAnonEventUpdateFor(services), timestamp, readSet, writeSet, anonUnique);
     }
 
     public Term elementary(UpdateableOperator lhs, Term rhs) {

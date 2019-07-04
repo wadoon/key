@@ -13,10 +13,7 @@
 
 package de.uka.ilkd.key.rule;
 
-import de.uka.ilkd.key.logic.op.FormulaSV;
-import de.uka.ilkd.key.logic.op.SchemaVariable;
-import de.uka.ilkd.key.logic.op.SkolemTermSV;
-import de.uka.ilkd.key.logic.op.TermSV;
+import de.uka.ilkd.key.logic.op.*;
 
 /**
  * class containing a pair of SchemaVariables, the first one being a
@@ -37,9 +34,9 @@ public class NewDependingOn {
      */
     public NewDependingOn(SchemaVariable first, SchemaVariable second) {
         if ( !( ( first instanceof SkolemTermSV)
-                && ( second instanceof FormulaSV || second instanceof TermSV ) ) ) {
+                && ( second instanceof FormulaSV || second instanceof TermSV || second instanceof UpdateSV) ) ) {
             throw new RuntimeException("NewDependingOn: First SchemaVariable has to be a SkolemTermSV or FormulaSV, " +
-                                       "the second one has to be a FormulaSV or a TermSV");
+                                       "the second one has to be a FormulaSV, a TermSV or an UpdateSV");
 	}
 	this.first = first;
 	this.second = second;

@@ -608,14 +608,23 @@ public abstract class AbstractLoopInvariantRule implements BuiltInRule {
             
             final Name anonEventStar = new Name(
                     tb.newName("anon_MemAcc_LOOP"));
+            final Name readSet = new Name(
+                    tb.newName("anon_readSet"));
+            final Name writeSet = new Name(
+                    tb.newName("anon_writeSet"));
+            
             final Function anonEventStarFunc = new Function(anonEventStar, 
             		services.getTypeConverter().getIntegerLDT().targetSort());
             services.getNamespaces().functions().addSafely(anonEventStarFunc);
+            final Function anonReadSet = new Function(readSet, services.getTypeConverter().getLocSetLDT().targetSort());
+            final Function anonWriteSet = new Function(writeSet, services.getTypeConverter().getLocSetLDT().targetSort());
+            
+            
             final Term anonEventStarTerm= tb.label(tb.func(anonEventStarFunc),
                     ParameterlessTermLabel.ANON_HEAP_LABEL);
             
  			anonUpdate = tb.parallel(anonUpdate, 
-            		tb.anonEventUpdate(tb.func(timestampAnonymizedValue), anonEventStarTerm));
+            		tb.anonEventUpdate( tb.func(timestampAnonymizedValue), tb.func(anonReadSet), tb.func(anonWriteSet), anonEventStarTerm));
 
             wellFormedAnon = and(tb, wellFormedAnon,
                     tb.wellFormed(tAnon.anonHeap));

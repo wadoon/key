@@ -2554,8 +2554,8 @@ elementary_update_term returns[Term _elementary_update_term=null]
          {
                 result = getServices().getTermBuilder().eventUpdate(marker, locset, timestamp);
          } |
-         ANON_EVENT_UPDATE LPAREN timestamp=equivalence_term COMMA anonUnique=equivalence_term  RPAREN {
-                result = getServices().getTermBuilder().anonEventUpdate(timestamp, anonUnique);
+         ANON_EVENT_UPDATE LPAREN timestamp=equivalence_term COMMA readSet=equivalence_term COMMA writeSet=equivalence_term COMMA anonUnique=equivalence_term  RPAREN {
+                result = getServices().getTermBuilder().anonEventUpdate(timestamp, readSet, writeSet, anonUnique);
          }
    ;
         catch [TermCreationException ex] {

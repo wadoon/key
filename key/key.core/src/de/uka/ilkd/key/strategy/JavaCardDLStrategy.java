@@ -1752,6 +1752,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
     	
     	// move lookup of functions to LDT
     	Namespace<Function> funcNames = getServices().getNamespaces().functions();
+        final Operator noRaWBefore = funcNames.lookup("noRaWBefore");
 		final Operator noRaW = funcNames.lookup("noRaW");
 		final Operator noWaR = funcNames.lookup("noWaR");
 		final Operator noR = funcNames.lookup("noR");
@@ -1761,7 +1762,7 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 		
 		
     	bindRuleSet(d, "pull_out_dep_locations",     			
-    			add(applyTF(FocusProjection.create(1), or(op(noRaW), or(op(noWaR), op(noR), op(noW)))),
+    			add(applyTF(FocusProjection.create(1), or(op(noRaWBefore), op(noRaW), or(op(noWaR), op(noR), op(noW)))),
     					applyTF(FocusProjection.create(2), ff.update),	
     					applyTF("t", IsNonRigidTermFeature.INSTANCE),
     					longConst(100)));

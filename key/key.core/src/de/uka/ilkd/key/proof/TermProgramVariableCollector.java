@@ -50,11 +50,12 @@ public class TermProgramVariableCollector extends DefaultVisitor {
 		containsNonRigidFunctionSymbol = true;
 
 		Namespace<Function> funcNames = services.getNamespaces().functions();
+        final Operator noRaWBefore = funcNames.lookup("noRaWBefore");
 		final Operator noRaW = funcNames.lookup("noRaW");
 		final Operator noWaR = funcNames.lookup("noWaR");
 		final Operator noR = funcNames.lookup("noR");
 		final Operator noW = funcNames.lookup("noW");
-		if (t.op() == noRaW || t.op() == noWaR || t.op() == noR|| t.op() == noW) {
+		if (t.op() == noRaW || t.op() == noWaR || t.op() == noR|| t.op() == noW || t.op() == noRaWBefore) {
 			containsAtMostDepPredAsNonRigid &= true;
 		} else {
 			containsAtMostDepPredAsNonRigid = false;
