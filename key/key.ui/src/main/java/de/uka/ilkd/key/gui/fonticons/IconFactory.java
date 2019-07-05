@@ -38,6 +38,7 @@ public final class IconFactory {
     public static final IconFontProvider SAVE_FILE = new IconFontProvider(FontAwesomeSolid.SAVE);
     public static final IconFontProvider EDIT = new IconFontProvider(FontAwesomeSolid.EDIT);
     public static final IconFontProvider INTERACTIVE = new IconFontProvider(FontAwesomeSolid.HAND_POINT_RIGHT);
+    public static final IconFontProvider SCRIPT = new IconFontProvider(FontAwesomeSolid.SCROLL);
     public static final IconFontProvider PRUNE = new IconFontProvider(FontAwesomeSolid.HAND_SCISSORS);
     public static final IconFontProvider GOAL_BACK = new IconFontProvider(FontAwesomeSolid.BACKSPACE);
     public static final IconFontProvider EXPAND_GOALS = new IconFontProvider(FontAwesomeSolid.EXPAND_ARROWS_ALT);
@@ -362,6 +363,11 @@ public final class IconFactory {
 
     public static Icon interactiveAppLogo(int size) {
         return INTERACTIVE.load(size);
+        //return scaleIcon(interactiveAppLogo, size, size);
+    }
+
+    public static Icon scriptAppLogo(int size) {
+        return SCRIPT.load(size);
         //return scaleIcon(interactiveAppLogo, size, size);
     }
 
