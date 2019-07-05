@@ -6,6 +6,8 @@ import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.macros.*;
 import de.uka.ilkd.key.settings.AbstractPropertiesSettings;
 import de.uka.ilkd.key.settings.PathConfig;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.swing.*;
 import java.awt.event.KeyEvent;
@@ -32,6 +34,8 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
      */
     public static final File SETTINGS_FILE = new File(PathConfig.getKeyConfigDir(),
             KeyStrokeSettings.SETTINGS_FILENAME);
+
+    private static final Logger LOGGER = LogManager.getLogger(KeyStrokeSettings.class);
 
     /**
      * singleton instance
@@ -146,7 +150,7 @@ public class KeyStrokeSettings extends AbstractPropertiesSettings {
     }
 
     public void save() {
-        System.out.println("[KeyStrokeSettings] Save keyboard shortcuts to: " + SETTINGS_FILE.getAbsolutePath());
+        LOGGER.info("Save keyboard shortcuts to: " + SETTINGS_FILE.getAbsolutePath());
         try (Writer writer = new FileWriter(SETTINGS_FILE)) {
             properties.store(writer, "KeY's KeyStrokes");
             writer.flush();

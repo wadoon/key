@@ -13,21 +13,8 @@
 
 package de.uka.ilkd.key.core;
 
-import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.key_project.util.java.IOUtil;
-import org.key_project.util.reflection.ClassLoaderUtil;
-import org.xml.sax.SAXException;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import de.uka.ilkd.key.control.UserInterfaceControl;
 import de.uka.ilkd.key.gui.ExampleChooser;
 import de.uka.ilkd.key.gui.MainWindow;
@@ -51,7 +38,18 @@ import de.uka.ilkd.key.util.CommandLineException;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYConstants;
 import de.uka.ilkd.key.util.rifl.RIFLTransformer;
+import org.key_project.util.java.IOUtil;
+import org.key_project.util.reflection.ClassLoaderUtil;
+import org.xml.sax.SAXException;
 import recoder.ParserException;
+
+import javax.xml.parsers.ParserConfigurationException;
+import java.awt.*;
+import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * The main entry point for KeY
@@ -59,6 +57,17 @@ import recoder.ParserException;
  * This has been extracted from MainWindow to keep GUI and control further apart.
  */
 public final class Main {
+    public static final String JUSTIFY_RULES = "--justify-rules";
+    public static final String JKEY_PREFIX = "--jr-";
+    public static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
+    //    deprecated
+//    public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
+    public static final String JPATH_OF_RESULT = JKEY_PREFIX + "pathOfResult";
+    public static final String JTIMEOUT = JKEY_PREFIX + "timeout";
+    public static final String JPRINT = JKEY_PREFIX + "print";
+    public static final String JSAVE_RESULTS_TO_FILE = JKEY_PREFIX + "saveProofToFile";
+    public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
+    public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX + "signature";
     /**
      * Command line options
      */
@@ -83,44 +92,33 @@ public final class Main {
     private static final String MACRO = "--macro";
     private static final String NO_JMLSPECS = "--no-jmlspecs";
     private static final String TACLET_DIR = "--tacletDir";
-    public static final String JUSTIFY_RULES = "--justify-rules";
     private static final String SAVE_ALL_CONTRACTS = "--save-all";
     private static final String TIMEOUT = "--timeout";
     private static final String EXAMPLES = "--examples";
     private static final String RIFL = "--rifl";
-    public static final String JKEY_PREFIX = "--jr-";
-    public static final String JMAX_RULES = JKEY_PREFIX + "maxRules";
-    //    deprecated
-//    public static final String JPATH_OF_RULE_FILE = JKEY_PREFIX + "pathOfRuleFile";
-    public static final String JPATH_OF_RESULT = JKEY_PREFIX + "pathOfResult";
-    public static final String JTIMEOUT = JKEY_PREFIX + "timeout";
-    public static final String JPRINT = JKEY_PREFIX + "print";
-    public static final String JSAVE_RESULTS_TO_FILE = JKEY_PREFIX + "saveProofToFile";
-    public static final String JFILE_FOR_AXIOMS = JKEY_PREFIX + "axioms";
-    public static final String JFILE_FOR_DEFINITION = JKEY_PREFIX + "signature";
     private static final String VERBOSITY = "--verbose";
+    private static final String LOGGING_CONFIG_EXPERIMENTAL = "/log4j2.experimental.yaml";
+    private static final String LOGGING_CONFIG_DEFAULT = "/log4j2.yaml";
+
+    /**
+     * <p>
+     * This flag indicates if the example chooser should be shown
+     * if {@link #examplesDir} is defined (not {@code null}). It is set
+     * in the Eclipse integration to {@code false}, because it is required
+     * to define the path to a different one without showing the chooser.
+     * </p>
+     * <p>
+     * Conclusion: It must be possible to use KeY with a custom examples
+     * directory without show in the chooser on startup.
+     * </p>
+     */
+    public static boolean showExampleChooserIfExamplesDirIsDefined = true;
     /**
      * The {@link KeYDesktop} used by KeY. The default implementation is
      * replaced in Eclipse. For this reason the {@link Desktop} should never
      * be used directly.
      */
     private static KeYDesktop keyDesktop = new DefaultKeYDesktop();
-
-    /**
-     * The user interface modes KeY can operate in.
-     */
-    private enum UiMode {
-        /**
-         * Interactive operation mode.
-         */
-        INTERACTIVE,
-
-        /**
-         * Auto operation mode.
-         */
-        AUTO
-    }
-
     /**
      * Level of verbosity for command line outputs.
      */
@@ -177,20 +175,7 @@ public final class Main {
     private static boolean saveAllContracts = false;
 
     private static ProofMacro autoMacro = new SkipMacro();
-
-    /**
-     * <p>
-     * This flag indicates if the example chooser should be shown
-     * if {@link #examplesDir} is defined (not {@code null}). It is set
-     * in the Eclipse integration to {@code false}, because it is required
-     * to define the path to a different one without showing the chooser.
-     * </p>
-     * <p>
-     * Conclusion: It must be possible to use KeY with a custom examples
-     * directory without show in the chooser on startup.
-     * </p>
-     */
-    public static boolean showExampleChooserIfExamplesDirIsDefined = true;
+    private static Logger LOGGER = LogManager.getLogger(Main.class);
 
     public static void main(final String[] args) {
         Locale.setDefault(Locale.US);
@@ -293,10 +278,17 @@ public final class Main {
 
     /**
      * Evaluate the parsed commandline options
-     *
-     * @param commandline object cl
      */
     public static void evaluateOptions(CommandLine cl) {
+        if (cl.isSet(EXPERIMENTAL)) {
+            if (verbosity > Verbosity.SILENT) {
+                LOGGER.info("Running in experimental mode ...");
+            }
+            setEnabledExperimentalFeatures(true);
+        } else {
+            setEnabledExperimentalFeatures(false);
+        }
+
 
         if (cl.isSet(VERBOSITY)) { // verbosity
             try {
@@ -387,29 +379,20 @@ public final class Main {
 
         if (verbosity > Verbosity.SILENT) {
             if (Debug.ENABLE_DEBUG) {
-                System.out.println("Running in debug mode ...");
+                LOGGER.info("Running in debug mode");
             }
 
             if (Debug.ENABLE_ASSERTION) {
-                System.out.println("Using assertions ...");
+                LOGGER.info("Using assertions");
             } else {
-                System.out.println("Not using assertions ...");
+                LOGGER.info("Not using assertions");
             }
-        }
-
-        if (cl.isSet(EXPERIMENTAL)) {
-            if (verbosity > Verbosity.SILENT) {
-                System.out.println("Running in experimental mode ...");
-            }
-            setEnabledExperimentalFeatures(true);
-        } else {
-            setEnabledExperimentalFeatures(false);
         }
 
         if (cl.isSet(RIFL)) {
             riflFileName = new File(cl.getString(RIFL, null));
             if (verbosity > Verbosity.SILENT) {
-                System.out.println("[RIFL] Loading RIFL specification from " + riflFileName + " ...");
+                LOGGER.info("[RIFL] Loading RIFL specification from " + riflFileName);
             }
         }
 
@@ -476,6 +459,11 @@ public final class Main {
      */
     public static void setEnabledExperimentalFeatures(boolean state) {
         experimentalMode = state;
+        String configuration = experimentalMode ? LOGGING_CONFIG_EXPERIMENTAL : LOGGING_CONFIG_DEFAULT;
+        try (final InputStream in = Main.class.getResourceAsStream(configuration)) {
+        } catch (IOException e) {
+            //LOGGER.log(Level.INFO, e.getMessage(), e);
+        }
     }
 
     public static boolean isExperimentalMode() {
@@ -486,8 +474,8 @@ public final class Main {
      * Print a header text on to the console.
      */
     private static void printHeader() {
-        System.out.println("\nKeY Version " + KeYConstants.VERSION);
-        System.out.println(KeYConstants.COPYRIGHT + "\nKeY is protected by the " +
+        LOGGER.info("KeY Version " + KeYConstants.VERSION);
+        LOGGER.info(KeYConstants.COPYRIGHT + "\nKeY is protected by the " +
                 "GNU General Public License\n");
     }
 
@@ -508,8 +496,7 @@ public final class Main {
                 @Override
                 public void uncaughtException(Thread t, Throwable e) {
                     if (verbosity > Verbosity.SILENT) {
-                        System.out.println("Auto mode was terminated by an exception:"
-                                + e.getClass().toString().substring(5));
+                        LOGGER.error("Auto mode was terminated by an exception:", e);
                         if (verbosity >= Verbosity.DEBUG) {
                             e.printStackTrace();
                         }
@@ -702,5 +689,20 @@ public final class Main {
     public static void setKeyDesktop(KeYDesktop keyDesktop) {
         assert keyDesktop != null;
         Main.keyDesktop = keyDesktop;
+    }
+
+    /**
+     * The user interface modes KeY can operate in.
+     */
+    private enum UiMode {
+        /**
+         * Interactive operation mode.
+         */
+        INTERACTIVE,
+
+        /**
+         * Auto operation mode.
+         */
+        AUTO
     }
 }

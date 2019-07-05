@@ -23,6 +23,8 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
@@ -83,6 +85,7 @@ public class KeyboardTacletExtension implements KeYGuiExtension,
 @SuppressWarnings("WeakerAccess")
 class KeyboardTacletPanel extends JPanel implements TabPanel {
     private static final String PROP_MODEL = "taclets";
+    private static final Logger LOGGER = LogManager.getLogger(KeyboardTacletPanel.class);
     private final Services services;
     private final JTextField txtInput = new JTextField();
     private final ActivateAction actionActivate = new ActivateAction();
@@ -163,7 +166,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
         if (model != null) {
             Optional<RuleApp> app = model.getFirstMatchingTacletApp();
             app.ifPresent(this::applyRule);
-            System.out.println("applied");
+            LOGGER.debug("selected taclet applied");
         }
     }
 
@@ -313,7 +316,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
 
         KeyboardTacletModel newModel = new KeyboardTacletModel(taclets);
         setModel(newModel);
-        System.out.format("Took: %d ms%n", System.currentTimeMillis() - time);
+        LOGGER.debug("Took: %d ms%n", System.currentTimeMillis() - time);
     }
 
     public boolean isActive() {
