@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
 import java.util.Optional;
 
 import de.uka.ilkd.key.abstractexecution.java.statement.AbstractPlaceholderStatement;
@@ -45,6 +46,7 @@ import de.uka.ilkd.key.proof.init.Profile;
 import de.uka.ilkd.key.proof.mgt.SpecificationRepository;
 import de.uka.ilkd.key.util.Debug;
 import de.uka.ilkd.key.util.KeYRecoderExcHandler;
+import org.key_project.util.lookup.Lookup;
 
 /**
  * this is a collection of common services to the KeY prover. Services
@@ -344,7 +346,6 @@ public class Services implements TermServices {
     	s.setNamespaces(namespaces.copy());
     	nameRecorder = nameRecorder.copy();
     	s.setJavaModel(getJavaModel());
-        s.freshForInstantiations = new HashMap<>(this.freshForInstantiations);
 
     	return s;
     }
@@ -375,7 +376,6 @@ public class Services implements TermServices {
         s.setNamespaces(namespaces.copy());
         nameRecorder = nameRecorder.copy();
         s.setJavaModel(getJavaModel());
-        s.freshForInstantiations = new HashMap<>(freshForInstantiations);
 
         return s;
     }
@@ -496,6 +496,20 @@ public class Services implements TermServices {
       assert this.javaModel == null;
       this.javaModel = javaModel;
    }
+
+    public Lookup createLookup() {
+        Lookup lookup = new Lookup();
+        lookup.register(getJavaInfo());
+        lookup.register(getJavaModel());
+        lookup.register(getProfile());
+        lookup.register(getProof());
+        lookup.register(getNamespaces());
+        lookup.register(getTermBuilder());
+        lookup.register(getNameRecorder());
+        lookup.register(getVariableNamer());
+        return lookup;
+   }
+
     /**
      * See {@link #freshForInstantiations}.
      *
@@ -544,5 +558,5 @@ public class Services implements TermServices {
             return obj instanceof NameEqBasedHashKey
                     && ((NameEqBasedHashKey) obj).hashCode == this.hashCode;
         }
-    }
+   }
 }
