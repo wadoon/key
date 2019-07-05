@@ -98,8 +98,12 @@ public final class CreateHeapAnonUpdate extends AbstractTermTransformer {
         final List<LocationVariable> heapContext = //
                 HeapContext.getModHeaps(services, isTransaction);
         final Map<LocationVariable, Term> mods = new LinkedHashMap<>();
-        heapContext.forEach(heap -> mods.put(heap, loopSpec.getModifies(heap,
-                loopSpec.getInternalSelfTerm(), atPres, services)));
+//        heapContext.forEach(heap -> mods.put(heap, loopSpec.getModifies(heap,
+//                loopSpec.getInternalSelfTerm(), atPres, services)));
+        heapContext.forEach(heap -> mods.put(heap,
+                MiscTools.removeSingletonPVs(loopSpec.getModifies(heap,
+                        loopSpec.getInternalSelfTerm(), atPres, services),
+                        services)));
 
         final HeapLDT heapLDT = services.getTypeConverter().getHeapLDT();
 
