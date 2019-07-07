@@ -1,10 +1,9 @@
 package org.key_project.ui.interactionlog.algo
 
-import org.key_project.ui.interactionlog.api.Markdownable
-import org.key_project.ui.interactionlog.api.Interaction
-import org.key_project.ui.interactionlog.model.InteractionLog
 import org.key_project.ui.interactionlog.Markdown
-
+import org.key_project.ui.interactionlog.api.Interaction
+import org.key_project.ui.interactionlog.api.Markdownable
+import org.key_project.ui.interactionlog.model.InteractionLog
 import java.io.PrintWriter
 
 class MarkdownExport(private val writer: PrintWriter) {

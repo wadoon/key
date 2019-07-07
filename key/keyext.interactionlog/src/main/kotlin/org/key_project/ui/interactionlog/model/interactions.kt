@@ -1,5 +1,6 @@
 package org.key_project.ui.interactionlog.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import de.uka.ilkd.key.api.ProofMacroApi
 import de.uka.ilkd.key.control.InteractionListener
 import de.uka.ilkd.key.logic.PosInOccurrence
@@ -28,26 +29,33 @@ import java.io.Serializable
 import java.io.StringWriter
 import java.lang.ref.WeakReference
 import java.util.*
-import javax.xml.bind.annotation.*
 
 
 /**
  * @author Alexander Weigl
  * @version 1 (06.12.18)
  */
-@XmlRootElement(name = "interaction-log")
-@XmlAccessorType(XmlAccessType.FIELD)
-class InteractionLog : Serializable {
-    @XmlTransient
+class InteractionLog {
+    @JsonIgnore
     var proof: WeakReference<Proof> = WeakReference<Proof>(null)
 
-    @XmlAttribute
+    @JsonIgnore
+    val listeners = arrayListOf<() -> Unit>()
+
+
     val name: String
 
-    @XmlAttribute
     var created = Date()
 
-    var interactions: MutableList<Interaction> = ArrayList()
+    private val _interactions: MutableList<Interaction> = ArrayList()
+
+    val interactions: List<Interaction>
+        get() = _interactions
+
+
+    fun add(interaction: Interaction) = _interactions.add(interaction)
+    fun remove(interaction: Interaction) = _interactions.remove(interaction)
+    fun remove(index: Int) = _interactions.removeAt(index)
 
     @JvmOverloads
     constructor(name: String = RandomName.getRandomName()) {
@@ -64,14 +72,9 @@ class InteractionLog : Serializable {
     override fun toString(): String {
         return name
     }
-
-    companion object {
-        private const val serialVersionUID = 1L
-    }
 }
 
 
-@XmlTransient
 abstract class NodeInteraction(@Transient var serialNr: Int? = null) : Interaction() {
     var nodeId: NodeIdentifier? = null
 
@@ -92,15 +95,11 @@ abstract class NodeInteraction(@Transient var serialNr: Int? = null) : Interacti
 /**
  * @author Alexander Weigl
  */
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 class MacroInteraction() : NodeInteraction() {
     var macroName: String? = null
 
-    @XmlTransient
     var macro: ProofMacro? = null
 
-    @XmlTransient
     var pos: PosInOccurrence? = null
 
     var info: String? = null
@@ -132,7 +131,7 @@ class MacroInteraction() : NodeInteraction() {
     }
 
     @Throws(Exception::class)
-    override fun reapply(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
+    override fun reapplyStrict(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
         val macro = ProofMacroApi().getMacro(macroName)
         val pio = pos
         if (macro != null) {
@@ -159,17 +158,12 @@ class MacroInteraction() : NodeInteraction() {
  * @author Alexander Weigl
  * @version 1 (06.12.18)
  */
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 class NodeIdentifier() : Serializable {
 
-    @XmlElement(required = true, name = "select")
     private var list: MutableList<Int> = ArrayList()
 
-    @XmlAttribute
     var branchLabel: String? = null
 
-    @XmlTransient
     var serialNr: Int = 0
 
     constructor(seq: List<Int>) : this() {
@@ -225,8 +219,6 @@ class NodeIdentifier() : Serializable {
 }
 
 
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 class PruneInteraction() : NodeInteraction() {
     constructor(node: Node) : this() {
         serialNr = node.serialNr()
@@ -246,7 +238,7 @@ class PruneInteraction() : NodeInteraction() {
     }
 
     @Throws(Exception::class)
-    override fun reapply(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
+    override fun reapplyStrict(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
         nodeId?.findNode(goal.proof())
                 ?.get()
                 ?.also { goal.proof().pruneProof(it) }
@@ -262,18 +254,11 @@ class PruneInteraction() : NodeInteraction() {
  * @author Alexander Weigl
  * @version 1 (09.12.18)
  */
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 class OccurenceIdentifier {
-    @XmlAttribute
     var path: Array<Int>? = null
-    @XmlAttribute
     var term: String? = null
-    @XmlAttribute
     var toplevelTerm: String? = null
-    @XmlAttribute
     var termHash: Int = 0
-    @XmlAttribute
     var isAntec: Boolean = false
 
     override fun toString(): String {
@@ -321,8 +306,6 @@ class OccurenceIdentifier {
 }
 
 
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 class UserNoteInteraction() : Interaction() {
     var note: String = ""
 
@@ -350,16 +333,11 @@ class UserNoteInteraction() : Interaction() {
 }
 
 
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 class SettingChangeInteraction() : Interaction() {
-    @XmlElement
     var savedSettings: Properties? = null
 
-    @XmlAttribute
     var type: InteractionListener.SettingType? = null
 
-    @XmlAttribute
     var message: String? = null
 
     override val markdown: String
@@ -386,7 +364,7 @@ class SettingChangeInteraction() : Interaction() {
     }
 
     @Throws(Exception::class)
-    override fun reapply(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
+    override fun reapplyStrict(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
         val settings = goal.proof().settings
         when (type) {
             InteractionListener.SettingType.SMT -> settings.smtSettings.readSettings(savedSettings)
@@ -401,8 +379,6 @@ class SettingChangeInteraction() : Interaction() {
 }
 
 
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 class AutoModeInteraction() : Interaction() {
     var info: ApplyStrategyInfo? = null
 
@@ -441,7 +417,7 @@ class AutoModeInteraction() : Interaction() {
     }
 
     @Throws(Exception::class)
-    override fun reapply(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
+    override fun reapplyStrict(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
         uic.proofControl.startAutoMode(goal.proof(), goal.proof().openGoals(), uic)
     }
 
@@ -454,7 +430,6 @@ class AutoModeInteraction() : Interaction() {
 /**
  * @author weigl
  */
-@XmlRootElement
 class RuleInteraction() : NodeInteraction() {
     var ruleName: String? = null
     var posInOccurence: OccurenceIdentifier? = null
@@ -532,7 +507,7 @@ class RuleInteraction() : NodeInteraction() {
     }
 
     @Throws(Exception::class)
-    override fun reapply(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
+    override fun reapplyStrict(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
         val ruleCommand = RuleCommand()
         val state = EngineState(goal.proof())
         val parameter: RuleCommand.Parameters?

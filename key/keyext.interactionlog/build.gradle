@@ -18,8 +18,7 @@ dependencies {
     implementation group: 'com.atlassian.commonmark', name: 'commonmark-ext-gfm-tables', version: '0.12.1'
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 
-    implementation 'javax.xml.bind:jaxb-api:2.3.1'
-    implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.1'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.9.1'
 }
 
 

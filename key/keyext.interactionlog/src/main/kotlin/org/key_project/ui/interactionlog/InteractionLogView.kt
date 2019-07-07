@@ -1,9 +1,8 @@
 package org.key_project.ui.interactionlog
 
+import bibliothek.gui.dock.common.DefaultMultipleCDockable
+import bibliothek.gui.dock.common.NullMultipleCDockableFactory
 import de.uka.ilkd.key.core.KeYMediator
-import de.uka.ilkd.key.core.KeYSelectionEvent
-import de.uka.ilkd.key.core.KeYSelectionListener
-import de.uka.ilkd.key.gui.MainWindow
 import de.uka.ilkd.key.gui.actions.KeyAction
 import de.uka.ilkd.key.gui.extension.api.TabPanel
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeRegular
@@ -11,12 +10,11 @@ import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid
 import de.uka.ilkd.key.gui.fonticons.IconFactory
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider
 import de.uka.ilkd.key.proof.Proof
-import org.key_project.ui.BoundsPopupMenuListener
 import org.key_project.ui.interactionlog.algo.MUProofScriptExport
 import org.key_project.ui.interactionlog.algo.MarkdownExport
 import org.key_project.ui.interactionlog.api.Interaction
-import org.key_project.ui.interactionlog.model.InteractionLog
 import org.key_project.ui.interactionlog.api.InteractionRecorderListener
+import org.key_project.ui.interactionlog.model.InteractionLog
 import org.key_project.ui.interactionlog.model.NodeInteraction
 import org.key_project.ui.interactionlog.model.UserNoteInteraction
 import java.awt.*
@@ -31,19 +29,16 @@ import java.io.File
 import java.io.FileWriter
 import java.io.IOException
 import java.io.PrintWriter
+import java.lang.ref.WeakReference
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.swing.*
 import javax.swing.border.Border
-import javax.swing.filechooser.FileNameExtensionFilter
 
-class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), InteractionRecorderListener, TabPanel {
-    val recorder = InteractionRecorder()
-
+class InteractionLogView(val interactionLog: InteractionLog, private var mediator: KeYMediator) : JPanel(), TabPanel {
     val actionExportProofScript: KeyAction = ExportMUScriptAction()
     val actionKPSExport: KeyAction = ExportKPSAction()
     val actionSave: KeyAction = SaveAction()
-    val actionLoad: KeyAction = LoadAction()
     val actionAddUserNote: KeyAction = AddUserNoteAction()
     val actionToggleFavourite: KeyAction = ToggleFavouriteAction()
     val actionJumpIntoTree: KeyAction = JumpIntoTreeAction()
@@ -51,39 +46,21 @@ class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), 
     val actionExportMarkdown: KeyAction = ExportMarkdownAction()
     val actionShowExtended: KeyAction = ShowExtendedActionsAction()
     val actionMUCopyClipboard: KeyAction = ExportMUScriptClipboardAction()
-    val actionPauseLogging: KeyAction = PauseLoggingAction()
 
 
     val listInteraction = JList<Interaction>()
-    val interactionLogSelection = JComboBox<InteractionLog>()
     val interactionListModel = DefaultListModel<Interaction>()
-    private var mediator: KeYMediator? = null
-    private var currentProof: Proof? = null
-    private val keYSelectionListener = object : KeYSelectionListener {
-        override fun selectedNodeChanged(e: KeYSelectionEvent) {}
 
-        override fun selectedProofChanged(e: KeYSelectionEvent) {
-            setCurrentProof(e.source.selectedProof)
-        }
-    }
+    private var currentProof: Proof? = interactionLog.proof.get()
     private var fileChooser: JFileChooser = JFileChooser()
-
-    private val selectedItem: InteractionLog
-        get() = interactionLogSelection.getSelectedItem() as InteractionLog
+    private val lblCurrentProof = JLabel(currentProof?.name().toString())
 
     init {
         // register the recorder in the proof control
         listInteraction.model = interactionListModel
         listInteraction.cellRenderer = InteractionCellRenderer()
 
-        val listener = BoundsPopupMenuListener(true, false)
-        interactionLogSelection.addPopupMenuListener(listener)
-        interactionLogSelection.prototypeDisplayValue = InteractionLog("INTERACTION LOG")
-
-
         val panelButtons = JToolBar()
-        panelButtons.add(interactionLogSelection)
-        val btnLoad = JButton(actionLoad)
         val btnSave = JButton(actionSave)
         val btnExport = JButton(actionExportProofScript)
         val btnAddNote = JButton(actionAddUserNote)
@@ -91,9 +68,7 @@ class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), 
         btnExport.hideActionText = true
         btnSave.hideActionText = true
         btnAddNote.hideActionText = true
-        btnLoad.hideActionText = true
 
-        panelButtons.add(btnLoad)
         panelButtons.add(btnSave)
         panelButtons.add(Box.createHorizontalGlue())
         panelButtons.add(actionAddUserNote)
@@ -110,11 +85,6 @@ class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), 
         popup.add(JMenuItem(actionAddUserNote))
         listInteraction.componentPopupMenu = popup
 
-        recorder.addListener(this)
-
-        interactionLogSelection.model = recorder.getLoadedInteractionLogs()
-        interactionLogSelection.addActionListener { this.handleSelectionChange(it) }
-        interactionLogSelection.model = recorder.getLoadedInteractionLogs()
 
         listInteraction.addMouseMotionListener(object : MouseMotionAdapter() {
             override fun mouseMoved(e: MouseEvent?) {
@@ -128,7 +98,6 @@ class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), 
             }
         })
 
-        interactionLogSelection.model = recorder.getLoadedInteractionLogs()
 
         DropTarget(listInteraction, 0, object : DropTargetAdapter() {
             override fun drop(dtde: DropTargetDropEvent) {
@@ -152,35 +121,28 @@ class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), 
         layout = BorderLayout()
         add(panelButtons, BorderLayout.NORTH)
         add(JScrollPane(listInteraction))
-        recorder.addListener(this)
+
+        val pSouth = JPanel()
+        pSouth.add(JLabel("Proof: "))
+        pSouth.add(lblCurrentProof)
+        pSouth.add(JButton(JumpToProofAction()))
+        pSouth.add(JButton(BindToCurrentProofAction()))
+        add(pSouth, BorderLayout.SOUTH)
 
         border = BorderFactory.createTitledBorder("Interactions")
 
-        setMainWindow(window)
-        setMediator(mediator)
+        InteractionLogExt.recorder.addListener(object : InteractionRecorderListener {
+            override fun onInteraction(recorder: InteractionRecorder, log: InteractionLog, event: Interaction) {
+                if (interactionLog == log) {
+                    updateList()
+                }
+            }
+        })
+        updateList()
     }
 
-    private fun handleSelectionChange(actionEvent: ActionEvent) {
-        val selectedLog = selectedItem
-        updateList(selectedLog)
-    }
 
-    private fun setCurrentProof(proof: Proof?) {
-        if (proof == null) return
-        currentProof = proof
-        recorder.get(proof)
-        //rebuildList();
-    }
-
-    private fun rebuildList() {
-        //val currentInteractionLog = selectedItem
-        currentProof?.also {
-            val state = recorder.get(it)
-            updateList(state)
-        }
-    }
-
-    private fun updateList(interactionLog: InteractionLog) {
+    fun updateList() {
         interactionListModel.clear()
         interactionLog.interactions.forEach { interactionListModel.addElement(it) }
     }
@@ -194,27 +156,8 @@ class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), 
         return fileChooser
     }
 
-    override fun onInteraction(interaction: Interaction) {
-        rebuildList()
-    }
-
-    fun setMediator(mediator: KeYMediator) {
-        if (this.mediator != null) {
-            this.mediator!!.removeKeYSelectionListener(keYSelectionListener)
-        }
-        this.mediator = mediator
-        mediator.addKeYSelectionListener(keYSelectionListener)
-        setCurrentProof(mediator.selectedProof)
-    }
-
-    fun setMainWindow(window: MainWindow) {
-        window.userInterface.proofControl.addInteractionListener(recorder)
-        window.userInterface.proofControl.addAutoModeListener(recorder)
-    }
-
-
     override fun getTitle(): String {
-        return "Interaction Log"
+        return interactionLog.name
     }
 
     override fun getIcon(): Icon? {
@@ -225,8 +168,38 @@ class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), 
         return this
     }
 
+    val dockable by lazy {
+        val d = DefaultMultipleCDockable(NullMultipleCDockableFactory.NULL, icon, title, this, permissions)
+        d.isCloseable = true
+        d
+    }
 
-    private inner class InteractionLogModelItem : DefaultComboBoxModel<InteractionLog>()
+
+    private inner class BindToCurrentProofAction : KeyAction() {
+        init {
+            name = "Rebind"
+        }
+
+        override fun actionPerformed(e: ActionEvent?) {
+            val proof = mediator.selectionModel.selectedProof
+            interactionLog.proof = WeakReference(proof)
+            InteractionLogExt.recorder.prioritize(interactionLog)
+            lblCurrentProof.text = proof.name().toString()
+        }
+    }
+
+    private inner class JumpToProofAction : KeyAction() {
+
+        init {
+            name = "Jump to proof"
+        }
+
+        override fun actionPerformed(e: ActionEvent?) {
+            currentProof?.also {
+                mediator.selectionModel.selectedProof = it
+            }
+        }
+    }
 
     private inner class ExportMUScriptAction internal constructor() : AbstractFileSaveAction() {
         init {
@@ -237,7 +210,7 @@ class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), 
         }
 
         override fun save(selectedFile: File) {
-            val current = selectedItem
+            val current = interactionLog
             val script = MUProofScriptExport.getScript(current)
             try {
                 FileWriter(selectedFile).use { fw -> fw.write(script) }
@@ -257,42 +230,10 @@ class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), 
         }
 
         override fun actionPerformed(e: ActionEvent) {
-            val text = (listInteraction.getSelectedValue() as Interaction).proofScriptRepresentation
+            val text = (listInteraction.selectedValue as Interaction).proofScriptRepresentation
             val clipboard = Toolkit.getDefaultToolkit().systemClipboard
             val contents = StringSelection(text)
             clipboard.setContents(contents, contents)
-        }
-    }
-
-    private inner class LoadAction internal constructor() : KeyAction() {
-        init {
-            name = "Load"
-            putValue(Action.SHORT_DESCRIPTION, "Load Interaction Log")
-            setIcon(ICON_LOAD.get(SMALL_ICON_SIZE))
-            priority = 0
-            menuPath = MENU_ILOG
-            lookupAcceleratorKey()
-        }
-
-        override fun actionPerformed(e: ActionEvent) {
-            val fileChooser = JFileChooser()
-            fileChooser.fileFilter = FileNameExtensionFilter(
-                    "InteractionLog", "xml")
-            val returnValue = fileChooser.showOpenDialog(null)
-            if (returnValue == JFileChooser.APPROVE_OPTION) {
-                try {
-                    val file = fileChooser.selectedFile
-                    recorder.readInteractionLog(file)
-                    //addInteractionLog(importedLog);
-                } catch (exception: Exception) {
-                    JOptionPane.showMessageDialog(null,
-                            exception.cause,
-                            "IOException",
-                            JOptionPane.WARNING_MESSAGE)
-                    exception.printStackTrace()
-                }
-
-            }
         }
     }
 
@@ -311,7 +252,7 @@ class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), 
             val fileChooser = getFileChooser()
             val returnValue = fileChooser.showSaveDialog(null)
             if (returnValue == JFileChooser.APPROVE_OPTION) {
-                val activeInteractionLog = selectedItem
+                val activeInteractionLog = interactionLog
                 try {
                     InteractionLogFacade.storeInteractionLog(activeInteractionLog,
                             fileChooser.selectedFile)
@@ -344,11 +285,9 @@ class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), 
             val note = MultiLineInputPrompt(this@InteractionLogView, prefilled).show()
             if (note.isPresent) {
                 val interaction = UserNoteInteraction(note.get())
-                val interactionLog = interactionLogSelection.selectedItem as InteractionLog
-                interactionLog.interactions.add(interaction)
-                onInteraction(interaction)
+                val interactionLog = interactionLog
+                interactionLog.add(interaction)
             }
-
         }
     }
 
@@ -363,8 +302,8 @@ class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), 
         }
 
         override fun actionPerformed(e: ActionEvent) {
-            if (listInteraction.getSelectedValue() != null) {
-                listInteraction.getSelectedValue().isFavoured = !listInteraction.getSelectedValue().isFavoured
+            if (listInteraction.selectedValue != null) {
+                listInteraction.selectedValue.isFavoured = !listInteraction.selectedValue.isFavoured
             }
         }
     }
@@ -381,8 +320,8 @@ class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), 
             try {
                 val current = listInteraction.selectedValue as? NodeInteraction
                 if (current != null) {
-                    val node = current.getNode(mediator!!.selectedProof)
-                    mediator!!.selectionModel.selectedNode = node
+                    val node = current.getNode(mediator.selectedProof)
+                    mediator.selectionModel.selectedNode = node
                 }
             } catch (ex: ClassCastException) {
 
@@ -400,11 +339,11 @@ class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), 
         }
 
         override fun actionPerformed(e: ActionEvent) {
-            val inter = listInteraction.getSelectedValue()
+            val inter = listInteraction.selectedValue
             try {
                 //Reapplication should be ignored by the logging.
-                recorder.isDisableAll = true
-                inter.reapply(mediator!!.ui, mediator!!.selectedGoal)
+                InteractionLogExt.disableLogging()
+                inter.reapplyStrict(mediator.ui, mediator.selectedGoal)
             } catch (ex: UnsupportedOperationException) {
                 JOptionPane.showMessageDialog(null,
                         String.format("<html>Reapplication of %s is not implemented<br>If you know how to do it, then override the corresponding method in %s.</html>",
@@ -412,7 +351,7 @@ class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), 
             } catch (e1: Exception) {
                 e1.printStackTrace()
             } finally {
-                recorder.isDisableAll = false
+                InteractionLogExt.enableLogging()
             }
         }
     }
@@ -441,7 +380,7 @@ class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), 
 
         override fun save(selectedFile: File) {
             try {
-                FileWriter(selectedFile).use { fw -> MarkdownExport.writeTo(selectedItem, PrintWriter(fw)) }
+                FileWriter(selectedFile).use { fw -> MarkdownExport.writeTo(interactionLog, PrintWriter(fw)) }
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -460,7 +399,7 @@ class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), 
 
         override fun save(selectedFile: File) {
             try {
-                FileWriter(selectedFile).use { fw -> MarkdownExport.writeTo(selectedItem, PrintWriter(fw)) }
+                FileWriter(selectedFile).use { fw -> MarkdownExport.writeTo(interactionLog, PrintWriter(fw)) }
             } catch (e: IOException) {
                 e.printStackTrace()
             }
@@ -493,47 +432,17 @@ class InteractionLogView(window: MainWindow, mediator: KeYMediator) : JPanel(), 
         }
     }
 
-    private inner class PauseLoggingAction : KeyAction() {
-        init {
-            isSelected = recorder.isDisableAll
-            priority = -1
-            menuPath = MENU_ILOG
-            putValue(Action.SHORT_DESCRIPTION, "Activation or Deactivation of interaction logging")
-
-            update()
-            addPropertyChangeListener { evt ->
-                if (evt.propertyName == Action.SELECTED_KEY)
-                    update()
-            }
-            lookupAcceleratorKey()
-        }
-
-        private fun update() {
-            if (!isSelected) {
-                setIcon(IconFactory.INTERLOG_PAUSE.get())
-                name = "Pause Interaction Logging"
-            } else {
-                setIcon(IconFactory.INTERLOG_RESUME.get())
-                name = "Resume Interaction Logging"
-            }
-        }
-
-        override fun actionPerformed(e: ActionEvent) {
-            setSelected(!isSelected)
-            recorder.isDisableAll = isSelected
-        }
-    }
-
     companion object {
         private val INTERACTION_LOG_ICON = IconFactory.INTERLOG_ICON.get()
-        private val SMALL_ICON_SIZE = 16f
-        private val MENU_ILOG = "Interaction Logging"
+        val SMALL_ICON_SIZE = 16f
+        val MENU_ILOG = "Interaction Logging"
         private val MENU_ILOG_EXPORT = "$MENU_ILOG.Export"
 
-        private val ICON_LOAD = IconFontProvider(FontAwesomeSolid.TRUCK_LOADING)
-        private val ICON_ADD_USER_ACTION = IconFontProvider(FontAwesomeRegular.STICKY_NOTE)
-        private val ICON_TOGGLE_FAVOURITE = IconFontProvider(FontAwesomeSolid.HEART, Color.red)
-        private val ICON_MARKDOWN = IconFontProvider(FontAwesomeSolid.MARKDOWN)
+        val ICON_LOAD = IconFontProvider(FontAwesomeSolid.TRUCK_LOADING)
+        val ICON_ADD_USER_ACTION = IconFontProvider(FontAwesomeRegular.STICKY_NOTE)
+        val ICON_TOGGLE_FAVOURITE = IconFontProvider(FontAwesomeSolid.HEART, Color.red)
+        val ICON_MARKDOWN = IconFontProvider(FontAwesomeSolid.MARKDOWN)
+        val ICON_SHOW = IconFontProvider(FontAwesomeSolid.BOOK_OPEN)
     }
 }
 
@@ -552,7 +461,7 @@ internal class MultiLineInputPrompt(private var parent: JComponent?, private val
         box.add(btnOk)
         box.add(btnCancel)
 
-        btnOk.addActionListener { evt -> accept(area.text) }
+        btnOk.addActionListener { accept(area.text) }
         btnCancel.addActionListener { evt -> cancel() }
         d.defaultCloseOperation = JDialog.HIDE_ON_CLOSE
         d.addWindowListener(object : WindowAdapter() {
@@ -583,10 +492,6 @@ internal class MultiLineInputPrompt(private var parent: JComponent?, private val
     fun show(): Optional<String> {
         dialog.isVisible = true
         return Optional.ofNullable(acceptedAnswer)
-    }
-
-    fun setParent(parent: JComponent) {
-        this.parent = parent
     }
 }
 
@@ -660,6 +565,4 @@ internal class InteractionCellRenderer : JPanel(), ListCellRenderer<Interaction>
         private val df = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
         private val COLOR_FAVOURED = Color(0xFFD373)
     }
-
-
 }

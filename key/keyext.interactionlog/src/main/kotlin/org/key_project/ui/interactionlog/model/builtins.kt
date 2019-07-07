@@ -6,7 +6,6 @@ import de.uka.ilkd.key.proof.Node
 import de.uka.ilkd.key.rule.*
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp
 import de.uka.ilkd.key.smt.RuleAppSMT
-import javax.xml.bind.annotation.*
 
 object BuiltInRuleInteractionFactory {
     fun <T : IBuiltInRuleApp> create(node: Node, app: T): BuiltInRuleInteraction {
@@ -24,10 +23,7 @@ object BuiltInRuleInteractionFactory {
 }
 
 
-@XmlTransient
-@XmlAccessorType(XmlAccessType.FIELD)
 sealed class BuiltInRuleInteraction : NodeInteraction() {
-    @XmlAttribute
     var ruleName: String? = null
 
     companion object {
@@ -39,12 +35,10 @@ sealed class BuiltInRuleInteraction : NodeInteraction() {
  * @author Alexander Weigl
  * @version 1 (09.12.18)
  */
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 class ContractBuiltInRuleInteraction : BuiltInRuleInteraction {
-    constructor() {}
+    constructor()
 
-    constructor(app: ContractRuleApp, node: Node) {}
+    constructor(app: ContractRuleApp, node: Node)
 }
 
 
@@ -52,13 +46,11 @@ class ContractBuiltInRuleInteraction : BuiltInRuleInteraction {
  * @author Alexander Weigl
  * @version 1 (09.12.18)
  */
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 class LoopContractInternalBuiltInRuleInteraction : BuiltInRuleInteraction {
 
-    constructor() {}
+    constructor()
 
-    constructor(app: LoopContractInternalBuiltInRuleApp, node: Node) {}
+    constructor(app: LoopContractInternalBuiltInRuleApp, node: Node)
 }
 
 
@@ -66,11 +58,7 @@ class LoopContractInternalBuiltInRuleInteraction : BuiltInRuleInteraction {
  * @author Alexander Weigl
  * @version 1 (09.12.18)
  */
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
-class LoopInvariantBuiltInRuleInteraction(app: LoopInvariantBuiltInRuleApp, node: Node) : BuiltInRuleInteraction() {
-
-}
+class LoopInvariantBuiltInRuleInteraction(app: LoopInvariantBuiltInRuleApp, node: Node) : BuiltInRuleInteraction()
 
 
 /**
@@ -78,13 +66,11 @@ class LoopInvariantBuiltInRuleInteraction(app: LoopInvariantBuiltInRuleApp, node
  * @version 1 (09.12.18)
  */
 
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 class MergeRuleBuiltInRuleInteraction : BuiltInRuleInteraction {
 
-    constructor() {}
+    constructor()
 
-    constructor(app: MergeRuleBuiltInRuleApp, node: Node) {}
+    constructor(app: MergeRuleBuiltInRuleApp, node: Node)
 }
 
 
@@ -93,9 +79,7 @@ class MergeRuleBuiltInRuleInteraction : BuiltInRuleInteraction {
  * @version 1 (09.12.18)
  */
 
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
-class OSSBuiltInRuleInteraction : BuiltInRuleInteraction {
+class OSSBuiltInRuleInteraction() : BuiltInRuleInteraction() {
 
     var occurenceIdentifier: OccurenceIdentifier? = null
     var nodeIdentifier: NodeIdentifier? = null
@@ -113,9 +97,7 @@ class OSSBuiltInRuleInteraction : BuiltInRuleInteraction {
                 occurenceIdentifier?.toplevelTerm
         )
 
-    constructor() {}
-
-    constructor(app: OneStepSimplifierRuleApp, node: Node) {
+    constructor(app: OneStepSimplifierRuleApp, node: Node) : this() {
         nodeIdentifier = NodeIdentifier.get(node)
         occurenceIdentifier = OccurenceIdentifier.get(app.posInOccurrence())
     }
@@ -138,13 +120,11 @@ class OSSBuiltInRuleInteraction : BuiltInRuleInteraction {
  * @author Alexander Weigl
  * @version 1 (09.12.18)
  */
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 class SMTBuiltInRuleInteraction : BuiltInRuleInteraction {
 
-    constructor() {}
+    constructor()
 
-    constructor(app: RuleAppSMT, node: Node) {}
+    constructor(app: RuleAppSMT, node: Node)
 }
 
 
@@ -152,11 +132,9 @@ class SMTBuiltInRuleInteraction : BuiltInRuleInteraction {
  * @author Alexander Weigl
  * @version 1 (09.12.18)
  */
-@XmlRootElement
-@XmlAccessorType(XmlAccessType.FIELD)
 class UseDependencyContractBuiltInRuleInteraction : BuiltInRuleInteraction {
 
-    constructor() {}
+    constructor()
 
-    constructor(app: UseDependencyContractApp, node: Node) {}
+    constructor(app: UseDependencyContractApp, node: Node)
 }

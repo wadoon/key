@@ -4,10 +4,9 @@ import de.uka.ilkd.key.java.Services
 import de.uka.ilkd.key.proof.Node
 import org.key_project.ui.interactionlog.api.Interaction
 import org.key_project.ui.interactionlog.model.InteractionLog
-
 import java.io.PrintWriter
 import java.io.StringWriter
-import java.util.HashMap
+import java.util.*
 import java.util.function.Function
 
 /**
