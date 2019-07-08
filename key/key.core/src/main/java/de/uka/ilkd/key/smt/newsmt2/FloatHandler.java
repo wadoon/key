@@ -84,6 +84,8 @@ public class FloatHandler implements SMTHandler {
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
+        trans.addFromSnippets("float");
+        trans.addFromSnippets("double");
         Operator op = term.op();
         if (fpOperators.containsKey(op)) {
             SMTTermFloatOp.Op fpop = fpOperators.get(op);
