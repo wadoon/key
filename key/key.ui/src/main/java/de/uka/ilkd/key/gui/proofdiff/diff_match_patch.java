@@ -35,14 +35,7 @@ package de.uka.ilkd.key.gui.proofdiff;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -1819,6 +1812,7 @@ public class diff_match_patch {
    * @return LinkedList of Patch objects.
    * @deprecated Prefer patch_make(String text1, LinkedList<Diff> diffs).
    */
+  @Deprecated
   public LinkedList<Patch> patch_make(String text1, String text2,
       LinkedList<Diff> diffs) {
     return patch_make(text1, diffs);
