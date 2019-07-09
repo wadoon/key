@@ -120,7 +120,7 @@ public interface KeYGuiExtension {
          * Called before any other method; can be used to construct the UI.
          *
          * @param window   parent of this extension
-         * @param mediator the current mediator
+         * @param mediator the current getMediator
          */
         @NotNull Collection<TabPanel> getPanels(@NotNull MainWindow window, @NotNull KeYMediator mediator);
     }

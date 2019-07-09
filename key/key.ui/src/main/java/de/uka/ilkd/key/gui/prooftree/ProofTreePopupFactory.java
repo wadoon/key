@@ -37,7 +37,7 @@ public class ProofTreePopupFactory {
     protected ProofTreePopupFactory() {
         addAction(RunStrategyOnNode::new);
         addAction(Prune::new);
-        /*ProofMacroMenu macroMenu = new ProofMacroMenu(mediator, null);
+        /*ProofMacroMenu macroMenu = new ProofMacroMenu(getMediator, null);
         if (!macroMenu.isEmpty()) {
             this.add(macroMenu);
         }
@@ -306,7 +306,7 @@ public class ProofTreePopupFactory {
             context.proofTreeView.collapseClosedNodes();
             // do not show selected node if it is not on the path to an
             // open goal, but do expand root
-            // makeNodeVisible(mediator.getSelectedNode());
+            // makeNodeVisible(getMediator.getSelectedNode());
             context.delegateView.expandRow(0);
         }
     }

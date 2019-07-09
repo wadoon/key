@@ -35,7 +35,7 @@ import java.util.List;
  * macros.
  * <p>
  * It decouples proof macros from the GUI event thread. It registers with the
- * mediator to receive Stop-Button events
+ * getMediator to receive Stop-Button events
  */
 public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> implements InterruptListener {
 
@@ -57,7 +57,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> 
      */
     private final ProofMacro macro;
     /**
-     * The mediator of the environment
+     * The getMediator of the environment
      */
     private final KeYMediator mediator;
     /**
@@ -79,7 +79,7 @@ public class ProofMacroWorker extends SwingWorker<ProofMacroFinishedInfo, Void> 
      *
      * @param node     the {@link Node} to start macro at.
      * @param macro    the macro, not null
-     * @param mediator the mediator, not null
+     * @param mediator the getMediator, not null
      * @param posInOcc the position, possibly null
      */
     public ProofMacroWorker(Node node, ProofMacro macro, KeYMediator mediator, PosInOccurrence posInOcc) {

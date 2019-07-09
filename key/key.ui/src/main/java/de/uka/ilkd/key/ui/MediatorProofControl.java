@@ -144,8 +144,8 @@ public class MediatorProofControl extends AbstractProofControl {
      * <b>Attention:</b> Before this thread is started it is required to
      * freeze the MainWindow via
      * {@code
-     * mediator().stopInterface(true);
-     *   mediator().setInteractive(false);
+     * getMediator().stopInterface(true);
+     *   getMediator().setInteractive(false);
      * }. The thread itself unfreezes the UI when it is finished.
      * </p>
      */

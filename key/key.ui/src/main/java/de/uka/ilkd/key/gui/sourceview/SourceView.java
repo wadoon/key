@@ -102,7 +102,7 @@ public final class SourceView extends JComponent {
                     new Color(57, 210, 81));
 
     /**
-     * The main window of KeY (needed to get the mediator).
+     * The main window of KeY (needed to get the getMediator).
      */
     private final MainWindow mainWindow;
 

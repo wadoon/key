@@ -179,8 +179,8 @@ class TacletDescriber {
             }
 
 //                  s = s + "\n\nApplication justified by: ";
-//                  s = s + mediator.getSelectedProof().env().getJustifInfo()
-//                                      .getJustification(app, mediator.getServices())+"\n";
+//                  s = s + getMediator.getSelectedProof().env().getJustifInfo()
+//                                      .getJustification(app, getMediator.getServices())+"\n";
         } else {
             // Is this case possible?
             s += "No rule was applied on this node.";

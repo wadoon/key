@@ -119,7 +119,7 @@ public final class MainWindow extends JFrame {
     private final JScrollPane proofListView;
     private final TaskTree proofList;
     /**
-     * the mediator is stored here
+     * the getMediator is stored here
      */
     private final KeYMediator mediator;
     /**
@@ -238,7 +238,7 @@ public final class MainWindow extends JFrame {
         termLabelMenu = new TermLabelMenu(this);
         proofListView = new JScrollPane();
         autoModeAction = new AutoModeAction(this);
-        //mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
+        //mainWindowTabbedPane = new MainWindowTabbedPane(this, getMediator, autoModeAction);
         mainFrame = new MainFrame(this, emptySequent);
         sourceView = SourceView.getSourceView(this);
         proofList = new TaskTree(mediator);
@@ -361,9 +361,9 @@ public final class MainWindow extends JFrame {
     }
 
     /**
-     * return the mediator
+     * return the getMediator
      *
-     * @return the mediator
+     * @return the getMediator
      */
     public KeYMediator getMediator() {
         if (mediator == null) {

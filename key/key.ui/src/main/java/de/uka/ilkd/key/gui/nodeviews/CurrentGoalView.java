@@ -73,7 +73,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
                     new Color(0, 150, 130, 104));
 
 
-    // the mediator
+    // the getMediator
     private final KeYMediator mediator;
 
     // the mouse/mouseMotion listener
@@ -296,7 +296,7 @@ public class CurrentGoalView extends SequentView implements Autoscroll {
     }
 
     /**
-     * returns the mediator of this view
+     * returns the getMediator of this view
      *
      * @return the KeYMediator
      */

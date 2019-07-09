@@ -49,7 +49,7 @@ public class MergeRuleMenuItem extends JMenuItem {
      *            The position the join shall be applied to (symbolic state /
      *            program counter formula).
      * @param mediator
-     *            The KeY mediator.
+     *            The KeY getMediator.
      */
     public MergeRuleMenuItem(final Goal goal, final PosInOccurrence pio,
             final KeYMediator mediator) {

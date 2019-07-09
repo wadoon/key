@@ -87,7 +87,7 @@ public class ProofTreeView extends JPanel implements TabPanel {
     GUIProofTreeModel delegateModel;
 
     /**
-     * the mediator is stored here
+     * the getMediator is stored here
      */
     private KeYMediator mediator;
     private WeakHashMap<Proof, GUIProofTreeModel> models = new WeakHashMap<Proof, GUIProofTreeModel>(20);
@@ -256,16 +256,16 @@ public class ProofTreeView extends JPanel implements TabPanel {
     }
 
     /**
-     * returns the mediator to communicate with the model
+     * returns the getMediator to communicate with the model
      *
-     * @return the mediator to communicate with the model
+     * @return the getMediator to communicate with the model
      */
     public KeYMediator getMediator() {
         return mediator;
     }
 
     /**
-     * sets the mediator to communicate with the model
+     * sets the getMediator to communicate with the model
      */
     private void setMediator(KeYMediator m) {
         assert m != null;

@@ -516,7 +516,7 @@ public class TacletMenu extends JMenu {
 
         /*for (final TacletApp app : taclets) {
             final Taclet taclet = app.taclet();
-            if (!mediator.getFilterForInteractiveProving().filter(taclet)) {
+            if (!getMediator.getFilterForInteractiveProving().filter(taclet)) {
                 continue;
             }
 
@@ -524,7 +524,7 @@ public class TacletMenu extends JMenu {
                     !insSystemInvItem.isResponsible(taclet)) {
                 final DefaultTacletMenuItem item =
                         new DefaultTacletMenuItem(this, app,
-                                mediator.getNotationInfo(), mediator.getServices());
+                                getMediator.getNotationInfo(), getMediator.getServices());
                 item.addActionListener(control);
                 boolean rareRule = false;
                 for (RuleSet rs : taclet.getRuleSets()) {

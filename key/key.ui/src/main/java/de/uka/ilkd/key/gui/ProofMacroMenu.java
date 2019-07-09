@@ -82,7 +82,7 @@ public class ProofMacroMenu extends JMenu {
      *
      * Only applicable macros are added as menu items.
      *
-     * @param mediator the mediator of the current proof.
+     * @param mediator the getMediator of the current proof.
      * @param posInOcc the pos in occurrence, can be <code>null</code> if not
      * available.
      */
@@ -134,7 +134,7 @@ public class ProofMacroMenu extends JMenu {
      *
      * Only macros applicable at any PosInOccurrence are added as menu items.
      *
-     * @param mediator the mediator of the current proof.
+     * @param mediator the getMediator of the current proof.
      */
     public ProofMacroMenu(KeYMediator mediator) {
         this(mediator, null);
