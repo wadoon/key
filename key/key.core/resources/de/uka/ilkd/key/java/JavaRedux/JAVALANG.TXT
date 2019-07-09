@@ -29,7 +29,9 @@ java.lang.IndexOutOfBoundsException
 java.lang.NullPointerException
 java.lang.Enum
 java.lang.Object
+java.lang.StringBuilder
 java.lang.StringBuffer
+java.lang.System
 java.lang.Number
 java.lang.Cloneable
 java.lang.Throwable
@@ -53,8 +55,13 @@ java.io.Closeable
 java.io.Reader
 java.io.ByteArrayInputStream
 java.math.BigInteger
+java.util.ArrayList
+java.util.Arrays
+java.util.Date
 java.util.Set
 java.util.Collection
+java.util.LinkedHashMap
+java.util.LinkedList
 java.util.ListIterator
 java.util.Iterator
 java.util.List
