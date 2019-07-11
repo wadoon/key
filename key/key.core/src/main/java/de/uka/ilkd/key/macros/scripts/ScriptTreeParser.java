@@ -19,7 +19,7 @@ public class ScriptTreeParser {
         while(true) {
 
             int from = lineParser.getPosition();
-            Map<String, String> command = lineParser.parseCommand();
+            Map<String, String> command = lineParser.getNextCommand();
             int to = lineParser.getPosition();
 
             if(command == null) {

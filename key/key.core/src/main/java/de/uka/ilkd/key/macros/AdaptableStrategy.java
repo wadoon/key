@@ -25,6 +25,11 @@ public class AdaptableStrategy implements Strategy {
      *
      */
     protected final Strategy delegate;
+    /**
+     * Set of forbidden rulesets. A taclet is not applied if it is belongs at least to ONE forbidden
+     * rule set.
+     */
+    protected Set<String> disabledRulesBySet = new HashSet<>();
 
     /**
      *
@@ -59,6 +64,22 @@ public class AdaptableStrategy implements Strategy {
         if (disabledRulesByName.contains(app.rule().name().toString())) {
             return false;
         }
+
+        if (!disabledRulesBySet.isEmpty()) {//guard for performance
+            try {
+                Taclet t = (Taclet) app.rule();
+                boolean hit = t.getRuleSets().stream().anyMatch(rs ->
+                        disabledRulesBySet.contains(rs.name().toString()));
+                if (hit) {
+                    //cache the decision
+                    disabledRulesByName.add(t.name().toString());
+                    return true;
+                }
+            } catch (ClassCastException ignored) {
+
+            }
+        }
+
         return delegate.isApprovedApp(app, pio, goal);
     }
 
@@ -101,11 +122,17 @@ public class AdaptableStrategy implements Strategy {
     public void loadFrom(Properties p) {
         p.forEach((k, v) -> {
             String key = k.toString();
-            String t = key.substring(0, key.lastIndexOf('.'));
-            if (key.endsWith(".disabled") && Boolean.valueOf(v.toString())) {
+            String t = key.substring(key.indexOf('.'), key.lastIndexOf('.'));
+            if (key.startsWith("rule.") && key.endsWith(".disabled") && Boolean.valueOf(v.toString())) {
                 disabledRulesByName.add(t);
-            }else{
+            } else {
                 disabledRulesByName.remove(t);
+            }
+
+            if (key.startsWith("ruleset.") && key.endsWith(".disabled") && Boolean.valueOf(v.toString())) {
+                disabledRulesBySet.add(t);
+            } else {
+                disabledRulesBySet.remove(t);
             }
         });
     }
@@ -187,7 +214,7 @@ public class AdaptableStrategy implements Strategy {
                             Taclet t = (Taclet) app.rule();
                             ImmutableList<RuleSet> rs = t.getRuleSets();
                             return rs.head().name().toString();
-                        }catch (ClassCastException e) {
+                        } catch (ClassCastException e) {
                             return "";
                         }
                     })

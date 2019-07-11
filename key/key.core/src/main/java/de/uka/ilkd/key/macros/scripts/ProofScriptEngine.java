@@ -1,19 +1,16 @@
 package de.uka.ilkd.key.macros.scripts;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
-import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Observer;
-import java.util.Optional;
-import java.util.ServiceLoader;
-
 import de.uka.ilkd.key.control.AbstractUserInterfaceControl;
 import de.uka.ilkd.key.parser.Location;
 import de.uka.ilkd.key.proof.Node;
 import de.uka.ilkd.key.proof.Proof;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.nio.file.Files;
+import java.util.*;
 
 /**
  * @author Mattias Ulbrich
@@ -25,21 +22,26 @@ public class ProofScriptEngine {
     private static final Map<String, ProofScriptCommand> COMMANDS = loadCommands();
 
     private final Location initialLocation;
-    private final String script;
+    private final Reader script;
 
     private Observer commandMonitor;
 
     public ProofScriptEngine(File file) throws IOException {
         this.initialLocation = new Location(file.getAbsolutePath(), 1, 1);
-        this.script = new String(Files.readAllBytes(file.toPath()));
+        this.script = Files.newBufferedReader(file.toPath());
     }
 
     public ProofScriptEngine(String script, Location initLocation) {
+        this.script = new StringReader(script);
+        this.initialLocation = initLocation;
+    }
+
+    public ProofScriptEngine(Reader script, Location initLocation) {
         this.script = script;
         this.initialLocation = initLocation;
     }
 
-    private static Map<String, ProofScriptCommand> loadCommands() {
+    public static Map<String, ProofScriptCommand> loadCommands() {
         Map<String, ProofScriptCommand> result = new HashMap<String, ProofScriptCommand>();
         ServiceLoader<ProofScriptCommand> loader = ServiceLoader
                 .load(ProofScriptCommand.class);
@@ -55,7 +57,7 @@ public class ProofScriptEngine {
     public void execute(AbstractUserInterfaceControl uiControl, Proof proof)
             throws IOException, InterruptedException, ScriptException {
 
-        ScriptLineParser mlp = new ScriptLineParser(new StringReader(script));
+        ScriptLineParser mlp = new ScriptLineParser(script);
         mlp.setLocation(initialLocation);
 
         EngineState stateMap = new EngineState(proof);
@@ -77,13 +79,14 @@ public class ProofScriptEngine {
                 throw new InterruptedException();
             }
 
-            Map<String, String> argMap = mlp.parseCommand();
+            Map<String, String> argMap = mlp.getNextCommand();
             if (argMap == null) {
                 // EOF reached
                 break;
             }
 
-            String cmd = "'" + argMap.get(ScriptLineParser.LITERAL_KEY) + "'";
+            String cmd = "'" + argMap.getOrDefault(ScriptLineParser.LITERAL_KEY,
+                    argMap.get(ScriptLineParser.COMMAND_KEY)) + "'";
             if (cmd.length() > MAX_CHARS_PER_COMMAND) {
                 cmd = cmd.substring(0, MAX_CHARS_PER_COMMAND) + " ...'";
             }
@@ -102,6 +105,7 @@ public class ProofScriptEngine {
 
                 ProofScriptCommand<Object> command = COMMANDS.get(name);
                 if (command == null) {
+                    System.out.println(">>> Known commands: " + COMMANDS.keySet());
                     throw new ScriptException("Unknown command " + name);
                 }
 
@@ -113,8 +117,10 @@ public class ProofScriptEngine {
 
                 Object o = command.evaluateArguments(stateMap, argMap);
                 final Node firstNode = stateMap.getFirstOpenAutomaticGoal().node();
+                beforeCommandApplication(command, o, firstNode);
                 command.execute(uiControl, o, stateMap);
                 firstNode.getNodeInfo().setScriptRuleApplication(true);
+                afterCommandApplication(command, o, firstNode);
             } catch (InterruptedException ie) {
                 throw ie;
             } catch (Exception e) {
@@ -138,6 +144,14 @@ public class ProofScriptEngine {
         }
     }
 
+    protected void afterCommandApplication(ProofScriptCommand<Object> command, Object arg, Node firstNode) {
+
+    }
+
+    protected void beforeCommandApplication(ProofScriptCommand<Object> command, Object o, Node firstNode) {
+
+    }
+
 //    private void write(String s, int cnt, Proof proof) {
 //        try (FileWriter fw = new FileWriter(String.format(s, cnt))) {
 //            fw.write(proof.toString());
@@ -150,8 +164,7 @@ public class ProofScriptEngine {
      * Set the routine that is executed before every successfully executed
      * command.
      *
-     * @param monitor
-     *            the monitor to set
+     * @param monitor the monitor to set
      */
     public void setCommandMonitor(Observer monitor) {
         this.commandMonitor = monitor;

@@ -42,6 +42,10 @@ public abstract class ConfigurableProofMacro<Macro extends ProofMacro> extends S
         this.internal = internal;
     }
 
+    public AdaptableStrategy.RuleNameAndSetCostAdapter getCostAdapter() {
+        return costAdapter;
+    }
+
     private static List<Taclet> findTaclets(Proof p) {
         Goal g = p.openGoals().head();
         Services services = p.getServices();
@@ -149,12 +153,14 @@ public abstract class ConfigurableProofMacro<Macro extends ProofMacro> extends S
                 .collect(Collectors.toList());
 
 
-        JTable tacletFactor = new JTable(new TacletCostWithDisableModel(tacletNames, costAdapter.getRuleName(),
+        JTable tacletFactor = new JTable(new TacletCostWithDisableModel(tacletNames,
+                costAdapter.getRuleName(),
                 strategy.disabledRulesByName));
         tabbedPane.addTab("Taclet Factor", new JScrollPane(tacletFactor));
 
 
-        JTable ruleSetFactor = new JTable(new TacletCostModel(ruleSetNames, costAdapter.getRuleSet()));
+        JTable ruleSetFactor = new JTable(new TacletCostWithDisableModel(ruleSetNames,
+                costAdapter.getRuleSet(), strategy.disabledRulesBySet));
         tabbedPane.addTab("RuleSet Factor", new JScrollPane(ruleSetFactor));
 
         panel.add(tabbedPane);
