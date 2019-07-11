@@ -35,7 +35,7 @@ fi
 # Initialise the options with default options.
 # OLD   # For debugging reasons disable JIT (otherwise strace doesn't work)
 # OLD   JAVA_OPTS="-XX:+UseG1GC"
-JAVA_OPTS="-Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler"
+JAVA_OPTS=
 
 add_jvm_option() {
    JAVA_OPTS="${JAVA_OPTS} $@"
@@ -60,6 +60,10 @@ list_help() {
     echo "  --help	: prints help message of the KeY prover"
 }
 
+
+add_jvm_option "-Dsun.awt.exception.handler=de.uka.ilkd.key.gui.ExceptionalHandler"
+add_jvm_option "-Dkey.examples.dir=$KEY_HOME/key.ui/examples"
+
 while [ $# -ne 0 ]; do
     case $1 in
         #     -K options for configuration options of KeY, such as debugmode, flags,
@@ -71,11 +75,6 @@ while [ $# -ne 0 ]; do
 	--K-help)
 	    list_help
 	    exit;;
-
-	--K-headless)
-	    echo "Warning: --K-headless option is deprecated"
-	    shift
-	    continue;;
 
 	--K-keydebug)
 	    add_jvm_option -DKeyDebugFlag=on
@@ -99,7 +98,7 @@ while [ $# -ne 0 ]; do
 	    continue;;
 
 	--K-remotedebug)
-            if [ ${2} = "wait" ]
+            if [ "$2" = "wait" ]
             then
                 wait="y"
                 shift
@@ -156,4 +155,5 @@ while [ $# -ne 0 ]; do
     esac
 done
 
+export JAVA_OPTS
 $START_SCRIPT $@
