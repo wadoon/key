@@ -176,6 +176,8 @@ public abstract class ForkedTestFileRunner implements Serializable {
             installTimeoutWatchdog(testFiles[0].getSettings(), tempDirectory);
          ArrayList<TestResult> testResults = new ArrayList<>();
          for (TestFile testFile : testFiles) {
+        	System.out.println(testFile.getKeYFile().getAbsolutePath()); 
+        	System.err.println(testFile.getKeYFile().getAbsolutePath()); 
             testResults.add(testFile.runKey());
          }
          writeObject(getLocationOfSerializedTestResults(tempDirectory),
