@@ -151,7 +151,7 @@ public interface SolverType  {
 
             @Override
             public String getName() {
-                    return "Z3";
+                    return "Z3 (Old TL)";
             }
 
             @Override
@@ -238,7 +238,7 @@ public interface SolverType  {
 
 		@Override
 		public String getName() {
-			return "Z3_NEW_TL";
+			return "Z3 (New TL)";
 		}
 
 		@Override
@@ -590,7 +590,7 @@ public interface SolverType  {
 
         @Override
         public String getName() {
-            return "CVC4";
+            return "CVC4 (New TL)";
         }
 
         @Override
@@ -611,8 +611,7 @@ public interface SolverType  {
 
         @Override
         public SMTTranslator createTranslator(Services services) {
-            final Configuration conf = new Configuration(false, true);
-            return new SmtLib2Translator(services, conf);
+			return new ModularSMTLib2Translator();
         }
 
         @Override
