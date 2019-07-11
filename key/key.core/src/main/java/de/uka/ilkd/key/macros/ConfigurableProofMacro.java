@@ -16,8 +16,11 @@ import org.key_project.util.collection.ImmutableList;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import java.awt.*;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -31,7 +34,9 @@ public abstract class ConfigurableProofMacro<Macro extends ProofMacro> extends S
     protected final Macro internal;
 
     protected AdaptableStrategy strategy;
-    protected AdaptableStrategy.RuleNameAndSetAdapter costAdapter;
+
+    protected AdaptableStrategy.RuleNameAndSetCostAdapter costAdapter
+            = AdaptableStrategy.RuleNameAndSetCostAdapter.createDefault();
 
     public ConfigurableProofMacro(Macro internal) {
         this.internal = internal;
@@ -78,7 +83,7 @@ public abstract class ConfigurableProofMacro<Macro extends ProofMacro> extends S
     protected AdaptableStrategy createStrategy(Proof proof, PosInOccurrence posInOcc) {
         if (this.strategy == null) {
             this.strategy = new AdaptableStrategy(proof.getActiveStrategy());
-            this.costAdapter = new AdaptableStrategy.RuleNameAndSetAdapter();
+            this.costAdapter = AdaptableStrategy.RuleNameAndSetCostAdapter.createDefault();
             this.strategy.costAdapter = this.costAdapter;
         }
         return this.strategy;
@@ -144,11 +149,12 @@ public abstract class ConfigurableProofMacro<Macro extends ProofMacro> extends S
                 .collect(Collectors.toList());
 
 
-        JTable tacletFactor = new JTable(new TacletCostModel(tacletNames, costAdapter.ruleName));
+        JTable tacletFactor = new JTable(new TacletCostWithDisableModel(tacletNames, costAdapter.getRuleName(),
+                strategy.disabledRulesByName));
         tabbedPane.addTab("Taclet Factor", new JScrollPane(tacletFactor));
 
 
-        JTable ruleSetFactor = new JTable(new TacletCostModel(ruleSetNames, costAdapter.ruleSet));
+        JTable ruleSetFactor = new JTable(new TacletCostModel(ruleSetNames, costAdapter.getRuleSet()));
         tabbedPane.addTab("RuleSet Factor", new JScrollPane(ruleSetFactor));
 
         panel.add(tabbedPane);
@@ -156,20 +162,114 @@ public abstract class ConfigurableProofMacro<Macro extends ProofMacro> extends S
         dialog.setContentPane(panel);
         dialog.setSize(300, 600);
 
-        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        JPanel pSouth = new JPanel(new FlowLayout(FlowLayout.CENTER));
         JButton btnOk = new JButton("Run");
         btnOk.addActionListener(evt -> {
             dialog.setVisible(false);
         });
-        buttons.add(btnOk);
-        panel.add(buttons, BorderLayout.SOUTH);
+        pSouth.add(btnOk);
+        panel.add(pSouth, BorderLayout.SOUTH);
+
+
+        JPanel pNorth = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JButton btnSave = new JButton("Save");
+        JButton btnLoad = new JButton("Load");
+        pNorth.add(btnSave);
+        pNorth.add(btnLoad);
+        panel.add(pNorth, BorderLayout.NORTH);
+
+        btnLoad.addActionListener(e -> {
+            JFileChooser jf = new JFileChooser("Choose a property file...");
+            int c = jf.showOpenDialog(dialog);
+            if (c == JFileChooser.APPROVE_OPTION) {
+                Properties p = new Properties();
+                try (Reader reader = new FileReader(jf.getSelectedFile())) {
+                    p.load(reader);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                costAdapter.loadFrom(p);
+                strategy.loadFrom(p);
+                tacletFactor.repaint();
+            }
+        });
+
+        btnSave.addActionListener(e -> {
+            JFileChooser jf = new JFileChooser("Choose a property file to store...");
+            int c = jf.showSaveDialog(dialog);
+            if (c == JFileChooser.APPROVE_OPTION) {
+                Properties p = new Properties();
+                costAdapter.storeInto(p);
+                strategy.storeInto(p);
+                try (Writer writer = new FileWriter(jf.getSelectedFile())) {
+                    p.store(writer, "");
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                tacletFactor.repaint();
+            }
+        });
+
         dialog.setVisible(true);
     }
 
+    private class TacletCostWithDisableModel extends TacletCostModel {
+        private final Set<String> disabled;
+
+        public TacletCostWithDisableModel(List<String> keys, AdaptableStrategy.SetBasedCostAdapter<String> ruleSet, Set<String> disabled) {
+            super(keys, ruleSet);
+            this.disabled = disabled;
+        }
+
+        @Override
+        public int getColumnCount() {
+            return super.getColumnCount() + 1;
+        }
+
+        @Override
+        public String getColumnName(int columnIndex) {
+            if (columnIndex == 3) return "Disabled";
+            return super.getColumnName(columnIndex);
+        }
+
+        @Override
+        public Class<?> getColumnClass(int columnIndex) {
+            if (columnIndex == 3) return Boolean.class;
+            return super.getColumnClass(columnIndex);
+        }
+
+        @Override
+        public boolean isCellEditable(int rowIndex, int columnIndex) {
+            return columnIndex == 3 || super.isCellEditable(rowIndex, columnIndex);
+        }
+
+        @Override
+        public Object getValueAt(int rowIndex, int columnIndex) {
+            if (columnIndex == 3) {
+                String name = keys.get(rowIndex);
+                return disabled.contains(name);
+            }
+            return super.getValueAt(rowIndex, columnIndex);
+        }
+
+        @Override
+        public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
+            if (columnIndex == 3) {
+                String name = keys.get(rowIndex);
+                if (Boolean.valueOf(aValue.toString())) {
+                    disabled.add(name);
+                } else {
+                    disabled.remove(name);
+                }
+                return;
+            }
+            super.setValueAt(aValue, rowIndex, columnIndex);
+        }
+    }
 
     private class TacletCostModel extends AbstractTableModel {
+        protected final List<String> keys;
         private final AdaptableStrategy.SetBasedCostAdapter<String> costAdapter;
-        private final List<String> keys;
 
         public TacletCostModel(List<String> keys, AdaptableStrategy.SetBasedCostAdapter<String> ruleSet) {
             this.keys = keys;

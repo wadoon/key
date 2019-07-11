@@ -10,11 +10,10 @@ import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCostCollector;
 import de.uka.ilkd.key.strategy.Strategy;
+import org.jetbrains.annotations.NotNull;
+import org.key_project.util.collection.ImmutableList;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -39,6 +38,12 @@ public class AdaptableStrategy implements Strategy {
      */
     public AdaptableStrategy(Strategy delegate) {
         this.delegate = delegate;
+    }
+
+    public static CostAdapter createFromProperties(Properties p) {
+        RuleNameAndSetCostAdapter adapter = RuleNameAndSetCostAdapter.createDefault();
+        adapter.loadFrom(p);
+        return adapter;
     }
 
     /**
@@ -93,11 +98,38 @@ public class AdaptableStrategy implements Strategy {
         return costAdapter.computeCost(defaultCost, app, pos, goal);
     }
 
-    interface CostAdapter {
-        public RuleAppCost computeCost(RuleAppCost oldCost, RuleApp app,
-                                       PosInOccurrence pos, Goal goal);
+    public void loadFrom(Properties p) {
+        p.forEach((k, v) -> {
+            String key = k.toString();
+            String t = key.substring(0, key.lastIndexOf('.'));
+            if (key.endsWith(".disabled") && Boolean.valueOf(v.toString())) {
+                disabledRulesByName.add(t);
+            }else{
+                disabledRulesByName.remove(t);
+            }
+        });
     }
 
+    public void storeInto(Properties p) {
+        disabledRulesByName.forEach(s -> p.put(s + ".disabled", "true"));
+    }
+
+    interface CostAdapter {
+        /**
+         * Based on the old cost of the rule given rule application, its position in occurence and the goal
+         * should this method return the new cost.
+         */
+        @NotNull RuleAppCost computeCost(@NotNull RuleAppCost oldCost, @NotNull RuleApp app,
+                                         @NotNull PosInOccurrence pos,
+                                         @NotNull Goal goal);
+    }
+
+    /**
+     * This cost adapter is based on sets. You need to give a project function <code>(RuleApp -> Key)</code>,
+     * then you can define the new cost in the summandMap and factorMap.
+     *
+     * @param <T> the lookup key, typically a string.
+     */
     public static class SetBasedCostAdapter<T> extends LinearCostAdapater {
         protected Map<T, Long> summandMap = new HashMap<>();
         protected Map<T, Long> factorMap = new HashMap<>();
@@ -125,48 +157,135 @@ public class AdaptableStrategy implements Strategy {
                 return factorNeutral.apply(app);
             };
         }
+
+        public Map<T, Long> getSummandMap() {
+            return summandMap;
+        }
+
+        public Map<T, Long> getFactorMap() {
+            return factorMap;
+        }
     }
 
-    public static class RuleNameAndSetAdapter implements CostAdapter {
-        SetBasedCostAdapter<String> ruleSet = new SetBasedCostAdapter<>(app -> "");
-        SetBasedCostAdapter<String> ruleName = new SetBasedCostAdapter<>(
-                (app) -> app.rule().name().toString());
+    /**
+     * Class bundles two cost adapter: one for the rule name and one for the rulset.
+     */
+    public static class RuleNameAndSetCostAdapter implements CostAdapter {
+        private final SetBasedCostAdapter<String> ruleSet;
+        private final SetBasedCostAdapter<String> ruleName;
 
-        public RuleNameAndSetAdapter() {
-            ruleSet.translateApp = (app) -> {
-                try {
-                    Taclet t = (Taclet) app.rule();
-                    for (RuleSet rs : t.getRuleSets()) {
-                        String name = rs.name().toString();
-                        if (ruleSet.factorMap.containsKey(name)) {
-                            return name;
+        public RuleNameAndSetCostAdapter(SetBasedCostAdapter<String> ruleSet, SetBasedCostAdapter<String> ruleName) {
+            this.ruleSet = ruleSet;
+            this.ruleName = ruleName;
+        }
+
+        public static RuleNameAndSetCostAdapter createDefault() {
+            return new RuleNameAndSetCostAdapter(
+                    new SetBasedCostAdapter<>(app -> app.rule().name().toString()),
+                    new SetBasedCostAdapter<>(app -> {
+                        try {
+                            Taclet t = (Taclet) app.rule();
+                            ImmutableList<RuleSet> rs = t.getRuleSets();
+                            return rs.head().name().toString();
+                        }catch (ClassCastException e) {
+                            return "";
                         }
-                    }
-                } catch (ClassCastException e) {
-                }
-                return null;
-            };
+                    })
+            );
+        }
+
+        public SetBasedCostAdapter<String> getRuleSet() {
+            return ruleSet;
+        }
+
+        public SetBasedCostAdapter<String> getRuleName() {
+            return ruleName;
         }
 
         @Override
-        public RuleAppCost computeCost(RuleAppCost oldCost, RuleApp app, PosInOccurrence pos, Goal goal) {
+        public RuleAppCost computeCost(@NotNull RuleAppCost oldCost, @NotNull RuleApp app, PosInOccurrence pos, @NotNull Goal goal) {
             return ruleName.computeCost(ruleSet.computeCost(oldCost, app, pos, goal), app, pos, goal);
+        }
+
+        public void loadFrom(Properties p) {
+            for (Map.Entry<Object, Object> entry : p.entrySet()) {
+                Object k = entry.getKey();
+                Object v = entry.getValue();
+                try {
+                    String key = k.toString();
+
+                    Map<String, Long> fMap, sMap;
+                    if (key.startsWith("ruleset.")) {
+                        key = key.substring(8);
+                        fMap = ruleSet.factorMap;
+                        sMap = ruleSet.summandMap;
+                    } else if (key.startsWith("rule.")) {
+                        key = key.substring(5);
+                        fMap = ruleName.factorMap;
+                        sMap = ruleName.summandMap;
+                    } else {
+                        continue;
+                    }
+
+                    long value = Long.parseLong(v.toString());
+                    if (key.endsWith(".factor")) {
+                        fMap.put(key.substring(0, key.lastIndexOf('.')), value);
+                    }
+
+                    if (key.endsWith(".summand")) {
+                        sMap.put(key.substring(0, key.lastIndexOf('.')), value);
+                    }
+
+                } catch (Exception e) {
+
+                }
+            }
+        }
+
+        public void storeInto(Properties p) {
+            store(p, "ruleset.", ".factor", ruleSet.factorMap);
+            store(p, "ruleset.", ".summand", ruleSet.summandMap);
+            store(p, "rule.", ".factor", ruleName.factorMap);
+            store(p, "rule.", ".summand", ruleName.summandMap);
+        }
+
+        private void store(Properties p, String prefix, String suffix, Map<String, Long> values) {
+            values.forEach((k, v) -> p.put(prefix + k + suffix, v.toString()));
         }
     }
 
+    /**
+     * This cost adapter changes the cost by using a linear model.
+     * <p>
+     * The new costs are given by <code>summand + (oldCost * factor)</code>
+     */
     public abstract static class LinearCostAdapater implements CostAdapter {
         protected java.util.function.Function<RuleApp, RuleAppCost> summand = (app) -> NumberRuleAppCost.getZeroCost();
         protected java.util.function.Function<RuleApp, RuleAppCost> factor = (app) -> NumberRuleAppCost.create(1);
 
+        public LinearCostAdapater() {
+        }
+
+        public LinearCostAdapater(Function<RuleApp, RuleAppCost> summand, Function<RuleApp, RuleAppCost> factor) {
+            this.summand = summand;
+            this.factor = factor;
+        }
+
+        @NotNull
         @Override
-        public RuleAppCost computeCost(RuleAppCost oldCost, RuleApp app, PosInOccurrence pos, Goal goal) {
+        public RuleAppCost computeCost(@NotNull RuleAppCost oldCost, @NotNull RuleApp app,
+                                       @NotNull PosInOccurrence pos, @NotNull Goal goal) {
             return oldCost.mul(factor.apply(app)).add(summand.apply(app));
         }
     }
 
-    private static class NeutralCostAdapter implements CostAdapter {
+    /**
+     * This cost adapter does not change the given costs.
+     */
+    public static class NeutralCostAdapter implements CostAdapter {
+        @NotNull
         @Override
-        public RuleAppCost computeCost(RuleAppCost oldCost, RuleApp app, PosInOccurrence pos, Goal goal) {
+        public RuleAppCost computeCost(@NotNull RuleAppCost oldCost, @NotNull RuleApp app, @NotNull PosInOccurrence pos, @NotNull Goal goal) {
             return oldCost;
         }
     }
