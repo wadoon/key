@@ -4,10 +4,12 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.ldt.DoubleLDT;
 import de.uka.ilkd.key.ldt.FloatLDT;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
+import de.uka.ilkd.key.smt.NumberTranslation;
 import de.uka.ilkd.key.smt.SMTTranslationException;
-import de.uka.ilkd.key.smt.lang.SMTSort;
-import de.uka.ilkd.key.smt.lang.SMTTermFloatOp;
+import de.uka.ilkd.key.smt.lang.*;
 import org.key_project.util.collection.ImmutableArray;
 
 import java.io.IOException;
@@ -26,6 +28,7 @@ public class FloatHandler implements SMTHandler {
 
     @Override
     public void init(Services services) throws IOException {
+
         this.services = services;
         floatLDT = services.getTypeConverter().getFloatLDT();
         doubleLDT = services.getTypeConverter().getDoubleLDT();
@@ -79,26 +82,68 @@ public class FloatHandler implements SMTHandler {
 
     @Override
     public boolean canHandle(Term term) {
-        return fpOperators.containsKey(term.op()) || fpLiterals.contains(term.op());
+
+        Operator op = term.op();
+
+        if (fpOperators.containsKey(op) || fpLiterals.contains(op) || op == doubleLDT.getRoundingModeRNE()
+            || op == doubleLDT.getRoundingModeRTN() || op == doubleLDT.getRoundingModeRTP())
+
+            return true;
+
+        return false;
     }
 
     @Override
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
+
         trans.addFromSnippets("float");
         trans.addFromSnippets("double");
+
         Operator op = term.op();
         if (fpOperators.containsKey(op)) {
+
             SMTTermFloatOp.Op fpop = fpOperators.get(op);
             String opName = fpop.getOpName();
             SExpr.Type exprType = fpop.getImageSort().equals(SMTSort.BOOL) ? SExpr.Type.BOOL : SExpr.Type.FLOAT;
             ImmutableArray<Term> subs = term.subs();
             List<SExpr> translatedSubs = new LinkedList<>();
+
             for (Term t : subs) {
-                translatedSubs.add(trans.translate(t));
+
+                Operator subOp = t.op();
+                String termType = t.sort().toString();
+
+                if (subOp instanceof ProgramVariable || services.getTypeConverter().getHeapLDT().isSelectOp(subOp)) {
+
+                    if (termType.equals("float"))
+                        translatedSubs.add(trans.translate(t, SExpr.Type.FLOAT));
+                    else if (termType.equals("double"))
+                        translatedSubs.add(trans.translate(t, SExpr.Type.DOUBLE));
+
+                } else
+                    translatedSubs.add(trans.translate(t));
             }
             return new SExpr(opName, exprType, translatedSubs);
-        } // else if ... else if ...
-          else {
+
+        } else if (fpLiterals.contains(op)) {
+
+            String lit = op.name().toString();
+            if (lit.equals("DFP")) {
+                return new SExpr(NumberTranslation.translateDoubleToSMTLIB(term, services), SExpr.Type.DOUBLE);
+            } else { // lit.equals("FP")
+                return new SExpr(NumberTranslation.translateFloatToSMTLIB(term, services), SExpr.Type.FLOAT);
+            }
+
+        } else if (op == doubleLDT.getRoundingModeRNE()) {
+            return new SExpr(SMTTermConst.FP_RNE.toString());
+
+        } else if (op == doubleLDT.getRoundingModeRTN()) {
+            return new SExpr(SMTTermConst.FP_RTN.toString());
+
+        } else if (op == doubleLDT.getRoundingModeRTP()) {
+            return new SExpr(SMTTermConst.FP_RTP.toString());
+
+        } else {
             throw new SMTTranslationException("Error in floating point translation!");
         }
     }

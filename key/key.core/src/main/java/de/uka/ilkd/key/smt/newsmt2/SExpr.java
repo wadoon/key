@@ -19,14 +19,13 @@ import de.uka.ilkd.key.logic.sort.Sort;
 
 /**
  * This class models s-expressions to be used for the SMT translation.
- *
+ * <p>
  * Every s-expression has got a {@link #name} and a (potentially empty) list of
  * {@link #children}.
- *
+ * <p>
  * They can be printed out, non-simple names are escaped for SMT.
  *
  * @author Mattias Ulbrich
- *
  */
 public class SExpr implements Writable {
 
@@ -35,7 +34,7 @@ public class SExpr implements Writable {
     }
 
     private static final Pattern EXTRACHAR_PATTERN =
-            Pattern.compile("[^-A-Za-z0-9+/*=%?!.$_~&^<>@]");
+        Pattern.compile("[^-A-Za-z0-9+/*=%?!.$_~&^<>@]");
 
     private final String name;
     private final Type type;
@@ -116,7 +115,8 @@ public class SExpr implements Writable {
         if (name.length() > 0 && name.charAt(0) == '|' && name.charAt(name.length() - 1) == '|') {
             return name; //already escaped
         }
-        if (EXTRACHAR_PATTERN.matcher(name).find() && type != Type.PATTERN) {
+
+        if (EXTRACHAR_PATTERN.matcher(name).find() && type != Type.PATTERN && type != Type.DOUBLE && type != Type.FLOAT) {
             return "|" + name + "|";
         } else {
             return name;
@@ -126,10 +126,10 @@ public class SExpr implements Writable {
     @Override
     public void appendTo(StringBuffer sb) {
         boolean noSpace = name.isEmpty();
-        if(children.size() > 0 || noSpace) {
+        if (children.size() > 0 || noSpace) {
             sb.append("(").append(getEscapedName());
             for (SExpr child : children) {
-                if(!noSpace) {
+                if (!noSpace) {
                     sb.append(" ");
                 } else {
                     noSpace = false;
