@@ -43,7 +43,13 @@ public class ProofSettings {
     public static final File PROVER_CONFIG_FILE = new File(PathConfig.getKeyConfigDir(), "proof-settings.props");
     public static final URL PROVER_CONFIG_FILE_TEMPLATE = KeYResourceManager.getManager()
             .getResourceFile(ProofSettings.class, "default-proof-settings.props");
-    public static final ProofSettings DEFAULT_SETTINGS = new ProofSettings();
+    public static final ProofSettings DEFAULT_SETTINGS = ProofSettings.loadedSettings();
+
+    private static ProofSettings loadedSettings() {
+        ProofSettings ps = new ProofSettings();
+        ps.loadSettings();
+        return ps;
+    }
 
     /**
      * all setting objects in the following order: heuristicSettings
@@ -110,9 +116,9 @@ public class ProofSettings {
     }
 
 
-    private AtomicInteger cnt = new AtomicInteger();
+    //private AtomicInteger cnt = new AtomicInteger();
     public void ensureInitialized() {
-        System.out.println("ProofSettings.ensureInitialized: " + cnt.getAndIncrement());
+        //System.out.println("ProofSettings.ensureInitialized: " + cnt.getAndIncrement());
         /*if (isInitialized()) {
             loadSettings();
         }*/
@@ -201,9 +207,9 @@ public class ProofSettings {
     /**
      * Loads the the former settings from configuration file.
      */
-    private AtomicInteger counter = new AtomicInteger();
+    //private AtomicInteger counter = new AtomicInteger();
     public void loadSettings() {
-        System.out.println("ProofSettings.loadSettings:" + counter.getAndIncrement());
+        //System.out.println("ProofSettings.loadSettings:" + counter.getAndIncrement());
         try (FileReader in = new FileReader(PROVER_CONFIG_FILE)) {
             if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
                 System.err.println("The settings in " + PROVER_CONFIG_FILE + " are *not* read.");
