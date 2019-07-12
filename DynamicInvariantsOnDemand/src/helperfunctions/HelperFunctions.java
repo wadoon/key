@@ -1,5 +1,8 @@
 package helperfunctions;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,5 +37,47 @@ public final class HelperFunctions {
 	        return false;
 	    }
 	    return true;
+	}
+	
+	public static String formatTracesToDIG(HashMap<String, ArrayList<Integer>> varTraces) {
+		StringBuilder sb = new StringBuilder();
+		
+		//FIXME: sage works with first sign alphanumeric variables, thus conversion: _x -> u_x
+		//Write Var. line: "u_x y q a b r"
+		int i = 0;
+		for (String varName : varTraces.keySet()) {
+			if (i != 0)
+				sb.append(" ");
+			String varNameWithoutUnderscore = varName.replaceFirst("^_", "u_");
+			sb.append(varNameWithoutUnderscore);
+			i++;
+		}
+		sb.append(System.lineSeparator());
+		
+		ArrayList<ArrayList<Integer>> values = new ArrayList<ArrayList<Integer>>();
+		for (Map.Entry<String, ArrayList<Integer>> e : varTraces.entrySet()) {
+			values.add(e.getValue());
+		}
+		
+		for (int j = 0; j < values.get(0).size(); j++) {
+			for (int k = 0; k < values.size(); k++) {
+				sb.append(values.get(k).get(j));
+				sb.append(" ");
+			}
+			sb.append(System.lineSeparator());
+		}
+		
+		return sb.toString();
+	}
+	
+	public static void writeStringToFile(String content, String fileDest) {
+	    try {
+	    	BufferedWriter writer = new BufferedWriter(new FileWriter(fileDest));
+			writer.write(content);
+			writer.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

@@ -73,11 +73,22 @@ public class AuxiliaryFunctions {
 		//den sequent allgemeingültig macht?
 		while (it.hasNext()) {
 			final SequentFormula sf = it.next();
-			if (hasModalities(sf.formula(), removePostCondition)) {
-				continue;
-			}
-			newSequent = newSequent.addFormula(sf, false, false).sequent();
+			final String sfString = sf.toString();
+//			if (hasModalities(sf.formula(), removePostCondition)) {
+//				continue;
+//			}
+			if (sfString.equals("equals(self,null)") || sfString.equals("equals(null,self)")) 
+				newSequent = newSequent.addFormula(sf, false, false).sequent();
 		}
+//Orig Code
+//		while (it.hasNext()) {
+//			final SequentFormula sf = it.next();
+//			final String sfString = sf.toString();
+//			if (hasModalities(sf.formula(), removePostCondition)) {
+//				continue;
+//			}
+//			newSequent = newSequent.addFormula(sf, false, false).sequent();
+//		}
 		// Check if a proof with the same sequent already exists.
 		if (otherProofs != null) {
 			for (final Proof otherProof : otherProofs) {

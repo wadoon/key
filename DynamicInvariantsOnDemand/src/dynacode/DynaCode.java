@@ -77,7 +77,7 @@ public final class DynaCode {
 			SourceDir src = new SourceDir(srcDir);
 			sourceDirs.add(src);
 
-			info("Add source dir " + srcDir);
+			//info("Add source dir " + srcDir);
 		}
 
 		return true;
@@ -310,7 +310,7 @@ public final class DynaCode {
 						+ srcFile.getAbsolutePath());
 			}
 
-			info("Init " + clazz);
+			//info("Init " + clazz);
 		}
 	}
 

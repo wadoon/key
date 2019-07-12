@@ -358,22 +358,19 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description='Invariant and Inequality generation from program traces.')
-    parser.add_argument('eqinv_or_ineqinv', metavar='eqinv_or_ineqinv', type=str,
-                        help='eqinv or ineqinv as option, one must be chosen')
-    parser.add_argument('filepath', metavar='filepath', type=str,
-                        help='filepath to the traces file')
-    parser.add_argument("--debug", action='store_true', help="output debug messages")
+    parser.add_argument('eqinv_or_ineqinv', metavar='eqinv_or_ineqinv', type=str, help='eqinv or ineqinv as option, one must be chosen')
+    parser.add_argument('filepath', metavar='filepath', type=str, help='filepath to the traces file')
+    parser.add_argument('degree', metavar='degree', type=str, help='generate terms to this degree')
+    parser.add_argument("--debug", action='store_true', help="output no debug messages")
     args = parser.parse_args()
-    if args.debug:
-        print "debug messages turned on"
     print args.filepath
 
     if args.debug:
         dig = DIG(filename=args.filepath)
     else:
-        dig =  DIG(filename=args.filepath, verbose=args.debug)
+        dig =  DIG(filename=args.filepath, verbose=False)
 
     if args.eqinv_or_ineqinv == 'eqinv':
-        dig.get_invs()
+        dig.get_invs(int(args.degree))
     elif args.eqinv_or_ineqinv == 'ineqinv':
         dig.get_ieqs_cl_gen()

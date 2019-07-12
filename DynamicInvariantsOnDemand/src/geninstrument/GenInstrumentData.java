@@ -1,6 +1,8 @@
 package geninstrument;
 
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
+import java.util.List;
 
 //Singleton class, data storage for information about the generated method
 public class GenInstrumentData {
@@ -20,4 +22,7 @@ public class GenInstrumentData {
 	public boolean isInitialized = false;
 	
 	public LinkedHashSet<String> inputVars;
+	public LinkedHashSet<String> allVars;
+	public LinkedHashSet<String> nonInputVars;
+	public List<String> javaAssignments;
 }

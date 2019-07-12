@@ -9,7 +9,7 @@ public class Plus {
 		int r = 0;
 		int i = 0;
 		/*@
-		  @ loop_invariant i<=a;
+		  @ loop_invariant i<=a && r==i;
 		  @ assignable \nothing;
 		  @*/
 		while(i < a) {
@@ -18,7 +18,7 @@ public class Plus {
 		}
 		int j = 0;
 		/*@
-		  @ loop_invariant j<=b;
+		  @ loop_invariant j<=b && r==a+j;
 		  @ assignable \nothing;
 		  @*/
 		while(j < b) {
@@ -27,15 +27,4 @@ public class Plus {
 		}
 		return r;
 	}
-
 }
-
-
-
-
-
-
-
-
-
-

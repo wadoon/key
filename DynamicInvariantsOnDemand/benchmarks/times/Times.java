@@ -9,10 +9,12 @@ class Times {
 	int times(int a, int b) {
 		int r = 0;
 		int i = 0;
-		/*@ loop_invariant i<=a && r==i*b; @*/
+// && r==i*b; 
+		/*@ loop_invariant i<=a; @*/
 		while(i < a) {
 			int j = 0;
-			/*@ loop_invariant j<=b && r==i*b+j; @*/
+// && r==i*b+j; 
+			/*@ loop_invariant j<=b; @*/
 			while(j < b) {
 				r = r + 1;
 				j = j + 1;
