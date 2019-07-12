@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class is used to load and save settings for proofs such as which data
@@ -109,10 +110,12 @@ public class ProofSettings {
     }
 
 
+    private AtomicInteger cnt = new AtomicInteger();
     public void ensureInitialized() {
-        if (isInitialized()) {
+        System.out.println("ProofSettings.ensureInitialized: " + cnt.getAndIncrement());
+        /*if (isInitialized()) {
             loadSettings();
-        }
+        }*/
     }
 
     private boolean isInitialized() {
@@ -147,7 +150,6 @@ public class ProofSettings {
      * Saves the current settings in this dialog into a configuration file.
      */
     public void saveSettings() {
-        ensureInitialized();
         try {
             if (!PROVER_CONFIG_FILE.exists()) {
                 PROVER_CONFIG_FILE.getParentFile().mkdirs();
@@ -199,11 +201,12 @@ public class ProofSettings {
     /**
      * Loads the the former settings from configuration file.
      */
+    private AtomicInteger counter = new AtomicInteger();
     public void loadSettings() {
+        System.out.println("ProofSettings.loadSettings:" + counter.getAndIncrement());
         try (FileReader in = new FileReader(PROVER_CONFIG_FILE)) {
             if (Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
-                //System.err.println("The settings in " +
-                //        PROVER_CONFIG_FILE + " are *not* read.");
+                System.err.println("The settings in " + PROVER_CONFIG_FILE + " are *not* read.");
             } else {
                 loadSettingsFromStream(in);
             }
@@ -230,7 +233,6 @@ public class ProofSettings {
      * @return the StrategySettings object
      */
     public StrategySettings getStrategySettings() {
-        ensureInitialized();
         return strategySettings;
     }
 
@@ -240,7 +242,6 @@ public class ProofSettings {
      * @return the ChoiceSettings object
      */
     public ChoiceSettings getChoiceSettings() {
-        ensureInitialized();
         return choiceSettings;
     }
 
@@ -250,7 +251,6 @@ public class ProofSettings {
      * @return the DecisionProcedureSettings object
      */
     public ProofDependentSMTSettings getSMTSettings() {
-        ensureInitialized();
         return smtSettings;
     }
 
@@ -282,7 +282,6 @@ public class ProofSettings {
      * @return the term label settings
      */
     public TermLabelSettings getTermLabelSettings() {
-        ensureInitialized();
         return termLabelSettings;
     }
 }
