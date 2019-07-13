@@ -131,7 +131,7 @@ while [ $# -ne 0 ]; do
 	    continue;;
 
 	--J*)
-	    option=\${1#--J}
+	    option=${1#--J}
 	    add_jvm_option ${option}
 	    shift
 	    continue;;
