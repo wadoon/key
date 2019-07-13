@@ -52,15 +52,15 @@ class ScriptLineParser {
                 }
             }
             lexer.feed((char) c);
-            Token lastToken = lexer.getLastToken();
+            ScriptLineLexer.Token lastToken = lexer.getLastToken();
             // ";" marks the terminates a command!
-            if (lastToken != null && lastToken.type == TokenType.TERMINATE) {
+            if (lastToken != null && lastToken.type == ScriptLineLexer.TokenType.TERMINATE) {
                 return assembleCommand(lexer.fetchAllAndClear());
             }
         }
     }
 
-    private @Nullable Map<String, String> assembleCommand(List<Token> toks) {
+    private @Nullable Map<String, String> assembleCommand(List<ScriptLineLexer.Token> toks) {
         Map<String, String> result = new HashMap<>();
         String key = null;
         int impCounter = 1;
@@ -71,13 +71,13 @@ class ScriptLineParser {
         }
 
         do {
-            Token cur = toks.get(pos), la = toks.get(pos + 1);
-            if (la.type == TokenType.EQUAL) {
+            ScriptLineLexer.Token cur = toks.get(pos), la = toks.get(pos + 1);
+            if (la.type == ScriptLineLexer.TokenType.EQUAL) {
                 // <cur> = <next>
                 String next = pos + 2 <= toks.size() - 2 ? toks.get(pos + 2).text : "";
                 result.put(cur.text, next);
                 pos += 3; // three tokens consumed
-            } else if (cur.type == TokenType.ID || cur.type == TokenType.STRING) {
+            } else if (cur.type == ScriptLineLexer.TokenType.ID || cur.type == ScriptLineLexer.TokenType.STRING) {
                 result.put("#" + (impCounter++), cur.text);
                 pos++;
             }

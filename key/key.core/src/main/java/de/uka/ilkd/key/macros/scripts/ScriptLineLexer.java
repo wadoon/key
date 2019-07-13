@@ -25,13 +25,6 @@ enum State {
     IN_COMMENT;
 }
 
-enum TokenType {ID, STRING, EQUAL, TERMINATE}
-
-class Token {
-    public TokenType type;
-    public String text;
-    int line, col, pos;
-}
 
 /**
  * @author Alexander Weigl
@@ -61,11 +54,6 @@ public class ScriptLineLexer {
      * number of characters read so far
      */
     private int readChars;
-    /**
-     * While within a string literal, this stores the character with which the
-     * string has started.
-     */
-    private int stringInitChar;
     private StringBuilder storedChars = new StringBuilder();
     private List<Token> publishedTokens = new LinkedList<>();
 
@@ -226,5 +214,13 @@ public class ScriptLineLexer {
 
     private boolean isIDChar(int c) {
         return Character.isLetterOrDigit(c) || ADMISSIBLE_CHARS.indexOf((char) c) > -1;
+    }
+
+    public enum TokenType {ID, STRING, EQUAL, TERMINATE}
+
+    public static class Token {
+        public TokenType type;
+        public String text;
+        public int line, col, pos;
     }
 }

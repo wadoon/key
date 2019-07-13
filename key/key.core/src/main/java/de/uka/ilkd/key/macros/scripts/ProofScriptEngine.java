@@ -105,8 +105,9 @@ public class ProofScriptEngine {
 
                 ProofScriptCommand<Object> command = COMMANDS.get(name);
                 if (command == null) {
-                    System.out.println(">>> Known commands: " + COMMANDS.keySet());
-                    throw new ScriptException("Unknown command " + name);
+                    System.err.println("...Unknown command " + name);
+                    System.err.println("...Known commands: " + COMMANDS.keySet());
+                    continue;
                 }
 
                 if (!name.startsWith(SYSTEM_COMMAND_PREFIX)
