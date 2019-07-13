@@ -119,7 +119,7 @@ while [ $# -ne 0 ]; do
         # special treatment of the options which are also set by default
         # values: xms and Xmx
 	--J-Xms*)
-	    option=\${1#--J}
+	    option=${1#--J}
 	    add_jvm_option -Xms=${option}
 	    shift
 	    continue;;
