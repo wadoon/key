@@ -24,7 +24,6 @@ public class TermUpdateVisitor implements Visitor{
 
 	@Override
 	public boolean visitSubtree(Term visited) {
-		// TODO Auto-generated method stub
 		return true;
 	}
 	
@@ -72,14 +71,10 @@ public class TermUpdateVisitor implements Visitor{
 
 	@Override
 	public void subtreeEntered(Term subtreeRoot) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void subtreeLeft(Term subtreeRoot) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

@@ -196,7 +196,6 @@ public class Main {
 						// save the inequality invariant for the loop to restore it at backtracking
 						addLoopWithSpecInvToList(loopsWithSpecInequalityInv, currentGoal, suggestedInvariant);
 					} catch (Exception e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 					
@@ -529,7 +528,6 @@ public class Main {
 	}
 
 	private static List<Term> filterCandidatesBodyPreserves(List<Term> initValidCandidates) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -737,7 +735,6 @@ public class Main {
 		    System.out.println("Raw Invs: " + invs);
 	    
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return invs;
@@ -829,7 +826,6 @@ public class Main {
 		try {
 			onlyLoopProof = AuxiliaryFunctions.createProof(loopGoal.proof(), "loopProof", loopGoal.sequent());
 		} catch (ProofInputException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		Goal clonedLoopGoal = onlyLoopProof.openGoals().head();

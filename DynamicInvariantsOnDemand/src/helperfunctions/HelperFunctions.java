@@ -76,7 +76,6 @@ public final class HelperFunctions {
 			writer.write(content);
 			writer.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
