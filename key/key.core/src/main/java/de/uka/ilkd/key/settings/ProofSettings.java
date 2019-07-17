@@ -21,7 +21,6 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * This class is used to load and save settings for proofs such as which data
@@ -113,19 +112,6 @@ public class ProofSettings {
         if (lastLoadedProperties != null) {
             settings.readSettings(lastLoadedProperties);
         }
-    }
-
-
-    //private AtomicInteger cnt = new AtomicInteger();
-    public void ensureInitialized() {
-        //System.out.println("ProofSettings.ensureInitialized: " + cnt.getAndIncrement());
-        /*if (isInitialized()) {
-            loadSettings();
-        }*/
-    }
-
-    private boolean isInitialized() {
-        return lastLoadedProperties != null;
     }
 
     /**

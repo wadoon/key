@@ -76,7 +76,6 @@ public class ProofIndependentSettings {
 
     private void loadSettings() {
         try {
-            //System.out.println("ProofIndependentSettings.loadSettings");
             File testFile = new File(filename);
             if(testFile.exists()) {
                 if(Boolean.getBoolean(PathConfig.DISREGARD_SETTINGS_PROPERTY)) {
@@ -120,12 +119,10 @@ public class ProofIndependentSettings {
     }
 
     public GeneralSettings getGeneralSettings() {
-        //ensureInitialized();
         return generalSettings;
     }
 
     public ViewSettings getViewSettings() {
-        //ensureInitialized();
         return viewSettings;
     }
 
