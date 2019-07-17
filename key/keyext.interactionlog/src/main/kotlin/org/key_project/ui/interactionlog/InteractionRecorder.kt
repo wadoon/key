@@ -147,7 +147,7 @@ class InteractionRecorder : InteractionListener, AutoModeListener {
         emit(state, interaction)
     }
 
-    override fun runMacro(node: Node, macro: ProofMacro, posInOcc: PosInOccurrence, info: ProofMacroFinishedInfo) {
+    override fun runMacro(node: Node, macro: ProofMacro, posInOcc: PosInOccurrence?, info: ProofMacroFinishedInfo) {
         if (isDisableAll) return
         val state = get(node.proof())
         val interaction = MacroInteraction(node, macro, posInOcc, info)

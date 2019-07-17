@@ -97,15 +97,10 @@ abstract class NodeInteraction(@Transient var serialNr: Int? = null) : Interacti
  */
 class MacroInteraction() : NodeInteraction() {
     var macroName: String? = null
-
     var macro: ProofMacro? = null
-
     var pos: PosInOccurrence? = null
-
     var info: String? = null
-
     var openGoalSerialNumbers: List<Int>? = null
-
     var openGoalNodeIds: List<NodeIdentifier>? = null
 
     override val markdown: String
@@ -114,7 +109,7 @@ class MacroInteraction() : NodeInteraction() {
     override val proofScriptRepresentation: String
         get() = String.format("macro %s;%n", macro)
 
-    constructor(node: Node, macro: ProofMacro, posInOcc: PosInOccurrence, info: ProofMacroFinishedInfo) : this() {
+    constructor(node: Node, macro: ProofMacro, posInOcc: PosInOccurrence?, info: ProofMacroFinishedInfo) : this() {
         this.info = info.toString()
         macroName = macro.scriptCommandName
         pos = posInOcc

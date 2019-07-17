@@ -1,11 +1,13 @@
 package org.key_project.ui.interactionlog.model
 
 import de.uka.ilkd.key.gui.WindowUserInterfaceControl
+import de.uka.ilkd.key.logic.PosInOccurrence
 import de.uka.ilkd.key.proof.Goal
 import de.uka.ilkd.key.proof.Node
 import de.uka.ilkd.key.rule.*
 import de.uka.ilkd.key.rule.merge.MergeRuleBuiltInRuleApp
 import de.uka.ilkd.key.smt.RuleAppSMT
+import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl
 
 object BuiltInRuleInteractionFactory {
     fun <T : IBuiltInRuleApp> create(node: Node, app: T): BuiltInRuleInteraction {
@@ -23,11 +25,14 @@ object BuiltInRuleInteractionFactory {
 }
 
 
-sealed class BuiltInRuleInteraction : NodeInteraction() {
+sealed class BuiltInRuleInteraction() : NodeInteraction() {
     var ruleName: String? = null
+    var nodeIdentifier: NodeIdentifier? = null
+    var occurenceIdentifier: OccurenceIdentifier? = null
 
-    companion object {
-        private val serialVersionUID = -4704080776691885200L
+    constructor(node: Node, pio: PosInOccurrence) : this() {
+        this.nodeIdentifier = NodeIdentifier.get(node)
+        this.occurenceIdentifier = OccurenceIdentifier.get(pio)
     }
 }
 
@@ -35,10 +40,29 @@ sealed class BuiltInRuleInteraction : NodeInteraction() {
  * @author Alexander Weigl
  * @version 1 (09.12.18)
  */
-class ContractBuiltInRuleInteraction : BuiltInRuleInteraction {
-    constructor()
+class ContractBuiltInRuleInteraction() : BuiltInRuleInteraction() {
+    var contractType: String? = null
+    var contractName: String? = null
 
-    constructor(app: ContractRuleApp, node: Node)
+    constructor(app: ContractRuleApp, node: Node) : this() {
+        nodeIdentifier = NodeIdentifier.get(node)
+        occurenceIdentifier = OccurenceIdentifier.get(app.posInOccurrence())
+        contractName = app.instantiation.name
+        contractType = app.instantiation.typeName
+    }
+
+    override fun toString() = "Contract ${contractName} applied"
+
+    override val proofScriptRepresentation: String
+        get() = "contract $contractName"
+
+    override fun reapplyStrict(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
+        super.reapplyStrict(uic, goal)
+    }
+
+    override fun reapplyRelaxed(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
+        super.reapplyRelaxed(uic, goal)
+    }
 }
 
 
@@ -46,11 +70,18 @@ class ContractBuiltInRuleInteraction : BuiltInRuleInteraction {
  * @author Alexander Weigl
  * @version 1 (09.12.18)
  */
-class LoopContractInternalBuiltInRuleInteraction : BuiltInRuleInteraction {
+class LoopContractInternalBuiltInRuleInteraction() : BuiltInRuleInteraction() {
+    var displayName: String? = null
+    var contractName: String? = null
 
-    constructor()
-
-    constructor(app: LoopContractInternalBuiltInRuleApp, node: Node)
+    constructor(app: LoopContractInternalBuiltInRuleApp, node: Node) : this() {
+        nodeIdentifier = NodeIdentifier.get(node)
+        occurenceIdentifier = OccurenceIdentifier.get(app.posInOccurrence())
+        contractName = app.contract.name
+        displayName = app.contract.displayName
+        println(app.statement)
+        println(app.executionContext)
+    }
 }
 
 
@@ -58,19 +89,16 @@ class LoopContractInternalBuiltInRuleInteraction : BuiltInRuleInteraction {
  * @author Alexander Weigl
  * @version 1 (09.12.18)
  */
-class LoopInvariantBuiltInRuleInteraction(app: LoopInvariantBuiltInRuleApp, node: Node) : BuiltInRuleInteraction()
+class LoopInvariantBuiltInRuleInteraction() : BuiltInRuleInteraction() {
+    var displayName: String? = null
+    var contractName: String? = null
 
-
-/**
- * @author Alexander Weigl
- * @version 1 (09.12.18)
- */
-
-class MergeRuleBuiltInRuleInteraction : BuiltInRuleInteraction {
-
-    constructor()
-
-    constructor(app: MergeRuleBuiltInRuleApp, node: Node)
+    constructor(app: LoopInvariantBuiltInRuleApp, node: Node) : this() {
+        nodeIdentifier = NodeIdentifier.get(node)
+        occurenceIdentifier = OccurenceIdentifier.get(app.posInOccurrence())
+        println(app.loopStatement)
+        println(app.executionContext)
+    }
 }
 
 
@@ -78,12 +106,19 @@ class MergeRuleBuiltInRuleInteraction : BuiltInRuleInteraction {
  * @author Alexander Weigl
  * @version 1 (09.12.18)
  */
+class MergeRuleBuiltInRuleInteraction() : BuiltInRuleInteraction() {
+    constructor(app: MergeRuleBuiltInRuleApp, node: Node) : this() {
+        nodeIdentifier = NodeIdentifier.get(node)
+        occurenceIdentifier = OccurenceIdentifier.get(app.posInOccurrence())
+    }
+}
 
+
+/**
+ * @author Alexander Weigl
+ * @version 1 (09.12.18)
+ */
 class OSSBuiltInRuleInteraction() : BuiltInRuleInteraction() {
-
-    var occurenceIdentifier: OccurenceIdentifier? = null
-    var nodeIdentifier: NodeIdentifier? = null
-
     override val markdown: String
         get() = String.format("## One step simplification%n" + "* applied on %n  * Term:%s%n  * Toplevel %s%n",
                 occurenceIdentifier?.term,
@@ -120,11 +155,23 @@ class OSSBuiltInRuleInteraction() : BuiltInRuleInteraction() {
  * @author Alexander Weigl
  * @version 1 (09.12.18)
  */
-class SMTBuiltInRuleInteraction : BuiltInRuleInteraction {
+class SMTBuiltInRuleInteraction() : BuiltInRuleInteraction() {
+    constructor(app: RuleAppSMT, node: Node) : this() {
+        nodeIdentifier = NodeIdentifier.get(node)
+        occurenceIdentifier = OccurenceIdentifier.get(app.posInOccurrence())
+        println(app.ifInsts())
+    }
 
-    constructor()
+    override val proofScriptRepresentation: String
+        get() = "smt"
 
-    constructor(app: RuleAppSMT, node: Node)
+    override fun reapplyStrict(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
+        super.reapplyStrict(uic, goal)
+    }
+
+    override fun reapplyRelaxed(uic: AbstractMediatorUserInterfaceControl, goal: Goal) {
+        super.reapplyRelaxed(uic, goal)
+    }
 }
 
 
@@ -132,9 +179,9 @@ class SMTBuiltInRuleInteraction : BuiltInRuleInteraction {
  * @author Alexander Weigl
  * @version 1 (09.12.18)
  */
-class UseDependencyContractBuiltInRuleInteraction : BuiltInRuleInteraction {
-
-    constructor()
-
-    constructor(app: UseDependencyContractApp, node: Node)
+class UseDependencyContractBuiltInRuleInteraction() : BuiltInRuleInteraction() {
+    constructor(app: UseDependencyContractApp, node: Node) : this() {
+        nodeIdentifier = NodeIdentifier.get(node)
+        occurenceIdentifier = OccurenceIdentifier.get(app.posInOccurrence())
+    }
 }
