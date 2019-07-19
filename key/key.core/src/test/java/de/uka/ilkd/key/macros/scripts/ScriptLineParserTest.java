@@ -33,7 +33,7 @@ public class ScriptLineParserTest {
         for (int i = 0; i < script.length(); i++) {
             lexer.feed(script.charAt(i));
         }
-        @NotNull List<Token> toks = lexer.fetchAllAndClear();
+        @NotNull List<ScriptLineLexer.Token> toks = lexer.fetchAllAndClear();
         List<String> values = toks.stream().map(it -> it.text).collect(Collectors.toList());
         Assert.assertEquals(Arrays.asList("@ma-cro", "key1", "=", "value1", "key2", "=", "value two", "defval3", "long defvalue", ";"),
                 values);
