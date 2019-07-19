@@ -63,11 +63,13 @@ test {
             excludeCategories 'org.key_project.util.testcategories.Performance'
             excludeCategories 'org.key_project.util.testcategories.Interactive'
     }
+    afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
 }
 
 task testProofRules(type: Test) {
     group "verification"
     filter { includeTestsMatching "ProveRulesTest" }
+    afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
 }
 
 task testRunAllProofs(type: Test) {
@@ -77,6 +79,7 @@ task testRunAllProofs(type: Test) {
         includeTestsMatching "RunAllProofsInfFlow"
         includeTestsMatching "RunAllProofsFunctional"
     }
+    afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
 }
 
 task generateVersionFiles() {
