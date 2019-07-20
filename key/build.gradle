@@ -4,8 +4,8 @@ plugins {
     id("idea")
     id("eclipse")
     id "com.jfrog.bintray" version "1.8.4" apply false
-    id "com.github.hierynomus.license-base" version"0.15.0"
-    id "com.github.hierynomus.license-report" version"0.15.0"
+    id "com.github.hierynomus.license-base" version "0.15.0"
+    id "com.github.hierynomus.license-report" version "0.15.0"
 }
 
 idea {
@@ -84,7 +84,11 @@ subprojects {
 
     test {
         useJUnit {
-            excludeCategories 'org.key_project.util.testcategories.Interactive', 'org.key_project.util.testcategories.Performance'
+            excludeCategories 'org.key_project.util.testcategories.Interactive',  \
+                         'org.key_project.util.testcategories.Performance'
+        }
+        filter {
+            includeTestsMatching "AllTests"
         }
         afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
         //beforeTest { desc -> logger.error "> ${desc.className}#${desc.name}" }
@@ -206,8 +210,8 @@ subprojects {
         mapping {
             //find styles here:
             // http://code.mycila.com/license-maven-plugin/#supported-comment-types
-            java="SLASHSTAR_STYLE" // DOUBLESLASH_STYLE
-            javascript="SLASHSTAR_STYLE"
+            java = "SLASHSTAR_STYLE" // DOUBLESLASH_STYLE
+            javascript = "SLASHSTAR_STYLE"
         }
         mapping("key", "SLASHSTAR_STYLE")
     }

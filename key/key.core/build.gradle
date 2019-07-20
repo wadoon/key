@@ -51,13 +51,13 @@ compileJavacc {
 test {
     filter {
         // use testProofRules or testRunAllProofs, avoid double execution on jenkins
-        excludeTestsMatching "ProveRulesTest"
+        /*excludeTestsMatching "ProveRulesTest"
         excludeTestsMatching "RunAllProofsTestSuite"
         excludeTestsMatching "RunAllProofsInfFlow"
         excludeTestsMatching "RunAllProofsTestWithComputeCostProfiling"
         excludeTestsMatching "RunAllProofsFunctional"
         excludeTestsMatching "TestParallelParsing"
-        excludeTestsMatching "TestCvc4"
+        excludeTestsMatching "TestCvc4"*/
     }
     useJUnit {
             excludeCategories 'org.key_project.util.testcategories.Performance'
