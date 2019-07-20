@@ -60,8 +60,8 @@ test {
         excludeTestsMatching "TestCvc4"*/
     }
     useJUnit {
-            excludeCategories 'org.key_project.util.testcategories.Performance'
-            excludeCategories 'org.key_project.util.testcategories.Interactive'
+        excludeCategories 'org.key_project.util.testcategories.Performance'
+        excludeCategories 'org.key_project.util.testcategories.Interactive'
     }
     afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
 }
@@ -74,7 +74,7 @@ task testProofRules(type: Test) {
 
 task testRunAllProofs(type: Test) {
     group "verification"
-    filter { 
+    filter {
         includeTestsMatching "RunAllProofsTestSuite"
         includeTestsMatching "RunAllProofsInfFlow"
         includeTestsMatching "RunAllProofsFunctional"
@@ -102,3 +102,21 @@ task generateVersionFiles() {
 processResources.dependsOn generateVersionFiles
 
 //check.dependsOn << testProofRules << testRunAllProofs
+
+
+def getTestClasses() {
+    List<String> classes = []
+    sourceSets.test.allJava.visit { FileVisitDetails it ->
+        if (it.getFile().isFile() && it.getName().endsWith(".java")) {
+            def content = it.getFile().readLines()
+            def isTest = content.any {
+                it.contains("extends TestCase") ||
+                        it.contains("@RunWith") ||
+                        it.contains("@Test")
+            }
+            if (isTest) classes.add(it.getRelativePath().pathString.replace('/', '.'))
+        }
+    }
+    return classes
+}
+//println(getTestClasses())
