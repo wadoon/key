@@ -13,7 +13,6 @@ import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.nodeviews.MainFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
-import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 import java.util.LinkedList;
@@ -62,10 +61,9 @@ public class DockingHelper {
 
         for (int c = mainWindow.getDockControl().getCDockableCount(), i = 0;
              i < c; i++) {
-            CDockable cur = mainWindow.getDockControl().getCDockable(i);
+            final CDockable cur = mainWindow.getDockControl().getCDockable(i);
             if (cur instanceof SingleCDockable) {
-                String id = ((SingleCDockable) cur).getUniqueId();
-                //System.out.println(id);
+                final String id = ((SingleCDockable) cur).getUniqueId();
                 if (LEFT_PANEL.contains(id)) {
                     leftPanels.add(cur);
                     continue;
@@ -130,7 +128,7 @@ public class DockingHelper {
                 p.getPermissions(), a);
     }
 
-    public static @NotNull CAction translateAction(@NotNull Action action) {
+    public static CAction translateAction(Action action) {
         if (action.getValue(Action.SELECTED_KEY) != null) {
             return createCheckBox(action);
 
@@ -139,7 +137,7 @@ public class DockingHelper {
         }
     }
 
-    private static @NotNull CAction createCheckBox(@NotNull Action action) {
+    private static CAction createCheckBox(Action action) {
         CCheckBox button = new CCheckBox(
                 (String) action.getValue(Action.NAME),
                 (Icon) action.getValue(Action.SMALL_ICON)) {

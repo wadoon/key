@@ -23,7 +23,6 @@ import de.uka.ilkd.key.rule.TacletApp;
 import de.uka.ilkd.key.ui.MediatorProofControl;
 import net.miginfocom.layout.CC;
 import net.miginfocom.swing.MigLayout;
-import org.jetbrains.annotations.Nullable;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSet;
 
@@ -80,8 +79,9 @@ public class KeyboardTacletExtension implements KeYGuiExtension,
     }
 }
 
-@SuppressWarnings("WeakerAccess")
+//@SuppressWarnings("WeakerAccess")
 class KeyboardTacletPanel extends JPanel implements TabPanel {
+    private static final long serialVersionUID = 7177463219802611202L;
     private static final String PROP_MODEL = "taclets";
     private final Services services;
     private final JTextField txtInput = new JTextField();
@@ -90,10 +90,10 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     private final DirectModeAction actionDirectMode = new DirectModeAction();
     private final OnlyCompleteTacletsAction actionOnlyCompleteTaclets = new OnlyCompleteTacletsAction();
     private final MainWindow mainWindow;
-    @Nullable
+    
     private KeyboardTacletModel model;
     private Box pCenter = new Box(BoxLayout.Y_AXIS);
-    @Nullable
+    
     private Goal lastGoal;
     private PropertyChangeListener updateListener = (f) -> {
         updateCurrentPrefix();
@@ -345,6 +345,8 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     }
 
     private class ActivateAction extends KeyAction {
+        private static final long serialVersionUID = -4742232031922075724L;
+
         public ActivateAction() {
             setName("Active");
             setSelected(false);
@@ -357,6 +359,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     }
 
     private class FilterMouseAction extends KeyAction {
+        private static final long serialVersionUID = 1164072669829431402L;
 
         public FilterMouseAction() {
             setSelected(true);
@@ -370,6 +373,8 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     }
 
     private class DirectModeAction extends KeyAction {
+        private static final long serialVersionUID = 6088849221857521104L;
+
         public DirectModeAction() {
             setName("Apply directly on unique match.");
             setSelected(true);
@@ -382,6 +387,8 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
     }
 
     private class OnlyCompleteTacletsAction extends KeyAction {
+        private static final long serialVersionUID = -5530054898175961064L;
+
         public OnlyCompleteTacletsAction() {
             setName("Show only completed taclets");
             setSelected(false);
@@ -397,7 +404,7 @@ class KeyboardTacletPanel extends JPanel implements TabPanel {
 /**
  *
  */
-@SuppressWarnings("WeakerAccess")
+//@SuppressWarnings("WeakerAccess")
 class KeyboardTacletModel {
     public static final String PROP_CURRENT_PREFIX = "currentPrefix";
     public static final String PROP_CURRENT_POS = "currentPos";
