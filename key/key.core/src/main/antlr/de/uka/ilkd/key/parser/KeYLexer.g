@@ -244,7 +244,7 @@ lexer grammar KeYLexer;
 	FINAL : '\\final';
 	ELEMSORT : '\\elemSort';
 	HASLABEL : '\\hasLabel';
-	HAS_LOOP_LABEL : '\\hasLoopLabel';
+	IS_LABELED : '\\isLabeled';
 	HASSUBFORMULAS : '\\hasSubFormulas';
 	ISARRAY:'\\isArray';
 	ISARRAYLENGTH:'\\isArrayLength';

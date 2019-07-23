@@ -1174,6 +1174,7 @@ options {
         }
         
         // not found
+
         if (args==null) {
             throw new NotDeclException
                 (input, "(program) variable or constant", varfunc_name);
@@ -3866,6 +3867,7 @@ varexp[TacletBuilder b]
   | 
   ( (NOT_ {negated = true;} )? 
     (   varcond_abstractOrInterface[b, negated]
+	    | varcond_isLabeled[b, negated]
 	    | varcond_hasLoopLabel[b, negated]
 	    | varcond_array[b, negated]
         | varcond_array_length[b, negated]	
@@ -3884,11 +3886,10 @@ varexp[TacletBuilder b]
         | varcond_label[b, negated]
         | varcond_static_field[b, negated]
         | varcond_subFormulas[b, negated]
-        | varcond_containsAssignment[b, negated]        
+        | varcond_containsAssignment[b, negated]
       )
   )
 ;
-
 
 varcond_sameObserver[TacletBuilder b]
 :
@@ -3897,6 +3898,8 @@ varcond_sameObserver[TacletBuilder b]
     b.addVariableCondition(new SameObserverCondition(t1, t2));
   }
   ;
+
+
 varcond_applyUpdateOnRigid [TacletBuilder b]
 :
    APPLY_UPDATE_ON_RIGID LPAREN u=varId COMMA x=varId COMMA x2=varId RPAREN 
@@ -3962,6 +3965,14 @@ varcond_hasLoopLabel[TacletBuilder b, boolean negated]
    HAS_LOOP_LABEL
    {
       b.addVariableCondition(new HasLoopLabelCondition((ProgramSV)t, negated));
+   }
+;
+
+varcond_isLabeled[TacletBuilder b, boolean negated]
+:
+   IS_LABELED LPAREN t=varId RPAREN
+   {
+      b.addVariableCondition(new IsLabeledCondition((ProgramSV)t, negated));
    }
 ;
 
@@ -4640,6 +4651,7 @@ skipBracedBlock
     }
     RBRACE
     ;
+
 problem returns [ Term _problem = null ]
 @init {
     boolean axiomMode = false;
@@ -4679,7 +4691,8 @@ problem returns [ Term _problem = null ]
         (  ( RULES { axiomMode = false;} 
            | AXIOMS { axiomMode = true;}
            )
-        ( choices = option_list[choices] )?
+
+           ( choices = option_list[choices] )?
            (
               // #MT-1185: KeY parses the same file several times.
               // During problem parsing, some aspects of taclets
@@ -4688,7 +4701,7 @@ problem returns [ Term _problem = null ]
               { skip_taclets }? =>
               skipBracedBlock
            |
-	    LBRACE
+            LBRACE
             { 
                 switchToSchemaMode(); 
             }
@@ -4710,7 +4723,7 @@ problem returns [ Term _problem = null ]
                 }
             )*
             RBRACE {choices=DefaultImmutableSet.<Choice>nil();}
-        )
+           )
         ) *
 
         { if(input.index() == 0) {
