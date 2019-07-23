@@ -211,12 +211,12 @@ public final class ApplyConcrOnAbstrUpdateCondition implements VariableCondition
             newAssignables = abstrUpdBeforeRepl.getAllAssignables().stream()
                     .map(assgn -> assgn instanceof HeapLocLHS
                             ? ((HeapLocLHS) assgn).applyUpdate(services.getProof(), concrUpdate)
-                                    .orElseThrow()
+                                    .orElseThrow(() -> new NoSuchElementException())
                             : (assgn instanceof HasToLoc
                                     && (((HasToLoc) assgn).child() instanceof HeapLocLHS)
                                             ? new HasToLoc(((HeapLocLHS) ((HasToLoc) assgn).child())
                                                     .applyUpdate(services.getProof(), concrUpdate)
-                                                    .orElseThrow())
+                                                    .orElseThrow(() -> new NoSuchElementException()))
                                             : assgn))
                     .collect(Collectors.toCollection(LinkedHashSet::new));
         } catch (NoSuchElementException nsee) {
