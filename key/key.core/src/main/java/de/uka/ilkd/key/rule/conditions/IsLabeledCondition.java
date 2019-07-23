@@ -37,8 +37,8 @@ public class IsLabeledCondition implements VariableCondition {
     private final boolean negated;
     private final ProgramSV stmtSV;
 
-    public IsLabeledCondition(ProgramSV loopStmtSV, boolean negated) {
-        this.stmtSV = loopStmtSV;
+    public IsLabeledCondition(ProgramSV stmtSV, boolean negated) {
+        this.stmtSV = stmtSV;
         this.negated = negated;
     }
 

@@ -3879,7 +3879,7 @@ varexp[TacletBuilder b]
     | varcond_initializeExpression[b]
     | varcond_storeResultVarIn[b]
     | varcond_storeTermIn[b]
-    | varcond_storeActiveStmtIn[b]
+    | varcond_storeStmtIn[b]
     | varcond_storeContextLabelsIn[b]
     | varcond_storeContextLoopLabelsIn[b]
     | varcond_freshAbstractProgram[b]
@@ -4082,11 +4082,11 @@ varcond_storeTermIn[TacletBuilder b]
    }
 ;
 
-varcond_storeActiveStmtIn[TacletBuilder b]
+varcond_storeStmtIn[TacletBuilder b]
 :
-   STORE_ACTIVE_STMT_IN LPAREN sv=varId COMMA t=term RPAREN 
+   STORE_STMT_IN LPAREN sv=varId COMMA t=term RPAREN 
    {
-      b.addVariableCondition(new StoreActiveStmtInCondition((ProgramSV) sv, t));
+      b.addVariableCondition(new StoreStmtInCondition((ProgramSV) sv, t));
    }
 ;
 
