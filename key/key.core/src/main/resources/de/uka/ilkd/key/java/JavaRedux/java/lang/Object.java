@@ -1,7 +1,7 @@
 package java.lang;
 
 public class Object {  
-
+	
     
     /*@ public normal_behavior
       @   assignable \nothing;
@@ -26,5 +26,10 @@ public class Object {
 
     public final void wait(long ms, int ns)
 	throws java.lang.InterruptedException;
+    
+    public final void require(boolean b);
+    public final void _assert(boolean b);
+    
+    
 
 }
