@@ -66,6 +66,17 @@ test {
     afterTest { desc, result -> logger.error "${result.resultType}: ${desc.className}#${desc.name}" }
 }
 
+testFast {
+    useJUnit {
+        excludeCategories 'org.key_project.util.testcategories.Performance'
+        excludeCategories 'org.key_project.util.testcategories.Interactive'
+    }
+
+    filter {
+        excludeTestsMatching "AllTests" // prevent double execution
+    }
+}
+
 task testProofRules(type: Test) {
     group "verification"
     filter { includeTestsMatching "ProveRulesTest" }
