@@ -342,15 +342,15 @@ class CVC4Socket extends AbstractSolverSocket{
 		}
 
         if(sc.getState() == WAIT_FOR_RESULT ){
-            if(message.indexOf("\n"+UNSAT) > -1){
+            if(message.indexOf(UNSAT) > -1){
                 sc.setFinalResult(SMTSolverResult.createValidResult(name));
                 sc.setState(FINISH);
                 pipe.close();
-            } else if(message.indexOf("\n"+SAT) > -1){
+            } else if(message.indexOf(SAT) > -1){
                 sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
                 sc.setState(FINISH);
                 pipe.close();
-            } else if(message.indexOf("\n"+UNKNOWN)> -1){
+            } else if(message.indexOf(UNKNOWN)> -1){
                 sc.setFinalResult(SMTSolverResult.createUnknownResult(name));
                 sc.setState(FINISH);
                 pipe.close();
