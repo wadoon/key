@@ -559,7 +559,10 @@ public final class Main {
                 ExampleChooser.lookForExamples() :
                 new File(getExamplesDir());
         if (!examplesDir.exists()) {
-            setExamplesDir(WebstartMain.setupExamples().getAbsolutePath());
+        	try {
+        		setExamplesDir(WebstartMain.setupExamples().getAbsolutePath());
+        	} catch (Exception e) {
+        	}
         }
     }
 

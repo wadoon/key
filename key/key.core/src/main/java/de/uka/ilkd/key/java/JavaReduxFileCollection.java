@@ -84,8 +84,7 @@ public class JavaReduxFileCollection implements FileCollection {
 	                .getInternalClassDirectory();
 	}
 	String resourceString = resourceLocation + "/"	        
-	        + profile
-	                .getInternalClasslistFilename();
+	        + profile.getInternalClasslistFilename();
 
 	URL jlURL = KeYResourceManager.getManager().getResourceFile(
 	        Recoder2KeY.class, resourceString);
@@ -219,6 +218,8 @@ public class JavaReduxFileCollection implements FileCollection {
             // may be null!
             currentURL = KeYResourceManager.getManager().getResourceFile(
                     Recoder2KeY.class, resourceLocation + "/" + currentFileName);
+            
+            System.out.println(resourceLocation + "/" + currentFileName);
             
             return true;
         }
