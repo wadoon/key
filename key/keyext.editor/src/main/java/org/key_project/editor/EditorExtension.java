@@ -14,6 +14,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -24,6 +25,13 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * The extension which brings a text editors to KeY.
+ * <p>
+ * This extension also has an extension: You add language support
+ * by implementing {@link EditorFactory}.
+ * <p>
+ * Extension brings several global editor actions: new, load, save, and saveAs.
+ *
  * @author Alexander Weigl
  * @version 1 (21.05.19)
  */
@@ -32,16 +40,20 @@ public class EditorExtension implements KeYGuiExtension,
         KeYGuiExtension.MainMenu {
     public static final float ICON_SIZE = 16;
     private static final String EDITOR_MENU = "File.Editor";
+
     private static SaveAction actionSave;
     private static SaveAsAction actionSaveAs;
     private static LoadAction actionLoad;
+
+    @Getter
     private static OpenCurrentAsFileAction actionOpenCurrentProofFile;
 
     @Getter
     private NewAction actionNew;
+
+    private JFileChooser fileChooser;
+
     @Getter
-    private JFileChooser fileChooser = new JFileChooser();
-    private CControl control;
     private MainWindow mainWindow;
 
     public static LoadAction getActionLoad() {
@@ -71,7 +83,7 @@ public class EditorExtension implements KeYGuiExtension,
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
         if (mainWindow == null) {
-            this.control = window.getDockControl();
+            CControl control = window.getDockControl();
             this.mainWindow = window;
             control.addMultipleDockableFactory("editors", EditorFacade.getEditorDockableFactory());
             actionNew = new NewAction();
@@ -94,6 +106,19 @@ public class EditorExtension implements KeYGuiExtension,
                 }
             });
         }
+    }
+
+    public JFileChooser getFileChooser() {
+        if(fileChooser==null) {
+            fileChooser = new JFileChooser();
+        }
+
+        for (FileFilter f : fileChooser.getChoosableFileFilters()) {
+            fileChooser.removeChoosableFileFilter(f);
+        }
+        EditorFacade.getFileFilters().forEach(fileChooser::addChoosableFileFilter);
+
+        return fileChooser;
     }
 
     @Override
@@ -135,7 +160,9 @@ public class EditorExtension implements KeYGuiExtension,
                 if (recentFile != null) {
                     File f = new File(recentFile);
                     try {
-                        EditorFacade.open(f.toPath());
+                        Editor editor = EditorFacade.open(f.toPath());
+                        if(editor!=null)
+                            EditorFacade.addEditor(editor, mainWindow);
                     } catch (Exception exc) {
                         setEnabled(false);
                     }
@@ -157,15 +184,16 @@ public class EditorExtension implements KeYGuiExtension,
         @Override
         public void actionPerformed(ActionEvent e) {
             Editor editor = getCurrentEditor();
+            JFileChooser fc = getFileChooser();
             if (editor != null) {
                 Path file = editor.getPath();
                 if (file != null) {
-                    fileChooser.setCurrentDirectory(file.getParent().toFile());
-                    fileChooser.setSelectedFile(file.toFile());
+                    fc.setCurrentDirectory(file.getParent().toFile());
+                    fc.setSelectedFile(file.toFile());
                 }
-                int c = fileChooser.showSaveDialog(mainWindow);
+                int c = fc.showSaveDialog(mainWindow);
                 if (c == JFileChooser.APPROVE_OPTION) {
-                    File f = fileChooser.getSelectedFile();
+                    File f = fc.getSelectedFile();
                     try {
                         Files.writeString(f.toPath(), editor.getText());
                     } catch (IOException e1) {
@@ -216,7 +244,7 @@ public class EditorExtension implements KeYGuiExtension,
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int c = fileChooser.showOpenDialog(mainWindow);
+            int c = getFileChooser().showOpenDialog(mainWindow);
             if (c == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 Editor editor = EditorFacade.open(file.toPath());

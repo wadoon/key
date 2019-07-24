@@ -10,55 +10,36 @@ import static de.uka.ilkd.key.parser.KeYLexer.*;
 public class KeYTokenFactory extends AntlrTokenMakerFactory implements TokenTypes {
     @Override
     protected int rewriteTokenType(int antlrType) {
-        //TODO Map the types
         switch (antlrType) {
             case ABSTRACT:
-            case ADD:
             case ADDPROGVARS:
             case ADDRULES:
-            case AND:
             case ANTECEDENTPOLARITY:
             case APPLY_UPDATE_ON_RIGID:
-            case ASSIGN:
             case ASSUMES:
-            case AT:
             case AVOID:
             case AXIOMS:
             case BACKSLASH:
             case BIGINT:
             case BOOTCLASSPATH:
-            case CHAR_LITERAL:
             case CHOOSECONTRACT:
             case CLASSPATH:
             case CLOSEGOAL:
-            case COLON:
-            case COMMA:
+            case ASSIGN:
             case CONTAINERTYPE:
             case CONTAINS_ASSIGNMENT:
             case CONTRACTS:
             case DEPENDINGON:
             case DIFFERENT:
             case DIFFERENTFIELDS:
-            case DIGIT:
             case DIGIT_DISPATCH:
             case DISJOINTMODULONULL:
             case DISPLAYNAME:
-            case DOT:
-            case DOTRANGE:
-            case DOUBLECOLON:
             case DROP_EFFECTLESS_ELEMENTARIES:
             case DROP_EFFECTLESS_STORES:
             case ELEMSORT:
             case ELSE:
-            case EMPTYBRACKETS:
-            case ENUM_CONST:
-            case EQUALS:
-            case EQUAL_UNIQUE:
-            case EQV:
-            case EXISTS:
-            case EXP:
             case EXTENDS:
-            case FALSE:
             case FIELDTYPE:
             case FINAL:
             case FIND:
@@ -67,7 +48,6 @@ public class KeYTokenFactory extends AntlrTokenMakerFactory implements TokenType
             case FREELABELIN:
             case FUNCTIONS:
             case GENERIC:
-            case GREATER:
             case GREATEREQUAL:
             case HASLABEL:
             case HASSORT:
@@ -75,10 +55,6 @@ public class KeYTokenFactory extends AntlrTokenMakerFactory implements TokenType
             case HELPTEXT:
             case HEURISTICS:
             case HEURISTICSDECL:
-            case HEX:
-            case HEX_LITERAL:
-            case IDCHAR:
-            case IDENT:
             case IF:
             case IFEX:
             case IMP:
@@ -105,18 +81,14 @@ public class KeYTokenFactory extends AntlrTokenMakerFactory implements TokenType
             case JAVABLOCK:
             case JAVASOURCE:
             case KEYSETTINGS:
-            case LBRACE:
-            case LBRACKET:
             case LEMMA:
             case LESS:
             case LESSEQUAL:
             case LESS_DISPATCH:
             case LETTER:
-            case LGUILLEMETS:
             case LOCSET:
             case LPAREN:
             case METADISJOINT:
-            case MINUS:
             case MODALITY:
             case MODALITYEND:
             case MODALOPERATOR:
@@ -125,17 +97,11 @@ public class KeYTokenFactory extends AntlrTokenMakerFactory implements TokenType
             case NEWLABEL:
             case NODEFAULTCLASSES:
             case NONINTERACTIVE:
-            case NOT:
             case NOTFREEIN:
-            case NOT_:
-            case NOT_EQUALS:
-            case NUM_LITERAL:
             case ONEOF:
             case OPTIONSDECL:
-            case OR:
             case PARALLEL:
             case PERCENT:
-            case PLUS:
             case PREDICATES:
             case PRIMES:
             case PRIMES_OR_CHARLITERAL:
@@ -148,39 +114,29 @@ public class KeYTokenFactory extends AntlrTokenMakerFactory implements TokenType
             case PROOFSCRIPT:
             case PROXY:
             case QUOTED_STRING_LITERAL:
-            case RBRACE:
-            case RBRACKET:
             case REPLACEWITH:
-            case RGUILLEMETS:
-            case RPAREN:
             case RULES:
             case SAME:
             case SAMEUPDATELEVEL:
             case SCHEMAVAR:
             case SCHEMAVARIABLES:
-            case SEMI:
-            case SEQ:
-            case SEQARROW:
+
             case SIMPLIFY_IF_THEN_ELSE_UPDATE:
             case SKOLEMFORMULA:
             case SKOLEMTERM:
             case SLASH:
-
             case SORTS:
-            case STAR:
+
             case STATIC:
             case STATICMETHODREFERENCE:
             case STRICT:
-            case STRING_LITERAL:
-            case SUBST:
             case SUCCEDENTPOLARITY:
             case TERM:
             case TERMLABEL:
+            case EXISTS:
             case THEN:
-            case TILDE:
             case TRANSFORMERS:
             case TRIGGER:
-            case TRUE:
             case TYPEOF:
             case UNIQUE:
             case UPDATE:
@@ -196,6 +152,66 @@ public class KeYTokenFactory extends AntlrTokenMakerFactory implements TokenType
             case VOCAB:
             case WITHOPTIONS:
                 return RESERVED_WORD;
+
+            //Operators
+            case OR:
+            case PLUS:
+            case ADD:
+            case AND:
+            case EQUALS:
+            case EQUAL_UNIQUE:
+            case EQV:
+            case EXP:
+            case STAR:
+            case MINUS:
+            case GREATER:
+            case NOT:
+            case NOT_:
+            case NOT_EQUALS:
+                return OPERATOR;
+
+            case TRUE:
+            case FALSE:
+                return LITERAL_BOOLEAN;
+
+            case IDCHAR:
+            case IDENT:
+
+            case ENUM_CONST:
+                return LITERAL_BACKQUOTE;
+            case CHAR_LITERAL:
+                return LITERAL_CHAR;
+            case HEX_LITERAL:
+            case HEX:
+            case NUM_LITERAL:
+            case DIGIT:
+                return LITERAL_NUMBER_DECIMAL_INT;
+
+
+            //seperators:
+            case LGUILLEMETS:
+            case RGUILLEMETS:
+            case TILDE:
+            case DOT:
+            case DOTRANGE:
+            case DOUBLECOLON:
+            case COLON:
+            case COMMA:
+            case LBRACE:
+            case LBRACKET:
+            case RBRACE:
+            case RBRACKET:
+            case EMPTYBRACKETS:
+            case RPAREN:
+            case SUBST:
+            case SEMI:
+            case SEQ:
+            case SEQARROW:
+            case AT:
+                return SEPARATOR;
+
+            case STRING_LITERAL:
+                return LITERAL_STRING_DOUBLE_QUOTE;
 
             case SL_COMMENT:
             case ML_COMMENT:

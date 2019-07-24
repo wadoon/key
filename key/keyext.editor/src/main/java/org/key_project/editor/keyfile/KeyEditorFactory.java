@@ -10,13 +10,14 @@ import org.key_project.editor.Editor;
  */
 public class KeyEditorFactory extends AbstractEditorFactory {
     public KeyEditorFactory() {
-        super("Key Problem Files", ".kps", KeyEditor.KEY_LANGUAGE_ID);
+        super("Key Problem Files", ".key",
+                KeyEditor.KEY_LANGUAGE_ID);
     }
 
     @Override
     public Editor open() {
         val e = new KeyEditor();
-        e.setMimeType(mimeType);
+        e.setMimeType(getMimeType());
         return e;
     }
 }
