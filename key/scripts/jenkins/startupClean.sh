@@ -10,6 +10,3 @@ set +e # ignore errors
 echo "JAVA_HOME: $JAVA_HOME"
 java -version
 javac -version
-
-$JAVA_HOME/bin/java -version
-$JAVA_HOME/bin/javac -version
