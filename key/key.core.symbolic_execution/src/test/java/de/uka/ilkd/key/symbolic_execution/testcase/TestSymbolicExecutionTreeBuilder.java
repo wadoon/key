@@ -1441,7 +1441,7 @@ public class TestSymbolicExecutionTreeBuilder extends AbstractSymbolicExecutionT
    /**
     * Tests example: /set/constraintsAfterUsedLoopInvariant
     */
-   @Test@Ignore public void testConstraintsAfterUsedLoopInvariant() throws Exception {
+   @Test @Ignore public void testConstraintsAfterUsedLoopInvariant() throws Exception {
       doSETTest(testCaseDirectory, 
                 "/set/constraintsAfterUsedLoopInvariant/test/E_Loop.java", 
                 "E_Loop", 
