@@ -28,7 +28,6 @@ public class Object {
 	throws java.lang.InterruptedException;
     
     public final void require(boolean b);
-    public final void _assert(boolean b);
     
     
 
