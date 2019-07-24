@@ -678,6 +678,7 @@ class TacletTranslationOptions extends TablePanel{
 class TranslationOptions extends TablePanel{
 	private static final long serialVersionUID = 1L;
 	private JCheckBox useExplicitTypeHierachy;
+	private JCheckBox enableQuantifiers;
 	private JCheckBox useNullInstantiation;
 	private JCheckBox useBuiltInUniqueness;
 	private JCheckBox useUIMultiplication;
@@ -753,6 +754,7 @@ class TranslationOptions extends TablePanel{
 	@Override
     protected void createComponents(){
 		createUseExplicitTypeHierachy();
+		createEnableQuantifiers();
 		createNullInstantiation();
 		createBuiltInUniqueness();
 		createUIMultiplication();
@@ -773,6 +775,21 @@ class TranslationOptions extends TablePanel{
 		}
 		return useExplicitTypeHierachy;
 	}
+
+	public JCheckBox createEnableQuantifiers() {
+        if(enableQuantifiers == null){
+            enableQuantifiers = addCheckBox("Enable quantifiers in SMT translation",
+                    "",
+                    settings.enableQuantifiers
+                    , new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            settings.enableQuantifiers = enableQuantifiers.isSelected();
+                        }
+                    });
+        }
+        return useExplicitTypeHierachy;
+    }
 
 	public JCheckBox createNullInstantiation() {
 		if(useNullInstantiation == null){

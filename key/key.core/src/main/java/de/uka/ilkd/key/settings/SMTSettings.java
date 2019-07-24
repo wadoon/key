@@ -138,6 +138,12 @@ public class SMTSettings implements de.uka.ilkd.key.smt.SMTSettings{
         }
 
         @Override
+        public boolean quantifiersEnabled() {
+
+            return pdSettings.enableQuantifiers;
+        }
+
+        @Override
         public boolean useUninterpretedMultiplicationIfNecessary() {
                 
                 return pdSettings.useUIMultiplication;

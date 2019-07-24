@@ -29,6 +29,8 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
 
         private static final String EXPLICIT_TYPE_HIERARCHY = "[SMTSettings]explicitTypeHierarchy";
 
+        private static final String ENABLE_QUANTIFIERS = "[SMTSettings]enableQuantifiers";
+
         private static final String INSTANTIATE_NULL_PREDICATES = "[SMTSettings]instantiateHierarchyAssumptions";
 
 
@@ -53,6 +55,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
         private Collection<SettingsListener> listeners = new LinkedHashSet<SettingsListener>();
 
         public boolean useExplicitTypeHierarchy     = false;
+        public boolean enableQuantifiers     = true;
         public boolean useNullInstantiation         = true;
         public boolean useBuiltInUniqueness          = false;
         public boolean useUIMultiplication          = true;
@@ -80,6 +83,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
         public void copy(ProofDependentSMTSettings data){
                 supportedTaclets = new SupportedTaclets(data.supportedTaclets.getNamesOfSelectedTaclets());
                 this.useExplicitTypeHierarchy      = data.useExplicitTypeHierarchy;
+                this.enableQuantifiers             = data.enableQuantifiers;
                 this.useNullInstantiation          = data.useNullInstantiation;
                 this.maxGenericSorts               = data.maxGenericSorts;
                 this.useBuiltInUniqueness          = data.useBuiltInUniqueness;
@@ -111,6 +115,8 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
 
                 useExplicitTypeHierarchy = SettingsConverter.read(props,EXPLICIT_TYPE_HIERARCHY,
                                 useExplicitTypeHierarchy);
+                enableQuantifiers = SettingsConverter.read(props,ENABLE_QUANTIFIERS,
+                        enableQuantifiers);
                 useNullInstantiation = SettingsConverter.read(props,INSTANTIATE_NULL_PREDICATES,
                                 useNullInstantiation);
                 useBuiltInUniqueness = SettingsConverter.read(props,USE_BUILT_IN_UNIQUENESS,useBuiltInUniqueness);
@@ -132,6 +138,7 @@ public class ProofDependentSMTSettings implements de.uka.ilkd.key.settings.Setti
         @Override
         public void writeSettings(Object sender, Properties props){
                 SettingsConverter.store(props,EXPLICIT_TYPE_HIERARCHY,useExplicitTypeHierarchy);
+                SettingsConverter.store(props,ENABLE_QUANTIFIERS,enableQuantifiers);
                 SettingsConverter.store(props,INSTANTIATE_NULL_PREDICATES,useNullInstantiation);
                 SettingsConverter.store(props,MAX_GENERIC_SORTS,maxGenericSorts);
                 SettingsConverter.store(props,TACLET_SELECTION,supportedTaclets.getNamesOfSelectedTaclets());

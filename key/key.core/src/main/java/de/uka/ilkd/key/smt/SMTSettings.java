@@ -72,7 +72,9 @@ public interface SMTSettings {
      * Has only some effect if the solver supports a built in feature for uniqueness.
      */
     public boolean useBuiltInUniqueness();
-    
+
+    boolean quantifiersEnabled();
+
     /**
      * Returns <code>true</code> if a uninterpreted function should be used if the
      * normal normal multiplication is not supported. In case that such a function 
