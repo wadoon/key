@@ -5,3 +5,11 @@ git clean -x -d -f -q
 # clean the settings to start with a defined configuration
 rm -rf /var/lib/jenkins/.key/ $HOME/.key
 
+
+set +e # ignore errors
+echo "JAVA_HOME: $JAVA_HOME"
+java -version
+javac -version
+
+$JAVA_HOME/bin/java -version
+$JAVA_HOME/bin/javac -version
