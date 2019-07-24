@@ -1,13 +1,11 @@
 package de.uka.ilkd.key.proof.io;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.URL;
+import java.nio.ByteBuffer;
 
-public class UrlRuleSource
-        extends RuleSource {
-
+public class UrlRuleSource extends RuleSource {
+    private byte[] buffer;
     private final URL url;
     private final long numberOfBytes;
 
@@ -21,12 +19,14 @@ public class UrlRuleSource
     }
 
     private long countBytesByReadingStream() {
-        try {
-            final InputStream input = url.openStream();
+        long start = System.nanoTime();
+        try(final InputStream input = url.openStream()) {
             long localNumberOfBytes = 0;
-            for (int readValue = input.read(); readValue != -1; localNumberOfBytes++, readValue = input.read());
+            buffer = input.readAllBytes();
             input.close();
-            return localNumberOfBytes;
+            long stop = System.nanoTime();
+            System.out.println("UrlRuleSource.countBytesByReadingStream: " + (stop - start) + " ns");
+            return buffer.length;
         } catch (final IOException exception) {
             throw new RuntimeException(exception);
         }
@@ -55,6 +55,8 @@ public class UrlRuleSource
     @Override
     public InputStream getNewStream() {
         try {
+            if(buffer!=null)
+                return new ByteArrayInputStream(buffer);
             return url.openStream();
         } catch (final IOException exception) {
             throw new RuntimeException("Error while reading rules.", exception);
