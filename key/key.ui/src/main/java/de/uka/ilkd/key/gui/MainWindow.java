@@ -13,27 +13,135 @@
 
 package de.uka.ilkd.key.gui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.FlowLayout;
+import java.awt.GraphicsEnvironment;
+import java.awt.GridBagLayout;
+import java.awt.Point;
+import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.util.Collection;
+import java.util.EventObject;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
+import java.util.stream.Stream;
+
+import javax.swing.Action;
+import javax.swing.Box;
+import javax.swing.ButtonGroup;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JRadioButtonMenuItem;
+import javax.swing.JScrollPane;
+import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
+import javax.swing.ToolTipManager;
+import javax.swing.UIManager;
+import javax.swing.WindowConstants;
+import javax.swing.event.MenuEvent;
+import javax.swing.event.MenuListener;
+import javax.swing.event.MouseInputAdapter;
+
+import bibliothek.gui.dock.StackDockStation;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.SingleCDockable;
 import bibliothek.gui.dock.common.action.CAction;
 import bibliothek.gui.dock.common.action.CButton;
 import bibliothek.gui.dock.common.intern.CDockable;
+import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 import de.uka.ilkd.key.control.AutoModeListener;
 import de.uka.ilkd.key.control.TermLabelVisibilityManager;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
-import de.uka.ilkd.key.gui.actions.*;
+import de.uka.ilkd.key.gui.actions.AbandonTaskAction;
+import de.uka.ilkd.key.gui.actions.AboutAction;
+import de.uka.ilkd.key.gui.actions.AutoModeAction;
+import de.uka.ilkd.key.gui.actions.AutoSave;
+import de.uka.ilkd.key.gui.actions.BundleSavingToggleAction;
+import de.uka.ilkd.key.gui.actions.CounterExampleAction;
+import de.uka.ilkd.key.gui.actions.DecreaseFontSizeAction;
+import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
+import de.uka.ilkd.key.gui.actions.ExitMainAction;
+import de.uka.ilkd.key.gui.actions.GoalBackAction;
+import de.uka.ilkd.key.gui.actions.GoalSelectAboveAction;
+import de.uka.ilkd.key.gui.actions.GoalSelectBelowAction;
+import de.uka.ilkd.key.gui.actions.HeatmapSettingsAction;
+import de.uka.ilkd.key.gui.actions.HidePackagePrefixToggleAction;
+import de.uka.ilkd.key.gui.actions.IncreaseFontSizeAction;
+import de.uka.ilkd.key.gui.actions.KeYProjectHomepageAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationAction;
+import de.uka.ilkd.key.gui.actions.LemmaGenerationBatchModeAction;
+import de.uka.ilkd.key.gui.actions.LicenseAction;
+import de.uka.ilkd.key.gui.actions.MacroKeyBinding;
+import de.uka.ilkd.key.gui.actions.MainWindowAction;
+import de.uka.ilkd.key.gui.actions.MenuSendFeedackAction;
+import de.uka.ilkd.key.gui.actions.MinimizeInteraction;
+import de.uka.ilkd.key.gui.actions.OpenExampleAction;
+import de.uka.ilkd.key.gui.actions.OpenFileAction;
+import de.uka.ilkd.key.gui.actions.OpenMostRecentFileAction;
+import de.uka.ilkd.key.gui.actions.PrettyPrintToggleAction;
+import de.uka.ilkd.key.gui.actions.ProofManagementAction;
+import de.uka.ilkd.key.gui.actions.PruneProofAction;
+import de.uka.ilkd.key.gui.actions.QuickLoadAction;
+import de.uka.ilkd.key.gui.actions.QuickSaveAction;
+import de.uka.ilkd.key.gui.actions.RightMouseClickToggleAction;
+import de.uka.ilkd.key.gui.actions.SMTOptionsAction;
+import de.uka.ilkd.key.gui.actions.SaveBundleAction;
+import de.uka.ilkd.key.gui.actions.SaveFileAction;
+import de.uka.ilkd.key.gui.actions.SearchInProofTreeAction;
+import de.uka.ilkd.key.gui.actions.SearchInSequentAction;
+import de.uka.ilkd.key.gui.actions.SearchModeChangeAction;
+import de.uka.ilkd.key.gui.actions.SearchNextAction;
+import de.uka.ilkd.key.gui.actions.SearchPreviousAction;
+import de.uka.ilkd.key.gui.actions.ShowActiveSettingsAction;
+import de.uka.ilkd.key.gui.actions.ShowActiveTactletOptionsAction;
+import de.uka.ilkd.key.gui.actions.ShowKnownTypesAction;
+import de.uka.ilkd.key.gui.actions.ShowProofStatistics;
+import de.uka.ilkd.key.gui.actions.ShowUsedContractsAction;
+import de.uka.ilkd.key.gui.actions.SyntaxHighlightingToggleAction;
+import de.uka.ilkd.key.gui.actions.TacletOptionsAction;
+import de.uka.ilkd.key.gui.actions.TermLabelMenu;
+import de.uka.ilkd.key.gui.actions.TestGenerationAction;
+import de.uka.ilkd.key.gui.actions.ToggleConfirmExitAction;
+import de.uka.ilkd.key.gui.actions.ToggleSequentViewTooltipAction;
+import de.uka.ilkd.key.gui.actions.ToolTipOptionsAction;
+import de.uka.ilkd.key.gui.actions.UnicodeToggleAction;
 import de.uka.ilkd.key.gui.configuration.Config;
 import de.uka.ilkd.key.gui.docking.DockingHelper;
-import de.uka.ilkd.key.gui.docking.DockingLayout;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.help.HelpFacade;
 import de.uka.ilkd.key.gui.help.HelpInfo;
-import de.uka.ilkd.key.gui.nodeviews.*;
+import de.uka.ilkd.key.gui.nodeviews.CurrentGoalView;
+import de.uka.ilkd.key.gui.nodeviews.EmptySequent;
+import de.uka.ilkd.key.gui.nodeviews.InnerNodeView;
+import de.uka.ilkd.key.gui.nodeviews.MainFrame;
+import de.uka.ilkd.key.gui.nodeviews.SequentView;
+import de.uka.ilkd.key.gui.nodeviews.SequentViewSearchBar;
 import de.uka.ilkd.key.gui.notification.NotificationManager;
 import de.uka.ilkd.key.gui.notification.events.ExitKeYEvent;
 import de.uka.ilkd.key.gui.notification.events.NotificationEvent;
@@ -42,7 +150,7 @@ import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
 import de.uka.ilkd.key.gui.settings.SettingsManager;
 import de.uka.ilkd.key.gui.smt.ComplexButton;
 import de.uka.ilkd.key.gui.smt.SolverListener;
-import de.uka.ilkd.key.gui.sourceview.SourceView;
+import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 import de.uka.ilkd.key.gui.utilities.GuiUtilities;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.proof.Goal;
@@ -56,21 +164,11 @@ import de.uka.ilkd.key.smt.SMTProblem;
 import de.uka.ilkd.key.smt.SolverLauncher;
 import de.uka.ilkd.key.smt.SolverTypeCollection;
 import de.uka.ilkd.key.ui.AbstractMediatorUserInterfaceControl;
-import de.uka.ilkd.key.util.*;
-
-import javax.swing.*;
-import javax.swing.event.MenuEvent;
-import javax.swing.event.MenuListener;
-import javax.swing.event.MouseInputAdapter;
-import java.awt.*;
-import java.awt.event.*;
-import java.io.File;
-import java.util.List;
-import java.util.*;
-import java.util.prefs.BackingStoreException;
-import java.util.prefs.Preferences;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import de.uka.ilkd.key.util.Debug;
+import de.uka.ilkd.key.util.KeYConstants;
+import de.uka.ilkd.key.util.KeYResourceManager;
+import de.uka.ilkd.key.util.PreferenceSaver;
+import de.uka.ilkd.key.util.ThreadUtilities;
 
 @HelpInfo()
 public final class MainWindow extends JFrame {
@@ -112,7 +210,7 @@ public final class MainWindow extends JFrame {
     /**
      * the view to show source code and symbolic execution information
      */
-    private final JComponent sourceView;
+    private final SourceViewFrame sourceViewFrame;
     /**
      * Use this SequentView in case no proof is loaded.
      */
@@ -145,13 +243,15 @@ public final class MainWindow extends JFrame {
             new PreferenceSaver(Preferences.userNodeForPackage(MainWindow.class));
     private final HidePackagePrefixToggleAction hidePackagePrefixToggleAction =
             new HidePackagePrefixToggleAction(this);
+    private final ToggleSequentViewTooltipAction toggleSequentViewTooltipAction =
+            new ToggleSequentViewTooltipAction(this);
     private final TermLabelMenu termLabelMenu;
     public boolean frozen = false;
+    JCheckBoxMenuItem saveSMTFile;
     /**
      *
      */
     private CControl dockControl = new CControl(this);
-    JCheckBoxMenuItem saveSMTFile;
     /**
      * the first toolbar
      */
@@ -210,6 +310,7 @@ public final class MainWindow extends JFrame {
     private ExitMainAction exitMainAction;
     private ShowActiveSettingsAction showActiveSettingsAction;
     private UnicodeToggleAction unicodeToggleAction;
+
     private SingleCDockable dockProofListView;
     private SingleCDockable dockSourceView;
     private SingleCDockable dockSequent;
@@ -244,7 +345,7 @@ public final class MainWindow extends JFrame {
         autoModeAction = new AutoModeAction(this);
         //mainWindowTabbedPane = new MainWindowTabbedPane(this, mediator, autoModeAction);
         mainFrame = new MainFrame(this, emptySequent);
-        sourceView = SourceView.getSourceView(this);
+        sourceViewFrame = new SourceViewFrame(this);
         proofList = new TaskTree(mediator);
         notificationManager = new NotificationManager(mediator, this);
         recentFileMenu = new RecentFileMenu(mediator);
@@ -443,7 +544,7 @@ public final class MainWindow extends JFrame {
         //JPanel rightPane = new JPanel();
         //rightPane.setLayout(new BorderLayout());
         //rightPane.add(mainFrame, BorderLayout.CENTER);
-        //rightPane.add(sequentViewSearchBar, BorderLayout.SOUTH);
+        mainFrame.add(sequentViewSearchBar, BorderLayout.SOUTH);
 
         //JSplitPane pane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, rightPane, sourceView);
         //pane.setResizeWeight(0.5);
@@ -455,12 +556,15 @@ public final class MainWindow extends JFrame {
         //splitPane.setOneTouchExpandable(true);
         //splitPane.setName("splitPane");
         //getContentPane().add(splitPane, BorderLayout.CENTER);
+
+        dockControl.putProperty(StackDockStation.TAB_PLACEMENT, TabPlacement.TOP_OF_DOCKABLE);
+
         getContentPane().add(dockControl.getContentArea());
 
         dockProofListView = DockingHelper.createSingleDock("Loaded Proofs", proofListView,
                 TaskTree.class.getName());
         dockSequent = DockingHelper.createSingleDock("Sequent", mainFrame);
-        dockSourceView = DockingHelper.createSingleDock("Source", sourceView);
+        dockSourceView = DockingHelper.createSingleDock("Source", sourceViewFrame);
 
         Stream<TabPanel> extensionPanels = KeYGuiExtensionFacade.getAllPanels(this);
         Stream<TabPanel> defaultPanels = Stream.of(proofTreeView, infoView,
@@ -474,6 +578,7 @@ public final class MainWindow extends JFrame {
 
         dockProofListView.setVisible(true);
         dockSequent.setVisible(true);
+
         dockSourceView.setVisible(true);
 
         DockingHelper.restoreFactoryDefault(this);
@@ -737,6 +842,7 @@ public final class MainWindow extends JFrame {
         view.add(new JCheckBoxMenuItem(new SyntaxHighlightingToggleAction(this)));
         view.add(termLabelMenu);
         view.add(new JCheckBoxMenuItem(hidePackagePrefixToggleAction));
+        view.add(new JCheckBoxMenuItem(toggleSequentViewTooltipAction));
 
         view.addSeparator();
         {
@@ -1222,6 +1328,19 @@ public final class MainWindow extends JFrame {
     public CDockable getDockProofListView() {
         return dockProofListView;
     }
+
+    public SingleCDockable getDockSourceView() {
+        return dockSourceView;
+    }
+
+    public SingleCDockable getDockSequent() {
+        return dockSequent;
+    }
+
+    public SourceViewFrame getSourceViewFrame() {
+        return sourceViewFrame;
+    }
+
     /**
      * Glass pane that only delivers events for the status line (i.e. the abort button)
      * <p>
@@ -1650,14 +1769,4 @@ public final class MainWindow extends JFrame {
         }
 
     }
-
-
-    public SingleCDockable getDockSourceView() {
-        return dockSourceView;
-    }
-
-    public SingleCDockable getDockSequent() {
-        return dockSequent;
-    }
-
 }
