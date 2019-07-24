@@ -60,6 +60,7 @@ public class LicenseAction extends MainWindowAction {
         try {
             InputStreamReader inp = new InputStreamReader(resource.openStream(), "UTF-8");
             int c;
+            //TODO: If Java 9, replace with inp.readAllBytes() for more performance
             char[] buf = new char[1024];
             while ((c = inp.read(buf)) > 0) {
                 sb.append(buf, 0, c);
