@@ -7,11 +7,11 @@ export STATISTICS_DIR="$JENKINS_HOME/userContent/statistics-$JOB_NAME"
 runTests() {
     (cd $1; shift;
      ./start.sh\
-         -Dtest-resources=src/test/resources\
-         -Dtestcases=src/test/resources/testcase\
-         -DTACLET_PROOFS=tacletProofs\
-         -DEXAMPLES_DIR=../key.ui/examples\
-         -DRUNALLPROOFS_DIR=$buildDir/report/runallproves\
+         -Dtest-resources=$(pwd)/src/test/resources\
+         -Dtestcases=$(pwd)/src/test/resources/testcase\
+         -DTACLET_PROOFS=$(pwd)/../key.core/tacletProofs\
+         -DEXAMPLES_DIR=$(pwd)/../key.ui/examples\
+         -DRUNALLPROOFS_DIR=$(pwd)/build/report/runallproves\
          -Dkey.disregardSettings=true\
          -Xmx4g -XX:MaxPermSize=256m -ea -Dkey.disregardSettings=true \
          org.junit.runner.JUnitCore  \
@@ -28,7 +28,7 @@ cd key
 ./gradlew --continue compileTestJava genTest
 
 (#subshell
-    set -e #abort early
+    #set -e #abort early
 
     runTests key.core \
              de.uka.ilkd.key.suite.TestKey
@@ -42,12 +42,14 @@ cd key
     runTests key.core.proof_references \
              de.uka.ilkd.key.proof_references.suite.AllProofReferencesTests
 
-    #runTests key.core \
-        #         de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestSuite
+    runTests key.core \
+             de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestSuite
 
-    #runTests key.core \
-        #         de.uka.ilkd.key.proof.proverules.ProveRulesTest
+    runTests key.core \
+             de.uka.ilkd.key.proof.proverules.ProveRulesTest
 )
+
+exit $?
 
 EXIT_UNIT_TESTS=$?
 
