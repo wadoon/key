@@ -88,8 +88,10 @@ public class ModularSMTLib2Translator implements SMTTranslator {
         }
         sb.append("\n");
 
-        TypeManager tm = new TypeManager();
-        tm.createSortTypeHierarchy(master);
+        if (services.getProof().getSettings().getSMTSettings().useExplicitTypeHierarchy) {
+            TypeManager tm = new TypeManager();
+            tm.createSortTypeHierarchy(master);
+        }
 
         for (Writable decl : master.getDeclarations()) {
             decl.appendTo(sb);
@@ -122,8 +124,9 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
     /**
      * Adds all sorts contained in the given problem to the master handler.
+     *
      * @param problem the given problem
-     * @param master the master handler of the problem
+     * @param master  the master handler of the problem
      */
     private void addAllSorts(Term problem, MasterHandler master) {
         Sort s = problem.sort();

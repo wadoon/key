@@ -20,10 +20,11 @@ import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
 public class UninterpretedSymbolsHandler implements SMTHandler {
 
     public final static String PREFIX = "ui_";
+    private boolean useTypeHierarchy;
 
     @Override
     public void init(Services services) {
-        // nothing to be done
+        useTypeHierarchy = services.getProof().getSettings().getSMTSettings().useExplicitTypeHierarchy;
     }
 
     @Override
@@ -46,7 +47,7 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
         String sortString = term.sort() == Sort.FORMULA ? "Bool" : "U";
 
         String name = PREFIX + op.name().toString();
-        if(!trans.isKnownSymbol(name)) {
+        if (!trans.isKnownSymbol(name)) {
             int a = op.arity();
             SExpr signature = new SExpr(Collections.nCopies(a, new SExpr("U")));
             trans.addDeclaration(
@@ -62,7 +63,6 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
                     SExpr axiom = new SExpr("assert",
                             new SExpr("instanceof", Type.BOOL, name, SExpr.sortExpr(sop.sort()).toString()));
                     trans.addAxiom(axiom);
-
                 }
             }
         }
