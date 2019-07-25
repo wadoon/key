@@ -20,33 +20,37 @@ runTests() {
 cd key
 ./gradlew --continue compileTestJava genTest
 
-runTests key.core \
-         de.uka.ilkd.key.suite.TestKey
+(#subshell
+    set -e #abort early
 
-runTests key.core.symbolic_execution \
-         de.uka.ilkd.key.symbolic_execution.suite.AllSymbolicExecutionTests
+    runTests key.core \
+             de.uka.ilkd.key.suite.TestKey
 
-runTests key.core.testgen \
-         de.uka.ilkd.key.suite.AllTestGenTests
+    runTests key.core.symbolic_execution \
+             de.uka.ilkd.key.symbolic_execution.suite.AllSymbolicExecutionTests
 
-runTests key.core.proof_references \
-         de.uka.ilkd.key.proof_references.suite.AllProofReferencesTests
+    runTests key.core.testgen \
+             de.uka.ilkd.key.suite.AllTestGenTests
 
-#runTests key.core \
-#         de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestSuite
+    runTests key.core.proof_references \
+             de.uka.ilkd.key.proof_references.suite.AllProofReferencesTests
 
-#runTests key.core \
-#         de.uka.ilkd.key.proof.proverules.ProveRulesTest
+    #runTests key.core \
+        #         de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestSuite
+
+    #runTests key.core \
+        #         de.uka.ilkd.key.proof.proverules.ProveRulesTest
+)
 
 EXIT_UNIT_TESTS=$?
 
 # Adapt to old scheme. copy tests xml to a folder where jenkins find them.
 # Change if there is no ant build.
 # Old regex: key/**/testresults/*.xml
-XMLTESTFOLDER="xxx/testresults"
-rm -rf $XMLTESTFOLDER
-mkdir -p $XMLTESTFOLDER
-find -iname 'TEST-*.xml' -exec cp {} $XMLTESTFOLDER \;
+#XMLTESTFOLDER="xxx/testresults"
+#rm -rf $XMLTESTFOLDER
+#mkdir -p $XMLTESTFOLDER
+#find -iname 'TEST-*.xml' -exec cp {} $XMLTESTFOLDER \;
 
 #
 # create statistics if successful
