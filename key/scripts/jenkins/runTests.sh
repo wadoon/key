@@ -4,11 +4,40 @@ export KEY_VERSION="2.7.$BUILD_NUMBER"
 export PATH=$PATH:/home/hudson/key/bin/
 export STATISTICS_DIR="$JENKINS_HOME/userContent/statistics-$JOB_NAME"
 
+function runTests() {
+    (cd $1; shift;
+     ./start.sh  -Xmx4g -XX:MaxPermSize=256m -ea -Dkey.disregardSettings=true \
+                 org.junit.runner.JUnitCore  \
+                 $@
+     )
+}
+
+
+
 #
 # Run unit tests
 #
 cd key
-./gradlew --continue test testProofRules testRunAllProofs
+./gradlew --continue compileTestJava genTest
+
+runTests key.core \
+         de.uka.ilkd.key.suite.TestKey
+
+runTests key.core.symbolic_execution \
+         de.uka.ilkd.key.symbolic_execution.suite.AllSymbolicExecutionTests
+
+runTests key.core.testgen \
+         de.uka.ilkd.key.suite.AllTestGenTests
+
+runTests key.core.proof_references \
+         de.uka.ilkd.key.proof_references.suite.AllProofReferencesTests
+
+runTests key.core \
+         de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestSuite
+
+runTests key.core \
+         de.uka.ilkd.key.proof.proverules.ProveRulesTest
+
 EXIT_UNIT_TESTS=$?
 
 # Adapt to old scheme. copy tests xml to a folder where jenkins find them.

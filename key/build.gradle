@@ -99,6 +99,23 @@ subprojects {
         }
     }
 
+    // add an action to the build task that creates a startup shell script
+    task genTest {
+        doFirst {
+            File script = file('start.sh')
+            def rt = sourceSets.test.runtimeClasspath.collect { it.absolutePath }.join(':')
+
+            script.withPrintWriter {
+                it.println '#!/bin/sh'
+                it.println "java -cp ${rt} \"\$@\""
+            }
+
+            // make it executable
+            ant.chmod(file: script.absolutePath, perm: 'u+x')
+        }
+    }
+
+
     /*findbugs { findbugsTest.enabled = false; ignoreFailures = true }
     pmd { pmdTest.enabled = false; ignoreFailures = true }
     tasks.withType(Checkstyle) {
