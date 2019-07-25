@@ -33,6 +33,9 @@ public class MasterHandler {
     /** All axioms */
     private List<Writable> axioms = new ArrayList<>();
 
+    /** All options */
+    private List<Writable> options = new ArrayList<>();
+
     /** A list of known symbols */
     private Set<String> knownSymbols  = new HashSet<>();
 
@@ -59,8 +62,19 @@ public class MasterHandler {
             }
             handlers.add(smtHandler);
         }
+        snippets.loadFromXML(getClass().getResourceAsStream("preamble.xml"));
 
-        snippets.loadFromXML(getClass().getResourceAsStream("CastHandler.preamble.xml"));
+        if (snippets.containsKey("opts")) {
+            VerbatimSMT opts = new VerbatimSMT(snippets.getProperty("opts"));
+            addOption(opts);
+        }
+        //TODO js,mu: which of these are strictly always necessary, which can be loaded on demand?
+        addFromSnippets("general");
+        addFromSnippets("bool");
+        addFromSnippets("int");
+        addFromSnippets("instanceof");
+        addFromSnippets("types");
+        addFromSnippets("null");
     }
 
     public SExpr translate(Term problem) {
@@ -244,6 +258,14 @@ public class MasterHandler {
 
     public HashSet<Sort> getSorts() {
         return sorts;
+    }
+
+    public List<Writable> getOptions() {
+        return options;
+    }
+
+    public void addOption(Writable w) {
+        options.add(w);
     }
 
     void addFromSnippets(String functionName) {
