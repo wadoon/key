@@ -6,9 +6,16 @@ export STATISTICS_DIR="$JENKINS_HOME/userContent/statistics-$JOB_NAME"
 
 runTests() {
     (cd $1; shift;
-     ./start.sh  -Xmx4g -XX:MaxPermSize=256m -ea -Dkey.disregardSettings=true \
-                 org.junit.runner.JUnitCore  \
-                 $@
+     ./start.sh\
+         -Dtest-resources=src/test/resources\
+         -Dtestcases=src/test/resources/testcase\
+         -DTACLET_PROOFS=tacletProofs\
+         -DEXAMPLES_DIR=../key.ui/examples\
+         -DRUNALLPROOFS_DIR=$buildDir/report/runallproves\
+         -Dkey.disregardSettings=true\
+         -Xmx4g -XX:MaxPermSize=256m -ea -Dkey.disregardSettings=true \
+         org.junit.runner.JUnitCore  \
+         $@
      )
 }
 
