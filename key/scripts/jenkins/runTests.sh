@@ -32,11 +32,11 @@ runTests key.core.testgen \
 runTests key.core.proof_references \
          de.uka.ilkd.key.proof_references.suite.AllProofReferencesTests
 
-runTests key.core \
-         de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestSuite
+#runTests key.core \
+#         de.uka.ilkd.key.proof.runallproofs.RunAllProofsTestSuite
 
-runTests key.core \
-         de.uka.ilkd.key.proof.proverules.ProveRulesTest
+#runTests key.core \
+#         de.uka.ilkd.key.proof.proverules.ProveRulesTest
 
 EXIT_UNIT_TESTS=$?
 
