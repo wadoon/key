@@ -469,7 +469,7 @@ NOT_EQUALS
 	;
 
 SEQARROW
-:	'==>'
+:	'==>' | '\u27F9'
 	;
 
 EXP
