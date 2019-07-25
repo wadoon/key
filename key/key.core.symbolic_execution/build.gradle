@@ -2,8 +2,7 @@ dependencies {
     compile project(":key.core")
 }
 
-/*test {
-    systemProperty "testcases", "src/test/resources/testcase"
-    maxHeapSize = "4g"
+
+test {
     filter { includeTestsMatching "AllSymbolicExecutionTests" }
-}*/
+}

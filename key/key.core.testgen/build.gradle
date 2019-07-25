@@ -2,7 +2,6 @@ dependencies {
     compile project(":key.core")
 }
 
-/*test {
-    systemProperty "testcases", "src/test/resources/testcase"
+test {
     filter { includeTestsMatching "AllTestGenTests" }
-}*/
+}
