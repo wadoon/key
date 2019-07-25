@@ -4,7 +4,7 @@ export KEY_VERSION="2.7.$BUILD_NUMBER"
 export PATH=$PATH:/home/hudson/key/bin/
 export STATISTICS_DIR="$JENKINS_HOME/userContent/statistics-$JOB_NAME"
 
-function runTests() {
+function runTests {
     (cd $1; shift;
      ./start.sh  -Xmx4g -XX:MaxPermSize=256m -ea -Dkey.disregardSettings=true \
                  org.junit.runner.JUnitCore  \
