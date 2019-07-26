@@ -77,7 +77,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     private LockAndAutoReloadAction actionLockAndAutoReload = new LockAndAutoReloadAction();
 
     @Getter
-    LintParser lintParser = new LintParser();
+    LintParser lintParser = new LintParser(mediator);
 
     public ScriptEditor() {
         setMimeType(ScriptUtils.KPS_LANGUAGE_ID);
@@ -569,6 +569,11 @@ class LintParser extends AbstractParser {
     @Getter
     private List<DefaultParserNotice> runtimeException = new ArrayList<>(2);
     private DefaultParseResult result = new DefaultParseResult(this);
+    private final KeYMediator mediator;
+
+    LintParser(KeYMediator mediator) {
+        this.mediator = mediator;
+    }
 
     @Override
     public ParseResult parse(RSyntaxDocument doc, String style) {
@@ -577,6 +582,15 @@ class LintParser extends AbstractParser {
         try {
             List<ProofScript> scripts = Facade.getAST(CharStreams.fromReader(dr));
             LinterStrategy ls = LinterStrategy.getDefaultLinter();
+            {
+                InterpreterBuilder ib = new InterpreterBuilder();
+                ib.proof(null, mediator.getSelectedProof())
+                        .macros()
+                        .scriptCommands();
+                ls.getCheckers().add(new CallLinter(ib.getLookup()));
+            }
+
+
             List<LintProblem> problems = ls.check(scripts);
 
             runtimeException.forEach(result::addNotice);
