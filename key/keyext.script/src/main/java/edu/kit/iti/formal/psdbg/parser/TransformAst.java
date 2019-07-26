@@ -53,6 +53,7 @@ public class TransformAst implements ScriptLanguageParserVisitor<Object> {
      * Start index for positional arguments for command calls
      */
     public static final int KEY_START_INDEX_PARAMETER = 2;
+    public static final String MAIN_SCRIPT_NAME = "__main__";
 
     @Getter
     private final List<ProofScript> scripts = new ArrayList<>(10);
@@ -102,7 +103,7 @@ public class TransformAst implements ScriptLanguageParserVisitor<Object> {
         if (ctx.stmtList() != null) {
             Statements body = (Statements) ctx.stmtList().accept(this);
             ProofScript main = new ProofScript();
-            main.setName("__main__");
+            main.setName(MAIN_SCRIPT_NAME);
             main.setBody(body);
             scripts.add(main);
         }
