@@ -14,14 +14,18 @@ import edu.kit.iti.formal.psdbg.interpreter.InterpreterBuilder;
 import edu.kit.iti.formal.psdbg.interpreter.KeyInterpreter;
 import edu.kit.iti.formal.psdbg.interpreter.data.KeyData;
 import edu.kit.iti.formal.psdbg.interpreter.dbg.*;
+import edu.kit.iti.formal.psdbg.interpreter.exceptions.InterpreterRuntimeException;
+import edu.kit.iti.formal.psdbg.interpreter.exceptions.NoCallHandlerException;
 import edu.kit.iti.formal.psdbg.lint.LintProblem;
 import edu.kit.iti.formal.psdbg.lint.LinterStrategy;
 import edu.kit.iti.formal.psdbg.parser.Facade;
 import edu.kit.iti.formal.psdbg.parser.ScriptLexer;
+import edu.kit.iti.formal.psdbg.parser.ast.ASTNode;
 import edu.kit.iti.formal.psdbg.parser.ast.ProofScript;
 import lombok.Getter;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CodePointCharStream;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.fife.io.DocumentReader;
 import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
@@ -121,8 +125,23 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
      * @param throwable
      */
     public void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework, Throwable throwable) {
-        window.popupWarning(throwable.getMessage(), "Interpreting Error");
-        throwable.printStackTrace();
+
+        if(throwable instanceof InterpreterRuntimeException){
+            InterpreterRuntimeException nch = (InterpreterRuntimeException) throwable;
+            String msg = "There was an error while interpreting script";
+            if(nch.getMessage().equals("")){
+                msg = nch.getMessage();
+            }
+            ASTNode<ParserRuleContext> scriptASTNode = nch.getScriptASTNode();
+            if(scriptASTNode != null){
+                msg+= " in statement line "+ scriptASTNode.getStartPosition().getLineNumber();
+
+            }
+            window.popupWarning(msg, "Interpreting Error");
+        } else {
+            window.popupWarning(throwable.getMessage(), "Interpreting Error");
+            throwable.printStackTrace();
+        }
         enableGui();
     }
 
@@ -307,7 +326,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
 
         private void setEnabled() {
             setEnabled(mediator.getSelectedProof() != null
-                    && getDebuggerFramework() == null
+                   // && getDebuggerFramework() == null
                     && !mediator.isInAutoMode() &&
                     !mediator.getSelectedProof().closed());
         }

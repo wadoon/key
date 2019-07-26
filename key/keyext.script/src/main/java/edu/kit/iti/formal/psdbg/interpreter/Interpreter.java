@@ -6,6 +6,7 @@ import edu.kit.iti.formal.psdbg.interpreter.data.GoalNode;
 import edu.kit.iti.formal.psdbg.interpreter.data.State;
 import edu.kit.iti.formal.psdbg.interpreter.data.VariableAssignment;
 import edu.kit.iti.formal.psdbg.interpreter.exceptions.InterpreterRuntimeException;
+import edu.kit.iti.formal.psdbg.interpreter.exceptions.NoCallHandlerException;
 import edu.kit.iti.formal.psdbg.interpreter.funchdl.CommandLookup;
 import edu.kit.iti.formal.psdbg.parser.DefaultASTVisitor;
 import edu.kit.iti.formal.psdbg.parser.Visitor;
@@ -67,7 +68,7 @@ public class Interpreter<T> extends DefaultASTVisitor<Object>
     @Override
     public <T extends ParserRuleContext> void enterScope(ASTNode<T> node) {
         if (hardStop.get())
-            throw new InterpreterRuntimeException("hard stop");
+            throw new InterpreterRuntimeException("Hard stop", node);
         if (!suppressListeners) callListeners(getEntryListeners(), node);
     }
 
@@ -82,7 +83,8 @@ public class Interpreter<T> extends DefaultASTVisitor<Object>
     public void interpret(ProofScript script) {
         //enterScope(script);
         if (stateStack.empty()) {
-            throw new InterpreterRuntimeException("no state on stack. call newState before interpret");
+            //this should not happen on productive code
+            throw new InterpreterRuntimeException("No state on stack. Call newState before interpreting", script);
         }
 
         if (getSelectedNode() != null) {
@@ -152,7 +154,7 @@ public class Interpreter<T> extends DefaultASTVisitor<Object>
         if (expr != null) {
             Type type = node.getVariableType(var);
             if (type == null) {
-                throw new RuntimeException("SimpleType of Variable " + var + " is not declared yet");
+                throw new InterpreterRuntimeException("Type of Variable " + var + " is not declared yet", assignmentStatement);
             } else {
                 Value v = evaluate(expr);
                 if (fireVariableAssignmentHook(node, var.getIdentifier(), v)) {
@@ -578,13 +580,14 @@ public class Interpreter<T> extends DefaultASTVisitor<Object>
             try {
                 functionLookup.callCommand(this, call, params);
 
+            } catch (NoCallHandlerException nch){
+                throw new InterpreterRuntimeException("Call command "+call.getCommand()+" not found", nch, call);
+
             } catch (RuntimeException e) {
-                System.err.println("Call command " + call.getCommand() + "not applicable");
-                throw e;
-                //TODO handling of error state for each visit
-                //State<T> newErrorState = newState(null, null);
-                //newErrorState.setErrorState(true);
-                //pushState(newErrorState);
+                throw new InterpreterRuntimeException("Call command " + call.getCommand() + "not applicable", e, call);
+/*                System.err.println();
+                throw e;*/
+
             } finally {
                 if (!unInterpretedParams) {
                     //TODO this may not be needed
@@ -688,6 +691,7 @@ public class Interpreter<T> extends DefaultASTVisitor<Object>
             } while (b);
         } catch (InterpreterRuntimeException e) {
             logger.debug("Catched!", e);
+            throw new InterpreterRuntimeException(e, repeatStatement);
         }
         exitScope(repeatStatement);
         return null;

@@ -28,6 +28,8 @@ public class NoCallHandlerException extends InterpreterRuntimeException{
     }
 
     public NoCallHandlerException(CallStatement callStatement) {
-        super(callStatement.toString());
+        super("No callhandler for statement "+callStatement.toString()+" found", callStatement);
+
+
     }
 }
