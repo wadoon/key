@@ -14,6 +14,7 @@ import edu.kit.iti.formal.psdbg.interpreter.InterpreterBuilder;
 import edu.kit.iti.formal.psdbg.interpreter.KeyInterpreter;
 import edu.kit.iti.formal.psdbg.interpreter.data.KeyData;
 import edu.kit.iti.formal.psdbg.interpreter.dbg.*;
+import edu.kit.iti.formal.psdbg.interpreter.exceptions.InterpreterRuntimeException;
 import edu.kit.iti.formal.psdbg.lint.LintProblem;
 import edu.kit.iti.formal.psdbg.lint.LinterStrategy;
 import edu.kit.iti.formal.psdbg.parser.Facade;
@@ -35,15 +36,14 @@ import org.key_project.editor.Editor;
 import org.key_project.util.RandomName;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -76,6 +76,8 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     @Getter
     private LockAndAutoReloadAction actionLockAndAutoReload = new LockAndAutoReloadAction();
 
+    @Getter
+    LintParser lintParser = new LintParser();
 
     public ScriptEditor() {
         setMimeType(ScriptUtils.KPS_LANGUAGE_ID);
@@ -84,7 +86,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         editor.setCloseCurlyBraces(true);
         editor.setCloseMarkupTags(true);
         editor.setCodeFoldingEnabled(true);
-        editor.addParser(new LintParser());
+        editor.addParser(lintParser);
         editor.setText("auto; \n\n//To call subscripts simply add \n//script name(){command;} \n//and call it top level using name;");
         ScriptUtils.createAutoCompletion().install(editor);
         gutter.setBookmarkIcon(BOOKMARK_ICON);
@@ -120,11 +122,23 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
      * @param keyDataDebuggerFramework
      * @param throwable
      */
-    public void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework, Throwable throwable) {
+    public void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework,
+                               Throwable throwable) {
         window.popupWarning(throwable.getMessage(), "Interpreting Error");
         throwable.printStackTrace();
         enableGui();
     }
+
+    public void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework,
+                               InterpreterRuntimeException throwable) {
+        window.popupWarning(throwable.getMessage(), "Interpreting Error");
+        throwable.printStackTrace();
+        lintParser.getRuntimeException().add(
+                new DefaultParserNotice(lintParser, throwable.getMessage(),
+                        0, 0, 10));
+        enableGui();
+    }
+
 
     private void disableGui() {
         mediator.stopInterface(true);
@@ -313,6 +327,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            getLintParser().getRuntimeException().clear();
             InterpreterBuilder ib = new InterpreterBuilder();
             try {
                 final ScriptEditor f = ScriptEditor.this;
@@ -551,6 +566,8 @@ class ModifiedFileWatcherService implements Runnable {
 }
 
 class LintParser extends AbstractParser {
+    @Getter
+    private List<DefaultParserNotice> runtimeException = new ArrayList<>(2);
     private DefaultParseResult result = new DefaultParseResult(this);
 
     @Override
@@ -562,6 +579,8 @@ class LintParser extends AbstractParser {
             LinterStrategy ls = LinterStrategy.getDefaultLinter();
             List<LintProblem> problems = ls.check(scripts);
 
+            runtimeException.forEach(result::addNotice);
+
             for (LintProblem lp : problems) {
                 result.addNotice(new DefaultParserNotice(this,
                         lp.getMessage(), lp.getLineNumber(),
@@ -572,6 +591,7 @@ class LintParser extends AbstractParser {
             //TODO result.setParsedLines();
         } catch (IOException | NullPointerException e) {
             result.setError(e);
+            e.printStackTrace();
         }
 
         return result;

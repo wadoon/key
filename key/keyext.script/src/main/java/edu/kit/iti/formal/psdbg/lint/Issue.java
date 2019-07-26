@@ -21,7 +21,8 @@ public enum Issue {
     REDECLARE_VARIABLE_TYPE_MISMATCH(WARN),
     VARIABLE_NOT_DECLARED(WARN),
     VARIABLE_NOT_USED(WARN),
-    FOREACH_AFTER_THEONLY(WARN, "{{firstToken.text}}");
+    FOREACH_AFTER_THEONLY(WARN, "{{firstToken.text}}"),
+    MAIN_NAME_USED(ERROR);
 
 
     @Getter
