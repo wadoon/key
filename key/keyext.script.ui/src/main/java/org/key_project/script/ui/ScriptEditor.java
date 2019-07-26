@@ -8,6 +8,7 @@ import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
+import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.proof.Proof;
 import edu.kit.iti.formal.psdbg.LabelFactory;
 import edu.kit.iti.formal.psdbg.interpreter.InterpreterBuilder;
@@ -40,6 +41,7 @@ import org.key_project.util.RandomName;
 import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.IOException;
@@ -144,6 +146,13 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
             ASTNode<ParserRuleContext> scriptASTNode = throwable.getScriptASTNode();
             if(scriptASTNode != null){
                 msg+= " in statement line "+ scriptASTNode.getStartPosition().getLineNumber();
+                try {
+                    org.fife.ui.rsyntaxtextarea.Token tokenListForLine = getEditor().getTokenListForLine(scriptASTNode.getStartPosition().getLineNumber() - 1);
+                    System.out.println("tokenListForLine = " + tokenListForLine);
+                    getEditor().addLineHighlight(scriptASTNode.getStartPosition().getLineNumber()-1, Color.RED);
+                } catch (BadLocationException e) {
+                    e.printStackTrace();
+                }
 
             }
             window.popupWarning(msg, "Interpreting Error");
@@ -362,7 +371,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
                     try {
                         int line = 1 + editor.getLineOfOffset(it.getMarkedOffset());
                         Breakpoint brk = new Breakpoint(f.getTitle(), line);
-                        System.out.println(brk);
+                        System.out.println("Breakpoint in ScritpEditor: "+brk);
                         df.getBreakpoints().add(brk);
                     } catch (BadLocationException e1) {
                         e1.printStackTrace();
