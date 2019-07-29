@@ -30,7 +30,7 @@ public class QuantifierHandler implements SMTHandler {
     public SExpr handle(MasterHandler trans, Term term) throws SMTTranslationException {
 
         if (!(services.getProof().getSettings().getSMTSettings().enableQuantifiers)) {
-            return handleWithoutQuantifiers(trans, term);
+            throw new SMTTranslationException("Quantifiers are disabled, quantified formula untranslated.");
         }
 
         SExpr matrix = trans.translate(term.sub(0), Type.BOOL);
@@ -50,15 +50,5 @@ public class QuantifierHandler implements SMTHandler {
         }
 
         return new SExpr(smtOp, Type.BOOL, new SExpr(vars), matrix);
-
     }
-
-    private SExpr handleWithoutQuantifiers(MasterHandler trans, Term term) {
-        List<SExpr> vars = new ArrayList<>();
-        for(QuantifiableVariable bv : term.boundVars()) {
-            trans.addDeclaration(new SExpr("declare-const", Type.NONE, LogicalVariableHandler.VAR_PREFIX + bv.name(), "U"));
-        }
-        return trans.translate(term.sub(0), Type.BOOL);
-    }
-
 }

@@ -111,7 +111,7 @@ public class ModularSMTLib2Translator implements SMTTranslator {
 
         // any exceptions?
         for (Throwable t : exceptions) {
-            sb.append("; " + t.toString());
+            sb.append("\n" + "; " + t.toString());
         }
 
         return sb;
