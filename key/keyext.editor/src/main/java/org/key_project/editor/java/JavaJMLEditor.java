@@ -6,11 +6,14 @@ import de.uka.ilkd.key.gui.colors.ColorSettings;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import lombok.Getter;
 import org.fife.ui.rsyntaxtextarea.AbstractTokenMakerFactory;
+import org.fife.ui.rsyntaxtextarea.Style;
+import org.fife.ui.rsyntaxtextarea.SyntaxScheme;
 import org.fife.ui.rsyntaxtextarea.TokenMakerFactory;
 import org.fife.ui.rsyntaxtextarea.folding.CurlyFoldParser;
 import org.fife.ui.rsyntaxtextarea.folding.FoldParserManager;
 import org.key_project.editor.Editor;
 import org.key_project.editor.EditorExtension;
+import org.key_project.util.RandomName;
 
 import javax.swing.*;
 import java.awt.*;
@@ -26,7 +29,7 @@ public class JavaJMLEditor extends Editor {
     public static final String MIME_TYPE = "text/java";
     private static final ColorSettings.ColorProperty JML_BACKGROUND_COLOR =
             ColorSettings.define("[editor]jmlBackground", "A descent color for the background of JML annotations.",
-                    new Color(100, 180, 255));
+                    new Color(140, 220, 255));
 
     @Getter
     private KeyAction actionOpen = new OpenAction();
@@ -38,6 +41,7 @@ public class JavaJMLEditor extends Editor {
     }
 
     public JavaJMLEditor() {
+        super(RandomName.getRandomName("") + ".java");
         setMimeType(MIME_TYPE);
         editor.setAntiAliasingEnabled(true);
         editor.setCloseCurlyBraces(true);
@@ -49,8 +53,19 @@ public class JavaJMLEditor extends Editor {
         editor.setMarkOccurrences(true);
         editor.setMarkOccurrencesDelay(1000);
         editor.setSecondaryLanguageBackground(1, JML_BACKGROUND_COLOR.get());
-
         toolBarActions.add(actionOpen);
+
+        editor.setSyntaxScheme(new SyntaxScheme(true) {
+            @Override
+            public Style getStyle(int index) {
+                try {
+                    return super.getStyle(index);
+                }catch(ArrayIndexOutOfBoundsException e) {
+                    return super.getStyle(0);
+                }
+            }
+        });
+
     }
 
     private class OpenAction extends KeyAction {

@@ -28,7 +28,6 @@ public class UIScriptExtension implements
         KeYGuiExtension.LeftPanel,
         KeYGuiExtension.MainMenu,
         KeYGuiExtension.StatusLine
-//        KeYGuiExtension.Toolbar
 {
     static {
         ScriptUtils.registerCodeTemplates();
@@ -36,8 +35,7 @@ public class UIScriptExtension implements
         EditorFacade.register(new ScriptEditorFactory());
     }
 
-    private JLabel lblInterpreterStatus = new JLabel();
-
+    private JLabel lblInterpreterStatus = new JLabel("I");
 
     @Getter
     private CommandHelpPane commandHelpPane;

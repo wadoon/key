@@ -13,7 +13,6 @@ import org.fife.ui.rsyntaxtextarea.ErrorStrip;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.RSyntaxUtilities;
 import org.fife.ui.rtextarea.*;
-import org.key_project.util.RandomName;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -45,7 +44,8 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
     @Getter
     private final RTextScrollPane editorView;
 
-    private final String name = RandomName.getRandomName("-") + ".kps";
+    private final String name;
+
     private final DefaultMultipleCDockable dockable = this;
 
     private final PropertyChangeSupport eventSupport = new PropertyChangeSupport(this);
@@ -59,8 +59,9 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
     @Getter
     private Path path;
 
-    public Editor() {
+    public Editor(String name) {
         super(EditorFacade.getEditorDockableFactory());
+        this.name = name;
         pane = (JPanel) getContentPane();
         pane.setLayout(new BorderLayout(5, 5));
 

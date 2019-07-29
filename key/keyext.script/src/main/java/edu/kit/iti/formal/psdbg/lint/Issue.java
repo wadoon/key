@@ -5,11 +5,6 @@ import lombok.Getter;
 import static edu.kit.iti.formal.psdbg.lint.Level.*;
 import lombok.Setter;
 
-/**
- * @author Alexander Weigl
- * @version 1 (06.03.19)
- */
-enum Level {WARN, INFO, ERROR}
 
 public enum Issue {
     EMPTY_BLOCKS(INFO, "Empty blocks are useless!"),

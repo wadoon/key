@@ -38,6 +38,8 @@ import lombok.Setter;
 @members {
    @Getter @Setter private boolean key = true;
 
+   private boolean _slJml = true;
+
    /**
     *
     */
@@ -200,12 +202,12 @@ ELLIPSIS:           '...';
 
 WS:                 [ \t\r\n\u000C]+ -> channel(HIDDEN);
 //Extension for JML
-JML_START: '/*@' -> pushMode(jmlContract);
-JML_SINGLELINE:  '//@' -> type(JML_START), pushMode(jmlSLContract);
+JML_START:       '/*@' {_slJml=false;} -> pushMode(jmlContract);
+JML_SINGLELINE:  '//@' {_slJml=true;}  -> type(JML_START), pushMode(jmlContract);
 
-COMMENT_START:      '/*' ~[@]        -> channel(HIDDEN), pushMode(comment);
-COMMENT_END:       '*/'; // should never be hit by this lexer mode, catched by modes expr, jmlContract, comment.
-LINE_COMMENT:       '//' ~[\r\n]*    -> channel(HIDDEN);
+COMMENT_START:    '/*' ~[@]        -> channel(HIDDEN), pushMode(comment);
+COMMENT_END:      '*/'; // should never be hit by this lexer mode, catched by modes expr, jmlContract, comment.
+LINE_COMMENT:     '//' ~[@] ~[\r\n]*    -> channel(HIDDEN);
 
 // Identifiers
 IDENTIFIER:         JavaLetter JavaLetterOrDigit*;
@@ -295,49 +297,49 @@ JC_STATIC:              'static' -> type(STATIC);
 ALSO:                   'also';
 
 // Keywords that introduce expression
-JC_ASSERT:              'assert' -> pushMode(expr), type(ASSERT);
-MODEL:                  'model'         -> pushMode(expr); //TODO this is not always the case
-INVARIANT:              'invariant'     -> pushMode(expr);
-CONSTRAINT:             'constraint'    -> pushMode(expr);
-INITIALLY:              'initially'     -> pushMode(expr);
-AXIOM:                  'axiom'         -> pushMode(expr);
-ACCESSIBLE:             'accessible'    -> pushMode(expr);
-ASSIGNABLE:             'assignable'    -> pushMode(expr);
-BREAKS:                 'breaks'        -> pushMode(expr);
-CONTINUES:              'continues'     -> pushMode(expr);
+JC_ASSERT:              'assert'        -> pushMode(jmlExpr), type(ASSERT);
+MODEL:                  'model'         -> pushMode(jmlExpr); //TODO this is not always the case
+INVARIANT:              'invariant'     -> pushMode(jmlExpr);
+CONSTRAINT:             'constraint'    -> pushMode(jmlExpr);
+INITIALLY:              'initially'     -> pushMode(jmlExpr);
+AXIOM:                  'axiom'         -> pushMode(jmlExpr);
+ACCESSIBLE:             'accessible'    -> pushMode(jmlExpr);
+ASSIGNABLE:             'assignable'    -> pushMode(jmlExpr);
+BREAKS:                 'breaks'        -> pushMode(jmlExpr);
+CONTINUES:              'continues'     -> pushMode(jmlExpr);
 DECREASES:              ('decreasing'
-                        | 'decreases')  -> pushMode(expr); // internal translation for 'measured_by'
-DEPENDS:                'depends'       -> pushMode(expr); // internal translation for 'accessible' on model fields
-DETERMINES:             'determines'    -> pushMode(expr); //KeY extension, not official JML
+                        | 'decreases')  -> pushMode(jmlExpr); // internal translation for 'measured_by'
+DEPENDS:                'depends'       -> pushMode(jmlExpr); // internal translation for 'accessible' on model fields
+DETERMINES:             'determines'    -> pushMode(jmlExpr); //KeY extension, not official JML
 ENSURES:                ('ensures'
                         | 'post'
-                        ) '_free'? '_redundantly'? -> pushMode(expr);
-LOOP_DETERMINES:        'loop_determines'         -> pushMode(expr);  // internal translation for 'determines' in loop invariants
-LOOP_SEPARATES:         'loop_separates'          -> pushMode(expr);  //KeY extension, deprecated
-MODEL_METHOD_AXIOM:     'model_method_axiom'      -> pushMode(expr);  //KeY extension, not official JML
-MERGE_PARAMS:           'merge_params'            -> pushMode(expr);  //KeY extension, not official JML
-REPRESENTS:             'represents'              -> pushMode(expr);
+                        ) '_free'? '_redundantly'? -> pushMode(jmlExpr);
+LOOP_DETERMINES:        'loop_determines'         -> pushMode(jmlExpr);  // internal translation for 'determines' in loop invariants
+LOOP_SEPARATES:         'loop_separates'          -> pushMode(jmlExpr);  //KeY extension, deprecated
+MODEL_METHOD_AXIOM:     'model_method_axiom'      -> pushMode(jmlExpr);  //KeY extension, not official JML
+MERGE_PARAMS:           'merge_params'            -> pushMode(jmlExpr);  //KeY extension, not official JML
+REPRESENTS:             'represents'              -> pushMode(jmlExpr);
 REQUIRES:               ('requires' | 'post')
-                        '_free'? '_redundantly'?  -> pushMode(expr);
-RETURNS:                'returns'                 -> pushMode(expr);  //KeY extension, not official JML
-SEPARATES:              'separates'               -> pushMode(expr);  //KeY extension, not official JML
-SIGNALS:                'signals'                 -> pushMode(expr);
-SIGNALS_ONLY:           'signals_only'            -> pushMode(expr);
-DIVERGES:               'diverges'                -> pushMode(expr);
-SET:                    'set'                     -> pushMode(expr);
+                        '_free'? '_redundantly'?  -> pushMode(jmlExpr);
+RETURNS:                'returns'                 -> pushMode(jmlExpr);  //KeY extension, not official JML
+SEPARATES:              'separates'               -> pushMode(jmlExpr);  //KeY extension, not official JML
+SIGNALS:                'signals'                 -> pushMode(jmlExpr);
+SIGNALS_ONLY:           'signals_only'            -> pushMode(jmlExpr);
+DIVERGES:               'diverges'                -> pushMode(jmlExpr);
+SET:                    'set'                     -> pushMode(jmlExpr);
 LOOP_INVARIANT:         ('maintaining' | 'loop_invariant')
-                        '_free'?                  -> pushMode(expr);
-GHOST:                  'ghost'                   -> pushMode(expr);
-MODIFIABLE:             'modifiable'              -> pushMode(expr);
-MODIFIES:               'modifies'                -> pushMode(expr);
-MEASURED_BY:            '\\'? 'measured_by'       -> pushMode(expr);
+                        '_free'?                  -> pushMode(jmlExpr);
+GHOST:                  'ghost'                   -> pushMode(jmlExpr);
+MODIFIABLE:             'modifiable'              -> pushMode(jmlExpr);
+MODIFIES:               'modifies'                -> pushMode(jmlExpr);
+MEASURED_BY:            '\\'? 'measured_by'       -> pushMode(jmlExpr);
 
 
 // Modifiers
 NON_NULL:               'non_null';
 NULLABLE:               'nullable';
 UNREACHABLE:            'unreachable';
-PURE: 		            'pure';
+PURE: 		              'pure';
 STRICTLY_PURE:          'strictly_pure';
 HELPER:                 'helper';
 NULLABLE_BY_DEFAULT:    'nullable_by_default';
@@ -345,14 +347,15 @@ INSTANCE:               'instance';
 TWO_STATE:              'two_state';
 NO_STATE:               'no_state';
 
-JC_JML_END:             '*/'                -> type(COMMENT_END), popMode;
-WS_CONTRACT:             [ @\t\r\n\u000C]+   -> channel(HIDDEN);
+JC_JML_END:             {!_slJml}? '*/'       -> type(COMMENT_END), popMode;
+WS_CONTRACT_QUIT:       {_slJml}?  [\r\n\f]   -> type(COMMENT_END), popMode;
+WS_CONTRACT_IGNORE:     {!_slJml}?  [@\r\n\u000C]+ -> channel(HIDDEN);
+WS_CONTRACT:            [ \t]+   -> channel(HIDDEN);
+
 LINE_COMMENT_CONTRACT:  '//' ~[\r\n]*       -> channel(HIDDEN);
 
-//ID : '\\'? JavaLetter  ( JavaLetterOrDigit )*;
-
-JC_NESTED_CONTRACT_START:   '{|';
-JC_NESTED_CONTRACT_END:   '|}';
+JC_NESTED_CONTRACT_START:   {!_slJml}? '{|';
+JC_NESTED_CONTRACT_END:     {!_slJml}? '|}';
 
 JC_COMMA:           ',' -> type(COMMA);
 
@@ -364,7 +367,7 @@ JC_DOUBLE:          'double'    -> type(DOUBLE);
 
 JC_ERROR_CHAR: . -> type(ERROR_CHAR);
 
-mode expr;
+mode jmlExpr;
 
 DOTDOT:             '..';
 EQUIVALENCE:        '<==>';
@@ -395,7 +398,7 @@ JE_NO_STATE:           'no_state'   -> type(NO_STATE);
 JE_INSTANCE:           'instance'   -> type(INSTANCE);
 
 //Prefixed keywords
-JE_MEASURED_BY:        '\\measured_by' -> type(MEASURED_BY);
+JE_MEASURED_BY:     '\\measured_by' -> type(MEASURED_BY);
 SUCH_THAT:          '\\such_that';
 LBLPOS:             '\\lblpos';
 LBLNEG:             '\\lblneg';
@@ -533,11 +536,15 @@ JE_ELLIPSIS:           '...' -> type(ELLIPSIS);
 
 // Whitespace and comments
 
-JE_WS:                 [ @\t\r\n\u000C]+ -> channel(HIDDEN), type(WS);
+JE_JML_END:             {!_slJml}? '*/'       -> type(COMMENT_END), popMode, popMode;
+JE_WS_CONTRACT_QUIT:       {_slJml}?  [\r\n\f]   -> type(COMMENT_END), popMode, popMode;
+JE_WS_CONTRACT_IGNORE:     {!_slJml}?  [@\r\n\u000C]+ -> channel(HIDDEN), type(WS);
+JE_WS_CONTRACT:            [ \t]+   -> channel(HIDDEN), type(WS);
+
 //JML:                '/*@' .*? '*/'; // capture
-JE_COMMENT:            '{*'              -> channel(HIDDEN), type(COMMENT_START), pushMode(jmlComment);
+JE_COMMENT:            {!_slJml}? '{*'              -> channel(HIDDEN), type(COMMENT_START), pushMode(jmlComment);
 JE_LINE_COMMENT:       '//' ~[\r\n]*     -> channel(HIDDEN), type(LINE_COMMENT);
-JE_END_COMMENT:        '*/' -> /*channel(HIDDEN),*/ popMode, popMode, type(COMMENT_END);
+JE_END_COMMENT:        {!_slJml}? '*/' -> /*channel(HIDDEN),*/ popMode, popMode, type(COMMENT_END);
 // Identifiers
 
 //JE_IDENTIFIER:         JavaLetter JavaLetterOrDigit* -> type(IDENTIFIER);
@@ -604,12 +611,6 @@ JML_IDENTIFIER : '\\'? JavaLetter  ( JavaLetterOrDigit )*  -> type(IDENTIFIER);
 
 JE_ERROR_CHAR: . -> type(ERROR_CHAR);
 
-mode jmlSLContract;
-STOP: '\n\r\f' -> type(COMMENT_END), popMode;
-SL_ALL: ~[\n\r\f]+ -> channel(HIDDEN); //TODO
-
-
-
 mode comment;
 
 COMMENT_END_COMMENT: '*/'   -> channel(HIDDEN), popMode, type(COMMENT_END);
@@ -619,4 +620,4 @@ COMMENT_EVERY_CHAR: .       -> channel(HIDDEN);
 mode jmlComment;
 
 JML_COMMENT_END: '*}'         -> channel(HIDDEN), popMode, type(COMMENT_END);
-JML_COMMENT_EVERY_CHAR: .     -> channel(HIDDEN), type(COMMENT_EVERY_CHAR);
+JML_COMMENT_EVERY_CHAR: .     -> channel(HIDDEN);

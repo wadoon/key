@@ -112,6 +112,8 @@ public class Actions {
             setName("Auto open proof script");
             setSelected(true);
             setMenuPath(ScriptEditor.MENU_PROOF_SCRIPTS);
+            putValue(CHECKBOX, true);
+            lookupAcceleratorKey();
         }
 
         @Override

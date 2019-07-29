@@ -109,7 +109,7 @@ public class EditorExtension implements KeYGuiExtension,
     }
 
     public JFileChooser getFileChooser() {
-        if(fileChooser==null) {
+        if (fileChooser == null) {
             fileChooser = new JFileChooser();
         }
 
@@ -149,6 +149,7 @@ public class EditorExtension implements KeYGuiExtension,
         public OpenCurrentAsFileAction() {
             setName("Open Current Proof As File");
             setMenuPath(EDITOR_MENU);
+            lookupAcceleratorKey();
         }
 
         @Override
@@ -161,7 +162,7 @@ public class EditorExtension implements KeYGuiExtension,
                     File f = new File(recentFile);
                     try {
                         Editor editor = EditorFacade.open(f.toPath());
-                        if(editor!=null)
+                        if (editor != null)
                             EditorFacade.addEditor(editor, mainWindow);
                     } catch (Exception exc) {
                         setEnabled(false);
@@ -174,11 +175,11 @@ public class EditorExtension implements KeYGuiExtension,
     class SaveAsAction extends MainWindowAction {
         public SaveAsAction(MainWindow mw) {
             super(mw);
-            setName("Save as…");
-            setTooltip("Save the current proof scripts");
-            setMenuPath("File");
+            setName("Save current editor as…");
+            setTooltip("Save the current focused editor under a new path.");
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.SAVE, MainWindow.TOOLBAR_ICON_SIZE));
             setMenuPath(EDITOR_MENU);
+            lookupAcceleratorKey();
         }
 
         @Override
@@ -196,6 +197,8 @@ public class EditorExtension implements KeYGuiExtension,
                     File f = fc.getSelectedFile();
                     try {
                         Files.writeString(f.toPath(), editor.getText());
+                        editor.setPath(f.toPath());
+                        editor.setDirty(false);
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
@@ -209,10 +212,11 @@ public class EditorExtension implements KeYGuiExtension,
     class SaveAction extends MainWindowAction {
         public SaveAction(MainWindow mw) {
             super(mw);
-            setName("Save");
-            setTooltip("Store script file");
+            setName("Save current editor");
+            setTooltip("Save current editor");
             setMenuPath(EDITOR_MENU);
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.DOWNLOAD, ICON_SIZE));
+            lookupAcceleratorKey();
         }
 
         @Override
@@ -222,6 +226,7 @@ public class EditorExtension implements KeYGuiExtension,
                 if (editor.getPath() != null) {
                     try {
                         Files.writeString(editor.getPath(), editor.getText());
+                        editor.setDirty(false);
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
@@ -237,9 +242,10 @@ public class EditorExtension implements KeYGuiExtension,
     class LoadAction extends MainWindowAction {
         public LoadAction(MainWindow mw) {
             super(mw);
-            setName("Load proof script");
+            setName("Load file in editor...");
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.UPLOAD, ICON_SIZE));
             setMenuPath(EDITOR_MENU);
+            lookupAcceleratorKey();
         }
 
         @Override
@@ -256,9 +262,10 @@ public class EditorExtension implements KeYGuiExtension,
     private class NewAction extends KeyAction {
         public NewAction() {
             setName("New file");
-            setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.FILE, ICON_SIZE));
+            setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.FILE_MEDICAL, ICON_SIZE));
             setTooltip("Store script file");
             setMenuPath(EDITOR_MENU);
+            lookupAcceleratorKey();
         }
 
         @Override
@@ -271,9 +278,9 @@ public class EditorExtension implements KeYGuiExtension,
                 menu.add(item);
             });
             Component c = (Component) e.getSource();
-            int x = c.getLocationOnScreen().x + c.getWidth();
-            int y = c.getLocationOnScreen().y + c.getHeight();
-            menu.show(mainWindow, x, y);
+            int x = c.getWidth();
+            int y = c.getHeight();
+            menu.show(c, x, y);
         }
     }
 }

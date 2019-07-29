@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.Recognizer;
 import org.fife.ui.rsyntaxtextarea.Token;
 import org.fife.ui.rsyntaxtextarea.TokenImpl;
 import org.fife.ui.rsyntaxtextarea.TokenTypes;
+import org.jetbrains.annotations.Contract;
 
 import javax.swing.text.Segment;
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
                 EQUIVALENCE, ANTIVALENCE, IMPLIES, IMPLIESBACKWARD, LOCKSET_LEQ,
                 LOCKSET_LT, ST, SUCH_THAT, LBLPOS, LBLNEG, FORALL, IMPLEMENTS, MODIFIABLE, MODEL_METHOD_AXIOM,
                 EXISTS, BY, DECLASSIFIES, ERASES, NEW_OBJECTS, SEMI_TOPLEVEL, LBLNEG, LBLPOS,
-                SL_ALL, JE_MEASURED_BY, STOP, FORALL, EXISTS, NORMAL_BEHAVIOR, EXCEPTIONAL_BEHAVIOR, ERASES, NEW_OBJECTS,
+                JE_MEASURED_BY, FORALL, EXISTS, NORMAL_BEHAVIOR, EXCEPTIONAL_BEHAVIOR, ERASES, NEW_OBJECTS,
                 CONTINUE_BEHAVIOR, CONTINUES, INSTANCE, MODEL, DIVERGES, MEASURED_BY, ASSIGNABLE, ACCESSIBLE);
 
 
@@ -71,7 +72,7 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
 
         add(TokenTypes.DATA_TYPE, INT, FLOAT, SHORT, BYTE, DOUBLE, LONG, CHAR, BOOLEAN);
 
-        add(TokenTypes.COMMENT_MULTILINE, COMMENT_START, COMMENT_EVERY_CHAR, COMMENT_END);
+        add(TokenTypes.COMMENT_MULTILINE, COMMENT_START, JML_COMMENT_EVERY_CHAR, COMMENT_EVERY_CHAR, COMMENT_END);
 
         add(TokenTypes.WHITESPACE, WS, WS_CONTRACT);
     }
@@ -101,59 +102,71 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
         }
 
         String charSeq = text.toString();
-        TokenImpl lastToken = null;
+         Lexer lexer = createLexer(charSeq);
 
-        boolean inComment = initialTokenType == TokenTypes.COMMENT_MULTILINE;
-        boolean inJml = initialTokenType != TokenTypes.NULL && !inComment;
-
-        Lexer lexer = createLexer(charSeq);
-        if (inJml) lexer.pushMode(jmlContract);
-        if (inComment) lexer.pushMode(comment);
+        //initialTokenType contains the list of mode stack of the lexer
+        while (initialTokenType > 0) {
+            int mode = (initialTokenType & 0xF); //using four bits for lexer mode
+            lexer.pushMode(mode);
+            initialTokenType = initialTokenType >> 4;
+        }
 
         List<org.antlr.v4.runtime.Token> tokens = new ArrayList<>();
+        List<Integer> modes = new ArrayList<>();
         org.antlr.v4.runtime.Token cur = lexer.nextToken();
         while (cur.getType() != Recognizer.EOF) {
             System.out.format("%25s %-25s%n", cur.getText(), lexer.getVocabulary().getSymbolicName(cur.getType()));
-
+            modes.add(lexer._mode);
             tokens.add(cur);
             cur = lexer.nextToken();
         }
 
-
         if (tokens.isEmpty()) {
             addNullToken();
         } else {
+            int i = 0;
             for (org.antlr.v4.runtime.Token token : tokens) {
-                if (token.getType() == COMMENT_END) inJml = false;
-                if (token.getType() == JML_START) inJml = true;
-                if (token.getType() == COMMENT_START) inComment = true;
-                if (token.getType() == COMMENT_END) inComment = false;
-
                 int newType = rewriteTokenType(token.getType());
                 int start = token.getStartIndex();
+                int mode = modes.get(i++);
                 TokenImpl t = new TokenImpl(text,
                         text.offset + start,
                         text.offset + start + token.getText().length() - 1,
                         startOffset + start, newType, 0);
-                t.setLanguageIndex(inJml ? 1 : 0);
+                t.setLanguageIndex(inJml(mode) ? 1 : 0);
                 if (firstToken == null) {
                     firstToken = t;
+                    currentToken = t;
                 } else {
-                    assert lastToken != null;
-                    lastToken.setNextToken(t);
+                    assert currentToken != null;
+                    currentToken.setNextToken(t);
                 }
-                lastToken = t;
+                currentToken = t;
             }
-            if (!inJml && inComment) {
-                TokenImpl token = new TokenImpl();
-                token.text = null;
-                token.setType(Token.NULL);
-                token.setOffset(-1);
-                token.setNextToken(null);
-                lastToken.setNextToken(token);//close line with a "0" if not ended in JML mode.
-            }
-        }
 
+            int tokenType = (0xF & lexer._mode);//current mode is not on stack
+            while (lexer._modeStack.size() > 0) {
+                tokenType = (tokenType << 4) | (0xF & lexer._modeStack.pop());
+            }
+
+            TokenImpl token = new TokenImpl() {
+                @Override
+                public boolean isPaintable() {
+                    return false;
+                }
+            };
+            token.text = null;
+            token.setOffset(-1);
+            token.setNextToken(null);
+            token.setType(tokenType);
+            currentToken.setNextToken(token);
+
+        }
         return firstToken;
+    }
+
+    @Contract(pure = true)
+    private boolean inJml(int m) {
+        return m == jmlComment || m == jmlContract || m == jmlExpr;
     }
 }

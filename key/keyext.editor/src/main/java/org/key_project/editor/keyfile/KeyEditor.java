@@ -10,6 +10,7 @@ import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult;
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice;
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult;
 import org.key_project.editor.Editor;
+import org.key_project.util.RandomName;
 
 /**
  * @author Alexander Weigl
@@ -25,6 +26,7 @@ public class KeyEditor extends Editor {
     }
 
     public KeyEditor() {
+        super(RandomName.getRandomName("-") + ".key");
         editor.setAntiAliasingEnabled(true);
         editor.setAutoIndentEnabled(true);
         editor.setCodeFoldingEnabled(false);

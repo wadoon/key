@@ -11,6 +11,7 @@ import org.fife.ui.rsyntaxtextarea.Theme;
 import org.jetbrains.annotations.NotNull;
 import org.key_project.editor.java.JavaJMLEditorFactory;
 import org.key_project.editor.keyfile.KeyEditorFactory;
+import org.key_project.util.RandomName;
 
 import javax.swing.filechooser.FileFilter;
 import java.io.*;
@@ -104,7 +105,7 @@ public class EditorFacade {
 
                     @Override
                     public String getDescription() {
-                        return it.getName();
+                        return it.getName() + " ("+ String.join(", ", it.getFileSuffixes()) +")";
                     }
                 }
         );
@@ -213,7 +214,7 @@ public class EditorFacade {
 
         @Override
         public Editor open() {
-            Editor e = new Editor();
+            Editor e = new Editor(RandomName.getRandomName("-") + ".txt");
             e.setMimeType("text/plain");
             return e;
         }

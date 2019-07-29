@@ -7,9 +7,7 @@ import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
-import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.proof.Proof;
@@ -19,32 +17,31 @@ import edu.kit.iti.formal.psdbg.interpreter.KeyInterpreter;
 import edu.kit.iti.formal.psdbg.interpreter.data.KeyData;
 import edu.kit.iti.formal.psdbg.interpreter.dbg.*;
 import edu.kit.iti.formal.psdbg.interpreter.exceptions.InterpreterRuntimeException;
+import edu.kit.iti.formal.psdbg.lint.Level;
 import edu.kit.iti.formal.psdbg.lint.LintProblem;
 import edu.kit.iti.formal.psdbg.lint.LinterStrategy;
 import edu.kit.iti.formal.psdbg.parser.Facade;
+import edu.kit.iti.formal.psdbg.parser.ScriptLanguageParser;
 import edu.kit.iti.formal.psdbg.parser.ScriptLexer;
+import edu.kit.iti.formal.psdbg.parser.TransformAst;
 import edu.kit.iti.formal.psdbg.parser.ast.ASTNode;
 import edu.kit.iti.formal.psdbg.parser.ast.ProofScript;
 import lombok.Getter;
 import lombok.val;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CodePointCharStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.atn.ATNConfigSet;
+import org.antlr.v4.runtime.dfa.DFA;
 import org.fife.io.DocumentReader;
 import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
-import org.fife.ui.rsyntaxtextarea.parser.AbstractParser;
-import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult;
-import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice;
-import org.fife.ui.rsyntaxtextarea.parser.ParseResult;
+import org.fife.ui.rsyntaxtextarea.parser.*;
 import org.jetbrains.annotations.NotNull;
 import org.key_project.editor.Editor;
 import org.key_project.ui.interactionlog.InteractionRecorder;
 import org.key_project.ui.interactionlog.api.Interaction;
 import org.key_project.util.RandomName;
 
-import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
@@ -53,7 +50,6 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.*;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -68,9 +64,10 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     public static final Icon BOOKMARK_ICON = IconFontSwing.buildIcon(FontAwesomeSolid.CIRCLE, 12, Color.red);
     private static final IconFontProvider ICON_REBIND_PROOF = new IconFontProvider(FontAwesomeSolid.LINK);
     private static final IconFontProvider ICON_CLEAR_BOUND_PROOF = new IconFontProvider(FontAwesomeSolid.UNLINK);
-    private final String name = RandomName.getRandomName("-") + ".kps";
+    private static final IconFontProvider ICON_HAMBURGER = new IconFontProvider(FontAwesomeSolid.BARS);
+
     @Getter
-    private final KeyAction actionImportFromInteractionLog = new ImportFromInteractionLog();
+    private final ImportFromInteractionLogAction actionImportFromInteractionLog = new ImportFromInteractionLogAction();
     private final KeyAction actionToggleComment = new ToggleCommentAction();
     @Getter
     LintParser lintParser = new LintParser(this);
@@ -92,13 +89,14 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     private LockAndAutoReloadAction actionLockAndAutoReload = new LockAndAutoReloadAction();
     private JLabel lblBoundProof = new JLabel();
     @Getter
-    private KeyAction actionRebindProof = new RebindProofAction();
+    private RebindProofAction actionRebindProof = new RebindProofAction();
     @Getter
-    private KeyAction actionClearProofBinding = new ClearProofBindingAction();
+    private ClearProofBindingAction actionClearProofBinding = new ClearProofBindingAction();
     private Proof boundProof;
     private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     public ScriptEditor() {
+        super(RandomName.getRandomName("-") + ".kps");
         setMimeType(ScriptUtils.KPS_LANGUAGE_ID);
         getDockable().setTitleText(name);
         editor.setAntiAliasingEnabled(true);
@@ -111,6 +109,17 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         gutter.setBookmarkIcon(BOOKMARK_ICON);
         gutter.setBookmarkingEnabled(true);
 
+        layoutToolbar();
+
+        actionToggleComment.registerIn(getEditor());
+        actionSimpleReformat.registerIn(getEditor());
+        actionCasesFromGoals.registerIn(getEditor());
+
+        mediator.addKeYSelectionListener(this);
+        setActionEnable();
+    }
+
+    private void layoutToolbar() {
         toolBarActions.add(actionExecute);
         toolBarActions.add(actionContinue);
         toolBarActions.add(actionStepOver);
@@ -123,22 +132,20 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         toolBarActions.add(actionClearProofBinding);
         addPropertyChangeListener("boundProof", e -> {
             updateBoundProof();
+            setActionEnable();
         });
         updateBoundProof();
 
-        val more = new CDropDownButton("",IconFactory.CONFIGURE.get());
-        more.add(DockingHelper.translateAction(actionToggleComment));
-        more.add(DockingHelper.translateAction(actionSimpleReformat));
-        more.add(DockingHelper.translateAction(actionCasesFromGoals));
-        more.add(DockingHelper.translateAction(actionImportFromInteractionLog));
-        addAction(more);
-
-        actionToggleComment.registerIn(getEditor());
-        actionSimpleReformat.registerIn(getEditor());
-        actionCasesFromGoals.registerIn(getEditor());
-
-        mediator.addKeYSelectionListener(this);
-
+        JPopupMenu menu = new JPopupMenu();
+        JButton btnMore = new JButton(ICON_HAMBURGER.get());
+        menu.add((actionToggleComment));
+        menu.add((actionSimpleReformat));
+        menu.add((actionCasesFromGoals));
+        menu.add((actionImportFromInteractionLog));
+        btnMore.addActionListener(e ->
+                menu.show(btnMore, btnMore.getWidth(), btnMore.getHeight()));
+        toolBarActions.add(Box.createHorizontalGlue());
+        toolBarActions.add(btnMore);
     }
 
     private void updateBoundProof() {
@@ -167,13 +174,14 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
      */
     public void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework,
                                Throwable throwable) {
-        if(throwable instanceof  InterpreterRuntimeException){
+        if (throwable instanceof InterpreterRuntimeException) {
             onRuntimeError(keyDataDebuggerFramework, (InterpreterRuntimeException) throwable);
         } else {
             window.popupWarning(throwable.getMessage(), "Interpreting Error");
             throwable.printStackTrace();
-            enableGui();
         }
+        enableGui();
+        setActionEnable();
     }
 
     public void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework,
@@ -197,8 +205,8 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
                     e.printStackTrace();
                 }
 
-            }
-            window.popupWarning(msg, "Interpreting Error");
+        }
+        window.popupWarning(msg, "Interpreting Error");
         enableGui();
     }
 
@@ -216,6 +224,10 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         getActionStop().setEnabled();
         getActionContinue().setEnabled();
         getActionCasesFromGoals().setEnabled();
+        getActionImportFromInteractionLog().setEnabled();
+        actionRebindProof.setEnabled();
+        actionClearProofBinding.setEnabled();
+        getProof();//re-evaluate if the bound proof is still valid.
     }
 
     private DebuggerFramework<?> getDebuggerFramework() {
@@ -310,11 +322,12 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
 
     private void insertAfterMainPart(String insert) {
         ScriptLexer lexer = new ScriptLexer(CharStreams.fromString(getText()));
-        Token tok; int toktype;
+        Token tok;
+        int toktype;
         do {
             tok = lexer.nextToken();
             toktype = tok.getType();
-        } while (toktype!= ScriptLexer.SCRIPT && toktype != -1);
+        } while (toktype != ScriptLexer.SCRIPT && toktype != -1);
 
         int pos = tok != null ? tok.getStartIndex() : getText().length() - 1;
         editor.insert(insert, pos);
@@ -427,8 +440,9 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         }
 
         private void setEnabled() {
-            setEnabled(getProof() != null
-                    && getDebuggerFramework() == null
+            setEnabled((getProof() != null)
+                    && ((getDebuggerFramework() == null) ||
+                    (getDebuggerFramework().getInterpreterThread().getState() == Thread.State.TERMINATED))
                     && !mediator.isInAutoMode() &&
                     !getProof().closed());
         }
@@ -442,6 +456,10 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
                 final RSyntaxTextArea editor = f.editor;
                 final CodePointCharStream stream = CharStreams.fromString(editor.getText(), f.getTitle());
                 final List<ProofScript> ast = Facade.getAST(stream);
+
+                if(ast.size() == 0) {
+                    return;
+                }
 
                 ib.addProofScripts(ast)
                         .proof(null,
@@ -460,7 +478,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
                     try {
                         int line = 1 + editor.getLineOfOffset(it.getMarkedOffset());
                         Breakpoint brk = new Breakpoint(f.getTitle(), line);
-                        System.out.println("Breakpoint in ScritpEditor: "+brk);
+                        System.out.println("Breakpoint in ScritpEditor: " + brk);
                         df.getBreakpoints().add(brk);
                     } catch (BadLocationException e1) {
                         e1.printStackTrace();
@@ -468,12 +486,9 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
                 });
                 setDebuggerFramework(df);
                 disableGui();
-                df.setSucceedListener(keyDataDebuggerFramework -> onRunSucceed(keyDataDebuggerFramework));
-                df.setErrorListener((keyDataDebuggerFramework, throwable) -> {
-                    onRuntimeError(keyDataDebuggerFramework, throwable);
-                });
+                df.setSucceedListener(ScriptEditor.this::onRunSucceed);
+                df.setErrorListener(ScriptEditor.this::onRuntimeError);
                 df.start();
-
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
@@ -609,12 +624,16 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         }
     }
 
-    private class ImportFromInteractionLog extends KeyAction {
+    private class ImportFromInteractionLogAction extends KeyAction {
         private Interaction lastInteraction = null;
 
-        public ImportFromInteractionLog() {
+        public ImportFromInteractionLogAction() {
             setName("Import from interaction log");
             setTooltip("Import the last (unimported) interaction into this buffer.");
+        }
+
+        public void setEnabled() {
+            setEnabled(getProof() != null);
         }
 
         @Override
@@ -626,7 +645,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
                 return;
             }
             val log = recorder.get(getProof());
-            if(log == null) return;
+            if (log == null) return;
             val inters = log.getInteractions();
             int startIndex = 0;
             if (lastInteraction != null)
@@ -655,6 +674,10 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         public void actionPerformed(ActionEvent e) {
             setBoundProof(mediator.getSelectedProof());
         }
+
+        public void setEnabled() {
+            setEnabled(mediator.getSelectedProof() != null);
+        }
     }
 
     private class ClearProofBindingAction extends KeyAction {
@@ -667,6 +690,10 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             setBoundProof(null);
+        }
+
+        public void setEnabled() {
+            setEnabled(boundProof != null);
         }
     }
 }
@@ -730,7 +757,7 @@ class ModifiedFileWatcherService implements Runnable {
     }
 }
 
-class LintParser extends AbstractParser {
+class LintParser extends AbstractParser implements ANTLRErrorListener {
     private final ScriptEditor scriptEditor;
     @Getter
     private List<DefaultParserNotice> runtimeException = new ArrayList<>(2);
@@ -743,32 +770,42 @@ class LintParser extends AbstractParser {
     @Override
     public ParseResult parse(RSyntaxDocument doc, String style) {
         result.clearNotices();
-        clearRuntimeExceptions();
+        runtimeException.forEach(result::addNotice);
         DocumentReader dr = new DocumentReader(doc);
         try {
-            List<ProofScript> scripts = Facade.getAST(CharStreams.fromReader(dr));
-            LinterStrategy ls = LinterStrategy.getDefaultLinter();
-            if (scriptEditor.getProof() != null) {
-                InterpreterBuilder ib = new InterpreterBuilder();
-                ib.proof(null, scriptEditor.getProof())
-                        .macros()
-                        .scriptCommands();
-                ls.getCheckers().add(new CallLinter(ib.getLookup()));
+            val stream = CharStreams.fromReader(dr);
+            val parser = Facade.getParser(stream);
+            parser.removeErrorListeners();
+            parser.addErrorListener(this);
+            ScriptLanguageParser.StartContext ctx =parser.start();
+            if (0 == parser.getNumberOfSyntaxErrors()) {
+                val astt = new TransformAst();
+                ctx.accept(astt);
+                val scripts = astt.getScripts();
+                LinterStrategy ls = LinterStrategy.getDefaultLinter();
+                if (scriptEditor.getProof() != null) {
+                    InterpreterBuilder ib = new InterpreterBuilder();
+                    ib.proof(null, scriptEditor.getProof())
+                            .macros()
+                            .scriptCommands();
+                    ls.getCheckers().add(new CallLinter(ib.getLookup()));
+                }
+
+                List<LintProblem> problems = ls.check(scripts);
+                for (LintProblem lp : problems) {
+                    DefaultParserNotice notice = new DefaultParserNotice(this,
+                            lp.getMessage(), lp.getLineNumber(),
+                            lp.getFirstToken().getStartIndex(),
+                            lp.getFirstToken().getText().length());
+                    if(lp.getIssue().getLevel()== Level.WARN)
+                        notice.setLevel(ParserNotice.Level.WARNING);
+                    if(lp.getIssue().getLevel()== Level.ERROR)
+                        notice.setLevel(ParserNotice.Level.ERROR);
+                    if(lp.getIssue().getLevel()== Level.INFO)
+                        notice.setLevel(ParserNotice.Level.INFO);
+                    result.addNotice(notice);
+                }
             }
-
-
-            List<LintProblem> problems = ls.check(scripts);
-
-            runtimeException.forEach(result::addNotice);
-
-            for (LintProblem lp : problems) {
-                result.addNotice(new DefaultParserNotice(this,
-                        lp.getMessage(), lp.getLineNumber(),
-                        lp.getFirstToken().getStartIndex(),
-                        lp.getFirstToken().getText().length()));
-            }
-
-            //TODO result.setParsedLines();
         } catch (IOException | NullPointerException e) {
             result.setError(e);
             e.printStackTrace();
@@ -777,7 +814,22 @@ class LintParser extends AbstractParser {
         return result;
     }
 
-    public void clearRuntimeExceptions() {
-        this.runtimeException = new ArrayList<>();
+    @Override
+    public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+        DefaultParserNotice notice = new DefaultParserNotice(this, msg, line);
+        notice.setLevel(ParserNotice.Level.ERROR);
+        result.addNotice(notice);
+    }
+
+    @Override
+    public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact, BitSet ambigAlts, ATNConfigSet configs) {
+    }
+
+    @Override
+    public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, ATNConfigSet configs) {
+    }
+
+    @Override
+    public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, ATNConfigSet configs) {
     }
 }

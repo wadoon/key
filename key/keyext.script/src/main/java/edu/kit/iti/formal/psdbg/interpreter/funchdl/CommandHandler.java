@@ -53,4 +53,5 @@ public interface CommandHandler<T> {
     default boolean isUninterpretedParams(CallStatement call){
         return false;
     }
+
 }
