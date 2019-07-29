@@ -21,6 +21,9 @@ import de.uka.ilkd.key.smt.newsmt2.SExpr.Type;
 
 public class MasterHandler {
 
+    /** Services for smt settings */
+    private Services services;
+
     /** Exceptions that occur during translation */
     private List<Throwable> exceptions = new ArrayList<>();
 
@@ -49,6 +52,7 @@ public class MasterHandler {
     private Map<String, Object> translationState = new HashMap<>();
 
     public MasterHandler(Services services) throws IOException {
+        this.services = services;
 
         for (SMTHandler smtHandler : ServiceLoader.load(SMTHandler.class)) {
             smtHandler.init(services);
@@ -278,9 +282,12 @@ public class MasterHandler {
             addDeclaration(decl);
         }
 
-        if (snippets.containsKey(functionName + ".axioms")) {
-            VerbatimSMT ax = new VerbatimSMT(snippets.getProperty(functionName + ".axioms"));
-            addAxiom(ax);
+        //TODO js since many axioms are all-quantified, this is a cheap way to disable quantifiers
+        if (services.getProof().getSettings().getSMTSettings().enableQuantifiers) {
+            if (snippets.containsKey(functionName + ".axioms")) {
+                VerbatimSMT ax = new VerbatimSMT(snippets.getProperty(functionName + ".axioms"));
+                addAxiom(ax);
+            }
         }
 
         addKnownSymbol(functionName);
