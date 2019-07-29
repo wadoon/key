@@ -1,6 +1,5 @@
 package org.key_project.script.ui;
 
-import bibliothek.gui.dock.common.action.CButton;
 import bibliothek.gui.dock.common.action.CDropDownButton;
 import com.google.common.base.Strings;
 import de.uka.ilkd.key.core.KeYMediator;
@@ -13,7 +12,6 @@ import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
 import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
-import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.proof.Proof;
 import edu.kit.iti.formal.psdbg.LabelFactory;
 import edu.kit.iti.formal.psdbg.interpreter.InterpreterBuilder;
@@ -48,9 +46,7 @@ import org.key_project.util.RandomName;
 
 import javax.swing.*;
 import javax.swing.Timer;
-import javax.swing.*;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeListener;
@@ -59,7 +55,6 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 import java.util.List;
-import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -174,15 +169,17 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
                                Throwable throwable) {
         if(throwable instanceof  InterpreterRuntimeException){
             onRuntimeError(keyDataDebuggerFramework, (InterpreterRuntimeException) throwable);
+        } else {
+            window.popupWarning(throwable.getMessage(), "Interpreting Error");
+            throwable.printStackTrace();
+            enableGui();
         }
-        window.popupWarning(throwable.getMessage(), "Interpreting Error");
-        throwable.printStackTrace();
-        enableGui();
     }
 
     public void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework,
                                InterpreterRuntimeException throwable) {
         throwable.printStackTrace();
+        lintParser.clearRuntimeExceptions();
         lintParser.getRuntimeException().add(
                 new DefaultParserNotice(lintParser, throwable.getMessage(),
                         0, 0, 10));
@@ -195,7 +192,6 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
                 msg+= " in statement line "+ scriptASTNode.getStartPosition().getLineNumber();
                 try {
                     org.fife.ui.rsyntaxtextarea.Token tokenListForLine = getEditor().getTokenListForLine(scriptASTNode.getStartPosition().getLineNumber() - 1);
-                    System.out.println("tokenListForLine = " + tokenListForLine);
                     getEditor().addLineHighlight(scriptASTNode.getStartPosition().getLineNumber()-1, Color.RED);
                 } catch (BadLocationException e) {
                     e.printStackTrace();
@@ -747,6 +743,7 @@ class LintParser extends AbstractParser {
     @Override
     public ParseResult parse(RSyntaxDocument doc, String style) {
         result.clearNotices();
+        clearRuntimeExceptions();
         DocumentReader dr = new DocumentReader(doc);
         try {
             List<ProofScript> scripts = Facade.getAST(CharStreams.fromReader(dr));
@@ -778,5 +775,9 @@ class LintParser extends AbstractParser {
         }
 
         return result;
+    }
+
+    public void clearRuntimeExceptions() {
+        this.runtimeException = new ArrayList<>();
     }
 }

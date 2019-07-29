@@ -2,6 +2,7 @@ package edu.kit.iti.formal.psdbg.interpreter.dbg;
 
 import com.google.common.graph.MutableValueGraph;
 import edu.kit.iti.formal.psdbg.interpreter.Interpreter;
+import edu.kit.iti.formal.psdbg.interpreter.exceptions.InterpreterRuntimeException;
 import edu.kit.iti.formal.psdbg.interpreter.graphs.ControlFlowNode;
 import edu.kit.iti.formal.psdbg.interpreter.graphs.ControlFlowTypes;
 import edu.kit.iti.formal.psdbg.parser.ast.CallStatement;
@@ -140,7 +141,10 @@ public class DebuggerFramework<T> {
             interpreter.visit(new CallStatement());
 //            ptreeManager.fireStatePointerChanged();
             succeedListener.accept(this);
-        } catch (Exception e) {
+        } catch (InterpreterRuntimeException e) {
+            error = e;
+            errorListener.accept(this, e);
+        } catch (Exception e){
             error = e;
             errorListener.accept(this, e);
         }
