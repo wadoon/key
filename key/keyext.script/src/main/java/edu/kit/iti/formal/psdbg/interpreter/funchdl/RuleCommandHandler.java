@@ -77,12 +77,13 @@ public class RuleCommandHandler implements CommandHandler<KeyData> {
         try {
             for (SequentFormula sf : g.node().sequent().succedent()) {
                 ImmutableList<TacletApp> apps = index.getTacletAppAtAndBelow(filter,
-                        new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
+                        new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
                         services);
                 apps.forEach(t -> set.add(t.taclet().name().toString()));
             }
         } catch (NullPointerException e) {
-            e.printStackTrace();
+            LOGGER.catching(e);
+           // e.printStackTrace();
         }
         return set;
     }
@@ -97,7 +98,8 @@ public class RuleCommandHandler implements CommandHandler<KeyData> {
                 return rules.contains(call.getCommand());
             }
         } catch (NullPointerException npe) {
-            System.out.println("npe = " + npe);
+           // System.out.println("npe = " + npe);
+            LOGGER.catching(npe);
             return false;
         }
         return false;
