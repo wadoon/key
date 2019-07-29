@@ -32,6 +32,7 @@ import java.util.List;
         description = "Should only be used for testing of the extension facade",
         priority = 100000,
         optional = true,
+        disabled = true,
         experimental = true)
 public class TestExtension implements KeYGuiExtension,
         KeYGuiExtension.MainMenu,

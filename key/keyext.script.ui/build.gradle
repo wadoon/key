@@ -3,6 +3,8 @@ dependencies {
     implementation project(":key.ui")
 
     implementation project(":keyext.editor")
+    implementation project(":keyext.interactionlog")
+
     implementation "com.fifesoft:rsyntaxtextarea:3.0.2"
     implementation "com.fifesoft:rstaui:3.0.0"
     implementation "com.fifesoft:autocomplete:3.0.0"

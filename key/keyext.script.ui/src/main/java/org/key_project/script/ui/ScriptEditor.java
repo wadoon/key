@@ -1,12 +1,17 @@
 package org.key_project.script.ui;
 
+import bibliothek.gui.dock.common.action.CButton;
+import bibliothek.gui.dock.common.action.CDropDownButton;
 import com.google.common.base.Strings;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
 import de.uka.ilkd.key.core.KeYSelectionListener;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.actions.KeyAction;
+import de.uka.ilkd.key.gui.docking.DockingHelper;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
+import de.uka.ilkd.key.gui.fonticons.IconFactory;
+import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.gui.sourceview.SourceView;
 import de.uka.ilkd.key.proof.Proof;
@@ -23,6 +28,7 @@ import edu.kit.iti.formal.psdbg.parser.ScriptLexer;
 import edu.kit.iti.formal.psdbg.parser.ast.ASTNode;
 import edu.kit.iti.formal.psdbg.parser.ast.ProofScript;
 import lombok.Getter;
+import lombok.val;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -36,18 +42,24 @@ import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice;
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult;
 import org.jetbrains.annotations.NotNull;
 import org.key_project.editor.Editor;
+import org.key_project.ui.interactionlog.InteractionRecorder;
+import org.key_project.ui.interactionlog.api.Interaction;
 import org.key_project.util.RandomName;
 
 import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -55,16 +67,20 @@ import java.util.regex.Pattern;
  * @version 1 (06.03.19)
  */
 class ScriptEditor extends Editor implements KeYSelectionListener {
-    public static final String MENU_PROOF_SCRIPTS = "Proof Scripts";
+    public static final String MENU_PROOF_SCRIPTS = "Proof.Scripts";
     public static final float ICON_SIZE = 16;
     public static final String MENU_PROOF_SCRIPTS_EXEC = MENU_PROOF_SCRIPTS + ".Run";
     public static final Icon BOOKMARK_ICON = IconFontSwing.buildIcon(FontAwesomeSolid.CIRCLE, 12, Color.red);
+    private static final IconFontProvider ICON_REBIND_PROOF = new IconFontProvider(FontAwesomeSolid.LINK);
+    private static final IconFontProvider ICON_CLEAR_BOUND_PROOF = new IconFontProvider(FontAwesomeSolid.UNLINK);
     private final String name = RandomName.getRandomName("-") + ".kps";
-
+    @Getter
+    private final KeyAction actionImportFromInteractionLog = new ImportFromInteractionLog();
+    private final KeyAction actionToggleComment = new ToggleCommentAction();
+    @Getter
+    LintParser lintParser = new LintParser(this);
     private MainWindow window = MainWindow.getInstance();
     private KeYMediator mediator = window.getMediator();
-
-
     @Getter
     private ExecuteAction actionExecute = new ExecuteAction();
     @Getter
@@ -79,9 +95,13 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     private ContinueAction actionContinue = new ContinueAction();
     @Getter
     private LockAndAutoReloadAction actionLockAndAutoReload = new LockAndAutoReloadAction();
-
+    private JLabel lblBoundProof = new JLabel();
     @Getter
-    LintParser lintParser = new LintParser(mediator);
+    private KeyAction actionRebindProof = new RebindProofAction();
+    @Getter
+    private KeyAction actionClearProofBinding = new ClearProofBindingAction();
+    private Proof boundProof;
+    private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
 
     public ScriptEditor() {
         setMimeType(ScriptUtils.KPS_LANGUAGE_ID);
@@ -100,13 +120,37 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         toolBarActions.add(actionContinue);
         toolBarActions.add(actionStepOver);
         toolBarActions.add(actionStop);
+
         toolBarActions.addSeparator();
-        toolBarActions.add(actionSimpleReformat);
-        toolBarActions.add(actionCasesFromGoals);
+        toolBarActions.add(new JLabel("Proof:"));
+        toolBarActions.add(lblBoundProof);
+        toolBarActions.add(actionRebindProof);
+        toolBarActions.add(actionClearProofBinding);
+        addPropertyChangeListener("boundProof", e -> {
+            updateBoundProof();
+        });
+        updateBoundProof();
+
+        val more = new CDropDownButton("",IconFactory.CONFIGURE.get());
+        more.add(DockingHelper.translateAction(actionToggleComment));
+        more.add(DockingHelper.translateAction(actionSimpleReformat));
+        more.add(DockingHelper.translateAction(actionCasesFromGoals));
+        more.add(DockingHelper.translateAction(actionImportFromInteractionLog));
+        addAction(more);
+
+        actionToggleComment.registerIn(getEditor());
+        actionSimpleReformat.registerIn(getEditor());
+        actionCasesFromGoals.registerIn(getEditor());
 
         mediator.addKeYSelectionListener(this);
 
+    }
 
+    private void updateBoundProof() {
+        if (boundProof == null)
+            lblBoundProof.setText("<selected>");
+        else
+            lblBoundProof.setText(boundProof.name().toString());
     }
 
     /**
@@ -233,6 +277,53 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
 
     }
 
+    public void setBoundProof(Proof boundProof) {
+        val old = this.boundProof;
+        this.boundProof = boundProof;
+        changeSupport.firePropertyChange("boundProof", old, boundProof);
+    }
+
+    public void addPropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(listener);
+    }
+
+    public void removePropertyChangeListener(PropertyChangeListener listener) {
+        changeSupport.removePropertyChangeListener(listener);
+    }
+
+    public void addPropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        changeSupport.addPropertyChangeListener(propertyName, listener);
+    }
+
+    public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
+        changeSupport.removePropertyChangeListener(propertyName, listener);
+    }
+
+    /**
+     * @return the instance on which the script should be executed
+     */
+    Proof getProof() {
+        if (boundProof != null) {
+            if (!boundProof.isDisposed()) {
+                return boundProof;
+            }
+            setBoundProof(null);
+        }
+        return mediator.getSelectedProof();
+    }
+
+    private void insertAfterMainPart(String insert) {
+        ScriptLexer lexer = new ScriptLexer(CharStreams.fromString(getText()));
+        Token tok; int toktype;
+        do {
+            tok = lexer.nextToken();
+            toktype = tok.getType();
+        } while (toktype!= ScriptLexer.SCRIPT && toktype != -1);
+
+        int pos = tok != null ? tok.getStartIndex() : getText().length() - 1;
+        editor.insert(insert, pos);
+    }
+
     class ToggleCommentAction extends KeyAction {
         public ToggleCommentAction() {
             setName("Toogle Comment");
@@ -336,15 +427,14 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
             setPriority(0);
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.PLAY_CIRCLE, ICON_SIZE,
                     new Color(140, 182, 60)));
-
             setEnabled();
         }
 
         private void setEnabled() {
-            setEnabled(mediator.getSelectedProof() != null
-                   // && getDebuggerFramework() == null
+            setEnabled(getProof() != null
+                    && getDebuggerFramework() == null
                     && !mediator.isInAutoMode() &&
-                    !mediator.getSelectedProof().closed());
+                    !getProof().closed());
         }
 
         @Override
@@ -359,7 +449,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
 
                 ib.addProofScripts(ast)
                         .proof(null,
-                                mediator.getSelectedProof())
+                                getProof())
                         .startWith(ast.get(0))
                         .macros()
                         .scriptCommands()
@@ -384,7 +474,6 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
                 disableGui();
                 df.setSucceedListener(keyDataDebuggerFramework -> onRunSucceed(keyDataDebuggerFramework));
                 df.setErrorListener((keyDataDebuggerFramework, throwable) -> {
-
                     onRuntimeError(keyDataDebuggerFramework, throwable);
                 });
                 df.start();
@@ -407,8 +496,8 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
 
         public void setEnabled() {
             setEnabled(
-                    mediator.getSelectedProof() != null
-                            && !mediator.getSelectedProof().closed()
+                    getProof() != null
+                            && !getProof().closed()
                             && getDebuggerFramework() != null
                             && getDebuggerFramework().getStatePointer().getStepOver() != null
                             && !getDebuggerFramework().getBreakpoints().isEmpty());
@@ -448,7 +537,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            Proof proof = mediator.getSelectedProof();
+            Proof proof = getProof();
             List<String[]> labels = LabelFactory.getLabelOfOpenGoals(proof, LabelFactory::getBranchingLabel);
             String text;
             if (labels.isEmpty()) {
@@ -486,8 +575,8 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
 
         public void setEnabled() {
             setEnabled(
-                    mediator.getSelectedProof() != null &&
-                            !mediator.getSelectedProof().closed()
+                    getProof() != null &&
+                            !getProof().closed()
             );
         }
     }
@@ -523,6 +612,67 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
             }
         }
     }
+
+    private class ImportFromInteractionLog extends KeyAction {
+        private Interaction lastInteraction = null;
+
+        public ImportFromInteractionLog() {
+            setName("Import from interaction log");
+            setTooltip("Import the last (unimported) interaction into this buffer.");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            InteractionRecorder recorder = mediator.get(InteractionRecorder.class);
+            if (recorder == null) {
+                setEnabled(false);
+                window.setStatusLine("Could not find interaction log extension.");
+                return;
+            }
+            val log = recorder.get(getProof());
+            if(log == null) return;
+            val inters = log.getInteractions();
+            int startIndex = 0;
+            if (lastInteraction != null)
+                startIndex = Math.max(0, 1 + inters.lastIndexOf(lastInteraction));
+            val sub = inters.subList(startIndex, inters.size());
+            StringBuilder sb = new StringBuilder();
+            sb.append("// imported from ").append(log.getName()).append("\n");
+
+            for (val inter : sub) {
+                sb.append(inter.getProofScriptRepresentation())
+                        .append("\n");
+                lastInteraction = inter;
+            }
+            insertAfterMainPart(sb.toString());
+        }
+    }
+
+    private class RebindProofAction extends KeyAction {
+        public RebindProofAction() {
+            setName("Bind");
+            setTooltip("Bind this editor to the current selected proof.");
+            setIcon(ICON_REBIND_PROOF.get());
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            setBoundProof(mediator.getSelectedProof());
+        }
+    }
+
+    private class ClearProofBindingAction extends KeyAction {
+        public ClearProofBindingAction() {
+            setName("Clear");
+            setTooltip("Clears the bond to the current proof.");
+            setIcon(ICON_CLEAR_BOUND_PROOF.get());
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            setBoundProof(null);
+        }
+    }
 }
 
 class ModifiedFileWatcherService implements Runnable {
@@ -542,19 +692,15 @@ class ModifiedFileWatcherService implements Runnable {
     private final Map<WatchKey, Runnable> consumers = new HashMap<>();
     private final Map<Path, WatchKey> keys = new HashMap<>();
 
-    ModifiedFileWatcherService() throws IOException {
+    private ModifiedFileWatcherService() {
     }
 
     static ModifiedFileWatcherService getInstance() {
-        try {
-            if (SERVICE == null) {
-                SERVICE = new ModifiedFileWatcherService();
-                Thread t = new Thread(SERVICE);
-                t.setDaemon(true);
-                t.start();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (SERVICE == null) {
+            SERVICE = new ModifiedFileWatcherService();
+            Thread t = new Thread(SERVICE);
+            t.setDaemon(true);
+            t.start();
         }
         return SERVICE;
     }
@@ -589,13 +735,13 @@ class ModifiedFileWatcherService implements Runnable {
 }
 
 class LintParser extends AbstractParser {
+    private final ScriptEditor scriptEditor;
     @Getter
     private List<DefaultParserNotice> runtimeException = new ArrayList<>(2);
     private DefaultParseResult result = new DefaultParseResult(this);
-    private final KeYMediator mediator;
 
-    LintParser(KeYMediator mediator) {
-        this.mediator = mediator;
+    LintParser(ScriptEditor editor) {
+        this.scriptEditor = editor;
     }
 
     @Override
@@ -605,9 +751,9 @@ class LintParser extends AbstractParser {
         try {
             List<ProofScript> scripts = Facade.getAST(CharStreams.fromReader(dr));
             LinterStrategy ls = LinterStrategy.getDefaultLinter();
-            {
+            if (scriptEditor.getProof() != null) {
                 InterpreterBuilder ib = new InterpreterBuilder();
-                ib.proof(null, mediator.getSelectedProof())
+                ib.proof(null, scriptEditor.getProof())
                         .macros()
                         .scriptCommands();
                 ls.getCheckers().add(new CallLinter(ib.getLookup()));

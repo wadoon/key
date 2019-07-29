@@ -2,11 +2,7 @@ package de.uka.ilkd.key.gui.actions;
 
 import java.util.Iterator;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
-import javax.swing.Icon;
-import javax.swing.JMenu;
-import javax.swing.KeyStroke;
+import javax.swing.*;
 
 import de.uka.ilkd.key.gui.extension.impl.KeYGuiExtensionFacade;
 import de.uka.ilkd.key.gui.keyshortcuts.KeyStrokeManager;
@@ -153,5 +149,14 @@ public abstract class KeyAction extends AbstractAction {
 
     protected void setPriority(int priority) {
         putValue(PRIORITY, priority);
+    }
+
+    public void registerIn(JComponent component, int condition) {
+        if(getAcceleratorKey()!=null)
+            component.registerKeyboardAction(this, getAcceleratorKey(), condition);
+    }
+
+    public void registerIn(JComponent component) {
+        registerIn(component, JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
     }
 }
