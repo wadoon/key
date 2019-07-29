@@ -3,6 +3,7 @@ package edu.kit.iti.formal.psdbg.lint;
 import lombok.Getter;
 
 import static edu.kit.iti.formal.psdbg.lint.Level.*;
+import lombok.Setter;
 
 /**
  * @author Alexander Weigl
@@ -22,7 +23,7 @@ public enum Issue {
     VARIABLE_NOT_DECLARED(WARN),
     VARIABLE_NOT_USED(WARN),
     FOREACH_AFTER_THEONLY(WARN, "{{firstToken.text}}"),
-    MAIN_NAME_USED(ERROR), CALL_UNDEFINED(WARN, "");
+    MAIN_NAME_USED(ERROR), CALL_UNDEFINED(WARN, "Could not find this proof command. Maybe you have misspelled it.");
 
 
     @Getter

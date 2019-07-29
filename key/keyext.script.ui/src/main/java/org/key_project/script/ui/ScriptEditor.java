@@ -128,6 +128,9 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
      */
     public void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework,
                                Throwable throwable) {
+        if(throwable instanceof  InterpreterRuntimeException){
+            onRuntimeError(keyDataDebuggerFramework, (InterpreterRuntimeException) throwable);
+        }
         window.popupWarning(throwable.getMessage(), "Interpreting Error");
         throwable.printStackTrace();
         enableGui();
@@ -381,6 +384,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
                 disableGui();
                 df.setSucceedListener(keyDataDebuggerFramework -> onRunSucceed(keyDataDebuggerFramework));
                 df.setErrorListener((keyDataDebuggerFramework, throwable) -> {
+
                     onRuntimeError(keyDataDebuggerFramework, throwable);
                 });
                 df.start();
