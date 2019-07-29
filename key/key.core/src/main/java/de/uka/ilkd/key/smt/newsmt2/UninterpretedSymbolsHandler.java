@@ -20,11 +20,11 @@ import static de.uka.ilkd.key.smt.newsmt2.SExpr.Type.UNIVERSE;
 public class UninterpretedSymbolsHandler implements SMTHandler {
 
     public final static String PREFIX = "ui_";
-    private boolean useTypeHierarchy;
+    private boolean enableQuantifiers;
 
     @Override
     public void init(Services services) {
-        useTypeHierarchy = services.getProof().getSettings().getSMTSettings().useExplicitTypeHierarchy;
+        enableQuantifiers = services.getProof().getSettings().getSMTSettings().enableQuantifiers;
     }
 
     @Override
@@ -55,7 +55,10 @@ public class UninterpretedSymbolsHandler implements SMTHandler {
             trans.addKnownSymbol(name);
             if (op instanceof SortedOperator && term.sort() != Sort.FORMULA) {
                 if (op.arity() > 0) {
-                    SExpr axiom = funTypeAxiomFromTerm(term, name, trans);
+                    SExpr axiom = null;
+                    if (enableQuantifiers) {
+                        axiom = funTypeAxiomFromTerm(term, name, trans);
+                    }
                     trans.addAxiom(axiom);
                 }
                 if (op.arity() == 0) {
