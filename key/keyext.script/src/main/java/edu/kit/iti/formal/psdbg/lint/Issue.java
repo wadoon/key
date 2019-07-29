@@ -22,7 +22,7 @@ public enum Issue {
     VARIABLE_NOT_DECLARED(WARN),
     VARIABLE_NOT_USED(WARN),
     FOREACH_AFTER_THEONLY(WARN, "{{firstToken.text}}"),
-    MAIN_NAME_USED(ERROR);
+    MAIN_NAME_USED(ERROR), CALL_UNDEFINED(WARN, "");
 
 
     @Getter
