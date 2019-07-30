@@ -561,12 +561,12 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         }
 
         public void setEnabled() {
-            setEnabled(
-                    getProof() != null
-                            && !getProof().closed()
-                            && getDebuggerFramework() != null
-                            && getDebuggerFramework().getStatePointer().getStepOver() != null
-                            && !getDebuggerFramework().getBreakpoints().isEmpty());
+            boolean flag = getDebuggerFramework() != null &&
+                    getDebuggerFramework().getInterpreterThread() != null &&
+                    (getDebuggerFramework().getInterpreterThread().getState() == Thread.State.WAITING
+                            || getDebuggerFramework().getInterpreterThread().getState() == Thread.State.BLOCKED
+                    );
+            setEnabled(flag);
         }
 
         @Override
