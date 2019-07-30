@@ -69,6 +69,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     private static final IconFontProvider ICON_CLEAR_BOUND_PROOF = new IconFontProvider(FontAwesomeSolid.UNLINK);
     private static final IconFontProvider ICON_HAMBURGER = new IconFontProvider(FontAwesomeSolid.BARS);
 
+
     private HaltListener haltListener = new HaltListener() {
         @Override
         public <T> void onContinue(Interpreter<T> interpreter) {
@@ -111,6 +112,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     private ClearProofBindingAction actionClearProofBinding = new ClearProofBindingAction();
     private Proof boundProof;
     private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+
 
     public ScriptEditor() {
         super(RandomName.getRandomName("-") + ".kps");
@@ -178,7 +180,14 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
      * @param keyDataDebuggerFramework
      */
     public void onRunSucceed(DebuggerFramework<KeyData> keyDataDebuggerFramework) {
+        try {
+            unHighlightAllExecutionLines();
+            highlightExecutionLine(keyDataDebuggerFramework.getCurrentStatePointer().getStepInvOver().getStatement().getStartPosition().getLineNumber());
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
         window.setStatusLine("Interpreting finished");
+
         enableGui();
         setActionEnable();
     }
@@ -191,11 +200,21 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
      */
     public void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework,
                                Throwable throwable) {
+        try {
+            unHighlightAllExecutionLines();
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
         if (throwable instanceof InterpreterRuntimeException) {
             onRuntimeError(keyDataDebuggerFramework, (InterpreterRuntimeException) throwable);
         } else {
             window.popupWarning(throwable.getMessage(), "Interpreting Error");
             throwable.printStackTrace();
+        }
+        try {
+            highlightExecutionLine(keyDataDebuggerFramework.getCurrentStatePointer().getStatement().getStartPosition().getLineNumber());
+        } catch (BadLocationException e) {
+            e.printStackTrace();
         }
         enableGui();
         setActionEnable();
@@ -215,17 +234,18 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
             ASTNode<ParserRuleContext> scriptASTNode = throwable.getScriptASTNode();
             if(scriptASTNode != null){
                 msg+= " in statement line "+ scriptASTNode.getStartPosition().getLineNumber();
-                try {
+                /*try {
                     org.fife.ui.rsyntaxtextarea.Token tokenListForLine = getEditor().getTokenListForLine(scriptASTNode.getStartPosition().getLineNumber() - 1);
                     getEditor().addLineHighlight(scriptASTNode.getStartPosition().getLineNumber()-1, Color.RED);
                 } catch (BadLocationException e) {
                     e.printStackTrace();
-                }
+                }*/
 
         }
         window.popupWarning(msg, "Interpreting Error");
         enableGui();
     }
+
 
     private void disableGui() {
         mediator.stopInterface(true);
@@ -304,6 +324,12 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
         if (mediator.getSelectedProof() != null) {
+
+            try {
+                unHighlightAllExecutionLines();
+            } catch (BadLocationException ex) {
+                ex.printStackTrace();
+            }
             setActionEnable();
         }
 
@@ -473,6 +499,11 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            try {
+                unHighlightAllExecutionLines();
+            } catch (BadLocationException ex) {
+                ex.printStackTrace();
+            }
             getLintParser().getRuntimeException().clear();
             InterpreterBuilder ib = new InterpreterBuilder();
             try {
@@ -856,4 +887,10 @@ class LintParser extends AbstractParser implements ANTLRErrorListener {
     @Override
     public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, ATNConfigSet configs) {
     }
+
+    public void clearRuntimeExceptions() {
+        this.runtimeException = new ArrayList<>();
+    }
+
+
 }

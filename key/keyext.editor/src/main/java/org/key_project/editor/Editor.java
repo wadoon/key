@@ -24,6 +24,8 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeSupport;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import static javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
 
@@ -34,6 +36,9 @@ import static javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
 public class Editor extends DefaultMultipleCDockable implements SearchListener {
     public static final String PROP_DIRTY = "DIRTY";
     public static final String PROP_PATH = "PATH";
+
+    private final Color EXECUTION_HIGHLIGHT = Color.LIGHT_GRAY;
+
 
     @Getter
     protected final RSyntaxTextArea editor;
@@ -58,6 +63,8 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
 
     @Getter
     private Path path;
+
+    private List<Integer> highlightedLines = new ArrayList<>();
 
     public Editor(String name) {
         super(EditorFacade.getEditorDockableFactory());
@@ -281,5 +288,35 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
             }
         }
 
+    }
+
+    /**
+     * Highlight whole line
+     *
+     * @param line
+     * @throws BadLocationException
+     */
+    public void highlightExecutionLine(int line) throws BadLocationException {
+        editor.addLineHighlight(line, EXECUTION_HIGHLIGHT);
+        highlightedLines.add(line);
+    }
+
+    /**
+     * Remove all highlighted lines
+     *
+     * @throws BadLocationException
+     */
+    public void unHighlightAllExecutionLines() throws BadLocationException {
+        for (Integer i : highlightedLines) {
+            editor.addLineHighlight(i, getEditor().getBackground());
+        }
+        highlightedLines.clear();
+    }
+
+
+    public void unHighlightExecutionLines(int line) throws BadLocationException {
+        editor.addLineHighlight(line, getEditor().getBackground());
+        int i = highlightedLines.indexOf(line);
+        highlightedLines.remove(i);
     }
 }
