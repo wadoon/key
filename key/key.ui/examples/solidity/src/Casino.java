@@ -1,4 +1,4 @@
-public class Casino {
+public class Casino extends Address {
 
     public int pot;
 

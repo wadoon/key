@@ -1,4 +1,6 @@
 java.lang.Object
+java.lang.Address
+java.lang.Message
 java.lang.annotation.Annotation
 java.lang.ArithmeticException
 java.lang.ArrayIndexOutOfBoundsException
