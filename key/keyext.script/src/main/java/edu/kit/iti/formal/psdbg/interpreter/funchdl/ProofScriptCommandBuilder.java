@@ -183,4 +183,9 @@ public class ProofScriptCommandBuilder implements CommandHandler<KeyData> {
         return html.toString();
 */
     }
+
+    @Override
+    public Collection<String> getAllCommandStrings() {
+        return getCommands().keySet();
+    }
 }

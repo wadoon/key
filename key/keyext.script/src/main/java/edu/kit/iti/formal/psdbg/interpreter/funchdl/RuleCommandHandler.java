@@ -33,10 +33,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Alexander Weigl
@@ -153,6 +150,11 @@ public class RuleCommandHandler implements CommandHandler<KeyData> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public Collection<String> getAllCommandStrings() {
+        return getRules().keySet();
     }
 
     private Map<String, Object> createParameters(VariableAssignment assignments) {

@@ -5,7 +5,9 @@ import edu.kit.iti.formal.psdbg.interpreter.data.VariableAssignment;
 import edu.kit.iti.formal.psdbg.parser.ast.CallStatement;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -53,5 +55,11 @@ public interface CommandHandler<T> {
     default boolean isUninterpretedParams(CallStatement call){
         return false;
     }
+
+    /**
+     * Returns all available commands in their String representation
+     * @return
+     */
+    default Collection<String> getAllCommandStrings() {return Collections.emptyList();}
 
 }

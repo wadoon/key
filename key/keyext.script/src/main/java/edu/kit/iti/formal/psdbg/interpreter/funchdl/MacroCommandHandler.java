@@ -105,4 +105,9 @@ public class MacroCommandHandler implements CommandHandler<KeyData> {
 
 
     }
+
+    @Override
+    public Collection<String> getAllCommandStrings() {
+        return macros.keySet();
+    }
 }
