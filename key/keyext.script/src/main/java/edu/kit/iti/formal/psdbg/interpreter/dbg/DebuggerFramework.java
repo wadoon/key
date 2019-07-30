@@ -82,7 +82,7 @@ public class DebuggerFramework<T> {
 
     private final Thread interpreterThread;
 
-    private final BlockListener<T> blocker;
+    private final HaltManager<T> blocker;
 
     private final StateWrapper<T> stateWrapper;
 
@@ -108,7 +108,7 @@ public class DebuggerFramework<T> {
                              MutableValueGraph<ControlFlowNode, ControlFlowTypes> cfg) {
         this.interpreter = interpreter;
         mainScript = main;
-        blocker = new BlockListener<>(interpreter);
+        blocker = new HaltManager<>(interpreter);
         breakpointBlocker = new Blocker.BreakpointLine<>(interpreter);
         blocker.getPredicates().add(breakpointBlocker);
         stateWrapper = new StateWrapper<>(interpreter);
@@ -238,5 +238,13 @@ public class DebuggerFramework<T> {
 
     public void removeSucceedListener() {
         succeedListener = null;
+    }
+
+    public boolean addHaltListener(HaltListener haltListener) {
+        return blocker.addHaltListener(haltListener);
+    }
+
+    public boolean removeHaltListener(HaltListener o) {
+        return blocker.removeHaltListener(o);
     }
 }

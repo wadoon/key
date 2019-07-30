@@ -11,6 +11,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.ThreadSafe;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,32 +21,35 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
+ * This class listens to the interpreter and halts it, if a blocker is triggered.
+ * <p>
  * Created by weigl on 21.05.2017.
  */
 @NoArgsConstructor
-public class BlockListener<T> implements InterpreterObserver<T> {
-    private static Logger LOGGER = LogManager.getLogger(BlockListener.class);
+public class HaltManager<T> implements InterpreterObserver<T> {
+    private static Logger LOGGER = LogManager.getLogger(HaltManager.class);
 
     private final Lock lock = new ReentrantLock();
     private final Condition block = lock.newCondition();
-
-    @Getter @Setter
+    /**
+     * Listeners, that are notify on blocking/continuing.
+     */
+    private final List<HaltListener> listeners = new LinkedList<>();
+    @Getter
+    @Setter
     private Interpreter<T> interpreter;
-
     @Getter
     private Visitor<Void> entryListener = new EntryListener();
-
     @Getter
     private Visitor<Void> exitListener = new ExitListener();
-
     @Getter
     private List<Blocker.BlockPredicate> predicates = new LinkedList<>();
     private Set<Blocker.BlockPredicate> markForRemoval = new HashSet<>();
 
-    public BlockListener(@Nonnull Interpreter<T> inter) {
+
+    public HaltManager(@Nonnull Interpreter<T> inter) {
         install(inter);
     }
-
 
     public Void checkForHalt(ASTNode node) {
         boolean halt = false;
@@ -55,9 +59,9 @@ public class BlockListener<T> implements InterpreterObserver<T> {
             if (p.test(node)) {
                 LOGGER.debug("Blocked by {}", p);
                 halt = true;
-                if(!markForRemoval.contains(p)) {
+                if (!markForRemoval.contains(p)) {
                     keep.add(p);
-                }else{
+                } else {
                     markForRemoval.remove(p);
                 }
             } else {
@@ -65,15 +69,42 @@ public class BlockListener<T> implements InterpreterObserver<T> {
             }
         }
         predicates = keep;
-        if (halt) block();
+        if (halt) {
+            block();
+        }
 
         return null;
+    }
+
+    private void fireContinue() {
+        synchronized (listeners) {
+            listeners.forEach(it -> it.onContinue(this.interpreter));
+        }
+    }
+
+    private void fireHalt() {
+        synchronized (listeners) {
+            listeners.forEach(it -> it.onHalt(this.interpreter));
+        }
+    }
+
+    public boolean addHaltListener(HaltListener haltListener) {
+        synchronized (listeners) {
+            return listeners.add(haltListener);
+        }
+    }
+
+    public boolean removeHaltListener(HaltListener o) {
+        synchronized (listeners) {
+            return listeners.remove(o);
+        }
     }
 
     /**
      * Blocks the current thread. Makes him awakable on {@code block}.
      */
     private void block() {
+        fireHalt();
         try {
             lock.lock();
             block.await();
@@ -82,6 +113,7 @@ public class BlockListener<T> implements InterpreterObserver<T> {
         } finally {
             lock.unlock();
         }
+        fireContinue();
     }
 
     public void unlock() {
