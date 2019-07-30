@@ -4,7 +4,9 @@ import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
+import edu.kit.iti.formal.psdbg.interpreter.Interpreter;
 import edu.kit.iti.formal.psdbg.interpreter.dbg.DebuggerFramework;
+import edu.kit.iti.formal.psdbg.interpreter.dbg.HaltListener;
 import lombok.Getter;
 import org.key_project.editor.EditorFacade;
 
@@ -27,8 +29,9 @@ public class UIScriptExtension implements
         KeYGuiExtension,
         KeYGuiExtension.LeftPanel,
         KeYGuiExtension.MainMenu,
-        KeYGuiExtension.StatusLine
-{
+        KeYGuiExtension.StatusLine {
+    static HaltListener haltListener;
+
     static {
         ScriptUtils.registerCodeTemplates();
         ScriptUtils.registerKPSLanguage();
@@ -36,10 +39,8 @@ public class UIScriptExtension implements
     }
 
     private JLabel lblInterpreterStatus = new JLabel("I");
-
     @Getter
     private CommandHelpPane commandHelpPane;
-
     @Getter
     private Actions actions;
 
@@ -49,8 +50,36 @@ public class UIScriptExtension implements
         if (actions == null)
             actions = new Actions(window, mediator);
 
+        haltListener = new HaltListener() {
+            @Override
+            public <T> void onContinue(Interpreter<T> interpreter) {
+                updateStatusLabel();
+            }
 
-        Timer timer = new Timer(100, e -> {
+            @Override
+            public <T> void onHalt(Interpreter<T> interpreter) {
+                updateStatusLabel();
+            }
+
+            private void updateStatusLabel() {
+                DebuggerFramework<?> debuggerFramework = mediator.get(DebuggerFramework.class);
+                /*boolean flag = debuggerFramework != null &&
+                        debuggerFramework.getInterpreterThread() != null &&
+                        (debuggerFramework.getInterpreterThread().getState() == Thread.State.WAITING
+                                || debuggerFramework.getInterpreterThread().getState() == Thread.State.BLOCKED
+                        );
+                if (flag)
+                    mediator.startInterface(true);
+                else
+                    mediator.stopInterface();*/
+
+                if (debuggerFramework != null && debuggerFramework.getInterpreterThread() != null)
+                    lblInterpreterStatus.setText(debuggerFramework.getInterpreterThread().getState().toString());
+            }
+        };
+
+
+        /*Timer timer = new Timer(100, e -> {
             DebuggerFramework<?> debuggerFramework = mediator.get(DebuggerFramework.class);
             boolean flag = debuggerFramework != null &&
                     debuggerFramework.getInterpreterThread() != null &&
@@ -63,7 +92,7 @@ public class UIScriptExtension implements
             if (debuggerFramework != null && debuggerFramework.getInterpreterThread() != null)
                 lblInterpreterStatus.setText(debuggerFramework.getInterpreterThread().getState().toString());
         });
-        timer.start();
+        timer.start();*/
     }
 
     @Override

@@ -12,6 +12,7 @@ import de.uka.ilkd.key.gui.fonticons.IconFontProvider;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
 import de.uka.ilkd.key.proof.Proof;
 import edu.kit.iti.formal.psdbg.LabelFactory;
+import edu.kit.iti.formal.psdbg.interpreter.Interpreter;
 import edu.kit.iti.formal.psdbg.interpreter.InterpreterBuilder;
 import edu.kit.iti.formal.psdbg.interpreter.KeyInterpreter;
 import edu.kit.iti.formal.psdbg.interpreter.data.KeyData;
@@ -42,6 +43,7 @@ import org.key_project.ui.interactionlog.InteractionRecorder;
 import org.key_project.ui.interactionlog.api.Interaction;
 import org.key_project.util.RandomName;
 
+import javax.swing.*;
 import javax.swing.Timer;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
@@ -50,6 +52,7 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.nio.file.*;
+import java.util.*;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -65,6 +68,20 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     private static final IconFontProvider ICON_REBIND_PROOF = new IconFontProvider(FontAwesomeSolid.LINK);
     private static final IconFontProvider ICON_CLEAR_BOUND_PROOF = new IconFontProvider(FontAwesomeSolid.UNLINK);
     private static final IconFontProvider ICON_HAMBURGER = new IconFontProvider(FontAwesomeSolid.BARS);
+
+    private HaltListener haltListener = new HaltListener() {
+        @Override
+        public <T> void onContinue(Interpreter<T> interpreter) {
+            setActionEnable();
+            disableGui();
+        }
+
+        @Override
+        public <T> void onHalt(Interpreter<T> interpreter) {
+            setActionEnable();
+            enableGui();
+        }
+    };
 
     @Getter
     private final ImportFromInteractionLogAction actionImportFromInteractionLog = new ImportFromInteractionLogAction();
@@ -98,7 +115,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     public ScriptEditor() {
         super(RandomName.getRandomName("-") + ".kps");
         setMimeType(ScriptUtils.KPS_LANGUAGE_ID);
-        getDockable().setTitleText(name);
+        getDockable().setTitleText(getTitle());
         editor.setAntiAliasingEnabled(true);
         editor.setCloseCurlyBraces(true);
         editor.setCloseMarkupTags(true);
@@ -187,7 +204,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     public void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework,
                                InterpreterRuntimeException throwable) {
         throwable.printStackTrace();
-        lintParser.clearRuntimeExceptions();
+        lintParser.getRuntimeException().clear();
         lintParser.getRuntimeException().add(
                 new DefaultParserNotice(lintParser, throwable.getMessage(),
                         0, 0, 10));
@@ -235,8 +252,15 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     }
 
     private void setDebuggerFramework(DebuggerFramework<?> framework) {
-        mediator.deregister(getDebuggerFramework(), DebuggerFramework.class);
+        val old = getDebuggerFramework();
+        if(old!=null) {
+            mediator.deregister(old, DebuggerFramework.class);
+            old.removeHaltListener(haltListener);
+            old.removeHaltListener(UIScriptExtension.haltListener);
+        }
         mediator.register(framework, DebuggerFramework.class);
+        framework.addHaltListener(haltListener);
+        framework.addHaltListener(UIScriptExtension.haltListener);
     }
 
     private void simpleReformat() {
