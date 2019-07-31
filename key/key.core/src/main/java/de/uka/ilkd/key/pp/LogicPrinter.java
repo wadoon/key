@@ -1131,6 +1131,7 @@ public class LogicPrinter {
             if (t.op() == getHeapLDT().getCreated()) {
                 markStartKeyword();
             }
+            System.err.println(opName);
             layouter.print("[" + opName + "(").beginC(0);
             if (t.op() == getHeapLDT().getCreated()) {
                 markEndKeyword();
