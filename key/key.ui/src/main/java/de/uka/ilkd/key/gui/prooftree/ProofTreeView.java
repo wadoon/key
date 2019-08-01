@@ -382,6 +382,22 @@ public class ProofTreeView extends JPanel implements TabPanel {
         return false;
     }
 
+
+    // This method is probably responsible for #1509.
+    // It deregisters the component from mediator and other services.
+    // This is bad since the docking framework may detach and reattach
+    // components during the runtime.
+//    @Override
+//    public void removeNotify() {
+//        unregister();
+//        try {
+//            delegateModel.unregister();
+//        } catch (NullPointerException e) {
+//            Debug.out("Exception thrown by class ProofTreeView at unregister()");
+//        }
+//        super.removeNotify();
+//    }
+
     /**
      * sets up the proof tree view if a proof has been loaded
      *
