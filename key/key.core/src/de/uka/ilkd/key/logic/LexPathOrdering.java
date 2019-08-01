@@ -378,7 +378,7 @@ public class LexPathOrdering implements TermOrdering {
             if (opStr.equals ("single")) return Integer.valueOf( 4 );
             if ( opStr.equals ("SetIntersection")) return Integer.valueOf ( 6 );
             if ( opStr.equals ("SetUnion")) return Integer.valueOf ( 7 );
-                       
+            
             if ( opStr.equals ("SetDifference")) return Integer.valueOf ( 9 );
             if ( opStr.equals ("cardinality")) return Integer.valueOf( 10 );
             //End Sets
