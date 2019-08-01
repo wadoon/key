@@ -18,6 +18,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -25,7 +26,9 @@ import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeSupport;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
 
@@ -61,10 +64,10 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
     @Getter
     private boolean dirty;
 
-    @Getter
+
     private Path path;
 
-    private List<Integer> highlightedLines = new ArrayList<>();
+    private Map<Integer, Object> highlightedLines = new HashMap<>();
 
     public Editor(String name) {
         super(EditorFacade.getEditorDockableFactory());
@@ -297,8 +300,8 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
      * @throws BadLocationException
      */
     public void highlightExecutionLine(int line) throws BadLocationException {
-        editor.addLineHighlight(line, EXECUTION_HIGHLIGHT);
-        highlightedLines.add(line);
+        Object tag = editor.addLineHighlight(line, EXECUTION_HIGHLIGHT);
+        highlightedLines.put(line, tag);
     }
 
     /**
@@ -307,16 +310,26 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
      * @throws BadLocationException
      */
     public void unHighlightAllExecutionLines() throws BadLocationException {
-        for (Integer i : highlightedLines) {
-            editor.addLineHighlight(i, getEditor().getBackground());
+        for (Map.Entry<Integer, Object> entry : highlightedLines.entrySet()) {
+            editor.removeLineHighlight(entry.getValue());
         }
         highlightedLines.clear();
+
     }
 
 
     public void unHighlightExecutionLines(int line) throws BadLocationException {
-        editor.addLineHighlight(line, getEditor().getBackground());
-        int i = highlightedLines.indexOf(line);
-        highlightedLines.remove(i);
+        if(highlightedLines.containsKey(line)){
+            Object tag = highlightedLines.get(line);
+            editor.removeLineHighlight(tag);
+            highlightedLines.remove(line, tag);
+        }
+
     }
+
+    public void highlightRange(int charStart, int charStop, Color c) throws BadLocationException {
+        editor.getHighlighter().addHighlight(charStart, charStop, new DefaultHighlighter.DefaultHighlightPainter(c));
+    }
+
+
 }

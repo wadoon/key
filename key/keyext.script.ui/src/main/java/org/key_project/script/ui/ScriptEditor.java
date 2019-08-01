@@ -84,6 +84,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         }
     };
 
+
     @Getter
     private final ImportFromInteractionLogAction actionImportFromInteractionLog = new ImportFromInteractionLogAction();
     private final KeyAction actionToggleComment = new ToggleCommentAction();
@@ -112,6 +113,11 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     private ClearProofBindingAction actionClearProofBinding = new ClearProofBindingAction();
     private Proof boundProof;
     private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+
+    /**
+     * Bookeeping that a line highlight is not changed if ptreenode was exited
+     */
+    private PTreeNode currentNode = null;
 
 
     public ScriptEditor() {
@@ -180,14 +186,9 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
      * @param keyDataDebuggerFramework
      */
     public void onRunSucceed(DebuggerFramework<KeyData> keyDataDebuggerFramework) {
-        try {
-            unHighlightAllExecutionLines();
-            highlightExecutionLine(keyDataDebuggerFramework.getCurrentStatePointer().getStepInvOver().getStatement().getStartPosition().getLineNumber());
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        }
-        window.setStatusLine("Interpreting finished");
 
+        window.setStatusLine("Interpreting finished");
+        editor.setEditable(true);
         enableGui();
         setActionEnable();
     }
@@ -200,22 +201,14 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
      */
     public void onRuntimeError(DebuggerFramework<KeyData> keyDataDebuggerFramework,
                                Throwable throwable) {
-        try {
-            unHighlightAllExecutionLines();
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        }
+
         if (throwable instanceof InterpreterRuntimeException) {
             onRuntimeError(keyDataDebuggerFramework, (InterpreterRuntimeException) throwable);
         } else {
             window.popupWarning(throwable.getMessage(), "Interpreting Error");
             throwable.printStackTrace();
         }
-        try {
-            highlightExecutionLine(keyDataDebuggerFramework.getCurrentStatePointer().getStatement().getStartPosition().getLineNumber());
-        } catch (BadLocationException e) {
-            e.printStackTrace();
-        }
+        editor.setEditable(true);
         enableGui();
         setActionEnable();
     }
@@ -234,15 +227,10 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
             ASTNode<ParserRuleContext> scriptASTNode = throwable.getScriptASTNode();
             if(scriptASTNode != null){
                 msg+= " in statement line "+ scriptASTNode.getStartPosition().getLineNumber();
-                /*try {
-                    org.fife.ui.rsyntaxtextarea.Token tokenListForLine = getEditor().getTokenListForLine(scriptASTNode.getStartPosition().getLineNumber() - 1);
-                    getEditor().addLineHighlight(scriptASTNode.getStartPosition().getLineNumber()-1, Color.RED);
-                } catch (BadLocationException e) {
-                    e.printStackTrace();
-                }*/
 
         }
         window.popupWarning(msg, "Interpreting Error");
+        editor.setEditable(true);
         enableGui();
     }
 
@@ -281,8 +269,29 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         mediator.register(framework, DebuggerFramework.class);
         framework.addHaltListener(haltListener);
         framework.addHaltListener(UIScriptExtension.haltListener);
+        framework.getPtreeManager().getStatePointerListener().add(this::onStatePointerChanged);
     }
 
+    private void onStatePointerChanged(PTreeNode<?> pTreeNode) {
+        //ensure that we only highlight once
+        if(this.currentNode == null || !this.currentNode.equals(pTreeNode)) {
+            this.currentNode = pTreeNode;
+            if(pTreeNode.getStatement().getStartPosition().getLineNumber() != -1) {
+                try {
+                    unHighlightAllExecutionLines();
+                    highlightExecutionLine(pTreeNode.getStatement().getStartPosition().getLineNumber() - 1);
+                } catch (BadLocationException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+
+    private void highlightStatement(ASTNode statement) throws BadLocationException {
+        int lineStartOffset = getEditor().getLineStartOffset(statement.getStartPosition().getLineNumber()-1);
+        highlightRange(statement.getStartPosition().getCharInLine()+lineStartOffset, statement.getEndPosition().getCharInLine()+lineStartOffset, new Color(95, 249, 130));
+    }
     private void simpleReformat() {
         Pattern spacesAtLineEnd = Pattern.compile("[\t ]+\n", Pattern.MULTILINE);
         String text = editor.getText();
@@ -324,12 +333,6 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     @Override
     public void selectedProofChanged(KeYSelectionEvent e) {
         if (mediator.getSelectedProof() != null) {
-
-            try {
-                unHighlightAllExecutionLines();
-            } catch (BadLocationException ex) {
-                ex.printStackTrace();
-            }
             setActionEnable();
         }
 
@@ -423,6 +426,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            getEditor().setEditable(true);
             DebuggerFramework debuggerFramework = mediator.get(DebuggerFramework.class);
             debuggerFramework.stop();
             try {
@@ -499,12 +503,8 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            try {
-                unHighlightAllExecutionLines();
-            } catch (BadLocationException ex) {
-                ex.printStackTrace();
-            }
             getLintParser().getRuntimeException().clear();
+            getEditor().setEditable(false);
             InterpreterBuilder ib = new InterpreterBuilder();
             try {
                 final ScriptEditor f = ScriptEditor.this;

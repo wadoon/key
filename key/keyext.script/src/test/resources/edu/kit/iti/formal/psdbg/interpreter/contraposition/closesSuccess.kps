@@ -2,13 +2,13 @@ script t1(){
     impRight;
     impLeft;
     cases{
-        case closes {
-            auto; //should close
-        } :
-            impRight; //should not close proof
+         case closes {
+             auto; //should close
+         } :
+             impRight; //should not close proof
 
-        case match `==> imp(not(q),not(p))`:
-         auto;
-    }
+         case match `==> imp(not(q),not(p))`:
+          auto;
+     }
 
-}
+ }
