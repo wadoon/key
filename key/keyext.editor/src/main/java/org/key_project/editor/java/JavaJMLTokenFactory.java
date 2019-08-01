@@ -102,7 +102,7 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
         }
 
         String charSeq = text.toString();
-         Lexer lexer = createLexer(charSeq);
+        Lexer lexer = createLexer(charSeq + '\n');
 
         //initialTokenType contains the list of mode stack of the lexer
         while (initialTokenType > 0) {
@@ -121,14 +121,16 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
             cur = lexer.nextToken();
         }
 
-        if (tokens.isEmpty()) {
+        if (tokens.size() <= 1) {
             addNullToken();
         } else {
-            int i = 0;
-            for (org.antlr.v4.runtime.Token token : tokens) {
+            int mode = 0;
+            // skip last artificial '\n' token
+            for (int i = 0; i < tokens.size() - 1; i++) {
+                org.antlr.v4.runtime.Token token = tokens.get(i);
+                mode = modes.get(i);
                 int newType = rewriteTokenType(token.getType());
                 int start = token.getStartIndex();
-                int mode = modes.get(i++);
                 TokenImpl t = new TokenImpl(text,
                         text.offset + start,
                         text.offset + start + token.getText().length() - 1,
@@ -160,7 +162,6 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
             token.setNextToken(null);
             token.setType(tokenType);
             currentToken.setNextToken(token);
-
         }
         return firstToken;
     }

@@ -352,6 +352,7 @@ WS_CONTRACT_QUIT:       {_slJml}?  [\r\n\f]   -> type(COMMENT_END), popMode;
 WS_CONTRACT_IGNORE:     {!_slJml}?  [@\r\n\u000C]+ -> channel(HIDDEN);
 WS_CONTRACT:            [ \t]+   -> channel(HIDDEN);
 
+JC_COMMENT:            {!_slJml}? '{*' -> channel(HIDDEN), type(COMMENT_START), pushMode(jmlComment);
 LINE_COMMENT_CONTRACT:  '//' ~[\r\n]*       -> channel(HIDDEN);
 
 JC_NESTED_CONTRACT_START:   {!_slJml}? '{|';
@@ -619,5 +620,6 @@ COMMENT_EVERY_CHAR: .       -> channel(HIDDEN);
 
 mode jmlComment;
 
-JML_COMMENT_END: '*}'         -> channel(HIDDEN), popMode, type(COMMENT_END);
+JML_COMMENT_END: '*}'         -> channel(HIDDEN), popMode;
+JML_COMMENT_CONTRACT_END: '*/'-> popMode, popMode, type(COMMENT_END);
 JML_COMMENT_EVERY_CHAR: .     -> channel(HIDDEN);

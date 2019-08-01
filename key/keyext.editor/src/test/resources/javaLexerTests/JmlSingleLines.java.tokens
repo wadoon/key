@@ -1,0 +1,262 @@
+                    class : CLASS                : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+           JmlSingleLines : IDENTIFIER           : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                        { : LBRACE               : DEFAULT_MODE
+                   \n     : WS                   : DEFAULT_MODE
+                      //@ : JML_START            : jmlContract
+                          : WS_CONTRACT          : jmlContract
+                  ensures : ENSURES              : jmlExpr
+                          : WS                   : jmlExpr
+                     true : BOOL_LITERAL         : jmlExpr
+                        ; : SEMI_TOPLEVEL        : jmlContract
+                       \n : COMMENT_END          : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                   public : PUBLIC               : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                     void : VOID                 : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                     test : IDENTIFIER           : DEFAULT_MODE
+                        ( : LPAREN               : DEFAULT_MODE
+                        ) : RPAREN               : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                        { : LBRACE               : DEFAULT_MODE
+                        } : RBRACE               : DEFAULT_MODE
+                 \n\n     : WS                   : DEFAULT_MODE
+                      //@ : JML_START            : jmlContract
+                          : WS_CONTRACT          : jmlContract
+                 requires : REQUIRES             : jmlExpr
+                          : WS                   : jmlExpr
+                        f : IDENTIFIER           : jmlExpr
+                        ( : LPAREN               : jmlExpr
+                        a : IDENTIFIER           : jmlExpr
+                        ) : RPAREN               : jmlExpr
+                        ; : SEMI_TOPLEVEL        : jmlContract
+                       \n : COMMENT_END          : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                   public : PUBLIC               : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                     void : VOID                 : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                     test : IDENTIFIER           : DEFAULT_MODE
+                        ( : LPAREN               : DEFAULT_MODE
+                        ) : RPAREN               : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                        { : LBRACE               : DEFAULT_MODE
+                        } : RBRACE               : DEFAULT_MODE
+                 \n\n     : WS                   : DEFAULT_MODE
+                      //@ : JML_START            : jmlContract
+                          : WS_CONTRACT          : jmlContract
+            requires_free : REQUIRES             : jmlExpr
+                          : WS                   : jmlExpr
+                        f : IDENTIFIER           : jmlExpr
+                        ( : LPAREN               : jmlExpr
+                        a : IDENTIFIER           : jmlExpr
+                        ) : RPAREN               : jmlExpr
+                        ; : SEMI_TOPLEVEL        : jmlContract
+                       \n : COMMENT_END          : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                   public : PUBLIC               : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                     void : VOID                 : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                     test : IDENTIFIER           : DEFAULT_MODE
+                        ( : LPAREN               : DEFAULT_MODE
+                        ) : RPAREN               : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                        { : LBRACE               : DEFAULT_MODE
+                        } : RBRACE               : DEFAULT_MODE
+                 \n\n     : WS                   : DEFAULT_MODE
+                      //@ : JML_START            : jmlContract
+                          : WS_CONTRACT          : jmlContract
+               assignable : ASSIGNABLE           : jmlExpr
+                          : WS                   : jmlExpr
+                        f : IDENTIFIER           : jmlExpr
+                        ( : LPAREN               : jmlExpr
+                        a : IDENTIFIER           : jmlExpr
+                        ) : RPAREN               : jmlExpr
+                        ; : SEMI_TOPLEVEL        : jmlContract
+                       \n : COMMENT_END          : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                   public : PUBLIC               : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                     void : VOID                 : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                     test : IDENTIFIER           : DEFAULT_MODE
+                        ( : LPAREN               : DEFAULT_MODE
+                        ) : RPAREN               : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                        { : LBRACE               : DEFAULT_MODE
+                        } : RBRACE               : DEFAULT_MODE
+                 \n\n     : WS                   : DEFAULT_MODE
+                      //@ : JML_START            : jmlContract
+                          : WS_CONTRACT          : jmlContract
+               assignable : ASSIGNABLE           : jmlExpr
+                          : WS                   : jmlExpr
+        missing_semicolon : IDENTIFIER           : jmlExpr
+                       \n : COMMENT_END          : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                   public : PUBLIC               : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                     void : VOID                 : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                     test : IDENTIFIER           : DEFAULT_MODE
+                        ( : LPAREN               : DEFAULT_MODE
+                        ) : RPAREN               : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                        { : LBRACE               : DEFAULT_MODE
+                        } : RBRACE               : DEFAULT_MODE
+                 \n\n     : WS                   : DEFAULT_MODE
+                      //@ : JML_START            : jmlContract
+                          : WS_CONTRACT          : jmlContract
+                 requires : REQUIRES             : jmlExpr
+                          : WS                   : jmlExpr
+                 \nothing : IDENTIFIER           : jmlExpr
+                        ; : SEMI_TOPLEVEL        : jmlContract
+                       \n : COMMENT_END          : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                      //@ : JML_START            : jmlContract
+                          : WS_CONTRACT          : jmlContract
+                  ensures : ENSURES              : jmlExpr
+                          : WS                   : jmlExpr
+              \everything : IDENTIFIER           : jmlExpr
+                        ; : SEMI_TOPLEVEL        : jmlContract
+                       \n : COMMENT_END          : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                   public : PUBLIC               : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                     void : VOID                 : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                     test : IDENTIFIER           : DEFAULT_MODE
+                        ( : LPAREN               : DEFAULT_MODE
+                        ) : RPAREN               : DEFAULT_MODE
+                          : WS                   : DEFAULT_MODE
+                        { : LBRACE               : DEFAULT_MODE
+                        } : RBRACE               : DEFAULT_MODE
+                 \n\n     : WS                   : DEFAULT_MODE
+                      /*  : COMMENT_START        : comment
+                        T : COMMENT_EVERY_CHAR   : comment
+                        h : COMMENT_EVERY_CHAR   : comment
+                        i : COMMENT_EVERY_CHAR   : comment
+                        s : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                        i : COMMENT_EVERY_CHAR   : comment
+                        s : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                        a : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                        c : COMMENT_EVERY_CHAR   : comment
+                        o : COMMENT_EVERY_CHAR   : comment
+                        m : COMMENT_EVERY_CHAR   : comment
+                        m : COMMENT_EVERY_CHAR   : comment
+                        e : COMMENT_EVERY_CHAR   : comment
+                        n : COMMENT_EVERY_CHAR   : comment
+                        t : COMMENT_EVERY_CHAR   : comment
+                        : : COMMENT_EVERY_CHAR   : comment
+                       \n : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                        / : COMMENT_EVERY_CHAR   : comment
+                        / : COMMENT_EVERY_CHAR   : comment
+                        @ : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                        e : COMMENT_EVERY_CHAR   : comment
+                        n : COMMENT_EVERY_CHAR   : comment
+                        s : COMMENT_EVERY_CHAR   : comment
+                        u : COMMENT_EVERY_CHAR   : comment
+                        r : COMMENT_EVERY_CHAR   : comment
+                        e : COMMENT_EVERY_CHAR   : comment
+                        s : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                        \ : COMMENT_EVERY_CHAR   : comment
+                        e : COMMENT_EVERY_CHAR   : comment
+                        v : COMMENT_EVERY_CHAR   : comment
+                        e : COMMENT_EVERY_CHAR   : comment
+                        r : COMMENT_EVERY_CHAR   : comment
+                        y : COMMENT_EVERY_CHAR   : comment
+                        t : COMMENT_EVERY_CHAR   : comment
+                        h : COMMENT_EVERY_CHAR   : comment
+                        i : COMMENT_EVERY_CHAR   : comment
+                        n : COMMENT_EVERY_CHAR   : comment
+                        g : COMMENT_EVERY_CHAR   : comment
+                        ; : COMMENT_EVERY_CHAR   : comment
+                       \n : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                        S : COMMENT_EVERY_CHAR   : comment
+                        o : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                        t : COMMENT_EVERY_CHAR   : comment
+                        h : COMMENT_EVERY_CHAR   : comment
+                        e : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                        p : COMMENT_EVERY_CHAR   : comment
+                        r : COMMENT_EVERY_CHAR   : comment
+                        e : COMMENT_EVERY_CHAR   : comment
+                        v : COMMENT_EVERY_CHAR   : comment
+                        i : COMMENT_EVERY_CHAR   : comment
+                        o : COMMENT_EVERY_CHAR   : comment
+                        u : COMMENT_EVERY_CHAR   : comment
+                        s : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                        j : COMMENT_EVERY_CHAR   : comment
+                        m : COMMENT_EVERY_CHAR   : comment
+                        l : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                        c : COMMENT_EVERY_CHAR   : comment
+                        o : COMMENT_EVERY_CHAR   : comment
+                        n : COMMENT_EVERY_CHAR   : comment
+                        t : COMMENT_EVERY_CHAR   : comment
+                        r : COMMENT_EVERY_CHAR   : comment
+                        a : COMMENT_EVERY_CHAR   : comment
+                        c : COMMENT_EVERY_CHAR   : comment
+                        t : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                        s : COMMENT_EVERY_CHAR   : comment
+                        h : COMMENT_EVERY_CHAR   : comment
+                        o : COMMENT_EVERY_CHAR   : comment
+                        u : COMMENT_EVERY_CHAR   : comment
+                        l : COMMENT_EVERY_CHAR   : comment
+                        d : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                        n : COMMENT_EVERY_CHAR   : comment
+                        o : COMMENT_EVERY_CHAR   : comment
+                        t : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                        b : COMMENT_EVERY_CHAR   : comment
+                        e : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                        l : COMMENT_EVERY_CHAR   : comment
+                        e : COMMENT_EVERY_CHAR   : comment
+                        x : COMMENT_EVERY_CHAR   : comment
+                        e : COMMENT_EVERY_CHAR   : comment
+                        d : COMMENT_EVERY_CHAR   : comment
+                        . : COMMENT_EVERY_CHAR   : comment
+                       \n : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                          : COMMENT_EVERY_CHAR   : comment
+                       */ : COMMENT_END          : DEFAULT_MODE
+                   \n     : WS                   : DEFAULT_MODE
+                      //@ : JML_START            : jmlContract
+                          : WS_CONTRACT          : jmlContract
+            requires_free : REQUIRES             : jmlExpr
+                          : WS                   : jmlExpr
+                    blubb : IDENTIFIER           : jmlExpr
+                        ; : SEMI_TOPLEVEL        : jmlContract
+                       \n : COMMENT_END          : DEFAULT_MODE
+                        } : RBRACE               : DEFAULT_MODE
