@@ -42,7 +42,7 @@ public class HaltManager<T> implements InterpreterObserver<T> {
     private Visitor<Void> entryListener = new EntryListener();
     @Getter
     private Visitor<Void> exitListener = new ExitListener();
-    @Getter
+
     private List<Blocker.BlockPredicate> predicates = new LinkedList<>();
     private Set<Blocker.BlockPredicate> markForRemoval = new HashSet<>();
 
@@ -131,6 +131,14 @@ public class HaltManager<T> implements InterpreterObserver<T> {
 
     public void getMarkForDisable(Blocker.BlockPredicate predicate) {
         markForRemoval.add(predicate);
+    }
+
+    public synchronized void addPredicate(Blocker.BlockPredicate predicate) {
+        predicates.add(predicate);
+    }
+
+    public synchronized void clearPredicates() {
+        predicates.clear();
     }
 
     private class EntryListener extends DefaultASTVisitor<Void> {

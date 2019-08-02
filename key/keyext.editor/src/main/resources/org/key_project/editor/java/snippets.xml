@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <comment>This is easy!</comment>
+    <entry key="method_contract">
+        <![CDATA[
+/*@ requires true;
+  @ ensures true;
+  @ measures_by i;
+  @ assignable \strictly_nothing;
+*/
+]]>
+    </entry>
+
+    <entry key="method_contract">
+        <![CDATA[
+/*@ requires true;
+  @ ensures true;
+  @ measures_by i;
+  @ assignable \strictly_nothing;
+*/
+]]>
+    </entry>
+
+    <entry key="inv">//@ invariant #;</entry>
+    <entry key="qarrall">(\forall int i = 0; i &lt;= 0 &amp;&amp; i &lt; a.length; #)</entry>
+    <entry key="qarrex">(\exists int i = 0; i &lt;= 0 &amp;&amp; i &lt; a.length; #)</entry>
+    <entry key="qsum">(\sum int i = 0; i &lt;= 0 &amp;&amp; i &lt; a.length; #)</entry>
+
+</properties>

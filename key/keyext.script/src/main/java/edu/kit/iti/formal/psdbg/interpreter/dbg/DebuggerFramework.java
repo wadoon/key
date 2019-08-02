@@ -110,7 +110,7 @@ public class DebuggerFramework<T> {
         mainScript = main;
         blocker = new HaltManager<>(interpreter);
         breakpointBlocker = new Blocker.BreakpointLine<>(interpreter);
-        blocker.getPredicates().add(breakpointBlocker);
+        blocker.addPredicate(breakpointBlocker);
         stateWrapper = new StateWrapper<>(interpreter);
         ptreeManager = new ProofTreeManager<>(cfg);
         stateWrapper.setEmitNode(ptreeManager::receiveNode);
@@ -182,12 +182,16 @@ public class DebuggerFramework<T> {
         this.blocker.deinstall();
     }
 
+    public HaltManager<T> getBlocker() {
+        return blocker;
+    }
+
     public PTreeNode<T> getCurrentStatePointer() {
         return ptreeManager.getStatePointer();
     }
 
     public void releaseUntil(Blocker.BlockPredicate predicate) {
-        blocker.getPredicates().add(predicate);
+        blocker.addPredicate(predicate);
         blocker.getMarkForDisable(predicate);
         blocker.unlock();
     }
@@ -204,7 +208,7 @@ public class DebuggerFramework<T> {
      * Let the interpreter run, without adding any further blockers.
      */
     public void releaseForever() {
-        blocker.getPredicates().clear();
+        blocker.clearPredicates();
         release();
     }
 
