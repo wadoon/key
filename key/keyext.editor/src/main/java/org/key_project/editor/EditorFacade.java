@@ -223,6 +223,8 @@ public class EditorFacade {
     }
 
     public static void loadSnippets(URL snippetUrl) {
+        RSyntaxTextArea.setTemplatesEnabled(true);
+
         if (snippetUrl != null) {
             try (InputStream s = new BufferedInputStream(snippetUrl.openStream())) {
                 CodeTemplateManager ctm = RSyntaxTextArea.getCodeTemplateManager();

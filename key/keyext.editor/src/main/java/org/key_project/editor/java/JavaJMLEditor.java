@@ -40,8 +40,6 @@ public class JavaJMLEditor extends Editor {
         AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory) TokenMakerFactory.getDefaultInstance();
         atmf.putMapping(MIME_TYPE, JavaJMLTokenFactory.class.getName());
         FoldParserManager.get().addFoldParserMapping(MIME_TYPE, new CurlyFoldParser());
-        RSyntaxTextArea.setTemplatesEnabled(true);
-
         URL snippetUrl = JavaJMLEditor.class.getResource("snippets.xml");
         EditorFacade.loadSnippets(snippetUrl);
     }
