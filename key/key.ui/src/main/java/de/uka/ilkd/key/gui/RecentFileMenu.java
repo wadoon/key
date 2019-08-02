@@ -21,7 +21,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -31,9 +30,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import de.uka.ilkd.key.core.KeYMediator;
-import de.uka.ilkd.key.core.Main;
 import de.uka.ilkd.key.gui.fonticons.IconFactory;
-import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.settings.PathConfig;
 import de.uka.ilkd.key.util.Debug;
 
@@ -86,6 +83,7 @@ public class RecentFileMenu {
      */
     public RecentFileMenu(final KeYMediator mediator) {
         this.menu = new JMenu("Recent Files");
+
         this.lissy = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

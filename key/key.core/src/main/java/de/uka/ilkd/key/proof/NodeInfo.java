@@ -13,6 +13,7 @@
 
 package de.uka.ilkd.key.proof;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -403,8 +404,8 @@ public class NodeInfo {
      *
      * @return the set of files relevant to this node.
      */
-    public ImmutableSet<String> getRelevantFiles() {
-        return relevantFiles;
+    public Set<String> getRelevantFiles() {
+        return Collections.unmodifiableSet(relevantFiles);
     }
 
     /**
@@ -413,7 +414,7 @@ public class NodeInfo {
      * @param relevantFile the file to add.
      */
     public void addRelevantFile(String relevantFile) {
-        this.relevantFiles = this.relevantFiles.add(relevantFile);
+        this.relevantFiles.add(relevantFile);
     }
 
     /**
@@ -421,12 +422,8 @@ public class NodeInfo {
      *
      * @param relevantFiles the files to add.
      */
-    public void addRelevantFiles(ImmutableSet<String> relevantFiles) {
-        if (this.relevantFiles.isEmpty()) {
-            this.relevantFiles = relevantFiles;
-        } else {
-            this.relevantFiles = this.relevantFiles.union(relevantFiles);
-        }
+    public void addRelevantFiles(Set<String> relevantFiles) {
+        this.relevantFiles.addAll(relevantFiles);
     }
 
     /** Add user-provided plain-text annotations.
