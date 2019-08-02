@@ -25,9 +25,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeSupport;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
@@ -39,16 +37,11 @@ import static javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
 public class Editor extends DefaultMultipleCDockable implements SearchListener {
     public static final String PROP_DIRTY = "DIRTY";
     public static final String PROP_PATH = "PATH";
-
-    private final Color EXECUTION_HIGHLIGHT = Color.LIGHT_GRAY;
-
-
     @Getter
     protected final RSyntaxTextArea editor;
-
     @Getter
     protected final Gutter gutter;
-
+    private final Color EXECUTION_HIGHLIGHT = Color.LIGHT_GRAY;
     @Getter
     private final RTextScrollPane editorView;
 
@@ -124,26 +117,15 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
         eventSupport.addPropertyChangeListener(it -> dockable.setTitleText(getTitle()));
         dockable.setTitleText(getTitle());
 
-        pane.registerKeyboardAction(
-                EditorExtension.getSaveAction(),
-                EditorExtension.getSaveAction().getAcceleratorKey(),
+        EditorExtension.getSaveAction().registerIn(pane,
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
-        pane.registerKeyboardAction(
-                EditorExtension.getActionLoad(),
-                EditorExtension.getActionLoad().getAcceleratorKey(),
+        EditorExtension.getActionLoad().registerIn(pane,
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
-        pane.registerKeyboardAction(
-                EditorExtension.getActionSaveAs(),
-                EditorExtension.getActionSaveAs().getAcceleratorKey(),
+        EditorExtension.getActionSaveAs().registerIn(pane,
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         KeyAction actionGoto = new GoToLineAction();
-        pane.registerKeyboardAction(
-                actionGoto,
-                actionGoto.getAcceleratorKey(),
-                WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        actionGoto.registerIn(pane, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         pane.registerKeyboardAction(
                 this::increaseFontSize,
@@ -155,7 +137,6 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
                 KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK),
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-
         KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK);
         Action a = csp.addBottomComponent(ks, findToolBar);
         a.putValue(Action.NAME, "Show Find Search Bar");
@@ -164,6 +145,13 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
         a = csp.addBottomComponent(ks, replaceToolBar);
         a.putValue(Action.NAME, "Show Replace Search Bar");
         pane.registerKeyboardAction(a, ks, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+
+        Font font = Font.getFont("Fira Code");
+        if(font != null) {
+            font.deriveFont(12f);
+            editor.setFont(font);
+        }
     }
 
     private void decreaseFontSize(ActionEvent actionEvent) {
@@ -268,31 +256,6 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
         return null;
     }
 
-    private class GoToLineAction extends KeyAction {
-        GoToLineAction() {
-            setName("Go To Line...");
-            int c = InputEvent.CTRL_DOWN_MASK;
-            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_L, c));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            GoToDialog dialog = new GoToDialog((Frame) null);
-            dialog.setMaxLineNumberAllowed(editor.getLineCount());
-            dialog.setVisible(true);
-            int line = dialog.getLineNumber();
-            if (line > 0) {
-                try {
-                    editor.setCaretPosition(editor.getLineStartOffset(line - 1));
-                } catch (BadLocationException ble) { // Never happens
-                    UIManager.getLookAndFeel().provideErrorFeedback(editor);
-                    ble.printStackTrace();
-                }
-            }
-        }
-
-    }
-
     /**
      * Highlight whole line
      *
@@ -317,9 +280,8 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
 
     }
 
-
     public void unHighlightExecutionLines(int line) throws BadLocationException {
-        if(highlightedLines.containsKey(line)){
+        if (highlightedLines.containsKey(line)) {
             Object tag = highlightedLines.get(line);
             editor.removeLineHighlight(tag);
             highlightedLines.remove(line, tag);
@@ -331,5 +293,28 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
         editor.getHighlighter().addHighlight(charStart, charStop, new DefaultHighlighter.DefaultHighlightPainter(c));
     }
 
+    private class GoToLineAction extends KeyAction {
+        GoToLineAction() {
+            setName("Go To Line...");
+            int c = InputEvent.CTRL_DOWN_MASK;
+            putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_L, c));
+        }
 
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            GoToDialog dialog = new GoToDialog((Frame) null);
+            dialog.setMaxLineNumberAllowed(editor.getLineCount());
+            dialog.setVisible(true);
+            int line = dialog.getLineNumber();
+            if (line > 0) {
+                try {
+                    editor.setCaretPosition(editor.getLineStartOffset(line - 1));
+                } catch (BadLocationException ble) { // Never happens
+                    UIManager.getLookAndFeel().provideErrorFeedback(editor);
+                    ble.printStackTrace();
+                }
+            }
+        }
+
+    }
 }

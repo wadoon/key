@@ -7,7 +7,11 @@ import bibliothek.gui.dock.common.MultipleCDockableLayout;
 import bibliothek.util.xml.XElement;
 import de.uka.ilkd.key.gui.MainWindow;
 import lombok.Data;
+import org.fife.ui.rsyntaxtextarea.CodeTemplateManager;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.Theme;
+import org.fife.ui.rsyntaxtextarea.templates.CodeTemplate;
+import org.fife.ui.rsyntaxtextarea.templates.StaticCodeTemplate;
 import org.jetbrains.annotations.NotNull;
 import org.key_project.editor.java.JavaJMLEditorFactory;
 import org.key_project.editor.keyfile.KeyEditorFactory;
@@ -15,13 +19,11 @@ import org.key_project.util.RandomName;
 
 import javax.swing.filechooser.FileFilter;
 import java.io.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -217,6 +219,32 @@ public class EditorFacade {
             Editor e = new Editor(RandomName.getRandomName("-") + ".txt");
             e.setMimeType("text/plain");
             return e;
+        }
+    }
+
+    public static void loadSnippets(URL snippetUrl) {
+        if (snippetUrl != null) {
+            try (InputStream s = new BufferedInputStream(snippetUrl.openStream())) {
+                CodeTemplateManager ctm = RSyntaxTextArea.getCodeTemplateManager();
+                Properties p = new Properties();
+                p.loadFromXML(s);
+                p.forEach((key, value) -> {
+                    String v = value.toString();
+                    String[] t = v.split("[#]");
+                    if (t.length > 1) {
+                        CodeTemplate ct = new StaticCodeTemplate(key.toString(), t[0], t[1]);
+                        ctm.addTemplate(ct);
+                    } else {
+                        CodeTemplate ct = new StaticCodeTemplate(key.toString(), v, null);
+                        ctm.addTemplate(ct);
+                    }
+                });
+                System.out.println("Java snippets loaded");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.err.println("Could not find snippets.xml");
         }
     }
 }

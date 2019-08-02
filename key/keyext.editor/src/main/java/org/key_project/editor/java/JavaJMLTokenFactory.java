@@ -96,6 +96,7 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
 
     @Override
     public Token getTokenList(Segment text, int initialTokenType, int startOffset) {
+        long startTime = System.currentTimeMillis();
         resetTokenList();
         if (text == null) {
             throw new IllegalArgumentException();
@@ -105,8 +106,11 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
         Lexer lexer = createLexer(charSeq);
 
         //initialTokenType contains the list of mode stack of the lexer
+        int mode = (initialTokenType & 0xF); //using four bits for lexer mode
+        lexer._mode = mode;
+        initialTokenType = initialTokenType >> 4;
         while (initialTokenType > 0) {
-            int mode = (initialTokenType & 0xF); //using four bits for lexer mode
+            mode = (initialTokenType & 0xF); //using four bits for lexer mode
             lexer.pushMode(mode);
             initialTokenType = initialTokenType >> 4;
         }
@@ -115,7 +119,7 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
         List<Integer> modes = new ArrayList<>();
         org.antlr.v4.runtime.Token cur = lexer.nextToken();
         while (cur.getType() != Recognizer.EOF) {
-            System.out.format("%25s %-25s%n", cur.getText(), lexer.getVocabulary().getSymbolicName(cur.getType()));
+            //System.out.format("%25s %-25s%n", cur.getText(), lexer.getVocabulary().getSymbolicName(cur.getType()));
             modes.add(lexer._mode);
             tokens.add(cur);
             cur = lexer.nextToken();
@@ -124,7 +128,7 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
         if (tokens.size() == 0) {
             addNullToken();
         } else {
-            int mode = 0;
+            mode = 0;
             // skip last artificial '\n' token
             for (int i = 0; i < tokens.size(); i++) {
                 org.antlr.v4.runtime.Token token = tokens.get(i);
@@ -163,6 +167,9 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
             token.setType(tokenType);
             currentToken.setNextToken(token);
         }
+
+        long stop = System.currentTimeMillis();
+        System.out.println("JavaJMLTokenFactory.getTokenList : " + (stop - startTime) + " ms");
         return firstToken;
     }
 

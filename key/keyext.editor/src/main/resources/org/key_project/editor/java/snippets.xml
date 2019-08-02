@@ -12,11 +12,11 @@
 ]]>
     </entry>
 
-    <entry key="method_contract">
+    <entry key="loopinv">
         <![CDATA[
-/*@ requires true;
-  @ ensures true;
-  @ measures_by i;
+/*@ loop_invariant
+  @     »;
+  @ decreases arr.length - i;
   @ assignable \strictly_nothing;
 */
 ]]>
@@ -26,5 +26,4 @@
     <entry key="qarrall">(\forall int i = 0; i &lt;= 0 &amp;&amp; i &lt; a.length; #)</entry>
     <entry key="qarrex">(\exists int i = 0; i &lt;= 0 &amp;&amp; i &lt; a.length; #)</entry>
     <entry key="qsum">(\sum int i = 0; i &lt;= 0 &amp;&amp; i &lt; a.length; #)</entry>
-
 </properties>

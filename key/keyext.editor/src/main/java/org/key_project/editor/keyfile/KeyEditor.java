@@ -10,6 +10,7 @@ import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult;
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice;
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult;
 import org.key_project.editor.Editor;
+import org.key_project.editor.EditorFacade;
 import org.key_project.util.RandomName;
 
 /**
@@ -23,6 +24,7 @@ public class KeyEditor extends Editor {
         AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory) TokenMakerFactory.getDefaultInstance();
         atmf.putMapping(KEY_LANGUAGE_ID, KeYTokenFactory.class.getName());
         FoldParserManager.get().addFoldParserMapping(KEY_LANGUAGE_ID, new CurlyFoldParser());
+        EditorFacade.loadSnippets(KeyEditor.class.getResource("snippets.xml"));
     }
 
     public KeyEditor() {
