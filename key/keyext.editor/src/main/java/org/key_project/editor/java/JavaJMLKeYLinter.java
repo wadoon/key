@@ -27,7 +27,7 @@ public class JavaJMLKeYLinter extends AbstractParser {
             CompilationUnit comp = new Recoder2KeY(services, services.getNamespaces())
                     .readCompilationUnit(text);
             System.out.println("XXX");
-        } catch (BadLocationException e) {
+        } catch (NullPointerException e) {
             e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();

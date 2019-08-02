@@ -37,8 +37,7 @@ import lombok.Setter;
 
 @members {
    @Getter @Setter private boolean key = true;
-
-   private boolean _slJml = true;
+	 @Getter boolean _slJml = false;
 
    /**
     *
@@ -347,8 +346,8 @@ INSTANCE:               'instance';
 TWO_STATE:              'two_state';
 NO_STATE:               'no_state';
 
-JC_JML_END:             {!_slJml}? '*/'       -> type(COMMENT_END), popMode;
-WS_CONTRACT_QUIT:       {_slJml}?  [\r\n\f]   -> type(COMMENT_END), popMode;
+JML_END:                {!_slJml}? '*/'       -> popMode;
+WS_CONTRACT_QUIT:       {_slJml}?  [\r\n\f]   -> type(JML_END), popMode;
 WS_CONTRACT_IGNORE:     {!_slJml}?  [@\r\n\u000C]+ -> channel(HIDDEN);
 WS_CONTRACT:            [ \t]+   -> channel(HIDDEN);
 
@@ -537,15 +536,15 @@ JE_ELLIPSIS:           '...' -> type(ELLIPSIS);
 
 // Whitespace and comments
 
-JE_JML_END:             {!_slJml}? '*/'       -> type(COMMENT_END), popMode, popMode;
-JE_WS_CONTRACT_QUIT:       {_slJml}?  [\r\n\f]   -> type(COMMENT_END), popMode, popMode;
+JE_JML_END:             {!_slJml}? '*/'       -> type(JML_END), popMode, popMode;
+JE_WS_CONTRACT_QUIT:       {_slJml}?  [\r\n\f]   -> type(JML_END), popMode, popMode;
 JE_WS_CONTRACT_IGNORE:     {!_slJml}?  [@\r\n\u000C]+ -> channel(HIDDEN), type(WS);
 JE_WS_CONTRACT:            [ \t]+   -> channel(HIDDEN), type(WS);
 
 //JML:                '/*@' .*? '*/'; // capture
 JE_COMMENT:            {!_slJml}? '{*'              -> channel(HIDDEN), type(COMMENT_START), pushMode(jmlComment);
 JE_LINE_COMMENT:       '//' ~[\r\n]*     -> channel(HIDDEN), type(LINE_COMMENT);
-JE_END_COMMENT:        {!_slJml}? '*/' -> /*channel(HIDDEN),*/ popMode, popMode, type(COMMENT_END);
+JE_END_COMMENT:        {!_slJml}? '*/' -> /*channel(HIDDEN),*/ popMode, popMode, type(JML_END);
 // Identifiers
 
 //JE_IDENTIFIER:         JavaLetter JavaLetterOrDigit* -> type(IDENTIFIER);

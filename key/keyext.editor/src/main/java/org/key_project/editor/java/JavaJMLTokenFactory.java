@@ -102,7 +102,7 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
         }
 
         String charSeq = text.toString();
-        Lexer lexer = createLexer(charSeq + '\n');
+        Lexer lexer = createLexer(charSeq);
 
         //initialTokenType contains the list of mode stack of the lexer
         while (initialTokenType > 0) {
@@ -121,12 +121,12 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
             cur = lexer.nextToken();
         }
 
-        if (tokens.size() <= 1) {
+        if (tokens.size() == 0) {
             addNullToken();
         } else {
             int mode = 0;
             // skip last artificial '\n' token
-            for (int i = 0; i < tokens.size() - 1; i++) {
+            for (int i = 0; i < tokens.size(); i++) {
                 org.antlr.v4.runtime.Token token = tokens.get(i);
                 mode = modes.get(i);
                 int newType = rewriteTokenType(token.getType());
@@ -146,7 +146,7 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
                 currentToken = t;
             }
 
-            int tokenType = (0xF & lexer._mode);//current mode is not on stack
+            int tokenType = (0xF & simulateNewLine((JavaJMLLexer) lexer));//current mode is not on stack
             while (lexer._modeStack.size() > 0) {
                 tokenType = (tokenType << 4) | (0xF & lexer._modeStack.pop());
             }
@@ -164,6 +164,17 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
             currentToken.setNextToken(token);
         }
         return firstToken;
+    }
+
+    private int simulateNewLine(JavaJMLLexer lexer) {
+        switch (lexer._mode) {
+            case jmlExpr:
+            case jmlComment:
+            case jmlContract:
+                return lexer.is_slJml() ? DEFAULT_MODE : lexer._mode;
+            default:
+                return lexer._mode;
+        }
     }
 
     @Contract(pure = true)
