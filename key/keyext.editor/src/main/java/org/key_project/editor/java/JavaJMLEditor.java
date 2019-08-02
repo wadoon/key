@@ -48,6 +48,7 @@ public class JavaJMLEditor extends Editor {
         editor.setCloseMarkupTags(false);
         editor.setCodeFoldingEnabled(true);
         editor.addParser(new JavaJMLLinter());
+        editor.addParser(new JavaJMLKeYLinter());
 
         editor.setAnimateBracketMatching(true);
         editor.setMarkOccurrences(true);
