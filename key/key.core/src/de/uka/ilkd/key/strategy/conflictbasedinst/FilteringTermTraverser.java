@@ -8,15 +8,18 @@ import de.uka.ilkd.key.logic.Term;
 public class FilteringTermTraverser {
 
     private Condition cond;
+    private Permutation permutation;
     private Set<Term> terms;
 
-    private FilteringTermTraverser(Condition cond) {
+    private FilteringTermTraverser(Condition cond, Permutation permutation) {
         this.cond = cond;
+        this.permutation = permutation;
         this.terms = new HashSet<Term>();
     }
 
     private void filter(Term term) {
-        if(cond.decide(term)) terms.add(term);
+        if (cond.decide(term))
+            terms.add(permutation.permute(term));
         term.subs().forEach(sub -> filter(sub));
     }
 
@@ -24,13 +27,17 @@ public class FilteringTermTraverser {
         return terms;
     }
 
-    public static Set<Term> filter(Term term, Condition cond) {
-        FilteringTermTraverser traverser = new FilteringTermTraverser(cond);
+    public static Set<Term> filter(Term term, Condition cond, Permutation permutation) {
+        FilteringTermTraverser traverser = new FilteringTermTraverser(cond, permutation);
         traverser.filter(term);
         return traverser.getResult();
     }
 
-    private interface Condition {
+    public interface Permutation {
+        Term permute(Term t);
+    }
+
+    public interface Condition {
         boolean decide(Term t);
     }
 
