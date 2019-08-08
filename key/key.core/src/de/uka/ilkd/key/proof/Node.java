@@ -61,7 +61,7 @@ public class Node  {
 
     Node                 parent              = null;
 
-    private RuleApp              appliedRuleApp;
+	private RuleApp appliedRuleApp;
 
     private NameRecorder         nameRecorder;
 
@@ -202,7 +202,7 @@ public class Node  {
 	return renamings;
     }
 
-    public RuleApp getAppliedRuleApp() {
+	public RuleApp getAppliedRuleApp() {
         return appliedRuleApp;
     }
 
@@ -543,7 +543,6 @@ public class Node  {
 				       newPostNr,
 				       children.size(), childId);
 	}
-
 	return tree;
     }
 

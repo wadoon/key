@@ -389,6 +389,7 @@ public final class MainWindow extends JFrame  {
         setSize(1000, 600);
 
         loadPreferences(this);
+        setLocation(new Point(0, 0));
     }
 
     private JToolBar createFileOpsToolBar() {
@@ -892,6 +893,7 @@ public final class MainWindow extends JFrame  {
 
     public ProofTreeView getProofTreeView() {
         return mainWindowTabbedPane.getProofTreeView();
+        
     }
 
     /**

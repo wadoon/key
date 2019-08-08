@@ -3,5 +3,8 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/key.core"/>
+	<classpathentry kind="lib" path="C:/Users/shiva/Desktop/my/new thesis/gson-2.6.2.jar"/>
+	<classpathentry kind="lib" path="C:/Users/shiva/Desktop/java-json.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/key.util"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

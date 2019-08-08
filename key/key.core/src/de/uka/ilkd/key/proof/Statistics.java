@@ -82,7 +82,7 @@ public class Statistics {
         this.timePerStepInMillis = timePerStepInMillis;
     }
 
-    Statistics(Node startNode) {
+    public Statistics(Node startNode) {
         final Iterator<Node> it = startNode.subtreeIterator();
 
         TemporaryStatistics tmp = new TemporaryStatistics();
