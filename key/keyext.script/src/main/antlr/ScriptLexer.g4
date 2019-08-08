@@ -4,7 +4,7 @@ WS : [ \t\n\r]+ -> channel(HIDDEN) ;
 
 //comments, allowing nesting.
 SINGLE_LINE_COMMENT : '//' ~[\r\n]* -> channel(HIDDEN);
-MULTI_LINE_COMMENT  : '/*' -> pushMode(COMMENT), channel(HIDDEN);
+MULTI_LINE_COMMENT  : '/*' -> more, pushMode(COMMENT);
 
 CASES: 'cases';
 CASE: 'case';
@@ -37,13 +37,9 @@ SEMICOLON : ';' ;
 COLON : ':' ;
 SUBST_TO: '\\';
 
-STRING_LITERAL
-   : '\'' ('\'\'' | ~ ('\''))* '\''
-   ;
-
-TERM_LITERAL
-   : '`' ~('`')* '`'
-   ;
+STRING_LITERAL_DOUBLE : '"'  -> more, pushMode(STRINGD);
+STRING_LITERAL_SINGLE : '\'' -> more, pushMode(STRINGS);
+TERM_LITERAL:           '`'  -> more, pushMode(TERM);
 
 PLUS : '+' ;
 MINUS : '-' ;
@@ -75,5 +71,17 @@ ID : ([a-zA-Z]|'#'|'_') ([_a-zA-Z0-9] | '.' | '\\'| '#'|'<'|'>')*;
 ERROR_CHAR: .;
 
 mode COMMENT;
-END_COMMENT: '*/'->popMode, channel(HIDDEN);
-COMMENT_CHAR: . -> channel(HIDDEN);
+END_COMMENT: '*/'-> popMode, type(MULTI_LINE_COMMENT), channel(HIDDEN);
+COMMENT_CHAR: . -> more;
+
+mode STRINGD;
+STRING_DOUBLE_END : '"' -> type(STRING_LITERAL_DOUBLE), popMode;
+STRING_DOUBLE_ANY : .   -> type(STRING_LITERAL_DOUBLE);
+
+mode STRINGS;
+STRING_SINGLE_END : '\'' -> type(STRING_LITERAL_SINGLE), popMode;
+STRING_SINGLE_ANY : .   -> type(STRING_LITERAL_DOUBLE);
+
+mode TERM;
+TERM_END : '`' -> type(TERM_LITERAL), popMode;
+TERM_ANY : .   -> more;

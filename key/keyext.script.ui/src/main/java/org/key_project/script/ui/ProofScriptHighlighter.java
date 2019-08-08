@@ -2,51 +2,16 @@ package org.key_project.script.ui;
 
 import edu.kit.iti.formal.psdbg.parser.ScriptLexer;
 import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonToken;
 import org.antlr.v4.runtime.Lexer;
 import org.fife.ui.rsyntaxtextarea.Token;
-import org.key_project.editor.java.Antlr4TokenMakerFactory;
+import org.key_project.editor.java.JavaJMLTokenFactory;
 
 /**
  * @author Alexander Weigl
  * @version 1 (01.03.19)
  */
-public class ProofScriptHighlighter extends Antlr4TokenMakerFactory {
-
-    /*
-        case ScriptLexer.MULTI_LINE_COMMENT:
-            int commentStop = startOffset;
-            for (; commentStop < end - 1; commentStop++) {
-                if (array[commentStop] == '*' && array[commentStop + 1] == '/') {
-                    break;
-                }
-            }
-            addToken(text, startOffset, commentStop, ScriptLexer.MULTI_LINE_COMMENT,
-                    newStartOffset);
-            startOffset += 1 + commentStop;
-            break;
-        case ScriptLexer.STRING_LITERAL:
-            int stringStop = startOffset;
-            for (; stringStop < end; stringStop++) {
-                if (array[stringStop] == '"') {
-                    break;
-                }
-            }
-            addToken(text, startOffset, stringStop, ScriptLexer.MULTI_LINE_COMMENT, newStartOffset);
-            startOffset = 1 + stringStop;
-            break;
-        case ScriptLexer.TERM_LITERAL:
-            int termStop = startOffset;
-            for (; termStop < end; termStop++) {
-                if (array[termStop] == '`') {
-                    break;
-                }
-            }
-            addToken(text, startOffset, termStop, ScriptLexer.MULTI_LINE_COMMENT, newStartOffset);
-            startOffset = 1 + termStop;
-            break;
-    }
-    */
-
+public class ProofScriptHighlighter extends JavaJMLTokenFactory {
     @Override
     protected Lexer createLexer(String toString) {
         return new ScriptLexer(CharStreams.fromString(toString));
@@ -67,7 +32,6 @@ public class ProofScriptHighlighter extends Antlr4TokenMakerFactory {
             case ScriptLexer.COLON:
             case ScriptLexer.ASSIGN:
                 return Token.OPERATOR;
-
             case ScriptLexer.FOREACH:
             case ScriptLexer.REPEAT:
             case ScriptLexer.WHILE:
@@ -76,12 +40,15 @@ public class ProofScriptHighlighter extends Antlr4TokenMakerFactory {
             case ScriptLexer.CASES:
             case ScriptLexer.DERIVABLE:
             case ScriptLexer.USING:
+            case ScriptLexer.BIND:
+            case ScriptLexer.MATCH:
             case ScriptLexer.SCRIPT:
             case ScriptLexer.THEONLY:
             case ScriptLexer.CALL:
             case ScriptLexer.COMMA:
             case ScriptLexer.CLOSES:
             case ScriptLexer.STRICT:
+            case ScriptLexer.DEFAULT:
                 return Token.FUNCTION;
             case ScriptLexer.ID:
                 return Token.IDENTIFIER;
@@ -92,7 +59,8 @@ public class ProofScriptHighlighter extends Antlr4TokenMakerFactory {
                 return Token.COMMENT_MULTILINE;
             case ScriptLexer.TERM_LITERAL:
                 return Token.LITERAL_BACKQUOTE;
-            case ScriptLexer.STRING_LITERAL:
+            case ScriptLexer.STRING_LITERAL_DOUBLE:
+            case ScriptLexer.STRING_LITERAL_SINGLE:
                 return Token.LITERAL_STRING_DOUBLE_QUOTE;
             case ScriptLexer.DIGITS:
                 return Token.LITERAL_NUMBER_DECIMAL_INT;
@@ -105,9 +73,37 @@ public class ProofScriptHighlighter extends Antlr4TokenMakerFactory {
             case ScriptLexer.LPAREN:
             case ScriptLexer.INDENT:
             case ScriptLexer.DEDENT:
+            case ScriptLexer.SEMICOLON:
                 return Token.SEPARATOR;
+            case ScriptLexer.ERROR_CHAR:
+                return Token.ERROR_CHAR;
             default:
-                return 2;
+                return Token.ERROR_IDENTIFIER;
+        }
+    }
+
+    @Override
+    protected int simulateNewLine(Lexer l) {
+        return l._mode;
+    }
+
+    @Override
+    protected void changeType(Lexer lexer, org.antlr.v4.runtime.Token cur) {
+        ScriptLexer l = (ScriptLexer) lexer;
+        CommonToken tok = (CommonToken) cur;
+        switch (l._mode) {
+            case ScriptLexer.STRINGS:
+                tok.setType(ScriptLexer.STRING_LITERAL_SINGLE);
+                break;
+            case ScriptLexer.STRINGD:
+                tok.setType(ScriptLexer.STRING_LITERAL_DOUBLE);
+                break;
+            case ScriptLexer.TERM:
+                tok.setType(ScriptLexer.TERM_LITERAL);
+                break;
+            case ScriptLexer.COMMENT:
+                tok.setType(ScriptLexer.MULTI_LINE_COMMENT);
+                break;
         }
     }
 }

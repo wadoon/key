@@ -44,16 +44,10 @@ letStmt
         )
     ;
 
-/*scriptDecl
-    :
-    SCRIPT name=ID '(' signature=argList? ')' INDENT body=stmtList DEDENT
-    ;
-*/
 assignment
     :   variable=ID COLON type=ID SEMICOLON
     |   variable=ID (COLON type=ID)? ASSIGN expression SEMICOLON
     ;
-
 
 expression
     :
@@ -65,7 +59,7 @@ expression
     | expression AND expression   #exprAnd
     | expression OR expression    #exprOr
     | expression IMP expression   #exprIMP
-    //|   expression EQUIV expression already covered by EQ/NEQ
+    | expression EQUIV expression #exprEquiv// already covered by EQ/NEQ
     | expression LBRACKET substExpressionList RBRACKET #exprSubst
     | ID LPAREN  (expression (COMMA expression)*)? RPAREN  #function
     | MINUS expression         #exprNegate
@@ -87,7 +81,8 @@ literals :
         ID             #literalID
     |   DIGITS         #literalDigits
     |   TERM_LITERAL   #literalTerm
-    |   STRING_LITERAL #literalString
+    |   ( STRING_LITERAL_SINGLE |
+          STRING_LITERAL_DOUBLE ) #literalString
     |   TRUE           #literalTrue
     |   FALSE          #literalFalse
 ;
@@ -131,11 +126,13 @@ casesList
     ;*/
 
 unconditionalBlock
-    : (kind+=(FOREACH|THEONLY|STRICT|RELAX|REPEAT))+ INDENT stmtList DEDENT
+    : (kind+=(FOREACH|THEONLY|STRICT|RELAX|REPEAT))+
+      (INDENT stmtList DEDENT | statement )
     ;
 
 conditionalBlock
-    : kind=(IF|WHILE) LPAREN expression RPAREN INDENT stmtList DEDENT
+    : kind=(IF|WHILE) LPAREN expression RPAREN
+      (INDENT stmtList DEDENT | statement )
     ;
 
 
@@ -145,9 +142,3 @@ scriptCommand
 
 parameters: parameter+;
 parameter :  ((pname=ID EQ)? expr=expression);
-
-/*
-callStmt
-    :   CALL scriptCommand SEMICOLON
-    ;
-*/

@@ -26,7 +26,7 @@ public class WalkableLabelFacadeTest {
 
         Assert.assertEquals(asList(0, 1, 2, 3, 4, 0, 1, 2, 3, 4), v1);
         Assert.assertEquals(Collections.emptyList(), v2);
-        Assert.assertEquals(asList(-111), v3);
+        Assert.assertEquals(Collections.singletonList(-111), v3);
         Assert.assertEquals(Collections.emptyList(), v4);
         Assert.assertEquals(Collections.emptyList(), v5);
     }
@@ -42,19 +42,6 @@ public class WalkableLabelFacadeTest {
         compressAndUncompress(list1);
         compressAndUncompress(list0);
         compressAndUncompress(list2);
-
-        System.out.println(compress(list.iterator()));
-        System.out.println(compress(list1.iterator()));
-        System.out.println(compress(list2.iterator()));
-        System.out.println(compress(list0.iterator()));
-
-        Assert.assertEquals(
-                "[4=0, 5=1, 1=10, 2=0, 3=1, 1=10, 1=0, 2=2, 1=4]",
-                compress(list.iterator()).toString());
-
-        Assert.assertEquals("[1=0]", compress(list1.iterator()).toString());
-        Assert.assertEquals("[16=1]", compress(list2.iterator()).toString());
-        Assert.assertEquals("[]", compress(list0.iterator()).toString());
     }
 
     public void compressAndUncompress(List<Integer> list) {

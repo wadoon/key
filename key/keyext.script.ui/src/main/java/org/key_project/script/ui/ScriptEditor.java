@@ -1,6 +1,5 @@
 package org.key_project.script.ui;
 
-import bibliothek.gui.dock.common.action.CDropDownButton;
 import com.google.common.base.Strings;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.core.KeYSelectionEvent;
@@ -29,8 +28,8 @@ import edu.kit.iti.formal.psdbg.parser.ast.ASTNode;
 import edu.kit.iti.formal.psdbg.parser.ast.ProofScript;
 import lombok.Getter;
 import lombok.val;
-import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.Parser;
+import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.atn.ATNConfigSet;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.fife.io.DocumentReader;
@@ -43,8 +42,8 @@ import org.key_project.ui.interactionlog.InteractionRecorder;
 import org.key_project.ui.interactionlog.api.Interaction;
 import org.key_project.util.RandomName;
 
-import javax.swing.*;
 import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.text.BadLocationException;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -52,8 +51,8 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.regex.Pattern;
 
 /**
@@ -68,23 +67,6 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     private static final IconFontProvider ICON_REBIND_PROOF = new IconFontProvider(FontAwesomeSolid.LINK);
     private static final IconFontProvider ICON_CLEAR_BOUND_PROOF = new IconFontProvider(FontAwesomeSolid.UNLINK);
     private static final IconFontProvider ICON_HAMBURGER = new IconFontProvider(FontAwesomeSolid.BARS);
-
-
-    private HaltListener haltListener = new HaltListener() {
-        @Override
-        public <T> void onContinue(Interpreter<T> interpreter) {
-            setActionEnable();
-            disableGui();
-        }
-
-        @Override
-        public <T> void onHalt(Interpreter<T> interpreter) {
-            setActionEnable();
-            enableGui();
-        }
-    };
-
-
     @Getter
     private final ImportFromInteractionLogAction actionImportFromInteractionLog = new ImportFromInteractionLogAction();
     private final KeyAction actionToggleComment = new ToggleCommentAction();
@@ -113,7 +95,19 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     private ClearProofBindingAction actionClearProofBinding = new ClearProofBindingAction();
     private Proof boundProof;
     private PropertyChangeSupport changeSupport = new PropertyChangeSupport(this);
+    private HaltListener haltListener = new HaltListener() {
+        @Override
+        public <T> void onContinue(Interpreter<T> interpreter) {
+            setActionEnable();
+            disableGui();
+        }
 
+        @Override
+        public <T> void onHalt(Interpreter<T> interpreter) {
+            setActionEnable();
+            enableGui();
+        }
+    };
     /**
      * Bookeeping that a line highlight is not changed if ptreenode was exited
      */
@@ -220,13 +214,13 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
         lintParser.getRuntimeException().add(
                 new DefaultParserNotice(lintParser, throwable.getMessage(),
                         0, 0, 10));
-            String msg = "There was an error while interpreting script";
-            if(throwable.getMessage().equals("")){
-                msg = throwable.getMessage();
-            }
-            ASTNode<ParserRuleContext> scriptASTNode = throwable.getScriptASTNode();
-            if(scriptASTNode != null){
-                msg+= " in statement line "+ scriptASTNode.getStartPosition().getLineNumber();
+        String msg = "There was an error while interpreting script";
+        if (throwable.getMessage().equals("")) {
+            msg = throwable.getMessage();
+        }
+        ASTNode<ParserRuleContext> scriptASTNode = throwable.getScriptASTNode();
+        if (scriptASTNode != null) {
+            msg += " in statement line " + scriptASTNode.getStartPosition().getLineNumber();
 
         }
         window.popupWarning(msg, "Interpreting Error");
@@ -261,7 +255,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
 
     private void setDebuggerFramework(DebuggerFramework<?> framework) {
         val old = getDebuggerFramework();
-        if(old!=null) {
+        if (old != null) {
             mediator.deregister(old, DebuggerFramework.class);
             old.removeHaltListener(haltListener);
             old.removeHaltListener(UIScriptExtension.haltListener);
@@ -274,9 +268,9 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
 
     private void onStatePointerChanged(PTreeNode<?> pTreeNode) {
         //ensure that we only highlight once
-        if(this.currentNode == null || !this.currentNode.equals(pTreeNode)) {
+        if (this.currentNode == null || !this.currentNode.equals(pTreeNode)) {
             this.currentNode = pTreeNode;
-            if(pTreeNode.getStatement().getStartPosition().getLineNumber() != -1) {
+            if (pTreeNode.getStatement().getStartPosition().getLineNumber() != -1) {
                 try {
                     unHighlightAllExecutionLines();
                     highlightExecutionLine(pTreeNode.getStatement().getStartPosition().getLineNumber() - 1);
@@ -289,9 +283,10 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
     }
 
     private void highlightStatement(ASTNode statement) throws BadLocationException {
-        int lineStartOffset = getEditor().getLineStartOffset(statement.getStartPosition().getLineNumber()-1);
-        highlightRange(statement.getStartPosition().getCharInLine()+lineStartOffset, statement.getEndPosition().getCharInLine()+lineStartOffset, new Color(95, 249, 130));
+        int lineStartOffset = getEditor().getLineStartOffset(statement.getStartPosition().getLineNumber() - 1);
+        highlightRange(statement.getStartPosition().getCharInLine() + lineStartOffset, statement.getEndPosition().getCharInLine() + lineStartOffset, new Color(95, 249, 130));
     }
+
     private void simpleReformat() {
         Pattern spacesAtLineEnd = Pattern.compile("[\t ]+\n", Pattern.MULTILINE);
         String text = editor.getText();
@@ -314,7 +309,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
             if (tok.getType() == ScriptLexer.WS && tok.getText().startsWith("\n")) {
                 builder.append(
                         tok.getText().replaceAll("\n[ \t]*",
-                                "\n" + Strings.repeat(" ", nested * 4)));
+                                "\n" + Strings.repeat(" ", Math.max(0, nested * 4))));
             } else {
                 builder.append(tok.getText());
             }
@@ -512,7 +507,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
                 final CodePointCharStream stream = CharStreams.fromString(editor.getText(), f.getTitle());
                 final List<ProofScript> ast = Facade.getAST(stream);
 
-                if(ast.size() == 0) {
+                if (ast.size() == 0) {
                     return;
                 }
 
@@ -832,7 +827,7 @@ class LintParser extends AbstractParser implements ANTLRErrorListener {
             val parser = Facade.getParser(stream);
             parser.removeErrorListeners();
             parser.addErrorListener(this);
-            ScriptLanguageParser.StartContext ctx =parser.start();
+            ScriptLanguageParser.StartContext ctx = parser.start();
             if (0 == parser.getNumberOfSyntaxErrors()) {
                 val astt = new TransformAst();
                 ctx.accept(astt);
@@ -848,17 +843,21 @@ class LintParser extends AbstractParser implements ANTLRErrorListener {
 
                 List<LintProblem> problems = ls.check(scripts);
                 for (LintProblem lp : problems) {
-                    DefaultParserNotice notice = new DefaultParserNotice(this,
-                            lp.getMessage(), lp.getLineNumber(),
-                            lp.getFirstToken().getStartIndex(),
-                            lp.getFirstToken().getText().length());
-                    if(lp.getIssue().getLevel()== Level.WARN)
-                        notice.setLevel(ParserNotice.Level.WARNING);
-                    if(lp.getIssue().getLevel()== Level.ERROR)
-                        notice.setLevel(ParserNotice.Level.ERROR);
-                    if(lp.getIssue().getLevel()== Level.INFO)
-                        notice.setLevel(ParserNotice.Level.INFO);
-                    result.addNotice(notice);
+                    try {
+                        System.out.println(lp);
+                        DefaultParserNotice notice = new DefaultParserNotice(this,
+                                lp.getMessage(), lp.getLineNumber() - 1,
+                                lp.getFirstToken().getStartIndex(),
+                                lp.getFirstToken().getText().length());
+                        if (lp.getIssue().getLevel() == Level.WARN)
+                            notice.setLevel(ParserNotice.Level.WARNING);
+                        if (lp.getIssue().getLevel() == Level.ERROR)
+                            notice.setLevel(ParserNotice.Level.ERROR);
+                        if (lp.getIssue().getLevel() == Level.INFO)
+                            notice.setLevel(ParserNotice.Level.INFO);
+                        result.addNotice(notice);
+                    } catch (NullPointerException e) {//linenumber unknown
+                    }
                 }
             }
         } catch (IOException | NullPointerException e) {

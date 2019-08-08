@@ -139,7 +139,7 @@ public enum Operator {
         }
     },
     /** */
-    EQ("=", "≡", 50, INT, INT, BOOL) {
+    EQ("=", "≡", 50, null, null, BOOL) {
         @Override
         public Value evaluate(Value... v) {
             return Value.from((((BigInteger) v[0].getData()).compareTo((BigInteger) v[1].getData()) == 0));

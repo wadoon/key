@@ -581,7 +581,7 @@ public final class MainWindow extends JFrame {
 
         dockSourceView.setVisible(true);
 
-        DockingHelper.restoreFactoryDefault(this);
+        //DockingHelper.restoreFactoryDefault(this);
 
         statusLine = new MainStatusLine("<html>" + PARA + KeYConstants.COPYRIGHT + PARA
                 + "KeY is free software and comes with ABSOLUTELY NO WARRANTY."

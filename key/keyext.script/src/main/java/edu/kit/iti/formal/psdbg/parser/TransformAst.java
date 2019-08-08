@@ -215,6 +215,7 @@ public class TransformAst implements ScriptLanguageParserVisitor<Object> {
         return createBinaryExpression(ctx, ctx.expression(), Operator.MULTIPLY);
     }
 
+
     private BinaryExpression createBinaryExpression(ParserRuleContext ctx,
                                                     List<ScriptLanguageParser.ExpressionContext> expression, Operator op) {
         Expression<ParserRuleContext> left = (Expression<ParserRuleContext>) expression.get(0).accept(this);
@@ -267,6 +268,11 @@ public class TransformAst implements ScriptLanguageParserVisitor<Object> {
     public Object visitExprEquality(ScriptLanguageParser.ExprEqualityContext ctx) {
         return createBinaryExpression(ctx, ctx.expression(), findOperator(ctx.op.getText()));
 
+    }
+
+    @Override
+    public Object visitExprEquiv(ScriptLanguageParser.ExprEquivContext ctx) {
+        return createBinaryExpression(ctx, ctx.expression(), Operator.EQUIVALENCE);
     }
 
     @Override

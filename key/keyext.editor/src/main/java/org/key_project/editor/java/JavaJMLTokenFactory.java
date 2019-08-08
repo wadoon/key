@@ -125,6 +125,16 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
             cur = lexer.nextToken();
         }
 
+        //Handling of unfinished token, a token sequence with ANTLR `more` action
+        if (cur.getType() == Recognizer.EOF &&
+                (cur.getStopIndex() - cur.getStartIndex()) > 0) {
+            changeType(lexer, cur);
+            if (cur.getType() != org.antlr.v4.runtime.Token.EOF) {
+                modes.add(lexer._mode);
+                tokens.add(cur);
+            }
+        }
+
         if (tokens.size() == 0) {
             addNullToken();
         } else {
@@ -150,7 +160,7 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
                 currentToken = t;
             }
 
-            int tokenType = (0xF & simulateNewLine((JavaJMLLexer) lexer));//current mode is not on stack
+            int tokenType = (0xF & simulateNewLine(lexer));//current mode is not on stack
             while (lexer._modeStack.size() > 0) {
                 tokenType = (tokenType << 4) | (0xF & lexer._modeStack.pop());
             }
@@ -173,7 +183,11 @@ public class JavaJMLTokenFactory extends Antlr4TokenMakerFactory {
         return firstToken;
     }
 
-    private int simulateNewLine(JavaJMLLexer lexer) {
+    protected void changeType(Lexer lexer, org.antlr.v4.runtime.Token cur) {
+    }
+
+    protected int simulateNewLine(Lexer l) {
+        JavaJMLLexer lexer = (JavaJMLLexer) l;
         switch (lexer._mode) {
             case jmlExpr:
             case jmlComment:
