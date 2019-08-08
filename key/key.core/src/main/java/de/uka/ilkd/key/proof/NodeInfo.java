@@ -13,7 +13,6 @@
 
 package de.uka.ilkd.key.proof;
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -404,8 +403,8 @@ public class NodeInfo {
      *
      * @return the set of files relevant to this node.
      */
-    public Set<String> getRelevantFiles() {
-        return Collections.unmodifiableSet(relevantFiles);
+    public ImmutableSet<String> getRelevantFiles() {
+        return relevantFiles;
     }
 
     /**
@@ -414,7 +413,14 @@ public class NodeInfo {
      * @param relevantFile the file to add.
      */
     public void addRelevantFile(String relevantFile) {
-        this.relevantFiles.add(relevantFile);
+        ImmutableSet<String> oldRelevantFiles = this.relevantFiles;
+
+        this.relevantFiles = this.relevantFiles.add(relevantFile);
+
+        if (oldRelevantFiles != this.relevantFiles) {
+            node.childrenIterator().forEachRemaining(
+                c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
+        }
     }
 
     /**
@@ -422,8 +428,19 @@ public class NodeInfo {
      *
      * @param relevantFiles the files to add.
      */
-    public void addRelevantFiles(Set<String> relevantFiles) {
-        this.relevantFiles.addAll(relevantFiles);
+    public void addRelevantFiles(ImmutableSet<String> relevantFiles) {
+        ImmutableSet<String> oldRelevantFiles = this.relevantFiles;
+
+        if (this.relevantFiles.isEmpty() || this.relevantFiles.subset(relevantFiles)) {
+            this.relevantFiles = relevantFiles;
+        } else {
+            this.relevantFiles = this.relevantFiles.union(relevantFiles);
+        }
+
+        if (oldRelevantFiles != this.relevantFiles) {
+            node.childrenIterator().forEachRemaining(
+                c -> c.getNodeInfo().addRelevantFiles(this.relevantFiles));
+        }
     }
 
     /** Add user-provided plain-text annotations.
