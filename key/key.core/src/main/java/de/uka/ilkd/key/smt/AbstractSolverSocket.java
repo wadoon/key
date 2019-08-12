@@ -348,15 +348,19 @@ class CVC4Socket extends AbstractSolverSocket{
                 pipe.close();
             } else if(message.indexOf(SAT) > -1){
                 sc.setFinalResult(SMTSolverResult.createInvalidResult(name));
-                sc.setState(FINISH);
-                pipe.close();
+								pipe.sendMessage("(get-model)");
+								pipe.sendMessage("(exit)\n");
+								sc.setState(WAIT_FOR_DETAILS);
             } else if(message.indexOf(UNKNOWN)> -1){
                 sc.setFinalResult(SMTSolverResult.createUnknownResult(name));
                 sc.setState(FINISH);
                 pipe.close();
             }
-        }
-
+        } else if(sc.getState() == WAIT_FOR_DETAILS){
+					      if (message.equals("success")) {
+					        pipe.close();
+				      	}
+			 	  }
     }
 
 }
