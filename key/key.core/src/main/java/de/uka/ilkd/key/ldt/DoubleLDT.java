@@ -22,7 +22,6 @@ import de.uka.ilkd.key.java.abstraction.PrimitiveType;
 import de.uka.ilkd.key.java.abstraction.Type;
 import de.uka.ilkd.key.java.expression.Literal;
 import de.uka.ilkd.key.java.expression.literal.DoubleLiteral;
-import de.uka.ilkd.key.java.expression.literal.IntLiteral;
 import de.uka.ilkd.key.java.expression.literal.LongLiteral;
 import de.uka.ilkd.key.java.expression.operator.Negative;
 import de.uka.ilkd.key.java.reference.ExecutionContext;
@@ -83,6 +82,9 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
     private final Function intervalMax;
     private final Function toInterval;
 
+    private final Function sinDouble;
+    private final Function cosDouble;
+
     public DoubleLDT(TermServices services) {
 	super(NAME, services);
 
@@ -127,6 +129,8 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 	intervalMax	    = addFunction(services, "ivMaxD");
 	toInterval	    = addFunction(services, "DTI");
 
+	sinDouble       = addFunction(services, "sinDouble");
+  cosDouble       = addFunction(services, "cosDouble");
     }
 
     @Override
@@ -178,7 +182,7 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
    assert lit instanceof DoubleLiteral : "Literal '"+lit+"' is not a double literal.";
 	String s = ((DoubleLiteral)lit).getValue();
 	final boolean negative = (s.charAt(0) == '-');
-	
+
 
 	long doubleBits = Double.doubleToLongBits(Double.parseDouble(s));
         // String bitString = Long.toBinaryString(doubleBits);
@@ -420,4 +424,8 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
     public Function getToInterval() {
 	return toInterval;
     }
+
+    public Function getSinDouble() { return sinDouble; }
+
+    public Function getCosDouble() { return cosDouble; }
 }

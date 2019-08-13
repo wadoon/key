@@ -21,6 +21,7 @@ import java.util.Map;
 public class FloatHandler implements SMTHandler {
 
     private final Map<Operator, SMTTermFloatOp.Op> fpOperators = new HashMap<>();
+    private final Map<Operator, SMTTermFloatOp.Op> mathOperators = new HashMap<>();
     private final List<Operator> fpLiterals = new LinkedList<>();
     private FloatLDT floatLDT;
     private DoubleLDT doubleLDT;
@@ -78,6 +79,9 @@ public class FloatHandler implements SMTHandler {
         fpOperators.put(doubleLDT.getIsInfinite(), SMTTermFloatOp.Op.FPISINFINITE);
         fpOperators.put(doubleLDT.getIsNegative(), SMTTermFloatOp.Op.FPISNEGATIVE);
         fpOperators.put(doubleLDT.getIsPositive(), SMTTermFloatOp.Op.FPISPOSITIVE);
+
+        mathOperators.put(doubleLDT.getSinDouble(),SMTTermFloatOp.Op.SINDOUBLE);
+        mathOperators.put(doubleLDT.getCosDouble(),SMTTermFloatOp.Op.COSDOUBLE);
     }
 
     @Override
@@ -85,7 +89,7 @@ public class FloatHandler implements SMTHandler {
 
         Operator op = term.op();
 
-        if (fpOperators.containsKey(op) || fpLiterals.contains(op) || op == doubleLDT.getRoundingModeRNE()
+        if (fpOperators.containsKey(op) ||mathOperators.containsKey(op) || fpLiterals.contains(op) || op == doubleLDT.getRoundingModeRNE()
             || op == doubleLDT.getRoundingModeRTN() || op == doubleLDT.getRoundingModeRTP())
 
             return true;
@@ -100,9 +104,14 @@ public class FloatHandler implements SMTHandler {
         trans.addFromSnippets("double");
 
         Operator op = term.op();
-        if (fpOperators.containsKey(op)) {
-
-            SMTTermFloatOp.Op fpop = fpOperators.get(op);
+        if (fpOperators.containsKey(op) || mathOperators.containsKey(op)) {
+            SMTTermFloatOp.Op fpop;
+            if(fpOperators.containsKey(op)) {
+                fpop = fpOperators.get(op);
+            }else {
+                fpop = mathOperators.get(op);
+                trans.addFromSnippets(fpop.getOpName());
+            }
             String opName = fpop.getOpName();
             SExpr.Type exprType = fpop.getImageSort().equals(SMTSort.BOOL) ? SExpr.Type.BOOL : SExpr.Type.FLOAT;
             ImmutableArray<Term> subs = term.subs();

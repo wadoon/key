@@ -26,4 +26,22 @@
 (declare-const sort_double T)
     </entry>
 
+    <entry key="sinDouble.axioms">
+(assert (forall ((a Float64)) (=> (not (fp.isNaN a)) (and (fp.leq (sinDouble a) (fp #b0 #b01111111111 #b0000000000000000000000000000000000000000000000000000))(fp.geq (sinDouble a) (fp #b1 #b01111111111 #b0000000000000000000000000000000000000000000000000000))))))
+
+    </entry>
+
+    <entry key="sinDouble.decls">
+(declare-fun sinDouble (Float64) Float64)
+    </entry>
+
+    <entry key="cosDouble.axioms">
+(assert (forall ((a Float64)) (=> (not (fp.isNaN a)) (and (fp.leq (cosDouble a) (fp #b0 #b01111111111 #b0000000000000000000000000000000000000000000000000000))(fp.geq (cosDouble a) (fp #b1 #b01111111111 #b0000000000000000000000000000000000000000000000000000))))))
+
+    </entry>
+
+    <entry key="cosDouble.decls">
+(declare-fun cosDouble (Float64) Float64)
+    </entry>
+
 </properties>

@@ -50,6 +50,8 @@ public class SMTTermFloatOp extends SMTTerm{
 		public static final Op FPDIV	= new Op("fp.div", ROUNDMODESORT, SMTSort.FLOAT, SMTSort.FLOAT, SMTSort.FLOAT);
 		public static final Op CASTLONGTOFLOAT  = new Op("(_ to_fp 8 24) RNE", SMTSort.INT, SMTSort.FLOAT);
 		public static final Op CASTFLOATTOLONG  = new Op("(_ fp.to_sbv 64) RTZ", SMTSort.FLOAT, SMTSort.INT);
+		public static final Op SINDOUBLE = new Op("sinDouble", SMTSort.DOUBLE, SMTSort.DOUBLE);
+		public static final Op COSDOUBLE = new Op("cosDouble", SMTSort.DOUBLE, SMTSort.DOUBLE);
 
 		private static Op unaryFloatPred(String name) {
 			return new Op("fp." + name, SMTSort.FLOAT, SMTSort.BOOL);
