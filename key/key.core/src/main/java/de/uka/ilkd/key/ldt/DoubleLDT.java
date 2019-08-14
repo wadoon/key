@@ -84,6 +84,13 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 
     private final Function sinDouble;
     private final Function cosDouble;
+    private final Function acosDouble;
+    private final Function asinDouble;
+    private final Function tanDouble;
+    private final Function atan2Double;
+    private final Function sqrtDouble;
+    private final Function powDouble;
+    private final Function expDouble;
 
     public DoubleLDT(TermServices services) {
 	super(NAME, services);
@@ -131,6 +138,13 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
 
 	sinDouble       = addFunction(services, "sinDouble");
   cosDouble       = addFunction(services, "cosDouble");
+  acosDouble       = addFunction(services, "acosDouble");
+  asinDouble       = addFunction(services, "asinDouble");
+  tanDouble       = addFunction(services, "tanDouble");
+  atan2Double       = addFunction(services, "atan2Double");
+  sqrtDouble       = addFunction(services, "sqrtDouble");
+  powDouble       = addFunction(services, "powDouble");
+  expDouble       = addFunction(services, "expDouble");
     }
 
     @Override
@@ -428,4 +442,18 @@ public final class DoubleLDT extends LDT implements IFloatingPointLDT {
     public Function getSinDouble() { return sinDouble; }
 
     public Function getCosDouble() { return cosDouble; }
+
+    public Function getAcosDouble() { return acosDouble; }
+
+    public Function getAsinDouble() { return asinDouble; }
+
+    public Function getTanDouble() { return tanDouble; }
+
+    public Function getAtan2Double() { return atan2Double; }
+
+    public Function getSqrtDouble() { return sqrtDouble; }
+
+    public Function getPowDouble() { return powDouble; }
+
+    public Function getExpDouble() { return expDouble; }
 }
