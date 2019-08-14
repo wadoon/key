@@ -14,6 +14,8 @@ public class Math {
         return (d <= 0) ? 0 - d : d;
     }
     public static double max(double a, double b) {
+        if (a != a)
+            return a;
         return (a >= b) ? a : b;
     }
     public static double sin(double d);
