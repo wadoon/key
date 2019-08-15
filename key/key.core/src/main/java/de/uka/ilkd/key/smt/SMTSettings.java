@@ -75,6 +75,8 @@ public interface SMTSettings {
 
     boolean quantifiersEnabled();
 
+    boolean disableSqrtAxiomatizing();
+
     /**
      * Returns <code>true</code> if a uninterpreted function should be used if the
      * normal normal multiplication is not supported. In case that such a function 

@@ -679,6 +679,7 @@ class TranslationOptions extends TablePanel{
 	private static final long serialVersionUID = 1L;
 	private JCheckBox useExplicitTypeHierachy;
 	private JCheckBox enableQuantifiers;
+	private JCheckBox disableSqrtAxiomatizing;
 	private JCheckBox useNullInstantiation;
 	private JCheckBox useBuiltInUniqueness;
 	private JCheckBox useUIMultiplication;
@@ -697,6 +698,8 @@ class TranslationOptions extends TablePanel{
 			+ "If the option is selected, the following assumption is additionally added to the assumptions above:\n"
 			+ "\\forall x; (type_of_C(x)->type_of_A(x))\n";
 
+	private static final String infoDisableSqrtAxiomatizing = "If this option is selected, axiomatizing the \"Math.sqrt\"" +
+			" will be disabled and instead the \"fp.sqrt\" is used";
 	private static final String infoUseNullInstantiation =
 			"At the moment this option has only effect on hierarchy assumptions regarding the null object.\n"
 					+ "Example: Let A and B be classes.\n"
@@ -755,6 +758,7 @@ class TranslationOptions extends TablePanel{
     protected void createComponents(){
 		createUseExplicitTypeHierachy();
 		createEnableQuantifiers();
+		createDisableSqrtAxiomatizing();
 		createNullInstantiation();
 		createBuiltInUniqueness();
 		createUIMultiplication();
@@ -790,6 +794,21 @@ class TranslationOptions extends TablePanel{
         }
         return useExplicitTypeHierachy;
     }
+
+	public JCheckBox createDisableSqrtAxiomatizing() {
+		if(disableSqrtAxiomatizing == null){
+			disableSqrtAxiomatizing = addCheckBox("Disable sqrt axiomatizing in SMT translation",
+					infoDisableSqrtAxiomatizing,
+					settings.disableSqrtAxiomatizing
+					, new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							settings.disableSqrtAxiomatizing = disableSqrtAxiomatizing.isSelected();
+						}
+					});
+		}
+		return disableSqrtAxiomatizing;
+	}
 
 	public JCheckBox createNullInstantiation() {
 		if(useNullInstantiation == null){

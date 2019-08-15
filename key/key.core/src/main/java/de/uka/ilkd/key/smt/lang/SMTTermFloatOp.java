@@ -57,6 +57,7 @@ public class SMTTermFloatOp extends SMTTerm{
 		public static final Op TANDOUBLE = new Op("tanDouble", SMTSort.DOUBLE, SMTSort.DOUBLE);
 		public static final Op ATAN2DOUBLE = new Op("atan2Double", SMTSort.DOUBLE, SMTSort.DOUBLE, SMTSort.DOUBLE);
 		public static final Op SQRTDOUBLE = new Op("sqrtDouble", SMTSort.DOUBLE, SMTSort.DOUBLE);
+		public static final Op FPSQRT = new Op("fp.sqrt RNE", SMTSort.DOUBLE, SMTSort.DOUBLE);
 		public static final Op POWDOUBLE = new Op("powDouble", SMTSort.DOUBLE, SMTSort.DOUBLE, SMTSort.DOUBLE);
 		public static final Op EXPDOUBLE = new Op("expDouble", SMTSort.DOUBLE, SMTSort.DOUBLE);
 

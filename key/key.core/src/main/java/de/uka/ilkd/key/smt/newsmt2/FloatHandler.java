@@ -26,6 +26,7 @@ public class FloatHandler implements SMTHandler {
     private FloatLDT floatLDT;
     private DoubleLDT doubleLDT;
     private Services services;
+    private boolean disableSqrtAxiomatizing;
 
     @Override
     public void init(Services services) throws IOException {
@@ -33,6 +34,7 @@ public class FloatHandler implements SMTHandler {
         this.services = services;
         floatLDT = services.getTypeConverter().getFloatLDT();
         doubleLDT = services.getTypeConverter().getDoubleLDT();
+        disableSqrtAxiomatizing = services.getProof().getSettings().getSMTSettings().disableSqrtAxiomatizing;
 
         // float literals
         fpLiterals.add(floatLDT.getFloatSymbol());
@@ -117,7 +119,11 @@ public class FloatHandler implements SMTHandler {
                 fpop = fpOperators.get(op);
             }else {
                 fpop = mathOperators.get(op);
-                trans.addFromSnippets(fpop.getOpName());
+                if(!disableSqrtAxiomatizing || fpop != SMTTermFloatOp.Op.SQRTDOUBLE){
+                    trans.addFromSnippets(fpop.getOpName());
+                }else {
+                    fpop = SMTTermFloatOp.Op.FPSQRT;
+                }
             }
             String opName = fpop.getOpName();
             SExpr.Type exprType = fpop.getImageSort().equals(SMTSort.BOOL) ? SExpr.Type.BOOL : SExpr.Type.FLOAT;
