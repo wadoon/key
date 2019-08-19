@@ -182,6 +182,26 @@ compile:testFast:ui:
       junit:
         - "**/**/build/test-results/*/TEST-*.xml"
 
+compile:testFast:script:
+  stage: ternary
+  image: wadoon/key-test-docker:jdk11
+  script:
+    - javac -version
+    - cd key
+    - gradle --build-cache --continue :keyext.editor:testFast :keyext.script:testFast :keyext.script.ui:testFast
+    - ls
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    policy: pull
+    paths:
+      - build
+      - .gradle
+  artifacts:
+    reports:
+      junit:
+        - "**/**/build/test-results/*/TEST-*.xml"
+
+
 compile:testFast:removegenerics:
   stage: ternary
   image: wadoon/key-test-docker:jdk11
