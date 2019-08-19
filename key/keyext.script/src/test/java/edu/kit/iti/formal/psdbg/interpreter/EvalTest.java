@@ -25,6 +25,7 @@ package edu.kit.iti.formal.psdbg.interpreter;
 
 import edu.kit.iti.formal.psdbg.interpreter.data.GoalNode;
 import edu.kit.iti.formal.psdbg.interpreter.data.VariableAssignment;
+import edu.kit.iti.formal.psdbg.interpreter.dbg.PseudoMatcher;
 import edu.kit.iti.formal.psdbg.parser.NotWelldefinedException;
 import edu.kit.iti.formal.psdbg.TestHelper;
 import edu.kit.iti.formal.psdbg.parser.ast.Expression;
@@ -57,7 +58,9 @@ public class EvalTest {
         Expression e_exp = TestHelper.toExpr(expResult);
 
         VariableAssignment s = createAssignments();
-        Evaluator<String> evaluator = new Evaluator<>(s, new GoalNode<>(null));
+        GoalNode<String> selected = new GoalNode<>("selg");
+        Evaluator<String> evaluator = new Evaluator<>(s, selected);
+        evaluator.setMatcher(new PseudoMatcher());
 
         Value is = evaluator.eval(e_is);
         Value exp = evaluator.eval(e_exp);

@@ -8,7 +8,6 @@ import edu.kit.iti.formal.psdbg.interpreter.data.GoalNode;
 import edu.kit.iti.formal.psdbg.interpreter.data.KeyData;
 import edu.kit.iti.formal.psdbg.interpreter.data.State;
 
-import javax.xml.bind.JAXBException;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
@@ -18,7 +17,7 @@ import java.io.Writer;
  * @version 1 (16.05.18)
  */
 public class KeyPersistentFacade {
-    public static void write(State<KeyData> state, Writer fw) throws IOException, JAXBException {
+    public static void write(State<KeyData> state, Writer fw) throws IOException {
         PersistentState ps = new PersistentState();
         for (GoalNode<KeyData> gn : state.getGoals()) {
             PersistentGoal pg = new PersistentGoal();
@@ -36,7 +35,7 @@ public class KeyPersistentFacade {
     }
 
     public static State<KeyData> read(KeYEnvironment env, Proof proof, Reader reader)
-            throws JAXBException {
+            throws IOException {
         PersistentState ps = PersistentFacade.read(reader);
         State<KeyData> state = new State<>();
         for (PersistentGoal pg : ps.getGoals()) {

@@ -4,7 +4,7 @@ options { tokenVocab=ScriptLexer; }
 
 
 start
-    :  stmtList (script)*
+    :  stmtList (script)* EOF
     ;
 
 script
@@ -69,6 +69,7 @@ expression
     | matchPattern             #exprMatch
 ;
 
+expressionEOF: expression EOF;
 
 substExpressionList
     :

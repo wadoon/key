@@ -80,9 +80,9 @@ public class WalkableLabelFacade {
                                                             String delimEntries, String delimLength,
                                                             Function<String, T> parse) {
         input = removePrefixAndSuffix(input, prefix, suffix);
-
         Pattern reOuter = Pattern.compile(delimEntries);
         Collection<Pair<Integer, T>> seq = new ArrayList<>();
+        if(input.isBlank()) return seq;
         reOuter.splitAsStream(input).forEach(
                 chunk -> {
                     String s[] = chunk.split(Pattern.quote(delimLength));

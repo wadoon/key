@@ -340,6 +340,11 @@ public class TransformAst implements ScriptLanguageParserVisitor<Object> {
     }
 
     @Override
+    public Object visitExpressionEOF(ScriptLanguageParser.ExpressionEOFContext ctx) {
+        return ctx.expression().accept(this);
+    }
+
+    @Override
     public Map<String, Expression<ParserRuleContext>> visitSubstExpressionList(ScriptLanguageParser.SubstExpressionListContext ctx) {
         Map<String, Expression<ParserRuleContext>> map = new LinkedHashMap<>();
         for (int i = 0; i < ctx.scriptVar().size(); i++) {

@@ -108,7 +108,7 @@ public class TestHelper {
 
     public static Expression toExpr(String s) {
         TransformAst v = new TransformAst();
-        Expression e = (Expression) getParser(s).expression().accept(v);
+        Expression e = (Expression) getParser(s).expressionEOF().accept(v);
         return e;
     }
 }

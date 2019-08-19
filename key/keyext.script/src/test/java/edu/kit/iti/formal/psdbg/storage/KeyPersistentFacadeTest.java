@@ -16,7 +16,6 @@ import edu.kit.iti.formal.psdbg.parser.ast.ProofScript;
 import org.junit.Assert;
 import org.junit.Test;
 
-import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
@@ -29,7 +28,7 @@ import java.util.ArrayList;
  */
 public class KeyPersistentFacadeTest {
     @Test
-    public void testWriteReadXml() throws JAXBException {
+    public void testWriteReadXml() throws IOException {
         StringWriter writer = new StringWriter();
         PersistentState state = new PersistentState();
         PersistentGoal g1 = new PersistentGoal("g1", false, new ArrayList<>());
@@ -53,7 +52,7 @@ public class KeyPersistentFacadeTest {
 
 
     @Test
-    public void testWriteReadKey() throws ProblemLoaderException, IOException, JAXBException {
+    public void testWriteReadKey() throws ProblemLoaderException, IOException {
         File cp = new File("src/test/resources/edu/kit/iti/formal/psdbg/interpreter/contraposition/contraposition.key");
         System.out.println(cp.getAbsolutePath());
         ProofManagementApi a = KeYApi.loadFromKeyFile(cp);

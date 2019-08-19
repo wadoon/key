@@ -13,7 +13,6 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nullable;
 import javax.swing.*;
-import javax.xml.bind.JAXBException;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -74,7 +73,7 @@ public class SaveCommand implements CommandHandler<KeyData> {
                 KeyPersistentFacade.write(interpreter.getCurrentState(), new FileWriter(sp.getPersistedStateFile(newFile)));
             System.out.println();
 
-        } catch (IOException | InterruptedException | JAXBException e) {
+        } catch (IOException | InterruptedException  e) {
             e.printStackTrace();
         }
     }

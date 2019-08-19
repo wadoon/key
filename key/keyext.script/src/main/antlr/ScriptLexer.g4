@@ -76,11 +76,11 @@ COMMENT_CHAR: . -> more;
 
 mode STRINGD;
 STRING_DOUBLE_END : '"' -> type(STRING_LITERAL_DOUBLE), popMode;
-STRING_DOUBLE_ANY : .   -> type(STRING_LITERAL_DOUBLE);
+STRING_DOUBLE_ANY : .   -> more;
 
 mode STRINGS;
 STRING_SINGLE_END : '\'' -> type(STRING_LITERAL_SINGLE), popMode;
-STRING_SINGLE_ANY : .   -> type(STRING_LITERAL_DOUBLE);
+STRING_SINGLE_ANY : .   -> more;
 
 mode TERM;
 TERM_END : '`' -> type(TERM_LITERAL), popMode;
