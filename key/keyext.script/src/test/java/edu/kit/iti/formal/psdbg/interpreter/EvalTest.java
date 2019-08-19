@@ -41,7 +41,7 @@ import java.io.IOException;
 public class EvalTest {
     @Parameterized.Parameters(name = "{0}")
     public static Iterable<Object[]> getGoodExpressions() throws IOException {
-        return TestHelper.loadLines("eval.txt", 2);
+        return TestHelper.loadLines("parser/eval.txt", 2);
     }
 
     @Parameterized.Parameter(0)

@@ -36,15 +36,15 @@ import org.antlr.v4.runtime.ParserRuleContext;
  */
 public abstract class Expression<T extends ParserRuleContext> extends ASTNode<T> {
     /**
-     * @param type
+     * @param type if null, the expression is allowed to have every type
      * @param e
      * @param signature
      * @throws NotWelldefinedException
      */
     public static final void checkType(Type type, Expression e, Signature signature) throws NotWelldefinedException {
         Type got = e.getType(signature);
-        if (!type.equals(got)) {
-            throw new NotWelldefinedException("Typemismatch in expected " + type + ", got" + got, e);
+        if (type != null && !type.equals(got)) {
+            throw new NotWelldefinedException("Typemismatch in expected " + type + ", got " + got, e);
         }
     }
 

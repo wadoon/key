@@ -248,8 +248,6 @@ class LoadLayoutAction extends MainWindowAction {
 }
 
 class ResetLayoutAction extends MainWindowAction {
-    private static final long serialVersionUID = 8772915552504055750L;
-
     public ResetLayoutAction(MainWindow mainWindow) {
         super(mainWindow);
         setName("Reset Layout");

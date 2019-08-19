@@ -48,11 +48,12 @@ import java.util.stream.Collectors;
  * @version 2 (29.10.17), introduction of parent
  * version 1 (27.04.17)
  */
-public class TransformAst implements ScriptLanguageVisitor<Object> {
+public class TransformAst implements ScriptLanguageParserVisitor<Object> {
     /**
      * Start index for positional arguments for command calls
      */
     public static final int KEY_START_INDEX_PARAMETER = 2;
+    public static final String MAIN_SCRIPT_NAME = "__main__";
 
     @Getter
     private final List<ProofScript> scripts = new ArrayList<>(10);
@@ -102,7 +103,7 @@ public class TransformAst implements ScriptLanguageVisitor<Object> {
         if (ctx.stmtList() != null) {
             Statements body = (Statements) ctx.stmtList().accept(this);
             ProofScript main = new ProofScript();
-            main.setName("__main__");
+            main.setName(MAIN_SCRIPT_NAME);
             main.setBody(body);
             scripts.add(main);
         }
@@ -214,6 +215,7 @@ public class TransformAst implements ScriptLanguageVisitor<Object> {
         return createBinaryExpression(ctx, ctx.expression(), Operator.MULTIPLY);
     }
 
+
     private BinaryExpression createBinaryExpression(ParserRuleContext ctx,
                                                     List<ScriptLanguageParser.ExpressionContext> expression, Operator op) {
         Expression<ParserRuleContext> left = (Expression<ParserRuleContext>) expression.get(0).accept(this);
@@ -266,6 +268,11 @@ public class TransformAst implements ScriptLanguageVisitor<Object> {
     public Object visitExprEquality(ScriptLanguageParser.ExprEqualityContext ctx) {
         return createBinaryExpression(ctx, ctx.expression(), findOperator(ctx.op.getText()));
 
+    }
+
+    @Override
+    public Object visitExprEquiv(ScriptLanguageParser.ExprEquivContext ctx) {
+        return createBinaryExpression(ctx, ctx.expression(), Operator.EQUIVALENCE);
     }
 
     @Override

@@ -4,23 +4,27 @@ import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import bibliothek.gui.dock.common.MultipleCDockableFactory;
 import bibliothek.gui.dock.common.MultipleCDockableLayout;
-import bibliothek.util.xml.XAttribute;
 import bibliothek.util.xml.XElement;
 import de.uka.ilkd.key.gui.MainWindow;
 import lombok.Data;
+import org.fife.ui.rsyntaxtextarea.CodeTemplateManager;
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.Theme;
+import org.fife.ui.rsyntaxtextarea.templates.CodeTemplate;
+import org.fife.ui.rsyntaxtextarea.templates.StaticCodeTemplate;
+import org.jetbrains.annotations.NotNull;
 import org.key_project.editor.java.JavaJMLEditorFactory;
 import org.key_project.editor.keyfile.KeyEditorFactory;
+import org.key_project.util.RandomName;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import javax.swing.filechooser.FileFilter;
+import java.io.*;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * @author Alexander Weigl
@@ -37,7 +41,7 @@ public class EditorFacade {
         register(new KeyEditorFactory());
     }
 
-    public static MultipleCDockableFactory<?, ?> getEditorDockableFactory() {
+    static MultipleCDockableFactory<?, ?> getEditorDockableFactory() {
         return editorDockableFactory;
     }
 
@@ -93,8 +97,25 @@ public class EditorFacade {
         return EDITOR_THEME;
     }
 
+    public static Stream<FileFilter> getFileFilters() {
+        return getEditorFactories().stream().map(it ->
+                new FileFilter() {
+                    @Override
+                    public boolean accept(File f) {
+                        return it.getFileSuffixes().stream().anyMatch(it -> f.getName().endsWith(it));
+                    }
+
+                    @Override
+                    public String getDescription() {
+                        return it.getName() + " ("+ String.join(", ", it.getFileSuffixes()) +")";
+                    }
+                }
+        );
+    }
+
     @Data
     public static class EditorDockableData implements MultipleCDockableLayout {
+        public static final String NEW_LINE_REPLACEMENT = "%%N";
         private String path, textContent, mimeType;
 
         @Override
@@ -114,15 +135,17 @@ public class EditorFacade {
         @Override
         public void writeXML(XElement xElement) {
             xElement.addString("PATH", path);
-            xElement.addString("TEXT_CONTENT", textContent);
+            xElement.addString("TEXT_CONTENT",
+                    textContent.replace("\n", NEW_LINE_REPLACEMENT));
             xElement.addString("MIMETYPE", mimeType);
         }
 
         @Override
         public void readXML(XElement xElement) {
-            path = xElement.getAttribute("PATH").getString();
-            textContent = xElement.getAttribute("TEXT_CONTENT").getString();
+            path = xElement.getString("PATH");
             mimeType = xElement.getString("MIMETYPE");
+            textContent = xElement.getString("TEXT_CONTENT")
+                    .replace(NEW_LINE_REPLACEMENT, "\n");
         }
     }
 
@@ -130,7 +153,7 @@ public class EditorFacade {
             implements MultipleCDockableFactory<Editor, EditorDockableData> {
         @Override
         public EditorDockableData write(Editor defaultMultipleCDockable) {
-            Editor editor = (Editor) defaultMultipleCDockable;
+            Editor editor = defaultMultipleCDockable;
             EditorDockableData dockableData = create();
             dockableData.path = (editor.getPath() == null ? "" : editor.getPath().toString());
             dockableData.textContent = editor.getText();
@@ -144,6 +167,7 @@ public class EditorFacade {
                 return open(Paths.get(editorDockableData.path));
             else {
                 Editor e = open(editorDockableData.mimeType);
+                assert e != null;
                 e.setText(editorDockableData.textContent);
                 return e;
             }
@@ -172,6 +196,11 @@ public class EditorFacade {
         }
 
         @Override
+        public @NotNull Collection<String> getFileSuffixes() {
+            return Collections.singleton("txt");
+        }
+
+        @Override
         public Editor open(Path path) throws IOException {
             Editor e = open();
             e.setText(Files.readString(path));
@@ -187,9 +216,37 @@ public class EditorFacade {
 
         @Override
         public Editor open() {
-            Editor e = new Editor();
+            Editor e = new Editor(RandomName.getRandomName("-") + ".txt");
             e.setMimeType("text/plain");
             return e;
+        }
+    }
+
+    public static void loadSnippets(URL snippetUrl) {
+        RSyntaxTextArea.setTemplatesEnabled(true);
+
+        if (snippetUrl != null) {
+            try (InputStream s = new BufferedInputStream(snippetUrl.openStream())) {
+                CodeTemplateManager ctm = RSyntaxTextArea.getCodeTemplateManager();
+                Properties p = new Properties();
+                p.loadFromXML(s);
+                p.forEach((key, value) -> {
+                    String v = value.toString();
+                    String[] t = v.split("[#]");
+                    if (t.length > 1) {
+                        CodeTemplate ct = new StaticCodeTemplate(key.toString(), t[0], t[1]);
+                        ctm.addTemplate(ct);
+                    } else {
+                        CodeTemplate ct = new StaticCodeTemplate(key.toString(), v, null);
+                        ctm.addTemplate(ct);
+                    }
+                });
+                System.out.println("Java snippets loaded");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            System.err.println("Could not find snippets.xml");
         }
     }
 }

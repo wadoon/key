@@ -26,6 +26,11 @@ import de.uka.ilkd.key.gui.TaskTree;
 import de.uka.ilkd.key.gui.extension.api.TabPanel;
 import de.uka.ilkd.key.gui.nodeviews.MainFrame;
 import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
+import de.uka.ilkd.key.gui.sourceview.SourceView;
+import de.uka.ilkd.key.gui.nodeviews.MainFrame;
+import de.uka.ilkd.key.gui.prooftree.ProofTreeView;
+import java.util.LinkedList;
+import java.util.List;
 import de.uka.ilkd.key.gui.sourceview.SourceViewFrame;
 
 public class DockingHelper {

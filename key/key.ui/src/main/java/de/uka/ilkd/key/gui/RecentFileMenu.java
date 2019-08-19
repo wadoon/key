@@ -83,6 +83,7 @@ public class RecentFileMenu {
      */
     public RecentFileMenu(final KeYMediator mediator) {
         this.menu = new JMenu("Recent Files");
+
         this.lissy = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

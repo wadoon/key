@@ -66,6 +66,8 @@ import javax.swing.event.MouseInputAdapter;
 import bibliothek.gui.dock.StackDockStation;
 import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.SingleCDockable;
+import bibliothek.gui.dock.common.action.CAction;
+import bibliothek.gui.dock.common.action.CButton;
 import bibliothek.gui.dock.common.intern.CDockable;
 import bibliothek.gui.dock.station.stack.tab.layouting.TabPlacement;
 import de.uka.ilkd.key.control.AutoModeListener;
@@ -321,6 +323,7 @@ public final class MainWindow extends JFrame {
      * This class should only be instantiated once!
      */
     private MainWindow() {
+        instance = this;
         getRootPane().getInputMap().put(HelpFacade.ACTION_OPEN_HELP.getAcceleratorKey(),
                 HelpFacade.ACTION_OPEN_HELP);
         getRootPane().getActionMap().put(HelpFacade.ACTION_OPEN_HELP,
@@ -578,7 +581,7 @@ public final class MainWindow extends JFrame {
 
         dockSourceView.setVisible(true);
 
-        DockingHelper.restoreFactoryDefault(this);
+        //DockingHelper.restoreFactoryDefault(this);
 
         statusLine = new MainStatusLine("<html>" + PARA + KeYConstants.COPYRIGHT + PARA
                 + "KeY is free software and comes with ABSOLUTELY NO WARRANTY."

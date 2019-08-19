@@ -3,12 +3,8 @@ package edu.kit.iti.formal.psdbg.lint;
 import lombok.Getter;
 
 import static edu.kit.iti.formal.psdbg.lint.Level.*;
+import lombok.Setter;
 
-/**
- * @author Alexander Weigl
- * @version 1 (06.03.19)
- */
-enum Level {WARN, INFO, ERROR}
 
 public enum Issue {
     EMPTY_BLOCKS(INFO, "Empty blocks are useless!"),
@@ -21,7 +17,8 @@ public enum Issue {
     REDECLARE_VARIABLE_TYPE_MISMATCH(WARN),
     VARIABLE_NOT_DECLARED(WARN),
     VARIABLE_NOT_USED(WARN),
-    FOREACH_AFTER_THEONLY(WARN, "{{firstToken.text}}");
+    FOREACH_AFTER_THEONLY(WARN, "{{firstToken.text}}"),
+    MAIN_NAME_USED(ERROR), CALL_UNDEFINED(WARN, "Could not find this proof command. Maybe you have misspelled it.");
 
 
     @Getter

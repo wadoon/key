@@ -23,7 +23,7 @@ public abstract class Antlr4TokenMakerFactory extends TokenMakerBase {
         List<org.antlr.v4.runtime.Token> tokens = new ArrayList<>();
         org.antlr.v4.runtime.Token cur = lexer.nextToken();
         while (cur.getType() != Recognizer.EOF) {
-            System.out.format("%25s %-25s%n", cur.getText(), lexer.getVocabulary().getSymbolicName(cur.getType()));
+            //System.out.format("%25s %-25s%n", cur.getText(), lexer.getVocabulary().getSymbolicName(cur.getType()));
 
             tokens.add(cur);
             cur = lexer.nextToken();

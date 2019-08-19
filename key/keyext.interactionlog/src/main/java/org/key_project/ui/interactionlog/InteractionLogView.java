@@ -91,6 +91,7 @@ public class InteractionLogView extends JPanel implements InteractionRecorderLis
 
     public InteractionLogView(MainWindow window, KeYMediator mediator) {
         // register the recorder in the proof control
+        mediator.register(recorder, InteractionRecorder.class);
         listInteraction.setModel(interactionListModel);
         listInteraction.setCellRenderer(new InteractionCellRenderer());
 

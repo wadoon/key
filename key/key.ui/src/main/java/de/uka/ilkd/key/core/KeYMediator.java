@@ -225,7 +225,6 @@ public class KeYMediator {
         return getSelectedProof() != null;
     }
 
-
     /**
      * Returns a filter that is used for filtering taclets that should not be showed
      * while interactive proving.
@@ -385,6 +384,7 @@ public class KeYMediator {
     public void removeGUIListener(GUIListener listener) {
         listenerList.remove(GUIListener.class, listener);
     }
+
 
     public void addInterruptedListener(InterruptListener listener) {
         listenerList.add(InterruptListener.class, listener);

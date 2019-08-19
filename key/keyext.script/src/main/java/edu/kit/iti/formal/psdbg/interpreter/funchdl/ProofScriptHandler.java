@@ -10,10 +10,7 @@ import lombok.RequiredArgsConstructor;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -117,5 +114,10 @@ public class ProofScriptHandler implements CommandHandler<Object> {
         } catch (IOException e) {
             return Stream.of();
         }
+    }
+
+    @Override
+    public Collection<String> getAllCommandStrings() {
+        return getScripts().keySet();
     }
 }

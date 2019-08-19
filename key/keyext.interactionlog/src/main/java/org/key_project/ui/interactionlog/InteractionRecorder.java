@@ -38,6 +38,7 @@ public class InteractionRecorder implements InteractionListener, AutoModeListene
     private boolean disableSettingsChanges = false;
 
     public InteractionLog get(Proof proof) {
+        if(proof==null) return null;
         if (!instances.containsKey(proof)) {
             InteractionLog il = new InteractionLog(proof);
             loadedInteractionLogs.addElement(il);

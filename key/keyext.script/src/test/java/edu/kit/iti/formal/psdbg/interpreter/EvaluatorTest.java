@@ -30,7 +30,7 @@ public class EvaluatorTest {
 
     @Parameterized.Parameters(name = "{0} => {1}")
     public static Iterable<Object[]> expr() throws IOException {
-        return TestHelper.loadLines("eval.txt", 2);
+        return TestHelper.loadLines("parser/eval.txt", 2);
     }
 
     @Before

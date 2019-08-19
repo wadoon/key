@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <comment>This is easy!</comment>
+    <entry key="keyfile"><![CDATA[
+\sorts {
+	s;
+}
+
+\functions{
+    int f;
+    int x;
+    int z;
+}
+\predicates {
+	p;
+	q;
+	r;
+}
+
+\problem {
+    f = x & x = z -> z = f
+}
+    ]]></entry>
+</properties>

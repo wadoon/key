@@ -2,6 +2,7 @@ package edu.kit.iti.formal.psdbg.interpreter.dbg;
 
 import com.google.common.graph.MutableValueGraph;
 import edu.kit.iti.formal.psdbg.interpreter.Interpreter;
+import edu.kit.iti.formal.psdbg.interpreter.exceptions.InterpreterRuntimeException;
 import edu.kit.iti.formal.psdbg.interpreter.graphs.ControlFlowNode;
 import edu.kit.iti.formal.psdbg.interpreter.graphs.ControlFlowTypes;
 import edu.kit.iti.formal.psdbg.parser.ast.CallStatement;
@@ -81,7 +82,7 @@ public class DebuggerFramework<T> {
 
     private final Thread interpreterThread;
 
-    private final BlockListener<T> blocker;
+    private final HaltManager<T> blocker;
 
     private final StateWrapper<T> stateWrapper;
 
@@ -107,9 +108,9 @@ public class DebuggerFramework<T> {
                              MutableValueGraph<ControlFlowNode, ControlFlowTypes> cfg) {
         this.interpreter = interpreter;
         mainScript = main;
-        blocker = new BlockListener<>(interpreter);
+        blocker = new HaltManager<>(interpreter);
         breakpointBlocker = new Blocker.BreakpointLine<>(interpreter);
-        blocker.getPredicates().add(breakpointBlocker);
+        blocker.addPredicate(breakpointBlocker);
         stateWrapper = new StateWrapper<>(interpreter);
         ptreeManager = new ProofTreeManager<>(cfg);
         stateWrapper.setEmitNode(ptreeManager::receiveNode);
@@ -140,7 +141,10 @@ public class DebuggerFramework<T> {
             interpreter.visit(new CallStatement());
 //            ptreeManager.fireStatePointerChanged();
             succeedListener.accept(this);
-        } catch (Exception e) {
+        } catch (InterpreterRuntimeException e) {
+            error = e;
+            errorListener.accept(this, e);
+        } catch (Exception e){
             error = e;
             errorListener.accept(this, e);
         }
@@ -178,12 +182,16 @@ public class DebuggerFramework<T> {
         this.blocker.deinstall();
     }
 
+    public HaltManager<T> getBlocker() {
+        return blocker;
+    }
+
     public PTreeNode<T> getCurrentStatePointer() {
         return ptreeManager.getStatePointer();
     }
 
     public void releaseUntil(Blocker.BlockPredicate predicate) {
-        blocker.getPredicates().add(predicate);
+        blocker.addPredicate(predicate);
         blocker.getMarkForDisable(predicate);
         blocker.unlock();
     }
@@ -200,7 +208,7 @@ public class DebuggerFramework<T> {
      * Let the interpreter run, without adding any further blockers.
      */
     public void releaseForever() {
-        blocker.getPredicates().clear();
+        blocker.clearPredicates();
         release();
     }
 
@@ -234,5 +242,13 @@ public class DebuggerFramework<T> {
 
     public void removeSucceedListener() {
         succeedListener = null;
+    }
+
+    public boolean addHaltListener(HaltListener haltListener) {
+        return blocker.addHaltListener(haltListener);
+    }
+
+    public boolean removeHaltListener(HaltListener o) {
+        return blocker.removeHaltListener(o);
     }
 }

@@ -1,44 +1,59 @@
 package org.key_project.editor;
 
 import bibliothek.gui.dock.common.CControl;
-import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import bibliothek.gui.dock.common.event.CFocusListener;
 import bibliothek.gui.dock.common.intern.CDockable;
 import de.uka.ilkd.key.core.KeYMediator;
 import de.uka.ilkd.key.gui.MainWindow;
-import de.uka.ilkd.key.gui.actions.EditMostRecentFileAction;
 import de.uka.ilkd.key.gui.actions.KeyAction;
 import de.uka.ilkd.key.gui.actions.MainWindowAction;
 import de.uka.ilkd.key.gui.extension.api.KeYGuiExtension;
 import de.uka.ilkd.key.gui.fonticons.FontAwesomeSolid;
 import de.uka.ilkd.key.gui.fonticons.IconFontSwing;
-import de.uka.ilkd.key.proof.Proof;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 
 /**
+ * The extension which brings a text editors to KeY.
+ * <p>
+ * This extension also has an extension: You add language support
+ * by implementing {@link EditorFactory}.
+ * <p>
+ * Extension brings several global editor actions: new, load, save, and saveAs.
+ *
  * @author Alexander Weigl
  * @version 1 (21.05.19)
  */
-public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup, KeYGuiExtension.Toolbar {
+public class EditorExtension implements KeYGuiExtension,
+        KeYGuiExtension.Startup, KeYGuiExtension.Toolbar,
+        KeYGuiExtension.MainMenu {
     public static final float ICON_SIZE = 16;
+    private static final String EDITOR_MENU = "File.Editor";
+
     private static SaveAction actionSave;
     private static SaveAsAction actionSaveAs;
     private static LoadAction actionLoad;
+
+    @Getter
     private static OpenCurrentAsFileAction actionOpenCurrentProofFile;
 
     @Getter
     private NewAction actionNew;
+
+    private JFileChooser fileChooser;
+
     @Getter
-    private JFileChooser fileChooser = new JFileChooser();
-    private CControl control;
     private MainWindow mainWindow;
 
     public static LoadAction getActionLoad() {
@@ -68,7 +83,7 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
     @Override
     public void init(MainWindow window, KeYMediator mediator) {
         if (mainWindow == null) {
-            this.control = window.getDockControl();
+            CControl control = window.getDockControl();
             this.mainWindow = window;
             control.addMultipleDockableFactory("editors", EditorFacade.getEditorDockableFactory());
             actionNew = new NewAction();
@@ -93,6 +108,19 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
         }
     }
 
+    public JFileChooser getFileChooser() {
+        if (fileChooser == null) {
+            fileChooser = new JFileChooser();
+        }
+
+        for (FileFilter f : fileChooser.getChoosableFileFilters()) {
+            fileChooser.removeChoosableFileFilter(f);
+        }
+        EditorFacade.getFileFilters().forEach(fileChooser::addChoosableFileFilter);
+
+        return fileChooser;
+    }
+
     @Override
     public JToolBar getToolbar(MainWindow mainWindow) {
         init(mainWindow, null);
@@ -101,14 +129,27 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
         tb.add(actionLoad);
         tb.add(actionSave);
         tb.add(actionSaveAs);
-        tb.addSeparator();
-        tb.add(actionOpenCurrentProofFile);
+        //tb.addSeparator();
+        //tb.add(actionOpenCurrentProofFile);
         return tb;
+    }
+
+    @Override
+    public @NotNull List<Action> getMainMenuActions(@NotNull MainWindow mainWindow) {
+        init(mainWindow, null);
+        return Arrays.asList(
+                actionNew,
+                actionLoad,
+                actionSave,
+                actionSaveAs,
+                actionOpenCurrentProofFile);
     }
 
     private class OpenCurrentAsFileAction extends KeyAction {
         public OpenCurrentAsFileAction() {
-            setName("Open Current Proof As File...");
+            setName("Open Current Proof As File");
+            setMenuPath(EDITOR_MENU);
+            lookupAcceleratorKey();
         }
 
         @Override
@@ -120,7 +161,9 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
                 if (recentFile != null) {
                     File f = new File(recentFile);
                     try {
-                        EditorFacade.open(f.toPath());
+                        Editor editor = EditorFacade.open(f.toPath());
+                        if (editor != null)
+                            EditorFacade.addEditor(editor, mainWindow);
                     } catch (Exception exc) {
                         setEnabled(false);
                     }
@@ -132,26 +175,30 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
     class SaveAsAction extends MainWindowAction {
         public SaveAsAction(MainWindow mw) {
             super(mw);
-            setName("Save as…");
-            setTooltip("Save the current proof scripts");
-            setMenuPath("File");
+            setName("Save current editor as…");
+            setTooltip("Save the current focused editor under a new path.");
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.SAVE, MainWindow.TOOLBAR_ICON_SIZE));
+            setMenuPath(EDITOR_MENU);
+            lookupAcceleratorKey();
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             Editor editor = getCurrentEditor();
+            JFileChooser fc = getFileChooser();
             if (editor != null) {
                 Path file = editor.getPath();
                 if (file != null) {
-                    fileChooser.setCurrentDirectory(file.getParent().toFile());
-                    fileChooser.setSelectedFile(file.toFile());
+                    fc.setCurrentDirectory(file.getParent().toFile());
+                    fc.setSelectedFile(file.toFile());
                 }
-                int c = fileChooser.showSaveDialog(mainWindow);
+                int c = fc.showSaveDialog(mainWindow);
                 if (c == JFileChooser.APPROVE_OPTION) {
-                    File f = fileChooser.getSelectedFile();
+                    File f = fc.getSelectedFile();
                     try {
                         Files.writeString(f.toPath(), editor.getText());
+                        editor.setPath(f.toPath());
+                        editor.setDirty(false);
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
@@ -165,10 +212,11 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
     class SaveAction extends MainWindowAction {
         public SaveAction(MainWindow mw) {
             super(mw);
-            setName("Save");
-            setTooltip("Store script file");
-            setMenuPath("File");
+            setName("Save current editor");
+            setTooltip("Save current editor");
+            setMenuPath(EDITOR_MENU);
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.DOWNLOAD, ICON_SIZE));
+            lookupAcceleratorKey();
         }
 
         @Override
@@ -178,6 +226,7 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
                 if (editor.getPath() != null) {
                     try {
                         Files.writeString(editor.getPath(), editor.getText());
+                        editor.setDirty(false);
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
@@ -193,14 +242,15 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
     class LoadAction extends MainWindowAction {
         public LoadAction(MainWindow mw) {
             super(mw);
-            setName("Load proof script");
+            setName("Load file in editor...");
             setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.UPLOAD, ICON_SIZE));
-            setMenuPath("File");
+            setMenuPath(EDITOR_MENU);
+            lookupAcceleratorKey();
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int c = fileChooser.showOpenDialog(mainWindow);
+            int c = getFileChooser().showOpenDialog(mainWindow);
             if (c == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
                 Editor editor = EditorFacade.open(file.toPath());
@@ -212,8 +262,10 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
     private class NewAction extends KeyAction {
         public NewAction() {
             setName("New file");
-            setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.FILE, ICON_SIZE));
+            setIcon(IconFontSwing.buildIcon(FontAwesomeSolid.FILE_MEDICAL, ICON_SIZE));
             setTooltip("Store script file");
+            setMenuPath(EDITOR_MENU);
+            lookupAcceleratorKey();
         }
 
         @Override
@@ -226,9 +278,9 @@ public class EditorExtension implements KeYGuiExtension, KeYGuiExtension.Startup
                 menu.add(item);
             });
             Component c = (Component) e.getSource();
-            int x = c.getLocationOnScreen().x + c.getWidth();
-            int y = c.getLocationOnScreen().y + c.getHeight();
-            menu.show(mainWindow, x, y);
+            int x = c.getWidth();
+            int y = c.getHeight();
+            menu.show(c, x, y);
         }
     }
 }

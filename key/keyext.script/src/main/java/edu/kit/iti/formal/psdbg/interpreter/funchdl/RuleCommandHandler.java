@@ -33,10 +33,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.key_project.util.collection.ImmutableList;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author Alexander Weigl
@@ -77,12 +74,13 @@ public class RuleCommandHandler implements CommandHandler<KeyData> {
         try {
             for (SequentFormula sf : g.node().sequent().succedent()) {
                 ImmutableList<TacletApp> apps = index.getTacletAppAtAndBelow(filter,
-                        new PosInOccurrence(sf, PosInTerm.getTopLevel(), true),
+                        new PosInOccurrence(sf, PosInTerm.getTopLevel(), false),
                         services);
                 apps.forEach(t -> set.add(t.taclet().name().toString()));
             }
         } catch (NullPointerException e) {
-            e.printStackTrace();
+            LOGGER.catching(e);
+           // e.printStackTrace();
         }
         return set;
     }
@@ -97,7 +95,8 @@ public class RuleCommandHandler implements CommandHandler<KeyData> {
                 return rules.contains(call.getCommand());
             }
         } catch (NullPointerException npe) {
-            System.out.println("npe = " + npe);
+           // System.out.println("npe = " + npe);
+            LOGGER.catching(npe);
             return false;
         }
         return false;
@@ -151,6 +150,11 @@ public class RuleCommandHandler implements CommandHandler<KeyData> {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public Collection<String> getAllCommandStrings() {
+        return getRules().keySet();
     }
 
     private Map<String, Object> createParameters(VariableAssignment assignments) {

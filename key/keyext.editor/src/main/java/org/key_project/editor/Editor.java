@@ -2,7 +2,6 @@ package org.key_project.editor;
 
 import bibliothek.gui.dock.common.DefaultMultipleCDockable;
 import de.uka.ilkd.key.gui.actions.KeyAction;
-import de.uka.ilkd.key.symbolic_execution.util.SideProofStore;
 import lombok.Getter;
 import org.fife.rsta.ui.CollapsibleSectionPanel;
 import org.fife.rsta.ui.GoToDialog;
@@ -14,18 +13,20 @@ import org.fife.ui.rsyntaxtextarea.ErrorStrip;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.RSyntaxUtilities;
 import org.fife.ui.rtextarea.*;
-import org.key_project.util.RandomName;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeSupport;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 import static javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
 
@@ -36,17 +37,16 @@ import static javax.swing.JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT;
 public class Editor extends DefaultMultipleCDockable implements SearchListener {
     public static final String PROP_DIRTY = "DIRTY";
     public static final String PROP_PATH = "PATH";
-
     @Getter
     protected final RSyntaxTextArea editor;
-
     @Getter
     protected final Gutter gutter;
-
+    private final Color EXECUTION_HIGHLIGHT = Color.LIGHT_GRAY;
     @Getter
     private final RTextScrollPane editorView;
 
-    private final String name = RandomName.getRandomName("-") + ".kps";
+    private final String name;
+
     private final DefaultMultipleCDockable dockable = this;
 
     private final PropertyChangeSupport eventSupport = new PropertyChangeSupport(this);
@@ -57,11 +57,14 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
     @Getter
     private boolean dirty;
 
-    @Getter
+
     private Path path;
 
-    public Editor() {
+    private Map<Integer, Object> highlightedLines = new HashMap<>();
+
+    public Editor(String name) {
         super(EditorFacade.getEditorDockableFactory());
+        this.name = name;
         pane = (JPanel) getContentPane();
         pane.setLayout(new BorderLayout(5, 5));
 
@@ -114,27 +117,25 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
         eventSupport.addPropertyChangeListener(it -> dockable.setTitleText(getTitle()));
         dockable.setTitleText(getTitle());
 
-        pane.registerKeyboardAction(
-                EditorExtension.getSaveAction(),
-                EditorExtension.getSaveAction().getAcceleratorKey(),
+        EditorExtension.getSaveAction().registerIn(pane,
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
-        pane.registerKeyboardAction(
-                EditorExtension.getActionLoad(),
-                EditorExtension.getActionLoad().getAcceleratorKey(),
+        EditorExtension.getActionLoad().registerIn(pane,
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-
-        pane.registerKeyboardAction(
-                EditorExtension.getActionSaveAs(),
-                EditorExtension.getActionSaveAs().getAcceleratorKey(),
+        EditorExtension.getActionSaveAs().registerIn(pane,
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         KeyAction actionGoto = new GoToLineAction();
+        actionGoto.registerIn(pane, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
         pane.registerKeyboardAction(
-                actionGoto,
-                actionGoto.getAcceleratorKey(),
+                this::increaseFontSize,
+                KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, InputEvent.CTRL_DOWN_MASK),
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
+        pane.registerKeyboardAction(
+                this::decreaseFontSize,
+                KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK),
+                WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK);
         Action a = csp.addBottomComponent(ks, findToolBar);
@@ -144,6 +145,25 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
         a = csp.addBottomComponent(ks, replaceToolBar);
         a.putValue(Action.NAME, "Show Replace Search Bar");
         pane.registerKeyboardAction(a, ks, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+
+
+        Font font = Font.getFont("Fira Code");
+        if(font != null) {
+            font.deriveFont(12f);
+            editor.setFont(font);
+        }
+    }
+
+    private void decreaseFontSize(ActionEvent actionEvent) {
+        Font f = getEditor().getFont();
+        getEditor().setFont(f.deriveFont(f.getSize() - 2f));
+        System.out.println("Editor.decreaseFontSize");
+    }
+
+    private void increaseFontSize(ActionEvent actionEvent) {
+        Font f = getEditor().getFont();
+        getEditor().setFont(f.deriveFont(f.getSize() + 2f));
+        System.out.println("Editor.increaseFontSize");
     }
 
     public String getTitle() {
@@ -234,6 +254,43 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
     @Override
     public String getSelectedText() {
         return null;
+    }
+
+    /**
+     * Highlight whole line
+     *
+     * @param line
+     * @throws BadLocationException
+     */
+    public void highlightExecutionLine(int line) throws BadLocationException {
+        Object tag = editor.addLineHighlight(line, EXECUTION_HIGHLIGHT);
+        highlightedLines.put(line, tag);
+    }
+
+    /**
+     * Remove all highlighted lines
+     *
+     * @throws BadLocationException
+     */
+    public void unHighlightAllExecutionLines() throws BadLocationException {
+        for (Map.Entry<Integer, Object> entry : highlightedLines.entrySet()) {
+            editor.removeLineHighlight(entry.getValue());
+        }
+        highlightedLines.clear();
+
+    }
+
+    public void unHighlightExecutionLines(int line) throws BadLocationException {
+        if (highlightedLines.containsKey(line)) {
+            Object tag = highlightedLines.get(line);
+            editor.removeLineHighlight(tag);
+            highlightedLines.remove(line, tag);
+        }
+
+    }
+
+    public void highlightRange(int charStart, int charStop, Color c) throws BadLocationException {
+        editor.getHighlighter().addHighlight(charStart, charStop, new DefaultHighlighter.DefaultHighlightPainter(c));
     }
 
     private class GoToLineAction extends KeyAction {
