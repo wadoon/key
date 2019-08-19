@@ -41,6 +41,7 @@ public class ProofIndependentSettings {
             new LemmaGeneratorSettings();
     private final GeneralSettings generalSettings = new GeneralSettings();
     private final ViewSettings viewSettings = new ViewSettings();
+    private final TermLabelSettings termLabelSettings = new TermLabelSettings();
     private final String filename;
 
     private final TestGenerationSettings testGenSettings = new TestGenerationSettings();
@@ -56,11 +57,7 @@ public class ProofIndependentSettings {
         addSettings(generalSettings);
         addSettings(viewSettings);
         addSettings(testGenSettings);
-
         this.filename = filename;
-        for (Settings settings : settings) {
-            settings.addSettingsListener(settingsListener);
-        }
         loadSettings();
     }
 
@@ -119,12 +116,14 @@ public class ProofIndependentSettings {
     }
 
     public GeneralSettings getGeneralSettings() {
-        //ensureInitialized();
         return generalSettings;
     }
 
+    public TermLabelSettings getTermLabelSettings() {
+        return termLabelSettings;
+    }
+
     public ViewSettings getViewSettings() {
-        //ensureInitialized();
         return viewSettings;
     }
 
@@ -139,9 +138,6 @@ public class ProofIndependentSettings {
     public TestGenerationSettings getTestGenerationSettings() {
         return testGenSettings;
     }
-
-
-
 
     /**
      * Checks if pretty printing is enabled or not.

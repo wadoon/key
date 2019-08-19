@@ -278,6 +278,7 @@ lexer grammar KeYLexer;
 	SAME : '\\same';
 	STATIC : '\\static';
         STATICMETHODREFERENCE : '\\staticMethodReference';
+        MAXEXPANDMETHOD : '\\mayExpandMethod';
 	STRICT    : '\\strict';
 	TYPEOF : '\\typeof';
 	INSTANTIATE_GENERIC : '\\instantiateGeneric';
@@ -469,7 +470,7 @@ NOT_EQUALS
 	;
 
 SEQARROW
-:	'==>'
+:	'==>' | '\u27F9'
 	;
 
 EXP
