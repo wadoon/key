@@ -4,6 +4,8 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.sort.Sort;
 import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
+import de.uka.ilkd.key.proof.io.ProblemLoaderException;
+import edu.kit.iti.formal.psdbg.interpreter.data.GoalNode;
 import edu.kit.iti.formal.psdbg.interpreter.data.KeyData;
 import edu.kit.iti.formal.psdbg.interpreter.data.State;
 import edu.kit.iti.formal.psdbg.interpreter.data.TermValue;
@@ -17,12 +19,15 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.List;
 
 import static edu.kit.iti.formal.psdbg.TestHelper.getFile;
 
 /**
+ * This class test the KeYInterpreter by using the command line implementation
  * @author Alexander Weigl
  * @version 1 (28.05.17)
+ * @version 2 by S.Grebing August 2019
  */
 public class ExecuteTest {
     private static Execute create(String... cmd) throws IOException, ParseException {
@@ -136,4 +141,84 @@ public class ExecuteTest {
         Assert.assertEquals("The substituted variable values must be identical", y.getData(), ((TermValue) z.getData()).getTermRepr());
      }
 
+    /***
+     * This test should test that if a try block is used and teh content does not close the proof it is rolled back
+     * @throws IOException
+     * @throws ParseException
+     * @throws ProblemLoaderException
+     */
+    @Test
+    public void testTryFail() throws IOException, ParseException {
+        Execute execute = create(getFile(getClass(), "contraposition/contraposition.key"), "-s",
+                getFile(getClass(), "contraposition/testIsClosable.kps"));
+        Interpreter<KeyData> i = execute.run();
+
+        List<GoalNode<KeyData>> goals = i.getCurrentState().getGoals();
+        Assert.assertEquals(2, goals.size());
+        for (GoalNode<KeyData> goal : goals) {
+            Assert.assertEquals("Label for node " + goal.getData().getNode(), "impLeft // impRight // $$", goal.getData().getRuleLabel());
+        }
+
+    }
+
+    /**
+     * This test test that the closes statement as match expression for a case branch is effectless if the content does not close th proof
+     * @throws IOException
+     * @throws ParseException
+     */
+    @Test
+    public void testClosesFail() throws IOException, ParseException {
+        Execute execute = create(getFile(getClass(), "contraposition/contraposition.key"), "-s",
+                getFile(getClass(), "contraposition/closes.kps"));
+        Interpreter<KeyData> i = execute.run();
+
+        List<GoalNode<KeyData>> goals = i.getCurrentState().getGoals();
+        Assert.assertEquals(2, goals.size());
+        for (GoalNode<KeyData> goal : goals) {
+            Assert.assertEquals("Label for node " + goal.getData().getNode(), "impLeft // impRight // $$", goal.getData().getRuleLabel());
+        }
+
+        // Assert.assertEquals(10, i.getCurrentState().getGoals().size());
+    }
+
+
+    /**
+     * This test tests a successful closes block taht is rolled back and because it would close the proof the
+     * case branch is executed, which should not close the proof. If teh proof is closed the case branch was skipped
+     * and teh default branch was exectued instead.
+     * @throws IOException
+     * @throws ParseException
+     */
+    @Test
+    public void testClosesScriptSuccess() throws IOException, ParseException {
+        Execute execute = create(getFile(getClass(), "contraposition/contraposition.key"), "-s",
+                getFile(getClass(), "contraposition/closesSuccess.kps"));
+        Interpreter<KeyData> i = execute.run();
+        List<GoalNode<KeyData>> goals = i.getCurrentState().getGoals();
+        Assert.assertEquals(2, goals.size());
+        for (GoalNode<KeyData> goal : goals) {
+            Assert.assertEquals("Label for node " + goal.getData().getNode(), "impRight // impLeft // impRight // $$", goal.getData().getRuleLabel());
+        }
+
+        Assert.assertFalse("The proof is not closed goal 0", goals.get(0).isClosed());
+        Assert.assertFalse("The proof is not closed goal 1", goals.get(1).isClosed());
+
+
+    }
+
+    /**
+     * This test test that the extra variables are correctly used
+     * @throws IOException
+     * @throws ParseException
+     */
+    @Test
+    public void testHookAssignments() throws IOException, ParseException {
+        Execute execute = create(getFile(getClass(), "contraposition/contraposition.key"), "-s",
+                getFile(getClass(), "contraposition/hookTestScript.kps"));
+        Interpreter<KeyData> i = execute.run();
+
+
+        Assert.assertTrue(i.isStrictMode());
+
+    }
 }

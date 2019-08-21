@@ -1,4 +1,3 @@
-script t1(){
     impRight;
     impLeft;
     cases{
@@ -8,4 +7,3 @@ script t1(){
 
     }
 
-}
