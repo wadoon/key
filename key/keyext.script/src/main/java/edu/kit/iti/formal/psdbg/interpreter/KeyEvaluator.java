@@ -47,11 +47,13 @@ public class KeyEvaluator extends Evaluator<KeyData> {
 
                 //either evalute the substitent or find ?X in the
                 String newVal = "";
-                if (t != null)
+                if (t != null) {
                     newVal = ((Value) t.accept(this)).getData().toString();
-                else
+                    m.appendReplacement(newTerm, newVal);
+                } else {
                     // newVal = state.getValue(new Variable(name)).getData().toString();
                     m.appendReplacement(newTerm, newVal);
+                }
             }
             m.appendTail(newTerm);
             return new Value<>(TypeFacade.ANY_TERM, new TermValue(newTerm.toString()));

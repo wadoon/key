@@ -1,0 +1,7 @@
+  cases{
+    //X:TERM :=`p`;
+    case match `==>?X -> ?Y`:
+        F:TERM := `?X`[?X \ X];
+        Z:TERM := `?ANY`[?ANY \ Y];
+
+  }

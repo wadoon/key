@@ -6,6 +6,7 @@ import de.uka.ilkd.key.parser.DefaultTermParser;
 import de.uka.ilkd.key.parser.ParserException;
 import edu.kit.iti.formal.psdbg.interpreter.data.KeyData;
 import edu.kit.iti.formal.psdbg.interpreter.data.State;
+import edu.kit.iti.formal.psdbg.interpreter.data.TermValue;
 import edu.kit.iti.formal.psdbg.parser.ast.Variable;
 import edu.kit.iti.formal.psdbg.parser.data.Value;
 import org.apache.commons.cli.ParseException;
@@ -66,7 +67,7 @@ public class ExecuteTest {
         State<KeyData> currentState = i.getCurrentState();
         System.out.println(currentState);
         //This revealed a bug in the interpreter for body of a case
-        Assert.assertEquals("Number of goals has to be two ", 2, i.getCurrentGoals().size());
+        Assert.assertEquals("Number of goals has to be two ", 4, i.getCurrentGoals().size());
         KeyData goal0_data = currentState.getGoals().get(0).getData();
         Value y = currentState.getGoals().get(0).getAssignments().getValue(new Variable("Y"));
         Assert.assertTrue(goal0_data.getRuleLabel().contains("cut"));
@@ -107,5 +108,32 @@ public class ExecuteTest {
         State<KeyData> currentState = i.getCurrentState();
         System.out.println(currentState);
     }
+
+
+    /**
+     * This test reveiled an already fixed bug in the KeYevluator for Subtitution expressions
+     * @throws IOException
+     * @throws ParseException
+     * @throws ParserException
+     */
+    @Test
+    public void testSubstitutionOfMatch() throws IOException, ParseException, ParserException {
+        Execute execute = create(
+                getFile(getClass(), "contraposition/contraposition.key"),
+                "-s", getFile(getClass(), "contraposition/subst.kps"));
+        Interpreter<KeyData> i = execute.run();
+        State<KeyData> currentState = i.getCurrentState();
+
+        KeyData goal0_data = currentState.getGoals().get(0).getData();
+        Value f = currentState.getGoals().get(0).getAssignments().getValue(new Variable("F")); //should be !p->!q
+
+        Value x = currentState.getGoals().get(0).getAssignments().getValue(new Variable("X")); //should be !p->!q
+
+        Value y = currentState.getGoals().get(0).getAssignments().getValue(new Variable("Y")); //should be p->q
+        Value z = currentState.getGoals().get(0).getAssignments().getValue(new Variable("Z"));
+
+        Assert.assertEquals("The substituted variable values must be identical", x.getData(), ((TermValue) f.getData()).getTermRepr());
+        Assert.assertEquals("The substituted variable values must be identical", y.getData(), ((TermValue) z.getData()).getTermRepr());
+     }
 
 }
