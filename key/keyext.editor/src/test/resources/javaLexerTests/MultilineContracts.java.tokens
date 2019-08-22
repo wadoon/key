@@ -179,7 +179,7 @@
                      \n\n : WS_CONTRACT_IGNORE   : jmlContract
                           : WS_CONTRACT          : jmlContract
                         @ : WS_CONTRACT_IGNORE   : jmlContract
-                       */ : COMMENT_END          : DEFAULT_MODE
+                       */ : JML_END              : DEFAULT_MODE
                    \n\n   : WS                   : DEFAULT_MODE
                       int : INT                  : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE

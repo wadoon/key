@@ -10,7 +10,7 @@
                           : WS                   : jmlExpr
                      true : BOOL_LITERAL         : jmlExpr
                         ; : SEMI_TOPLEVEL        : jmlContract
-                       \n : COMMENT_END          : DEFAULT_MODE
+                       \n : JML_END              : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
                    public : PUBLIC               : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
@@ -32,7 +32,7 @@
                         a : IDENTIFIER           : jmlExpr
                         ) : RPAREN               : jmlExpr
                         ; : SEMI_TOPLEVEL        : jmlContract
-                       \n : COMMENT_END          : DEFAULT_MODE
+                       \n : JML_END              : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
                    public : PUBLIC               : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
@@ -54,7 +54,7 @@
                         a : IDENTIFIER           : jmlExpr
                         ) : RPAREN               : jmlExpr
                         ; : SEMI_TOPLEVEL        : jmlContract
-                       \n : COMMENT_END          : DEFAULT_MODE
+                       \n : JML_END              : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
                    public : PUBLIC               : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
@@ -76,7 +76,7 @@
                         a : IDENTIFIER           : jmlExpr
                         ) : RPAREN               : jmlExpr
                         ; : SEMI_TOPLEVEL        : jmlContract
-                       \n : COMMENT_END          : DEFAULT_MODE
+                       \n : JML_END              : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
                    public : PUBLIC               : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
@@ -94,7 +94,7 @@
                assignable : ASSIGNABLE           : jmlExpr
                           : WS                   : jmlExpr
         missing_semicolon : IDENTIFIER           : jmlExpr
-                       \n : COMMENT_END          : DEFAULT_MODE
+                       \n : JML_END              : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
                    public : PUBLIC               : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
@@ -113,7 +113,7 @@
                           : WS                   : jmlExpr
                  \nothing : IDENTIFIER           : jmlExpr
                         ; : SEMI_TOPLEVEL        : jmlContract
-                       \n : COMMENT_END          : DEFAULT_MODE
+                       \n : JML_END              : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
                       //@ : JML_START            : jmlContract
                           : WS_CONTRACT          : jmlContract
@@ -121,7 +121,7 @@
                           : WS                   : jmlExpr
               \everything : IDENTIFIER           : jmlExpr
                         ; : SEMI_TOPLEVEL        : jmlContract
-                       \n : COMMENT_END          : DEFAULT_MODE
+                       \n : JML_END              : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
                    public : PUBLIC               : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
@@ -258,5 +258,5 @@
                           : WS                   : jmlExpr
                     blubb : IDENTIFIER           : jmlExpr
                         ; : SEMI_TOPLEVEL        : jmlContract
-                       \n : COMMENT_END          : DEFAULT_MODE
+                       \n : JML_END              : DEFAULT_MODE
                         } : RBRACE               : DEFAULT_MODE

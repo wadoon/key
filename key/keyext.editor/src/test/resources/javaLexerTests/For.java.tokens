@@ -64,7 +64,7 @@
                         ] : RBRACK               : jmlExpr
                         ) : RPAREN               : jmlExpr
                         ; : SEMI_TOPLEVEL        : jmlContract
-                       \n : COMMENT_END          : DEFAULT_MODE
+                       \n : JML_END              : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
                       int : INT                  : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
@@ -179,7 +179,7 @@
                        \n : WS_CONTRACT_IGNORE   : jmlContract
                           : WS_CONTRACT          : jmlContract
                         @ : WS_CONTRACT_IGNORE   : jmlContract
-                       */ : COMMENT_END          : DEFAULT_MODE
+                       */ : JML_END              : DEFAULT_MODE
                \n         : WS                   : DEFAULT_MODE
                       for : FOR                  : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
@@ -233,7 +233,7 @@
                        \n : WS_CONTRACT_IGNORE   : jmlContract
                           : WS_CONTRACT          : jmlContract
                         @ : WS_CONTRACT_IGNORE   : jmlContract
-                       */ : COMMENT_END          : DEFAULT_MODE
+                       */ : JML_END              : DEFAULT_MODE
                    \n     : WS                   : DEFAULT_MODE
                      void : VOID                 : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
@@ -252,7 +252,7 @@
                         f : IDENTIFIER           : jmlExpr
                         ) : RPAREN               : jmlExpr
                         ; : SEMI_TOPLEVEL        : jmlContract
-                       \n : COMMENT_END          : DEFAULT_MODE
+                       \n : JML_END              : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
                       //@ : JML_START            : jmlContract
                           : WS_CONTRACT          : jmlContract
@@ -260,7 +260,7 @@
                           : WS                   : jmlExpr
         \strictly_nothing : IDENTIFIER           : jmlExpr
                         ; : SEMI_TOPLEVEL        : jmlContract
-                       \n : COMMENT_END          : DEFAULT_MODE
+                       \n : JML_END              : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
                       for : FOR                  : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE

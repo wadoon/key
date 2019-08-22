@@ -136,14 +136,14 @@
                        \n : WS_CONTRACT_IGNORE   : jmlContract
                           : WS_CONTRACT          : jmlContract
                         @ : WS_CONTRACT_IGNORE   : jmlContract
-                       */ : COMMENT_END          : DEFAULT_MODE
+                       */ : JML_END              : DEFAULT_MODE
                    \n     : WS                   : DEFAULT_MODE
                    static : STATIC               : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
                       /*@ : JML_START            : jmlContract
                      pure : PURE                 : jmlContract
                         @ : WS_CONTRACT_IGNORE   : jmlContract
-                       */ : COMMENT_END          : DEFAULT_MODE
+                       */ : JML_END              : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
                       int : INT                  : DEFAULT_MODE
                           : WS                   : DEFAULT_MODE
@@ -365,7 +365,7 @@
                        \n : WS_CONTRACT_IGNORE   : jmlContract
                           : WS_CONTRACT          : jmlContract
                         @ : WS_CONTRACT_IGNORE   : jmlContract
-                       */ : COMMENT_END          : DEFAULT_MODE
+                       */ : JML_END              : DEFAULT_MODE
                \n         : WS                   : DEFAULT_MODE
                     while : WHILE                : DEFAULT_MODE
                         ( : LPAREN               : DEFAULT_MODE
