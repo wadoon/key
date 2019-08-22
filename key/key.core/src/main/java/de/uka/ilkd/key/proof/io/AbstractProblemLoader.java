@@ -576,6 +576,7 @@ public abstract class AbstractProblemLoader {
         		problemInitializer.startProver(initConfig, poContainer.getProofOblInput());
 
         for (Proof p : proofList.getProofs()) {
+            p.setLoadedFromFile(file);
             // register proof
             initConfig.getServices().getSpecificationRepository()
                                     .registerProof(poContainer.getProofOblInput(), p);

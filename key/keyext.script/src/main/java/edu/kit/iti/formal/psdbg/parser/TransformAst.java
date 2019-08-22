@@ -459,7 +459,13 @@ public class TransformAst implements ScriptLanguageParserVisitor<Object> {
             return b;
         }).orElse(first);
         list.forEach(a -> a.setRuleContext(ctx));
-        Statements body = (Statements) ctx.stmtList().accept(this);
+        Statements body;
+        if (ctx.stmtList() != null)
+            body = (Statements) ctx.stmtList().accept(this);
+        else {
+            body = new Statements();
+            body.add((Statement) ctx.statement().accept(this));
+        }
         last.setBody(body);
         body.setParent(last);
         return first;

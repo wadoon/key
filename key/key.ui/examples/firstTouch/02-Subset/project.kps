@@ -1,0 +1,53 @@
+/**
+ * Author: Alexander Weigl (2019)
+ */
+
+impRight; andLeft;
+repeat allRight;
+impRight; andLeft;
+
+rule instAll
+  	     on = "x5_0"
+  	formula = "subzet(x5_0,x6_0)"
+     inst_t = "x5_0"
+     inst_u = "x1"
+     inst_b = "\forall S x2; (subzet(x1, x2) <-> \forall S x3; (member(x3, x1) -> member(x3, x2)))"
+;
+
+rule instAll
+	       on = "x6_0"
+	  formula = "subzet(x5_0,x6_0)"
+     inst_t = "x6_0"
+     inst_u = "x2"
+     inst_b = "subzet(x5_0, x2) <-> \forall S x3; (member(x3, x5_0) -> member(x3, x2))"
+;
+
+rule instAll
+	       on = "x6_0"
+	  formula = "subzet(x6_0,x7_0)"
+     inst_t = "x6_0"
+     inst_u = "x1"
+     inst_b = "\forall S x2; (subzet(x1, x2) <-> \forall S x3; (member(x3, x1) -> member(x3, x2)))"
+;
+
+rule instAll
+	       on = "x7_0"
+	  formula = "subzet(x6_0,x7_0)"
+     inst_t = "x7_0"
+     inst_u = "x2"
+     inst_b = "subzet(x6_0, x2) <-> \forall S x3; (member(x3, x6_0) -> member(x3, x2))"
+;
+
+replace_known_left
+	       on = "subzet(x6_0,x7_0)"
+	  formula = "equiv(subzet(x6_0,x7_0),all{x3:S}(imp(member(x3,x6_0),member(x3,x7_0))))"
+     inst_b = "subzet(x6_0, x7_0)"
+;
+
+replace_known_left
+  	     on = "subzet(x5_0,x6_0)"
+	  formula = "equiv(subzet(x5_0,x6_0),all{x3:S}(imp(member(x3,x5_0),member(x3,x6_0))))"
+     inst_b = "subzet(x5_0, x6_0)"
+;
+
+auto;

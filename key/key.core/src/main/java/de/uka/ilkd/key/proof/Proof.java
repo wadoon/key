@@ -153,6 +153,11 @@ public class Proof implements Named {
      */
     private File proofFile;
 
+    /** The file which was used to load this proof in the {@link de.uka.ilkd.key.proof.io.AbstractProblemLoader}.
+        A key, proof, or java file, may be null
+     */
+    private @Nullable File loadedFromFile;
+
     /**
      * constructs a new empty proof with name
      */
@@ -612,6 +617,23 @@ public class Proof implements Named {
      */
     public boolean closed () {
         return root.isClosed() && openGoals.isEmpty();
+    }
+
+    /**
+     *
+     * @param loadedFromFile
+     */
+    public void setLoadedFromFile(@Nullable File loadedFromFile) {
+        this.loadedFromFile = loadedFromFile;
+    }
+
+    /**
+     * The file which was used to load this proof in the {@link de.uka.ilkd.key.proof.io.AbstractProblemLoader}.
+     *
+     * @return A key, proof, or java file, may be null
+     */
+    public @Nullable File getLoadedFromFile() {
+        return loadedFromFile;
     }
 
 

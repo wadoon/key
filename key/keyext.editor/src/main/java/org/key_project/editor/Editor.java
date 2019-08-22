@@ -315,6 +315,5 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
                 }
             }
         }
-
     }
 }

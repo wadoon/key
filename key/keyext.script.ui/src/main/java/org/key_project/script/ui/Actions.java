@@ -43,7 +43,7 @@ public class Actions {
     public Actions(@NotNull MainWindow window, @NotNull KeYMediator mediator) {
         this.window = window;
         this.mediator = mediator;
-        autoLoadProofScriptAction.actionPerformed(null);
+        autoLoadProofScriptAction.actionPerformed(null);//pre-register
     }
 
     private void saveToClipboard(String label) {
@@ -133,8 +133,8 @@ public class Actions {
         @Override
         public void selectedProofChanged(KeYSelectionEvent e) {
             int hash = mediator.getSelectedProof().hashCode();
-            File f = mediator.getSelectedProof().getProofFile();
-            if (loadedProofs.contains(hash) && f != null) {
+            File f = mediator.getSelectedProof().getLoadedFromFile();
+            if (!loadedProofs.contains(hash) && f != null) {
                 loadedProofs.add(hash);
 
                 String name = f.getName();
@@ -142,8 +142,12 @@ public class Actions {
                 Path path = f.toPath().resolveSibling(
                         name + ".kps"
                 );
-                if (null == EditorFacade.open(path)) {
+                var editor = (ScriptEditor) EditorFacade.open(path);
+                if (editor == null) {
                     window.setStatusLine("Could not find a corresponding proof file for proof: " + path);
+                } else {
+                    editor.setBoundProof(mediator.getSelectedProof());
+                    EditorFacade.addEditor(editor, window);
                 }
             }
         }

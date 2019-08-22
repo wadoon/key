@@ -1,0 +1,10 @@
+/* Contraposition by Hand
+ * Alexander Weigl -- 2019
+ */
+
+impRight;
+impRight;
+notRight;
+notLeft;
+impLeft;
+foreach close;
