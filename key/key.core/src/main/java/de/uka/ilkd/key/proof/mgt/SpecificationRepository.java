@@ -23,10 +23,12 @@ import java.util.Map.Entry;
 import java.util.function.UnaryOperator;
 
 import org.key_project.util.collection.DefaultImmutableSet;
+import org.key_project.util.collection.ImmutableArray;
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
 import org.key_project.util.collection.ImmutableSet;
 
+import de.uka.ilkd.key.dependency_calculator.DependencyCalculator;
 import de.uka.ilkd.key.java.JavaInfo;
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.StatementBlock;
@@ -45,6 +47,7 @@ import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Equality;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.IObserverFunction;
 import de.uka.ilkd.key.logic.op.IProgramMethod;
 import de.uka.ilkd.key.logic.op.LocationVariable;
@@ -90,6 +93,7 @@ import de.uka.ilkd.key.speclang.jml.JMLInfoExtractor;
 import de.uka.ilkd.key.speclang.translation.SLTranslationException;
 import de.uka.ilkd.key.util.MiscTools;
 import de.uka.ilkd.key.util.Pair;
+import de.uka.ilkd.key.util.Triple;
 
 /**
  * Central storage for all specification elements, such as contracts, class
@@ -164,6 +168,10 @@ public final class SpecificationRepository {
     private final Map<IObserverFunction, ImmutableSet<Taclet>>
         unlimitedToLimitTaclets =
             new LinkedHashMap<IObserverFunction, ImmutableSet<Taclet>>();
+    
+    // TODO: Think about a better solution
+    private int uniqueHelper = 0;
+    public final Map<ClassInvariant, ClassInvariant> intermediateToConcreteInvariants = new LinkedHashMap<ClassInvariant, ClassInvariant>();
 
     /**
      * <p>
@@ -1088,11 +1096,14 @@ public final class SpecificationRepository {
      * if it is public or protected.
      */
     public void addClassInvariant(ClassInvariant inv) {
+    	
+    	ClassInvariant intermediateInv = calcIntermediateInvariant(inv);
+    	
         final KeYJavaType kjt = inv.getKJT();
         final IObserverFunction target = inv.isStatic()
                 ? services.getJavaInfo().getStaticInv(kjt)
                 : services.getJavaInfo().getInv();
-        invs.put(kjt, getClassInvariants(kjt).add(inv));
+        invs.put(kjt, getClassInvariants(kjt).add(intermediateInv));
         final ImmutableSet<ClassWellDefinedness> cwds = getWdClassChecks(kjt);
         if (cwds.isEmpty()) {
             registerContract(new ClassWellDefinedness(inv, target, null, null,
@@ -1105,9 +1116,9 @@ public final class SpecificationRepository {
                     null, null, services), services);
             registerContract(cwd);
         }
-
+        
         // in any case, create axiom with non-static target
-        addClassAxiom(new PartialInvAxiom(inv, false, services));
+        addClassAxiom(new PartialInvAxiom(intermediateInv, false, services));
         // for a static invariant, create also an axiom with a static target
         if (inv.isStatic()) {
             addClassAxiom(new PartialInvAxiom(inv, true, services));
@@ -1139,6 +1150,67 @@ public final class SpecificationRepository {
             }
         }
     }
+    
+    /**
+     * This method creates an intermediate representation of an invariant inform of 
+     * an observer symbol. Also, it creates the mapping from the intermediate representation
+     * of an invariant to the concrete version. Furthermore a dependency contract for the
+     * newly created observer symbol is created and registered.
+     * 
+     */
+    public ClassInvariant calcIntermediateInvariant(ClassInvariant inv) { 
+
+    	// TODO: treat static invariants.
+    	if(inv.isStatic()) {
+    		return inv;
+    	}
+    
+    	// Create new observer for the partial invariant predicate
+    	IObserverFunction observerSymbol = new ObserverFunction("<"+"p_inv_"+this.uniqueHelper+">",
+                Sort.FORMULA,
+                null,
+                services.getTypeConverter().getHeapLDT().targetSort(),
+                services.getJavaInfo().getJavaLangObject(),
+                false,
+                new ImmutableArray<KeYJavaType>(),
+                HeapContext.getModHeaps(services, false).size(),
+                1);
+    	
+    	// Add observer to the namespace
+        services.getNamespaces().functions().addSafely((Function)observerSymbol);
+              
+        Term predicatSymbol = tb.func(observerSymbol, 
+        						tb.var(services.getTypeConverter().getHeapLDT().getHeap()), 
+        						tb.var(inv.getOrigVars().self));
+        
+        ClassInvariant intermediateInv = new ClassInvariantImpl("p_inv_"+this.uniqueHelper, 
+        													"p_inv_"+this.uniqueHelper, 
+        													inv.getKJT(), 
+        													inv.getVisibility(), 
+        													predicatSymbol, 
+        													inv.getOrigVars().self);
+        
+        this.uniqueHelper++;
+        
+        // Create and register a new Dependency Contract for the intermediate invariant
+        Term dep =  tb.union(DependencyCalculator.calculateDependenciesForInvariant(inv, 
+        																			services, 
+        																			inv.getOrigVars().self, 
+        																			inv.getKJT()));
+        
+        DependencyContract dpc = this.cf.dep(intermediateInv.getKJT(), 
+        									services.getTypeConverter().getHeapLDT().getHeap(), 
+        									new Triple<IObserverFunction, Term, Term>(observerSymbol, dep, tb.var(inv.getOrigVars().self)), 
+        									inv.getOrigVars().self);
+        registerContract(dpc);
+        
+        // Add the pair of (intermediateInv, concreteInv) to the overall mapping
+        intermediateToConcreteInvariants.put(intermediateInv, inv);
+        
+    	return intermediateInv;
+    }
+    
+    
 
     /**
      * Registers the passed class invariants.

@@ -8,7 +8,9 @@ import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.java.abstraction.KeYJavaType;
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
+import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.op.LogicVariable;
+import de.uka.ilkd.key.logic.op.ProgramVariable;
 import de.uka.ilkd.key.proof.Proof;
 import de.uka.ilkd.key.speclang.ClassInvariant;
 
@@ -19,18 +21,21 @@ public class DependencyCalculator {
 		
 		Services services = proof.getServices();
 		HashSet<Term> dependencies = new HashSet<Term>();
-		LogicVariable self = new LogicVariable(new Name("self"), kjt.getSort());
+		// TODO: Program Variable also okay?
+		//LogicVariable self = new LogicVariable(new Name("self"), kjt.getSort());
 		
 		ImmutableSet<ClassInvariant> invariants = proof.getServices().getSpecificationRepository().getClassInvariants(kjt);
 		
-		for(ClassInvariant inv: invariants){
-			dependencies.addAll(calculateDependenciesForInvariant(inv, services, self, kjt));
-		}
-		
-		return dependencies;
+//		for(ClassInvariant inv: invariants){
+//			dependencies.addAll(calculateDependenciesForInvariant(inv, services, self, kjt));
+//		}
+//		
+//		return dependencies;
+		//TODO: Don't forget to use the above implementation after fixing logic vs. program variable
+		return null;
 	}
 	
-	private static HashSet<Term> calculateDependenciesForInvariant(ClassInvariant invariant, Services services, LogicVariable self, KeYJavaType kjt){
+	public static HashSet<Term> calculateDependenciesForInvariant(ClassInvariant invariant, Services services, ProgramVariable self, KeYJavaType kjt){
 								
 		DepVisitor depVisitor = new DepVisitor(services, kjt);
 		invariant.getInv(self, services).execPostOrder(depVisitor);

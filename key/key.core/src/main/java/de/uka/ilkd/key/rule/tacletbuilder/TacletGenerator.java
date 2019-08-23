@@ -66,6 +66,7 @@ import de.uka.ilkd.key.proof.OpReplacer;
 import de.uka.ilkd.key.rule.RewriteTaclet;
 import de.uka.ilkd.key.rule.RuleSet;
 import de.uka.ilkd.key.rule.Taclet;
+import de.uka.ilkd.key.speclang.ClassInvariant;
 import de.uka.ilkd.key.speclang.HeapContext;
 import de.uka.ilkd.key.util.Pair;
 
@@ -778,7 +779,40 @@ public class TacletGenerator {
         result = result.add(tacletBuilder.getTaclet());
         return result;
     }
+    
+    /**
+     * This method creates a rewrite taclet in order to transform the intermediate representation
+     * of an invariant to the corresponding concrete representation.
+     * 
+     * If no corresponding concrete invariant is found, this method returns null.
+     * 
+     */
+    public Taclet generateIntermediateToConcreteInvTaclet( SchemaVariable selfSV,
+    														ClassInvariant intermediate,
+    														Services services) {
+    	// Retrieve the concrete invariant matching to the intermediate one
+    	ClassInvariant concreteInv = services
+    									.getSpecificationRepository()
+    									.intermediateToConcreteInvariants
+    									.get(intermediate);
+        
+    	// There is no mapping from an intermediate invariant to a concrete one
+    	if(concreteInv == null || !(intermediate.getOriginalInv().op() instanceof IObserverFunction)) {
+    		return null;
+    	}
 
+    	ImmutableList<ProgramVariable> params =  intermediate.getOrigVars().params.append(services.getTypeConverter().getHeapLDT().getHeap());
+    	
+    	// Create replace taclet to transform the intermediate invariant to the concrete one
+        Taclet taclet =
+        	generateRewriteTaclet(new Name("Intermediate_to_concrete_inv_for_" + intermediate.getName()), 
+        							intermediate.getInv(selfSV, services), 
+        							concreteInv.getInv(selfSV, services),
+        							params,
+        							new RuleSet(new Name("classAxiom")), 
+        							services);
+        return taclet;
+    }
 
     @SuppressWarnings("unused")
     private TermAndBoundVarPair createSchemaTerm(Term term,
