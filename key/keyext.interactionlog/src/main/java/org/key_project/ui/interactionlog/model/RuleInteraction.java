@@ -25,6 +25,7 @@ import java.util.Iterator;
 @XmlRootElement
 public final class RuleInteraction extends NodeInteraction {
     private static final long serialVersionUID = -3178292652264875668L;
+    private String displayName;
     private String ruleName;
     private OccurenceIdentifier posInOccurence;
     private HashMap<String, String> arguments = new HashMap<>();
@@ -36,7 +37,8 @@ public final class RuleInteraction extends NodeInteraction {
     public RuleInteraction(Node node, RuleApp app) {
         super(node);
 
-        this.ruleName = app.rule().displayName();
+        this.displayName = app.rule().displayName();
+        this.ruleName = app.rule().name().toString();
         this.posInOccurence = OccurenceIdentifier.get(app.posInOccurrence());
 
         if (app instanceof TacletApp) {
