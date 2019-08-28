@@ -50,7 +50,8 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
     private final DefaultMultipleCDockable dockable = this;
 
     private final PropertyChangeSupport eventSupport = new PropertyChangeSupport(this);
-    private final JPanel pane;
+    private final JPanel contentPanel;
+    protected final CollapsibleSectionPanel rootPanel;
 
     protected JToolBar toolBarActions = new JToolBar();
 
@@ -65,8 +66,8 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
     public Editor(String name) {
         super(EditorFacade.getEditorDockableFactory());
         this.name = name;
-        pane = (JPanel) getContentPane();
-        pane.setLayout(new BorderLayout(5, 5));
+        contentPanel = (JPanel) getContentPane();
+        contentPanel.setLayout(new BorderLayout(5, 5));
 
         FindToolBar findToolBar = new FindToolBar(this);
         ReplaceToolBar replaceToolBar = new ReplaceToolBar(this);
@@ -106,9 +107,9 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
             }
         });
         add(toolBarActions, BorderLayout.NORTH);
-        CollapsibleSectionPanel csp = new CollapsibleSectionPanel();
-        csp.add(editorView);
-        add(csp);
+        this.rootPanel = new CollapsibleSectionPanel();
+        rootPanel.add(editorView);
+        add(rootPanel);
 
         ErrorStrip errorStrip = new ErrorStrip(editor);
         add(errorStrip, BorderLayout.LINE_END);
@@ -117,34 +118,34 @@ public class Editor extends DefaultMultipleCDockable implements SearchListener {
         eventSupport.addPropertyChangeListener(it -> dockable.setTitleText(getTitle()));
         dockable.setTitleText(getTitle());
 
-        EditorExtension.getSaveAction().registerIn(pane,
+        EditorExtension.getSaveAction().registerIn(contentPanel,
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        EditorExtension.getActionLoad().registerIn(pane,
+        EditorExtension.getActionLoad().registerIn(contentPanel,
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-        EditorExtension.getActionSaveAs().registerIn(pane,
+        EditorExtension.getActionSaveAs().registerIn(contentPanel,
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         KeyAction actionGoto = new GoToLineAction();
-        actionGoto.registerIn(pane, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        actionGoto.registerIn(contentPanel, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        pane.registerKeyboardAction(
+        contentPanel.registerKeyboardAction(
                 this::increaseFontSize,
                 KeyStroke.getKeyStroke(KeyEvent.VK_PLUS, InputEvent.CTRL_DOWN_MASK),
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        pane.registerKeyboardAction(
+        contentPanel.registerKeyboardAction(
                 this::decreaseFontSize,
                 KeyStroke.getKeyStroke(KeyEvent.VK_MINUS, InputEvent.CTRL_DOWN_MASK),
                 WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
         KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK);
-        Action a = csp.addBottomComponent(ks, findToolBar);
+        Action a = rootPanel.addBottomComponent(ks, findToolBar);
         a.putValue(Action.NAME, "Show Find Search Bar");
-        pane.registerKeyboardAction(a, ks, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPanel.registerKeyboardAction(a, ks, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
         ks = KeyStroke.getKeyStroke(KeyEvent.VK_R, InputEvent.CTRL_DOWN_MASK);
-        a = csp.addBottomComponent(ks, replaceToolBar);
+        a = rootPanel.addBottomComponent(ks, replaceToolBar);
         a.putValue(Action.NAME, "Show Replace Search Bar");
-        pane.registerKeyboardAction(a, ks, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
+        contentPanel.registerKeyboardAction(a, ks, WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
 
         Font font = Font.getFont("Fira Code");

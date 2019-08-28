@@ -202,6 +202,7 @@ class ScriptEditor extends Editor implements KeYSelectionListener {
             window.popupWarning(throwable.getMessage(), "Interpreting Error");
             throwable.printStackTrace();
         }
+        getContentPane().add(new JTextArea(throwable.getMessage(), 5, 40), BorderLayout.SOUTH);
         editor.setEditable(true);
         enableGui();
         setActionEnable();

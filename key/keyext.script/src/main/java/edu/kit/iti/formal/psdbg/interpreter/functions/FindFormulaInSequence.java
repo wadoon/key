@@ -38,6 +38,7 @@ import java.util.stream.Stream;
  * @version 1 (10.11.17)
  * @version 2 (28.08.19)
  */
+//TODO create test case
 public class FindFormulaInSequence implements ScriptFunction {
     @NotNull
     @Override

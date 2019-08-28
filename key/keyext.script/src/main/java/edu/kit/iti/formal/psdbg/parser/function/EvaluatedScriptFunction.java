@@ -1,7 +1,7 @@
 package edu.kit.iti.formal.psdbg.parser.function;
 
+import edu.kit.iti.formal.psdbg.interpreter.Evaluator;
 import edu.kit.iti.formal.psdbg.parser.Visitor;
-import edu.kit.iti.formal.psdbg.parser.ast.Expression;
 import edu.kit.iti.formal.psdbg.parser.ast.FunctionCall;
 import edu.kit.iti.formal.psdbg.parser.data.Value;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public abstract class EvaluatedScriptFunction implements ScriptFunction {
     @NotNull
     @Override
-    public Value eval(Visitor<Value> val, FunctionCall call) {
+    public <T> Value eval(Evaluator<T> val, FunctionCall call) {
         List<Value> values = call.getArguments().stream()
                 .map(e -> (Value) e.accept(val))
                 .collect(Collectors.toList());
