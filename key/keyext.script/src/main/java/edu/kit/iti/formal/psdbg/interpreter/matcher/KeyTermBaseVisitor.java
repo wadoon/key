@@ -49,6 +49,7 @@ public abstract class KeyTermBaseVisitor<T,S> {
                 + getClass().getSimpleName());
     }
 
+
     interface TermAcceptor<T, S> {
         T visit(Term term, S arg) throws InvocationTargetException, IllegalAccessException;
     }

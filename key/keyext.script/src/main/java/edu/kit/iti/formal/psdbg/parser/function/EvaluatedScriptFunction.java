@@ -4,6 +4,7 @@ import edu.kit.iti.formal.psdbg.parser.Visitor;
 import edu.kit.iti.formal.psdbg.parser.ast.Expression;
 import edu.kit.iti.formal.psdbg.parser.ast.FunctionCall;
 import edu.kit.iti.formal.psdbg.parser.data.Value;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
  * @version 1 (10.11.17)
  */
 public abstract class EvaluatedScriptFunction implements ScriptFunction {
+    @NotNull
     @Override
     public Value eval(Visitor<Value> val, FunctionCall call) {
         List<Value> values = call.getArguments().stream()

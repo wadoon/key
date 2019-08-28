@@ -51,6 +51,9 @@ public class KeyTermMatcher extends  KeyTermBaseVisitor<Matchings, MatchPath> {
         return matchesSemisequent(peek, patterns);
     }
 
+    public Matchings matchesTerm(Term termPattern, Term term) {
+        return visit(termPattern, new MatchPath.MPTerm(null, term, 0));
+    }
 
     private Matchings matchesSemisequent(MatchPath.MPSemiSequent peek, List<Term> patterns) {
 

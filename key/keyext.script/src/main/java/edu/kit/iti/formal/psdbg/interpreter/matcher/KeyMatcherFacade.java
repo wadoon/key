@@ -53,7 +53,7 @@ public class KeyMatcherFacade {
         return ret;
     }
 
-    private Matchings matchesTerm(String pattern) {
+    public Matchings matchesTerm(String pattern) {
         List<Term> positions = new ArrayList<>();
         for (String patternTerm : hasToplevelComma(pattern)) {
             try {
@@ -79,10 +79,18 @@ public class KeyMatcherFacade {
         return keyTermMatcher.matchesSequent(sequent, seq);
     }
 
-    private Reader createReader(String pattern) {
-        StringReader sr = new StringReader(pattern);
-        return sr;
+    private static Reader createReader(String pattern) {
+        return new StringReader(pattern);
     }
 
 
+    public static boolean matchesTerm(Services services, String pattern, Term term) throws ParserException {
+        List<Term> positions = new ArrayList<>();
+        Term termPattern = new DefaultTermParser().parse(createReader(pattern),
+                null, services, services.getNamespaces(),
+                null, true);
+        KeyTermMatcher keyTermMatcher = new KeyTermMatcher();
+        Matchings m = keyTermMatcher.matchesTerm(termPattern, term);
+        return !m.isNoMatch();
+    }
 }

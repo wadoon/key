@@ -14,6 +14,8 @@
 package de.uka.ilkd.key.logic;
 
 import java.util.Iterator;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 import org.key_project.util.collection.ImmutableList;
 import org.key_project.util.collection.ImmutableSLList;
@@ -442,6 +444,13 @@ public class Semisequent implements Iterable<SequentFormula> {
 
     public ImmutableList<SequentFormula> asList () {
         return seqList;
+    }
+
+    /**
+     * @return a stream over the sequent formulas
+     */
+    public Stream<SequentFormula> stream() {
+        return StreamSupport.stream(spliterator(), true);
     }
 
     @Override
