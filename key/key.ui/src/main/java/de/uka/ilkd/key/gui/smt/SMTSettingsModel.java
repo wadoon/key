@@ -15,8 +15,6 @@ package de.uka.ilkd.key.gui.smt;
 
 
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.LinkedList;
 
 import javax.swing.BorderFactory;
@@ -135,10 +133,10 @@ class GeneralOptions extends TablePanel{
 	private JCheckBox  solverSupportCheck;
 	private final ProofIndependentSMTSettings settings;
 
-	public final static String PROGRESS_MODE_USER = "Progress dialog remains open after executing solvers.";
-	public final static String PROGRESS_MODE_CLOSE = "Close progress dialog after all solvers have finished.";
-	public final static String PROGRESS_MODE_CLOSE_FIRST = "Close progress dialog after the first solver has finished.";
-	public final int minWidthOfTitle;
+	private final static String PROGRESS_MODE_USER = "Progress dialog remains open after executing solvers.";
+	private final static String PROGRESS_MODE_CLOSE = "Close progress dialog after all solvers have finished.";
+	private final static String PROGRESS_MODE_CLOSE_FIRST = "Close progress dialog after the first solver has finished.";
+	private final int minWidthOfTitle;
 
 	private final static String infoBound = "Bitvector size for this type. Use a value larger than 0.";
 
@@ -171,7 +169,7 @@ class GeneralOptions extends TablePanel{
 			private final static String infoTimeoutField = "Timeout for the external solvers in seconds. Fractions of a second are allowed.\n"
                         + "Example: 6.5";
 
-					public GeneralOptions(ProofIndependentSMTSettings settings) {
+					GeneralOptions(ProofIndependentSMTSettings settings) {
 						super();
 						this.minWidthOfTitle = SwingUtilities.computeStringWidth(this.getFontMetrics(getFont()),"Concurrent ProcessesBLANK");
 						this.settings = settings;
@@ -189,117 +187,87 @@ class GeneralOptions extends TablePanel{
 
 					}
 
-					public JTextField getMaxProcesses() {
+					private JTextField getMaxProcesses() {
 						if(maxProcesses == null){
 							maxProcesses = addTextField("Concurrent Processes:",minWidthOfTitle,Long.toString(settings.maxConcurrentProcesses),infoMaxProcesses,
-									new ActionListener(){
-
-								@Override
-								public void actionPerformed(
-										ActionEvent e) {
-									int value;
-									try {
-										value = Integer.parseInt(maxProcesses.getText());
-									} catch (NumberFormatException ex) {
-										value = settings.maxConcurrentProcesses;
-									}
-									settings.maxConcurrentProcesses = value;
-								}
-							});
+									e -> {
+										int value;
+										try {
+											value = Integer.parseInt(maxProcesses.getText());
+										} catch (NumberFormatException ex) {
+											value = settings.maxConcurrentProcesses;
+										}
+										settings.maxConcurrentProcesses = value;
+									});
 						}
 						return maxProcesses;
 					}
 
-					public JTextField getTimeoutField() {
+					private JTextField getTimeoutField() {
 						if(timeoutField == null){
 							timeoutField = addTextField("Timeout:",minWidthOfTitle,Float.toString((float)settings.timeout/1000),infoTimeoutField,
-									new ActionListener(){
-
-								@Override
-								public void actionPerformed(
-										ActionEvent e) {
-									long value;
-									try {
-										value = (long)(Float.parseFloat(timeoutField.getText())*1000);
-									} catch (NumberFormatException ex) {
-										value = settings.timeout;
-									}
-									settings.timeout = value;
-								}
-							});
+									e -> {
+										long value;
+										try {
+											value = (long)(Float.parseFloat(timeoutField.getText())*1000);
+										} catch (NumberFormatException ex) {
+											value = settings.timeout;
+										}
+										settings.timeout = value;
+									});
 						}
 						return timeoutField;
 					}
 
-					public void getBoundFields() {
+					private void getBoundFields() {
 						if(intBoundField == null){
 							intBoundField = addTextField("Integer Bound:",minWidthOfTitle,Long.toString(settings.intBound),infoBound,
-									new ActionListener(){
-
-								@Override
-								public void actionPerformed(
-										ActionEvent e) {
-									long value;
-									try {
-										value = Long.parseLong(intBoundField.getText());
-									} catch (NumberFormatException ex) {
-										value = settings.intBound;
-									}
-									settings.intBound = value;
-								}
-							});
+									e -> {
+										long value;
+										try {
+											value = Long.parseLong(intBoundField.getText());
+										} catch (NumberFormatException ex) {
+											value = settings.intBound;
+										}
+										settings.intBound = value;
+									});
 						}
 
 						if(seqBoundField == null){
 							seqBoundField = addTextField("Seq Bound:",minWidthOfTitle,Long.toString(settings.seqBound),infoBound,
-									new ActionListener(){
-
-								@Override
-								public void actionPerformed(
-										ActionEvent e) {
-									long value;
-									try {
-										value = Long.parseLong(seqBoundField.getText());
-									} catch (NumberFormatException ex) {
-										value = settings.seqBound;
-									}
-									settings.seqBound = value;
-								}
-							});
+									e -> {
+										long value;
+										try {
+											value = Long.parseLong(seqBoundField.getText());
+										} catch (NumberFormatException ex) {
+											value = settings.seqBound;
+										}
+										settings.seqBound = value;
+									});
 						}
 						if(objectBoundField == null){
 							objectBoundField = addTextField("Object Bound:",minWidthOfTitle,Long.toString(settings.objectBound),infoBound,
-									new ActionListener(){
-
-								@Override
-								public void actionPerformed(
-										ActionEvent e) {
-									long value;
-									try {
-										value = Long.parseLong(objectBoundField.getText());
-									} catch (NumberFormatException ex) {
-										value = settings.objectBound;
-									}
-									settings.objectBound = value;
-								}
-							});
+									e -> {
+										long value;
+										try {
+											value = Long.parseLong(objectBoundField.getText());
+										} catch (NumberFormatException ex) {
+											value = settings.objectBound;
+										}
+										settings.objectBound = value;
+									});
 						}
 						if(locsetBoundField == null){
 							locsetBoundField = addTextField("Locset Bound:",minWidthOfTitle,Long.toString(settings.locsetBound),infoBound,
-									new ActionListener(){
-
-								@Override
-								public void actionPerformed(
-										ActionEvent e) {
-									long value;
-									try {
-										value = Long.parseLong(locsetBoundField.getText());
-									} catch (NumberFormatException ex) {
-										value = settings.locsetBound;
-									}
-									settings.locsetBound = value;
-								}
-							});
+									e -> {
+										long value;
+										try {
+											value = Long.parseLong(locsetBoundField.getText());
+										} catch (NumberFormatException ex) {
+											value = settings.locsetBound;
+										}
+										settings.locsetBound = value;
+									});
 						}
 
 					}
@@ -308,51 +276,36 @@ class GeneralOptions extends TablePanel{
 
 
 
-					public JComboBox<String> getProgressModeBox() {
+					private JComboBox<String> getProgressModeBox() {
 						if(progressModeBox == null){
-							progressModeBox = addComboBox(infoProgressModeBox,settings.modeOfProgressDialog, new ActionListener() {
-
-								@Override
-								public void actionPerformed(ActionEvent e) {
-									settings.modeOfProgressDialog = progressModeBox.getSelectedIndex();
-								}
-							},
+							progressModeBox = addComboBox(infoProgressModeBox,settings.modeOfProgressDialog, e -> settings.modeOfProgressDialog = progressModeBox.getSelectedIndex(),
 							getProgressMode(ProofIndependentSMTSettings.PROGRESS_MODE_USER),
 							getProgressMode(ProofIndependentSMTSettings.PROGRESS_MODE_CLOSE));
 						}
 						return progressModeBox;
 					}
 
-					public JCheckBox getSolverSupportCheck() {
+					private JCheckBox getSolverSupportCheck() {
 						if(solverSupportCheck == null){
 							solverSupportCheck = addCheckBox("Check for support when a solver is started.",
 									infoCheckForSupport,
 									settings.checkForSupport
-									, new ActionListener() {
-								@Override
-								public void actionPerformed(ActionEvent e) {
-									settings.checkForSupport = solverSupportCheck.isSelected();
-								}
-							});
+									, e -> settings.checkForSupport = solverSupportCheck.isSelected());
 						}
 
 						return solverSupportCheck;
 					}
 
 
-					public FileChooserPanel getSaveToFilePanel() {
+					private FileChooserPanel getSaveToFilePanel() {
 						if(saveToFilePanel == null){
 							saveToFilePanel = addFileChooserPanel("Store translation to file:",
 									settings.pathForSMTTranslation, infoSaveToFilePanel,
-                                        true,settings.storeSMTTranslationToFile,new ActionListener() {
+                                        true,settings.storeSMTTranslationToFile, e -> {
+											settings.pathForSMTTranslation = saveToFilePanel.getPath();
+											settings.storeSMTTranslationToFile = saveToFilePanel.isSelected();
 
-								@Override
-								public void actionPerformed(ActionEvent e) {
-									settings.pathForSMTTranslation = saveToFilePanel.getPath();
-									settings.storeSMTTranslationToFile = saveToFilePanel.isSelected();
-
-								}
-							});
+										});
 						}
 						return saveToFilePanel;
 					}
@@ -361,7 +314,7 @@ class GeneralOptions extends TablePanel{
 
 
 
-					public String getProgressMode(int index) {
+					private String getProgressMode(int index) {
 						switch (index) {
 						case ProofIndependentSMTSettings.PROGRESS_MODE_USER:
 							return PROGRESS_MODE_USER;
@@ -421,7 +374,7 @@ class SolverOptions extends TablePanel{
 	private static final int SOLVER_NOT_SUPPOTED = 1;
 	private static final int SOLVER_SUPPORT_NOT_CHECKED = 2;
 
-	public SolverOptions(SolverType solverType,ProofIndependentSMTSettings settings) {
+	SolverOptions(SolverType solverType, ProofIndependentSMTSettings settings) {
 		super();
 		this.minWidthOfTitle = SwingUtilities.computeStringWidth(this.getFontMetrics(getFont()),"InstalledBLANK");
 		this.setName(solverType.getName());
@@ -459,17 +412,13 @@ class SolverOptions extends TablePanel{
 
 
 
-	public void createButtons() {
+	private void createButtons() {
 		toDefaultButton = new JButton("Set parameters to default.");
 
-		toDefaultButton.addActionListener(new ActionListener() {
+		toDefaultButton.addActionListener(arg0 -> {
+			getSolverParameters().setText(solverType.getDefaultSolverParameters());
+			settings.setParameters(solverType, solverParameters.getText());
 
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				getSolverParameters().setText(solverType.getDefaultSolverParameters());
-				settings.setParameters(solverType, solverParameters.getText());
-
-			}
 		});
 
 
@@ -512,7 +461,7 @@ class SolverOptions extends TablePanel{
 		}
 	}
 
-	public JTextField getSolverSupported() {
+	private JTextField getSolverSupported() {
 		if(solverSupported == null){
 			solverSupported = addTextField("Support",minWidthOfTitle,getSolverSupportText(),
 					infoSolverSupport+createSupportedVersionText(),null);
@@ -523,35 +472,23 @@ class SolverOptions extends TablePanel{
 	}
 
 
-	public JTextField getSolverParameters() {
+	private JTextField getSolverParameters() {
 		if(solverParameters == null){
-			solverParameters = addTextField("Parameters",minWidthOfTitle,solverType.getSolverParameters(),infoSolverParameters,new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					settings.setParameters(solverType, solverParameters.getText());
-				}
-			});
+			solverParameters = addTextField("Parameters",minWidthOfTitle,solverType.getSolverParameters(),infoSolverParameters, e -> settings.setParameters(solverType, solverParameters.getText()));
 		}
 		return solverParameters;
 	}
 
-	public JTextField getSolverCommand() {
+	private JTextField getSolverCommand() {
 		if(solverCommand == null){
 			solverCommand = addTextField("Command",minWidthOfTitle,solverType.getSolverCommand()
-					,infoSolverCommand,new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					settings.setCommand(solverType, solverCommand.getText());
-				}
-			});
+					,infoSolverCommand, e -> settings.setCommand(solverType, solverCommand.getText()));
 		}
 		return solverCommand;
 	}
 
 
-	public JTextField getSolverInstalled() {
+	private JTextField getSolverInstalled() {
 		if(solverInstalled == null){
                     final boolean installed = solverType.isInstalled(true);
                     String info = installed? "yes": "no";
@@ -570,7 +507,7 @@ class SolverOptions extends TablePanel{
 		return solverInstalled;
 	}
 
-	public JTextField getSolverName() {
+	private JTextField getSolverName() {
 		if(solverName == null){
 			solverName = addTextField("Name",minWidthOfTitle,solverType.getName(),infoSolverName,null);
 			solverName.setBackground(this.getBackground());
@@ -613,7 +550,7 @@ class TacletTranslationOptions extends TablePanel{
 					+ " generic sorts.";
 
 
-	public TacletTranslationOptions(SMTSettings settings) {
+	TacletTranslationOptions(SMTSettings settings) {
 		super();
 		this.minWidthOfTitle = SwingUtilities.computeStringWidth(this.getFontMetrics(getFont()),"Maximum number of generic sorts.BLANK");
 		this.settings = settings;
@@ -628,41 +565,33 @@ class TacletTranslationOptions extends TablePanel{
 
 	}
 
-	public JTextField createMaxNumberOfGenerics() {
+	private JTextField createMaxNumberOfGenerics() {
 		if(maxNumberOfGenerics == null){
 			maxNumberOfGenerics = addTextField("Maximum number of generic sorts.",minWidthOfTitle,
 					Integer.toString(settings.getMaxNumberOfGenerics())
-					, infoMaxNumberOfGenerics, new ActionListener() {
+					, infoMaxNumberOfGenerics, e -> {
+						int value;
+						try {
+							value = Integer.parseInt(maxNumberOfGenerics.getText());
+						} catch (NumberFormatException ex) {
+							value = settings.getPdSettings().maxGenericSorts;
+						}
+						settings.getPdSettings().maxGenericSorts = value;
 
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					int value;
-					try {
-						value = Integer.parseInt(maxNumberOfGenerics.getText());
-					} catch (NumberFormatException ex) {
-						value = settings.getPdSettings().maxGenericSorts;
-					}
-					settings.getPdSettings().maxGenericSorts = value;
-
-				}
-			});
+					});
 		}
 		return maxNumberOfGenerics;
 	}
 
 
-	public FileChooserPanel createFileChooserPanel() {
+	private FileChooserPanel createFileChooserPanel() {
 		if(fileChooserPanel == null){
 			fileChooserPanel = addFileChooserPanel("Store taclet translation to file:",
 					settings.getPathForTacletTranslation(),
-					infoFileChooserPanel, true,settings.storeTacletTranslationToFile(),new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					settings.getPiSettings().pathForTacletTranslation = fileChooserPanel.getPath();
-					settings.getPiSettings().storeTacletTranslationToFile = fileChooserPanel.isSelected();
-				}
-			});
+					infoFileChooserPanel, true,settings.storeTacletTranslationToFile(), e -> {
+						settings.getPiSettings().pathForTacletTranslation = fileChooserPanel.getPath();
+						settings.getPiSettings().storeTacletTranslationToFile = fileChooserPanel.isSelected();
+					});
 
 		}
 		return fileChooserPanel;
@@ -746,7 +675,7 @@ class TranslationOptions extends TablePanel{
 
 
 
-	public TranslationOptions(ProofDependentSMTSettings settings) {
+	TranslationOptions(ProofDependentSMTSettings settings) {
 		super();
 		this.minWidthOfTitle = SwingUtilities.computeStringWidth(this.getFontMetrics(getFont()),"MaximumBLANK");
 		this.settings = settings;
@@ -765,136 +694,92 @@ class TranslationOptions extends TablePanel{
 		createConstantsForIntegers();
 	}
 
-	public JCheckBox createUseExplicitTypeHierachy() {
+	private void createUseExplicitTypeHierachy() {
 		if(useExplicitTypeHierachy == null){
 			useExplicitTypeHierachy = addCheckBox("Use a explicit type hierarchy.",
 					infoUseExplicitTypeHierarchy,
-					settings.useExplicitTypeHierarchy
-					, new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					settings.useExplicitTypeHierarchy = useExplicitTypeHierachy.isSelected();
-				}
-			});
+					settings.useExplicitTypeHierarchy,
+					e -> settings.useExplicitTypeHierarchy = useExplicitTypeHierachy.isSelected());
 		}
-		return useExplicitTypeHierachy;
 	}
 
-	public JCheckBox createEnableQuantifiers() {
+	private void createEnableQuantifiers() {
         if(enableQuantifiers == null){
             enableQuantifiers = addCheckBox("Enable quantifiers in SMT translation",
                     "",
-                    settings.enableQuantifiers
-                    , new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            settings.enableQuantifiers = enableQuantifiers.isSelected();
-                        }
-                    });
+                    settings.enableQuantifiers,
+					e -> settings.enableQuantifiers = enableQuantifiers.isSelected());
         }
-        return useExplicitTypeHierachy;
-    }
+	}
 
-	public JCheckBox createDisableSqrtAxiomatizing() {
-		if(disableSqrtAxiomatizing == null){
+	private void createDisableSqrtAxiomatizing() {
+		if (disableSqrtAxiomatizing == null) {
 			disableSqrtAxiomatizing = addCheckBox("Disable sqrt axiomatizing in SMT translation",
 					infoDisableSqrtAxiomatizing,
-					settings.disableSqrtAxiomatizing
-					, new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							settings.disableSqrtAxiomatizing = disableSqrtAxiomatizing.isSelected();
-						}
-					});
+					settings.disableSqrtAxiomatizing,
+					e -> settings.disableSqrtAxiomatizing = disableSqrtAxiomatizing.isSelected());
 		}
-		return disableSqrtAxiomatizing;
 	}
 
-	public JCheckBox createNullInstantiation() {
+	private void createNullInstantiation() {
 		if(useNullInstantiation == null){
 			useNullInstantiation = addCheckBox("Instantiate hierarchy assumptions if possible (recommended).",
-					infoUseNullInstantiation
-					,settings.useNullInstantiation
-					, new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					settings.useNullInstantiation = useNullInstantiation.isSelected();
-				}
-			});
+					infoUseNullInstantiation,
+					settings.useNullInstantiation,
+					e -> settings.useNullInstantiation = useNullInstantiation.isSelected());
 		}
-		return useNullInstantiation;
 	}
 
-	public JCheckBox createBuiltInUniqueness() {
+	private void createBuiltInUniqueness() {
 		if(useBuiltInUniqueness == null){
 			useBuiltInUniqueness = addCheckBox("Use built-in mechanism for uniqueness if possible.",
-					infoUseBuiltInUniqueness
-					,settings.useBuiltInUniqueness
-					, new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					settings.useBuiltInUniqueness = useBuiltInUniqueness.isSelected();
-				}
-			});
+					infoUseBuiltInUniqueness,
+					settings.useBuiltInUniqueness,
+					e -> settings.useBuiltInUniqueness = useBuiltInUniqueness.isSelected());
 		}
-		return useBuiltInUniqueness;
 	}
 
-	public JCheckBox createUIMultiplication() {
+	private void createUIMultiplication() {
 
 		if(useUIMultiplication == null){
 			useUIMultiplication = addCheckBox( "Use uninterpreted multiplication if necessary.",
-					infoUseUIMultiplication
-					,settings.useUIMultiplication
-					, new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					settings.useUIMultiplication = useUIMultiplication.isSelected();
-				}
-			});
+					infoUseUIMultiplication,
+					settings.useUIMultiplication,
+					e -> settings.useUIMultiplication = useUIMultiplication.isSelected());
 		}
-		return useUIMultiplication;
 	}
 
 
 
-	public JCheckBox createConstantsForIntegers() {
+	private void createConstantsForIntegers() {
 
 		if(useConstantsForIntegers == null){
 			Box box = Box.createVerticalBox();
 
 			box.setBorder(BorderFactory.createTitledBorder("Use constants for too big or too small integers."));
 
-			maxField = createTextField(Long.toString(settings.maxInteger), new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					long result = settings.maxInteger;
-					try{
-						result = Long.parseLong(maxField.getText());
-						maxField.setForeground(Color.BLACK);
-					}catch(Throwable ex){
-						maxField.setForeground(Color.RED);
-					}
-					settings.maxInteger = result;
-
+			maxField = createTextField(Long.toString(settings.maxInteger), e -> {
+				long result = settings.maxInteger;
+				try{
+					result = Long.parseLong(maxField.getText());
+					maxField.setForeground(Color.BLACK);
+				}catch(Throwable ex){
+					maxField.setForeground(Color.RED);
 				}
+				settings.maxInteger = result;
+
 			});
 
-			minField = createTextField(Long.toString(settings.minInteger), new ActionListener() {
-
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					long result = settings.minInteger;
-					try{
-						result = Long.parseLong(minField.getText());
-						minField.setForeground(Color.BLACK);
-					}catch(Throwable ex){
-						minField.setForeground(Color.RED);
-					}
-					settings.minInteger = result;
-
+			minField = createTextField(Long.toString(settings.minInteger), e -> {
+				long result = settings.minInteger;
+				try{
+					result = Long.parseLong(minField.getText());
+					minField.setForeground(Color.BLACK);
+				}catch(Throwable ex){
+					minField.setForeground(Color.RED);
 				}
+				settings.minInteger = result;
+
 			});
 
 
@@ -903,13 +788,10 @@ class TranslationOptions extends TablePanel{
 
 			useConstantsForIntegers = createCheckBox("activated"
 					,settings.useConstantsForIntegers
-					, new ActionListener() {
-						@Override
-						public void actionPerformed(ActionEvent e) {
-							settings.useConstantsForIntegers = useConstantsForIntegers.isSelected();
-							maxField.setEnabled(useConstantsForIntegers.isSelected());
-							minField.setEnabled(useConstantsForIntegers.isSelected());
-						}
+					, e -> {
+						settings.useConstantsForIntegers = useConstantsForIntegers.isSelected();
+						maxField.setEnabled(useConstantsForIntegers.isSelected());
+						minField.setEnabled(useConstantsForIntegers.isSelected());
 					});
 			Box box2 = Box.createHorizontalBox();
 			box2.add(useConstantsForIntegers);
@@ -922,6 +804,5 @@ class TranslationOptions extends TablePanel{
 
 			addComponent(infoUseConstantsForIntegers,box);
 		}
-		return useConstantsForIntegers;
 	}
 }
