@@ -29,8 +29,6 @@ import profiling.ProfilingData;
 import profiling.nodecount.NodeCountProfiler;
 import profiling.statistics.StatisticsProfiler;
 import com.google.gson.*;
-import com.sun.xml.internal.bind.v2.runtime.RuntimeUtil.ToStringAdapter;
-import com.sun.xml.internal.fastinfoset.util.StringArray;
 public class Main {
 
 	final static String PATH = "C:\\key workspace\\key\\key\\key.ui\\examples\\standard_key\\prop_log\\proof\\allClausesLength4.key.proof";
