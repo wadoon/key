@@ -15,7 +15,11 @@ package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
 import java.util.Iterator;
 
+import org.key_project.util.collection.DefaultImmutableSet;
+
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
+import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermServices;
 import de.uka.ilkd.key.logic.op.Function;
@@ -37,14 +41,26 @@ public class HeuristicInstantiation implements TermGenerator {
             PosInOccurrence pos,
             Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
-
+        System.out.println("Calling HEUR generate");
         final Term qf = pos.sequentFormula ().formula ();
-        final Instantiation ia = Instantiation.create ( qf, goal.sequent(),
-                goal.proof().getServices() );
+        final Sequent seq = goal.sequent();
+        final Services services = goal.proof().getServices();
         final QuantifiableVariable var =
                 qf.varsBoundHere ( 0 ).last ();
+        //final LinkedHashSet<Term> cbi = ConflictBasedInstantiation.create(qf, seq, services).getInstantiation();
+        //        if(!cbi.isEmpty()) {
+        //            System.out.println("Ignoring E-Matching in favor of CBI");
+        //            return new HIIterator(cbi.iterator(), var, services);
+        //        }
+        //        System.out.println("CBI found nothing, try E-Matching");
+        final Instantiation ia = Instantiation.create ( qf, goal.sequent(),
+                goal.proof().getServices() );
         HIIterator hiit = new HIIterator ( ia.getSubstitution ().iterator (), var, goal.proof().getServices() );
         return hiit;
+    }
+
+    private HIIterator empty(QuantifiableVariable var, Services services) {
+        return new HIIterator(DefaultImmutableSet.<Term>nil().iterator(), var, services);
     }
 
 

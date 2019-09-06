@@ -33,6 +33,7 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
@@ -59,17 +60,29 @@ class Instantiation {
     private final TriggersSet triggersSet;
 
     private Instantiation(Term allterm, Sequent seq, Services services) {
+        System.out.println("Start E-Matching on " + LogicPrinter.quickPrintTerm(allterm, services));
         firstVar = allterm.varsBoundHere(0).get(0);
         matrix = TriggerUtils.discardQuantifiers(allterm);
         /* Terms bound in every formula on <code>goal</code> */
         triggersSet = TriggersSet.create(allterm, services);
         assumedLiterals = initAssertLiterals(seq, services);
         addInstances(sequentToTerms(seq), services);
+        System.out.print("Found: ");
+        for (final Map.Entry<Term, Long> e: instancesWithCosts.entrySet()) {
+            System.out.print(e.getKey().toString() + ": " + e.getValue() + ", ");
+        }
+        System.out.println();
     }
 
     private static Term lastQuantifiedFormula = null;
     private static Sequent lastSequent = null;
     private static Instantiation lastResult = null;
+
+    public static boolean instantiated(Term qf, Sequent seq) {
+        synchronized(Instantiation.class) {
+            return (qf == lastQuantifiedFormula && seq == lastSequent);
+        }
+    }
 
     static Instantiation create(Term qf, Sequent seq, Services services) {
         synchronized(Instantiation.class) {
@@ -184,6 +197,9 @@ class Instantiation {
      */
     static RuleAppCost computeCost(Term inst, Term form, Sequent seq,
             Services services) {
+        if(!Instantiation.instantiated(form, seq)) {
+            return NumberRuleAppCost.create(Long.MAX_VALUE);
+        }
         return Instantiation.create(form, seq, services).computeCostHelp(inst);
     }
 

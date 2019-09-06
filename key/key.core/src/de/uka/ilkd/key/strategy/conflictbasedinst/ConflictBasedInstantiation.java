@@ -1,494 +1,341 @@
 package de.uka.ilkd.key.strategy.conflictbasedinst;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
+
+import org.key_project.util.collection.ImmutableArray;
 
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Name;
-import de.uka.ilkd.key.logic.Semisequent;
+import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
-import de.uka.ilkd.key.logic.SequentFormula;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
 import de.uka.ilkd.key.logic.TermFactory;
-import de.uka.ilkd.key.logic.op.Equality;
-import de.uka.ilkd.key.logic.op.Junctor;
-import de.uka.ilkd.key.logic.op.LogicVariable;
-import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.init.ProofInputException;
-import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
-import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
-import de.uka.ilkd.key.strategy.StrategyProperties;
-import de.uka.ilkd.key.strategy.conflictbasedinst.EquivalenceClosure.EquivalenceClass;
-import de.uka.ilkd.key.util.ProofStarter;
-import de.uka.ilkd.key.util.SideProofUtil;
 
 public class ConflictBasedInstantiation {
 
     /*
-     * Services
+     * CUSTOMIZABLE BEHAVIOR
+     */
+    private static final boolean FIND_INDUCING = false;
+
+    /*
+     * SINGLETON BEHAVIOR
+     */
+
+    /**
+     * A class to hold the singleton instance of
+     * {@link ConflictBasedInstantiationOld}.
+     *
+     * @author Andre Challier <andre.challier@stud.tu-darmstadt.de>
+     *
+     */
+    private static class Holder {
+        private static final ConflictBasedInstantiation INSTANCE = new ConflictBasedInstantiation();
+    }
+
+    /**
+     * Empty constructor for singleton creation.
+     */
+    private ConflictBasedInstantiation() {
+    }
+
+    /**
+     * Returns this instantiation strategies singleton instance.
+     *
+     * @return This singletons instance
+     */
+    public static ConflictBasedInstantiation getInstance() {
+        return Holder.INSTANCE;
+    }
+
+    /**
+     * The universally quantified formula in antecedent or the existentially
+     * quantified formula in succedent.
+     */
+    private Term formula;
+
+    /**
+     * The formula that was used in the last run, saved to return same result if
+     * called on the same formula/sequent twice.
+     */
+    private Term lastFormula;
+    /**
+     * The sequent to build the context from.
+     */
+    private Sequent sequent;
+
+    /**
+     * The current goals services.
      */
     private Services services;
+
+    /**
+     * The holder for CBIs TermBuilder
+     */
     private TermBuilder tb;
     private TermFactory tf;
 
-    /*
-     * Context
+    /**
+     * The consecutive number for renamed quantified variables
      */
-    private LinkedHashSet<Term> context;
-    private HashMap<Operator, HashSet<Term>> contextFunctionMap;
+    private int qvNumber;
 
-    /*
-     * Flattened formula
+    private static final String CBI_QV_NAME = "cbi_renamed_qv_";
+
+    /**
+     * The consecutive number for skolem functions
      */
-    private Term flatBody;
-    private LinkedHashSet<Constraint> constraints;
-    private LinkedHashSet<Term> variables; // TODO devide in X (quantifiedvars) and Y (freshvars)
-    private LinkedHashSet<Term> freshVariables;
+    private int skolemNumber;
 
-    /*
-     * Conflicting Instance Substitutions
+    private static final String CBI_SKOLEM_FUNCTION_NAME = "cbi_scolem_function_";
+
+    /**
+     * The context (may be stored between runs later)
      */
-    private LinkedHashSet<Term> conflictingSubstitutions = new LinkedHashSet<Term>();
+    private Context context;
 
-
-    /*
-     * Constrained Assignments
+    /**
+     * The result of the last run.
      */
-    private LinkedHashSet<LinkedHashSet<Term>> falsifyConstraints;
-    private LinkedHashSet<Term> matchingConstraints;
+    private Term result;
 
-    public ConflictBasedInstantiation(Term formula, Sequent sequent,
-            Services services) {
-        assert formula.op() == Quantifier.ALL : "Can only instantiate universally quantified formulae";
+    /**
+     * Returns a term to substitute the formula with to create an instance of
+     * the formula that leads to apply a closing rule on the sequent or
+     * <code>null</code> if no such term can be found.
+     *
+     * This procedure allows to find instances for universally quantified
+     * formulas of the sequents antecedent or existentially quantified formulas
+     * of the sequents succedent. If the formula does not conform to this
+     * requirement <code>null</code> is returned.
+     *
+     * The procedure returns terms so that the substituted instance of the
+     * formula suffices to apply a close rule on the sequent. If conflict
+     * inducing instances are enabled the procedure also returns terms to create
+     * instances that lead to new constraints and thereby can be supportive to
+     * close the sequent in a later run. Conflict inducing terms will be
+     * returned only if no conflicting term can be found.
+     *
+     * @param formula
+     * @param sequent
+     * @param services
+     * @return a conflicting or conflict inducing term to instantiate the
+     *         formula or null if no term found.
+     * @throws IllegalArgumentException
+     *             if formula is not ALL in antecedent or EX in succedent.
+     */
+    public Term findConflictingTerm(Term formula, Sequent sequent,
+            PosInOccurrence pos, Services services) {
+        if (this.lastFormula == formula && this.sequent == sequent) {
+            // TODO find next conflicting term
+            /*
+             * This can actually not happen as the sequent changes if one
+             * instance was found To handle that build context from sequent
+             * incrementally (traverse sequent for unknown terms) and keep state
+             * if formula is the same (cbi called on same formula repeatedly)
+             */
+        }
+        /*
+         * Find conflicting term on fresh formula
+         */
+        this.lastFormula = formula;
+        this.sequent = sequent;
         this.services = services;
-        tb = services.getTermBuilder();
-        tf = services.getTermFactory();
-        context = getGroundLiterals(sequent);
-        contextFunctionMap = createFunctionMap(context);
+        // register current termbuilder
+        this.tb = services.getTermBuilder();
+        this.tf = services.getTermFactory();
+        TermBuilderHolder.getInstance().setTermBuilder(tb);
+        // reset consecutive numbers
+        this.qvNumber = 0;
+        this.skolemNumber = 0;
+
+        if (!((formula.op() == Quantifier.ALL && pos.isInAntec())
+                || (formula.op() == Quantifier.EX && !pos.isInAntec()))) {
+            throw new IllegalArgumentException(
+                    "Can only handle ALL in antecedent or EX in succedent.");
+        }
+
+        /*
+         * Handle EX in succedent ( A => \exists x:p(x), S --> A, \forall x;
+         * !p(x) => S)
+         */
+        if (formula.op() == Quantifier.EX) {
+            formula = tb.all(formula.boundVars(), tb.not(formula.sub(0)));
+        }
+
+        /*
+         * Prepare formula
+         */
+
+        HashMap<Term, Term> replaceMap = new HashMap<Term, Term>();
+        LinkedHashSet<Term> boundVars = new LinkedHashSet<Term>();
+        Term prepForm = prepareFormula(
+                formula, replaceMap, boundVars);
+        System.out.println("Prepared formula: " + prepForm);
+        System.out.println("ReplacementMap: " + replaceMap);
+
+        /*
+         * Create context
+         */
+        context = new Context(formula, sequent);
+        //TODO remove prints
         System.out.println("Context: " + context.toString());
-        variables = new LinkedHashSet<Term>();
-        freshVariables = new LinkedHashSet<Term>();
-        constraints = new LinkedHashSet<Constraint>();
-        formula.boundVars().forEach(bv -> variables.add(tb.var(bv)));
-        FlattenResult fr = flatten(formula.sub(0));
-        System.out.println("Variables: " + variables.toString());
-        System.out.println("Fresh Variables: " + freshVariables.toString());
-        System.out.println("Constraints: " + constraints.toString());
-        flatBody = fr.getTerm();
-        System.out.println("Flat Body: " + flatBody.toString());
-        falsifyConstraints = falsify(flatBody, true);
-        System.out.println("Falsify: " + falsifyConstraints.toString());
-        matchingConstraints = matchConstraintSet(constraints);
-        System.out.println("Match: " + matchingConstraints.toString());
-        extractConflictingSubstitution();
+        LinkedHashSet<CbiPair> pairs = falsify(formula, true,
+                new ConstrainedAssignment(),
+                MatchingConstraints.extractFrom(formula));
+        System.out.println(pairs);
+        return extractConflictingSubstitution(pairs);
     }
 
-    public LinkedHashSet<Term> getInstantiation() {
-        for(Term term: conflictingSubstitutions) {
-            System.out.println("CBI: " + term.toString());
+    private Term prepareFormula(Term formula, HashMap<Term, Term> replaceMap, LinkedHashSet<Term> boundVars) {
+        if(replaceMap.containsKey(formula)) {
+            return replaceMap.get(formula);
         }
-        return conflictingSubstitutions;
+        LinkedHashSet<Term> extendedBoundVars = new LinkedHashSet<Term>(boundVars);
+        HashMap<Term, Term> extendedReplaceMap = new HashMap<Term, Term>(replaceMap);
+        if (formula.op() == Quantifier.ALL) {
+            for(QuantifiableVariable qv: formula.boundVars()) {
+                Term freshQV = createQuantVar(qv.sort());
+                extendedReplaceMap.put(tb.var(qv), freshQV);
+                extendedBoundVars.add(freshQV);
+            }
+            return prepareFormula(formula.sub(0), extendedReplaceMap, extendedBoundVars);
+        }
+        else if (formula.op() == Quantifier.EX) {
+            Term[] bvArray = boundVars.toArray(new Term[0]);
+            for(QuantifiableVariable qv: formula.boundVars()) {
+                Term skolem = createSkolemFunction(qv.sort(), bvArray);
+                extendedReplaceMap.put(tb.var(qv), skolem);
+            }
+            return prepareFormula(formula.sub(0), extendedReplaceMap, boundVars);
+        }
+
+        Term[] subs = new Term[formula.subs().size()];
+        for (int i = 0; i < formula.subs().size(); i++) {
+            subs[i] = prepareFormula(formula.subs().get(i), replaceMap, boundVars);
+        }
+        return tf.createTerm(formula.op(), new ImmutableArray<Term>(subs), formula.boundVars(), formula.javaBlock(), formula.getLabels());
     }
 
-    /*
-     * BUILDING CONTEXT
-     */
-
-    private LinkedHashSet<Term> getGroundLiterals(Sequent sequent) {
-        LinkedHashSet<Term> ret = new LinkedHashSet<Term>();
-        ret.addAll(getGroundLiterals(sequent.antecedent(), true));
-        ret.addAll(getGroundLiterals(sequent.succedent(), false));
-        return ret;
+    private Term createQuantVar(Sort sort) {
+        return TermHelper.quantVar(CBI_QV_NAME + ++qvNumber, sort);
     }
 
-    private LinkedHashSet<Term> getGroundLiterals(Semisequent semiseq,
-            boolean b) {
-        LinkedHashSet<Term> ret = new LinkedHashSet<Term>();
-        for (SequentFormula sf : semiseq) {
-            Term term = sf.formula();
-            if (isGroundLiteral(term)) {
-                ret.add(b ? term : negate(term));
+    private Term createSkolemFunction(Sort sort, Term[] subs) {
+        Sort[] sorts = new Sort[subs.length];
+        for(int i = 0; i < subs.length; i++) {
+            sorts[i] = subs[i].sort();
+        }
+        return tb.func(new Function(new Name(CBI_SKOLEM_FUNCTION_NAME + ++skolemNumber), sort, sorts), subs);
+    }
+
+    private Term extractConflictingSubstitution(LinkedHashSet<CbiPair> pairs) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    private LinkedHashSet<CbiPair> falsify(Term formula, boolean polarity,
+            ConstrainedAssignment ca, MatchingConstraints mc) {
+        System.out.println("Calling falsify with: " + formula.toString() + ", "
+                + polarity + ", " + ca.toString() + ", " + mc.toString());
+        LinkedHashSet<CbiPair> result = new LinkedHashSet<CbiPair>();
+        if (TermHelper.isGround((formula))) {
+            if (context.satisfies(formula) != polarity) {
+                result.add(new CbiPair(ca, mc));
             }
         }
-        return ret;
-    }
-
-    private boolean isGroundLiteral(Term term) {
-        if (term.op() == Junctor.NOT)
-            return isGroundLiteral(term.sub(0));
-        return isAtom(term);
-    }
-
-    /*
-     * CREATING FLAT FORM
-     */
-
-    private FlattenResult flatten(Term term) {
-        /*
-         * first handle quantifiers because all recursive calls on sub-terms
-         * must know possible substitutions
-         */
-        // if (term.op() instanceof Quantifier) {
-        // term = handleQuantifier(term, (Quantifier) term.op());
-        // }
-
-        /*
-         * Terms with arity 0 can be handled without flatten its sub-terms.
-         */
-        if (term.arity() == 0) {
-            return handleNullary(term);
+        else if (TermHelper.isEquality(formula)) {
+            return match(mc.only(formula.subs()),
+                    ca.addConstraint(
+                            polarity ? TermHelper.negate(formula) : formula),
+                    mc.without(formula.subs()));
         }
-
-        return flattenSubs(term);
-    }
-
-    private FlattenResult flattenSubs(Term term) {
-        int arity = term.arity();
-        assert (arity != 0) : "Cannot flatten subs if arity 0";
-
-        Term[] subs = new Term[arity];
-        boolean subsFlat = true;
-        boolean subsVar = true;
-        for (int i = 0; i < arity; i++) {
-            FlattenResult fr = flatten(term.sub(i));
-            subsFlat &= fr.isFlat();
-            subsVar &= isAnyVariable(fr.getTerm());
-            subs[i] = fr.getTerm();
+        else if (TermHelper.isNegation(formula)) {
+            falsify(formula.sub(0), !polarity, ca, mc);
         }
-
-        term = tf.createTerm(term.op(), subs);
-
-        // a junction of flat terms is flat
-        if (subsFlat && term.op() instanceof Junctor) {
-            return new FlattenResult(term, true);
-        }
-        // an equality between variables is flat
-        if (subsVar && term.op() == Equality.EQUALS) {
-            return new FlattenResult(term, true);
-        }
-
-        // everything else is not
-        return replace(term);
-
-    }
-
-    private FlattenResult handleNullary(Term term) {
-        assert isNullary(term) : "Can only determine if term is flat if arity is 0";
-
-        // Predicates with arity 0 are flat by definition
-        if (term.sort() == Sort.FORMULA)
-            return new FlattenResult(term, true);
-
-        // Variables are not Ground -> not Flat
-        if (isAnyVariable(term))
-            return new FlattenResult(term, false);
-
-        // Everything else must be replaced by a fresh variable
-        return replace(term);
-    }
-
-    private FlattenResult replace(Term term) {
-        Term fresh = freshVariable(term.sort());
-        freshVariables.add(fresh);
-        constraints.add(new Constraint(fresh, term, tb));
-        // Variables are not flat
-        return new FlattenResult(fresh, false);
-    }
-
-    private class FlattenResult {
-        private Term term;
-        private Boolean flat;
-
-        public FlattenResult(Term term, Boolean ground) {
-            super();
-            this.setTerm(term);
-            this.setFlat(ground);
-        }
-
-        public Term getTerm() {
-            return term;
-        }
-
-        public void setTerm(Term term) {
-            this.term = term;
-        }
-
-        public Boolean isFlat() {
-            return flat;
-        }
-
-        public void setFlat(Boolean flat) {
-            this.flat = flat;
-        }
-
-    }
-
-    /*
-     * FALSIFY
-     */
-
-    private LinkedHashSet<LinkedHashSet<Term>> falsify(Term term, boolean b) {
-        LinkedHashSet<LinkedHashSet<Term>> ret = new LinkedHashSet<LinkedHashSet<Term>>();
-        if (isGround(term)) {
-            if(satisfied(term) != b) {
-                return ret;
-            } else {
-                // TODO maybe exit with exception?
-                return null;
+        else if (TermHelper.isOr(formula)) {
+            if (polarity) {
+                for (CbiPair pair : falsify(formula.sub(0), polarity, ca, mc)) {
+                    result.addAll(falsify(formula.sub(1), polarity,
+                            pair.getConstrainedAssignment(),
+                            pair.getMatchingConstraints()));
+                }
+            }
+            else {
+                result.addAll(falsify(formula.sub(0), polarity, ca, mc));
+                result.addAll(falsify(formula.sub(1), polarity, ca, mc));
             }
         }
-
-        if (term.op() == Equality.EQUALS) {
-            ret.add(createAssignment(b ? negate(term) : term));
-            return ret;
-        }
-
-        if (term.op() == Junctor.NOT) {
-            return falsify(term.sub(0), !b);
-        }
-
-        if (term.op() == Junctor.OR) {
-            if (b) {
-                return caunion(falsify(term.sub(0), b), falsify(term.sub(1), b));
-            } else {
-                return union(falsify(term.sub(0), b), falsify(term.sub(1), b));
+        else if (TermHelper.isAnd(formula)) {
+            // a & b = !(!a | !b)
+            if (polarity) {
+                result.addAll(falsify(formula.sub(0), !polarity, ca, mc));
+                result.addAll(falsify(formula.sub(1), !polarity, ca, mc));
             }
-        }
-        return ret;
-    }
-
-    public LinkedHashSet<Term> createAssignment(Term term) {
-        LinkedHashSet<Term> ret = new LinkedHashSet<Term>();
-        ret.add(term);
-        return ret;
-    }
-
-    /*
-     * MATCH
-     */
-
-    private LinkedHashSet<Term> matchConstraintSet(LinkedHashSet<Constraint> constraints) {
-        LinkedHashSet<Term> matchedConstraints = new LinkedHashSet<Term>();
-        for(Constraint constraint: constraints) {
-            getMatches(constraint, matchedConstraints);
-        }
-        return matchedConstraints;
-    }
-
-    private void getMatches(Constraint constraint, LinkedHashSet<Term> matches) {
-        HashSet<Term> cfun = contextFunctionMap.get(constraint.getTerm().op());
-        if(cfun == null) return;
-        for(Term match: cfun) {
-            if(match.arity() == constraint.getTerm().arity()) {
-                matches.add(tb.equals(constraint.getVar(), match));
-                for(int i = 0; i < match.arity(); i++) {
-                    matches.add(tb.equals(constraint.getTerm().sub(i), match.sub(i)));
+            // !(a & b) = !a | !b
+            else {
+                for (CbiPair pair : falsify(formula.sub(0), !polarity, ca,
+                        mc)) {
+                    result.addAll(falsify(formula.sub(1), !polarity,
+                            pair.getConstrainedAssignment(),
+                            pair.getMatchingConstraints()));
                 }
             }
         }
-    }
-
-    /*
-     * EXTRACT CONFLICTING SUBSTITUTION
-     */
-
-    private void extractConflictingSubstitution() {
-        for(LinkedHashSet<Term> fca : falsifyConstraints) {
-            LinkedHashSet<Term> b = new LinkedHashSet<Term>();
-            LinkedHashSet<Term> c = new LinkedHashSet<Term>();
-            EquivalenceClosure ec = new EquivalenceClosure();
-
-            // splitting into a and b
-            for(Term term: union(matchingConstraints, fca)) {
-                if(ec.addEquality(term)) {
-                    b.add(term);
-                }else {
-                    c.add(term);
+        else if (TermHelper.isImp(formula)) {
+            // a -> b = !a | b
+            if (polarity) {
+                for (CbiPair pair : falsify(formula.sub(0), !polarity, ca,
+                        mc)) {
+                    result.addAll(falsify(formula.sub(1), polarity,
+                            pair.getConstrainedAssignment(),
+                            pair.getMatchingConstraints()));
                 }
             }
-            System.out.println("EQClosure: " + ec.toString());
-            LinkedHashSet<Term> groundSubst = new LinkedHashSet<Term>();
-            Term subst = tb.and(c);
-            for(EquivalenceClass eqc : ec.getEquivalenceClasses()) {
-                System.out.println("Checking eqc: " + eqc.toString());
-                if(eqc.containsGround()) {
-                    Term grnd = eqc.getGroundTerm();
-                    System.out.println("Ground Term: " + grnd.toString());
-                    for(Term term: eqc) {
-                        if(!(term.equals(grnd))) {
-                            QuantifiableVariable qv = (QuantifiableVariable) term.op();
-                            subst = tb.subst(qv, grnd, subst);
-                            if(isVariable(term)) {
-                                System.out.println("Adding GroundSubst: " + grnd.toString());
-                                groundSubst.add(grnd);
-                            }
-                        }
-                    }
-                }else {
-                    // TODO take arbitrary terms from context
-                }
-            }
-            System.out.println("subst: " + subst.toString());
-            if(satisfied(subst)) {
-                System.out.println("success!!!");
-                conflictingSubstitutions.addAll(groundSubst);
-            }else {
-                System.out.println("unsuccessfull.");
+            // !(a -> b) = !(!a | b) = a & !b
+            else {
+                result.addAll(falsify(formula.sub(0), !polarity, ca, mc));
+                result.addAll(falsify(formula.sub(1), polarity, ca, mc));
             }
         }
-
-    }
-
-    /*
-     * UTILITY
-     */
-
-    private boolean isAtom(Term term) {
-        // TODO ask Richard maby
-        return term.op() == Equality.EQUALS;
-    }
-
-    private boolean isVariable(Term term) {
-        return variables.contains(term);
-    }
-
-    private boolean isFreshVariable(Term term) {
-        return freshVariables.contains(term);
-    }
-
-    private boolean isAnyVariable(Term term) {
-        return isFreshVariable(term) || isVariable(term);
-    }
-
-    private boolean isNullary(Term term) {
-        return term.arity() == 0;
-    }
-
-    private static final String BASENAME = "cbi";
-    private int varcnt = 0;
-
-    private Term freshVariable(Sort sort) {
-        return tb.var(new LogicVariable(new Name(BASENAME + "_" + ++varcnt), sort));
-    }
-
-    private Term negate(Term term) {
-        return tb.not(term);
-    }
-
-    private boolean isGround(Term term) {
-        //        if (isNullary(term)) {
-        //            return (!variables.contains(term));
-        //        }
-        //        for (Term sub : term.subs()) {
-        //            if (!isGround(sub))
-        //                return false;
-        //        }
-        //        return true;
-        if(isNullary(term)) {
-            return (term.freeVars().size() == 0);
+        else if (TermHelper.isAll(formula)) {
+            // TODO rename double isAlls before touching the formula
+            result.addAll(falsify(formula.sub(0), polarity, ca, mc));
         }
-        for(Term sub: term.subs()) {
-            if(!isGround(sub)) return false;
+        else if (TermHelper.isExists(formula)) {
+            // TODO NOP can not handle exists in formula
         }
-        return true;
-
+        return result;
     }
 
-    private LinkedHashSet<LinkedHashSet<Term>> caunion(LinkedHashSet<LinkedHashSet<Term>> a, LinkedHashSet<LinkedHashSet<Term>> b) {
-        LinkedHashSet<LinkedHashSet<Term>> ret = new LinkedHashSet<LinkedHashSet<Term>>();
-        a.forEach(s -> b.forEach(t -> {
-            ret.add(union(s,t));
-        }));
-        return ret;
-    }
-
-    private <T> LinkedHashSet<T> union(LinkedHashSet<T> s,
-            LinkedHashSet<T> t) {
-        LinkedHashSet<T> ret = new LinkedHashSet<T>();
-        ret.addAll(s);
-        ret.addAll(t);
-        return ret;
-    }
-
-    private static final String SUBPROOF = "CBI_SUBPROOF";
-    private static final long timeoutInMillis = Long.MAX_VALUE;
-    private static final int maxRuleApps = Integer.MAX_VALUE;
-
-    private boolean satisfied(Term term) {
-        if (services.getProof().name().toString().startsWith(SUBPROOF)) {
-            System.out.println("Satisfied was chain-called");
-            return false;
+    private LinkedHashSet<CbiPair> match(MatchingConstraints mc,
+            ConstrainedAssignment ca, MatchingConstraints rest) {
+        System.out.println("Match: \t" + mc.toString() + "\t" + ca.toString()
+        + "\t" + rest.toString());
+        LinkedHashSet<CbiPair> ret = new LinkedHashSet<CbiPair>();
+        if (mc.isEmpty()) {
+            ret.add(new CbiPair(ca, mc));
         }
-        Semisequent ante = new Semisequent(new SequentFormula(tb.and(context)));
-        Semisequent succ = new Semisequent(new SequentFormula(term));
-        Sequent seq = Sequent.createSequent(ante, succ);
-
-        final ProofStarter ps = new ProofStarter(false);
-        final ProofEnvironment env = SideProofUtil
-                .cloneProofEnvironmentWithOwnOneStepSimplifier(
-                        services.getProof());
-        try {
-            ps.init(seq, env, SUBPROOF);
-        }
-        catch (ProofInputException pie) {
-            pie.printStackTrace();
-            return false;
-        }
-
-        final StrategyProperties sp = setupStrategy();
-
-        ps.setStrategyProperties(sp);
-        ps.setMaxRuleApplications(maxRuleApps);
-        ps.setTimeout(timeoutInMillis);
-        final ApplyStrategyInfo info = ps.start();
-
-        boolean sat = info.getProof().closed();
-        System.out.println(context.toString()
-                + (sat ? " satisfies " : " not satisfies ") + term.toString());
-        return sat;
-    }
-
-    protected StrategyProperties setupStrategy() {
-        final StrategyProperties sp = new StrategyProperties();
-        sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY,
-                StrategyProperties.AUTO_INDUCTION_OFF);
-        sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
-                StrategyProperties.QUERY_OFF);
-        sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
-                StrategyProperties.NON_LIN_ARITH_DEF_OPS);
-        sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
-                StrategyProperties.QUANTIFIERS_NONE);
-        sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
-                StrategyProperties.SPLITTING_NORMAL);
-        sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
-                StrategyProperties.DEP_OFF);
-        sp.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
-                StrategyProperties.CLASS_AXIOM_OFF);
-        return sp;
-    }
-
-    private HashMap<Operator, HashSet<Term>> createFunctionMap(
-            LinkedHashSet<Term> context) {
-        HashMap<Operator, HashSet<Term>> ret = new HashMap<Operator, HashSet<Term>>();
-        for(Term term: context) {
-            addTermToFunctionSet(term, ret);
+        else {
+            Term constraint = mc.getFirst();
+            LinkedHashSet<Term> matches = context
+                    .getMatchingLiterals(constraint);
+            System.out.println("Matching Literals: " + matches.toString());
+            MatchingConstraints newMc = mc.without(constraint)
+                    .union(rest.only(constraint.subs()));
+            MatchingConstraints newRest = rest.without(constraint.subs());
+            for (Term match : matches) {
+                ret.addAll(match(newMc, ca.addAssignment(constraint, match),
+                        newRest));
+            }
         }
         return ret;
     }
 
-    private void addTermToFunctionSet(Term term,
-            HashMap<Operator, HashSet<Term>> ret) {
-        if(ret.containsKey(term.op())) {
-            ret.get(term.op()).add(term);
-            term.subs().forEach(t -> addTermToFunctionSet(t, ret));
-        }else {
-            ret.put(term.op(), new HashSet<Term>());
-            addTermToFunctionSet(term, ret);
-        }
-    }
 }

@@ -15,6 +15,7 @@ import de.uka.ilkd.key.strategy.termgenerator.TermGenerator;
  *
  * @author Andre Challier <andre.challier@stud.tu-darmstadt.de>
  *
+ * TODO just kept for development purposes. Remove later.
  */
 public class CBITermGenerator implements TermGenerator {
 
@@ -39,12 +40,14 @@ public class CBITermGenerator implements TermGenerator {
     @Override
     public Iterator<Term> generate(RuleApp app, PosInOccurrence pos, Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
-        System.out.println("Rule: " + app.rule());
         final Term formula = pos.sequentFormula().formula();
         final Sequent sequent = goal.sequent();
         final Services services = goal.proof().getServices();
-        final ConflictBasedInstantiation cbi = new ConflictBasedInstantiation(formula, sequent, services);
-        return cbi.getInstantiation().iterator();
+        //final ConflictBasedInstantiation cbi = ConflictBasedInstantiation.create(formula, sequent, pos, services);
+        System.out.print("CBI: ");
+        // cbi.getInstantiation().forEach(term -> System.out.println(term.toString() + " "));
+        System.out.println();
+        return null;
     }
 
 }
