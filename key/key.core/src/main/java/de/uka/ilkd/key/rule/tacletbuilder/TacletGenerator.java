@@ -132,8 +132,8 @@ public class TacletGenerator {
                                         Term originalFind,
                                         Term originalAxiom,
                                         ImmutableList<ProgramVariable> programVars,
-                                        RuleSet ruleSet,
-                                        TermServices services) {
+                                        TermServices services,
+                                        RuleSet... ruleSet) {
         // create schema terms
         final ImmutableList<SchemaVariable> schemaVars =
                 createSchemaVariables(programVars);
@@ -150,7 +150,10 @@ public class TacletGenerator {
         tacletBuilder.setFind(schemaFind.term);
         tacletBuilder.addGoalTerm(schemaAxiom.term);
         tacletBuilder.addVarsNotFreeIn(boundSVs, schemaVars);
-        tacletBuilder.addRuleSet(ruleSet);
+        
+        for (RuleSet rs : ruleSet) {
+        	tacletBuilder.addRuleSet(rs);
+		}
         return tacletBuilder.getTaclet();
     }
 
@@ -811,8 +814,9 @@ public class TacletGenerator {
         							intermediate.getOriginalInv(), 
         							concreteInv.getOriginalInv(),
         							params,
-        							new RuleSet(new Name("classAxiom")), 
-        							services);
+        							services, 
+        							new RuleSet(new Name("classAxiom")),
+        							new RuleSet(new Name("partialInvExpand")));
         return taclet;
     }
 

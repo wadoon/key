@@ -560,6 +560,12 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         if (classAxiomApplicationEnabled()) {
             bindRuleSet(d, "classAxiom", longConst(-250));
+            Feature partialExpandFeature =
+            		ifZero(ifZero(TopLevelFindFeature.ANTEC, 
+            				 ContainsSamePartialInvariant.ANTEC_INSTANCE,
+            				 ContainsSamePartialInvariant.SUCC_INSTANCE),
+            				longConst(600), longConst(1200));
+            bindRuleSet(d, "partialInvExpand", partialExpandFeature);
         } else {
             bindRuleSet(d, "classAxiom", inftyConst());
         }
