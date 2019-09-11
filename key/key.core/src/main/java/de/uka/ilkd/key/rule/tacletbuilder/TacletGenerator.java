@@ -800,14 +800,16 @@ public class TacletGenerator {
     	if(concreteInv == null || !(intermediate.getOriginalInv().op() instanceof IObserverFunction)) {
     		return null;
     	}
-
-    	ImmutableList<ProgramVariable> params =  intermediate.getOrigVars().params.append(services.getTypeConverter().getHeapLDT().getHeap());
+    	
+    	ImmutableList<ProgramVariable> params =  intermediate.getOrigVars().params.append(services.getTypeConverter().getHeapLDT().getHeap());	    	
+    	params = params.append(intermediate.getOrigVars().self);
+    	params = params.append(concreteInv.getOrigVars().self);
     	
     	// Create replace taclet to transform the intermediate invariant to the concrete one
         Taclet taclet =
         	generateRewriteTaclet(new Name("Intermediate_to_concrete_inv_for_" + intermediate.getName()), 
-        							intermediate.getInv(selfSV, services), 
-        							concreteInv.getInv(selfSV, services),
+        							intermediate.getOriginalInv(), 
+        							concreteInv.getOriginalInv(),
         							params,
         							new RuleSet(new Name("classAxiom")), 
         							services);

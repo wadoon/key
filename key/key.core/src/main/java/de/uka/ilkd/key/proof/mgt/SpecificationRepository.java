@@ -1193,7 +1193,7 @@ public final class SpecificationRepository {
         this.uniqueHelper++;
         
         // Create and register a new Dependency Contract for the intermediate invariant
-        Term dep =  tb.union(DependencyCalculator.calculateDependenciesForInvariant(inv, 
+        Term dep =  tb.union(DependencyCalculator.calculateDependenciesForConcreteInvariant(inv, 
         																			services, 
         																			inv.getOrigVars().self, 
         																			inv.getKJT()));

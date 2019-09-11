@@ -81,7 +81,7 @@ public class CalculateDependenciesAction extends MainWindowAction {
 		ContractPO contractPO = proof.getServices().getSpecificationRepository().getContractPOForProof(proof);
 		KeYJavaType kjt  = contractPO.getContract().getKJT();
 		
-		HashSet<Term> dependencies = DependencyCalculator.calculateDependenciesForInvariants(proof,kjt);
+		HashSet<Term> dependencies = DependencyCalculator.calculateDependenciesForIntermediateInvariants(proof,kjt);
 		
 		// Print out all the retrieved dependency terms
 		for (Term term : dependencies) {
