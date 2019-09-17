@@ -41,7 +41,7 @@ public class HeuristicInstantiation implements TermGenerator {
             PosInOccurrence pos,
             Goal goal) {
         assert pos != null : "Feature is only applicable to rules with find";
-        System.out.println("Calling HEUR generate");
+        //System.out.println("Calling HEUR generate");
         final Term qf = pos.sequentFormula ().formula ();
         final Sequent seq = goal.sequent();
         final Services services = goal.proof().getServices();

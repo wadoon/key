@@ -13,6 +13,8 @@
 
 package de.uka.ilkd.key.strategy.quantifierHeuristics;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -33,7 +35,6 @@ import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.op.SortDependingFunction;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.pp.LogicPrinter;
 import de.uka.ilkd.key.strategy.NumberRuleAppCost;
 import de.uka.ilkd.key.strategy.RuleAppCost;
 import de.uka.ilkd.key.strategy.TopRuleAppCost;
@@ -60,18 +61,15 @@ class Instantiation {
     private final TriggersSet triggersSet;
 
     private Instantiation(Term allterm, Sequent seq, Services services) {
-        System.out.println("Start E-Matching on " + LogicPrinter.quickPrintTerm(allterm, services));
+        LocalDateTime ts = LocalDateTime.now();
         firstVar = allterm.varsBoundHere(0).get(0);
         matrix = TriggerUtils.discardQuantifiers(allterm);
         /* Terms bound in every formula on <code>goal</code> */
         triggersSet = TriggersSet.create(allterm, services);
         assumedLiterals = initAssertLiterals(seq, services);
         addInstances(sequentToTerms(seq), services);
-        System.out.print("Found: ");
-        for (final Map.Entry<Term, Long> e: instancesWithCosts.entrySet()) {
-            System.out.print(e.getKey().toString() + ": " + e.getValue() + ", ");
-        }
-        System.out.println();
+        Duration d = Duration.between(ts, LocalDateTime.now());
+        //System.out.println("HEUR[" + instancesWithCosts + "," + d.toMillis() + "]");
     }
 
     private static Term lastQuantifiedFormula = null;

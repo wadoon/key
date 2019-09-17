@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.strategy.conflictbasedinst;
 
+import java.time.LocalDateTime;
+
 import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.PosInOccurrence;
 import de.uka.ilkd.key.logic.Sequent;
@@ -11,7 +13,11 @@ import de.uka.ilkd.key.strategy.termProjection.ProjectionToTerm;
 
 public class CbiProjection extends BinaryFeature implements ProjectionToTerm{
 
-    private CbiProjection() {}
+    private CbiStats stats;
+
+    private CbiProjection() {
+        stats = CbiStats.getInstance();
+    }
 
     private static class CbiProjectionHolder {
         private static final CbiProjection instance = new CbiProjection();
@@ -27,7 +33,6 @@ public class CbiProjection extends BinaryFeature implements ProjectionToTerm{
 
     @Override
     public Term toTerm(RuleApp app, PosInOccurrence pos, Goal goal) {
-        System.out.println("toTerm called");
         final Term formula = pos.sequentFormula().formula();
         final Sequent sequent = goal.sequent();
         final Services services = goal.proof().getServices();
@@ -36,13 +41,14 @@ public class CbiProjection extends BinaryFeature implements ProjectionToTerm{
         }
         this.sequent = sequent;
         this.formula = formula;
+        LocalDateTime start = LocalDateTime.now();
         result = ConflictBasedInstantiation.getInstance().findConflictingTerm(formula, sequent, pos, services);
+        stats.addStat(formula, start, LocalDateTime.now(), result);
         return result;
     }
 
     @Override
     protected boolean filter(RuleApp app, PosInOccurrence pos, Goal goal) {
-        System.out.println("filter called");
         return toTerm(app,pos,goal) != null;
     }
 

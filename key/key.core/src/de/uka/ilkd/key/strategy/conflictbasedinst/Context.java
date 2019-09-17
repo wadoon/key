@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.stream.Collectors;
 
+import de.uka.ilkd.key.java.Services;
 import de.uka.ilkd.key.logic.Semisequent;
 import de.uka.ilkd.key.logic.Sequent;
 import de.uka.ilkd.key.logic.SequentFormula;
@@ -15,23 +16,38 @@ import de.uka.ilkd.key.logic.op.Equality;
 import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.Junctor;
 import de.uka.ilkd.key.logic.op.Operator;
+import de.uka.ilkd.key.proof.init.ProofInputException;
+import de.uka.ilkd.key.proof.mgt.ProofEnvironment;
+import de.uka.ilkd.key.prover.impl.ApplyStrategyInfo;
+import de.uka.ilkd.key.strategy.StrategyProperties;
+import de.uka.ilkd.key.util.ProofStarter;
+import de.uka.ilkd.key.util.SideProofUtil;
 
 public class Context {
 
     private TermBuilder tb;
     private LinkedHashSet<Term> literals;
     private LinkedHashSet<Term> terms;
+    private LinkedHashSet<Term> grounds;
     private HashMap<Operator, LinkedHashSet<Term>> functionMap;
     private HashMap<Term, LinkedHashSet<Term>> eqClassMap;
+    private Services services;
+    private Sequent cntx;
 
     protected Context(Term formula, Sequent sequent) {
         this.literals = new LinkedHashSet<Term>();
         this.terms = new LinkedHashSet<Term>();
-        this.tb = TermBuilderHolder.getInstance().getTermBuilder();
+        this.tb = CbiServices.getTermBuiler();
         this.functionMap = new LinkedHashMap<Operator, LinkedHashSet<Term>>();
         this.eqClassMap = new LinkedHashMap<Term, LinkedHashSet<Term>>();
+        this.grounds = new LinkedHashSet<Term>();
         extractGroundLiterals(sequent.antecedent(), formula, true);
         extractGroundLiterals(sequent.succedent(), formula, false);
+        this.services = CbiServices.getServices();
+        sequent.antecedent().forEach(term -> grounds.add(term.formula()));
+        sequent.succedent().forEach(term -> grounds.add(tb.not(term.formula())));
+        SequentFormula sf = new SequentFormula(tb.and(grounds));
+        cntx = Sequent.createAnteSequent(new Semisequent(sf));
     }
 
     private void extractGroundLiterals(Semisequent semiseq, Term formula,
@@ -90,13 +106,13 @@ public class Context {
     private void addTerm(Term term) {
         // terms that are not functions can be ignored as they are not
         // matched anyways
-        System.out.println("Evaluating: " + term.toString() + " op: " + term.op() + " opclass: " + term.op().getClass().getSimpleName());
+        //System.out.println("Evaluating: " + term.toString() + " op: " + term.op() + " opclass: " + term.op().getClass().getSimpleName());
         if (term.op() instanceof Function) {
-            System.out.println("Adding " + term.toString());
+            //System.out.println("Adding " + term.toString());
             terms.add(term);
             addToFunctionMap(term);
         }else {
-            System.out.println("not adding " + term.toString());
+            //System.out.println("not adding " + term.toString());
         }
     }
 
@@ -114,16 +130,75 @@ public class Context {
         return s;
     }
 
+    private static final long timeoutInMillis = Long.MAX_VALUE;
+    private static final int maxRuleApps = Integer.MAX_VALUE;
+
+    public boolean feasible(Term formula) {
+        SequentFormula seqFormula = new SequentFormula(tb.and(tb.and(grounds), formula));
+        Semisequent ante = new Semisequent(seqFormula);
+        Sequent seq = Sequent.createAnteSequent(ante);
+        return !closeable(seq);
+    }
+
+    public boolean feasible(Iterable<Term> terms) {
+        SequentFormula seqFormula = new SequentFormula(tb.and(tb.and(grounds), tb.and(terms)));
+        Semisequent ante = new Semisequent(seqFormula);
+        Sequent seq = Sequent.createAnteSequent(ante);
+        return !closeable(seq);
+    }
+
     public boolean satisfies(Term formula) {
-        if(literals.contains(formula)) {
-            return true;
-        }else if(TermHelper.isTrue(formula)) {
-            return true;
-        }else if(TermHelper.isFalse(formula)) {
-            return false;
-        }else {
+        return satisfies(new Term[] {formula});
+    }
+
+    public boolean satisfies(Term... terms) {
+        Term formula = tb.and(terms);
+        Semisequent antec = cntx.antecedent();
+        Semisequent succ = new Semisequent(new SequentFormula(formula));
+        Sequent seq = Sequent.createSequent(antec, succ);
+        return closeable(seq);
+    }
+
+    public boolean closeable(Sequent seq) {
+        if (services.getProof().name().toString().startsWith("CBI_SUBPROOF")) {
             return false;
         }
+        ProofEnvironment env = SideProofUtil
+                .cloneProofEnvironmentWithOwnOneStepSimplifier(
+                        services.getProof());
+        ProofStarter ps = new ProofStarter(false);
+        try {
+            ps.init(seq, env, "CBI_SUBPROOF");
+        }
+        catch (ProofInputException e) {
+            return false;
+        }
+
+        final StrategyProperties sp = setupStrategy();
+        ps.setStrategyProperties(sp);
+        ps.setMaxRuleApplications(maxRuleApps);
+        ps.setTimeout(timeoutInMillis);
+        final ApplyStrategyInfo info = ps.start();
+        return info.getProof().closed();
+    }
+
+    protected StrategyProperties setupStrategy() {
+        final StrategyProperties sp = new StrategyProperties();
+        sp.setProperty(StrategyProperties.AUTO_INDUCTION_OPTIONS_KEY,
+                StrategyProperties.AUTO_INDUCTION_OFF);
+        sp.setProperty(StrategyProperties.QUERY_OPTIONS_KEY,
+                StrategyProperties.QUERY_OFF);
+        sp.setProperty(StrategyProperties.NON_LIN_ARITH_OPTIONS_KEY,
+                StrategyProperties.NON_LIN_ARITH_DEF_OPS);
+        sp.setProperty(StrategyProperties.QUANTIFIERS_OPTIONS_KEY,
+                StrategyProperties.QUANTIFIERS_NONE);
+        sp.setProperty(StrategyProperties.SPLITTING_OPTIONS_KEY,
+                StrategyProperties.SPLITTING_NORMAL);
+        sp.setProperty(StrategyProperties.DEP_OPTIONS_KEY,
+                StrategyProperties.DEP_OFF);
+        sp.setProperty(StrategyProperties.CLASS_AXIOM_OPTIONS_KEY,
+                StrategyProperties.CLASS_AXIOM_OFF);
+        return sp;
     }
 
     public boolean satisfies(Term funA, Term funB) {
@@ -133,5 +208,24 @@ public class Context {
 
     public LinkedHashSet<Term> getMatchingLiterals(Term constraint) {
         return functionMap.getOrDefault(constraint.op(), new LinkedHashSet<Term>());
+    }
+
+    public boolean sat(Iterable<Term> terms) {
+        for(Term term: terms) {
+            if(!sat(term)) return false;
+        }
+        return true;
+    }
+
+    private boolean sat(Term term) {
+        for(Term ground: grounds) {
+            if(!sat(ground, term)) return false;
+        }
+        return true;
+    }
+
+    private boolean sat(Term ground, Term term) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

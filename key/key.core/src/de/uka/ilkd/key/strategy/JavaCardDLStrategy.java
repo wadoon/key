@@ -634,16 +634,16 @@ public class JavaCardDLStrategy extends AbstractFeatureStrategy {
 
         if (quantifierInstantiatedEnabled()) {
             // TODO reenable normalisation
-            //setupFormulaNormalisation(d, numbers, locSetLDT);
-            bindRuleSet(d, "negationNormalForm", inftyConst());
-            bindRuleSet(d, "moveQuantToLeft", inftyConst());
-            bindRuleSet(d, "conjNormalForm", inftyConst());
-            bindRuleSet(d, "apply_equations_andOr", inftyConst());
-            bindRuleSet(d, "elimQuantifier", inftyConst());
-            bindRuleSet(d, "distrQuantifier", inftyConst());
-            bindRuleSet(d, "swapQuantifiers", inftyConst());
-            bindRuleSet(d, "pullOutQuantifierAll", inftyConst());
-            bindRuleSet(d, "pullOutQuantifierEx", inftyConst());
+            setupFormulaNormalisation(d, numbers, locSetLDT);
+            //            bindRuleSet(d, "negationNormalForm", inftyConst());
+            //            bindRuleSet(d, "moveQuantToLeft", inftyConst());
+            //            bindRuleSet(d, "conjNormalForm", inftyConst());
+            //            bindRuleSet(d, "apply_equations_andOr", inftyConst());
+            //            bindRuleSet(d, "elimQuantifier", inftyConst());
+            //            bindRuleSet(d, "distrQuantifier", inftyConst());
+            //            bindRuleSet(d, "swapQuantifiers", inftyConst());
+            //            bindRuleSet(d, "pullOutQuantifierAll", inftyConst());
+            //            bindRuleSet(d, "pullOutQuantifierEx", inftyConst());
         } else {
             bindRuleSet(d, "negationNormalForm", inftyConst());
             bindRuleSet(d, "moveQuantToLeft", inftyConst());

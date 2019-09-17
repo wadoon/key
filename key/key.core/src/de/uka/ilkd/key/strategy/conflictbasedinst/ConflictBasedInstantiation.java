@@ -1,6 +1,7 @@
 package de.uka.ilkd.key.strategy.conflictbasedinst;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 
 import org.key_project.util.collection.ImmutableArray;
@@ -16,6 +17,7 @@ import de.uka.ilkd.key.logic.op.Function;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.sort.Sort;
+import de.uka.ilkd.key.strategy.conflictbasedinst.EquivalenceClosure.EquivalenceClass;
 
 public class ConflictBasedInstantiation {
 
@@ -105,6 +107,10 @@ public class ConflictBasedInstantiation {
      */
     private Term result;
 
+    private LinkedHashSet<Term> inducing;
+
+    private LinkedHashSet<Term> variables;
+
     /**
      * Returns a term to substitute the formula with to create an instance of
      * the formula that leads to apply a closing rule on the sequent or
@@ -141,6 +147,9 @@ public class ConflictBasedInstantiation {
              * if formula is the same (cbi called on same formula repeatedly)
              */
         }
+        if(!TermHelper.containsEqualityInScope(formula)) {
+            return null;
+        }
         /*
          * Find conflicting term on fresh formula
          */
@@ -150,10 +159,13 @@ public class ConflictBasedInstantiation {
         // register current termbuilder
         this.tb = services.getTermBuilder();
         this.tf = services.getTermFactory();
-        TermBuilderHolder.getInstance().setTermBuilder(tb);
+        CbiServices.setTermBuiler(tb);
+        CbiServices.setTermFactory(tf);
+        CbiServices.setServices(services);
         // reset consecutive numbers
         this.qvNumber = 0;
         this.skolemNumber = 0;
+        this.variables = new LinkedHashSet<Term>();
 
         if (!((formula.op() == Quantifier.ALL && pos.isInAntec())
                 || (formula.op() == Quantifier.EX && !pos.isInAntec()))) {
@@ -177,19 +189,20 @@ public class ConflictBasedInstantiation {
         LinkedHashSet<Term> boundVars = new LinkedHashSet<Term>();
         Term prepForm = prepareFormula(
                 formula, replaceMap, boundVars);
-        System.out.println("Prepared formula: " + prepForm);
-        System.out.println("ReplacementMap: " + replaceMap);
+        //System.out.println("Prepared formula: " + prepForm);
+        //System.out.println("ReplacementMap: " + replaceMap);
 
         /*
          * Create context
          */
-        context = new Context(formula, sequent);
+        context = new Context(prepForm, sequent);
+        ContextSingleton.setContext(context);
         //TODO remove prints
-        System.out.println("Context: " + context.toString());
-        LinkedHashSet<CbiPair> pairs = falsify(formula, true,
+        //System.out.println("Context: " + context.toString());
+        LinkedHashSet<CbiPair> pairs = falsify(prepForm, true,
                 new ConstrainedAssignment(),
-                MatchingConstraints.extractFrom(formula));
-        System.out.println(pairs);
+                MatchingConstraints.extractFrom(prepForm));
+        //System.out.println(pairs);
         return extractConflictingSubstitution(pairs);
     }
 
@@ -204,6 +217,7 @@ public class ConflictBasedInstantiation {
                 Term freshQV = createQuantVar(qv.sort());
                 extendedReplaceMap.put(tb.var(qv), freshQV);
                 extendedBoundVars.add(freshQV);
+                variables.add(freshQV);
             }
             return prepareFormula(formula.sub(0), extendedReplaceMap, extendedBoundVars);
         }
@@ -236,14 +250,77 @@ public class ConflictBasedInstantiation {
     }
 
     private Term extractConflictingSubstitution(LinkedHashSet<CbiPair> pairs) {
-        // TODO Auto-generated method stub
+        LinkedHashSet<Term> inducing = new LinkedHashSet<Term>();
+        for(CbiPair pair: pairs) {
+            ConstrainedAssignment ca = pair.getConstrainedAssignment();
+            if(ca.isContextFeasible()) {
+                LinkedHashSet<Term> b = new LinkedHashSet<Term>();
+                LinkedHashSet<Term> c = new LinkedHashSet<Term>();
+                EquivalenceClosure ec = new EquivalenceClosure();
+
+                for (Term term : ca.getTerms()) {
+                    if (ec.addEquality(term)) {
+                        b.add(term);
+                    }
+                    else {
+                        c.add(term);
+                    }
+                }
+
+                LinkedHashSet<Term> groundSubst = new LinkedHashSet<Term>();
+                Term subst = tb.and(c);
+                for (EquivalenceClass eqc : ec.getEquivalenceClasses()) {
+                    // System.out.println("Checking eqc: " + eqc.toString());
+                    if (eqc.containsGround()) {
+                        Term grnd = eqc.getGroundTerm();
+                        // System.out.println("Ground Term: " + grnd.toString());
+                        for (Term term : eqc) {
+                            if (!(term.equals(grnd))) {
+                                //subst = tb.subst(qv, grnd, subst);
+                                subst = TermHelper.replaceAll(term, grnd, subst);
+                                if (variables.contains(term)) {
+                                    // System.out.println("Adding GroundSubst: " +
+                                    // grnd.toString());
+                                    groundSubst.add(grnd);
+                                    if(variables.iterator().next().equals(term)) {
+                                        result = grnd;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        // System.out.println("Could not find ground subst.");
+                        // TODO take arbitrary terms from context
+                    }
+                }
+
+                // System.out.println("subst: " + subst.toString());
+                if (context.satisfies(subst)) {
+                    //System.out.println("found result: " + result);
+                    return result;
+                }
+                else {
+                    // System.out.println("found inducing: " + result.toString());
+                    inducing.add(result);
+                }
+            }else {
+                // System.out.println("Not feasible: " + ca.toString());
+            }
+        }
+        Iterator<Term> it = inducing.iterator();
+        if(it.hasNext()) {
+            result = it.next();
+            //System.out.println("found result: " + result);
+            return result;
+        }
         return null;
     }
 
     private LinkedHashSet<CbiPair> falsify(Term formula, boolean polarity,
             ConstrainedAssignment ca, MatchingConstraints mc) {
-        System.out.println("Calling falsify with: " + formula.toString() + ", "
-                + polarity + ", " + ca.toString() + ", " + mc.toString());
+        // System.out.println("Calling falsify with: " + formula.toString() + ", "
+        //        + polarity + ", " + ca.toString() + ", " + mc.toString());
         LinkedHashSet<CbiPair> result = new LinkedHashSet<CbiPair>();
         if (TermHelper.isGround((formula))) {
             if (context.satisfies(formula) != polarity) {
@@ -304,20 +381,13 @@ public class ConflictBasedInstantiation {
                 result.addAll(falsify(formula.sub(1), polarity, ca, mc));
             }
         }
-        else if (TermHelper.isAll(formula)) {
-            // TODO rename double isAlls before touching the formula
-            result.addAll(falsify(formula.sub(0), polarity, ca, mc));
-        }
-        else if (TermHelper.isExists(formula)) {
-            // TODO NOP can not handle exists in formula
-        }
         return result;
     }
 
     private LinkedHashSet<CbiPair> match(MatchingConstraints mc,
             ConstrainedAssignment ca, MatchingConstraints rest) {
-        System.out.println("Match: \t" + mc.toString() + "\t" + ca.toString()
-        + "\t" + rest.toString());
+        //System.out.println("Match: \t" + mc.toString() + "\t" + ca.toString()
+        //+ "\t" + rest.toString());
         LinkedHashSet<CbiPair> ret = new LinkedHashSet<CbiPair>();
         if (mc.isEmpty()) {
             ret.add(new CbiPair(ca, mc));
@@ -326,7 +396,7 @@ public class ConflictBasedInstantiation {
             Term constraint = mc.getFirst();
             LinkedHashSet<Term> matches = context
                     .getMatchingLiterals(constraint);
-            System.out.println("Matching Literals: " + matches.toString());
+            //System.out.println("Matching Literals: " + matches.toString());
             MatchingConstraints newMc = mc.without(constraint)
                     .union(rest.only(constraint.subs()));
             MatchingConstraints newRest = rest.without(constraint.subs());

@@ -17,19 +17,24 @@ import de.uka.ilkd.key.logic.TermBuilder;
  */
 public class ConstrainedAssignment {
 
+    private Context context;
     private LinkedHashMap<Term, LinkedHashSet<Term>> equations;
     private LinkedHashSet<Term> constraints;
+    private LinkedHashSet<Term> terms;
     private TermBuilder tb;
 
     public ConstrainedAssignment() {
         equations = new LinkedHashMap<Term, LinkedHashSet<Term>>();
         constraints = new LinkedHashSet<Term>();
-        tb = TermBuilderHolder.getInstance().getTermBuilder();
+        terms = new LinkedHashSet<Term>();
+        tb = CbiServices.getTermBuiler();
+        context = ContextSingleton.getContext();
     }
 
     public ConstrainedAssignment addConstraint(Term equation) {
         ConstrainedAssignment ca = copy();
         ca.constraints.add(equation);
+        ca.terms.add(equation);
         return ca;
     }
 
@@ -37,9 +42,11 @@ public class ConstrainedAssignment {
         assert terma.arity() == termb.arity() : "Can not add assignment with unequal arities";
         ConstrainedAssignment ca = copy();
         ca.equations.computeIfAbsent(terma, map -> new LinkedHashSet<Term>()).add(termb);
+        ca.terms.add(tb.equals(terma, termb));
         for(int i = 0; i < terma.arity(); i++) {
             Term constraint = tb.equals(terma.sub(i), termb.sub(i));
             ca.constraints.add(constraint);
+            ca.terms.add(constraint);
         }
         return ca;
     }
@@ -50,6 +57,7 @@ public class ConstrainedAssignment {
             ca.equations.put(equation.getKey(), equation.getValue());
         }
         ca.constraints.addAll(constraints);
+        ca.terms.addAll(terms);
         return ca;
     }
 
@@ -64,6 +72,24 @@ public class ConstrainedAssignment {
         s += constraints.stream().map(term -> term.toString()).collect(Collectors.joining(", ", " <>", ""));
         s += "}";
         return s;
+    }
+
+    public boolean isContextFeasible() {
+        return context.feasible(terms);
+    }
+
+    public boolean hasSubstitution() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    public Term getSubstitution() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public LinkedHashSet<Term> getTerms() {
+        return terms;
     }
 
 

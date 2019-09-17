@@ -15,7 +15,6 @@ import de.uka.ilkd.key.logic.op.LogicVariable;
 import de.uka.ilkd.key.logic.op.QuantifiableVariable;
 import de.uka.ilkd.key.logic.op.Quantifier;
 import de.uka.ilkd.key.logic.sort.Sort;
-import de.uka.ilkd.key.proof.io.ProofSaver;
 
 public class FormulaFlattener {
 
@@ -52,7 +51,7 @@ public class FormulaFlattener {
         FormulaFlattener fqff = new FormulaFlattener(services,
                 term.boundVars());
 
-        System.out.println("Flatten: " + ProofSaver.printTerm(term, services));
+        //System.out.println("Flatten: " + ProofSaver.printTerm(term, services));
 
         FlattenResult fr = fqff.flatten(term.sub(0));
         if (!fr.isFlat())

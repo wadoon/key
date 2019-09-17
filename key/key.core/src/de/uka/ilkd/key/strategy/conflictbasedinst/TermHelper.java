@@ -1,5 +1,7 @@
 package de.uka.ilkd.key.strategy.conflictbasedinst;
 
+import org.key_project.util.collection.ImmutableArray;
+
 import de.uka.ilkd.key.logic.Name;
 import de.uka.ilkd.key.logic.Term;
 import de.uka.ilkd.key.logic.TermBuilder;
@@ -15,11 +17,11 @@ import de.uka.ilkd.key.logic.sort.Sort;
 class TermHelper {
 
     private static TermBuilder tb() {
-        return TermBuilderHolder.getInstance().getTermBuilder();
+        return CbiServices.getTermBuiler();
     }
 
     private static TermFactory tf() {
-        return null;
+        return CbiServices.getTermFactory();
     }
 
     public static Term negate(Term term) {
@@ -83,6 +85,26 @@ class TermHelper {
 
     public static boolean isExists(Term term) {
         return term.op() == Quantifier.EX;
+    }
+
+    public static boolean containsEqualityInScope(Term term) {
+        if(term.op() == Equality.EQUALS) return true;
+        if(term.op() instanceof Junctor || term.op() == Quantifier.ALL) {
+            for(Term sub : term.subs()) {
+                if(containsEqualityInScope(sub)) return true;
+            }
+        }
+        return false;
+    }
+
+    public static Term replaceAll(Term term, Term grnd, Term subst) {
+        if(subst.equals(term)) return grnd;
+        if(subst.subs().size() == 0) return subst;
+        Term[] subs = new Term[subst.subs().size()];
+        for(int i = 0; i < subst.subs().size(); i++) {
+            subs[i] = replaceAll(term, grnd, subst.subs().get(i));
+        }
+        return tf().createTerm(subst.op(), new ImmutableArray<Term>(subs), subst.boundVars(), subst.javaBlock(), subst.getLabels());
     }
 
 }
