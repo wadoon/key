@@ -10,10 +10,18 @@ public class Math {
     public static double toDegrees(double angrad) {
         return angrad * 180.0 / PI;
     }
-    public static double abs(double d) {
-        return (d <= 0) ? 0 - d : d;
+    public static double abs(double a) {
+        return (a <= 0.0D) ? 0.0D - a : a;
+    }
+    public static float abs(float a) {
+        return (a <= 0.0F) ? 0.0F - a : a;
     }
     public static double max(double a, double b) {
+        if (a != a)
+            return a;
+        return (a >= b) ? a : b;
+    }
+    public static float max(float a, float b) {
         if (a != a)
             return a;
         return (a >= b) ? a : b;
