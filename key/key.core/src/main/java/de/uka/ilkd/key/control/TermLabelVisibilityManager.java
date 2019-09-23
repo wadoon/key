@@ -32,7 +32,7 @@ public class TermLabelVisibilityManager implements VisibleTermLabels {
     /**
      * A switch to choose whether labels are to be shown or not.
      */
-    private boolean showLabels = true;
+    private boolean showLabels = false;
 
     /**
      * The names of all term labels that should not be printed, this contains
